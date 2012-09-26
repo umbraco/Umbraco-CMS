@@ -128,13 +128,13 @@ namespace Umbraco.Web
 			var umbracoPath = GlobalSettings.UmbracoMvcArea;
 
 			//we need to find the surface controllers and route them
-			var surfaceControllers = SurfaceControllerResolver.Current.SurfaceControllers.ToArray();
+			var surfaceControllers = SurfaceControllerResolver.Current.RegisteredSurfaceControllers.ToArray();
 
 			//local surface controllers do not contain the attribute 			
-			var localSurfaceControlleres = surfaceControllers.Where(x => x.GetType().GetCustomAttribute<PluginControllerAttribute>(false) == null);
+			var localSurfaceControlleres = surfaceControllers.Where(x => PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
 			foreach (var s in localSurfaceControlleres)
 			{
-				var meta = s.GetMetadata();
+				var meta = PluginController.GetMetadata(s);
 				var route = RouteTable.Routes.MapRoute(
 					string.Format("umbraco-{0}-{1}", "surface", meta.ControllerName),
 					umbracoPath + "/Surface/" + meta.ControllerName + "/{action}/{id}",//url to match
@@ -146,12 +146,13 @@ namespace Umbraco.Web
 			
 			//need to get the plugin controllers that are unique to each area (group by)
 			//TODO: One day when we have more plugin controllers, we will need to do a group by on ALL of them to pass into the ctor of PluginControllerArea
-			var groupedAreas = surfaceControllers.GroupBy(controller => controller.GetMetadata().AreaName);
+			var pluginSurfaceControlleres = surfaceControllers.Where(x => !PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
+			var groupedAreas = pluginSurfaceControlleres.GroupBy(controller => PluginController.GetMetadata(controller).AreaName);
 			//loop through each area defined amongst the controllers
 			foreach(var g in groupedAreas)
 			{
 				//create an area for the controllers (this will throw an exception if all controllers are not in the same area)
-				var pluginControllerArea = new PluginControllerArea(g);
+				var pluginControllerArea = new PluginControllerArea(g.Select(PluginController.GetMetadata));
 				//register it
 				RouteTable.Routes.RegisterArea(pluginControllerArea);
 			}

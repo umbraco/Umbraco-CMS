@@ -19,5 +19,13 @@ namespace Umbraco.Web.Mvc
 		{
 			get { return Values; }
 		}
+
+		/// <summary>
+		/// Gets all of the surface controller types
+		/// </summary>
+		public IEnumerable<Type> RegisteredSurfaceControllers
+		{
+			get { return InstanceTypes; }
+		}
 	}
 }

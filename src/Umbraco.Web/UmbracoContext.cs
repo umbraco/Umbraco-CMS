@@ -16,10 +16,6 @@ using Examine;
 
 namespace Umbraco.Web
 {
-	public interface IRequiresUmbracoContext
-	{
-		UmbracoContext UmbracoContext { get; set; }
-	}
 
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request

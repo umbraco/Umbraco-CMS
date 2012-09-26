@@ -25,6 +25,9 @@ namespace Umbraco.Web.Mvc
 
 			var routeDef = (RouteDefinition)context.RouteData.DataTokens["umbraco-route-def"];
 
+			//ensure the original template is reset
+			context.RouteData.Values["action"] = routeDef.ActionName;
+
 			//ensure ModelState is copied across
 			routeDef.Controller.ViewData.ModelState.Merge(context.Controller.ViewData.ModelState);
 

@@ -8,12 +8,13 @@ namespace Umbraco.Web.Mvc
 	/// <summary>
 	/// A base class for all plugin controllers to inherit from
 	/// </summary>
-	public abstract class PluginController : Controller, IRequiresUmbracoContext
+	public abstract class PluginController : Controller
 	{
 		/// <summary>
 		/// stores the metadata about plugin controllers
 		/// </summary>
-		private static readonly ConcurrentDictionary<Type, PluginControllerMetadata> Metadata = new ConcurrentDictionary<Type, PluginControllerMetadata>();
+		private static readonly ConcurrentDictionary<Type, PluginControllerMetadata> MetadataStorage = new ConcurrentDictionary<Type, PluginControllerMetadata>();
+
 
 		/// <summary>
 		/// Default constructor
@@ -21,8 +22,19 @@ namespace Umbraco.Web.Mvc
 		/// <param name="umbracoContext"></param>
 		protected PluginController(UmbracoContext umbracoContext)
 		{
+			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
 			UmbracoContext = umbracoContext;
 			InstanceId = Guid.NewGuid();
+		}
+
+		public IPublishedContentStore PublishedContentStore
+		{
+			get { return PublishedContentStoreResolver.Current.PublishedContentStore; }
+		}
+
+		public IPublishedMediaStore PublishedMediaStore
+		{
+			get { return PublishedMediaStoreResolver.Current.PublishedMediaStore; }
 		}
 
 		/// <summary>
@@ -30,30 +42,56 @@ namespace Umbraco.Web.Mvc
 		/// </summary>
 		internal Guid InstanceId { get; private set; }
 
-		public UmbracoContext UmbracoContext { get; set; }
+		/// <summary>
+		/// Returns the current UmbracoContext
+		/// </summary>
+		public UmbracoContext UmbracoContext { get; private set; }
+
+		/// <summary>
+		/// Returns the current ApplicationContext
+		/// </summary>
+		public ApplicationContext ApplicationContext
+		{
+			get { return UmbracoContext.Application; }
+		}
 
 		/// <summary>
 		/// Returns the metadata for this instance
 		/// </summary>
-		internal PluginControllerMetadata GetMetadata()
+		internal PluginControllerMetadata Metadata
 		{
+			get { return GetMetadata(this.GetType()); }
+		}
+
+		/// <summary>
+		/// Returns the metadata for a PluginController
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		internal static PluginControllerMetadata GetMetadata(Type type)
+		{
+			if (!TypeHelper.IsTypeAssignableFrom<PluginController>(type))
+			{
+				throw new InvalidOperationException("Cannot get metadata from a type that is not a PluginController");
+			}
+
 			PluginControllerMetadata meta;
-			if (Metadata.TryGetValue(this.GetType(), out meta))
+			if (MetadataStorage.TryGetValue(type, out meta))
 			{
 				return meta;
 			}
 
-			var attribute = this.GetType().GetCustomAttribute<PluginControllerAttribute>(false);
+			var attribute = type.GetCustomAttribute<PluginControllerAttribute>(false);
 
 			meta = new PluginControllerMetadata()
 			{
 				AreaName = attribute == null ? null : attribute.AreaName,
-				ControllerName = ControllerExtensions.GetControllerName(this.GetType()),
-				ControllerNamespace = this.GetType().Namespace,
-				ControllerType = this.GetType()
+				ControllerName = ControllerExtensions.GetControllerName(type),
+				ControllerNamespace = type.Namespace,
+				ControllerType = type
 			};
 
-			Metadata.TryAdd(this.GetType(), meta);
+			MetadataStorage.TryAdd(type, meta);
 
 			return meta;
 		}

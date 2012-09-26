@@ -5,7 +5,7 @@ namespace Umbraco.Web
 	/// <summary>
 	/// Defines the methods to access published content
 	/// </summary>
-	internal interface IPublishedContentStore : IPublishedStore
+	public interface IPublishedContentStore : IPublishedStore
 	{		
 		IDocument GetDocumentByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null);
 		IDocument GetDocumentByUrlAlias(UmbracoContext umbracoContext, int rootNodeId, string alias);

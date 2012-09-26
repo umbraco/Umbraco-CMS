@@ -90,21 +90,17 @@ namespace Umbraco.Web.Mvc
 			if (!decodedParts.Any(x => x.Key == "ar"))
 				return null;
 
-			//the surface id
-			if (decodedParts.Any(x => x.Key == "i"))
-			{
-				Guid id;
-				if (Guid.TryParse(decodedParts.Single(x => x.Key == "i").Value, out id))
-				{
-					return new PostedDataProxyInfo
-					{
-						ControllerName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "c").Value),
-						ActionName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "a").Value),
-						Area = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "ar").Value),
-						SurfaceId = id,
-					};
-				}
-			}
+			////the controller type, if it contains this then it is a plugin controller, not locally declared.
+			//if (decodedParts.Any(x => x.Key == "t"))
+			//{
+			//    return new PostedDataProxyInfo
+			//    {
+			//        ControllerName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "c").Value),
+			//        ActionName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "a").Value),
+			//        Area = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "ar").Value),
+			//        ControllerType = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "t").Value)
+			//    };				
+			//}
 
 			//return the proxy info without the surface id... could be a local controller.
 			return new PostedDataProxyInfo
@@ -122,10 +118,10 @@ namespace Umbraco.Web.Mvc
 		/// </summary>
 		/// <param name="requestContext"></param>
 		/// <param name="postedInfo"></param>
-		/// <param name="document"></param>
 		/// <param name="routeDefinition">The original route definition that would normally be used to route if it were not a POST</param>
-		private IHttpHandler HandlePostedValues(RequestContext requestContext, PostedDataProxyInfo postedInfo, IDocument document, RouteDefinition routeDefinition)
+		private IHttpHandler HandlePostedValues(RequestContext requestContext, PostedDataProxyInfo postedInfo, RouteDefinition routeDefinition)
 		{
+			var standardArea = Umbraco.Core.Configuration.GlobalSettings.UmbracoMvcArea;
 
 			//set the standard route values/tokens
 			requestContext.RouteData.Values["controller"] = postedInfo.ControllerName;
@@ -134,19 +130,21 @@ namespace Umbraco.Web.Mvc
 
 			IHttpHandler handler = new MvcHandler(requestContext);
 
-			//ensure the surface id is set if found, meaning it is a plugin, not locally declared
-			if (postedInfo.SurfaceId != default(Guid))
+			//ensure the controllerType is set if found, meaning it is a plugin, not locally declared
+			if (postedInfo.Area != standardArea)
 			{
-				requestContext.RouteData.Values["surfaceId"] = postedInfo.SurfaceId.ToString("N");
+				//requestContext.RouteData.Values["controllerType"] = postedInfo.ControllerType;
 				//find the other data tokens for this route and merge... things like Namespace will be included here
 				using (RouteTable.Routes.GetReadLock())
 				{
 					var surfaceRoute = RouteTable.Routes.OfType<Route>()
-						.Where(x => x.Defaults != null && x.Defaults.ContainsKey("surfaceId") &&
-							x.Defaults["surfaceId"].ToString() == postedInfo.SurfaceId.ToString("N"))
-						.SingleOrDefault();
+						.SingleOrDefault(x => x.Defaults != null &&
+						                      x.Defaults.ContainsKey("controller") &&
+						                      x.Defaults["controller"].ToString() == postedInfo.ControllerName &&
+						                      x.DataTokens.ContainsKey("area") &&
+						                      x.DataTokens["area"].ToString() == postedInfo.Area);
 					if (surfaceRoute == null)
-						throw new InvalidOperationException("Could not find a Surface controller route in the RouteTable for id " + postedInfo.SurfaceId);
+						throw new InvalidOperationException("Could not find a Surface controller route in the RouteTable for controller name " + postedInfo.ControllerName + " and within the area of " + postedInfo.Area);
 					//set the 'Namespaces' token so the controller factory knows where to look to construct it
 					if (surfaceRoute.DataTokens.ContainsKey("Namespaces"))
 					{
@@ -234,6 +232,13 @@ namespace Umbraco.Web.Mvc
 		internal IHttpHandler GetHandlerForRoute(RequestContext requestContext, DocumentRequest documentRequest)
 		{
 			var routeDef = GetUmbracoRouteDefinition(requestContext, documentRequest);
+
+			//Need to check for a special case if there is form data being posted back to an Umbraco URL
+			var postedInfo = GetPostedFormInfo(requestContext);
+			if (postedInfo != null)
+			{
+				return HandlePostedValues(requestContext, postedInfo, routeDef);
+			}
 
 			//here we need to check if there is no hijacked route and no template assigned, if this is the case
 			//we want to return a blank page, but we'll leave that up to the NoTemplateHandler.

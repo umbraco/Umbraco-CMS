@@ -57,7 +57,6 @@ namespace Umbraco.Web
 				new Dictionary<string, object>
 					{
 						{ "controller", controllerName },
-						{ "controllerType", controllerType.FullName },
 						{ "action", defaultAction },
 						{ "id", defaultId }    
 					});
@@ -66,8 +65,7 @@ namespace Umbraco.Web
 			controllerPluginRoute.Constraints = new RouteValueDictionary(
 				new Dictionary<string, object>
 					{
-						{ "controller", @"(\w+)" + controllerSuffixName },
-						{ "controllerType", controllerType.FullName }
+						{ "controller", @"(\w+)" + controllerSuffixName }
 					});
 			
 			

@@ -8,6 +8,5 @@ namespace Umbraco.Web.Mvc
 	internal class PostedDataProxyInfo : RouteDefinition
 	{
 		public string Area { get; set; }
-		public Guid SurfaceId { get; set; }
 	}
 }
