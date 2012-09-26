@@ -273,6 +273,7 @@
     <Compile Include="Mvc\HtmlTagWrapperTextNode.cs" />
     <Compile Include="Mvc\IHtmlTagWrapper.cs" />
     <Compile Include="Mvc\MergeModelStateToChildActionAttribute.cs" />
+    <Compile Include="Mvc\PluginController.cs" />
     <Compile Include="Mvc\PostedDataProxyInfo.cs" />
     <Compile Include="Mvc\RedirectToUmbracoPageResult.cs" />
     <Compile Include="Mvc\Strings.Designer.cs">
@@ -281,10 +282,10 @@
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
     <Compile Include="Mvc\SurfaceController.cs" />
-    <Compile Include="Mvc\SurfaceControllerArea.cs" />
-    <Compile Include="Mvc\SurfaceControllerAttribute.cs" />
+    <Compile Include="Mvc\PluginControllerArea.cs" />
+    <Compile Include="Mvc\PluginControllerAttribute.cs" />
     <Compile Include="Mvc\SurfaceControllerFactory.cs" />
-    <Compile Include="Mvc\SurfaceControllerMetadata.cs" />
+    <Compile Include="Mvc\PluginControllerMetadata.cs" />
     <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="PropertyEditors\RteMacroRenderingPropertyEditorValueConverter.cs" />
     <Compile Include="PublishedMediaStoreResolver.cs" />

@@ -6,12 +6,13 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.Mvc
 {
-	[SurfaceController("DD307F95-6D90-4593-8C97-093AC7C12573")]
+	[PluginController("MyTestSurfaceController")]
 	public class TestSurfaceController : SurfaceController
 	{
 		public ActionResult Index()
 		{
-			return Content("<html><body>hello</body></html>");
+			return View();
+			//return Content("<html><body>hello</body></html>");
 		}
 	}
 
@@ -19,37 +20,24 @@ namespace Umbraco.Web.Mvc
 	/// The base controller that all Presentation Add-in controllers should inherit from
 	/// </summary>
 	[MergeModelStateToChildAction]
-	public abstract class SurfaceController : Controller, IRequiresUmbracoContext
-	{
-		///// <summary>
-		///// stores the metadata about surface controllers
-		///// </summary>
-		//private static ConcurrentDictionary<Type, SurfaceControllerMetadata> _metadata = new ConcurrentDictionary<Type, SurfaceControllerMetadata>();
-
-		public UmbracoContext UmbracoContext { get; set; }
-
-		/// <summary>
-		/// Useful for debugging
-		/// </summary>
-		internal Guid InstanceId { get; private set; }
+	public abstract class SurfaceController : PluginController
+	{		
 
 		/// <summary>
 		/// Default constructor
 		/// </summary>
 		/// <param name="umbracoContext"></param>
 		protected SurfaceController(UmbracoContext umbracoContext)
-		{
-			UmbracoContext = umbracoContext;
-			InstanceId = Guid.NewGuid();
+			: base(umbracoContext)
+		{			
 		}
 
 		/// <summary>
 		/// Empty constructor, uses Singleton to resolve the UmbracoContext
 		/// </summary>
 		protected SurfaceController()
-		{
-			UmbracoContext = UmbracoContext.Current;
-			InstanceId = Guid.NewGuid();
+			: base(UmbracoContext.Current)
+		{			
 		}
 
 		/// <summary>
@@ -105,20 +93,6 @@ namespace Umbraco.Web.Mvc
 			}
 		}
 
-		/// <summary>
-		/// Returns the metadata for this instance
-		/// </summary>
-		internal SurfaceControllerMetadata GetMetadata()
-		{
-			var controllerId = this.GetType().GetCustomAttribute<SurfaceControllerAttribute>(false);
-
-			return new SurfaceControllerMetadata()
-				{
-					ControllerId = controllerId == null ? null : (Guid?) controllerId.Id,
-					ControllerName = ControllerExtensions.GetControllerName(this.GetType()),
-					ControllerNamespace = this.GetType().Namespace,
-					ControllerType = this.GetType()
-				};
-		}
+		
 	}
 }

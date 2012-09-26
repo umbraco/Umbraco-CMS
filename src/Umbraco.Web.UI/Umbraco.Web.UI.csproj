@@ -172,6 +172,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\WebPages\System.Web.Helpers.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\WebPages\System.Web.Razor.dll</HintPath>
@@ -1663,6 +1664,7 @@
     <None Include="umbraco_client\CodeMirror\js\mode\r\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\xquery\LICENSE" />
     <Content Include="Views\web.config" />
+    <Content Include="Views\TestSurface\Index.cshtml" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>

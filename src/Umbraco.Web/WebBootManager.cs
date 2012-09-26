@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
@@ -124,12 +125,42 @@ namespace Umbraco.Web
 				);
 			defaultRoute.RouteHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory());
 
-			//now we need to find the surface controllers and route them too
-			var surfaceControllers = SurfaceControllerResolver.Current.SurfaceControllers;
-			//create a custom area for them
-			var surfaceControllerArea = new SurfaceControllerArea(surfaceControllers);
-			//register it
-			RouteTable.Routes.RegisterArea(surfaceControllerArea);
+			var umbracoPath = GlobalSettings.UmbracoMvcArea;
+
+			//we need to find the surface controllers and route them
+			var surfaceControllers = SurfaceControllerResolver.Current.SurfaceControllers.ToArray();
+
+			//local surface controllers do not contain the attribute 			
+			var localSurfaceControlleres = surfaceControllers.Where(x => x.GetType().GetCustomAttribute<PluginControllerAttribute>(false) == null);
+			foreach (var s in localSurfaceControlleres)
+			{
+				var meta = s.GetMetadata();
+				var route = RouteTable.Routes.MapRoute(
+					string.Format("umbraco-{0}-{1}", "surface", meta.ControllerName),
+					umbracoPath + "/Surface/" + meta.ControllerName + "/{action}/{id}",//url to match
+					new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
+					new[] { meta.ControllerNamespace }); //only match this namespace
+				route.DataTokens.Add("area", umbracoPath); //only match this area
+				route.DataTokens.Add("umbraco", "surface"); //ensure the umbraco token is set
+			}
+			
+			//need to get the plugin controllers that are unique to each area (group by)
+			//TODO: One day when we have more plugin controllers, we will need to do a group by on ALL of them to pass into the ctor of PluginControllerArea
+			var groupedAreas = surfaceControllers.GroupBy(controller => controller.GetMetadata().AreaName);
+			//loop through each area defined amongst the controllers
+			foreach(var g in groupedAreas)
+			{
+				//create an area for the controllers (this will throw an exception if all controllers are not in the same area)
+				var pluginControllerArea = new PluginControllerArea(g);
+				//register it
+				RouteTable.Routes.RegisterArea(pluginControllerArea);
+			}
+
+			RouteTable.Routes.MapRoute(
+				"Account",
+				"account/{action}/{id}",
+				new { controller = "Account", action = "Index", id = UrlParameter.Optional }
+				);
 		}
 
 		
