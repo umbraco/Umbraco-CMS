@@ -156,12 +156,6 @@ namespace Umbraco.Web
 				//register it
 				RouteTable.Routes.RegisterArea(pluginControllerArea);
 			}
-
-			RouteTable.Routes.MapRoute(
-				"Account",
-				"account/{action}/{id}",
-				new { controller = "Account", action = "Index", id = UrlParameter.Optional }
-				);
 		}
 
 		
