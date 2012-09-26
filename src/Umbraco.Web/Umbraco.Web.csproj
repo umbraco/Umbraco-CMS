@@ -259,6 +259,7 @@
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IPublishedStore.cs" />
     <Compile Include="IPublishedMediaStore.cs" />
+    <Compile Include="LegacyScheduledTasks.cs" />
     <Compile Include="Media\EmbedProviders\AbstractOEmbedProvider.cs" />
     <Compile Include="Media\EmbedProviders\AbstractProvider.cs" />
     <Compile Include="Media\EmbedProviders\Flickr.cs" />
