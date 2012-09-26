@@ -1663,7 +1663,7 @@
     <None Include="umbraco_client\CodeMirror\js\mode\ruby\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\r\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\xquery\LICENSE" />
-    <Content Include="Views\web.config" />
+    <Content Include="Views\Web.config" />
     <Content Include="Views\TestSurface\Index.cshtml" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
