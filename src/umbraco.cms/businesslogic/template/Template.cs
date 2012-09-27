@@ -132,29 +132,17 @@ namespace umbraco.cms.businesslogic.template
                 _mastertemplate = dr.IsNull("master") ? 0 : dr.GetInt("master");
             }
             dr.Close();
+            
+            if (UmbracoSettings.EnableMvcSupport && Template.HasView(this))
+                _design = ViewHelper.GetViewFile(this);
+            else
+                _design = MasterpageHelper.GetMasterpageFile(this);
 
-            // test for masterpages
-            if (UmbracoSettings.UseAspNetMasterPages)
-            {
-                _design = getMasterPageContent();
-            }
         }
 
         private bool isMasterPageSyntax(string code)
         {
             return code.Contains("<%@ Master") || code.Contains("<umbraco:Item") || code.Contains("<asp:") || code.Contains("<umbraco:Macro");
-        }
-
-        private string getMasterPageContent()
-        {
-            string masterpageContent = "";
-            if (!File.Exists(MasterPageFile))
-                SaveAsMasterPage();
-
-            System.IO.TextReader tr = new StreamReader(MasterPageFile);
-            masterpageContent = tr.ReadToEnd();
-            tr.Close();
-            return masterpageContent;
         }
 
         public new string Path
@@ -257,24 +245,23 @@ namespace umbraco.cms.businesslogic.template
             set
             {
                 FlushCache();
+
                 _design = value.Trim(Environment.NewLine.ToCharArray());
                 // NH: Removing an generating the directive can mess up code behind
                 // We don't store the masterpage directive in the design value
                 //                if (_design.StartsWith("<%@"))
                 //                    _design = _design.Substring(_design.IndexOf("%>") + 3).Trim(Environment.NewLine.ToCharArray());
 
-                if (UmbracoSettings.UseAspNetMasterPages && isMasterPageSyntax(_design))
-                {
-                    SaveMasterPageFile(_design);
 
-                    SqlHelper.ExecuteNonQuery("Update cmsTemplate set design = @design where NodeId = @id",
-                        SqlHelper.CreateParameter("@design", value),
-                        SqlHelper.CreateParameter("@id", Id));
+                //we only switch to MVC View editing if the template has a view file, and MVC editing is enabled
+                if (UmbracoSettings.EnableMvcSupport && !isMasterPageSyntax(_design))
+                    _design = ViewHelper.UpdateViewFile(this);
+                else if (UmbracoSettings.UseAspNetMasterPages)
+                    _design = MasterpageHelper.UpdateMasterpageFile(this, _oldAlias);
+                
 
-                }
-                else
-                    SqlHelper.ExecuteNonQuery("Update cmsTemplate set design = @design where NodeId = @id",
-                        SqlHelper.CreateParameter("@design", value),
+                SqlHelper.ExecuteNonQuery("Update cmsTemplate set design = @design where NodeId = @id",
+                        SqlHelper.CreateParameter("@design", _design),
                         SqlHelper.CreateParameter("@id", Id));
             }
         }
@@ -331,11 +318,17 @@ namespace umbraco.cms.businesslogic.template
 
         public static Template MakeNew(string Name, BusinessLogic.User u, Template master)
         {
-
             Template t = MakeNew(Name, u);
             t.MasterTemplate = master.Id;
-            t.Design = "";
 
+            if (UmbracoSettings.EnableMvcSupport)
+                ViewHelper.CreateViewFile(t, true);
+            else
+                MasterpageHelper.CreateMasterpageFile(t, true);
+            
+            
+
+            /*
             if (UmbracoSettings.UseAspNetMasterPages)
             {
                 string design = t.getMasterPageHeader() + "\n";
@@ -346,7 +339,7 @@ namespace umbraco.cms.businesslogic.template
                 }
 
                 t.Design = design;
-            }
+            }*/
 
             t.Save();
             return t;
@@ -367,6 +360,8 @@ namespace umbraco.cms.businesslogic.template
             if (name.Length > 100)
                 name = name.Substring(0, 95) + "...";
 
+          
+
 
             SqlHelper.ExecuteNonQuery("INSERT INTO cmsTemplate (NodeId, Alias, design, master) VALUES (@nodeId, @alias, @design, @master)",
                                       SqlHelper.CreateParameter("@nodeId", n.Id),
@@ -377,6 +372,12 @@ namespace umbraco.cms.businesslogic.template
             Template t = new Template(n.Id);
             NewEventArgs e = new NewEventArgs();
             t.OnNew(e);
+
+            if (UmbracoSettings.EnableMvcSupport)
+                t._design = ViewHelper.CreateViewFile(t);
+            else
+                t._design = MasterpageHelper.CreateMasterpageFile(t);
+
 
             return t;
         }
@@ -504,13 +505,17 @@ namespace umbraco.cms.businesslogic.template
                 if (System.IO.File.Exists(MasterPageFile))
                     System.IO.File.Delete(MasterPageFile);
 
+                if (System.IO.File.Exists(Umbraco.Core.IO.IOHelper.MapPath(ViewHelper.ViewPath(this))))
+                    System.IO.File.Delete(Umbraco.Core.IO.IOHelper.MapPath(ViewHelper.ViewPath(this)));
+
                 FireAfterDelete(e);
             }
         }
 
-        public void SaveAsMasterPage()
+        [Obsolete("This method, doesnt actually do anything, as the file is created when the design is set", false)]
+        public void _SaveAsMasterPage()
         {
-            SaveMasterPageFile(ConvertToMasterPageSyntax(Design));
+            //SaveMasterPageFile(ConvertToMasterPageSyntax(Design));
         }
 
         public string GetMasterContentElement(int masterTemplateId)
@@ -526,7 +531,6 @@ namespace umbraco.cms.businesslogic.template
                 return
                     String.Format("<asp:Content ContentPlaceHolderID=\"ContentPlaceHolderDefault\" runat=\"server\">",
                     Alias.Replace(" ", ""));
-
         }
 
         public List<string> contentPlaceholderIds()
@@ -591,8 +595,13 @@ namespace umbraco.cms.businesslogic.template
             return masterPageContent;
         }
 
+
+
         public void ImportDesign(string design)
         {
+            Design = design; 
+
+            /*
             if (!isMasterPageSyntax(design))
             {
                 Design = ConvertToMasterPageSyntax(design);
@@ -600,26 +609,17 @@ namespace umbraco.cms.businesslogic.template
             else
             {
                 Design = design;
-            }
+            }*/
 
-        }
-
-        private string getMasterPageHeader()
-        {
-            return String.Format("<%@ Master Language=\"C#\" MasterPageFile=\"{0}\" AutoEventWireup=\"true\" %>",
-                currentMasterTemplateFileName()) + Environment.NewLine;
-        }
-
-        private string currentMasterTemplateFileName()
-        {
-            if (MasterTemplate != 0)
-                return SystemDirectories.Masterpages + "/" + new Template(MasterTemplate).Alias.Replace(" ", "") + ".master";
-            else
-                return UmbracoMasterTemplate;
         }
 
         public void SaveMasterPageFile(string masterPageContent)
         {
+            //this will trigger the helper and store everything
+            this.Design = masterPageContent;
+
+            /*
+
             // Add header to master page if it doesn't exist
             if (!masterPageContent.StartsWith("<%@"))
             {
@@ -681,6 +681,21 @@ namespace umbraco.cms.businesslogic.template
             // save the file in UTF-8
 
             File.WriteAllText(MasterPageFile, masterPageContent, System.Text.Encoding.UTF8);
+             * */
+        }
+
+        private string getMasterPageHeader()
+        {
+            return String.Format("<%@ Master Language=\"C#\" MasterPageFile=\"{0}\" AutoEventWireup=\"true\" %>",
+                currentMasterTemplateFileName()) + Environment.NewLine;
+        }
+
+        private string currentMasterTemplateFileName()
+        {
+            if (MasterTemplate != 0)
+                return SystemDirectories.Masterpages + "/" + new Template(MasterTemplate).Alias.Replace(" ", "") + ".master";
+            else
+                return UmbracoMasterTemplate;
         }
 
         private void getAspNetMasterPageForm(ref string design)
@@ -802,11 +817,17 @@ namespace umbraco.cms.businesslogic.template
             }
 
             t.Alias = alias;
-
             t.ImportDesign(xmlHelper.GetNodeValue(n.SelectSingleNode("Design")));
 
             return t;
         }
+
+        public static bool HasView(Template t)
+        {
+            var path = Umbraco.Core.IO.SystemDirectories.MvcViews + "/" + t.Alias.Replace(" ", "") + ".cshtml";
+            return System.IO.File.Exists(Umbraco.Core.IO.IOHelper.MapPath(path));
+        }
+
 
         #region Events
         //EVENTS
