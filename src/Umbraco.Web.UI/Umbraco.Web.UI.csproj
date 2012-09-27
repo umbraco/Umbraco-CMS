@@ -2198,7 +2198,6 @@
     <Folder Include="umbraco_client\FolderBrowser\Images\" />
     <Folder Include="umbraco_client\tags\images\" />
     <Folder Include="usercontrols\" />
-    <Folder Include="Views\TestSurface\" />
     <Folder Include="xslt\" />
   </ItemGroup>
   <PropertyGroup>
