@@ -72,18 +72,21 @@ namespace Umbraco.Web.BaseRest
 		{
 			return GetFromConfiguration(extensionAlias, methodName)
 				?? GetFromAttribute(extensionAlias, methodName)
-				?? GetFromLegacyAttribute(extensionAlias, methodName)
+				?? GetFromLegacyConfiguration(extensionAlias, methodName) // that one should be obsoleted at some point
+				?? GetFromLegacyAttribute(extensionAlias, methodName) // that one should be obsoleted at some point
 				?? MissingMethod;
 		}
 
 		// gets a RestExtensionMethodInfo matching extensionAlias and methodName
-		// by looking at the configuration file
+		// by looking at the legacy configuration file
 		// returns null if not found
 		//
-		static RestExtensionMethodInfo GetFromConfiguration(string extensionAlias, string methodName)
+		static RestExtensionMethodInfo GetFromLegacyConfiguration(string extensionAlias, string methodName)
 		{
 			const string ExtensionXPath = "/RestExtensions/ext [@alias='{0}']";
 			const string MethodXPath = "./permission [@method='{0}']";
+
+			var config = (Configuration.BaseRestSection)System.Configuration.ConfigurationManager.GetSection("BaseRestExtensions");
 
 			// fixme - at the moment we reload the config file each time
 			//   we have to support live edits of the config file for backward compatibility reason
@@ -102,13 +105,7 @@ namespace Umbraco.Web.BaseRest
 			if (mNode == null)
 				return null; // does not exist
 
-			// fixme - legacy loaded assemblies in the /bin folder using LoadFrom
-			//   which means that it is not possible to load App_Code
-			//   plus there is no point?
-
 			string assemblyName = eNode.Attributes["assembly"].Value;
-			//string assemblyPath = IOHelper.MapPath(string.Format("{0}/{1}.dll", SystemDirectories.Bin, assemblyName.TrimStart('/')));
-			//var assembly = Assembly.LoadFrom(assemblyPath);
 			var assembly = Assembly.Load(assemblyName);
 
 			string typeName = eNode.Attributes["type"].Value;
@@ -125,6 +122,49 @@ namespace Umbraco.Web.BaseRest
 			var info = new RestExtensionMethodInfo(allowAll != null && allowAll.ToLower() == "true",
 				GetAttribute(mNode, "allowGroup"), GetAttribute(mNode, "allowType"), GetAttribute(mNode, "allowMember"),
 				returnXml == null || returnXml.ToLower() != "false",
+				method);
+
+			return info;
+		}
+
+		// gets a RestExtensionMethodInfo matching extensionAlias and methodName
+		// by looking at the configuration file
+		// returns null if not found
+		//
+		static RestExtensionMethodInfo GetFromConfiguration(string extensionAlias, string methodName)
+		{
+			var config = (Configuration.BaseRestSection)System.Configuration.ConfigurationManager.GetSection("BaseRestExtensions");
+
+			Configuration.ExtensionElement configExtension = config.Items[extensionAlias];
+			if (configExtension == null)
+				return null; // does not exist
+
+			Configuration.MethodElement configMethod = configExtension[methodName];
+			if (configMethod == null)
+				return null; // does not exist
+
+			MethodInfo method;
+			try
+			{
+				var parts = configExtension.Type.Split(',');
+				if (parts.Length > 2)
+					throw new Exception(string.Format("Failed to load extension '{0}', invalid type."));
+
+				var assembly = parts.Length == 1 ? Assembly.GetExecutingAssembly() : Assembly.Load(parts[1]);
+				var type = assembly.GetType(parts[0]);
+				method = type.GetMethod(methodName);
+			}
+			catch (Exception e)
+			{
+				throw new Exception(string.Format("Failed to load extension '{0}', see inner exception.", configExtension.Type), e);
+			}
+
+			if (method == null)
+				return null; // does not exist
+
+			var info = new RestExtensionMethodInfo(configMethod.AllowAll,
+				configMethod.AllowGroup, configMethod.AllowType, configMethod.AllowMember,
+				configMethod.ReturnXml,
 				method);
 
 			return info;
@@ -281,90 +321,76 @@ namespace Umbraco.Web.BaseRest
 					// ensure that method is static public
 					return "<error>Method has to be public and static</error>";
 				}
+
+				// ensure we have the right number of parameters
+				if (_method.GetParameters().Length != parameters.Length)
+				{
+					return "<error>Not Enough parameters in url</error>";
+				}
+
+				// invoke
+
+				object response;
+
+				if (_method.GetParameters().Length == 0)
+				{
+					response = _method.Invoke(null, null); // invoke with null as parameters as there are none
+				}
 				else
 				{
-					// ensure we have the right number of parameters
-					if (_method.GetParameters().Length != parameters.Length)
+					object[] methodParams = new object[parameters.Length];
+
+					int i = 0;
+
+					foreach (ParameterInfo pInfo in _method.GetParameters())
 					{
-						return "<error>Not Enough parameters in url</error>";
+						Type myType = Type.GetType(pInfo.ParameterType.ToString());
+						methodParams[(i)] = Convert.ChangeType(parameters[i], myType);
+						i++;
 					}
-					else
+
+					response = _method.Invoke(null, methodParams);
+				}
+
+				// this is legacy and could probably be improved
+				if (response != null)
+				{
+					switch (_method.ReturnType.ToString())
 					{
-						// invoke
+						case "System.Xml.XPath.XPathNodeIterator":
+							return ((System.Xml.XPath.XPathNodeIterator)response).Current.OuterXml;
+						case "System.Xml.Linq.XDocument":
+							return response.ToString();
+						case "System.Xml.XmlDocument":
+							XmlDocument xmlDoc = (XmlDocument)response;
+							StringWriter sw = new StringWriter();
+							XmlTextWriter xw = new XmlTextWriter(sw);
+							xmlDoc.WriteTo(xw);
+							return sw.ToString();
+						default:
+							string strResponse = (string)response.ToString();
 
-						// fixme - what is the point?
-						//Create an instance of the type we need to invoke the method from.
-						//**Object obj = Activator.CreateInstance(myExtension.type);
-
-						object response;
-
-						if (_method.GetParameters().Length == 0)
-						{
-							//response = myMethod.method.Invoke(obj, BindingFlags.Public | BindingFlags.Instance, bBinder, null, System.Globalization.CultureInfo.CurrentCulture);
-							response = _method.Invoke(null /*obj*/, null); // invoke with null as parameters as there are none
-						}
-
-						else
-						{
-							object[] methodParams = new object[parameters.Length];
-
-							int i = 0;
-
-							foreach (ParameterInfo pInfo in _method.GetParameters())
-							{
-								Type myType = Type.GetType(pInfo.ParameterType.ToString());
-								methodParams[(i)] = Convert.ChangeType(parameters[i], myType);
-								i++;
-							}
-
-							//Invoke with methodParams
-							//response = myMethod.method.Invoke(obj, BindingFlags.Public | BindingFlags.Instance, bBinder, methodParams, System.Globalization.CultureInfo.CurrentCulture);
-							response = _method.Invoke(/*obj*/null, methodParams);
-						}
-
-						/*TODO - SOMETHING ALITTLE BETTER THEN ONLY CHECK FOR XPATHNODEITERATOR OR ELSE do ToString() */
-						if (response != null)
-						{
-							switch (_method.ReturnType.ToString())
-							{
-								case "System.Xml.XPath.XPathNodeIterator":
-									return ((System.Xml.XPath.XPathNodeIterator)response).Current.OuterXml;
-								case "System.Xml.Linq.XDocument":
-									return response.ToString();
-								case "System.Xml.XmlDocument":
-									XmlDocument xmlDoc = (XmlDocument)response;
-									StringWriter sw = new StringWriter();
-									XmlTextWriter xw = new XmlTextWriter(sw);
-									xmlDoc.WriteTo(xw);
-									return sw.ToString();
-								default:
-									string strResponse = ((string)response.ToString());
-
-									if (this.ReturnXml)
-									{
-										// do a quick "is this html?" check... if it is add CDATA... 
-										if (strResponse.Contains("<") || strResponse.Contains(">"))
-											strResponse = "<![CDATA[" + strResponse + "]]>";
-										return "<value>" + strResponse + "</value>";
-									}
-									else
-									{
-										//HttpContext.Current.Response.ContentType = "text/html";
-										return strResponse;
-									}
-							}
-						}
-						else
-						{
 							if (this.ReturnXml)
-								return "<error>Null value returned</error>";
+							{
+								// do a quick "is this html?" check... if it is add CDATA... 
+								if (strResponse.Contains("<") || strResponse.Contains(">"))
+									strResponse = "<![CDATA[" + strResponse + "]]>";
+								return "<value>" + strResponse + "</value>";
+							}
 							else
-								return string.Empty;
-						}
+							{
+								return strResponse;
+							}
 					}
 				}
+				else
+				{
+					if (this.ReturnXml)
+						return "<error>Null value returned</error>";
+					else
+						return string.Empty;
+				}
 			}
-
 			catch (Exception ex)
 			{
 				//Overall exception handling... 

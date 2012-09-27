@@ -12,7 +12,7 @@ using umbraco.cms.businesslogic.property;
 
 namespace Umbraco.Web.BaseRest
 {
-	public class MemberRest
+	public static class MemberRest
 	{
 		public static int GetCurrentMemberId()
 		{
@@ -46,12 +46,6 @@ namespace Umbraco.Web.BaseRest
 			}
 		}
 
-		[Obsolete("Use Login(login, password).", false)]
-		public static int login(string loginname, string password)
-		{
-			return Login(loginname, password);
-		}
-
 		public static int Logout()
 		{
 			var currentId = GetCurrentMemberId();
@@ -67,19 +61,7 @@ namespace Umbraco.Web.BaseRest
 			}
 		}
 
-		[Obsolete("Use Logout().", false)]
-		public static int logout(int NodeId)
-		{
-			return Logout();
-		}
-
-		[Obsolete("Use Logout().", false)]
-		public static int logout()
-		{
-			return Logout();
-		}
-
-		public static XPathNodeIterator Data()
+		public static XPathNodeIterator GetCurrentMemberAsXml()
 		{
 			var m = GetCurrentMember();
 			if (m != null)
@@ -93,18 +75,6 @@ namespace Umbraco.Web.BaseRest
 			{
 				return null;
 			}
-		}
-
-		[Obsolete("Use Data().", false)]
-		public static XPathNodeIterator data()
-		{
-			return Data();
-		}
-
-		[Obsolete("Use GetCurrentMemberId().", false)]
-		public static int id()
-		{
-			return GetCurrentMemberId();
 		}
 
 		public static string SetProperty(string alias, object value)
@@ -149,12 +119,6 @@ namespace Umbraco.Web.BaseRest
 			}
 
 			return ret;
-		}
-
-		[Obsolete("Use SetProperty(alias, value).", false)]
-		public static string setProperty(string alias, object value)
-		{
-			return SetProperty(alias, value);
 		}
 	}
 }

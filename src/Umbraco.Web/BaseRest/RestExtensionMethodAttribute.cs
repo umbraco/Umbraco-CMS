@@ -6,7 +6,7 @@ using System.Text;
 namespace Umbraco.Web.BaseRest
 {
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-	public class RestExtensionMethodAttribute : Attribute
+	public sealed class RestExtensionMethodAttribute : Attribute
 	{
 		public bool AllowAll { get; set; }
 		public string AllowGroup { get; set; }

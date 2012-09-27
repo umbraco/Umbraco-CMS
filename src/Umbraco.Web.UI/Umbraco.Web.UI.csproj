@@ -268,6 +268,12 @@
       <DependentUpon>ClientDependency.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
+    <Content Include="config\BaseRestExtensions.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="config\BaseRestExtensions.Release.config">
+      <DependentUpon>BaseRestExtensions.config</DependentUpon>
+    </Content>
     <None Include="config\log4net.Release.config">
       <DependentUpon>log4net.config</DependentUpon>
     </None>
@@ -2091,7 +2097,9 @@
     <Content Include="config\404handlers.config" />
     <Content Include="config\Dashboard.config" />
     <Content Include="config\metablogConfig.config" />
-    <Content Include="config\restExtensions.config" />
+    <Content Include="config\restExtensions.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="config\tinyMceConfig.config" />
     <Content Include="config\umbracoSettings.config" />
     <Content Include="config\xsltExtensions.config" />

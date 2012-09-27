@@ -6,7 +6,7 @@ using System.Text;
 namespace Umbraco.Web.BaseRest
 {
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-	public class RestExtensionAttribute : Attribute
+	public sealed class RestExtensionAttribute : Attribute
 	{
 		public string Alias { get; private set; }
 
