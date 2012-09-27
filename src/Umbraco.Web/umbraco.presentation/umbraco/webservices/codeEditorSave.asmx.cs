@@ -402,7 +402,7 @@ namespace umbraco.presentation.webservices
             }
             return "false";
         }
-
+        
         [WebMethod]
         public string SaveTemplate(string templateName, string templateAlias, string templateContents, int templateID, int masterTemplateID)
         {
@@ -417,6 +417,7 @@ namespace umbraco.presentation.webservices
                     _template.Alias = templateAlias;
                     _template.MasterTemplate = masterTemplateID;
                     _template.Design = templateContents;
+
                     _template.Save();
 
                     retVal = "true";

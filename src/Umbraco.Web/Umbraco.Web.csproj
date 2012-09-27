@@ -309,6 +309,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProviderAccessUpdate.cs" />
+    <Compile Include="umbraco.presentation\umbraco\settings\views\editView.aspx.cs">
+      <DependentUpon>editView.aspx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\uQuery\IGetProperty.cs" />
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="ViewContextExtensions.cs" />
@@ -1911,6 +1914,7 @@
     <Content Include="umbraco.presentation\umbraco\channels\rsd.aspx" />
     <Content Include="umbraco.presentation\umbraco\channels\wlwmanifest.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\mediaPicker.aspx" />
+    <Content Include="umbraco.presentation\umbraco\settings\views\editView.aspx" />
     <Content Include="umbraco.presentation\umbraco\webservices\MacroContainerService.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\empty.htm" />

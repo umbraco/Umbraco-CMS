@@ -44,15 +44,20 @@ namespace umbraco
         {
             int masterId = ParentID;
             BusinessLogic.Log.Add(LogTypes.Debug, -1, "tp id:" + masterId.ToString());
+
+            var editor = "settings/editTemplate.aspx";
+            if(UmbracoSettings.EnableMvcSupport)
+                editor = "settings/views/editView.aspx";
+
             if (masterId > 0)
             {
                 int id = cms.businesslogic.template.Template.MakeNew(Alias, BusinessLogic.User.GetUser(_userID), new cms.businesslogic.template.Template(masterId)).Id;
-                m_returnUrl = string.Format("settings/editTemplate.aspx?templateID={0}", id);
+                m_returnUrl = string.Format("{1}?templateID={0}", id, editor);
             }
             else
             {
                 int id = cms.businesslogic.template.Template.MakeNew(Alias, BusinessLogic.User.GetUser(_userID)).Id;
-                m_returnUrl = string.Format("settings/editTemplate.aspx?templateID={0}", id);
+                m_returnUrl = string.Format("{1}?templateID={0}", id, editor);
 
             }
             return true;
