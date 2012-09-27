@@ -1141,6 +1141,71 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
+        /// Enables MVC, and at the same time disable webform masterpage templates.
+        /// This ensure views are automaticly created instead of masterpages.
+        /// Views are display in the tree instead of masterpages and a MVC template editor
+        /// is used instead of the masterpages editor
+        /// </summary>
+        /// <value><c>true</c> if umbraco defaults to using MVC views for templating, otherwise <c>false</c>.</value>
+
+        private static bool? _enableMvc;
+        public static bool EnableMvcSupport
+        {
+            get
+            {
+                if (_enableMvc == null)
+                {
+                    try
+                    {
+                         bool enableMvc = false;
+                         string value = GetKey("/settings/templates/enableMvcSupport");
+                         if (value != null)
+                            if (bool.TryParse(value, out enableMvc))
+                                _enableMvc = enableMvc;
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine("Could not load /settings/templates/enableMvcSupport from umbracosettings.config:\r\n {0}",
+                                ex.Message);
+
+                        _enableMvc = false;
+                    }
+                }
+                return _enableMvc == true;
+            }
+        }
+
+        private static string[] _mvcViewExtensions;
+        public static string[] MvcViewExtensions
+        {
+            get
+            {
+                string[] defaultValue = "cshtml".Split(',');
+
+                if (_mvcViewExtensions == null)
+                {
+                    try
+                    {   
+                        string value = GetKey("/settings/templates/mvcViewExtensions");
+                        if (!string.IsNullOrEmpty(value))
+                            _mvcViewExtensions = value.Split(',');
+                        else
+                            _mvcViewExtensions = defaultValue;
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine("Could not load /settings/templates/mvcViewExtensions from umbracosettings.config:\r\n {0}",
+                                ex.Message);
+
+                        _mvcViewExtensions = defaultValue;
+                    }
+                }
+
+                return _mvcViewExtensions;
+            }
+        }
+
+        /// <summary>
         /// Configuration regarding webservices
         /// </summary>
         /// <remarks>Put in seperate class for more logik/seperation</remarks>
