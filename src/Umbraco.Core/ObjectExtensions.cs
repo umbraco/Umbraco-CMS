@@ -121,7 +121,15 @@ namespace Umbraco.Core
 			{
 				if (outputConverter.CanConvertFrom(input.GetType()))
 				{
-					return new Attempt<object>(true, outputConverter.ConvertFrom(input));
+					try
+					{
+						var converted = outputConverter.ConvertFrom(input);
+						return new Attempt<object>(true, converted);
+					}
+					catch (Exception e)
+					{
+						return new Attempt<object>(e);
+					}
 				}
 			}
 

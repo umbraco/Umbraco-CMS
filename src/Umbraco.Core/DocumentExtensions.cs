@@ -27,7 +27,7 @@ namespace Umbraco.Core
 			var p = prop.GetProperty(alias);
 			if (p == null)
 				return default(T);
-			var converted = p.TryConvertTo<T>();
+			var converted = p.Value.TryConvertTo<T>();
 			if (converted.Success)
 				return converted.Result;
 			return ifCannotConvert;
