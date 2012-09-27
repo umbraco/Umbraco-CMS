@@ -350,6 +350,7 @@
     <Content Include="umbraco\images\thumbs_lrg.png" />
     <Content Include="umbraco\images\thumbs_med.png" />
     <Content Include="umbraco\images\thumbs_smll.png" />
+    <Content Include="umbraco\images\umbraco\settingView.gif" />
     <Content Include="umbraco\plugins\uGoLive\cog.png" />
     <Content Include="umbraco\plugins\uGoLive\cross.png" />
     <Content Include="umbraco\plugins\uGoLive\Dashboard.ascx" />

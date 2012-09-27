@@ -303,6 +303,7 @@
       <delete assembly="umbraco" type="ScriptTasks" />
     </tasks>
   </nodeType>
+    
   <nodeType alias="initpackager">
     <header>Package</header>
     <usercontrol>/create/simple.ascx</usercontrol>

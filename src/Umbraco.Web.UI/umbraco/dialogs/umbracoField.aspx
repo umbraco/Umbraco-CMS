@@ -9,7 +9,8 @@
         {
             margin-top: 0px !important;
             padding-top: 0px !important;</style>
-    <script type="text/javascript">
+        
+        <script type="text/javascript">
 		function doSubmit()
 		{
 		
@@ -62,11 +63,10 @@
 			
 			  tagString += " runat=\"server\" />";
 			
-			UmbClientMgr.contentFrame().focus();
 
-		    UmbClientMgr.contentFrame().UmbEditor.Insert(tagString, '', '<%=umbraco.helper.Request("objectId")%>');
-		  	
-		  UmbClientMgr.closeModalWindow();
+			UmbClientMgr.contentFrame().focus();
+            UmbClientMgr.contentFrame().UmbEditor.Insert(tagString, '', '<%=umbraco.helper.Request("objectId")%>');
+		  	UmbClientMgr.closeModalWindow();
 		}
 		
 	var functionsFrame = this;
