@@ -25,22 +25,18 @@ namespace Umbraco.Web.Mvc
 			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
 			UmbracoContext = umbracoContext;
 			InstanceId = Guid.NewGuid();
-		}
-
-		public IPublishedContentStore PublishedContentStore
-		{
-			get { return PublishedContentStoreResolver.Current.PublishedContentStore; }
-		}
-
-		public IPublishedMediaStore PublishedMediaStore
-		{
-			get { return PublishedMediaStoreResolver.Current.PublishedMediaStore; }
+			Umbraco = new UmbracoHelper(umbracoContext);
 		}
 
 		/// <summary>
 		/// Useful for debugging
 		/// </summary>
 		internal Guid InstanceId { get; private set; }
+
+		/// <summary>
+		/// Returns an UmbracoHelper object
+		/// </summary>
+		public UmbracoHelper Umbraco { get; private set; }
 
 		/// <summary>
 		/// Returns the current UmbracoContext

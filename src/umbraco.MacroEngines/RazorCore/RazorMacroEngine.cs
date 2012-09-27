@@ -6,6 +6,7 @@ using System.Threading;
 using System.Web;
 using System.Web.Compilation;
 using System.Web.WebPages;
+using Umbraco.Core;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
 using umbraco.IO;
@@ -24,14 +25,7 @@ namespace umbraco.MacroEngines
         }
 
         public string GetMd5(string text) {
-            var x = new System.Security.Cryptography.MD5CryptoServiceProvider();
-            var bs = System.Text.Encoding.UTF8.GetBytes(text);
-            bs = x.ComputeHash(bs);
-            var s = new System.Text.StringBuilder();
-            foreach (var b in bs) {
-                s.Append(b.ToString("x2").ToLower());
-            }
-            return s.ToString();
+			return text.ToMd5();
         }
 
         /// <summary>

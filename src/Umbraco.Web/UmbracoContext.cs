@@ -200,6 +200,22 @@ namespace Umbraco.Web
 		}
 
 		/// <summary>
+		/// A shortcut to the UmbracoContext's RoutingContext's NiceUrlProvider
+		/// </summary>
+		/// <remarks>
+		/// If the RoutingContext is null, this will throw an exception.
+		/// </remarks>
+    	internal NiceUrlProvider NiceUrlProvider
+    	{
+    		get
+    		{
+    			if (RoutingContext == null)
+					throw new InvalidOperationException("Cannot access the NiceUrlProvider when the UmbracoContext's RoutingContext is null");
+    			return RoutingContext.NiceUrlProvider;
+    		}
+    	}
+
+		/// <summary>
 		/// Gets/sets the RoutingContext object
 		/// </summary>
 		internal RoutingContext RoutingContext { get; set; }	

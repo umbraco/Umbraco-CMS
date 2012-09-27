@@ -51,8 +51,6 @@ namespace Umbraco.Web.Mvc
 		/// </summary>
 		public dynamic CurrentPage { get; private set; }
 
-		private ICultureDictionary _cultureDictionary;
-
 		/// <summary>
 		/// Returns the dictionary value for the key specified
 		/// </summary>
@@ -60,12 +58,7 @@ namespace Umbraco.Web.Mvc
 		/// <returns></returns>
 		public string GetDictionaryValue(string key)
 		{
-			if (_cultureDictionary == null)
-			{
-				var factory = CultureDictionaryFactoryResolver.Current.Factory;
-				_cultureDictionary = factory.CreateDictionary();
-			}
-			return _cultureDictionary[key];
+			return Umbraco.GetDictionaryValue(key);
 		}
 
 		private UmbracoHelper _helper;
