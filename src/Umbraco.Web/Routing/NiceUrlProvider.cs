@@ -17,7 +17,10 @@ namespace Umbraco.Web.Routing
 	/// Provides nice urls for a nodes.
 	/// </summary>
     internal class NiceUrlProvider
-    {
+	{
+
+		internal const string NullUrl = "#";
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="NiceUrlProvider"/> class.
 		/// </summary>
@@ -81,7 +84,7 @@ namespace Umbraco.Web.Routing
 						"Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
 						nodeId);
 
-					return "#"; 
+					return NullUrl; 
 				}
 				
 				// walk up from that node until we hit a node with a domain,
@@ -169,7 +172,7 @@ namespace Umbraco.Web.Routing
 			{
 				var node = _publishedContentStore.GetDocumentById(_umbracoContext, nodeId);
 				if (node == null)
-					return new string[] { "#" }; // legacy wrote to the log here...
+					return new string[] { NullUrl }; // legacy wrote to the log here...
 
 				var pathParts = new List<string>();
 				int id = nodeId;

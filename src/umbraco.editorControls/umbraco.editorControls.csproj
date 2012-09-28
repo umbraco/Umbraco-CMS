@@ -415,6 +415,7 @@
     <Compile Include="userControlWrapper\usercontrolDataType.cs" />
     <Compile Include="userControlWrapper\usercontrolPrevalueEditor.cs" />
     <Compile Include="XmlData.cs" />
+    <Compile Include="XPathCheckBoxList\XPathCheckBoxList.cs" />
     <Compile Include="XPathCheckBoxList\XPathCheckBoxListDataEditor.cs" />
     <Compile Include="XPathCheckBoxList\XPathCheckBoxListDataType.cs" />
     <Compile Include="XPathCheckBoxList\XPathCheckBoxListOptions.cs" />

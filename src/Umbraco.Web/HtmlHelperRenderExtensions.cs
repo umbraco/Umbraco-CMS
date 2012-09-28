@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using Umbraco.Core;
+using Umbraco.Core.Dynamics;
+using Umbraco.Web.Mvc;
 using umbraco;
 
 namespace Umbraco.Web
@@ -14,64 +17,6 @@ namespace Umbraco.Web
 	/// </summary>
 	public static class HtmlHelperRenderExtensions
 	{
-		/// <summary>
-		/// Used for rendering out the Form for BeginUmbracoForm
-		/// </summary>
-		internal class UmbracoForm : MvcForm
-		{
-			public UmbracoForm(
-				ViewContext viewContext,
-				string surfaceController,
-				string surfaceAction,
-				string area,
-				Guid? surfaceId,
-				object additionalRouteVals = null)
-				: base(viewContext)
-			{
-				//need to create a params string as Base64 to put into our hidden field to use during the routes
-				string surfaceRouteParams;
-				if (surfaceId.HasValue)
-				{
-					surfaceRouteParams = string.Format("c={0}&a={1}&i={2}&ar={3}",
-					                                   viewContext.HttpContext.Server.UrlEncode(surfaceController),
-					                                   viewContext.HttpContext.Server.UrlEncode(surfaceAction),
-					                                   viewContext.HttpContext.Server.UrlEncode(surfaceId.Value.ToString("N")),
-					                                   area);
-				}
-				else
-				{
-					surfaceRouteParams = string.Format("c={0}&a={1}&ar={2}",
-					                                   viewContext.HttpContext.Server.UrlEncode(surfaceController),
-					                                   viewContext.HttpContext.Server.UrlEncode(surfaceAction),
-					                                   area);
-				}
-
-				var additionalRouteValsAsQuery = additionalRouteVals.ToDictionary<object>().ToQueryString();
-				if (!additionalRouteValsAsQuery.IsNullOrWhiteSpace())
-					surfaceRouteParams = "&" + additionalRouteValsAsQuery;
-
-				_base64String = Convert.ToBase64String(Encoding.UTF8.GetBytes(surfaceRouteParams));
-
-				_textWriter = viewContext.Writer;
-			}
-
-
-			private bool _disposed;
-			private readonly string _base64String;
-			private readonly TextWriter _textWriter;
-
-			protected override void Dispose(bool disposing)
-			{
-				if (this._disposed)
-					return;
-				this._disposed = true;
-
-				//write out the hidden surface form routes
-				_textWriter.Write("<input name='uformpostroutevals' type='hidden' value='" + _base64String + "' />");
-
-				base.Dispose(disposing);
-			}
-		}
 
 		public static MvcHtmlString EditorFor<T>(this HtmlHelper htmlHelper, string templateName = "", string htmlFieldName = "", object additionalViewData = null)
 			where T : new()
@@ -111,6 +56,63 @@ namespace Umbraco.Web
 			return filteredHtmlHelper.ValidationSummary(excludePropertyErrors, message, htmlAttributes);
 		}
 
+		#region BeginUmbracoForm
+
+		/// <summary>
+		/// Used for rendering out the Form for BeginUmbracoForm
+		/// </summary>
+		internal class UmbracoForm : MvcForm
+		{
+			/// <summary>
+			/// Creates an UmbracoForm
+			/// </summary>
+			/// <param name="viewContext"></param>
+			/// <param name="surfaceController"></param>
+			/// <param name="surfaceAction"></param>
+			/// <param name="area"></param>		
+			/// <param name="additionalRouteVals"></param>
+			public UmbracoForm(
+				ViewContext viewContext,
+				string surfaceController,
+				string surfaceAction,
+				string area,
+				object additionalRouteVals = null)
+				: base(viewContext)
+			{
+				//need to create a params string as Base64 to put into our hidden field to use during the routes
+				var surfaceRouteParams = string.Format("c={0}&a={1}&ar={2}",
+														  viewContext.HttpContext.Server.UrlEncode(surfaceController),
+														  viewContext.HttpContext.Server.UrlEncode(surfaceAction),
+														  area);
+
+				var additionalRouteValsAsQuery = additionalRouteVals.ToDictionary<object>().ToQueryString();
+				if (!additionalRouteValsAsQuery.IsNullOrWhiteSpace())
+					surfaceRouteParams = "&" + additionalRouteValsAsQuery;
+
+				_base64String = Convert.ToBase64String(Encoding.UTF8.GetBytes(surfaceRouteParams));
+
+				_textWriter = viewContext.Writer;
+			}
+
+
+			private bool _disposed;
+			private readonly string _base64String;
+			private readonly TextWriter _textWriter;
+
+			protected override void Dispose(bool disposing)
+			{
+				if (this._disposed)
+					return;
+				this._disposed = true;
+
+				//write out the hidden surface form routes
+				_textWriter.Write("<input name='uformpostroutevals' type='hidden' value='" + _base64String + "' />");
+
+				base.Dispose(disposing);
+			}
+		}
+
+
 		/// <summary>
 		/// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller
 		/// </summary>
@@ -131,8 +133,7 @@ namespace Umbraco.Web
 		/// <param name="controllerName"></param>
 		/// <param name="additionalRouteVals"></param>
 		/// <returns></returns>
-		public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName,
-		                                       object additionalRouteVals)
+		public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName, object additionalRouteVals)
 		{
 			return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, new Dictionary<string, object>());
 		}
@@ -147,8 +148,8 @@ namespace Umbraco.Web
 		/// <param name="htmlAttributes"></param>
 		/// <returns></returns>
 		public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName,
-		                                       object additionalRouteVals,
-		                                       object htmlAttributes)
+											   object additionalRouteVals,
+											   object htmlAttributes)
 		{
 			return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, htmlAttributes.ToDictionary<object>());
 		}
@@ -163,14 +164,14 @@ namespace Umbraco.Web
 		/// <param name="htmlAttributes"></param>
 		/// <returns></returns>
 		public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName,
-		                                       object additionalRouteVals,
-		                                       IDictionary<string, object> htmlAttributes)
+											   object additionalRouteVals,
+											   IDictionary<string, object> htmlAttributes)
 		{
-			var settings = DependencyResolver.Current.GetService<UmbracoSettings>();
-			var area = Umbraco.Core.Configuration.GlobalSettings.MvcArea;
-			var formAction = html.ViewContext.HttpContext.Request.Url.AbsolutePath;
+			Mandate.ParameterNotNullOrEmpty(action, "action");
+			Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
 
-			return html.RenderForm(formAction, FormMethod.Post, htmlAttributes, controllerName, action, area, null);
+			var area = Umbraco.Core.Configuration.GlobalSettings.UmbracoMvcArea;
+			return html.BeginUmbracoForm(action, controllerName, area, additionalRouteVals, htmlAttributes);
 		}
 
 		/// <summary>
@@ -178,11 +179,24 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="html"></param>
 		/// <param name="action"></param>
-		/// <param name="surfaceId">The surface controller to route to</param>
+		/// <param name="surfaceType">The surface controller to route to</param>
 		/// <returns></returns>
-		public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, Guid surfaceId)
+		public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, Type surfaceType)
 		{
-			return html.BeginUmbracoForm(action, surfaceId, null, new Dictionary<string, object>());
+			return html.BeginUmbracoForm(action, surfaceType, null, new Dictionary<string, object>());
+		}
+
+		/// <summary>
+		/// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="html"></param>
+		/// <param name="action"></param>
+		/// <returns></returns>
+		public static MvcForm BeginUmbracoForm<T>(this HtmlHelper html, string action)
+			where T : SurfaceController
+		{
+			return html.BeginUmbracoForm(action, typeof(T));
 		}
 
 		/// <summary>
@@ -190,13 +204,27 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="html"></param>
 		/// <param name="action"></param>
-		/// <param name="surfaceId">The surface controller to route to</param>
+		/// <param name="surfaceType">The surface controller to route to</param>
 		/// <param name="additionalRouteVals"></param>
 		/// <returns></returns>
-		public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, Guid surfaceId,
-		                                       object additionalRouteVals)
+		public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, Type surfaceType,
+											   object additionalRouteVals)
 		{
-			return html.BeginUmbracoForm(action, surfaceId, additionalRouteVals, new Dictionary<string, object>());
+			return html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, new Dictionary<string, object>());
+		}
+
+		/// <summary>
+		/// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="html"></param>
+		/// <param name="action"></param>
+		/// <param name="additionalRouteVals"></param>
+		/// <returns></returns>
+		public static MvcForm BeginUmbracoForm<T>(this HtmlHelper html, string action, object additionalRouteVals)
+			where T : SurfaceController
+		{
+			return html.BeginUmbracoForm(action, typeof(T), additionalRouteVals);
 		}
 
 		/// <summary>
@@ -204,15 +232,32 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="html"></param>
 		/// <param name="action"></param>
-		/// <param name="surfaceId">The surface controller to route to</param>
+		/// <param name="surfaceType">The surface controller to route to</param>
 		/// <param name="additionalRouteVals"></param>
 		/// <param name="htmlAttributes"></param>
 		/// <returns></returns>
-		public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, Guid surfaceId,
-		                                       object additionalRouteVals,
-		                                       object htmlAttributes)
+		public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, Type surfaceType,
+											   object additionalRouteVals,
+											   object htmlAttributes)
 		{
-			return html.BeginUmbracoForm(action, surfaceId, additionalRouteVals, htmlAttributes.ToDictionary<object>());
+			return html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, htmlAttributes.ToDictionary<object>());
+		}
+
+		/// <summary>
+		/// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="html"></param>
+		/// <param name="action"></param>
+		/// <param name="additionalRouteVals"></param>
+		/// <param name="htmlAttributes"></param>
+		/// <returns></returns>
+		public static MvcForm BeginUmbracoForm<T>(this HtmlHelper html, string action,
+											   object additionalRouteVals,
+											   object htmlAttributes)
+			where T : SurfaceController
+		{
+			return html.BeginUmbracoForm(action, typeof(T), additionalRouteVals, htmlAttributes);
 		}
 
 		/// <summary>
@@ -220,40 +265,80 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="html"></param>
 		/// <param name="action"></param>
-		/// <param name="surfaceId">The surface controller to route to</param>
+		/// <param name="surfaceType">The surface controller to route to</param>
 		/// <param name="additionalRouteVals"></param>
 		/// <param name="htmlAttributes"></param>
 		/// <returns></returns>
-		public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, Guid surfaceId,
-		                                       object additionalRouteVals,
-		                                       IDictionary<string, object> htmlAttributes)
+		public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, Type surfaceType,
+											   object additionalRouteVals,
+											   IDictionary<string, object> htmlAttributes)
 		{
-			//TODO: Make me work :)
+			Mandate.ParameterNotNullOrEmpty(action, "action");
+			Mandate.ParameterNotNull(surfaceType, "surfaceType");
 
-			throw new NotImplementedException();
+			var area = Umbraco.Core.Configuration.GlobalSettings.UmbracoMvcArea;
+			var surfaceController = SurfaceControllerResolver.Current.SurfaceControllers
+				.SingleOrDefault(x => x.Metadata.ControllerType == surfaceType);
+			if (surfaceController == null)
+				throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
+			if (!surfaceController.Metadata.AreaName.IsNullOrWhiteSpace())
+			{
+				//set the area to the plugin area
+				area = surfaceController.Metadata.AreaName;
+			}
+			return html.BeginUmbracoForm(action, surfaceController.Metadata.ControllerName, area, additionalRouteVals, htmlAttributes);
+		}
 
-			//var settings = DependencyResolver.Current.GetService<UmbracoSettings>();
-			//var area = Umbraco.Core.Configuration.GlobalSettings.MvcArea;
-			//var formAction = html.ViewContext.HttpContext.Request.Url.AbsolutePath;
+		/// <summary>
+		/// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="html"></param>
+		/// <param name="action"></param>
+		/// <param name="additionalRouteVals"></param>
+		/// <param name="htmlAttributes"></param>
+		/// <returns></returns>
+		public static MvcForm BeginUmbracoForm<T>(this HtmlHelper html, string action,
+											   object additionalRouteVals,
+											   IDictionary<string, object> htmlAttributes)
+			where T : SurfaceController
+		{
+			return html.BeginUmbracoForm(action, typeof(T), additionalRouteVals, htmlAttributes);
+		}
 
-			//var surfaceMetadata = DependencyResolver.Current.GetService<ComponentRegistrations>()
-			//        .SurfaceControllers
-			//        .Where(x => x.Metadata.Id == surfaceId)
-			//        .SingleOrDefault();
-			//if (surfaceMetadata == null)
-			//    throw new InvalidOperationException("Could not find the surface controller with id " + surfaceId);
-			////now, need to figure out what area this surface controller belongs too...
-			//var pluginDefition = surfaceMetadata.Metadata.PluginDefinition;
-			//if (pluginDefition.HasRoutablePackageArea())
-			//{
-			//    //a plugin def CAN be null, if the plugin is actually in our Web DLL folder or if someone drops their 
-			//    //dll into the bin... though if they do  that it still wont work since they wont get an area registered.
-			//    //area = PluginManager.GetPackageFolderFromPluginDll(pluginDefition.OriginalAssemblyFile).Name;
-			//    area = pluginDefition.PackageName;
-			//}
+		/// <summary>
+		/// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
+		/// </summary>
+		/// <param name="html"></param>
+		/// <param name="action"></param>
+		/// <param name="controllerName"></param>
+		/// <param name="area"></param>
+		/// <returns></returns>
+		public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName, string area)
+		{
+			return html.BeginUmbracoForm(action, controllerName, area, null, new Dictionary<string, object>());
+		}
 
-			////render the form
-			//return html.RenderForm(formAction, FormMethod.Post, htmlAttributes, surfaceMetadata.Metadata.ControllerName, action, area, surfaceId);
+		/// <summary>
+		/// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
+		/// </summary>
+		/// <param name="html"></param>
+		/// <param name="action"></param>
+		/// <param name="controllerName"></param>
+		/// <param name="area"></param>
+		/// <param name="additionalRouteVals"></param>
+		/// <param name="htmlAttributes"></param>
+		/// <returns></returns>
+		public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName, string area,
+											   object additionalRouteVals,
+											   IDictionary<string, object> htmlAttributes)
+		{
+			Mandate.ParameterNotNullOrEmpty(area, "area");
+			Mandate.ParameterNotNullOrEmpty(action, "action");
+			Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
+
+			var formAction = UmbracoContext.Current.RequestUrl.ToString();
+			return html.RenderForm(formAction, FormMethod.Post, htmlAttributes, controllerName, action, area, additionalRouteVals);
 		}
 
 		/// <summary>
@@ -265,22 +350,20 @@ namespace Umbraco.Web
 		/// <param name="htmlAttributes"></param>
 		/// <param name="surfaceController"></param>
 		/// <param name="surfaceAction"></param>
-		/// <param name="area"></param>
-		/// <param name="surfaceId"></param>
+		/// <param name="area"></param>		
 		/// <param name="additionalRouteVals"></param>
 		/// <returns></returns>
 		/// <remarks>
 		/// This code is pretty much the same as the underlying MVC code that writes out the form
 		/// </remarks>
 		private static MvcForm RenderForm(this HtmlHelper htmlHelper,
-		                                  string formAction,
-		                                  FormMethod method,
-		                                  IDictionary<string, object> htmlAttributes,
-		                                  string surfaceController,
-		                                  string surfaceAction,
-		                                  string area,
-		                                  Guid? surfaceId,
-		                                  object additionalRouteVals = null)
+										  string formAction,
+										  FormMethod method,
+										  IDictionary<string, object> htmlAttributes,
+										  string surfaceController,
+										  string surfaceAction,
+										  string area,
+										  object additionalRouteVals = null)
 		{
 
 			var tagBuilder = new TagBuilder("form");
@@ -298,7 +381,7 @@ namespace Umbraco.Web
 			htmlHelper.ViewContext.Writer.Write(tagBuilder.ToString(TagRenderMode.StartTag));
 
 			//new UmbracoForm:
-			var theForm = new UmbracoForm(htmlHelper.ViewContext, surfaceController, surfaceAction, area, surfaceId, additionalRouteVals);
+			var theForm = new UmbracoForm(htmlHelper.ViewContext, surfaceController, surfaceAction, area, additionalRouteVals);
 
 			if (traditionalJavascriptEnabled)
 			{
@@ -307,6 +390,75 @@ namespace Umbraco.Web
 			return theForm;
 		}
 
+		#endregion
+
+
+		#region Wrap
+
+		public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, string innerText, params IHtmlTagWrapper[] children)
+		{
+			var item = html.Wrap(tag, innerText, (object)null);
+			foreach (var child in children)
+			{
+				item.AddChild(child);
+			}
+			return item;
+		}
+
+		public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, object inner, object anonymousAttributes, params IHtmlTagWrapper[] children)
+		{
+			string innerText = null;
+			if (inner != null && inner.GetType() != typeof(DynamicNull))
+			{
+				innerText = string.Format("{0}", inner);
+			}
+			var item = html.Wrap(tag, innerText, anonymousAttributes);
+			foreach (var child in children)
+			{
+				item.AddChild(child);
+			}
+			return item;
+		}
+		public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, object inner)
+		{
+			string innerText = null;
+			if (inner != null && inner.GetType() != typeof(DynamicNull))
+			{
+				innerText = string.Format("{0}", inner);
+			}
+			return html.Wrap(tag, innerText, (object)null);
+		}
+
+		public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, string innerText, object anonymousAttributes, params IHtmlTagWrapper[] children)
+		{
+			var wrap = new HtmlTagWrapper(tag);
+			if (anonymousAttributes != null)
+			{
+				wrap.ReflectAttributesFromAnonymousType(anonymousAttributes);
+			}
+			if (!string.IsNullOrWhiteSpace(innerText))
+			{
+				wrap.AddChild(new HtmlTagWrapperTextNode(innerText));
+			}
+			foreach (var child in children)
+			{
+				wrap.AddChild(child);
+			}
+			return wrap;
+		}
+
+		public static HtmlTagWrapper Wrap(this HtmlHelper html, bool visible, string tag, string innerText, object anonymousAttributes, params IHtmlTagWrapper[] children)
+		{
+			var item = html.Wrap(tag, innerText, anonymousAttributes, children);
+			item.Visible = visible;
+			foreach (var child in children)
+			{
+				item.AddChild(child);
+			}
+			return item;
+		}
+
+		#endregion
 
 	}
 }

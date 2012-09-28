@@ -5,22 +5,27 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Configuration;
+using System.Web.Security;
 using System.Web.UI;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using HtmlAgilityPack;
 using Umbraco.Core;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
 using umbraco;
 using System.Collections.Generic;
+using umbraco.cms.businesslogic.member;
+using umbraco.cms.businesslogic.web;
 using umbraco.presentation.templateControls;
 using HtmlTagWrapper = Umbraco.Web.Mvc.HtmlTagWrapper;
 
 namespace Umbraco.Web
 {
-	
+
 	/// <summary>
 	/// A helper class that provides many useful methods and functionality for using Umbraco in templates
 	/// </summary>
@@ -32,8 +37,12 @@ namespace Umbraco.Web
 		internal UmbracoHelper(UmbracoContext umbracoContext)
 		{
 			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+			if (umbracoContext.RoutingContext == null) throw new NullReferenceException("The RoutingContext on the UmbracoContext cannot be null");
 			_umbracoContext = umbracoContext;
-			_currentPage = _umbracoContext.DocumentRequest.Document;
+			if (_umbracoContext.IsFrontEndUmbracoRequest)
+			{
+				_currentPage = _umbracoContext.DocumentRequest.Document;	
+			}
 		}
 
 
@@ -125,6 +134,10 @@ namespace Umbraco.Web
 			RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged,
 			string formatString = "")
 		{
+			if (_currentPage == null)
+			{
+				throw new InvalidOperationException("Cannot call this method when not rendering a front-end document");
+			}
 			return Field(_currentPage, fieldAlias, valueAlias, altFieldAlias, altValueAlias,
 				altText, insertBefore, insertAfter, recursive, convertLineBreaks, removeParagraphTags,
 				casing, encoding, formatString);
@@ -191,7 +204,7 @@ namespace Umbraco.Web
 			var attributesForItem = new AttributeCollectionAdapter(
 				new AttributeCollection(
 					new StateBag()));
-			foreach(var i in attributes)
+			foreach (var i in attributes)
 			{
 				attributesForItem.Add(i.Key, i.Value);
 			}
@@ -201,7 +214,7 @@ namespace Umbraco.Web
 					Field = fieldAlias,
 					TextIfEmpty = altText,
 					LegacyAttributes = attributesForItem
-				};			
+				};
 			var containerPage = new FormlessPage();
 			containerPage.Controls.Add(item);
 
@@ -217,7 +230,119 @@ namespace Umbraco.Web
 
 		#endregion
 
+		#region Dictionary
+
+		private ICultureDictionary _cultureDictionary;
+
+		/// <summary>
+		/// Returns the dictionary value for the key specified
+		/// </summary>
+		/// <param name="key"></param>
+		/// <returns></returns>
+		public string GetDictionaryValue(string key)
+		{
+			if (_cultureDictionary == null)
+			{
+				var factory = CultureDictionaryFactoryResolver.Current.Factory;
+				_cultureDictionary = factory.CreateDictionary();
+			}
+			return _cultureDictionary[key];
+		}
+
+		#endregion
+
+		#region Membership
+
+		/// <summary>
+		/// Check if a document object is protected by the "Protect Pages" functionality in umbraco
+		/// </summary>
+		/// <param name="documentId">The identifier of the document object to check</param>
+		/// <param name="path">The full path of the document object to check</param>
+		/// <returns>True if the document object is protected</returns>
+		public bool IsProtected(int documentId, string path)
+		{
+			return Access.IsProtected(documentId, path);
+		}
+
+		/// <summary>
+		/// Check if the current user has access to a document
+		/// </summary>
+		/// <param name="nodeId">The identifier of the document object to check</param>
+		/// <param name="path">The full path of the document object to check</param>
+		/// <returns>True if the current user has access or if the current document isn't protected</returns>
+		public bool MemberHasAccess(int nodeId, string path)
+		{
+			if (IsProtected(nodeId, path))
+			{
+				return Member.IsLoggedOn() && Access.HasAccess(nodeId, path, Membership.GetUser());
+			}
+			return true;
+		}
+
+		/// <summary>
+		/// Whether or not the current member is logged in (based on the membership provider)
+		/// </summary>
+		/// <returns>True is the current user is logged in</returns>
+		public bool MemberIsLoggedOn()
+		{
+			/*
+			   MembershipUser u = Membership.GetUser();
+			   return u != null;           
+			*/
+			return Member.IsLoggedOn();
+		} 
+
+		#endregion
+
+		#region NiceUrls
+
+		/// <summary>
+		/// Returns a string with a friendly url from a node.
+		/// IE.: Instead of having /482 (id) as an url, you can have
+		/// /screenshots/developer/macros (spoken url)
+		/// </summary>
+		/// <param name="nodeId">Identifier for the node that should be returned</param>
+		/// <returns>String with a friendly url from a node</returns>
+		public string NiceUrl(int nodeId)
+		{
+			var niceUrlsProvider = UmbracoContext.Current.NiceUrlProvider;
+			return niceUrlsProvider.GetNiceUrl(nodeId);
+		}
+
+		/// <summary>
+		/// This method will always add the domain to the path if the hostnames are set up correctly. 
+		/// </summary>
+		/// <param name="nodeId">Identifier for the node that should be returned</param>
+		/// <returns>String with a friendly url with full domain from a node</returns>
+		public string NiceUrlWithDomain(int nodeId)
+		{
+			var niceUrlsProvider = UmbracoContext.Current.NiceUrlProvider;
+			return niceUrlsProvider.GetNiceUrl(nodeId, UmbracoContext.Current.UmbracoUrl, true);
+		}
+
+		#endregion
+
 		#region Content
+
+		public IDocument GetContentById(int id)
+		{
+			return GetDocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
+		}
+
+		public IDocument GetContentById(string id)
+		{
+			return GetDocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
+		}
+
+		public IEnumerable<IDocument> GetContentByIds(params int[] ids)
+		{
+			return GetDocumentByIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
+		}
+
+		public IEnumerable<IDocument> GetContentByIds(params string[] ids)
+		{
+			return GetDocumentByIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
+		}
 
 		public dynamic ContentById(int id)
 		{
@@ -238,10 +363,30 @@ namespace Umbraco.Web
 		{
 			return DocumentByIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
 		}
-		
+
 		#endregion
 
 		#region Media
+
+		public IDocument GetMediaById(int id)
+		{
+			return GetDocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
+		}
+
+		public IDocument GetMediaById(string id)
+		{
+			return GetDocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
+		}
+
+		public IEnumerable<IDocument> GetMediaByIds(params int[] ids)
+		{
+			return GetDocumentByIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
+		}
+
+		public IEnumerable<IDocument> GetMediaByIds(params string[] ids)
+		{
+			return GetDocumentByIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
+		}
 
 		public dynamic MediaById(int id)
 		{
@@ -267,6 +412,29 @@ namespace Umbraco.Web
 
 		#region Used by Content/Media
 
+		private IDocument GetDocumentById(int id, IPublishedStore store)
+		{
+			return store.GetDocumentById(UmbracoContext.Current, id);			
+		}
+
+		private IDocument GetDocumentById(string id, IPublishedStore store)
+		{
+			int docId;
+			return int.TryParse(id, out docId)
+				? DocumentById(docId, store)
+				: null;
+		}
+
+		private IEnumerable<IDocument> GetDocumentByIds(IPublishedStore store, params int[] ids)
+		{
+			return ids.Select(eachId => GetDocumentById(eachId, store));			
+		}
+
+		private IEnumerable<IDocument> GetDocumentByIds(IPublishedStore store, params string[] ids)
+		{
+			return ids.Select(eachId => GetDocumentById(eachId, store));
+		}
+
 		private dynamic DocumentById(int id, IPublishedStore store)
 		{
 			var doc = store.GetDocumentById(UmbracoContext.Current, id);
@@ -278,8 +446,8 @@ namespace Umbraco.Web
 		private dynamic DocumentById(string id, IPublishedStore store)
 		{
 			int docId;
-			return int.TryParse(id, out docId) 
-				? DocumentById(docId, store) 
+			return int.TryParse(id, out docId)
+				? DocumentById(docId, store)
 				: new DynamicNull();
 		}
 
@@ -360,6 +528,29 @@ namespace Umbraco.Web
 		#endregion
 
 		#region Strings
+
+		/// <summary>
+		/// Replaces text line breaks with html line breaks
+		/// </summary>
+		/// <param name="text">The text.</param>
+		/// <returns>The text with text line breaks replaced with html linebreaks (<br/>)</returns>
+		public string ReplaceLineBreaksForHtml(string text)
+		{
+			if (bool.Parse(Umbraco.Core.Configuration.GlobalSettings.EditXhtmlMode))
+				return text.Replace("\n", "<br/>\n");
+			else
+				return text.Replace("\n", "<br />\n");
+		}
+
+		/// <summary>
+		/// Returns an MD5 hash of the string specified
+		/// </summary>
+		/// <param name="text">The text to create a hash from</param>
+		/// <returns>Md5 has of the string</returns>
+		public string CreateMd5Hash(string text)
+		{
+			return text.ToMd5();
+		}
 
 		public HtmlString StripHtml(IHtmlString html, params string[] tags)
 		{
@@ -445,7 +636,7 @@ namespace Umbraco.Web
 
 		internal string Join<TIgnore>(string seperator, params object[] args)
 		{
-			var results = args.Where(arg => arg != null && arg.GetType() != typeof (TIgnore)).Select(arg => string.Format("{0}", arg)).Where(sArg => !string.IsNullOrWhiteSpace(sArg)).ToList();
+			var results = args.Where(arg => arg != null && arg.GetType() != typeof(TIgnore)).Select(arg => string.Format("{0}", arg)).Where(sArg => !string.IsNullOrWhiteSpace(sArg)).ToList();
 			return string.Join(seperator, results);
 		}
 
@@ -645,71 +836,6 @@ namespace Umbraco.Web
 
 		#endregion
 
-		#region Wrap
 
-		public HtmlTagWrapper Wrap(string tag, string innerText, params IHtmlTagWrapper[] children)
-		{
-			var item = Wrap(tag, innerText, (object)null);
-			foreach (var child in children)
-			{
-				item.AddChild(child);
-			}
-			return item;
-		}	
-
-		public HtmlTagWrapper Wrap(string tag, object inner, object anonymousAttributes, params IHtmlTagWrapper[] children)
-		{
-			string innerText = null;
-			if (inner != null && inner.GetType() != typeof(DynamicNull))
-			{
-				innerText = string.Format("{0}", inner);
-			}
-			var item = Wrap(tag, innerText, anonymousAttributes);
-			foreach (var child in children)
-			{
-				item.AddChild(child);
-			}
-			return item;
-		}
-		public HtmlTagWrapper Wrap(string tag, object inner)
-		{
-			string innerText = null;
-			if (inner != null && inner.GetType() != typeof(DynamicNull))
-			{
-				innerText = string.Format("{0}", inner);
-			}
-			return Wrap(tag, innerText, (object)null);
-		}
-		
-		public HtmlTagWrapper Wrap(string tag, string innerText, object anonymousAttributes, params IHtmlTagWrapper[] children)
-		{
-			var wrap = new HtmlTagWrapper(tag);
-			if (anonymousAttributes != null)
-			{
-				wrap.ReflectAttributesFromAnonymousType(anonymousAttributes);
-			}
-			if (!string.IsNullOrWhiteSpace(innerText))
-			{
-				wrap.AddChild(new HtmlTagWrapperTextNode(innerText));
-			}
-			foreach (var child in children)
-			{
-				wrap.AddChild(child);
-			}
-			return wrap;
-		}
-
-		public HtmlTagWrapper Wrap(bool visible, string tag, string innerText, object anonymousAttributes, params IHtmlTagWrapper[] children)
-		{
-			var item = Wrap(tag, innerText, anonymousAttributes, children);
-			item.Visible = visible;
-			foreach (var child in children)
-			{
-				item.AddChild(child);
-			}
-			return item;
-		}
-
-		#endregion
 	}
 }

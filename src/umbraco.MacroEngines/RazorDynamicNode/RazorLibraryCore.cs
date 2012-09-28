@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web.Mvc;
 using Umbraco.Core.Dynamics;
 using Umbraco.Web;
 using umbraco.interfaces;
@@ -17,6 +18,12 @@ namespace umbraco.MacroEngines.Library
     {
         private readonly INode _node;
     	private readonly UmbracoHelper _umbracoHelper;
+		
+		/// <summary>
+		/// An empty HtmlHelper with a blank ViewContext, used only to access some htmlHelper extension methods
+		/// </summary>
+		private readonly HtmlHelper _htmlHelper;
+
         public INode Node
         {
             get { return _node; }
@@ -25,6 +32,7 @@ namespace umbraco.MacroEngines.Library
         {
             this._node = node;
 			_umbracoHelper = new UmbracoHelper(UmbracoContext.Current);
+			_htmlHelper = new HtmlHelper(new ViewContext(), new ViewPage());
         }
 
         public dynamic NodeById(int Id)
@@ -194,24 +202,24 @@ namespace umbraco.MacroEngines.Library
         }
 
 		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(string tag, string innerText, params Umbraco.Web.Mvc.IHtmlTagWrapper[] children)
-        {
-        	return _umbracoHelper.Wrap(tag, innerText, children);
+		{
+			return _htmlHelper.Wrap(tag, innerText, children);
         }
 		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(string tag, object inner, object anonymousAttributes, params Umbraco.Web.Mvc.IHtmlTagWrapper[] children)
 		{
-			return _umbracoHelper.Wrap(tag, inner, anonymousAttributes, children);
+			return _htmlHelper.Wrap(tag, inner, anonymousAttributes, children);
 		}
 		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(string tag, object inner)
 		{
-			return _umbracoHelper.Wrap(tag, inner);
+			return _htmlHelper.Wrap(tag, inner);
 		}
 		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(string tag, string innerText, object anonymousAttributes, params Umbraco.Web.Mvc.IHtmlTagWrapper[] children)
 		{
-			return _umbracoHelper.Wrap(tag, innerText, anonymousAttributes, children);
+			return _htmlHelper.Wrap(tag, innerText, anonymousAttributes, children);
 		}
 		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(bool visible, string tag, string innerText, object anonymousAttributes, params Umbraco.Web.Mvc.IHtmlTagWrapper[] children)
 		{
-			return _umbracoHelper.Wrap(visible, tag, innerText, anonymousAttributes, children);
+			return _htmlHelper.Wrap(visible, tag, innerText, anonymousAttributes, children);
 		}
 
         public IHtmlString Truncate(IHtmlString html, int length)

@@ -172,6 +172,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\WebPages\System.Web.Helpers.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\WebPages\System.Web.Razor.dll</HintPath>
@@ -322,6 +323,7 @@
     <None Include="config\Dashboard.Release.config">
       <DependentUpon>Dashboard.config</DependentUpon>
     </None>
+    <None Include="packages.config" />
     <None Include="umbraco\config\create\UI.Release.xml">
       <DependentUpon>UI.xml</DependentUpon>
     </None>
@@ -354,6 +356,7 @@
     <Content Include="umbraco\images\thumbs_lrg.png" />
     <Content Include="umbraco\images\thumbs_med.png" />
     <Content Include="umbraco\images\thumbs_smll.png" />
+    <Content Include="umbraco\images\umbraco\settingView.gif" />
     <Content Include="umbraco\plugins\uGoLive\cog.png" />
     <Content Include="umbraco\plugins\uGoLive\cross.png" />
     <Content Include="umbraco\plugins\uGoLive\Dashboard.ascx" />
@@ -1668,6 +1671,7 @@
     <None Include="umbraco_client\CodeMirror\js\mode\ruby\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\r\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\xquery\LICENSE" />
+    <Content Include="Views\Web.config" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -2203,7 +2207,6 @@
     <Folder Include="umbraco_client\FolderBrowser\Images\" />
     <Folder Include="umbraco_client\tags\images\" />
     <Folder Include="usercontrols\" />
-    <Folder Include="Views\" />
     <Folder Include="xslt\" />
   </ItemGroup>
   <PropertyGroup>

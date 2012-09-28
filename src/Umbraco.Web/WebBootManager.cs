@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.PropertyEditors;
@@ -12,6 +14,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Routing;
 using umbraco.businesslogic;
+
 
 namespace Umbraco.Web
 {
@@ -55,8 +58,6 @@ namespace Umbraco.Web
 			//set model binder
 			ModelBinders.Binders.Add(new KeyValuePair<Type, IModelBinder>(typeof(RenderModel), new RenderModelBinder()));
 
-			//set routes
-			CreateRoutes();
 
 			//find and initialize the application startup handlers, we need to initialize this resolver here because
 			//it is a special resolver where they need to be instantiated first before any other resolvers in order to bind to 
@@ -100,6 +101,9 @@ namespace Umbraco.Web
 		{
 			base.Complete(afterComplete);
 
+			//set routes
+			CreateRoutes();
+
 			//call OnApplicationStarting of each application events handler
 			ApplicationEventsResolver.Current.ApplicationEventHandlers
 				.ForEach(x => x.OnApplicationStarted(_umbracoApplication, ApplicationContext));
@@ -112,14 +116,49 @@ namespace Umbraco.Web
 		/// </summary>
 		protected internal void CreateRoutes()
 		{
+
 			//set routes
-			var route = RouteTable.Routes.MapRoute(
+			var defaultRoute = RouteTable.Routes.MapRoute(
 				"Umbraco_default",
 				"Umbraco/RenderMvc/{action}/{id}",
 				new { controller = "RenderMvc", action = "Index", id = UrlParameter.Optional }
 				);
-			route.RouteHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory());
+			defaultRoute.RouteHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory());
+
+			var umbracoPath = GlobalSettings.UmbracoMvcArea;
+
+			//we need to find the surface controllers and route them
+			var surfaceControllers = SurfaceControllerResolver.Current.RegisteredSurfaceControllers.ToArray();
+
+			//local surface controllers do not contain the attribute 			
+			var localSurfaceControlleres = surfaceControllers.Where(x => PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
+			foreach (var s in localSurfaceControlleres)
+			{
+				var meta = PluginController.GetMetadata(s);
+				var route = RouteTable.Routes.MapRoute(
+					string.Format("umbraco-{0}-{1}", "surface", meta.ControllerName),
+					umbracoPath + "/Surface/" + meta.ControllerName + "/{action}/{id}",//url to match
+					new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
+					new[] { meta.ControllerNamespace }); //only match this namespace
+				route.DataTokens.Add("area", umbracoPath); //only match this area
+				route.DataTokens.Add("umbraco", "surface"); //ensure the umbraco token is set
+			}
+			
+			//need to get the plugin controllers that are unique to each area (group by)
+			//TODO: One day when we have more plugin controllers, we will need to do a group by on ALL of them to pass into the ctor of PluginControllerArea
+			var pluginSurfaceControlleres = surfaceControllers.Where(x => !PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
+			var groupedAreas = pluginSurfaceControlleres.GroupBy(controller => PluginController.GetMetadata(controller).AreaName);
+			//loop through each area defined amongst the controllers
+			foreach(var g in groupedAreas)
+			{
+				//create an area for the controllers (this will throw an exception if all controllers are not in the same area)
+				var pluginControllerArea = new PluginControllerArea(g.Select(PluginController.GetMetadata));
+				//register it
+				RouteTable.Routes.RegisterArea(pluginControllerArea);
+			}
 		}
+
+		
 
 		/// <summary>
 		/// Initializes all web based and core resolves 
@@ -127,6 +166,9 @@ namespace Umbraco.Web
 		protected override void InitializeResolvers()
 		{
 			base.InitializeResolvers();
+
+			SurfaceControllerResolver.Current = new SurfaceControllerResolver(
+				PluginManager.Current.ResolveSurfaceControllers());
 
 			//the base creates the PropertyEditorValueConvertersResolver but we want to modify it in the web app and replace
 			//the TinyMcePropertyEditorValueConverter with the RteMacroRenderingPropertyEditorValueConverter

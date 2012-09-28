@@ -5,17 +5,14 @@ using System.Linq;
 using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.ObjectResolution;
 using umbraco.IO;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
+	[WeightedPlugin(1000)]
     public class ImageThumbnailProvider : AbstractThumbnailProvider
-    {
-        public override int Priority
-        {
-            get { return 1000; }
-        }
-
+    {        
         protected override IEnumerable<string> SupportedExtensions
         {
             get { return new List<string> { ".jpeg", ".jpg", ".gif", ".bmp", ".png", ".tiff", ".tif" }; }

@@ -9,8 +9,6 @@ namespace Umbraco.Web.Media.ThumbnailProviders
 {
     public abstract class AbstractThumbnailProvider : IThumbnailProvider
     {
-        public abstract int Priority { get; }
-
         protected abstract IEnumerable<string> SupportedExtensions { get; }
 
         public bool CanProvideThumbnail(string fileUrl)

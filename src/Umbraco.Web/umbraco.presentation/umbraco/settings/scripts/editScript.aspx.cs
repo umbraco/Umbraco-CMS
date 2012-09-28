@@ -42,8 +42,6 @@ namespace umbraco.cms.presentation.settings.scripts
 
             NameTxt.Text = file;
 
-
-
             string path = "";
             if (file.StartsWith("~/"))
                 path = IOHelper.ResolveUrl(file);
@@ -53,10 +51,23 @@ namespace umbraco.cms.presentation.settings.scripts
 
             lttPath.Text = "<a target='_blank' href='" + path + "'>" + path + "</a>";
 
+            var exts = UmbracoSettings.ScriptFileTypes.Split(',').ToList();
+            if (UmbracoSettings.EnableMvcSupport)
+            {
+                exts.Add("cshtml");
+                exts.Add("vbhtml");
+            }
+
+            var dirs = Umbraco.Core.IO.SystemDirectories.Scripts;
+            if (UmbracoSettings.EnableMvcSupport)
+                dirs += "," + Umbraco.Core.IO.SystemDirectories.MvcViews;
+
             // validate file
-            IOHelper.ValidateEditPath(IOHelper.MapPath(path), SystemDirectories.Scripts);
+            IOHelper.ValidateEditPath(IOHelper.MapPath(path), dirs.Split(','));
+            
             // validate extension
-            IOHelper.ValidateFileExtension(IOHelper.MapPath(path), UmbracoSettings.ScriptFileTypes.Split(',').ToList());
+            IOHelper.ValidateFileExtension(IOHelper.MapPath(path), exts);
+
 
             StreamReader SR;
             string S;

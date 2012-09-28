@@ -1,4 +1,5 @@
 using System.Web.Mvc;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Mvc
 {
@@ -18,7 +19,7 @@ namespace Umbraco.Web.Mvc
 		/// <summary>
 		/// The current RenderModel found for the request
 		/// </summary>
-		public object DocumentRequest { get; set; }
+		public DocumentRequest DocumentRequest { get; set; }
 
 		/// <summary>
 		/// Gets/sets whether the current request has a hijacked route/user controller routed for it

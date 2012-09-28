@@ -9,8 +9,8 @@ using System.Web;
 using System.Web.UI;
 using System.Xml;
 using System.Xml.XPath;
-
-
+using Umbraco.Core;
+using Umbraco.Web;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.media;
@@ -25,11 +25,11 @@ using umbraco.DataLayer;
 using System.Web.Security;
 using umbraco.cms.businesslogic.language;
 using umbraco.IO;
-using umbraco.presentation;
 using System.Collections;
 using System.Collections.Generic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.NodeFactory;
+using UmbracoContext = umbraco.presentation.UmbracoContext;
 
 namespace umbraco
 {
@@ -42,6 +42,14 @@ namespace umbraco
     /// </summary>
     public class library
     {
+		/// <summary>
+		/// Returns a new UmbracoHelper so that we can start moving the logic from some of these methods to it
+		/// </summary>
+		/// <returns></returns>
+		private static UmbracoHelper GetUmbracoHelper()
+		{
+			return new UmbracoHelper(Umbraco.Web.UmbracoContext.Current);
+		}
 
         #region Declarations
 
@@ -370,8 +378,7 @@ namespace umbraco
         /// <returns>String with a friendly url from a node</returns>
         public static string NiceUrl(int nodeID)
         {
-            var niceUrlsProvider = Umbraco.Web.UmbracoContext.Current.RoutingContext.NiceUrlProvider;
-            return niceUrlsProvider.GetNiceUrl(nodeID);
+        	return GetUmbracoHelper().NiceUrl(nodeID);            
         }
 
         /// <summary>
@@ -393,8 +400,7 @@ namespace umbraco
         /// <returns>String with a friendly url with full domain from a node</returns>
         public static string NiceUrlWithDomain(int nodeID)
         {
-            var niceUrlsProvider = Umbraco.Web.UmbracoContext.Current.RoutingContext.NiceUrlProvider;
-            return niceUrlsProvider.GetNiceUrl(nodeID, Umbraco.Web.UmbracoContext.Current.UmbracoUrl, true);
+        	return GetUmbracoHelper().NiceUrlWithDomain(nodeID);
         }
 
         /// <summary>
@@ -413,7 +419,7 @@ namespace umbraco
 
         public static string ResolveVirtualPath(string path)
         {
-            return IOHelper.ResolveUrl(path);
+			return Umbraco.Core.IO.IOHelper.ResolveUrl(path);
         }
 
 
@@ -659,12 +665,7 @@ namespace umbraco
         /// <returns>True is the current user is logged in</returns>
         public static bool IsLoggedOn()
         {
-            /*
-               MembershipUser u = Membership.GetUser();
-               return u != null;           
-            */
-
-            return Member.IsLoggedOn();
+        	return GetUmbracoHelper().MemberIsLoggedOn();
         }
 
         public static XPathNodeIterator AllowedGroups(int documentId, string path)
@@ -684,7 +685,7 @@ namespace umbraco
         /// <returns>True if the document object is protected</returns>
         public static bool IsProtected(int DocumentId, string Path)
         {
-            return Access.IsProtected(DocumentId, Path);
+        	return GetUmbracoHelper().IsProtected(DocumentId, Path);
         }
 
         /// <summary>
@@ -695,39 +696,18 @@ namespace umbraco
         /// <returns>True if the current user has access or if the current document isn't protected</returns>
         public static bool HasAccess(int NodeId, string Path)
         {
-            if (IsProtected(NodeId, Path))
-            {
-                if (Member.IsLoggedOn())
-                    return Access.HasAccess(NodeId, Path, Membership.GetUser());
-                else
-                    return false;
-            }
-            else
-                return true;
-
+        	return GetUmbracoHelper().MemberHasAccess(NodeId, Path);
         }
 
 
         /// <summary>
-        /// Encrypts the string using md5
+        /// Returns an MD5 hash of the string specified
         /// </summary>
-        /// <param name="text">The text.</param>
-        /// <returns>Md5 encrupted string</returns>
+        /// <param name="text">The text to create a hash from</param>
+        /// <returns>Md5 has of the string</returns>
         public static string md5(string text)
         {
-            System.Security.Cryptography.MD5CryptoServiceProvider x = new System.Security.Cryptography.MD5CryptoServiceProvider();
-            byte[] bs = System.Text.Encoding.UTF8.GetBytes(text);
-
-            bs = x.ComputeHash(bs);
-
-            System.Text.StringBuilder s = new System.Text.StringBuilder();
-
-            foreach (byte b in bs)
-            {
-                s.Append(b.ToString("x2").ToLower());
-            }
-
-            return s.ToString();
+			return text.ToMd5();
         }
 
         /// <summary>
@@ -1060,10 +1040,7 @@ namespace umbraco
         /// <returns>The text with text line breaks replaced with html linebreaks (<br/>)</returns>
         public static string ReplaceLineBreaks(string text)
         {
-            if (bool.Parse(GlobalSettings.EditXhtmlMode))
-                return text.Replace("\n", "<br/>\n");
-            else
-                return text.Replace("\n", "<br />\n");
+        	return GetUmbracoHelper().ReplaceLineBreaksForHtml(text);
         }
 
         /// <summary>

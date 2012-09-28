@@ -240,6 +240,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationEventsResolver.cs" />
+    <Compile Include="AreaRegistrationExtensions.cs" />
     <Compile Include="BaseRest\Configuration\BaseRestSection.cs" />
     <Compile Include="BaseRest\BaseRestHandler.cs" />
     <Compile Include="BaseRest\Configuration\ExtensionElement.cs" />
@@ -276,12 +277,29 @@
     <Compile Include="Mvc\HtmlTagWrapper.cs" />
     <Compile Include="Mvc\HtmlTagWrapperTextNode.cs" />
     <Compile Include="Mvc\IHtmlTagWrapper.cs" />
+    <Compile Include="Mvc\MergeModelStateToChildActionAttribute.cs" />
+    <Compile Include="Mvc\PluginController.cs" />
+    <Compile Include="Mvc\PostedDataProxyInfo.cs" />
+    <Compile Include="Mvc\RedirectToUmbracoPageResult.cs" />
+    <Compile Include="Mvc\Strings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Mvc\SurfaceController.cs" />
+    <Compile Include="Mvc\PluginControllerArea.cs" />
+    <Compile Include="Mvc\PluginControllerAttribute.cs" />
+    <Compile Include="Mvc\SurfaceControllerFactory.cs" />
+    <Compile Include="Mvc\PluginControllerMetadata.cs" />
+    <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="PropertyEditors\RteMacroRenderingPropertyEditorValueConverter.cs" />
     <Compile Include="PublishedMediaStoreResolver.cs" />
     <Compile Include="RenderFieldCaseType.cs" />
     <Compile Include="RenderFieldEncodingType.cs" />
+    <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Routing\LookupByPageIdQuery.cs" />
     <Compile Include="Routing\NoTemplateHandler.cs" />
+    <Compile Include="Mvc\SurfaceControllerResolver.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -296,6 +314,10 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProviderAccessUpdate.cs" />
+    <Compile Include="umbraco.presentation\umbraco\settings\views\editView.aspx.cs">
+      <DependentUpon>editView.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\uQuery\IGetProperty.cs" />
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="ViewContextExtensions.cs" />
@@ -1899,6 +1921,7 @@
     <Content Include="umbraco.presentation\umbraco\channels\rsd.aspx" />
     <Content Include="umbraco.presentation\umbraco\channels\wlwmanifest.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\mediaPicker.aspx" />
+    <Content Include="umbraco.presentation\umbraco\settings\views\editView.aspx" />
     <Content Include="umbraco.presentation\umbraco\webservices\MacroContainerService.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\empty.htm" />
@@ -1965,6 +1988,7 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertMacro.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx" />
+    <None Include="Mvc\web.config.template" />
     <None Include="Web References\org.umbraco.update\UpgradeResult1.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
@@ -2102,6 +2126,10 @@
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <EmbeddedResource Include="Mvc\Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="umbraco.presentation\install\steps\database.ascx.resx">
       <DependentUpon>database.ascx.cs</DependentUpon>
       <SubType>Designer</SubType>

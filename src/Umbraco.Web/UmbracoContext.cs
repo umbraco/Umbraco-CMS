@@ -16,6 +16,7 @@ using Examine;
 
 namespace Umbraco.Web
 {
+
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
@@ -199,6 +200,22 @@ namespace Umbraco.Web
 		}
 
 		/// <summary>
+		/// A shortcut to the UmbracoContext's RoutingContext's NiceUrlProvider
+		/// </summary>
+		/// <remarks>
+		/// If the RoutingContext is null, this will throw an exception.
+		/// </remarks>
+    	internal NiceUrlProvider NiceUrlProvider
+    	{
+    		get
+    		{
+    			if (RoutingContext == null)
+					throw new InvalidOperationException("Cannot access the NiceUrlProvider when the UmbracoContext's RoutingContext is null");
+    			return RoutingContext.NiceUrlProvider;
+    		}
+    	}
+
+		/// <summary>
 		/// Gets/sets the RoutingContext object
 		/// </summary>
 		internal RoutingContext RoutingContext { get; set; }	
@@ -228,7 +245,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the current page ID, or <c>null</c> if no page ID is available (e.g. a custom page).
         /// </summary>
-        public virtual int? PageId
+        public int? PageId
         {
             get
             {
@@ -248,7 +265,7 @@ namespace Umbraco.Web
         /// Gets the current logged in Umbraco user (editor).
         /// </summary>
         /// <value>The Umbraco user object or null</value>
-        public virtual User UmbracoUser
+        public User UmbracoUser
         {
             get
             {
@@ -260,7 +277,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>
-        public virtual bool InPreviewMode
+        public bool InPreviewMode
         {
             get
             {

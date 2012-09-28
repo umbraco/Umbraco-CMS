@@ -29,13 +29,7 @@ namespace Umbraco.Web.Media.ThumbnailProviders
 		/// </summary>
 		public IEnumerable<IThumbnailProvider> Providers
 		{
-			get 
-			{ 				
-				var vals = Values.ToList();
-				//ensure they are sorted
-				vals.Sort((f1, f2) => f1.Priority.CompareTo(f2.Priority));
-				return vals;
-			}
+			get { return GetSortedValues(); }
 		}
 
         public string GetThumbnailUrl(string fileUrl)

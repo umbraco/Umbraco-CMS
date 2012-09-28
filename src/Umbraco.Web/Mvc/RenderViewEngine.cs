@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Mvc
 {
@@ -31,6 +33,25 @@ namespace Umbraco.Web.Mvc
 
 			AreaPartialViewLocationFormats = new string[] { };
 			AreaViewLocationFormats = new string[] { };
+
+			EnsureFolderAndWebConfig();
+		}
+
+		/// <summary>
+		/// Ensures that the correct web.config for razor exists in the /Views folder.
+		/// </summary>
+		private void EnsureFolderAndWebConfig()
+		{
+			var viewFolder = IOHelper.MapPath(Constants.ViewLocation);
+			//ensure the web.config file is in the ~/Views folder
+			Directory.CreateDirectory(viewFolder);
+			if (!File.Exists(Path.Combine(viewFolder, "web.config")))
+			{
+				using (var writer = File.CreateText(Path.Combine(viewFolder, "web.config")))
+				{
+					writer.Write(Strings.web_config);
+				}
+			}
 		}
 
 		public override ViewEngineResult FindView(ControllerContext controllerContext, string viewName, string masterName, bool useCache)

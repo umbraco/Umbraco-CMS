@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="ContentStores\PublishMediaStoreTests.cs" />
     <Compile Include="DynamicDocument\DocumentTests.cs" />
+    <Compile Include="HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="Resolvers\ActionsResolverTests.cs" />
     <Compile Include="AsynchronousRollingFileAppenderTests.cs" />
     <Compile Include="BusinessLogic\ApplicationTest.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="DataTypeFactoryTests.cs" />
     <Compile Include="Routing\LookupByNiceUrlWithDomainsTests.cs" />
     <Compile Include="Routing\NiceUrlsProviderWithDomainsTests.cs" />
+    <Compile Include="Surface\PluginControllerAreaTests.cs" />
     <Compile Include="TestHelpers\BaseRoutingTest.cs" />
     <Compile Include="GlobalSettingsTests.cs" />
     <Compile Include="Routing\LookupByAliasTests.cs" />

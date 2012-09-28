@@ -32,27 +32,39 @@ namespace umbraco
     [Tree("settings", "templates", "Templates", sortOrder: 1)]
     public class loadTemplates : BaseTree
     {
-        public loadTemplates(string application) : base(application) { }
+        public loadTemplates(string application) : base(application) {}
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
-        {                        
-			rootNode.NodeType = "init" + TreeAlias;
+        {
+            if (!Umbraco.Core.Configuration.UmbracoSettings.EnableMvcSupport)  
+			    rootNode.NodeType = "init" + TreeAlias; 
+            else
+                rootNode.NodeType = "initviews";
+                
+            
 			rootNode.NodeID = "init";
         }
 
+
         public override void RenderJS(ref StringBuilder Javascript)
         {
+           
             Javascript.Append(
                 @"
                 function openTemplate(id) {
 	                UmbClientMgr.contentFrame('settings/editTemplate.aspx?templateID=' + id);
-                }
+                }   
+                
+                 function openView(id) {
+                    UmbClientMgr.contentFrame('settings/views/editView.aspx?templateID=' + id);
+			    }
 
                 function openSkin(id) {
 	                UmbClientMgr.contentFrame('settings/editSkin.aspx?skinID=' + id);
                 }
                 ");
         }
+
 
         public override void Render(ref XmlTree tree)
         {
@@ -69,7 +81,6 @@ namespace umbraco
                 RenderTemplates(ref tree);
             }
         }
-
 
         private void RenderTemplateFolderItems(string folder, string folderPath, ref XmlTree tree)
         {
@@ -184,11 +195,20 @@ namespace umbraco
                 XmlTreeNode xNode = XmlTreeNode.Create(this);
                 xNode.NodeID = t.Id.ToString();
                 xNode.Text = t.Text;
-                xNode.Action = "javascript:openTemplate(" + t.Id + ");";
-                xNode.Icon = "settingTemplate.gif";
-                xNode.OpenIcon = "settingTemplate.gif";
                 xNode.Source = GetTreeServiceUrl(t.Id);
                 xNode.HasChildren = t.HasChildren;
+                
+                if (UmbracoSettings.EnableMvcSupport && Template.HasView(t))
+                {
+                    xNode.Action = "javascript:openView(" + t.Id + ");";
+                    xNode.Icon = "settingView.gif";
+                    xNode.OpenIcon = "settingView.gif";
+                }else{
+                    xNode.Action = "javascript:openTemplate(" + t.Id + ");";
+                    xNode.Icon = "settingTemplate.gif";
+                    xNode.OpenIcon = "settingTemplate.gif";
+                }
+                
                 if (t.HasChildren)
                 {
                     xNode.Icon = "settingMasterTemplate.gif";
@@ -196,6 +216,7 @@ namespace umbraco
                 }
 
                 OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                
                 if (xNode != null)
                 {
                     tree.Add(xNode);

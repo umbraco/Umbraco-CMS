@@ -165,6 +165,23 @@ namespace Umbraco.Core.IO
             return true;
         }
 
+        public static bool ValidateEditPath(string filePath, string[] validDirs)
+        {
+            foreach (var dir in validDirs)
+            {
+                var validDir = dir;
+                if (!filePath.StartsWith(MapPath(SystemDirectories.Root)))
+                    filePath = MapPath(filePath);
+                if (!validDir.StartsWith(MapPath(SystemDirectories.Root)))
+                    validDir = MapPath(validDir);
+
+                if (filePath.StartsWith(validDir))
+                    return true;
+            }
+
+           throw new FileSecurityException(String.Format("The filepath '{0}' is not within an allowed directory for this type of files", filePath.Replace(MapPath(SystemDirectories.Root), "")));
+        }
+
         public static bool ValidateFileExtension(string filePath, List<string> validFileExtensions)
         {
             if (!filePath.StartsWith(MapPath(SystemDirectories.Root)))
