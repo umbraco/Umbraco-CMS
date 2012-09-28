@@ -152,7 +152,7 @@ namespace Umbraco.Core.IO
         /// <param name="filePath">filepath </param>
         /// <param name="validDir"></param>
         /// <returns>true if valid, throws a FileSecurityException if not</returns>
-        public static bool ValidateEditPath(string filePath, string validDir)
+        internal static bool ValidateEditPath(string filePath, string validDir)
         {
             if (!filePath.StartsWith(MapPath(SystemDirectories.Root)))
                 filePath = MapPath(filePath);
@@ -165,7 +165,7 @@ namespace Umbraco.Core.IO
             return true;
         }
 
-        public static bool ValidateEditPath(string filePath, string[] validDirs)
+        internal static bool ValidateEditPath(string filePath, IEnumerable<string> validDirs)
         {
             foreach (var dir in validDirs)
             {
@@ -182,7 +182,7 @@ namespace Umbraco.Core.IO
            throw new FileSecurityException(String.Format("The filepath '{0}' is not within an allowed directory for this type of files", filePath.Replace(MapPath(SystemDirectories.Root), "")));
         }
 
-        public static bool ValidateFileExtension(string filePath, List<string> validFileExtensions)
+        internal static bool ValidateFileExtension(string filePath, List<string> validFileExtensions)
         {
             if (!filePath.StartsWith(MapPath(SystemDirectories.Root)))
                 filePath = MapPath(filePath);
