@@ -28,17 +28,31 @@ namespace Umbraco.Web.Routing
 
 			if (bindToEvents)
 			{
-				//FIXME:
-				//
-				// here we must register handlers to clear the cache when content changes
-				// this was done by presentation.library, which cleared everything when content changed
-				// but really, we should do some partial refreshes
-
-				// these are the two events that were used by presentation.library
-				// are they enough?
-
+                // content - whenever the entire XML cache is rebuilt (from disk cache or from database)
+                //  we must clear the cache entirely
 				global::umbraco.content.AfterRefreshContent += (sender, e) => Clear();
+
+                // document - whenever a document is updated in, or removed from, the XML cache
+                //  we must clear the cache - at the moment, we clear the entire cache
+                //  TODO could we do partial updates instead of clearing the whole cache?
 				global::umbraco.content.AfterUpdateDocumentCache += (sender, e) => Clear();
+                global::umbraco.content.AfterClearDocumentCache += (sender, e) => Clear();
+
+                // domains - whenever a domain change we must clear the cache
+                //  because routes contain the id of root nodes of domains
+                //  TODO could we do partial updates instead of clearing the whole cache?
+                global::umbraco.cms.businesslogic.web.Domain.AfterDelete += (sender, e) => Clear();
+                global::umbraco.cms.businesslogic.web.Domain.AfterSave += (sender, e) => Clear();
+                global::umbraco.cms.businesslogic.web.Domain.New += (sender, e) => Clear();
+
+                // FIXME
+                // the content class needs to be refactored - at the moment 
+                // content.XmlContentInternal setter does not trigger any event
+                // content.UpdateDocumentCache(List<Document> Documents) does not trigger any event
+                // content.RefreshContentFromDatabaseAsync triggers AfterRefresh _while_ refreshing
+                // etc...
+                // in addition some events do not make sense... we trigger Publish when moving
+                // a node, which we should not (the node is moved, not published...) etc.
 			}			
 		}
 

@@ -155,7 +155,7 @@ namespace umbraco
                     {
                         Cache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
                     }
-                    requestHandler.ClearProcessedRequests();
+
                     _xmlContent = value;
 
                     if (!UmbracoSettings.isXmlContentCacheDisabled && UmbracoSettings.continouslyUpdateXmlDiskCache)
