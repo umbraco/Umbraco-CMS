@@ -1170,9 +1170,7 @@ namespace Umbraco.Core.Configuration
                     }
                     catch (Exception ex)
                     {
-                        Trace.WriteLine("Could not load /settings/templates/enableMvcSupport from umbracosettings.config:\r\n {0}",
-                                ex.Message);
-
+                        LogHelper.Error<UmbracoSettings>("Could not load /settings/templates/enableMvcSupport from umbracosettings.config", ex);
                         _enableMvc = false;
                     }
                 }
@@ -1180,35 +1178,6 @@ namespace Umbraco.Core.Configuration
             }
         }
 
-        private static string[] _mvcViewExtensions;
-        public static string[] MvcViewExtensions
-        {
-            get
-            {
-                string[] defaultValue = "cshtml".Split(',');
-
-                if (_mvcViewExtensions == null)
-                {
-                    try
-                    {   
-                        string value = GetKey("/settings/templates/mvcViewExtensions");
-                        if (!string.IsNullOrEmpty(value))
-                            _mvcViewExtensions = value.Split(',');
-                        else
-                            _mvcViewExtensions = defaultValue;
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.WriteLine("Could not load /settings/templates/mvcViewExtensions from umbracosettings.config:\r\n {0}",
-                                ex.Message);
-
-                        _mvcViewExtensions = defaultValue;
-                    }
-                }
-
-                return _mvcViewExtensions;
-            }
-        }
 
         /// <summary>
         /// Configuration regarding webservices

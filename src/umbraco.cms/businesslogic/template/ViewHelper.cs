@@ -30,7 +30,7 @@ namespace umbraco.cms.businesslogic.template
             string path = IOHelper.MapPath(ViewPath(t));
 
             if (!File.Exists(path) || overWrite)
-                viewContent = saveTemplateToFile(t, t.Alias);
+                viewContent = SaveTemplateToFile(t, t.Alias);
             else
             {
                 System.IO.TextReader tr = new StreamReader(path);
@@ -41,7 +41,7 @@ namespace umbraco.cms.businesslogic.template
             return viewContent;
         }
 
-        internal static string saveTemplateToFile(Template template, string currentAlias)
+        internal static string SaveTemplateToFile(Template template, string currentAlias)
         {
             var design = EnsureInheritedLayout(template);
             System.IO.File.WriteAllText(IOHelper.MapPath(ViewPath(template)), design, Encoding.UTF8);

@@ -17,7 +17,7 @@ namespace umbraco.cms.businesslogic.template
             string masterpageContent = "";
 
             if (!File.Exists(t.MasterPageFile) || overWrite)
-                masterpageContent = saveTemplateToFile(t, t.Alias);
+                masterpageContent = SaveTemplateToFile(t, t.Alias);
             else
             {
                 System.IO.TextReader tr = new StreamReader(t.MasterPageFile);
@@ -42,19 +42,19 @@ namespace umbraco.cms.businesslogic.template
 
         internal static string UpdateMasterpageFile(Template t, string currentAlias)
         {
-            return saveTemplateToFile(t, currentAlias);
+            return SaveTemplateToFile(t, currentAlias);
         }
 
-        internal static string saveTemplateToFile(Template template, string currentAlias)
+        internal static string SaveTemplateToFile(Template template, string currentAlias)
         {
             var masterPageContent = template.Design;
-            if (!isMasterPageSyntax(masterPageContent))
+            if (!IsMasterPageSyntax(masterPageContent))
                 masterPageContent = ConvertToMasterPageSyntax(template);
 
             // Add header to master page if it doesn't exist
             if (!masterPageContent.TrimStart().StartsWith("<%@"))
             {
-                masterPageContent = getMasterPageHeader(template) + "\n" + masterPageContent;
+                masterPageContent = GetMasterPageHeader(template) + "\n" + masterPageContent;
             }
             else
             {
@@ -73,7 +73,7 @@ namespace umbraco.cms.businesslogic.template
                     {
                         // validate the masterpagefile
                         string currentMasterPageFile = attributeSet.Groups["attributeValue"].Value;
-                        string currentMasterTemplateFile = parentTemplatePath(template);
+                        string currentMasterTemplateFile = ParentTemplatePath(template);
 
                         if (currentMasterPageFile != currentMasterTemplateFile)
                         {
@@ -131,17 +131,17 @@ namespace umbraco.cms.businesslogic.template
             return masterPageContent;
         }
 
-        private static bool isMasterPageSyntax(string code)
+        private static bool IsMasterPageSyntax(string code)
         {
             return code.Contains("<%@ Master") || code.Contains("<umbraco:Item") || code.Contains("<asp:") || code.Contains("<umbraco:Macro");
         }
 
-        private static string getMasterPageHeader(Template template)
+        private static string GetMasterPageHeader(Template template)
         {
-            return String.Format("<%@ Master Language=\"C#\" MasterPageFile=\"{0}\" AutoEventWireup=\"true\" %>", parentTemplatePath(template)) + Environment.NewLine;
+            return String.Format("<%@ Master Language=\"C#\" MasterPageFile=\"{0}\" AutoEventWireup=\"true\" %>", ParentTemplatePath(template)) + Environment.NewLine;
         }
 
-        private static string parentTemplatePath(Template template)
+        private static string ParentTemplatePath(Template template)
         {
             var masterTemplate = DefaultMasterTemplate;
             if (template.MasterTemplate != 0)
@@ -168,18 +168,18 @@ namespace umbraco.cms.businesslogic.template
 
         internal static string EnsureMasterPageSyntax(string templateAlias, string masterPageContent)
         {
-            replaceElement(ref masterPageContent, "?UMBRACO_GETITEM", "umbraco:Item", true);
-            replaceElement(ref masterPageContent, "?UMBRACO_GETITEM", "umbraco:Item", false);
+            ReplaceElement(ref masterPageContent, "?UMBRACO_GETITEM", "umbraco:Item", true);
+            ReplaceElement(ref masterPageContent, "?UMBRACO_GETITEM", "umbraco:Item", false);
 
             // Parse the design for macros
-            replaceElement(ref masterPageContent, "?UMBRACO_MACRO", "umbraco:Macro", true);
-            replaceElement(ref masterPageContent, "?UMBRACO_MACRO", "umbraco:Macro", false);
+            ReplaceElement(ref masterPageContent, "?UMBRACO_MACRO", "umbraco:Macro", true);
+            ReplaceElement(ref masterPageContent, "?UMBRACO_MACRO", "umbraco:Macro", false);
 
             // Parse the design for load childs
-            masterPageContent = masterPageContent.Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD/>",  createDefaultPlaceHolder(templateAlias))
-                                                 .Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD />", createDefaultPlaceHolder(templateAlias));
+            masterPageContent = masterPageContent.Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD/>",  CreateDefaultPlaceHolder(templateAlias))
+                                                 .Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD />", CreateDefaultPlaceHolder(templateAlias));
             // Parse the design for aspnet forms
-            getAspNetMasterPageForm(ref masterPageContent, templateAlias);
+            GetAspNetMasterPageForm(ref masterPageContent, templateAlias);
             masterPageContent = masterPageContent.Replace("</?ASPNET_FORM>", "</form>");
             // Parse the design for aspnet heads
             masterPageContent = masterPageContent.Replace("</ASPNET_HEAD>", String.Format("<head id=\"{0}Head\" runat=\"server\">", templateAlias.Replace(" ", "")));
@@ -188,9 +188,9 @@ namespace umbraco.cms.businesslogic.template
         }
 
 
-        private static void getAspNetMasterPageForm(ref string design, string templateAlias)
+        private static void GetAspNetMasterPageForm(ref string design, string templateAlias)
         {
-            Match formElement = Regex.Match(design, getElementRegExp("?ASPNET_FORM", false), RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+            Match formElement = Regex.Match(design, GetElementRegExp("?ASPNET_FORM", false), RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
             
             if (formElement != null && formElement.Value != "")
             {
@@ -203,15 +203,15 @@ namespace umbraco.cms.businesslogic.template
             }
         }
 
-        private static string createDefaultPlaceHolder(string templateAlias)
+        private static string CreateDefaultPlaceHolder(string templateAlias)
         {
             return String.Format("<asp:ContentPlaceHolder ID=\"{0}ContentPlaceHolder\" runat=\"server\"></asp:ContentPlaceHolder>", templateAlias.Replace(" ", ""));
         }
 
-        private static void replaceElement(ref string design, string elementName, string newElementName, bool checkForQuotes)
+        private static void ReplaceElement(ref string design, string elementName, string newElementName, bool checkForQuotes)
         {
             MatchCollection m =
-                Regex.Matches(design, getElementRegExp(elementName, checkForQuotes),
+                Regex.Matches(design, GetElementRegExp(elementName, checkForQuotes),
                   RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
             foreach (Match match in m)
@@ -248,7 +248,7 @@ namespace umbraco.cms.businesslogic.template
             }
         }
 
-        private static string getElementRegExp(string elementName, bool checkForQuotes)
+        private static string GetElementRegExp(string elementName, bool checkForQuotes)
         {
             if (checkForQuotes)
                 return String.Format("\"<[^>\\s]*\\b{0}(\\b[^>]*)>\"", elementName);
