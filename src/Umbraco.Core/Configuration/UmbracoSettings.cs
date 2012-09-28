@@ -398,25 +398,6 @@ namespace Umbraco.Core.Configuration
             }
         }
 
-		public static bool HandleMissingTemplateAs404
-		{
-			get
-			{
-				try
-				{
-					bool result;
-					if (bool.TryParse(GetKey("/settings/templates/handleMissingTemplateAs404"), out result))
-						return result;
-					return false;
-				}
-				catch
-				{
-					return false;
-				}
-			}
-		}
-
-
         /// <summary>
         /// Gets a value indicating whether umbraco will attempt to load any skins to override default template files
         /// </summary>
