@@ -33,10 +33,7 @@ namespace Umbraco.Core
 			_timer = DisposableTimer.Start(x => LogHelper.Info<CoreBootManager>("Umbraco application startup complete" + " (took " + x + "ms)"));
 
 			//create the ApplicationContext
-			ApplicationContext = ApplicationContext.Current = new ApplicationContext()
-			{
-				IsReady = true	// fixme
-			};
+			ApplicationContext = ApplicationContext.Current = new ApplicationContext();
 
 			InitializeResolvers();
 

@@ -108,6 +108,9 @@ namespace Umbraco.Web
 			ApplicationEventsResolver.Current.ApplicationEventHandlers
 				.ForEach(x => x.OnApplicationStarted(_umbracoApplication, ApplicationContext));
 
+			// we're ready to serve content!
+			ApplicationContext.IsReady = true;
+
 			return this;
 		}
 

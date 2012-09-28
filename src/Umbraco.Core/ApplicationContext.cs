@@ -36,6 +36,7 @@ namespace Umbraco.Core
         // note - the original umbraco module checks on content.Instance in umbraco.dll
         //   now, the boot task that setup the content store ensures that it is ready
         bool _isReady = false;
+		System.Threading.ManualResetEventSlim _isReadyEvent = new System.Threading.ManualResetEventSlim(false);
         public bool IsReady
         {
             get
@@ -46,8 +47,14 @@ namespace Umbraco.Core
             {
                 AssertIsNotReady();
                 _isReady = value;
+				_isReadyEvent.Set();
             }
         }
+
+		public bool WaitForReady(int timeout)
+		{
+			return _isReadyEvent.WaitHandle.WaitOne(timeout);
+		}
 
 
         // notes
