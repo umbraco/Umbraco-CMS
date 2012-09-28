@@ -313,6 +313,19 @@ namespace Umbraco.Web
 		/// <param name="action"></param>
 		/// <param name="controllerName"></param>
 		/// <param name="area"></param>
+		/// <returns></returns>
+		public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName, string area)
+		{
+			return html.BeginUmbracoForm(action, controllerName, area, null, new Dictionary<string, object>());
+		}
+
+		/// <summary>
+		/// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
+		/// </summary>
+		/// <param name="html"></param>
+		/// <param name="action"></param>
+		/// <param name="controllerName"></param>
+		/// <param name="area"></param>
 		/// <param name="additionalRouteVals"></param>
 		/// <param name="htmlAttributes"></param>
 		/// <returns></returns>

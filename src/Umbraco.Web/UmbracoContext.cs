@@ -245,7 +245,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the current page ID, or <c>null</c> if no page ID is available (e.g. a custom page).
         /// </summary>
-        public virtual int? PageId
+        public int? PageId
         {
             get
             {
@@ -265,7 +265,7 @@ namespace Umbraco.Web
         /// Gets the current logged in Umbraco user (editor).
         /// </summary>
         /// <value>The Umbraco user object or null</value>
-        public virtual User UmbracoUser
+        public User UmbracoUser
         {
             get
             {
@@ -277,7 +277,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>
-        public virtual bool InPreviewMode
+        public bool InPreviewMode
         {
             get
             {

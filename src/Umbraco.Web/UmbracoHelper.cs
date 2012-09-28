@@ -37,8 +37,12 @@ namespace Umbraco.Web
 		internal UmbracoHelper(UmbracoContext umbracoContext)
 		{
 			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+			if (umbracoContext.RoutingContext == null) throw new NullReferenceException("The RoutingContext on the UmbracoContext cannot be null");
 			_umbracoContext = umbracoContext;
-			_currentPage = _umbracoContext.DocumentRequest.Document;
+			if (_umbracoContext.IsFrontEndUmbracoRequest)
+			{
+				_currentPage = _umbracoContext.DocumentRequest.Document;	
+			}
 		}
 
 
@@ -130,6 +134,10 @@ namespace Umbraco.Web
 			RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged,
 			string formatString = "")
 		{
+			if (_currentPage == null)
+			{
+				throw new InvalidOperationException("Cannot call this method when not rendering a front-end document");
+			}
 			return Field(_currentPage, fieldAlias, valueAlias, altFieldAlias, altValueAlias,
 				altText, insertBefore, insertAfter, recursive, convertLineBreaks, removeParagraphTags,
 				casing, encoding, formatString);

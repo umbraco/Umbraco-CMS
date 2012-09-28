@@ -311,6 +311,7 @@
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProviderAccessUpdate.cs" />
     <Compile Include="umbraco.presentation\umbraco\settings\views\editView.aspx.cs">
       <DependentUpon>editView.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\uQuery\IGetProperty.cs" />
     <Compile Include="UmbracoHelper.cs" />
