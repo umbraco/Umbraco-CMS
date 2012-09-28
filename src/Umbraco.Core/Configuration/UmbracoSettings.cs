@@ -148,6 +148,11 @@ namespace Umbraco.Core.Configuration
 			get { return "~/default.aspx"; }
 		}
 
+        internal static string NoContentSplashPage
+        {
+            get { return "~/config/splashes/noNodes.aspx"; }
+        }
+
         /// <summary>
         /// Gets a value indicating whether logging is enabled in umbracoSettings.config (/settings/logging/enableLogging).
         /// </summary>

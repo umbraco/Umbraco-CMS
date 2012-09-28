@@ -9,5 +9,6 @@ namespace Umbraco.Web
 	{		
 		IDocument GetDocumentByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null);
 		IDocument GetDocumentByUrlAlias(UmbracoContext umbracoContext, int rootNodeId, string alias);
+        bool HasContent(UmbracoContext umbracoContext);
 	}
 }

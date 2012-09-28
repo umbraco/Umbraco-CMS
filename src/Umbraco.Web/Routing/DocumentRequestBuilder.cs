@@ -231,7 +231,10 @@ namespace Umbraco.Web.Routing
 		/// Follows internal redirections through the <c>umbracoInternalRedirectId</c> document property.
 		/// </summary>
 		/// <returns>A value indicating whether redirection took place and led to a new published document.</returns>
-		/// <remarks>Redirecting to a different site root and/or culture will not pick the new site root nor the new culture.</remarks>
+		/// <remarks>
+		/// <para>Redirecting to a different site root and/or culture will not pick the new site root nor the new culture.</para>
+		/// <para>As per legacy, if the redirect does not work, we just ignore it.</para>
+		/// </remarks>
 		private bool FollowInternalRedirects()
 		{
 			const string tracePrefix = "FollowInternalRedirects: ";
@@ -252,8 +255,8 @@ namespace Umbraco.Web.Routing
 
 				if (internalRedirectId <= 0)
 				{
-					// bad redirect
-					_documentRequest.Document = null;
+					// bad redirect - log and display the current page (legacy behavior)
+					//_documentRequest.Document = null; // no! that would be to force a 404
 					LogHelper.Debug<DocumentRequest>("{0}Failed to redirect to id={1}: invalid value", () => tracePrefix, () => internalRedirect);
 				}
 				else if (internalRedirectId == _documentRequest.DocumentId)
@@ -375,18 +378,22 @@ namespace Umbraco.Web.Routing
 			if (!_documentRequest.HasTemplate)
 			{
 				LogHelper.Debug<DocumentRequest>("{0}No template was found.");
-				// do not do it if we're already 404 else it creates an infinite loop
-				if (Umbraco.Core.Configuration.UmbracoSettings.HandleMissingTemplateAs404 && !_documentRequest.Is404)
-				{
-					LogHelper.Debug<DocumentRequest>("{0}Assume page not found (404).");
-					_documentRequest.Document = null;
-				}
+
+				// initial idea was: if we're not already 404 and UmbracoSettings.HandleMissingTemplateAs404 is true
+				// then reset _documentRequest.Document to null to force a 404.
+				//
+				// but: because we want to let MVC hijack routes even though no template is defined, we decide that
+				// a missing template is OK but the request will then be forwarded to MVC, which will need to take
+				// care of everything.
+				//
+				// so, don't set _documentRequest.Document to null here
 			}
 		}
 
 		/// <summary>
 		/// Follows external redirection through <c>umbracoRedirect</c> document property.
 		/// </summary>
+		/// <remarks>As per legacy, if the redirect does not work, we just ignore it.</remarks>
 		private void FollowRedirect()
 		{
 			if (_documentRequest.HasNode)

@@ -88,6 +88,13 @@ namespace Umbraco.Web
 			return ConvertToDocument(GetXml(umbracoContext).SelectSingleNode(xpath));
         }
 
+        public bool HasContent(UmbracoContext umbracoContext)
+        {
+            const string xpath = "/root/*[@isDoc]";
+            var node = GetXml(umbracoContext).SelectSingleNode(xpath);
+            return node != null;
+        }
+
 		XmlDocument GetXml(UmbracoContext umbracoContext)
 		{
 			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
