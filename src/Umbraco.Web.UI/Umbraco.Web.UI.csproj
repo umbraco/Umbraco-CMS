@@ -370,6 +370,7 @@
     <Content Include="umbraco\plugins\uGoLive\run.png" />
     <Content Include="umbraco\plugins\uGoLive\throbber.gif" />
     <Content Include="umbraco\plugins\uGoLive\tick.png" />
+    <Content Include="umbraco\settings\views\editView.aspx" />
     <Content Include="umbraco\webservices\api\DocumentService.asmx" />
     <Content Include="umbraco\webservices\api\FileService.asmx" />
     <Content Include="umbraco\webservices\api\MaintanceService.asmx" />

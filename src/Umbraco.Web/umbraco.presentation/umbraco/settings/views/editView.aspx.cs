@@ -14,7 +14,7 @@ using umbraco.uicontrols;
 
 namespace umbraco.cms.presentation.settings.views
 {
-    public partial class editView : BasePages.UmbracoEnsuredPage
+    public partial class EditView : BasePages.UmbracoEnsuredPage
     {
         private Template _template;
 
@@ -35,52 +35,46 @@ namespace umbraco.cms.presentation.settings.views
         protected global::System.Web.UI.WebControls.Repeater rpt_macros;
 
 
-        public editView()
+        public EditView()
         {
             CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
         }
 
-        protected void Page_Load(object sender, EventArgs e)
+        protected override void OnLoad(EventArgs e)
         {
+            base.OnLoad(e);
+
             MasterTemplate.Attributes.Add("onchange", "changeMasterPageFile()");
 
             if (!IsPostBack)
             {
                 MasterTemplate.Items.Add(new ListItem(ui.Text("none"), "0"));
+                var selectedTemplate = string.Empty;
 
                 foreach (Template t in Template.GetAllAsList())
                 {
-                    if (t.Id != _template.Id)
-                    {
-                        var li = new ListItem(t.Text, t.Id.ToString());
+                    if (t.Id == _template.Id) continue;
+                    
+                    var li = new ListItem(t.Text, t.Id.ToString());
+                    li.Attributes.Add("id", t.Alias.Replace(" ", ""));
 
-                        li.Attributes.Add("id", t.Alias.Replace(" ", ""));
-
-                        if (t.Id == _template.MasterTemplate)
-                        {
-                            try
-                            {
-                                li.Selected = true;
-                            }
-                            catch
-                            {
-                            }
-                        }
-                        MasterTemplate.Items.Add(li);
-                    }
+                    if (t.Id == _template.MasterTemplate)
+                        selectedTemplate = t.Alias.Replace(" ", "");
+                        
+                    MasterTemplate.Items.Add(li);
                 }
+
+                MasterTemplate.SelectedValue = selectedTemplate;
 
                 NameTxt.Text = _template.GetRawText();
                 AliasTxt.Text = _template.Alias;
                 editorSource.Text = _template.Design;
-
 
                 ClientTools
                     .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadTemplates>().Tree.Alias)
                     .SyncTree("-1,init," + _template.Path.Replace("-1,", ""), false);
             }
         }
-
 
 
         #region Web Form Designer generated code
