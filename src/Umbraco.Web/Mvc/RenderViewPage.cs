@@ -71,5 +71,10 @@ namespace Umbraco.Web.Mvc
 			get { return _helper ?? (_helper = new UmbracoHelper(UmbracoContext)); }
 		}
 
+		public override void Write(object value)
+		{
+			base.Write(value);
+		}
+
 	}
 }
