@@ -233,10 +233,8 @@ namespace Umbraco.Web
 				ItemRenderer.Instance.Load(item);
 				ItemRenderer.Instance.Render(item, htmlWriter);
 				
-				//Now, we need to ensure that local links are parsed
-				return new HtmlString(
-					TemplateUtilities.ParseInternalLinks(
-						output.ToString()));
+				//because we are rendering the output through the legacy Item (webforms) stuff, the {localLinks} will already be replaced.
+				return new HtmlString(output.ToString());
 			}
 		}
 
