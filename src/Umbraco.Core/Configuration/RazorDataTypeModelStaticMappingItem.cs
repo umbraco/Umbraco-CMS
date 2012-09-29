@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.Configuration
 {
 
 	//NOTE: This is used in the old DynamicNode for performing value conversions/mappings for certain data types.

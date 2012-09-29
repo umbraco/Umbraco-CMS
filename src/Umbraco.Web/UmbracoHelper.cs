@@ -168,6 +168,9 @@ namespace Umbraco.Web
 			RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged,
 			string formatString = "")
 		{
+			Mandate.ParameterNotNull(currentPage, "currentPage");
+			Mandate.ParameterNotNullOrEmpty(fieldAlias, "fieldAlias");
+
 			//TODO: This is real nasty and we should re-write the 'item' and 'ItemRenderer' class but si fine for now
 
 			var attributes = new Dictionary<string, string>

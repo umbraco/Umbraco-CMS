@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Umbraco.Core;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {

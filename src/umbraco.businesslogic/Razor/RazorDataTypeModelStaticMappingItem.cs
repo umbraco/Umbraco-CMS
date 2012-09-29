@@ -8,7 +8,7 @@ namespace umbraco.MacroEngines
 	[Obsolete("use Umbraco.Core.RazorDataTypeModelStaticMappingItem instead")]
     public class RazorDataTypeModelStaticMappingItem
 	{
-		private readonly Umbraco.Core.RazorDataTypeModelStaticMappingItem _realMappingItem = new Umbraco.Core.RazorDataTypeModelStaticMappingItem();
+		private readonly Umbraco.Core.Configuration.RazorDataTypeModelStaticMappingItem _realMappingItem = new Umbraco.Core.Configuration.RazorDataTypeModelStaticMappingItem();
 
 		public string Raw
 		{

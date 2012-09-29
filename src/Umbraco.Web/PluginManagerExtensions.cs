@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core;
+using Umbraco.Core.Media;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using umbraco;
