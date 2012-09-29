@@ -70,7 +70,7 @@ namespace Umbraco.Web.Templates
 						//                else
 						if (!String.IsNullOrEmpty(url))
 						{
-							string resolvedUrl = (url.Substring(0, 1) == "/") ? IOHelper.ResolveUrl(url.Substring(1)) : ResolveUrl(url);
+							string resolvedUrl = (url.Substring(0, 1) == "/") ? IOHelper.ResolveUrl(url.Substring(1)) : IOHelper.ResolveUrl(url);
 							text = text.Replace(url, resolvedUrl);
 						}
 					}
