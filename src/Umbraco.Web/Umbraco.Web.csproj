@@ -301,6 +301,7 @@
     <Compile Include="Routing\NoTemplateHandler.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
     <Compile Include="Routing\RenderingEngine.cs" />
+    <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

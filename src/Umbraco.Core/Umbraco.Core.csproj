@@ -131,7 +131,6 @@
     <Compile Include="ObjectResolution\Resolution.cs" />
     <Compile Include="ObjectResolution\ResolverBase.cs" />
     <Compile Include="ObjectResolution\SingleObjectResolverBase.cs" />
-    <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="ReadLock.cs" />
     <Compile Include="TypeFinder.cs" />
