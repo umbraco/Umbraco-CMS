@@ -10,7 +10,7 @@ using System.IO;
 namespace Umbraco.Core.IO
 {
     //all paths has a starting but no trailing /
-	internal class SystemDirectories
+	public class SystemDirectories
     {
         public static string Bin
         {

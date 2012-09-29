@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.UI;
 using System.Xml;
 using Umbraco.Core.Macros;
+using Umbraco.Web.Templates;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.web;
@@ -65,7 +66,7 @@ namespace umbraco.presentation.templateControls
 				// handle text before/after
 				xsltTransformedOutput = AddBeforeAfterText(xsltTransformedOutput, helper.FindAttribute(item.LegacyAttributes, "insertTextBefore"), helper.FindAttribute(item.LegacyAttributes, "insertTextAfter"));
 				string finalResult = xsltTransformedOutput.Trim().Length > 0 ? xsltTransformedOutput : GetEmptyText(item);
-				writer.Write(IOHelper.ResolveUrlsFromTextString(finalResult));
+				writer.Write(TemplateUtilities.ResolveUrlsFromTextString(finalResult));
 			}
 			catch (Exception renderException)
 			{
