@@ -157,7 +157,7 @@ namespace Umbraco.Web
 			// pass off to our handlers (mvc or webforms)
 
 			// assign the legacy page back to the docrequest
-			// handlers like default.aspx will want it
+			// handlers like default.aspx will want it and most macros currently need it
 			docreq.UmbracoPage = new page(docreq);
 
 			// these two are used by many legacy objects
@@ -360,7 +360,7 @@ namespace Umbraco.Web
 		/// </summary>		
 		/// <param name="context"></param>
 		/// <param name="currentQuery"></param>
-		/// <param name="isMvc"> </param>
+		/// <param name="engine"> </param>
 		private void RewriteToUmbracoHandler(HttpContext context, string currentQuery, RenderingEngine engine)
 		{
 

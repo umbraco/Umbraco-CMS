@@ -19,13 +19,6 @@ using umbraco.interfaces;
 
 namespace Umbraco.Web.Routing
 {
-
-	internal enum RenderingEngine
-	{
-		Mvc,
-		WebForms
-	}
-	
 	/// <summary>
 	/// represents a request for one specified Umbraco document to be rendered
 	/// by one specified template, using one particular culture.
@@ -154,9 +147,9 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the requested document could not be found.
+        /// Gets or sets a value indicating whether the requested document could not be found. This is set in the DocumentRequestBuilder.
         /// </summary>
-        public bool Is404 { get; internal set; }
+        internal bool Is404 { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the document request triggers a redirect.

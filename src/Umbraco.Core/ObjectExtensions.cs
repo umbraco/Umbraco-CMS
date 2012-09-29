@@ -99,11 +99,16 @@ namespace Umbraco.Core
 			}
 
 			var inputConverter = TypeDescriptor.GetConverter(input);
-			if (inputConverter != null)
+			if (inputConverter.CanConvertTo(destinationType))
 			{
-				if (inputConverter.CanConvertTo(destinationType))
+				try
 				{
-					return new Attempt<object>(true, inputConverter.ConvertTo(input, destinationType));
+					var converted = inputConverter.ConvertTo(input, destinationType);
+					return new Attempt<object>(true, converted);
+				}
+				catch (Exception e)
+				{
+					return new Attempt<object>(e);
 				}
 			}
 
@@ -112,18 +117,9 @@ namespace Umbraco.Core
 				var boolConverter = new CustomBooleanTypeConverter();
 				if (boolConverter.CanConvertFrom(input.GetType()))
 				{
-					return new Attempt<object>(true, boolConverter.ConvertFrom(input));
-				}
-			}
-
-			var outputConverter = TypeDescriptor.GetConverter(destinationType);
-			if (outputConverter != null)
-			{
-				if (outputConverter.CanConvertFrom(input.GetType()))
-				{
 					try
 					{
-						var converted = outputConverter.ConvertFrom(input);
+						var converted = boolConverter.ConvertFrom(input);
 						return new Attempt<object>(true, converted);
 					}
 					catch (Exception e)
@@ -133,17 +129,32 @@ namespace Umbraco.Core
 				}
 			}
 
-			try
+			var outputConverter = TypeDescriptor.GetConverter(destinationType);
+			if (outputConverter.CanConvertFrom(input.GetType()))
 			{
-				if (TypeHelper.IsTypeAssignableFrom<IConvertible>(input))
+				try
+				{
+					var converted = outputConverter.ConvertFrom(input);
+					return new Attempt<object>(true, converted);
+				}
+				catch (Exception e)
+				{
+					return new Attempt<object>(e);
+				}
+			}
+
+
+			if (TypeHelper.IsTypeAssignableFrom<IConvertible>(input))
+			{
+				try
 				{
 					var casted = Convert.ChangeType(input, destinationType);
 					return new Attempt<object>(true, casted);
 				}
-			}
-			catch (Exception)
-			{
-				/* Swallow */
+				catch (Exception e)
+				{
+					return new Attempt<object>(e);
+				}
 			}
 
 			return Attempt<object>.False;
@@ -161,7 +172,7 @@ namespace Umbraco.Core
 		//    CamelCase,
 		//    CaseInsensitive
 		//}
-		
+
 		///// <summary>
 		///// Convert an object to a JSON string with camelCase formatting
 		///// </summary>
@@ -220,7 +231,7 @@ namespace Umbraco.Core
 
 		//    return JObject.FromObject(obj, serializer).ToString(Formatting.None, dateTimeConverter);
 		//}
-		
+
 		/// <summary>
 		/// Converts an object into a dictionary
 		/// </summary>
@@ -231,7 +242,7 @@ namespace Umbraco.Core
 		/// <param name="ignoreProperties"></param>
 		/// <returns></returns>
 		public static IDictionary<string, TVal> ToDictionary<T, TProperty, TVal>(this T o,
-		                                                                         params Expression<Func<T, TProperty>>[] ignoreProperties)
+																				 params Expression<Func<T, TProperty>>[] ignoreProperties)
 		{
 			return o.ToDictionary<TVal>(ignoreProperties.Select(e => o.GetPropertyInfo(e)).Select(propInfo => propInfo.Name).ToArray());
 		}
@@ -285,8 +296,8 @@ namespace Umbraco.Core
 					var items = (from object enumItem in enumerable let value = GetEnumPropertyDebugString(enumItem, levels) where value != null select value).Take(10).ToList();
 
 					return items.Count() > 0
-					       	? "{{ {0} }}".InvariantFormat(String.Join(", ", items))
-					       	: null;
+							? "{{ {0} }}".InvariantFormat(String.Join(", ", items))
+							: null;
 				}
 
 				var props = obj.GetType().GetProperties();
@@ -312,8 +323,8 @@ namespace Umbraco.Core
 						select "{0}={1}".InvariantFormat(propertyInfo.Name, value);
 
 					return items.Count() > 0
-					       	? "[{0}]:{{ {1} }}".InvariantFormat(obj.GetType().Name, String.Join(", ", items))
-					       	: null;
+							? "[{0}]:{{ {1} }}".InvariantFormat(obj.GetType().Name, String.Join(", ", items))
+							: null;
 				}
 			}
 			catch (Exception ex)

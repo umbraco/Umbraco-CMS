@@ -370,7 +370,7 @@ namespace Umbraco.Web.Routing
 			else
 			{
 				LogHelper.Debug<DocumentRequest>("{0}Look for template alias=\"{1}\" (altTemplate)", () => tracePrefix, () => templateAlias);
-				//TODO: Need to figure out if this is web forms or MVC based on template name somehow!!
+
 				var template = Template.GetByAlias(templateAlias);
 				_documentRequest.Template = template;
 			}
