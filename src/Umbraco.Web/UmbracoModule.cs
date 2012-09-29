@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Web;
+using System.Web.Compilation;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.UI;
@@ -397,6 +398,10 @@ namespace Umbraco.Web
 					rewritePath = "~/default.aspx" + currentQuery;
 					//First we rewrite the path to the path of the handler (i.e. default.aspx or /umbraco/RenderMvc )
 					context.RewritePath(rewritePath, "", currentQuery.TrimStart(new[] { '?' }), false);
+
+					//now, execute the handler
+					var webFormshandler = (global::umbraco.UmbracoDefault)BuildManager.CreateInstanceFromVirtualPath("~/default.aspx", typeof(global::umbraco.UmbracoDefault));
+					context.RemapHandler(webFormshandler);
 					break;
 			}
 
