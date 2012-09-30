@@ -1,4 +1,4 @@
-<%@ Page Language="c#" CodeBehind="treeInit.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.TreeInit" %>
+<%@ Page Language="c#" CodeBehind="TreeInit.aspx.cs" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Umbraco.TreeInit" %>
 <%@ Register Src="controls/Tree/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>

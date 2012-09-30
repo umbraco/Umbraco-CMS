@@ -260,12 +260,19 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="umbraco\Umbraco.aspx.cs">
-			<DependentUpon>umbraco.aspx</DependentUpon>
+    <Compile Include="umbraco\TreeInit.aspx.cs">
+			<DependentUpon>treeInit.aspx</DependentUpon>  
 			<SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco\TreeInit.aspx.designer.cs">
+      <DependentUpon>treeInit.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\Umbraco.aspx.cs">
+      <DependentUpon>umbraco.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco\Umbraco.aspx.designer.cs">
-      <DependentUpon>Umbraco.aspx.cs</DependentUpon>
+      <DependentUpon>Umbraco.aspx</DependentUpon>
     </Compile>
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />

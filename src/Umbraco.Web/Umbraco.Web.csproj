@@ -1656,11 +1656,7 @@
       <DependentUpon>tree.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\treeInit.aspx.cs">
-      <DependentUpon>treeInit.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\treeInit.aspx.designer.cs">
-      <DependentUpon>treeInit.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\BaseContentTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\BaseTree.cs" />
@@ -2084,7 +2080,6 @@
     <Content Include="umbraco.presentation\umbraco\tree.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\treeInit.aspx" />
     <Content Include="umbraco.presentation\umbraco\users\EditUser.aspx" />
     <Content Include="umbraco.presentation\umbraco\users\EditUserType.aspx" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
