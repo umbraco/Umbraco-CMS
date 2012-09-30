@@ -33,7 +33,7 @@ namespace Umbraco.Web.Routing
             {
 				var pos = docRequest.Uri.AbsolutePath.LastIndexOf('/');
 				var templateAlias = docRequest.Uri.AbsolutePath.Substring(pos + 1);
-				path = path.Substring(0, pos);
+				path = pos == 0 ? "/" : path.Substring(0, pos);
 
 				//TODO: We need to check if the altTemplate is for MVC or not, though I'm not exactly sure how the best
 				// way to do that would be since the template is just an alias and if we are not having a flag on the 
