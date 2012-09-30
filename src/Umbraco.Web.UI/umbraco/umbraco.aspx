@@ -1,5 +1,5 @@
 <%@ Page Trace="false" Language="c#" CodeBehind="umbraco.aspx.cs" AutoEventWireup="True"
-    Inherits="umbraco.cms.presentation._umbraco" %>
+    Inherits="Umbraco.Web.UI.Umbraco.Umbraco" %>
 
 <%@ Register Src="controls/Tree/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>

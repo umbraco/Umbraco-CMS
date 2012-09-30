@@ -260,6 +260,13 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="umbraco\Umbraco.aspx.cs">
+			<DependentUpon>umbraco.aspx</DependentUpon>
+			<SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\Umbraco.aspx.designer.cs">
+      <DependentUpon>Umbraco.aspx.cs</DependentUpon>
+    </Compile>
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
     <None Include="config\404handlers.Release.config">
