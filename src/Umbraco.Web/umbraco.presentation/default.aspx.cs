@@ -11,6 +11,7 @@ using Umbraco.Web;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Web.Templates;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic;
 
@@ -123,7 +124,7 @@ namespace umbraco
 			string text = sw.ToString();
 
 			// filter / parse internal links - although this should be done elsewhere!
-			text = template.ParseInternalLinks(text);
+			text = TemplateUtilities.ParseInternalLinks(text);
 
 			// filter / add preview banner
 			if (UmbracoContext.Current.InPreviewMode)

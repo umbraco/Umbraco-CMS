@@ -19,7 +19,7 @@ namespace Umbraco.Core.Dynamics
 	/// </summary>
 	public class DynamicDocument : DynamicObject
 	{
-		private readonly IDocument _backingItem;
+		private readonly IDocument _document;
 		private DynamicDocumentList _cachedChildren;
 		private readonly ConcurrentDictionary<string, object> _cachedMemberOutput = new ConcurrentDictionary<string, object>();
 
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Dynamics
 		public DynamicDocument(IDocument node)
 		{
 			if (node == null) throw new ArgumentNullException("node");
-			_backingItem = node;
+			_document = node;
 		}
 
 		/// <summary>
@@ -107,82 +107,9 @@ namespace Umbraco.Core.Dynamics
 			return DynamicDocumentWalker.Sibling(this, nodeTypeAlias);
 		}
 
-		//public DynamicDocumentList XPath(string xPath)
-		//{
-		//    //if this DN was initialized with an underlying NodeFactory.Node
-		//    if (n != null && n.Type == DynamicBackingItemType.Content)
-		//    {
-		//        //get the underlying xml content
-		//        XmlDocument doc = umbraco.content.Instance.XmlContent;
-		//        if (doc != null)
-		//        {
-		//            //get n as a XmlNode (to be used as the context point for the xpath)
-		//            //rather than just applying the xPath to the root node, this lets us use .. etc from the DynamicNode point
-
-
-		//            //in test mode, n.Id is 0, let this always succeed
-		//            if (n.Id == 0)
-		//            {
-		//                List<DynamicNode> selfList = new List<DynamicNode>() { this };
-		//                return new DynamicDocumentList(selfList);
-		//            }
-		//            XmlNode node = doc.SelectSingleNode(string.Format("//*[@id='{0}']", n.Id));
-		//            if (node != null)
-		//            {
-		//                //got the current node (within the XmlContent instance)
-		//                XmlNodeList nodes = node.SelectNodes(xPath);
-		//                if (nodes.Count > 0)
-		//                {
-		//                    //we got some resulting nodes
-		//                    List<NodeFactory.Node> nodeFactoryNodeList = new List<NodeFactory.Node>();
-		//                    //attempt to convert each node in the set to a NodeFactory.Node
-		//                    foreach (XmlNode nodeXmlNode in nodes)
-		//                    {
-		//                        try
-		//                        {
-		//                            nodeFactoryNodeList.Add(new NodeFactory.Node(nodeXmlNode));
-		//                        }
-		//                        catch (Exception) { } //swallow the exceptions - the returned nodes might not be full nodes, e.g. property
-		//                    }
-		//                    //Wanted to do this, but because we return DynamicDocumentList here, the only
-		//                    //common parent class is DynamicObject
-		//                    //maybe some future refactoring will solve this?
-		//                    //if (nodeFactoryNodeList.Count == 0)
-		//                    //{
-		//                    //    //if the xpath resulted in a node set, but none of them could be converted to NodeFactory.Node
-		//                    //    XElement xElement = XElement.Parse(node.OuterXml);
-		//                    //    //return 
-		//                    //    return new DynamicXml(xElement);
-		//                    //}
-		//                    //convert the NodeFactory nodelist to IEnumerable<DynamicNode> and return it as a DynamicDocumentList
-		//                    return new DynamicDocumentList(nodeFactoryNodeList.ConvertAll(nfNode => new DynamicNode((INode)nfNode)));
-		//                }
-		//                else
-		//                {
-		//                    // XPath returned no nodes, return an empty DynamicDocumentList
-		//                    return new DynamicDocumentList();
-		//                }
-		//            }
-		//            else
-		//            {
-		//                throw new NullReferenceException("Couldn't locate the DynamicNode within the XmlContent");
-		//            }
-		//        }
-		//        else
-		//        {
-		//            throw new NullReferenceException("umbraco.content.Instance.XmlContent is null");
-		//        }
-		//    }
-		//    else
-		//    {
-		//        throw new NullReferenceException("DynamicNode wasn't initialized with an underlying NodeFactory.Node");
-		//    }
-		//}
-
-
 		public bool HasProperty(string name)
 		{
-			if (_backingItem != null)
+			if (_document != null)
 			{
 				try
 				{
@@ -240,7 +167,7 @@ namespace Umbraco.Core.Dynamics
 				{
 					try
 					{
-						result = ExecuteExtensionMethod(args, binder.Name, false);
+						result = ExecuteExtensionMethod(args, binder.Name);
 						return true;
 					}
 					catch (TargetInvocationException)
@@ -269,7 +196,7 @@ namespace Umbraco.Core.Dynamics
 
 		}
 
-		private object ExecuteExtensionMethod(object[] args, string name, bool argsContainsThis)
+		private object ExecuteExtensionMethod(object[] args, string name)
 		{
 			object result = null;
 			
@@ -350,7 +277,7 @@ namespace Umbraco.Core.Dynamics
 		protected virtual Attempt<object> TryGetChildrenByAlias(GetMemberBinder binder)
 		{
 			
-			var filteredTypeChildren = _backingItem.Children
+			var filteredTypeChildren = _document.Children
 				.Where(x => x.DocumentTypeAlias.InvariantEquals(binder.Name) || x.DocumentTypeAlias.MakePluralName().InvariantEquals(binder.Name))
 				.ToArray();
 			if (filteredTypeChildren.Any())
@@ -403,7 +330,7 @@ namespace Umbraco.Core.Dynamics
 			
 			var result = userProperty.Value;
 
-			if (_backingItem.DocumentTypeAlias == null && userProperty.Alias == null)
+			if (_document.DocumentTypeAlias == null && userProperty.Alias == null)
 			{
 				throw new InvalidOperationException("No node alias or property alias available. Unable to look up the datatype of the property you are trying to fetch.");
 			}
@@ -496,7 +423,7 @@ namespace Umbraco.Core.Dynamics
 		/// <returns></returns>
 		private PropertyResult GetReflectedProperty(string alias)
 		{
-			return GetPropertyInternal(alias, _backingItem, false);
+			return GetPropertyInternal(alias, _document, false);
 		}
 
 		/// <summary>
@@ -509,15 +436,15 @@ namespace Umbraco.Core.Dynamics
 		{
 			if (!recursive)
 			{
-				return GetPropertyInternal(alias, _backingItem);
+				return GetPropertyInternal(alias, _document);
 			}
 			var context = this;
-			var prop = GetPropertyInternal(alias, _backingItem);
+			var prop = GetPropertyInternal(alias, _document);
 			while (prop == null || !prop.HasValue())
 			{
 				context = context.Parent;
 				if (context == null) break;
-				prop = context.GetPropertyInternal(alias, context._backingItem);
+				prop = context.GetPropertyInternal(alias, context._document);
 			}
 			return prop;
 		}
@@ -830,7 +757,7 @@ namespace Umbraco.Core.Dynamics
 		}
 		internal DynamicDocumentList Descendants(Func<IDocument, bool> func)
 		{
-			var flattenedNodes = this._backingItem.Children.Map(func, (IDocument n) => n.Children);
+			var flattenedNodes = this._document.Children.Map(func, (IDocument n) => n.Children);
 			return new DynamicDocumentList(flattenedNodes.ToList().ConvertAll(dynamicBackingItem => new DynamicDocument(dynamicBackingItem)));
 		}
 		public DynamicDocumentList DescendantsOrSelf(int level)
@@ -847,14 +774,14 @@ namespace Umbraco.Core.Dynamics
 		}
 		internal DynamicDocumentList DescendantsOrSelf(Func<IDocument, bool> func)
 		{
-			if (this._backingItem != null)
+			if (this._document != null)
 			{
 				var thisNode = new List<IDocument>();
-				if (func(this._backingItem))
+				if (func(this._document))
 				{
-					thisNode.Add(this._backingItem);
+					thisNode.Add(this._document);
 				}
-				var flattenedNodes = this._backingItem.Children.Map(func, (IDocument n) => n.Children);
+				var flattenedNodes = this._document.Children.Map(func, (IDocument n) => n.Children);
 				return new DynamicDocumentList(thisNode.Concat(flattenedNodes).ToList().ConvertAll(dynamicBackingItem => new DynamicDocument(dynamicBackingItem)));
 			}
 			return new DynamicDocumentList(Enumerable.Empty<IDocument>());
@@ -906,11 +833,11 @@ namespace Umbraco.Core.Dynamics
 		{
 			get
 			{
-				if (_backingItem.Parent != null)
+				if (_document.Parent != null)
 				{
-					return new DynamicDocument(_backingItem.Parent);
+					return new DynamicDocument(_document.Parent);
 				}
-				if (_backingItem != null && _backingItem.Id == 0)
+				if (_document != null && _document.Id == 0)
 				{
 					return this;
 				}
@@ -920,17 +847,17 @@ namespace Umbraco.Core.Dynamics
 
 		public int TemplateId
 		{
-			get { return _backingItem.TemplateId; }
+			get { return _document.TemplateId; }
 		}
 
 		public int SortOrder
 		{
-			get { return _backingItem.SortOrder; }
+			get { return _document.SortOrder; }
 		}
 
 		public string Name
 		{
-			get { return _backingItem.Name; }
+			get { return _document.Name; }
 		}
 		public bool Visible
 		{
@@ -948,66 +875,66 @@ namespace Umbraco.Core.Dynamics
 
 		public string UrlName
 		{
-			get { return _backingItem.UrlName; }
+			get { return _document.UrlName; }
 		}
 
 		public string DocumentTypeAlias
 		{
-			get { return _backingItem.DocumentTypeAlias; }
+			get { return _document.DocumentTypeAlias; }
 		}
 
 		public string WriterName
 		{
-			get { return _backingItem.WriterName; }
+			get { return _document.WriterName; }
 		}
 
 		public string CreatorName
 		{
-			get { return _backingItem.CreatorName; }
+			get { return _document.CreatorName; }
 		}
 
 		public int WriterId
 		{
-			get { return _backingItem.WriterId; }
+			get { return _document.WriterId; }
 		}
 
 		public int CreatorId
 		{
-			get { return _backingItem.CreatorId; }
+			get { return _document.CreatorId; }
 		}
 
 		public string Path
 		{
-			get { return _backingItem.Path; }
+			get { return _document.Path; }
 		}
 
 		public DateTime CreateDate
 		{
-			get { return _backingItem.CreateDate; }
+			get { return _document.CreateDate; }
 		}
 		public int Id
 		{
-			get { return _backingItem.Id; }
+			get { return _document.Id; }
 		}
 
 		public DateTime UpdateDate
 		{
-			get { return _backingItem.UpdateDate; }
+			get { return _document.UpdateDate; }
 		}
 
 		public Guid Version
 		{
-			get { return _backingItem.Version; }
+			get { return _document.Version; }
 		}
 		
 		public int Level
 		{
-			get { return _backingItem.Level; }
+			get { return _document.Level; }
 		}
 
 		public IEnumerable<IDocumentProperty> Properties
 		{
-			get { return _backingItem.Properties; }
+			get { return _document.Properties; }
 		}
 		
 		public IEnumerable<DynamicDocument> Children
@@ -1016,15 +943,15 @@ namespace Umbraco.Core.Dynamics
 			{
 				if (_cachedChildren == null)
 				{
-					var children = _backingItem.Children;
+					var children = _document.Children;
 					//testing, think this must be a special case for the root node ?
-					if (!children.Any() && _backingItem.Id == 0)
+					if (!children.Any() && _document.Id == 0)
 					{
-						_cachedChildren = new DynamicDocumentList(new List<DynamicDocument> { new DynamicDocument(this._backingItem) });
+						_cachedChildren = new DynamicDocumentList(new List<DynamicDocument> { new DynamicDocument(this._document) });
 					}
 					else
 					{
-						_cachedChildren = new DynamicDocumentList(_backingItem.Children.Select(x => new DynamicDocument(x)));
+						_cachedChildren = new DynamicDocumentList(_document.Children.Select(x => new DynamicDocument(x)));
 					}
 				}
 				return _cachedChildren;

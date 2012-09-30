@@ -5,6 +5,7 @@ using System.IO;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
+using Umbraco.Web.Templates;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
@@ -383,7 +384,7 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
                     // add the item's contents to the output
                     HtmlGenericControl itemUpdate = new HtmlGenericControl("umbraco:itemupdate");
                     itemUpdate.Attributes["itemId"] = affectedItem.ItemId.ToString();
-                    itemUpdate.InnerHtml = template.ParseInternalLinks(itemRenderOutput.ToString());
+					itemUpdate.InnerHtml = TemplateUtilities.ParseInternalLinks(itemRenderOutput.ToString());
                     itemUpdate.EnableViewState = false;
                     m_Manager.AddClientOutput(itemUpdate);
                 }

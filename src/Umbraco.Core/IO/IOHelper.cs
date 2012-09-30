@@ -9,12 +9,14 @@ using System.Configuration;
 using System.Web;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
 {
 	internal static class IOHelper
     {
         private static string _rootDir = "";
+
         // static compiled regex for faster performance
         private readonly static Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
@@ -49,46 +51,33 @@ namespace Umbraco.Core.IO
                 return VirtualPathUtility.ToAbsolute(virtualPath, SystemDirectories.Root);
         }
 
-
+		[Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ResolveUrlsFromTextString instead, this method on this class will be removed in future versions")]
         public static string ResolveUrlsFromTextString(string text)
         {
             if (UmbracoSettings.ResolveUrlsFromTextString)
-            {
-                var sw = new Stopwatch();
-                sw.Start();
-                Debug.WriteLine("Start: " + sw.ElapsedMilliseconds);
+            {				
+				using (var timer = DisposableTimer.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
+				{
+					// find all relative urls (ie. urls that contain ~)
+					var tags = ResolveUrlPattern.Matches(text);
+					LogHelper.Debug(typeof(IOHelper), "After regex: " + timer.Stopwatch.ElapsedMilliseconds + " matched: " + tags.Count);
+					foreach (Match tag in tags)
+					{						
+						string url = "";
+						if (tag.Groups[1].Success)
+							url = tag.Groups[1].Value;
 
-                // find all relative urls (ie. urls that contain ~)
-                var tags =
-                    ResolveUrlPattern.Matches(text);
-                Debug.WriteLine("After regex: " + sw.ElapsedMilliseconds);
-                foreach (Match tag in tags)
-                {
-                    Debug.WriteLine("-- inside regex: " + sw.ElapsedMilliseconds);
-                    string url = "";
-                    if (tag.Groups[1].Success)
-                        url = tag.Groups[1].Value;
-
-                    // The richtext editor inserts a slash in front of the url. That's why we need this little fix
-                    //                if (url.StartsWith("/"))
-                    //                    text = text.Replace(url, ResolveUrl(url.Substring(1)));
-                    //                else
-                    if (!String.IsNullOrEmpty(url))
-                    {
-                        Debug.WriteLine("---- before resolve: " + sw.ElapsedMilliseconds);
-                        string resolvedUrl = (url.Substring(0, 1) == "/") ? ResolveUrl(url.Substring(1)) : ResolveUrl(url);
-                        Debug.WriteLine("---- after resolve: " + sw.ElapsedMilliseconds);
-                        Debug.WriteLine("---- before replace: " + sw.ElapsedMilliseconds);
-                        text = text.Replace(url, resolvedUrl);
-                        Debug.WriteLine("---- after replace: " + sw.ElapsedMilliseconds);
-                    }
-
-                }
-
-                Debug.WriteLine("total: " + sw.ElapsedMilliseconds);
-                sw.Stop();
-				Debug.WriteLine("Resolve Urls", sw.ElapsedMilliseconds.ToString());
-
+						// The richtext editor inserts a slash in front of the url. That's why we need this little fix
+						//                if (url.StartsWith("/"))
+						//                    text = text.Replace(url, ResolveUrl(url.Substring(1)));
+						//                else
+						if (!String.IsNullOrEmpty(url))
+						{
+							string resolvedUrl = (url.Substring(0, 1) == "/") ? ResolveUrl(url.Substring(1)) : ResolveUrl(url);
+							text = text.Replace(url, resolvedUrl);
+						}
+					}
+				}
             }
             return text;
         }

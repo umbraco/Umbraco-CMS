@@ -3,7 +3,7 @@ using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace Umbraco.Web
+namespace Umbraco.Web.Mvc
 {
 	internal static class RouteValueDictionaryExtensions
 	{

@@ -84,12 +84,6 @@ namespace Umbraco.Web.Routing
                 }
             }
 
-			//SD: We are setting the Is404 to true here because these are 404 handlers. 
-			// if people in the future add their own last chance lookup resolver, they might not want things to be 404s
-			// and instead do their own thing so we should leave it up to the last chance resolver to set the 404, not the
-			// module.
-			docRequest.Is404 = true;
-
             return currentPage;
         }
 

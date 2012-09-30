@@ -8,7 +8,7 @@ using System.Web;
 
 namespace Umbraco.Core.IO
 {
-    internal class SystemFiles
+    public class SystemFiles
     {
 
         public static string AccessXml
@@ -96,7 +96,7 @@ namespace Umbraco.Core.IO
         {
             get
             {
-                if (ContentCacheXmlIsEphemeral)
+                if (ContentCacheXmlIsEphemeral && SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
                 {
                     return Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco.config");
                 }
@@ -104,7 +104,7 @@ namespace Umbraco.Core.IO
             }
         }
 
-        public static bool ContentCacheXmlIsEphemeral
+        internal static bool ContentCacheXmlIsEphemeral
         {
             get
             {

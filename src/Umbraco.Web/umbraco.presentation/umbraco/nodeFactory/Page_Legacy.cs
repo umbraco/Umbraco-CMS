@@ -4,6 +4,7 @@ using System.Data;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.XPath;
+using Umbraco.Web.Templates;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.propertytype;
 
@@ -543,9 +544,11 @@ namespace umbraco.presentation.nodeFactory
             get { return _alias; }
         }
 
+		private string _parsedValue;
+
         public string Value
         {
-            get { return IO.IOHelper.ResolveUrlsFromTextString(_value); }
+            get { return _parsedValue ?? (_parsedValue = TemplateUtilities.ResolveUrlsFromTextString(_value)); }
         }
 
         public Guid Version

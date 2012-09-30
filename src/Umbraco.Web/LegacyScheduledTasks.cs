@@ -14,7 +14,7 @@ namespace Umbraco.Web
 	//   and it needs to be manually registered - which we want to avoid, in order
 	//   to be as unobtrusive as possible
 
-	public class LegacyScheduledTasks : IApplicationEventHandler
+	public sealed class LegacyScheduledTasks : IApplicationEventHandler
 	{
 		Timer pingTimer;
 		Timer publishingTimer;

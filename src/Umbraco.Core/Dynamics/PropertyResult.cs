@@ -7,7 +7,7 @@ namespace Umbraco.Core.Dynamics
 {
 	internal class PropertyResult : IDocumentProperty, IHtmlString
     {
-		public PropertyResult(IDocumentProperty source, PropertyResultType type)
+		internal PropertyResult(IDocumentProperty source, PropertyResultType type)
         {
     		if (source == null) throw new ArgumentNullException("source");
 
@@ -16,7 +16,7 @@ namespace Umbraco.Core.Dynamics
 			Version = source.Version;
 			PropertyType = type;
         }
-        public PropertyResult(string alias, object value, Guid version, PropertyResultType type)
+		internal PropertyResult(string alias, object value, Guid version, PropertyResultType type)
         {
         	if (alias == null) throw new ArgumentNullException("alias");
         	if (value == null) throw new ArgumentNullException("value");
@@ -32,10 +32,16 @@ namespace Umbraco.Core.Dynamics
     	public string Alias { get; private set; }
 
     	public object Value { get; private set; }
-
-		public string ValueAsString
+	
+		/// <summary>
+		/// Returns the value as a string output, this is used in the final rendering process of a property
+		/// </summary>
+		internal string ValueAsString
 		{
-			get { return Value == null ? "" : Convert.ToString(Value); }
+			get
+			{
+				return Value == null ? "" : Convert.ToString(Value);
+			}
 		}
 
     	public Guid Version { get; private set; }

@@ -16,6 +16,7 @@ using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Templates;
 using umbraco;
 using System.Collections.Generic;
 using umbraco.cms.businesslogic.member;
@@ -102,7 +103,11 @@ namespace Umbraco.Web
 			using (var output = new StringWriter())
 			{
 				_umbracoContext.HttpContext.Server.Execute(containerPage, output, false);
-				return new HtmlString(output.ToString());
+
+				//Now, we need to ensure that local links are parsed
+				return new HtmlString(
+					TemplateUtilities.ParseInternalLinks(
+						output.ToString()));
 			}
 		}
 
@@ -168,6 +173,9 @@ namespace Umbraco.Web
 			RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged,
 			string formatString = "")
 		{
+			Mandate.ParameterNotNull(currentPage, "currentPage");
+			Mandate.ParameterNotNullOrEmpty(fieldAlias, "fieldAlias");
+
 			//TODO: This is real nasty and we should re-write the 'item' and 'ItemRenderer' class but si fine for now
 
 			var attributes = new Dictionary<string, string>
@@ -224,7 +232,11 @@ namespace Umbraco.Web
 				ItemRenderer.Instance.Init(item);
 				ItemRenderer.Instance.Load(item);
 				ItemRenderer.Instance.Render(item, htmlWriter);
-				return new HtmlString(output.ToString());
+				
+				//Now, we need to ensure that local links are parsed
+				return new HtmlString(
+					TemplateUtilities.ParseInternalLinks(
+						output.ToString()));
 			}
 		}
 

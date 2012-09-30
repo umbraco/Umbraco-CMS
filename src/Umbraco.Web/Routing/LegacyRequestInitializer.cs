@@ -1,7 +1,7 @@
 using System;
 using System.Web;
 
-namespace Umbraco.Web
+namespace Umbraco.Web.Routing
 {
     /// <summary>
     /// A legacy class for old style handling of URL requests

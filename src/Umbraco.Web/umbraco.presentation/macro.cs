@@ -17,6 +17,7 @@ using System.Web.UI.WebControls;
 using System.Xml;
 using System.Xml.Xsl;
 using Umbraco.Core;
+using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.businesslogic.macro;
@@ -757,7 +758,7 @@ namespace umbraco
             // Do transformation
             UmbracoContext.Current.Trace.Write("umbracoMacro", "Before performing transformation");
             xslt.Transform(macroXML.CreateNavigator(), xslArgs, tw);
-            return IOHelper.ResolveUrlsFromTextString(tw.ToString());
+			return TemplateUtilities.ResolveUrlsFromTextString(tw.ToString());
         }
 
         public static XsltArgumentList AddXsltExtensions()

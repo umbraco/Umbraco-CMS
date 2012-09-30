@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 
-namespace Umbraco.Web
+namespace Umbraco.Web.Mvc
 {
 	internal static class AreaRegistrationExtensions
 	{

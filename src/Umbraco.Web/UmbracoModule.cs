@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Web;
+using System.Web.Compilation;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.UI;
@@ -157,7 +158,7 @@ namespace Umbraco.Web
 			// pass off to our handlers (mvc or webforms)
 
 			// assign the legacy page back to the docrequest
-			// handlers like default.aspx will want it
+			// handlers like default.aspx will want it and most macros currently need it
 			docreq.UmbracoPage = new page(docreq);
 
 			// these two are used by many legacy objects
@@ -359,7 +360,7 @@ namespace Umbraco.Web
 		/// </summary>		
 		/// <param name="context"></param>
 		/// <param name="currentQuery"></param>
-		/// <param name="isMvc"> </param>
+		/// <param name="engine"> </param>
 		private void RewriteToUmbracoHandler(HttpContext context, string currentQuery, RenderingEngine engine)
 		{
 
@@ -396,6 +397,10 @@ namespace Umbraco.Web
 					rewritePath = "~/default.aspx" + currentQuery;
 					//First we rewrite the path to the path of the handler (i.e. default.aspx or /umbraco/RenderMvc )
 					context.RewritePath(rewritePath, "", currentQuery.TrimStart(new[] { '?' }), false);
+
+					//now, execute the handler
+					var webFormshandler = (global::umbraco.UmbracoDefault)BuildManager.CreateInstanceFromVirtualPath("~/default.aspx", typeof(global::umbraco.UmbracoDefault));
+					context.RemapHandler(webFormshandler);
 					break;
 			}
 

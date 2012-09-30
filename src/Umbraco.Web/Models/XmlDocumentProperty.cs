@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.Models
 {
@@ -25,9 +26,27 @@ namespace Umbraco.Web.Models
 			get { return _alias; }
 		}
 
+		private string _parsedValue;
+
+		/// <summary>
+		/// Returns the value of a property from the XML cache
+		/// </summary>
+		/// <remarks>
+		/// This ensures that the result has any {localLink} syntax parsed and that urls are resolved correctly.
+		/// This also ensures that the parsing is only done once as the result is cached in a private field of this object.
+		/// </remarks>
 		public object Value
 		{
-			get { return IOHelper.ResolveUrlsFromTextString(_value); }
+			get
+			{
+				if (_parsedValue == null)
+				{
+					_parsedValue = TemplateUtilities.ResolveUrlsFromTextString(
+						TemplateUtilities.ParseInternalLinks(
+							_value));	
+				}
+				return _parsedValue;
+			}
 		}
 
 		public Guid Version

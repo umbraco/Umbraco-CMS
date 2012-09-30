@@ -36,7 +36,7 @@ namespace umbraco.IO
 			return Umbraco.Core.IO.IOHelper.ResolveUrl(virtualPath); 
         }
 
-
+		[Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ResolveUrlsFromTextString instead, this method on this class will be removed in future versions")]
         public static string ResolveUrlsFromTextString(string text)
         {
 			return Umbraco.Core.IO.IOHelper.ResolveUrlsFromTextString(text); 

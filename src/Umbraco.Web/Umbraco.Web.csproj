@@ -240,7 +240,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationEventsResolver.cs" />
-    <Compile Include="AreaRegistrationExtensions.cs" />
+    <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
     <Compile Include="BaseRest\Configuration\BaseRestSection.cs" />
     <Compile Include="BaseRest\BaseRestHandler.cs" />
     <Compile Include="BaseRest\Configuration\ExtensionElement.cs" />
@@ -300,6 +300,8 @@
     <Compile Include="Routing\LookupByPageIdQuery.cs" />
     <Compile Include="Routing\NoTemplateHandler.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
+    <Compile Include="Routing\RenderingEngine.cs" />
+    <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -320,8 +322,8 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\uQuery\IGetProperty.cs" />
     <Compile Include="UmbracoHelper.cs" />
-    <Compile Include="ViewContextExtensions.cs" />
-    <Compile Include="ViewDataContainerExtensions.cs" />
+    <Compile Include="Mvc\ViewContextExtensions.cs" />
+    <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
     <Compile Include="DefaultPublishedContentStore.cs" />
     <Compile Include="PublishedContentStoreResolver.cs" />
     <Compile Include="Routing\DocumentNotFoundHandler.cs" />
@@ -341,14 +343,14 @@
     <Compile Include="Mvc\RenderViewEngine.cs" />
     <Compile Include="Mvc\RenderViewPage.cs" />
     <Compile Include="Mvc\RouteDefinition.cs" />
-    <Compile Include="RouteValueDictionaryExtensions.cs" />
+    <Compile Include="Mvc\RouteValueDictionaryExtensions.cs" />
     <Compile Include="Routing\DocumentLookupBase.cs" />
     <Compile Include="Routing\DocumentRequestBuilder.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\Node.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\Nodes.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\Property.cs" />
     <Compile Include="WebBootManager.cs" />
-    <Compile Include="LegacyRequestInitializer.cs" />
+    <Compile Include="Routing\LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
     <Compile Include="Routing\DefaultLastChanceLookup.cs" />
     <Compile Include="Routing\IDocumentLastChanceLookup.cs" />

@@ -57,7 +57,7 @@
 
             xsltSnippet = UmbEditor.IsSimpleEditor
                 ? jQuery("#<%= editorSource.ClientID %>").getSelection().text
-                    : UmbEditor._editor.selection();
+                    : UmbEditor._editor.getSelection();
 
             if (xsltSnippet == '') {
                 xsltSnippet = UmbEditor.IsSimpleEditor

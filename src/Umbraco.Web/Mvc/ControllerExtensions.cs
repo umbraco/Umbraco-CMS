@@ -1,16 +1,18 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
+using System.Web.Mvc;
 
 namespace Umbraco.Web.Mvc
 {
-	public static class ControllerExtensions
+	internal static class ControllerExtensions
     {
         /// <summary>
         /// Return the controller name from the controller type
         /// </summary>
         /// <param name="controllerType"></param>
         /// <returns></returns>
-        public static string GetControllerName(Type controllerType)
+		internal static string GetControllerName(Type controllerType)
         {
             return controllerType.Name.Substring(0, controllerType.Name.LastIndexOf("Controller"));
         }
@@ -21,9 +23,125 @@ namespace Umbraco.Web.Mvc
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static string GetControllerName<T>()
+		internal static string GetControllerName<T>()
         {
             return GetControllerName(typeof(T));
         }
+
+		/// <summary>
+		/// This is generally used for proxying to a ChildAction which requires a ViewContext to be setup
+		/// but since the View isn't actually rendered the IView object is null, however the rest of the 
+		/// properties are filled in.
+		/// </summary>
+		/// <param name="controller"></param>
+		/// <returns></returns>
+		internal static ViewContext CreateEmptyViewContext(this ControllerBase controller)
+		{
+			return new ViewContext
+			{
+				Controller = controller,
+				HttpContext = controller.ControllerContext.HttpContext,
+				RequestContext = controller.ControllerContext.RequestContext,
+				RouteData = controller.ControllerContext.RouteData,
+				TempData = controller.TempData,
+				ViewData = controller.ViewData
+			};
+		}
+
+		/// <summary>
+		/// Returns the string output from a ViewResultBase object
+		/// </summary>
+		/// <param name="controller"></param>
+		/// <param name="viewResult"></param>
+		/// <returns></returns>
+		internal static string RenderViewResultAsString(this ControllerBase controller, ViewResultBase viewResult)
+		{
+			using (var sw = new StringWriter())
+			{
+				controller.EnsureViewObjectDataOnResult(viewResult);
+
+				var viewContext = new ViewContext(controller.ControllerContext, viewResult.View, viewResult.ViewData, viewResult.TempData, sw);
+				viewResult.View.Render(viewContext, sw);
+				foreach (var v in viewResult.ViewEngineCollection)
+				{
+					v.ReleaseView(controller.ControllerContext, viewResult.View);
+				}
+				return sw.ToString().Trim();
+			}
+		}
+
+		/// <summary>
+		/// Renders the partial view to string.
+		/// </summary>
+		/// <param name="controller">The controller context.</param>
+		/// <param name="viewName">Name of the view.</param>
+		/// <param name="model">The model.</param>
+		/// <returns></returns>
+		internal static string RenderPartialViewToString(this ControllerBase controller, string viewName, object model)
+		{
+
+			controller.ViewData.Model = model;
+
+			using (StringWriter sw = new StringWriter())
+			{
+				ViewEngineResult viewResult = ViewEngines.Engines.FindPartialView(controller.ControllerContext, viewName);
+				ViewContext viewContext = new ViewContext(controller.ControllerContext, viewResult.View, controller.ViewData, controller.TempData, sw);
+				viewResult.View.Render(viewContext, sw);
+
+				return sw.GetStringBuilder().ToString();
+			}
+		}
+
+		/// <summary>
+		/// Normally in MVC the way that the View object gets assigned to the result is to Execute the ViewResult, this however
+		/// will write to the Response output stream which isn't what we want. Instead, this method will use the same logic inside
+		/// of MVC to assign the View object to the result but without executing it. This also ensures that the ViewData and the TempData
+		/// is assigned from the controller.
+		/// This is only relavent for view results of PartialViewResult or ViewResult.
+		/// </summary>
+		/// <param name="result"></param>
+		/// <param name="controller"></param>
+		internal static void EnsureViewObjectDataOnResult(this ControllerBase controller, ViewResultBase result)
+		{
+			result.ViewData.ModelState.Merge(controller.ViewData.ModelState);
+
+			// Temporarily copy the dictionary to avoid enumerator-modification errors
+			var newViewDataDict = new ViewDataDictionary(controller.ViewData);
+			foreach (var d in newViewDataDict)
+				result.ViewData[d.Key] = d.Value;
+
+			result.TempData = controller.TempData;
+
+			if (result.View != null) return;
+
+			if (string.IsNullOrEmpty(result.ViewName))
+				result.ViewName = controller.ControllerContext.RouteData.GetRequiredString("action");
+
+			if (result.View != null) return;
+
+			if (result is PartialViewResult)
+			{
+				var viewEngineResult = ViewEngines.Engines.FindPartialView(controller.ControllerContext, result.ViewName);
+
+				if (viewEngineResult.View == null)
+				{
+					throw new InvalidOperationException("Could not find the view " + result.ViewName + ", the following locations were searched: " + Environment.NewLine + string.Join(Environment.NewLine, viewEngineResult.SearchedLocations));
+				}
+
+				result.View = viewEngineResult.View;
+			}
+			else if (result is ViewResult)
+			{
+				var vr = (ViewResult)result;
+				var viewEngineResult = ViewEngines.Engines.FindView(controller.ControllerContext, vr.ViewName, vr.MasterName);
+
+				if (viewEngineResult.View == null)
+				{
+					throw new InvalidOperationException("Could not find the view " + vr.ViewName + ", the following locations were searched: " + Environment.NewLine + string.Join(Environment.NewLine, viewEngineResult.SearchedLocations));
+				}
+
+				result.View = viewEngineResult.View;
+			}
+		}
     }
 }

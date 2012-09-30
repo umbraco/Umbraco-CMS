@@ -1,6 +1,7 @@
 using System;
 using System.Xml;
 using System.Xml.Serialization;
+using Umbraco.Web.Templates;
 using umbraco.interfaces;
 
 namespace umbraco.NodeFactory
@@ -18,9 +19,10 @@ namespace umbraco.NodeFactory
 			get { return _alias; }
 		}
 
+		private string _parsedValue;
 		public string Value
 		{
-			get { return IO.IOHelper.ResolveUrlsFromTextString(_value); }
+			get { return _parsedValue ?? (_parsedValue = TemplateUtilities.ResolveUrlsFromTextString(_value)); }
 		}
 
 		public Guid Version

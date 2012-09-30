@@ -1,6 +1,6 @@
 using System.Web.Mvc;
 
-namespace Umbraco.Web
+namespace Umbraco.Web.Mvc
 {
 	internal static class ViewDataContainerExtensions
 	{
