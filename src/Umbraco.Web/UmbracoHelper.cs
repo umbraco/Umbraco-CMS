@@ -119,9 +119,7 @@ namespace Umbraco.Web
 		/// Renders an field to the template
 		/// </summary>
 		/// <param name="fieldAlias"></param>
-		/// <param name="valueAlias"></param>
 		/// <param name="altFieldAlias"></param>
-		/// <param name="altValueAlias"></param>
 		/// <param name="altText"></param>
 		/// <param name="insertBefore"></param>
 		/// <param name="insertAfter"></param>
@@ -132,8 +130,8 @@ namespace Umbraco.Web
 		/// <param name="encoding"></param>
 		/// <param name="formatString"></param>
 		/// <returns></returns>
-		public IHtmlString Field(string fieldAlias, string valueAlias = "",
-			string altFieldAlias = "", string altValueAlias = "", string altText = "", string insertBefore = "", string insertAfter = "",
+		public IHtmlString Field(string fieldAlias, 
+			string altFieldAlias = "", string altText = "", string insertBefore = "", string insertAfter = "",
 			bool recursive = false, bool convertLineBreaks = false, bool removeParagraphTags = false,
 			RenderFieldCaseType casing = RenderFieldCaseType.Unchanged,
 			RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged,
@@ -143,7 +141,7 @@ namespace Umbraco.Web
 			{
 				throw new InvalidOperationException("Cannot call this method when not rendering a front-end document");
 			}
-			return Field(_currentPage, fieldAlias, valueAlias, altFieldAlias, altValueAlias,
+			return Field(_currentPage, fieldAlias, altFieldAlias, 
 				altText, insertBefore, insertAfter, recursive, convertLineBreaks, removeParagraphTags,
 				casing, encoding, formatString);
 		}
@@ -153,9 +151,7 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="currentPage"></param>
 		/// <param name="fieldAlias"></param>
-		/// <param name="valueAlias"></param>
 		/// <param name="altFieldAlias"></param>
-		/// <param name="altValueAlias"></param>
 		/// <param name="altText"></param>
 		/// <param name="insertBefore"></param>
 		/// <param name="insertAfter"></param>
@@ -166,8 +162,8 @@ namespace Umbraco.Web
 		/// <param name="encoding"></param>
 		/// <param name="formatString"></param>
 		/// <returns></returns>
-		public IHtmlString Field(IDocument currentPage, string fieldAlias, string valueAlias = "",
-			string altFieldAlias = "", string altValueAlias = "", string altText = "", string insertBefore = "", string insertAfter = "",
+		public IHtmlString Field(IDocument currentPage, string fieldAlias, 
+			string altFieldAlias = "", string altText = "", string insertBefore = "", string insertAfter = "",
 			bool recursive = false, bool convertLineBreaks = false, bool removeParagraphTags = false,
 			RenderFieldCaseType casing = RenderFieldCaseType.Unchanged,
 			RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged,
@@ -334,26 +330,7 @@ namespace Umbraco.Web
 
 		#region Content
 
-		public IDocument GetContentById(int id)
-		{
-			return GetDocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
-		}
-
-		public IDocument GetContentById(string id)
-		{
-			return GetDocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
-		}
-
-		public IEnumerable<IDocument> GetContentByIds(params int[] ids)
-		{
-			return GetDocumentByIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
-		}
-
-		public IEnumerable<IDocument> GetContentByIds(params string[] ids)
-		{
-			return GetDocumentByIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
-		}
-
+		
 		public dynamic ContentById(int id)
 		{
 			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
@@ -378,25 +355,6 @@ namespace Umbraco.Web
 
 		#region Media
 
-		public IDocument GetMediaById(int id)
-		{
-			return GetDocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
-		}
-
-		public IDocument GetMediaById(string id)
-		{
-			return GetDocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
-		}
-
-		public IEnumerable<IDocument> GetMediaByIds(params int[] ids)
-		{
-			return GetDocumentByIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
-		}
-
-		public IEnumerable<IDocument> GetMediaByIds(params string[] ids)
-		{
-			return GetDocumentByIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
-		}
 
 		public dynamic MediaById(int id)
 		{
@@ -422,28 +380,6 @@ namespace Umbraco.Web
 
 		#region Used by Content/Media
 
-		private IDocument GetDocumentById(int id, IPublishedStore store)
-		{
-			return store.GetDocumentById(UmbracoContext.Current, id);			
-		}
-
-		private IDocument GetDocumentById(string id, IPublishedStore store)
-		{
-			int docId;
-			return int.TryParse(id, out docId)
-				? DocumentById(docId, store)
-				: null;
-		}
-
-		private IEnumerable<IDocument> GetDocumentByIds(IPublishedStore store, params int[] ids)
-		{
-			return ids.Select(eachId => GetDocumentById(eachId, store));			
-		}
-
-		private IEnumerable<IDocument> GetDocumentByIds(IPublishedStore store, params string[] ids)
-		{
-			return ids.Select(eachId => GetDocumentById(eachId, store));
-		}
 
 		private dynamic DocumentById(int id, IPublishedStore store)
 		{

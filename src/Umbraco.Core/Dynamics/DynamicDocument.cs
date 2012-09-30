@@ -17,13 +17,15 @@ namespace Umbraco.Core.Dynamics
 	/// <summary>
 	/// The dynamic model for views
 	/// </summary>
-	public class DynamicDocument : DynamicObject
+	public class DynamicDocument : DynamicObject, IDocument
 	{
 		private readonly IDocument _document;
 		private DynamicDocumentList _cachedChildren;
 		private readonly ConcurrentDictionary<string, object> _cachedMemberOutput = new ConcurrentDictionary<string, object>();
 
 		internal DynamicDocumentList OwnerList { get; set; }
+
+		#region Constructors
 
 		public DynamicDocument(IDocument node)
 		{
@@ -41,14 +43,17 @@ namespace Umbraco.Core.Dynamics
 		}
 
 		private DynamicDocument()
-		{			
-		}
+		{
+		} 
+
+		#endregion
 
 		public dynamic AsDynamic()
 		{
 			return this;
 		}
 
+		#region Traversal
 		public DynamicDocument Up()
 		{
 			return DynamicDocumentWalker.Up(this);
@@ -105,7 +110,8 @@ namespace Umbraco.Core.Dynamics
 		public DynamicDocument Sibling(string nodeTypeAlias)
 		{
 			return DynamicDocumentWalker.Sibling(this, nodeTypeAlias);
-		}
+		} 
+		#endregion
 
 		public bool HasProperty(string name)
 		{
@@ -510,7 +516,6 @@ namespace Umbraco.Core.Dynamics
 					};
 		}
 
-
 		/// <summary>
 		/// Converts the currentValue to a correctly typed value based on known registered converters, then based on known standards.
 		/// </summary>
@@ -661,6 +666,7 @@ namespace Umbraco.Core.Dynamics
 		//    return null;
 		//}
 
+		#region Ancestors, Descendants and Parent
 		public DynamicDocument AncestorOrSelf()
 		{
 			//TODO: Why is this query like this??
@@ -843,7 +849,8 @@ namespace Umbraco.Core.Dynamics
 				}
 				return null;
 			}
-		}
+		} 
+		#endregion
 
 		public int TemplateId
 		{
@@ -859,6 +866,7 @@ namespace Umbraco.Core.Dynamics
 		{
 			get { return _document.Name; }
 		}
+
 		public bool Visible
 		{
 			get
@@ -912,6 +920,7 @@ namespace Umbraco.Core.Dynamics
 		{
 			get { return _document.CreateDate; }
 		}
+		
 		public int Id
 		{
 			get { return _document.Id; }
@@ -994,16 +1003,7 @@ namespace Umbraco.Core.Dynamics
 
 		#endregion
 		
-		public bool IsNull(string alias, bool recursive)
-		{
-			var prop = GetUserProperty(alias, recursive);
-			if (prop == null) return true;
-			return ((PropertyResult)prop).HasValue();
-		}
-		public bool IsNull(string alias)
-		{
-			return IsNull(alias, false);
-		}
+		#region HasValue
 		public bool HasValue(string alias)
 		{
 			return HasValue(alias, false);
@@ -1029,7 +1029,9 @@ namespace Umbraco.Core.Dynamics
 		public IHtmlString HasValue(string alias, bool recursive, string valueIfTrue)
 		{
 			return HasValue(alias, recursive) ? new HtmlString(valueIfTrue) : new HtmlString(string.Empty);
-		}
+		} 
+		#endregion
+
 		public int Position()
 		{
 			return this.Index();
@@ -1059,6 +1061,18 @@ namespace Umbraco.Core.Dynamics
 			{
 				throw new ArgumentNullException(string.Format("Node {0} has been orphaned and doesn't belong to a DynamicDocumentList", this.Id));
 			}
+		}
+
+		#region Is Helpers
+		public bool IsNull(string alias, bool recursive)
+		{
+			var prop = GetUserProperty(alias, recursive);
+			if (prop == null) return true;
+			return ((PropertyResult)prop).HasValue();
+		}
+		public bool IsNull(string alias)
+		{
+			return IsNull(alias, false);
 		}
 		public bool IsFirst()
 		{
@@ -1354,7 +1368,11 @@ namespace Umbraco.Core.Dynamics
 		public HtmlString IsHelper(Func<DynamicDocument, bool> test, string valueIfTrue, string valueIfFalse)
 		{
 			return test(this) ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
-		}
+		} 
+		#endregion
+
+		#region Where
+
 		public HtmlString Where(string predicate, string valueIfTrue)
 		{
 			return Where(predicate, valueIfTrue, string.Empty);
@@ -1379,15 +1397,120 @@ namespace Umbraco.Core.Dynamics
 				return true;
 			}
 			return false;
+		} 
+
+		#endregion
+
+		//TODO: need a method to return a string value for a user property regardless of xml content or data type thus bypassing all of the PropertyEditorValueConverters
+		///// <summary>
+		///// Returns the value as as string regardless of xml content or data type
+		///// </summary>
+		///// <returns></returns>
+		//public override string ToString()
+		//{
+		//    return base.ToString();
+		//}
+
+		#region Explicit IDocument implementation
+		IDocument IDocument.Parent
+		{
+			get { return _document.Parent; }
 		}
 
-		/// <summary>
-		/// Returns the value as as string regardless of xml content or data type
-		/// </summary>
-		/// <returns></returns>
-		public override string ToString()
+		int IDocument.Id
 		{
-			return base.ToString();
+			get { return _document.Id; }
 		}
+
+		int IDocument.TemplateId
+		{
+			get { return _document.TemplateId; }
+		}
+
+		int IDocument.SortOrder
+		{
+			get { return _document.SortOrder; }
+		}
+
+		string IDocument.Name
+		{
+			get { return _document.Name; }
+		}
+
+		string IDocument.UrlName
+		{
+			get { return _document.UrlName; }
+		}
+
+		string IDocument.DocumentTypeAlias
+		{
+			get { return _document.DocumentTypeAlias; }
+		}
+
+		int IDocument.DocumentTypeId
+		{
+			get { return _document.DocumentTypeId; }
+		}
+
+		string IDocument.WriterName
+		{
+			get { return _document.WriterName; }
+		}
+
+		string IDocument.CreatorName
+		{
+			get { return _document.CreatorName; }
+		}
+
+		int IDocument.WriterId
+		{
+			get { return _document.WriterId; }
+		}
+
+		int IDocument.CreatorId
+		{
+			get { return _document.CreatorId; }
+		}
+
+		string IDocument.Path
+		{
+			get { return _document.Path; }
+		}
+
+		DateTime IDocument.CreateDate
+		{
+			get { return _document.CreateDate; }
+		}
+
+		DateTime IDocument.UpdateDate
+		{
+			get { return _document.UpdateDate; }
+		}
+
+		Guid IDocument.Version
+		{
+			get { return _document.Version; }
+		}
+
+		int IDocument.Level
+		{
+			get { return _document.Level; }
+		}
+
+		System.Collections.ObjectModel.Collection<IDocumentProperty> IDocument.Properties
+		{
+			get { return _document.Properties; }
+		}
+
+		IEnumerable<IDocument> IDocument.Children
+		{
+			get { return _document.Children; }
+		}
+
+		IDocumentProperty IDocument.GetProperty(string alias)
+		{
+			return _document.GetProperty(alias);
+		} 
+		#endregion
 	}
 }

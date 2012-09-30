@@ -23,6 +23,12 @@ namespace Umbraco.Web.Templates
 		/// <returns></returns>
 		public static string ParseInternalLinks(string text)
 		{
+			//don't attempt to proceed without a context as we cannot lookup urls without one
+			if (UmbracoContext.Current == null)
+			{
+				return text;
+			}
+
 			var niceUrlsProvider = UmbracoContext.Current.NiceUrlProvider;
 
 			// Parse internal links
