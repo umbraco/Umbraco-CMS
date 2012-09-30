@@ -91,6 +91,22 @@ namespace Umbraco.Tests.Routing
 			Domain.MakeNew("http://domain3.com/fr", 10032, langFr.id);
 		}
 
+		void SetDomains5()
+		{
+			var langEn = Language.GetByCultureCode("en-US");
+			var langFr = Language.GetByCultureCode("fr-FR");
+
+			Domain.MakeNew("http://domain1.com/en", 10011, langEn.id);
+			Domain.MakeNew("http://domain1a.com/en", 10011, langEn.id);
+			Domain.MakeNew("http://domain1b.com/en", 10011, langEn.id);
+			Domain.MakeNew("http://domain1.com/fr", 10012, langFr.id);
+			Domain.MakeNew("http://domain1a.com/fr", 10012, langFr.id);
+			Domain.MakeNew("http://domain1b.com/fr", 10012, langFr.id);
+
+			Domain.MakeNew("http://domain3.com/en", 10031, langEn.id);
+			Domain.MakeNew("http://domain3.com/fr", 10032, langFr.id);
+		}
+
 		protected override string GetXmlContent(int templateId)
 		{
 			return @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -194,6 +210,7 @@ namespace Umbraco.Tests.Routing
 
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false"); // ignored w/domains
+			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
 
 			InitializeLanguagesAndDomains();
 			SetDomains1();
@@ -223,6 +240,7 @@ namespace Umbraco.Tests.Routing
 
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false"); // ignored w/domains
+			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
 
 			InitializeLanguagesAndDomains();
 			SetDomains2();
@@ -244,6 +262,7 @@ namespace Umbraco.Tests.Routing
 
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false"); // ignored w/domains
+			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
 
 			InitializeLanguagesAndDomains();
 			SetDomains3();
@@ -268,6 +287,7 @@ namespace Umbraco.Tests.Routing
 		public void Get_Nice_Url_NestedDomains(int nodeId, string currentUrl, bool absolute, string expected)
 		{
 			var routingContext = GetRoutingContext("/test", 1111);
+			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
 
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false"); // ignored w/domains
@@ -287,6 +307,7 @@ namespace Umbraco.Tests.Routing
 
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false"); // ignored w/domains
+			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
 
 			InitializeLanguagesAndDomains();
 			SetDomains4();
@@ -336,6 +357,53 @@ namespace Umbraco.Tests.Routing
 			Assert.AreEqual(route, routes[id]);
 			Assert.IsTrue(ids.ContainsKey(route));
 			Assert.AreEqual(id, ids[route]);
+		}
+
+		[Test]
+		public void Get_Nice_Url_Relative_Or_Absolute()
+		{
+			var routingContext = GetRoutingContext("http://domain1.com/test", 1111);
+
+			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
+			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false");
+
+			InitializeLanguagesAndDomains();
+			SetDomains4();
+
+			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
+			Assert.AreEqual("/en/1001-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100111));
+			Assert.AreEqual("http://domain3.com/en/1003-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100311));
+
+			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = true;
+			Assert.AreEqual("http://domain1.com/en/1001-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100111));
+			Assert.AreEqual("http://domain3.com/en/1003-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100311));
+
+			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
+			routingContext.NiceUrlProvider.EnforceAbsoluteUrls = true;
+			Assert.AreEqual("http://domain1.com/en/1001-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100111));
+			Assert.AreEqual("http://domain3.com/en/1003-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100311));
+		}
+
+		[Test]
+		public void Get_Nice_Url_Alternate()
+		{
+			var routingContext = GetRoutingContext("http://domain1.com/test", 1111);
+
+			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
+			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false");
+
+			InitializeLanguagesAndDomains();
+			SetDomains5();
+
+			var result = routingContext.NiceUrlProvider.GetAllAbsoluteNiceUrls(100111);
+			
+			// will always get absolute urls
+			// all of them
+			// including the local one - duplicate?! - then must manually exclude?
+			Assert.AreEqual(3, result.Count());
+			Assert.IsTrue(result.Contains("http://domain1.com/en/1001-1-1"));
+			Assert.IsTrue(result.Contains("http://domain1a.com/en/1001-1-1"));
+			Assert.IsTrue(result.Contains("http://domain1b.com/en/1001-1-1"));
 		}
 	}
 }

@@ -86,5 +86,37 @@ namespace Umbraco.Tests
 		{
 			return new Uri(url, url.StartsWith("http:") ? UriKind.Absolute : UriKind.Relative);
 		}
+
+		//
+		[TestCase("/", "/", "/")]
+		[TestCase("/", "/foo", "/foo")]
+		[TestCase("/", "~/foo", "/foo")]
+		[TestCase("/vdir", "/", "/vdir/")]
+		[TestCase("/vdir", "/foo", "/vdir/foo")]
+		[TestCase("/vdir", "/foo/", "/vdir/foo/")]
+		[TestCase("/vdir", "~/foo", "/vdir/foo")]
+
+		public void Uri_To_Absolute(string virtualPath, string sourceUrl, string expectedUrl)
+		{
+			UriUtility.SetAppDomainAppVirtualPath(virtualPath);
+			var resultUrl = UriUtility.ToAbsolute(sourceUrl);
+			Assert.AreEqual(expectedUrl, resultUrl);
+		}
+
+		//
+		[TestCase("/", "/", "/")]
+		[TestCase("/", "/foo", "/foo")]
+		[TestCase("/", "/foo/", "/foo/")]
+		[TestCase("/vdir", "/vdir", "/")]
+		[TestCase("/vdir", "/vdir/", "/")]
+		[TestCase("/vdir", "/vdir/foo", "/foo")]
+		[TestCase("/vdir", "/vdir/foo/", "/foo/")]
+
+		public void Url_To_App_Relative(string virtualPath, string sourceUrl, string expectedUrl)
+		{
+			UriUtility.SetAppDomainAppVirtualPath(virtualPath);
+			var resultUrl = UriUtility.ToAppRelative(sourceUrl);
+			Assert.AreEqual(expectedUrl, resultUrl);
+		}
 	}
 }

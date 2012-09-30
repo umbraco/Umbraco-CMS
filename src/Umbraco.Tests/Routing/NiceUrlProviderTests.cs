@@ -78,23 +78,6 @@ namespace Umbraco.Tests.Routing
 			}
 		}
 
-		//[TestCase(1046, "/home.aspx")]
-		//[TestCase(1173, "/home/sub1.aspx")]
-		//[TestCase(1174, "/home/sub1/sub2.aspx")]
-		//[TestCase(1176, "/home/sub1/sub-3.aspx")]
-		//[TestCase(1177, "/home/sub1/custom-sub-1.aspx")]
-		//[TestCase(1178, "/home/sub1/custom-sub-2.aspx")]
-		//[TestCase(1175, "/home/sub-2.aspx")]
-		//[TestCase(1172, "/test-page.aspx")]
-		//public void Get_Nice_Url_Not_Hiding_Top_Level_No_Directory_Urls(int nodeId, string niceUrlMatch)
-		//{
-		//    var routingContext = GetRoutingContext("/test", 1111);
-			
-		//    var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId);
-
-		//    Assert.AreEqual(niceUrlMatch, result);
-		//}
-
 		// test hideTopLevelNodeFromPath false
 		[TestCase(1046, "/home")]
 		[TestCase(1173, "/home/sub1")]
@@ -111,31 +94,13 @@ namespace Umbraco.Tests.Routing
 
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false");
+			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
 
 			var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId);
 			Assert.AreEqual(niceUrlMatch, result);
 		}
 
 		// no need for umbracoUseDirectoryUrls test = should be handled by UriUtilityTests
-
-		//[TestCase(1046, "/")]
-		//[TestCase(1173, "/sub1.aspx")]
-		//[TestCase(1174, "/sub1/sub2.aspx")]
-		//[TestCase(1176, "/sub1/sub-3.aspx")]
-		//[TestCase(1177, "/sub1/custom-sub-1.aspx")]
-		//[TestCase(1178, "/sub1/custom-sub-2.aspx")]
-		//[TestCase(1175, "/sub-2.aspx")]
-		//[TestCase(1172, "/test-page.aspx")]
-		//public void Get_Nice_Url_Hiding_Top_Level_No_Directory_Urls(int nodeId, string niceUrlMatch)
-		//{
-		//    var routingContext = GetRoutingContext("/test", 1111);
-
-		//    ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
-
-		//     var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId);
-
-		//    Assert.AreEqual(niceUrlMatch, result);
-		//}
 
 		// test hideTopLevelNodeFromPath true
 		[TestCase(1046, "/")]
@@ -153,9 +118,46 @@ namespace Umbraco.Tests.Routing
 
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
+			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
 
 			var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId);
 			Assert.AreEqual(niceUrlMatch, result);
+		}
+
+		[Test]
+		public void Get_Nice_Url_Relative_Or_Absolute()
+		{
+			var routingContext = GetRoutingContext("http://example.com/test", 1111);
+
+			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
+			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false");
+
+			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
+			Assert.AreEqual("/home/sub1/custom-sub-1", routingContext.NiceUrlProvider.GetNiceUrl(1177));
+
+			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = true;
+			Assert.AreEqual("http://example.com/home/sub1/custom-sub-1", routingContext.NiceUrlProvider.GetNiceUrl(1177));
+
+			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
+			routingContext.NiceUrlProvider.EnforceAbsoluteUrls = true;
+			Assert.AreEqual("http://example.com/home/sub1/custom-sub-1", routingContext.NiceUrlProvider.GetNiceUrl(1177));
+		}
+
+		[Test]
+		public void Get_Nice_Url_Unpublished()
+		{
+			var routingContext = GetRoutingContext("http://example.com/test", 1111);
+
+			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
+			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false");
+
+			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
+			Assert.AreEqual("#", routingContext.NiceUrlProvider.GetNiceUrl(999999));
+			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = true;
+			Assert.AreEqual("#", routingContext.NiceUrlProvider.GetNiceUrl(999999));
+			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
+			routingContext.NiceUrlProvider.EnforceAbsoluteUrls = true;
+			Assert.AreEqual("#", routingContext.NiceUrlProvider.GetNiceUrl(999999));
 		}
 	}
 }
