@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Specialized;
 using System.Configuration;
 using System.Globalization;
 using System.Web;
@@ -23,10 +24,14 @@ namespace Umbraco.Web.Media
             Initialize("ImageUrl");
         }
 
-        public static string GetImageUrl(string specifiedSrc, string field, string provider, int? nodeId = null)
+        public static string GetImageUrl(string specifiedSrc, string field, string provider, string parameters, int? nodeId = null)
         {
             string url;
             ImageUrlProviderBase p = GetProvider(provider);
+
+            NameValueCollection parsedParameters = string.IsNullOrEmpty(parameters)?
+                new NameValueCollection() : 
+                HttpUtility.ParseQueryString(parameters);
 
             string fieldValue = string.Empty;
             if (!string.IsNullOrEmpty(field))
@@ -56,18 +61,18 @@ namespace Umbraco.Web.Media
                 if (int.TryParse(fieldValue, out mediaId))
                 {
                     //Fetch media
-                    url = p.GetImageUrlFromMedia(mediaId);
+                    url = p.GetImageUrlFromMedia(mediaId, parsedParameters);
                 }
                 else
                 {
                     //assume file path
-                    url =  p.GetImageUrlFromFileName(fieldValue);
+                    url =  p.GetImageUrlFromFileName(fieldValue, parsedParameters);
                 }
 
             }
             else
             {
-                url = p.GetImageUrlFromFileName(specifiedSrc);
+                url = p.GetImageUrlFromFileName(specifiedSrc, parsedParameters);
             }
             return url;
         }

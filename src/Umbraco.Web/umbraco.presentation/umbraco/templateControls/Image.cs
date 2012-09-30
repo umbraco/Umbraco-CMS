@@ -10,6 +10,7 @@ namespace umbraco.presentation.templateControls
         public string NodeId { get; set; }
         public string Field { get; set; }
         public string Provider { get; set; }
+        public string Parameters { get; set; }
 
         protected override void Render(HtmlTextWriter writer)
         {
@@ -17,7 +18,7 @@ namespace umbraco.presentation.templateControls
             bool hasid = int.TryParse(NodeId, out id);
             int? nodeId = hasid ? id : (int?) null;
             
-            Src = ImageUrl.GetImageUrl(Src, Field, Provider, nodeId);
+            Src = ImageUrl.GetImageUrl(Src, Field, Provider, Parameters, nodeId);
             base.Render(writer);
         }
     }
