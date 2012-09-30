@@ -7,47 +7,58 @@ using umbraco;
 
 namespace Umbraco.Web
 {
-    static class UriUtility
+    public static class UriUtility
     {
-        static readonly string _appVirtualPath;
-        static readonly string _appVirtualPathPrefix;
+        static string _appPath;
+        static string _appPathPrefix;
 
         static UriUtility()
         {
-			// Virtual path
-            _appVirtualPath = HttpRuntime.AppDomainAppVirtualPath ?? "/";
-            _appVirtualPathPrefix = _appVirtualPath;
-            if (_appVirtualPathPrefix == "/")
-                _appVirtualPathPrefix = String.Empty;
+			SetAppDomainAppVirtualPath(HttpRuntime.AppDomainAppVirtualPath);
         }
 
+		// internal for unit testing only
+		internal static void SetAppDomainAppVirtualPath(string appPath)
+		{
+			_appPath = appPath ?? "/";
+			_appPathPrefix = _appPath;
+			if (_appPathPrefix == "/")
+				_appPathPrefix = String.Empty;
+		}
+
 		// will be "/" or "/foo"
-        public static string AppVirtualPath
+        public static string AppPath
         {
-            get { return _appVirtualPath; }
+            get { return _appPath; }
         }
 
 		// will be "" or "/foo"
-        public static string AppVirtualPathPrefix
+        public static string AppPathPrefix
         {
-            get { return _appVirtualPathPrefix; }
+            get { return _appPathPrefix; }
         }
 
-        public static string ToAbsolute(string url)
+		// adds the virtual directory if any
+		// see also VirtualPathUtility.ToAbsolute
+		// FIXME
+		public static string ToAbsolute(string url)
         {
-            return ResolveUrl(url);
+			//return ResolveUrl(url);
+			url = url.TrimStart('~');
+			return _appPathPrefix + url;
         }
 
-        public static string ToAppRelative(string url)
+		// strips the virtual directory if any
+		// see also VirtualPathUtility.ToAppRelative
+        public static string ToAppRelative(string virtualPath)
         {
-            if (url.StartsWith(_appVirtualPathPrefix))
-                url = url.Substring(_appVirtualPathPrefix.Length);
-            return url;
+            if (virtualPath.StartsWith(_appPathPrefix))
+                virtualPath = virtualPath.Substring(_appPathPrefix.Length);
+            return virtualPath;
         }
 
-		// fixme - what about vdir?
-		// path = path.Substring(UriUtility.AppVirtualPathPrefix.Length); // remove virtual directory
-
+		// maps an internal umbraco uri to a public uri
+		// ie with virtual directory, .aspx if required...
     	public static Uri UriFromUmbraco(Uri uri)
     	{
     		var path = uri.GetSafeAbsolutePath();
@@ -59,19 +70,19 @@ namespace Umbraco.Web
     		else if (UmbracoSettings.AddTrailingSlash)
     			path += "/";
 
+			path = ToAbsolute(path);
+
     		return uri.Rewrite(path);
     	}
 
-		/// <summary>
-		/// Converts a Uri to a path based URI that is lower cased
-		/// </summary>
-		/// <param name="uri"></param>
-		/// <returns></returns>
-    	public static Uri UriToUmbraco(Uri uri)
+		// maps a public uri to an internal umbraco uri
+		// ie no virtual directory, no .aspx, lowercase...
+		public static Uri UriToUmbraco(Uri uri)
     	{
     		var path = uri.GetSafeAbsolutePath();
 
     		path = path.ToLower();
+			path = ToAppRelative(path); // strip vdir if any
 
 			//we need to check if the path is /default.aspx because this will occur when using a 
 			//web server pre IIS 7 when requesting the root document
@@ -116,7 +127,7 @@ namespace Umbraco.Web
             }
 
             StringBuilder sbUrl = new StringBuilder();
-            sbUrl.Append(HttpRuntime.AppDomainAppVirtualPath);
+            sbUrl.Append(_appPathPrefix);
             if (sbUrl.Length == 0 || sbUrl[sbUrl.Length - 1] != '/') sbUrl.Append('/');
 
             // found question mark already? query string, do not touch!

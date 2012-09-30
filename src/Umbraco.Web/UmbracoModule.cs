@@ -222,7 +222,7 @@ namespace Umbraco.Web
 			if (!EnsureIsConfigured(httpContext, uri))
 				return false;
             // ensure Umbraco has documents to serve
-            if (!EnsureHasContent(httpContext))
+            if (!EnsureHasContent(context, httpContext))
                 return false;
 
 			return true;
@@ -316,9 +316,8 @@ namespace Umbraco.Web
 		// ensures Umbraco has at least one published node
 		// if not, rewrites to splash and return false
 		// if yes, return true
-		bool EnsureHasContent(HttpContextBase httpContext)
+		bool EnsureHasContent(UmbracoContext context, HttpContextBase httpContext)
 		{
-			var context = UmbracoContext.Current;
 			var store = context.RoutingContext.PublishedContentStore;
 			if (!store.HasContent(context))
 			{

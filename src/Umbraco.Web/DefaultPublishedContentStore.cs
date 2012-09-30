@@ -119,8 +119,8 @@ namespace Umbraco.Web
                 else
                 {
                     // if not in a domain - what is the default page?
-                    // let's say it is the first one in the tree, if any
-                    xpath = "(/root/*[@isDoc])[1]";
+                    // let's say it is the first one in the tree, if any -- order by sortOrder
+                    xpath = "/root/*[@isDoc and @sortOrder='0']";
                 }
             }
             else

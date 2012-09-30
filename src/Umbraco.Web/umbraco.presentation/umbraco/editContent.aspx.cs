@@ -20,6 +20,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.presentation;
 using umbraco.cms.businesslogic.skinning;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace umbraco.cms.presentation
 {
@@ -180,7 +181,7 @@ namespace umbraco.cms.presentation
             publishProps.addProperty(ui.Text("content", "expireDate", base.getUser()), dpExpire);
 
             // url's
-            updateLinks();
+            UpdateNiceUrls();
             linkProps.addProperty(ui.Text("content", "urls", base.getUser()), l);
 
             if (domainText.Text != "")
@@ -323,7 +324,7 @@ namespace umbraco.cms.presentation
                             UnPublish.Visible = true;
 
                         _documentHasPublishedVersion = _document.HasPublishedVersion();
-                        updateLinks();
+                        UpdateNiceUrls();
                     }
                     else
                     {
@@ -353,57 +354,36 @@ namespace umbraco.cms.presentation
 
         }
 
-        private void updateLinks()
-        {
-            if (_documentHasPublishedVersion)
-            {
-                // zb-00007 #29928 : refactor
-                string currentLink = library.NiceUrl(_document.Id);
-                l.Text = "<a href=\"" + currentLink + "\" target=\"_blank\">" + currentLink + "</a>";
+		void UpdateNiceUrls()
+		{
+			if (!_documentHasPublishedVersion)
+			{
+				l.Text = "<i>" + ui.Text("content", "itemNotPublished", base.getUser()) + "</i>";
+				return;
+			}
 
-                // domains
-                domainText.Text = "";
-                foreach (string s in _document.Path.Split(','))
-                {
-                    if (int.Parse(s) > -1)
-                    {
-                        cms.businesslogic.web.Document dChild = new cms.businesslogic.web.Document(int.Parse(s));
-                        if (dChild.Published)
-                        {
-                            cms.businesslogic.web.Domain[] domains = cms.businesslogic.web.Domain.GetDomainsById(int.Parse(s));
-                            if (domains.Length > 0)
-                            {
-                                for (int i = 0; i < domains.Length; i++)
-                                {
-                                    string tempLink = "";
-                                    if (library.NiceUrl(int.Parse(s)) == "")
-                                        tempLink = "<em>N/A</em>";
-                                    else if (int.Parse(s) != _document.Id)
-                                    {
-                                        string tempNiceUrl = library.NiceUrl(int.Parse(s));
+			var niceUrlProvider = Umbraco.Web.UmbracoContext.Current.RoutingContext.NiceUrlProvider;
+			var url = niceUrlProvider.GetNiceUrl(_document.Id);
 
-                                        string niceUrl = tempNiceUrl != "/" ? currentLink.Replace(tempNiceUrl.Replace(".aspx", ""), "") : currentLink;
-                                        if (!niceUrl.StartsWith("/"))
-                                            niceUrl = "/" + niceUrl;
+			if (url == "#")
+			{
+				var parent = _document;
+				while (parent.Published && parent.ParentId > 0)
+					parent = new Document(_document.ParentId);
+				if (parent.Published)
+					l.Text = "<i>" + ui.Text("content", "parentNotPublished", "???", base.getUser()) + "</i>";
+				else
+					l.Text = "<i>" + ui.Text("content", "parentNotPublished", parent.Text, base.getUser()) + "</i>";
+				return;
+			}
 
-                                        tempLink = "http://" + domains[i].Name + niceUrl;
-                                    }
-                                    else
-                                        tempLink = "http://" + domains[i].Name;
+			l.Text = string.Format("<a href=\"{0}\" target=\"_blank\">{0}</a>", url);
 
-                                    domainText.Text += "<a href=\"" + tempLink + "\" target=\"_blank\">" + tempLink + "</a><br/>";
-                                }
-                            }
-                        }
-                        else
-                            l.Text = "<i>" + ui.Text("content", "parentNotPublished", dChild.Text, base.getUser()) + "</i>";
-                    }
-                }
-
-            }
-            else
-                l.Text = "<i>" + ui.Text("content", "itemNotPublished", base.getUser()) + "</i>";
-        }
+			var lb = new System.Text.StringBuilder();			
+			foreach (var altUrl in niceUrlProvider.GetAllAbsoluteNiceUrls(_document.Id).Where(u => u != url))
+				lb.AppendFormat("<a href=\"{0}\" target=\"_blank\">{0}</a><br />", altUrl);
+			domainText.Text = lb.ToString();
+		}
 
         /// <summary>
         /// Clears the page of all controls and shows a simple message. Used if users don't have visible access to the page.

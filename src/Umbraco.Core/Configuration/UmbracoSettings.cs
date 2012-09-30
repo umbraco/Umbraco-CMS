@@ -312,16 +312,21 @@ namespace Umbraco.Core.Configuration
             get { return "packages.umbraco.org"; }
         }
 
+		static bool? _useDomainPrefixes = null;
+
         /// <summary>
         /// Gets a value indicating whether umbraco will use domain prefixes.
         /// </summary>
         /// <value><c>true</c> if umbraco will use domain prefixes; otherwise, <c>false</c>.</value>
+		// TODO rename as EnforceAbsoluteUrls
         public static bool UseDomainPrefixes
         {
             get
             {
                 try
                 {
+					if (_useDomainPrefixes.HasValue)
+						return _useDomainPrefixes.Value;
                     bool result;
                     if (bool.TryParse(GetKey("/settings/requestHandler/useDomainPrefixes"), out result))
                         return result;
@@ -332,6 +337,11 @@ namespace Umbraco.Core.Configuration
                     return false;
                 }
             }
+			// for unit tests only
+			internal set
+			{
+				_useDomainPrefixes = value;
+			}
         }
 
 		static bool? _addTrailingSlash = null;
@@ -365,6 +375,7 @@ namespace Umbraco.Core.Configuration
                     return false;
                 }
             }
+			// for unit tests only
 			internal set
 			{
 				_addTrailingSlash = value;

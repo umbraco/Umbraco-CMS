@@ -55,6 +55,7 @@ namespace Umbraco.Tests.Routing
 			ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "");		
 		}
 
+		// do not test for /base here as it's handled before EnsureUmbracoRoutablePage is called
 		[TestCase("/umbraco_client/Tree/treeIcons.css", false)]
 		[TestCase("/umbraco_client/Tree/Themes/umbraco/style.css?cdv=37", false)]
 		[TestCase("/umbraco_client/scrollingmenu/style.css?cdv=37", false)]
@@ -65,7 +66,6 @@ namespace Umbraco.Tests.Routing
 		[TestCase("/install?installStep=license", false)]
 		[TestCase("/install/test.aspx", false)]
 		[TestCase("/config/splashes/noNodes.aspx", false)]
-		[TestCase("/base/somebasehandler", false)]
 		[TestCase("/", true)]
 		[TestCase("/home.aspx", true)]
 		[TestCase("/umbraco-test", true)]
@@ -74,7 +74,8 @@ namespace Umbraco.Tests.Routing
 		{
 			var httpContextFactory = new FakeHttpContextFactory(url);
 			var httpContext = httpContextFactory.HttpContext;
-			var umbracoContext = GetUmbracoContext(url, 1234);
+			var routingContext = GetRoutingContext(url);
+			var umbracoContext = routingContext.UmbracoContext;
 			
 			var result = _module.EnsureUmbracoRoutablePage(umbracoContext, httpContext);
 

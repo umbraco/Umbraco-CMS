@@ -323,7 +323,7 @@ namespace Umbraco.Web
 		public string NiceUrlWithDomain(int nodeId)
 		{
 			var niceUrlsProvider = UmbracoContext.Current.NiceUrlProvider;
-			return niceUrlsProvider.GetNiceUrl(nodeId, UmbracoContext.Current.UmbracoUrl, true);
+			return niceUrlsProvider.GetNiceUrl(nodeId, true);
 		}
 
 		#endregion
