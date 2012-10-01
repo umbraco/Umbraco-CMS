@@ -1,5 +1,5 @@
-<%@ Page Language="C#" MasterPageFile="../../masterpages/umbracoPage.Master" AutoEventWireup="true"
-    CodeBehind="editView.aspx.cs" Inherits="umbraco.cms.presentation.settings.views.EditView"
+<%@ Page Language="C#" MasterPageFile="../../masterpages/umbracoPage.Master" AutoEventWireup="True"
+    CodeBehind="EditView.aspx.cs" Inherits="Umbraco.Web.UI.Umbraco.Settings.Views.EditView"
     ValidateRequest="False" %>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>

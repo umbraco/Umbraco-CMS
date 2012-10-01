@@ -260,9 +260,16 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="umbraco\TreeInit.aspx.cs">
-			<DependentUpon>treeInit.aspx</DependentUpon>  
+    <Compile Include="umbraco\settings\views\EditView.aspx.cs">
+			<DependentUpon>EditView.aspx</DependentUpon>
 			<SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\settings\views\EditView.aspx.designer.cs">
+      <DependentUpon>EditView.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\TreeInit.aspx.cs">
+      <DependentUpon>treeInit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco\TreeInit.aspx.designer.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
