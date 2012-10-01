@@ -141,7 +141,7 @@ namespace Umbraco.Web
 
 				if (!docreq.HasNode)
 				{
-					httpContext.RemapHandler(new DocumentNotFoundHandler());
+					httpContext.RemapHandler(new PublishedContentNotFoundHandler());
 					return;
 				}
 

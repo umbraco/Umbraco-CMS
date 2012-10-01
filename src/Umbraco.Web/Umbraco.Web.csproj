@@ -323,7 +323,7 @@
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
     <Compile Include="DefaultPublishedContentStore.cs" />
     <Compile Include="PublishedContentStoreResolver.cs" />
-    <Compile Include="Routing\DocumentNotFoundHandler.cs" />
+    <Compile Include="Routing\PublishedContentNotFoundHandler.cs" />
     <Compile Include="IPublishedContentStore.cs" />
     <Compile Include="Models\XmlPublishedContent.cs" />
     <Compile Include="Models\XmlDocumentProperty.cs" />

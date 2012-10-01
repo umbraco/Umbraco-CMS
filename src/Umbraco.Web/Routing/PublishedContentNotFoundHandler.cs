@@ -5,7 +5,7 @@ namespace Umbraco.Web.Routing
 	/// <summary>
 	/// Gets executed when no document can be found in Umbraco
 	/// </summary>
-	internal class DocumentNotFoundHandler : IHttpHandler
+	internal class PublishedContentNotFoundHandler : IHttpHandler
 	{
 		public void ProcessRequest(HttpContext context)
 		{
