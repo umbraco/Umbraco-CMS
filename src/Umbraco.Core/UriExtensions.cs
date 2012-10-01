@@ -96,5 +96,12 @@ namespace Umbraco.Core
 			}
 			return uri;
 		}
+
+		public static Uri MakeAbsolute(this Uri uri, Uri baseUri)
+		{
+			if (uri.IsAbsoluteUri)
+				throw new ArgumentException("Uri is already absolute.", "uri");
+			return new Uri(baseUri.GetLeftPart(UriPartial.Authority) + uri.GetSafeAbsolutePath());
+		}
 	}
 }

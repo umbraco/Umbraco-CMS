@@ -237,12 +237,8 @@ namespace Umbraco.Web
 			
 			if (!absolutePath.StartsWith("/"))
 				throw new FormatException("The absolutePath specified does not start with a '/'");
-			
 
-			var url = httpContext.Request.Url;
-			var port = url.Port != 80 ? (":" + url.Port) : String.Empty;
-
-    		return new Uri(String.Format("{0}://{1}{2}{3}", url.Scheme, url.Host, port, absolutePath));
+			return new Uri(absolutePath, UriKind.Relative).MakeAbsolute(httpContext.Request.Url);
 		}
     }
 }

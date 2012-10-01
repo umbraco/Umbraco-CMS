@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Xml.XPath;
 using umbraco;
 using umbraco.NodeFactory;
+using Umbraco.Core;
 
 namespace umbraco
 {
@@ -200,7 +202,9 @@ namespace umbraco
 		/// </remarks>
 		public static int GetNodeIdByUrl(string url)
 		{
-			var uri = new System.Uri(url);
+			var uri = new Uri(url, UriKind.RelativeOrAbsolute);
+			if (!uri.IsAbsoluteUri)
+				uri = uri.MakeAbsolute(Umbraco.Web.UmbracoContext.Current.UmbracoUrl);
 			uri = Umbraco.Web.UriUtility.UriToUmbraco(uri);
 
 			var docreq = new Umbraco.Web.Routing.DocumentRequest(uri, Umbraco.Web.UmbracoContext.Current.RoutingContext);
