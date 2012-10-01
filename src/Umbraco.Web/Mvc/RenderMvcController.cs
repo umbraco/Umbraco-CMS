@@ -14,32 +14,32 @@ namespace Umbraco.Web.Mvc
 			ActionInvoker = new RenderActionInvoker();
 		}
 		
-		private DocumentRequest _documentRequest;
+		private PublishedContentRequest _publishedContentRequest;
 
 		/// <summary>
 		/// Returns the current UmbracoContext
 		/// </summary>
 		protected UmbracoContext UmbracoContext
 		{
-			get { return DocumentRequest.RoutingContext.UmbracoContext; }
+			get { return PublishedContentRequest.RoutingContext.UmbracoContext; }
 		}
 
-		//TODO: make this protected once we make DocumentRequest not internal after we figure out what it should actually contain
+		//TODO: make this protected once we make PublishedContentRequest not internal after we figure out what it should actually contain
 		/// <summary>
-		/// Returns the current DocumentRequest
+		/// Returns the current PublishedContentRequest
 		/// </summary>
-		internal DocumentRequest DocumentRequest
+		internal PublishedContentRequest PublishedContentRequest
 		{
 			get
 			{
-				if (_documentRequest != null)
-					return _documentRequest;
+				if (_publishedContentRequest != null)
+					return _publishedContentRequest;
 				if (!RouteData.DataTokens.ContainsKey("umbraco-doc-request"))
 				{
-					throw new InvalidOperationException("DataTokens must contain an 'umbraco-doc-request' key with a DocumentRequest object");
+					throw new InvalidOperationException("DataTokens must contain an 'umbraco-doc-request' key with a PublishedContentRequest object");
 				}
-				_documentRequest = (DocumentRequest) RouteData.DataTokens["umbraco-doc-request"];
-				return _documentRequest;
+				_publishedContentRequest = (PublishedContentRequest) RouteData.DataTokens["umbraco-doc-request"];
+				return _publishedContentRequest;
 			}
 		}
 		

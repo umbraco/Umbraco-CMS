@@ -13,23 +13,23 @@ using umbraco.cms.businesslogic.web;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Looks up the document using ILookup's and sets any additional properties required on the DocumentRequest object
+	/// Looks up the document using ILookup's and sets any additional properties required on the PublishedContentRequest object
 	/// </summary>
 	internal class DocumentRequestBuilder
 	{
-		private readonly DocumentRequest _documentRequest;
+		private readonly PublishedContentRequest _publishedContentRequest;
 		private readonly UmbracoContext _umbracoContext;
 		private readonly RoutingContext _routingContext;
 
-		public DocumentRequestBuilder(DocumentRequest documentRequest)
+		public DocumentRequestBuilder(PublishedContentRequest publishedContentRequest)
 		{
-			_documentRequest = documentRequest;
-			_umbracoContext = documentRequest.RoutingContext.UmbracoContext;
-			_routingContext = documentRequest.RoutingContext;
+			_publishedContentRequest = publishedContentRequest;
+			_umbracoContext = publishedContentRequest.RoutingContext.UmbracoContext;
+			_routingContext = publishedContentRequest.RoutingContext;
 		}
 
 		/// <summary>
-		/// Determines the rendering engine to use and sets the flag on the DocumentRequest
+		/// Determines the rendering engine to use and sets the flag on the PublishedContentRequest
 		/// </summary>
 		internal void DetermineRenderingEngine()
 		{
@@ -37,13 +37,13 @@ namespace Umbraco.Web.Routing
 			//sometimes don't require a template since the developer may want full control over the rendering. 
 			//Webforms doesn't support this so MVC it is. MVC will also handle what to do if no template or hijacked route
 			//is there (i.e. blank page)
-			if (!_documentRequest.HasTemplate)
+			if (!_publishedContentRequest.HasTemplate)
 			{
-				_documentRequest.RenderingEngine = RenderingEngine.Mvc;
+				_publishedContentRequest.RenderingEngine = RenderingEngine.Mvc;
 				return;
 			}
 
-			var templateAlias = _documentRequest.Template.Alias;
+			var templateAlias = _publishedContentRequest.Template.Alias;
 
 			Func<DirectoryInfo, string, string[], RenderingEngine, bool> determineEngine =
 				(directory, alias, extensions, renderingEngine) =>
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Routing
 						if (file != null)
 						{
 							//it is mvc since we have a template there that exists with this alias
-							_documentRequest.RenderingEngine = renderingEngine;
+							_publishedContentRequest.RenderingEngine = renderingEngine;
 							return true;
 						}
 						return false;
@@ -92,7 +92,7 @@ namespace Umbraco.Web.Routing
 
 			// note - we are not handling schemes nor ports here.
 
-			LogHelper.Debug<DocumentRequest>("{0}Uri=\"{1}\"", () => tracePrefix, () => _documentRequest.Uri);
+			LogHelper.Debug<PublishedContentRequest>("{0}Uri=\"{1}\"", () => tracePrefix, () => _publishedContentRequest.Uri);
 
 			// try to find a domain matching the current request
 			var domainAndUri = DomainHelper.DomainMatch(Domain.GetDomains(), _umbracoContext.UmbracoUrl, false);
@@ -101,15 +101,15 @@ namespace Umbraco.Web.Routing
 			if (domainAndUri != null)
 			{
 				// matching an existing domain
-				LogHelper.Debug<DocumentRequest>("{0}Matches domain=\"{1}\", rootId={2}, culture=\"{3}\"",
+				LogHelper.Debug<PublishedContentRequest>("{0}Matches domain=\"{1}\", rootId={2}, culture=\"{3}\"",
 												 () => tracePrefix,
 												 () => domainAndUri.Domain.Name,
 												 () => domainAndUri.Domain.RootNodeId,
 												 () => domainAndUri.Domain.Language.CultureAlias);
 
-				_documentRequest.Domain = domainAndUri.Domain;
-				_documentRequest.DomainUri = domainAndUri.Uri;
-				_documentRequest.Culture = new CultureInfo(domainAndUri.Domain.Language.CultureAlias);
+				_publishedContentRequest.Domain = domainAndUri.Domain;
+				_publishedContentRequest.DomainUri = domainAndUri.Uri;
+				_publishedContentRequest.Culture = new CultureInfo(domainAndUri.Domain.Language.CultureAlias);
 
 				// canonical? not implemented at the moment
 				// if (...)
@@ -121,15 +121,15 @@ namespace Umbraco.Web.Routing
 			else
 			{
 				// not matching any existing domain
-				LogHelper.Debug<DocumentRequest>("{0}Matches no domain", () => tracePrefix);
+				LogHelper.Debug<PublishedContentRequest>("{0}Matches no domain", () => tracePrefix);
 
 				var defaultLanguage = Language.GetAllAsList().FirstOrDefault();
-				_documentRequest.Culture = defaultLanguage == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultLanguage.CultureAlias);
+				_publishedContentRequest.Culture = defaultLanguage == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultLanguage.CultureAlias);
 			}
 
-			LogHelper.Debug<DocumentRequest>("{0}Culture=\"{1}\"", () => tracePrefix, () => _documentRequest.Culture.Name);
+			LogHelper.Debug<PublishedContentRequest>("{0}Culture=\"{1}\"", () => tracePrefix, () => _publishedContentRequest.Culture.Name);
 
-			return _documentRequest.Domain != null;
+			return _publishedContentRequest.Domain != null;
 		}
 
 		/// <summary>
@@ -139,7 +139,7 @@ namespace Umbraco.Web.Routing
 		internal bool LookupDocument()
 		{
 			const string tracePrefix = "LookupDocument: ";
-			LogHelper.Debug<DocumentRequest>("{0}Path=\"{1}\"", () => tracePrefix, () => _documentRequest.Uri.AbsolutePath);
+			LogHelper.Debug<PublishedContentRequest>("{0}Path=\"{1}\"", () => tracePrefix, () => _publishedContentRequest.Uri.AbsolutePath);
 
 			// look for the document
 			// the first successful resolver, if any, will set this.Node, and may also set this.Template
@@ -147,9 +147,9 @@ namespace Umbraco.Web.Routing
 
 			using (DisposableTimer.DebugDuration<PluginManager>(
 				string.Format("{0}Begin resolvers", tracePrefix),
-				string.Format("{0}End resolvers, {1}", tracePrefix, (_documentRequest.HasNode ? "a document was found" : "no document was found"))))
+				string.Format("{0}End resolvers, {1}", tracePrefix, (_publishedContentRequest.HasNode ? "a document was found" : "no document was found"))))
 			{
-				_routingContext.DocumentLookups.Any(lookup => lookup.TrySetDocument(_documentRequest));
+				_routingContext.DocumentLookups.Any(lookup => lookup.TrySetDocument(_publishedContentRequest));
 			}
 
 			// fixme - not handling umbracoRedirect
@@ -162,7 +162,7 @@ namespace Umbraco.Web.Routing
 			// handle umbracoRedirect (moved from umbraco.page)
 			FollowRedirect();
 
-			bool resolved = _documentRequest.HasNode && _documentRequest.HasTemplate;
+			bool resolved = _publishedContentRequest.HasNode && _publishedContentRequest.HasTemplate;
 			return resolved;
 		}
 
@@ -180,23 +180,23 @@ namespace Umbraco.Web.Routing
 			const int maxLoop = 12;
 			do
 			{
-				LogHelper.Debug<DocumentRequest>("{0}{1}", () => tracePrefix, () => (i == 0 ? "Begin" : "Loop"));
+				LogHelper.Debug<PublishedContentRequest>("{0}{1}", () => tracePrefix, () => (i == 0 ? "Begin" : "Loop"));
 
 				// handle not found
-				if (!_documentRequest.HasNode)
+				if (!_publishedContentRequest.HasNode)
 				{
-					_documentRequest.Is404 = true;
-					LogHelper.Debug<DocumentRequest>("{0}No document, try last chance lookup", () => tracePrefix);
+					_publishedContentRequest.Is404 = true;
+					LogHelper.Debug<PublishedContentRequest>("{0}No document, try last chance lookup", () => tracePrefix);
 
 					// if it fails then give up, there isn't much more that we can do
 					var lastChance = _routingContext.DocumentLastChanceLookup;
-					if (lastChance == null || !lastChance.TrySetDocument(_documentRequest))
+					if (lastChance == null || !lastChance.TrySetDocument(_publishedContentRequest))
 					{
-						LogHelper.Debug<DocumentRequest>("{0}Failed to find a document, give up", () => tracePrefix);
+						LogHelper.Debug<PublishedContentRequest>("{0}Failed to find a document, give up", () => tracePrefix);
 						break;
 					}
 
-					LogHelper.Debug<DocumentRequest>("{0}Found a document", () => tracePrefix);
+					LogHelper.Debug<PublishedContentRequest>("{0}Found a document", () => tracePrefix);
 				}
 
 				// follow internal redirects as long as it's not running out of control ie infinite loop of some sort
@@ -206,25 +206,25 @@ namespace Umbraco.Web.Routing
 					break;
 
 				// ensure access
-				if (_documentRequest.HasNode)
+				if (_publishedContentRequest.HasNode)
 					EnsureNodeAccess();
 
 				// resolve template
-				if (_documentRequest.HasNode)
+				if (_publishedContentRequest.HasNode)
 					LookupTemplate();
 
 				// loop while we don't have page, ie the redirect or access
 				// got us to nowhere and now we need to run the notFoundLookup again
 				// as long as it's not running out of control ie infinite loop of some sort
 
-			} while (!_documentRequest.HasNode && i++ < maxLoop);
+			} while (!_publishedContentRequest.HasNode && i++ < maxLoop);
 
 			if (i == maxLoop || j == maxLoop)
 			{
-				LogHelper.Debug<DocumentRequest>("{0}Looks like we're running into an infinite loop, abort", () => tracePrefix);
-				_documentRequest.PublishedContent = null;
+				LogHelper.Debug<PublishedContentRequest>("{0}Looks like we're running into an infinite loop, abort", () => tracePrefix);
+				_publishedContentRequest.PublishedContent = null;
 			}
-			LogHelper.Debug<DocumentRequest>("{0}End", () => tracePrefix);
+			LogHelper.Debug<PublishedContentRequest>("{0}End", () => tracePrefix);
 		}
 
 		/// <summary>
@@ -239,15 +239,15 @@ namespace Umbraco.Web.Routing
 		{
 			const string tracePrefix = "FollowInternalRedirects: ";
 
-			if (_documentRequest.PublishedContent == null)
+			if (_publishedContentRequest.PublishedContent == null)
 				throw new InvalidOperationException("There is no node.");
 
 			bool redirect = false;
-			var internalRedirect = _documentRequest.PublishedContent.GetPropertyValue<string>("umbracoInternalRedirectId");
+			var internalRedirect = _publishedContentRequest.PublishedContent.GetPropertyValue<string>("umbracoInternalRedirectId");
 			
 			if (!string.IsNullOrWhiteSpace(internalRedirect))
 			{
-				LogHelper.Debug<DocumentRequest>("{0}Found umbracoInternalRedirectId={1}", () => tracePrefix, () => internalRedirect);
+				LogHelper.Debug<PublishedContentRequest>("{0}Found umbracoInternalRedirectId={1}", () => tracePrefix, () => internalRedirect);
 
 				int internalRedirectId;
 				if (!int.TryParse(internalRedirect, out internalRedirectId))
@@ -256,13 +256,13 @@ namespace Umbraco.Web.Routing
 				if (internalRedirectId <= 0)
 				{
 					// bad redirect - log and display the current page (legacy behavior)
-					//_documentRequest.Document = null; // no! that would be to force a 404
-					LogHelper.Debug<DocumentRequest>("{0}Failed to redirect to id={1}: invalid value", () => tracePrefix, () => internalRedirect);
+					//_publishedContentRequest.Document = null; // no! that would be to force a 404
+					LogHelper.Debug<PublishedContentRequest>("{0}Failed to redirect to id={1}: invalid value", () => tracePrefix, () => internalRedirect);
 				}
-				else if (internalRedirectId == _documentRequest.DocumentId)
+				else if (internalRedirectId == _publishedContentRequest.DocumentId)
 				{
 					// redirect to self
-					LogHelper.Debug<DocumentRequest>("{0}Redirecting to self, ignore", () => tracePrefix);
+					LogHelper.Debug<PublishedContentRequest>("{0}Redirecting to self, ignore", () => tracePrefix);
 				}
 				else
 				{
@@ -271,15 +271,15 @@ namespace Umbraco.Web.Routing
 						_umbracoContext,
 						internalRedirectId);
 
-					_documentRequest.PublishedContent = node;
+					_publishedContentRequest.PublishedContent = node;
 					if (node != null)
 					{
 						redirect = true;
-						LogHelper.Debug<DocumentRequest>("{0}Redirecting to id={1}", () => tracePrefix, () => internalRedirectId);
+						LogHelper.Debug<PublishedContentRequest>("{0}Redirecting to id={1}", () => tracePrefix, () => internalRedirectId);
 					}
 					else
 					{
-						LogHelper.Debug<DocumentRequest>("{0}Failed to redirect to id={1}: no such published document", () => tracePrefix, () => internalRedirectId);
+						LogHelper.Debug<PublishedContentRequest>("{0}Failed to redirect to id={1}: no such published document", () => tracePrefix, () => internalRedirectId);
 					}
 				}
 			}
@@ -295,43 +295,43 @@ namespace Umbraco.Web.Routing
 		{
 			const string tracePrefix = "EnsurePageAccess: ";
 
-			if (_documentRequest.PublishedContent == null)
+			if (_publishedContentRequest.PublishedContent == null)
 				throw new InvalidOperationException("There is no node.");
 
-			var path = _documentRequest.PublishedContent.Path;
+			var path = _publishedContentRequest.PublishedContent.Path;
 
-			if (Access.IsProtected(_documentRequest.DocumentId, path))
+			if (Access.IsProtected(_publishedContentRequest.DocumentId, path))
 			{
-				LogHelper.Debug<DocumentRequest>("{0}Page is protected, check for access", () => tracePrefix);
+				LogHelper.Debug<PublishedContentRequest>("{0}Page is protected, check for access", () => tracePrefix);
 
 				var user = System.Web.Security.Membership.GetUser();
 
 				if (user == null || !Member.IsLoggedOn())
 				{
-					LogHelper.Debug<DocumentRequest>("{0}Not logged in, redirect to login page", () => tracePrefix);
+					LogHelper.Debug<PublishedContentRequest>("{0}Not logged in, redirect to login page", () => tracePrefix);
 					var loginPageId = Access.GetLoginPage(path);
-					if (loginPageId != _documentRequest.DocumentId)
-						_documentRequest.PublishedContent = _routingContext.PublishedContentStore.GetDocumentById(
+					if (loginPageId != _publishedContentRequest.DocumentId)
+						_publishedContentRequest.PublishedContent = _routingContext.PublishedContentStore.GetDocumentById(
 							_umbracoContext,
 							loginPageId);
 				}
-				else if (!Access.HasAccces(_documentRequest.DocumentId, user.ProviderUserKey))
+				else if (!Access.HasAccces(_publishedContentRequest.DocumentId, user.ProviderUserKey))
 				{
-					LogHelper.Debug<DocumentRequest>("{0}Current member has not access, redirect to error page", () => tracePrefix);
+					LogHelper.Debug<PublishedContentRequest>("{0}Current member has not access, redirect to error page", () => tracePrefix);
 					var errorPageId = Access.GetErrorPage(path);
-					if (errorPageId != _documentRequest.DocumentId)
-						_documentRequest.PublishedContent = _routingContext.PublishedContentStore.GetDocumentById(
+					if (errorPageId != _publishedContentRequest.DocumentId)
+						_publishedContentRequest.PublishedContent = _routingContext.PublishedContentStore.GetDocumentById(
 							_umbracoContext,
 							errorPageId);
 				}
 				else
 				{
-					LogHelper.Debug<DocumentRequest>("{0}Current member has access", () => tracePrefix);
+					LogHelper.Debug<PublishedContentRequest>("{0}Current member has access", () => tracePrefix);
 				}
 			}
 			else
 			{
-				LogHelper.Debug<DocumentRequest>("{0}Page is not protected", () => tracePrefix);
+				LogHelper.Debug<PublishedContentRequest>("{0}Page is not protected", () => tracePrefix);
 			}
 		}
 
@@ -341,11 +341,11 @@ namespace Umbraco.Web.Routing
 		private void LookupTemplate()
 		{
 			//return if the request already has a template assigned, this can be possible if an ILookup assigns one
-			if (_documentRequest.HasTemplate) return;
+			if (_publishedContentRequest.HasTemplate) return;
 
 			const string tracePrefix = "LookupTemplate: ";
 
-			if (_documentRequest.PublishedContent == null)
+			if (_publishedContentRequest.PublishedContent == null)
 				throw new InvalidOperationException("There is no node.");
 
 			//gets item from query string, form, cookie or server vars
@@ -357,36 +357,36 @@ namespace Umbraco.Web.Routing
 				// associated with it.
 				//TODO: When we remove the need for a database for templates, then this id should be irrelavent, not sure how were going to do this nicely.
 
-				var templateId = _documentRequest.PublishedContent.TemplateId;
-				LogHelper.Debug<DocumentRequest>("{0}Look for template id={1}", () => tracePrefix, () => templateId);
+				var templateId = _publishedContentRequest.PublishedContent.TemplateId;
+				LogHelper.Debug<PublishedContentRequest>("{0}Look for template id={1}", () => tracePrefix, () => templateId);
 				
 				if (templateId > 0)
 				{
 					//NOTE: This will throw an exception if the template id doesn't exist, but that is ok to inform the front end.
 					var template = new Template(templateId);
-					_documentRequest.Template = template;
+					_publishedContentRequest.Template = template;
 				}
 			}
 			else
 			{
-				LogHelper.Debug<DocumentRequest>("{0}Look for template alias=\"{1}\" (altTemplate)", () => tracePrefix, () => templateAlias);
+				LogHelper.Debug<PublishedContentRequest>("{0}Look for template alias=\"{1}\" (altTemplate)", () => tracePrefix, () => templateAlias);
 
 				var template = Template.GetByAlias(templateAlias);
-				_documentRequest.Template = template;
+				_publishedContentRequest.Template = template;
 			}
 
-			if (!_documentRequest.HasTemplate)
+			if (!_publishedContentRequest.HasTemplate)
 			{
-				LogHelper.Debug<DocumentRequest>("{0}No template was found.");
+				LogHelper.Debug<PublishedContentRequest>("{0}No template was found.");
 
 				// initial idea was: if we're not already 404 and UmbracoSettings.HandleMissingTemplateAs404 is true
-				// then reset _documentRequest.Document to null to force a 404.
+				// then reset _publishedContentRequest.Document to null to force a 404.
 				//
 				// but: because we want to let MVC hijack routes even though no template is defined, we decide that
 				// a missing template is OK but the request will then be forwarded to MVC, which will need to take
 				// care of everything.
 				//
-				// so, don't set _documentRequest.Document to null here
+				// so, don't set _publishedContentRequest.Document to null here
 			}
 		}
 
@@ -396,15 +396,15 @@ namespace Umbraco.Web.Routing
 		/// <remarks>As per legacy, if the redirect does not work, we just ignore it.</remarks>
 		private void FollowRedirect()
 		{
-			if (_documentRequest.HasNode)
+			if (_publishedContentRequest.HasNode)
 			{
-				var redirectId = _documentRequest.PublishedContent.GetPropertyValue<int>("umbracoRedirect", -1);
+				var redirectId = _publishedContentRequest.PublishedContent.GetPropertyValue<int>("umbracoRedirect", -1);
 				
 				string redirectUrl = "#";
 				if (redirectId > 0)
 					redirectUrl = _routingContext.NiceUrlProvider.GetNiceUrl(redirectId);
 				if (redirectUrl != "#")
-					_documentRequest.RedirectUrl = redirectUrl;
+					_publishedContentRequest.RedirectUrl = redirectUrl;
 			}
 		}
 	}

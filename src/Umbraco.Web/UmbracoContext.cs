@@ -196,7 +196,7 @@ namespace Umbraco.Web
 		/// </summary>
 		public bool IsFrontEndUmbracoRequest
 		{
-			get { return DocumentRequest != null; }
+			get { return PublishedContentRequest != null; }
 		}
 
 		/// <summary>
@@ -221,9 +221,9 @@ namespace Umbraco.Web
 		internal RoutingContext RoutingContext { get; set; }	
 
 		/// <summary>
-		/// Gets/sets the DocumentRequest object
+		/// Gets/sets the PublishedContentRequest object
 		/// </summary>
-		internal DocumentRequest DocumentRequest { get; set; }	
+		internal PublishedContentRequest PublishedContentRequest { get; set; }	
 
         /// <summary>
         /// Exposes the HttpContext for the current request

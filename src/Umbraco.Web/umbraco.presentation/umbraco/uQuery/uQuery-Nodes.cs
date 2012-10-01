@@ -207,7 +207,7 @@ namespace umbraco
 				uri = uri.MakeAbsolute(Umbraco.Web.UmbracoContext.Current.UmbracoUrl);
 			uri = Umbraco.Web.UriUtility.UriToUmbraco(uri);
 
-			var docreq = new Umbraco.Web.Routing.DocumentRequest(uri, Umbraco.Web.UmbracoContext.Current.RoutingContext);
+			var docreq = new Umbraco.Web.Routing.PublishedContentRequest(uri, Umbraco.Web.UmbracoContext.Current.RoutingContext);
 			var builder = new Umbraco.Web.Routing.DocumentRequestBuilder(docreq);
 			builder.LookupDomain();
 			builder.LookupDocument();

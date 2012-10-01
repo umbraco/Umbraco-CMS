@@ -32,11 +32,11 @@ namespace Umbraco.Web.Routing
 		// want, then make it the default one, then remove this one.
 
 		/// <summary>
-		/// Tries to find and assign an Umbraco document to a <c>DocumentRequest</c>.
+		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
 		/// </summary>
-		/// <param name="docRequest">The <c>DocumentRequest</c>.</param>
+		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-		public bool TrySetDocument(DocumentRequest docRequest)
+		public bool TrySetDocument(PublishedContentRequest docRequest)
         {
 			docRequest.PublishedContent = HandlePageNotFound(docRequest);
             return docRequest.HasNode;
@@ -46,7 +46,7 @@ namespace Umbraco.Web.Routing
 
 		//FIXME: this is temporary and should be obsoleted
 
-		IPublishedContent HandlePageNotFound(DocumentRequest docRequest)
+		IPublishedContent HandlePageNotFound(PublishedContentRequest docRequest)
         {
 			LogHelper.Debug<DefaultLastChanceLookup>("Running for url='{0}'.", () => docRequest.Uri.AbsolutePath);
 			

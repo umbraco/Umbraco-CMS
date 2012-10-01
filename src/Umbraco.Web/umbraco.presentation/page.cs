@@ -104,8 +104,8 @@ namespace umbraco
 		/// <summary>
 		/// Initializes a new instance of the <see cref="page"/> class for a published document.
 		/// </summary>
-		/// <param name="docreq">The <see cref="DocumentRequest"/> pointing to the document.</param>
-		internal page(DocumentRequest docreq)
+		/// <param name="docreq">The <see cref="PublishedContentRequest"/> pointing to the document.</param>
+		internal page(PublishedContentRequest docreq)
 		{
 
 			if (!docreq.HasNode)
@@ -280,7 +280,7 @@ namespace umbraco
 				string alias = data.Name;
 				string value = data.FirstChild.Value;
 
-				// moved to DocumentRequest + UmbracoModule
+				// moved to PublishedContentRequest + UmbracoModule
 				//if (alias == "umbracoRedirect")
 				//{
 				//    int i;

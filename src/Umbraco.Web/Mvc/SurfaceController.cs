@@ -109,7 +109,7 @@ namespace Umbraco.Web.Mvc
 					throw new InvalidOperationException("Can only use " + typeof(UmbracoPageResult).Name + " in the context of an Http POST when using the BeginUmbracoForm helper");
 
 				var routeDef = (RouteDefinition)ControllerContext.RouteData.DataTokens["umbraco-route-def"];
-				return routeDef.DocumentRequest.PublishedContent;
+				return routeDef.PublishedContentRequest.PublishedContent;
 			}
 		}
 

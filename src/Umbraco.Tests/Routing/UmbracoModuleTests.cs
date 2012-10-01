@@ -133,13 +133,13 @@ namespace Umbraco.Tests.Routing
 
 		//    _module.AssignDocumentRequest(httpContext, umbracoContext, httpContext.Request.Url);
 
-		//    Assert.IsNotNull(umbracoContext.DocumentRequest);
-		//    Assert.IsNotNull(umbracoContext.DocumentRequest.XmlNode);	
-		//    Assert.IsFalse(umbracoContext.DocumentRequest.IsRedirect);
-		//    Assert.IsFalse(umbracoContext.DocumentRequest.Is404);
-		//    Assert.AreEqual(umbracoContext.DocumentRequest.Culture, Thread.CurrentThread.CurrentCulture);
-		//    Assert.AreEqual(umbracoContext.DocumentRequest.Culture, Thread.CurrentThread.CurrentUICulture);
-		//    Assert.AreEqual(nodeId, umbracoContext.DocumentRequest.NodeId);
+		//    Assert.IsNotNull(umbracoContext.PublishedContentRequest);
+		//    Assert.IsNotNull(umbracoContext.PublishedContentRequest.XmlNode);	
+		//    Assert.IsFalse(umbracoContext.PublishedContentRequest.IsRedirect);
+		//    Assert.IsFalse(umbracoContext.PublishedContentRequest.Is404);
+		//    Assert.AreEqual(umbracoContext.PublishedContentRequest.Culture, Thread.CurrentThread.CurrentCulture);
+		//    Assert.AreEqual(umbracoContext.PublishedContentRequest.Culture, Thread.CurrentThread.CurrentUICulture);
+		//    Assert.AreEqual(nodeId, umbracoContext.PublishedContentRequest.NodeId);
 			
 		//}
 

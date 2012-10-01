@@ -18,7 +18,7 @@ namespace Umbraco.Web.Routing
 
 			response.Clear();
 
-			var docreq = UmbracoContext.Current.DocumentRequest;
+			var docreq = UmbracoContext.Current.PublishedContentRequest;
 			var reason = "Cannot render the page at url '{0}'.";
 			if (!docreq.HasNode)
 				reason = "No umbraco document matches the url '{0}'.";

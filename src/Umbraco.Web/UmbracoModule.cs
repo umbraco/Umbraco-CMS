@@ -98,11 +98,11 @@ namespace Umbraco.Web
 			LegacyCleanUmbPageFromQueryString(ref uri);
 
 			// create the new document request since we're rendering a document on the front-end
-			var docreq = new DocumentRequest(
+			var docreq = new PublishedContentRequest(
 				umbracoContext.UmbracoUrl, //very important to use this url! it is the path only lowercased version of the current URL. 
 				routingContext);
 			//assign the document request to the umbraco context now that we know its a front end request
-			umbracoContext.DocumentRequest = docreq;
+			umbracoContext.PublishedContentRequest = docreq;
 
 			// note - at that point the original legacy module did something do handle IIS custom 404 errors
 			//   ie pages looking like /anything.aspx?404;/path/to/document - I guess the reason was to support

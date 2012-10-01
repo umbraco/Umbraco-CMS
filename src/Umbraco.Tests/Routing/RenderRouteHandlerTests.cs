@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Routing
 			var route = RouteTable.Routes["Umbraco_default"];
 			var routeData = new RouteData() { Route = route };
 			var routingContext = GetRoutingContext("~/dummy-page", template, routeData);
-			var docRequest = new DocumentRequest(routingContext.UmbracoContext.UmbracoUrl, routingContext)
+			var docRequest = new PublishedContentRequest(routingContext.UmbracoContext.UmbracoUrl, routingContext)
 			{
 				PublishedContent = routingContext.PublishedContentStore.GetDocumentById(routingContext.UmbracoContext, 1174),
 				Template = template
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Routing
 			var route = RouteTable.Routes["Umbraco_default"];
 			var routeData = new RouteData() {Route = route};
 			var routingContext = GetRoutingContext("~/dummy-page", template, routeData);
-			var docRequest = new DocumentRequest(routingContext.UmbracoContext.UmbracoUrl, routingContext)
+			var docRequest = new PublishedContentRequest(routingContext.UmbracoContext.UmbracoUrl, routingContext)
 				{
 					PublishedContent = routingContext.PublishedContentStore.GetDocumentById(routingContext.UmbracoContext, 1172), 
 					Template = template

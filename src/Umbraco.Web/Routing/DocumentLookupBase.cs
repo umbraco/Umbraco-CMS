@@ -7,7 +7,7 @@ namespace Umbraco.Web.Routing
 	///// </summary>
 	//internal abstract class DocumentLookupBase : IDocumentLookup
 	//{
-	//    public bool TrySetDocument(DocumentRequest docRequest)
+	//    public bool TrySetDocument(PublishedContentRequest docRequest)
 	//    {
 	//        if (docRequest == null) throw new ArgumentNullException("docRequest");
 	//        if (docRequest.RoutingContext == null) throw new ArgumentNullException("docRequest.RoutingContext");
@@ -16,6 +16,6 @@ namespace Umbraco.Web.Routing
 	//        return TrySetDocument(docRequest, docRequest.RoutingContext, docRequest.UmbracoContext);
 	//    }
 
-	//    protected abstract bool TrySetDocument(DocumentRequest docRequest, RoutingContext routingContext, UmbracoContext umbracoContext);
+	//    protected abstract bool TrySetDocument(PublishedContentRequest docRequest, RoutingContext routingContext, UmbracoContext umbracoContext);
 	//}
 }

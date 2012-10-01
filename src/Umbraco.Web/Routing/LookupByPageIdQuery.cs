@@ -9,7 +9,7 @@ namespace Umbraco.Web.Routing
 	/// </remarks>
 	internal class LookupByPageIdQuery : IDocumentLookup
 	{
-		public bool TrySetDocument(DocumentRequest docRequest)
+		public bool TrySetDocument(PublishedContentRequest docRequest)
 		{
 			int pageId;
 			if (int.TryParse(docRequest.RoutingContext.UmbracoContext.HttpContext.Request["umbPageID"], out pageId))

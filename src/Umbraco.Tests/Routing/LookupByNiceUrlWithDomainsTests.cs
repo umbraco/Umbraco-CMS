@@ -162,7 +162,7 @@ namespace Umbraco.Tests.Routing
 
 			var routingContext = GetRoutingContext(url);
 			var uri = routingContext.UmbracoContext.UmbracoUrl; //very important to use the cleaned up umbraco url
-			var docreq = new DocumentRequest(uri, routingContext);
+			var docreq = new PublishedContentRequest(uri, routingContext);
 
 			// must lookup domain else lookup by url fails
 			var builder = new DocumentRequestBuilder(docreq);
@@ -202,7 +202,7 @@ namespace Umbraco.Tests.Routing
 
 			var routingContext = GetRoutingContext(url);
 			var uri = routingContext.UmbracoContext.UmbracoUrl; //very important to use the cleaned up umbraco url
-			var docreq = new DocumentRequest(uri, routingContext);
+			var docreq = new PublishedContentRequest(uri, routingContext);
 
 			// must lookup domain else lookup by url fails
 			var builder = new DocumentRequestBuilder(docreq);

@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Routing
 		{
 			var routingContext = GetRoutingContext(urlString);
 			var url = routingContext.UmbracoContext.UmbracoUrl; //very important to use the cleaned up umbraco url
-			var docreq = new DocumentRequest(url, routingContext);
+			var docreq = new PublishedContentRequest(url, routingContext);
 			var lookup = new LookupByNiceUrl();
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
 
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Routing
 		{
 			var routingContext = GetRoutingContext(urlString);
 			var url = routingContext.UmbracoContext.UmbracoUrl;	//very important to use the cleaned up umbraco url		
-			var docreq = new DocumentRequest(url, routingContext);			
+			var docreq = new PublishedContentRequest(url, routingContext);			
 			var lookup = new LookupByNiceUrl();
 
 			var result = lookup.TrySetDocument(docreq);

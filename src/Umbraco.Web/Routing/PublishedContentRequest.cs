@@ -23,9 +23,9 @@ namespace Umbraco.Web.Routing
 	/// represents a request for one specified Umbraco document to be rendered
 	/// by one specified template, using one particular culture.
 	/// </summary>
-	internal class DocumentRequest
+	internal class PublishedContentRequest
     {
-		public DocumentRequest(Uri uri, RoutingContext routingContext)
+		public PublishedContentRequest(Uri uri, RoutingContext routingContext)
         {
 			this.Uri = uri;
 			RoutingContext = routingContext;
@@ -133,7 +133,7 @@ namespace Umbraco.Web.Routing
             get
             {
                 if (this.PublishedContent == null)
-                    throw new InvalidOperationException("DocumentRequest has no document.");
+                    throw new InvalidOperationException("PublishedContentRequest has no document.");
                 return _nodeId;
             }
         }

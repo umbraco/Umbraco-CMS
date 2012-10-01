@@ -16,11 +16,11 @@ namespace Umbraco.Web.Routing
 	internal class LookupByNiceUrl : IDocumentLookup
     {
 		/// <summary>
-		/// Tries to find and assign an Umbraco document to a <c>DocumentRequest</c>.
+		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
 		/// </summary>
-		/// <param name="docRequest">The <c>DocumentRequest</c>.</param>		
+		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-		public virtual bool TrySetDocument(DocumentRequest docRequest)
+		public virtual bool TrySetDocument(PublishedContentRequest docRequest)
         {
 			string route;
 			if (docRequest.HasDomain)
@@ -33,12 +33,12 @@ namespace Umbraco.Web.Routing
         }
 
 		/// <summary>
-		/// Tries to find an Umbraco document for a <c>DocumentRequest</c> and a route.
+		/// Tries to find an Umbraco document for a <c>PublishedContentRequest</c> and a route.
 		/// </summary>
 		/// <param name="docreq">The document request.</param>
 		/// <param name="route">The route.</param>
 		/// <returns>The document node, or null.</returns>
-        protected IPublishedContent LookupDocumentNode(DocumentRequest docreq, string route)
+        protected IPublishedContent LookupDocumentNode(PublishedContentRequest docreq, string route)
         {
 			LogHelper.Debug<LookupByNiceUrl>("Test route \"{0}\"", () => route);
 

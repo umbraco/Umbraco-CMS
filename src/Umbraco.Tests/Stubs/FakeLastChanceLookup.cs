@@ -4,7 +4,7 @@ namespace Umbraco.Tests.Stubs
 {
 	internal class FakeLastChanceLookup : IDocumentLastChanceLookup
 	{
-		public bool TrySetDocument(DocumentRequest docRequest)
+		public bool TrySetDocument(PublishedContentRequest docRequest)
 		{
 			return false;
 		}

@@ -42,7 +42,7 @@ namespace Umbraco.Web
 			_umbracoContext = umbracoContext;
 			if (_umbracoContext.IsFrontEndUmbracoRequest)
 			{
-				_currentPage = _umbracoContext.DocumentRequest.PublishedContent;	
+				_currentPage = _umbracoContext.PublishedContentRequest.PublishedContent;	
 			}
 		}
 
@@ -85,9 +85,9 @@ namespace Umbraco.Web
 			{
 				throw new InvalidOperationException("Cannot render a macro when UmbracoContext.PageId is null.");
 			}
-			if (_umbracoContext.DocumentRequest == null)
+			if (_umbracoContext.PublishedContentRequest == null)
 			{
-				throw new InvalidOperationException("Cannot render a macro when there is no current DocumentRequest.");
+				throw new InvalidOperationException("Cannot render a macro when there is no current PublishedContentRequest.");
 			}
 			var macroProps = new Hashtable();
 			foreach (var i in parameters)
@@ -97,7 +97,7 @@ namespace Umbraco.Web
 				macroProps.Add(i.Key.ToLower(), i.Value);
 			}
 			var macroControl = m.renderMacro(macroProps,
-				UmbracoContext.Current.DocumentRequest.UmbracoPage.Elements,
+				UmbracoContext.Current.PublishedContentRequest.UmbracoPage.Elements,
 				_umbracoContext.PageId.Value);
 			containerPage.Controls.Add(macroControl);
 			using (var output = new StringWriter())

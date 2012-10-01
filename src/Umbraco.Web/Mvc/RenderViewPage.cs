@@ -26,7 +26,7 @@ namespace Umbraco.Web.Mvc
 				var dynamicNode = new DynamicPublishedContent(Model.CurrentContent);
 				CurrentPage = dynamicNode.AsDynamic();
 			}
-			DocumentRequest = (DocumentRequest)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-doc-request");
+			PublishedContentRequest = (PublishedContentRequest)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-doc-request");
 			UmbracoContext = (UmbracoContext)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-context");
 			ApplicationContext = UmbracoContext.Application;
 		}
@@ -42,9 +42,9 @@ namespace Umbraco.Web.Mvc
 		public ApplicationContext ApplicationContext { get; private set; }
 
 		/// <summary>
-		/// Returns the current DocumentRequest
+		/// Returns the current PublishedContentRequest
 		/// </summary>
-		internal DocumentRequest DocumentRequest { get; private set; }
+		internal PublishedContentRequest PublishedContentRequest { get; private set; }
 
 		/// <summary>
 		/// Returns the a DynamicPublishedContent object

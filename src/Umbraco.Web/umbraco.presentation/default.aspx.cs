@@ -27,7 +27,7 @@ namespace umbraco
 	public class UmbracoDefault : Page
 	{
 		private page _upage;
-		private DocumentRequest _docRequest;
+		private PublishedContentRequest _docRequest;
 		bool _validateRequest = true;
 
 		/// <summary>
@@ -45,7 +45,7 @@ namespace umbraco
 			base.OnPreInit(e);
 
 			// get the document request and the page
-			_docRequest = UmbracoContext.Current.DocumentRequest;
+			_docRequest = UmbracoContext.Current.PublishedContentRequest;
 			_upage = _docRequest.UmbracoPage;
 
 			//we need to check this for backwards compatibility in case people still arent' using master pages

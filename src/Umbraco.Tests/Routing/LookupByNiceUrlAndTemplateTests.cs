@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Routing
 			var altTemplate = Template.MakeNew("blah", new User(0));
 			var routingContext = GetRoutingContext(urlAsString, template);
 			var url = routingContext.UmbracoContext.UmbracoUrl; //very important to use the cleaned up umbraco url
-			var docRequest = new DocumentRequest(url, routingContext);
+			var docRequest = new PublishedContentRequest(url, routingContext);
 			var lookup = new LookupByNiceUrlAndTemplate();
 
 			var result = lookup.TrySetDocument(docRequest);

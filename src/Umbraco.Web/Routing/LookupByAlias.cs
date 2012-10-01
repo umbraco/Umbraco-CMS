@@ -17,11 +17,11 @@ namespace Umbraco.Web.Routing
 	internal class LookupByAlias : IDocumentLookup
     {
 		/// <summary>
-		/// Tries to find and assign an Umbraco document to a <c>DocumentRequest</c>.
+		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
 		/// </summary>
-		/// <param name="docRequest">The <c>DocumentRequest</c>.</param>		
+		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-		public bool TrySetDocument(DocumentRequest docRequest)
+		public bool TrySetDocument(PublishedContentRequest docRequest)
 		{
 			
 			IPublishedContent node = null;

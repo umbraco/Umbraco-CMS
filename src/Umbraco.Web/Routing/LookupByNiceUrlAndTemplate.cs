@@ -17,12 +17,12 @@ namespace Umbraco.Web.Routing
     internal class LookupByNiceUrlAndTemplate : LookupByNiceUrl, IDocumentLookup
     {
 		/// <summary>
-		/// Tries to find and assign an Umbraco document to a <c>DocumentRequest</c>.
+		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
 		/// </summary>
-		/// <param name="docRequest">The <c>DocumentRequest</c>.</param>		
+		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		/// <remarks>If successful, also assigns the template.</remarks>
-		public override bool TrySetDocument(DocumentRequest docRequest)
+		public override bool TrySetDocument(PublishedContentRequest docRequest)
         {
             IPublishedContent node = null;
 			string path = docRequest.Uri.AbsolutePath;
