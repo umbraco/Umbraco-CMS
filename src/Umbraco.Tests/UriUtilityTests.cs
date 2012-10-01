@@ -43,6 +43,8 @@ namespace Umbraco.Tests
 
 		public void Uri_To_Umbraco(string sourceUrl, string expectedUrl)
 		{
+			UriUtility.SetAppDomainAppVirtualPath("/");
+
 			var expectedUri = new Uri(expectedUrl);
 			var sourceUri = new Uri(sourceUrl);
 			var resultUri = UriUtility.UriToUmbraco(sourceUri);			
@@ -74,6 +76,7 @@ namespace Umbraco.Tests
 		{
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", directoryUrls ? "true" : "false");
 			Umbraco.Core.Configuration.UmbracoSettings.AddTrailingSlash = trailingSlash;
+			UriUtility.SetAppDomainAppVirtualPath("/");
 
 			var expectedUri = NewUri(expectedUrl);
 			var sourceUri = NewUri(sourceUrl);

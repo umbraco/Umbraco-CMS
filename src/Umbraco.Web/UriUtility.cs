@@ -54,6 +54,8 @@ namespace Umbraco.Web
         {
             if (virtualPath.StartsWith(_appPathPrefix))
                 virtualPath = virtualPath.Substring(_appPathPrefix.Length);
+			if (virtualPath.Length == 0)
+				virtualPath = "/";
             return virtualPath;
         }
 
