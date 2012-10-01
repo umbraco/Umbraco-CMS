@@ -15,13 +15,13 @@ namespace Umbraco.Web.Routing
 	/// <summary>
 	/// Looks up the document using ILookup's and sets any additional properties required on the PublishedContentRequest object
 	/// </summary>
-	internal class DocumentRequestBuilder
+	internal class PublishedContentRequestBuilder
 	{
 		private readonly PublishedContentRequest _publishedContentRequest;
 		private readonly UmbracoContext _umbracoContext;
 		private readonly RoutingContext _routingContext;
 
-		public DocumentRequestBuilder(PublishedContentRequest publishedContentRequest)
+		public PublishedContentRequestBuilder(PublishedContentRequest publishedContentRequest)
 		{
 			_publishedContentRequest = publishedContentRequest;
 			_umbracoContext = publishedContentRequest.RoutingContext.UmbracoContext;

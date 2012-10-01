@@ -165,7 +165,7 @@ namespace Umbraco.Tests.Routing
 			var docreq = new PublishedContentRequest(uri, routingContext);
 
 			// must lookup domain else lookup by url fails
-			var builder = new DocumentRequestBuilder(docreq);
+			var builder = new PublishedContentRequestBuilder(docreq);
 			builder.LookupDomain();
 
 			var lookup = new LookupByNiceUrl();
@@ -205,7 +205,7 @@ namespace Umbraco.Tests.Routing
 			var docreq = new PublishedContentRequest(uri, routingContext);
 
 			// must lookup domain else lookup by url fails
-			var builder = new DocumentRequestBuilder(docreq);
+			var builder = new PublishedContentRequestBuilder(docreq);
 			builder.LookupDomain();
 			Assert.AreEqual(expectedCulture, docreq.Culture.Name);
 

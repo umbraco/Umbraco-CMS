@@ -342,7 +342,7 @@
     <Compile Include="Mvc\RouteDefinition.cs" />
     <Compile Include="Mvc\RouteValueDictionaryExtensions.cs" />
     <Compile Include="Routing\DocumentLookupBase.cs" />
-    <Compile Include="Routing\DocumentRequestBuilder.cs" />
+    <Compile Include="Routing\PublishedContentRequestBuilder.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\Node.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\Nodes.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\Property.cs" />

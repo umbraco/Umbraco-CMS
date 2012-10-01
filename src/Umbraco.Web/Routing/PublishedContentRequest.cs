@@ -147,7 +147,7 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the requested document could not be found. This is set in the DocumentRequestBuilder.
+        /// Gets or sets a value indicating whether the requested document could not be found. This is set in the PublishedContentRequestBuilder.
         /// </summary>
         internal bool Is404 { get; set; }
 

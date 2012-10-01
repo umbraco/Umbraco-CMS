@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Routing
 			url = "http://domain1.com/1001-1/1001-1-1";
 			var uri = routingContext.UmbracoContext.UmbracoUrl; //very important to use the cleaned up umbraco url
 			var docreq = new PublishedContentRequest(uri, routingContext);
-			var builder = new DocumentRequestBuilder(docreq);
+			var builder = new PublishedContentRequestBuilder(docreq);
 			builder.LookupDomain();
 			Assert.IsTrue(docreq.HasDomain);
 

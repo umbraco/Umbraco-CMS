@@ -114,7 +114,7 @@ namespace Umbraco.Web
 			//   TODO: SD: We need more information on this for when we release 4.10.0 as I'm not sure what this means.
 
 			//create the searcher
-			var searcher = new DocumentRequestBuilder(docreq);
+			var searcher = new PublishedContentRequestBuilder(docreq);
 			//find domain
 			searcher.LookupDomain();
 			// redirect if it has been flagged

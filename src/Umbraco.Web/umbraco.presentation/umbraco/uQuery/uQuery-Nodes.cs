@@ -208,7 +208,7 @@ namespace umbraco
 			uri = Umbraco.Web.UriUtility.UriToUmbraco(uri);
 
 			var docreq = new Umbraco.Web.Routing.PublishedContentRequest(uri, Umbraco.Web.UmbracoContext.Current.RoutingContext);
-			var builder = new Umbraco.Web.Routing.DocumentRequestBuilder(docreq);
+			var builder = new Umbraco.Web.Routing.PublishedContentRequestBuilder(docreq);
 			builder.LookupDomain();
 			builder.LookupDocument();
 			return docreq.HasNode ? docreq.DocumentId : uQuery.RootNodeId;
