@@ -1,5 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F0242771-6DE6-4E03-BD3A-7B79BA79105B}"
 	ProjectSection(SolutionItems) = preProject
 		INDIGO64.testrunconfig = INDIGO64.testrunconfig
@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}"
 	ProjectSection(SolutionItems) = preProject
 		..\build\Build.bat = ..\build\Build.bat
+		..\build\Build.proj = ..\build\Build.proj
 		umbraco.presentation.targets = umbraco.presentation.targets
 	EndProjectSection
 EndProject

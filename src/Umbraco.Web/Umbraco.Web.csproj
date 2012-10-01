@@ -279,6 +279,7 @@
     <Compile Include="Mvc\IHtmlTagWrapper.cs" />
     <Compile Include="Mvc\MergeModelStateToChildActionAttribute.cs" />
     <Compile Include="Mvc\PluginController.cs" />
+    <Compile Include="Mvc\PluginViewEngine.cs" />
     <Compile Include="Mvc\PostedDataProxyInfo.cs" />
     <Compile Include="Mvc\RedirectToUmbracoPageResult.cs" />
     <Compile Include="Mvc\Strings.Designer.cs">

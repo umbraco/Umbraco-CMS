@@ -54,6 +54,8 @@ namespace Umbraco.Web
 
 			//set the render view engine
 			ViewEngines.Engines.Add(new RenderViewEngine());
+			//set the plugin view engine
+			ViewEngines.Engines.Add(new PluginViewEngine());
 
 			//set model binder
 			ModelBinders.Binders.Add(new KeyValuePair<Type, IModelBinder>(typeof(RenderModel), new RenderModelBinder()));

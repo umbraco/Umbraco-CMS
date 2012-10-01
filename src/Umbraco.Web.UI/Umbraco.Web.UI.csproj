@@ -261,8 +261,8 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="umbraco\settings\views\EditView.aspx.cs">
-			<DependentUpon>EditView.aspx</DependentUpon>
-			<SubType>ASPXCodeBehind</SubType>
+      <DependentUpon>EditView.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco\settings\views\EditView.aspx.designer.cs">
       <DependentUpon>EditView.aspx</DependentUpon>
@@ -2221,6 +2221,7 @@
   <ItemGroup>
     <Folder Include="App_Code\" />
     <Folder Include="App_Data\" />
+    <Folder Include="App_Plugins\Packages\" />
     <Folder Include="css\" />
     <Folder Include="macroScripts\" />
     <Folder Include="masterpages\" />
