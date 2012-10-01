@@ -58,6 +58,11 @@ namespace Umbraco.Web.Mvc
 		/// </summary>
 		/// <param name="routes"></param>
 		/// <param name="surfaceControllers"></param>
+		/// <remarks>
+		/// The routes will be:
+		/// 
+		/// /Umbraco/[AreaName]/[ControllerName]/[Action]/[Id]
+		/// </remarks>
 		private void MapRouteSurfaceControllers(RouteCollection routes, IEnumerable<PluginControllerMetadata> surfaceControllers)
 		{
 			foreach (var s in surfaceControllers)

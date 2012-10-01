@@ -1,5 +1,7 @@
+using System.IO;
 using System.Linq;
 using System.Web.Mvc;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Mvc
 {
@@ -31,16 +33,16 @@ namespace Umbraco.Web.Mvc
 
 			var viewLocationsArray = new[]
 				{
-					string.Concat(Constants.PluginsLocation, "/Packages/{2}/Views/{1}/{0}.cshtml"),
-					string.Concat(Constants.PluginsLocation, "/Packages/{2}/Views/{1}/{0}.vbhtml")                    
+					string.Concat(Constants.PluginsLocation, "/{2}/Views/{1}/{0}.cshtml"),
+					string.Concat(Constants.PluginsLocation, "/{2}/Views/{1}/{0}.vbhtml")                    
 				};
 
 			//set all of the area view locations to the plugin folder
 			AreaViewLocationFormats = viewLocationsArray
 				.Concat(new[]
 					{
-						string.Concat(Constants.PluginsLocation, "/Packages/{2}/Views/Shared/{0}.cshtml"),
-						string.Concat(Constants.PluginsLocation, "/Packages/{2}/Views/Shared/{0}.vbhtml")                        
+						string.Concat(Constants.PluginsLocation, "/{2}/Views/Shared/{0}.cshtml"),
+						string.Concat(Constants.PluginsLocation, "/{2}/Views/Shared/{0}.vbhtml")                        
 					})
 				.ToArray();
 
@@ -49,17 +51,55 @@ namespace Umbraco.Web.Mvc
 			AreaPartialViewLocationFormats = new[]
 				{
 					//will be used when we have partial view and child action macros
-					string.Concat(Constants.PluginsLocation, "/Packages/{2}/Views/Partials/{0}.cshtml"),
-					string.Concat(Constants.PluginsLocation, "/Packages/{2}/Views/Partials/{0}.vbhtml"),
-					string.Concat(Constants.PluginsLocation, "/Packages/{2}/Views/MacroPartials/{0}.cshtml"),
-					string.Concat(Constants.PluginsLocation, "/Packages/{2}/Views/MacroPartials/{0}.vbhtml"),                    
+					string.Concat(Constants.PluginsLocation, "/{2}/Views/Partials/{0}.cshtml"),
+					string.Concat(Constants.PluginsLocation, "/{2}/Views/Partials/{0}.vbhtml"),
+					string.Concat(Constants.PluginsLocation, "/{2}/Views/MacroPartials/{0}.cshtml"),
+					string.Concat(Constants.PluginsLocation, "/{2}/Views/MacroPartials/{0}.vbhtml"),                    
 					//for partials                    
-					string.Concat(Constants.PluginsLocation, "/Packages/{2}/Views/{1}/{0}.cshtml"),
-					string.Concat(Constants.PluginsLocation, "/Packages/{2}/Views/{1}/{0}.vbhtml"),
-					string.Concat(Constants.PluginsLocation, "/Packages/{2}/Views/Shared/{0}.cshtml"),
-					string.Concat(Constants.PluginsLocation, "/Packages/{2}/Views/Shared/{0}.vbhtml")
+					string.Concat(Constants.PluginsLocation, "/{2}/Views/{1}/{0}.cshtml"),
+					string.Concat(Constants.PluginsLocation, "/{2}/Views/{1}/{0}.vbhtml"),
+					string.Concat(Constants.PluginsLocation, "/{2}/Views/Shared/{0}.cshtml"),
+					string.Concat(Constants.PluginsLocation, "/{2}/Views/Shared/{0}.vbhtml")
 				};
 
+		}
+
+		/// <summary>
+		/// Ensures that the correct web.config for razor exists in the /Views folder.
+		/// </summary>
+		private void EnsureFolderAndWebConfig(ViewEngineResult result)
+		{
+			if (result.View == null) return;
+			var razorResult = result.View as RazorView;
+			if (razorResult == null) return;
+
+			var folder = Path.GetDirectoryName(IOHelper.MapPath(razorResult.ViewPath));
+			//now we need to get the /View/ folder
+			var viewFolder = folder.Substring(0, folder.LastIndexOf("\\Views\\")) + "\\Views";
+
+			//ensure the web.config file is in the ~/Views folder
+			Directory.CreateDirectory(viewFolder);
+			if (!File.Exists(Path.Combine(viewFolder, "web.config")))
+			{
+				using (var writer = File.CreateText(Path.Combine(viewFolder, "web.config")))
+				{
+					writer.Write(Strings.web_config);
+				}
+			}
+		}
+
+		public override ViewEngineResult FindView(ControllerContext controllerContext, string viewName, string masterName, bool useCache)
+		{			
+			var result = base.FindView(controllerContext, viewName, masterName, useCache);
+			EnsureFolderAndWebConfig(result);
+			return result;
+		}
+
+		public override ViewEngineResult FindPartialView(ControllerContext controllerContext, string partialViewName, bool useCache)
+		{			
+			var result = base.FindPartialView(controllerContext, partialViewName, useCache);
+			EnsureFolderAndWebConfig(result);
+			return result;
 		}
 	}
 }

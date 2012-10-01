@@ -47,7 +47,6 @@
 
  <ItemGroup>
 	 <SystemFolders Include="$(WebAppFolder)App_Plugins" />
-	 <SystemFolders Include="$(WebAppFolder)App_Plugins\Packages" />
 	 <SystemFolders Include="$(WebAppFolder)App_Code" />
    <SystemFolders Include="$(WebAppFolder)App_Data" />
    <SystemFolders Include="$(WebAppFolder)media" />

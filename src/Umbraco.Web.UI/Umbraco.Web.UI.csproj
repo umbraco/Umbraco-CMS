@@ -2221,7 +2221,7 @@
   <ItemGroup>
     <Folder Include="App_Code\" />
     <Folder Include="App_Data\" />
-    <Folder Include="App_Plugins\Packages\" />
+    <Folder Include="App_Plugins\" />
     <Folder Include="css\" />
     <Folder Include="macroScripts\" />
     <Folder Include="masterpages\" />
