@@ -44,7 +44,7 @@ namespace Umbraco.Web.Mvc
 
 			var renderModel = new RenderModel()
 			{
-				CurrentPublishedContent = docRequest.PublishedContent
+				CurrentContent = docRequest.PublishedContent
 			};
 
 			//put essential data into the data tokens, the 'umbraco' key is required to be there for the view engine

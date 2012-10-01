@@ -13,6 +13,6 @@ namespace Umbraco.Web.Mvc
 		//NOTE: the model isn't just IPublishedContent because in the future we will most likely want to add other properties here, 
 		//or we will want to add extensions.
 
-		public IPublishedContent CurrentPublishedContent { get; set; }
+		public IPublishedContent CurrentContent { get; set; }
 	}
 }

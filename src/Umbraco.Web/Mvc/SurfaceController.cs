@@ -73,11 +73,11 @@ namespace Umbraco.Web.Mvc
 		/// <summary>
 		/// Redirects to the Umbraco page with the given id
 		/// </summary>
-		/// <param name="pagePublishedContent"></param>
+		/// <param name="publishedContent"></param>
 		/// <returns></returns>
-		protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent pagePublishedContent)
+		protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent)
 		{
-			return new RedirectToUmbracoPageResult(pagePublishedContent, UmbracoContext);
+			return new RedirectToUmbracoPageResult(publishedContent, UmbracoContext);
 		}
 
 		/// <summary>
