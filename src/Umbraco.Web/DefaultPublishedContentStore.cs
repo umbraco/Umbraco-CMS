@@ -151,8 +151,7 @@ namespace Umbraco.Web
                 else
                 {
                     xpathBuilder.AppendFormat("//*[@isDoc and @id={0}]", startNodeId);
-                    if (!hideTopLevelNodeFromPath)
-                        xpathBuilder.AppendFormat("[@urlName='{0}']", urlParts[partsIndex++]); // first node is in the url
+					// always "hide top level" when there's a domain
                 }
                 while (partsIndex < urlParts.Length)
                     xpathBuilder.AppendFormat("/*[@isDoc and @urlName='{0}']", urlParts[partsIndex++]);

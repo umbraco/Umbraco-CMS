@@ -102,6 +102,23 @@ namespace Umbraco.Web.Routing
 		}
 
 		/// <summary>
+		/// Gets a value indicating whether there is another domain defined down in the path to a node under the current domain's root node.
+		/// </summary>
+		/// <param name="current">The current domain.</param>
+		/// <param name="path">The path to a node under the current domain's root node.</param>
+		/// <returns>A value indicating if there is another domain defined down in the path.</returns>
+		public static bool ExistsDomainInPath(Domain current, string path)
+		{
+			var domains = Domain.GetDomains();
+
+			return path.Split(',')
+				.Reverse()
+				.Select(id => int.Parse(id))
+				.TakeWhile(id => id != current.RootNodeId)
+				.Any(id => domains.Any(d => d.RootNodeId == id));
+		}
+
+		/// <summary>
 		/// Returns the part of a path relative to the uri of a domain.
 		/// </summary>
 		/// <param name="domainUri">The normalized uri of the domain.</param>

@@ -44,6 +44,14 @@ namespace Umbraco.Tests.Routing
 			Language.MakeNew("fr-FR");
 		}
 
+		void SetDomains3()
+		{
+			var langEn = Language.GetByCultureCode("en-US");
+			var langFr = Language.GetByCultureCode("fr-FR");
+
+			Domain.MakeNew("domain1.com/", 1001, langEn.id);
+		}
+
 		void SetDomains4()
 		{
 			var langEn = Language.GetByCultureCode("en-US");
@@ -139,6 +147,31 @@ namespace Umbraco.Tests.Routing
 		</Doc>
 	</Doc>
 </root>";
+		}
+
+		[TestCase("http://domain1.com/", 1001)]
+		[TestCase("http://domain1.com/1001-1", 10011)]
+		[TestCase("http://domain1.com/1001-2/1001-2-1", 100121)]
+
+		public void Lookup_SingleDomain(string url, int expectedId)
+		{
+			InitializeLanguagesAndDomains();
+			SetDomains3();
+
+			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
+
+			var routingContext = GetRoutingContext(url);
+			var uri = routingContext.UmbracoContext.UmbracoUrl; //very important to use the cleaned up umbraco url
+			var docreq = new DocumentRequest(uri, routingContext);
+
+			// must lookup domain else lookup by url fails
+			var builder = new DocumentRequestBuilder(docreq);
+			builder.LookupDomain();
+
+			var lookup = new LookupByNiceUrl();
+			var result = lookup.TrySetDocument(docreq);
+			Assert.IsTrue(result);
+			Assert.AreEqual(expectedId, docreq.DocumentId);
 		}
 
 		[TestCase("http://domain1.com/", 1001, "en-US")]

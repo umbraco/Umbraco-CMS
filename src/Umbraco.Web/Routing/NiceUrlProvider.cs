@@ -145,7 +145,7 @@ namespace Umbraco.Web.Routing
 
 		public IEnumerable<string> GetAllAbsoluteNiceUrls(int nodeId)
 		{
-			return GetAlternateNiceUrls(nodeId, _umbracoContext.UmbracoUrl);
+			return GetAllAbsoluteNiceUrls(nodeId, _umbracoContext.UmbracoUrl);
 		}
 
 		/// <summary>
@@ -155,7 +155,7 @@ namespace Umbraco.Web.Routing
 		/// <param name="current">The current url.</param>
 		/// <returns>An enumeration of all valid urls for the node.</returns>
 		/// <remarks>The urls are absolute. A node can have more than one url if more than one domain is defined.</remarks>
-		public IEnumerable<string> GetAlternateNiceUrls(int nodeId, Uri current)
+		public IEnumerable<string> GetAllAbsoluteNiceUrls(int nodeId, Uri current)
 		{
 			// this is for editContent.aspx which had its own, highly buggy, implementation of NiceUrl...
 			//TODO: finalize & test implementation then replace in editContent.aspx
