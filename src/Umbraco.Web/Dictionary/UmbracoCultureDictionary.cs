@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Dynamic;
 using System.Globalization;
+using System.Web;
+using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.language;
 
@@ -22,10 +24,10 @@ namespace Umbraco.Web.Dictionary
 				{
 					return new global::umbraco.cms.businesslogic.Dictionary.DictionaryItem(key).Value(Language.id);
 				}
-				catch (Exception)
+				catch (Exception e)
 				{
-					//NOTE: SD: I'm not sure why this is here but was copied from the UmbracoCultureDictionary in the macroEngines project
-					// which previously seems to have worked so I'm leaving it for now.
+					var trace = UmbracoContext.Current != null ? UmbracoContext.Current.HttpContext.Trace : null;
+					LogHelper.Warn<DefaultCultureDictionary>("Error returning dictionary item '" + key + "'", trace, e);					
 					return string.Empty;
 				}
 			}

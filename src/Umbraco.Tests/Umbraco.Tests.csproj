@@ -56,6 +56,7 @@
     <Compile Include="ContentStores\PublishMediaStoreTests.cs" />
     <Compile Include="DynamicDocument\DocumentTests.cs" />
     <Compile Include="HtmlHelperExtensionMethodsTests.cs" />
+    <Compile Include="LibraryTests.cs" />
     <Compile Include="Resolvers\ActionsResolverTests.cs" />
     <Compile Include="AsynchronousRollingFileAppenderTests.cs" />
     <Compile Include="BusinessLogic\ApplicationTest.cs" />

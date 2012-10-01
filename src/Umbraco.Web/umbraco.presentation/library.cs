@@ -434,26 +434,46 @@ namespace umbraco
         /// <returns>Returns a string with the data from the given element of a node</returns>
         public static string GetItem(int nodeID, String alias)
         {
-            XmlDocument umbracoXML = UmbracoContext.Current.GetXml();
+	        var doc = PublishedContentStoreResolver.Current.PublishedContentStore.GetDocumentById(
+		        Umbraco.Web.UmbracoContext.Current,
+		        nodeID);
 
-            string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data [@alias='{0}']" : "./{0}";
+			if (doc == null)
+				return string.Empty;
 
-            if (umbracoXML.GetElementById(nodeID.ToString()) != null)
-                if (
-                    ",id,version,parentID,level,writerID,editDataType,template,sortOrder,createDate,updateDate,nodeName,writerName,path,"
-                        .
-                        IndexOf("," + alias + ",") > -1)
-                    return umbracoXML.GetElementById(nodeID.ToString()).Attributes.GetNamedItem(alias).Value;
-                else if (
-                    umbracoXML.GetElementById(nodeID.ToString()).SelectSingleNode(string.Format(xpath, alias)) !=
-                    null)
-                    return
-                        umbracoXML.GetElementById(nodeID.ToString()).SelectSingleNode(string.Format(xpath, alias)).ChildNodes[0].
-                            Value; //.Value + "*";
-                else
-                    return string.Empty;
-            else
-                return string.Empty;
+	        switch (alias)
+	        {
+				case "id":
+			        return doc.Id.ToString();
+				case "version":
+			        return doc.Version.ToString();
+				case "parentID":
+			        return doc.Parent.Id.ToString();
+				case "level":
+			        return doc.Level.ToString();
+				case "writerID":
+			        return doc.WriterId.ToString();
+				case "template":
+			        return doc.TemplateId.ToString();
+				case "sortOrder":
+			        return doc.SortOrder.ToString();
+				case "createDate":
+					return doc.CreateDate.ToString("yyyy-MM-dd'T'HH:mm:ss");
+				case "updateDate":
+					return doc.UpdateDate.ToString("yyyy-MM-dd'T'HH:mm:ss");
+				case "nodeName":
+			        return doc.Name;
+				case "writerName":
+			        return doc.WriterName;
+				case "path":
+			        return doc.Path;
+				case "creatorName":
+			        return doc.CreatorName;
+	        }
+
+	        var prop = doc.GetProperty(alias);
+	        return prop == null ? string.Empty : prop.Value.ToString();
+
         }
 
         /// <summary>
@@ -1492,17 +1512,7 @@ namespace umbraco
         /// <returns>A dictionary items value as a string.</returns>
         public static string GetDictionaryItem(string Key)
         {
-            try
-            {
-                Language l = Language.GetByCultureCode(System.Threading.Thread.CurrentThread.CurrentUICulture.Name);
-                return new Dictionary.DictionaryItem(Key).Value(l.id);
-                //return new Dictionary.DictionaryItem(Key).Value(GetCurrentLanguageId());
-            }
-            catch (Exception errDictionary)
-            {
-                HttpContext.Current.Trace.Warn("library", "Error returning dictionary item '" + Key + "'", errDictionary);
-                return string.Empty;
-            }
+	        return GetUmbracoHelper().GetDictionaryValue(Key);			
         }
 
         /// <summary>

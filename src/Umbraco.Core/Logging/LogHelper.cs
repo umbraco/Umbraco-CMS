@@ -60,13 +60,7 @@ namespace Umbraco.Core.Logging
 		}
 		#endregion
 
-		#region Warn
-		public static void Warn(Type callingType, string message)
-		{
-			var logger = LogManager.GetLogger(callingType);
-			if (logger != null)
-				logger.Warn(PrefixThreadId(message));
-		}
+		#region Warn		
 
 		public static void Warn(Type callingType, string message, params object[] format)
 		{
@@ -75,30 +69,44 @@ namespace Umbraco.Core.Logging
 				logger.WarnFormat(PrefixThreadId(message), format);
 		}
 
-		/// <summary>
-		/// Adds a warn log
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="message"></param>
-		public static void Warn<T>(string message)
+		public static void Warn(Type callingType, TraceContext trace, string message, params object[] format)
 		{
-			var logger = LoggerFor<T>();
+			if (trace != null)
+			{
+				trace.Warn(string.Format(message, format));
+			}	
+
+			var logger = LogManager.GetLogger(callingType);
 			if (logger != null)
-				logger.Warn(PrefixThreadId(message));
+				logger.WarnFormat(PrefixThreadId(message), format);
+
 		}
 
 		/// <summary>
 		/// Adds a warn log
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
-		/// <param name="format"></param>
+		/// <param name="message"></param>
 		/// <param name="items"></param>
-		public static void Warn<T>(string format, params object[] items)
+		public static void Warn<T>(string message, params object[] items)
 		{
 			var logger = LoggerFor<T>();
 			if (logger != null)
-				logger.WarnFormat(PrefixThreadId(format), items);
+				logger.WarnFormat(PrefixThreadId(message), items);
+		}
+
+		public static void Warn<T>(string message, TraceContext trace, params object[] items)
+		{
+			if (trace != null)
+			{
+				trace.Warn(string.Format(message, items));
+			}	
+
+			var logger = LoggerFor<T>();
+			if (logger != null)
+				logger.WarnFormat(PrefixThreadId(message), items);
 		} 
+
 		#endregion
 
 		#region Info
