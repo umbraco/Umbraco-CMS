@@ -120,7 +120,18 @@ namespace Umbraco.Web
                 {
                     // if not in a domain - what is the default page?
                     // let's say it is the first one in the tree, if any -- order by sortOrder
-                    xpath = "/root/*[@isDoc and @sortOrder='0']";
+
+					// but!
+					// umbraco does not consistently guarantee that sortOrder starts with 0
+					// so the one that we want is the one with the smallest sortOrder
+					// read http://stackoverflow.com/questions/1128745/how-can-i-use-xpath-to-find-the-minimum-value-of-an-attribute-in-a-set-of-elemen
+                    
+					// so that one does not work, because min(@sortOrder) maybe 1
+					// xpath = "/root/*[@isDoc and @sortOrder='0']";
+
+					// and we can't use min() because that's XPath 2.0
+					// that one works
+					xpath = "/root/*[@isDoc and not(@sortOrder > ../*[@isDoc]/@sortOrder)][1]";
                 }
             }
             else
