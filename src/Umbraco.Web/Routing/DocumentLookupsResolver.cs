@@ -11,9 +11,9 @@ namespace Umbraco.Web.Routing
 {
 
 	/// <summary>
-	/// A multiply registered resolver to manage all IDocumentLookup objects
+	/// A multiply registered resolver to manage all IPublishedContentLookup objects
 	/// </summary>
-	internal sealed class DocumentLookupsResolver : ManyObjectsResolverBase<DocumentLookupsResolver, IDocumentLookup>
+	internal sealed class DocumentLookupsResolver : ManyObjectsResolverBase<DocumentLookupsResolver, IPublishedContentLookup>
 	{
 		
 		internal DocumentLookupsResolver(IEnumerable<Type> lookups)
@@ -25,9 +25,9 @@ namespace Umbraco.Web.Routing
 		} 
 		
 		/// <summary>
-		/// Gets the <see cref="IDocumentLookup"/> implementations.
+		/// Gets the <see cref="IPublishedContentLookup"/> implementations.
 		/// </summary>
-		public IEnumerable<IDocumentLookup> DocumentLookups
+		public IEnumerable<IPublishedContentLookup> DocumentLookups
 		{
 			get { return Values; }
 		}

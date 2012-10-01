@@ -7,7 +7,7 @@ using umbraco;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Provides an implementation of <see cref="IDocumentLookup"/> that handles profiles.
+	/// Provides an implementation of <see cref="IPublishedContentLookup"/> that handles profiles.
 	/// </summary>
 	/// <remarks>
 	/// <para>Handles <c>/profile/login</c> where <c>/profile</c> is the profile page nice url and <c>login</c> the login of a member.</para>

@@ -5,7 +5,7 @@ namespace Umbraco.Web.Routing
 	///// <summary>
 	///// Abstract DocumentLookup class
 	///// </summary>
-	//internal abstract class DocumentLookupBase : IDocumentLookup
+	//internal abstract class DocumentLookupBase : IPublishedContentLookup
 	//{
 	//    public bool TrySetDocument(PublishedContentRequest docRequest)
 	//    {

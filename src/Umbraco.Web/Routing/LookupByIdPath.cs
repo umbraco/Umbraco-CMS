@@ -8,13 +8,13 @@ using umbraco.interfaces;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Provides an implementation of <see cref="IDocumentLookup"/> that handles page identifiers.
+	/// Provides an implementation of <see cref="IPublishedContentLookup"/> that handles page identifiers.
 	/// </summary>
 	/// <remarks>
 	/// <para>Handles <c>/1234</c> where <c>1234</c> is the identified of a document.</para>
 	/// </remarks>
 	//[ResolutionWeight(20)]
-	internal class LookupByIdPath : IDocumentLookup
+	internal class LookupByIdPath : IPublishedContentLookup
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.

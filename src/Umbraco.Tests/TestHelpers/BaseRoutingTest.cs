@@ -41,7 +41,7 @@ namespace Umbraco.Tests.TestHelpers
 			var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
 			var routingContext = new RoutingContext(
 				umbracoContext,
-				Enumerable.Empty<IDocumentLookup>(),
+				Enumerable.Empty<IPublishedContentLookup>(),
 				new FakeLastChanceLookup(),
 				contentStore,
 				niceUrls);

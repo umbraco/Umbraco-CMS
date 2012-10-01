@@ -7,14 +7,14 @@ using umbraco.cms.businesslogic.template;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Provides an implementation of <see cref="IDocumentLookup"/> that handles page nice urls and a template.
+	/// Provides an implementation of <see cref="IPublishedContentLookup"/> that handles page nice urls and a template.
 	/// </summary>
 	/// <remarks>
 	/// <para>Handles <c>/foo/bar/template</c> where <c>/foo/bar</c> is the nice url of a document, and <c>template</c> a template alias.</para>
 	/// <para>If successful, then the template of the document request is also assigned.</para>
 	/// </remarks>
 	//[ResolutionWeight(30)]
-    internal class LookupByNiceUrlAndTemplate : LookupByNiceUrl, IDocumentLookup
+    internal class LookupByNiceUrlAndTemplate : LookupByNiceUrl, IPublishedContentLookup
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.

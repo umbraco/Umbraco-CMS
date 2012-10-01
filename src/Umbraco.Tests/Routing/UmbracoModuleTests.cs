@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Routing
 		//    var contentStore = new ContentStore(umbracoContext);
 		//    var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
 		//    umbracoContext.RoutingContext = new RoutingContext(
-		//        new IDocumentLookup[] {new LookupByNiceUrl()},
+		//        new IPublishedContentLookup[] {new LookupByNiceUrl()},
 		//        new DefaultLastChanceLookup(),
 		//        contentStore,
 		//        niceUrls); 

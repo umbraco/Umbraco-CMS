@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Routing
 			var templateId = 1111;
 
 			var lookup = new Umbraco.Web.Routing.LookupByNiceUrl();
-			var lookups = new Umbraco.Web.Routing.IDocumentLookup[] { lookup };
+			var lookups = new Umbraco.Web.Routing.IPublishedContentLookup[] { lookup };
 
 			var umbracoContext = GetUmbracoContext(url, templateId, null);
 			var contentStore = new Umbraco.Web.DefaultPublishedContentStore();

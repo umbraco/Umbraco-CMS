@@ -368,7 +368,7 @@
     <Compile Include="Routing\DomainHelper.cs" />
     <Compile Include="Routing\DocumentLookupsResolver.cs" />
     <Compile Include="Routing\PublishedContentRequest.cs" />
-    <Compile Include="Routing\IDocumentLookup.cs" />
+    <Compile Include="Routing\IPublishedContentLookup.cs" />
     <Compile Include="Routing\IRoutesCache.cs" />
     <Compile Include="Routing\DefaultRoutesCache.cs" />
     <Compile Include="Routing\RoutesCacheResolver.cs" />

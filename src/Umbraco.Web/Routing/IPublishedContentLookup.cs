@@ -5,7 +5,7 @@ namespace Umbraco.Web.Routing
 	/// <summary>
 	/// Provides a method to try to find an assign an Umbraco document to a <c>PublishedContentRequest</c>.
 	/// </summary>
-	internal interface IDocumentLookup
+	internal interface IPublishedContentLookup
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.

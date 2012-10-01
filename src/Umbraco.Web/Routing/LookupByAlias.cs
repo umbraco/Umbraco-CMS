@@ -7,14 +7,14 @@ using umbraco.interfaces;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Provides an implementation of <see cref="IDocumentLookup"/> that handles page aliases.
+	/// Provides an implementation of <see cref="IPublishedContentLookup"/> that handles page aliases.
 	/// </summary>
 	/// <remarks>
 	/// <para>Handles <c>/just/about/anything</c> where <c>/just/about/anything</c> is contained in the <c>umbracoUrlAlias</c> property of a document.</para>
 	/// <para>The alias is the full path to the document. There can be more than one alias, separated by commas.</para>
 	/// </remarks>
 	//[ResolutionWeight(50)]
-	internal class LookupByAlias : IDocumentLookup
+	internal class LookupByAlias : IPublishedContentLookup
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.

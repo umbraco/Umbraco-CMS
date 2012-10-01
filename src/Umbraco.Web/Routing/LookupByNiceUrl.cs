@@ -7,13 +7,13 @@ using umbraco.interfaces;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Provides an implementation of <see cref="IDocumentLookup"/> that handles page nice urls.
+	/// Provides an implementation of <see cref="IPublishedContentLookup"/> that handles page nice urls.
 	/// </summary>
 	/// <remarks>
 	/// <para>Handles <c>/foo/bar</c> where <c>/foo/bar</c> is the nice url of a document.</para>
 	/// </remarks>
 	//[ResolutionWeight(10)]
-	internal class LookupByNiceUrl : IDocumentLookup
+	internal class LookupByNiceUrl : IPublishedContentLookup
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.

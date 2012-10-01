@@ -19,7 +19,7 @@ namespace Umbraco.Web.Routing
 		/// <param name="niceUrlResolver">The nice urls resolver.</param>
 		internal RoutingContext(
 			UmbracoContext umbracoContext,
-			IEnumerable<IDocumentLookup> documentLookups,
+			IEnumerable<IPublishedContentLookup> documentLookups,
 			IDocumentLastChanceLookup documentLastChanceLookup,
             IPublishedContentStore publishedContentStore,
 			NiceUrlProvider niceUrlResolver)
@@ -39,7 +39,7 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Gets the document lookups resolver.
 		/// </summary>
-		internal IEnumerable<IDocumentLookup> DocumentLookups { get; private set; }
+		internal IEnumerable<IPublishedContentLookup> DocumentLookups { get; private set; }
 
 		/// <summary>
 		/// Gets the last chance lookup
