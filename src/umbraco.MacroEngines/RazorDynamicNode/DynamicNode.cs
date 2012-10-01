@@ -543,7 +543,7 @@ namespace umbraco.MacroEngines
 
                     //contextAlias is the node which the property data was returned from
                     //Guid dataType = ContentType.GetDataType(data.ContextAlias, data.Alias);
-					//SD: replaced with our temporary resolver so that we can unit test this properly, this is what DynamicDocument uses until we create our new data access layer.
+					//SD: replaced with our temporary resolver so that we can unit test this properly, this is what DynamicPublishedContent uses until we create our new data access layer.
                 	var dataType = DynamicDocumentDataSourceResolver.Current.DataSource.GetDataType(data.ContextAlias, data.Alias);
                     
                     var staticMapping = UmbracoSettings.RazorDataTypeModelStaticMapping.FirstOrDefault(mapping =>

@@ -10,9 +10,9 @@ namespace Umbraco.Web.Mvc
 	/// </summary>
 	public class RenderModel
 	{
-		//NOTE: the model isn't just IDocument because in the future we will most likely want to add other properties here, 
+		//NOTE: the model isn't just IPublishedContent because in the future we will most likely want to add other properties here, 
 		//or we will want to add extensions.
 
-		public IDocument CurrentDocument { get; set; }
+		public IPublishedContent CurrentPublishedContent { get; set; }
 	}
 }

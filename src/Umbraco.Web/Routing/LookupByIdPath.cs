@@ -23,7 +23,7 @@ namespace Umbraco.Web.Routing
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		public bool TrySetDocument(DocumentRequest docRequest)
         {
-            IDocument node = null;
+            IPublishedContent node = null;
 
             int nodeId = -1;
 			if (docRequest.Uri.AbsolutePath != "/") // no id if "/"
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Routing
 
                     if (node != null)
                     {
-						docRequest.Document = node;
+						docRequest.PublishedContent = node;
 						LogHelper.Debug<LookupByIdPath>("Found node with id={0}", () => docRequest.DocumentId);
                     }
                     else

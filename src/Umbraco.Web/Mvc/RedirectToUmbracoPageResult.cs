@@ -11,7 +11,7 @@ namespace Umbraco.Web.Mvc
 	/// </summary>
 	public class RedirectToUmbracoPageResult : ActionResult
 	{
-		private IDocument _document;
+		private IPublishedContent _publishedContent;
 		private readonly int _pageId;
 		private readonly UmbracoContext _umbracoContext;
 		private string _url;
@@ -21,12 +21,12 @@ namespace Umbraco.Web.Mvc
 			{
 				if (!_url.IsNullOrWhiteSpace()) return _url;
 
-				if (Document == null)
+				if (PublishedContent == null)
 				{
 					throw new InvalidOperationException("Cannot redirect, no entity was found for id " + _pageId);
 				}
 
-				var result = _umbracoContext.RoutingContext.NiceUrlProvider.GetNiceUrl(Document.Id);
+				var result = _umbracoContext.RoutingContext.NiceUrlProvider.GetNiceUrl(PublishedContent.Id);
 				if (result != NiceUrlProvider.NullUrl)
 				{
 					_url = result;
@@ -38,16 +38,16 @@ namespace Umbraco.Web.Mvc
 			}
 		}
 
-		public IDocument Document
+		public IPublishedContent PublishedContent
 		{
 			get
 			{
-				if (_document != null) return _document;
+				if (_publishedContent != null) return _publishedContent;
 
 				//need to get the URL for the page
-				_document = PublishedContentStoreResolver.Current.PublishedContentStore.GetDocumentById(_umbracoContext, _pageId);				
+				_publishedContent = PublishedContentStoreResolver.Current.PublishedContentStore.GetDocumentById(_umbracoContext, _pageId);				
 
-				return _document;
+				return _publishedContent;
 			}
 		}
 
@@ -63,21 +63,21 @@ namespace Umbraco.Web.Mvc
 		/// <summary>
 		/// Creates a new RedirectToUmbracoResult
 		/// </summary>
-		/// <param name="document"></param>
-		public RedirectToUmbracoPageResult(IDocument document)
-			: this(document, UmbracoContext.Current)
+		/// <param name="publishedContent"></param>
+		public RedirectToUmbracoPageResult(IPublishedContent publishedContent)
+			: this(publishedContent, UmbracoContext.Current)
 		{
 		}
 
 		/// <summary>
 		/// Creates a new RedirectToUmbracoResult
 		/// </summary>
-		/// <param name="document"></param>
+		/// <param name="publishedContent"></param>
 		/// <param name="umbracoContext"></param>
-		public RedirectToUmbracoPageResult(IDocument document, UmbracoContext umbracoContext)
+		public RedirectToUmbracoPageResult(IPublishedContent publishedContent, UmbracoContext umbracoContext)
 		{
-			_document = document;
-			_pageId = document.Id;
+			_publishedContent = publishedContent;
+			_pageId = publishedContent.Id;
 			_umbracoContext = umbracoContext;
 		}
 

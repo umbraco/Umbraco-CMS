@@ -6,7 +6,7 @@ namespace Umbraco.Core.Dynamics
 {
     public class DynamicGrouping : IEnumerable
     {
-        internal IEnumerable<Grouping<object, DynamicDocument>> Inner;
+        internal IEnumerable<Grouping<object, DynamicPublishedContent>> Inner;
 
         public DynamicGrouping OrderBy(string expression)
         {
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Dynamics
               .Select(node =>
                 {
                     string predicate = groupBy;
-                    var internalList = new DynamicDocumentList(new DynamicDocument[] { node });
+                    var internalList = new DynamicDocumentList(new DynamicPublishedContent[] { node });
                     var query = (IQueryable<object>)internalList.Select(predicate, new object[] { });
                     var key = query.FirstOrDefault();
                     return new
@@ -32,13 +32,13 @@ namespace Umbraco.Core.Dynamics
                 })
               .Where(item => item.Key != null)
               .GroupBy(item => item.Key)
-              .Select(item => new Grouping<object, DynamicDocument>()
+              .Select(item => new Grouping<object, DynamicPublishedContent>()
               {
                   Key = item.Key,
                   Elements = item.Select(inner => inner.Node)
               });
         }
-        internal DynamicGrouping(IEnumerable<Grouping<object, DynamicDocument>> source)
+        internal DynamicGrouping(IEnumerable<Grouping<object, DynamicPublishedContent>> source)
         {
             this.Inner = source;
         }

@@ -24,7 +24,7 @@ namespace Umbraco.Web.Routing
 		/// <remarks>If successful, also assigns the template.</remarks>
 		public override bool TrySetDocument(DocumentRequest docRequest)
         {
-            IDocument node = null;
+            IPublishedContent node = null;
 			string path = docRequest.Uri.AbsolutePath;
 
 			if (docRequest.HasDomain)

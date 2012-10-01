@@ -111,10 +111,10 @@ namespace umbraco
 			if (!docreq.HasNode)
 				throw new ArgumentException("Document request has no node.", "docreq");
 			
-			populatePageData(docreq.Document.Id,
-				docreq.Document.Name, docreq.Document.DocumentTypeId, docreq.Document.DocumentTypeAlias,
-				docreq.Document.WriterName, docreq.Document.CreatorName, docreq.Document.CreateDate, docreq.Document.UpdateDate,
-				docreq.Document.Path, docreq.Document.Version, docreq.Document.Parent == null ? -1 : docreq.Document.Parent.Id);
+			populatePageData(docreq.PublishedContent.Id,
+				docreq.PublishedContent.Name, docreq.PublishedContent.DocumentTypeId, docreq.PublishedContent.DocumentTypeAlias,
+				docreq.PublishedContent.WriterName, docreq.PublishedContent.CreatorName, docreq.PublishedContent.CreateDate, docreq.PublishedContent.UpdateDate,
+				docreq.PublishedContent.Path, docreq.PublishedContent.Version, docreq.PublishedContent.Parent == null ? -1 : docreq.PublishedContent.Parent.Id);
 
 			if (docreq.HasTemplate)
 			{
@@ -123,7 +123,7 @@ namespace umbraco
 				_elements["template"] = _template.ToString();				
 			}
 
-			PopulateElementData(docreq.Document);
+			PopulateElementData(docreq.PublishedContent);
 
 		}
 
@@ -256,7 +256,7 @@ namespace umbraco
 		/// Puts the properties of the node into the elements table
 		/// </summary>
 		/// <param name="node"></param>
-		void PopulateElementData(IDocument node)
+		void PopulateElementData(IPublishedContent node)
 		{
 			foreach(var p in node.Properties)
 			{

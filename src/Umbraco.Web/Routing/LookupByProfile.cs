@@ -24,7 +24,7 @@ namespace Umbraco.Web.Routing
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		public override bool TrySetDocument(DocumentRequest docRequest)
         {
-            IDocument node = null;
+            IPublishedContent node = null;
 
             bool isProfile = false;
 			var pos = docRequest.Uri.AbsolutePath.LastIndexOf('/');

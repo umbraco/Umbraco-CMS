@@ -44,7 +44,7 @@ namespace Umbraco.Web.Mvc
 
 			var renderModel = new RenderModel()
 			{
-				CurrentDocument = docRequest.Document
+				CurrentPublishedContent = docRequest.PublishedContent
 			};
 
 			//put essential data into the data tokens, the 'umbraco' key is required to be there for the view engine
@@ -183,7 +183,7 @@ namespace Umbraco.Web.Mvc
 				};
 
 			//check if there's a custom controller assigned, base on the document type alias.
-			var controller = _controllerFactory.CreateController(requestContext, documentRequest.Document.DocumentTypeAlias);
+			var controller = _controllerFactory.CreateController(requestContext, documentRequest.PublishedContent.DocumentTypeAlias);
 
 
 			//check if that controller exists
@@ -203,7 +203,7 @@ namespace Umbraco.Web.Mvc
 				}
 				else
 				{
-					LogHelper.Warn<RenderRouteHandler>("The current Document Type {0} matches a locally declared controller of type {1}. Custom Controllers for Umbraco routing must inherit from '{2}'.", documentRequest.Document.DocumentTypeAlias, controller.GetType().FullName, typeof(RenderMvcController).FullName);
+					LogHelper.Warn<RenderRouteHandler>("The current Document Type {0} matches a locally declared controller of type {1}. Custom Controllers for Umbraco routing must inherit from '{2}'.", documentRequest.PublishedContent.DocumentTypeAlias, controller.GetType().FullName, typeof(RenderMvcController).FullName);
 					//exit as we cannnot route to the custom controller, just route to the standard one.
 					return def;
 				}

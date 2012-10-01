@@ -325,7 +325,7 @@
     <Compile Include="PublishedContentStoreResolver.cs" />
     <Compile Include="Routing\DocumentNotFoundHandler.cs" />
     <Compile Include="IPublishedContentStore.cs" />
-    <Compile Include="Models\XmlDocument.cs" />
+    <Compile Include="Models\XmlPublishedContent.cs" />
     <Compile Include="Models\XmlDocumentProperty.cs" />
     <Compile Include="Mvc\Constants.cs" />
     <Compile Include="Mvc\FilteredControllerFactoriesResolver.cs" />

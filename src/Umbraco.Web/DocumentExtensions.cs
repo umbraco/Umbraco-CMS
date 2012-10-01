@@ -10,7 +10,7 @@ using Umbraco.Core;
 namespace Umbraco.Web
 {
 	/// <summary>
-	/// Extension methods for IDocument
+	/// Extension methods for IPublishedContent
 	/// </summary>
 	/// <remarks>
 	/// These methods exist in the web project as we need access to web based classes like NiceUrl provider
@@ -20,23 +20,23 @@ namespace Umbraco.Web
 	{	
 
 		/// <summary>
-		/// Returns a DataTable object for the IDocument
+		/// Returns a DataTable object for the IPublishedContent
 		/// </summary>
 		/// <param name="d"></param>
 		/// <param name="nodeTypeAliasFilter"></param>
 		/// <returns></returns>
-		public static DataTable ChildrenAsTable(this IDocument d, string nodeTypeAliasFilter = "")
+		public static DataTable ChildrenAsTable(this IPublishedContent d, string nodeTypeAliasFilter = "")
 		{
 			return GenerateDataTable(d, nodeTypeAliasFilter);
 		}
 
 		/// <summary>
-		/// Generates the DataTable for the IDocument
+		/// Generates the DataTable for the IPublishedContent
 		/// </summary>
 		/// <param name="node"></param>
 		/// <param name="nodeTypeAliasFilter"> </param>
 		/// <returns></returns>
-		private static DataTable GenerateDataTable(IDocument node, string nodeTypeAliasFilter = "")
+		private static DataTable GenerateDataTable(IPublishedContent node, string nodeTypeAliasFilter = "")
 		{
 			var firstNode = nodeTypeAliasFilter.IsNullOrWhiteSpace()
 			                	? node.Children.Any()

@@ -13,7 +13,7 @@ namespace Umbraco.Core.Dynamics
 
         public IEnumerator<T> GetEnumerator()
         {
-            var temp = new DynamicDocumentList(Elements.Cast<DynamicDocument>());
+            var temp = new DynamicDocumentList(Elements.Cast<DynamicPublishedContent>());
             return (IEnumerator<T>)temp.GetEnumerator();
         }
         IEnumerator IEnumerable.GetEnumerator()
@@ -42,7 +42,7 @@ namespace Umbraco.Core.Dynamics
                     object key = null;
                     (item as DynamicObject).TryGetMember(new DynamicQueryableGetMemberBinder(ordering, false), out key);
                     return key;
-                }).Cast<DynamicDocument>());
+                }).Cast<DynamicPublishedContent>());
             }
             else
             {
@@ -51,7 +51,7 @@ namespace Umbraco.Core.Dynamics
                     object key = null;
                     (item as DynamicObject).TryGetMember(new DynamicQueryableGetMemberBinder(ordering, false), out key);
                     return key;
-                }).Cast<DynamicDocument>());
+                }).Cast<DynamicPublishedContent>());
             }
         }
     }

@@ -47,7 +47,7 @@ namespace Umbraco.Core.Dynamics
             return new DynamicDocumentList(all.Items.OrderBy(x => Guid.NewGuid()).Take(max));
         }
 
-        public static DynamicDocument Random(this DynamicDocumentList all)
+        public static DynamicPublishedContent Random(this DynamicDocumentList all)
         {
             return all.Items.OrderBy(x => Guid.NewGuid()).First();
         }

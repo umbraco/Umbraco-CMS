@@ -38,7 +38,7 @@ namespace Umbraco.Web.Routing
 		/// <param name="docreq">The document request.</param>
 		/// <param name="route">The route.</param>
 		/// <returns>The document node, or null.</returns>
-        protected IDocument LookupDocumentNode(DocumentRequest docreq, string route)
+        protected IPublishedContent LookupDocumentNode(DocumentRequest docreq, string route)
         {
 			LogHelper.Debug<LookupByNiceUrl>("Test route \"{0}\"", () => route);
 
@@ -50,7 +50,7 @@ namespace Umbraco.Web.Routing
 
 			// if a node was found, get it by id and ensure it exists
 			// else clear the cache
-            IDocument node = null;
+            IPublishedContent node = null;
             if (nodeId > 0)
             {
 				node = docreq.RoutingContext.PublishedContentStore.GetDocumentById(
@@ -59,7 +59,7 @@ namespace Umbraco.Web.Routing
 
                 if (node != null)
                 {
-                    docreq.Document = node;
+                    docreq.PublishedContent = node;
 					LogHelper.Debug<LookupByNiceUrl>("Cache hit, id={0}", () => nodeId);
                 }
                 else
@@ -78,7 +78,7 @@ namespace Umbraco.Web.Routing
 
                 if (node != null)
                 {
-                    docreq.Document = node;
+                    docreq.PublishedContent = node;
 					LogHelper.Debug<LookupByNiceUrl>("Query matches, id={0}", () => docreq.DocumentId);
 
 					var iscanon = true;

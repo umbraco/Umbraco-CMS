@@ -37,7 +37,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		int _nodeId = 0;
 		
-		private IDocument _document = null;
+		private IPublishedContent _publishedContent = null;
 
         #region Properties
 
@@ -100,14 +100,14 @@ namespace Umbraco.Web.Routing
 		// TODO: fixme - do we want to have an ordered list of alternate cultures,
         //         to allow for fallbacks when doing dictionnary lookup and such?
 
-		public IDocument Document
+		public IPublishedContent PublishedContent
 		{			
-			get { return _document; }
+			get { return _publishedContent; }
 			set
 			{
-				_document = value;
+				_publishedContent = value;
 				this.Template = null;
-				_nodeId = _document != null ? _document.Id : 0;
+				_nodeId = _publishedContent != null ? _publishedContent.Id : 0;
 			}
 		}
 
@@ -132,7 +132,7 @@ namespace Umbraco.Web.Routing
         {
             get
             {
-                if (this.Document == null)
+                if (this.PublishedContent == null)
                     throw new InvalidOperationException("DocumentRequest has no document.");
                 return _nodeId;
             }
@@ -143,7 +143,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public bool HasNode
         {
-            get { return this.Document != null; }
+            get { return this.PublishedContent != null; }
         }
 
         /// <summary>

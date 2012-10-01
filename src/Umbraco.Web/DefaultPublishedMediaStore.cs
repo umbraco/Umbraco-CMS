@@ -21,12 +21,12 @@ namespace Umbraco.Web
 	/// </remarks>
 	internal class DefaultPublishedMediaStore : IPublishedMediaStore
 	{
-		public virtual IDocument GetDocumentById(UmbracoContext umbracoContext, int nodeId)
+		public virtual IPublishedContent GetDocumentById(UmbracoContext umbracoContext, int nodeId)
 		{
 			return GetUmbracoMedia(nodeId);
 		}
 
-		private IDocument GetUmbracoMedia(int id)
+		private IPublishedContent GetUmbracoMedia(int id)
 		{
 
 			try
@@ -62,7 +62,7 @@ namespace Umbraco.Web
 			return null;
 		}
 
-		internal IDocument ConvertFromSearchResult(SearchResult searchResult)
+		internal IPublishedContent ConvertFromSearchResult(SearchResult searchResult)
 		{
 			//TODO: Some fields will not be included, that just the way it is unfortunatley until this is fixed:
 			// http://examine.codeplex.com/workitem/10350
@@ -91,7 +91,7 @@ namespace Umbraco.Web
 			}
 
 
-			return new DictionaryDocument(values,
+			return new DictionaryPublishedContent(values,
 			                              d => d.ParentId != -1 //parent should be null if -1
 			                                   	? GetUmbracoMedia(d.ParentId)
 			                                   	: null,
@@ -103,7 +103,7 @@ namespace Umbraco.Web
 				};
 		}
 
-		internal IDocument ConvertFromXPathNavigator(XPathNavigator xpath)
+		internal IPublishedContent ConvertFromXPathNavigator(XPathNavigator xpath)
 		{
 			if (xpath == null) throw new ArgumentNullException("xpath");
 
@@ -151,7 +151,7 @@ namespace Umbraco.Web
 				}
 			}
 
-			return new DictionaryDocument(values, 
+			return new DictionaryPublishedContent(values, 
 				d => d.ParentId != -1 //parent should be null if -1
 					? GetUmbracoMedia(d.ParentId) 
 					: null,
@@ -167,7 +167,7 @@ namespace Umbraco.Web
 		/// <param name="dd"> </param>
 		/// <param name="alias"></param>
 		/// <returns></returns>
-		private IDocumentProperty GetProperty(DictionaryDocument dd, string alias)
+		private IDocumentProperty GetProperty(DictionaryPublishedContent dd, string alias)
 		{
 			if (dd.LoadedFromExamine)
 			{
@@ -210,7 +210,7 @@ namespace Umbraco.Web
 		/// <param name="parentId"></param>
 		/// <param name="xpath"></param>
 		/// <returns></returns>
-		private IEnumerable<IDocument> GetChildrenMedia(int parentId, XPathNavigator xpath = null)
+		private IEnumerable<IPublishedContent> GetChildrenMedia(int parentId, XPathNavigator xpath = null)
 		{	
 
 			//if there is no navigator, try examine first, then re-look it up
@@ -248,7 +248,7 @@ namespace Umbraco.Web
 			}
 
 			var children = xpath.SelectChildren(XPathNodeType.Element);
-			var mediaList = new List<IDocument>();
+			var mediaList = new List<IPublishedContent>();
 			while (children.Current != null)
 			{
 				if (!children.MoveNext())
@@ -272,20 +272,20 @@ namespace Umbraco.Web
 		}
 
 		/// <summary>
-		/// An IDocument that is represented all by a dictionary.
+		/// An IPublishedContent that is represented all by a dictionary.
 		/// </summary>
 		/// <remarks>
 		/// This is a helper class and definitely not intended for public use, it expects that all of the values required 
-		/// to create an IDocument exist in the dictionary by specific aliases.
+		/// to create an IPublishedContent exist in the dictionary by specific aliases.
 		/// </remarks>
-		internal class DictionaryDocument : IDocument
+		internal class DictionaryPublishedContent : IPublishedContent
 		{
 
-			public DictionaryDocument(
+			public DictionaryPublishedContent(
 				IDictionary<string, string> valueDictionary, 
-				Func<DictionaryDocument, IDocument> getParent,
-				Func<DictionaryDocument, IEnumerable<IDocument>> getChildren,
-				Func<DictionaryDocument, string, IDocumentProperty> getProperty)
+				Func<DictionaryPublishedContent, IPublishedContent> getParent,
+				Func<DictionaryPublishedContent, IEnumerable<IPublishedContent>> getChildren,
+				Func<DictionaryPublishedContent, string, IDocumentProperty> getProperty)
 			{
 				if (valueDictionary == null) throw new ArgumentNullException("valueDictionary");
 				if (getParent == null) throw new ArgumentNullException("getParent");
@@ -339,11 +339,11 @@ namespace Umbraco.Web
 			/// </summary>
 			internal bool LoadedFromExamine { get; set; }
 
-			private readonly Func<DictionaryDocument, IDocument> _getParent;
-			private readonly Func<DictionaryDocument, IEnumerable<IDocument>> _getChildren;
-			private readonly Func<DictionaryDocument, string, IDocumentProperty> _getProperty;
+			private readonly Func<DictionaryPublishedContent, IPublishedContent> _getParent;
+			private readonly Func<DictionaryPublishedContent, IEnumerable<IPublishedContent>> _getChildren;
+			private readonly Func<DictionaryPublishedContent, string, IDocumentProperty> _getProperty;
 
-			public IDocument Parent
+			public IPublishedContent Parent
 			{
 				get { return _getParent(this); }
 			}
@@ -366,7 +366,7 @@ namespace Umbraco.Web
 			public Guid Version { get; private set; }
 			public int Level { get; private set; }
 			public Collection<IDocumentProperty> Properties { get; private set; }
-			public IEnumerable<IDocument> Children
+			public IEnumerable<IPublishedContent> Children
 			{
 				get { return _getChildren(this); }
 			}

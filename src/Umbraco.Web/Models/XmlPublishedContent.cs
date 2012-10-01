@@ -13,17 +13,17 @@ namespace Umbraco.Web.Models
 {
 
 	/// <summary>
-	/// Represents an IDocument which is created based on an Xml structure
+	/// Represents an IPublishedContent which is created based on an Xml structure
 	/// </summary>
 	[Serializable]
 	[XmlType(Namespace = "http://umbraco.org/webservices/")]
-	internal class XmlDocument : IDocument
+	internal class XmlPublishedContent : IPublishedContent
 	{
 		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="xmlNode"></param>
-		public XmlDocument(XmlNode xmlNode)
+		public XmlPublishedContent(XmlNode xmlNode)
 		{
 			_pageXmlNode = xmlNode;
 			InitializeStructure();
@@ -35,7 +35,7 @@ namespace Umbraco.Web.Models
 		/// </summary>
 		/// <param name="xmlNode"></param>
 		/// <param name="disableInitializing"></param>
-		internal XmlDocument(XmlNode xmlNode, bool disableInitializing)
+		internal XmlPublishedContent(XmlNode xmlNode, bool disableInitializing)
 		{
 			_pageXmlNode = xmlNode;
 			InitializeStructure();
@@ -44,8 +44,8 @@ namespace Umbraco.Web.Models
 		}
 
 		private bool _initialized = false;
-		private readonly ICollection<IDocument> _children = new Collection<IDocument>();
-		private IDocument _parent = null;
+		private readonly ICollection<IPublishedContent> _children = new Collection<IPublishedContent>();
+		private IPublishedContent _parent = null;
 		private int _id;
 		private int _template;
 		private string _name;
@@ -65,7 +65,7 @@ namespace Umbraco.Web.Models
 		private int _sortOrder;
 		private int _level;
 
-		public IEnumerable<IDocument> Children
+		public IEnumerable<IPublishedContent> Children
 		{
 			get
 			{
@@ -80,7 +80,7 @@ namespace Umbraco.Web.Models
 			return Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 		}
 
-		public IDocument Parent
+		public IPublishedContent Parent
 		{
 			get
 			{
@@ -270,7 +270,7 @@ namespace Umbraco.Web.Models
 			{
 				XmlNode parent = _pageXmlNode.SelectSingleNode("..");
 				if (parent != null && (parent.Name == "node" || (parent.Attributes != null && parent.Attributes.GetNamedItem("isDoc") != null)))
-					_parent = new XmlDocument(parent, true);
+					_parent = new XmlPublishedContent(parent, true);
 			}
 		}
 
@@ -347,7 +347,7 @@ namespace Umbraco.Web.Models
 				while (iterator.MoveNext())
 				{
 					_children.Add(
-						new XmlDocument(((IHasXmlNode)iterator.Current).GetNode(), true)
+						new XmlPublishedContent(((IHasXmlNode)iterator.Current).GetNode(), true)
 						);
 				}
 			}

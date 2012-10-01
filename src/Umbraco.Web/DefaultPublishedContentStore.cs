@@ -17,22 +17,22 @@ namespace Umbraco.Web
     internal class DefaultPublishedContentStore : IPublishedContentStore
     {
 
-    	private IDocument ConvertToDocument(XmlNode xmlNode)
+    	private IPublishedContent ConvertToDocument(XmlNode xmlNode)
 		{
 			if (xmlNode == null)
 				return null;
 
-			return new Models.XmlDocument(xmlNode);
+			return new Models.XmlPublishedContent(xmlNode);
 		}
 		
-    	public virtual IDocument GetDocumentById(UmbracoContext umbracoContext, int nodeId)
+    	public virtual IPublishedContent GetDocumentById(UmbracoContext umbracoContext, int nodeId)
     	{
     		if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
 
     		return ConvertToDocument(GetXml(umbracoContext).GetElementById(nodeId.ToString()));
     	}
 
-		public IDocument GetDocumentByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null)
+		public IPublishedContent GetDocumentByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null)
         {
 			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
 			if (route == null) throw new ArgumentNullException("route");
@@ -64,7 +64,7 @@ namespace Umbraco.Web
         	return ConvertToDocument(found);
         }
 
-		public IDocument GetDocumentByUrlAlias(UmbracoContext umbracoContext, int rootNodeId, string alias)
+		public IPublishedContent GetDocumentByUrlAlias(UmbracoContext umbracoContext, int rootNodeId, string alias)
         {
 			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
 			if (alias == null) throw new ArgumentNullException("alias");

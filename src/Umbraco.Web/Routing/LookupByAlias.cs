@@ -24,7 +24,7 @@ namespace Umbraco.Web.Routing
 		public bool TrySetDocument(DocumentRequest docRequest)
 		{
 			
-			IDocument node = null;
+			IPublishedContent node = null;
 
 			if (docRequest.Uri.AbsolutePath != "/") // no alias if "/"
 			{
@@ -35,7 +35,7 @@ namespace Umbraco.Web.Routing
 
 				if (node != null)
 				{					
-					docRequest.Document = node;
+					docRequest.PublishedContent = node;
 					LogHelper.Debug<LookupByAlias>("Path \"{0}\" is an alias for id={1}", () => docRequest.Uri.AbsolutePath, () => docRequest.DocumentId);
 				}
 			}

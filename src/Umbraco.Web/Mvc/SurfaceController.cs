@@ -73,11 +73,11 @@ namespace Umbraco.Web.Mvc
 		/// <summary>
 		/// Redirects to the Umbraco page with the given id
 		/// </summary>
-		/// <param name="pageDocument"></param>
+		/// <param name="pagePublishedContent"></param>
 		/// <returns></returns>
-		protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IDocument pageDocument)
+		protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent pagePublishedContent)
 		{
-			return new RedirectToUmbracoPageResult(pageDocument, UmbracoContext);
+			return new RedirectToUmbracoPageResult(pagePublishedContent, UmbracoContext);
 		}
 
 		/// <summary>
@@ -101,7 +101,7 @@ namespace Umbraco.Web.Mvc
 		/// <summary>
 		/// Gets the current page.
 		/// </summary>
-		protected IDocument CurrentPage
+		protected IPublishedContent CurrentPage
 		{
 			get
 			{
@@ -109,7 +109,7 @@ namespace Umbraco.Web.Mvc
 					throw new InvalidOperationException("Can only use " + typeof(UmbracoPageResult).Name + " in the context of an Http POST when using the BeginUmbracoForm helper");
 
 				var routeDef = (RouteDefinition)ControllerContext.RouteData.DataTokens["umbraco-route-def"];
-				return routeDef.DocumentRequest.Document;
+				return routeDef.DocumentRequest.PublishedContent;
 			}
 		}
 

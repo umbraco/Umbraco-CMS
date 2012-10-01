@@ -16,7 +16,7 @@ namespace Umbraco.Web
 			this IEnumerable<SearchResult> results,
 			IPublishedStore store)
 		{
-			//TODO: The search result has already returned a result which SHOULD include all of the data to create an IDocument, 
+			//TODO: The search result has already returned a result which SHOULD include all of the data to create an IPublishedContent, 
 			// however thsi is currently not the case: 
 			// http://examine.codeplex.com/workitem/10350
 
@@ -31,7 +31,7 @@ namespace Umbraco.Web
 				if (doc == null) continue; //skip if this doesn't exist in the cache				
 				doc.Properties.Add(
 					new PropertyResult("examineScore", result.Score.ToString(), Guid.Empty, PropertyResultType.CustomProperty));
-				var dynamicDoc = new DynamicDocument(doc);
+				var dynamicDoc = new DynamicPublishedContent(doc);
 				list.Add(dynamicDoc);
 			}
 			return list;

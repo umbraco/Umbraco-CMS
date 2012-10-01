@@ -12,7 +12,7 @@ using Umbraco.Web;
 namespace Umbraco.Tests.DynamicDocument
 {
 	/// <summary>
-	/// Unit tests for IDocument and extensions
+	/// Unit tests for IPublishedContent and extensions
 	/// </summary>
 	[TestFixture]
 	public class DocumentTests : BaseRoutingTest
@@ -92,7 +92,7 @@ namespace Umbraco.Tests.DynamicDocument
 		{
 			var doc = GetDocument(true, 1);
 			//change a doc type alias
-			((TestDocument) doc.Children.ElementAt(0)).DocumentTypeAlias = "DontMatch";
+			((TestPublishedContent) doc.Children.ElementAt(0)).DocumentTypeAlias = "DontMatch";
 
 			var dt = doc.ChildrenAsTable("Child");
 
@@ -116,9 +116,9 @@ namespace Umbraco.Tests.DynamicDocument
 			Assert.AreEqual(0, dt.Rows.Count);			
 		}
 
-		private IDocument GetDocument(bool createChildren, int indexVals)
+		private IPublishedContent GetDocument(bool createChildren, int indexVals)
 		{
-			var d = new TestDocument
+			var d = new TestPublishedContent
 				{
 					CreateDate = DateTime.Now,
 					CreatorId = 1,
@@ -143,11 +143,11 @@ namespace Umbraco.Tests.DynamicDocument
 								new PropertyResult("property1", "value" + indexVals, Guid.NewGuid(), PropertyResultType.UserProperty),
 								new PropertyResult("property2", "value" + (indexVals + 1), Guid.NewGuid(), PropertyResultType.UserProperty)
 							}),
-					Children = new List<IDocument>()
+					Children = new List<IPublishedContent>()
 				};
 			if (createChildren)
 			{
-				d.Children = new List<IDocument>()
+				d.Children = new List<IPublishedContent>()
 					{
 						GetDocument(false, indexVals + 3),
 						GetDocument(false, indexVals + 6),
@@ -167,9 +167,9 @@ namespace Umbraco.Tests.DynamicDocument
 		}
 
 
-		private class TestDocument : IDocument
+		private class TestPublishedContent : IPublishedContent
 		{
-			public IDocument Parent { get; set; }
+			public IPublishedContent Parent { get; set; }
 			public int Id { get; set; }
 			public int TemplateId { get; set; }
 			public int SortOrder { get; set; }
@@ -187,7 +187,7 @@ namespace Umbraco.Tests.DynamicDocument
 			public Guid Version { get; set; }
 			public int Level { get; set; }
 			public Collection<IDocumentProperty> Properties { get; set; }
-			public IEnumerable<IDocument> Children { get; set; }
+			public IEnumerable<IPublishedContent> Children { get; set; }
 			public IDocumentProperty GetProperty(string alias)
 			{
 				return Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));

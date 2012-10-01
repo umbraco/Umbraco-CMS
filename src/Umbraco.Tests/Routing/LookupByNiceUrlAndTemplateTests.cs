@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Routing
 			var result = lookup.TrySetDocument(docRequest);
 
 			Assert.IsTrue(result);
-			Assert.IsNotNull(docRequest.Document);
+			Assert.IsNotNull(docRequest.PublishedContent);
 			Assert.IsNotNull(docRequest.Template);
 			Assert.AreEqual("blah".ToUpperInvariant(), docRequest.Template.Alias.ToUpperInvariant());
 		}

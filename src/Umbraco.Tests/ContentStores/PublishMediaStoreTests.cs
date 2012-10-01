@@ -60,7 +60,7 @@ namespace Umbraco.Tests
 			var child1 = GetDictionaryDocument(idVal: 222333);
 			var child2 = GetDictionaryDocument(idVal: 444555);
 
-			var dicDoc = GetDictionaryDocument(children: new List<IDocument>()
+			var dicDoc = GetDictionaryDocument(children: new List<IPublishedContent>()
 				{
 					child1, child2
 				});
@@ -169,7 +169,7 @@ namespace Umbraco.Tests
 				};
 		}
 		
-		private DefaultPublishedMediaStore.DictionaryDocument GetDictionaryDocument(
+		private DefaultPublishedMediaStore.DictionaryPublishedContent GetDictionaryDocument(
 			string idKey = "id",
 			string templateKey = "template",
 			string nodeNameKey = "nodeName",
@@ -177,20 +177,20 @@ namespace Umbraco.Tests
 			string pathKey = "path", 
 			int idVal = 1234,
 			int parentIdVal = 321,
-			IEnumerable<IDocument> children = null)
+			IEnumerable<IPublishedContent> children = null)
 		{
 			if (children == null)
-				children = new List<IDocument>();
-			var dicDoc = new DefaultPublishedMediaStore.DictionaryDocument(
+				children = new List<IPublishedContent>();
+			var dicDoc = new DefaultPublishedMediaStore.DictionaryPublishedContent(
 				//the dictionary
 				GetDictionary(idVal, parentIdVal, idKey, templateKey, nodeNameKey, nodeTypeAliasKey, pathKey),
 				//callback to get the parent
-				d => new DefaultPublishedMediaStore.DictionaryDocument(
+				d => new DefaultPublishedMediaStore.DictionaryPublishedContent(
 						GetDictionary(parentIdVal, -1, idKey, templateKey, nodeNameKey, nodeTypeAliasKey, pathKey),
 					//there is no parent
 						a => null,
 					//we're not going to test this so ignore
-						a => new List<IDocument>(),
+						a => new List<IPublishedContent>(),
 						(dd, a) => dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(a))),
 				//callback to get the children
 				d => children,
@@ -199,7 +199,7 @@ namespace Umbraco.Tests
 		}
 
 		private void DoAssert(
-			DefaultPublishedMediaStore.DictionaryDocument dicDoc,
+			DefaultPublishedMediaStore.DictionaryPublishedContent dicDoc,
 			int idVal = 1234,
 			int templateIdVal = 333,
 			int sortOrderVal = 44,
@@ -221,15 +221,15 @@ namespace Umbraco.Tests
 			if (!updateDateVal.HasValue)
 				updateDateVal = DateTime.Parse("2012-01-03");
 
-			DoAssert((IDocument)dicDoc, idVal, templateIdVal, sortOrderVal, urlNameVal, nodeTypeAliasVal, nodeTypeIdVal, writerNameVal, 
+			DoAssert((IPublishedContent)dicDoc, idVal, templateIdVal, sortOrderVal, urlNameVal, nodeTypeAliasVal, nodeTypeIdVal, writerNameVal, 
 				creatorNameVal, writerIdVal, creatorIdVal, pathVal, createDateVal, updateDateVal, levelVal);
 
-			//now validate the parentId that has been parsed, this doesn't exist on the IDocument
+			//now validate the parentId that has been parsed, this doesn't exist on the IPublishedContent
 			Assert.AreEqual(parentIdVal, dicDoc.ParentId);
 		}
 
 		private void DoAssert(
-			IDocument doc,
+			IPublishedContent doc,
 			int idVal = 1234,
 			int templateIdVal = 333,
 			int sortOrderVal = 44,

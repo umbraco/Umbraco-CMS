@@ -33,7 +33,7 @@ namespace Umbraco.Web
 	public class UmbracoHelper
 	{
 		private readonly UmbracoContext _umbracoContext;
-		private readonly IDocument _currentPage;
+		private readonly IPublishedContent _currentPage;
 
 		internal UmbracoHelper(UmbracoContext umbracoContext)
 		{
@@ -42,7 +42,7 @@ namespace Umbraco.Web
 			_umbracoContext = umbracoContext;
 			if (_umbracoContext.IsFrontEndUmbracoRequest)
 			{
-				_currentPage = _umbracoContext.DocumentRequest.Document;	
+				_currentPage = _umbracoContext.DocumentRequest.PublishedContent;	
 			}
 		}
 
@@ -162,7 +162,7 @@ namespace Umbraco.Web
 		/// <param name="encoding"></param>
 		/// <param name="formatString"></param>
 		/// <returns></returns>
-		public IHtmlString Field(IDocument currentPage, string fieldAlias, 
+		public IHtmlString Field(IPublishedContent currentPage, string fieldAlias, 
 			string altFieldAlias = "", string altText = "", string insertBefore = "", string insertAfter = "",
 			bool recursive = false, bool convertLineBreaks = false, bool removeParagraphTags = false,
 			RenderFieldCaseType casing = RenderFieldCaseType.Unchanged,
@@ -386,7 +386,7 @@ namespace Umbraco.Web
 			var doc = store.GetDocumentById(UmbracoContext.Current, id);
 			return doc == null
 					? new DynamicNull()
-					: new DynamicDocument(doc).AsDynamic();
+					: new DynamicPublishedContent(doc).AsDynamic();
 		}
 
 		private dynamic DocumentById(string id, IPublishedStore store)
@@ -401,7 +401,7 @@ namespace Umbraco.Web
 		{
 			var nodes = ids.Select(eachId => DocumentById(eachId, store))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
-				.Cast<DynamicDocument>();
+				.Cast<DynamicPublishedContent>();
 			return new DynamicDocumentList(nodes);
 		}
 
@@ -409,7 +409,7 @@ namespace Umbraco.Web
 		{
 			var nodes = ids.Select(eachId => DocumentById(eachId, store))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
-				.Cast<DynamicDocument>();
+				.Cast<DynamicPublishedContent>();
 			return new DynamicDocumentList(nodes);
 		}
 

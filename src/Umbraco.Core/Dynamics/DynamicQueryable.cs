@@ -21,22 +21,22 @@ namespace Umbraco.Core.Dynamics
             if (source == null) throw new ArgumentNullException("source");
             if (predicate == null) throw new ArgumentNullException("predicate");
             LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(bool), predicate, true, values);
-            if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicDocument))
+            if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicPublishedContent))
             {
                 //source list is DynamicNode and the lambda returns a Func<object>
-                IQueryable<DynamicDocument> typedSource = source as IQueryable<DynamicDocument>;
+                IQueryable<DynamicPublishedContent> typedSource = source as IQueryable<DynamicPublishedContent>;
                 var compiledFunc = lambda.Compile();
-                Func<DynamicDocument, object> func = null;
-                Func<DynamicDocument, bool> boolFunc = null;
-                if (compiledFunc is Func<DynamicDocument, object>)
+                Func<DynamicPublishedContent, object> func = null;
+                Func<DynamicPublishedContent, bool> boolFunc = null;
+                if (compiledFunc is Func<DynamicPublishedContent, object>)
                 {
-                    func = (Func<DynamicDocument, object>)compiledFunc;
+                    func = (Func<DynamicPublishedContent, object>)compiledFunc;
                 }
-                if (compiledFunc is Func<DynamicDocument, bool>)
+                if (compiledFunc is Func<DynamicPublishedContent, bool>)
                 {
-                    boolFunc = (Func<DynamicDocument, bool>)compiledFunc;
+                    boolFunc = (Func<DynamicPublishedContent, bool>)compiledFunc;
                 }
-                return typedSource.Where(delegate(DynamicDocument node)
+                return typedSource.Where(delegate(DynamicPublishedContent node)
                 {
                     object value = -1;
                     //value = func(node);
@@ -46,13 +46,13 @@ namespace Umbraco.Core.Dynamics
                         if (func != null)
                         {
                             var firstFuncResult = func(node);
-                            if (firstFuncResult is Func<DynamicDocument, object>)
+                            if (firstFuncResult is Func<DynamicPublishedContent, object>)
                             {
-                                value = (firstFuncResult as Func<DynamicDocument, object>)(node);
+                                value = (firstFuncResult as Func<DynamicPublishedContent, object>)(node);
                             }
-                            if (firstFuncResult is Func<DynamicDocument, bool>)
+                            if (firstFuncResult is Func<DynamicPublishedContent, bool>)
                             {
-                                value = (firstFuncResult as Func<DynamicDocument, bool>)(node);
+                                value = (firstFuncResult as Func<DynamicPublishedContent, bool>)(node);
                             }
                             if (firstFuncResult is bool)
                             {
@@ -86,28 +86,28 @@ namespace Umbraco.Core.Dynamics
             }
         }
 
-        public static IQueryable Select(this IQueryable<DynamicDocument> source, string selector, params object[] values)
+        public static IQueryable Select(this IQueryable<DynamicPublishedContent> source, string selector, params object[] values)
         {
             if (source == null) throw new ArgumentNullException("source");
             if (selector == null) throw new ArgumentNullException("selector");
             LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(object), selector, false, values);
-            if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicDocument))
+            if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicPublishedContent))
             {
                 //source list is DynamicNode and the lambda returns a Func<object>
-                IQueryable<DynamicDocument> typedSource = source as IQueryable<DynamicDocument>;
+                IQueryable<DynamicPublishedContent> typedSource = source as IQueryable<DynamicPublishedContent>;
                 var compiledFunc = lambda.Compile();
-                Func<DynamicDocument, object> func = null;
-                if (compiledFunc is Func<DynamicDocument, object>)
+                Func<DynamicPublishedContent, object> func = null;
+                if (compiledFunc is Func<DynamicPublishedContent, object>)
                 {
-                    func = (Func<DynamicDocument, object>)compiledFunc;
+                    func = (Func<DynamicPublishedContent, object>)compiledFunc;
                 }
-                return typedSource.Select(delegate(DynamicDocument node)
+                return typedSource.Select(delegate(DynamicPublishedContent node)
                 {
                     object value = null;
                     value = func(node);
-                    if (value is Func<DynamicDocument, object>)
+                    if (value is Func<DynamicPublishedContent, object>)
                     {
-                        var innerValue = (value as Func<DynamicDocument, object>)(node);
+                        var innerValue = (value as Func<DynamicPublishedContent, object>)(node);
                         return innerValue;
                     }
                     return value;
@@ -133,7 +133,7 @@ namespace Umbraco.Core.Dynamics
             if (source == null) throw new ArgumentNullException("source");
             if (ordering == null) throw new ArgumentNullException("ordering");
 
-            IQueryable<DynamicDocument> typedSource = source as IQueryable<DynamicDocument>;
+            IQueryable<DynamicPublishedContent> typedSource = source as IQueryable<DynamicPublishedContent>;
             if (!ordering.Contains(","))
             {
                 bool descending = false;
@@ -149,10 +149,10 @@ namespace Umbraco.Core.Dynamics
                 }
 
                 LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(object), ordering, false, values);
-                if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicDocument))
+                if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicPublishedContent))
                 {
                     //source list is DynamicNode and the lambda returns a Func<object>
-                    Func<DynamicDocument, object> func = (Func<DynamicDocument, object>)lambda.Compile();
+                    Func<DynamicPublishedContent, object> func = (Func<DynamicPublishedContent, object>)lambda.Compile();
                     //get the values out
                     var query = typedSource.ToList().ConvertAll(item => new { node = item, key = EvaluateDynamicNodeFunc(item, func) });
                     if (query.Count == 0)
@@ -246,13 +246,13 @@ namespace Umbraco.Core.Dynamics
                 return null;
             }
         }
-        private static object EvaluateDynamicNodeFunc(DynamicDocument document, Func<DynamicDocument, object> func)
+        private static object EvaluateDynamicNodeFunc(DynamicPublishedContent publishedContent, Func<DynamicPublishedContent, object> func)
         {
             object value = -1;
-            var firstFuncResult = func(document);
-            if (firstFuncResult is Func<DynamicDocument, object>)
+            var firstFuncResult = func(publishedContent);
+            if (firstFuncResult is Func<DynamicPublishedContent, object>)
             {
-                value = (firstFuncResult as Func<DynamicDocument, object>)(document);
+                value = (firstFuncResult as Func<DynamicPublishedContent, object>)(publishedContent);
             }
             if (firstFuncResult.GetType().IsValueType || firstFuncResult is string)
             {

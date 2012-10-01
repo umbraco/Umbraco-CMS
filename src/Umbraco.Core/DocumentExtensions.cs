@@ -11,9 +11,9 @@ namespace Umbraco.Core
 	public static class DocumentExtensions
 	{
 
-		public static dynamic AsDynamic(this IDocument doc)
+		public static dynamic AsDynamic(this IPublishedContent doc)
 		{
-			var dd = new DynamicDocument(doc);
+			var dd = new DynamicPublishedContent(doc);
 			return dd.AsDynamic();
 		}
 
@@ -25,12 +25,12 @@ namespace Umbraco.Core
 		/// <param name="prop"></param>
 		/// <param name="alias"></param>
 		/// <returns></returns>
-		public static T GetPropertyValue<T>(this IDocument prop, string alias)
+		public static T GetPropertyValue<T>(this IPublishedContent prop, string alias)
 		{
 			return prop.GetPropertyValue<T>(alias, default(T));
 		}
 
-		public static T GetPropertyValue<T>(this IDocument prop, string alias, T ifCannotConvert)
+		public static T GetPropertyValue<T>(this IPublishedContent prop, string alias, T ifCannotConvert)
 		{
 			var p = prop.GetProperty(alias);
 			if (p == null)

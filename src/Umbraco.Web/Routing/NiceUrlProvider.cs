@@ -302,7 +302,7 @@ namespace Umbraco.Web.Routing
 			return domainAndUris.Select(d => d.Uri);
 		}
 
-		void ApplyHideTopLevelNodeFromPath(Core.Models.IDocument node, List<string> pathParts)
+		void ApplyHideTopLevelNodeFromPath(Core.Models.IPublishedContent node, List<string> pathParts)
 		{
 			// in theory if hideTopLevelNodeFromPath is true, then there should be only once
 			// top-level node, or else domains should be assigned. but for backward compatibility

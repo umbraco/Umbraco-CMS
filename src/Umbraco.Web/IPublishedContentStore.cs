@@ -7,8 +7,8 @@ namespace Umbraco.Web
 	/// </summary>
 	internal interface IPublishedContentStore : IPublishedStore
 	{		
-		IDocument GetDocumentByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null);
-		IDocument GetDocumentByUrlAlias(UmbracoContext umbracoContext, int rootNodeId, string alias);
+		IPublishedContent GetDocumentByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null);
+		IPublishedContent GetDocumentByUrlAlias(UmbracoContext umbracoContext, int rootNodeId, string alias);
         bool HasContent(UmbracoContext umbracoContext);
 	}
 }

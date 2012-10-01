@@ -7,6 +7,6 @@ namespace Umbraco.Web
 	/// </summary>
 	public interface IPublishedStore
 	{
-		IDocument GetDocumentById(UmbracoContext umbracoContext, int nodeId);
+		IPublishedContent GetDocumentById(UmbracoContext umbracoContext, int nodeId);
 	}
 }

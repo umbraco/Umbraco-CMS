@@ -11,7 +11,7 @@ namespace Umbraco.Core.Dynamics
 		UserProperty,
 
 		/// <summary>
-		/// The property resolved was a property defined as a member on the document object (IDocument) itself
+		/// The property resolved was a property defined as a member on the document object (IPublishedContent) itself
 		/// </summary>
 		ReflectedProperty,
 

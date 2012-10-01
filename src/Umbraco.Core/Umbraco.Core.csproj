@@ -68,7 +68,7 @@
     <Compile Include="Dynamics\DynamicDictionary.cs" />
     <Compile Include="Dynamics\DynamicExpression.cs" />
     <Compile Include="Dynamics\DynamicGrouping.cs" />
-    <Compile Include="Dynamics\DynamicDocument.cs" />
+    <Compile Include="Dynamics\DynamicPublishedContent.cs" />
     <Compile Include="Dynamics\DynamicDocumentDataSourceResolver.cs" />
     <Compile Include="Dynamics\DynamicDocumentIdEqualityComparer.cs" />
     <Compile Include="Dynamics\DynamicDocumentList.cs" />
@@ -101,7 +101,7 @@
     <Compile Include="Dynamics\Res.cs" />
     <Compile Include="Dynamics\Signature.cs" />
     <Compile Include="ExpressionExtensions.cs" />
-    <Compile Include="Models\IDocument.cs" />
+    <Compile Include="Models\IPublishedContent.cs" />
     <Compile Include="Models\IDocumentProperty.cs" />
     <Compile Include="ActionsResolver.cs" />
     <Compile Include="CacheRefreshersResolver.cs" />

@@ -222,7 +222,7 @@ namespace Umbraco.Web.Routing
 			if (i == maxLoop || j == maxLoop)
 			{
 				LogHelper.Debug<DocumentRequest>("{0}Looks like we're running into an infinite loop, abort", () => tracePrefix);
-				_documentRequest.Document = null;
+				_documentRequest.PublishedContent = null;
 			}
 			LogHelper.Debug<DocumentRequest>("{0}End", () => tracePrefix);
 		}
@@ -239,11 +239,11 @@ namespace Umbraco.Web.Routing
 		{
 			const string tracePrefix = "FollowInternalRedirects: ";
 
-			if (_documentRequest.Document == null)
+			if (_documentRequest.PublishedContent == null)
 				throw new InvalidOperationException("There is no node.");
 
 			bool redirect = false;
-			var internalRedirect = _documentRequest.Document.GetPropertyValue<string>("umbracoInternalRedirectId");
+			var internalRedirect = _documentRequest.PublishedContent.GetPropertyValue<string>("umbracoInternalRedirectId");
 			
 			if (!string.IsNullOrWhiteSpace(internalRedirect))
 			{
@@ -271,7 +271,7 @@ namespace Umbraco.Web.Routing
 						_umbracoContext,
 						internalRedirectId);
 
-					_documentRequest.Document = node;
+					_documentRequest.PublishedContent = node;
 					if (node != null)
 					{
 						redirect = true;
@@ -295,10 +295,10 @@ namespace Umbraco.Web.Routing
 		{
 			const string tracePrefix = "EnsurePageAccess: ";
 
-			if (_documentRequest.Document == null)
+			if (_documentRequest.PublishedContent == null)
 				throw new InvalidOperationException("There is no node.");
 
-			var path = _documentRequest.Document.Path;
+			var path = _documentRequest.PublishedContent.Path;
 
 			if (Access.IsProtected(_documentRequest.DocumentId, path))
 			{
@@ -311,7 +311,7 @@ namespace Umbraco.Web.Routing
 					LogHelper.Debug<DocumentRequest>("{0}Not logged in, redirect to login page", () => tracePrefix);
 					var loginPageId = Access.GetLoginPage(path);
 					if (loginPageId != _documentRequest.DocumentId)
-						_documentRequest.Document = _routingContext.PublishedContentStore.GetDocumentById(
+						_documentRequest.PublishedContent = _routingContext.PublishedContentStore.GetDocumentById(
 							_umbracoContext,
 							loginPageId);
 				}
@@ -320,7 +320,7 @@ namespace Umbraco.Web.Routing
 					LogHelper.Debug<DocumentRequest>("{0}Current member has not access, redirect to error page", () => tracePrefix);
 					var errorPageId = Access.GetErrorPage(path);
 					if (errorPageId != _documentRequest.DocumentId)
-						_documentRequest.Document = _routingContext.PublishedContentStore.GetDocumentById(
+						_documentRequest.PublishedContent = _routingContext.PublishedContentStore.GetDocumentById(
 							_umbracoContext,
 							errorPageId);
 				}
@@ -345,7 +345,7 @@ namespace Umbraco.Web.Routing
 
 			const string tracePrefix = "LookupTemplate: ";
 
-			if (_documentRequest.Document == null)
+			if (_documentRequest.PublishedContent == null)
 				throw new InvalidOperationException("There is no node.");
 
 			//gets item from query string, form, cookie or server vars
@@ -357,7 +357,7 @@ namespace Umbraco.Web.Routing
 				// associated with it.
 				//TODO: When we remove the need for a database for templates, then this id should be irrelavent, not sure how were going to do this nicely.
 
-				var templateId = _documentRequest.Document.TemplateId;
+				var templateId = _documentRequest.PublishedContent.TemplateId;
 				LogHelper.Debug<DocumentRequest>("{0}Look for template id={1}", () => tracePrefix, () => templateId);
 				
 				if (templateId > 0)
@@ -398,7 +398,7 @@ namespace Umbraco.Web.Routing
 		{
 			if (_documentRequest.HasNode)
 			{
-				var redirectId = _documentRequest.Document.GetPropertyValue<int>("umbracoRedirect", -1);
+				var redirectId = _documentRequest.PublishedContent.GetPropertyValue<int>("umbracoRedirect", -1);
 				
 				string redirectUrl = "#";
 				if (redirectId > 0)

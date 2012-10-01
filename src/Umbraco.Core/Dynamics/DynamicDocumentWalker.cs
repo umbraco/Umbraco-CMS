@@ -6,11 +6,11 @@ namespace Umbraco.Core.Dynamics
 {
 	internal static class DynamicDocumentWalker
 	{
-		public static DynamicDocument Up(this DynamicDocument context)
+		public static DynamicPublishedContent Up(this DynamicPublishedContent context)
 		{
 			return context.Up(0);
 		}
-		public static DynamicDocument Up(this DynamicDocument context, int number)
+		public static DynamicPublishedContent Up(this DynamicPublishedContent context, int number)
 		{
 			if (number == 0)
 			{
@@ -22,7 +22,7 @@ namespace Umbraco.Core.Dynamics
 				return context;
 			}
 		}
-		public static DynamicDocument Up(this DynamicDocument context, string nodeTypeAlias)
+		public static DynamicPublishedContent Up(this DynamicPublishedContent context, string nodeTypeAlias)
 		{
 			if (string.IsNullOrEmpty(nodeTypeAlias))
 			{
@@ -35,11 +35,11 @@ namespace Umbraco.Core.Dynamics
 			}
 		}
 
-		public static DynamicDocument Down(this DynamicDocument context)
+		public static DynamicPublishedContent Down(this DynamicPublishedContent context)
 		{
 			return context.Down(0);
 		}
-		public static DynamicDocument Down(this DynamicDocument context, int number)
+		public static DynamicPublishedContent Down(this DynamicPublishedContent context, int number)
 		{
 			var children = new DynamicDocumentList(context.Children);
 			if (number == 0)
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Dynamics
 			}
 			else
 			{
-				DynamicDocument working = context;
+				DynamicPublishedContent working = context;
 				while (number-- >= 0)
 				{
 					working = children.Items.First();
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Dynamics
 				return working;
 			}
 		}
-		public static DynamicDocument Down(this DynamicDocument context, string nodeTypeAlias)
+		public static DynamicPublishedContent Down(this DynamicPublishedContent context, string nodeTypeAlias)
 		{
 
 			if (string.IsNullOrEmpty(nodeTypeAlias))
@@ -70,11 +70,11 @@ namespace Umbraco.Core.Dynamics
 				return context.Descendants(nodeTypeAlias).Items.FirstOrDefault();
 			}
 		}
-		public static DynamicDocument Next(this DynamicDocument context)
+		public static DynamicPublishedContent Next(this DynamicPublishedContent context)
 		{
 			return context.Next(0);
 		}
-		public static DynamicDocument Next(this DynamicDocument context, int number)
+		public static DynamicPublishedContent Next(this DynamicPublishedContent context, int number)
 		{
 			if (context.OwnerList == null && context.Parent != null)
 			{
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Dynamics
 				throw new ArgumentNullException(string.Format("Node {0} has been orphaned and doesn't belong to a DynamicNodeList", context.Id));
 			}
 		}
-		public static DynamicDocument Sibling(this DynamicDocument context, int number)
+		public static DynamicPublishedContent Sibling(this DynamicPublishedContent context, int number)
 		{
 			if (context.OwnerList == null && context.Parent != null)
 			{
@@ -126,7 +126,7 @@ namespace Umbraco.Core.Dynamics
 				throw new ArgumentNullException(string.Format("Node {0} has been orphaned and doesn't belong to a DynamicNodeList", context.Id));
 			}
 		}
-		public static DynamicDocument Sibling(this DynamicDocument context, string nodeTypeAlias)
+		public static DynamicPublishedContent Sibling(this DynamicPublishedContent context, string nodeTypeAlias)
 		{
 			if (context.OwnerList == null && context.Parent != null)
 			{
@@ -166,7 +166,7 @@ namespace Umbraco.Core.Dynamics
 				throw new ArgumentNullException(string.Format("Node {0} has been orphaned and doesn't belong to a DynamicNodeList", context.Id));
 			}
 		}
-		public static DynamicDocument Next(this DynamicDocument context, string nodeTypeAlias)
+		public static DynamicPublishedContent Next(this DynamicPublishedContent context, string nodeTypeAlias)
 		{
 			if (context.OwnerList == null && context.Parent != null)
 			{
@@ -197,11 +197,11 @@ namespace Umbraco.Core.Dynamics
 				throw new ArgumentNullException(string.Format("Node {0} has been orphaned and doesn't belong to a DynamicNodeList", context.Id));
 			}
 		}
-		public static DynamicDocument Previous(this DynamicDocument context)
+		public static DynamicPublishedContent Previous(this DynamicPublishedContent context)
 		{
 			return context.Previous(0);
 		}
-		public static DynamicDocument Previous(this DynamicDocument context, int number)
+		public static DynamicPublishedContent Previous(this DynamicPublishedContent context, int number)
 		{
 			if (context.OwnerList == null && context.Parent != null)
 			{
@@ -211,7 +211,7 @@ namespace Umbraco.Core.Dynamics
 			}
 			if (context.OwnerList != null)
 			{
-				List<DynamicDocument> container = context.OwnerList.Items.ToList();
+				List<DynamicPublishedContent> container = context.OwnerList.Items.ToList();
 				int currentIndex = container.FindIndex(n => n.Id == context.Id);
 				if (currentIndex != -1)
 				{
@@ -227,7 +227,7 @@ namespace Umbraco.Core.Dynamics
 				throw new ArgumentNullException(string.Format("Node {0} has been orphaned and doesn't belong to a DynamicNodeList", context.Id));
 			}
 		}
-		public static DynamicDocument Previous(this DynamicDocument context, string nodeTypeAlias)
+		public static DynamicPublishedContent Previous(this DynamicPublishedContent context, string nodeTypeAlias)
 		{
 			if (context.OwnerList == null && context.Parent != null)
 			{
@@ -237,7 +237,7 @@ namespace Umbraco.Core.Dynamics
 			}
 			if (context.OwnerList != null)
 			{
-				List<DynamicDocument> container = context.OwnerList.Items.ToList();
+				List<DynamicPublishedContent> container = context.OwnerList.Items.ToList();
 				int currentIndex = container.FindIndex(n => n.Id == context.Id);
 				if (currentIndex != -1)
 				{

@@ -14,7 +14,7 @@ using umbraco.cms.businesslogic.web;
 namespace Umbraco.Tests.DynamicDocument
 {
 	[TestFixture]
-	public class DynamicDocumentTests : DynamicDocumentTestsBase<Umbraco.Core.Dynamics.DynamicDocument, DynamicDocumentList>
+	public class DynamicDocumentTests : DynamicDocumentTestsBase<Umbraco.Core.Dynamics.DynamicPublishedContent, DynamicDocumentList>
 	{
 		public override void Initialize()
 		{
@@ -36,7 +36,7 @@ namespace Umbraco.Tests.DynamicDocument
 			PropertyEditorValueConvertersResolver.Reset();
 		}
 
-		internal Core.Dynamics.DynamicDocument GetNode(int id)
+		internal Core.Dynamics.DynamicPublishedContent GetNode(int id)
 		{
 			//var template = Template.MakeNew("test", new User(0));
 			//var ctx = GetUmbracoContext("/test", template.Id);
@@ -44,7 +44,7 @@ namespace Umbraco.Tests.DynamicDocument
 			var contentStore = new DefaultPublishedContentStore();
 			var doc = contentStore.GetDocumentById(ctx, id);
 			Assert.IsNotNull(doc);
-			var dynamicNode = new Core.Dynamics.DynamicDocument(doc);
+			var dynamicNode = new Core.Dynamics.DynamicPublishedContent(doc);
 			Assert.IsNotNull(dynamicNode);
 			return dynamicNode;
 		}
@@ -71,7 +71,7 @@ namespace Umbraco.Tests.DynamicDocument
 		{
 			var helper = new TestHelper(GetNode(1173));
 			var doc = helper.GetDoc();
-			//HasProperty is only a prop on DynamicDocument, NOT IDocument
+			//HasProperty is only a prop on DynamicPublishedContent, NOT IPublishedContent
 			Assert.IsFalse(doc.GetType().GetProperties().Any(x => x.Name == "HasProperty"));
 		}
 
@@ -80,7 +80,7 @@ namespace Umbraco.Tests.DynamicDocument
 		{
 			var helper = new TestHelper(GetNode(1173));
 			var doc = helper.GetDocAsDynamic();
-			//HasProperty is only a prop on DynamicDocument, NOT IDocument
+			//HasProperty is only a prop on DynamicPublishedContent, NOT IPublishedContent
 			Assert.IsTrue(doc.HasProperty("umbracoUrlAlias"));
 		}
 
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.DynamicDocument
 			var helper = new TestHelper(GetNode(1173));
 			var doc = helper.GetDoc();
 			var ddoc = (dynamic) doc;
-			//HasProperty is only a prop on DynamicDocument, NOT IDocument
+			//HasProperty is only a prop on DynamicPublishedContent, NOT IPublishedContent
 			Assert.IsTrue(ddoc.HasProperty("umbracoUrlAlias"));
 		}
 
@@ -99,14 +99,14 @@ namespace Umbraco.Tests.DynamicDocument
 		/// </summary>
 		public class TestHelper
 		{
-			private readonly Core.Dynamics.DynamicDocument _doc;
+			private readonly Core.Dynamics.DynamicPublishedContent _doc;
 
-			public TestHelper(Core.Dynamics.DynamicDocument doc)
+			public TestHelper(Core.Dynamics.DynamicPublishedContent doc)
 			{
 				_doc = doc;
 			}
 
-			public IDocument GetDoc()
+			public IPublishedContent GetDoc()
 			{
 				return _doc;
 			}

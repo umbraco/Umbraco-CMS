@@ -20,7 +20,7 @@ namespace Umbraco.Web.Routing
 
 				if (doc != null)
 				{
-					docRequest.Document = doc;
+					docRequest.PublishedContent = doc;
 					return true;
 				}
 			}

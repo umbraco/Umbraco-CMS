@@ -10,7 +10,7 @@ using umbraco.interfaces;
 namespace umbraco.MacroEngines.Library
 {
 	/// <summary>
-	/// Extension methods for converting DynamicDocument to INode
+	/// Extension methods for converting DynamicPublishedContent to INode
 	/// </summary>
 	internal static class DynamicDocumentExtensions
 	{
@@ -20,20 +20,20 @@ namespace umbraco.MacroEngines.Library
 			return new PropertyResult(prop.Alias, prop.Value.ToString(), prop.Version);
 		}
 
-		internal static INode ConvertToNode(this DynamicDocument doc)
+		internal static INode ConvertToNode(this DynamicPublishedContent doc)
 		{
 			var node = new ConvertedNode(doc);	
 			return node;
 		}
 
 		/// <summary>
-		/// Internal custom INode class used for conversions from DynamicDocument
+		/// Internal custom INode class used for conversions from DynamicPublishedContent
 		/// </summary>
 		private class ConvertedNode : INode
 		{
-			private readonly DynamicDocument _doc;
+			private readonly DynamicPublishedContent _doc;
 
-			public ConvertedNode(DynamicDocument doc)
+			public ConvertedNode(DynamicPublishedContent doc)
 			{
 				_doc = doc;
 				template = doc.TemplateId;

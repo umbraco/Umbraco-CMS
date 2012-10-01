@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Dynamics
 {
-    internal class DynamicDocumentIdEqualityComparer : EqualityComparer<DynamicDocument>
+    internal class DynamicDocumentIdEqualityComparer : EqualityComparer<DynamicPublishedContent>
     {
 
-        public override bool Equals(DynamicDocument x, DynamicDocument y)
+        public override bool Equals(DynamicPublishedContent x, DynamicPublishedContent y)
         {
             //Check whether the compared objects reference the same data.
             if (Object.ReferenceEquals(x, y)) return true;
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Dynamics
 
         }
 
-        public override int GetHashCode(DynamicDocument obj)
+        public override int GetHashCode(DynamicPublishedContent obj)
         {
             if (Object.ReferenceEquals(obj, null)) return 0;
 

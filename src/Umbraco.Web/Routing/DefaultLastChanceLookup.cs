@@ -38,7 +38,7 @@ namespace Umbraco.Web.Routing
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		public bool TrySetDocument(DocumentRequest docRequest)
         {
-			docRequest.Document = HandlePageNotFound(docRequest);
+			docRequest.PublishedContent = HandlePageNotFound(docRequest);
             return docRequest.HasNode;
         }
 
@@ -46,12 +46,12 @@ namespace Umbraco.Web.Routing
 
 		//FIXME: this is temporary and should be obsoleted
 
-		IDocument HandlePageNotFound(DocumentRequest docRequest)
+		IPublishedContent HandlePageNotFound(DocumentRequest docRequest)
         {
 			LogHelper.Debug<DefaultLastChanceLookup>("Running for url='{0}'.", () => docRequest.Uri.AbsolutePath);
 			
 			//XmlNode currentPage = null;
-			IDocument currentPage = null;
+			IPublishedContent currentPage = null;
 
             foreach (var handler in GetNotFoundHandlers())
             {

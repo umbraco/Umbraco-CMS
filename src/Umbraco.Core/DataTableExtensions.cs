@@ -28,7 +28,7 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		/// <remarks>
 		/// This has been migrated from the Node class and uses proper locking now. It is now used by the Node class and the 
-		/// DynamicDocument extensions for legacy reasons.
+		/// DynamicPublishedContent extensions for legacy reasons.
 		/// </remarks>
 		public static DataTable GenerateDataTable(
 			string tableAlias, 						
