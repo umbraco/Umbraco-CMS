@@ -1,6 +1,7 @@
 ﻿using System.Web.Mvc;
 using System.Web.Routing;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Tests.Stubs;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
@@ -11,15 +12,22 @@ using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Tests.Routing
 {
-	[TestFixture(Ignore=true, IgnoreReason="Fails?")]
+	[TestFixture]
 	public class RenderRouteHandlerTests : BaseRoutingTest
 	{
 
 		public override void Initialize()
 		{
 			base.Initialize();
-			var webBoot = new WebBootManager(new UmbracoApplication());
-			//System.Configuration.ConfigurationManager.AppSettings.Set("umbracoPath", "???");
+			System.Configuration.ConfigurationManager.AppSettings.Set("umbracoPath", "~/umbraco");
+
+			SurfaceControllerResolver.Current = new SurfaceControllerResolver(
+				PluginManager.Current.ResolveSurfaceControllers());
+
+			var webBoot = new WebBootManager(new UmbracoApplication(), true);
+			//webBoot.Initialize();
+			//webBoot.Startup(null); -> don't call startup, we don't want any other application event handlers to bind for this test.
+			//webBoot.Complete(null);
 			webBoot.CreateRoutes();
 		}
 
@@ -27,6 +35,8 @@ namespace Umbraco.Tests.Routing
 		{
 			base.TearDown();
 			RouteTable.Routes.Clear();
+			System.Configuration.ConfigurationManager.AppSettings.Set("umbracoPath", "");
+			SurfaceControllerResolver.Reset();
 		}
 
 		/// <summary>

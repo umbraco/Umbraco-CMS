@@ -23,10 +23,22 @@ namespace Umbraco.Web
 	/// </summary>
 	internal class WebBootManager : CoreBootManager
 	{
+		private readonly bool _isForTesting;
 		private readonly UmbracoApplication _umbracoApplication;
 
 		public WebBootManager(UmbracoApplication umbracoApplication)
+			: this(umbracoApplication, false)
 		{
+		}
+
+		/// <summary>
+		/// Constructor for unit tests, ensures some resolvers are not initialized
+		/// </summary>
+		/// <param name="umbracoApplication"></param>
+		/// <param name="isForTesting"></param>
+		internal WebBootManager(UmbracoApplication umbracoApplication, bool isForTesting)
+		{
+			_isForTesting = isForTesting;
 			_umbracoApplication = umbracoApplication;
 			if (umbracoApplication == null) throw new ArgumentNullException("umbracoApplication");
 		}
@@ -206,7 +218,7 @@ namespace Umbraco.Web
 						typeof (LookupByAlias)
 					});
 
-			RoutesCacheResolver.Current = new RoutesCacheResolver(new DefaultRoutesCache());
+			RoutesCacheResolver.Current = new RoutesCacheResolver(new DefaultRoutesCache(_isForTesting == false));
 
 			ThumbnailProvidersResolver.Current = new ThumbnailProvidersResolver(
 				PluginManager.Current.ResolveThumbnailProviders());

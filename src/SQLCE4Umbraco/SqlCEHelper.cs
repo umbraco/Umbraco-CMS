@@ -51,7 +51,7 @@ namespace SqlCE4Umbraco
         internal void ClearDatabase()
         {
             var localConnection = new SqlCeConnection(ConnectionString);
-            if (!System.IO.File.Exists(ReplaceDataDirectory(localConnection.Database)))
+            if (System.IO.File.Exists(ReplaceDataDirectory(localConnection.Database)))
             {
                 var tables = new List<string>();
                 using (var reader = ExecuteReader("select table_name from information_schema.tables where TABLE_TYPE <> 'VIEW'"))

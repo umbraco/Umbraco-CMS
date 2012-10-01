@@ -1,7 +1,9 @@
+using System.IO;
 using System.Web.Routing;
 using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
@@ -24,6 +26,11 @@ namespace Umbraco.Tests.TestHelpers
 				TestHelper.InitializeDatabase();
 			Resolution.Freeze();
 			ApplicationContext = new ApplicationContext() { IsReady = true };
+			//we need to clear out all currently created template files
+			var masterPages = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Masterpages));
+			masterPages.GetFiles().ForEach(x => x.Delete());
+			var mvcViews = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.MvcViews));
+			mvcViews.GetFiles().ForEach(x => x.Delete());
 		}
 
 		[TearDown]
