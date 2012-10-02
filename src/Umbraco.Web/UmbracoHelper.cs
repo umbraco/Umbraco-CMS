@@ -330,24 +330,24 @@ namespace Umbraco.Web
 
 		#region Content
 
-		public IPublishedContent ContentTyped(int id)
+		public IPublishedContent TypedContent(int id)
 		{
-			return DocumentTypedById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
+			return TypedDocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
 		}
 
-		public IPublishedContent ContentTyped(string id)
+		public IPublishedContent TypedContent(string id)
 		{
-			return DocumentTypedById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
+			return TypedDocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
 		}
 
-		public IEnumerable<IPublishedContent> ContentTyped(params int[] ids)
+		public IEnumerable<IPublishedContent> TypedContent(params int[] ids)
 		{
-			return DocumentsTypedByIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
+			return TypedDocumentsbyIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
 		}
 
-		public IEnumerable<IPublishedContent> ContentTyped(params string[] ids)
+		public IEnumerable<IPublishedContent> TypedContent(params string[] ids)
 		{
-			return DocumentsTypedByIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
+			return TypedDocumentsbyIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
 		}
 
 		public dynamic Content(int id)
@@ -374,24 +374,24 @@ namespace Umbraco.Web
 
 		#region Media
 
-		public IPublishedContent MediaTyped(int id)
+		public IPublishedContent TypedMedia(int id)
 		{
-			return DocumentTypedById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
+			return TypedDocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
 		}
 
-		public IPublishedContent MediaTyped(string id)
+		public IPublishedContent TypedMedia(string id)
 		{
-			return DocumentTypedById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
+			return TypedDocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
 		}
 
-		public IEnumerable<IPublishedContent> MediaTyped(params int[] ids)
+		public IEnumerable<IPublishedContent> TypedMedia(params int[] ids)
 		{
-			return DocumentsTypedByIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
+			return TypedDocumentsbyIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
 		}
 
-		public IEnumerable<IPublishedContent> MediaTyped(params string[] ids)
+		public IEnumerable<IPublishedContent> TypedMedia(params string[] ids)
 		{
-			return DocumentsTypedByIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
+			return TypedDocumentsbyIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
 		}
 
 		public dynamic Media(int id)
@@ -418,13 +418,13 @@ namespace Umbraco.Web
 
 		#region Used by Content/Media
 
-		private IPublishedContent DocumentTypedById(int id, IPublishedStore store)
+		private IPublishedContent TypedDocumentById(int id, IPublishedStore store)
 		{
 			var doc = store.GetDocumentById(UmbracoContext.Current, id);
 			return doc;
 		}
 
-		private IPublishedContent DocumentTypedById(string id, IPublishedStore store)
+		private IPublishedContent TypedDocumentById(string id, IPublishedStore store)
 		{
 			int docId;
 			return int.TryParse(id, out docId)
@@ -432,14 +432,14 @@ namespace Umbraco.Web
 				       : null;
 		}
 
-		private IEnumerable<IPublishedContent> DocumentsTypedByIds(IPublishedStore store, params int[] ids)
+		private IEnumerable<IPublishedContent> TypedDocumentsbyIds(IPublishedStore store, params int[] ids)
 		{
-			return ids.Select(eachId => DocumentTypedById(eachId, store));
+			return ids.Select(eachId => TypedDocumentById(eachId, store));
 		}
 
-		private IEnumerable<IPublishedContent> DocumentsTypedByIds(IPublishedStore store, params string[] ids)
+		private IEnumerable<IPublishedContent> TypedDocumentsbyIds(IPublishedStore store, params string[] ids)
 		{
-			return ids.Select(eachId => DocumentTypedById(eachId, store));
+			return ids.Select(eachId => TypedDocumentById(eachId, store));
 		}
 
 		private dynamic DocumentById(int id, IPublishedStore store)
