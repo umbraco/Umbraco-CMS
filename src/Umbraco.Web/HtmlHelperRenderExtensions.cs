@@ -366,6 +366,12 @@ namespace Umbraco.Web
 										  object additionalRouteVals = null)
 		{
 
+			//ensure that the multipart/form-data is added to the html attributes
+			if (!htmlAttributes.ContainsKey("enctype"))
+			{
+				htmlAttributes.Add("enctype", "multipart/form-data");
+			}
+
 			var tagBuilder = new TagBuilder("form");
 			tagBuilder.MergeAttributes(htmlAttributes);
 			// action is implicitly generated, so htmlAttributes take precedence.
