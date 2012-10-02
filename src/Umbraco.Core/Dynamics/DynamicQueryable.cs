@@ -214,7 +214,7 @@ namespace Umbraco.Core.Dynamics
                     //reroute each stacked Expression.Call into our own methods that know how to deal
                     //with DynamicNode
                     queryExpr = Expression.Call(
-                            typeof(DynamicDocumentListOrdering),
+                            typeof(DynamicPublishedContentListOrdering),
                             o.Ascending ? methodAsc : methodDesc,
                             null,
                             queryExpr,

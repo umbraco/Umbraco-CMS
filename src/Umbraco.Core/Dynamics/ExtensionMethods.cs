@@ -32,7 +32,7 @@ namespace Umbraco.Core.Dynamics
         }
 
 
-        public static DynamicDocumentList Random(this DynamicDocumentList all, int min, int max)
+        public static DynamicPublishedContentList Random(this DynamicPublishedContentList all, int min, int max)
         {
             //get a random number generator
             Random r = new Random();
@@ -41,13 +41,13 @@ namespace Umbraco.Core.Dynamics
             //Call the other method
             return Random(all, Number);
         }
-        public static DynamicDocumentList Random(this DynamicDocumentList all, int max)
+        public static DynamicPublishedContentList Random(this DynamicPublishedContentList all, int max)
         {
             //Randomly order the items in the set by a Guid, Take the correct number, and return this wrapped in a new DynamicNodeList
-            return new DynamicDocumentList(all.Items.OrderBy(x => Guid.NewGuid()).Take(max));
+            return new DynamicPublishedContentList(all.Items.OrderBy(x => Guid.NewGuid()).Take(max));
         }
 
-        public static DynamicPublishedContent Random(this DynamicDocumentList all)
+        public static DynamicPublishedContent Random(this DynamicPublishedContentList all)
         {
             return all.Items.OrderBy(x => Guid.NewGuid()).First();
         }

@@ -12,7 +12,7 @@ namespace Umbraco.Web
 	/// </summary>
 	internal static class ExamineExtensions
 	{
-		internal static DynamicDocumentList ConvertSearchResultToDynamicDocument(
+		internal static DynamicPublishedContentList ConvertSearchResultToDynamicDocument(
 			this IEnumerable<SearchResult> results,
 			IPublishedStore store)
 		{
@@ -20,7 +20,7 @@ namespace Umbraco.Web
 			// however thsi is currently not the case: 
 			// http://examine.codeplex.com/workitem/10350
 
-			var list = new DynamicDocumentList();
+			var list = new DynamicPublishedContentList();
 			var xd = new XmlDocument();
 
 			foreach (var result in results.OrderByDescending(x => x.Score))

@@ -12,7 +12,7 @@ namespace umbraco.MacroEngines.Library
 	/// <summary>
 	/// Extension methods for converting DynamicPublishedContent to INode
 	/// </summary>
-	internal static class DynamicDocumentExtensions
+	internal static class DynamicPublishedContentExtensions
 	{
 		
 		internal static IProperty ConvertToNodeProperty(this IDocumentProperty prop)

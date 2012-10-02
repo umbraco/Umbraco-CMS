@@ -3,7 +3,7 @@ using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Tests.DynamicDocument
 {
-	public static class DynamicDocumentCustomExtensionMethods
+	public static class DynamicPublishedContentCustomExtensionMethods
 	{
 
 		public static string DynamicDocumentNoParameters(this Core.Dynamics.DynamicPublishedContent doc)
@@ -21,7 +21,7 @@ namespace Umbraco.Tests.DynamicDocument
 			return custom + i + b;
 		}
 	
-		public static string DynamicDocumentListMultiParam(this DynamicDocumentList doc, string custom, int i, bool b)
+		public static string DynamicDocumentListMultiParam(this DynamicPublishedContentList doc, string custom, int i, bool b)
 		{
 			return custom + i + b;
 		}

@@ -13,7 +13,7 @@ namespace Umbraco.Core.Dynamics
 
         public IEnumerator<T> GetEnumerator()
         {
-            var temp = new DynamicDocumentList(Elements.Cast<DynamicPublishedContent>());
+            var temp = new DynamicPublishedContentList(Elements.Cast<DynamicPublishedContent>());
             return (IEnumerator<T>)temp.GetEnumerator();
         }
         IEnumerator IEnumerable.GetEnumerator()
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Dynamics
             return (IEnumerator)GetEnumerator();
         }
 
-        public DynamicDocumentList OrderBy(string ordering)
+        public DynamicPublishedContentList OrderBy(string ordering)
         {
             bool descending = false;
             if (ordering.IndexOf(" descending", StringComparison.CurrentCultureIgnoreCase) >= 0)
@@ -37,7 +37,7 @@ namespace Umbraco.Core.Dynamics
 
             if (!descending)
             {
-                return new DynamicDocumentList(Elements.OrderBy(item =>
+                return new DynamicPublishedContentList(Elements.OrderBy(item =>
                 {
                     object key = null;
                     (item as DynamicObject).TryGetMember(new DynamicQueryableGetMemberBinder(ordering, false), out key);
@@ -46,7 +46,7 @@ namespace Umbraco.Core.Dynamics
             }
             else
             {
-                return new DynamicDocumentList(Elements.OrderByDescending(item =>
+                return new DynamicPublishedContentList(Elements.OrderByDescending(item =>
                 {
                     object key = null;
                     (item as DynamicObject).TryGetMember(new DynamicQueryableGetMemberBinder(ordering, false), out key);

@@ -16,7 +16,7 @@ namespace Umbraco.Web
 	/// These methods exist in the web project as we need access to web based classes like NiceUrl provider
 	/// which is why they cannot exist in the Core project.
 	/// </remarks>
-	public static class DocumentExtensions
+	public static class PublishedContentExtensions
 	{	
 
 		/// <summary>

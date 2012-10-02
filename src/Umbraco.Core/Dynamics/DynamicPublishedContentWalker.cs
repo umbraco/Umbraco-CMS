@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Umbraco.Core.Dynamics
 {
-	internal static class DynamicDocumentWalker
+	internal static class DynamicPublishedContentWalker
 	{
 		public static DynamicPublishedContent Up(this DynamicPublishedContent context)
 		{
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Dynamics
 		}
 		public static DynamicPublishedContent Down(this DynamicPublishedContent context, int number)
 		{
-			var children = new DynamicDocumentList(context.Children);
+			var children = new DynamicPublishedContentList(context.Children);
 			if (number == 0)
 			{
 				return children.Items.First();
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Dynamics
 				while (number-- >= 0)
 				{
 					working = children.Items.First();
-					children = new DynamicDocumentList(working.Children);
+					children = new DynamicPublishedContentList(working.Children);
 				}
 				return working;
 			}
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Dynamics
 
 			if (string.IsNullOrEmpty(nodeTypeAlias))
 			{
-				var children = new DynamicDocumentList(context.Children);
+				var children = new DynamicPublishedContentList(context.Children);
 				return children.Items.First();
 			}
 			else
@@ -80,7 +80,7 @@ namespace Umbraco.Core.Dynamics
 			{
 				//var list = context.Parent.Children.Select(n => new DynamicNode(n));
 				var list = context.Parent.Children;
-				context.OwnerList = new DynamicDocumentList(list);
+				context.OwnerList = new DynamicPublishedContentList(list);
 			}
 			if (context.OwnerList != null)
 			{
@@ -106,7 +106,7 @@ namespace Umbraco.Core.Dynamics
 			{
 				//var list = context.Parent.Children.Select(n => new DynamicNode(n));
 				var list = context.Parent.Children;
-				context.OwnerList = new DynamicDocumentList(list);
+				context.OwnerList = new DynamicPublishedContentList(list);
 			}
 			if (context.OwnerList != null)
 			{
@@ -132,7 +132,7 @@ namespace Umbraco.Core.Dynamics
 			{
 				//var list = context.Parent.Children.Select(n => new DynamicNode(n));
 				var list = context.Parent.Children;
-				context.OwnerList = new DynamicDocumentList(list);
+				context.OwnerList = new DynamicPublishedContentList(list);
 			}
 			if (context.OwnerList != null)
 			{
@@ -172,7 +172,7 @@ namespace Umbraco.Core.Dynamics
 			{
 				//var list = context.Parent.Children.Select(n => new DynamicNode(n));
 				var list = context.Parent.Children;
-				context.OwnerList = new DynamicDocumentList(list);
+				context.OwnerList = new DynamicPublishedContentList(list);
 			}
 			if (context.OwnerList != null)
 			{
@@ -207,7 +207,7 @@ namespace Umbraco.Core.Dynamics
 			{
 				//var list = context.Parent.Children.Select(n => new DynamicNode(n));
 				var list = context.Parent.Children;
-				context.OwnerList = new DynamicDocumentList(list);
+				context.OwnerList = new DynamicPublishedContentList(list);
 			}
 			if (context.OwnerList != null)
 			{
@@ -233,7 +233,7 @@ namespace Umbraco.Core.Dynamics
 			{
 				//var list = context.Parent.Children.Select(n => new DynamicNode(n));
 				var list = context.Parent.Children;
-				context.OwnerList = new DynamicDocumentList(list);
+				context.OwnerList = new DynamicPublishedContentList(list);
 			}
 			if (context.OwnerList != null)
 			{

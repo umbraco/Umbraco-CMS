@@ -463,7 +463,7 @@ namespace Umbraco.Web
 			var nodes = ids.Select(eachId => DocumentById(eachId, store))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
 				.Cast<DynamicPublishedContent>();
-			return new DynamicDocumentList(nodes);
+			return new DynamicPublishedContentList(nodes);
 		}
 
 		private dynamic DocumentByIds(IPublishedStore store, params string[] ids)
@@ -471,7 +471,7 @@ namespace Umbraco.Web
 			var nodes = ids.Select(eachId => DocumentById(eachId, store))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
 				.Cast<DynamicPublishedContent>();
-			return new DynamicDocumentList(nodes);
+			return new DynamicPublishedContentList(nodes);
 		}
 
 		#endregion

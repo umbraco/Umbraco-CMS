@@ -13,7 +13,7 @@ namespace Umbraco.Core.Dynamics
             return this;
         }
 
-        public DynamicGrouping(DynamicDocumentList list, string groupBy)
+        public DynamicGrouping(DynamicPublishedContentList list, string groupBy)
         {
             Inner =
               list
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Dynamics
               .Select(node =>
                 {
                     string predicate = groupBy;
-                    var internalList = new DynamicDocumentList(new DynamicPublishedContent[] { node });
+                    var internalList = new DynamicPublishedContentList(new DynamicPublishedContent[] { node });
                     var query = (IQueryable<object>)internalList.Select(predicate, new object[] { });
                     var key = query.FirstOrDefault();
                     return new

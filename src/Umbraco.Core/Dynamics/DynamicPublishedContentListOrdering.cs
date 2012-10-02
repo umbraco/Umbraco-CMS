@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace Umbraco.Core.Dynamics
 {
-    internal static class DynamicDocumentListOrdering
+    internal static class DynamicPublishedContentListOrdering
     {
 
         private static TOut Reduce<TOut>(Func<DynamicPublishedContent, TOut> func, DynamicPublishedContent publishedContent)

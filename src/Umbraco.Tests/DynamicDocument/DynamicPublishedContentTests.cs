@@ -14,7 +14,7 @@ using umbraco.cms.businesslogic.web;
 namespace Umbraco.Tests.DynamicDocument
 {
 	[TestFixture]
-	public class DynamicDocumentTests : DynamicDocumentTestsBase<Umbraco.Core.Dynamics.DynamicPublishedContent, DynamicDocumentList>
+	public class DynamicPublishedContentTests : DynamicDocumentTestsBase<Umbraco.Core.Dynamics.DynamicPublishedContent, DynamicPublishedContentList>
 	{
 		public override void Initialize()
 		{

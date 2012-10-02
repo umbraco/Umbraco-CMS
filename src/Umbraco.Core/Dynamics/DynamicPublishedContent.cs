@@ -20,10 +20,10 @@ namespace Umbraco.Core.Dynamics
 	public class DynamicPublishedContent : DynamicObject, IPublishedContent
 	{
 		private readonly IPublishedContent _publishedContent;
-		private DynamicDocumentList _cachedChildren;
+		private DynamicPublishedContentList _cachedChildren;
 		private readonly ConcurrentDictionary<string, object> _cachedMemberOutput = new ConcurrentDictionary<string, object>();
 
-		internal DynamicDocumentList OwnerList { get; set; }
+		internal DynamicPublishedContentList OwnerList { get; set; }
 
 		#region Constructors
 
@@ -56,60 +56,60 @@ namespace Umbraco.Core.Dynamics
 		#region Traversal
 		public DynamicPublishedContent Up()
 		{
-			return DynamicDocumentWalker.Up(this);
+			return DynamicPublishedContentWalker.Up(this);
 		}
 		public DynamicPublishedContent Up(int number)
 		{
-			return DynamicDocumentWalker.Up(this, number);
+			return DynamicPublishedContentWalker.Up(this, number);
 		}
 		public DynamicPublishedContent Up(string nodeTypeAlias)
 		{
-			return DynamicDocumentWalker.Up(this, nodeTypeAlias);
+			return DynamicPublishedContentWalker.Up(this, nodeTypeAlias);
 		}
 		public DynamicPublishedContent Down()
 		{
-			return DynamicDocumentWalker.Down(this);
+			return DynamicPublishedContentWalker.Down(this);
 		}
 		public DynamicPublishedContent Down(int number)
 		{
-			return DynamicDocumentWalker.Down(this, number);
+			return DynamicPublishedContentWalker.Down(this, number);
 		}
 		public DynamicPublishedContent Down(string nodeTypeAlias)
 		{
-			return DynamicDocumentWalker.Down(this, nodeTypeAlias);
+			return DynamicPublishedContentWalker.Down(this, nodeTypeAlias);
 		}
 		public DynamicPublishedContent Next()
 		{
-			return DynamicDocumentWalker.Next(this);
+			return DynamicPublishedContentWalker.Next(this);
 		}
 		public DynamicPublishedContent Next(int number)
 		{
-			return DynamicDocumentWalker.Next(this, number);
+			return DynamicPublishedContentWalker.Next(this, number);
 		}
 		public DynamicPublishedContent Next(string nodeTypeAlias)
 		{
-			return DynamicDocumentWalker.Next(this, nodeTypeAlias);
+			return DynamicPublishedContentWalker.Next(this, nodeTypeAlias);
 		}
 
 		public DynamicPublishedContent Previous()
 		{
-			return DynamicDocumentWalker.Previous(this);
+			return DynamicPublishedContentWalker.Previous(this);
 		}
 		public DynamicPublishedContent Previous(int number)
 		{
-			return DynamicDocumentWalker.Previous(this, number);
+			return DynamicPublishedContentWalker.Previous(this, number);
 		}
 		public DynamicPublishedContent Previous(string nodeTypeAlias)
 		{
-			return DynamicDocumentWalker.Previous(this, nodeTypeAlias);
+			return DynamicPublishedContentWalker.Previous(this, nodeTypeAlias);
 		}
 		public DynamicPublishedContent Sibling(int number)
 		{
-			return DynamicDocumentWalker.Sibling(this, number);
+			return DynamicPublishedContentWalker.Sibling(this, number);
 		}
 		public DynamicPublishedContent Sibling(string nodeTypeAlias)
 		{
-			return DynamicDocumentWalker.Sibling(this, nodeTypeAlias);
+			return DynamicPublishedContentWalker.Sibling(this, nodeTypeAlias);
 		} 
 		#endregion
 
@@ -237,11 +237,11 @@ namespace Umbraco.Core.Dynamics
 				}				
 				if (result is IEnumerable<IPublishedContent>)
 				{
-					result = new DynamicDocumentList((IEnumerable<IPublishedContent>)result);
+					result = new DynamicPublishedContentList((IEnumerable<IPublishedContent>)result);
 				}
 				if (result is IEnumerable<DynamicPublishedContent>)
 				{
-					result = new DynamicDocumentList((IEnumerable<DynamicPublishedContent>)result);
+					result = new DynamicPublishedContentList((IEnumerable<DynamicPublishedContent>)result);
 				}				
 			}
 			return result;
@@ -289,7 +289,7 @@ namespace Umbraco.Core.Dynamics
 			if (filteredTypeChildren.Any())
 			{
 				return new Attempt<object>(true,
-				                           new DynamicDocumentList(filteredTypeChildren.Select(x => new DynamicPublishedContent(x))));
+				                           new DynamicPublishedContentList(filteredTypeChildren.Select(x => new DynamicPublishedContent(x))));
 			}
 			return Attempt<object>.False;
 		}
@@ -342,7 +342,7 @@ namespace Umbraco.Core.Dynamics
 			}
 
 			//get the data type id for the current property
-			var dataType = DynamicDocumentDataSourceResolver.Current.DataSource.GetDataType(userProperty.DocumentTypeAlias, userProperty.Alias);
+			var dataType = DynamicPublishedContentDataSourceResolver.Current.DataSource.GetDataType(userProperty.DocumentTypeAlias, userProperty.Alias);
 
 			//convert the string value to a known type
 			var converted = ConvertPropertyValue(result, dataType, userProperty.DocumentTypeAlias, userProperty.Alias);
@@ -680,13 +680,13 @@ namespace Umbraco.Core.Dynamics
 		{
 			return AncestorOrSelf(node => node.DocumentTypeAlias == nodeTypeAlias);
 		}
-		public DynamicPublishedContent AncestorOrSelf(Func<DynamicPublishedContent, bool> func)
+		public DynamicPublishedContent AncestorOrSelf(Func<IPublishedContent, bool> func)
 		{
 			var node = this;
 			while (node != null)
 			{
 				if (func(node)) return node;
-				DynamicPublishedContent parent = node.Parent;
+				var parent = node.Parent;
 				if (parent != null)
 				{
 					if (this != parent)
@@ -705,15 +705,15 @@ namespace Umbraco.Core.Dynamics
 			}
 			return node;
 		}
-		public DynamicDocumentList AncestorsOrSelf(Func<DynamicPublishedContent, bool> func)
+		public DynamicPublishedContentList AncestorsOrSelf(Func<IPublishedContent, bool> func)
 		{
-			var ancestorList = new List<DynamicPublishedContent>();
+			var ancestorList = new List<IPublishedContent>();
 			var node = this;
 			ancestorList.Add(node);
 			while (node != null)
 			{
 				if (node.Level == 1) break;
-				DynamicPublishedContent parent = node.Parent;
+				var parent = node.Parent;
 				if (parent != null)
 				{
 					if (this != parent)
@@ -735,50 +735,50 @@ namespace Umbraco.Core.Dynamics
 				}
 			}
 			ancestorList.Reverse();
-			return new DynamicDocumentList(ancestorList);
+			return new DynamicPublishedContentList(ancestorList);
 		}
-		public DynamicDocumentList AncestorsOrSelf()
+		public DynamicPublishedContentList AncestorsOrSelf()
 		{
 			return AncestorsOrSelf(n => true);
 		}
-		public DynamicDocumentList AncestorsOrSelf(string nodeTypeAlias)
+		public DynamicPublishedContentList AncestorsOrSelf(string nodeTypeAlias)
 		{
 			return AncestorsOrSelf(n => n.DocumentTypeAlias == nodeTypeAlias);
 		}
-		public DynamicDocumentList AncestorsOrSelf(int level)
+		public DynamicPublishedContentList AncestorsOrSelf(int level)
 		{
 			return AncestorsOrSelf(n => n.Level <= level);
 		}
-		public DynamicDocumentList Descendants(string nodeTypeAlias)
+		public DynamicPublishedContentList Descendants(string nodeTypeAlias)
 		{
 			return Descendants(p => p.DocumentTypeAlias == nodeTypeAlias);
 		}
-		public DynamicDocumentList Descendants(int level)
+		public DynamicPublishedContentList Descendants(int level)
 		{
 			return Descendants(p => p.Level >= level);
 		}
-		public DynamicDocumentList Descendants()
+		public DynamicPublishedContentList Descendants()
 		{
 			return Descendants(n => true);
 		}
-		internal DynamicDocumentList Descendants(Func<IPublishedContent, bool> func)
+		internal DynamicPublishedContentList Descendants(Func<IPublishedContent, bool> func)
 		{
 			var flattenedNodes = this._publishedContent.Children.Map(func, (IPublishedContent n) => n.Children);
-			return new DynamicDocumentList(flattenedNodes.ToList().ConvertAll(dynamicBackingItem => new DynamicPublishedContent(dynamicBackingItem)));
+			return new DynamicPublishedContentList(flattenedNodes.ToList().ConvertAll(dynamicBackingItem => new DynamicPublishedContent(dynamicBackingItem)));
 		}
-		public DynamicDocumentList DescendantsOrSelf(int level)
+		public DynamicPublishedContentList DescendantsOrSelf(int level)
 		{
 			return DescendantsOrSelf(p => p.Level >= level);
 		}
-		public DynamicDocumentList DescendantsOrSelf(string nodeTypeAlias)
+		public DynamicPublishedContentList DescendantsOrSelf(string nodeTypeAlias)
 		{
 			return DescendantsOrSelf(p => p.DocumentTypeAlias == nodeTypeAlias);
 		}
-		public DynamicDocumentList DescendantsOrSelf()
+		public DynamicPublishedContentList DescendantsOrSelf()
 		{
 			return DescendantsOrSelf(p => true);
 		}
-		internal DynamicDocumentList DescendantsOrSelf(Func<IPublishedContent, bool> func)
+		internal DynamicPublishedContentList DescendantsOrSelf(Func<IPublishedContent, bool> func)
 		{
 			if (this._publishedContent != null)
 			{
@@ -788,30 +788,30 @@ namespace Umbraco.Core.Dynamics
 					thisNode.Add(this._publishedContent);
 				}
 				var flattenedNodes = this._publishedContent.Children.Map(func, (IPublishedContent n) => n.Children);
-				return new DynamicDocumentList(thisNode.Concat(flattenedNodes).ToList().ConvertAll(dynamicBackingItem => new DynamicPublishedContent(dynamicBackingItem)));
+				return new DynamicPublishedContentList(thisNode.Concat(flattenedNodes).ToList().ConvertAll(dynamicBackingItem => new DynamicPublishedContent(dynamicBackingItem)));
 			}
-			return new DynamicDocumentList(Enumerable.Empty<IPublishedContent>());
+			return new DynamicPublishedContentList(Enumerable.Empty<IPublishedContent>());
 		}
-		public DynamicDocumentList Ancestors(int level)
+		public DynamicPublishedContentList Ancestors(int level)
 		{
 			return Ancestors(n => n.Level <= level);
 		}
-		public DynamicDocumentList Ancestors(string nodeTypeAlias)
+		public DynamicPublishedContentList Ancestors(string nodeTypeAlias)
 		{
 			return Ancestors(n => n.DocumentTypeAlias == nodeTypeAlias);
 		}
-		public DynamicDocumentList Ancestors()
+		public DynamicPublishedContentList Ancestors()
 		{
 			return Ancestors(n => true);
 		}
-		public DynamicDocumentList Ancestors(Func<DynamicPublishedContent, bool> func)
+		public DynamicPublishedContentList Ancestors(Func<IPublishedContent, bool> func)
 		{
-			var ancestorList = new List<DynamicPublishedContent>();
+			var ancestorList = new List<IPublishedContent>();
 			var node = this;
 			while (node != null)
 			{
 				if (node.Level == 1) break;
-				DynamicPublishedContent parent = node.Parent;
+				var parent = node.Parent;
 				if (parent != null)
 				{
 					if (this != parent)
@@ -833,7 +833,7 @@ namespace Umbraco.Core.Dynamics
 				}
 			}
 			ancestorList.Reverse();
-			return new DynamicDocumentList(ancestorList);
+			return new DynamicPublishedContentList(ancestorList);
 		}
 		public DynamicPublishedContent Parent
 		{
@@ -956,11 +956,11 @@ namespace Umbraco.Core.Dynamics
 					//testing, think this must be a special case for the root node ?
 					if (!children.Any() && _publishedContent.Id == 0)
 					{
-						_cachedChildren = new DynamicDocumentList(new List<DynamicPublishedContent> { new DynamicPublishedContent(this._publishedContent) });
+						_cachedChildren = new DynamicPublishedContentList(new List<DynamicPublishedContent> { new DynamicPublishedContent(this._publishedContent) });
 					}
 					else
 					{
-						_cachedChildren = new DynamicDocumentList(_publishedContent.Children.Select(x => new DynamicPublishedContent(x)));
+						_cachedChildren = new DynamicPublishedContentList(_publishedContent.Children.Select(x => new DynamicPublishedContent(x)));
 					}
 				}
 				return _cachedChildren;
@@ -1042,7 +1042,7 @@ namespace Umbraco.Core.Dynamics
 			{
 				//var list = this.Parent.Children.Select(n => new DynamicNode(n));
 				var list = this.Parent.Children;
-				this.OwnerList = new DynamicDocumentList(list);
+				this.OwnerList = new DynamicPublishedContentList(list);
 			}
 			if (this.OwnerList != null)
 			{
@@ -1357,15 +1357,15 @@ namespace Umbraco.Core.Dynamics
 			var descendants = this.DescendantsOrSelf();
 			return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null, valueIfTrue, valueIfFalse);
 		}
-		public bool IsHelper(Func<DynamicPublishedContent, bool> test)
+		private bool IsHelper(Func<DynamicPublishedContent, bool> test)
 		{
 			return test(this);
 		}
-		public HtmlString IsHelper(Func<DynamicPublishedContent, bool> test, string valueIfTrue)
+		private HtmlString IsHelper(Func<DynamicPublishedContent, bool> test, string valueIfTrue)
 		{
 			return IsHelper(test, valueIfTrue, string.Empty);
 		}
-		public HtmlString IsHelper(Func<DynamicPublishedContent, bool> test, string valueIfTrue, string valueIfFalse)
+		private HtmlString IsHelper(Func<DynamicPublishedContent, bool> test, string valueIfTrue, string valueIfFalse)
 		{
 			return test(this) ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
 		} 
@@ -1388,7 +1388,7 @@ namespace Umbraco.Core.Dynamics
 		public bool Where(string predicate)
 		{
 			//Totally gonna cheat here
-			var dynamicDocumentList = new DynamicDocumentList();
+			var dynamicDocumentList = new DynamicPublishedContentList();
 			dynamicDocumentList.Add(this);
 			var filtered = dynamicDocumentList.Where<DynamicPublishedContent>(predicate);
 			if (Queryable.Count(filtered) == 1)

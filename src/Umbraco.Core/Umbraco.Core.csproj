@@ -69,11 +69,11 @@
     <Compile Include="Dynamics\DynamicExpression.cs" />
     <Compile Include="Dynamics\DynamicGrouping.cs" />
     <Compile Include="Dynamics\DynamicPublishedContent.cs" />
-    <Compile Include="Dynamics\DynamicDocumentDataSourceResolver.cs" />
-    <Compile Include="Dynamics\DynamicDocumentIdEqualityComparer.cs" />
-    <Compile Include="Dynamics\DynamicDocumentList.cs" />
-    <Compile Include="Dynamics\DynamicDocumentListOrdering.cs" />
-    <Compile Include="Dynamics\DynamicDocumentWalker.cs" />
+    <Compile Include="Dynamics\DynamicPublishedContentDataSourceResolver.cs" />
+    <Compile Include="Dynamics\DynamicPublishedContentIdEqualityComparer.cs" />
+    <Compile Include="Dynamics\DynamicPublishedContentList.cs" />
+    <Compile Include="Dynamics\DynamicPublishedContentListOrdering.cs" />
+    <Compile Include="Dynamics\DynamicPublishedContentWalker.cs" />
     <Compile Include="Dynamics\DynamicNull.cs" />
     <Compile Include="Dynamics\DynamicOrdering.cs" />
     <Compile Include="Dynamics\DynamicProperty.cs" />
@@ -95,7 +95,7 @@
     <Compile Include="ObjectResolution\WeightedPluginAttribute.cs" />
     <Compile Include="PropertyEditors\DatePickerPropertyEditorValueConverter.cs" />
     <Compile Include="PropertyEditors\IPropertyEditorValueConverter.cs" />
-    <Compile Include="Dynamics\IDynamicDocumentDataSource.cs" />
+    <Compile Include="Dynamics\IDynamicPublishedContentDataSource.cs" />
     <Compile Include="Dynamics\ParseException.cs" />
     <Compile Include="Dynamics\PropertyResult.cs" />
     <Compile Include="Dynamics\Res.cs" />

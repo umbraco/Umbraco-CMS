@@ -1,5 +1,4 @@
-using System;
-using System.Collections.Generic;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Dynamics
 {
@@ -8,9 +7,13 @@ namespace Umbraco.Core.Dynamics
 	/// and currently the business logic part of Umbraco is still in the legacy project and we don't want to move that to the core so in the
 	/// meantime until the new APIs are made, we need to have this data source in place with a resolver which is set in the web project.
 	/// </summary>
-	internal interface IDynamicDocumentDataSource
+	internal class DynamicPublishedContentDataSourceResolver : SingleObjectResolverBase<DynamicPublishedContentDataSourceResolver, IDynamicPublishedContentDataSource>
 	{
-		Guid GetDataType(string docTypeAlias, string propertyAlias);
+		public IDynamicPublishedContentDataSource DataSource { get; private set; }
 
+		public DynamicPublishedContentDataSourceResolver(IDynamicPublishedContentDataSource dataSource)
+		{
+			DataSource = dataSource;
+		}
 	}
 }

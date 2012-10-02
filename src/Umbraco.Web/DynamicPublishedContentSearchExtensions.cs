@@ -6,9 +6,9 @@ namespace Umbraco.Web
 	/// <summary>
 	/// DynamicPublishedContent extension methods for searching using Examine
 	/// </summary>
-	public static class DynamicDocumentSearchExtensions
+	public static class DynamicPublishedContentSearchExtensions
 	{
-		public static DynamicDocumentList Search(this DynamicPublishedContent d, string term, bool useWildCards = true, string searchProvider = null)
+		public static DynamicPublishedContentList Search(this DynamicPublishedContent d, string term, bool useWildCards = true, string searchProvider = null)
 		{
 			var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
 			if (!string.IsNullOrEmpty(searchProvider))
@@ -24,12 +24,12 @@ namespace Umbraco.Web
 			return d.Search(crit, searcher);
 		}
 
-		public static DynamicDocumentList SearchDescendants(this DynamicPublishedContent d, string term, bool useWildCards = true, string searchProvider = null)
+		public static DynamicPublishedContentList SearchDescendants(this DynamicPublishedContent d, string term, bool useWildCards = true, string searchProvider = null)
 		{
 			return d.Search(term, useWildCards, searchProvider);
 		}
 
-		public static DynamicDocumentList SearchChildren(this DynamicPublishedContent d, string term, bool useWildCards = true, string searchProvider = null)
+		public static DynamicPublishedContentList SearchChildren(this DynamicPublishedContent d, string term, bool useWildCards = true, string searchProvider = null)
 		{
 			var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
 			if (!string.IsNullOrEmpty(searchProvider))
@@ -45,7 +45,7 @@ namespace Umbraco.Web
 			return d.Search(crit, searcher);
 		}
 
-		public static DynamicDocumentList Search(this DynamicPublishedContent d, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+		public static DynamicPublishedContentList Search(this DynamicPublishedContent d, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
 		{
 			var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
 			if (searchProvider != null)

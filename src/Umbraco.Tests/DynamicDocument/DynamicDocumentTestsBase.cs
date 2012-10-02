@@ -17,14 +17,14 @@ namespace Umbraco.Tests.DynamicDocument
 		{
 			base.Initialize();
 
-			DynamicDocumentDataSourceResolver.Current = new DynamicDocumentDataSourceResolver(
-				new TestDynamicDocumentDataSource());
+			DynamicPublishedContentDataSourceResolver.Current = new DynamicPublishedContentDataSourceResolver(
+				new TestDynamicPublishedContentDataSource());
 		}
 
 		public override void TearDown()
 		{
 			base.TearDown();
-			DynamicDocumentDataSourceResolver.Reset();
+			DynamicPublishedContentDataSourceResolver.Reset();
 		}
 
 		protected override bool RequiresDbSetup
@@ -32,7 +32,7 @@ namespace Umbraco.Tests.DynamicDocument
 			get { return false; }
 		}
 
-		private class TestDynamicDocumentDataSource : IDynamicDocumentDataSource
+		private class TestDynamicPublishedContentDataSource : IDynamicPublishedContentDataSource
 		{
 			public Guid GetDataType(string docTypeAlias, string propertyAlias)
 			{

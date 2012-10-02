@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Dynamics
 {
-    internal class DynamicDocumentIdEqualityComparer : EqualityComparer<DynamicPublishedContent>
+    internal class DynamicPublishedContentIdEqualityComparer : EqualityComparer<DynamicPublishedContent>
     {
 
         public override bool Equals(DynamicPublishedContent x, DynamicPublishedContent y)

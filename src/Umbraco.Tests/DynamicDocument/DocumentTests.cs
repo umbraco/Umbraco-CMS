@@ -21,7 +21,7 @@ namespace Umbraco.Tests.DynamicDocument
 		{
 			base.Initialize();
 			//need to specify a different callback for testing
-			Umbraco.Web.DocumentExtensions.GetPropertyAliasesAndNames = s =>
+			Umbraco.Web.PublishedContentExtensions.GetPropertyAliasesAndNames = s =>
 				{
 					var userFields = new Dictionary<string, string>()
 						{
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.DynamicDocument
 		public override void TearDown()
 		{
 			base.TearDown();
-			Umbraco.Web.DocumentExtensions.GetPropertyAliasesAndNames = null;
+			Umbraco.Web.PublishedContentExtensions.GetPropertyAliasesAndNames = null;
 			UmbracoContext.Current = null;
 		}		
 

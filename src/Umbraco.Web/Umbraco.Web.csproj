@@ -250,12 +250,12 @@
     <Compile Include="BaseRest\RestExtensionAttribute.cs" />
     <Compile Include="BaseRest\RestExtensionMethodAttribute.cs" />
     <Compile Include="BaseRest\RestExtensionMethodInfo.cs" />
-    <Compile Include="DefaultDynamicDocumentDataSource.cs" />
+    <Compile Include="DefaultDynamicPublishedContentDataSource.cs" />
     <Compile Include="DefaultPublishedMediaStore.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
-    <Compile Include="DocumentExtensions.cs" />
-    <Compile Include="DynamicDocumentSearchExtensions.cs" />
+    <Compile Include="PublishedContentExtensions.cs" />
+    <Compile Include="DynamicPublishedContentSearchExtensions.cs" />
     <Compile Include="ExamineExtensions.cs" />
     <Compile Include="FormlessPage.cs">
       <SubType>ASPXCodeBehind</SubType>
