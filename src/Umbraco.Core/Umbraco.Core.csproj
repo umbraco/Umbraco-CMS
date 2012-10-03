@@ -99,6 +99,13 @@
     <Compile Include="Models\EntityBase\ICanBeDirty.cs" />
     <Compile Include="Models\EntityBase\IEntity.cs" />
     <Compile Include="Models\EntityBase\IValueObject.cs" />
+    <Compile Include="Models\IContent.cs" />
+    <Compile Include="Models\IContentBase.cs" />
+    <Compile Include="Models\IContentType.cs" />
+    <Compile Include="Models\IContentTypeBase.cs" />
+    <Compile Include="Models\IContentTypeComposition.cs" />
+    <Compile Include="Models\IMedia.cs" />
+    <Compile Include="Models\IMediaType.cs" />
     <Compile Include="Models\Property.cs" />
     <Compile Include="Models\PropertyCollection.cs" />
     <Compile Include="Models\PropertyGroup.cs" />
