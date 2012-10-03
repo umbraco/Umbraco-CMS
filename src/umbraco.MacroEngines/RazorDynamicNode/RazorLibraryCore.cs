@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Web;
+using Umbraco.Web.Models;
 using umbraco.interfaces;
 using System.Xml.Linq;
 using System.Xml.XPath;

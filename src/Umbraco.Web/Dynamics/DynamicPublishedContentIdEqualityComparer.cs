@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Web.Models;
 
-namespace Umbraco.Core.Dynamics
+namespace Umbraco.Web.Dynamics
 {
-    internal class DynamicPublishedContentIdEqualityComparer : EqualityComparer<DynamicPublishedContentBase>
+    internal class DynamicPublishedContentIdEqualityComparer : EqualityComparer<DynamicPublishedContent>
     {
 
-        public override bool Equals(DynamicPublishedContentBase x, DynamicPublishedContentBase y)
+        public override bool Equals(DynamicPublishedContent x, DynamicPublishedContent y)
         {
             //Check whether the compared objects reference the same data.
             if (Object.ReferenceEquals(x, y)) return true;
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Dynamics
 
         }
 
-        public override int GetHashCode(DynamicPublishedContentBase obj)
+        public override int GetHashCode(DynamicPublishedContent obj)
         {
             if (Object.ReferenceEquals(obj, null)) return 0;
 

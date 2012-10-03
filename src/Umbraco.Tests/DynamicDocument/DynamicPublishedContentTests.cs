@@ -1,5 +1,8 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using NUnit.Framework;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
@@ -16,7 +19,7 @@ using umbraco.cms.businesslogic.web;
 namespace Umbraco.Tests.DynamicDocument
 {
 	[TestFixture]
-	public class DynamicPublishedContentTests : DynamicDocumentTestsBase<DynamicPublishedContentBase, DynamicPublishedContentList>
+	public class DynamicPublishedContentTests : DynamicDocumentTestsBase<DynamicPublishedContent, DynamicPublishedContentList>
 	{
 		public override void Initialize()
 		{
@@ -112,9 +115,9 @@ namespace Umbraco.Tests.DynamicDocument
 		/// </summary>
 		public class TestHelper
 		{
-			private readonly DynamicPublishedContentBase _doc;
+			private readonly DynamicPublishedContent _doc;
 
-			public TestHelper(DynamicPublishedContentBase doc)
+			public TestHelper(DynamicPublishedContent doc)
 			{
 				_doc = doc;
 			}

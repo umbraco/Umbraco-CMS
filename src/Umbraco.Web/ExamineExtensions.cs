@@ -5,6 +5,7 @@ using System.Xml;
 using Examine;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Web
 {
@@ -32,7 +33,7 @@ namespace Umbraco.Web
 				if (doc == null) continue; //skip if this doesn't exist in the cache				
 				doc.Properties.Add(
 					new PropertyResult("examineScore", result.Score.ToString(), Guid.Empty, PropertyResultType.CustomProperty));
-				var dynamicDoc = new DynamicPublishedContentBase(doc);
+				var dynamicDoc = new DynamicPublishedContent(doc);
 				list.Add(dynamicDoc);
 			}
 			return list;

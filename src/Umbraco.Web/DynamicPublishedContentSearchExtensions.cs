@@ -1,6 +1,7 @@
 using Examine.LuceneEngine.SearchCriteria;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Web
 {
@@ -9,7 +10,7 @@ namespace Umbraco.Web
 	/// </summary>
 	public static class DynamicPublishedContentSearchExtensions
 	{
-		public static DynamicPublishedContentList Search(this DynamicPublishedContentBase d, string term, bool useWildCards = true, string searchProvider = null)
+		public static DynamicPublishedContentList Search(this DynamicPublishedContent d, string term, bool useWildCards = true, string searchProvider = null)
 		{
 			var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
 			if (!string.IsNullOrEmpty(searchProvider))
@@ -25,12 +26,12 @@ namespace Umbraco.Web
 			return d.Search(crit, searcher);
 		}
 
-		public static DynamicPublishedContentList SearchDescendants(this DynamicPublishedContentBase d, string term, bool useWildCards = true, string searchProvider = null)
+		public static DynamicPublishedContentList SearchDescendants(this DynamicPublishedContent d, string term, bool useWildCards = true, string searchProvider = null)
 		{
 			return d.Search(term, useWildCards, searchProvider);
 		}
 
-		public static DynamicPublishedContentList SearchChildren(this DynamicPublishedContentBase d, string term, bool useWildCards = true, string searchProvider = null)
+		public static DynamicPublishedContentList SearchChildren(this DynamicPublishedContent d, string term, bool useWildCards = true, string searchProvider = null)
 		{
 			var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
 			if (!string.IsNullOrEmpty(searchProvider))
@@ -46,7 +47,7 @@ namespace Umbraco.Web
 			return d.Search(crit, searcher);
 		}
 
-		public static DynamicPublishedContentList Search(this DynamicPublishedContentBase d, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+		public static DynamicPublishedContentList Search(this DynamicPublishedContent d, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
 		{
 			var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
 			if (searchProvider != null)

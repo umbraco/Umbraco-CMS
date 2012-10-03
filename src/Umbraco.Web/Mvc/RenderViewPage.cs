@@ -3,6 +3,7 @@ using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
+using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Mvc
@@ -24,7 +25,7 @@ namespace Umbraco.Web.Mvc
 			{
 				////this.ViewData.Model = Model;
 				//var backingItem = new DynamicBackingItem(Model.CurrentNode);
-				var dynamicNode = new DynamicPublishedContentBase(Model.CurrentContent);
+				var dynamicNode = new DynamicPublishedContent(Model.CurrentContent);
 				CurrentPage = dynamicNode.AsDynamic();
 			}
 			PublishedContentRequest = (PublishedContentRequest)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-doc-request");

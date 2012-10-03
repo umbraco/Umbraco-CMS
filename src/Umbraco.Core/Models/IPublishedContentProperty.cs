@@ -2,7 +2,7 @@ using System;
 
 namespace Umbraco.Core.Models
 {
-	public interface IDocumentProperty
+	public interface IPublishedContentProperty
 	{
 		string Alias { get; }
 		object Value { get; }

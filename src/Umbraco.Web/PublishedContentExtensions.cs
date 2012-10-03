@@ -22,6 +22,41 @@ namespace Umbraco.Web
 	public static class PublishedContentExtensions
 	{
 
+		#region List Extensions
+
+		public static IQueryable<IPublishedContent> OrderBy(this IEnumerable<IPublishedContent> list, string predicate)
+		{
+			var dList = new DynamicPublishedContentList(list);
+			return dList.OrderBy<DynamicPublishedContent>(predicate);
+		}
+
+		public static IQueryable<IPublishedContent> Where(this IEnumerable<IPublishedContent> list, string predicate)
+		{
+			var dList = new DynamicPublishedContentList(list);
+			return dList.Where<DynamicPublishedContent>(predicate);
+		}
+
+		public static IEnumerable<IGrouping<object, IPublishedContent>> GroupBy(this IEnumerable<IPublishedContent> list, string predicate)
+		{
+			var dList = new DynamicPublishedContentList(list);
+			return dList.GroupBy(predicate);
+		}
+
+		public static IQueryable Select(this IEnumerable<IPublishedContent> list, string predicate, params object[] values)
+		{
+			var dList = new DynamicPublishedContentList(list);
+			return dList.Select(predicate);
+		}
+
+		#endregion
+
+		public static dynamic AsDynamic(this IPublishedContent doc)
+		{
+			if (doc == null) throw new ArgumentNullException("doc");
+			var dd = new DynamicPublishedContent(doc);
+			return dd.AsDynamic();
+		}
+
 		/// <summary>
 		/// Converts a IPublishedContent to a DynamicPublishedContent and tests for null
 		/// </summary>
@@ -34,27 +69,39 @@ namespace Umbraco.Web
 			return new DynamicPublishedContent(content);
 		}
 
-		public static IDocumentProperty GetProperty(this IPublishedContent content, string alias, bool recursive)
+		#region Where
+
+		public static HtmlString Where(this IPublishedContent doc, string predicate, string valueIfTrue)
 		{
-			return content.GetUserRecursive(alias, recursive);
+			if (doc == null) throw new ArgumentNullException("doc");
+			return doc.Where(predicate, valueIfTrue, string.Empty);
 		}
 
-		private static IDocumentProperty GetUserRecursive(this IPublishedContent content, string alias, bool recursive = false)
+		public static HtmlString Where(this IPublishedContent doc, string predicate, string valueIfTrue, string valueIfFalse)
 		{
-			if (!recursive)
+			if (doc == null) throw new ArgumentNullException("doc");
+			if (doc.Where(predicate))
 			{
-				return content.GetProperty(alias);
+				return new HtmlString(valueIfTrue);
 			}
-			var context = content;
-			var prop = content.GetUserRecursive(alias);
-			while (prop == null || prop.Value == null || prop.Value.ToString().IsNullOrWhiteSpace())
-			{
-				var parent = context.Parent;
-				if (parent == null) break;
-				prop = context.GetUserRecursive(alias);
-			}
-			return prop;
+			return new HtmlString(valueIfFalse);
 		}
+		public static bool Where(this IPublishedContent doc, string predicate)
+		{
+			if (doc == null) throw new ArgumentNullException("doc");
+			//Totally gonna cheat here
+			var dynamicDocumentList = new DynamicPublishedContentList();
+			dynamicDocumentList.Add(doc.AsDynamicPublishedContent());
+			var filtered = dynamicDocumentList.Where<DynamicPublishedContent>(predicate);
+			if (Queryable.Count(filtered) == 1)
+			{
+				//this node matches the predicate
+				return true;
+			}
+			return false;
+		}
+
+		#endregion
 
 		#region Position/Index
 		public static int Position(this IPublishedContent content)
@@ -288,42 +335,42 @@ namespace Umbraco.Web
 			var ancestors = content.AncestorsOrSelf();
 			return content.IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.Id == other.Id) != null);
 		}
-		public static HtmlString IsDescendantOrSelf(this IPublishedContent content, DynamicPublishedContentBase other, string valueIfTrue)
+		public static HtmlString IsDescendantOrSelf(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue)
 		{
 			var ancestors = content.AncestorsOrSelf();
 			return content.IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.Id == other.Id) != null, valueIfTrue);
 		}
-		public static HtmlString IsDescendantOrSelf(this IPublishedContent content, DynamicPublishedContentBase other, string valueIfTrue, string valueIfFalse)
+		public static HtmlString IsDescendantOrSelf(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue, string valueIfFalse)
 		{
 			var ancestors = content.AncestorsOrSelf();
 			return content.IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.Id == other.Id) != null, valueIfTrue, valueIfFalse);
 		}
-		public static bool IsAncestor(this IPublishedContent content, DynamicPublishedContentBase other)
+		public static bool IsAncestor(this IPublishedContent content, DynamicPublishedContent other)
 		{
 			var descendants = content.Descendants();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null);
 		}
-		public static HtmlString IsAncestor(this IPublishedContent content, DynamicPublishedContentBase other, string valueIfTrue)
+		public static HtmlString IsAncestor(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue)
 		{
 			var descendants = content.Descendants();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null, valueIfTrue);
 		}
-		public static HtmlString IsAncestor(this IPublishedContent content, DynamicPublishedContentBase other, string valueIfTrue, string valueIfFalse)
+		public static HtmlString IsAncestor(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue, string valueIfFalse)
 		{
 			var descendants = content.Descendants();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null, valueIfTrue, valueIfFalse);
 		}
-		public static bool IsAncestorOrSelf(this IPublishedContent content, DynamicPublishedContentBase other)
+		public static bool IsAncestorOrSelf(this IPublishedContent content, DynamicPublishedContent other)
 		{
 			var descendants = content.DescendantsOrSelf();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null);
 		}
-		public static HtmlString IsAncestorOrSelf(this IPublishedContent content, DynamicPublishedContentBase other, string valueIfTrue)
+		public static HtmlString IsAncestorOrSelf(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue)
 		{
 			var descendants = content.DescendantsOrSelf();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null, valueIfTrue);
 		}
-		public static HtmlString IsAncestorOrSelf(this IPublishedContent content, DynamicPublishedContentBase other, string valueIfTrue, string valueIfFalse)
+		public static HtmlString IsAncestorOrSelf(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue, string valueIfFalse)
 		{
 			var descendants = content.DescendantsOrSelf();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null, valueIfTrue, valueIfFalse);
@@ -504,7 +551,7 @@ namespace Umbraco.Web
 					thisNode.Add(content);
 				}
 				var flattenedNodes = content.Children.Map(func, (IPublishedContent n) => n.Children);
-				return thisNode.Concat(flattenedNodes).ToList().ConvertAll(dynamicBackingItem => new DynamicPublishedContentBase(dynamicBackingItem));
+				return thisNode.Concat(flattenedNodes).ToList().ConvertAll(dynamicBackingItem => new DynamicPublishedContent(dynamicBackingItem));
 			}
 			return Enumerable.Empty<IPublishedContent>();
 		}
@@ -748,7 +795,7 @@ namespace Umbraco.Web
 									{"Url", urlProvider.GetNiceUrl(n.Id)}
 								};
 							var userVals = new Dictionary<string, object>();
-							foreach (var p in from IDocumentProperty p in n.Properties where p.Value != null select p)
+							foreach (var p in from IPublishedContentProperty p in n.Properties where p.Value != null select p)
 							{
 								userVals[p.Alias] = p.Value;
 							}

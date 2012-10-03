@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
 using System.Dynamic;
-using Umbraco.Core.Models;
+using Umbraco.Core.Dynamics;
+using Umbraco.Web.Models;
 
-namespace Umbraco.Core.Dynamics
+namespace Umbraco.Web.Dynamics
 {
     internal class Grouping<K, T> : IGrouping<K, T> where T : DynamicObject
     {
@@ -14,7 +15,7 @@ namespace Umbraco.Core.Dynamics
 
         public IEnumerator<T> GetEnumerator()
         {
-            var temp = new DynamicPublishedContentList(Elements.Cast<DynamicPublishedContentBase>());
+            var temp = new DynamicPublishedContentList(Elements.Cast<DynamicPublishedContent>());
             return (IEnumerator<T>)temp.GetEnumerator();
         }
         IEnumerator IEnumerable.GetEnumerator()
@@ -43,7 +44,7 @@ namespace Umbraco.Core.Dynamics
                     object key = null;
                     (item as DynamicObject).TryGetMember(new DynamicQueryableGetMemberBinder(ordering, false), out key);
                     return key;
-                }).Cast<DynamicPublishedContentBase>());
+                }).Cast<DynamicPublishedContent>());
             }
             else
             {
@@ -52,7 +53,7 @@ namespace Umbraco.Core.Dynamics
                     object key = null;
                     (item as DynamicObject).TryGetMember(new DynamicQueryableGetMemberBinder(ordering, false), out key);
                     return key;
-                }).Cast<DynamicPublishedContentBase>());
+                }).Cast<DynamicPublishedContent>());
             }
         }
     }

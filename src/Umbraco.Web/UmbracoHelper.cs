@@ -15,6 +15,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Templates;
 using umbraco;
@@ -487,7 +488,7 @@ namespace Umbraco.Web
 			var doc = store.GetDocumentById(UmbracoContext.Current, id);
 			return doc == null
 					? new DynamicNull()
-					: new DynamicPublishedContentBase(doc).AsDynamic();
+					: new DynamicPublishedContent(doc).AsDynamic();
 		}
 
 		private dynamic DocumentById(string id, IPublishedStore store)
@@ -502,7 +503,7 @@ namespace Umbraco.Web
 		{
 			var nodes = ids.Select(eachId => DocumentById(eachId, store))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
-				.Cast<DynamicPublishedContentBase>();
+				.Cast<DynamicPublishedContent>();
 			return new DynamicPublishedContentList(nodes);
 		}
 
@@ -510,7 +511,7 @@ namespace Umbraco.Web
 		{
 			var nodes = ids.Select(eachId => DocumentById(eachId, store))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
-				.Cast<DynamicPublishedContentBase>();
+				.Cast<DynamicPublishedContent>();
 			return new DynamicPublishedContentList(nodes);
 		}
 

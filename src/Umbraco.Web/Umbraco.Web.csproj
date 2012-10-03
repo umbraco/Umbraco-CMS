@@ -240,7 +240,16 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationEventsResolver.cs" />
+    <Compile Include="Dynamics\DynamicExpression.cs" />
+    <Compile Include="Dynamics\DynamicGrouping.cs" />
+    <Compile Include="Dynamics\DynamicPublishedContentIdEqualityComparer.cs" />
+    <Compile Include="Dynamics\DynamicPublishedContentListOrdering.cs" />
+    <Compile Include="Dynamics\DynamicQueryable.cs" />
+    <Compile Include="Dynamics\ExpressionParser.cs" />
+    <Compile Include="Dynamics\ExtensionMethods.cs" />
+    <Compile Include="Dynamics\Grouping.cs" />
     <Compile Include="Models\DynamicPublishedContent.cs" />
+    <Compile Include="Models\DynamicPublishedContentList.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
     <Compile Include="BaseRest\Configuration\BaseRestSection.cs" />
     <Compile Include="BaseRest\BaseRestHandler.cs" />
@@ -326,7 +335,7 @@
     <Compile Include="Routing\PublishedContentNotFoundHandler.cs" />
     <Compile Include="IPublishedContentStore.cs" />
     <Compile Include="Models\XmlPublishedContent.cs" />
-    <Compile Include="Models\XmlDocumentProperty.cs" />
+    <Compile Include="Models\XmlPublishedContentProperty.cs" />
     <Compile Include="Mvc\Constants.cs" />
     <Compile Include="Mvc\FilteredControllerFactoriesResolver.cs" />
     <Compile Include="Mvc\IFilteredControllerFactory.cs" />

@@ -1,23 +1,24 @@
 using System.Collections.Generic;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Tests.DynamicDocument
 {
 	public static class DynamicPublishedContentCustomExtensionMethods
 	{
 
-		public static string DynamicDocumentNoParameters(this DynamicPublishedContentBase doc)
+		public static string DynamicDocumentNoParameters(this DynamicPublishedContent doc)
 		{
 			return "Hello world";
 		}
 		
-		public static string DynamicDocumentCustomString(this DynamicPublishedContentBase doc, string custom)
+		public static string DynamicDocumentCustomString(this DynamicPublishedContent doc, string custom)
 		{
 			return custom;
 		}
 
-		public static string DynamicDocumentMultiParam(this DynamicPublishedContentBase doc, string custom, int i, bool b)
+		public static string DynamicDocumentMultiParam(this DynamicPublishedContent doc, string custom, int i, bool b)
 		{
 			return custom + i + b;
 		}
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.DynamicDocument
 			return custom + i + b;
 		}
 
-		public static string DynamicDocumentEnumerableMultiParam(this IEnumerable<DynamicPublishedContentBase> doc, string custom, int i, bool b)
+		public static string DynamicDocumentEnumerableMultiParam(this IEnumerable<DynamicPublishedContent> doc, string custom, int i, bool b)
 		{
 			return custom + i + b;
 		}

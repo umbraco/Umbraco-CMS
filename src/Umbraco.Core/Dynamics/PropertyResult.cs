@@ -5,9 +5,9 @@ using System.Web;
 
 namespace Umbraco.Core.Dynamics
 {
-	internal class PropertyResult : IDocumentProperty, IHtmlString
+	internal class PropertyResult : IPublishedContentProperty, IHtmlString
     {
-		internal PropertyResult(IDocumentProperty source, PropertyResultType type)
+		internal PropertyResult(IPublishedContentProperty source, PropertyResultType type)
         {
     		if (source == null) throw new ArgumentNullException("source");
 
@@ -46,11 +46,6 @@ namespace Umbraco.Core.Dynamics
 
     	public Guid Version { get; private set; }
 
-    
-        public bool HasValue()
-        {
-			return !ValueAsString.IsNullOrWhiteSpace();
-        }
 
 		/// <summary>
 		/// The Id of the document for which this property belongs to
