@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or Sets the Id of the Parent for the Content
         /// </summary>
-        int ParentId { get; }
+        int ParentId { get; set; }
 
         /// <summary>
         /// Gets or Sets the Name of the Content

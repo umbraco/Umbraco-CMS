@@ -84,7 +84,7 @@ namespace Umbraco.Core.Models
         public int ParentId
         {
             get { return _parentId; }
-            private set
+            set
             {
                 _parentId = value;
                 OnPropertyChanged(ParentIdSelector);
