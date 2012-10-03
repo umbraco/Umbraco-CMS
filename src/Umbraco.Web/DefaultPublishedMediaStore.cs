@@ -167,7 +167,7 @@ namespace Umbraco.Web
 		/// <param name="dd"> </param>
 		/// <param name="alias"></param>
 		/// <returns></returns>
-		private IDocumentProperty GetProperty(DictionaryPublishedContent dd, string alias)
+		private IPublishedContentProperty GetProperty(DictionaryPublishedContent dd, string alias)
 		{
 			if (dd.LoadedFromExamine)
 			{
@@ -285,7 +285,7 @@ namespace Umbraco.Web
 				IDictionary<string, string> valueDictionary, 
 				Func<DictionaryPublishedContent, IPublishedContent> getParent,
 				Func<DictionaryPublishedContent, IEnumerable<IPublishedContent>> getChildren,
-				Func<DictionaryPublishedContent, string, IDocumentProperty> getProperty)
+				Func<DictionaryPublishedContent, string, IPublishedContentProperty> getProperty)
 			{
 				if (valueDictionary == null) throw new ArgumentNullException("valueDictionary");
 				if (getParent == null) throw new ArgumentNullException("getParent");
@@ -322,7 +322,7 @@ namespace Umbraco.Web
 						}						
 					}, "parentID");
 
-				Properties = new Collection<IDocumentProperty>();
+				Properties = new Collection<IPublishedContentProperty>();
 
 				//loop through remaining values that haven't been applied
 				foreach (var i in valueDictionary.Where(x => !_keysAdded.Contains(x.Key)))
@@ -341,7 +341,7 @@ namespace Umbraco.Web
 
 			private readonly Func<DictionaryPublishedContent, IPublishedContent> _getParent;
 			private readonly Func<DictionaryPublishedContent, IEnumerable<IPublishedContent>> _getChildren;
-			private readonly Func<DictionaryPublishedContent, string, IDocumentProperty> _getProperty;
+			private readonly Func<DictionaryPublishedContent, string, IPublishedContentProperty> _getProperty;
 
 			public IPublishedContent Parent
 			{
@@ -365,13 +365,13 @@ namespace Umbraco.Web
 			public DateTime UpdateDate { get; private set; }
 			public Guid Version { get; private set; }
 			public int Level { get; private set; }
-			public Collection<IDocumentProperty> Properties { get; private set; }
+			public Collection<IPublishedContentProperty> Properties { get; private set; }
 			public IEnumerable<IPublishedContent> Children
 			{
 				get { return _getChildren(this); }
 			}
 
-			public IDocumentProperty GetProperty(string alias)
+			public IPublishedContentProperty GetProperty(string alias)
 			{
 				return _getProperty(this, alias);
 			}

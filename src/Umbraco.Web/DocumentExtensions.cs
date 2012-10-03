@@ -80,7 +80,7 @@ namespace Umbraco.Web
 									{"Url", urlProvider.GetNiceUrl(n.Id)}
 								};
 							var userVals = new Dictionary<string, object>();
-							foreach (var p in from IDocumentProperty p in n.Properties where p.Value != null select p)
+							foreach (var p in from IPublishedContentProperty p in n.Properties where p.Value != null select p)
 							{
 								userVals[p.Alias] = p.Value;
 							}

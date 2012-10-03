@@ -16,7 +16,7 @@ namespace umbraco.MacroEngines.Library
 	internal static class DynamicDocumentExtensions
 	{
 		
-		internal static IProperty ConvertToNodeProperty(this IDocumentProperty prop)
+		internal static IProperty ConvertToNodeProperty(this IPublishedContentProperty prop)
 		{
 			return new PropertyResult(prop.Alias, prop.Value.ToString(), prop.Version);
 		}

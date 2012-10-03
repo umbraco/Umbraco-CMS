@@ -30,7 +30,7 @@ namespace Umbraco.Core.Models
 		DateTime UpdateDate { get; }
 		Guid Version { get; }
 		int Level { get; }
-		Collection<IDocumentProperty> Properties { get; }
+		Collection<IPublishedContentProperty> Properties { get; }
 		IEnumerable<IPublishedContent> Children { get; }
 
 		/// <summary>
@@ -46,6 +46,6 @@ namespace Umbraco.Core.Models
 		/// In some cases Pulish Stores, a property value may exist in multiple places and we need to fallback to different cached locations
 		/// therefore sometimes the 'Properties' collection may not be sufficient.
 		/// </remarks>
-		IDocumentProperty GetProperty(string alias);
+		IPublishedContentProperty GetProperty(string alias);
 	}
 }

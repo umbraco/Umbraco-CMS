@@ -60,7 +60,7 @@ namespace Umbraco.Web.Models
 		private DateTime _createDate;
 		private DateTime _updateDate;
 		private Guid _version;
-		private readonly Collection<IDocumentProperty> _properties = new Collection<IDocumentProperty>();
+		private readonly Collection<IPublishedContentProperty> _properties = new Collection<IPublishedContentProperty>();
 		private readonly XmlNode _pageXmlNode;
 		private int _sortOrder;
 		private int _level;
@@ -75,7 +75,7 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public IDocumentProperty GetProperty(string alias)
+		public IPublishedContentProperty GetProperty(string alias)
 		{
 			return Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 		}
@@ -251,7 +251,7 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public Collection<IDocumentProperty> Properties
+		public Collection<IPublishedContentProperty> Properties
 		{
 			get
 			{

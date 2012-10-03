@@ -159,7 +159,7 @@
     <Compile Include="Dynamics\Signature.cs" />
     <Compile Include="ExpressionExtensions.cs" />
     <Compile Include="Models\IPublishedContent.cs" />
-    <Compile Include="Models\IDocumentProperty.cs" />
+    <Compile Include="Models\IPublishedContentProperty.cs" />
     <Compile Include="ActionsResolver.cs" />
     <Compile Include="CacheRefreshersResolver.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />

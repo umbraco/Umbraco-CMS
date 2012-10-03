@@ -941,7 +941,7 @@ namespace Umbraco.Core.Dynamics
 			get { return _publishedContent.Level; }
 		}
 
-		public IEnumerable<IDocumentProperty> Properties
+		public IEnumerable<IPublishedContentProperty> Properties
 		{
 			get { return _publishedContent.Properties; }
 		}
@@ -969,11 +969,11 @@ namespace Umbraco.Core.Dynamics
 
 		#region GetProperty methods which can be used with the dynamic object
 
-		public IDocumentProperty GetProperty(string alias)
+		public IPublishedContentProperty GetProperty(string alias)
 		{
 			return GetProperty(alias, false);
 		}
-		public IDocumentProperty GetProperty(string alias, bool recursive)
+		public IPublishedContentProperty GetProperty(string alias, bool recursive)
 		{
 			return alias.StartsWith("@")
 				? GetReflectedProperty(alias.TrimStart('@'))
@@ -1497,7 +1497,7 @@ namespace Umbraco.Core.Dynamics
 			get { return _publishedContent.Level; }
 		}
 
-		System.Collections.ObjectModel.Collection<IDocumentProperty> IPublishedContent.Properties
+		System.Collections.ObjectModel.Collection<IPublishedContentProperty> IPublishedContent.Properties
 		{
 			get { return _publishedContent.Properties; }
 		}
@@ -1507,7 +1507,7 @@ namespace Umbraco.Core.Dynamics
 			get { return _publishedContent.Children; }
 		}
 
-		IDocumentProperty IPublishedContent.GetProperty(string alias)
+		IPublishedContentProperty IPublishedContent.GetProperty(string alias)
 		{
 			return _publishedContent.GetProperty(alias);
 		} 

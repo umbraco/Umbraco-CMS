@@ -137,8 +137,8 @@ namespace Umbraco.Tests.DynamicDocument
 					WriterName = "Shannon",
 					Parent = null,
 					Level = 1,
-					Properties = new Collection<IDocumentProperty>(
-						new List<IDocumentProperty>()
+					Properties = new Collection<IPublishedContentProperty>(
+						new List<IPublishedContentProperty>()
 							{
 								new PropertyResult("property1", "value" + indexVals, Guid.NewGuid(), PropertyResultType.UserProperty),
 								new PropertyResult("property2", "value" + (indexVals + 1), Guid.NewGuid(), PropertyResultType.UserProperty)
@@ -186,9 +186,9 @@ namespace Umbraco.Tests.DynamicDocument
 			public DateTime UpdateDate { get; set; }
 			public Guid Version { get; set; }
 			public int Level { get; set; }
-			public Collection<IDocumentProperty> Properties { get; set; }
+			public Collection<IPublishedContentProperty> Properties { get; set; }
 			public IEnumerable<IPublishedContent> Children { get; set; }
-			public IDocumentProperty GetProperty(string alias)
+			public IPublishedContentProperty GetProperty(string alias)
 			{
 				return Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 			}
