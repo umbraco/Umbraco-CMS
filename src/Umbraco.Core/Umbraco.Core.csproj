@@ -92,6 +92,9 @@
     <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="Macros\MacroTagParser.cs" />
     <Compile Include="Mandate.cs" />
+    <Compile Include="Models\Content.cs" />
+    <Compile Include="Models\ContentStatus.cs" />
+    <Compile Include="Models\ContentType.cs" />
     <Compile Include="Models\DataTypeDatabaseType.cs" />
     <Compile Include="Models\DataTypeDefinition.cs" />
     <Compile Include="Models\EntityBase\Entity.cs" />

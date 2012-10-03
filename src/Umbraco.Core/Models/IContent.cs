@@ -21,7 +21,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Language of the data contained within the Content object
         /// </summary>
-        string Language { get; set; }
+        //string Language { get; set; }
 
         /// <summary>
         /// Gets the Guid Id of the Content's Version
