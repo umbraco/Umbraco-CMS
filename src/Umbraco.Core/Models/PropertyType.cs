@@ -1,0 +1,351 @@
+﻿using System;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using Umbraco.Core.Models.EntityBase;
+
+namespace Umbraco.Core.Models
+{
+    /// <summary>
+    /// Defines the type of a <see cref="Property"/> object
+    /// </summary>
+    [Serializable]
+    [DataContract(IsReference = true)]
+    public class PropertyType : Entity, IEquatable<PropertyType>
+    {
+        //private SerializationService _service;
+        private string _name;
+        private string _alias;
+        private string _description;
+        private int _dataTypeId;
+        private Guid _dataTypeControlId;
+        private DataTypeDatabaseType _dataTypeDatabaseType;
+        private bool _mandatory;
+        private string _helpText;
+        private int _sortOrder;
+        private string _validationRegExp;
+
+        public PropertyType(DataTypeDefinition dataTypeDefinition)
+        {
+            if(dataTypeDefinition.HasIdentity)
+                DataTypeId = dataTypeDefinition.Id;
+
+            DataTypeControlId = dataTypeDefinition.ControlId;
+            DataTypeDatabaseType = dataTypeDefinition.DatabaseType;
+
+            EnsureSerializationService();
+        }
+
+        internal PropertyType(Guid dataTypeControlId, DataTypeDatabaseType dataTypeDatabaseType)
+        {
+            DataTypeControlId = dataTypeControlId;
+            DataTypeDatabaseType = dataTypeDatabaseType;
+
+            EnsureSerializationService();
+        }
+
+        private void EnsureSerializationService()
+        {
+            /*var serviceStackSerializer = new ServiceStackXmlSerializer();
+            _service = new SerializationService(serviceStackSerializer);*/
+        }
+
+        private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Name);
+        private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Alias);
+        private static readonly PropertyInfo DescriptionSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Description);
+        private static readonly PropertyInfo DataTypeIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.DataTypeId);
+        private static readonly PropertyInfo DataTypeControlIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, Guid>(x => x.DataTypeControlId);
+        private static readonly PropertyInfo DataTypeDatabaseTypeSelector = ExpressionHelper.GetPropertyInfo<PropertyType, DataTypeDatabaseType>(x => x.DataTypeDatabaseType);
+        private static readonly PropertyInfo MandatorySelector = ExpressionHelper.GetPropertyInfo<PropertyType, bool>(x => x.Mandatory);
+        private static readonly PropertyInfo HelpTextSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.HelpText);
+        private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.SortOrder);
+        private static readonly PropertyInfo ValidationRegExpSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationRegExp);
+
+        /// <summary>
+        /// Gets of Sets the Name of the PropertyType
+        /// </summary>
+        [DataMember]
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                _name = value;
+                OnPropertyChanged(NameSelector);
+            }
+        }
+
+        /// <summary>
+        /// Gets of Sets the Alias of the PropertyType
+        /// </summary>
+        [DataMember]
+        public string Alias
+        {
+            get { return _alias; }
+            set
+            {
+                _alias = value;
+                OnPropertyChanged(AliasSelector);
+            }
+        }
+
+        /// <summary>
+        /// Gets of Sets the Description for the PropertyType
+        /// </summary>
+        [DataMember]
+        public string Description
+        {
+            get { return _description; }
+            set
+            {
+                _description = value;
+                OnPropertyChanged(DescriptionSelector);
+            }
+        }
+
+        /// <summary>
+        /// Gets of Sets the Id of the DataType, which the PropertyType is "wrapping"
+        /// </summary>
+        /// <remarks>This is actually the Id of the DataTypeDefinition</remarks>
+        [DataMember]
+        public int DataTypeId
+        {
+            get { return _dataTypeId; }
+            set
+            {
+                _dataTypeId = value;
+                OnPropertyChanged(DataTypeIdSelector);
+            }
+        }
+
+        /// <summary>
+        /// Gets of Sets the Id of the DataType control
+        /// </summary>
+        /// <remarks>This is the Id of the actual DataType control</remarks>
+        [DataMember]
+        internal Guid DataTypeControlId
+        {
+            get { return _dataTypeControlId; }
+            private set
+            {
+                _dataTypeControlId = value;
+                OnPropertyChanged(DataTypeControlIdSelector);
+            }
+        }
+
+        /// <summary>
+        /// Gets or Sets the DatabaseType for which the DataType's value is saved as
+        /// </summary>
+        [DataMember]
+        internal DataTypeDatabaseType DataTypeDatabaseType
+        {
+            get { return _dataTypeDatabaseType; }
+            private set
+            {
+                _dataTypeDatabaseType = value;
+                OnPropertyChanged(DataTypeDatabaseTypeSelector);
+            }
+        }
+
+        /// <summary>
+        /// Gets of Sets the Boolean indicating whether a value for this PropertyType is required
+        /// </summary>
+        [DataMember]
+        public bool Mandatory
+        {
+            get { return _mandatory; }
+            set
+            {
+                _mandatory = value;
+                OnPropertyChanged(MandatorySelector);
+            }
+        }
+
+        /// <summary>
+        /// Gets of Sets the Help text for the current PropertyType
+        /// </summary>
+        [DataMember]
+        public string HelpText
+        {
+            get { return _helpText; }
+            set
+            {
+                _helpText = value;
+                OnPropertyChanged(HelpTextSelector);
+            }
+        }
+
+        /// <summary>
+        /// Gets of Sets the Sort order of the PropertyType, which is used for sorting within a group
+        /// </summary>
+        [DataMember]
+        public int SortOrder
+        {
+            get { return _sortOrder; }
+            set
+            {
+                _sortOrder = value;
+                OnPropertyChanged(SortOrderSelector);
+            }
+        }
+
+        /// <summary>
+        /// Gets or Sets the RegEx for validation of legacy DataTypes
+        /// </summary>
+        [DataMember]
+        internal string ValidationRegExp
+        {
+            get { return _validationRegExp; }
+            set
+            {
+                _validationRegExp = value;
+                OnPropertyChanged(ValidationRegExpSelector);
+            }
+        }
+        //Note that Validation should eventually come from PropertyEditors like in v5
+
+        /// <summary>
+        /// Create a new Property object from a "raw" database value.
+        /// </summary>
+        /// <remarks>Can be used for the "old" values where no serialization type exists</remarks>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        internal Property CreatePropertyFromRawValue(object value)
+        {
+            return new Property(this, value);
+        }
+
+        /// <summary>
+        /// Create a new Property object from a "raw" database value.
+        /// In some cases the value will need to be deserialized.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="serializationType"> </param>
+        /// <returns></returns>
+        internal Property CreatePropertyFromRawValue(object value, string serializationType)
+        {
+            //The value from the db needs to be deserialized and then added to the property
+            //if its not a simple type (Integer, Date, Nvarchar, Ntext)
+            /*if (DataTypeDatabaseType == DataTypeDatabaseType.Object)
+            {
+                Type type = Type.GetType(serializationType);
+                var stream = new MemoryStream(Encoding.UTF8.GetBytes(value.ToString()));
+                var objValue = _service.FromStream(stream, type);
+                return new Property(this, objValue);
+            }*/
+
+            return new Property(this, value);
+        }
+
+        /// <summary>
+        /// Create a new Property object that conforms to the Type of the DataType
+        /// and can be validated according to DataType validation / Mandatory-check.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public Property CreatePropertyFromValue(object value)
+        {
+            //Note that validation will occur when setting the value on the Property
+            return new Property(this, value);
+        }
+
+        public bool IsPropertyTypeValid(object value)
+        {
+            //Check type if the type of the value match the type from the DataType/PropertyEditor
+            Type type = value.GetType();
+            /*bool isEditorModel = value is IEditorModel;
+
+            if (isEditorModel && DataTypeControlId != Guid.Empty)
+            {
+                //Find PropertyEditor by Id
+                var propertyEditor = PropertyEditorResolver.Current.GetById(DataTypeControlId);
+
+                if (propertyEditor == null)
+                    return false;//Throw exception instead?
+
+                //Get the generic parameter of the PropertyEditor and check it against the type of the passed in (object) value
+                Type argument = propertyEditor.GetType().BaseType.GetGenericArguments()[0];
+                return argument == type;
+            }*/
+
+            if (DataTypeControlId != Guid.Empty)
+            {
+                //Note that this check will only work when the PropertyType has been instantiated through the repository
+                //Programmatically creating a PropertyType will not set the DataType Control ID nor the DataType Id.
+                //Consider adding the DataType/PropertyEditor as a constructor dependency, so we can set the DataTypeControlId
+
+                //Find DataType by Id
+                //IDataType dataType = DataTypesResolver.Current.GetById(DataTypeControlId);
+                //Check if dataType is null (meaning that the ControlId is valid) ?
+                //Possibly cast to BaseDataType and get the DbType from there (which might not be possible because it lives in umbraco.cms.businesslogic.datatype) ?
+
+                if (DataTypeDatabaseType == DataTypeDatabaseType.Integer && type == typeof(int))
+                    return true;
+
+                if (DataTypeDatabaseType == DataTypeDatabaseType.Date && type == typeof(DateTime))
+                    return true;
+
+                if (DataTypeDatabaseType == DataTypeDatabaseType.Nvarchar && type == typeof(string))
+                    return true;
+
+                if (DataTypeDatabaseType == DataTypeDatabaseType.Ntext && type == typeof(string))
+                    return true;
+            }
+
+            //Fallback for simple value types when no Control Id or Database Type is set
+            if (type.IsPrimitive || value is string)
+                return true;
+
+            return false;
+        }
+
+        public bool IsPropertyValueValid(object value)
+        {
+            //If the Property is mandatory and value is null or empty, return false as the validation failed
+            if (Mandatory && (value == null || string.IsNullOrEmpty(value.ToString())))
+                return false;
+
+            //Check against Regular Expression for Legacy DataTypes
+            if(!string.IsNullOrEmpty(ValidationRegExp))
+            {
+                var regexPattern = new Regex(ValidationRegExp);
+                return regexPattern.IsMatch(value.ToString());
+            }
+
+            /*if (value is IEditorModel && DataTypeControlId != Guid.Empty)
+            {
+                //Find PropertyEditor by Id
+                var propertyEditor = PropertyEditorResolver.Current.GetById(DataTypeControlId);
+
+                //TODO Get the validation from the PropertyEditor if a validation attribute exists
+                //Will probably need to reflect the PropertyEditor in order to apply the validation
+            }*/
+
+            return true;
+        }
+
+        public bool Equals(PropertyType other)
+        {
+            //Check whether the compared object is null. 
+            if (Object.ReferenceEquals(other, null)) return false;
+
+            //Check whether the compared object references the same data. 
+            if (Object.ReferenceEquals(this, other)) return true;
+
+            //Check whether the PropertyType's properties are equal. 
+            return Alias.Equals(other.Alias) && Name.Equals(other.Name);
+        }
+
+        public override int GetHashCode()
+        {
+            //Get hash code for the Name field if it is not null. 
+            int hashName = Name == null ? 0 : Name.GetHashCode();
+
+            //Get hash code for the Alias field. 
+            int hashAlias = Alias.GetHashCode();
+
+            //Calculate the hash code for the product. 
+            return hashName ^ hashAlias;
+        }
+    }
+}

@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
+using Property = umbraco.cms.businesslogic.property.Property;
 
 namespace umbraco
 {

@@ -6,6 +6,7 @@ using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using umbraco.NodeFactory;
 using umbraco.interfaces;
+using Property = umbraco.NodeFactory.Property;
 
 namespace umbraco.MacroEngines.Library
 {

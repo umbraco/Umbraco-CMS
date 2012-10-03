@@ -1,0 +1,124 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Threading;
+
+namespace Umbraco.Core.Models
+{
+    [Serializable]
+    [DataContract(IsReference = true)]
+    public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, INotifyCollectionChanged
+    {
+         private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
+        internal Action OnAdd;
+
+        internal PropertyGroupCollection()
+        {
+            
+        }
+
+        public PropertyGroupCollection(IEnumerable<PropertyGroup> groups)
+        {
+            Reset(groups);
+        }
+
+        /// <summary>
+        /// Resets the collection to only contain the <see cref="PropertyGroup"/> instances referenced in the <paramref name="groups"/> parameter.
+        /// </summary>
+        /// <param name="groups">The property groups.</param>
+        /// <remarks></remarks>
+        internal void Reset(IEnumerable<PropertyGroup> groups)
+        {
+            Clear();
+            groups.ForEach(Add);
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+
+        protected override void SetItem(int index, PropertyGroup item)
+        {
+            base.SetItem(index, item);
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
+        }
+
+        protected override void RemoveItem(int index)
+        {
+            var removed = this[index];
+            base.RemoveItem(index);
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removed));
+        }
+
+        protected override void InsertItem(int index, PropertyGroup item)
+        {
+            base.InsertItem(index, item);
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+        }
+
+        protected override void ClearItems()
+        {
+            base.ClearItems();
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+
+        internal new void Add(PropertyGroup item)
+        {
+            using (new WriteLock(_addLocker))
+            {
+                var key = GetKeyForItem(item);
+                if (key != null)
+                {
+                    var exists = this.Contains(key);
+                    if (exists)
+                    {
+                        SetItem(IndexOfKey(key), item);
+                        return;
+                    }
+                }
+                base.Add(item);
+                OnAdd.IfNotNull(x => x.Invoke());//Could this not be replaced by a Mandate/Contract for ensuring item is not null
+
+                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+            }
+        }
+
+        /// <summary>
+        /// Determines whether this collection contains a <see cref="PropertyGroup"/> whose name matches the specified parameter.
+        /// </summary>
+        /// <param name="groupName">Name of the PropertyGroup.</param>
+        /// <returns><c>true</c> if the collection contains the specified name; otherwise, <c>false</c>.</returns>
+        /// <remarks></remarks>
+        public new bool Contains(string groupName)
+        {
+            return this.Any(x => x.Name == groupName);
+        }
+
+        public int IndexOfKey(string key)
+        {
+            for (var i = 0; i < this.Count; i++)
+            {
+                if (this[i].Name == key)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        protected override string GetKeyForItem(PropertyGroup item)
+        {
+            return item.Name;
+        }
+
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
+        {
+            if (CollectionChanged != null)
+            {
+                CollectionChanged(this, args);
+            }
+        }
+    }
+}
