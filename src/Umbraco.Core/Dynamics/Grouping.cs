@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
 using System.Dynamic;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Dynamics
 {
@@ -13,7 +14,7 @@ namespace Umbraco.Core.Dynamics
 
         public IEnumerator<T> GetEnumerator()
         {
-            var temp = new DynamicPublishedContentList(Elements.Cast<DynamicPublishedContent>());
+            var temp = new DynamicPublishedContentList(Elements.Cast<DynamicPublishedContentBase>());
             return (IEnumerator<T>)temp.GetEnumerator();
         }
         IEnumerator IEnumerable.GetEnumerator()
@@ -42,7 +43,7 @@ namespace Umbraco.Core.Dynamics
                     object key = null;
                     (item as DynamicObject).TryGetMember(new DynamicQueryableGetMemberBinder(ordering, false), out key);
                     return key;
-                }).Cast<DynamicPublishedContent>());
+                }).Cast<DynamicPublishedContentBase>());
             }
             else
             {
@@ -51,7 +52,7 @@ namespace Umbraco.Core.Dynamics
                     object key = null;
                     (item as DynamicObject).TryGetMember(new DynamicQueryableGetMemberBinder(ordering, false), out key);
                     return key;
-                }).Cast<DynamicPublishedContent>());
+                }).Cast<DynamicPublishedContentBase>());
             }
         }
     }

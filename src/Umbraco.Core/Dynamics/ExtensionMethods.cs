@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Dynamics
 {
@@ -47,7 +48,7 @@ namespace Umbraco.Core.Dynamics
             return new DynamicPublishedContentList(all.Items.OrderBy(x => Guid.NewGuid()).Take(max));
         }
 
-        public static DynamicPublishedContent Random(this DynamicPublishedContentList all)
+        public static DynamicPublishedContentBase Random(this DynamicPublishedContentList all)
         {
             return all.Items.OrderBy(x => Guid.NewGuid()).First();
         }

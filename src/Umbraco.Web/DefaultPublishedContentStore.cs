@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
@@ -31,6 +32,11 @@ namespace Umbraco.Web
 
     		return ConvertToDocument(GetXml(umbracoContext).GetElementById(nodeId.ToString()));
     	}
+
+		public IEnumerable<IPublishedContent> GetRootDocuments(UmbracoContext umbracoContext)
+		{
+			return (from XmlNode x in GetXml(umbracoContext).SelectNodes("/root/*[@isDoc]") select ConvertToDocument(x)).ToList();
+		}
 
 		public IPublishedContent GetDocumentByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null)
         {

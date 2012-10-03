@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Dynamics
 {
     public class DynamicGrouping : IEnumerable
     {
-        internal IEnumerable<Grouping<object, DynamicPublishedContent>> Inner;
+        internal IEnumerable<Grouping<object, DynamicPublishedContentBase>> Inner;
 
         public DynamicGrouping OrderBy(string expression)
         {
@@ -21,7 +22,7 @@ namespace Umbraco.Core.Dynamics
               .Select(node =>
                 {
                     string predicate = groupBy;
-                    var internalList = new DynamicPublishedContentList(new DynamicPublishedContent[] { node });
+                    var internalList = new DynamicPublishedContentList(new DynamicPublishedContentBase[] { node });
                     var query = (IQueryable<object>)internalList.Select(predicate, new object[] { });
                     var key = query.FirstOrDefault();
                     return new
@@ -32,13 +33,13 @@ namespace Umbraco.Core.Dynamics
                 })
               .Where(item => item.Key != null)
               .GroupBy(item => item.Key)
-              .Select(item => new Grouping<object, DynamicPublishedContent>()
+              .Select(item => new Grouping<object, DynamicPublishedContentBase>()
               {
                   Key = item.Key,
                   Elements = item.Select(inner => inner.Node)
               });
         }
-        internal DynamicGrouping(IEnumerable<Grouping<object, DynamicPublishedContent>> source)
+        internal DynamicGrouping(IEnumerable<Grouping<object, DynamicPublishedContentBase>> source)
         {
             this.Inner = source;
         }

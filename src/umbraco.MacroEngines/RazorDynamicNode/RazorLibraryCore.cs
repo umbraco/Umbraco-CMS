@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Web.Mvc;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.Models;
 using Umbraco.Web;
 using umbraco.interfaces;
 using System.Xml.Linq;

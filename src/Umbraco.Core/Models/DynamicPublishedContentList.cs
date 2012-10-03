@@ -2,32 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Dynamic;
-using Umbraco.Core.Models;
-using umbraco.interfaces;
+using Umbraco.Core.Dynamics;
 using System.Collections;
 using System.Reflection;
 
-namespace Umbraco.Core.Dynamics
+namespace Umbraco.Core.Models
 {
-    public class DynamicPublishedContentList : DynamicObject, IEnumerable<DynamicPublishedContent>
+    public class DynamicPublishedContentList : DynamicObject, IEnumerable<DynamicPublishedContentBase>
     {
-		internal List<DynamicPublishedContent> Items { get; set; }
+		internal List<DynamicPublishedContentBase> Items { get; set; }
         
         public DynamicPublishedContentList()
         {
-            Items = new List<DynamicPublishedContent>();
+            Items = new List<DynamicPublishedContentBase>();
         }
-        public DynamicPublishedContentList(IEnumerable<DynamicPublishedContent> items)
+        public DynamicPublishedContentList(IEnumerable<DynamicPublishedContentBase> items)
         {
-            List<DynamicPublishedContent> list = items.ToList();
-            list.ForEach(node => node.OwnerList = this);
+            var list = items.ToList();
             Items = list;
         }
 
         public DynamicPublishedContentList(IEnumerable<IPublishedContent> items)
         {
-            List<DynamicPublishedContent> list = items.Select(x => new DynamicPublishedContent(x)).ToList();
-			list.ForEach(node => node.OwnerList = this);
+            var list = items.Select(x => new DynamicPublishedContentBase(x)).ToList();
             Items = list;
         }
         public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
@@ -61,14 +58,14 @@ namespace Umbraco.Core.Dynamics
                 var values = args.Skip(1).ToArray();
 				//TODO: We are pre-resolving the where into a ToList() here which will have performance impacts if there where clauses
 				// are nested! We should somehow support an QueryableDocumentList!
-				result = new DynamicPublishedContentList(this.Where<DynamicPublishedContent>(predicate, values).ToList());				
+				result = new DynamicPublishedContentList(this.Where<DynamicPublishedContentBase>(predicate, values).ToList());				
                 return true;
             }
             if (name == "OrderBy")
             {
 				//TODO: We are pre-resolving the where into a ToList() here which will have performance impacts if there where clauses
 				// are nested! We should somehow support an QueryableDocumentList!
-				result = new DynamicPublishedContentList(this.OrderBy<DynamicPublishedContent>(args.First().ToString()).ToList());
+				result = new DynamicPublishedContentList(this.OrderBy<DynamicPublishedContentBase>(args.First().ToString()).ToList());
                 return true;
             }
 			if (name == "Take")
@@ -86,7 +83,7 @@ namespace Umbraco.Core.Dynamics
                 int groupSize = 0;
                 if (int.TryParse(args.First().ToString(), out groupSize))
                 {
-                    result = this.InGroupsOf<DynamicPublishedContent>(groupSize);
+                    result = this.InGroupsOf<DynamicPublishedContentBase>(groupSize);
                     return true;
                 }
                 result = new DynamicNull();
@@ -97,7 +94,7 @@ namespace Umbraco.Core.Dynamics
                 int groupCount = 0;
                 if (int.TryParse(args.First().ToString(), out groupCount))
                 {
-                    result = this.GroupedInto<DynamicPublishedContent>(groupCount);
+                    result = this.GroupedInto<DynamicPublishedContentBase>(groupCount);
                     return true;
                 }
                 result = new DynamicNull();
@@ -105,7 +102,7 @@ namespace Umbraco.Core.Dynamics
             }
             if (name == "GroupBy")
             {
-                result = this.GroupBy<DynamicPublishedContent>(args.First().ToString());
+                result = this.GroupBy<DynamicPublishedContentBase>(args.First().ToString());
                 return true;
             }
             if (name == "Average" || name == "Min" || name == "Max" || name == "Sum")
@@ -115,9 +112,9 @@ namespace Umbraco.Core.Dynamics
             }
             if (name == "Union")
             {
-                if ((args.First() as IEnumerable<DynamicPublishedContent>) != null)
+                if ((args.First() as IEnumerable<DynamicPublishedContentBase>) != null)
                 {
-					result = new DynamicPublishedContentList(this.Items.Union(args.First() as IEnumerable<DynamicPublishedContent>));
+					result = new DynamicPublishedContentList(this.Items.Union(args.First() as IEnumerable<DynamicPublishedContentBase>));
                     return true;
                 }
                 if ((args.First() as DynamicPublishedContentList) != null)
@@ -128,9 +125,9 @@ namespace Umbraco.Core.Dynamics
             }
             if (name == "Except")
             {
-                if ((args.First() as IEnumerable<DynamicPublishedContent>) != null)
+                if ((args.First() as IEnumerable<DynamicPublishedContentBase>) != null)
                 {
-					result = new DynamicPublishedContentList(this.Items.Except(args.First() as IEnumerable<DynamicPublishedContent>, new DynamicPublishedContentIdEqualityComparer()));					
+					result = new DynamicPublishedContentList(this.Items.Except(args.First() as IEnumerable<DynamicPublishedContentBase>, new DynamicPublishedContentIdEqualityComparer()));					
                     return true;
                 }
                 if ((args.First() as DynamicPublishedContentList) != null)
@@ -141,9 +138,9 @@ namespace Umbraco.Core.Dynamics
             }
             if (name == "Intersect")
             {
-                if ((args.First() as IEnumerable<DynamicPublishedContent>) != null)
+                if ((args.First() as IEnumerable<DynamicPublishedContentBase>) != null)
                 {
-					result = new DynamicPublishedContentList(this.Items.Intersect(args.First() as IEnumerable<DynamicPublishedContent>, new DynamicPublishedContentIdEqualityComparer()));					
+					result = new DynamicPublishedContentList(this.Items.Intersect(args.First() as IEnumerable<DynamicPublishedContentBase>, new DynamicPublishedContentIdEqualityComparer()));					
                     return true;
                 }
                 if ((args.First() as DynamicPublishedContentList) != null)
@@ -202,7 +199,7 @@ namespace Umbraco.Core.Dynamics
                         //We do this to enable error checking of Razor Syntax when a method e.g. ElementAt(2) is used.
                         //When the Script is tested, there's no Children which means ElementAt(2) is invalid (IndexOutOfRange)
                         //Instead, we are going to return an empty DynamicNode.
-                    	result = DynamicPublishedContent.Empty();
+                    	result = DynamicPublishedContentBase.Empty();
                         return true;
                     }
 
@@ -368,7 +365,7 @@ namespace Umbraco.Core.Dynamics
 
         	var methodTypesToFind = new[]
         		{
-					typeof(IEnumerable<DynamicPublishedContent>),
+					typeof(IEnumerable<DynamicPublishedContentBase>),
 					typeof(DynamicPublishedContentList)
         		};
 
@@ -408,15 +405,15 @@ namespace Umbraco.Core.Dynamics
             {
 				if (result is IPublishedContent)
 				{
-					result = new DynamicPublishedContent((IPublishedContent)result);
+					result = new DynamicPublishedContentBase((IPublishedContent)result);
 				}
 				if (result is IEnumerable<IPublishedContent>)
 				{
 					result = new DynamicPublishedContentList((IEnumerable<IPublishedContent>)result);
 				}
-				if (result is IEnumerable<DynamicPublishedContent>)
+				if (result is IEnumerable<DynamicPublishedContentBase>)
 				{
-					result = new DynamicPublishedContentList((IEnumerable<DynamicPublishedContent>)result);
+					result = new DynamicPublishedContentList((IEnumerable<DynamicPublishedContentBase>)result);
 				}		
             }
             return result;
@@ -441,9 +438,9 @@ namespace Umbraco.Core.Dynamics
             return new DynamicGrouping(
                this
                .Items
-               .Select((node, index) => new KeyValuePair<int, DynamicPublishedContent>(index, node))
+               .Select((node, index) => new KeyValuePair<int, DynamicPublishedContentBase>(index, node))
                .GroupBy(kv => (object)(kv.Key / groupSize))
-               .Select(item => new Grouping<object, DynamicPublishedContent>()
+               .Select(item => new Grouping<object, DynamicPublishedContentBase>()
                {
                    Key = item.Key,
                    Elements = item.Select(inner => inner.Value)
@@ -454,9 +451,9 @@ namespace Umbraco.Core.Dynamics
             return new DynamicGrouping(
                 this
                 .Items
-                .Select((node, index) => new KeyValuePair<int, DynamicPublishedContent>(index, node))
+                .Select((node, index) => new KeyValuePair<int, DynamicPublishedContentBase>(index, node))
                 .GroupBy(kv => (object)(kv.Key / groupSize))
-                .Select(item => new Grouping<object, DynamicPublishedContent>()
+                .Select(item => new Grouping<object, DynamicPublishedContentBase>()
                 {
                     Key = item.Key,
                     Elements = item.Select(inner => inner.Value)
@@ -469,16 +466,14 @@ namespace Umbraco.Core.Dynamics
             return Items.AsQueryable().Select(predicate, values);
         }
 
-        public void Add(DynamicPublishedContent publishedContent)
+        public void Add(DynamicPublishedContentBase publishedContent)
         {
-            publishedContent.OwnerList = this;
             this.Items.Add(publishedContent);
         }
-        public void Remove(DynamicPublishedContent publishedContent)
+        public void Remove(DynamicPublishedContentBase publishedContent)
         {
             if (this.Items.Contains(publishedContent))
             {
-				publishedContent.OwnerList = null;
                 this.Items.Remove(publishedContent);
             }
         }
@@ -491,7 +486,7 @@ namespace Umbraco.Core.Dynamics
             return true;
         }
 
-    	public IEnumerator<DynamicPublishedContent> GetEnumerator()
+    	public IEnumerator<DynamicPublishedContentBase> GetEnumerator()
     	{
     		return Items.GetEnumerator();
     	}

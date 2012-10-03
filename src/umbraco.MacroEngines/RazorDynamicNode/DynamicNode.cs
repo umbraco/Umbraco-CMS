@@ -30,6 +30,12 @@ namespace umbraco.MacroEngines
 {
     public class DynamicNode : DynamicObject
     {
+		/// <summary>
+		/// This callback is used only so we can set it dynamically for use in unit tests
+		/// </summary>
+		internal static Func<string, string, Guid> GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
+			ContentType.GetDataType(docTypeAlias, propertyAlias);
+
         #region consts
         // these are private readonlys as const can't be Guids
         private readonly Guid DATATYPE_YESNO_GUID = new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a");
@@ -503,6 +509,11 @@ namespace umbraco.MacroEngines
     		}
     	}
 
+		private static Guid GetDataType(string docTypeAlias, string propertyAlias)
+		{
+			return GetDataTypeCallback(docTypeAlias, propertyAlias);
+		}
+
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
 
@@ -542,9 +553,8 @@ namespace umbraco.MacroEngines
                     }
 
                     //contextAlias is the node which the property data was returned from
-                    //Guid dataType = ContentType.GetDataType(data.ContextAlias, data.Alias);
-					//SD: replaced with our temporary resolver so that we can unit test this properly, this is what DynamicPublishedContent uses until we create our new data access layer.
-                	var dataType = DynamicPublishedContentDataSourceResolver.Current.DataSource.GetDataType(data.ContextAlias, data.Alias);
+                    //Guid dataType = ContentType.GetDataType(data.ContextAlias, data.Alias);					
+                	var dataType = GetDataType(data.ContextAlias, data.Alias);
                     
                     var staticMapping = UmbracoSettings.RazorDataTypeModelStaticMapping.FirstOrDefault(mapping =>
                     {

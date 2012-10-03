@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -64,6 +65,15 @@ namespace Umbraco.Tests
 		public void TearDown()
 		{
 			
+		}
+
+		[Test]
+		public void Get_Root_Docs()
+		{
+			var result = _publishedContentStore.GetRootDocuments(_umbracoContext);
+			Assert.AreEqual(2, result.Count());
+			Assert.AreEqual(1046, result.ElementAt(0).Id);
+			Assert.AreEqual(1172, result.ElementAt(1).Id);
 		}
 
 		[TestCase("/", 1046)]

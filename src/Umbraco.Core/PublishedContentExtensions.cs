@@ -8,12 +8,15 @@ using umbraco.interfaces;
 
 namespace Umbraco.Core
 {
-	public static class DocumentExtensions
+	/// <summary>
+	/// Extension methods for IPublishedContent
+	/// </summary>
+	public static class PublishedContentExtensions
 	{
 
 		public static dynamic AsDynamic(this IPublishedContent doc)
 		{
-			var dd = new DynamicPublishedContent(doc);
+			var dd = new DynamicPublishedContentBase(doc);
 			return dd.AsDynamic();
 		}
 

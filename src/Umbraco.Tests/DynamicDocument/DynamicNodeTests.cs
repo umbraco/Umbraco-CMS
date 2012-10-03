@@ -1,9 +1,11 @@
+using System;
 using System.IO;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.Models;
 using umbraco.BusinessLogic;
 using umbraco.IO;
 using umbraco.MacroEngines;
@@ -43,6 +45,17 @@ namespace Umbraco.Tests.DynamicDocument
 				{
 					typeof(DynamicNode).Assembly
 				};
+
+			//need to specify a custom callback for unit tests
+			DynamicNode.GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
+			{
+				if (propertyAlias == "content")
+				{
+					//return the rte type id
+					return Guid.Parse("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
+				}
+				return Guid.Empty;
+			};
 
 		}
 
