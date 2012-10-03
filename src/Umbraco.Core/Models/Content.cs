@@ -10,7 +10,7 @@ using Umbraco.Core.Models.EntityBase;
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Defines a Content object
+    /// Represents a Content object
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]

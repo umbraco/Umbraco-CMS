@@ -107,8 +107,15 @@
     <Compile Include="Models\IContentType.cs" />
     <Compile Include="Models\IContentTypeBase.cs" />
     <Compile Include="Models\IContentTypeComposition.cs" />
+    <Compile Include="Models\IMacro.cs" />
+    <Compile Include="Models\IMacroProperty.cs" />
+    <Compile Include="Models\IMacroPropertyType.cs" />
     <Compile Include="Models\IMedia.cs" />
     <Compile Include="Models\IMediaType.cs" />
+    <Compile Include="Models\Macro.cs" />
+    <Compile Include="Models\MacroProperty.cs" />
+    <Compile Include="Models\MacroPropertyTypeBaseTypes.cs" />
+    <Compile Include="Models\MacroTypes.cs" />
     <Compile Include="Models\Property.cs" />
     <Compile Include="Models\PropertyCollection.cs" />
     <Compile Include="Models\PropertyGroup.cs" />

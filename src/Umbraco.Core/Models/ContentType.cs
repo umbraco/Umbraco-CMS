@@ -9,7 +9,7 @@ using Umbraco.Core.Models.EntityBase;
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Defines the type of a <see cref="Content"/> object
+    /// Represents the type of a <see cref="Content"/> object
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
