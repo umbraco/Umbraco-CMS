@@ -99,6 +99,7 @@
     <Compile Include="Models\EntityBase\IValueObject.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="ObjectResolution\WeightedPluginAttribute.cs" />
+    <Compile Include="Persistence\PetaPoco.cs" />
     <Compile Include="PropertyEditors\DatePickerPropertyEditorValueConverter.cs" />
     <Compile Include="PropertyEditors\IPropertyEditorValueConverter.cs" />
     <Compile Include="Dynamics\IDynamicDocumentDataSource.cs" />
@@ -180,7 +181,13 @@
       <Name>umbraco.interfaces</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Persistence\Caching\" />
+    <Folder Include="Persistence\Factories\" />
+    <Folder Include="Persistence\Querying\" />
+    <Folder Include="Persistence\Repositories\" />
+    <Folder Include="Persistence\UnitOfWork\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
