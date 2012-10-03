@@ -37,6 +37,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml.Linq" />
@@ -91,6 +92,11 @@
     <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="Macros\MacroTagParser.cs" />
     <Compile Include="Mandate.cs" />
+    <Compile Include="Models\EntityBase\Entity.cs" />
+    <Compile Include="Models\EntityBase\IAggreateRoot.cs" />
+    <Compile Include="Models\EntityBase\ICanBeDirty.cs" />
+    <Compile Include="Models\EntityBase\IEntity.cs" />
+    <Compile Include="Models\EntityBase\IValueObject.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="ObjectResolution\WeightedPluginAttribute.cs" />
     <Compile Include="PropertyEditors\DatePickerPropertyEditorValueConverter.cs" />
