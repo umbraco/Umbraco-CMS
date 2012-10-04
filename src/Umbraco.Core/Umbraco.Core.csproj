@@ -37,6 +37,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -81,6 +82,23 @@
     <Compile Include="Models\Script.cs" />
     <Compile Include="Models\Stylesheet.cs" />
     <Compile Include="Models\Template.cs" />
+    <Compile Include="Persistence\Caching\InMemoryCacheProvider.cs" />
+    <Compile Include="Persistence\Caching\IRepositoryCacheProvider.cs" />
+    <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
+    <Compile Include="Persistence\Factories\ContentFactory.cs" />
+    <Compile Include="Persistence\Mappers\ModelDtoMapper.cs" />
+    <Compile Include="Persistence\Querying\ExpressionHelper.cs" />
+    <Compile Include="Persistence\Querying\IQuery.cs" />
+    <Compile Include="Persistence\Querying\Query.cs" />
+    <Compile Include="Persistence\Querying\SqlTranslator.cs" />
+    <Compile Include="Persistence\Repositories\ContentRepository.cs" />
+    <Compile Include="Persistence\Repositories\IContentRepository.cs" />
+    <Compile Include="Persistence\Repositories\IContentTypeRepository.cs" />
+    <Compile Include="Persistence\Repositories\IRepository.cs" />
+    <Compile Include="Persistence\Relators\TabPropertyTypeRelator.cs" />
+    <Compile Include="Persistence\Repositories\Repository.cs" />
+    <Compile Include="Persistence\UnitOfWork\IUnitOfWork.cs" />
+    <Compile Include="Persistence\UnitOfWork\IUnitOfWorkProvider.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dynamics\ClassFactory.cs" />
@@ -271,13 +289,7 @@
       <Name>umbraco.interfaces</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Persistence\Caching\" />
-    <Folder Include="Persistence\Factories\" />
-    <Folder Include="Persistence\Querying\" />
-    <Folder Include="Persistence\Repositories\" />
-    <Folder Include="Persistence\UnitOfWork\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
