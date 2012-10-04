@@ -997,6 +997,8 @@ namespace Umbraco.Core.Configuration
             }
         }
 
+	    private static bool? _useLegacySchema;
+
         /// <summary>
         /// Whether to use the new 4.1 schema or the old legacy schema
         /// </summary>
@@ -1009,6 +1011,9 @@ namespace Umbraco.Core.Configuration
             {
 				try
 				{
+					if (_useLegacySchema.HasValue)
+						return _useLegacySchema.Value;
+
 					string value = GetKey("/settings/content/UseLegacyXmlSchema");
 					bool result;
 					if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out result))
@@ -1022,6 +1027,11 @@ namespace Umbraco.Core.Configuration
 					return false; 
 				}
             }
+			internal set
+			{
+				//used for unit  testing
+				_useLegacySchema = value;
+			}
         }
 
 		[Obsolete("This setting is not used anymore, the only file extensions that are supported are .cs and .vb files")]
