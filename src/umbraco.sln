@@ -52,8 +52,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.MacroEngines", "umb
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.MacroEngines.Iron", "umbraco.MacroEngines.Iron\umbraco.MacroEngines.Iron.csproj", "{98CBA7E2-1B62-497C-8AA3-B868704068D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.LegacyTests", "..\test\umbraco.Test\Umbraco.LegacyTests.csproj", "{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{B5BD12C1-A454-435E-8A46-FF4A364C0382}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Core", "Umbraco.Core\Umbraco.Core.csproj", "{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}"
@@ -123,10 +121,6 @@ Global
 		{98CBA7E2-1B62-497C-8AA3-B868704068D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98CBA7E2-1B62-497C-8AA3-B868704068D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98CBA7E2-1B62-497C-8AA3-B868704068D7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -144,7 +138,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{6277C9FB-3A9A-4537-AA86-82DA9B2527FD} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{5D3B8245-ADA6-453F-A008-50ED04BFE770} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 	EndGlobalSection
 EndGlobal
