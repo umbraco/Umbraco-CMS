@@ -62,6 +62,9 @@
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
+    <Compile Include="Models\DictionaryItem.cs" />
+    <Compile Include="Models\DictionaryTranslation.cs" />
+    <Compile Include="Models\Language.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dynamics\ClassFactory.cs" />
