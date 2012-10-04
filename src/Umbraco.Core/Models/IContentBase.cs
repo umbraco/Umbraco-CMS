@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
@@ -72,6 +73,12 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>PropertyTypes are kind of lazy loaded as part of the object graph</remarks>
         IEnumerable<PropertyType> PropertyTypes { get; }
+
+        /// <summary>
+        /// Set property values by alias with an annonymous object
+        /// </summary>
+        [IgnoreDataMember]
+        object PropertyValues { set; }
 
         /// <summary>
         /// Indicates whether the content object has a property with the supplied alias

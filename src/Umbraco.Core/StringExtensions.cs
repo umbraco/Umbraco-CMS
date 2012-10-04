@@ -213,6 +213,20 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Parse string to Enum
+        /// </summary>
+        /// <typeparam name="T">The enum type</typeparam>
+        /// <param name="strType">The string to parse</param>
+        /// <param name="ignoreCase">The ignore case</param>
+        /// <returns>The parsed enum</returns>
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "By Design")]
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#", Justification = "By Design")]
+        public static T EnumParse<T>(this string strType, bool ignoreCase)
+        {
+            return (T)Enum.Parse(typeof(T), strType, ignoreCase);
+        }
+
+        /// <summary>
         /// Strips all html from a string.
         /// </summary>
         /// <param name="text">The text.</param>

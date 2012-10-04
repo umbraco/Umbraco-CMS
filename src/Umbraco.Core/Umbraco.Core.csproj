@@ -75,6 +75,7 @@
     <Compile Include="Models\File.cs" />
     <Compile Include="Models\IFile.cs" />
     <Compile Include="Models\Language.cs" />
+    <Compile Include="Models\Media.cs" />
     <Compile Include="Models\Relation.cs" />
     <Compile Include="Models\RelationType.cs" />
     <Compile Include="Models\Script.cs" />

@@ -98,14 +98,19 @@ namespace Umbraco.Core.Models
         public string Name
         {
             get { return _name; }
-            set { 
+            set 
+            { 
                 _name = value;
                 OnPropertyChanged(NameSelector);
             }
         }
 
         [IgnoreDataMember]
-        public string UrlName { get { return Name.ToLower().Replace(" ", "-"); } } //TODO Needs to implement proper url casing/syntax
+        public string UrlName
+        {
+            //TODO Needs to implement proper url casing/syntax
+            get { return Name.ToLower().Replace(" ", "-"); }
+        } 
 
         /// <summary>
         /// Gets or sets the sort order of the content entity
@@ -274,21 +279,6 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Collection of properties, which make up all the data available for this Content object
-        /// </summary>
-        /// <remarks>Properties are loaded as part of the Content object graph</remarks>
-        [DataMember]
-        public PropertyCollection Properties
-        {
-            get { return _properties; }
-            set
-            {
-                _properties = value;
-                _properties.CollectionChanged += PropertiesChanged;
-            }
-        }
-
-        /// <summary>
         /// Set property values by alias with an annonymous object
         /// </summary>
         [IgnoreDataMember]
@@ -325,6 +315,20 @@ namespace Umbraco.Core.Models
                         Properties.Add(property);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Collection of properties, which make up all the data available for this Content object
+        /// </summary>
+        [DataMember]
+        public PropertyCollection Properties
+        {
+            get { return _properties; }
+            set
+            {
+                _properties = value;
+                _properties.CollectionChanged += PropertiesChanged;
             }
         }
 
@@ -470,6 +474,8 @@ namespace Umbraco.Core.Models
             }
             Properties.Add(propertyType.CreatePropertyFromValue(value));
         }
+
+        //TODO Possibly add a ToXml method, which will generate valid xml for the current Content object
 
         /// <summary>
         /// Method to call when Entity is being saved
