@@ -169,9 +169,10 @@
       <Name>Umbraco.Web</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Masterpages\" />
-    <Folder Include="Views\" />
+    <Content Include="Masterpages\dummy.txt" />
+    <Content Include="Views\dummy.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
