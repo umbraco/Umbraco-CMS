@@ -3,6 +3,7 @@ using System.Xml;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using umbraco.cms.businesslogic.template;
+using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace Umbraco.Web.Routing
 {

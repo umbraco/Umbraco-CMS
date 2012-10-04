@@ -16,6 +16,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.member;
 using umbraco.interfaces;
+using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace Umbraco.Web.Routing
 {
