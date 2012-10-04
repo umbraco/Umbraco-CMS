@@ -4,8 +4,11 @@ using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Umbraco.Core;
+using Umbraco.Core.Dynamics;
+using Umbraco.Web.Models;
 
-namespace Umbraco.Core.Dynamics
+namespace Umbraco.Web.Dynamics
 {
 	internal class ExpressionParser
 	{

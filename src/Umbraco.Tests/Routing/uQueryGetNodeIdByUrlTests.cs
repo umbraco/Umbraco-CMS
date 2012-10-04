@@ -3,38 +3,61 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Umbraco.Tests.Stubs;
 using Umbraco.Tests.TestHelpers;
 using System.Configuration;
+using Umbraco.Web;
 using Umbraco.Web.Routing;
+using umbraco.BusinessLogic;
+using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Tests.Routing
 {
 	[TestFixture]
 	public class uQueryGetNodeIdByUrlTests : BaseRoutingTest
 	{
-		protected RoutingContext GetRoutingContext()
+		public override void TearDown()
 		{
-			var url = "/test";
-			var templateId = 1111;
+			base.TearDown();
 
+			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "");
+			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "");
+		}
+
+		internal override IRoutesCache GetRoutesCache()
+		{
+			return new DefaultRoutesCache(false);
+		}
+
+		public override void Initialize()
+		{
+			base.Initialize();
+
+			var url = "/test";
+			
 			var lookup = new Umbraco.Web.Routing.LookupByNiceUrl();
 			var lookups = new Umbraco.Web.Routing.IPublishedContentLookup[] { lookup };
 
-			var umbracoContext = GetUmbracoContext(url, templateId, null);
-			var contentStore = new Umbraco.Web.DefaultPublishedContentStore();
+			var t = Template.MakeNew("test", new User(0));
+
+			var umbracoContext = GetUmbracoContext(url, t.Id);
+			var contentStore = new DefaultPublishedContentStore();
 			var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
 			var routingContext = new RoutingContext(
 				umbracoContext,
 				lookups,
-				new Umbraco.Tests.Stubs.FakeLastChanceLookup(),
+				new FakeLastChanceLookup(),
 				contentStore,
 				niceUrls);
 
 			//assign the routing context back to the umbraco context
 			umbracoContext.RoutingContext = routingContext;
 
-			return routingContext;
+			////assign the routing context back to the umbraco context
+			//umbracoContext.RoutingContext = routingContext;
+			Umbraco.Web.UmbracoContext.Current = routingContext.UmbracoContext;
 		}
+
 
 		[TestCase(1046, "/home")]
 		[TestCase(1173, "/home/sub1")]
@@ -47,9 +70,7 @@ namespace Umbraco.Tests.Routing
 
 		public void GetNodeIdByUrl_Not_Hiding_Top_Level_Absolute(int nodeId, string url)
 		{
-			var routingContext = GetRoutingContext();
-			Umbraco.Web.UmbracoContext.Current = routingContext.UmbracoContext;
-
+			
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false");
 			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
@@ -68,9 +89,6 @@ namespace Umbraco.Tests.Routing
 
 		public void GetNodeIdByUrl_Not_Hiding_Top_Level_Relative(int nodeId, string url)
 		{
-			var routingContext = GetRoutingContext();
-			Umbraco.Web.UmbracoContext.Current = routingContext.UmbracoContext;
-
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false");
 			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;

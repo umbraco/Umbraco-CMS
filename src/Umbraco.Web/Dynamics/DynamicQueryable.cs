@@ -6,8 +6,10 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Diagnostics;
+using Umbraco.Core.Dynamics;
+using Umbraco.Web.Models;
 
-namespace Umbraco.Core.Dynamics
+namespace Umbraco.Web.Dynamics
 {
     internal static class DynamicQueryable
     {
@@ -214,7 +216,7 @@ namespace Umbraco.Core.Dynamics
                     //reroute each stacked Expression.Call into our own methods that know how to deal
                     //with DynamicNode
                     queryExpr = Expression.Call(
-                            typeof(DynamicDocumentListOrdering),
+                            typeof(DynamicPublishedContentListOrdering),
                             o.Ascending ? methodAsc : methodDesc,
                             null,
                             queryExpr,

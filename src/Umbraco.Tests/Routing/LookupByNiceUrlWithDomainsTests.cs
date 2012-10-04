@@ -14,22 +14,18 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class LookupByNiceUrlWithDomainsTests : BaseRoutingTest
 	{
+		public override void Initialize()
+		{
+			base.Initialize();
+			InitializeLanguagesAndDomains();
+		}
+
 		public override void TearDown()
 		{
 			base.TearDown();
-			ClearLanguagesAndDomains();
+			
 		}
 
-		void ClearLanguagesAndDomains()
-		{
-			var domains = Domain.GetDomains();
-			foreach (var d in domains)
-				d.Delete();
-
-			var langs = Language.GetAllAsList();
-			foreach (var l in langs.Skip(1))
-				l.Delete();
-		}
 
 		void InitializeLanguagesAndDomains()
 		{
@@ -155,7 +151,6 @@ namespace Umbraco.Tests.Routing
 
 		public void Lookup_SingleDomain(string url, int expectedId)
 		{
-			InitializeLanguagesAndDomains();
 			SetDomains3();
 
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
@@ -195,7 +190,6 @@ namespace Umbraco.Tests.Routing
 
 		public void Lookup_NestedDomains(string url, int expectedId, string expectedCulture)
 		{
-			InitializeLanguagesAndDomains();
 			SetDomains4();
 
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");

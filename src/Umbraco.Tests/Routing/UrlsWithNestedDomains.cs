@@ -71,7 +71,6 @@ namespace Umbraco.Tests.Routing
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "");
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "");
 
-			ClearLanguagesAndDomains();
 		}
 
 		internal override IRoutesCache GetRoutesCache()
@@ -79,16 +78,6 @@ namespace Umbraco.Tests.Routing
 			return new DefaultRoutesCache(false);
 		}
 
-		void ClearLanguagesAndDomains()
-		{
-			var domains = Domain.GetDomains();
-			foreach (var d in domains)
-				d.Delete();
-
-			var langs = Language.GetAllAsList();
-			foreach (var l in langs.Skip(1))
-				l.Delete();
-		}
 
 		void InitializeLanguagesAndDomains()
 		{

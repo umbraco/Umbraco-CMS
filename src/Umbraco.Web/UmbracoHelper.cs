@@ -15,6 +15,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Templates;
 using umbraco;
@@ -350,6 +351,16 @@ namespace Umbraco.Web
 			return TypedDocumentsbyIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
 		}
 
+		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<string> ids)
+		{
+			return TypedContent(ids.ToArray());
+		}
+
+		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<int> ids)
+		{
+			return TypedContent(ids.ToArray());
+		}
+
 		public dynamic Content(int id)
 		{
 			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
@@ -368,6 +379,16 @@ namespace Umbraco.Web
 		public dynamic Content(params string[] ids)
 		{
 			return DocumentByIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
+		}
+
+		public dynamic Content(IEnumerable<int> ids)
+		{
+			return Content(ids.ToArray());
+		}
+
+		public dynamic Content(IEnumerable<string> ids)
+		{
+			return Content(ids.ToArray());
 		}
 
 		#endregion
@@ -394,6 +415,16 @@ namespace Umbraco.Web
 			return TypedDocumentsbyIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
 		}
 
+		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<int> ids)
+		{
+			return TypedMedia(ids.ToArray());
+		}
+
+		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<string> ids)
+		{
+			return TypedMedia(ids.ToArray());
+		}
+
 		public dynamic Media(int id)
 		{
 			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
@@ -412,6 +443,16 @@ namespace Umbraco.Web
 		public dynamic Media(params string[] ids)
 		{
 			return DocumentByIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
+		}
+
+		public dynamic Media(IEnumerable<int> ids)
+		{
+			return Media(ids.ToArray());
+		}
+
+		public dynamic Media(IEnumerable<string> ids)
+		{
+			return Media(ids.ToArray());
 		}
 
 		#endregion
@@ -463,7 +504,7 @@ namespace Umbraco.Web
 			var nodes = ids.Select(eachId => DocumentById(eachId, store))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
 				.Cast<DynamicPublishedContent>();
-			return new DynamicDocumentList(nodes);
+			return new DynamicPublishedContentList(nodes);
 		}
 
 		private dynamic DocumentByIds(IPublishedStore store, params string[] ids)
@@ -471,7 +512,7 @@ namespace Umbraco.Web
 			var nodes = ids.Select(eachId => DocumentById(eachId, store))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
 				.Cast<DynamicPublishedContent>();
-			return new DynamicDocumentList(nodes);
+			return new DynamicPublishedContentList(nodes);
 		}
 
 		#endregion

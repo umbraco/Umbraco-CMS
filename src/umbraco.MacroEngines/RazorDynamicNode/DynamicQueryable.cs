@@ -23,7 +23,7 @@ namespace System.Linq.Dynamic
         {
             if (source == null) throw new ArgumentNullException("source");
             if (predicate == null) throw new ArgumentNullException("predicate");
-            LambdaExpression lambda = Umbraco.Core.Dynamics.DynamicExpression.ParseLambda(source.ElementType, typeof(bool), predicate, true, values);
+            LambdaExpression lambda = Umbraco.Web.Dynamics.DynamicExpression.ParseLambda(source.ElementType, typeof(bool), predicate, true, values);
             if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
             {
                 //source list is DynamicNode and the lambda returns a Func<object>
@@ -93,7 +93,7 @@ namespace System.Linq.Dynamic
         {
             if (source == null) throw new ArgumentNullException("source");
             if (selector == null) throw new ArgumentNullException("selector");
-            LambdaExpression lambda = Umbraco.Core.Dynamics.DynamicExpression.ParseLambda(source.ElementType, typeof(object), selector, false, values);
+            LambdaExpression lambda = Umbraco.Web.Dynamics.DynamicExpression.ParseLambda(source.ElementType, typeof(object), selector, false, values);
             if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
             {
                 //source list is DynamicNode and the lambda returns a Func<object>
@@ -151,7 +151,7 @@ namespace System.Linq.Dynamic
                     descending = true;
                 }
 
-				LambdaExpression lambda = Umbraco.Core.Dynamics.DynamicExpression.ParseLambda(source.ElementType, typeof(object), ordering, false, values);
+				LambdaExpression lambda = Umbraco.Web.Dynamics.DynamicExpression.ParseLambda(source.ElementType, typeof(object), ordering, false, values);
                 if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
                 {
                     //source list is DynamicNode and the lambda returns a Func<object>
@@ -288,8 +288,8 @@ namespace System.Linq.Dynamic
             if (source == null) throw new ArgumentNullException("source");
             if (keySelector == null) throw new ArgumentNullException("keySelector");
             if (elementSelector == null) throw new ArgumentNullException("elementSelector");
-            LambdaExpression keyLambda = Umbraco.Core.Dynamics.DynamicExpression.ParseLambda(source.ElementType, null, keySelector, true, values);
-            LambdaExpression elementLambda = Umbraco.Core.Dynamics.DynamicExpression.ParseLambda(source.ElementType, null, elementSelector, true, values);
+            LambdaExpression keyLambda = Umbraco.Web.Dynamics.DynamicExpression.ParseLambda(source.ElementType, null, keySelector, true, values);
+            LambdaExpression elementLambda = Umbraco.Web.Dynamics.DynamicExpression.ParseLambda(source.ElementType, null, elementSelector, true, values);
             return source.Provider.CreateQuery(
                 Expression.Call(
                     typeof(Queryable), "GroupBy",

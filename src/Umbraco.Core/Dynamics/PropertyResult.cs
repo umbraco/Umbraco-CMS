@@ -46,11 +46,6 @@ namespace Umbraco.Core.Dynamics
 
     	public Guid Version { get; private set; }
 
-    
-        public bool HasValue()
-        {
-			return !ValueAsString.IsNullOrWhiteSpace();
-        }
 
 		/// <summary>
 		/// The Id of the document for which this property belongs to

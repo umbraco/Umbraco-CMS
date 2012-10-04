@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
+using Umbraco.Web;
 using umbraco.NodeFactory;
 using umbraco.interfaces;
 using Property = umbraco.NodeFactory.Property;
@@ -13,7 +15,7 @@ namespace umbraco.MacroEngines.Library
 	/// <summary>
 	/// Extension methods for converting DynamicPublishedContent to INode
 	/// </summary>
-	internal static class DynamicDocumentExtensions
+	internal static class PublishedContentExtensions
 	{
 		
 		internal static IProperty ConvertToNodeProperty(this IPublishedContentProperty prop)
@@ -21,7 +23,7 @@ namespace umbraco.MacroEngines.Library
 			return new PropertyResult(prop.Alias, prop.Value.ToString(), prop.Version);
 		}
 
-		internal static INode ConvertToNode(this DynamicPublishedContent doc)
+		internal static INode ConvertToNode(this IPublishedContent doc)
 		{
 			var node = new ConvertedNode(doc);	
 			return node;
@@ -32,9 +34,9 @@ namespace umbraco.MacroEngines.Library
 		/// </summary>
 		private class ConvertedNode : INode
 		{
-			private readonly DynamicPublishedContent _doc;
+			private readonly IPublishedContent _doc;
 
-			public ConvertedNode(DynamicPublishedContent doc)
+			public ConvertedNode(IPublishedContent doc)
 			{
 				_doc = doc;
 				template = doc.TemplateId;
@@ -110,12 +112,12 @@ namespace umbraco.MacroEngines.Library
 
 			public DataTable ChildrenAsTable()
 			{
-				throw new NotImplementedException();
+				return _doc.ChildrenAsTable();
 			}
 
 			public DataTable ChildrenAsTable(string nodeTypeAliasFilter)
 			{
-				throw new NotImplementedException();
+				return _doc.ChildrenAsTable(nodeTypeAliasFilter);
 			}
 		}
 	}

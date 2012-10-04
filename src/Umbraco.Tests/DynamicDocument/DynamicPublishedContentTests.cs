@@ -1,10 +1,15 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using NUnit.Framework;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.Routing;
 using Umbraco.Web;
+using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
@@ -14,7 +19,7 @@ using umbraco.cms.businesslogic.web;
 namespace Umbraco.Tests.DynamicDocument
 {
 	[TestFixture]
-	public class DynamicDocumentTests : DynamicDocumentTestsBase<Umbraco.Core.Dynamics.DynamicPublishedContent, DynamicDocumentList>
+	public class DynamicPublishedContentTests : DynamicDocumentTestsBase<DynamicPublishedContent, DynamicPublishedContentList>
 	{
 		public override void Initialize()
 		{
@@ -27,6 +32,17 @@ namespace Umbraco.Tests.DynamicDocument
 						typeof(TinyMcePropertyEditorValueConverter),
 						typeof(YesNoPropertyEditorValueConverter)
 					});
+
+			//need to specify a custom callback for unit tests
+			DynamicPublishedContent.GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
+				{
+					if (propertyAlias == "content")
+					{
+						//return the rte type id
+						return Guid.Parse("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
+					}
+					return Guid.Empty;
+				};
 		}
 
 		public override void TearDown()
@@ -36,7 +52,7 @@ namespace Umbraco.Tests.DynamicDocument
 			PropertyEditorValueConvertersResolver.Reset();
 		}
 
-		internal Core.Dynamics.DynamicPublishedContent GetNode(int id)
+		internal DynamicPublishedContent GetNode(int id)
 		{
 			//var template = Template.MakeNew("test", new User(0));
 			//var ctx = GetUmbracoContext("/test", template.Id);
@@ -44,7 +60,7 @@ namespace Umbraco.Tests.DynamicDocument
 			var contentStore = new DefaultPublishedContentStore();
 			var doc = contentStore.GetDocumentById(ctx, id);
 			Assert.IsNotNull(doc);
-			var dynamicNode = new Core.Dynamics.DynamicPublishedContent(doc);
+			var dynamicNode = new DynamicPublishedContent(doc);
 			Assert.IsNotNull(dynamicNode);
 			return dynamicNode;
 		}
@@ -99,9 +115,9 @@ namespace Umbraco.Tests.DynamicDocument
 		/// </summary>
 		public class TestHelper
 		{
-			private readonly Core.Dynamics.DynamicPublishedContent _doc;
+			private readonly DynamicPublishedContent _doc;
 
-			public TestHelper(Core.Dynamics.DynamicPublishedContent doc)
+			public TestHelper(DynamicPublishedContent doc)
 			{
 				_doc = doc;
 			}

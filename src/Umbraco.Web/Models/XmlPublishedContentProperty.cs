@@ -15,7 +15,7 @@ namespace Umbraco.Web.Models
 	/// </summary>
 	[Serializable]
 	[XmlType(Namespace = "http://umbraco.org/webservices/")]
-	public class XmlDocumentProperty : IPublishedContentProperty
+	public class XmlPublishedContentProperty : IPublishedContentProperty
 	{
 		private readonly Guid _version;
 		private readonly string _alias;
@@ -54,12 +54,12 @@ namespace Umbraco.Web.Models
 			get { return _version; }
 		}
 
-		public XmlDocumentProperty()
+		public XmlPublishedContentProperty()
 		{
 
 		}
 
-		public XmlDocumentProperty(XmlNode propertyXmlData)
+		public XmlPublishedContentProperty(XmlNode propertyXmlData)
 		{
 			if (propertyXmlData != null)
 			{

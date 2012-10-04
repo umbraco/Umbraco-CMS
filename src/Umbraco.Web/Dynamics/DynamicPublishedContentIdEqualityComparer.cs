@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Web.Models;
 
-namespace Umbraco.Core.Dynamics
+namespace Umbraco.Web.Dynamics
 {
-    internal class DynamicDocumentIdEqualityComparer : EqualityComparer<DynamicPublishedContent>
+    internal class DynamicPublishedContentIdEqualityComparer : EqualityComparer<DynamicPublishedContent>
     {
 
         public override bool Equals(DynamicPublishedContent x, DynamicPublishedContent y)

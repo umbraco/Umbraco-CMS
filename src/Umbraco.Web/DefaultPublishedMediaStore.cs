@@ -27,6 +27,21 @@ namespace Umbraco.Web
 			return GetUmbracoMedia(nodeId);
 		}
 
+		public IEnumerable<IPublishedContent> GetRootDocuments(UmbracoContext umbracoContext)
+		{
+			var rootMedia = global::umbraco.cms.businesslogic.media.Media.GetRootMedias();
+			var result = new List<IPublishedContent>();
+			//TODO: need to get a ConvertFromMedia method but we'll just use this for now.
+			foreach (var media in rootMedia
+				.Select(m => global::umbraco.library.GetMedia(m.Id, true))
+				.Where(media => media != null && media.Current != null))
+			{
+				media.MoveNext();
+				result.Add(ConvertFromXPathNavigator(media.Current));
+			}
+			return result;
+		}
+
 		private IPublishedContent GetUmbracoMedia(int id)
 		{
 

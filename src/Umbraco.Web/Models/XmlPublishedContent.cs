@@ -336,7 +336,7 @@ namespace Umbraco.Web.Models
 				// load data
 				var dataXPath = UmbracoSettings.UseLegacyXmlSchema ? "data" : "* [not(@isDoc)]";
 				foreach (XmlNode n in _pageXmlNode.SelectNodes(dataXPath))
-					_properties.Add(new XmlDocumentProperty(n));
+					_properties.Add(new XmlPublishedContentProperty(n));
 
 				// load children
 				var childXPath = UmbracoSettings.UseLegacyXmlSchema ? "node" : "* [@isDoc]";

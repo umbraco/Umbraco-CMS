@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Web.Mvc;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.Models;
 using Umbraco.Web;
+using Umbraco.Web.Models;
 using umbraco.interfaces;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -144,7 +146,7 @@ namespace umbraco.MacroEngines.Library
         public dynamic Search(string term, bool useWildCards = true, string searchProvider = null)
         {
 			//wraps the functionality in UmbracoHelper but still returns the legacy DynamicNodeList
-			var nodes = ((DynamicDocumentList)_umbracoHelper.Search(term, useWildCards, searchProvider))
+			var nodes = ((DynamicPublishedContentList)_umbracoHelper.Search(term, useWildCards, searchProvider))
 				.Select(x => x.ConvertToNode());
 			return new DynamicNodeList(nodes);
         }
@@ -152,7 +154,7 @@ namespace umbraco.MacroEngines.Library
         public dynamic Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
         {
 			//wraps the functionality in UmbracoHelper but still returns the legacy DynamicNodeList
-        	var nodes = ((DynamicDocumentList) _umbracoHelper.Search(criteria, searchProvider))
+        	var nodes = ((DynamicPublishedContentList) _umbracoHelper.Search(criteria, searchProvider))
         		.Select(x => x.ConvertToNode());
         	return new DynamicNodeList(nodes);
         }
