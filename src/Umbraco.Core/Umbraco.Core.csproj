@@ -65,6 +65,8 @@
     <Compile Include="Models\DictionaryItem.cs" />
     <Compile Include="Models\DictionaryTranslation.cs" />
     <Compile Include="Models\Language.cs" />
+    <Compile Include="Models\Relation.cs" />
+    <Compile Include="Models\RelationType.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dynamics\ClassFactory.cs" />
