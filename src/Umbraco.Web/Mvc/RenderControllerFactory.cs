@@ -2,6 +2,7 @@ using System;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Mvc
 {
@@ -97,6 +98,10 @@ namespace Umbraco.Web.Mvc
 
 			public new Type GetControllerType(RequestContext requestContext, string controllerName)
 			{
+				if (controllerName.IsNullOrWhiteSpace())
+				{
+					return null;
+				}
 				return base.GetControllerType(requestContext, controllerName);
 			}
 		}
