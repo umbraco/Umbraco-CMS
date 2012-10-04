@@ -99,6 +99,8 @@
     <Compile Include="Persistence\Repositories\Repository.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkProvider.cs" />
+    <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWork.cs" />
+    <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWorkProvider.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dynamics\ClassFactory.cs" />

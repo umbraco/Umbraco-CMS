@@ -1,7 +1,7 @@
 ﻿namespace Umbraco.Core.Persistence.UnitOfWork
 {
-    public interface IUnitOfWorkProvider
+    public interface IUnitOfWorkProvider<T>
     {
-        IUnitOfWork GetUnitOfWork();
+        IUnitOfWork<T> GetUnitOfWork();
     }
 }

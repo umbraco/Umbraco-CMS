@@ -18,13 +18,13 @@ namespace Umbraco.Core.Persistence.Repositories
         private const string NodeObjectType = "C66BA18E-EAF3-4CFF-8A22-41B16D66A972";
         private readonly IContentTypeRepository _contentTypeRepository;
 
-        public ContentRepository(IUnitOfWork work, IContentTypeRepository contentTypeRepository)
+        public ContentRepository(IUnitOfWork<Database> work, IContentTypeRepository contentTypeRepository)
             : base(work)
         {
             _contentTypeRepository = contentTypeRepository;
         }
 
-        internal ContentRepository(IUnitOfWork work, IContentTypeRepository contentTypeRepository, IRepositoryCacheProvider registry)
+        internal ContentRepository(IUnitOfWork<Database> work, IContentTypeRepository contentTypeRepository, IRepositoryCacheProvider registry)
             : base(work, registry)
         {
             _contentTypeRepository = contentTypeRepository;

@@ -12,23 +12,24 @@ namespace Umbraco.Core.Persistence.Repositories
     /// Represent an abstract Repository, which is the base of the Repository implementations
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    internal abstract class Repository<TEntity> : IDisposable, IRepository<TEntity> where TEntity : class, IAggregateRoot
+    internal abstract class Repository<TEntity> : IDisposable, 
+        IRepository<TEntity> where TEntity : class, IAggregateRoot
     {
-        private IUnitOfWork _work;
+        private IUnitOfWork<Database> _work;
         private readonly IRepositoryCacheProvider _cache;
 
-        protected Repository(IUnitOfWork work)
+        protected Repository(IUnitOfWork<Database> work)
             : this(work, RuntimeCacheProvider.Current)
         {
         }
 
-        internal Repository(IUnitOfWork work, IRepositoryCacheProvider cache)
+        internal Repository(IUnitOfWork<Database> work, IRepositoryCacheProvider cache)
         {
             _work = work;
             _cache = cache;
         }
 
-        internal IUnitOfWork UnitOfWork
+        internal IUnitOfWork<Database> UnitOfWork
         {
             get { return _work; }
         }
@@ -127,9 +128,9 @@ namespace Umbraco.Core.Persistence.Repositories
             return PerformCount(query);
         }
 
-        public void SetUnitOfWork(IUnitOfWork work)
+        public void SetUnitOfWork<T>(IUnitOfWork<T> work)
         {
-            _work = work;
+            _work = work as IUnitOfWork<Database>;
         }
 
         public virtual void Dispose()

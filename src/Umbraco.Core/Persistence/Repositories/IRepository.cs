@@ -62,6 +62,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Sets the Unit Of Work for the Repository
         /// </summary>
         /// <param name="work"></param>
-        void SetUnitOfWork(IUnitOfWork work);
+        void SetUnitOfWork<T>(IUnitOfWork<T> work);
     }
 }
