@@ -13,7 +13,9 @@ namespace Umbraco.Web.Media
 
         public IImageUrlProvider Provider(string provider)
         {
-            return string.IsNullOrEmpty(provider) ? Values.First(v => v.Name == ImageUrlProvider.DefaultName) : Values.First(v => v.Name == provider);
+            return string.IsNullOrEmpty(provider) ? 
+                Values.First(v => v.Name.Equals(ImageUrlProvider.DefaultName, StringComparison.InvariantCultureIgnoreCase)) : 
+                Values.First(v => v.Name.Equals(provider, StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }

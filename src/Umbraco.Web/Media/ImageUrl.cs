@@ -83,10 +83,16 @@ namespace Umbraco.Web.Media
 
         private static object GetContentFromCache(int nodeIdInt, string field)
         {
-            object content =
-                ContextFactory.Context.Cache[
-                    String.Format("contentItem{0}_{1}", nodeIdInt.ToString(CultureInfo.InvariantCulture), field)];
-            return content;
+            HttpContext context = HttpContext.Current;
+            if (context != null)
+            {
+                object content = context.Cache[String.Format("contentItem{0}_{1}", nodeIdInt.ToString(CultureInfo.InvariantCulture), field)];
+                return content;
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
     }
 }
