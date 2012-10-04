@@ -12,7 +12,7 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.DynamicDocument
 {
 	[TestFixture]
-	public abstract class DynamicDocumentTestsBase<TDocument, TDocumentList> : BaseWebTest
+	public abstract class DynamicDocumentTestsBase<TDocument, TDocumentList> : BaseRoutingTest
 	{
 		public override void Initialize()
 		{
@@ -72,6 +72,58 @@ namespace Umbraco.Tests.DynamicDocument
 		/// <param name="id"></param>
 		/// <returns></returns>
 		protected abstract dynamic GetDynamicNode(int id);
+
+		[Test]
+		public void Index()
+		{
+			var doc = GetDynamicNode(1173);
+			Assert.AreEqual(0, doc.Index());
+			doc = GetDynamicNode(1176);
+			Assert.AreEqual(1, doc.Index());
+			doc = GetDynamicNode(1177);
+			Assert.AreEqual(2, doc.Index());
+			doc = GetDynamicNode(1178);
+			Assert.AreEqual(3, doc.Index());
+		}
+
+		[Test]
+		public void Is_First()
+		{
+			var doc = GetDynamicNode(1046); //test root nodes
+			Assert.IsTrue(doc.IsFirst());
+			doc = GetDynamicNode(1172);
+			Assert.IsFalse(doc.IsFirst());
+			doc = GetDynamicNode(1173); //test normal nodes
+			Assert.IsTrue(doc.IsFirst());
+			doc = GetDynamicNode(1175);
+			Assert.IsFalse(doc.IsFirst());
+		}
+
+		[Test]
+		public void Is_Not_First()
+		{
+			var doc = GetDynamicNode(1046); //test root nodes
+			Assert.IsFalse(doc.IsNotFirst());
+			doc = GetDynamicNode(1172);
+			Assert.IsTrue(doc.IsNotFirst());
+			doc = GetDynamicNode(1173); //test normal nodes
+			Assert.IsFalse(doc.IsNotFirst());
+			doc = GetDynamicNode(1175);
+			Assert.IsTrue(doc.IsNotFirst());
+		}
+
+		[Test]
+		public void Is_Position()
+		{
+			var doc = GetDynamicNode(1046); //test root nodes
+			Assert.IsTrue(doc.IsPosition(0));
+			doc = GetDynamicNode(1172);
+			Assert.IsTrue(doc.IsPosition(1));
+			doc = GetDynamicNode(1173); //test normal nodes
+			Assert.IsTrue(doc.IsPosition(0));
+			doc = GetDynamicNode(1175);
+			Assert.IsTrue(doc.IsPosition(1));
+		}
 
 		[Test]
 		public void Children_GroupBy_DocumentTypeAlias()
