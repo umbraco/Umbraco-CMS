@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 
@@ -7,6 +9,8 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Represents a Template file
     /// </summary>
+    [Serializable]
+    [DataContract(IsReference = true)]
     public class Template : File
     {
         public Template(string path)

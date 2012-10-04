@@ -1,8 +1,13 @@
-﻿namespace Umbraco.Core.Models
+﻿using System;
+using System.Runtime.Serialization;
+
+namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Enum for the various types of Macros
     /// </summary>
+    [Serializable]
+    [DataContract(IsReference = true)]
     public enum MacroTypes
     {
         Xslt = 1,

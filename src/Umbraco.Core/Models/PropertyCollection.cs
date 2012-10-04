@@ -8,6 +8,9 @@ using System.Threading;
 
 namespace Umbraco.Core.Models
 {
+    /// <summary>
+    /// Represents a Collection of <see cref="Property"/> objects
+    /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
     public class PropertyCollection : KeyedCollection<string, Property>, INotifyCollectionChanged

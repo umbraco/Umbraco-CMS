@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Css;
 using Umbraco.Core.Models.EntityBase;
@@ -9,6 +11,8 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Represents a Stylesheet file
     /// </summary>
+    [Serializable]
+    [DataContract(IsReference = true)]
     public class Stylesheet : File
     {
         public Stylesheet(string path) : base(path)
@@ -19,6 +23,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Returns a list of <see cref="StylesheetProperty"/>
         /// </summary>
+        [IgnoreDataMember]
         public IEnumerable<StylesheetProperty> Properties
         {
             get
@@ -26,6 +31,7 @@ namespace Umbraco.Core.Models
                 var properties = new List<StylesheetProperty>();
                 var parser = new CssParser(Path);//TODO change CssParser so we can use Content instead of Path
 
+                //TODO Need to explorer how the Stylesheet should be iterated to generate a list of css properties
                 foreach (CssAtRule statement in parser.StyleSheet.Statements)
                 {
                     properties.Add(new StylesheetProperty(statement.Value, ""));

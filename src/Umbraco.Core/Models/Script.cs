@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Runtime.Serialization;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 
@@ -7,6 +9,8 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Represents a Script file
     /// </summary>
+    [Serializable]
+    [DataContract(IsReference = true)]
     public class Script : File
     {
         public Script(string path) : base(path)
