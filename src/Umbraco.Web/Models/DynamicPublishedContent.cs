@@ -12,6 +12,7 @@ using Umbraco.Core.PropertyEditors;
 using System.Reflection;
 using System.Xml.Linq;
 using umbraco.cms.businesslogic;
+using ContentType = umbraco.cms.businesslogic.ContentType;
 
 namespace Umbraco.Web.Models
 {
