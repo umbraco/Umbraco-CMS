@@ -58,6 +58,11 @@
     <Compile Include="Configuration\FileSystemProviderElement.cs" />
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
+    <Compile Include="Configuration\Repositories\RepositoryConfigurationSection.cs" />
+    <Compile Include="Configuration\Repositories\RepositoryMappingCollection.cs" />
+    <Compile Include="Configuration\Repositories\RepositoryMappingConstants.cs" />
+    <Compile Include="Configuration\Repositories\RepositoryMappingElement.cs" />
+    <Compile Include="Configuration\Repositories\RepositorySettings.cs" />
     <Compile Include="CoreBootManager.cs" />
     <Compile Include="DataTableExtensions.cs" />
     <Compile Include="DictionaryExtensions.cs" />
@@ -98,6 +103,7 @@
     <Compile Include="Persistence\Repositories\IRepository.cs" />
     <Compile Include="Persistence\Relators\TabPropertyTypeRelator.cs" />
     <Compile Include="Persistence\Repositories\Repository.cs" />
+    <Compile Include="Persistence\RepositoryResolver.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWork.cs" />
