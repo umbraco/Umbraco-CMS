@@ -16,9 +16,76 @@ namespace Umbraco.Web
     /// An IPublishedContentStore which uses the Xml cache system to return data
     /// </summary>
     internal class DefaultPublishedContentStore : IPublishedContentStore
-    {
+	{
+		#region XPath Strings
 
-    	private IPublishedContent ConvertToDocument(XmlNode xmlNode)
+		class XPathStringsDefinition
+		{
+			public int Version { get; private set; }
+
+			public string Root { get { return "/root"; } }
+			public string RootDocuments { get; private set; }
+			public string DescendantDocumentById { get; private set; }
+			public string DescendantDocumentByAlias { get; private set; }
+			public string ChildDocumentByUrlName { get; private set; }
+			public string RootDocumentWithLowestSortOrder { get; private set; }
+
+			public XPathStringsDefinition(int version)
+			{
+				Version = version;
+
+				switch (version)
+				{
+					// legacy XML schema
+					case 0:
+						RootDocuments = "/root/node";
+						DescendantDocumentById = "//node [@id={0}]";
+						DescendantDocumentByAlias = "//node[("
+							+ "contains(concat(',',translate(data [@alias='umbracoUrlAlias'], ' ', ''),','),',{0},')"
+							+ " or contains(concat(',',translate(data [@alias='umbracoUrlAlias'], ' ', ''),','),',/{0},'"
+							+ ")]";
+						ChildDocumentByUrlName = "/node [@urlName='{0}']";
+						RootDocumentWithLowestSortOrder = "/root/node [not(@sortOrder > ../node/@sortOrder)][1]";
+						break;
+
+					// default XML schema as of 4.10
+					case 1:
+						RootDocuments = "/root/* [@isDoc]";
+						DescendantDocumentById = "//* [@isDoc and @id={0}]";
+						DescendantDocumentByAlias = "//* [@isDoc and ("
+							+ "contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{0},')"
+							+ " or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',/{0},')"
+							+ ")]";
+						ChildDocumentByUrlName = "/* [@isDoc and @urlName='{0}']";
+						RootDocumentWithLowestSortOrder = "/root/* [@isDoc and not(@sortOrder > ../* [@isDoc]/@sortOrder)][1]";
+						break;
+
+					default:
+						throw new Exception(string.Format("Unsupported Xml schema version '{0}').", version));
+				}
+			}
+		}
+
+		static XPathStringsDefinition XPathStringsValue = null;
+		static XPathStringsDefinition XPathStrings
+		{
+			get
+			{
+				// in theory XPathStrings should be a static variable that
+				// we should initialize in a static ctor - but then test cases
+				// that switch schemas fail - so cache and refresh when needed,
+				// ie never when running the actual site
+
+				int version = UmbracoSettings.UseLegacyXmlSchema ? 0 : 1;
+				if (XPathStringsValue == null || XPathStringsValue.Version != version)
+					XPathStringsValue = new XPathStringsDefinition(version);
+				return XPathStringsValue;
+			}
+		}
+
+		#endregion
+
+		private IPublishedContent ConvertToDocument(XmlNode xmlNode)
 		{
 			if (xmlNode == null)
 				return null;
@@ -35,7 +102,7 @@ namespace Umbraco.Web
 
 		public IEnumerable<IPublishedContent> GetRootDocuments(UmbracoContext umbracoContext)
 		{
-			return (from XmlNode x in GetXml(umbracoContext).SelectNodes("/root/*[@isDoc]") select ConvertToDocument(x)).ToList();
+			return (from XmlNode x in GetXml(umbracoContext).SelectNodes(XPathStrings.RootDocuments) select ConvertToDocument(x)).ToList();
 		}
 
 		public IPublishedContent GetDocumentByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null)
@@ -81,24 +148,21 @@ namespace Umbraco.Web
 
             alias = alias.TrimStart('/');
             var xpathBuilder = new StringBuilder();
-            xpathBuilder.Append("/root");
-            if (rootNodeId > 0)
-                xpathBuilder.AppendFormat("//*[@isDoc and @id={0}]", rootNodeId);
-            xpathBuilder.Append("//*[@isDoc and (");
-            xpathBuilder.AppendFormat("contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{0},')", alias);
-            xpathBuilder.AppendFormat(" or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',/{0},')", alias);
-            xpathBuilder.Append(")]");
+            xpathBuilder.Append(XPathStrings.Root);
 
-            var xpath = xpathBuilder.ToString();
+			if (rootNodeId > 0)
+				xpathBuilder.AppendFormat(XPathStrings.DescendantDocumentById, rootNodeId);
+			xpathBuilder.AppendFormat(XPathStrings.DescendantDocumentByAlias, alias);
+
+			var xpath = xpathBuilder.ToString();
 
 			return ConvertToDocument(GetXml(umbracoContext).SelectSingleNode(xpath));
         }
 
         public bool HasContent(UmbracoContext umbracoContext)
         {
-            const string xpath = "/root/*[@isDoc]";
-            var node = GetXml(umbracoContext).SelectSingleNode(xpath);
-            return node != null;
+			var node = GetXml(umbracoContext).SelectSingleNode(XPathStrings.RootDocuments);
+			return node != null;
         }
 
 		XmlDocument GetXml(UmbracoContext umbracoContext)
@@ -119,8 +183,8 @@ namespace Umbraco.Web
                 // if url is empty
                 if (startNodeId > 0)
                 {
-                    // if in a domain then use the root node of the domain
-                    xpath = string.Format("/root//*[@isDoc and @id={0}]", startNodeId);
+					// if in a domain then use the root node of the domain
+					xpath = string.Format(XPathStrings.Root + XPathStrings.DescendantDocumentById, startNodeId);                    
                 }
                 else
                 {
@@ -137,7 +201,7 @@ namespace Umbraco.Web
 
 					// and we can't use min() because that's XPath 2.0
 					// that one works
-					xpath = "/root/*[@isDoc and not(@sortOrder > ../*[@isDoc]/@sortOrder)][1]";
+					xpath = XPathStrings.RootDocumentWithLowestSortOrder;
                 }
             }
             else
@@ -147,20 +211,23 @@ namespace Umbraco.Web
                 var xpathBuilder = new StringBuilder();
                 int partsIndex = 0;
 
-                xpathBuilder.Append("/root");
-				
                 if (startNodeId == 0)
                 {
-                    if (hideTopLevelNodeFromPath)
-                        xpathBuilder.Append("/*[@isDoc]"); // first node is not in the url
+					if (hideTopLevelNodeFromPath)
+						xpathBuilder.Append(XPathStrings.RootDocuments); // first node is not in the url
+					else
+						xpathBuilder.Append(XPathStrings.Root);
                 }
                 else
                 {
-                    xpathBuilder.AppendFormat("//*[@isDoc and @id={0}]", startNodeId);
+					xpathBuilder.AppendFormat(XPathStrings.Root + XPathStrings.DescendantDocumentById, startNodeId);
 					// always "hide top level" when there's a domain
                 }
+
                 while (partsIndex < urlParts.Length)
-                    xpathBuilder.AppendFormat("/*[@isDoc and @urlName='{0}']", urlParts[partsIndex++]);
+                {
+					xpathBuilder.AppendFormat(XPathStrings.ChildDocumentByUrlName, urlParts[partsIndex++]);
+                }
 
                 xpath = xpathBuilder.ToString();
             }

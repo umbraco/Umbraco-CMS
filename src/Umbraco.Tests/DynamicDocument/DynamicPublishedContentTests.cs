@@ -43,6 +43,10 @@ namespace Umbraco.Tests.DynamicDocument
 					}
 					return Guid.Empty;
 				};
+
+			var rCtx = GetRoutingContext("/test", 1234);
+			UmbracoContext.Current = rCtx.UmbracoContext;
+			PublishedContentStoreResolver.Current = new PublishedContentStoreResolver(new DefaultPublishedContentStore());
 		}
 
 		public override void TearDown()
@@ -50,6 +54,8 @@ namespace Umbraco.Tests.DynamicDocument
 			base.TearDown();
 
 			PropertyEditorValueConvertersResolver.Reset();
+			PublishedContentStoreResolver.Reset();
+			UmbracoContext.Current = null;
 		}
 
 		internal DynamicPublishedContent GetNode(int id)

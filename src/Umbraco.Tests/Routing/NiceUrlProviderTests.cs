@@ -10,6 +10,11 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class NiceUrlProviderTests : BaseRoutingTest
 	{
+		public override void Initialize()
+		{
+			base.Initialize();
+			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
+		}
 
 		public override void TearDown()
 		{

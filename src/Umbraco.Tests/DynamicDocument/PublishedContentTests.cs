@@ -51,7 +51,7 @@ namespace Umbraco.Tests.DynamicDocument
 		</Home>
 		<Home id=""1175"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-20T18:08:01"" updateDate=""2012-07-20T18:49:32"" nodeName=""Sub 2"" urlName=""sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1175"" isDoc=""""><content><![CDATA[]]></content>
 		</Home>
-		<CustomDocument id=""4444"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,4444"" isDoc="""" />
+		<CustomDocument id=""4444"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,4444"" isDoc="""" />
 	</Home>
 	<CustomDocument id=""1172"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1172"" isDoc="""" />
 </root>";
@@ -79,6 +79,10 @@ namespace Umbraco.Tests.DynamicDocument
 					}
 					return Guid.Empty;
 				};
+
+			var umbCtx = GetUmbracoContext("/test", 1234);
+			UmbracoContext.Current = umbCtx;
+			PublishedContentStoreResolver.Current = new PublishedContentStoreResolver(new DefaultPublishedContentStore());
 		}
 
 		public override void TearDown()
@@ -86,6 +90,8 @@ namespace Umbraco.Tests.DynamicDocument
 			base.TearDown();
 
 			PropertyEditorValueConvertersResolver.Reset();
+			PublishedContentStoreResolver.Reset();
+			UmbracoContext.Current = null;
 		}
 
 		internal IPublishedContent GetNode(int id)
@@ -95,6 +101,58 @@ namespace Umbraco.Tests.DynamicDocument
 			var doc = contentStore.GetDocumentById(ctx, id);
 			Assert.IsNotNull(doc);
 			return doc;
+		}
+
+		[Test]
+		public void Index()
+		{
+			var doc = GetNode(1173);
+			Assert.AreEqual(0, doc.Index());
+			doc = GetNode(1176);
+			Assert.AreEqual(1, doc.Index());
+			doc = GetNode(1177);
+			Assert.AreEqual(2, doc.Index());
+			doc = GetNode(1178);
+			Assert.AreEqual(3, doc.Index());
+		}
+
+		[Test]
+		public void Is_First()
+		{
+			var doc = GetNode(1046); //test root nodes
+			Assert.IsTrue(doc.IsFirst());
+			doc = GetNode(1172);
+			Assert.IsFalse(doc.IsFirst());
+			doc = GetNode(1173); //test normal nodes
+			Assert.IsTrue(doc.IsFirst());
+			doc = GetNode(1175);
+			Assert.IsFalse(doc.IsFirst());
+		}
+
+		[Test]
+		public void Is_Not_First()
+		{
+			var doc = GetNode(1046); //test root nodes
+			Assert.IsFalse(doc.IsNotFirst());
+			doc = GetNode(1172);
+			Assert.IsTrue(doc.IsNotFirst());
+			doc = GetNode(1173); //test normal nodes
+			Assert.IsFalse(doc.IsNotFirst());
+			doc = GetNode(1175);
+			Assert.IsTrue(doc.IsNotFirst());
+		}
+
+		[Test]
+		public void Is_Position()
+		{
+			var doc = GetNode(1046); //test root nodes
+			Assert.IsTrue(doc.IsPosition(0));
+			doc = GetNode(1172);
+			Assert.IsTrue(doc.IsPosition(1));
+			doc = GetNode(1173); //test normal nodes
+			Assert.IsTrue(doc.IsPosition(0));
+			doc = GetNode(1175);
+			Assert.IsTrue(doc.IsPosition(1));
 		}
 
 		[Test]
