@@ -51,8 +51,15 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Returns the Id of the PropertyType, which this Property is based on
         /// </summary>
-        [DataMember]
+        [IgnoreDataMember]
         internal int PropertyTypeId { get { return _propertyType.Id; } }
+
+        /// <summary>
+        /// Returns the DatabaseType that the underlaying DataType is using to store its values
+        /// </summary>
+        /// <remarks>Only used internally when saving the property value</remarks>
+        [IgnoreDataMember]
+        internal DataTypeDatabaseType DataTypeDatabaseType { get { return _propertyType.DataTypeDatabaseType; } }
 
         /// <summary>
         /// Gets or Sets the version id for the Property

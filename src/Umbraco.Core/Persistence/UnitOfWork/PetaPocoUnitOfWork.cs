@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Persistence.UnitOfWork
+﻿using Umbraco.Core.Configuration;
+
+namespace Umbraco.Core.Persistence.UnitOfWork
 {
     internal class PetaPocoUnitOfWork : IUnitOfWork<Database>
     {
@@ -7,7 +9,8 @@
 
         public PetaPocoUnitOfWork()
         {
-            _storage = new Database(@"server=.\SQLEXPRESS;database=UmbracoPOC-Site;user id=umbraco;password=umbraco", "System.Data.SqlClient");
+            var connectionString = GlobalSettings.DbDsn;
+            _storage = new Database(connectionString);
             _petaTransaction = new Transaction(_storage);
         }
 

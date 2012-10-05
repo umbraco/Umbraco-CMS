@@ -43,19 +43,19 @@ namespace Umbraco.Core.Persistence.Factories
         internal static NodeDto CreateNodeDto(IContent entity, string nodeObjectType)
         {
             var nodeDto = new NodeDto
-            {
-                CreateDate = entity.CreateDate,
-                NodeId = entity.Id,
-                Level = short.Parse(entity.Level.ToString(CultureInfo.InvariantCulture)),
-                NodeObjectType = new Guid(nodeObjectType),
-                ParentId = entity.ParentId,
-                Path = entity.Path,
-                SortOrder = entity.SortOrder,
-                Text = entity.Name,
-                Trashed = entity.Trashed,
-                UniqueId = entity.Key,
-                UserId = entity.UserId
-            };
+                              {
+                                  CreateDate = entity.CreateDate,
+                                  NodeId = entity.Id,
+                                  Level = short.Parse(entity.Level.ToString(CultureInfo.InvariantCulture)),
+                                  NodeObjectType = new Guid(nodeObjectType),
+                                  ParentId = entity.ParentId,
+                                  Path = entity.Path,
+                                  SortOrder = entity.SortOrder,
+                                  Text = entity.Name,
+                                  Trashed = entity.Trashed,
+                                  UniqueId = entity.Key,
+                                  UserId = entity.UserId
+                              };
 
             return nodeDto;
         }
@@ -63,19 +63,19 @@ namespace Umbraco.Core.Persistence.Factories
         internal static NodeDto CreateNodeDto(IContent entity, string nodeObjectType, string path, int level, int sortOrder)
         {
             var nodeDto = new NodeDto
-            {
-                CreateDate = entity.CreateDate,
-                NodeId = entity.Id,
-                Level = short.Parse(level.ToString(CultureInfo.InvariantCulture)),
-                NodeObjectType = new Guid(nodeObjectType),
-                ParentId = entity.ParentId,
-                Path = path,
-                SortOrder = sortOrder,
-                Text = entity.Name,
-                Trashed = entity.Trashed,
-                UniqueId = entity.Key,
-                UserId = entity.UserId
-            };
+                              {
+                                  CreateDate = entity.CreateDate,
+                                  NodeId = entity.Id,
+                                  Level = short.Parse(level.ToString(CultureInfo.InvariantCulture)),
+                                  NodeObjectType = new Guid(nodeObjectType),
+                                  ParentId = entity.ParentId,
+                                  Path = path,
+                                  SortOrder = sortOrder,
+                                  Text = entity.Name,
+                                  Trashed = entity.Trashed,
+                                  UniqueId = entity.Key,
+                                  UserId = entity.UserId
+                              };
 
             return nodeDto;
         }
@@ -111,17 +111,17 @@ namespace Umbraco.Core.Persistence.Factories
         {
             //NOTE Currently doesn't add Alias and templateId (legacy stuff that eventually will go away)
             var documentDto = new DocumentDto
-            {
-                ExpiresDate = entity.ExpireDate,
-                Newest = true,
-                NodeId = entity.Id,
-                Published = entity.Published,
-                ReleaseDate = entity.ReleaseDate,
-                Text = entity.Name,
-                UpdateDate = entity.UpdateDate,
-                UserId = entity.UserId,
-                VersionId = entity.Version
-            };
+                                  {
+                                      ExpiresDate = entity.ExpireDate,
+                                      Newest = true,
+                                      NodeId = entity.Id,
+                                      Published = entity.Published,
+                                      ReleaseDate = entity.ReleaseDate,
+                                      Text = entity.Name,
+                                      UpdateDate = entity.UpdateDate,
+                                      UserId = entity.UserId,
+                                      VersionId = entity.Version
+                                  };
             return documentDto;
         }
 
@@ -134,26 +134,27 @@ namespace Umbraco.Core.Persistence.Factories
             foreach (var property in properties)
             {
                 var dto = new PropertyDataDto { NodeId = id, PropertyTypeId = property.PropertyTypeId, VersionId = version };
+                //TODO Add complex (PropertyEditor) ValueModels to the Ntext/Nvarchar column as a serialized 'Object' (DataTypeDatabaseType.Object)
                 /*if (property.Value is IEditorModel)
                 {
                     var result = service.ToStream(property.Value);
                     dto.Text = result.ResultStream.ToJsonString();
                 }*/
-                if (property.Value is int)
+                if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer)
                 {
                     dto.Integer = int.Parse(property.Value.ToString());
                 }
-                else if (property.Value is DateTime)
+                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Date)
                 {
                     dto.Date = DateTime.Parse(property.Value.ToString());
                 }
-                else if (property.Value is string)
+                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Ntext)
                 {
                     dto.Text = property.Value.ToString();
                 }
-                else if (property.Value != null)
+                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Nvarchar)
                 {
-                    dto.VarChar = property.Value.ToString();//TODO Check how/when NVarChar is actually set/used
+                    dto.VarChar = property.Value.ToString();
                 }
 
                 propertyDataDtos.Add(dto);

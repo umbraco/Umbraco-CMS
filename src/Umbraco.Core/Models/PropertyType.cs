@@ -249,12 +249,18 @@ namespace Umbraco.Core.Models
             return new Property(this, value);
         }
 
+        /// <summary>
+        /// Validates the Value from a Property according to its type
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns>True if valid, otherwise false</returns>
         public bool IsPropertyTypeValid(object value)
         {
             //Check type if the type of the value match the type from the DataType/PropertyEditor
             Type type = value.GetType();
-            /*bool isEditorModel = value is IEditorModel;
 
+            //TODO Add PropertyEditor Type validation when its relevant to introduce
+            /*bool isEditorModel = value is IEditorModel;
             if (isEditorModel && DataTypeControlId != Guid.Empty)
             {
                 //Find PropertyEditor by Id
@@ -270,15 +276,12 @@ namespace Umbraco.Core.Models
 
             if (DataTypeControlId != Guid.Empty)
             {
-                //Note that this check will only work when the PropertyType has been instantiated through the repository
-                //Programmatically creating a PropertyType will not set the DataType Control ID nor the DataType Id.
-                //Consider adding the DataType/PropertyEditor as a constructor dependency, so we can set the DataTypeControlId
-
                 //Find DataType by Id
                 //IDataType dataType = DataTypesResolver.Current.GetById(DataTypeControlId);
                 //Check if dataType is null (meaning that the ControlId is valid) ?
                 //Possibly cast to BaseDataType and get the DbType from there (which might not be possible because it lives in umbraco.cms.businesslogic.datatype) ?
 
+                //Simple validation using the DatabaseType from the DataTypeDefinition and Type of the passed in value
                 if (DataTypeDatabaseType == DataTypeDatabaseType.Integer && type == typeof(int))
                     return true;
 
@@ -299,6 +302,11 @@ namespace Umbraco.Core.Models
             return false;
         }
 
+        /// <summary>
+        /// Validates the Value from a Property according to the validation settings
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns>True if valid, otherwise false</returns>
         public bool IsPropertyValueValid(object value)
         {
             //If the Property is mandatory and value is null or empty, return false as the validation failed
@@ -312,6 +320,7 @@ namespace Umbraco.Core.Models
                 return regexPattern.IsMatch(value.ToString());
             }
 
+            //TODO Add PropertyEditor validation when its relevant to introduce
             /*if (value is IEditorModel && DataTypeControlId != Guid.Empty)
             {
                 //Find PropertyEditor by Id
