@@ -6,7 +6,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
     Umbraco.Controls.TreePicker = function(clientId, label, itemIdValueClientID, itemTitleClientID, itemPickerUrl, width, height, showHeader, umbracoPath) {
         var obj = {
             _itemPickerUrl: itemPickerUrl,
-            _webServiceUrl: umbracoPath + "/webservices/legacyAjaxCalls.asmx/GetNodeName",
+            //_webServiceUrl: umbracoPath + "/webservices/legacyAjaxCalls.asmx/GetNodeName",        // legacy service returns string with just node name
+            _webServiceUrl: umbracoPath + "/webservices/legacyAjaxCalls.asmx/GetNodeBreadcrumbs",   // new service returns array representing path/breadcrumbs
             _label: label,
             _width: width,
             _height: height,
@@ -37,14 +38,23 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function(msg) {
-                        $("#" + _this._itemTitleClientID).html(msg.d);
-                        $("#" + _this._itemTitleClientID).parent().show();
+                        var a = msg.d;
+                        var name = a[a.length - 1];
+                        var breadcrumbs = a.join(" > ");
+                        $("#" + _this._itemTitleClientID)
+                            .html(name)
+                            .attr('title', breadcrumbs)
+                            .parent()
+                                .show();
                     }
                 });
             },
 
             ClearSelection: function() {
-                $("#" + this._itemTitleClientID).parent().hide();
+                $("#" + this._itemTitleClientID)
+                    .attr('title', '')
+                    .parent()
+                        .hide();
                 $("#" + this._itemIdValueClientID).val('');
             }
         };
