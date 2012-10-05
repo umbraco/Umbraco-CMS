@@ -28,7 +28,7 @@ namespace umbraco.presentation.umbraco.dashboard
                 if (tempPassword == confirmpassword.Text)
                 {
                     // make sure password is not empty
-                    user.ChangePassword(u.Password, tempPassword);
+                    user.ChangePassword(currentpassword.Text, tempPassword);
                     changeForm.Visible = false;
                     errorPane.Visible = false;
                     passwordChanged.Visible = true;
