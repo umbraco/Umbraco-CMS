@@ -29,13 +29,13 @@ namespace Umbraco.Core.Models.EntityBase
         /// Gets or sets the Created Date
         /// </summary>
         [DataMember]
-        DateTime CreatedDate { get; set; }
+        DateTime CreateDate { get; set; }
 
         /// <summary>
         /// Gets or sets the Modified Date
         /// </summary>
         [DataMember]
-        DateTime ModifiedDate { get; set; }
+        DateTime UpdateDate { get; set; }
 
         /// <summary>
         /// Indicates whether the current entity has an identity, eg. Id.

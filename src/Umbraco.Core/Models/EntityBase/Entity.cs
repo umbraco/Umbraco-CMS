@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models.EntityBase
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public abstract class Entity : IEntity
+    public abstract class Entity : IEntity, ICanBeDirty
     {
         private bool _hasIdentity;
         private int? _hash;
@@ -59,13 +59,13 @@ namespace Umbraco.Core.Models.EntityBase
         /// Gets or sets the Created Date
         /// </summary>
         [DataMember]
-        public DateTime CreatedDate { get; set; }
+        public DateTime CreateDate { get; set; }
 
         /// <summary>
         /// Gets or sets the Modified Date
         /// </summary>
         [DataMember]
-        public DateTime ModifiedDate { get; set; }
+        public DateTime UpdateDate { get; set; }
 
         /// <summary>
         /// Property changed event
@@ -91,8 +91,8 @@ namespace Umbraco.Core.Models.EntityBase
         /// </summary>
         internal virtual void AddingEntity()
         {
-            CreatedDate = DateTime.UtcNow;
-            ModifiedDate = DateTime.UtcNow;
+            CreateDate = DateTime.UtcNow;
+            UpdateDate = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Models.EntityBase
         /// </summary>
         internal virtual void UpdatingEntity()
         {
-            ModifiedDate = DateTime.UtcNow;
+            UpdateDate = DateTime.UtcNow;
         }
 
         /// <summary>

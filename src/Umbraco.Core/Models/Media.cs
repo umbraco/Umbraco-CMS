@@ -186,46 +186,6 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Set property values by alias with an annonymous object
-        /// </summary>
-        [IgnoreDataMember]
-        public object PropertyValues
-        {
-            set
-            {
-                if (value == null)
-                    throw new Exception("No properties has been passed in");
-
-                var propertyInfos = value.GetType().GetProperties();
-                foreach (var propertyInfo in propertyInfos)
-                {
-                    //Check if a PropertyType with alias exists thus being a valid property
-                    var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias == propertyInfo.Name);
-                    if (propertyType == null)
-                        throw new Exception(
-                            string.Format(
-                                "The property alias {0} is not valid, because no PropertyType with this alias exists",
-                                propertyInfo.Name));
-
-                    //Check if a Property with the alias already exists in the collection thus being updated or inserted
-                    var item = Properties.FirstOrDefault(x => x.Alias == propertyInfo.Name);
-                    if (item != null)
-                    {
-                        item.Value = propertyInfo.GetValue(value, null);
-                        //Update item with newly added value
-                        Properties.Add(item);
-                    }
-                    else
-                    {
-                        //Create new Property to add to collection
-                        var property = propertyType.CreatePropertyFromValue(propertyInfo.GetValue(value, null));
-                        Properties.Add(property);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// List of properties, which make up all the data available for this Media object
         /// </summary>
         public PropertyCollection Properties

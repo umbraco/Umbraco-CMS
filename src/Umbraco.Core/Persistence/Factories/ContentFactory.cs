@@ -31,8 +31,8 @@ namespace Umbraco.Core.Persistence.Factories
                 SortOrder = documentDto.ContentVersionDto.ContentDto.NodeDto.SortOrder,
                 Trashed = documentDto.ContentVersionDto.ContentDto.NodeDto.Trashed,
                 Published = documentDto.Published,
-                CreatedDate = documentDto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
-                ModifiedDate = documentDto.ContentVersionDto.VersionDate,
+                CreateDate = documentDto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
+                UpdateDate = documentDto.ContentVersionDto.VersionDate,
                 ExpireDate = documentDto.ExpiresDate,
                 ReleaseDate = documentDto.ReleaseDate,
                 Version = documentDto.ContentVersionDto.VersionId,
@@ -44,7 +44,7 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var nodeDto = new NodeDto
             {
-                CreateDate = entity.CreatedDate,
+                CreateDate = entity.CreateDate,
                 NodeId = entity.Id,
                 Level = short.Parse(entity.Level.ToString(CultureInfo.InvariantCulture)),
                 NodeObjectType = new Guid(nodeObjectType),
@@ -64,7 +64,7 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var nodeDto = new NodeDto
             {
-                CreateDate = entity.CreatedDate,
+                CreateDate = entity.CreateDate,
                 NodeId = entity.Id,
                 Level = short.Parse(level.ToString(CultureInfo.InvariantCulture)),
                 NodeObjectType = new Guid(nodeObjectType),
@@ -101,7 +101,7 @@ namespace Umbraco.Core.Persistence.Factories
             var contentVersionDto = new ContentVersionDto
             {
                 NodeId = entity.Id,
-                VersionDate = entity.ModifiedDate,
+                VersionDate = entity.UpdateDate,
                 VersionId = entity.Version
             };
             return contentVersionDto;
@@ -118,7 +118,7 @@ namespace Umbraco.Core.Persistence.Factories
                 Published = entity.Published,
                 ReleaseDate = entity.ReleaseDate,
                 Text = entity.Name,
-                UpdateDate = entity.ModifiedDate,
+                UpdateDate = entity.UpdateDate,
                 UserId = entity.UserId,
                 VersionId = entity.Version
             };

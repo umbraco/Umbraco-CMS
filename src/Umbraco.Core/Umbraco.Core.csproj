@@ -63,6 +63,7 @@
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
+    <Compile Include="Models\ContentExtensions.cs" />
     <Compile Include="Models\Css\CssCompactor.cs" />
     <Compile Include="Models\Css\CssParser.cs" />
     <Compile Include="Models\Css\CssSyntax.cs" />
@@ -101,6 +102,16 @@
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWorkProvider.cs" />
+    <Compile Include="PropertyEditors\Attributes\PropertyEditorAttribute.cs" />
+    <Compile Include="PropertyEditors\Attributes\ShowLabelAttribute.cs" />
+    <Compile Include="PropertyEditors\BlankPreValueModel.cs" />
+    <Compile Include="PropertyEditors\EditorModel.cs" />
+    <Compile Include="PropertyEditors\EditorModel`T.cs" />
+    <Compile Include="PropertyEditors\IValueModel.cs" />
+    <Compile Include="PropertyEditors\PreValueDefinition.cs" />
+    <Compile Include="PropertyEditors\PreValueModel.cs" />
+    <Compile Include="PropertyEditors\PropertyEditor.cs" />
+    <Compile Include="PropertyEditors\PropertyEditor`T.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dynamics\ClassFactory.cs" />

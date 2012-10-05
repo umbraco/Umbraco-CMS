@@ -75,12 +75,6 @@ namespace Umbraco.Core.Models
         IEnumerable<PropertyType> PropertyTypes { get; }
 
         /// <summary>
-        /// Set property values by alias with an annonymous object
-        /// </summary>
-        [IgnoreDataMember]
-        object PropertyValues { set; }
-
-        /// <summary>
         /// Indicates whether the content object has a property with the supplied alias
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType</param>

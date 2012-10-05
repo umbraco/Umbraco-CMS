@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Relation : Entity
     {
-        //NOTE: The datetime column from umbracoRelation is set on CreatedDate on the Entity
+        //NOTE: The datetime column from umbracoRelation is set on CreateDate on the Entity
         private int _parentId;
         private int _childId;
         private RelationType _relationType;

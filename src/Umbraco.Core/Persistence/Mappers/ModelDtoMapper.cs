@@ -42,7 +42,7 @@ namespace Umbraco.Core.Persistence.Mappers
                     case "Key":
                         columnName = "[umbracoNode].[uniqueID]";
                         return true;
-                    case "CreatedDate":
+                    case "CreateDate":
                         columnName = "[umbracoNode].[createDate]";
                         return true;
                     case "Name":
