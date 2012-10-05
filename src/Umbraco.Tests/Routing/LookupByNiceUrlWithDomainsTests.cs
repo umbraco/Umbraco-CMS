@@ -18,6 +18,7 @@ namespace Umbraco.Tests.Routing
 		{
 			base.Initialize();
 			InitializeLanguagesAndDomains();
+			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
 		}
 
 		public override void TearDown()

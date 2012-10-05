@@ -21,6 +21,8 @@ namespace Umbraco.Web
 
 		class XPathStringsDefinition
 		{
+			public int Version { get; private set; }
+
 			public string Root { get { return "/root"; } }
 			public string RootDocuments { get; private set; }
 			public string DescendantDocumentById { get; private set; }
@@ -30,6 +32,8 @@ namespace Umbraco.Web
 
 			public XPathStringsDefinition(int version)
 			{
+				Version = version;
+
 				switch (version)
 				{
 					// legacy XML schema
@@ -62,11 +66,21 @@ namespace Umbraco.Web
 			}
 		}
 
-		static XPathStringsDefinition XPathStrings;
-
-		static DefaultPublishedContentStore()
+		static XPathStringsDefinition XPathStringsValue = null;
+		static XPathStringsDefinition XPathStrings
 		{
-			XPathStrings = new XPathStringsDefinition(UmbracoSettings.UseLegacyXmlSchema ? 0 : 1);
+			get
+			{
+				// in theory XPathStrings should be a static variable that
+				// we should initialize in a static ctor - but then test cases
+				// that switch schemas fail - so cache and refresh when needed,
+				// ie never when running the actual site
+
+				int version = UmbracoSettings.UseLegacyXmlSchema ? 0 : 1;
+				if (XPathStringsValue == null || XPathStringsValue.Version != version)
+					XPathStringsValue = new XPathStringsDefinition(version);
+				return XPathStringsValue;
+			}
 		}
 
 		#endregion
