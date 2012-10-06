@@ -130,6 +130,11 @@ namespace Umbraco.Web
 
 		#region Is Helpers
 
+		public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias)
+		{
+			return content.DocumentTypeAlias == docTypeAlias;
+		}
+
 		public static bool IsNull(this IPublishedContent content, string alias, bool recursive)
 		{
 			var prop = content.GetProperty(alias, recursive);

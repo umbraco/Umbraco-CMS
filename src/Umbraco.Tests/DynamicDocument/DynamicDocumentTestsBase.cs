@@ -53,14 +53,19 @@ namespace Umbraco.Tests.DynamicDocument
 				<creatorName><![CDATA[Custom data with same property name as the member name]]></creatorName>
 			</Home>
 			<Home id=""1176"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-20T18:08:08"" updateDate=""2012-07-20T19:10:52"" nodeName=""Sub 3"" urlName=""sub-3"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1176"" isDoc="""">
-				<content><![CDATA[]]></content>
+				<content><![CDATA[some content]]></content>
+				<blah><![CDATA[some content]]></blah>
 			</Home>
 			<CustomDocument id=""1177"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""custom sub 1"" urlName=""custom-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1177"" isDoc="""" />
 			<CustomDocument id=""1178"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-16T14:23:35"" nodeName=""custom sub 2"" urlName=""custom-sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1178"" isDoc="""" />
 		</Home>
 		<Home id=""1175"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-20T18:08:01"" updateDate=""2012-07-20T18:49:32"" nodeName=""Sub 2"" urlName=""sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1175"" isDoc=""""><content><![CDATA[]]></content>
 		</Home>
-		<CustomDocument id=""4444"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,4444"" isDoc="""" />
+		<CustomDocument id=""4444"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,4444"" isDoc="""">
+			<selectedNodes><![CDATA[1172,1176,1173]]></selectedNodes>
+			<CustomDocument id=""5555"" parentID=""1046"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""0"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,4444,5555"" isDoc="""">
+			</CustomDocument>
+		</CustomDocument>
 	</Home>
 	<CustomDocument id=""1172"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1172"" isDoc="""" />
 </root>";
@@ -72,6 +77,77 @@ namespace Umbraco.Tests.DynamicDocument
 		/// <param name="id"></param>
 		/// <returns></returns>
 		protected abstract dynamic GetDynamicNode(int id);
+
+		[Test]
+		public void Single()
+		{
+			var doc = GetDynamicNode(4444);
+
+			var result = doc.Children().Single();				
+
+			Assert.IsNotNull(result);
+			Assert.AreEqual(5555, result.Id);
+		}
+
+		[Test]
+		public void Single_With_Query()
+		{
+			var doc = GetDynamicNode(1046);
+
+			var result = doc.Children().Single("id==1175");
+
+			Assert.IsNotNull(result);
+			Assert.AreEqual(1175, result.Id);
+		}
+
+		[Test]
+		public void First()
+		{
+			var doc = GetDynamicNode(1173);
+
+			var result = doc.Children().First();
+
+			Assert.IsNotNull(result);
+			Assert.AreEqual(1174, result.Id);
+		}
+
+		[Test]
+		public void First_With_Query()
+		{
+			var doc = GetDynamicNode(1173);
+
+			var result = doc.Children().First("content==\"some content\"");
+
+			Assert.IsNotNull(result);
+			Assert.AreEqual(1176, result.Id);
+		}
+
+		[Test]
+		public void Where_User_Property_Value()
+		{
+			var doc = GetDynamicNode(1173);
+
+			//var result = (IEnumerable<dynamic>) doc.Children().Where("content==\"some content\"");
+			var result = (IEnumerable<dynamic>)doc.Children().Where("blah==\"some content\"");
+
+			Assert.IsNotNull(result);
+			Assert.AreEqual(1, result.Count());
+			Assert.AreEqual(1176, result.Single().Id);
+		}
+
+		[Test]
+		public void Complex_Linq()
+		{
+			var doc = GetDynamicNode(1173);
+
+			var result = doc.Ancestors().OrderBy("level")
+				.Single()
+				.Descendants()
+				.Where("GetPropertyValue(\"selectedNodes\", \"\").Split(',').Contains(\"1173\")")
+				.FirstOrDefault();
+
+			Assert.IsNotNull(result);
+		}
 
 		[Test]
 		public void Index()
@@ -132,7 +208,7 @@ namespace Umbraco.Tests.DynamicDocument
 
 			var found1 = doc.Children.GroupBy("DocumentTypeAlias");
 
-			var casted = (IEnumerable<IGrouping<object, IPublishedContent>>)(found1);
+			var casted = (IEnumerable<IGrouping<object, dynamic>>)(found1);
 			Assert.AreEqual(2, casted.Count());
 			Assert.AreEqual(2, casted.Single(x => x.Key.ToString() == "Home").Count());
 			Assert.AreEqual(1, casted.Single(x => x.Key.ToString() == "CustomDocument").Count());
@@ -151,6 +227,18 @@ namespace Umbraco.Tests.DynamicDocument
 		}
 
 		[Test]
+		public void Children_Where_NodeTypeAlias()
+		{
+			var doc = GetDynamicNode(1046);
+
+			var found1 = doc.Children.Where("NodeTypeAlias == \"CustomDocument\"");
+			var found2 = doc.Children.Where("NodeTypeAlias == \"Home\"");
+
+			Assert.AreEqual(1, found1.Count());
+			Assert.AreEqual(2, found2.Count());
+		}
+
+		[Test]
 		public void Children_Order_By_Update_Date()
 		{
 			var asDynamic = GetDynamicNode(1173);
@@ -160,6 +248,22 @@ namespace Umbraco.Tests.DynamicDocument
 
 			var correctOrder = new[] { 1178, 1177, 1174, 1176 };
 			for (var i = 0; i < correctOrder.Length ;i++)
+			{
+				Assert.AreEqual(correctOrder[i], ((dynamic)casted.ElementAt(i)).Id);
+			}
+
+		}
+
+		[Test]
+		public void Children_Order_By_Update_Date_Descending()
+		{
+			var asDynamic = GetDynamicNode(1173);
+
+			var ordered = asDynamic.Children.OrderBy("UpdateDate desc");
+			var casted = (IEnumerable<TDocument>)ordered;
+
+			var correctOrder = new[] { 1176, 1174, 1177, 1178 };
+			for (var i = 0; i < correctOrder.Length; i++)
 			{
 				Assert.AreEqual(correctOrder[i], ((dynamic)casted.ElementAt(i)).Id);
 			}

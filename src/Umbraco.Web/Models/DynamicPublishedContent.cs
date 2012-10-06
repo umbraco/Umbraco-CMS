@@ -883,6 +883,12 @@ namespace Umbraco.Web.Models
 		#endregion
 
 		#region Is Helpers
+
+		public bool IsDocumentType(string docTypeAlias)
+		{
+			return this.PublishedContent.IsDocumentType(docTypeAlias);
+		}
+
 		public bool IsNull(string alias, bool recursive)
 		{
 			return this.PublishedContent.IsNull(alias, recursive);
