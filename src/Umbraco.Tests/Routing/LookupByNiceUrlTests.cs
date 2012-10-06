@@ -10,6 +10,11 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class LookupByNiceUrlTests : BaseRoutingTest
 	{
+		public override void Initialize()
+		{
+			base.Initialize();
+			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
+		}
 
 		/// <summary>
 		/// We don't need a db for this test, will run faster without one

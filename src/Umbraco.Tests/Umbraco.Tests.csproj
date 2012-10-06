@@ -170,6 +170,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Content Include="Masterpages\dummy.txt" />
+    <Content Include="Views\dummy.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(ProjectDir)"..\..\lib\SQLCE4\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /D

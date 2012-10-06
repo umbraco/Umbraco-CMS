@@ -6,7 +6,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
     Umbraco.Controls.TreePicker = function(clientId, label, itemIdValueClientID, itemTitleClientID, itemPickerUrl, width, height, showHeader, umbracoPath) {
         var obj = {
             _itemPickerUrl: itemPickerUrl,
-            _webServiceUrl: umbracoPath + "/webservices/legacyAjaxCalls.asmx/GetNodeName",
+            _webServiceUrl: umbracoPath + "/webservices/legacyAjaxCalls.asmx/GetNodeBreadcrumbs",
             _label: label,
             _width: width,
             _height: height,
@@ -37,14 +37,23 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function(msg) {
-                        $("#" + _this._itemTitleClientID).html(msg.d);
-                        $("#" + _this._itemTitleClientID).parent().show();
+                        var a = msg.d;
+                        var name = a[a.length - 1];
+                        var breadcrumbs = a.join(" > ");
+                        $("#" + _this._itemTitleClientID)
+                            .html(name)
+                            .attr('title', breadcrumbs)
+                            .parent()
+                                .show();
                     }
                 });
             },
 
             ClearSelection: function() {
-                $("#" + this._itemTitleClientID).parent().hide();
+                $("#" + this._itemTitleClientID)
+                    .attr('title', '')
+                    .parent()
+                        .hide();
                 $("#" + this._itemIdValueClientID).val('');
             }
         };
@@ -54,17 +63,35 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
         Umbraco.Controls.TreePicker.inst[clientId] = obj;
 
         return obj;
-    }
+    };
 
+    $(document).ready(function () {
+        // Tooltip only Text
+        $('.treePickerTitle').hover(function () {
+            // Hover over code
+            var title = $(this).attr('title');
+            $(this).data('tipText', title).removeAttr('title');
+            $('<p class="treePickerTooltip"></p>').text(title).appendTo('body').fadeIn('fast');;
+        }, function () {
+            // Hover out code
+            $(this).attr('title', $(this).data('tipText'));
+            $('.treePickerTooltip').remove();
+        }).mousemove(function (e) {
+            var mousex = e.pageX + 10; //Get X coordinates
+            var mousey = e.pageY + 5; //Get Y coordinates
+            $('.treePickerTooltip').css({ top: mousey, left: mousex });
+        });
+    });
+    
     // Static methods
 
     //return the existing picker object based on client id of the control
     Umbraco.Controls.TreePicker.GetPickerById = function(id) {
         return Umbraco.Controls.TreePicker.inst[id] || null;
     };
-
+    
     // instance manager
     Umbraco.Controls.TreePicker.cntr = 0;
     Umbraco.Controls.TreePicker.inst = {};
-
+    
 })(jQuery);

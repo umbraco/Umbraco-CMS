@@ -488,6 +488,10 @@ guiEditor {
 	font-weight:	bold;
 }
 
+.treePickerTitle {
+	border-bottom: 1px dotted #333;
+}
+
 .umbMacroHolder 
 {
 	margin: 5px;
