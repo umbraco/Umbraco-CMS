@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using umbraco.MacroEngines;
 
 namespace System.Linq.Dynamic
 {
@@ -14,22 +15,22 @@ namespace System.Linq.Dynamic
 		}
 		public static Expression Parse(Type resultType, string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
 		{
-			return Umbraco.Web.Dynamics.DynamicExpression.Parse(resultType, expression, convertDynamicNullToBooleanFalse, values);
+			return Umbraco.Web.Dynamics.DynamicExpression.Parse<DynamicNode>(resultType, expression, convertDynamicNullToBooleanFalse, values);
 		}
 
 		public static LambdaExpression ParseLambda(Type itType, Type resultType, string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
 		{
-			return Umbraco.Web.Dynamics.DynamicExpression.ParseLambda(itType, resultType, expression, convertDynamicNullToBooleanFalse, values);
+			return Umbraco.Web.Dynamics.DynamicExpression.ParseLambda<DynamicNode>(itType, resultType, expression, convertDynamicNullToBooleanFalse, values);
 		}
 
 		public static LambdaExpression ParseLambda(ParameterExpression[] parameters, Type resultType, string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
 		{
-			return Umbraco.Web.Dynamics.DynamicExpression.ParseLambda(parameters, resultType, expression, convertDynamicNullToBooleanFalse, values);
+			return Umbraco.Web.Dynamics.DynamicExpression.ParseLambda<DynamicNode>(parameters, resultType, expression, convertDynamicNullToBooleanFalse, values);
 		}
 
 		public static Expression<Func<T, S>> ParseLambda<T, S>(string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
 		{
-			return Umbraco.Web.Dynamics.DynamicExpression.ParseLambda<T, S>(expression, convertDynamicNullToBooleanFalse, values);
+			return Umbraco.Web.Dynamics.DynamicExpression.ParseLambda<DynamicNode, T, S>(expression, convertDynamicNullToBooleanFalse, values);
 		}
 
 		public static Type CreateClass(params DynamicProperty[] properties)

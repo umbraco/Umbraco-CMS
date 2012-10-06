@@ -116,7 +116,7 @@ namespace Umbraco.Tests.DynamicDocument
 		{
 			var doc = GetDynamicNode(1173);
 
-			var result = doc.Children().First("content==\"some content\"");
+			var result = doc.Children().First("blah==\"some content\"");
 
 			Assert.IsNotNull(result);
 			Assert.AreEqual(1176, result.Id);
@@ -127,23 +127,23 @@ namespace Umbraco.Tests.DynamicDocument
 		{
 			var doc = GetDynamicNode(1173);
 
-			//var result = (IEnumerable<dynamic>) doc.Children().Where("content==\"some content\"");
 			var result = (IEnumerable<dynamic>)doc.Children().Where("blah==\"some content\"");
 
 			Assert.IsNotNull(result);
 			Assert.AreEqual(1, result.Count());
-			Assert.AreEqual(1176, result.Single().Id);
+			Assert.AreEqual(1176, result.Single().Id);		
 		}
 
 		[Test]
 		public void Complex_Linq()
 		{
 			var doc = GetDynamicNode(1173);
+			
 
 			var result = doc.Ancestors().OrderBy("level")
 				.Single()
 				.Descendants()
-				.Where("GetPropertyValue(\"selectedNodes\", \"\").Split(',').Contains(\"1173\")")
+				.Where("selectedNodes != null && selectedNodes != \"\" && selectedNodes.Split(new char[] {','}).Contains(\"1173\")")
 				.FirstOrDefault();
 
 			Assert.IsNotNull(result);
@@ -476,7 +476,7 @@ namespace Umbraco.Tests.DynamicDocument
 			Assert.IsNotNull(result);
 
 			var list = (IEnumerable<TDocument>)result;
-			Assert.AreEqual(8, list.Count());
+			Assert.AreEqual(9, list.Count());
 			Assert.IsTrue(list.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1046, 1173, 1174, 1176, 1175, 4444 }));
 		}
 
@@ -490,7 +490,7 @@ namespace Umbraco.Tests.DynamicDocument
 			Assert.IsNotNull(result);
 
 			var list = (IEnumerable<TDocument>)result;
-			Assert.AreEqual(7, list.Count());
+			Assert.AreEqual(8, list.Count());
 			Assert.IsTrue(list.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1174, 1176, 1175, 4444 }));
 		}
 

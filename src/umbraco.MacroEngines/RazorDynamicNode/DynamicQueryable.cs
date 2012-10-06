@@ -51,7 +51,7 @@ namespace System.Linq.Dynamic
 
         public static IQueryable GroupBy(this IQueryable source, string keySelector, string elementSelector, params object[] values)
         {
-			return (IQueryable)Umbraco.Web.Dynamics.DynamicQueryable.GroupBy(source, keySelector, elementSelector, values);	
+			return (IQueryable)Umbraco.Web.Dynamics.DynamicQueryable.GroupBy<DynamicNode>(source, keySelector, elementSelector, values);	
         }
 
         public static bool Any(this IQueryable source)
