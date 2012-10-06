@@ -293,9 +293,9 @@
     <Content Include="config\BaseRestExtensions.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="config\BaseRestExtensions.Release.config">
+    <None Include="config\BaseRestExtensions.Release.config">
       <DependentUpon>BaseRestExtensions.config</DependentUpon>
-    </Content>
+    </None>
     <None Include="config\log4net.Release.config">
       <DependentUpon>log4net.config</DependentUpon>
     </None>
