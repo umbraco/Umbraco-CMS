@@ -200,12 +200,13 @@ namespace Umbraco.Web.Dynamics
 		Dictionary<Expression, string> literals;
 		ParameterExpression it;
 		string text;
+		private readonly bool _flagConvertDynamicNullToBooleanFalse;
 		int textPos;
 		int textLen;
 		char ch;
 		Token token;
 
-		public ExpressionParser(ParameterExpression[] parameters, string expression, object[] values)
+		public ExpressionParser(ParameterExpression[] parameters, string expression, object[] values, bool flagConvertDynamicNullToBooleanFalse)
 		{
 			if (expression == null) throw new ArgumentNullException("expression");
 			if (keywords == null) keywords = CreateKeywords();
@@ -214,6 +215,7 @@ namespace Umbraco.Web.Dynamics
 			if (parameters != null) ProcessParameters(parameters);
 			if (values != null) ProcessValues(values);
 			text = expression;
+			_flagConvertDynamicNullToBooleanFalse = flagConvertDynamicNullToBooleanFalse;
 			textLen = text.Length;
 			SetTextPos(0);
 			NextToken();
@@ -839,6 +841,11 @@ namespace Umbraco.Web.Dynamics
 
 		Expression ParseMemberAccess(Type type, Expression instance)
 		{
+			//NOTE: SD: There is a lot of string checking going on here and I'm 99% sure this can all be done better
+			// in a more generic sense to support any types with any extension methods, etc...
+			// Too bad whoever wrote this decided not to put any code comments in :(
+			// This is how to support method calls, etc... in dynamic statements.
+
 			if (instance != null) type = instance.Type;
 			int errorPos = token.Pos;
 			string id = GetIdentifier();
@@ -864,17 +871,26 @@ namespace Umbraco.Web.Dynamics
 					if (typeArgs[0] == typeof(T))
 					{
 						if (instance != null && instance is LambdaExpression)
-						{
+						{							
+							//not sure why this is object or why we need to do this but if we change it, things die...
+							//also not sure why it is changed to string, i think this might be to ensure string methods are supported
+							//but seems to me that we then won't support other types of methods?
 							if (typeArgs[1] == typeof(object))
 							{
 								instanceAsString = StringFormat(instance as LambdaExpression, instanceExpression);
 								type = typeof(string);
 							}
-							if (typeArgs[1] == typeof(string))
+							else if (typeArgs[1] == typeof(string))
 							{
 								instanceAsString = instance as LambdaExpression;
 								type = typeof(string);
 							}
+							//else
+							//{
+							//	instanceAsString = instance as LambdaExpression;
+							//	type = typeArgs[1];	
+							//}
+							
 						}
 					}
 				}
@@ -882,6 +898,10 @@ namespace Umbraco.Web.Dynamics
 				{
 					case 0:
 						//not found
+
+						//SD: I have yet to see extension methods actually being called in the dynamic parsing... need to unit test these
+						// scenarios and figure out why all this type checking occurs.
+
 						if (type == typeof(string) && instanceAsString != null)
 						{
 							Expression[] newArgs = (new List<Expression>() { Expression.Invoke(instanceAsString, instanceExpression) }).Concat(args).ToArray();
@@ -944,7 +964,7 @@ namespace Umbraco.Web.Dynamics
 						BlockExpression block = Expression.Block(
 							typeof(object),
 							new[] { ignoreCase, binder, result, convertDynamicNullToBooleanFalse },
-							Expression.Assign(convertDynamicNullToBooleanFalse, Expression.Constant(DynamicExpression.ConvertDynamicNullToBooleanFalse, typeof(bool))),
+							Expression.Assign(convertDynamicNullToBooleanFalse, Expression.Constant(_flagConvertDynamicNullToBooleanFalse, typeof(bool))),
 							Expression.Assign(ignoreCase, Expression.Constant(false, typeof(bool))),
 							Expression.Assign(binder, Expression.New(getMemberBinderConstructor, Expression.Constant(id, typeof(string)), ignoreCase)),
 							Expression.Assign(result, Expression.Constant(null)),
@@ -981,7 +1001,7 @@ namespace Umbraco.Web.Dynamics
 						BlockExpression block = Expression.Block(
 							typeof(object),
 							new[] { lambdaResult, result, idParam, convertDynamicNullToBooleanFalse },
-							Expression.Assign(convertDynamicNullToBooleanFalse, Expression.Constant(DynamicExpression.ConvertDynamicNullToBooleanFalse, typeof(bool))),
+							Expression.Assign(convertDynamicNullToBooleanFalse, Expression.Constant(_flagConvertDynamicNullToBooleanFalse, typeof(bool))),
 							Expression.Assign(lambdaResult, Expression.Invoke(instance, lambdaInstanceExpression)),
 							Expression.Assign(result, Expression.Call(ReflectPropertyValue, lambdaResult, Expression.Constant(id))),
 							Expression.IfThen(
@@ -1020,21 +1040,11 @@ namespace Umbraco.Web.Dynamics
 			return null;
 		}
 		private static Expression CallMethodOnDynamicNode(Expression instance, Expression[] args, LambdaExpression instanceAsString, ParameterExpression instanceExpression, MethodInfo method, bool isStatic)
-		{
-			ConstantExpression defaultReturnValue = Expression.Constant(null, typeof(object));
+		{			
 			Type methodReturnType = method.ReturnType;
-			switch (methodReturnType.Name)
-			{
-				case "String":
-					defaultReturnValue = Expression.Constant(null, typeof(string));
-					break;
-				case "Int32":
-					defaultReturnValue = Expression.Constant(0, typeof(int));
-					break;
-				case "Boolean":
-					defaultReturnValue = Expression.Constant(false, typeof(bool));
-					break;
-			}
+
+			var defaultReturnValue = Expression.Constant(methodReturnType.GetDefaultValue(), methodReturnType);			
+
 			ParameterExpression result = Expression.Parameter(method.ReturnType, "result");
 			LabelTarget blockReturnLabel = Expression.Label(method.ReturnType);
 			BlockExpression block = Expression.Block(
@@ -1050,16 +1060,24 @@ namespace Umbraco.Web.Dynamics
 				Expression.Label(blockReturnLabel, defaultReturnValue)
 				);
 
-			switch (methodReturnType.Name)
-			{
-				case "String":
-					return Expression.Lambda<Func<T, string>>(block, instanceExpression);
-				case "Int32":
-					return Expression.Lambda<Func<T, int>>(block, instanceExpression);
-				case "Boolean":
-					return Expression.Lambda<Func<T, bool>>(block, instanceExpression);
-			}
-			return Expression.Call(instance, (MethodInfo)method, args);
+			Type func = typeof(Func<,>);
+			Type generic = func.MakeGenericType(typeof(T), methodReturnType);
+			return Expression.Lambda(generic, block, instanceExpression);
+
+			//if (methodReturnType == typeof(string))
+			//	return Expression.Lambda<Func<T, string>>(block, instanceExpression);
+			//if (methodReturnType == typeof(int))
+			//	return Expression.Lambda<Func<T, int>>(block, instanceExpression);
+			//if (methodReturnType == typeof(bool))
+			//	return Expression.Lambda<Func<T, bool>>(block, instanceExpression);
+			//if (methodReturnType == typeof(string[]))	
+				//return Expression.Lambda<Func<T, string[]>>(block, instanceExpression);
+			
+			//return Expression.Call(instance, (MethodInfo)method, args);
+
+			//return Expression.Lambda<Func<T, object>>(
+			//	Expression.Convert(block, typeof(object)), instanceExpression);
+			
 		}
 
 		static Type FindGenericType(Type generic, Type type)
@@ -1398,7 +1416,23 @@ namespace Umbraco.Web.Dynamics
 			{
 				ParameterInfo pi = method.Parameters[i];
 				if (pi.IsOut) return false;
-				Expression promoted = PromoteExpression(args[i], pi.ParameterType, false);
+				Expression promoted;
+				
+				//TODO: Turns out this is real difficult to parse and don't really have time to figure this out at the moment
+				// to parse params parameter arrays.
+				
+				////here we need to check if it is a params array parameter
+				//if (pi.ParameterType.IsArray 
+				//	&& pi.ParameterType.GetElementType() != null
+				//	&& pi.GetCustomAttributes(typeof(ParamArrayAttribute), false).Any())
+				//{
+				//	//it is a params parameter so convert the value to an array
+				//	promoted = PromoteExpression(args[i], pi.ParameterType.GetElementType(), false);	
+				//}
+				//else
+				//{
+				promoted = PromoteExpression(args[i], pi.ParameterType, false);	
+				//}
 				if (promoted == null) return false;
 				promotedArgs[i] = promoted;
 			}

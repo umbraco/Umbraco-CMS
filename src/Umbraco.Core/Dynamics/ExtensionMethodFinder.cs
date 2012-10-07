@@ -9,10 +9,11 @@ using System.Linq.Expressions;
 
 namespace Umbraco.Core.Dynamics
 {
+	/// <summary>
+	/// Utility class for finding extension methods on a type to execute
+	/// </summary>
     internal static class ExtensionMethodFinder
-    {
-		
-
+    {	
 		/// <summary>
 		/// Returns all extension methods found matching the definition
 		/// </summary>
@@ -22,7 +23,7 @@ namespace Umbraco.Core.Dynamics
 		/// <param name="argsContainsThis"></param>
 		/// <returns></returns>
 		/// <remarks>
-		/// NOTE: This will be an intensive method to call!! Results should be cached!
+		/// TODO: NOTE: This will be an intensive method to call!! Results should be cached!
 		/// </remarks>
         private static IEnumerable<MethodInfo> GetAllExtensionMethods(Type thisType, string name, int argumentCount, bool argsContainsThis)
         {
@@ -62,7 +63,8 @@ namespace Umbraco.Core.Dynamics
 
             return methodsWhereArgZeroIsTargetType.Select(mt => mt.m);
         }
-        private static bool MethodArgZeroHasCorrectTargetType(MethodInfo method, Type firstArgumentType, Type thisType)
+        
+		private static bool MethodArgZeroHasCorrectTargetType(MethodInfo method, Type firstArgumentType, Type thisType)
         {
             //This is done with seperate method calls because you can't debug/watch lamdas - if you're trying to figure
             //out why the wrong method is returned, it helps to be able to see each boolean result
@@ -112,7 +114,8 @@ namespace Umbraco.Core.Dynamics
             bool result = (thisType == firstArgumentType);
             return result;
         }
-        private static Type FirstParameterType(MethodInfo m)
+        
+		private static Type FirstParameterType(MethodInfo m)
         {
             ParameterInfo[] p = m.GetParameters();
             if (p.Any())
@@ -122,71 +125,74 @@ namespace Umbraco.Core.Dynamics
             return null;
         }
 
+		private static MethodInfo DetermineMethodFromParams(IEnumerable<MethodInfo> methods, Type genericType, IEnumerable<object> args)
+		{
+			if (!methods.Any())
+			{
+				return null;
+			}
+			MethodInfo methodToExecute = null;
+			if (methods.Count() > 1)
+			{
+				//Given the args, lets get the types and compare the type sequence to try and find the correct overload
+				var argTypes = args.ToList().ConvertAll(o =>
+				{
+					var oe = (o as Expression);
+					if (oe != null)
+					{
+						return oe.Type.FullName;
+					}
+					return o.GetType().FullName;
+				});
+				var methodsWithArgTypes = methods.Select(method => new { method, types = method.GetParameters().Select(pi => pi.ParameterType.FullName) });
+				var firstMatchingOverload = methodsWithArgTypes.FirstOrDefault(m => m.types.SequenceEqual(argTypes));
+				if (firstMatchingOverload != null)
+				{
+					methodToExecute = firstMatchingOverload.method;
+				}
+			}
+
+			if (methodToExecute == null)
+			{
+				var firstMethod = methods.FirstOrDefault();
+				// NH: this is to ensure that it's always the correct one being chosen when using the LINQ extension methods
+				if (methods.Count() > 1)
+				{
+					var firstGenericMethod = methods.FirstOrDefault(x => x.IsGenericMethodDefinition);
+					if (firstGenericMethod != null)
+					{
+						firstMethod = firstGenericMethod;
+					}
+				}
+
+				if (firstMethod != null)
+				{
+					if (firstMethod.IsGenericMethodDefinition)
+					{
+						if (genericType != null)
+						{
+							methodToExecute = firstMethod.MakeGenericMethod(genericType);
+						}
+					}
+					else
+					{
+						methodToExecute = firstMethod;
+					}
+				}
+			}
+			return methodToExecute;
+		}
+
         public static MethodInfo FindExtensionMethod(Type thisType, object[] args, string name, bool argsContainsThis)
         {
             Type genericType = null;
             if (thisType.IsGenericType)
             {
                 genericType = thisType.GetGenericArguments()[0];
-            }
+            }			
 
-        	var methods = GetAllExtensionMethods(thisType, name, args.Length, argsContainsThis)
-        		.ToArray();
-
-            if (!methods.Any())
-            {
-                return null;
-            }
-            MethodInfo methodToExecute = null;
-            if (methods.Count() > 1)
-            {
-                //Given the args, lets get the types and compare the type sequence to try and find the correct overload
-                var argTypes = args.ToList().ConvertAll(o =>
-                {
-                    var oe = (o as Expression);
-                    if (oe != null)
-                    {
-                        return oe.Type.FullName;
-                    }
-                    return o.GetType().FullName;
-                });
-				var methodsWithArgTypes = methods.Select(method => new {method, types = method.GetParameters().Select(pi => pi.ParameterType.FullName) });
-                var firstMatchingOverload = methodsWithArgTypes.FirstOrDefault(m => m.types.SequenceEqual(argTypes));
-                if (firstMatchingOverload != null)
-                {
-                    methodToExecute = firstMatchingOverload.method;
-                }
-            }
-
-            if (methodToExecute == null)
-            {
-                var firstMethod = methods.FirstOrDefault();
-                // NH: this is to ensure that it's always the correct one being chosen when using the LINQ extension methods
-                if (methods.Count() > 1)
-                {
-                    var firstGenericMethod = methods.FirstOrDefault(x => x.IsGenericMethodDefinition);
-                    if (firstGenericMethod != null)
-                    {
-                        firstMethod = firstGenericMethod;
-                    }
-                }
-
-                if (firstMethod != null)
-                {
-                    if (firstMethod.IsGenericMethodDefinition)
-                    {
-                        if (genericType != null)
-                        {
-                            methodToExecute = firstMethod.MakeGenericMethod(genericType);
-                        }
-                    }
-                    else
-                    {
-                        methodToExecute = firstMethod;
-                    }
-                }
-            }
-            return methodToExecute;
+        	var methods = GetAllExtensionMethods(thisType, name, args.Length, argsContainsThis).ToArray();
+			return DetermineMethodFromParams(methods, genericType, args);
         }
     }
 }

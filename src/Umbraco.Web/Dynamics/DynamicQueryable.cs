@@ -197,7 +197,7 @@ namespace Umbraco.Web.Dynamics
 
             ParameterExpression[] parameters = new ParameterExpression[] {
                 Expression.Parameter(source.ElementType, "") };
-            var parser = new ExpressionParser<T>(parameters, ordering, values);
+            var parser = new ExpressionParser<T>(parameters, ordering, values, false);
             IEnumerable<DynamicOrdering> orderings = parser.ParseOrdering();
             Expression queryExpr = source.Expression;
             string methodAsc = "OrderBy";

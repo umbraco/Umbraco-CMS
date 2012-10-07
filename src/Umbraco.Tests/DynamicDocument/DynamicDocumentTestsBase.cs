@@ -135,18 +135,85 @@ namespace Umbraco.Tests.DynamicDocument
 		}
 
 		[Test]
-		public void Complex_Linq()
+		public void String_ContainsValue_Extension_Method()
 		{
-			var doc = GetDynamicNode(1173);
-			
+			var doc = GetDynamicNode(1046);
 
-			var result = doc.Ancestors().OrderBy("level")
-				.Single()
-				.Descendants()
-				.Where("selectedNodes != null && selectedNodes != \"\" && selectedNodes.Split(new char[] {','}).Contains(\"1173\")")
+			var paramVals = new Dictionary<string, object> { { "searchId", 1173 } }; //this is an integer value
+			var result = doc.Children()
+				.Where("selectedNodes.ContainsValue(searchId)", paramVals) //call an extension method
 				.FirstOrDefault();
 
 			Assert.IsNotNull(result);
+			Assert.AreEqual(4444, result.Id);
+
+			//don't find!
+			paramVals = new Dictionary<string, object> { { "searchId", 1111777 } };
+			result = doc.Children()
+				.Where("selectedNodes.ContainsValue(searchId)", paramVals)
+				.FirstOrDefault();
+
+			Assert.IsNotNull(result);
+			Assert.IsTrue(result.GetType() == typeof(DynamicNull) || result.GetType() == typeof(umbraco.MacroEngines.DynamicNull));
+			//Assert.AreEqual(typeof(DynamicNull), result.GetType());
+		}
+
+		[Test]
+		public void String_Contains_Method()
+		{
+			var doc = GetDynamicNode(1046);
+
+			var paramVals = new Dictionary<string, object> { { "searchId", "1173" } };
+			var result = doc.Children()
+				.Where("selectedNodes.Contains(searchId)", paramVals)
+				.FirstOrDefault();
+
+			Assert.IsNotNull(result);
+			Assert.AreEqual(4444, result.Id);
+
+			//don't find!
+			paramVals = new Dictionary<string, object> { { "searchId", "1aaa173" } };
+			result = doc.Children()
+				.Where("selectedNodes.Contains(searchId)", paramVals)
+				.FirstOrDefault();
+
+			Assert.IsNotNull(result);
+			Assert.IsTrue(result.GetType() == typeof (DynamicNull) || result.GetType() == typeof (umbraco.MacroEngines.DynamicNull));
+			//Assert.AreEqual(typeof (DynamicNull), result.GetType());
+		}
+
+		[Test]
+		public void String_Split_Method()
+		{
+			var doc = GetDynamicNode(1046);
+
+			var paramVals = new Dictionary<string, object>
+				{
+					{ "splitTerm", new char[] { ',' } },
+					{ "splitOptions", StringSplitOptions.RemoveEmptyEntries }
+				};
+			var result = doc.Children()
+				.Where("selectedNodes.Split(splitTerm, splitOptions).Length == 3", paramVals)
+				.FirstOrDefault();
+
+			Assert.IsNotNull(result);
+			Assert.AreEqual(4444, result.Id);
+		}
+
+		[Test]
+		public void Complex_Linq()
+		{
+			var doc = GetDynamicNode(1173);
+
+			var paramVals = new Dictionary<string, object> {{"splitTerm", new char[] {','}}, {"searchId", "1173"}};
+			var result = doc.Ancestors().OrderBy("level")
+				.Single()
+				.Descendants()
+				.Where("selectedNodes != null && selectedNodes != String.Empty && selectedNodes.Split(splitTerm).Contains(searchId)", paramVals)
+				.FirstOrDefault();
+
+			Assert.IsNotNull(result);
+			Assert.AreEqual(4444, result.Id);	
 		}
 
 		[Test]
@@ -557,6 +624,16 @@ namespace Umbraco.Tests.DynamicDocument
 
 			Assert.AreEqual((int) 1174, (int) result.Id);
 		}
+	}
 
+	/// <summary>
+	/// Extension methods used in tests
+	/// </summary>
+	public static class TestExtensionMethods
+	{
+		public static bool ContainsValue(this string s, int val)
+		{
+			return s.Contains(val.ToString());
+		}
 	}
 }

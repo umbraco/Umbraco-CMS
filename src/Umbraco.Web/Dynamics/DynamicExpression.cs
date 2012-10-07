@@ -7,11 +7,12 @@ namespace Umbraco.Web.Dynamics
 {
 	internal static class DynamicExpression
 	{
-		public static bool ConvertDynamicNullToBooleanFalse = false;
+		//public static bool ConvertDynamicNullToBooleanFalse = false;
+
 		public static Expression Parse<T>(Type resultType, string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
 		{
-			ConvertDynamicNullToBooleanFalse = convertDynamicNullToBooleanFalse;
-			var parser = new ExpressionParser<T>(null, expression, values);
+			//ConvertDynamicNullToBooleanFalse = convertDynamicNullToBooleanFalse;
+			var parser = new ExpressionParser<T>(null, expression, values, convertDynamicNullToBooleanFalse);
 			return parser.Parse(resultType);
 		}
 
@@ -22,8 +23,8 @@ namespace Umbraco.Web.Dynamics
 
 		public static LambdaExpression ParseLambda<T>(ParameterExpression[] parameters, Type resultType, string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
 		{
-			ConvertDynamicNullToBooleanFalse = convertDynamicNullToBooleanFalse;
-			var parser = new ExpressionParser<T>(parameters, expression, values);
+			//ConvertDynamicNullToBooleanFalse = convertDynamicNullToBooleanFalse;
+			var parser = new ExpressionParser<T>(parameters, expression, values, convertDynamicNullToBooleanFalse);
 			return Expression.Lambda(parser.Parse(resultType), parameters);
 		}
 

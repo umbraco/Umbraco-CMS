@@ -8,11 +8,9 @@ namespace System.Linq.Dynamic
 	[Obsolete("This class has been superceded by Umbraco.Core.Dynamics.DynamicExpression")]
 	public static class DynamicExpression
 	{
-		public static bool ConvertDynamicNullToBooleanFalse
-		{
-			get { return Umbraco.Web.Dynamics.DynamicExpression.ConvertDynamicNullToBooleanFalse; }
-			set { Umbraco.Web.Dynamics.DynamicExpression.ConvertDynamicNullToBooleanFalse = value; }
-		}
+		[Obsolete("This property is no longer used and had caused concurrency issues.")]
+		public static bool ConvertDynamicNullToBooleanFalse { get; set; }
+
 		public static Expression Parse(Type resultType, string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
 		{
 			return Umbraco.Web.Dynamics.DynamicExpression.Parse<DynamicNode>(resultType, expression, convertDynamicNullToBooleanFalse, values);
