@@ -185,7 +185,7 @@ namespace umbraco.cms.businesslogic.web
                 select count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, 
 	                cmsDocument.documentUser, coalesce(cmsDocument.templateId, cmsDocumentType.templateNodeId) as templateId, 
 	                umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as isPublished, umbracoNode.createDate, 
-	                cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, 
+                    cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsDocument.releaseDate, cmsDocument.expireDate, cmsContentType.icon, cmsContentType.alias,
 	                cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId,
                     umbracoNode.nodeUser
                 from umbracoNode
@@ -202,7 +202,7 @@ namespace umbraco.cms.businesslogic.web
 	                cmsDocument.templateId, cmsDocumentType.templateNodeId, umbracoNode.path, umbracoNode.sortOrder, 
 	                coalesce(publishCheck.published,0), umbracoNode.createDate, cmsDocument.text, 
 	                cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, 
-	                cmsContentType.masterContentType, cmsContentType.nodeId, cmsDocument.updateDate, cmsContentVersion.versionDate, umbracoNode.nodeUser
+                    cmsContentType.masterContentType, cmsContentType.nodeId, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsDocument.releaseDate, cmsDocument.expireDate, umbracoNode.nodeUser
                 order by {1}
                 ";
 
@@ -1697,6 +1697,11 @@ namespace umbraco.cms.businesslogic.web
                 , masterContentType
                 , dr.GetInt("contentTypeId")
                 , dr.GetInt("templateId"));
+
+            if (!dr.IsNull("releaseDate"))
+                _release = dr.GetDateTime("releaseDate");
+            if (!dr.IsNull("expireDate"))
+                _expire = dr.GetDateTime("expireDate");
         }
 
         protected void SaveXmlPreview(XmlDocument xd)
