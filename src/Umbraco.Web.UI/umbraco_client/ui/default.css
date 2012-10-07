@@ -713,3 +713,12 @@ guiEditor {
     background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ddd), to(#fefefe));
     cursor:pointer;
 }
+
+.treePickerTooltip {
+	display: none;
+	position: absolute;
+	border: 1px solid #333;
+	background-color: #fff8cb;
+	padding: 3px;
+	color: #000;
+}

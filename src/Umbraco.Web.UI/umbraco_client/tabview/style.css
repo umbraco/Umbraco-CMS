@@ -128,12 +128,3 @@
     
     .footer .status{height: 12px; margin: 0px; overflow: hidden; background: url(images/footer_statusBar_bg.gif) top left no-repeat;}
     .footer .status h2{display: block; height: 12px; overflow: hidden; margin: 0px; padding: 0px; background: url(images/footer_statusBar_h2_bg.gif) top right no-repeat;}
-
-.treePickerTooltip {
-	display: none;
-	position: absolute;
-	border: 1px solid #333;
-	background-color: #fff8cb;
-	padding: 3px;
-	color: #000;
-}
