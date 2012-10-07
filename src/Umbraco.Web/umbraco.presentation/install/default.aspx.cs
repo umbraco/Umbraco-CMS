@@ -90,7 +90,7 @@ namespace umbraco.presentation.install
 
             //if this is not an upgrade we will log in with the default user.
             // It's not considered an upgrade if the ConfigurationStatus is missing or empty.
-            if (false == String.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus))
+            if (String.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus) == false)
             {
                 try
                 {

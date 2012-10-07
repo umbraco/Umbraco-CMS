@@ -28,7 +28,7 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override bool Completed()
         {
-            if (false == String.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus))
+            if (String.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus) == false)
                 return true;
 
             if (InstalledPackage.GetAllInstalledPackages().Count > 0)
