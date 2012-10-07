@@ -65,6 +65,7 @@ namespace umbraco.cms.businesslogic.macro
         /// 
         /// If not, the field can be manipulated by a default value given by the MacroPropertyType, this is s
         /// </summary>
+        [Obsolete]
         public bool Public
         {
             get { return _public; }

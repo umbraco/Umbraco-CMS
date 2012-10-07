@@ -137,9 +137,6 @@
                 <table cellspacing="0" cellpadding="2" width="98%" border="0">
                     <tr>
                         <td class="propertyHeader">
-                            <%=umbraco.ui.Text("show",this.getUser())%>
-                        </td>
-                        <td class="propertyHeader">
                             <%=umbraco.ui.Text("general", "alias",this.getUser())%>
                         </td>
                         <td class="propertyHeader">
@@ -153,9 +150,6 @@
             </HeaderTemplate>
             <ItemTemplate>
                 <tr>
-                    <td class="propertyContent">
-                        <asp:CheckBox runat="server" ID="macroPropertyHidden" Checked='<%# macroIsVisible (DataBinder.Eval(Container.DataItem, "Public"))%>' />
-                    </td>
                     <td class="propertyContent">
                         <input type="hidden" id="macroPropertyID" runat="server" value='<%#DataBinder.Eval(Container.DataItem, "id")%>'
                             name="macroPropertyID" />
@@ -179,13 +173,10 @@
             <FooterTemplate>
                 <tr>
                     <td class="propertyContent">
-                        <asp:CheckBox runat="server" ID="macroPropertyHiddenNew" />
+                        <asp:TextBox runat="server" ID="macroPropertyAliasNew" Text='' OnTextChanged="macroPropertyCreate" />
                     </td>
                     <td class="propertyContent">
-                        <asp:TextBox runat="server" ID="macroPropertyAliasNew" Text='New Alias' OnTextChanged="macroPropertyCreate" />
-                    </td>
-                    <td class="propertyContent">
-                        <asp:TextBox runat="server" ID="macroPropertyNameNew" Text='New Name' />
+                        <asp:TextBox runat="server" ID="macroPropertyNameNew" Text='' />
                     </td>
                     <td class="propertyContent">
                         <asp:DropDownList OnPreRender="AddChooseList" runat="server" ID="macroPropertyTypeNew"

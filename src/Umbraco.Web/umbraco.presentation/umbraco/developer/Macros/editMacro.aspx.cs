@@ -136,7 +136,6 @@ namespace umbraco.cms.presentation.developer
                     DropDownList macroElementType = (DropDownList)item.FindControl("macroPropertyType");
 
                     MacroProperty mp = new MacroProperty(int.Parse(macroPropertyID.Value));
-                    mp.Public = macroElementShow.Checked;
                     mp.Type = new MacroPropertyType(int.Parse(macroElementType.SelectedValue));
                     mp.Alias = macroElementAlias.Text;
                     mp.Name = macroElementName.Text;
@@ -253,7 +252,6 @@ namespace umbraco.cms.presentation.developer
 
         public void macroPropertyCreate(object sender, EventArgs e)
         {
-            CheckBox macroPropertyHiddenNew = (CheckBox)((Control)sender).Parent.FindControl("macroPropertyHiddenNew");
             TextBox macroPropertyAliasNew = (TextBox)((Control)sender).Parent.FindControl("macroPropertyAliasNew");
             TextBox macroPropertyNameNew = (TextBox)((Control)sender).Parent.FindControl("macroPropertyNameNew");
             DropDownList macroPropertyTypeNew = (DropDownList)((Control)sender).Parent.FindControl("macroPropertyTypeNew");
@@ -277,7 +275,7 @@ namespace umbraco.cms.presentation.developer
                 {
                     MacroProperty mp = new MacroProperty();
                     mp.Macro = m_macro;
-                    mp.Public = macroPropertyHiddenNew.Checked;
+                    mp.Public = true;
                     mp.Type = new MacroPropertyType(int.Parse(macroPropertyTypeNew.SelectedValue));
                     mp.Alias = macroPropertyAliasNew.Text;
                     mp.Name = macroPropertyNameNew.Text;

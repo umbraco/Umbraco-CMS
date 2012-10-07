@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Configuration;
 using System.Xml;
+using System.Xml.Linq;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -197,13 +198,19 @@ namespace Umbraco.Core.Configuration
                     vDir = v.PhysicalDirectory;
                 }
             }
-            
-            var doc = new XmlDocument();
-            doc.Load(String.Concat(vDir, "web.config"));
-            var root = doc.DocumentElement;
-            var setting = doc.SelectSingleNode(String.Concat("//appSettings/add[@key='", key, "']"));
-            setting.Attributes["value"].InnerText = value;
-            doc.Save(String.Concat(vDir, "web.config"));
+
+            string fileName = String.Concat(vDir, "web.config");
+            var xml = XDocument.Load(fileName);
+            var appSettings = xml.Root.Descendants("appSettings").Single();
+
+            // Update appSetting if it exists, or else create a new appSetting for the given key and value
+            var setting = appSettings.Descendants("add").Where(s => s.Attribute("key").Value == key).FirstOrDefault();
+            if (setting == null)
+                appSettings.Add(new XElement("add", new XAttribute("key", key), new XAttribute("value", value)));
+            else
+                setting.Attribute("value").Value = value;
+
+            xml.Save(fileName);
             ConfigurationManager.RefreshSection("appSettings");
         }
 
