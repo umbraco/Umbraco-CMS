@@ -129,22 +129,30 @@ namespace Umbraco.Web
 		/// <param name="removeParagraphTags"></param>
 		/// <param name="casing"></param>
 		/// <param name="encoding"></param>
-		/// <param name="formatString"></param>
+        /// <param name="formatAsDate"></param>
+        /// <param name="formatAsDateWithTime"></param>
+        /// <param name="formatAsDateWithTimeSeparator"></param>
+        //// <param name="formatString"></param>
 		/// <returns></returns>
 		public IHtmlString Field(string fieldAlias, 
 			string altFieldAlias = "", string altText = "", string insertBefore = "", string insertAfter = "",
 			bool recursive = false, bool convertLineBreaks = false, bool removeParagraphTags = false,
 			RenderFieldCaseType casing = RenderFieldCaseType.Unchanged,
-			RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged,
-			string formatString = "")
+            RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged, 
+            bool formatAsDate = false, 
+            bool formatAsDateWithTime = false,
+            string formatAsDateWithTimeSeparator = "")
+
+            //TODO: commented out until as it is not implemented by umbraco:item yet
+            //,string formatString = "")
 		{
 			if (_currentPage == null)
 			{
 				throw new InvalidOperationException("Cannot call this method when not rendering a front-end document");
 			}
-			return Field(_currentPage, fieldAlias, altFieldAlias, 
-				altText, insertBefore, insertAfter, recursive, convertLineBreaks, removeParagraphTags,
-				casing, encoding, formatString);
+            return Field(_currentPage, fieldAlias, altFieldAlias,
+                altText, insertBefore, insertAfter, recursive, convertLineBreaks, removeParagraphTags,
+                casing, encoding, formatAsDate, formatAsDateWithTime, formatAsDateWithTimeSeparator); // formatString);
 		}
 
 		/// <summary>
@@ -160,15 +168,23 @@ namespace Umbraco.Web
 		/// <param name="convertLineBreaks"></param>
 		/// <param name="removeParagraphTags"></param>
 		/// <param name="casing"></param>
-		/// <param name="encoding"></param>
-		/// <param name="formatString"></param>
+        /// <param name="encoding"></param>
+        /// <param name="formatAsDate"></param>
+        /// <param name="formatAsDateWithTime"></param>
+        /// <param name="formatAsDateWithTimeSeparator"></param>
+		//// <param name="formatString"></param>
 		/// <returns></returns>
 		public IHtmlString Field(IPublishedContent currentPage, string fieldAlias, 
 			string altFieldAlias = "", string altText = "", string insertBefore = "", string insertAfter = "",
 			bool recursive = false, bool convertLineBreaks = false, bool removeParagraphTags = false,
 			RenderFieldCaseType casing = RenderFieldCaseType.Unchanged,
-			RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged,
-			string formatString = "")
+			RenderFieldEncodingType encoding = RenderFieldEncodingType.Unchanged, 
+            bool formatAsDate =  false,
+            bool formatAsDateWithTime = false,
+            string formatAsDateWithTimeSeparator = "")
+            
+            //TODO: commented out until as it is not implemented by umbraco:item yet
+            //,string formatString = "")
 		{
 			Mandate.ParameterNotNull(currentPage, "currentPage");
 			Mandate.ParameterNotNullOrEmpty(fieldAlias, "fieldAlias");
@@ -179,26 +195,29 @@ namespace Umbraco.Web
 				{
 					{"field", fieldAlias},
 					{"recursive", recursive.ToString().ToLowerInvariant()},
-					{"useIfEmpty", altFieldAlias},
-					{"textIfEmpty", altText},
-					{"stripParagraph", removeParagraphTags.ToString().ToLowerInvariant()},
+					{"useifempty", altFieldAlias},
+					{"textifempty", altText},
+					{"stripparagraph", removeParagraphTags.ToString().ToLowerInvariant()},
 					{
 						"case", casing == RenderFieldCaseType.Lower ? "lower"
 						        	: casing == RenderFieldCaseType.Upper ? "upper"
 						        	  	: casing == RenderFieldCaseType.Title ? "title"
 						        	  	  	: string.Empty
 						},
-					{"insertTextBefore", insertBefore},
-					{"insertTextAfter", insertAfter},
-					{"convertLineBreaks", convertLineBreaks.ToString().ToLowerInvariant()}
+					{"inserttextbefore", insertBefore},
+					{"inserttextafter", insertAfter},
+					{"convertlinebreaks", convertLineBreaks.ToString().ToLowerInvariant()},
+                    {"formatasdate", formatAsDate.ToString().ToLowerInvariant()},
+                    {"formatasdatewithtime", formatAsDateWithTime.ToString().ToLowerInvariant()},
+                    {"formatasdatewithtimeseparator", formatAsDateWithTimeSeparator}
 				};
 			switch (encoding)
 			{
 				case RenderFieldEncodingType.Url:
-					attributes.Add("urlEncode", "true");
+					attributes.Add("urlencode", "true");
 					break;
 				case RenderFieldEncodingType.Html:
-					attributes.Add("htmlEncode", "true");
+					attributes.Add("htmlencode", "true");
 					break;
 				case RenderFieldEncodingType.Unchanged:
 				default:

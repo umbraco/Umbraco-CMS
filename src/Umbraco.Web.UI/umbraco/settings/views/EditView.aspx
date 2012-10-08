@@ -36,11 +36,12 @@
           var templateCode = UmbEditor.GetCode();
           var newValue = templateDropDown.options[templateDropDown.selectedIndex].id;
           
-          var layoutDefRegex = new RegExp("(@{[\\s\\S]*?Layout\\s*?=\\s*?\")[^\"]*?(\";[\\s\\S]*?})", "gi");
+          var layoutDefRegex = new RegExp("(@{[\\s\\S]*?Layout\\s*?=\\s*?)(\"[^\"]*?\"|null)(;[\\s\\S]*?})", "gi");
+
           if(newValue != undefined && newValue != "") {
             if (layoutDefRegex.test(templateCode)) {
                         // Declaration exists, so just update it
-                        templateCode = templateCode.replace(layoutDefRegex, "$1" + newValue + "$2");
+                        templateCode = templateCode.replace(layoutDefRegex, "$1\"" + newValue + "\"$3");
                 } else {
                     // Declaration doesn't exist, so prepend to start of doc
                     //TODO: Maybe insert at the cursor position, rather than just at the top of the doc?
@@ -49,7 +50,7 @@
             } else {
                 if (layoutDefRegex.test(templateCode)) {
                     // Declaration exists, so just update it
-                    templateCode = templateCode.replace(layoutDefRegex, "$1$2");
+                    templateCode = templateCode.replace(layoutDefRegex, "$1null$3");
                 }
             }
             
