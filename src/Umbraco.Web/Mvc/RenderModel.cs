@@ -14,7 +14,7 @@ namespace Umbraco.Web.Mvc
 		/// <summary>
 		/// Returns the current IPublishedContent object
 		/// </summary>
-		public IPublishedContent CurrentContent { get; internal set; }
+		public IPublishedContent Content { get; internal set; }
 
 		/// <summary>
 		/// Returns the current Culture assigned to the page being rendered

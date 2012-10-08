@@ -44,7 +44,7 @@ namespace Umbraco.Web.Mvc
 
 			var renderModel = new RenderModel()
 			{
-				CurrentContent = docRequest.PublishedContent,
+				Content = docRequest.PublishedContent,
 				CurrentCulture = docRequest.Culture
 			};
 

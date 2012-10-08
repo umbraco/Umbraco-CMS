@@ -408,7 +408,7 @@ namespace Umbraco.Web
 		{
 			return content.Ancestors(n => true);
 		}
-		public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, Func<IPublishedContent, bool> func)
+		private static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, Func<IPublishedContent, bool> func)
 		{
 			var ancestorList = new List<IPublishedContent>();
 			var node = content;
@@ -450,7 +450,7 @@ namespace Umbraco.Web
 		{
 			return content.AncestorOrSelf(node => node.DocumentTypeAlias == nodeTypeAlias);
 		}
-		public static IPublishedContent AncestorOrSelf(this IPublishedContent content, Func<IPublishedContent, bool> func)
+		private static IPublishedContent AncestorOrSelf(this IPublishedContent content, Func<IPublishedContent, bool> func)
 		{
 			var node = content;
 			while (node != null)
@@ -473,7 +473,7 @@ namespace Umbraco.Web
 			return null;
 		}
 
-		public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, Func<IPublishedContent, bool> func)
+		internal static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, Func<IPublishedContent, bool> func)
 		{
 			var ancestorList = new List<IPublishedContent>();
 			var node = content;
@@ -510,7 +510,7 @@ namespace Umbraco.Web
 		{
 			return content.AncestorsOrSelf(n => n.DocumentTypeAlias == nodeTypeAlias);
 		}
-		public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, int level)
+		private static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, int level)
 		{
 			return content.AncestorsOrSelf(n => n.Level <= level);
 		}
@@ -530,7 +530,7 @@ namespace Umbraco.Web
 		{
 			return content.Descendants(n => true);
 		}
-		internal static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, Func<IPublishedContent, bool> func)
+		private static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, Func<IPublishedContent, bool> func)
 		{
 			return content.Children.Map(func, (IPublishedContent n) => n.Children);
 		}
@@ -546,7 +546,7 @@ namespace Umbraco.Web
 		{
 			return content.DescendantsOrSelf(p => true);
 		}
-		internal static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, Func<IPublishedContent, bool> func)
+		private static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, Func<IPublishedContent, bool> func)
 		{
 			if (content != null)
 			{
@@ -738,6 +738,19 @@ namespace Umbraco.Web
 			throw new IndexOutOfRangeException(string.Format("Node {0} belongs to a DynamicNodeList but could not retrieve the index for it's position in the list", content.Id));
 		}
 		#endregion
+
+		/// <summary>
+		/// Method to return the Children of the content item
+		/// </summary>
+		/// <param name="p"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// This method exists for consistency, it is the same as calling content.Children as a property.
+		/// </remarks>
+		public static IEnumerable<IPublishedContent> Children(this IPublishedContent p)
+		{
+			return p.Children;
+		} 
 
 		/// <summary>
 		/// Returns a DataTable object for the IPublishedContent
