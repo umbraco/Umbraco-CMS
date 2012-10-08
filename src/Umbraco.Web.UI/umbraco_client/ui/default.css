@@ -488,6 +488,10 @@ guiEditor {
 	font-weight:	bold;
 }
 
+.treePickerTitle {
+	border-bottom: 1px dotted #333;
+}
+
 .umbMacroHolder 
 {
 	margin: 5px;
@@ -708,4 +712,13 @@ guiEditor {
     background: -moz-linear-gradient(100% 100% 90deg, #fefefe, #ddd);
     background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ddd), to(#fefefe));
     cursor:pointer;
+}
+
+.treePickerTooltip {
+	display: none;
+	position: absolute;
+	border: 1px solid #333;
+	background-color: #fff8cb;
+	padding: 3px;
+	color: #000;
 }

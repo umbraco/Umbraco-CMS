@@ -24,7 +24,7 @@ namespace Umbraco.Web.Templates
 		public static string ParseInternalLinks(string text)
 		{
 			//don't attempt to proceed without a context as we cannot lookup urls without one
-			if (UmbracoContext.Current == null)
+			if (UmbracoContext.Current == null || UmbracoContext.Current.RoutingContext == null)
 			{
 				return text;
 			}

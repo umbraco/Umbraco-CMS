@@ -28,7 +28,7 @@ using Examine.LuceneEngine.SearchCriteria;
 
 namespace umbraco.MacroEngines
 {
-    public class DynamicNode : DynamicObject
+    public class DynamicNode : DynamicObject, INode
     {
 		/// <summary>
 		/// This callback is used only so we can set it dynamically for use in unit tests
@@ -1334,6 +1334,11 @@ namespace umbraco.MacroEngines
             }
         }
 
+	    public DynamicNodeList Children
+	    {
+		    get { return ChildrenAsList; }
+	    }
+
         public IProperty GetProperty(string alias)
         {
             if (n == null) return null;
@@ -1773,5 +1778,129 @@ namespace umbraco.MacroEngines
             }
             return false;
         }
-    }
+
+		#region Explicit INode implementation
+		INode INode.Parent
+		{
+			get { return Parent; }
+		}
+
+		int INode.Id
+		{
+			get { return Id; }
+		}
+
+		int INode.template
+		{
+			get { return template; }
+		}
+
+		int INode.SortOrder
+		{
+			get { return SortOrder; }
+		}
+
+		string INode.Name
+		{
+			get { return Name; }
+		}
+
+		string INode.Url
+		{
+			get { return Url; }
+		}
+
+		string INode.UrlName
+		{
+			get { return UrlName; }
+		}
+
+		string INode.NodeTypeAlias
+		{
+			get { return NodeTypeAlias; }
+		}
+
+		string INode.WriterName
+		{
+			get { return WriterName; }
+		}
+
+		string INode.CreatorName
+		{
+			get { return CreatorName; }
+		}
+
+		int INode.WriterID
+		{
+			get { return WriterID; }
+		}
+
+		int INode.CreatorID
+		{
+			get { return CreatorID; }
+		}
+
+		string INode.Path
+		{
+			get { return Path; }
+		}
+
+		DateTime INode.CreateDate
+		{
+			get { return CreateDate; }
+		}
+
+		DateTime INode.UpdateDate
+		{
+			get { return UpdateDate; }
+		}
+
+		Guid INode.Version
+		{
+			get { return Version; }
+		}
+
+		string INode.NiceUrl
+		{
+			get { return NiceUrl; }
+		}
+
+		int INode.Level
+		{
+			get { return Level; }
+		}
+
+		List<IProperty> INode.PropertiesAsList
+		{
+			get { return PropertiesAsList; }
+		}
+
+		List<INode> INode.ChildrenAsList
+		{
+			get { return new List<INode>(ChildrenAsList.Select(x => x).ToList()); }
+		}
+
+		IProperty INode.GetProperty(string Alias)
+		{
+			return GetProperty(Alias);
+		}
+
+		IProperty INode.GetProperty(string Alias, out bool propertyExists)
+		{
+			var p = GetProperty(Alias, false);
+			propertyExists = p != null;
+			return p;
+		}
+
+		System.Data.DataTable INode.ChildrenAsTable()
+		{
+			return ChildrenAsTable();
+		}
+
+		System.Data.DataTable INode.ChildrenAsTable(string nodeTypeAliasFilter)
+		{
+			return ChildrenAsTable(nodeTypeAliasFilter);
+		} 
+		#endregion
+	}
 }

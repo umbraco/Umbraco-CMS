@@ -51,7 +51,9 @@ namespace Umbraco.Tests.DynamicDocument
 		</Home>
 		<Home id=""1175"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-20T18:08:01"" updateDate=""2012-07-20T18:49:32"" nodeName=""Sub 2"" urlName=""sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1175"" isDoc=""""><content><![CDATA[]]></content>
 		</Home>
-		<CustomDocument id=""4444"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,4444"" isDoc="""" />
+		<CustomDocument id=""4444"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,4444"" isDoc="""">
+			<selectedNodes><![CDATA[1172,1176,1173]]></selectedNodes>
+		</CustomDocument>
 	</Home>
 	<CustomDocument id=""1172"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1172"" isDoc="""" />
 </root>";
@@ -101,6 +103,19 @@ namespace Umbraco.Tests.DynamicDocument
 			var doc = contentStore.GetDocumentById(ctx, id);
 			Assert.IsNotNull(doc);
 			return doc;
+		}
+
+		[Test]
+		public void Complex_Linq()
+		{
+			var doc = GetNode(1173);
+
+			var result = doc.Ancestors().OrderBy(x => x.Level)
+				.Single()
+				.Descendants()
+				.FirstOrDefault(x => x.GetPropertyValue("selectedNodes", "").Split(',').Contains("1173"));
+
+			Assert.IsNotNull(result);
 		}
 
 		[Test]

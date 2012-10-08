@@ -15,7 +15,7 @@ namespace Umbraco.Tests.DynamicDocument
 	/// Unit tests for IPublishedContent and extensions
 	/// </summary>
 	[TestFixture]
-	public class DocumentTests : BaseRoutingTest
+	public class PublishedContentDataTableTests : BaseRoutingTest
 	{
 		public override void Initialize()
 		{
@@ -71,7 +71,7 @@ namespace Umbraco.Tests.DynamicDocument
 		[Test]
 		public void To_DataTable()
 		{	
-			var doc = GetDocument(true, 1);
+			var doc = GetContent(true, 1);
 			var dt = doc.ChildrenAsTable();
 
 			Assert.AreEqual(11, dt.Columns.Count);
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.DynamicDocument
 		[Test]
 		public void To_DataTable_With_Filter()
 		{
-			var doc = GetDocument(true, 1);
+			var doc = GetContent(true, 1);
 			//change a doc type alias
 			((TestPublishedContent) doc.Children.ElementAt(0)).DocumentTypeAlias = "DontMatch";
 
@@ -109,14 +109,14 @@ namespace Umbraco.Tests.DynamicDocument
 		[Test]
 		public void To_DataTable_No_Rows()
 		{
-			var doc = GetDocument(false, 1);			
+			var doc = GetContent(false, 1);			
 			var dt = doc.ChildrenAsTable();
 			//will return an empty data table
 			Assert.AreEqual(0, dt.Columns.Count);
 			Assert.AreEqual(0, dt.Rows.Count);			
 		}
 
-		private IPublishedContent GetDocument(bool createChildren, int indexVals)
+		private IPublishedContent GetContent(bool createChildren, int indexVals)
 		{
 			var d = new TestPublishedContent
 				{
@@ -149,9 +149,9 @@ namespace Umbraco.Tests.DynamicDocument
 			{
 				d.Children = new List<IPublishedContent>()
 					{
-						GetDocument(false, indexVals + 3),
-						GetDocument(false, indexVals + 6),
-						GetDocument(false, indexVals + 9)
+						GetContent(false, indexVals + 3),
+						GetContent(false, indexVals + 6),
+						GetContent(false, indexVals + 9)
 					};
 			}
 			if (!createChildren)

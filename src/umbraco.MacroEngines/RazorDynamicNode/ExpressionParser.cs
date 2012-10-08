@@ -6,10 +6,11 @@ using umbraco.MacroEngines;
 
 namespace System.Linq.Dynamic
 {
-	internal class ExpressionParser : Umbraco.Web.Dynamics.ExpressionParser
+	[Obsolete("This class is no longer used, use Umbraco.Web.Dynamics.ExpressionParser<T> instead")]
+	internal class ExpressionParser : Umbraco.Web.Dynamics.ExpressionParser<DynamicNode>
 	{
-		public ExpressionParser(ParameterExpression[] parameters, string expression, object[] values)
-			: base(parameters, expression, values)
+		public ExpressionParser(ParameterExpression[] parameters, string expression, object[] values, bool flagConvertDynamicNullToBooleanFalse)
+			: base(parameters, expression, values, flagConvertDynamicNullToBooleanFalse)
 		{
 		}
 	}

@@ -17,8 +17,8 @@ namespace umbraco.presentation.install
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-
-            if (!String.IsNullOrEmpty(GlobalSettings.ConfigurationStatus.Trim()))
+            // Display the Umbraco upgrade message if Umbraco is already installed
+            if (String.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus) == false)
             {
                 ph_install.Visible = false;
                 ph_upgrade.Visible = true;

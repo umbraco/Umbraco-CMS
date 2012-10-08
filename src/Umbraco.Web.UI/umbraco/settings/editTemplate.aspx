@@ -4,15 +4,60 @@
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
+   
     <umb:CssInclude ID="CssInclude1" runat="server" FilePath="splitbutton/splitbutton.css"
         PathNameAlias="UmbracoClient" />
-    <umb:JsInclude ID="JsInclude" runat="server" FilePath="splitbutton/jquery.splitbutton.js"
-        PathNameAlias="UmbracoClient" Priority="1" />
+
+    <style>
+
+        #codeTemplateMenu , #macroMenu
+        {
+            position: absolute;
+            top: 60px;
+            left:250px;
+            background-color: #ddd;
+            padding: 5px;
+            display: none;
+            max-height: 400px;
+            overflow-y: scroll;
+        }
+        #macroMenu {
+            left:110px;
+        }
+        .codeTemplate, .macro {
+            padding-left: 5px;
+            padding-top: 3px;
+            cursor: pointer;
+            
+        }
+         .codeTemplate:hover, .macro:hover {
+            background-color: #eee;
+         }
+    </style>
     <script language="javascript" type="text/javascript">
         jQuery(document).ready(function() {
-            //macro split button
-            jQuery('#sbMacro').splitbutton({menu:'#macroMenu'});
+
             jQuery("#splitButtonMacro").appendTo("#splitButtonMacroPlaceHolder");
+            jQuery("#selectMacro")
+                .click(function() {
+                    jQuery("#macroMenu").toggle();
+                });
+            jQuery("#macroMenu").hover(
+                function() { jQuery("#macroMenu").show(); },
+                function() { jQuery("#macroMenu").hide(); }
+            );
+             jQuery("#selectRazor")
+                .click(function() {
+                    jQuery("#codeTemplateMenu").toggle();
+                });
+            jQuery("#codeTemplateMenu").hover(
+                function() { jQuery("#codeTemplateMenu").show(); },
+                function() { jQuery("#codeTemplateMenu").hide(); }
+            );
+            
+		 
+            
+            
             jQuery(".macro").click(function(){
                 var alias = jQuery(this).attr("rel");
                if(jQuery(this).attr("params") == "1")
@@ -24,10 +69,10 @@
                     insertMacro(alias);
                 }
             });
-            applySplitButtonOverflow('mcontainer','innerc','macroMenu','.macro', 'showMoreMacros');
+
             
             //razor macro split button
-            jQuery('#sb').splitbutton({menu:'#codeTemplateMenu'});
+//            jQuery('#sb').splitbutton({menu:'#codeTemplateMenu'});
             jQuery("#splitButton").appendTo("#splitButtonPlaceHolder");
 
             jQuery(".codeTemplate").click(function(){              
@@ -185,12 +230,12 @@
             </cc1:PropertyPanel>
         </cc1:Pane>
     </cc1:UmbracoPanel>
+
     <div id="splitButton" style="display: inline; height: 23px; vertical-align: top;">
-        <a href="javascript:insertCodeBlock();" id="sb" class="sbLink">
-            <img alt="Insert Inline Razor Macro" src="../images/editor/insRazorMacro.png" title="Insert Inline Razor Macro"
-                style="vertical-align: top;">
-        </a>
+        <a href="#" id="sb" class="sbLink l-btn l-btn-plain"><span class="l-btn-left"><span class="l-btn-text"><img alt="Insert Inline Razor Macro" src="../images/editor/insRazorMacro.png" title="Insert Inline Razor Macro" style="vertical-align: top;"  onclick="javascript:insertCodeBlock();">
+        <span class="s-btn-downarrow" id="selectRazor">&nbsp;</span></span></span></a>
     </div>
+
     <div id="codeTemplateMenu" style="width: 285px;">
         <asp:Repeater ID="rpt_codeTemplates" runat="server">
             <ItemTemplate>
@@ -200,11 +245,10 @@
             </ItemTemplate>
         </asp:Repeater>
     </div>
+   
     <div id="splitButtonMacro" style="display: inline; height: 23px; vertical-align: top;">
-        <a href="javascript:openMacroModal();" id="sbMacro" class="sbLink">
-            <img alt="Insert Macro" src="../images/editor/insMacroSB.png" title="Insert Macro"
-                style="vertical-align: top;">
-        </a>
+        <a href="#" id="sbMacro" class="sbLink l-btn l-btn-plain"><span class="l-btn-left"><span class="l-btn-text"><img alt="Insert Macro" src="../images/editor/insMacroSB.png" title="Insert Macro" style="vertical-align: top;" onclick="javascript:openMacroModal();">
+        <span class="s-btn-downarrow" id="selectMacro">&nbsp;</span></span></span></a>
     </div>
     <div id="macroMenu" style="width: 285px">
         <asp:Repeater ID="rpt_macros" runat="server">

@@ -37,6 +37,13 @@
 			</li>
 			<li>
 				<span>
+					<asp:Label runat="server" AssociatedControlID="currentpassword" ID="Label2"><%=umbraco.ui.Text("password") %>:</asp:Label>
+					<asp:TextBox id="currentpassword" TextMode="password" CssClass="textfield" Runat="server"></asp:TextBox>
+					<asp:RequiredFieldValidator runat="server" ControlToValidate="currentpassword" ID="RequiredFieldValidator1" ValidationGroup="changepass">*</asp:RequiredFieldValidator>
+				</span>
+			</li>			
+			<li>
+				<span>
 					<asp:Label runat="server" AssociatedControlID="password" ID="passwordLabel"><%=umbraco.ui.Text("passwordEnterNew") %>:</asp:Label>
 					<asp:TextBox id="password" TextMode="password" CssClass="textfield" Runat="server"></asp:TextBox>
 					<asp:RequiredFieldValidator runat="server" ControlToValidate="password" ID="passwordvalidator" ValidationGroup="changepass">*</asp:RequiredFieldValidator>

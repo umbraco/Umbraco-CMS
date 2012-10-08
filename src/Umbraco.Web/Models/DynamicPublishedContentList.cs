@@ -54,10 +54,74 @@ namespace Umbraco.Web.Models
 			//NOTE: For many of these we could actually leave them out since we are executing custom extension methods and because
 			// we implement IEnumerable<T> they will execute just fine, however, to do that will be quite a bit slower than checking here.
 
+			var firstArg = args.FirstOrDefault();
+			//this is to check for 'DocumentTypeAlias' vs 'NodeTypeAlias' for compatibility
+			if (firstArg != null && firstArg.ToString().InvariantStartsWith("NodeTypeAlias"))
+			{
+				firstArg = "DocumentTypeAlias" + firstArg.ToString().Substring("NodeTypeAlias".Length);
+			}
+
             var name = binder.Name;
+			if (name == "Single")
+			{
+				string predicate = firstArg == null ? "" : firstArg.ToString();
+				var values = predicate.IsNullOrWhiteSpace() ? new object[] {} : args.Skip(1).ToArray();
+				var single = this.Single<DynamicPublishedContent>(predicate, values);				
+				result = new DynamicPublishedContent(single);				
+				return true;
+			}
+			if (name == "SingleOrDefault")
+			{
+				string predicate = firstArg == null ? "" : firstArg.ToString();
+				var values = predicate.IsNullOrWhiteSpace() ? new object[] { } : args.Skip(1).ToArray();
+				var single = this.SingleOrDefault<DynamicPublishedContent>(predicate, values);
+				if (single == null)
+					result = new DynamicNull();
+				else
+					result = new DynamicPublishedContent(single);
+				return true;
+			}
+			if (name == "First")
+			{
+				string predicate = firstArg == null ? "" : firstArg.ToString();
+				var values = predicate.IsNullOrWhiteSpace() ? new object[] { } : args.Skip(1).ToArray();
+				var first = this.First<DynamicPublishedContent>(predicate, values);
+				result = new DynamicPublishedContent(first);
+				return true;
+			}
+			if (name == "FirstOrDefault")
+			{
+				string predicate = firstArg == null ? "" : firstArg.ToString();
+				var values = predicate.IsNullOrWhiteSpace() ? new object[] { } : args.Skip(1).ToArray();
+				var first = this.FirstOrDefault<DynamicPublishedContent>(predicate, values);
+				if (first == null)
+					result = new DynamicNull();
+				else
+					result = new DynamicPublishedContent(first);
+				return true;
+			}
+			if (name == "Last")
+			{
+				string predicate = firstArg == null ? "" : firstArg.ToString();
+				var values = predicate.IsNullOrWhiteSpace() ? new object[] { } : args.Skip(1).ToArray();
+				var last = this.Last<DynamicPublishedContent>(predicate, values);
+				result = new DynamicPublishedContent(last);
+				return true;
+			}
+			if (name == "LastOrDefault")
+			{
+				string predicate = firstArg == null ? "" : firstArg.ToString();
+				var values = predicate.IsNullOrWhiteSpace() ? new object[] { } : args.Skip(1).ToArray();
+				var last = this.LastOrDefault<DynamicPublishedContent>(predicate, values);
+				if (last == null)
+					result = new DynamicNull();
+				else
+					result = new DynamicPublishedContent(last);
+				return true;
+			}
             if (name == "Where")
             {
-                string predicate = args.First().ToString();
+				string predicate = firstArg.ToString();
                 var values = args.Skip(1).ToArray();
 				//TODO: We are pre-resolving the where into a ToList() here which will have performance impacts if there where clauses
 				// are nested! We should somehow support an QueryableDocumentList!
@@ -68,23 +132,23 @@ namespace Umbraco.Web.Models
             {
 				//TODO: We are pre-resolving the where into a ToList() here which will have performance impacts if there where clauses
 				// are nested! We should somehow support an QueryableDocumentList!
-				result = new DynamicPublishedContentList(this.OrderBy<DynamicPublishedContent>(args.First().ToString()).ToList());
+				result = new DynamicPublishedContentList(this.OrderBy<DynamicPublishedContent>(firstArg.ToString()).ToList());
                 return true;
             }
 			if (name == "Take")
 			{
-				result = new DynamicPublishedContentList(this.Take((int)args.First()));
+				result = new DynamicPublishedContentList(this.Take((int)firstArg));
 				return true;
 			}
 			if (name == "Skip")
 			{
-				result = new DynamicPublishedContentList(this.Skip((int)args.First()));
+				result = new DynamicPublishedContentList(this.Skip((int)firstArg));
 				return true;
 			}
         	if (name == "InGroupsOf")
             {
                 int groupSize = 0;
-                if (int.TryParse(args.First().ToString(), out groupSize))
+				if (int.TryParse(firstArg.ToString(), out groupSize))
                 {
                     result = InGroupsOf(groupSize);
                     return true;
@@ -95,7 +159,7 @@ namespace Umbraco.Web.Models
             if (name == "GroupedInto")
             {
                 int groupCount = 0;
-                if (int.TryParse(args.First().ToString(), out groupCount))
+				if (int.TryParse(firstArg.ToString(), out groupCount))
                 {
                     result = GroupedInto(groupCount);
                     return true;
@@ -105,7 +169,7 @@ namespace Umbraco.Web.Models
             }
             if (name == "GroupBy")
             {
-                result = GroupBy(args.First().ToString());
+				result = GroupBy(firstArg.ToString());
                 return true;
             }
             if (name == "Average" || name == "Min" || name == "Max" || name == "Sum")
@@ -115,40 +179,40 @@ namespace Umbraco.Web.Models
             }
             if (name == "Union")
             {
-                if ((args.First() as IEnumerable<DynamicPublishedContent>) != null)
+				if ((firstArg as IEnumerable<DynamicPublishedContent>) != null)
                 {
-					result = new DynamicPublishedContentList(this.Items.Union(args.First() as IEnumerable<DynamicPublishedContent>));
+					result = new DynamicPublishedContentList(this.Items.Union(firstArg as IEnumerable<DynamicPublishedContent>));
                     return true;
                 }
-                if ((args.First() as DynamicPublishedContentList) != null)
+				if ((firstArg as DynamicPublishedContentList) != null)
                 {
-					result = new DynamicPublishedContentList(this.Items.Union((args.First() as DynamicPublishedContentList).Items));				
+					result = new DynamicPublishedContentList(this.Items.Union((firstArg as DynamicPublishedContentList).Items));				
                     return true;
                 }
             }
             if (name == "Except")
             {
-                if ((args.First() as IEnumerable<DynamicPublishedContent>) != null)
+				if ((firstArg as IEnumerable<DynamicPublishedContent>) != null)
                 {
-					result = new DynamicPublishedContentList(this.Items.Except(args.First() as IEnumerable<DynamicPublishedContent>, new DynamicPublishedContentIdEqualityComparer()));					
+					result = new DynamicPublishedContentList(this.Items.Except(firstArg as IEnumerable<DynamicPublishedContent>, new DynamicPublishedContentIdEqualityComparer()));					
                     return true;
                 }
-                if ((args.First() as DynamicPublishedContentList) != null)
+				if ((firstArg as DynamicPublishedContentList) != null)
                 {
-					result = new DynamicPublishedContentList(this.Items.Except((args.First() as DynamicPublishedContentList).Items, new DynamicPublishedContentIdEqualityComparer()));
+					result = new DynamicPublishedContentList(this.Items.Except((firstArg as DynamicPublishedContentList).Items, new DynamicPublishedContentIdEqualityComparer()));
                     return true;
                 }
             }
             if (name == "Intersect")
             {
-                if ((args.First() as IEnumerable<DynamicPublishedContent>) != null)
+				if ((firstArg as IEnumerable<DynamicPublishedContent>) != null)
                 {
-					result = new DynamicPublishedContentList(this.Items.Intersect(args.First() as IEnumerable<DynamicPublishedContent>, new DynamicPublishedContentIdEqualityComparer()));					
+					result = new DynamicPublishedContentList(this.Items.Intersect(firstArg as IEnumerable<DynamicPublishedContent>, new DynamicPublishedContentIdEqualityComparer()));					
                     return true;
                 }
-                if ((args.First() as DynamicPublishedContentList) != null)
+				if ((firstArg as DynamicPublishedContentList) != null)
                 {
-					result = new DynamicPublishedContentList(this.Items.Intersect((args.First() as DynamicPublishedContentList).Items, new DynamicPublishedContentIdEqualityComparer()));
+					result = new DynamicPublishedContentList(this.Items.Intersect((firstArg as DynamicPublishedContentList).Items, new DynamicPublishedContentIdEqualityComparer()));
                     return true;
                 }
             }
@@ -422,13 +486,50 @@ namespace Umbraco.Web.Models
             return result;
         }
 
+		public T Single<T>(string predicate, params object[] values)
+		{
+			return predicate.IsNullOrWhiteSpace() 
+				? ((IQueryable<T>) Items.AsQueryable()).Single() 
+				: Where<T>(predicate, values).Single();
+		}
+
+	    public T SingleOrDefault<T>(string predicate, params object[] values)
+		{
+			return predicate.IsNullOrWhiteSpace()
+				? ((IQueryable<T>)Items.AsQueryable()).SingleOrDefault()
+				: Where<T>(predicate, values).SingleOrDefault();
+		}
+		public T First<T>(string predicate, params object[] values)
+		{
+			return predicate.IsNullOrWhiteSpace()
+				? ((IQueryable<T>)Items.AsQueryable()).First()
+				: Where<T>(predicate, values).First();
+		}
+		public T FirstOrDefault<T>(string predicate, params object[] values)
+		{
+			return predicate.IsNullOrWhiteSpace()
+				? ((IQueryable<T>)Items.AsQueryable()).FirstOrDefault()
+				: Where<T>(predicate, values).FirstOrDefault();
+		}
+		public T Last<T>(string predicate, params object[] values)
+		{
+			return predicate.IsNullOrWhiteSpace()
+				? ((IQueryable<T>)Items.AsQueryable()).Last()
+				: Where<T>(predicate, values).Last();
+		}
+		public T LastOrDefault<T>(string predicate, params object[] values)
+		{
+			return predicate.IsNullOrWhiteSpace()
+				? ((IQueryable<T>)Items.AsQueryable()).LastOrDefault()
+				: Where<T>(predicate, values).LastOrDefault();
+		}
         public IQueryable<T> Where<T>(string predicate, params object[] values)
         {
             return ((IQueryable<T>)Items.AsQueryable()).Where(predicate, values);
         }
         public IQueryable<T> OrderBy<T>(string key)
         {
-            return ((IQueryable<T>)Items.AsQueryable()).OrderBy(key);
+			return ((IQueryable<T>)Items.AsQueryable()).OrderBy<T>(key, () => typeof(DynamicPublishedContentListOrdering));
         }
         public DynamicGrouping GroupBy(string key)
         {

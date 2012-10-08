@@ -173,7 +173,7 @@
                             <div class="container">
                                 <p>
                                     <strong>2. Getting a database setup for umbraco.</strong><br />
-                                    For first time users, we recommend you select "quick-and-simple file-based database".
+                                    For first time users, we recommend you select "quick-and-simple embedded database".
                                     This will install an easy to use database, that does
                                     not require any additional software to use.<br />
                                     Alternatively, you can install Microsoft SQL Server, which will require a bit more

@@ -7,29 +7,30 @@ namespace Umbraco.Web.Dynamics
 {
 	internal static class DynamicExpression
 	{
-		public static bool ConvertDynamicNullToBooleanFalse = false;
-		public static Expression Parse(Type resultType, string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
+		//public static bool ConvertDynamicNullToBooleanFalse = false;
+
+		public static Expression Parse<T>(Type resultType, string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
 		{
-			ConvertDynamicNullToBooleanFalse = convertDynamicNullToBooleanFalse;
-			ExpressionParser parser = new ExpressionParser(null, expression, values);
+			//ConvertDynamicNullToBooleanFalse = convertDynamicNullToBooleanFalse;
+			var parser = new ExpressionParser<T>(null, expression, values, convertDynamicNullToBooleanFalse);
 			return parser.Parse(resultType);
 		}
 
-		public static LambdaExpression ParseLambda(Type itType, Type resultType, string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
+		public static LambdaExpression ParseLambda<T>(Type itType, Type resultType, string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
 		{
-			return ParseLambda(new ParameterExpression[] { Expression.Parameter(itType, "") }, resultType, expression, convertDynamicNullToBooleanFalse, values);
+			return ParseLambda<T>(new ParameterExpression[] { Expression.Parameter(itType, "") }, resultType, expression, convertDynamicNullToBooleanFalse, values);
 		}
 
-		public static LambdaExpression ParseLambda(ParameterExpression[] parameters, Type resultType, string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
+		public static LambdaExpression ParseLambda<T>(ParameterExpression[] parameters, Type resultType, string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
 		{
-			ConvertDynamicNullToBooleanFalse = convertDynamicNullToBooleanFalse;
-			ExpressionParser parser = new ExpressionParser(parameters, expression, values);
+			//ConvertDynamicNullToBooleanFalse = convertDynamicNullToBooleanFalse;
+			var parser = new ExpressionParser<T>(parameters, expression, values, convertDynamicNullToBooleanFalse);
 			return Expression.Lambda(parser.Parse(resultType), parameters);
 		}
 
-		public static Expression<Func<T, S>> ParseLambda<T, S>(string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
+		public static Expression<Func<T, S>> ParseLambda<TDoc, T, S>(string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
 		{
-			return (Expression<Func<T, S>>)ParseLambda(typeof(T), typeof(S), expression, convertDynamicNullToBooleanFalse, values);
+			return (Expression<Func<T, S>>)ParseLambda<TDoc>(typeof(T), typeof(S), expression, convertDynamicNullToBooleanFalse, values);
 		}
 
 		public static Type CreateClass(params DynamicProperty[] properties)

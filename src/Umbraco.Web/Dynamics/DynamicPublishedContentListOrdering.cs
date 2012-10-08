@@ -6,7 +6,7 @@ using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Dynamics
 {
-    internal static class DynamicPublishedContentListOrdering
+    public static class DynamicPublishedContentListOrdering
     {
 
         private static TOut Reduce<TOut>(Func<DynamicPublishedContent, TOut> func, DynamicPublishedContent publishedContent)
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Dynamics
             }
             return (TOut)value;
         }
-		internal static IOrderedQueryable<DynamicPublishedContent> OrderBy(object source, object key)
+		public static IOrderedQueryable<DynamicPublishedContent> OrderBy(object source, object key)
         {
             IEnumerable<DynamicPublishedContent> typedSource = source as IEnumerable<DynamicPublishedContent>;
             LambdaExpression lambda = key as LambdaExpression;
@@ -92,7 +92,7 @@ namespace Umbraco.Web.Dynamics
             }
             return result;
         }
-		internal static IOrderedQueryable<DynamicPublishedContent> ThenBy(object source, object key)
+		public static IOrderedQueryable<DynamicPublishedContent> ThenBy(object source, object key)
         {
             IOrderedQueryable<DynamicPublishedContent> typedSource = source as IOrderedQueryable<DynamicPublishedContent>;
             LambdaExpression lambda = key as LambdaExpression;
@@ -143,7 +143,7 @@ namespace Umbraco.Web.Dynamics
             }
             return result;
         }
-		internal static IOrderedQueryable<DynamicPublishedContent> OrderByDescending(object source, object key)
+		public static IOrderedQueryable<DynamicPublishedContent> OrderByDescending(object source, object key)
         {
             IEnumerable<DynamicPublishedContent> typedSource = source as IEnumerable<DynamicPublishedContent>;
             LambdaExpression lambda = key as LambdaExpression;
@@ -194,7 +194,7 @@ namespace Umbraco.Web.Dynamics
             }
             return result;
         }
-		internal static IOrderedQueryable<DynamicPublishedContent> ThenByDescending(object source, object key)
+		public static IOrderedQueryable<DynamicPublishedContent> ThenByDescending(object source, object key)
         {
             IOrderedQueryable<DynamicPublishedContent> typedSource = source as IOrderedQueryable<DynamicPublishedContent>;
             LambdaExpression lambda = key as LambdaExpression;
