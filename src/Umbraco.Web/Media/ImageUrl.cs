@@ -16,15 +16,12 @@ namespace Umbraco.Web.Media
     public class ImageUrl
     {
 
-        public static string GetImageUrl(string specifiedSrc, string field, string provider, string parameters,
-                                         int? nodeId = null)
+        public static string GetImageUrl(string specifiedSrc, string field, string provider, string parameters, int? nodeId = null)
         {
             string url;
             IImageUrlProvider p = GetProvider(provider);
 
-            NameValueCollection parsedParameters = string.IsNullOrEmpty(parameters)
-                                                       ? new NameValueCollection()
-                                                       : HttpUtility.ParseQueryString(parameters);
+            NameValueCollection parsedParameters = string.IsNullOrEmpty(parameters) ? new NameValueCollection() : HttpUtility.ParseQueryString(parameters);
 
             if (!string.IsNullOrEmpty(field))
             {
