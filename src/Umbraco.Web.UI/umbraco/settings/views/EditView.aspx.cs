@@ -59,11 +59,16 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
                     MasterTemplate.Items.Add(li);
 				}
 
-                if (_template.MasterTemplate > 0)
-                    MasterTemplate.SelectedValue = _template.MasterTemplate.ToString();
+                try
+                {
+                    if (_template.MasterTemplate > 0)
+                        MasterTemplate.SelectedValue = _template.MasterTemplate.ToString();
+                }
+                catch (Exception ex)
+                {
+                }
 
-
-				MasterTemplate.SelectedValue = selectedTemplate;
+			    MasterTemplate.SelectedValue = selectedTemplate;
 
 				NameTxt.Text = _template.GetRawText();
 				AliasTxt.Text = _template.Alias;

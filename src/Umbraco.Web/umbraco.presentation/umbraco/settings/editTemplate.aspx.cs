@@ -59,8 +59,14 @@ namespace umbraco.cms.presentation.settings
                 AliasTxt.Text = _template.Alias;
                 editorSource.Text = _template.Design;
 
-                if(_template.MasterTemplate > 0)
-                    MasterTemplate.SelectedValue = _template.MasterTemplate.ToString();
+                try
+                {
+                    if (_template.MasterTemplate > 0)
+                        MasterTemplate.SelectedValue = _template.MasterTemplate.ToString();
+                }
+                catch (Exception ex)
+                {
+                }
 
                 ClientTools
                     .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadTemplates>().Tree.Alias)
