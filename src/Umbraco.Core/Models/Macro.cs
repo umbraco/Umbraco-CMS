@@ -97,6 +97,8 @@ namespace Umbraco.Core.Models
 
             var random = new Random();
             Id = random.Next(10000, int.MaxValue);
+
+            Key = Alias.EncodeAsGuid();
         }
 
         /// <summary>
