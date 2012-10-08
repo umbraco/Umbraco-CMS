@@ -935,7 +935,6 @@
     <Content Include="umbraco\images\editor\insRazorMacro.png" />
     <Content Include="umbraco_client\Application\JQuery\jquery.hotkeys.js" />
     <Content Include="umbraco_client\MaskedInput\jquery.maskedinput-1.3.min.js" />
-    <Content Include="umbraco_client\splitbutton\jquery.splitbutton.js" />
     <Content Include="umbraco_client\splitbutton\images\splitbutton_hover.png" />
     <Content Include="umbraco_client\splitbutton\images\splitbutton_downarrow.png" />
     <Content Include="umbraco_client\splitbutton\splitbutton.css" />
