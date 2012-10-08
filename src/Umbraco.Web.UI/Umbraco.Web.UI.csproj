@@ -260,6 +260,12 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="umbraco\developer\Macros\EditMacro.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\developer\Macros\EditMacro.aspx.designer.cs">
+      <DependentUpon>editMacro.aspx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\masterpages\UmbracoDialog.master.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

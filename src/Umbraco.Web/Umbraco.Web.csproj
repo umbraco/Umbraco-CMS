@@ -316,6 +316,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\LibraryCacheRefresher.cs" />
+    <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\editXslt.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1085,13 +1088,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\DataTypes\editDatatype.aspx.designer.cs">
       <DependentUpon>editDatatype.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.cs">
-      <DependentUpon>editMacro.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.designer.cs">
-      <DependentUpon>editMacro.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\BrowseRepository.aspx.cs">
       <DependentUpon>BrowseRepository.aspx</DependentUpon>
@@ -2024,7 +2020,6 @@
     <Content Include="umbraco.presentation\umbraco\developer\Macros\assemblyBrowser.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\autoDoc.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\DataTypes\editDatatype.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\getXsltStatus.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\Cache\viewCacheItem.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx" />
