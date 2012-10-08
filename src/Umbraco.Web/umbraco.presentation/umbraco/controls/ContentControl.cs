@@ -29,6 +29,7 @@ namespace umbraco.controls
     /// </summary>
     public class ContentControl : TabView
     {
+        private bool _hasContainer = false;
         private Content _content;
         private ArrayList _dataFields = new ArrayList();
         private UmbracoEnsuredPage prntpage;
@@ -93,6 +94,14 @@ namespace umbraco.controls
             if (virtualTabs == null)
                 virtualTabs = _content.ContentType.getVirtualTabs.ToList();
 
+            // Check for container
+            if (_content.ContentType.IsContainerContentType)
+            {
+                _hasContainer = true;
+                TabPage tp = NewTabPage("Children");
+                addSaveAndPublishButtons(ref tp);
+            }
+
             foreach (ContentType.TabI t in virtualTabs)
             {
                 TabPage tp = NewTabPage(t.Caption);
@@ -119,7 +128,7 @@ namespace umbraco.controls
 
             foreach (ContentType.TabI tab in virtualTabs)
             {
-                var tabPage = this.Panels[i] as TabPage;
+                var tabPage = _hasContainer ? this.Panels[i+1] as TabPage : this.Panels[i] as TabPage;
                 if (tabPage == null)
                 {
                     throw new ArgumentException("Unable to load tab \"" + tab.Caption + "\"");

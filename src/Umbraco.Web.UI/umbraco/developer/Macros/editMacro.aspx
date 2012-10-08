@@ -173,10 +173,10 @@
             <FooterTemplate>
                 <tr>
                     <td class="propertyContent">
-                        <asp:TextBox runat="server" ID="macroPropertyAliasNew" Text='' OnTextChanged="macroPropertyCreate" />
+                        <asp:TextBox runat="server" ID="macroPropertyAliasNew" Text='New Alias' OnTextChanged="macroPropertyCreate" />
                     </td>
                     <td class="propertyContent">
-                        <asp:TextBox runat="server" ID="macroPropertyNameNew" Text='' />
+                        <asp:TextBox runat="server" ID="macroPropertyNameNew" Text='New Name' />
                     </td>
                     <td class="propertyContent">
                         <asp:DropDownList OnPreRender="AddChooseList" runat="server" ID="macroPropertyTypeNew"

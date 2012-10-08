@@ -38,7 +38,7 @@ namespace umbraco.cms.presentation.create.controls
 				{
 					foreach (int i in allowedIds) if (i == dt.Id) nodeType.Items.Add(li);
 				} 
-				else
+				else if (dt.AllowAtRoot)
 					nodeType.Items.Add(li);
 			}
 		}

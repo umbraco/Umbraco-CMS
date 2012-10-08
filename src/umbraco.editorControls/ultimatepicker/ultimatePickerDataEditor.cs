@@ -113,22 +113,22 @@ namespace umbraco.editorControls.ultimatepicker
                 case "AutoComplete":
                     if (childtxt.Text.Contains("[") && childtxt.Text.Contains("]"))
                     {
-                        dataToSave = childtxt.Text.Replace("]","").Split("[".ToCharArray())[1];
+                        dataToSave = childtxt.Text.Replace("]", "").Split("[".ToCharArray())[1];
                     }
 
-                    
+
                     break;
                 case "auto-suggest":
                     goto case "AutoComplete";
                 case "CheckBoxList":
-
-                    foreach (ListItem item in checkboxlistNodes.Items)
-                    {
-                        if (item.Selected)
+                    if (checkboxlistNodes != null)
+                        foreach (ListItem item in checkboxlistNodes.Items)
                         {
-                            dataToSave += item.Value + ",";
+                            if (item.Selected)
+                            {
+                                dataToSave += item.Value + ",";
+                            }
                         }
-                    }
 
                     if (dataToSave.Length > 0)
                     {
@@ -204,7 +204,8 @@ namespace umbraco.editorControls.ultimatepicker
                 if (dataToSave.Length > 0)
                 {
                     this._data.Value = dataToSave;
-                }else
+                }
+                else
                 {
                     if (childtxt.Text.Trim().Length == 0)
                     {
@@ -303,7 +304,7 @@ namespace umbraco.editorControls.ultimatepicker
 
         void clearRadiobuttonlist_Click(object sender, EventArgs e)
         {
-           
+
 
             foreach (ListItem radiobutton in radiobuttonlistNodes.Items)
             {
@@ -313,7 +314,7 @@ namespace umbraco.editorControls.ultimatepicker
             clearRadiobuttons.Checked = true;
         }
 
-        
+
 
         /// <summary>
         /// Adds sub nodes to the ListControl object passed into the method, based on the Content node passed in
@@ -384,7 +385,7 @@ namespace umbraco.editorControls.ultimatepicker
             ClientDependencyLoader.Instance.RegisterDependency("Application/JQuery/jquery.autocomplete.js", "UmbracoClient", ClientDependencyType.Javascript);
             ClientDependencyLoader.Instance.RegisterDependency("css/umbracoGui.css", "UmbracoRoot", ClientDependencyType.Css);
 
-            
+
             childtxt = new TextBox();
             childtxt.ID = "ultimatePickerBox" + base.ID;
             childtxt.AutoCompleteType = AutoCompleteType.Disabled;
