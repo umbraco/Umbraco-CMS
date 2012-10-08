@@ -9,7 +9,9 @@ namespace Umbraco.Core.Persistence.Repositories
     /// Defines the implementation of a Repository
     /// </summary>
     /// <typeparam name="TEntity">Type of <see cref="IAggregateRoot"/> entity for which the repository is used</typeparam>
-    public interface IRepository<TEntity> where TEntity : class, IAggregateRoot
+    /// <typeparam name="TId">Type of the Id used for this entity</typeparam>
+    public interface IRepository<TId, TEntity> 
+        where TEntity : IAggregateRoot
     {
         /// <summary>
         /// Adds or Updates an Entity
@@ -28,14 +30,14 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        TEntity Get(int id);
+        TEntity Get(TId id);
 
         /// <summary>
         /// Gets all entities of the spefified type
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        IEnumerable<TEntity> GetAll(params int[] ids);
+        IEnumerable<TEntity> GetAll(params TId[] ids);
 
         /// <summary>
         /// Gets all entities of the spefified type and query
@@ -49,7 +51,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        bool Exists(int id);
+        bool Exists(TId id);
 
         /// <summary>
         /// Returns the count for the specified query
@@ -62,6 +64,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Sets the Unit Of Work for the Repository
         /// </summary>
         /// <param name="work"></param>
-        void SetUnitOfWork<T>(IUnitOfWork<T> work);
+        void SetUnitOfWork(IUnitOfWork work);
     }
 }

@@ -1,14 +1,16 @@
-﻿using System;
+﻿using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
     /// <summary>
     /// Defines a Unit Of Work
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public interface IUnitOfWork<T> : IDisposable
+    public interface IUnitOfWork
     {
+        void RegisterAdded(IEntity entity, IUnitOfWorkRepository repository);
+        void RegisterChanged(IEntity entity, IUnitOfWorkRepository repository);
+        void RegisterRemoved(IEntity entity, IUnitOfWorkRepository repository);
         void Commit();
-        T Storage { get; }//TODO This won't work! Need to change it
+        object Key { get; }
     }
 }

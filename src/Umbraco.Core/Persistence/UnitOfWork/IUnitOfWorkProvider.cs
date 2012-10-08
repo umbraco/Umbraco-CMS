@@ -3,9 +3,8 @@
     /// <summary>
     /// Defines a Unit of Work Provider
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public interface IUnitOfWorkProvider<T>
+    public interface IUnitOfWorkProvider
     {
-        IUnitOfWork<T> GetUnitOfWork();
+        IUnitOfWork GetUnitOfWork();
     }
 }

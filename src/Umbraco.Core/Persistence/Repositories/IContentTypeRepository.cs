@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IContentTypeRepository : IRepository<IContentType>
+    public interface IContentTypeRepository : IRepository<int, IContentType>
     {
          
     }

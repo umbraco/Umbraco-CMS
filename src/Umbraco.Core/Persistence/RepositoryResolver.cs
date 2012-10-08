@@ -22,8 +22,8 @@ namespace Umbraco.Core.Persistence
         //Otherwise look for an entity type in the config
         //- If type exists check dependencies, create new object, add it to dictionary and return it
         //If we have come this far the correct types wasn't found and we throw an exception
-        internal static TRepository ResolveByType<TRepository, TEntity>(IUnitOfWork<Database> unitOfWork)
-            where TRepository : class, IRepository<TEntity>
+        internal static TRepository ResolveByType<TRepository, TEntity, TId>(IUnitOfWork unitOfWork)
+            where TRepository : class, IRepository<TId, TEntity>
             where TEntity : class, IAggregateRoot
         {
             //Initialize the provider's default value
@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence
             if (Repositories.ContainsKey(interfaceShortName))
             {
                 repository = (TRepository)Repositories[interfaceShortName];
-                if (unitOfWork != null && repository.GetType().IsSubclassOf(typeof(IRepository<TEntity>)))
+                if (unitOfWork != null && repository.GetType().IsSubclassOf(typeof(IRepository<TId, TEntity>)))
                 {
                     repository.SetUnitOfWork(unitOfWork);
                 }
@@ -83,7 +83,7 @@ namespace Umbraco.Core.Persistence
         }
 
         //Recursive create and dependency check
-        private static object Resolve(Type repositoryType, IUnitOfWork<Database> unitOfWork)
+        private static object Resolve(Type repositoryType, IUnitOfWork unitOfWork)
         {
             var constructor = repositoryType.GetConstructors().SingleOrDefault();
             if (constructor == null)

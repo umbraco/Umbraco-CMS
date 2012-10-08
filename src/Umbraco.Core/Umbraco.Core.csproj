@@ -91,7 +91,10 @@
     <Compile Include="Persistence\Caching\InMemoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\IRepositoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
-    <Compile Include="Persistence\Factories\ContentFactory.cs" />
+    <Compile Include="Persistence\DatabaseFactory.cs" />
+    <Compile Include="Persistence\Factories\EntityFactory.cs" />
+    <Compile Include="Persistence\Factories\IEntityFactory.cs" />
+    <Compile Include="Persistence\Factories\PropertyFactory.cs" />
     <Compile Include="Persistence\Mappers\ModelDtoMapper.cs" />
     <Compile Include="Persistence\Querying\ExpressionHelper.cs" />
     <Compile Include="Persistence\Querying\IQuery.cs" />
@@ -102,10 +105,13 @@
     <Compile Include="Persistence\Repositories\IContentTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\IRepository.cs" />
     <Compile Include="Persistence\Relators\TabPropertyTypeRelator.cs" />
-    <Compile Include="Persistence\Repositories\Repository.cs" />
+    <Compile Include="Persistence\Repositories\PetaPocoRepositoryBase.cs" />
+    <Compile Include="Persistence\Repositories\RepositoryBase.cs" />
     <Compile Include="Persistence\RepositoryResolver.cs" />
+    <Compile Include="Persistence\TransactionType.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkProvider.cs" />
+    <Compile Include="Persistence\UnitOfWork\IUnitOfWorkRepository.cs" />
     <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWorkProvider.cs" />
     <Compile Include="PropertyEditors\Attributes\PropertyEditorAttribute.cs" />
