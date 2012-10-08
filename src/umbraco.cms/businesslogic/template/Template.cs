@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Xml;
+using Umbraco.Core;
 using umbraco.DataLayer;
 using System.Text.RegularExpressions;
 using System.IO;
@@ -132,8 +133,8 @@ namespace umbraco.cms.businesslogic.template
                 _mastertemplate = dr.IsNull("master") ? 0 : dr.GetInt("master");
             }
             dr.Close();
-            
-            if (UmbracoSettings.EnableMvcSupport && Template.HasView(this))
+
+			if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && Template.HasView(this))
                 _design = ViewHelper.GetViewFile(this);
             else
                 _design = MasterpageHelper.GetMasterpageFile(this);
@@ -254,7 +255,7 @@ namespace umbraco.cms.businesslogic.template
 
 
                 //we only switch to MVC View editing if the template has a view file, and MVC editing is enabled
-                if (UmbracoSettings.EnableMvcSupport && !isMasterPageSyntax(_design))
+                if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && !isMasterPageSyntax(_design))
                     _design = ViewHelper.UpdateViewFile(this);
                 else if (UmbracoSettings.UseAspNetMasterPages)
                     _design = MasterpageHelper.UpdateMasterpageFile(this, _oldAlias);
@@ -321,7 +322,7 @@ namespace umbraco.cms.businesslogic.template
             Template t = MakeNew(Name, u);
             t.MasterTemplate = master.Id;
 
-            if (UmbracoSettings.EnableMvcSupport)
+            if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
                 ViewHelper.CreateViewFile(t, true);
             else
                 MasterpageHelper.CreateMasterpageFile(t, true);
@@ -373,7 +374,7 @@ namespace umbraco.cms.businesslogic.template
             NewEventArgs e = new NewEventArgs();
             t.OnNew(e);
 
-            if (UmbracoSettings.EnableMvcSupport)
+            if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
                 t._design = ViewHelper.CreateViewFile(t);
             else
                 t._design = MasterpageHelper.CreateMasterpageFile(t);

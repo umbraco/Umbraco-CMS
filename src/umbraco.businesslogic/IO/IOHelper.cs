@@ -77,11 +77,6 @@ namespace umbraco.IO
 			return Umbraco.Core.IO.IOHelper.ValidateEditPath(filePath, validDir); 
         }
 
-        public static bool ValidateEditPath(string filePath, string[] validDirs)
-        {
-            return Umbraco.Core.IO.IOHelper.ValidateEditPath(filePath, validDirs);
-        }
-
 	    public static bool ValidateFileExtension(string filePath, List<string> validFileExtensions)
         {
 			return Umbraco.Core.IO.IOHelper.ValidateFileExtension(filePath, validFileExtensions); 

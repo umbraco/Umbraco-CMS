@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Core;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -46,7 +47,7 @@ namespace umbraco
             BusinessLogic.Log.Add(LogTypes.Debug, -1, "tp id:" + masterId.ToString());
 
             var editor = "settings/editTemplate.aspx";
-            if(UmbracoSettings.EnableMvcSupport)
+            if(Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
                 editor = "settings/views/editView.aspx";
 
             if (masterId > 0)
