@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Language : Entity
+    public class Language : Entity, IAggregateRoot
     {
         private string _isoCode;
         private string _cultureName;

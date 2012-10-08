@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class DictionaryItem : Entity
+    public class DictionaryItem : Entity, IAggregateRoot
     {
         private Guid _parentId;
         private string _itemKey;

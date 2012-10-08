@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Models.Rdbms
@@ -19,5 +20,8 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("key")]
         public string Key { get; set; }
+
+        [ResultColumn]
+        public List<LanguageTextDto> LanguageTextDtos { get; set; }
     }
 }

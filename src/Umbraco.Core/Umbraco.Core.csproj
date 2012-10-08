@@ -101,7 +101,10 @@
     <Compile Include="Persistence\Factories\ContentFactory.cs" />
     <Compile Include="Persistence\Factories\ContentTypeFactory.cs" />
     <Compile Include="Persistence\Factories\DataTypeDefinitionFactory.cs" />
+    <Compile Include="Persistence\Factories\DictionaryItemFactory.cs" />
+    <Compile Include="Persistence\Factories\DictionaryTranslationFactory.cs" />
     <Compile Include="Persistence\Factories\IEntityFactory.cs" />
+    <Compile Include="Persistence\Factories\LanguageFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyGroupFactory.cs" />
     <Compile Include="Persistence\Mappers\ModelDtoMapper.cs" />
@@ -112,12 +115,16 @@
     <Compile Include="Persistence\Repositories\ContentRepository.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\DataTypeDefinitionRepository.cs" />
+    <Compile Include="Persistence\Repositories\DictionaryRepository.cs" />
     <Compile Include="Persistence\Repositories\IContentRepository.cs" />
     <Compile Include="Persistence\Repositories\IContentTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\IDataTypeDefinitionRepository.cs" />
+    <Compile Include="Persistence\Repositories\IDictionaryRepository.cs" />
+    <Compile Include="Persistence\Repositories\ILanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\IMacroRepository.cs" />
     <Compile Include="Persistence\Repositories\IRepository.cs" />
     <Compile Include="Persistence\Relators\TabPropertyTypeRelator.cs" />
+    <Compile Include="Persistence\Repositories\LanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\MacroRepository.cs" />
     <Compile Include="Persistence\Repositories\PetaPocoRepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\RepositoryBase.cs" />
