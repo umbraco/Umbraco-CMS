@@ -50,9 +50,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var propertyDataDtos = Database.Fetch<PropertyDataDto, PropertyTypeDto>(propertySql);
 
             var contentType = _contentTypeRepository.Get(documentDto.ContentVersionDto.ContentDto.ContentType);
-            //var content = ContentFactory.CreateContent(id, contentType, documentDto, propertyDataDtos);
 
-            var factory = new EntityFactory(contentType, NodeObjectTypeId, id);
+            var factory = new ContentFactory(contentType, NodeObjectTypeId, id);
             var content = factory.BuildEntity(documentDto);
             
             var propertyFactory = new PropertyFactory(contentType, documentDto.ContentVersionDto.VersionId, id);
@@ -154,7 +153,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((Content)entity).AddingEntity();
 
-            var factory = new EntityFactory(null, NodeObjectTypeId, entity.Id);
+            var factory = new ContentFactory(null, NodeObjectTypeId, entity.Id);
             var dto = factory.BuildDto(entity);
 
             //NOTE Should the logic below have some kind of fallback for empty parent ids ?
@@ -166,7 +165,6 @@ namespace Umbraco.Core.Persistence.Repositories
                                                       new { ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId });
 
             //Create the (base) node data - umbracoNode
-            //var nodeDto = ContentFactory.CreateNodeDto(entity, NodeObjectTypeId, parent.Path, level, sortOrder);
             var nodeDto = dto.ContentVersionDto.ContentDto.NodeDto;
             nodeDto.Path = parent.Path;
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
@@ -184,25 +182,21 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.Level = level;
 
             //Create the Content specific data - cmsContent
-            //var contentDto = ContentFactory.CreateContentDto(entity);
             var contentDto = dto.ContentVersionDto.ContentDto;
             Database.Insert(contentDto);
 
             //Create the first version - cmsContentVersion
             //Assumes a new Version guid and Version date (modified date) has been set
-            //var contentVersionDto = ContentFactory.CreateContentVersionDto(entity);
             var contentVersionDto = dto.ContentVersionDto;
             Database.Insert(contentVersionDto);
 
             //Create the Document specific data for this version - cmsDocument
             //Assumes a new Version guid has been generated
-            //var documentDto = ContentFactory.CreateDocumentDto(entity);
             Database.Insert(dto);
 
             //Create the PropertyData for this version - cmsPropertyData
             var propertyFactory = new PropertyFactory(null, entity.Version, entity.Id);
             var propertyDataDtos = propertyFactory.BuildDto(entity.Properties);
-            //var propertyDataDtos = ContentFactory.CreateProperties(entity.Id, entity.Version, entity.Properties);
             //Add Properties
             foreach (var propertyDataDto in propertyDataDtos)
             {
@@ -217,14 +211,13 @@ namespace Umbraco.Core.Persistence.Repositories
             //Updates Modified date and Version Guid
             ((Content)entity).UpdatingEntity();
 
-            var factory = new EntityFactory(null, NodeObjectTypeId, entity.Id);
+            var factory = new ContentFactory(null, NodeObjectTypeId, entity.Id);
             //Look up Content entry to get Primary for updating the DTO
             var contentDto = Database.SingleOrDefault<ContentDto>("WHERE nodeId = @Id", new { Id = entity.Id });
             factory.SetPrimaryKey(contentDto.PrimaryKey);
             var dto = factory.BuildDto(entity);
 
             //Updates the (base) node data - umbracoNode
-            //var nodeDto = ContentFactory.CreateNodeDto(entity, NodeObjectTypeId);
             var nodeDto = dto.ContentVersionDto.ContentDto.NodeDto;
             var o = Database.Update(nodeDto);
             
@@ -232,7 +225,6 @@ namespace Umbraco.Core.Persistence.Repositories
             if (contentDto.ContentType != entity.ContentTypeId)
             {
                 //Create the Content specific data - cmsContent
-                //var newContentDto = ContentFactory.CreateContentDto(entity, contentDto.PrimaryKey);
                 var newContentDto = dto.ContentVersionDto.ContentDto;
                 Database.Update(newContentDto);
             }
@@ -248,17 +240,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Create a new version - cmsContentVersion
             //Assumes a new Version guid and Version date (modified date) has been set
-            //var contentVersionDto = ContentFactory.CreateContentVersionDto(entity);
             var contentVersionDto = dto.ContentVersionDto;
             Database.Insert(contentVersionDto);
 
             //Create the Document specific data for this version - cmsDocument
             //Assumes a new Version guid has been generated
-            //var documentDto = ContentFactory.CreateDocumentDto(entity);
             Database.Insert(dto);
 
             //Create the PropertyData for this version - cmsPropertyData
-            //var propertyDataDtos = ContentFactory.CreateProperties(entity.Id, entity.Version, entity.Properties);
             var propertyFactory = new PropertyFactory(null, entity.Version, entity.Id);
             var propertyDataDtos = propertyFactory.BuildDto(entity.Properties);
             //Add Properties
@@ -309,9 +298,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var propertyDataDtos = Database.Query<PropertyDataDto, PropertyTypeDto>(propertySql);
 
             var contentType = _contentTypeRepository.Get(documentDto.ContentVersionDto.ContentDto.ContentType);
-            //var content = ContentFactory.CreateContent(id, contentType, documentDto, propertyDataDtos);
 
-            var factory = new EntityFactory(contentType, NodeObjectTypeId, id);
+            var factory = new ContentFactory(contentType, NodeObjectTypeId, id);
             var content = factory.BuildEntity(documentDto);
 
             var propertyFactory = new PropertyFactory(contentType, documentDto.ContentVersionDto.VersionId, id);

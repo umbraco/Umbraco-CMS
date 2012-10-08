@@ -92,7 +92,7 @@
     <Compile Include="Persistence\Caching\IRepositoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
     <Compile Include="Persistence\DatabaseFactory.cs" />
-    <Compile Include="Persistence\Factories\EntityFactory.cs" />
+    <Compile Include="Persistence\Factories\ContentFactory.cs" />
     <Compile Include="Persistence\Factories\IEntityFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyFactory.cs" />
     <Compile Include="Persistence\Mappers\ModelDtoMapper.cs" />
