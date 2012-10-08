@@ -31,13 +31,6 @@
       <create assembly="umbraco" type="templateTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="initviews">
-    <header>Template</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="templateTasks" />
-    </tasks>
-  </nodeType>
   <nodeType alias="initmacros">
     <header>Macro</header>
     <usercontrol>/create/simple.ascx</usercontrol>
