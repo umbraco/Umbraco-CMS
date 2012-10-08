@@ -1997,7 +1997,9 @@
     </None>
     <None Include="umbraco.presentation\umbraco\LiveEditing\LiveEditing.cd" />
     <Content Include="umbraco.presentation\umbraco\masterpages\umbracoPage.Master" />
-    <Content Include="umbraco.presentation\umbraco\masterpages\umbracoDialog.Master" />
+    <Content Include="umbraco.presentation\umbraco\masterpages\umbracoDialog.Master">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\Search\QuickSearchHandler.ashx" />
     <None Include="umbraco.presentation\umbraco\templateControls\InlineXslt.xsltTemplate" />
     <Content Include="umbraco.presentation\umbraco\users\NodePermissions.ascx" />

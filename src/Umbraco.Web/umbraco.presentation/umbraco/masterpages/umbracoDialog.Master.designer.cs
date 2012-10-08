@@ -58,6 +58,15 @@ namespace umbraco.presentation.masterpages {
         protected global::ClientDependency.Core.Controls.JsInclude JsInclude3;
         
         /// <summary>
+        /// JsInclude6 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude6;
+        
+        /// <summary>
         /// JsInclude4 control.
         /// </summary>
         /// <remarks>
@@ -100,7 +109,7 @@ namespace umbraco.presentation.masterpages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.ScriptManager ScriptManager1;
+        protected global::System.Web.UI.WebControls.ScriptManager ScriptManager1;
         
         /// <summary>
         /// body control.

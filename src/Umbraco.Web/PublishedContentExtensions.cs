@@ -408,7 +408,7 @@ namespace Umbraco.Web
 		{
 			return content.Ancestors(n => true);
 		}
-		private static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, Func<IPublishedContent, bool> func)
+		internal static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, Func<IPublishedContent, bool> func)
 		{
 			var ancestorList = new List<IPublishedContent>();
 			var node = content;
@@ -450,7 +450,7 @@ namespace Umbraco.Web
 		{
 			return content.AncestorOrSelf(node => node.DocumentTypeAlias == nodeTypeAlias);
 		}
-		private static IPublishedContent AncestorOrSelf(this IPublishedContent content, Func<IPublishedContent, bool> func)
+		internal static IPublishedContent AncestorOrSelf(this IPublishedContent content, Func<IPublishedContent, bool> func)
 		{
 			var node = content;
 			while (node != null)
@@ -510,7 +510,7 @@ namespace Umbraco.Web
 		{
 			return content.AncestorsOrSelf(n => n.DocumentTypeAlias == nodeTypeAlias);
 		}
-		private static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, int level)
+		internal static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, int level)
 		{
 			return content.AncestorsOrSelf(n => n.Level <= level);
 		}
@@ -546,7 +546,7 @@ namespace Umbraco.Web
 		{
 			return content.DescendantsOrSelf(p => true);
 		}
-		private static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, Func<IPublishedContent, bool> func)
+		internal static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, Func<IPublishedContent, bool> func)
 		{
 			if (content != null)
 			{
