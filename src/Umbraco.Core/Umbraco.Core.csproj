@@ -99,6 +99,7 @@
     <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
     <Compile Include="Persistence\DatabaseFactory.cs" />
     <Compile Include="Persistence\Factories\ContentFactory.cs" />
+    <Compile Include="Persistence\Factories\DataTypeDefinitionFactory.cs" />
     <Compile Include="Persistence\Factories\IEntityFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyFactory.cs" />
     <Compile Include="Persistence\Mappers\ModelDtoMapper.cs" />
@@ -107,8 +108,10 @@
     <Compile Include="Persistence\Querying\Query.cs" />
     <Compile Include="Persistence\Querying\SqlTranslator.cs" />
     <Compile Include="Persistence\Repositories\ContentRepository.cs" />
+    <Compile Include="Persistence\Repositories\DataTypeDefinitionRepository.cs" />
     <Compile Include="Persistence\Repositories\IContentRepository.cs" />
     <Compile Include="Persistence\Repositories\IContentTypeRepository.cs" />
+    <Compile Include="Persistence\Repositories\IDataTypeDefinitionRepository.cs" />
     <Compile Include="Persistence\Repositories\IMacroRepository.cs" />
     <Compile Include="Persistence\Repositories\IRepository.cs" />
     <Compile Include="Persistence\Relators\TabPropertyTypeRelator.cs" />

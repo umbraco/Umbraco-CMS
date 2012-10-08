@@ -11,6 +11,9 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
+    /// <summary>
+    /// Represents a repository for doing CRUD operations for <see cref="IContent"/>
+    /// </summary>
     internal class ContentRepository : PetaPocoRepositoryBase<int, IContent>, IContentRepository
     {
         private readonly IContentTypeRepository _contentTypeRepository;
@@ -32,7 +35,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IContent PerformGet(int id)
         {
             var contentSql = GetBaseQuery(false);
-            contentSql.Where("[cmsDocument].[nodeId] = @Id", new { Id = id });
+            contentSql.Append(GetBaseWhereClause(id));
             contentSql.OrderBy("[cmsContentVersion].[VersionDate] DESC");
 
             var documentDto = Database.Query<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(contentSql).FirstOrDefault();
@@ -94,11 +97,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 yield return Get(documentDto.NodeId);
             }
         }
-
-        protected override bool PerformExists(int id)
-        {
-            return Database.Exists<NodeDto>(id);
-        }
         
         #endregion
 
@@ -112,13 +110,14 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.InnerJoin("cmsContentVersion ON ([cmsDocument].[versionId] = [cmsContentVersion].[VersionId])");
             sql.InnerJoin("cmsContent ON ([cmsContentVersion].[ContentId] = [cmsContent].[nodeId])");
             sql.InnerJoin("umbracoNode ON ([cmsContent].[nodeId] = [umbracoNode].[id])");
+            sql.Where("[umbracoNode].[nodeObjectType] = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
             return sql;
         }
 
-        protected override Sql GetBaseWhereClause()
+        protected override Sql GetBaseWhereClause(object id)
         {
             var sql = new Sql();
-            sql.Where("[umbracoNode].[nodeObjectType] = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
+            sql.Where("[cmsDocument].[nodeId] = @Id", new { Id = id });
             return sql;
         }
 
@@ -266,7 +265,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IContent> GetAllVersions(int id)
         {
             var contentSql = GetBaseQuery(false);
-            contentSql.Where("[cmsDocument].[nodeId] = @Id", new { Id = id });
+            contentSql.Append(GetBaseWhereClause(id));
             contentSql.OrderBy("[cmsContentVersion].[VersionDate] DESC");
 
             var documentDtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(contentSql);
@@ -279,7 +278,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public IContent GetByVersion(int id, Guid versionId)
         {
             var contentSql = GetBaseQuery(false);
-            contentSql.Where("[cmsDocument].[nodeId] = @Id", new { Id = id });
+            contentSql.Append(GetBaseWhereClause(id));
             contentSql.Where("[cmsContentVersion].[VersionId] = @VersionId", new { VersionId = versionId });
             contentSql.OrderBy("[cmsContentVersion].[VersionDate] DESC");
 

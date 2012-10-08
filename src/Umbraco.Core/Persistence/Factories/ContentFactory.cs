@@ -70,6 +70,11 @@ namespace Umbraco.Core.Persistence.Factories
 
         #endregion
 
+        public void SetPrimaryKey(int primaryKey)
+        {
+            _primaryKey = primaryKey;
+        }
+
         private ContentVersionDto BuildContentVersionDto(IContent entity)
         {
             var contentVersionDto = new ContentVersionDto
@@ -117,11 +122,6 @@ namespace Umbraco.Core.Persistence.Factories
                               };
 
             return nodeDto;
-        }
-
-        public void SetPrimaryKey(int primaryKey)
-        {
-            _primaryKey = primaryKey;
         }
     }
 }

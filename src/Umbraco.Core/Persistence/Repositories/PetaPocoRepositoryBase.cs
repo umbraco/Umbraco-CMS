@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
@@ -35,13 +34,21 @@ namespace Umbraco.Core.Persistence.Repositories
         #region Abstract Methods
         
         protected abstract Sql GetBaseQuery(bool isCount);
-        protected abstract Sql GetBaseWhereClause();
+        protected abstract Sql GetBaseWhereClause(object id);
         protected abstract IEnumerable<string> GetDeleteClauses();
         protected abstract Guid NodeObjectTypeId { get; }
         protected abstract override void PersistNewItem(TEntity entity);
         protected abstract override void PersistUpdatedItem(TEntity entity);
 
         #endregion
+
+        protected override bool PerformExists(TId id)
+        {
+            var sql = GetBaseQuery(true);
+            sql.Append(GetBaseWhereClause(id));
+            var count = _database.ExecuteScalar<int>(sql);
+            return count == 1;
+        }
 
         protected override int PerformCount(IQuery<TEntity> query)
         {
