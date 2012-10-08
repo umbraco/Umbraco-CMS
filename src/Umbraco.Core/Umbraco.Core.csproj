@@ -44,6 +44,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml.Linq" />
@@ -116,6 +117,8 @@
     <Compile Include="Persistence\Repositories\RepositoryBase.cs" />
     <Compile Include="Persistence\RepositoryResolver.cs" />
     <Compile Include="Persistence\TransactionType.cs" />
+    <Compile Include="Persistence\UnitOfWork\FileUnitOfWork.cs" />
+    <Compile Include="Persistence\UnitOfWork\FileUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkRepository.cs" />
