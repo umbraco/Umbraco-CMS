@@ -50,19 +50,7 @@ namespace umbraco.cms.presentation.settings
                     if (t.Id != _template.Id)
                     {
                         var li = new ListItem(t.Text, t.Id.ToString());
-
                         li.Attributes.Add("id", t.Alias.Replace(" ", ""));
-
-                        if (t.Id == _template.MasterTemplate)
-                        {
-                            try
-                            {
-                                li.Selected = true;
-                            }
-                            catch
-                            {
-                            }
-                        }
                         MasterTemplate.Items.Add(li);
                     }
                 }
@@ -71,6 +59,14 @@ namespace umbraco.cms.presentation.settings
                 AliasTxt.Text = _template.Alias;
                 editorSource.Text = _template.Design;
 
+                try
+                {
+                    if (_template.MasterTemplate > 0)
+                        MasterTemplate.SelectedValue = _template.MasterTemplate.ToString();
+                }
+                catch (Exception ex)
+                {
+                }
 
                 ClientTools
                     .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadTemplates>().Tree.Alias)
