@@ -13,8 +13,7 @@ namespace Umbraco.Core.Persistence.Factories
             return new DictionaryItem(dto.Parent, dto.Key)
                        {
                            Id = dto.PrimaryKey, 
-                           Key = dto.Id, 
-                           Translations = BuildTranslations(dto)
+                           Key = dto.Id
                        };
         }
 
@@ -48,17 +47,6 @@ namespace Umbraco.Core.Persistence.Factories
                     text.PrimaryKey = translation.Id;
 
                 list.Add(text);
-            }
-            return list;
-        }
-
-        //NOTE Should probably be a callback in the repo, so the Language obj comes from the LanguageRepository
-        private IEnumerable<DictionaryTranslation> BuildTranslations(DictionaryDto dto)
-        {
-            var list = new List<DictionaryTranslation>();
-            foreach (var textDto in dto.LanguageTextDtos)
-            {
-                list.Add(new DictionaryTranslation(null, textDto.Value, dto.Id) {Id = textDto.PrimaryKey});
             }
             return list;
         }
