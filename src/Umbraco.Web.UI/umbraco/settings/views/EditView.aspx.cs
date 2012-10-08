@@ -56,12 +56,12 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 
 					var li = new ListItem(t.Text, t.Id.ToString());
 					li.Attributes.Add("id", t.Alias.Replace(" ", ""));
-
-					if (t.Id == _template.MasterTemplate)
-						selectedTemplate = t.Alias.Replace(" ", "");
-
-					MasterTemplate.Items.Add(li);
+                    MasterTemplate.Items.Add(li);
 				}
+
+                if (_template.MasterTemplate > 0)
+                    MasterTemplate.SelectedValue = _template.MasterTemplate.ToString();
+
 
 				MasterTemplate.SelectedValue = selectedTemplate;
 

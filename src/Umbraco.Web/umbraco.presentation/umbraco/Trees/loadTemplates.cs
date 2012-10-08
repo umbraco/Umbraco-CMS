@@ -36,12 +36,7 @@ namespace umbraco
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
         {
-            if (!Umbraco.Core.Configuration.UmbracoSettings.EnableMvcSupport)  
-			    rootNode.NodeType = "init" + TreeAlias; 
-            else
-                rootNode.NodeType = "initviews";
-                
-            
+            rootNode.NodeType = "init" + TreeAlias; 
 			rootNode.NodeID = "init";
         }
 
