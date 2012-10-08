@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
+using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -21,17 +24,49 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Language PerformGet(int id)
         {
-            throw new NotImplementedException();
+            var sql = GetBaseQuery(false);
+            sql.Append(GetBaseWhereClause(id));
+
+            var languageDto = Database.First<LanguageDto>(sql);
+            if (languageDto == null)
+                return null;
+
+            var factory = new LanguageFactory();
+            var entity = factory.BuildEntity(languageDto);
+            return entity;
         }
 
         protected override IEnumerable<Language> PerformGetAll(params int[] ids)
         {
-            throw new NotImplementedException();
+            if (ids.Any())
+            {
+                foreach (var id in ids)
+                {
+                    yield return Get(id);
+                }
+            }
+            else
+            {
+                var dtos = Database.Fetch<LanguageDto>("WHERE id > 0");
+                foreach (var dto in dtos)
+                {
+                    yield return Get(dto.Id);
+                }
+            }
         }
 
         protected override IEnumerable<Language> PerformGetByQuery(IQuery<Language> query)
         {
-            throw new NotImplementedException();
+            var sqlClause = GetBaseQuery(false);
+            var translator = new SqlTranslator<Language>(sqlClause, query);
+            var sql = translator.Translate();
+
+            var dtos = Database.Fetch<LanguageDto>(sql);
+
+            foreach (var dto in dtos)
+            {
+                yield return Get(dto.Id);
+            }
         }
 
         #endregion
@@ -74,12 +109,27 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(Language entity)
         {
-            throw new NotImplementedException();
+            entity.AddingEntity();
+
+            var factory = new LanguageFactory();
+            var dto = factory.BuildDto(entity);
+
+            var id = Convert.ToInt32(Database.Insert(dto));
+            entity.Id = id;
+
+            entity.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(Language entity)
         {
-            throw new NotImplementedException();
+            entity.UpdatingEntity();
+
+            var factory = new LanguageFactory();
+            var dto = factory.BuildDto(entity);
+
+            Database.Update(dto);
+
+            entity.ResetDirtyProperties();
         }
 
         #endregion

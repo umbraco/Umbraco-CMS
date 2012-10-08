@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models;
+﻿using System.Globalization;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
@@ -9,12 +10,16 @@ namespace Umbraco.Core.Persistence.Factories
 
         public Language BuildEntity(LanguageDto dto)
         {
-            throw new System.NotImplementedException();
+            return new Language(dto.IsoCode){CultureName = dto.CultureName, Id = dto.Id};
         }
 
         public LanguageDto BuildDto(Language entity)
         {
-            throw new System.NotImplementedException();
+            var dto = new LanguageDto{ CultureName = entity.CultureName, IsoCode = entity.IsoCode};
+            if (entity.HasIdentity)
+                dto.Id = short.Parse(entity.Id.ToString(CultureInfo.InvariantCulture));
+
+            return dto;
         }
 
         #endregion

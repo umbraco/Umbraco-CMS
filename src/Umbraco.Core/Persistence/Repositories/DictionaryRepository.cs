@@ -10,12 +10,17 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class DictionaryRepository : PetaPocoRepositoryBase<int, DictionaryItem>, IDictionaryRepository
     {
-        public DictionaryRepository(IUnitOfWork work) : base(work)
+        private ILanguageRepository _languageRepository;
+
+        public DictionaryRepository(IUnitOfWork work, ILanguageRepository languageRepository) : base(work)
         {
+            _languageRepository = languageRepository;
         }
 
-        public DictionaryRepository(IUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
+        public DictionaryRepository(IUnitOfWork work, IRepositoryCacheProvider cache, ILanguageRepository languageRepository)
+            : base(work, cache)
         {
+            _languageRepository = languageRepository;
         }
 
         #region Overrides of RepositoryBase<int,DictionaryItem>
