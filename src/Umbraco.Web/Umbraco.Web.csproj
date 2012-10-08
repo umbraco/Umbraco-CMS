@@ -325,6 +325,7 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\treePicker.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\masterpages\umbracoDialog.master.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProviderAccessUpdate.cs" />
     <Compile Include="umbraco.presentation\umbraco\uQuery\IGetProperty.cs" />
     <Compile Include="UmbracoHelper.cs" />
@@ -1373,13 +1374,6 @@
     <Compile Include="umbraco.presentation\umbraco\masterpages\default.Master.designer.cs">
       <DependentUpon>default.Master</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\masterpages\umbracoDialog.Master.cs">
-      <DependentUpon>umbracoDialog.Master</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\masterpages\umbracoDialog.Master.designer.cs">
-      <DependentUpon>umbracoDialog.Master</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\masterpages\umbracoPage.Master.cs">
       <DependentUpon>umbracoPage.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1997,9 +1991,6 @@
     </None>
     <None Include="umbraco.presentation\umbraco\LiveEditing\LiveEditing.cd" />
     <Content Include="umbraco.presentation\umbraco\masterpages\umbracoPage.Master" />
-    <Content Include="umbraco.presentation\umbraco\masterpages\umbracoDialog.Master">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\Search\QuickSearchHandler.ashx" />
     <None Include="umbraco.presentation\umbraco\templateControls\InlineXslt.xsltTemplate" />
     <Content Include="umbraco.presentation\umbraco\users\NodePermissions.ascx" />
