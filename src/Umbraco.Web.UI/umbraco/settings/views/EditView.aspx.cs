@@ -55,7 +55,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 					if (t.Id == _template.Id) continue;
 
 					var li = new ListItem(t.Text, t.Id.ToString());
-					li.Attributes.Add("id", t.Alias.Replace(" ", ""));
+                    li.Attributes.Add("id", t.Alias.Replace(" ", "") + ".cshtml");
                     MasterTemplate.Items.Add(li);
 				}
 
@@ -66,9 +66,9 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
                 }
                 catch (Exception ex)
                 {
-                }
+				}
 
-			    MasterTemplate.SelectedValue = selectedTemplate;
+				MasterTemplate.SelectedValue = selectedTemplate;
 
 				NameTxt.Text = _template.GetRawText();
 				AliasTxt.Text = _template.Alias;
@@ -109,7 +109,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			umbField.OnClickCommand =
 				ClientTools.Scripts.OpenModalWindow(
 					IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" +
-					editorSource.ClientID + "&tagName=UMBRACOGETDATA", ui.Text("template", "insertPageField"), 640, 550);
+					editorSource.ClientID + "&tagName=UMBRACOGETDATA&mvcView=true", ui.Text("template", "insertPageField"), 640, 550);
 			umbField.AltText = ui.Text("template", "insertPageField");
 
 
@@ -119,7 +119,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			umbDictionary.OnClickCommand =
 				ClientTools.Scripts.OpenModalWindow(
 					IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" +
-					editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY", ui.Text("template", "insertDictionaryItem"),
+                    editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY&mvcView=true", ui.Text("template", "insertDictionaryItem"),
 					640, 550);
 			umbDictionary.AltText = "Insert umbraco dictionary item";
 

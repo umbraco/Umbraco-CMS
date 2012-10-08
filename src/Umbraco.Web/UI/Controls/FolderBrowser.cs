@@ -12,7 +12,7 @@ namespace Umbraco.Web.UI.Controls
     [ClientDependency(ClientDependencyType.Css, "ContextMenu/Css/jquery.contextMenu.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Css, "FolderBrowser/Css/folderbrowser.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "ui/jquery.js", "UmbracoClient", Priority = 1)]
-    [ClientDependency(ClientDependencyType.Javascript, "ui/base2.js", "UmbracoClient", Priority = 2)]
+    [ClientDependency(ClientDependencyType.Javascript, "ui/base2.js", "UmbracoClient", Priority = 1)]
     [ClientDependency(ClientDependencyType.Javascript, "ui/knockout.js", "UmbracoClient", Priority = 3)]
     [ClientDependency(ClientDependencyType.Javascript, "ui/knockout.mapping.js", "UmbracoClient", Priority = 4)]
     [ClientDependency(ClientDependencyType.Javascript, "ContextMenu/Js/jquery.contextMenu.js", "UmbracoClient", Priority = 5)]

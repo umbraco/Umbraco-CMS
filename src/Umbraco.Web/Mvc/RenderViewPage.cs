@@ -25,7 +25,7 @@ namespace Umbraco.Web.Mvc
 			{
 				////this.ViewData.Model = Model;
 				//var backingItem = new DynamicBackingItem(Model.CurrentNode);
-				var dynamicNode = new DynamicPublishedContent(Model.CurrentContent);
+				var dynamicNode = new DynamicPublishedContent(Model.Content);
 				CurrentPage = dynamicNode.AsDynamic();
 			}
 			PublishedContentRequest = (PublishedContentRequest)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-doc-request");

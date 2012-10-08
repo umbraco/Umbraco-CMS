@@ -262,6 +262,24 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="umbraco\developer\Macros\EditMacro.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\developer\Macros\EditMacro.aspx.designer.cs">
+      <DependentUpon>editMacro.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\masterpages\UmbracoDialog.master.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\masterpages\UmbracoDialog.master.designer.cs">
+      <DependentUpon>umbracoDialog.Master</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\settings\EditTemplate.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\settings\EditTemplate.aspx.designer.cs">
+      <DependentUpon>editTemplate.aspx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\settings\views\EditView.aspx.cs">
       <DependentUpon>EditView.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -553,6 +571,7 @@
     <Content Include="umbraco_client\CodeMirror\js\theme\xq-dark.css" />
     <Content Include="umbraco_client\ContextMenu\Css\jquery.contextMenu.css" />
     <Content Include="umbraco_client\ContextMenu\Js\jquery.contextMenu.js" />
+    <Content Include="umbraco_client\Dialogs\UmbracoField.js" />
     <Content Include="umbraco_client\FileUploader\js\jquery.fileUploader.js" />
     <Content Include="umbraco_client\FolderBrowser\Css\folderbrowser.css" />
     <Content Include="umbraco_client\FolderBrowser\Js\folderbrowser.js" />
