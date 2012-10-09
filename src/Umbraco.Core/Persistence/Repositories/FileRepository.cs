@@ -40,7 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories
             FileSystem.AddFile(entity.Name, stream, true);
         }
 
-        public void Delete(TEntity entity)
+        public virtual void Delete(TEntity entity)
         {
             if (_fileSystem.FileExists(entity.Name))
             {
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public abstract IEnumerable<TEntity> GetAll(params TId[] ids);
 
-        public bool Exists(TId id)
+        public virtual bool Exists(TId id)
         {
             return _fileSystem.FileExists(id.ToString());
         }

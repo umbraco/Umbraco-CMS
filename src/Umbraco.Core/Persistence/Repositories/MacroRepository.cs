@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private void EnsureDependencies()
         {
-            _fileSystem = FileSystemProviderManager.Current.GetFileSystemProvider("macro");
+            _fileSystem = FileSystemProviderManager.Current.GetFileSystemProvider("macros");
             var serviceStackSerializer = new ServiceStackJsonSerializer();
             _serializationService = new SerializationService(serviceStackSerializer);
         }

@@ -40,7 +40,7 @@ namespace Umbraco.Web.Publishing
             return doc.PublishWithResult(user);
         }
 
-        internal bool PublishWithChildrenWithResult(int userId, int contentId)
+        internal bool PublishWithChildren(int userId, int contentId)
         {
             var doc = new Document(contentId, true);
             var user = new User(userId);
