@@ -241,7 +241,7 @@ function openContent(id) {
         }
         protected void SetSourcesAttributes(ref XmlTreeNode treeElement, Document dd)
         {
-			treeElement.HasChildren = dd.HasChildren;
+			treeElement.HasChildren = !dd.ContentType.IsContainerContentType && dd.HasChildren;
 			if (!IsDialog)
 				treeElement.Source = GetTreeServiceUrl(dd.Id);
 			else

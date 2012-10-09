@@ -1994,8 +1994,12 @@
     <Content Include="umbraco.presentation\umbraco\translation\preview.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\translationTasks.dtd" />
     <Content Include="umbraco.presentation\umbraco\translation\xml.aspx" />
-    <Content Include="umbraco.presentation\umbraco\create.aspx" />
-    <Content Include="umbraco.presentation\umbraco\create\content.ascx" />
+    <Content Include="umbraco.presentation\umbraco\create.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="umbraco.presentation\umbraco\create\content.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\create\language.ascx">
       <SubType>UserControl</SubType>
     </Content>

@@ -94,9 +94,6 @@ namespace umbraco.cms.businesslogic.web
                         bool _hc = false;
                         if (dr.GetInt("children") > 0)
                             _hc = true;
-                        int? masterContentType = null;
-                        if (!dr.IsNull("masterContentType"))
-                            masterContentType = dr.GetInt("masterContentType");
                         SetupDocumentForTree(dr.GetGuid("uniqueId")
                             , dr.GetShort("level")
                             , dr.GetInt("parentId")
@@ -113,9 +110,10 @@ namespace umbraco.cms.businesslogic.web
                             , dr.GetString("alias")
                             , dr.GetString("thumbnail")
                             , dr.GetString("description")
-                            , masterContentType
+                            , null
                             , dr.GetInt("contentTypeId")
                             , dr.GetInt("templateId")
+                            , dr.GetBoolean("isContainer")
                             );
 
                         // initialize content object
@@ -153,10 +151,11 @@ namespace umbraco.cms.businesslogic.web
                 Select 
                     CASE WHEN (childrenTable.total>0) THEN childrenTable.total ELSE 0 END as Children,
                     CASE WHEN (publishedTable.publishedTotal>0) THEN publishedTable.publishedTotal ELSE 0 END as Published,
-	                cmsContentVersion.VersionId,
+	                cmsContentType.isContainer,
+                    cmsContentVersion.VersionId,
                     cmsContentVersion.versionDate,	                
 	                contentTypeNode.uniqueId as ContentTypeGuid, 
-					cmsContent.ContentType, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId,
+					cmsContent.ContentType, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.nodeId as contentTypeId,
 	                published, documentUser, coalesce(templateId, cmsDocumentType.templateNodeId) as templateId, cmsDocument.text as DocumentText, releaseDate, expireDate, updateDate, 
 	                umbracoNode.createDate, umbracoNode.trashed, umbracoNode.parentId, umbracoNode.nodeObjectType, umbracoNode.nodeUser, umbracoNode.level, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.uniqueId, umbracoNode.text 
                 from 
@@ -182,11 +181,11 @@ namespace umbraco.cms.businesslogic.web
         //            inner join (select contentId, max(versionDate) as versionDate from cmsContentVersion group by contentId) temp
         //                on cmsContentVersion.contentId = temp.contentId and cmsContentVersion.versionDate = temp.versionDate
         private const string m_SQLOptimizedMany = @"
-                select count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, 
+                select count(children.id) as children, cmsContentType.isContainer, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, 
 	                cmsDocument.documentUser, coalesce(cmsDocument.templateId, cmsDocumentType.templateNodeId) as templateId, 
 	                umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as isPublished, umbracoNode.createDate, 
                     cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsDocument.releaseDate, cmsDocument.expireDate, cmsContentType.icon, cmsContentType.alias,
-	                cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId,
+	                cmsContentType.thumbnail, cmsContentType.description, cmsContentType.nodeId as contentTypeId,
                     umbracoNode.nodeUser
                 from umbracoNode
                     left join umbracoNode children on children.parentId = umbracoNode.id
@@ -198,11 +197,11 @@ namespace umbraco.cms.businesslogic.web
                     left join cmsDocumentType on cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1
                 where umbracoNode.nodeObjectType = @nodeObjectType AND cmsDocument.newest = 1 AND {0}
                 group by 
-	                umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, 
+	                cmsContentType.isContainer, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, 
 	                cmsDocument.templateId, cmsDocumentType.templateNodeId, umbracoNode.path, umbracoNode.sortOrder, 
 	                coalesce(publishCheck.published,0), umbracoNode.createDate, cmsDocument.text, 
 	                cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, 
-                    cmsContentType.masterContentType, cmsContentType.nodeId, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsDocument.releaseDate, cmsDocument.expireDate, umbracoNode.nodeUser
+                    cmsContentType.nodeId, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsDocument.releaseDate, cmsDocument.expireDate, umbracoNode.nodeUser
                 order by {1}
                 ";
 
@@ -402,10 +401,11 @@ namespace umbraco.cms.businesslogic.web
             tmp.CreateContent(dct);
 
             //now create the document data
-            SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, Text) values (1, " +
+            SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, updateDate, Text) values (1, " +
                                       tmp.Id + ", 0, " +
-                                      u.Id + ", @versionId, @text)",
+                                      u.Id + ", @versionId, @updateDate, @text)",
                                       SqlHelper.CreateParameter("@versionId", tmp.Version),
+                                      SqlHelper.CreateParameter("@updateDate", DateTime.Now),
                                       SqlHelper.CreateParameter("@text", tmp.Text));
 
             //read the whole object from the db
@@ -995,19 +995,21 @@ namespace umbraco.cms.businesslogic.web
                 }
 
                 _published = true;
+                DateTime versionDate = DateTime.Now;
                 string tempVersion = Version.ToString();
-                Guid newVersion = createNewVersion();
+                Guid newVersion = createNewVersion(versionDate);
 
                 Log.Add(LogTypes.Publish, u, Id, "");
 
                 //PPH make sure that there is only 1 newest node, this is important in regard to schedueled publishing...
                 SqlHelper.ExecuteNonQuery("update cmsDocument set newest = 0 where nodeId = " + Id);
 
-                SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, Text, TemplateId) values (1,@id, 0, @userId, @versionId, @text, @template)",
+                SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, updateDate, Text, TemplateId) values (1,@id, 0, @userId, @versionId, @updateDate, @text, @template)",
                     SqlHelper.CreateParameter("@id", Id),
                     SqlHelper.CreateParameter("@template", _template > 0 ? (object)_template : (object)DBNull.Value), //pass null in if the template doesn't have a valid id
                     SqlHelper.CreateParameter("@userId", u.Id),
                     SqlHelper.CreateParameter("@versionId", newVersion),
+                    SqlHelper.CreateParameter("@updateDate", versionDate),
                     SqlHelper.CreateParameter("@text", Text));
 
                 SqlHelper.ExecuteNonQuery("update cmsDocument set published = 0 where nodeId = " + Id);
@@ -1064,23 +1066,26 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                Guid newVersion = createNewVersion();
+                DateTime versionDate = DateTime.Now;
+                Guid newVersion = createNewVersion(versionDate);
 
                 if (_template != 0)
                 {
-                    SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, Text, TemplateId) values (" +
+                    SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, updateDate, Text, TemplateId) values (" +
                                               Id +
                                               ", 0, " + u.Id + ", @versionId, @text, " +
                                               _template + ")",
                                               SqlHelper.CreateParameter("@versionId", newVersion),
+                                              SqlHelper.CreateParameter("@updateDate", versionDate),
                                               SqlHelper.CreateParameter("@text", Text));
                 }
                 else
                 {
-                    SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, Text) values (" +
+                    SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, updateDate, Text) values (" +
                                              Id +
                                              ", 0, " + u.Id + ", @versionId, @text )",
                                              SqlHelper.CreateParameter("@versionId", newVersion),
+                                              SqlHelper.CreateParameter("@updateDate", versionDate),
                                              SqlHelper.CreateParameter("@text", Text));
                 }
 
@@ -1125,12 +1130,14 @@ namespace umbraco.cms.businesslogic.web
             {
                 _published = true;
                 string tempVersion = Version.ToString();
-                Guid newVersion = createNewVersion();
+                DateTime versionDate = DateTime.Now;
+                Guid newVersion = createNewVersion(versionDate);
 
-                SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, Text) values (" +
+                SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, updateDate, Text) values (" +
                                           Id + ", 0, " + u.Id +
                                           ", @versionId, @text)",
                                           SqlHelper.CreateParameter("@versionId", newVersion),
+                                          SqlHelper.CreateParameter("@updateDate", versionDate),
                                           SqlHelper.CreateParameter("@text", Text));
 
                 SqlHelper.ExecuteNonQuery("update cmsDocument set published = 0 where nodeId = " + Id);
@@ -1201,13 +1208,14 @@ namespace umbraco.cms.businesslogic.web
 
         /// <summary>
         /// Pending changes means that there have been property/data changes since the last published version.
-        /// This is determined by the comparing the version date to the updated date. if they are different by .5 seconds, 
+        /// This is determined by the comparing the version date to the updated date. if they are different by more than 2 seconds, 
         /// then this is considered a change.
         /// </summary>
         /// <returns></returns>
         public bool HasPendingChanges()
         {
-            return new TimeSpan(UpdateDate.Ticks - VersionDate.Ticks).TotalMilliseconds > 2000;
+            double timeDiff = new TimeSpan(UpdateDate.Ticks - VersionDate.Ticks).TotalMilliseconds;
+            return timeDiff > 2000;
         }
 
         /// <summary>
@@ -1673,30 +1681,26 @@ namespace umbraco.cms.businesslogic.web
             if (dr.GetInt("children") > 0)
                 _hc = true;
 
-            int? masterContentType = null;
-
-            if (!dr.IsNull("masterContentType"))
-                masterContentType = dr.GetInt("masterContentType");
-
             SetupDocumentForTree(dr.GetGuid("uniqueId")
-                , dr.GetShort("level")
-                , dr.GetInt("parentId")
-                , dr.GetInt("nodeUser")
-                , dr.GetInt("documentUser")
-                , (dr.GetInt("isPublished") == 1)
-                , dr.GetString("path")
-                , dr.GetString("text")
-                , dr.GetDateTime("createDate")
-                , dr.GetDateTime("updateDate")
-                , dr.GetDateTime("versionDate")
-                , dr.GetString("icon")
-                , _hc
-                , dr.GetString("alias")
-                , dr.GetString("thumbnail")
-                , dr.GetString("description")
-                , masterContentType
-                , dr.GetInt("contentTypeId")
-                , dr.GetInt("templateId"));
+                     , dr.GetShort("level")
+                     , dr.GetInt("parentId")
+                     , dr.GetInt("nodeUser")
+                     , dr.GetInt("documentUser")
+                     , (dr.GetInt("isPublished") == 1)
+                     , dr.GetString("path")
+                     , dr.GetString("text")
+                     , dr.GetDateTime("createDate")
+                     , dr.GetDateTime("updateDate")
+                     , dr.GetDateTime("versionDate")
+                     , dr.GetString("icon")
+                     , _hc
+                     , dr.GetString("alias")
+                     , dr.GetString("thumbnail")
+                     , dr.GetString("description")
+                     , null
+                     , dr.GetInt("contentTypeId")
+                     , dr.GetInt("templateId")
+                     , dr.GetBoolean("isContainer"));
 
             if (!dr.IsNull("releaseDate"))
                 _release = dr.GetDateTime("releaseDate");
@@ -1715,7 +1719,7 @@ namespace umbraco.cms.businesslogic.web
         private void SetupDocumentForTree(Guid uniqueId, int level, int parentId, int creator, int writer, bool publish, string path,
                                          string text, DateTime createDate, DateTime updateDate,
                                          DateTime versionDate, string icon, bool hasChildren, string contentTypeAlias, string contentTypeThumb,
-                                           string contentTypeDesc, int? masterContentType, int contentTypeId, int templateId)
+                                           string contentTypeDesc, int? masterContentType, int contentTypeId, int templateId, bool isContainer)
         {
             SetupNodeForTree(uniqueId, _objectType, level, parentId, creator, path, text, createDate, hasChildren);
 
@@ -1723,7 +1727,7 @@ namespace umbraco.cms.businesslogic.web
             _published = publish;
             _updated = updateDate;
             _template = templateId;
-            ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, masterContentType);
+            ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, null, isContainer);
             ContentTypeIcon = icon;
             VersionDate = versionDate;
         }

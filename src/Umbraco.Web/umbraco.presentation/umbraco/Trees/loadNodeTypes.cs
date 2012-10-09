@@ -78,7 +78,7 @@ function openNodeType(id) {
             if (base.m_id == -1)
                 docTypes = DocumentType.GetAllAsList().FindAll(delegate(DocumentType dt) { return dt.MasterContentType == 0; });
             else
-                docTypes = DocumentType.GetAllAsList().FindAll(delegate(DocumentType dt) { return dt.MasterContentType == base.m_id; });
+                docTypes = DocumentType.GetAllAsList().FindAll(delegate(DocumentType dt) { return dt.MasterContentTypes.Contains(base.m_id); });
 
             foreach (DocumentType dt in docTypes)
             {
