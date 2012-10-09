@@ -9,7 +9,7 @@ using Umbraco.Core.Models.EntityBase;
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Represents the type of a <see cref="Content"/> object
+    /// Represents the contnet type that a <see cref="Content"/> object is based on
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
@@ -247,6 +247,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets a list of integer Ids for allowed ContentTypes
         /// </summary>
+        [DataMember]
         public IEnumerable<int> AllowedContentTypes
         {
             get { return _allowedContentTypes; }
@@ -285,6 +286,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// List of ContentTypes that make up a composition of PropertyGroups and PropertyTypes for the current ContentType
         /// </summary>
+        [DataMember]
         public List<IContentTypeComposition> ContentTypeComposition
         {
             get { return _contentTypeComposition; }

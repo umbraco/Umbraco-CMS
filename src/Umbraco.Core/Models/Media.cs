@@ -70,6 +70,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or Sets the Id of the Parent for the Media
         /// </summary>
+        [DataMember]
         public int ParentId
         {
             get { return _parentId; }
@@ -83,6 +84,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or Sets the Name of the Media
         /// </summary>
+        [DataMember]
         public string Name
         {
             get { return _name; }
@@ -96,6 +98,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the Url name of the Media item
         /// </summary>
+        [IgnoreDataMember]
         public string UrlName
         {
             //TODO: Should return the relative path to the media - if it should be implemented at all
@@ -109,6 +112,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or Sets the Sort Order of the Media
         /// </summary>
+        [DataMember]
         public int SortOrder
         {
             get { return _sortOrder; }
@@ -122,6 +126,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or Sets the Level of the Media
         /// </summary>
+        [DataMember]
         public int Level
         {
             get { return _level; }
@@ -135,6 +140,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or Sets the Path of the Media
         /// </summary>
+        [DataMember]
         public string Path
         {
             get { return _path; }
@@ -148,6 +154,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Id of the user who created the Media
         /// </summary>
+        [DataMember]
         public int UserId
         {
             get { return _userId; }
@@ -162,6 +169,7 @@ namespace Umbraco.Core.Models
         /// Boolean indicating whether this Media is Trashed or not.
         /// If Media is Trashed it will be located in the Recyclebin.
         /// </summary>
+        [DataMember]
         public bool Trashed
         {
             get { return _trashed; }
@@ -175,6 +183,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Integer Id of the default MediaType
         /// </summary>
+        [DataMember]
         public int ContentTypeId
         {
             get { return _contentTypeId; }
@@ -188,6 +197,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// List of properties, which make up all the data available for this Media object
         /// </summary>
+        [DataMember]
         public PropertyCollection Properties
         {
             get { return _properties; }
@@ -201,6 +211,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// List of PropertyGroups available on this Media object
         /// </summary>
+        [IgnoreDataMember]
         public IEnumerable<PropertyGroup> PropertyGroups
         {
             get { return _contentType.PropertyGroups; }
@@ -209,6 +220,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// List of PropertyTypes available on this Media object
         /// </summary>
+        [IgnoreDataMember]
         public IEnumerable<PropertyType> PropertyTypes
         {
             get { return _contentType.PropertyTypes; }
