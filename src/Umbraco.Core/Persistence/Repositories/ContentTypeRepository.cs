@@ -39,6 +39,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 return null;
 
             //TODO Get ContentType composition according to new table
+            //TODO Add AllowedContentTypes
 
             var propertySql = new Sql();
             propertySql.Select("*");
@@ -103,6 +104,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //NOTE: If IsDefault=true we won't get ContentTypes like File, Folder etc. but only DocumentTypes.
             //Which is why "AND cmsDocumentType.IsDefault = @IsDefault" has been removed from sql below.
             //But might need to add it if we create a MediaTypeRepository
+            //NOTE: Think the above is incorrect as ContentType and MediaType have different NodeObjectTypes.
             sql.Select(isCount ? "COUNT(*)" : "*");
             sql.From("cmsDocumentType");
             sql.RightJoin("cmsContentType ON ([cmsContentType].[nodeId] = [cmsDocumentType].[contentTypeNodeId])");

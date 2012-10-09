@@ -108,6 +108,7 @@
     <Compile Include="Persistence\Factories\DictionaryTranslationFactory.cs" />
     <Compile Include="Persistence\Factories\IEntityFactory.cs" />
     <Compile Include="Persistence\Factories\LanguageFactory.cs" />
+    <Compile Include="Persistence\Factories\MediaTypeFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyGroupFactory.cs" />
     <Compile Include="Persistence\Factories\RelationFactory.cs" />
@@ -141,6 +142,8 @@
     <Compile Include="Persistence\Repositories\Interfaces\ITemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\LanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\MacroRepository.cs" />
+    <Compile Include="Persistence\Repositories\MediaRepository.cs" />
+    <Compile Include="Persistence\Repositories\MediaTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\PetaPocoRepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\RelationRepository.cs" />
     <Compile Include="Persistence\Repositories\RelationTypeRepository.cs" />

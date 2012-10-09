@@ -9,12 +9,12 @@ namespace Umbraco.Core.Persistence.Factories
     {
         private readonly Guid _nodeObjectType;
 
-        #region Implementation of IEntityFactory<IContentType,DocumentTypeDto>
-
         public ContentTypeFactory(Guid nodeObjectType)
         {
             _nodeObjectType = nodeObjectType;
         }
+
+        #region Implementation of IEntityFactory<IContentType,DocumentTypeDto>
 
         public IContentType BuildEntity(DocumentTypeDto dto)
         {
