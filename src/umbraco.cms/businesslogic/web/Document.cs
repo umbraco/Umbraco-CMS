@@ -185,7 +185,7 @@ namespace umbraco.cms.businesslogic.web
 	                cmsDocument.documentUser, coalesce(cmsDocument.templateId, cmsDocumentType.templateNodeId) as templateId, 
 	                umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as isPublished, umbracoNode.createDate, 
                     cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsDocument.releaseDate, cmsDocument.expireDate, cmsContentType.icon, cmsContentType.alias,
-	                cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId,
+	                cmsContentType.thumbnail, cmsContentType.description, cmsContentType.nodeId as contentTypeId,
                     umbracoNode.nodeUser
                 from umbracoNode
                     left join umbracoNode children on children.parentId = umbracoNode.id
