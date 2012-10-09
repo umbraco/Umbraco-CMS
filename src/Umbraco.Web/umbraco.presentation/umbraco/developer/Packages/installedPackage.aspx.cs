@@ -459,6 +459,13 @@ namespace umbraco.presentation.developer.packages
                         DocumentType s = new DocumentType(nId);
                         if (s != null)
                         {
+                            // check for master doctypes
+                            if (s.IsMaster())
+                            {
+                                foreach(var ct in s.GetChildTypes())
+                                    ct.RemoveParentContentType(s.Id);
+                            }
+
                             s.delete();
                             pack.Data.Documenttypes.Remove(nId.ToString());
 

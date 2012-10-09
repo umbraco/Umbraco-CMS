@@ -498,7 +498,7 @@ namespace umbraco.cms.businesslogic
         protected void CreateContent(ContentType ct)
         {
             SqlHelper.ExecuteNonQuery("insert into cmsContent (nodeId,ContentType) values (" + this.Id + "," + ct.Id + ")");
-            createNewVersion();
+            createNewVersion(DateTime.Now);
         }
 
 
@@ -508,7 +508,7 @@ namespace umbraco.cms.businesslogic
         /// 
         /// </summary>
         /// <returns>The new version Id</returns>
-        protected Guid createNewVersion()
+        protected Guid createNewVersion(DateTime versionDate)
         {
             ClearLoadedProperties();
 
@@ -517,9 +517,10 @@ namespace umbraco.cms.businesslogic
 
             // we need to ensure that a version in the db exist before we add related data
             SqlHelper.ExecuteNonQuery("Insert into cmsContentVersion (ContentId,versionId,versionDate) values (" + this.Id + ",'" + newVersion + "', @updateDate)",
-                SqlHelper.CreateParameter("@updateDate", DateTime.Now));
+                SqlHelper.CreateParameter("@updateDate", versionDate));
 
-            foreach (propertytype.PropertyType pt in this.ContentType.PropertyTypes)
+            List<PropertyType> pts = ContentType.PropertyTypes;
+            foreach (propertytype.PropertyType pt in pts)
             {
                 object oldValue = "";
                 if (tempHasVersion)
