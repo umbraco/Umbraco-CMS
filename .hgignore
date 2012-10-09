@@ -1,6 +1,7 @@
-# use glob syntax
-syntax: glob
+syntax: regex
+^src/packages/(?!repositories.config$)
 
+syntax: glob
 *.obj
 *.exe
 *.pdb
@@ -51,4 +52,3 @@ src/Umbraco.Web.UI/Views/*.cshtml
 src/Umbraco.Web.UI/Views/*.vbhtml
 src/Umbraco.Tests/config/umbracoSettings.config
 src/Umbraco.Web.UI/App_Plugins/*
-src/packages/*
