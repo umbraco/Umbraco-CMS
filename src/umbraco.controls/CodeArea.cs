@@ -84,7 +84,8 @@ namespace umbraco.uicontrols
 
 
                 ClientDependencyLoader.Instance.RegisterDependency(2, "CodeMirror/js/lib/codemirror.css", "UmbracoClient", ClientDependencyType.Css);
-                ClientDependencyLoader.Instance.RegisterDependency(3, "CodeArea/styles.css", "UmbracoClient", ClientDependencyType.Css);
+                ClientDependencyLoader.Instance.RegisterDependency(3, "CodeMirror/css/umbracoCustom.css", "UmbracoClient", ClientDependencyType.Css);
+                ClientDependencyLoader.Instance.RegisterDependency(4, "CodeArea/styles.css", "UmbracoClient", ClientDependencyType.Css);
 
 
 
@@ -252,9 +253,9 @@ namespace umbraco.uicontrols
             string[] cssFile = new string[] { "jscolors.css", "umbracoCustom.css" };
 
             switch (CodeBase)
-            {
+            {                    
                 case EditorType.JavaScript:
-                    parserFiles = new string[] { "tokenizejavascript.js", "parsejavascript.js" };
+parserFiles = new string[] { "tokenizejavascript.js", "parsejavascript.js" };
                     cssFile = new string[] { "jscolors.css", "umbracoCustom.css" };
                     break;
                 case EditorType.Css:
