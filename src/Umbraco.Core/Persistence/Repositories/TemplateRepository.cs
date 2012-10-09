@@ -8,21 +8,18 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    /// <summary>
-    /// Represents the Script Repository
-    /// </summary>
-    internal class ScriptRepository : FileRepository<string, Script>, IScriptRepository
+    internal class TemplateRepository : FileRepository<string, Template>, ITemplateRepository
     {
-        public ScriptRepository(IUnitOfWork work)
-            : base(work, FileSystemProviderManager.Current.GetFileSystemProvider("script"))
+        public TemplateRepository(IUnitOfWork work)
+            : base(work, FileSystemProviderManager.Current.GetFileSystemProvider("template"))
         {
         }
 
-        #region Implementation of IRepository<string,Script>
+        #region Overrides of FileRepository<string,Template>
 
-        public override Script Get(string id)
+        public override Template Get(string id)
         {
-            if(!FileSystem.FileExists(id))
+            if (!FileSystem.FileExists(id))
             {
                 throw new Exception(string.Format("The file {0} was not found", id));
             }
@@ -35,11 +32,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var path = FileSystem.GetRelativePath(id);
 
-            var script = new Script(path) {Content = content};
-            return script;
+            var template = new Template(path) { Content = content };
+            return template;
         }
 
-        public override IEnumerable<Script> GetAll(params string[] ids)
+        public override IEnumerable<Template> GetAll(params string[] ids)
         {
             if (ids.Any())
             {
