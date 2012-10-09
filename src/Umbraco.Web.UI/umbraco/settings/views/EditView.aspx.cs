@@ -32,6 +32,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 		protected global::umbraco.uicontrols.CodeArea editorSource;
 		protected global::System.Web.UI.WebControls.Repeater rpt_codeTemplates;
 		protected global::System.Web.UI.WebControls.Repeater rpt_macros;
+		protected MenuIconI SaveButton;		
 
 
 		public EditView()
@@ -42,8 +43,6 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 		protected override void OnLoad(EventArgs e)
 		{
 			base.OnLoad(e);
-
-			MasterTemplate.Attributes.Add("onchange", "changeMasterPageFile()");
 
 			if (!IsPostBack)
 			{
@@ -91,11 +90,11 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			base.OnInit(e);
 			Panel1.hasMenu = true;
 
-			MenuIconI save = Panel1.Menu.NewIcon();
-			save.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
-			save.OnClickCommand = "doSubmit()";
-			save.AltText = ui.Text("save");
-			save.ID = "save";
+			SaveButton = Panel1.Menu.NewIcon();
+			SaveButton.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
+			//SaveButton.OnClickCommand = "doSubmit()";
+			SaveButton.AltText = ui.Text("save");
+			SaveButton.ID = "save";
 
 			Panel1.Text = ui.Text("edittemplate");
 			pp_name.Text = ui.Text("name", base.getUser());
