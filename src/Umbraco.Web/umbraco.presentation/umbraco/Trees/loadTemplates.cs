@@ -7,6 +7,7 @@ using System.Text;
 using System.Web;
 using System.Xml;
 using System.Configuration;
+using Umbraco.Core;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic;
@@ -193,7 +194,7 @@ namespace umbraco
                 xNode.Source = GetTreeServiceUrl(t.Id);
                 xNode.HasChildren = t.HasChildren;
                 
-                if (UmbracoSettings.EnableMvcSupport && Template.HasView(t))
+                if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && Template.HasView(t))
                 {
                     xNode.Action = "javascript:openView(" + t.Id + ");";
                     xNode.Icon = "settingView.gif";

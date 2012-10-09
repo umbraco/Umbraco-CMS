@@ -310,7 +310,8 @@
 	<key alias="changePassword" version="4.6">Kennwort ändern</key>
 	<key alias="changePasswordDescription" version="4.6">Sie können Ihr Kennwort für den Zugriff auf den Umbraco-Verwaltungsbereich ändern, indem Sie das nachfolgende Formular ausfüllen und auf die 'Kennwort ändern'-Schaltfläche klicken</key>
 	<key alias="passwordEnterNew" version="4.6">Geben Sie Ihr neues Kennwort ein</key>
-    <key alias="passwordConfirm" version="4.6">Bitte wiederholen Sie Ihr neues Kennwort</key>
+    <key alias="passwordCurrent" version="4.6">Aktuelle Kennwort</key>
+    <key alias="passwordInvalid">Ungültig aktuelle Kennwort</key>
     <key alias="passwordChanged" version="4.6">Ihr Kennwort wurde geändert!</key>
     <key alias="passwordIsDifferent" version="4.6">Ihr neues Kennwort und die Wiederholung Ihres neuen Kennworts stimmen nicht überein. Bitte versuchen Sie es erneut!</key>
     <key alias="passwordIsBlank" version="4.6">Ihr neues Kennwort darf nicht leer sein!</key>

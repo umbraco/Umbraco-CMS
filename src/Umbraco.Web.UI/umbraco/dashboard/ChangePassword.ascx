@@ -31,13 +31,13 @@
 		<ol class="form">
 			<li style="height: 20px;">
 				<span>
-					<asp:Label runat="server" AssociatedControlID="password" ID="Label1"><%=umbraco.ui.Text("username") %>:</asp:Label>
+					<asp:Label runat="server" ID="Label1"><%=umbraco.ui.Text("username") %>:</asp:Label>
 					<strong id="username"><%=umbraco.BusinessLogic.User.GetCurrent().Name%></strong>
 				</span>
 			</li>
 			<li>
 				<span>
-					<asp:Label runat="server" AssociatedControlID="currentpassword" ID="Label2"><%=umbraco.ui.Text("password") %>:</asp:Label>
+					<asp:Label runat="server" AssociatedControlID="currentpassword" ID="Label2"><%=umbraco.ui.Text("passwordCurrent") %>:</asp:Label>
 					<asp:TextBox id="currentpassword" TextMode="password" CssClass="textfield" Runat="server"></asp:TextBox>
 					<asp:RequiredFieldValidator runat="server" ControlToValidate="currentpassword" ID="RequiredFieldValidator1" ValidationGroup="changepass">*</asp:RequiredFieldValidator>
 				</span>
