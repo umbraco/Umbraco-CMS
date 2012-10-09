@@ -38,21 +38,11 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
-            var propertySql = new Sql();
-            propertySql.Select("*");
-            propertySql.From("cmsTab");
-            propertySql.RightJoin("cmsPropertyType ON [cmsTab].[id] = [cmsPropertyType].[tabId]");
-            propertySql.InnerJoin("cmsDataType ON [cmsPropertyType].[dataTypeId] = [cmsDataType].[nodeId]");
-            propertySql.Where("[cmsPropertyType].[contentTypeId] = @Id", new { Id = id });
-
-            var tabDtos = Database.Fetch<TabDto, PropertyTypeDto, DataTypeDto, TabDto>(new TabPropertyTypeRelator().Map, propertySql);
-
             var factory = new MediaTypeFactory(NodeObjectTypeId);
             var contentType = factory.BuildEntity(dto);
-
-            var propertyFactory = new PropertyGroupFactory(id);
-            var propertyGroups = propertyFactory.BuildEntity(tabDtos);
-            contentType.PropertyGroups = new PropertyGroupCollection(propertyGroups);
+            
+            contentType.AllowedContentTypes = GetAllowedContentTypeIds(id);
+            contentType.PropertyGroups = GetPropertyGroupCollection(id);
 
             ((MediaType)contentType).ResetDirtyProperties();
             return contentType;
@@ -170,6 +160,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Insert new ContentType entry
             Database.Insert(dto);
+
+            //Insert collection of allowed content types
+            foreach (var allowedContentType in entity.AllowedContentTypes)
+            {
+                Database.Insert(new ContentTypeAllowedContentTypeDto { Id = entity.Id, AllowedId = allowedContentType });
+            }
         }
 
         protected override void PersistUpdatedItem(IMediaType entity)
@@ -187,6 +183,15 @@ namespace Umbraco.Core.Persistence.Repositories
             var dtoPk = Database.First<ContentTypeDto>("WHERE nodeId = @Id", new { Id = entity.Id });
             dto.PrimaryKey = dtoPk.PrimaryKey;
             Database.Update(dto);
+
+            //Delete the allowed content type entries before adding the updated collection
+            Database.Delete<ContentTypeAllowedContentTypeDto>("WHERE Id = @Id", new { Id = entity.Id });
+
+            //Insert collection of allowed content types
+            foreach (var allowedContentType in entity.AllowedContentTypes)
+            {
+                Database.Insert(new ContentTypeAllowedContentTypeDto { Id = entity.Id, AllowedId = allowedContentType });
+            }
 
             //Check Dirty properties for Tabs/Groups and PropertyTypes - insert and delete accordingly
             if (((ICanBeDirty)entity).IsPropertyDirty("PropertyGroups") || entity.PropertyGroups.Any(x => x.IsDirty()))
@@ -237,5 +242,32 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
+
+        private IEnumerable<int> GetAllowedContentTypeIds(int id)
+        {
+            var allowedContentTypesSql = new Sql();
+            allowedContentTypesSql.Select("*");
+            allowedContentTypesSql.From("cmsContentTypeAllowedContentType");
+            allowedContentTypesSql.Where("[cmsContentTypeAllowedContentType].[Id] = @Id", new { Id = id });
+
+            var allowedContentTypeDtos = Database.Fetch<ContentTypeAllowedContentTypeDto>(allowedContentTypesSql);
+            return allowedContentTypeDtos.Select(x => x.AllowedId).ToList();
+        }
+
+        private PropertyGroupCollection GetPropertyGroupCollection(int id)
+        {
+            var propertySql = new Sql();
+            propertySql.Select("*");
+            propertySql.From("cmsTab");
+            propertySql.RightJoin("cmsPropertyType ON [cmsTab].[id] = [cmsPropertyType].[tabId]");
+            propertySql.InnerJoin("cmsDataType ON [cmsPropertyType].[dataTypeId] = [cmsDataType].[nodeId]");
+            propertySql.Where("[cmsPropertyType].[contentTypeId] = @Id", new { Id = id });
+
+            var tabDtos = Database.Fetch<TabDto, PropertyTypeDto, DataTypeDto, TabDto>(new TabPropertyTypeRelator().Map, propertySql);
+
+            var propertyFactory = new PropertyGroupFactory(id);
+            var propertyGroups = propertyFactory.BuildEntity(tabDtos);
+            return new PropertyGroupCollection(propertyGroups);
+        }
     }
 }
