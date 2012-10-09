@@ -181,7 +181,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentTypeDto = dto.ContentTypeDto;
             Database.Insert(contentTypeDto);
 
-            //TODO Insert new DocumentType entries - NOTE only seems relevant as long as Templates resides in the DB
+            //TODO Insert new DocumentType entries - NOTE only seems relevant as long as Templates resides in the DB?
             //TODO Insert allowed Templates and DocumentTypes
             //TODO Insert ContentType composition in new table
 

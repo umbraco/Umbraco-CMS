@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal class PropertyGroupFactory : IEntityFactory<IEnumerable<PropertyGroup>, IEnumerable<TabDto>>
     {
-        private int _id;
+        private readonly int _id;
 
         public PropertyGroupFactory(int id)
         {

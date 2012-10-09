@@ -394,6 +394,9 @@ namespace Umbraco.Core.Models
         {
             base.AddingEntity();
             Key = Guid.NewGuid();
+
+            if (ParentId == 0)
+                _parentId = -1;
         }
 
         /// <summary>

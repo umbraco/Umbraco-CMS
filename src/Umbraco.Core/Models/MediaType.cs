@@ -247,5 +247,27 @@ namespace Umbraco.Core.Models
         {
             get { return PropertyGroups.SelectMany(x => x.PropertyTypes); }
         }
+
+        /// <summary>
+        /// Method to call when Entity is being saved
+        /// </summary>
+        /// <remarks>Created date is set and a Unique key is assigned</remarks>
+        internal override void AddingEntity()
+        {
+            base.AddingEntity();
+            Key = Guid.NewGuid();
+
+            if (ParentId == 0)
+                _parentId = -1;
+        }
+
+        /// <summary>
+        /// Method to call when Entity is being updated
+        /// </summary>
+        /// <remarks>Modified Date is set and a new Version guid is set</remarks>
+        internal override void UpdatingEntity()
+        {
+            base.UpdatingEntity();
+        }
     }
 }
