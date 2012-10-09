@@ -71,5 +71,17 @@ namespace Umbraco.Core.Models
                 OnPropertyChanged(TranslationsSelector);
             }
         }
+
+        /// <summary>
+        /// Method to call before inserting a new entity in the db
+        /// </summary>
+        internal override void AddingEntity()
+        {
+            base.AddingEntity();
+
+            //If ParentId is not set we should default to the root parent id
+            if(ParentId == Guid.Empty)
+                _parentId = new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde");
+        }
     }
 }

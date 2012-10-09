@@ -11,6 +11,9 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
+    /// <summary>
+    /// Represents a repository for doing CRUD operations for <see cref="DictionaryItem"/>
+    /// </summary>
     internal class DictionaryRepository : PetaPocoRepositoryBase<int, DictionaryItem>, IDictionaryRepository
     {
         private readonly ILanguageRepository _languageRepository;

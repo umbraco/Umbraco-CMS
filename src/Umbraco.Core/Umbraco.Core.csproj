@@ -109,6 +109,8 @@
     <Compile Include="Persistence\Factories\LanguageFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyGroupFactory.cs" />
+    <Compile Include="Persistence\Factories\RelationFactory.cs" />
+    <Compile Include="Persistence\Factories\RelationTypeFactory.cs" />
     <Compile Include="Persistence\Mappers\ModelDtoMapper.cs" />
     <Compile Include="Persistence\Querying\ExpressionHelper.cs" />
     <Compile Include="Persistence\Querying\IQuery.cs" />
@@ -125,11 +127,15 @@
     <Compile Include="Persistence\Repositories\IDictionaryRepository.cs" />
     <Compile Include="Persistence\Repositories\ILanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\IMacroRepository.cs" />
+    <Compile Include="Persistence\Repositories\IRelationRepository.cs" />
+    <Compile Include="Persistence\Repositories\IRelationTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\IRepository.cs" />
     <Compile Include="Persistence\Relators\TabPropertyTypeRelator.cs" />
     <Compile Include="Persistence\Repositories\LanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\MacroRepository.cs" />
     <Compile Include="Persistence\Repositories\PetaPocoRepositoryBase.cs" />
+    <Compile Include="Persistence\Repositories\RelationRepository.cs" />
+    <Compile Include="Persistence\Repositories\RelationTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\RepositoryBase.cs" />
     <Compile Include="Persistence\RepositoryResolver.cs" />
     <Compile Include="Persistence\TransactionType.cs" />

@@ -35,7 +35,7 @@ namespace Umbraco.Core.Persistence.Factories
                               Comment = entity.Comment,
                               Datetime = entity.CreateDate,
                               ParentId = entity.ParentId,
-                              RelationType = _relationType.Id
+                              RelationType = entity.RelationType.Id
                           };
 
             if (entity.HasIdentity)
