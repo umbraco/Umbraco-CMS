@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IScriptRepository : ISimpleRepository<string, Script>
+    public interface IScriptRepository : IRepository<string, Script>
     {
          
     }

@@ -5,11 +5,11 @@ using Umbraco.Core.Persistence.Querying;
 namespace Umbraco.Core.Persistence.Repositories
 {
     /// <summary>
-    /// Defines the implementation of a Repository
+    /// Defines the implementation of a Repository, which allows queries against the <see cref="TEntity"/>
     /// </summary>
     /// <typeparam name="TEntity">Type of <see cref="IAggregateRoot"/> entity for which the repository is used</typeparam>
     /// <typeparam name="TId">Type of the Id used for this entity</typeparam>
-    public interface IRepositoryQueryable<TId, TEntity> : ISimpleRepository<TId, TEntity>
+    public interface IRepositoryQueryable<TId, TEntity> : IRepository<TId, TEntity>
         where TEntity : IAggregateRoot
     {
         /// <summary>

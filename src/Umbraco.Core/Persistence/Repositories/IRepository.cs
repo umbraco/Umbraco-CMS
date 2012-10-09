@@ -3,7 +3,10 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface ISimpleRepository<TId, TEntity>
+    /// <summary>
+    /// Defines the implementation of a Repository
+    /// </summary>
+    public interface IRepository<TId, TEntity>
     {
         /// <summary>
         /// Adds or Updates an Entity
