@@ -13,26 +13,18 @@ namespace Umbraco.Core.Persistence.Caching
     internal sealed class RuntimeCacheProvider : IRepositoryCacheProvider
     {
         #region Singleton
-        private static volatile RuntimeCacheProvider _instance;
-        private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
 
-        private RuntimeCacheProvider() { }
+        private static readonly Lazy<RuntimeCacheProvider> lazy = new Lazy<RuntimeCacheProvider>(() => new RuntimeCacheProvider());
 
-        public static RuntimeCacheProvider Current
+        public static RuntimeCacheProvider Current { get { return lazy.Value; } }
+
+        private RuntimeCacheProvider()
         {
-            get
-            {
-                using (new WriteLock(Lock))
-                {
-                    if (_instance == null) _instance = new RuntimeCacheProvider();
-                }
-
-                return _instance;
-            }
         }
+
         #endregion
 
-        private ObjectCache _memoryCache = new MemoryCache("in-memory");
+        private readonly ObjectCache _memoryCache = new MemoryCache("in-memory");
         private ConcurrentDictionary<string, string> _keyTracker = new ConcurrentDictionary<string, string>();
 
         public IEntity GetById(Type type, Guid id)

@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class PetaPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
         where TEntity : IAggregateRoot
     {
-        private Database _database;
+        private readonly Database _database;
 
         protected PetaPocoRepositoryBase(IUnitOfWork work) : base(work)
         {

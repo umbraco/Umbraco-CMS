@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Persistence
@@ -11,27 +12,13 @@ namespace Umbraco.Core.Persistence
     {
         #region Singleton
 
-        private static Database _database;
-        private static volatile DatabaseFactory _instance;
-        private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
+        private static readonly Database _database = new Database(GlobalSettings.DbDsn);
+        private static readonly Lazy<DatabaseFactory> lazy = new Lazy<DatabaseFactory>(() => new DatabaseFactory());
 
-        private DatabaseFactory() { }
+        public static DatabaseFactory Current { get { return lazy.Value; } }
 
-        public static DatabaseFactory Current
+        private DatabaseFactory()
         {
-            get
-            {
-                using (new WriteLock(Lock))
-                {
-                    if (_instance == null)
-                    {
-                        _instance = new DatabaseFactory();
-                        _database = new Database(GlobalSettings.DbDsn);
-                    }
-                }
-
-                return _instance;
-            }
         }
 
         #endregion

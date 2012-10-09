@@ -60,6 +60,7 @@
     <Compile Include="DynamicDocument\PublishedContentTests.cs" />
     <Compile Include="HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="LibraryTests.cs" />
+    <Compile Include="Persistence\DatabaseFactoryTests.cs" />
     <Compile Include="Resolvers\ActionsResolverTests.cs" />
     <Compile Include="AsynchronousRollingFileAppenderTests.cs" />
     <Compile Include="BusinessLogic\ApplicationTest.cs" />

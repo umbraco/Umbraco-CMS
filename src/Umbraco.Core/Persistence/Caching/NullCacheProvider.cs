@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Persistence.Caching
@@ -9,23 +8,15 @@ namespace Umbraco.Core.Persistence.Caching
     internal class NullCacheProvider : IRepositoryCacheProvider
     {
         #region Singleton
-        private static volatile NullCacheProvider _instance;
-        private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
 
-        private NullCacheProvider() { }
+        private static readonly Lazy<NullCacheProvider> lazy = new Lazy<NullCacheProvider>(() => new NullCacheProvider());
 
-        public static NullCacheProvider Current
+        public static NullCacheProvider Current { get { return lazy.Value; } }
+
+        private NullCacheProvider()
         {
-            get
-            {
-                using (new WriteLock(Lock))
-                {
-                    if (_instance == null) _instance = new NullCacheProvider();
-                }
-
-                return _instance;
-            }
         }
+
         #endregion
 
         #region Implementation of IRepositoryCacheProvider

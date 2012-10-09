@@ -13,23 +13,15 @@ namespace Umbraco.Core.Persistence.Caching
     internal class InMemoryCacheProvider : IRepositoryCacheProvider
     {
         #region Singleton
-        private static volatile InMemoryCacheProvider _instance;
-        private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
 
-        private InMemoryCacheProvider() { }
+        private static readonly Lazy<InMemoryCacheProvider> lazy = new Lazy<InMemoryCacheProvider>(() => new InMemoryCacheProvider());
 
-        public static InMemoryCacheProvider Current
+        public static InMemoryCacheProvider Current { get { return lazy.Value; } }
+
+        private InMemoryCacheProvider()
         {
-            get
-            {
-                using (new WriteLock(Lock))
-                {
-                    if (_instance == null) _instance = new InMemoryCacheProvider();
-                }
-
-                return _instance;
-            }
         }
+
         #endregion
 
         private readonly ConcurrentDictionary<string, IEntity> _cache = new ConcurrentDictionary<string, IEntity>();
