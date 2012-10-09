@@ -97,6 +97,7 @@
     <Compile Include="Models\Template.cs" />
     <Compile Include="Persistence\Caching\InMemoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\IRepositoryCacheProvider.cs" />
+    <Compile Include="Persistence\Caching\NullCacheProvider.cs" />
     <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
     <Compile Include="Persistence\DatabaseFactory.cs" />
     <Compile Include="Persistence\Factories\ContentFactory.cs" />
