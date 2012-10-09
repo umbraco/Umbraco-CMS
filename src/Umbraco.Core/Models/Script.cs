@@ -34,14 +34,14 @@ namespace Umbraco.Core.Models
             //See codeEditorSave.asmx.cs for reference.
 
             var exts = UmbracoSettings.ScriptFileTypes.Split(',').ToList();
-            if (UmbracoSettings.EnableMvcSupport)
+            if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
             {
                 exts.Add("cshtml");
                 exts.Add("vbhtml");
             }
 
             var dirs = SystemDirectories.Scripts;
-            if (UmbracoSettings.EnableMvcSupport)
+            if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
                 dirs += "," + SystemDirectories.MvcViews;
 
             //Validate file

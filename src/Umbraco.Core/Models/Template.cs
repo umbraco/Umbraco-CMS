@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models
         public override bool IsValid()
         {
             var exts = new List<string>();
-            if (UmbracoSettings.EnableMvcSupport)
+            if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
             {
                 exts.Add("cshtml");
                 exts.Add("vbhtml");
@@ -37,7 +37,7 @@ namespace Umbraco.Core.Models
             }
 
             var dirs = SystemDirectories.Masterpages;
-            if (UmbracoSettings.EnableMvcSupport)
+            if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
                 dirs += "," + SystemDirectories.MvcViews;
 
             //Validate file
