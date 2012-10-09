@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface ILanguageRepository : IRepository<int, Language>
+    public interface ILanguageRepository : IRepositoryQueryable<int, Language>
     {
          
     }

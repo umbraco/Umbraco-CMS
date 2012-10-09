@@ -129,8 +129,10 @@
     <Compile Include="Persistence\Repositories\IMacroRepository.cs" />
     <Compile Include="Persistence\Repositories\IRelationRepository.cs" />
     <Compile Include="Persistence\Repositories\IRelationTypeRepository.cs" />
-    <Compile Include="Persistence\Repositories\IRepository.cs" />
+    <Compile Include="Persistence\Repositories\IRepositoryQueryable.cs" />
     <Compile Include="Persistence\Relators\TabPropertyTypeRelator.cs" />
+    <Compile Include="Persistence\Repositories\IScriptRepository.cs" />
+    <Compile Include="Persistence\Repositories\ISimpleRepository.cs" />
     <Compile Include="Persistence\Repositories\LanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\MacroRepository.cs" />
     <Compile Include="Persistence\Repositories\PetaPocoRepositoryBase.cs" />

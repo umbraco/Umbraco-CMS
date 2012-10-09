@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     /// <typeparam name="TEntity">Type of <see cref="IAggregateRoot"/> entity for which the repository is used</typeparam>
     /// <typeparam name="TId">Type of the Id used for this entity</typeparam>
-    internal abstract class RepositoryBase<TId, TEntity> : IRepository<TId, TEntity>, 
+    internal abstract class RepositoryBase<TId, TEntity> : IRepositoryQueryable<TId, TEntity>, 
         IUnitOfWorkRepository where TEntity : IAggregateRoot
     {
         private IUnitOfWork _work;
