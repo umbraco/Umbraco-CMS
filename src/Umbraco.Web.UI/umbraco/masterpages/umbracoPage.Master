@@ -1,5 +1,5 @@
-﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="umbracoPage.master.cs"
-    Inherits="umbraco.presentation.masterpages.umbracoPage" %>
+﻿<%@ Master Language="C#" AutoEventWireup="True" CodeBehind="UmbracoPage.master.cs"
+    Inherits="Umbraco.Web.UI.Umbraco.Masterpages.UmbracoPage" %>
 
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
@@ -18,6 +18,7 @@
         Priority="1" />
     <umb:JsInclude ID="JsInclude9" runat="server" FilePath="Application/jQuery/jquery.cookie.js"
         PathNameAlias="UmbracoClient" Priority="1" />
+    <umb:JsInclude ID="JsInclude10" runat="server" FilePath="ui/base2.js" PathNameAlias="UmbracoClient" Priority="1"  /> 
     <umb:JsInclude ID="JsInclude4" runat="server" FilePath="Application/UmbracoApplicationActions.js"
         PathNameAlias="UmbracoClient" Priority="2" />
     <umb:JsInclude ID="JsInclude5" runat="server" FilePath="Application/UmbracoUtils.js"

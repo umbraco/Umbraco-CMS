@@ -34,13 +34,13 @@ namespace Umbraco.Web.Mvc
 			AreaPartialViewLocationFormats = new string[] { };
 			AreaViewLocationFormats = new string[] { };
 
-			EnsureFolderAndWebConfig();
+			EnsureFoldersAndFiles();
 		}
 
 		/// <summary>
-		/// Ensures that the correct web.config for razor exists in the /Views folder.
+		/// Ensures that the correct web.config for razor exists in the /Views folder, the partials folder exist and the ViewStartPage exists.
 		/// </summary>
-		private void EnsureFolderAndWebConfig()
+		private void EnsureFoldersAndFiles()
 		{
 			var viewFolder = IOHelper.MapPath(Constants.ViewLocation);
 			//ensure the web.config file is in the ~/Views folder
@@ -52,6 +52,11 @@ namespace Umbraco.Web.Mvc
 					writer.Write(Strings.web_config);
 				}
 			}
+			//auto create the partials folder
+			var partialsFolder = Path.Combine(viewFolder, "Partials");
+			Directory.CreateDirectory(partialsFolder);			
+
+			//We could create a _ViewStart page if it isn't there as well, but we may not allow editing of this page in the back office.
 		}
 
 		public override ViewEngineResult FindView(ControllerContext controllerContext, string viewName, string masterName, bool useCache)
