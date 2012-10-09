@@ -9,19 +9,18 @@ using Umbraco.Core.Persistence.UnitOfWork;
 namespace Umbraco.Core.Persistence.Repositories
 {
     /// <summary>
-    /// Represents the Template Repository
+    /// Represents the Stylesheet Repository
     /// </summary>
-    internal class TemplateRepository : FileRepository<string, Template>, ITemplateRepository
+    internal class StylesheetRepository : FileRepository<string, Stylesheet>, IStylesheetRepository
     {
-        //TODO: Figure out how to deal with templates in either Masterpages or Views folders (or in both folders)
-        public TemplateRepository(IUnitOfWork work)
-            : base(work, FileSystemProviderManager.Current.GetFileSystemProvider("template"))
+        public StylesheetRepository(IUnitOfWork work)
+            : base(work, FileSystemProviderManager.Current.GetFileSystemProvider("stylesheet"))
         {
         }
 
-        #region Overrides of FileRepository<string,Template>
+        #region Overrides of FileRepository<string,Stylesheet>
 
-        public override Template Get(string id)
+        public override Stylesheet Get(string id)
         {
             if (!FileSystem.FileExists(id))
             {
@@ -36,11 +35,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var path = FileSystem.GetRelativePath(id);
 
-            var template = new Template(path) { Content = content };
-            return template;
+            var stylesheet = new Stylesheet(path) { Content = content };
+            return stylesheet;
         }
 
-        public override IEnumerable<Template> GetAll(params string[] ids)
+        public override IEnumerable<Stylesheet> GetAll(params string[] ids)
         {
             if (ids.Any())
             {

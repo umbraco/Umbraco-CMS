@@ -134,6 +134,7 @@
     <Compile Include="Persistence\Relators\TabPropertyTypeRelator.cs" />
     <Compile Include="Persistence\Repositories\IScriptRepository.cs" />
     <Compile Include="Persistence\Repositories\IRepository.cs" />
+    <Compile Include="Persistence\Repositories\IStylesheetRepository.cs" />
     <Compile Include="Persistence\Repositories\ITemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\LanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\MacroRepository.cs" />
@@ -142,6 +143,7 @@
     <Compile Include="Persistence\Repositories\RelationTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\RepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\ScriptRepository.cs" />
+    <Compile Include="Persistence\Repositories\StylesheetRepository.cs" />
     <Compile Include="Persistence\Repositories\TemplateRepository.cs" />
     <Compile Include="Persistence\RepositoryResolver.cs" />
     <Compile Include="Persistence\TransactionType.cs" />
