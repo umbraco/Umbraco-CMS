@@ -108,6 +108,7 @@
     <Compile Include="Persistence\Factories\DictionaryTranslationFactory.cs" />
     <Compile Include="Persistence\Factories\IEntityFactory.cs" />
     <Compile Include="Persistence\Factories\LanguageFactory.cs" />
+    <Compile Include="Persistence\Factories\MediaFactory.cs" />
     <Compile Include="Persistence\Factories\MediaTypeFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyGroupFactory.cs" />

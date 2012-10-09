@@ -51,6 +51,7 @@ namespace Umbraco.Core.Models
             _contentType = contentType;
             _properties = properties;
             _properties.EnsurePropertyTypes(PropertyTypes);
+            Version = Guid.NewGuid();
         }
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<Media, string>(x => x.Name);
@@ -195,6 +196,12 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Guid Id of the curent Version
+        /// </summary>
+        [DataMember]
+        public Guid Version { get; internal set; }
+
+        /// <summary>
         /// List of properties, which make up all the data available for this Media object
         /// </summary>
         [DataMember]
@@ -318,6 +325,26 @@ namespace Umbraco.Core.Models
             }
 
             ChangeContentType(contentType);
+        }
+
+        /// <summary>
+        /// Method to call when Entity is being saved
+        /// </summary>
+        /// <remarks>Created date is set and a Unique key is assigned</remarks>
+        internal override void AddingEntity()
+        {
+            base.AddingEntity();
+            Key = Guid.NewGuid();
+        }
+
+        /// <summary>
+        /// Method to call when Entity is being updated
+        /// </summary>
+        /// <remarks>Modified Date is set and a new Version guid is set</remarks>
+        internal override void UpdatingEntity()
+        {
+            base.UpdatingEntity();
+            Version = Guid.NewGuid();
         }
     }
 }

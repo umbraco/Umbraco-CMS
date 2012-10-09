@@ -29,8 +29,9 @@ namespace Umbraco.Core.Models
         private PropertyGroupCollection _propertyGroups;
         private IEnumerable<int> _allowedContentTypes;
 
-        public MediaType()
+        public MediaType(int parentId)
         {
+            _parentId = parentId;
             _allowedContentTypes = new List<int>();
             _propertyGroups = new PropertyGroupCollection();
         }
@@ -256,9 +257,6 @@ namespace Umbraco.Core.Models
         {
             base.AddingEntity();
             Key = Guid.NewGuid();
-
-            if (ParentId == 0)
-                _parentId = -1;
         }
 
         /// <summary>

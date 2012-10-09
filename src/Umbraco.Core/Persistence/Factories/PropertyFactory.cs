@@ -9,10 +9,9 @@ namespace Umbraco.Core.Persistence.Factories
     internal class PropertyFactory : IEntityFactory<IEnumerable<Property>, IEnumerable<PropertyDataDto>>
     {
         private readonly IContentType _contentType;
+        private readonly IMediaType _mediaType;
         private readonly Guid _version;
         private readonly int _id;
-
-        #region Implementation of IEntityFactory<IContent,PropertyDataDto>
 
         public PropertyFactory(IContentType contentType, Guid version, int id)
         {
@@ -21,13 +20,21 @@ namespace Umbraco.Core.Persistence.Factories
             _id = id;
         }
 
+        public PropertyFactory(IMediaType mediaType, Guid version, int id)
+        {
+            _mediaType = mediaType;
+            _version = version;
+            _id = id;
+        }
+
+        #region Implementation of IEntityFactory<IContent,PropertyDataDto>
+
         public IEnumerable<Property> BuildEntity(IEnumerable<PropertyDataDto> dtos)
         {
             var properties = new List<Property>();
             foreach (var dto in dtos)
             {
-                var propertyType =
-                    _contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Id == dto.PropertyTypeId);
+                var propertyType = _contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Id == dto.PropertyTypeId);
                 properties.Add(propertyType.CreatePropertyFromRawValue(dto.GetValue));
             }
             return properties;
@@ -71,5 +78,16 @@ namespace Umbraco.Core.Persistence.Factories
         }
 
         #endregion
+
+        public IEnumerable<Property> BuildMediaEntity(IEnumerable<PropertyDataDto> dtos)
+        {
+            var properties = new List<Property>();
+            foreach (var dto in dtos)
+            {
+                var propertyType = _mediaType.PropertyTypes.FirstOrDefault(x => x.Id == dto.PropertyTypeId);
+                properties.Add(propertyType.CreatePropertyFromRawValue(dto.GetValue));
+            }
+            return properties;
+        }
     }
 }

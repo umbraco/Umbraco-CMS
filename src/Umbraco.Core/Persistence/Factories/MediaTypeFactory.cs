@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IMediaType BuildEntity(ContentTypeDto dto)
         {
-            var contentType = new MediaType
+            var contentType = new MediaType(dto.NodeDto.ParentId)
                                   {
                                       Id = dto.NodeDto.NodeId,
                                       Key =
@@ -34,7 +34,6 @@ namespace Umbraco.Core.Persistence.Factories
                                       CreateDate = dto.NodeDto.CreateDate,
                                       Path = dto.NodeDto.Path,
                                       Level = dto.NodeDto.Level,
-                                      ParentId = dto.NodeDto.ParentId,
                                       UserId =
                                           dto.NodeDto.UserId.HasValue
                                               ? dto.NodeDto.UserId.Value

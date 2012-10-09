@@ -18,7 +18,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IContentType BuildEntity(DocumentTypeDto dto)
         {
-            var contentType = new ContentType
+            var contentType = new ContentType(dto.ContentTypeDto.NodeDto.ParentId)
                                   {
                                       Id = dto.ContentTypeDto.NodeDto.NodeId,
                                       Key =
@@ -34,7 +34,6 @@ namespace Umbraco.Core.Persistence.Factories
                                       CreateDate = dto.ContentTypeDto.NodeDto.CreateDate,
                                       Path = dto.ContentTypeDto.NodeDto.Path,
                                       Level = dto.ContentTypeDto.NodeDto.Level,
-                                      ParentId = dto.ContentTypeDto.NodeDto.ParentId,
                                       UserId =
                                           dto.ContentTypeDto.NodeDto.UserId.HasValue
                                               ? dto.ContentTypeDto.NodeDto.UserId.Value

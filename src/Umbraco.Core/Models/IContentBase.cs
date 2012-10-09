@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
@@ -55,6 +55,11 @@ namespace Umbraco.Core.Models
         /// Integer Id of the default ContentType
         /// </summary>
         int ContentTypeId { get; }
+
+        /// <summary>
+        /// Gets the Guid Id of the Content's Version
+        /// </summary>
+        Guid Version { get; }
 
         /// <summary>
         /// List of properties, which make up all the data available for this Content object

@@ -32,8 +32,9 @@ namespace Umbraco.Core.Models
         private IEnumerable<string> _allowedTemplates;
         private IEnumerable<int> _allowedContentTypes;
 
-        public ContentType()
+        public ContentType(int parentId)
         {
+            _parentId = parentId;
             _allowedTemplates = new List<string>();
             _allowedContentTypes = new List<int>();
             _propertyGroups = new PropertyGroupCollection();
@@ -394,9 +395,6 @@ namespace Umbraco.Core.Models
         {
             base.AddingEntity();
             Key = Guid.NewGuid();
-
-            if (ParentId == 0)
-                _parentId = -1;
         }
 
         /// <summary>

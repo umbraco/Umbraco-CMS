@@ -24,11 +24,6 @@ namespace Umbraco.Core.Models
         //string Language { get; set; }
 
         /// <summary>
-        /// Gets the Guid Id of the Content's Version
-        /// </summary>
-        Guid Version { get; }
-
-        /// <summary>
         /// Gets or Sets the date the Content should be released and thus be published
         /// </summary>
         DateTime? ReleaseDate { get; set; }

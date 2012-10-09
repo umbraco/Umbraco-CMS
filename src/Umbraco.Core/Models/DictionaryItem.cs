@@ -16,8 +16,6 @@ namespace Umbraco.Core.Models
         private Guid _parentId;
         private string _itemKey;
         private IEnumerable<DictionaryTranslation> _translations;
-        //NOTE Add this to LocalizationService or Repository
-        //private static Guid _topLevelParent = new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde");
 
         public DictionaryItem(Guid parentId, string itemKey)
         {
