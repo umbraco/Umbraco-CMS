@@ -117,7 +117,6 @@ namespace Umbraco.Core.IO
         }
 
         //use a tilde character instead of the complete path
-		[Obsolete("This method is no longer in use and will be removed in future versions")]
 		internal static string ReturnPath(string settingsKey, string standardPath, bool useTilde)
         {
             string retval = ConfigurationManager.AppSettings[settingsKey];
@@ -128,7 +127,6 @@ namespace Umbraco.Core.IO
             return retval.TrimEnd('/');
         }
 
-		[Obsolete("This method is no longer in use and will be removed in future versions")]
         internal static string ReturnPath(string settingsKey, string standardPath)
         {
             return ReturnPath(settingsKey, standardPath, false);

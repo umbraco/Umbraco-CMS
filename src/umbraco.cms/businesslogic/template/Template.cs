@@ -45,10 +45,30 @@ namespace umbraco.cms.businesslogic.template
 
         #endregion
 
+		[Obsolete("Use TemplateFilePath instead")]
         public string MasterPageFile
         {
-            get { return IOHelper.MapPath(SystemDirectories.Masterpages + "/" + Alias.Replace(" ", "") + ".master"); }
+            get { return TemplateFilePath; }
         }
+
+		/// <summary>
+		/// Returns the file path for the current template
+		/// </summary>
+	    public string TemplateFilePath
+	    {
+		    get
+		    {
+				switch (DetermineRenderingEngine(this))
+				{
+					case RenderingEngine.Mvc:
+						return ViewHelper.GetFilePath(this);
+					case RenderingEngine.WebForms:
+						return MasterpageHelper.GetFilePath(this);
+					default:
+						throw new ArgumentOutOfRangeException();
+				}	  
+		    }
+	    }
 
         public static Hashtable TemplateAliases
         {
@@ -134,10 +154,10 @@ namespace umbraco.cms.businesslogic.template
             }
             dr.Close();
 
-			if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && Template.HasView(this))
-                _design = ViewHelper.GetViewFile(this);
+			if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(this))
+                _design = ViewHelper.GetFileContents(this);
             else
-                _design = MasterpageHelper.GetMasterpageFile(this);
+                _design = MasterpageHelper.GetFileContents(this);
 
         }
 		
@@ -251,7 +271,7 @@ namespace umbraco.cms.businesslogic.template
 
                 //we only switch to MVC View editing if the template has a view file, and MVC editing is enabled
                 if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && !MasterpageHelper.IsMasterPageSyntax(_design))
-                    _design = ViewHelper.UpdateViewFile(this);
+					_design = ViewHelper.UpdateViewFile(this, _oldAlias);
                 else if (UmbracoSettings.UseAspNetMasterPages)
                     _design = MasterpageHelper.UpdateMasterpageFile(this, _oldAlias);
                 
@@ -551,8 +571,8 @@ namespace umbraco.cms.businesslogic.template
                 if (System.IO.File.Exists(MasterPageFile))
                     System.IO.File.Delete(MasterPageFile);
 
-                if (System.IO.File.Exists(Umbraco.Core.IO.IOHelper.MapPath(ViewHelper.ViewPath(this))))
-                    System.IO.File.Delete(Umbraco.Core.IO.IOHelper.MapPath(ViewHelper.ViewPath(this)));
+				if (System.IO.File.Exists(Umbraco.Core.IO.IOHelper.MapPath(ViewHelper.ViewPath(this.Alias))))
+                    System.IO.File.Delete(Umbraco.Core.IO.IOHelper.MapPath(ViewHelper.ViewPath(this.Alias)));
 
                 FireAfterDelete(e);
             }
@@ -863,13 +883,7 @@ namespace umbraco.cms.businesslogic.template
 
             return t;
         }
-
-        public static bool HasView(Template t)
-        {
-            var path = Umbraco.Core.IO.SystemDirectories.MvcViews + "/" + t.Alias.Replace(" ", "") + ".cshtml";
-            return System.IO.File.Exists(Umbraco.Core.IO.IOHelper.MapPath(path));
-        }
-
+        
 
         #region Events
         //EVENTS

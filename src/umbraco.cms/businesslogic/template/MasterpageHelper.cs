@@ -15,18 +15,23 @@ namespace umbraco.cms.businesslogic.template
         
 		internal static bool MasterPageExists(Template t)
 		{
-			return File.Exists(t.MasterPageFile);
+			return File.Exists(GetFilePath(t));
+		}
+
+		internal static string GetFilePath(Template t)
+		{
+			return IOHelper.MapPath(SystemDirectories.Masterpages + "/" + t.Alias.Replace(" ", "") + ".master");
 		}
 
 	    internal static string CreateMasterpageFile(Template t, bool overWrite = false)
         {
             string masterpageContent = "";
 
-            if (!File.Exists(t.MasterPageFile) || overWrite)
+			if (!File.Exists(GetFilePath(t)) || overWrite)
                 masterpageContent = SaveTemplateToFile(t, t.Alias);
             else
             {
-                System.IO.TextReader tr = new StreamReader(t.MasterPageFile);
+				System.IO.TextReader tr = new StreamReader(GetFilePath(t));
                 masterpageContent = tr.ReadToEnd();
                 tr.Close();
             }
@@ -34,11 +39,12 @@ namespace umbraco.cms.businesslogic.template
             return masterpageContent;
         }
 
-        internal static string GetMasterpageFile(Template t)
+        internal static string GetFileContents(Template t)
         {
             string masterpageContent = "";
-            if (File.Exists(t.MasterPageFile)){
-                System.IO.TextReader tr = new StreamReader(t.MasterPageFile);
+			if (File.Exists(GetFilePath(t)))
+			{
+				System.IO.TextReader tr = new StreamReader(GetFilePath(t));
                 masterpageContent = tr.ReadToEnd();
                 tr.Close();
             }
@@ -104,7 +110,6 @@ namespace umbraco.cms.businesslogic.template
                 //Ensure that child templates have the right master masterpage file name
                 if (template.HasChildren)
                 {
-                    //store children array here because iterating over an Array property object is very inneficient.
                     var c = template.Children;
                     foreach (CMSNode cmn in c)
                         UpdateMasterpageFile(new Template(cmn.Id), null);
@@ -117,7 +122,7 @@ namespace umbraco.cms.businesslogic.template
             }
 
             // save the file in UTF-8
-            System.IO.File.WriteAllText(template.MasterPageFile, masterPageContent, System.Text.Encoding.UTF8);
+			System.IO.File.WriteAllText(GetFilePath(template), masterPageContent, System.Text.Encoding.UTF8);
             
             return masterPageContent;
         }

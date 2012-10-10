@@ -194,12 +194,14 @@ namespace umbraco
                 xNode.Source = GetTreeServiceUrl(t.Id);
                 xNode.HasChildren = t.HasChildren;
                 
-                if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && Template.HasView(t))
+                if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(t))
                 {
                     xNode.Action = "javascript:openView(" + t.Id + ");";
                     xNode.Icon = "settingView.gif";
                     xNode.OpenIcon = "settingView.gif";
-                }else{
+                }
+				else
+				{
                     xNode.Action = "javascript:openTemplate(" + t.Id + ");";
                     xNode.Icon = "settingTemplate.gif";
                     xNode.OpenIcon = "settingTemplate.gif";
