@@ -63,7 +63,7 @@ namespace umbraco.cms.businesslogic.template
 					case RenderingEngine.Mvc:
 						return ViewHelper.GetFilePath(this);
 					case RenderingEngine.WebForms:
-						return MasterpageHelper.GetFilePath(this);
+						return MasterPageHelper.GetFilePath(this);
 					default:
 						throw new ArgumentOutOfRangeException();
 				}	  
@@ -157,7 +157,7 @@ namespace umbraco.cms.businesslogic.template
 			if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(this))
                 _design = ViewHelper.GetFileContents(this);
             else
-                _design = MasterpageHelper.GetFileContents(this);
+                _design = MasterPageHelper.GetFileContents(this);
 
         }
 		
@@ -270,10 +270,10 @@ namespace umbraco.cms.businesslogic.template
 
 
                 //we only switch to MVC View editing if the template has a view file, and MVC editing is enabled
-                if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && !MasterpageHelper.IsMasterPageSyntax(_design))
+                if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && !MasterPageHelper.IsMasterPageSyntax(_design))
 					_design = ViewHelper.UpdateViewFile(this, _oldAlias);
                 else if (UmbracoSettings.UseAspNetMasterPages)
-                    _design = MasterpageHelper.UpdateMasterpageFile(this, _oldAlias);
+                    _design = MasterPageHelper.UpdateMasterPageFile(this, _oldAlias);
                 
 
                 SqlHelper.ExecuteNonQuery("Update cmsTemplate set design = @design where NodeId = @id",
@@ -351,7 +351,7 @@ namespace umbraco.cms.businesslogic.template
 		{
 			var engine = Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine;
 
-			if (!design.IsNullOrWhiteSpace() && MasterpageHelper.IsMasterPageSyntax(design))
+			if (!design.IsNullOrWhiteSpace() && MasterPageHelper.IsMasterPageSyntax(design))
 			{
 				//there is a design but its definitely a webforms design
 				return RenderingEngine.WebForms;
@@ -361,7 +361,7 @@ namespace umbraco.cms.businesslogic.template
 			{
 				case RenderingEngine.Mvc:
 					//check if there's a view in ~/masterpages
-					if (MasterpageHelper.MasterPageExists(t) && !ViewHelper.ViewExists(t))
+					if (MasterPageHelper.MasterPageExists(t) && !ViewHelper.ViewExists(t))
 					{
 						//change this to webforms since there's already a file there for this template alias
 						engine = RenderingEngine.WebForms;
@@ -369,7 +369,7 @@ namespace umbraco.cms.businesslogic.template
 					break;
 				case RenderingEngine.WebForms:
 					//check if there's a view in ~/views
-					if (ViewHelper.ViewExists(t) && !MasterpageHelper.MasterPageExists(t))
+					if (ViewHelper.ViewExists(t) && !MasterPageHelper.MasterPageExists(t))
 					{
 						//change this to mvc since there's already a file there for this template alias
 						engine = RenderingEngine.Mvc;
@@ -435,7 +435,7 @@ namespace umbraco.cms.businesslogic.template
 					ViewHelper.CreateViewFile(t, true);
 					break;
 				case RenderingEngine.WebForms:
-					MasterpageHelper.CreateMasterpageFile(t, true);
+					MasterPageHelper.CreateMasterPage(t, true);
 					break;
 			}
 
