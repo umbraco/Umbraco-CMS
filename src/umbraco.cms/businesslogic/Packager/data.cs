@@ -3,6 +3,7 @@ using System.Xml;
 using System.Xml.XPath;
 using System.Collections.Generic;
 using System.IO;
+using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.packager
 {
@@ -46,6 +47,24 @@ namespace umbraco.cms.businesslogic.packager
             {
                 _source = new XmlDocument();                
             }
+
+			//error checking here
+			if (File.Exists(dataSource))
+			{
+				var isEmpty = false;
+				using (var sr = new StreamReader(dataSource))
+				{
+					if (sr.ReadToEnd().IsNullOrWhiteSpace())
+					{
+						isEmpty = true;
+					}
+				}
+				if (isEmpty)
+				{
+					File.WriteAllText(dataSource, @"<?xml version=""1.0"" encoding=""utf-8""?><packages></packages>");
+				}
+			}
+
             _source.Load(dataSource);
         }
 
