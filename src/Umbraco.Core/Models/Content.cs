@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
@@ -14,21 +9,12 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Content : Entity, IContent
+    public class Content : ContentBase, IContent
     {
         private IContentType _contentType;
-        private int _parentId; 
-        private string _name;
-        private int _sortOrder;
-        private int _level;
-        private string _path;
         private string _template;
-        private int _userId;
-        private bool _trashed;
         private bool _published;
         private string _language;
-        private int _contentTypeId;
-        private PropertyCollection _properties;
         private DateTime? _releaseDate;
         private DateTime? _expireDate;
 
@@ -47,112 +33,16 @@ namespace Umbraco.Core.Models
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
-        public Content(int parentId, IContentType contentType, PropertyCollection properties)
+        public Content(int parentId, IContentType contentType, PropertyCollection properties) : base(parentId, contentType, properties)
         {
-            _parentId = parentId;
-            _contentTypeId = int.Parse(contentType.Id.ToString(CultureInfo.InvariantCulture));
             _contentType = contentType;
-            _properties = properties;
-            _properties.EnsurePropertyTypes(PropertyTypes);
-            Version = Guid.NewGuid();
         }
-
-        private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Name);
-        private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.ParentId);
-        private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.SortOrder);
-        private static readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.Level);
-        private static readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Path);
+        
         private static readonly PropertyInfo TemplateSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Template);
-        private static readonly PropertyInfo UserIdSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.UserId);
-        private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.Trashed);
         private static readonly PropertyInfo PublishedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.Published);
         private static readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Language);
-        private static readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.ContentTypeId);
         private static readonly PropertyInfo ReleaseDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ReleaseDate);
         private static readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
-        private readonly static PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<Content, PropertyCollection>(x => x.Properties);
-        void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            OnPropertyChanged(PropertyCollectionSelector);
-        }
-
-        /// <summary>
-        /// Gets or sets the Id of the Parent entity
-        /// </summary>
-        /// <remarks>Might not be necessary if handled as a relation?</remarks>
-        [DataMember]
-        public int ParentId
-        {
-            get { return _parentId; }
-            set
-            {
-                _parentId = value;
-                OnPropertyChanged(ParentIdSelector);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the name of the current entity
-        /// </summary>
-        [DataMember]
-        public string Name
-        {
-            get { return _name; }
-            set 
-            { 
-                _name = value;
-                OnPropertyChanged(NameSelector);
-            }
-        }
-
-        [IgnoreDataMember]
-        public string UrlName
-        {
-            //TODO Needs to implement proper url casing/syntax
-            get { return Name.ToLower().Replace(" ", "-"); }
-        } 
-
-        /// <summary>
-        /// Gets or sets the sort order of the content entity
-        /// </summary>
-        [DataMember]
-        public int SortOrder 
-        {
-            get { return _sortOrder; }
-            set
-            {
-                _sortOrder = value;
-                OnPropertyChanged(SortOrderSelector);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the level of the content entity
-        /// </summary>
-        [DataMember]
-        public int Level
-        {
-            get { return _level; }
-            set
-            {
-                _level = value;
-                OnPropertyChanged(LevelSelector);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the path
-        /// </summary>
-        [DataMember]
-        public string Path //Setting this value should be handled by the class not the user
-        {
-            get { return _path; }
-            set
-            {
-                _path = value;
-                OnPropertyChanged(PathSelector);
-            }
-        }
 
         /// <summary>
         /// Path to the template used by this Content
@@ -177,20 +67,6 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Id of the user who created this Content
-        /// </summary>
-        [DataMember]
-        public int UserId
-        {
-            get { return _userId; }
-            set
-            {
-                _userId = value;
-                OnPropertyChanged(UserIdSelector);
-            }
-        }
-
-        /// <summary>
         /// Gets the current status of the Content
         /// </summary>
         public ContentStatus Status
@@ -210,22 +86,6 @@ namespace Umbraco.Core.Models
                     return ContentStatus.Published;
 
                 return ContentStatus.Unpublished;
-            }
-        }
-
-        /// <summary>
-        /// Boolean indicating whether this Content is Trashed or not.
-        /// If Content is Trashed it will be located in the Recyclebin.
-        /// </summary>
-        /// <remarks>When content is trashed it should be unpublished</remarks>
-        [DataMember]
-        public bool Trashed //Setting this value should be handled by the class not the user
-        {
-            get { return _trashed; }
-            internal set
-            {
-                _trashed = value;
-                OnPropertyChanged(TrashedSelector);
             }
         }
 
@@ -257,52 +117,6 @@ namespace Umbraco.Core.Models
                 OnPropertyChanged(LanguageSelector);
             }
         }
-
-        /// <summary>
-        /// Guid Id of the curent Version
-        /// </summary>
-        [DataMember]
-        public Guid Version { get; internal set; }
-
-        /// <summary>
-        /// Integer Id of the default ContentType
-        /// </summary>
-        [DataMember]
-        public int ContentTypeId
-        {
-            get { return _contentTypeId; }
-            protected set
-            {
-                _contentTypeId = value;
-                OnPropertyChanged(DefaultContentTypeIdSelector);
-            }
-        }
-
-        /// <summary>
-        /// Collection of properties, which make up all the data available for this Content object
-        /// </summary>
-        [DataMember]
-        public PropertyCollection Properties
-        {
-            get { return _properties; }
-            set
-            {
-                _properties = value;
-                _properties.CollectionChanged += PropertiesChanged;
-            }
-        }
-
-        /// <summary>
-        /// List of PropertyGroups available on this Content object
-        /// </summary>
-        [IgnoreDataMember]
-        public IEnumerable<PropertyGroup> PropertyGroups { get { return _contentType.CompositionPropertyGroups; } }
-
-        /// <summary>
-        /// List of PropertyTypes available on this Content object
-        /// </summary>
-        [IgnoreDataMember]
-        public IEnumerable<PropertyType> PropertyTypes { get { return _contentType.CompositionPropertyTypes; } }
 
         /// <summary>
         /// The date this Content should be released and thus be published
@@ -359,8 +173,9 @@ namespace Umbraco.Core.Models
         {
             ContentTypeId = contentType.Id;
             _contentType = contentType;
-            _properties.EnsurePropertyTypes(PropertyTypes);
-            _properties.CollectionChanged += PropertiesChanged;
+            ContentTypeBase = contentType;
+            Properties.EnsurePropertyTypes(PropertyTypes);
+            Properties.CollectionChanged += PropertiesChanged;
         }
 
         /// <summary>
@@ -375,64 +190,13 @@ namespace Umbraco.Core.Models
             {
                 ContentTypeId = contentType.Id;
                 _contentType = contentType;
-                _properties.EnsureCleanPropertyTypes(PropertyTypes);
-                _properties.CollectionChanged += PropertiesChanged;
+                ContentTypeBase = contentType;
+                Properties.EnsureCleanPropertyTypes(PropertyTypes);
+                Properties.CollectionChanged += PropertiesChanged;
                 return;
             }
 
             ChangeContentType(contentType);
-        }
-
-        /// <summary>
-        /// Indicates whether the content object has a property with the supplied alias
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <returns>True if Property with given alias exists, otherwise False</returns>
-        public bool HasProperty(string propertyTypeAlias)
-        {
-            return Properties.Contains(propertyTypeAlias);
-        }
-
-        /// <summary>
-        /// Gets the value of a Property
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <returns><see cref="Property"/> Value as an <see cref="object"/></returns>
-        public object GetValue(string propertyTypeAlias)
-        {
-            return Properties[propertyTypeAlias].Value;
-        }
-
-        /// <summary>
-        /// Gets the value of a Property
-        /// </summary>
-        /// <typeparam name="TPassType">Type of the value to return</typeparam>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <returns><see cref="Property"/> Value as a <see cref="TPassType"/></returns>
-        public TPassType GetValue<TPassType>(string propertyTypeAlias)
-        {
-            return (TPassType)Properties[propertyTypeAlias].Value;
-        }
-
-        /// <summary>
-        /// Sets the value of a Property
-        /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
-        public void SetValue(string propertyTypeAlias, object value)
-        {
-            if (Properties.Contains(propertyTypeAlias))
-            {
-                Properties[propertyTypeAlias].Value = value;
-                return;
-            }
-
-            var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias == propertyTypeAlias);
-            if(propertyType == null)
-            {
-                throw new Exception(string.Format("No PropertyType exists with the supplied alias: {0}", propertyTypeAlias));
-            }
-            Properties.Add(propertyType.CreatePropertyFromValue(value));
         }
 
         //TODO Possibly add a ToXml method, which will generate valid xml for the current Content object

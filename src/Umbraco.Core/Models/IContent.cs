@@ -34,6 +34,11 @@ namespace Umbraco.Core.Models
         DateTime? ExpireDate { get; set; }
 
         /// <summary>
+        /// Gets the ContentType used by this content object
+        /// </summary>
+        IContentType ContentType { get; }
+
+        /// <summary>
         /// Changes the <see cref="IContentType"/> for the current content object
         /// </summary>
         /// <param name="contentType">New ContentType for this content</param>

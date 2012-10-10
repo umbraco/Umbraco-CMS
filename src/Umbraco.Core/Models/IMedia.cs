@@ -3,6 +3,11 @@
     public interface IMedia : IContentBase
     {
         /// <summary>
+        /// Gets the ContentType used by this Media object
+        /// </summary>
+        IMediaType ContentType { get; }
+
+        /// <summary>
         /// Changes the <see cref="IMediaType"/> for the current content object
         /// </summary>
         /// <param name="contentType">New ContentType for this content</param>

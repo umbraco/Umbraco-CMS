@@ -3,7 +3,7 @@
     /// <summary>
     /// Defines a ContentType, which Media is based on
     /// </summary>
-    public interface IMediaType : IContentTypeBase
+    public interface IMediaType : IContentTypeComposition
     {
          
     }
