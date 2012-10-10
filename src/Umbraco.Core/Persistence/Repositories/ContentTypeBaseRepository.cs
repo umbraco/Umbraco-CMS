@@ -188,7 +188,7 @@ namespace Umbraco.Core.Persistence.Repositories
             propertySql.InnerJoin("cmsDataType ON [cmsPropertyType].[dataTypeId] = [cmsDataType].[nodeId]");
             propertySql.Where("[cmsPropertyType].[contentTypeId] = @Id", new { Id = id });
 
-            var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new TabPropertyTypeRelator().Map, propertySql);
+            var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, propertySql);
 
             var propertyFactory = new PropertyGroupFactory(id);
             var propertyGroups = propertyFactory.BuildEntity(dtos);

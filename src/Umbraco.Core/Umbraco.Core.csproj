@@ -143,7 +143,7 @@
     <Compile Include="Persistence\Repositories\Interfaces\IRelationRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRelationTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRepositoryQueryable.cs" />
-    <Compile Include="Persistence\Relators\TabPropertyTypeRelator.cs" />
+    <Compile Include="Persistence\Relators\GroupPropertyTypeRelator.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IScriptRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IStylesheetRepository.cs" />

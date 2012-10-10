@@ -3,7 +3,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Relators
 {
-    internal class TabPropertyTypeRelator
+    internal class GroupPropertyTypeRelator
     {
         internal PropertyTypeGroupDto current;
 
