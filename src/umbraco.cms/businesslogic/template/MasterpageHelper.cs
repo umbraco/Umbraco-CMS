@@ -12,7 +12,13 @@ namespace umbraco.cms.businesslogic.template
     internal class MasterpageHelper
     {
         internal static readonly string DefaultMasterTemplate = SystemDirectories.Umbraco + "/masterpages/default.master";
-        internal static string CreateMasterpageFile(Template t, bool overWrite = false)
+        
+		internal static bool MasterPageExists(Template t)
+		{
+			return File.Exists(t.MasterPageFile);
+		}
+
+	    internal static string CreateMasterpageFile(Template t, bool overWrite = false)
         {
             string masterpageContent = "";
 

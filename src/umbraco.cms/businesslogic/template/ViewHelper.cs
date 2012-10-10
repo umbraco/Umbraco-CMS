@@ -9,6 +9,12 @@ namespace umbraco.cms.businesslogic.template
 {
     class ViewHelper
     {
+		internal static bool ViewExists(Template t)
+		{
+			string path = IOHelper.MapPath(ViewPath(t));
+			return File.Exists(path);
+		}
+
         internal static string GetViewFile(Template t)
         {
             string viewContent = "";

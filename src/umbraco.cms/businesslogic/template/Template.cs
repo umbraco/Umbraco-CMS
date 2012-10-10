@@ -317,17 +317,49 @@ namespace umbraco.cms.businesslogic.template
             return DocumentType.GetAllAsList().Where(x => x.allowedTemplates.Select(t => t.Id).Contains(this.Id));
         }
 
+		/// <summary>
+		/// This checks what the default rendering engine is set in config but then also ensures that there isn't already 
+		/// a template that exists in the opposite rendering engine's template folder, then returns the appropriate 
+		/// rendering engine to use.
+		/// </summary>
+		/// <param name="t"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// The reason this is required is because for example, if you have a master page file already existing under ~/masterpages/Blah.aspx
+		/// and then you go to create a template in the tree called Blah and the default rendering engine is MVC, it will create a Blah.cshtml 
+		/// empty template in ~/Views. This means every page that is using Blah will go to MVC and render an empty page. 
+		/// This is mostly related to installing packages since packages install file templates to the file system and then create the 
+		/// templates in business logic. Without this, it could cause the wrong rendering engine to be used for a package.
+		/// </remarks>
+		private static RenderingEngine DetermineRenderingEngine(Template t)
+		{
+			var engine = Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine;
+			switch (engine)
+			{
+				case RenderingEngine.Mvc:
+					//check if there's a view in ~/masterpages
+					if (MasterpageHelper.MasterPageExists(t) && !ViewHelper.ViewExists(t))
+					{
+						//change this to webforms since there's already a file there for this template alias
+						engine = RenderingEngine.WebForms;
+					}
+					break;
+				case RenderingEngine.WebForms:
+					//check if there's a view in ~/views
+					if (ViewHelper.ViewExists(t) && !MasterpageHelper.MasterPageExists(t))
+					{
+						//change this to mvc since there's already a file there for this template alias
+						engine = RenderingEngine.Mvc;
+					}
+					break;
+			}
+			return engine;
+		} 
+
         public static Template MakeNew(string Name, BusinessLogic.User u, Template master)
         {
             Template t = MakeNew(Name, u);
-            t.MasterTemplate = master.Id;
-
-            if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
-                ViewHelper.CreateViewFile(t, true);
-            else
-                MasterpageHelper.CreateMasterpageFile(t, true);
-            
-            
+            t.MasterTemplate = master.Id;			
 
             /*
             if (UmbracoSettings.UseAspNetMasterPages)
@@ -374,11 +406,15 @@ namespace umbraco.cms.businesslogic.template
             NewEventArgs e = new NewEventArgs();
             t.OnNew(e);
 
-            if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
-                t._design = ViewHelper.CreateViewFile(t);
-            else
-                t._design = MasterpageHelper.CreateMasterpageFile(t);
-
+			switch (DetermineRenderingEngine(t))
+			{
+				case RenderingEngine.Mvc:
+					ViewHelper.CreateViewFile(t, true);
+					break;
+				case RenderingEngine.WebForms:
+					MasterpageHelper.CreateMasterpageFile(t, true);
+					break;
+			}
 
             return t;
         }
