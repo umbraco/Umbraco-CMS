@@ -5,7 +5,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class PropertyGroupFactory : IEntityFactory<IEnumerable<PropertyGroup>, IEnumerable<TabDto>>
+    internal class PropertyGroupFactory : IEntityFactory<IEnumerable<PropertyGroup>, IEnumerable<PropertyTypeGroupDto>>
     {
         private readonly int _id;
 
@@ -16,18 +16,19 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region Implementation of IEntityFactory<IEnumerable<PropertyGroup>,IEnumerable<TabDto>>
 
-        public IEnumerable<PropertyGroup> BuildEntity(IEnumerable<TabDto> dto)
+        public IEnumerable<PropertyGroup> BuildEntity(IEnumerable<PropertyTypeGroupDto> dto)
         {
             var propertyGroups = new PropertyGroupCollection();
-            foreach (var tabDto in dto)
+            foreach (var groupDto in dto)
             {
                 var group = new PropertyGroup();
-                group.Id = tabDto.Id;
-                group.Name = tabDto.Text;
-                group.SortOrder = tabDto.SortOrder;
+                group.Id = groupDto.Id;
+                group.Name = groupDto.Text;
+                group.ParentId = groupDto.ParentGroupId;
+                group.SortOrder = groupDto.SortOrder;
                 group.PropertyTypes = new PropertyTypeCollection();
 
-                foreach (var typeDto in tabDto.PropertyTypeDtos)
+                foreach (var typeDto in groupDto.PropertyTypeDtos)
                 {
                     group.PropertyTypes.Add(new PropertyType(typeDto.DataTypeDto.ControlId,
                                                              typeDto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
@@ -50,28 +51,29 @@ namespace Umbraco.Core.Persistence.Factories
             return propertyGroups;
         }
 
-        public IEnumerable<TabDto> BuildDto(IEnumerable<PropertyGroup> entity)
+        public IEnumerable<PropertyTypeGroupDto> BuildDto(IEnumerable<PropertyGroup> entity)
         {
-            return entity.Select(propertyGroup => BuildTabDto(propertyGroup)).ToList();
+            return entity.Select(propertyGroup => BuildGroupDto(propertyGroup)).ToList();
         }
 
         #endregion
 
-        internal TabDto BuildTabDto(PropertyGroup propertyGroup)
+        internal PropertyTypeGroupDto BuildGroupDto(PropertyGroup propertyGroup)
         {
-            var tabDto = new TabDto
+            var dto = new PropertyTypeGroupDto
                              {
                                  ContentTypeNodeId = _id,
                                  SortOrder = propertyGroup.SortOrder,
-                                 Text = propertyGroup.Name
+                                 Text = propertyGroup.Name,
+                                 ParentGroupId = propertyGroup.ParentId
                              };
 
             if (propertyGroup.HasIdentity)
-                tabDto.Id = propertyGroup.Id;
+                dto.Id = propertyGroup.Id;
 
-            tabDto.PropertyTypeDtos = propertyGroup.PropertyTypes.Select(propertyType => BuildPropertyTypeDto(propertyGroup.Id, propertyType)).ToList();
+            dto.PropertyTypeDtos = propertyGroup.PropertyTypes.Select(propertyType => BuildPropertyTypeDto(propertyGroup.Id, propertyType)).ToList();
 
-            return tabDto;
+            return dto;
         }
 
         internal PropertyTypeDto BuildPropertyTypeDto(int tabId, PropertyType propertyType)

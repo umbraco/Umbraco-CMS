@@ -30,13 +30,13 @@ namespace Umbraco.Core.Models
         private PropertyGroupCollection _propertyGroups;
         private List<IContentTypeComposition> _contentTypeComposition;
         private IEnumerable<string> _allowedTemplates;
-        private IEnumerable<int> _allowedContentTypes;
+        private IEnumerable<ContentTypeSort> _allowedContentTypes;
 
         public ContentType(int parentId)
         {
             _parentId = parentId;
             _allowedTemplates = new List<string>();
-            _allowedContentTypes = new List<int>();
+            _allowedContentTypes = new List<ContentTypeSort>();
             _propertyGroups = new PropertyGroupCollection();
             _contentTypeComposition = new List<IContentTypeComposition>();
         }
@@ -54,7 +54,7 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo UserIdSelector = ExpressionHelper.GetPropertyInfo<ContentType, int>(x => x.UserId);
         private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentType, bool>(x => x.Trashed);
         private static readonly PropertyInfo AllowedTemplatesSelector = ExpressionHelper.GetPropertyInfo<ContentType, IEnumerable<string>>(x => x.AllowedTemplates);
-        private static readonly PropertyInfo AllowedContentTypesSelector = ExpressionHelper.GetPropertyInfo<ContentType, IEnumerable<int>>(x => x.AllowedContentTypes);
+        private static readonly PropertyInfo AllowedContentTypesSelector = ExpressionHelper.GetPropertyInfo<ContentType, IEnumerable<ContentTypeSort>>(x => x.AllowedContentTypes);
         private static readonly PropertyInfo ContentTypeCompositionSelector = ExpressionHelper.GetPropertyInfo<ContentType, List<IContentTypeComposition>>(x => x.ContentTypeComposition);
         private readonly static PropertyInfo PropertyGroupCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentType, PropertyGroupCollection>(x => x.PropertyGroups);
         void PropertyGroupsChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -249,7 +249,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets a list of integer Ids for allowed ContentTypes
         /// </summary>
         [DataMember]
-        public IEnumerable<int> AllowedContentTypes
+        public IEnumerable<ContentTypeSort> AllowedContentTypes
         {
             get { return _allowedContentTypes; }
             set

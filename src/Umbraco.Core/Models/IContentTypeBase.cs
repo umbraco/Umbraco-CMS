@@ -62,7 +62,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or Sets a list of integer Ids of the ContentTypes allowed under the ContentType
         /// </summary>
-        IEnumerable<int> AllowedContentTypes { get; set; }
+        IEnumerable<ContentTypeSort> AllowedContentTypes { get; set; }
 
         /// <summary>
         /// Gets or Sets a collection of Property Groups

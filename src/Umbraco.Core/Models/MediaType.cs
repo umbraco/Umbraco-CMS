@@ -27,12 +27,12 @@ namespace Umbraco.Core.Models
         private int _userId;
         private bool _trashed;
         private PropertyGroupCollection _propertyGroups;
-        private IEnumerable<int> _allowedContentTypes;
+        private IEnumerable<ContentTypeSort> _allowedContentTypes;
 
         public MediaType(int parentId)
         {
             _parentId = parentId;
-            _allowedContentTypes = new List<int>();
+            _allowedContentTypes = new List<ContentTypeSort>();
             _propertyGroups = new PropertyGroupCollection();
         }
 
@@ -47,7 +47,7 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo ThumbnailSelector = ExpressionHelper.GetPropertyInfo<MediaType, string>(x => x.Thumbnail);
         private static readonly PropertyInfo UserIdSelector = ExpressionHelper.GetPropertyInfo<MediaType, int>(x => x.UserId);
         private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<MediaType, bool>(x => x.Trashed);
-        private static readonly PropertyInfo AllowedContentTypesSelector = ExpressionHelper.GetPropertyInfo<MediaType, IEnumerable<int>>(x => x.AllowedContentTypes);
+        private static readonly PropertyInfo AllowedContentTypesSelector = ExpressionHelper.GetPropertyInfo<MediaType, IEnumerable<ContentTypeSort>>(x => x.AllowedContentTypes);
         private readonly static PropertyInfo PropertyGroupCollectionSelector = ExpressionHelper.GetPropertyInfo<MediaType, PropertyGroupCollection>(x => x.PropertyGroups);
         void PropertyGroupsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -214,7 +214,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets a list of integer Ids for allowed ContentTypes
         /// </summary>
         [DataMember]
-        public IEnumerable<int> AllowedContentTypes
+        public IEnumerable<ContentTypeSort> AllowedContentTypes
         {
             get { return _allowedContentTypes; }
             set

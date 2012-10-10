@@ -25,8 +25,11 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("description")]
         public string Description { get; set; }
 
-        [Column("masterContentType")]
-        public int? MasterContentType { get; set; }
+        [Column("isContainer")]
+        public bool IsContainer { get; set; }
+
+        [Column("allowAtRoot")]
+        public bool AllowAtRoot { get; set; }
 
         [ResultColumn]
         public NodeDto NodeDto { get; set; }

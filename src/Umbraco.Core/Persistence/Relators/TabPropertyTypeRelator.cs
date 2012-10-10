@@ -5,9 +5,9 @@ namespace Umbraco.Core.Persistence.Relators
 {
     internal class TabPropertyTypeRelator
     {
-        internal TabDto current;
+        internal PropertyTypeGroupDto current;
 
-        internal TabDto Map(TabDto a, PropertyTypeDto p, DataTypeDto d)
+        internal PropertyTypeGroupDto Map(PropertyTypeGroupDto a, PropertyTypeDto p, DataTypeDto d)
         {
             // Terminating call.  Since we can return null from this function
             // we need to be ready for PetaPoco to callback later with null
@@ -19,23 +19,23 @@ namespace Umbraco.Core.Persistence.Relators
             if (p.DataTypeId == d.DataTypeId)
                 p.DataTypeDto = d;
 
-            // Is this the same Tab as the current one we're processing
+            // Is this the same Group as the current one we're processing
             if (current != null && current.Id == a.Id)
             {
-                // Yes, just add this PropertyType to the current Tab's collection of PropertyTypes
+                // Yes, just add this PropertyType to the current Group's collection of PropertyTypes
                 current.PropertyTypeDtos.Add(p);
 
-                // Return null to indicate we're not done with this Tab yet
+                // Return null to indicate we're not done with this Group yet
                 return null;
             }
 
-            // This is a different Tab to the current one, or this is the 
+            // This is a different Group to the current one, or this is the 
             // first time through and we don't have a Tab yet
 
-            // Save the current Tab
+            // Save the current Group
             var prev = current;
 
-            // Setup the new current Tab
+            // Setup the new current Group
             current = a;
             current.PropertyTypeDtos = new List<PropertyTypeDto>();
             current.PropertyTypeDtos.Add(p);

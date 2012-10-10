@@ -14,6 +14,7 @@ namespace Umbraco.Core.Models
     public class PropertyGroup : Entity, IEquatable<PropertyGroup>
     {
         private string _name;
+        private int? _parentId;
         private int _sortOrder;
         private PropertyTypeCollection _propertyTypes;
 
@@ -27,6 +28,7 @@ namespace Umbraco.Core.Models
         }
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<PropertyGroup, string>(x => x.Name);
+        private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<PropertyGroup, int?>(x => x.ParentId);
         private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<PropertyGroup, int>(x => x.SortOrder);
         private readonly static PropertyInfo PropertyTypeCollectionSelector = ExpressionHelper.GetPropertyInfo<PropertyGroup, PropertyTypeCollection>(x => x.PropertyTypes);
         void PropertyTypesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -45,6 +47,20 @@ namespace Umbraco.Core.Models
             {
                 _name = value;
                 OnPropertyChanged(NameSelector);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the Name of the Group, which corresponds to the Tab-name in the UI
+        /// </summary>
+        [DataMember]
+        public int? ParentId
+        {
+            get { return _parentId; }
+            set
+            {
+                _parentId = value;
+                OnPropertyChanged(ParentIdSelector);
             }
         }
 

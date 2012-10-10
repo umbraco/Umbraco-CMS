@@ -12,5 +12,8 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("AllowedId")]
         public int AllowedId { get; set; }
+
+        [Column("SortOrder")]
+        public int SortOrder { get; set; }
     }
 }

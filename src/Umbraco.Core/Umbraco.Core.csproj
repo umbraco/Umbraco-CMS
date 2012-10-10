@@ -76,6 +76,7 @@
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
     <Compile Include="Models\ContentExtensions.cs" />
     <Compile Include="Enum.cs" />
+    <Compile Include="Models\ContentTypeSort.cs" />
     <Compile Include="Models\Css\CssCompactor.cs" />
     <Compile Include="Models\Css\CssParser.cs" />
     <Compile Include="Models\Css\CssSyntax.cs" />
@@ -91,6 +92,8 @@
     <Compile Include="Models\Language.cs" />
     <Compile Include="Models\Media.cs" />
     <Compile Include="Models\MediaType.cs" />
+    <Compile Include="Models\Rdbms\ContentType2ContentTypeDto.cs" />
+    <Compile Include="Models\Rdbms\PropertyTypeGroupDto.cs" />
     <Compile Include="Models\Relation.cs" />
     <Compile Include="Models\RelationType.cs" />
     <Compile Include="Models\Script.cs" />
@@ -266,7 +269,6 @@
     <Compile Include="Models\Rdbms\RelationTypeDto.cs" />
     <Compile Include="Models\Rdbms\StylesheetDto.cs" />
     <Compile Include="Models\Rdbms\StylesheetPropertyDto.cs" />
-    <Compile Include="Models\Rdbms\TabDto.cs" />
     <Compile Include="Models\Rdbms\TagDto.cs" />
     <Compile Include="Models\Rdbms\TagRelationshipDto.cs" />
     <Compile Include="Models\Rdbms\TaskDto.cs" />

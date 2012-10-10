@@ -164,7 +164,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Insert collection of allowed content types
             foreach (var allowedContentType in entity.AllowedContentTypes)
             {
-                Database.Insert(new ContentTypeAllowedContentTypeDto { Id = entity.Id, AllowedId = allowedContentType });
+                Database.Insert(new ContentTypeAllowedContentTypeDto { Id = entity.Id, AllowedId = allowedContentType.Id, SortOrder = allowedContentType.SortOrder});
             }
         }
 
@@ -190,7 +190,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Insert collection of allowed content types
             foreach (var allowedContentType in entity.AllowedContentTypes)
             {
-                Database.Insert(new ContentTypeAllowedContentTypeDto { Id = entity.Id, AllowedId = allowedContentType });
+                Database.Insert(new ContentTypeAllowedContentTypeDto { Id = entity.Id, AllowedId = allowedContentType.Id, SortOrder = allowedContentType.SortOrder });
             }
 
             //Check Dirty properties for Tabs/Groups and PropertyTypes - insert and delete accordingly
@@ -205,18 +205,18 @@ namespace Umbraco.Core.Persistence.Repositories
                     Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND Alias = @Alias", new { Id = entity.Id, Alias = alias });
                 }
                 //Delete Tabs/Groups by excepting entries from db with entries from collections
-                var dbPropertyGroups = Database.Fetch<TabDto>("WHERE contenttypeNodeId = @Id", new { Id = entity.Id }).Select(x => x.Text);
+                var dbPropertyGroups = Database.Fetch<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id", new { Id = entity.Id }).Select(x => x.Text);
                 var entityPropertyGroups = entity.PropertyGroups.Select(x => x.Name);
                 var tabs = dbPropertyGroups.Except(entityPropertyGroups);
                 foreach (var tabName in tabs)
                 {
-                    Database.Delete<TabDto>("WHERE contenttypeNodeId = @Id AND text = @Name", new { Id = entity.Id, Name = tabName });
+                    Database.Delete<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id AND text = @Name", new { Id = entity.Id, Name = tabName });
                 }
 
                 //Run through all groups and types to insert or update entries
                 foreach (var propertyGroup in entity.PropertyGroups)
                 {
-                    var tabDto = propertyFactory.BuildTabDto(propertyGroup);
+                    var tabDto = propertyFactory.BuildGroupDto(propertyGroup);
                     int groupPrimaryKey = propertyGroup.HasIdentity
                                               ? Database.Update(tabDto)
                                               : Convert.ToInt32(Database.Insert(tabDto));
@@ -243,7 +243,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        private IEnumerable<int> GetAllowedContentTypeIds(int id)
+        private IEnumerable<ContentTypeSort> GetAllowedContentTypeIds(int id)
         {
             var allowedContentTypesSql = new Sql();
             allowedContentTypesSql.Select("*");
@@ -251,7 +251,7 @@ namespace Umbraco.Core.Persistence.Repositories
             allowedContentTypesSql.Where("[cmsContentTypeAllowedContentType].[Id] = @Id", new { Id = id });
 
             var allowedContentTypeDtos = Database.Fetch<ContentTypeAllowedContentTypeDto>(allowedContentTypesSql);
-            return allowedContentTypeDtos.Select(x => x.AllowedId).ToList();
+            return allowedContentTypeDtos.Select(x => new ContentTypeSort { Id = x.AllowedId, SortOrder = x.SortOrder}).ToList();
         }
 
         private PropertyGroupCollection GetPropertyGroupCollection(int id)
@@ -263,7 +263,7 @@ namespace Umbraco.Core.Persistence.Repositories
             propertySql.InnerJoin("cmsDataType ON [cmsPropertyType].[dataTypeId] = [cmsDataType].[nodeId]");
             propertySql.Where("[cmsPropertyType].[contentTypeId] = @Id", new { Id = id });
 
-            var tabDtos = Database.Fetch<TabDto, PropertyTypeDto, DataTypeDto, TabDto>(new TabPropertyTypeRelator().Map, propertySql);
+            var tabDtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new TabPropertyTypeRelator().Map, propertySql);
 
             var propertyFactory = new PropertyGroupFactory(id);
             var propertyGroups = propertyFactory.BuildEntity(tabDtos);
