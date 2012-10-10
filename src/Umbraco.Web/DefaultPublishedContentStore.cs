@@ -161,7 +161,10 @@ namespace Umbraco.Web
 
         public bool HasContent(UmbracoContext umbracoContext)
         {
-			var node = GetXml(umbracoContext).SelectSingleNode(XPathStrings.RootDocuments);
+	        var xml = GetXml(umbracoContext);
+			if (xml == null)
+				return false;
+			var node = xml.SelectSingleNode(XPathStrings.RootDocuments);
 			return node != null;
         }
 

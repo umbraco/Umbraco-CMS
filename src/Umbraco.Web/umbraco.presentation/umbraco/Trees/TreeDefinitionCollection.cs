@@ -33,6 +33,7 @@ namespace umbraco.cms.presentation.Trees
         {
             get 
             {
+				instance.EnsureTreesRegistered();
                 return instance; 
             }
         }
