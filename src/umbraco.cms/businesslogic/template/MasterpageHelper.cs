@@ -137,7 +137,7 @@ namespace umbraco.cms.businesslogic.template
             return masterPageContent;
         }
 
-        private static bool IsMasterPageSyntax(string code)
+        internal static bool IsMasterPageSyntax(string code)
         {
             return code.Contains("<%@ Master") || code.Contains("<umbraco:Item") || code.Contains("<asp:") || code.Contains("<umbraco:Macro");
         }

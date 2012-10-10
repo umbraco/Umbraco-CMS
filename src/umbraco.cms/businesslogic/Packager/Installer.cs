@@ -332,7 +332,10 @@ namespace umbraco.cms.businesslogic.packager
             if (saveNeeded) { insPack.Save(); saveNeeded = false; }
 
 
-            // Add master templates
+			//NOTE: SD: I'm pretty sure the only thing the below script does is ensure that the Master template Id is set
+			// in the database, but this is also duplicating the saving of the design content since the above Template.Import
+			// already does this. I've left this for now because I'm not sure the reprocussions of removing it but seems there
+			// is a lot of excess database calls happening here.
             foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Templates/Template")) {
                 string master = xmlHelper.GetNodeValue(n.SelectSingleNode("Master"));
                 template.Template t = template.Template.GetByAlias(xmlHelper.GetNodeValue(n.SelectSingleNode("Alias")));
