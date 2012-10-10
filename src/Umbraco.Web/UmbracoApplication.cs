@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Web;
+using System.Web.Hosting;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
 using umbraco.businesslogic;
 
@@ -60,14 +63,38 @@ namespace Umbraco.Web
 				ApplicationStarted(sender, e);
 		}
 
-		protected virtual void Application_Error(object sender, EventArgs e)
+		/// <summary>
+		/// A method that can be overridden to invoke code when the application has an error.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		protected virtual void OnApplicationError(object sender, EventArgs e)
 		{
-
+			
 		}
 
-		protected virtual void Application_End(object sender, EventArgs e)
+		protected void Application_Error(object sender, EventArgs e)
 		{
+			OnApplicationError(sender, e);
+		}
 
+		/// <summary>
+		/// A method that can be overridden to invoke code when the application shuts down.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		protected virtual void OnApplicationEnd(object sender, EventArgs e)
+		{
+			
+		}
+
+		protected void Application_End(object sender, EventArgs e)
+		{
+			if (SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
+			{
+				LogHelper.Info<UmbracoApplication>("Application shutdown. Reason: " + HostingEnvironment.ShutdownReason);
+			}
+			OnApplicationEnd(sender, e);
 		}
 	}
 }
