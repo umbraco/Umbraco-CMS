@@ -658,7 +658,7 @@ namespace umbraco.cms.businesslogic
                     SqlHelper.CreateParameter("@parentContentTypeId", this.Id)) > 0;
         }
 
-        public List<ContentType> GetChildTypes()
+        public IEnumerable<ContentType> GetChildTypes()
         {
             var cts = new List<ContentType>();
             using (IRecordsReader dr =
@@ -694,7 +694,7 @@ namespace umbraco.cms.businesslogic
                 // has a nodetype of this id
                 var contentTypeToRemove = new ContentType(parentContentTypeId);
 
-                removeMasterPropertyTypeData(contentTypeToRemove, this);
+                RemoveMasterPropertyTypeData(contentTypeToRemove, this);
 
                 SqlHelper.ExecuteNonQuery(
                                           "DELETE FROM [cmsContentType2ContentType] WHERE parentContentTypeId = @parentContentTypeId AND childContentTypeId = @childContentTypeId",
@@ -704,7 +704,7 @@ namespace umbraco.cms.businesslogic
             }
         }
 
-        private void removeMasterPropertyTypeData(ContentType contentTypeToRemove, ContentType currentContentType)
+        private void RemoveMasterPropertyTypeData(ContentType contentTypeToRemove, ContentType currentContentType)
         {
             foreach (var pt in contentTypeToRemove.PropertyTypes)
             {
@@ -723,10 +723,10 @@ namespace umbraco.cms.businesslogic
             }
             // remove sub data too
             foreach(var ct in currentContentType.GetChildTypes())
-                removeMasterPropertyTypeData(contentTypeToRemove, ct);
+                RemoveMasterPropertyTypeData(contentTypeToRemove, ct);
         }
 
-        public List<PropertyTypeGroup> PropertyTypeGroups
+        public IEnumerable<PropertyTypeGroup> PropertyTypeGroups
         {
             get { return PropertyTypeGroup.GetPropertyTypeGroupsFromContentType(Id); }
         }

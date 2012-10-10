@@ -311,11 +311,11 @@ namespace umbraco.cms.businesslogic.propertytype
 
         public static PropertyType[] GetAll()
         {
-            List<PropertyType> result = GetPropertyTypes();
+            var result = GetPropertyTypes();
             return result.ToArray();
         }
 
-        public static List<PropertyType> GetPropertyTypes()
+        public static IEnumerable<PropertyType> GetPropertyTypes()
         {
             var result = new List<PropertyType>();
             using (IRecordsReader dr =
@@ -331,12 +331,12 @@ namespace umbraco.cms.businesslogic.propertytype
             return result;
         }
 
-        public static List<PropertyType> GetPropertyTypesByGroup(int groupId, List<int> contentTypeIds)
+		public static IEnumerable<PropertyType> GetPropertyTypesByGroup(int groupId, List<int> contentTypeIds)
         {
-            return GetPropertyTypesByGroup(groupId).FindAll(x => contentTypeIds.Contains(x.ContentTypeId));
+            return GetPropertyTypesByGroup(groupId).Where(x => contentTypeIds.Contains(x.ContentTypeId));
         }
 
-        public static List<PropertyType> GetPropertyTypesByGroup(int groupId)
+		public static IEnumerable<PropertyType> GetPropertyTypesByGroup(int groupId)
         {
             var result = new List<PropertyType>();
             using (IRecordsReader dr =
@@ -382,11 +382,11 @@ namespace umbraco.cms.businesslogic.propertytype
             FlushCache();
 
             // clean all properties on inherited document types (if this propertytype is removed from a master)
-            cleanPropertiesOnDeletion(_contenttypeid);
+            CleanPropertiesOnDeletion(_contenttypeid);
             //            DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == _contenttypeid).ForEach(dt => cleanPropertiesOnDeletion(dt.Id));
 
             // Delete all properties of propertytype
-            cleanPropertiesOnDeletion(_contenttypeid);
+            CleanPropertiesOnDeletion(_contenttypeid);
 
             // Delete PropertyType ..
             SqlHelper.ExecuteNonQuery("Delete from cmsPropertyType where id = " + Id);
@@ -409,12 +409,12 @@ namespace umbraco.cms.businesslogic.propertytype
             }
         }
 
-        private void cleanPropertiesOnDeletion(int contentTypeId)
+        private void CleanPropertiesOnDeletion(int contentTypeId)
         {
             // first delete from all master document types
             //TODO: Verify no endless loops with mixins
             DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentTypes.Contains(contentTypeId)).ForEach(
-                dt => cleanPropertiesOnDeletion(dt.Id));
+                dt => CleanPropertiesOnDeletion(dt.Id));
 
             // then remove from the current doc type
             Content[] objs = Content.getContentOfContentType(new ContentType(contentTypeId));
