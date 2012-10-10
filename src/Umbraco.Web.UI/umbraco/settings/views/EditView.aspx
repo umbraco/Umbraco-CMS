@@ -6,58 +6,34 @@
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
     
+    <umb:JsInclude ID="JsInclude1" runat="server" FilePath="Editors/EditView.js" PathNameAlias="UmbracoClient" />
+
     <script language="javascript" type="text/javascript">
         
-        function doSubmit() {
-            var codeVal = UmbEditor.GetCode();
-            umbraco.presentation.webservices.codeEditorSave.SaveTemplate(jQuery('#<%= NameTxt.ClientID %>').val(), jQuery('#<%= AliasTxt.ClientID %>').val(), codeVal, '<%= Request.QueryString["templateID"] %>', jQuery('#<%= MasterTemplate.ClientID %>').val(), submitSucces, submitFailure);
-        }
-        
-        function submitSucces(t)
-        {
-            if(t != 'true')
-            {
-                top.UmbSpeechBubble.ShowMessage('error', '<%= umbraco.ui.Text("speechBubbles", "templateErrorHeader") %>', '<%= umbraco.ui.Text("speechBubbles", "templateErrorText") %>');
-            }
-            else
-            {
-                top.UmbSpeechBubble.ShowMessage('save', '<%= umbraco.ui.Text("speechBubbles", "templateSavedHeader") %>', '<%= umbraco.ui.Text("speechBubbles", "templateSavedText") %>')
-            }
-        }
-        
-        function submitFailure(t)
-        {
-            top.UmbSpeechBubble.ShowMessage('error', '<%= umbraco.ui.Text("speechBubbles", "templateErrorHeader") %>', '<%= umbraco.ui.Text("speechBubbles", "templateErrorText") %>')
-        }
-
-        function changeMasterPageFile(){
-          var editor = document.getElementById("<%= editorSource.ClientID %>");
-          var templateDropDown = document.getElementById("<%= MasterTemplate.ClientID %>");
-          var templateCode = UmbEditor.GetCode();
-          var newValue = templateDropDown.options[templateDropDown.selectedIndex].id;
-          
-          var layoutDefRegex = new RegExp("(@{[\\s\\S]*?Layout\\s*?=\\s*?)(\"[^\"]*?\"|null)(;[\\s\\S]*?})", "gi");
-
-          if(newValue != undefined && newValue != "") {
-            if (layoutDefRegex.test(templateCode)) {
-                        // Declaration exists, so just update it
-                        templateCode = templateCode.replace(layoutDefRegex, "$1\"" + newValue + "\"$3");
-                } else {
-                    // Declaration doesn't exist, so prepend to start of doc
-                    //TODO: Maybe insert at the cursor position, rather than just at the top of the doc?
-                    templateCode = "@{\n\tLayout = \"" + newValue + "\";\n}\n" + templateCode;
-                }
-            } else {
-                if (layoutDefRegex.test(templateCode)) {
-                    // Declaration exists, so just update it
-                    templateCode = templateCode.replace(layoutDefRegex, "$1null$3");
-                }
-            }
-            
-            UmbEditor.SetCode(templateCode);
-
-            return false;
-        }
+        (function ($) {
+            $(document).ready(function () {
+                //create a new EditView object
+                var editView = new Umbraco.Editors.EditView({
+                    masterPageDropDown: $("#<%= MasterTemplate.ClientID %>"),
+                    nameTxtBox: $("#<%= NameTxt.ClientID %>"),
+                    aliasTxtBox: $("#<%= AliasTxt.ClientID %>"),
+                    saveButton: $("#<%= ((Control)SaveButton).ClientID %>"),
+                    templateId: '<%= Request.QueryString["templateID"] %>',
+                    msgs: {
+                        templateErrorHeader: "<%= umbraco.ui.Text("speechBubbles", "templateErrorHeader") %>",
+                        templateErrorText: "<%= umbraco.ui.Text("speechBubbles", "templateErrorText") %>",
+                        templateSavedHeader: "<%= umbraco.ui.Text("speechBubbles", "templateSavedHeader") %>",
+                        templateSavedText: "<%= umbraco.ui.Text("speechBubbles", "templateSavedText") %>"                        
+                    }
+                });
+                //initialize it.
+                editView.init();
+                
+                //bind save shortcut
+                UmbClientMgr.appActions().bindSaveShortCut();
+            });            
+        })(jQuery);
+       
     </script>
 
 </asp:Content>
@@ -85,12 +61,5 @@
 
         </cc1:Pane>
     </cc1:UmbracoPanel>
-
-    
-    <script type="text/javascript">
-        jQuery(document).ready(function () {
-            UmbClientMgr.appActions().bindSaveShortCut();
-        });
-    </script>
 
 </asp:Content>
