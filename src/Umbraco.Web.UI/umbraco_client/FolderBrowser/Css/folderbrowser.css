@@ -167,6 +167,8 @@
 
 .umbFolderBrowser .items li {
     display: inline-block;
+    list-style:  none;
+    float:  left;
 }
 
 .umbFolderBrowser .items li div {
