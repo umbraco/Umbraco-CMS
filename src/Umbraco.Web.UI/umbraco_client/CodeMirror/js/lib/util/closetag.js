@@ -26,6 +26,11 @@
 	/** Array of tag names where an end tag is forbidden. */
 	CodeMirror.defaults['closeTagVoid'] = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
 
+	function innerState(cm, state) {
+		return CodeMirror.innerMode(cm.getMode(), state).state;
+	}
+
+
 	/**
 	 * Call during key processing to close tags.  Handles the key event if the tag is closed, otherwise throws CodeMirror.Pass.
 	 * - cm: The editor instance.
@@ -39,40 +44,34 @@
 			throw CodeMirror.Pass;
 		}
 		
-		var mode = cm.getOption('mode');
+		/*
+		 * Relevant structure of token:
+		 *
+		 * htmlmixed
+		 * 		className
+		 * 		state
+		 * 			htmlState
+		 * 				type
+		 *				tagName
+		 * 				context
+		 * 					tagName
+		 * 			mode
+		 * 
+		 * xml
+		 * 		className
+		 * 		state
+		 * 			tagName
+		 * 			type
+		 */
 		
-		if (mode == 'text/html' || mode == 'xml') {
-		
-			/*
-			 * Relevant structure of token:
-			 *
-			 * htmlmixed
-			 * 		className
-			 * 		state
-			 * 			htmlState
-			 * 				type
-			 *				tagName
-			 * 				context
-			 * 					tagName
-			 * 			mode
-			 * 
-			 * xml
-			 * 		className
-			 * 		state
-			 * 			tagName
-			 * 			type
-			 */
-		
-			var pos = cm.getCursor();
-			var tok = cm.getTokenAt(pos);
-			var state = tok.state;
-			
-			if (state.mode && state.mode != 'html') {
-				throw CodeMirror.Pass; // With htmlmixed, we only care about the html sub-mode.
-			}
+		var pos = cm.getCursor();
+		var tok = cm.getTokenAt(pos);
+		var state = innerState(cm, tok.state);
+
+		if (state) {
 			
 			if (ch == '>') {
-				var type = state.htmlState ? state.htmlState.type : state.type; // htmlmixed : xml
+				var type = state.type;
 				
 				if (tok.className == 'tag' && type == 'closeTag') {
 					throw CodeMirror.Pass; // Don't process the '>' at the end of an end-tag.
@@ -83,11 +82,12 @@
 				cm.setCursor(pos);
 		
 				tok = cm.getTokenAt(cm.getCursor());
-				state = tok.state;
-				type = state.htmlState ? state.htmlState.type : state.type; // htmlmixed : xml
+				state = innerState(cm, tok.state);
+				if (!state) throw CodeMirror.Pass;
+				var type = state.type;
 
 				if (tok.className == 'tag' && type != 'selfcloseTag') {
-					var tagName = state.htmlState ? state.htmlState.tagName : state.tagName; // htmlmixed : xml
+					var tagName = state.tagName;
 					if (tagName.length > 0 && shouldClose(cm, vd, tagName)) {
 						insertEndTag(cm, indent, pos, tagName);
 					}
@@ -100,7 +100,7 @@
 			
 			} else if (ch == '/') {
 				if (tok.className == 'tag' && tok.string == '<') {
-					var tagName = state.htmlState ? (state.htmlState.context ? state.htmlState.context.tagName : '') : (state.context ? state.context.tagName : ''); // htmlmixed : xml
+					var ctx = state.context, tagName = ctx ? ctx.tagName : '';
 					if (tagName.length > 0) {
 						completeEndTag(cm, pos, tagName);
 						return;

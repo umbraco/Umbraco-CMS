@@ -1,20 +1,16 @@
 .CodeMirror {
   line-height: 1em;
-  font-family: Consolas, monospace;
+  font-family: monospace;
 
   /* Necessary so the scrollbar can be absolutely positioned within the wrapper on Lion. */
   position: relative;
   /* This prevents unwanted scrollbars from showing up on the body and wrapper in IE. */
   overflow: hidden;
-  
-  width: 100%;
-  height: 100%;
 }
 
 .CodeMirror-scroll {
-  overflow-x: auto;
-  overflow-y: hidden;
-  height: 100%;
+  overflow: auto;
+  height: 300px;
   /* This is needed to prevent an IE[67] bug where the scrolled content
      is visible outside of the scrolling box. */
   position: relative;
@@ -23,13 +19,11 @@
 
 /* Vertical scrollbar */
 .CodeMirror-scrollbar {
-  float: right;
+  position: absolute;
+  right: 0; top: 0;
   overflow-x: hidden;
   overflow-y: scroll;
-
-  /* This corrects for the 1px gap introduced to the left of the scrollbar
-     by the rule for .CodeMirror-scrollbar-inner. */
-  margin-left: -1px;
+  z-index: 5;
 }
 .CodeMirror-scrollbar-inner {
   /* This needs to have a nonzero width in order for the scrollbar to appear
@@ -71,10 +65,6 @@
   padding: .4em;
   white-space: pre;
   cursor: text;
-}
-.CodeMirror-lines * {
-  /* Necessary for throw-scrolling to decelerate properly on Safari. */
-  pointer-events: none;
 }
 
 .CodeMirror pre {
@@ -155,7 +145,7 @@ div.CodeMirror-selected { background: #d9d9d9; }
 .cm-s-default span.cm-error {color: #f00;}
 .cm-s-default span.cm-qualifier {color: #555;}
 .cm-s-default span.cm-builtin {color: #30a;}
-.cm-s-default span.cm-bracket {color: #cc7;}
+.cm-s-default span.cm-bracket {color: #997;}
 .cm-s-default span.cm-tag {color: #170;}
 .cm-s-default span.cm-attribute {color: #00c;}
 .cm-s-default span.cm-header {color: blue;}
@@ -168,5 +158,16 @@ span.cm-em {font-style: italic;}
 span.cm-emstrong {font-style: italic; font-weight: bold;}
 span.cm-link {text-decoration: underline;}
 
+span.cm-invalidchar {color: #f00;}
+
 div.CodeMirror span.CodeMirror-matchingbracket {color: #0f0;}
 div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #f22;}
+
+@media print {
+
+  /* Hide the cursor when printing */
+  .CodeMirror pre.CodeMirror-cursor {
+    visibility: hidden;
+  }
+
+}

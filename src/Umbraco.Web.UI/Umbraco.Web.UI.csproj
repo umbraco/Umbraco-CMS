@@ -432,11 +432,13 @@
     <Content Include="umbraco_client\CodeMirror\js\lib\util\pig-hint.js" />
     <Content Include="umbraco_client\CodeMirror\js\lib\util\razor-hint.js" />
     <Content Include="umbraco_client\CodeMirror\js\lib\util\razor-hints.js" />
+    <Content Include="umbraco_client\CodeMirror\js\lib\util\runmode-standalone.js" />
     <Content Include="umbraco_client\CodeMirror\js\lib\util\runmode.js" />
     <Content Include="umbraco_client\CodeMirror\js\lib\util\search.js" />
     <Content Include="umbraco_client\CodeMirror\js\lib\util\searchcursor.js" />
     <Content Include="umbraco_client\CodeMirror\js\lib\util\simple-hint.css" />
     <Content Include="umbraco_client\CodeMirror\js\lib\util\simple-hint-customized.js" />
+    <Content Include="umbraco_client\CodeMirror\js\lib\util\simple-hint.js" />
     <Content Include="umbraco_client\CodeMirror\js\lib\util\xml-hint.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\clike\clike.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\clike\index.html" />
@@ -445,8 +447,11 @@
     <Content Include="umbraco_client\CodeMirror\js\mode\clojure\index.html" />
     <Content Include="umbraco_client\CodeMirror\js\mode\coffeescript\coffeescript.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\coffeescript\index.html" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\commonlisp\commonlisp.js" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\commonlisp\index.html" />
     <Content Include="umbraco_client\CodeMirror\js\mode\css\css.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\css\index.html" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\css\test.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\diff\diff.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\diff\index.html" />
     <Content Include="umbraco_client\CodeMirror\js\mode\ecl\ecl.js" />
@@ -477,6 +482,7 @@
     <Content Include="umbraco_client\CodeMirror\js\mode\lua\lua.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\markdown\index.html" />
     <Content Include="umbraco_client\CodeMirror\js\mode\markdown\markdown.js" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\markdown\test.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\mysql\index.html" />
     <Content Include="umbraco_client\CodeMirror\js\mode\mysql\mysql.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\ntriples\index.html" />
@@ -517,6 +523,8 @@
     <Content Include="umbraco_client\CodeMirror\js\mode\scheme\scheme.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\shell\index.html" />
     <Content Include="umbraco_client\CodeMirror\js\mode\shell\shell.js" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\sieve\index.html" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\sieve\sieve.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\smalltalk\index.html" />
     <Content Include="umbraco_client\CodeMirror\js\mode\smalltalk\smalltalk.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\smarty\index.html" />
@@ -526,6 +534,7 @@
     <Content Include="umbraco_client\CodeMirror\js\mode\stex\index.html" />
     <Content Include="umbraco_client\CodeMirror\js\mode\stex\stex.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\stex\test.html" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\stex\test.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\tiddlywiki\index.html" />
     <Content Include="umbraco_client\CodeMirror\js\mode\tiddlywiki\tiddlywiki.css" />
     <Content Include="umbraco_client\CodeMirror\js\mode\tiddlywiki\tiddlywiki.js" />
@@ -1710,6 +1719,7 @@
     <Content Include="umbraco_client\CodeMirror\js\mode\razor\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\ruby\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\r\LICENSE" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\sieve\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\xquery\LICENSE" />
     <Content Include="Views\Web.config" />
     <None Include="web.Template.Debug.config">
