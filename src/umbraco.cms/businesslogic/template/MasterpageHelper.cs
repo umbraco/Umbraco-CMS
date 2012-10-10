@@ -5,11 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.template
 {
-    internal class MasterpageHelper
+    internal class MasterPageHelper
     {
         internal static readonly string DefaultMasterTemplate = SystemDirectories.Umbraco + "/masterpages/default.master";
         
@@ -23,7 +24,7 @@ namespace umbraco.cms.businesslogic.template
 			return IOHelper.MapPath(SystemDirectories.Masterpages + "/" + t.Alias.Replace(" ", "") + ".master");
 		}
 
-	    internal static string CreateMasterpageFile(Template t, bool overWrite = false)
+	    internal static string CreateMasterPage(Template t, bool overWrite = false)
         {
             string masterpageContent = "";
 
@@ -52,7 +53,7 @@ namespace umbraco.cms.businesslogic.template
             return masterpageContent;
         }
 
-        internal static string UpdateMasterpageFile(Template t, string currentAlias)
+        internal static string UpdateMasterPageFile(Template t, string currentAlias)
         {
             return SaveTemplateToFile(t, currentAlias);
         }
@@ -112,7 +113,7 @@ namespace umbraco.cms.businesslogic.template
                 {
                     var c = template.Children;
                     foreach (CMSNode cmn in c)
-                        UpdateMasterpageFile(new Template(cmn.Id), null);
+                        UpdateMasterPageFile(new Template(cmn.Id), null);
                 }
 
                 //then kill the old file.. 
@@ -144,7 +145,8 @@ namespace umbraco.cms.businesslogic.template
 
         internal static bool IsMasterPageSyntax(string code)
         {
-            return code.Contains("<%@ Master") || code.Contains("<umbraco:Item") || code.Contains("<asp:") || code.Contains("<umbraco:Macro");
+			return Regex.IsMatch(code, @"<%@\s*Master", RegexOptions.IgnoreCase) ||
+				code.InvariantContains("<umbraco:Item") || code.InvariantContains("<asp:") || code.InvariantContains("<umbraco:Macro");
         }
 
         private static string GetMasterPageHeader(Template template)
