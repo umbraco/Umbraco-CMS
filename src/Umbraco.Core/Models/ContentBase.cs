@@ -258,5 +258,14 @@ namespace Umbraco.Core.Models
             }
             Properties.Add(propertyType.CreatePropertyFromValue(value));
         }
+
+        /// <summary>
+        /// Boolean indicating whether the content and its properties are valid
+        /// </summary>
+        /// <returns>True if content is valid otherwise false</returns>
+        public virtual bool IsValid()
+        {
+            return Properties.Any(property => !property.IsValid()) == false;
+        }
     }
 }

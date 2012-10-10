@@ -107,5 +107,11 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
         /// <param name="value">Value to set for the Property</param>
         void SetValue(string propertyTypeAlias, object value);
+
+        /// <summary>
+        /// Boolean indicating whether the content and its properties are valid
+        /// </summary>
+        /// <returns>True if content is valid otherwise false</returns>
+        bool IsValid();
     }
 }

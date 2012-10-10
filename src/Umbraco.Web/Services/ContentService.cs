@@ -185,6 +185,8 @@ namespace Umbraco.Web.Services
 
             var list = new List<IContent>();
 
+            //Consider creating a Path query instead of recursive method
+            //var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith("-1"));
             var rootContent = GetRootContent();
             foreach (var content in rootContent)
             {
@@ -193,8 +195,12 @@ namespace Umbraco.Web.Services
 
             foreach (var item in list)
             {
-                ((Content)item).ChangePublishedState(true);
-                repository.AddOrUpdate(item);
+                //Only publish valid content - Might need to change the flat list as it could pose problems for children of invalid content
+                if(item.IsValid())
+                {
+                    ((Content)item).ChangePublishedState(true);
+                    repository.AddOrUpdate(item);
+                }
             }
 
             unitOfWork.Commit();
@@ -224,13 +230,19 @@ namespace Umbraco.Web.Services
             var unitOfWork = _provider.GetUnitOfWork();
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
+            //Consider creating a Path query instead of recursive method
+            //var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(content.Path));
             var list = GetChildrenDeep(content.Id);
             list.Add(content);
 
             foreach (var item in list)
             {
-                ((Content)item).ChangePublishedState(true);
-                repository.AddOrUpdate(item);
+                //Only publish valid content - Might need to change the flat list as it could pose problems for children of invalid content
+                if (item.IsValid())
+                {
+                    ((Content) item).ChangePublishedState(true);
+                    repository.AddOrUpdate(item);
+                }
             }
 
             unitOfWork.Commit();
@@ -283,7 +295,10 @@ namespace Umbraco.Web.Services
         {
             var unitOfWork = _provider.GetUnitOfWork();
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
-            
+
+            if (!content.IsValid())
+                return false;//Content contains invalid property values and can therefore not be published
+
             ((Content)content).ChangePublishedState(true);
             repository.AddOrUpdate(content);
             unitOfWork.Commit();

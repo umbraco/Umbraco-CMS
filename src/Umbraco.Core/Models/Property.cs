@@ -83,7 +83,10 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or Sets the value of the Property
         /// </summary>
-        /// <remarks>Setting the value will trigger a type and value validation</remarks>
+        /// <remarks>
+        /// Setting the value will trigger a type validation. 
+        /// The type of the value has to be valid in order to be saved.
+        /// </remarks>
         [DataMember]
         public object Value
         {
@@ -91,13 +94,6 @@ namespace Umbraco.Core.Models
             set
             {
                 bool typeValidation = _propertyType.IsPropertyTypeValid(value);
-                bool valueValidation = _propertyType.IsPropertyValueValid(value);
-
-                if (!typeValidation && !valueValidation)
-                    throw new Exception(
-                        string.Format(
-                            "Both Type and Value validation failed. The value type: {0} does not match the DataType in PropertyType with alias: {1}",
-                            value.GetType(), Alias));
 
                 if (!typeValidation)
                     throw new Exception(
@@ -105,15 +101,32 @@ namespace Umbraco.Core.Models
                             "Type validation failed. The value type: {0} does not match the DataType in PropertyType with alias: {1}",
                             value.GetType(), Alias));
 
-                if (!valueValidation)
-                    throw new Exception(
-                        string.Format(
-                            "Validation failed for the Value, because it does not conform to the validation rules set for the PropertyType with alias: {0}",
-                            Alias));
-
                 _value = value;
                 OnPropertyChanged(ValueSelector);
             }
+        }
+
+        /// <summary>
+        /// Boolean indicating whether the current value is valid
+        /// </summary>
+        /// <remarks>
+        /// A valid value implies that it is ready for publishing.
+        /// Invalid property values can be saved, but not published.
+        /// </remarks>
+        /// <returns>True is property value is valid, otherwise false</returns>
+        public bool IsValid()
+        {
+            return IsValid(Value);
+        }
+
+        /// <summary>
+        /// Boolean indicating whether the passed in value is valid
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns>True is property value is valid, otherwise false</returns>
+        public bool IsValid(object value)
+        {
+            return _propertyType.IsPropertyValueValid(value);
         }
     }
 }
