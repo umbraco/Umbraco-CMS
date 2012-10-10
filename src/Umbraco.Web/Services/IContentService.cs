@@ -13,9 +13,10 @@ namespace Umbraco.Web.Services
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
         /// that this Content is based on.
         /// </summary>
+        /// <param name="parentId">Id of Parent for content</param>
         /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
         /// <returns><see cref="IContent"/></returns>
-        IContent CreateContent(string contentTypeAlias);
+        IContent CreateContent(int parentId, string contentTypeAlias);
 
         //TODO Add CreateNewVersion method? Its currently used in the Document API when Publishing - latest version is published, 
         //but then a new version is created so latest version is not published.
@@ -76,8 +77,9 @@ namespace Umbraco.Web.Services
         /// <summary>
         /// Re-Publishes all Content
         /// </summary>
+        /// <param name="userId">Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        bool RePublishAll();
+        bool RePublishAll(int userId);
 
         /// <summary>
         /// Publishes a single <see cref="IContent"/> object
@@ -94,6 +96,14 @@ namespace Umbraco.Web.Services
         /// <param name="userId">Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
         bool PublishWithChildren(IContent content, int userId);
+
+        /// <summary>
+        /// UnPublishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="userId">Id of the User issueing the publishing</param>
+        /// <returns>True if unpublishing succeeded, otherwise False</returns>
+        bool UnPublish(IContent content, int userId);
 
         /// <summary>
         /// Saves and Publishes a single <see cref="IContent"/> object
@@ -163,7 +173,8 @@ namespace Umbraco.Web.Services
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to send to publication</param>
         /// <param name="userId">Id of the User issueing the send to publication</param>
-        void SendToPublication(IContent content, int userId);
+        /// <returns>True if sending publication was succesfull otherwise false</returns>
+        bool SendToPublication(IContent content, int userId);
 
         /// <summary>
         /// Rollback an <see cref="IContent"/> object to a previous version.

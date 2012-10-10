@@ -5,6 +5,9 @@ using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Models
 {
+    /// <summary>
+    /// Represents an abstract class for composition specific ContentType properties and methods
+    /// </summary>
     public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentTypeComposition
     {
         private List<IContentTypeComposition> _contentTypeComposition;
@@ -14,7 +17,7 @@ namespace Umbraco.Core.Models
             _contentTypeComposition = new List<IContentTypeComposition>();
         }
 
-        private static readonly PropertyInfo ContentTypeCompositionSelector = ExpressionHelper.GetPropertyInfo<ContentType, List<IContentTypeComposition>>(x => x.ContentTypeComposition);
+        private static readonly PropertyInfo ContentTypeCompositionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeCompositionBase, List<IContentTypeComposition>>(x => x.ContentTypeComposition);
 
          /// <summary>
          /// List of ContentTypes that make up a composition of PropertyGroups and PropertyTypes for the current ContentType

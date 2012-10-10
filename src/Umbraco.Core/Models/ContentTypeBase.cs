@@ -45,7 +45,7 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo UserIdSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.UserId);
         private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.Trashed);
         private static readonly PropertyInfo AllowedContentTypesSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<ContentTypeSort>>(x => x.AllowedContentTypes);
-        private readonly static PropertyInfo PropertyGroupCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentType, PropertyGroupCollection>(x => x.PropertyGroups);
+        private static readonly PropertyInfo PropertyGroupCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, PropertyGroupCollection>(x => x.PropertyGroups);
 
         protected void PropertyGroupsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>Might not be necessary if handled as a relation?</remarks>
         [DataMember]
-        public int ParentId
+        public virtual int ParentId
         {
             get { return _parentId; }
             set
@@ -71,7 +71,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the name of the current entity
         /// </summary>
         [DataMember]
-        public string Name
+        public virtual string Name
         {
             get { return _name; }
             set
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the level of the content entity
         /// </summary>
         [DataMember]
-        public int Level //NOTE Is this relevant for a ContentType?
+        public virtual int Level //NOTE Is this relevant for a ContentType?
         {
             get { return _level; }
             set
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Models
         /// Gets of sets the path
         /// </summary>
         [DataMember]
-        public string Path //NOTE Is this relevant for a ContentType?
+        public virtual string Path //NOTE Is this relevant for a ContentType?
         {
             get { return _path; }
             set
@@ -113,7 +113,7 @@ namespace Umbraco.Core.Models
         /// The Alias of the ContentType
         /// </summary>
         [DataMember]
-        public string Alias
+        public virtual string Alias
         {
             get { return _alias; }
             set
@@ -127,7 +127,7 @@ namespace Umbraco.Core.Models
         /// Description for the ContentType
         /// </summary>
         [DataMember]
-        public string Description
+        public virtual string Description
         {
             get { return _description; }
             set
@@ -141,7 +141,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the sort order of the content entity
         /// </summary>
         [DataMember]
-        public int SortOrder
+        public virtual int SortOrder
         {
             get { return _sortOrder; }
             set
@@ -155,7 +155,7 @@ namespace Umbraco.Core.Models
         /// Name of the icon (sprite class) used to identify the ContentType
         /// </summary>
         [DataMember]
-        public string Icon
+        public virtual string Icon
         {
             get { return _icon; }
             set
@@ -169,7 +169,7 @@ namespace Umbraco.Core.Models
         /// Name of the thumbnail used to identify the ContentType
         /// </summary>
         [DataMember]
-        public string Thumbnail
+        public virtual string Thumbnail
         {
             get { return _thumbnail; }
             set
@@ -183,7 +183,7 @@ namespace Umbraco.Core.Models
         /// Id of the user who created this Content
         /// </summary>
         [DataMember]
-        public int UserId
+        public virtual int UserId
         {
             get { return _userId; }
             set
@@ -198,7 +198,7 @@ namespace Umbraco.Core.Models
         /// If ContentType is Trashed it will be located in the Recyclebin.
         /// </summary>
         [DataMember]
-        public bool Trashed //NOTE Is this relevant for a ContentType?
+        public virtual bool Trashed //NOTE Is this relevant for a ContentType?
         {
             get { return _trashed; }
             set
@@ -212,7 +212,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets a list of integer Ids for allowed ContentTypes
         /// </summary>
         [DataMember]
-        public IEnumerable<ContentTypeSort> AllowedContentTypes
+        public virtual IEnumerable<ContentTypeSort> AllowedContentTypes
         {
             get { return _allowedContentTypes; }
             set
@@ -227,7 +227,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>A PropertyGroup corresponds to a Tab in the UI</remarks>
         [DataMember]
-        public PropertyGroupCollection PropertyGroups
+        public virtual PropertyGroupCollection PropertyGroups
         {
             get { return _propertyGroups; }
             set
@@ -242,7 +242,7 @@ namespace Umbraco.Core.Models
         /// This list aggregates PropertyTypes across the PropertyGroups.
         /// </summary>
         [IgnoreDataMember]
-        public IEnumerable<PropertyType> PropertyTypes
+        public virtual IEnumerable<PropertyType> PropertyTypes
         {
             get { return PropertyGroups.SelectMany(x => x.PropertyTypes); }
         }

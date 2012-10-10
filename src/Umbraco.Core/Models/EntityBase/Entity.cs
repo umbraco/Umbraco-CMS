@@ -86,6 +86,12 @@ namespace Umbraco.Core.Models.EntityBase
             }
         }
 
+        protected void ResetIdentity()
+        {
+            _hasIdentity = false;
+            _id = 0;
+        }
+
         /// <summary>
         /// Method to call on entity saved when first added
         /// </summary>

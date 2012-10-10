@@ -257,5 +257,19 @@ namespace Umbraco.Core.Models
                 ChangePublishedState(false);
             }
         }
+
+        /// <summary>
+        /// Creates a clone of the current entity
+        /// </summary>
+        /// <returns></returns>
+        public IContent Clone()
+        {
+            var clone = (Content)this.MemberwiseClone();
+            clone.Key = Guid.Empty;
+            clone.Version = Guid.NewGuid();
+            clone.ResetIdentity();
+
+            return clone;
+        }
     }
 }

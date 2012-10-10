@@ -304,6 +304,7 @@
     <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="PropertyEditors\RteMacroRenderingPropertyEditorValueConverter.cs" />
     <Compile Include="PublishedMediaStoreResolver.cs" />
+    <Compile Include="Publishing\IPublishingStrategy.cs" />
     <Compile Include="Publishing\PublishingStrategy.cs" />
     <Compile Include="RenderFieldCaseType.cs" />
     <Compile Include="RenderFieldEncodingType.cs" />
