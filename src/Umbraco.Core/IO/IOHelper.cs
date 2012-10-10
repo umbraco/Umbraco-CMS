@@ -13,7 +13,7 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
 {
-	internal static class IOHelper
+	public static class IOHelper
     {
         private static string _rootDir = "";
 
@@ -52,7 +52,7 @@ namespace Umbraco.Core.IO
         }
 
 		[Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ResolveUrlsFromTextString instead, this method on this class will be removed in future versions")]
-        public static string ResolveUrlsFromTextString(string text)
+        internal static string ResolveUrlsFromTextString(string text)
         {
             if (UmbracoSettings.ResolveUrlsFromTextString)
             {				
@@ -117,7 +117,8 @@ namespace Umbraco.Core.IO
         }
 
         //use a tilde character instead of the complete path
-        public static string ReturnPath(string settingsKey, string standardPath, bool useTilde)
+		[Obsolete("This method is no longer in use and will be removed in future versions")]
+		internal static string ReturnPath(string settingsKey, string standardPath, bool useTilde)
         {
             string retval = ConfigurationManager.AppSettings[settingsKey];
 
@@ -127,13 +128,12 @@ namespace Umbraco.Core.IO
             return retval.TrimEnd('/');
         }
 
-
-        public static string ReturnPath(string settingsKey, string standardPath)
+		[Obsolete("This method is no longer in use and will be removed in future versions")]
+        internal static string ReturnPath(string settingsKey, string standardPath)
         {
             return ReturnPath(settingsKey, standardPath, false);
 
         }
-
 
         /// <summary>
         /// Validates if the current filepath matches a directory where the user is allowed to edit a file
