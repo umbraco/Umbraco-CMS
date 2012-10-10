@@ -43,7 +43,7 @@
   
   CodeMirror.pigHint = function(editor) {
     return scriptHint(editor, pigKeywordsU, function (e, cur) {return e.getTokenAt(cur);});
-  }
+  };
  
  function toTitleCase(str) {
     return str.replace(/(?:^|\s)\w/g, function(match) {
@@ -72,11 +72,9 @@
   + "LONGAVG LONGMAX LONGMIN LONGSUM MAX MIN MAPSIZE MONITOREDUDF NONDETERMINISTIC OUTPUTSCHEMA  "
   + "PIGSTORAGE PIGSTREAMING RANDOM REGEX_EXTRACT REGEX_EXTRACT_ALL REPLACE ROUND SIN SINH SIZE "
   + "SQRT STRSPLIT SUBSTRING SUM STRINGCONCAT STRINGMAX STRINGMIN STRINGSIZE TAN TANH TOBAG "
-  + "TOKENIZE TOMAP TOP TOTUPLE TRIM TEXTLOADER TUPLESIZE UCFIRST UPPER UTF8STORAGECONVERTER";
-    
-  var pigBuiltinsU = pigBuiltins.split(" ").join("() ").split(" ");
-  var pigBuiltinsL = pigBuiltins.toLowerCase().split(" ").join("() ").split(" ");
-     
+  + "TOKENIZE TOMAP TOP TOTUPLE TRIM TEXTLOADER TUPLESIZE UCFIRST UPPER UTF8STORAGECONVERTER";  
+  var pigBuiltinsU = pigBuiltins.split(" ").join("() ").split(" ");  
+  var pigBuiltinsL = pigBuiltins.toLowerCase().split(" ").join("() ").split(" ");   
   var pigBuiltinsC = ("BagSize BinStorage Bloom BuildBloom ConstantSize CubeDimensions DoubleAbs "
   + "DoubleAvg DoubleBase DoubleMax DoubleMin DoubleRound DoubleSum FloatAbs FloatAvg FloatMax "
   + "FloatMin FloatRound FloatSum GenericInvoker IntAbs IntAvg IntMax IntMin IntSum "

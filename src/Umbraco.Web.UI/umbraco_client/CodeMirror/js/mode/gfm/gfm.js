@@ -32,14 +32,14 @@ CodeMirror.defineMode("gfm", function(config, parserConfig) {
     
     return function (lang) {
       return modes[lang] ? CodeMirror.getMode(config, modes[lang]) : null;
-    }
+    };
   }());
 
   function markdown(stream, state) {
     // intercept fenced code blocks
     if (stream.sol() && stream.match(/^```([\w+#]*)/)) {
       // try switching mode
-      state.localMode = getMode(RegExp.$1)
+      state.localMode = getMode(RegExp.$1);
       if (state.localMode)
         state.localState = state.localMode.startState();
 
@@ -96,13 +96,14 @@ CodeMirror.defineMode("gfm", function(config, parserConfig) {
     },
 
     copyState: function(state) {
-      return {token: state.token, mode: state.mode, mdState: CodeMirror.copyState(mdMode, state.mdState),
+      return {token: state.token, mdState: CodeMirror.copyState(mdMode, state.mdState),
               localMode: state.localMode,
               localState: state.localMode ? CodeMirror.copyState(state.localMode, state.localState) : null};
     },
 
     token: function(stream, state) {
         /* Parse GFM double bracket links */
+        var ch;
         if ((ch = stream.peek()) != undefined && ch == '[') {
             stream.next(); // Advance the stream
 
@@ -139,6 +140,11 @@ CodeMirror.defineMode("gfm", function(config, parserConfig) {
         }
 
         return state.token(stream, state);
+    },
+
+    innerMode: function(state) {
+      if (state.token == markdown) return {state: state.mdState, mode: mdMode};
+      else return {state: state.localState, mode: state.localMode};
     }
-  }
+  };
 }, "markdown");
