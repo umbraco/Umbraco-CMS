@@ -22,11 +22,10 @@ namespace umbraco.presentation.developer.packages
     /// </summary>
     public partial class Installer : BasePages.UmbracoEnsuredPage
     {
-        private Control configControl;
-        private cms.businesslogic.packager.repositories.Repository repo;
-
-        private cms.businesslogic.packager.Installer p = new cms.businesslogic.packager.Installer();
-        private string tempFileName = "";
+        private Control _configControl;
+        private cms.businesslogic.packager.repositories.Repository _repo;
+        private readonly cms.businesslogic.packager.Installer _installer = new cms.businesslogic.packager.Installer();
+        private string _tempFileName = "";
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
@@ -47,34 +46,34 @@ namespace umbraco.presentation.developer.packages
             //if we are actually in the middle of installing something... 
             if (!String.IsNullOrEmpty(helper.Request("installing")))
             {
-                hideAllPanes();
+                HideAllPanes();
                 pane_installing.Visible = true;
-                processInstall(helper.Request("installing"));
+                ProcessInstall(helper.Request("installing"));
 
             }
             else if (!String.IsNullOrEmpty(helper.Request("guid")) && !String.IsNullOrEmpty(helper.Request("repoGuid")))
             {
                 //we'll fetch the local information we have about our repo, to find out what webservice to query.
-                repo = cms.businesslogic.packager.repositories.Repository.getByGuid(helper.Request("repoGuid"));
+                _repo = cms.businesslogic.packager.repositories.Repository.getByGuid(helper.Request("repoGuid"));
 
-                if (repo.HasConnection())
+                if (_repo.HasConnection())
                 {
                     //from the webservice we'll fetch some info about the package.
-                    cms.businesslogic.packager.repositories.Package pack = repo.Webservice.PackageByGuid(helper.Request("guid"));
+                    cms.businesslogic.packager.repositories.Package pack = _repo.Webservice.PackageByGuid(helper.Request("guid"));
 
                     //if the package is protected we will ask for the users credentials. (this happens every time they try to fetch anything)
                     if (!pack.Protected)
                     {
                         //if it isn't then go straigt to the accept licens screen
-                        tempFile.Value = p.Import(repo.fetch(helper.Request("guid")));
-                        updateSettings();
+                        tempFile.Value = _installer.Import(_repo.fetch(helper.Request("guid")));
+                        UpdateSettings();
 
                     }
                     else if (!IsPostBack)
                     {
 
                         //Authenticate against the repo
-                        hideAllPanes();
+                        HideAllPanes();
                         pane_authenticate.Visible = true;
 
                     }
@@ -83,7 +82,7 @@ namespace umbraco.presentation.developer.packages
                 {
                     fb.Style.Add("margin-top", "7px");
                     fb.type = global::umbraco.uicontrols.Feedback.feedbacktype.error;
-                    fb.Text = "<strong>No connection to repository.</strong> Runway could not be installed as there was no connection to: '" + repo.RepositoryUrl + "'";
+                    fb.Text = "<strong>No connection to repository.</strong> Runway could not be installed as there was no connection to: '" + _repo.RepositoryUrl + "'";
                     pane_upload.Visible = false;
                 }
             }
@@ -99,11 +98,11 @@ namespace umbraco.presentation.developer.packages
         {
             try
             {
-                tempFileName = Guid.NewGuid().ToString() + ".umb";
-                string fileName = SystemDirectories.Data + System.IO.Path.DirectorySeparatorChar + tempFileName;
+                _tempFileName = Guid.NewGuid().ToString() + ".umb";
+                string fileName = SystemDirectories.Data + System.IO.Path.DirectorySeparatorChar + _tempFileName;
                 file1.PostedFile.SaveAs(IOHelper.MapPath(fileName));
-                tempFile.Value = p.Import(tempFileName);
-                updateSettings();
+                tempFile.Value = _installer.Import(_tempFileName);
+                UpdateSettings();
             }
             catch (Exception ex)
             {
@@ -116,75 +115,75 @@ namespace umbraco.presentation.developer.packages
         protected void fetchProtectedPackage(object sender, EventArgs e)
         {
             //we auth against the webservice. This key will be used to fetch the protected package.
-            string memberGuid = repo.Webservice.authenticate(tb_email.Text, library.md5(tb_password.Text));
+            string memberGuid = _repo.Webservice.authenticate(tb_email.Text, library.md5(tb_password.Text));
 
             //if we auth correctly and get a valid key back, we will fetch the file from the repo webservice.
             if (!string.IsNullOrEmpty(memberGuid))
             {
-                tempFile.Value = p.Import(repo.fetch(helper.Request("guid"), memberGuid));
-                updateSettings();
+                tempFile.Value = _installer.Import(_repo.fetch(helper.Request("guid"), memberGuid));
+                UpdateSettings();
             }
         }
 
         //this loads the accept license screen
-        private void updateSettings()
+        private void UpdateSettings()
         {
-            hideAllPanes();
+            HideAllPanes();
 
             pane_acceptLicense.Visible = true;
-            pane_acceptLicenseInner.Text = "Installing the package: " + p.Name;
-            Panel1.Text = "Installing the package: " + p.Name;
+            pane_acceptLicenseInner.Text = "Installing the package: " + _installer.Name;
+            Panel1.Text = "Installing the package: " + _installer.Name;
 
 
-            if (p.ContainsUnsecureFiles && repo == null)
+            if (_installer.ContainsUnsecureFiles && _repo == null)
             {
                 pp_unsecureFiles.Visible = true;
-                foreach (string str in p.UnsecureFiles)
+                foreach (string str in _installer.UnsecureFiles)
                 {
                     lt_files.Text += "<li>" + str + "</li>";
                 }
             }
 
-            if (p.ContainsMacroConflict)
+            if (_installer.ContainsMacroConflict)
             {
                 pp_macroConflicts.Visible = true;
-                foreach (var item in p.ConflictingMacroAliases)
+                foreach (var item in _installer.ConflictingMacroAliases)
                 {
                     ltrMacroAlias.Text += "<li>" + item.Key + " (Alias: " + item.Value + ")</li>";
                 }
             }
 
-            if (p.ContainsTemplateConflicts)
+            if (_installer.ContainsTemplateConflicts)
             {
                 pp_templateConflicts.Visible = true;
-                foreach (var item in p.ConflictingTemplateAliases)
+                foreach (var item in _installer.ConflictingTemplateAliases)
                 {
                     ltrTemplateAlias.Text += "<li>" + item.Key + " (Alias: " + item.Value + ")</li>";
                 }
             }
 
-            if (p.ContainsStyleSheeConflicts)
+            if (_installer.ContainsStyleSheeConflicts)
             {
                 pp_stylesheetConflicts.Visible = true;
-                foreach (var item in p.ConflictingStyleSheetNames)
+                foreach (var item in _installer.ConflictingStyleSheetNames)
                 {
                     ltrStylesheetNames.Text += "<li>" + item.Key + " (Alias: " + item.Value + ")</li>";
                 }
             }
 
-            LabelName.Text = p.Name + " Version: " + p.Version;
-            LabelMore.Text = "<a href=\"" + p.Url + "\" target=\"_blank\">" + p.Url + "</a>";
-            LabelAuthor.Text = "<a href=\"" + p.AuthorUrl + "\" target=\"_blank\">" + p.Author + "</a>";
-            LabelLicense.Text = "<a href=\"" + p.LicenseUrl + "\" target=\"_blank\">" + p.License + "</a>";
+            LabelName.Text = _installer.Name + " Version: " + _installer.Version;
+            LabelMore.Text = "<a href=\"" + _installer.Url + "\" target=\"_blank\">" + _installer.Url + "</a>";
+            LabelAuthor.Text = "<a href=\"" + _installer.AuthorUrl + "\" target=\"_blank\">" + _installer.Author + "</a>";
+            LabelLicense.Text = "<a href=\"" + _installer.LicenseUrl + "\" target=\"_blank\">" + _installer.License + "</a>";
 
-            if (p.ReadMe != "")
-                readme.Text = "<div style=\"border: 1px solid #999; padding: 5px; overflow: auto; width: 370px; height: 160px;\">" + library.ReplaceLineBreaks(library.StripHtml(p.ReadMe)) + "</div>";
+            if (_installer.ReadMe != "")
+                readme.Text = "<div style=\"border: 1px solid #999; padding: 5px; overflow: auto; width: 370px; height: 160px;\">" + library.ReplaceLineBreaks(library.StripHtml(_installer.ReadMe)) + "</div>";
             else
                 readme.Text = "<span style=\"color: #999\">No information</span><br/>";
         }
 
 
-        private void processInstall(string currentStep)
+        private void ProcessInstall(string currentStep)
         {
             string dir = helper.Request("dir");
             int packageId = 0;
@@ -193,20 +192,20 @@ namespace umbraco.presentation.developer.packages
             //first load in the config from the temporary directory
             //this will ensure that the installer have access to all the new files and the package manifest
 
-            p.LoadConfig(dir);
+            _installer.LoadConfig(dir);
 
             switch (currentStep)
             {
                 case "businesslogic":
 
-                    p.InstallBusinessLogic(packageId, dir);
+                    _installer.InstallBusinessLogic(packageId, dir);
 
 
                     //making sure that publishing actions performed from the cms layer gets pushed to the presentation
                     library.RefreshContent();
 
 
-                    if (p.Control != null && p.Control != "")
+                    if (_installer.Control != null && _installer.Control != "")
                     {
                         Response.Redirect("installer.aspx?installing=customInstaller&dir=" + dir + "&pId=" + packageId.ToString());
                     }
@@ -216,26 +215,26 @@ namespace umbraco.presentation.developer.packages
                     }
                     break;
                 case "customInstaller":
-                    if (p.Control != null && p.Control != "")
+                    if (_installer.Control != null && _installer.Control != "")
                     {
-                        hideAllPanes();
+                        HideAllPanes();
 
-                        configControl = new System.Web.UI.UserControl().LoadControl(SystemDirectories.Root + p.Control);
-                        configControl.ID = "packagerConfigControl";
+                        _configControl = new System.Web.UI.UserControl().LoadControl(SystemDirectories.Root + _installer.Control);
+                        _configControl.ID = "packagerConfigControl";
 
-                        pane_optional.Controls.Add(configControl);
+                        pane_optional.Controls.Add(_configControl);
                         pane_optional.Visible = true;
                     }
                     else
                     {
-                        hideAllPanes();
+                        HideAllPanes();
                         pane_success.Visible = true;
                         BasePage.Current.ClientTools.ReloadActionNode(true, true);
                     }
                     break;
                 case "finished":
-                    hideAllPanes();
-                    string url = p.Url;
+                    HideAllPanes();
+                    string url = _installer.Url;
                     string packageViewUrl = "installedPackage.aspx?id=" + packageId.ToString();
 
                     bt_viewInstalledPackage.OnClientClick = "document.location = '" + packageViewUrl + "'; return false;";
@@ -247,7 +246,7 @@ namespace umbraco.presentation.developer.packages
                     pane_success.Visible = true;
                     BasePage.Current.ClientTools.ReloadActionNode(true, true);
 
-                    p.InstallCleanUp(packageId, dir);
+                    _installer.InstallCleanUp(packageId, dir);
 
                     //clear the tree cache
                     ClientTools.ClearClientTreeCache()
@@ -269,30 +268,30 @@ namespace umbraco.presentation.developer.packages
             //we will now create the installer manifest, which means that umbraco can register everything that gets added to the system
             //this returns an id of the manifest.
 
-            p.LoadConfig(tempFile.Value);
+            _installer.LoadConfig(tempFile.Value);
 
-            int pId = p.CreateManifest(tempFile.Value, helper.Request("guid"), helper.Request("repoGuid"));
+            int pId = _installer.CreateManifest(tempFile.Value, helper.Request("guid"), helper.Request("repoGuid"));
 
             //and then copy over the files. This will take some time if it contains .dlls that will reboot the system..
-            p.InstallFiles(pId, tempFile.Value);
+            _installer.InstallFiles(pId, tempFile.Value);
 
             Response.Redirect("installer.aspx?installing=businesslogic&dir=" + tempFile.Value + "&pId=" + pId.ToString());
         }
 
 
-        private void drawConfig()
+        private void DrawConfig()
         {
-            hideAllPanes();
+            HideAllPanes();
 
-            configControl = new System.Web.UI.UserControl().LoadControl(SystemDirectories.Root + helper.Request("config"));
-            configControl.ID = "packagerConfigControl";
+            _configControl = new System.Web.UI.UserControl().LoadControl(SystemDirectories.Root + helper.Request("config"));
+            _configControl.ID = "packagerConfigControl";
 
-            pane_optional.Controls.Add(configControl);
+            pane_optional.Controls.Add(_configControl);
             pane_optional.Visible = true;
         }
 
 
-        private void hideAllPanes()
+        private void HideAllPanes()
         {
             pane_authenticate.Visible = false;
             pane_acceptLicense.Visible = false;

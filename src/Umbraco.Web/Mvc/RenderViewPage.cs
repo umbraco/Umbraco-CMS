@@ -51,17 +51,7 @@ namespace Umbraco.Web.Mvc
 		/// <summary>
 		/// Returns the a DynamicPublishedContent object
 		/// </summary>
-		public dynamic CurrentPage { get; private set; }
-
-		/// <summary>
-		/// Returns the dictionary value for the key specified
-		/// </summary>
-		/// <param name="key"></param>
-		/// <returns></returns>
-		public string GetDictionaryValue(string key)
-		{
-			return Umbraco.GetDictionaryValue(key);
-		}
+		public dynamic CurrentPage { get; private set; }		
 
 		private UmbracoHelper _helper;
 

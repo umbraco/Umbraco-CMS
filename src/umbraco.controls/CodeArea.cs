@@ -171,17 +171,17 @@ namespace umbraco.uicontrols
                 }
 
                 jsEventCode += @"                    
-
-                    //create the editor
-                   var UmbEditor = new Umbraco.Controls.CodeEditor.UmbracoEditor(" + (!CodeMirrorEnabled).ToString().ToLower() + @", '" + this.ClientID + @"');
-                   var m_textEditor = jQuery('#" + this.ClientID + @"');
+                    $(function () {
+                        //create the editor
+                       var UmbEditor = new Umbraco.Controls.CodeEditor.UmbracoEditor(" + (!CodeMirrorEnabled).ToString().ToLower() + @", '" + this.ClientID + @"');
+                       var m_textEditor = jQuery('#" + this.ClientID + @"');
                    
-                   //with codemirror adding divs for line numbers, we need to target a different element
-                   m_textEditor = m_textEditor.find('iframe').length > 0 ? m_textEditor.children('div').get(0) : m_textEditor.get(0);
+                       //with codemirror adding divs for line numbers, we need to target a different element
+                       m_textEditor = m_textEditor.find('iframe').length > 0 ? m_textEditor.children('div').get(0) : m_textEditor.get(0);
                    
-                   jQuery(window).resize(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });
-            	   jQuery(document).ready(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });";
-
+                       jQuery(window).resize(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });
+            	       jQuery(document).ready(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });
+                    });";
                 /* 
                if (!UmbracoSettings.ScriptDisableEditor && HttpContext.Current.Request.Browser.Browser == "IE")
                {

@@ -45,10 +45,30 @@ namespace umbraco.cms.businesslogic.template
 
         #endregion
 
+		[Obsolete("Use TemplateFilePath instead")]
         public string MasterPageFile
         {
-            get { return IOHelper.MapPath(SystemDirectories.Masterpages + "/" + Alias.Replace(" ", "") + ".master"); }
+            get { return TemplateFilePath; }
         }
+
+		/// <summary>
+		/// Returns the file path for the current template
+		/// </summary>
+	    public string TemplateFilePath
+	    {
+		    get
+		    {
+				switch (DetermineRenderingEngine(this))
+				{
+					case RenderingEngine.Mvc:
+						return ViewHelper.GetFilePath(this);
+					case RenderingEngine.WebForms:
+						return MasterPageHelper.GetFilePath(this);
+					default:
+						throw new ArgumentOutOfRangeException();
+				}	  
+		    }
+	    }
 
         public static Hashtable TemplateAliases
         {
@@ -134,18 +154,13 @@ namespace umbraco.cms.businesslogic.template
             }
             dr.Close();
 
-			if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && Template.HasView(this))
-                _design = ViewHelper.GetViewFile(this);
+			if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(this))
+                _design = ViewHelper.GetFileContents(this);
             else
-                _design = MasterpageHelper.GetMasterpageFile(this);
+                _design = MasterPageHelper.GetFileContents(this);
 
         }
-
-        private bool isMasterPageSyntax(string code)
-        {
-            return code.Contains("<%@ Master") || code.Contains("<umbraco:Item") || code.Contains("<asp:") || code.Contains("<umbraco:Macro");
-        }
-
+		
         public new string Path
         {
             get
@@ -255,10 +270,10 @@ namespace umbraco.cms.businesslogic.template
 
 
                 //we only switch to MVC View editing if the template has a view file, and MVC editing is enabled
-                if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && !isMasterPageSyntax(_design))
-                    _design = ViewHelper.UpdateViewFile(this);
+                if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && !MasterPageHelper.IsMasterPageSyntax(_design))
+					_design = ViewHelper.UpdateViewFile(this, _oldAlias);
                 else if (UmbracoSettings.UseAspNetMasterPages)
-                    _design = MasterpageHelper.UpdateMasterpageFile(this, _oldAlias);
+                    _design = MasterPageHelper.UpdateMasterPageFile(this, _oldAlias);
                 
 
                 SqlHelper.ExecuteNonQuery("Update cmsTemplate set design = @design where NodeId = @id",
@@ -317,17 +332,57 @@ namespace umbraco.cms.businesslogic.template
             return DocumentType.GetAllAsList().Where(x => x.allowedTemplates.Select(t => t.Id).Contains(this.Id));
         }
 
-        public static Template MakeNew(string Name, BusinessLogic.User u, Template master)
-        {
-            Template t = MakeNew(Name, u);
-            t.MasterTemplate = master.Id;
+	    /// <summary>
+	    /// This checks what the default rendering engine is set in config but then also ensures that there isn't already 
+	    /// a template that exists in the opposite rendering engine's template folder, then returns the appropriate 
+	    /// rendering engine to use.
+	    /// </summary>
+	    /// <param name="t"></param>
+	    /// <param name="design">If a template body is specified we'll check if it contains master page markup, if it does we'll auto assume its webforms </param>
+	    /// <returns></returns>
+	    /// <remarks>
+	    /// The reason this is required is because for example, if you have a master page file already existing under ~/masterpages/Blah.aspx
+	    /// and then you go to create a template in the tree called Blah and the default rendering engine is MVC, it will create a Blah.cshtml 
+	    /// empty template in ~/Views. This means every page that is using Blah will go to MVC and render an empty page. 
+	    /// This is mostly related to installing packages since packages install file templates to the file system and then create the 
+	    /// templates in business logic. Without this, it could cause the wrong rendering engine to be used for a package.
+	    /// </remarks>
+	    private static RenderingEngine DetermineRenderingEngine(Template t, string design = null)
+		{
+			var engine = Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine;
 
-            if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
-                ViewHelper.CreateViewFile(t, true);
-            else
-                MasterpageHelper.CreateMasterpageFile(t, true);
-            
-            
+			if (!design.IsNullOrWhiteSpace() && MasterPageHelper.IsMasterPageSyntax(design))
+			{
+				//there is a design but its definitely a webforms design
+				return RenderingEngine.WebForms;
+			}
+
+			switch (engine)
+			{
+				case RenderingEngine.Mvc:
+					//check if there's a view in ~/masterpages
+					if (MasterPageHelper.MasterPageExists(t) && !ViewHelper.ViewExists(t))
+					{
+						//change this to webforms since there's already a file there for this template alias
+						engine = RenderingEngine.WebForms;
+					}
+					break;
+				case RenderingEngine.WebForms:
+					//check if there's a view in ~/views
+					if (ViewHelper.ViewExists(t) && !MasterPageHelper.MasterPageExists(t))
+					{
+						//change this to mvc since there's already a file there for this template alias
+						engine = RenderingEngine.Mvc;
+					}
+					break;
+			}
+			return engine;
+		}
+
+		public static Template MakeNew(string Name, BusinessLogic.User u, Template master, string design = null)
+        {
+			Template t = MakeNew(Name, u, design);
+            t.MasterTemplate = master.Id;			
 
             /*
             if (UmbracoSettings.UseAspNetMasterPages)
@@ -346,7 +401,7 @@ namespace umbraco.cms.businesslogic.template
             return t;
         }
 
-        public static Template MakeNew(string name, BusinessLogic.User u)
+        public static Template MakeNew(string name, BusinessLogic.User u, string design = null)
         {
 
             // CMSNode MakeNew(int parentId, Guid objectType, int userId, int level, string text, Guid uniqueID)
@@ -374,11 +429,21 @@ namespace umbraco.cms.businesslogic.template
             NewEventArgs e = new NewEventArgs();
             t.OnNew(e);
 
-            if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
-                t._design = ViewHelper.CreateViewFile(t);
-            else
-                t._design = MasterpageHelper.CreateMasterpageFile(t);
+			switch (DetermineRenderingEngine(t, design))
+			{
+				case RenderingEngine.Mvc:
+					ViewHelper.CreateViewFile(t, true);
+					break;
+				case RenderingEngine.WebForms:
+					MasterPageHelper.CreateMasterPage(t, true);
+					break;
+			}
 
+			//if a design is supplied ensure it is updated.
+			if (!design.IsNullOrWhiteSpace())
+			{
+				t.ImportDesign(design);
+			}
 
             return t;
         }
@@ -506,8 +571,8 @@ namespace umbraco.cms.businesslogic.template
                 if (System.IO.File.Exists(MasterPageFile))
                     System.IO.File.Delete(MasterPageFile);
 
-                if (System.IO.File.Exists(Umbraco.Core.IO.IOHelper.MapPath(ViewHelper.ViewPath(this))))
-                    System.IO.File.Delete(Umbraco.Core.IO.IOHelper.MapPath(ViewHelper.ViewPath(this)));
+				if (System.IO.File.Exists(Umbraco.Core.IO.IOHelper.MapPath(ViewHelper.ViewPath(this.Alias))))
+                    System.IO.File.Delete(Umbraco.Core.IO.IOHelper.MapPath(ViewHelper.ViewPath(this.Alias)));
 
                 FireAfterDelete(e);
             }
@@ -578,17 +643,17 @@ namespace umbraco.cms.businesslogic.template
 
         public string EnsureMasterPageSyntax(string masterPageContent)
         {
-            replaceElement(ref masterPageContent, "?UMBRACO_GETITEM", "umbraco:Item", true);
-            replaceElement(ref masterPageContent, "?UMBRACO_GETITEM", "umbraco:Item", false);
+            ReplaceElement(ref masterPageContent, "?UMBRACO_GETITEM", "umbraco:Item", true);
+            ReplaceElement(ref masterPageContent, "?UMBRACO_GETITEM", "umbraco:Item", false);
 
             // Parse the design for macros
-            replaceElement(ref masterPageContent, "?UMBRACO_MACRO", "umbraco:Macro", true);
-            replaceElement(ref masterPageContent, "?UMBRACO_MACRO", "umbraco:Macro", false);
+            ReplaceElement(ref masterPageContent, "?UMBRACO_MACRO", "umbraco:Macro", true);
+            ReplaceElement(ref masterPageContent, "?UMBRACO_MACRO", "umbraco:Macro", false);
 
             // Parse the design for load childs
-            masterPageContent = masterPageContent.Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD/>", getAspNetMasterPageContentContainer()).Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD />", getAspNetMasterPageContentContainer());
+            masterPageContent = masterPageContent.Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD/>", GetAspNetMasterPageContentContainer()).Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD />", GetAspNetMasterPageContentContainer());
             // Parse the design for aspnet forms
-            getAspNetMasterPageForm(ref masterPageContent);
+            GetAspNetMasterPageForm(ref masterPageContent);
             masterPageContent = masterPageContent.Replace("</?ASPNET_FORM>", "</form>");
             // Parse the design for aspnet heads
             masterPageContent = masterPageContent.Replace("</ASPNET_HEAD>", String.Format("<head id=\"{0}Head\" runat=\"server\">", Alias.Replace(" ", "")));
@@ -683,15 +748,9 @@ namespace umbraco.cms.businesslogic.template
 
             File.WriteAllText(MasterPageFile, masterPageContent, System.Text.Encoding.UTF8);
              * */
-        }
+        }        
 
-        private string getMasterPageHeader()
-        {
-            return String.Format("<%@ Master Language=\"C#\" MasterPageFile=\"{0}\" AutoEventWireup=\"true\" %>",
-                currentMasterTemplateFileName()) + Environment.NewLine;
-        }
-
-        private string currentMasterTemplateFileName()
+        private string CurrentMasterTemplateFileName()
         {
             if (MasterTemplate != 0)
                 return SystemDirectories.Masterpages + "/" + new Template(MasterTemplate).Alias.Replace(" ", "") + ".master";
@@ -699,9 +758,9 @@ namespace umbraco.cms.businesslogic.template
                 return UmbracoMasterTemplate;
         }
 
-        private void getAspNetMasterPageForm(ref string design)
+        private void GetAspNetMasterPageForm(ref string design)
         {
-            Match formElement = Regex.Match(design, getElementRegExp("?ASPNET_FORM", false), RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+            Match formElement = Regex.Match(design, GetElementRegExp("?ASPNET_FORM", false), RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
             if (formElement != null && formElement.Value != "")
             {
                 string formReplace = String.Format("<form id=\"{0}Form\" runat=\"server\">", Alias.Replace(" ", ""));
@@ -713,17 +772,17 @@ namespace umbraco.cms.businesslogic.template
             }
         }
 
-        private string getAspNetMasterPageContentContainer()
+        private string GetAspNetMasterPageContentContainer()
         {
             return String.Format(
                 "<asp:ContentPlaceHolder ID=\"{0}ContentPlaceHolder\" runat=\"server\"></asp:ContentPlaceHolder>",
                 Alias.Replace(" ", ""));
         }
 
-        private void replaceElement(ref string design, string elementName, string newElementName, bool checkForQuotes)
+        private void ReplaceElement(ref string design, string elementName, string newElementName, bool checkForQuotes)
         {
             MatchCollection m =
-                Regex.Matches(design, getElementRegExp(elementName, checkForQuotes),
+                Regex.Matches(design, GetElementRegExp(elementName, checkForQuotes),
                   RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
             foreach (Match match in m)
@@ -762,7 +821,7 @@ namespace umbraco.cms.businesslogic.template
 
 
 
-        private string getElementRegExp(string elementName, bool checkForQuotes)
+        private string GetElementRegExp(string elementName, bool checkForQuotes)
         {
             if (checkForQuotes)
                 return String.Format("\"<[^>\\s]*\\b{0}(\\b[^>]*)>\"", elementName);
@@ -811,24 +870,20 @@ namespace umbraco.cms.businesslogic.template
             string alias = xmlHelper.GetNodeValue(n.SelectSingleNode("Alias"));
 
             Template t = Template.GetByAlias(alias);
+	        var design = xmlHelper.GetNodeValue(n.SelectSingleNode("Design"));
 
             if (t == null)
             {
-                t = MakeNew(xmlHelper.GetNodeValue(n.SelectSingleNode("Name")), u);
+				//create the template with the design if one is specified
+				t = MakeNew(xmlHelper.GetNodeValue(n.SelectSingleNode("Name")), u, 
+					design.IsNullOrWhiteSpace() ? null : design);
             }
 
             t.Alias = alias;
-            t.ImportDesign(xmlHelper.GetNodeValue(n.SelectSingleNode("Design")));
 
             return t;
         }
-
-        public static bool HasView(Template t)
-        {
-            var path = Umbraco.Core.IO.SystemDirectories.MvcViews + "/" + t.Alias.Replace(" ", "") + ".cshtml";
-            return System.IO.File.Exists(Umbraco.Core.IO.IOHelper.MapPath(path));
-        }
-
+        
 
         #region Events
         //EVENTS

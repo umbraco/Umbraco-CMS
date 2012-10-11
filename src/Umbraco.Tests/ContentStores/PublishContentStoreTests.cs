@@ -5,10 +5,9 @@ using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
-using umbraco;
 using umbraco.BusinessLogic;
 
-namespace Umbraco.Tests
+namespace Umbraco.Tests.ContentStores
 {
 	[TestFixture]
 	public class PublishContentStoreTests

@@ -53,12 +53,13 @@ namespace umbraco.IO
         }
 
         //use a tilde character instead of the complete path
+		[Obsolete("This method is no longer in use and will be removed in future versions")]
         public static string returnPath(string settingsKey, string standardPath, bool useTilde)
         {
 			return Umbraco.Core.IO.IOHelper.ReturnPath(settingsKey, standardPath, useTilde); 
         }
 
-
+		[Obsolete("This method is no longer in use and will be removed in future versions")]
         public static string returnPath(string settingsKey, string standardPath)
         {
 			return Umbraco.Core.IO.IOHelper.ReturnPath(settingsKey, standardPath); 

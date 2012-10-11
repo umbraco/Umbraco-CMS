@@ -658,7 +658,7 @@ namespace umbraco.cms.businesslogic
                     SqlHelper.CreateParameter("@parentContentTypeId", this.Id)) > 0;
         }
 
-        public List<ContentType> GetChildTypes()
+        public IEnumerable<ContentType> GetChildTypes()
         {
             var cts = new List<ContentType>();
             using (IRecordsReader dr =
@@ -694,7 +694,7 @@ namespace umbraco.cms.businesslogic
                 // has a nodetype of this id
                 var contentTypeToRemove = new ContentType(parentContentTypeId);
 
-                removeMasterPropertyTypeData(contentTypeToRemove, this);
+                RemoveMasterPropertyTypeData(contentTypeToRemove, this);
 
                 SqlHelper.ExecuteNonQuery(
                                           "DELETE FROM [cmsContentType2ContentType] WHERE parentContentTypeId = @parentContentTypeId AND childContentTypeId = @childContentTypeId",
@@ -704,7 +704,7 @@ namespace umbraco.cms.businesslogic
             }
         }
 
-        private void removeMasterPropertyTypeData(ContentType contentTypeToRemove, ContentType currentContentType)
+        private void RemoveMasterPropertyTypeData(ContentType contentTypeToRemove, ContentType currentContentType)
         {
             foreach (var pt in contentTypeToRemove.PropertyTypes)
             {
@@ -723,10 +723,10 @@ namespace umbraco.cms.businesslogic
             }
             // remove sub data too
             foreach(var ct in currentContentType.GetChildTypes())
-                removeMasterPropertyTypeData(contentTypeToRemove, ct);
+                RemoveMasterPropertyTypeData(contentTypeToRemove, ct);
         }
 
-        public List<PropertyTypeGroup> PropertyTypeGroups
+        public IEnumerable<PropertyTypeGroup> PropertyTypeGroups
         {
             get { return PropertyTypeGroup.GetPropertyTypeGroupsFromContentType(Id); }
         }
@@ -1170,7 +1170,7 @@ namespace umbraco.cms.businesslogic
         private void InitializeVirtualTabs()
         {
             m_VirtualTabs = new List<TabI>();
-            foreach (PropertyTypeGroup ptg in PropertyTypeGroups.FindAll(x => x.ParentId == 0 && x.ContentTypeId == this.Id))
+            foreach (PropertyTypeGroup ptg in PropertyTypeGroups.Where(x => x.ParentId == 0 && x.ContentTypeId == this.Id))
                 m_VirtualTabs.Add(new Tab(ptg.Id, ptg.Name, ptg.SortOrder, this));
 
             // Master Content Type
@@ -1335,19 +1335,24 @@ namespace umbraco.cms.businesslogic
             {
 
                 // NH, temp fix for 4.9 to use the new PropertyTypeGroup API
-                List<PropertyType> pts = PropertyTypeGroup.GetPropertyTypeGroup(this.Id).GetPropertyTypes();
+                var pts = PropertyTypeGroup.GetPropertyTypeGroup(this.Id).GetPropertyTypes();
                 if (includeInheritedProperties)
                 {
                     // we need to 
                     cms.businesslogic.ContentType ct = cms.businesslogic.ContentType.GetContentType(contentTypeId);
                     return
-                        pts.FindAll(
+                        pts.Where(
                             x =>
                             ct.MasterContentTypes.Contains(
                                 x.ContentTypeId) || x.ContentTypeId == contentTypeId).ToArray();
                 }
 
-                return pts.FindAll(x => x.ContentTypeId == contentTypeId).ToArray();
+                return pts.Where(x => x.ContentTypeId == contentTypeId).ToArray();
+
+				//TODO: Why is this code still here?? revision: 1bd01ec17bf9 
+				// shouldn't this code be removed/commented out or something?????
+				// the below code is completely unreachable.
+
 
                 // zb-00040 #29889 : fix cache key issues!
                 // now maintaining a cache of local properties per contentTypeId, then merging when required
@@ -1388,7 +1393,7 @@ namespace umbraco.cms.businesslogic
                             //                                while (dr.Read())
                             //                                    tmp1.Add(PropertyType.GetPropertyType(dr.GetInt("id")));
                             //                            }
-                            return tmp1;
+	                        return tmp1.ToList();
                         });
 
                     tmp.AddRange(ptypes);

@@ -86,8 +86,9 @@ namespace Umbraco.Core.IO
             }
         }
 
+		//have changed to internal so nobody uses this anymore since this is a new class.
         [Obsolete("Please use MacroScripts instead!", true)]
-        public static string Python
+        internal static string Python
         {
             get
             {

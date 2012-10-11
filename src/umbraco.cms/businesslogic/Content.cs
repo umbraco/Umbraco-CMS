@@ -508,8 +508,13 @@ namespace umbraco.cms.businesslogic
         /// 
         /// </summary>
         /// <returns>The new version Id</returns>
-        protected Guid createNewVersion(DateTime versionDate)
+		protected Guid createNewVersion(DateTime versionDate = default(DateTime))
         {
+			if (versionDate == default (DateTime))
+			{
+				versionDate = DateTime.Now;
+			}
+
             ClearLoadedProperties();
 
             Guid newVersion = Guid.NewGuid();

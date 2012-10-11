@@ -87,7 +87,7 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		public static DisposableTimer DebugDuration(Type loggerType, string startMessage, string completeMessage)
 		{
-			LogHelper.Info(loggerType, () => startMessage);
+			LogHelper.Debug(loggerType, () => startMessage);
 			return new DisposableTimer(x => LogHelper.Debug(loggerType, () => completeMessage + " (took " + x + "ms)"));
 		}
 

@@ -1,30 +1,39 @@
-﻿using umbraco.cms.businesslogic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Tests.TestHelpers;
+using umbraco.cms.businesslogic;
 using System;
 using System.Xml;
 using umbraco.cms.businesslogic.language;
 using umbraco.BusinessLogic;
 using System.Linq;
 
-namespace Umbraco.LegacyTests
+namespace Umbraco.Tests.BusinessLogic
 {
-    
+    //TODO: This was ported over from the previous unit tests, need to make them work now :)
     
     /// <summary>
     ///This is a test class for Dictionary_DictionaryItemTest and is intended
     ///to contain all Dictionary_DictionaryItemTest Unit Tests
     ///</summary>
-    [TestClass()]
-    public class DictionaryTest
+    [TestFixture]
+    public class DictionaryTest : BaseWebTest
     {
-        [TestMethod()]
+		public override void Initialize()
+		{
+			base.Initialize();
+
+			CreateNew();
+		}
+
+        [Test()]
         public void Dictionary_Get_Top_Level_Items()
         {
             var items = Dictionary.getTopMostItems;
 
             var d = CreateNew();
 
-            Assert.AreEqual<int>(items.Count() + 1, Dictionary.getTopMostItems.Count());
+            Assert.AreEqual(items.Count() + 1, Dictionary.getTopMostItems.Count());
 
             DeleteItem(d);
         }
@@ -33,7 +42,7 @@ namespace Umbraco.LegacyTests
         /// Creates a new dictionary entry, adds values for all languages assigned, then deletes the 
         /// entry and ensure that all other data is gone too.
         ///</summary>
-        [TestMethod()]
+		[Test()]
         public void Dictionary_Create_Add_Text_And_Delete()
         {
             var d = CreateNew();
@@ -55,7 +64,7 @@ namespace Umbraco.LegacyTests
         /// <summary>
         ///A test for IsTopMostItem
         ///</summary>
-        [TestMethod()]
+		[Test()]
         public void Dictionary_IsTopMostItem()
         {
             var parent = CreateNew();
@@ -64,7 +73,7 @@ namespace Umbraco.LegacyTests
             var childId = Dictionary.DictionaryItem.addKey("Test" + Guid.NewGuid().ToString("N"), "", parent.key);
             Assert.IsTrue(childId > 0);
             var child = new Dictionary.DictionaryItem(childId);
-            Assert.IsInstanceOfType(child, typeof(Dictionary.DictionaryItem));
+			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<Dictionary.DictionaryItem>(child));
 
             Assert.IsTrue(parent.IsTopMostItem());
             Assert.IsFalse(child.IsTopMostItem());
@@ -76,7 +85,7 @@ namespace Umbraco.LegacyTests
         /// <summary>
         /// Test the Parent and Children properties and ensures that the relationships work both ways
         ///</summary>
-        [TestMethod()]
+		[Test()]
         public void Dictionary_Parent_Child_Relationship()
         {
             var parent = CreateNew();
@@ -85,7 +94,7 @@ namespace Umbraco.LegacyTests
             var childId = Dictionary.DictionaryItem.addKey("Test" + Guid.NewGuid().ToString("N"), "", parent.key);
             Assert.IsTrue(childId > 0);
             var child = new Dictionary.DictionaryItem(childId);
-            Assert.IsInstanceOfType(child, typeof(Dictionary.DictionaryItem));
+			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<Dictionary.DictionaryItem>(child));
 
             //set the parent relationship
             Assert.AreEqual(parent.id, child.Parent.id);
@@ -94,7 +103,7 @@ namespace Umbraco.LegacyTests
 
             //test the child relationship
             Assert.IsTrue(parent.hasChildren);
-            Assert.AreEqual<int>(1, parent.Children.Length);
+            Assert.AreEqual(1, parent.Children.Length);
             Assert.AreEqual(child.id, parent.Children.First().id);
             Assert.AreEqual(child.key, parent.Children.First().key);
             Assert.AreEqual(child.UniqueId, parent.Children.First().UniqueId);
@@ -106,7 +115,7 @@ namespace Umbraco.LegacyTests
         /// <summary>
         /// Deletes a parent with existing children and ensures they are all gone.
         /// </summary>
-        [TestMethod()]
+        [Test()]
         public void Dictionary_Delete_Parent_With_Children()
         {
             var parent = CreateNew();
@@ -115,16 +124,16 @@ namespace Umbraco.LegacyTests
             var childId1 = Dictionary.DictionaryItem.addKey("Test" + Guid.NewGuid().ToString("N"), "", parent.key);
             Assert.IsTrue(childId1 > 0);
             var child1 = new Dictionary.DictionaryItem(childId1);
-            Assert.IsInstanceOfType(child1, typeof(Dictionary.DictionaryItem));
+			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<Dictionary.DictionaryItem>(child1));
 
             //create a child
             var childId2 = Dictionary.DictionaryItem.addKey("Test" + Guid.NewGuid().ToString("N"), "", parent.key);
             Assert.IsTrue(childId2 > 0);
             var child2 = new Dictionary.DictionaryItem(childId2);
-            Assert.IsInstanceOfType(child2, typeof(Dictionary.DictionaryItem));
+			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<Dictionary.DictionaryItem>(child2));
 
             Assert.IsTrue(parent.hasChildren);
-            Assert.AreEqual<int>(2, parent.Children.Length);
+            Assert.AreEqual(2, parent.Children.Length);
 
 
             DeleteItem(parent);
@@ -157,7 +166,7 @@ namespace Umbraco.LegacyTests
         /// <summary>
         /// Guid constructor test
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void Dictionary_Contructor_Guid()
         {
             var d = CreateNew();
@@ -174,7 +183,7 @@ namespace Umbraco.LegacyTests
         /// <summary>
         /// key constructor test
         /// </summary>
-        [TestMethod()]
+        [Test()]
         public void Dictionary_Contructor_Key()
         {
             var d = CreateNew();
@@ -191,7 +200,7 @@ namespace Umbraco.LegacyTests
         /// <summary>
         ///A test for ToXml
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void Dictionary_ToXml()
         {
             var d = CreateNew();
@@ -200,7 +209,7 @@ namespace Umbraco.LegacyTests
             var childId = Dictionary.DictionaryItem.addKey("Test" + Guid.NewGuid().ToString("N"), "", d.key);
             Assert.IsTrue(childId > 0);
             var child = new Dictionary.DictionaryItem(childId);
-            Assert.IsInstanceOfType(child, typeof(Dictionary.DictionaryItem));
+			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<Dictionary.DictionaryItem>(child));
             
             var xml = new XmlDocument();
 
@@ -218,7 +227,7 @@ namespace Umbraco.LegacyTests
         /// <summary>
         ///A test to change the key of an element
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void Dictionary_Change_Key()
         {
             //System.Diagnostics.Debugger.Break();
@@ -247,14 +256,14 @@ namespace Umbraco.LegacyTests
         /// <summary>
         /// Tries to create a duplicate key and ensures it's not possible.
         /// </summary>
-        [TestMethod()]
+        [Test()]
         public void Dictionary_Attempt_Duplicate_Key()
         {
             var key = "Test" + Guid.NewGuid().ToString("N");
             var d1Id = Dictionary.DictionaryItem.addKey(key, "");
             Assert.IsTrue(d1Id > 0);
             var d1 = new Dictionary.DictionaryItem(d1Id);
-            Assert.IsInstanceOfType(d1, typeof(Dictionary.DictionaryItem));
+			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<Dictionary.DictionaryItem>(d1));
 
             var alreadyExists = false;
             try
@@ -273,13 +282,14 @@ namespace Umbraco.LegacyTests
         }
 
         #region Private methods
+
         private Dictionary.DictionaryItem CreateNew()
         {
             var id = Dictionary.DictionaryItem.addKey("Test" + Guid.NewGuid().ToString("N"), "");
             Assert.IsTrue(id > 0);
 
             var d = new Dictionary.DictionaryItem(id);
-            Assert.IsInstanceOfType(d, typeof(Dictionary.DictionaryItem));
+			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<Dictionary.DictionaryItem>(d));
 
             return d;
         }
@@ -314,7 +324,7 @@ namespace Umbraco.LegacyTests
         ///// <summary>
         /////A test for Import
         /////</summary>
-        //[TestMethod()]
+        //[Test()]
         //public void ImportTest()
         //{
         //    XmlNode xmlData = null; // TODO: Initialize to an appropriate value
@@ -329,7 +339,7 @@ namespace Umbraco.LegacyTests
         ///// <summary>
         /////A test for Import
         /////</summary>
-        //[TestMethod()]
+        //[Test()]
         //public void ImportTest1()
         //{
         //    XmlNode xmlData = null; // TODO: Initialize to an appropriate value
@@ -345,7 +355,7 @@ namespace Umbraco.LegacyTests
         ///// <summary>
         /////A test for Save
         /////</summary>
-        //[TestMethod()]
+        //[Test()]
         //public void SaveTest()
         //{
         //    Guid id = new Guid(); // TODO: Initialize to an appropriate value
@@ -359,7 +369,7 @@ namespace Umbraco.LegacyTests
         ///// <summary>
         /////A test for Value
         /////</summary>
-        //[TestMethod()]
+        //[Test()]
         //public void ValueTest()
         //{
         //    Guid id = new Guid(); // TODO: Initialize to an appropriate value
@@ -375,7 +385,7 @@ namespace Umbraco.LegacyTests
         ///// <summary>
         /////A test for Value
         /////</summary>
-        //[TestMethod()]
+        //[Test()]
         //public void ValueTest1()
         //{
         //    Guid id = new Guid(); // TODO: Initialize to an appropriate value
@@ -390,7 +400,7 @@ namespace Umbraco.LegacyTests
         ///// <summary>
         /////A test for addKey
         /////</summary>
-        //[TestMethod()]
+        //[Test()]
         //public void addKeyTest()
         //{
         //    string key = string.Empty; // TODO: Initialize to an appropriate value
@@ -405,7 +415,7 @@ namespace Umbraco.LegacyTests
         ///// <summary>
         /////A test for addKey
         /////</summary>
-        //[TestMethod()]
+        //[Test()]
         //public void addKeyTest1()
         //{
         //    string key = string.Empty; // TODO: Initialize to an appropriate value
@@ -421,7 +431,7 @@ namespace Umbraco.LegacyTests
         ///// <summary>
         /////A test for delete
         /////</summary>
-        //[TestMethod()]
+        //[Test()]
         //public void deleteTest()
         //{
         //    Guid id = new Guid(); // TODO: Initialize to an appropriate value
@@ -433,7 +443,7 @@ namespace Umbraco.LegacyTests
         ///// <summary>
         /////A test for hasKey
         /////</summary>
-        //[TestMethod()]
+        //[Test()]
         //public void hasKeyTest()
         //{
         //    string key = string.Empty; // TODO: Initialize to an appropriate value
@@ -447,7 +457,7 @@ namespace Umbraco.LegacyTests
         ///// <summary>
         /////A test for setValue
         /////</summary>
-        //[TestMethod()]
+        //[Test()]
         //public void setValueTest()
         //{
         //    Guid id = new Guid(); // TODO: Initialize to an appropriate value
@@ -461,7 +471,7 @@ namespace Umbraco.LegacyTests
         ///// <summary>
         /////A test for setValue
         /////</summary>
-        //[TestMethod()]
+        //[Test()]
         //public void setValueTest1()
         //{
         //    Guid id = new Guid(); // TODO: Initialize to an appropriate value
@@ -474,7 +484,7 @@ namespace Umbraco.LegacyTests
         ///// <summary>
         /////A test for Children
         /////</summary>
-        //[TestMethod()]
+        //[Test()]
         //public void ChildrenTest()
         //{
         //    Guid id = new Guid(); // TODO: Initialize to an appropriate value
@@ -487,7 +497,7 @@ namespace Umbraco.LegacyTests
         ///// <summary>
         /////A test for Parent
         /////</summary>
-        //[TestMethod()]
+        //[Test()]
         //public void ParentTest()
         //{
         //    Guid id = new Guid(); // TODO: Initialize to an appropriate value
@@ -500,7 +510,7 @@ namespace Umbraco.LegacyTests
         ///// <summary>
         /////A test for hasChildren
         /////</summary>
-        //[TestMethod()]
+        //[Test()]
         //public void hasChildrenTest()
         //{
         //    Guid id = new Guid(); // TODO: Initialize to an appropriate value
@@ -513,7 +523,7 @@ namespace Umbraco.LegacyTests
         ///// <summary>
         /////A test for id
         /////</summary>
-        //[TestMethod()]
+        //[Test()]
         //public void idTest()
         //{
         //    Guid id = new Guid(); // TODO: Initialize to an appropriate value
@@ -526,34 +536,5 @@ namespace Umbraco.LegacyTests
         
         #endregion
 
-        #region Initialize and Cleanup
-        // 
-        //You can use the following additional attributes as you write your tests:
-        //
-        //Use ClassInitialize to run code before running the first test in the class
-        //[ClassInitialize()]
-        //public static void MyClassInitialize(TestContext testContext)
-        //{
-        //}
-        //
-        //Use ClassCleanup to run code after all tests in a class have run
-        //[ClassCleanup()]
-        //public static void MyClassCleanup()
-        //{
-        //}
-        //
-        //Use TestInitialize to run code before running each test
-        //[TestInitialize()]
-        //public void MyTestInitialize()
-        //{
-        //}
-        //
-        //Use TestCleanup to run code after each test has run
-        //[TestCleanup()]
-        //public void MyTestCleanup()
-        //{
-        //}
-        //
-        #endregion
     }
 }

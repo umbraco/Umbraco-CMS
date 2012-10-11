@@ -1,7 +1,7 @@
-﻿using umbraco.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
+using Umbraco.Core.IO;
 
-namespace Umbraco.LegacyTests
+namespace Umbraco.Tests.IO
 {
     
     
@@ -9,64 +9,14 @@ namespace Umbraco.LegacyTests
     ///This is a test class for IOHelperTest and is intended
     ///to contain all IOHelperTest Unit Tests
     ///</summary>
-    [TestClass()]
+    [TestFixture()]
     public class IOHelperTest
     {
-
-
-        private TestContext testContextInstance;
-
-        /// <summary>
-        ///Gets or sets the test context which provides
-        ///information about and functionality for the current test run.
-        ///</summary>
-        public TestContext TestContext
-        {
-            get
-            {
-                return testContextInstance;
-            }
-            set
-            {
-                testContextInstance = value;
-            }
-        }
-
-        #region Additional test attributes
-        // 
-        //You can use the following additional attributes as you write your tests:
-        //
-        //Use ClassInitialize to run code before running the first test in the class
-        //[ClassInitialize()]
-        //public static void MyClassInitialize(TestContext testContext)
-        //{
-        //}
-        //
-        //Use ClassCleanup to run code after all tests in a class have run
-        //[ClassCleanup()]
-        //public static void MyClassCleanup()
-        //{
-        //}
-        //
-        //Use TestInitialize to run code before running each test
-        //[TestInitialize()]
-        //public void MyTestInitialize()
-        //{
-        //}
-        //
-        //Use TestCleanup to run code after each test has run
-        //[TestCleanup()]
-        //public void MyTestCleanup()
-        //{
-        //}
-        //
-        #endregion
-
 
         /// <summary>
         ///A test for MapPath verifying that HttpContext method (which includes vdirs) matches non-HttpContext method
         ///</summary>
-        [TestMethod()]
+        [Test]
         public void IOHelper_MapPathTestVDirTraversal()
         {
             //System.Diagnostics.Debugger.Break();
@@ -84,9 +34,9 @@ namespace Umbraco.LegacyTests
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Root, true), IOHelper.MapPath(SystemDirectories.Root, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Scripts, true), IOHelper.MapPath(SystemDirectories.Scripts, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Umbraco, true), IOHelper.MapPath(SystemDirectories.Umbraco, false));
-            Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Umbraco_client, true), IOHelper.MapPath(SystemDirectories.Umbraco_client, false));
-            Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Usercontrols, true), IOHelper.MapPath(SystemDirectories.Usercontrols, false));
-            Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Webservices, true), IOHelper.MapPath(SystemDirectories.Webservices, false));
+            Assert.AreEqual(IOHelper.MapPath(SystemDirectories.UmbracoClient, true), IOHelper.MapPath(SystemDirectories.UmbracoClient, false));
+            Assert.AreEqual(IOHelper.MapPath(SystemDirectories.UserControls, true), IOHelper.MapPath(SystemDirectories.UserControls, false));
+            Assert.AreEqual(IOHelper.MapPath(SystemDirectories.WebServices, true), IOHelper.MapPath(SystemDirectories.WebServices, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Xslt, true), IOHelper.MapPath(SystemDirectories.Xslt, false));
         }
     }

@@ -30,6 +30,10 @@ namespace umbraco.BusinessLogic
 
         public ApplicationTreeRegistrar()
         {
+			//don't do anything if the application is not configured!
+			if (!ApplicationContext.Current.IsConfigured)
+				return;
+
             // Load all Trees by attribute and add them to the XML config
 			var types = PluginManager.Current.ResolveAttributedTrees();
 

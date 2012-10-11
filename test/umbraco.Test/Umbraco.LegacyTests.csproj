@@ -122,10 +122,8 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="DataTypeDefinitionTest.cs" />
-    <Compile Include="DictionaryTest.cs" />
     <Compile Include="DocumentTest.cs" />
     <Compile Include="DocumentTypeTest.cs" />
-    <Compile Include="IOHelperTest.cs" />
     <Compile Include="LanguageTest.cs" />
     <Compile Include="MacroPropertyTypeTest.cs" />
     <Compile Include="MacroTest.cs" />

@@ -37,20 +37,20 @@ namespace umbraco.cms.businesslogic.propertytype
             SortOrder = -1; // we set this to -1 so in the save method we can get the current highest sortorder in case it's not sat after init (ie. if you want to force a sortOrder)
         }
 
-        public List<PropertyType> GetPropertyTypes(List<int> contentTypeIds)
+        public IEnumerable<PropertyType> GetPropertyTypes(List<int> contentTypeIds)
         {
             return PropertyType.GetPropertyTypesByGroup(Id, contentTypeIds);
         }
 
-        public List<PropertyType> GetPropertyTypes()
+		public IEnumerable<PropertyType> GetPropertyTypes()
         {
             return PropertyType.GetPropertyTypesByGroup(Id);
         }
 
         //TODO: Verify support for master doctypes / mixins!
-        public List<PropertyTypeGroup> GetPropertyTypeGroups()
+		public IEnumerable<PropertyTypeGroup> GetPropertyTypeGroups()
         {
-            List<PropertyTypeGroup> ptgs = new List<PropertyTypeGroup>();
+            var ptgs = new List<PropertyTypeGroup>();
             using (IRecordsReader dr =
                 SqlHelper.ExecuteReader(@"
                     SELECT 
@@ -86,7 +86,7 @@ namespace umbraco.cms.businesslogic.propertytype
                         id = @id
                 ",
                     SqlHelper.CreateParameter("@id", Id),
-                    SqlHelper.CreateParameter("@parentGroupId", convertParentId(ParentId)),
+                    SqlHelper.CreateParameter("@parentGroupId", ConvertParentId(ParentId)),
                     SqlHelper.CreateParameter("@contentTypeId", ContentTypeId),
                     SqlHelper.CreateParameter("@sortOrder", SortOrder),
                     SqlHelper.CreateParameter("@name", Name)
@@ -106,7 +106,7 @@ namespace umbraco.cms.businesslogic.propertytype
                     VALUES 
                         (@parentGroupId, @contentTypeId, @sortOrder, @name)
                 ",
-                    SqlHelper.CreateParameter("@parentGroupId", convertParentId(ParentId)),
+                    SqlHelper.CreateParameter("@parentGroupId", ConvertParentId(ParentId)),
                     SqlHelper.CreateParameter("@contentTypeId", ContentTypeId),
                     SqlHelper.CreateParameter("@sortOrder", SortOrder),
                     SqlHelper.CreateParameter("@name", Name)
@@ -133,7 +133,7 @@ namespace umbraco.cms.businesslogic.propertytype
                                       SqlHelper.CreateParameter("@id", Id));
         }
 
-        public void Load()
+        internal void Load()
         {
             using (IRecordsReader dr =
                 SqlHelper.ExecuteReader(@"
@@ -164,9 +164,9 @@ namespace umbraco.cms.businesslogic.propertytype
             return ptg;
         }
 
-        public static List<PropertyTypeGroup> GetPropertyTypeGroupsFromContentType(int contentTypeId)
+		public static IEnumerable<PropertyTypeGroup> GetPropertyTypeGroupsFromContentType(int contentTypeId)
         {
-            List<PropertyTypeGroup> ptgs = new List<PropertyTypeGroup>();
+            var ptgs = new List<PropertyTypeGroup>();
             using (IRecordsReader dr =
                 SqlHelper.ExecuteReader(@"
                     SELECT 
@@ -185,7 +185,7 @@ namespace umbraco.cms.businesslogic.propertytype
             return ptgs;
         }
 
-        private object convertParentId(int parentId)
+        private object ConvertParentId(int parentId)
         {
             if (parentId == 0)
                 return DBNull.Value;

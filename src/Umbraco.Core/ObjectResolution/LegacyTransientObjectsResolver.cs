@@ -33,7 +33,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// TODO: However, it would make much more sense to do this and would speed up the application plus this would make the GetById method much easier.
 		/// </remarks>
 		protected LegacyTransientObjectsResolver(IEnumerable<Type> refreshers)
-			: base(ObjectLifetimeScope.Transient) // false = new objects every time
+			: base(ObjectLifetimeScope.Transient) //  new objects every time
 		{
 			foreach (var l in refreshers)
 			{

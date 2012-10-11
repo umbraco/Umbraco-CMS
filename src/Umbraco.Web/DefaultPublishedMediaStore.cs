@@ -71,8 +71,17 @@ namespace Umbraco.Web
 			var media = global::umbraco.library.GetMedia(id, true);
 			if (media != null && media.Current != null)
 			{
-				media.MoveNext();
-				return ConvertFromXPathNavigator(media.Current);
+				if (media.MoveNext())
+				{
+					var current = media.Current;
+					//error check
+					if (media.Current.MoveToFirstChild() && media.Current.Name.InvariantEquals("error"))
+					{
+						return null;
+					}
+
+					return ConvertFromXPathNavigator(current);
+				}				
 			}
 
 			return null;

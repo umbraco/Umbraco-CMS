@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Data.SqlClient;
+using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Core;
 using umbraco.BusinessLogic.Utils;
@@ -29,6 +31,11 @@ namespace umbraco.BusinessLogic
 
         public ApplicationRegistrar()
         {
+
+			//don't do anything if the application is not configured!
+			if (!ApplicationContext.Current.IsConfigured)
+				return;
+
             // Load all Applications by attribute and add them to the XML config
         	var types = PluginManager.Current.ResolveApplications();
 
@@ -40,7 +47,7 @@ namespace umbraco.BusinessLogic
 
             var allAliases = Application.getAll().Select(x => x.alias).Concat(attrs.Select(x => x.Alias));
             var inString = "'" + string.Join("','", allAliases) + "'";
-
+			
             Application.LoadXml(doc =>
                 {
                     foreach (var attr in attrs)
@@ -51,16 +58,17 @@ namespace umbraco.BusinessLogic
                                                   new XAttribute("icon", attr.Icon),
                                                   new XAttribute("sortOrder", attr.SortOrder)));
                     }
-
-                    var dbApps = SqlHelper.ExecuteReader("SELECT * FROM umbracoApp WHERE appAlias NOT IN ("+ inString +")");
-                    while (dbApps.Read())
-                    {
-                        doc.Root.Add(new XElement("add",
-                                                  new XAttribute("alias", dbApps.GetString("appAlias")),
-                                                  new XAttribute("name", dbApps.GetString("appName")),
-                                                  new XAttribute("icon", dbApps.GetString("appIcon")),
-                                                  new XAttribute("sortOrder", dbApps.GetByte("sortOrder"))));
-                    }
+					
+					var dbApps = SqlHelper.ExecuteReader("SELECT * FROM umbracoApp WHERE appAlias NOT IN (" + inString + ")");
+					while (dbApps.Read())
+					{
+						doc.Root.Add(new XElement("add",
+													new XAttribute("alias", dbApps.GetString("appAlias")),
+													new XAttribute("name", dbApps.GetString("appName")),
+													new XAttribute("icon", dbApps.GetString("appIcon")),
+													new XAttribute("sortOrder", dbApps.GetByte("sortOrder"))));
+					}
+					
 
                 }, true);
 

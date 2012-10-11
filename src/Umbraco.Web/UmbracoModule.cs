@@ -271,10 +271,11 @@ namespace Umbraco.Web
 			if (maybeDoc && GlobalSettings.IsReservedPathOrUrl(lpath))
 				maybeDoc = false;
 
-			if (!maybeDoc)
-			{
-				LogHelper.Warn<UmbracoModule>("Not a document");
-			}
+			//NOTE: No need to warn, plus if we do we should log the document, as this message doesn't really tell us anything :)
+			//if (!maybeDoc)
+			//{
+			//	LogHelper.Warn<UmbracoModule>("Not a document");
+			//}
 
 			return maybeDoc;
 		}
