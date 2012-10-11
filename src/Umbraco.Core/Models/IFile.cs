@@ -9,14 +9,14 @@ namespace Umbraco.Core.Models
     public interface IFile : IValueObject
     {
         /// <summary>
-        /// Gets or sets the Name of the File including extension
+        /// Gets the Name of the File including extension
         /// </summary>
-        string Name { get; set; }
+        string Name { get; }
 
         /// <summary>
-        /// Gets or sets the Alias of the File, which is the name without the extension
+        /// Gets the Alias of the File, which is the name without the extension
         /// </summary>
-        string Alias { get; set; }
+        string Alias { get; }
 
         /// <summary>
         /// Gets or sets the Path to the File from the root of the site

@@ -45,14 +45,15 @@ namespace Umbraco.Core.Models.Css
 
             if (this.source == null)
             {
-                if (System.IO.File.Exists(filePath))
+                this.source = filePath;//Changed to direct content string instead of file.
+                /*if (System.IO.File.Exists(filePath))
                 {
                     this.source = System.IO.File.ReadAllText(filePath);
                 }
                 else
                 {
                     throw new FileError("File not found", filePath, 0, 0);
-                }
+                }*/
             }
         }
 

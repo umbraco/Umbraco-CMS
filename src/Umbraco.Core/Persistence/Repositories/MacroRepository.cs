@@ -24,7 +24,8 @@ namespace Umbraco.Core.Persistence.Repositories
             EnsureDependencies();
         }
 
-        public MacroRepository(IUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
+        public MacroRepository(IUnitOfWork work, IRepositoryCacheProvider cache)
+            : base(work, cache)
         {
             EnsureDependencies();
         }

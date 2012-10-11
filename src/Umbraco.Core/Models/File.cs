@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
@@ -9,11 +10,8 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public abstract class File : IFile
+    public abstract class File : Entity, IFile
     {
-        private string _name;
-        private string _alias;
-
         protected File(string path)
         {
             Path = path;
@@ -27,13 +25,8 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (!string.IsNullOrEmpty(_name))
-                    return _name;
-
-                _name = new FileInfo(Path).Name;
-                return _name;
+                return new FileInfo(Path).Name;
             }
-            set { _name = value; }
         }
 
         /// <summary>
@@ -44,16 +37,11 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (!string.IsNullOrEmpty(_alias))
-                    return _alias;
-
                 var fileInfo = new FileInfo(Path);
                 var name = fileInfo.Name;
-                int lastIndexOf = name.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase) + 1;
-                _alias = name.Substring(0, lastIndexOf);
-                return _alias;
+                int lastIndexOf = name.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase);
+                return name.Substring(0, lastIndexOf);
             }
-            set { _alias = value; }
         }
 
         /// <summary>

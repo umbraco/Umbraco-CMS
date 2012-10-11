@@ -29,18 +29,19 @@ namespace Umbraco.Core.Models
             get
             {
                 var properties = new List<StylesheetProperty>();
-                var parser = new CssParser(Path);//TODO change CssParser so we can use Content instead of Path
+                var parser = new CssParser(Content);
 
                 //TODO Need to explorer how the Stylesheet should be iterated to generate a list of css properties
-                foreach (CssAtRule statement in parser.StyleSheet.Statements)
+                foreach (CssAtRule statement in parser.StyleSheet.Statements.Where(s => s is CssAtRule))
                 {
                     properties.Add(new StylesheetProperty(statement.Value, ""));
                 }
 
-                foreach (CssRuleSet statement in parser.StyleSheet.Statements)
+                foreach (CssRuleSet statement in parser.StyleSheet.Statements.Where(s => s is CssRuleSet))
                 {
                     var selector = statement.Selectors.First();
-                    properties.Add(new StylesheetProperty(selector.Value, ""));
+                    var declaration = statement.Declarations.FirstOrDefault();
+                    properties.Add(new StylesheetProperty(selector.Value, declaration.ToString()));
                 }
 
                 return properties;

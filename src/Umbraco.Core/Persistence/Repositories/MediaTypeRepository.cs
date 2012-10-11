@@ -19,7 +19,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
         }
 
-        public MediaTypeRepository(IUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
+        public MediaTypeRepository(IUnitOfWork work, IRepositoryCacheProvider cache)
+            : base(work, cache)
         {
         }
 

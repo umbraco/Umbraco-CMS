@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.Caching;
-using System.Threading;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Persistence.Caching

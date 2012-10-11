@@ -16,7 +16,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
         }
 
-        public LanguageRepository(IUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
+        public LanguageRepository(IUnitOfWork work, IRepositoryCacheProvider cache)
+            : base(work, cache)
         {
         }
 

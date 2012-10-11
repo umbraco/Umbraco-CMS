@@ -20,6 +20,18 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Returns the <see cref="RenderingEngine"/> that corresponds to the template file
+        /// </summary>
+        /// <returns><see cref="RenderingEngine"/></returns>
+        public RenderingEngine GetTypeOfRenderingEngine()
+        {
+            if(Path.EndsWith("cshtml") || Path.EndsWith("vbhtml"))
+                return RenderingEngine.Mvc;
+
+            return RenderingEngine.WebForms;
+        }
+
+        /// <summary>
         /// Boolean indicating whether the file could be validated
         /// </summary>
         /// <returns>True if file is valid, otherwise false</returns>

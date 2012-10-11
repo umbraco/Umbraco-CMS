@@ -70,6 +70,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             string content = string.Empty;
             string path = string.Empty;
+            DateTime created = new DateTime();
+            DateTime updated = new DateTime();
+            string name = string.Empty;
 
             if(FileSystem.FileExists(id))
             {
@@ -80,6 +83,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 content = Encoding.UTF8.GetString(bytes);
 
                 path = FileSystem.GetRelativePath(id);
+                created = FileSystem.GetCreated(path).UtcDateTime;
+                updated = FileSystem.GetLastModified(path).UtcDateTime;
+                name = new FileInfo(path).Name;
             }
             else
             {
@@ -90,9 +96,18 @@ namespace Umbraco.Core.Persistence.Repositories
                 content = Encoding.UTF8.GetString(bytes);
 
                 path = _viewsFileSystem.GetRelativePath(id);
+                created = FileSystem.GetCreated(path).UtcDateTime;
+                updated = FileSystem.GetLastModified(path).UtcDateTime;
+                name = new FileInfo(path).Name;
             }
 
-            var template = new Template(path) { Content = content };
+            var template = new Template(path)
+                               {
+                                   Content = content,
+                                   Key = name.EncodeAsGuid(),
+                                   CreateDate = created,
+                                   UpdateDate = updated
+                               };
             return template;
         }
 

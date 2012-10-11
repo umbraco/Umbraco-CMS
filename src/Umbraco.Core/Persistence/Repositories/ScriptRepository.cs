@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.IO;
@@ -34,8 +35,17 @@ namespace Umbraco.Core.Persistence.Repositories
             var content = Encoding.UTF8.GetString(bytes);
 
             var path = FileSystem.GetRelativePath(id);
+            var created = FileSystem.GetCreated(path).UtcDateTime;
+            var updated = FileSystem.GetLastModified(path).UtcDateTime;
+            var name = new FileInfo(path).Name;
 
-            var script = new Script(path) {Content = content};
+            var script = new Script(path)
+                             {
+                                 Content = content,
+                                 Key = name.EncodeAsGuid(),
+                                 CreateDate = created,
+                                 UpdateDate = updated
+                             };
             return script;
         }
 

@@ -3,7 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using Umbraco.Core.Configuration.Repositories;
+using System.Reflection;
+using Umbraco.Core.Configuration.InfrastructureSettings;
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -41,25 +43,23 @@ namespace Umbraco.Core.Persistence
                 }
                 return repository;
             }
-
-            var settings =
-                (RepositorySettings)
-                ConfigurationManager.GetSection(RepositoryMappingConstants.RepositoryMappingsConfigurationSectionName);
+            
+            var settings = Infrastructure.Instance.Repositories;
 
             Type repositoryType = null;
 
             //Check if a valid interfaceShortName was passed in
-            if (settings.RepositoryMappings.ContainsKey(interfaceShortName))
+            if (settings.Repository.ContainsKey(interfaceShortName))
             {
-                repositoryType = Type.GetType(settings.RepositoryMappings[interfaceShortName].RepositoryFullTypeName);
+                repositoryType = Type.GetType(settings.Repository[interfaceShortName].RepositoryFullTypeName);
             }
             else
             {
-                foreach (RepositoryMappingElement element in settings.RepositoryMappings)
+                foreach (Repository element in settings.Repository)
                 {
                     if (element.InterfaceShortTypeName.Contains(entityTypeName))
                     {
-                        repositoryType = Type.GetType(settings.RepositoryMappings[element.InterfaceShortTypeName].RepositoryFullTypeName);
+                        repositoryType = Type.GetType(settings.Repository[element.InterfaceShortTypeName].RepositoryFullTypeName);
                         break;
                     }
                 }
@@ -73,7 +73,7 @@ namespace Umbraco.Core.Persistence
             }
 
             //Resolve the repository with its constructor dependencies
-            repository = Resolve(repositoryType, unitOfWork) as TRepository;
+            repository = Resolve(repositoryType, unitOfWork, interfaceShortName) as TRepository;
 
             //Add the new repository instance to the cache
             Repositories.AddOrUpdate(interfaceShortName, repository, (x, y) => repository);
@@ -82,16 +82,17 @@ namespace Umbraco.Core.Persistence
         }
 
         //Recursive create and dependency check
-        private static object Resolve(Type repositoryType, IUnitOfWork unitOfWork)
+        private static object Resolve(Type repositoryType, IUnitOfWork unitOfWork, string interfaceShortName)
         {
-            var constructor = repositoryType.GetConstructors().SingleOrDefault();
+            var constructors = repositoryType.GetConstructors();
+            var constructor = constructors.LastOrDefault();
             if (constructor == null)
             {
                 throw new Exception(string.Format("No public constructor was found on {0}", repositoryType.FullName));
             }
 
             var constructorArgs = new List<object>();
-            var settings = (RepositorySettings)ConfigurationManager.GetSection(RepositoryMappingConstants.RepositoryMappingsConfigurationSectionName);
+            var settings = Infrastructure.Instance.Repositories;
 
             var parameters = constructor.GetParameters();
             foreach (var parameter in parameters)
@@ -105,13 +106,26 @@ namespace Umbraco.Core.Persistence
                     var repo = Repositories[parameter.ParameterType.Name];
                     constructorArgs.Add(repo);
                 }
+                else if(parameter.ParameterType.Name.Equals(typeof(IRepositoryCacheProvider).Name))
+                {
+                    //Get the Type of the cache provider and activate the singleton instance
+                    var cacheType = Type.GetType(settings.Repository[interfaceShortName].CacheProviderFullTypeName);
+                    if (cacheType == null)
+                        throw new Exception(string.Format("Unable to get the type of cache provider '{0}' from configuration while creating an instance of {1}",
+                                                          settings.Repository[parameter.ParameterType.Name].
+                                                              CacheProviderFullTypeName,
+                                                              parameter.ParameterType.Name));
+
+                    var cacheProvider = cacheType.InvokeMember("Current", BindingFlags.GetProperty, null, cacheType, new object[0]);
+                    constructorArgs.Add(cacheProvider);
+                }
                 else
                 {
-                    if (settings.RepositoryMappings.ContainsKey(parameter.ParameterType.Name))
+                    if (settings.Repository.ContainsKey(parameter.ParameterType.Name))
                     {
                         //Get the Type of the repository and resolve the object
-                        var repoType = Type.GetType(settings.RepositoryMappings[parameter.ParameterType.Name].RepositoryFullTypeName);
-                        var repo = Resolve(repoType, unitOfWork);
+                        var repoType = Type.GetType(settings.Repository[parameter.ParameterType.Name].RepositoryFullTypeName);
+                        var repo = Resolve(repoType, unitOfWork, parameter.ParameterType.Name);
 
                         // Add the new repository instance to the cache
                         Repositories.AddOrUpdate(parameter.ParameterType.Name, repo, (x, y) => repo);
@@ -121,10 +135,16 @@ namespace Umbraco.Core.Persistence
                     }
                     else
                     {
-                        throw new Exception("Cannot create the Repository. There was one or more invalid repositoryMapping configuration settings.");
+                        throw new Exception("Cannot create the Repository. There was one or more invalid repository configuration settings.");
                     }
                 }
             }
+
+            if (parameters.Count() != constructorArgs.Count)
+                throw new Exception(
+                    string.Format(
+                        "The amount of expected parameters is different from the amount of constructed parameters, which is confusing! Repository of type '{0}' could not be created.",
+                        repositoryType.FullName));
 
             var repositoryObj = Activator.CreateInstance(repositoryType, constructorArgs.ToArray());
             return repositoryObj;
@@ -135,16 +155,14 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         internal static void RegisterRepositories()
         {
-            var settings =
-                (RepositorySettings)
-                ConfigurationManager.GetSection(RepositoryMappingConstants.RepositoryMappingsConfigurationSectionName);
+            var settings = Infrastructure.Instance.Repositories;
 
-            foreach (RepositoryMappingElement element in settings.RepositoryMappings)
+            foreach (Repository element in settings.Repository)
             {
                 if (Repositories.ContainsKey(element.InterfaceShortTypeName)) continue;
 
-                var repositoryType = Type.GetType(settings.RepositoryMappings[element.InterfaceShortTypeName].RepositoryFullTypeName);
-                var repository = Resolve(repositoryType, null);
+                var repositoryType = Type.GetType(settings.Repository[element.InterfaceShortTypeName].RepositoryFullTypeName);
+                var repository = Resolve(repositoryType, null, element.InterfaceShortTypeName);
 
                 //Add the new repository instance to the cache
                 Repositories.AddOrUpdate(element.InterfaceShortTypeName, repository, (x, y) => repository);

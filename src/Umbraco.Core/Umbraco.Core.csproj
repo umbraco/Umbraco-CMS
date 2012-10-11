@@ -64,11 +64,7 @@
     <Compile Include="Configuration\FileSystemProviderElement.cs" />
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
-    <Compile Include="Configuration\Repositories\RepositoryConfigurationSection.cs" />
-    <Compile Include="Configuration\Repositories\RepositoryMappingCollection.cs" />
-    <Compile Include="Configuration\Repositories\RepositoryMappingConstants.cs" />
-    <Compile Include="Configuration\Repositories\RepositoryMappingElement.cs" />
-    <Compile Include="Configuration\Repositories\RepositorySettings.cs" />
+    <Compile Include="Configuration\InfrastructureSettings\Infrastructure.cs" />
     <Compile Include="CoreBootManager.cs" />
     <Compile Include="DataTableExtensions.cs" />
     <Compile Include="DictionaryExtensions.cs" />
@@ -101,6 +97,8 @@
     <Compile Include="Models\RelationType.cs" />
     <Compile Include="Models\Script.cs" />
     <Compile Include="Models\Stylesheet.cs" />
+    <Compile Include="Models\Task.cs" />
+    <Compile Include="Models\TaskType.cs" />
     <Compile Include="Models\Template.cs" />
     <Compile Include="Persistence\Caching\InMemoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\IRepositoryCacheProvider.cs" />
