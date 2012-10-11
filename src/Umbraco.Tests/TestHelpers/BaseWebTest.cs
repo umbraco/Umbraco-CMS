@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Web.Routing;
 using System.Xml;
@@ -14,7 +15,7 @@ using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Tests.TestHelpers
 {
-	[TestFixture]
+	[TestFixture, RequiresSTA]
 	public abstract class BaseWebTest
 	{
 
@@ -22,6 +23,9 @@ namespace Umbraco.Tests.TestHelpers
 		public virtual void Initialize()
 		{
 			TestHelper.SetupLog4NetForTests();
+
+			AppDomain.CurrentDomain.SetData("DataDirectory", TestHelper.CurrentAssemblyDirectory);
+
 			if (RequiresDbSetup)
 				TestHelper.InitializeDatabase();
 			Resolution.Freeze();
@@ -36,6 +40,8 @@ namespace Umbraco.Tests.TestHelpers
 		[TearDown]
 		public virtual void TearDown()
 		{
+			AppDomain.CurrentDomain.SetData("DataDirectory", null);
+
 			//reset the app context
 			ApplicationContext.Current = null;
 			Resolution.IsFrozen = false;
