@@ -112,16 +112,16 @@ namespace Umbraco.Web.UI.Controls
 
             // Create size changer
             sb.Append("<div class='thumb-sizer'>" +
-                      "<input type='radio' name='thumb_size' value='small' data-bind='checked: thumbSize' />" +
-                      "<img src='images/thumbs_smll.png' alt='Small thumbnails' />" +
-                      "<input type='radio' name='thumb_size' value='medium' data-bind='checked: thumbSize' />" +
-                      "<img src='images/thumbs_med.png' alt='Medium thumbnails' />" +
-                      "<input type='radio' name='thumb_size' value='large' data-bind='checked: thumbSize' />" +
-                      "<img src='images/thumbs_lrg.png' alt='Large thumbnails' />" +
+                      "<input type='radio' name='thumb_size' id='thumb_size_small' value='small' data-bind='checked: thumbSize' />" +
+                      "<label for='thumb_size_small'><img src='images/thumbs_smll.png' alt='Small thumbnails' /></label>" +
+                      "<input type='radio' name='thumb_size' id='thumb_size_medium' value='medium' data-bind='checked: thumbSize' />" +
+                      "<label for='thumb_size_medium'><img src='images/thumbs_med.png' alt='Medium thumbnails' /></label>" +
+                      "<input type='radio' name='thumb_size' id='thumb_size_large' value='large' data-bind='checked: thumbSize' />" +
+                      "<label for='thumb_size_large'><img src='images/thumbs_lrg.png' alt='Large thumbnails' /></label>" +
                       "</div>");
 
             // Create the filter input
-            sb.Append("<div class='filter'>Filter: <input type='text' data-bind=\"value: filterTerm, valueUpdate: 'afterkeydown'\" /></div>");
+            sb.Append("<div class='filter'>Filter: <input type='text' data-bind=\"value: filterTerm, valueUpdate: 'afterkeydown'\" id='filterTerm'/></div>");
 
             // Create throbber to display whilst loading items
             sb.Append("<img src='images/throbber.gif' alt='' class='throbber' data-bind=\"visible: filtered().length == 0\" />");
@@ -137,7 +137,8 @@ namespace Umbraco.Web.UI.Controls
 
             Page.ClientScript.RegisterStartupScript(typeof(FolderBrowser),
                 "RegisterFolderBrowsers",
-                string.Format("$(function () {{ $(\".umbFolderBrowser\").folderBrowser({{ umbracoPath : '{0}', basePath : '{1}' }}); }});",
+                string.Format("$(function () {{ $(\".umbFolderBrowser\").folderBrowser({{ umbracoPath : '{0}', basePath : '{1}' }}); " +
+                 "$(\".umbFolderBrowser #filterTerm\").keypress(function(event) {{ return event.keyCode != 13; }});}});",
                 IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                 IOHelper.ResolveUrl(SystemDirectories.Base)),
                 true);
