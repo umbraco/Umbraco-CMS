@@ -64,6 +64,9 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.ApplicationBlocks.Data, Version=1.0.1559.20655, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Microsoft.ApplicationBlocks.Data.dll</HintPath>
@@ -78,6 +81,7 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -93,6 +97,7 @@
     <Compile Include="IRecordsReader.cs" />
     <Compile Include="ISqlHelper.cs" />
     <Compile Include="IParameterContainer.cs" />
+    <Compile Include="LogHelper.cs" />
     <Compile Include="SqlHelperException.cs" />
     <Compile Include="SqlHelpers\MySql\MySqlInstaller.cs" />
     <Compile Include="SqlHelpers\MySql\MySqlParser.cs" />
@@ -141,6 +146,7 @@
     <Compile Include="SqlHelpers\SqlServer\SqlServerParameter.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="SqlHelpers\SqlServer\Sql\Total.sql" />
   </ItemGroup>
   <ItemGroup>
