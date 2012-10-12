@@ -198,7 +198,7 @@ namespace umbraco.DataLayer
             }
             catch (Exception e)
             {
-                LogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
+                TemporaryLogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
                 throw new SqlHelperException("ExecuteScalar", commandText, parameters, e);
             }
         }
@@ -222,7 +222,7 @@ namespace umbraco.DataLayer
             }
             catch (Exception e)
             {
-                LogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
+                TemporaryLogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
                 throw new SqlHelperException("ExecuteNonQuery", commandText, parameters, e);
             }
         }
@@ -246,7 +246,7 @@ namespace umbraco.DataLayer
             }
             catch (Exception e)
             {
-                LogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
+                TemporaryLogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
                 throw new SqlHelperException("ExecuteReader", commandText, parameters, e);
             }
         }
@@ -270,7 +270,7 @@ namespace umbraco.DataLayer
             }
             catch (Exception e)
             {
-                LogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
+                TemporaryLogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
                 throw new SqlHelperException("ExecuteXmlReader", commandText, parameters, e);
             }
         }

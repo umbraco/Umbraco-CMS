@@ -6,10 +6,15 @@ using log4net;
 
 namespace umbraco.DataLayer
 {
+    // TODO: Make this not be a copy of the loghelper in Umbraco.Core
+    // Currently this is JUST here so we can do some logging of the 
+    // installer and to find calls to legacy tables/columns so they 
+    // can be removed over time. Do not rely on this thing, it will move
+
     ///<summary>
     /// Used for logging
     ///</summary>
-    internal static class LogHelper
+    internal static class TemporaryLogHelper
     {
         ///<summary>
         /// Returns a logger for the type specified
