@@ -95,7 +95,7 @@ namespace umbraco.cms.businesslogic.propertytype
             else
             {
                 if (SortOrder == -1)
-                    SortOrder = SqlHelper.ExecuteScalar<int>("select count(*) from cmsPropertyTypeGroup where isnull(parentGroupId, 0) = 0 and contenttypeNodeId = @nodeId",
+                    SortOrder = SqlHelper.ExecuteScalar<int>("select count(*) from cmsPropertyTypeGroup where COALESCE(parentGroupId, 0) = 0 and contenttypeNodeId = @nodeId",
                         SqlHelper.CreateParameter("@nodeId", ContentTypeId)) + 1;
 
                 SqlHelper.ExecuteNonQuery(
