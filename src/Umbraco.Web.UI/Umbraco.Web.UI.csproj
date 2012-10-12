@@ -541,6 +541,7 @@
     <Content Include="umbraco_client\Installer\images\btn-buisness-repeat.png" />
     <Content Include="umbraco_client\Installer\images\btn-confirm.png" />
     <Content Include="umbraco_client\Installer\images\pbar.gif" />
+    <Content Include="umbraco_client\splitbutton\jquery.splitbutton.js" />
     <Content Include="umbraco_client\tags\css\jquery.tagsinput.css" />
     <Content Include="umbraco_client\tags\js\jquery.tagsinput.js" />
     <Content Include="umbraco_client\tags\js\jquery.tagsinput.min.js">
