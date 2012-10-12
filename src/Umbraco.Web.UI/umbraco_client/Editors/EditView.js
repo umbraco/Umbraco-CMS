@@ -30,7 +30,7 @@
         },
 
         doSubmit: function () {
-            var codeVal = UmbEditor.GetCode();
+            var codeVal = UmbClientMgr.contentFrame().UmbEditor.GetCode();
             var self = this;
 
             umbraco.presentation.webservices.codeEditorSave.SaveTemplate(
@@ -59,7 +59,7 @@
         changeMasterPageFile: function ( ) {
             //var editor = document.getElementById(this._opts.sourceEditorId);
             var templateDropDown = this._opts.masterPageDropDown.get(0);
-            var templateCode = UmbEditor.GetCode();
+            var templateCode = UmbClientMgr.contentFrame().UmbEditor.GetCode();
             var newValue = templateDropDown.options[templateDropDown.selectedIndex].id;
 
             var layoutDefRegex = new RegExp("(@{[\\s\\S]*?Layout\\s*?=\\s*?)(\"[^\"]*?\"|null)(;[\\s\\S]*?})", "gi");
@@ -80,7 +80,7 @@
                 }
             }
 
-            UmbEditor.SetCode(templateCode);
+            UmbClientMgr.contentFrame().UmbEditor.SetCode(templateCode);
 
             return false;
         }
