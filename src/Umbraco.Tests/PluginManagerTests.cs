@@ -75,14 +75,14 @@ namespace Umbraco.Tests
 		public void Resolves_Attributed_Trees()
 		{
 			var trees = PluginManager.Current.ResolveAttributedTrees();
-			Assert.AreEqual(26, trees.Count());
+			Assert.AreEqual(27, trees.Count());
 		}
 
 		[Test]
 		public void Resolves_Actions()
 		{
 			var actions = PluginManager.Current.ResolveActions();
-			Assert.AreEqual(36, actions.Count());
+			Assert.AreEqual(37, actions.Count());
 		}
 
 		[Test]
@@ -110,14 +110,14 @@ namespace Umbraco.Tests
 		public void Resolves_DataTypes()
 		{
 			var types = PluginManager.Current.ResolveDataTypes();
-			Assert.AreEqual(36, types.Count());
+			Assert.AreEqual(37, types.Count());
 		}
 
 		[Test]
 		public void Resolves_RazorDataTypeModels()
 		{
 			var types = PluginManager.Current.ResolveRazorDataTypeModels();
-			Assert.AreEqual(1, types.Count());
+			Assert.AreEqual(2, types.Count());
 		}
 
 		[Test]
