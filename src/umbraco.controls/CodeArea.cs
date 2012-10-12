@@ -170,10 +170,13 @@ namespace umbraco.uicontrols
                     OffSetX += 20;
                 }
 
-                jsEventCode += @"                    
-                    $(function () {
+                jsEventCode += @"   
+					//TODO: for now this is a global var, need to refactor all this so that is using proper js standards
+					//with correct objects, and proper accessors to these objects.
+					var UmbEditor;                 
+                    $(document).ready(function () {
                         //create the editor
-                       var UmbEditor = new Umbraco.Controls.CodeEditor.UmbracoEditor(" + (!CodeMirrorEnabled).ToString().ToLower() + @", '" + this.ClientID + @"');
+                       UmbEditor = new Umbraco.Controls.CodeEditor.UmbracoEditor(" + (!CodeMirrorEnabled).ToString().ToLower() + @", '" + this.ClientID + @"');
                        var m_textEditor = jQuery('#" + this.ClientID + @"');
                    
                        //with codemirror adding divs for line numbers, we need to target a different element
