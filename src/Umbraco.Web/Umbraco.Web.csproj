@@ -1852,7 +1852,9 @@
     <Content Include="umbraco.presentation\install\steps\Skinning\loadStarterKitDesigns.ascx" />
     <Content Include="umbraco.presentation\install\steps\Skinning\loadStarterKits.ascx" />
     <Content Include="umbraco.presentation\install\Title.ascx" />
-    <Content Include="umbraco.presentation\install\utills\p.aspx" />
+    <Content Include="umbraco.presentation\install\utills\p.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dashboard\ChangePassword.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\DeveloperDashboardIntro.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\DeveloperDashboardVideos.ascx" />
