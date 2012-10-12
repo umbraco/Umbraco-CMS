@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using NUnit.Framework;
 using SqlCE4Umbraco;
+using Umbraco.Tests.TestHelpers;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.IO;
@@ -41,6 +42,8 @@ namespace Umbraco.Tests.BusinessLogic
             if (dataHelper == null)
                 throw new InvalidOperationException("The sql helper for unit tests must be of type SqlCEHelper, check the ensure the connection string used for this test is set to use SQLCE");
             dataHelper.ClearDatabase();
+
+            AppDomain.CurrentDomain.SetData("DataDirectory", null);
         }
 
         private void InitializeDatabase()
@@ -49,6 +52,7 @@ namespace Umbraco.Tests.BusinessLogic
 
 			ClearDatabase();
 
+            AppDomain.CurrentDomain.SetData("DataDirectory", TestHelper.CurrentAssemblyDirectory);
             var dataHelper = DataLayerHelper.CreateSqlHelper(GlobalSettings.DbDSN);
             var installer = dataHelper.Utility.CreateInstaller();
             if (installer.CanConnect)
