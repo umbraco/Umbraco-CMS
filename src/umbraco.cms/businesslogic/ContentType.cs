@@ -168,73 +168,23 @@ namespace umbraco.cms.businesslogic
                 return _propertyTypeCache[key];
             }
 
-            //Instead of going via API, run this query to find the control type
-            //by-passes a lot of queries just to determine if this is a true/false data type
-
-            //This SQL returns a larger recordset than intended 
-            //causing controlId to sometimes be null instead of correct
-            //because all properties for the type are returned
-            //side effect of changing inner join to left join when adding masterContentType
-            //string sql = "select " +
-            //    "cmsDataType.controlId, masterContentType.alias as masterAlias " +
-            //    "from " +
-            //    "cmsContentType " +
-            //    "inner join cmsPropertyType on (cmsContentType.nodeId = cmsPropertyType.contentTypeId) " +
-            //    "left join cmsDataType on (cmsPropertyType.dataTypeId = cmsDataType.nodeId) and cmsPropertyType.Alias = @propertyAlias " +
-            //    "left join cmsContentType masterContentType on masterContentType.nodeid = cmsContentType.masterContentType " +
-            //    "where cmsContentType.alias = @contentTypeAlias";
-
-            //this SQL correctly returns a single row when the property exists, but still returns masterAlias if it doesn't
-            string sql = "select  cmsDataType.controlId, masterContentType.alias as masterAlias  " +
-                "from  " +
-                "cmsContentType  " +
-                "left join cmsPropertyType on (cmsContentType.nodeId = cmsPropertyType.contentTypeId and cmsPropertyType.Alias = @propertyAlias)  " +
-                "left join cmsDataType on (cmsPropertyType.dataTypeId = cmsDataType.nodeId) " +
-                "left join cmsContentType masterContentType on masterContentType.nodeid = cmsContentType.masterContentType  " +
-                "where  " +
-                "cmsContentType.alias = @contentTypeAlias";
-
-            //Ensure that getdatatype doesn't throw an exception
-            //http://our.umbraco.org/forum/developers/razor/18085-Access-custom-node-properties-with-Razor
-
-            //grab the controlid or test for parent
+            // With 4.10 we can't do this via direct SQL as we have content type mixins
             Guid controlId = Guid.Empty;
-            IRecordsReader reader = null;
-            try
+            ContentType ct = GetByAlias(contentTypeAlias);
+            PropertyType pt = ct.getPropertyType(propertyTypeAlias);
+            if (pt != null)
             {
-                reader = Application.SqlHelper.ExecuteReader(sql,
-                    Application.SqlHelper.CreateParameter("@contentTypeAlias", contentTypeAlias),
-                    Application.SqlHelper.CreateParameter("@propertyAlias", propertyTypeAlias)
-                    );
-                if (reader.Read())
-                {
-                    if (!reader.IsNull("controlId"))
-                        controlId = reader.GetGuid("controlId");
-                    else if (!reader.IsNull("masterAlias") && !String.IsNullOrEmpty(reader.GetString("masterAlias")))
-                    {
-                        controlId = GetDataType(reader.GetString("masterAlias"), propertyTypeAlias);
-                    }
-
-                }
-            }
-            catch (UmbracoException)
-            {
-                _propertyTypeCache.Add(key, controlId);
-            }
-            finally
-            {
-                if (reader != null)
-                {
-                    reader.Close();
-                }
+                controlId = pt.DataTypeDefinition.DataType.Id;
             }
 
-            //add to cache
+            //add to cache (even if empty!)
             if (!_propertyTypeCache.ContainsKey(key))
             {
                 _propertyTypeCache.Add(key, controlId);
             }
+
             return controlId;
+
 
         }
 
