@@ -104,6 +104,17 @@
     <Compile Include="Persistence\Caching\IRepositoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\NullCacheProvider.cs" />
     <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
+    <Compile Include="Persistence\DatabaseAnnotations\AttributeExtensions.cs" />
+    <Compile Include="Persistence\DatabaseAnnotations\ConstraintAttribute.cs" />
+    <Compile Include="Persistence\DatabaseAnnotations\DatabaseTypeAttribute.cs" />
+    <Compile Include="Persistence\DatabaseAnnotations\DatabaseTypes.cs" />
+    <Compile Include="Persistence\DatabaseAnnotations\ForeignKeyAttribute.cs" />
+    <Compile Include="Persistence\DatabaseAnnotations\IndexAttribute.cs" />
+    <Compile Include="Persistence\DatabaseAnnotations\IndexTypes.cs" />
+    <Compile Include="Persistence\DatabaseAnnotations\NullSettingAttribute.cs" />
+    <Compile Include="Persistence\DatabaseAnnotations\NullSettings.cs" />
+    <Compile Include="Persistence\DatabaseAnnotations\PrimaryKeyColumnAttribute.cs" />
+    <Compile Include="Persistence\DatabaseAnnotations\ReferencesAttribute.cs" />
     <Compile Include="Persistence\DatabaseFactory.cs" />
     <Compile Include="Persistence\Factories\ContentFactory.cs" />
     <Compile Include="Persistence\Factories\ContentTypeFactory.cs" />
@@ -119,6 +130,7 @@
     <Compile Include="Persistence\Factories\RelationFactory.cs" />
     <Compile Include="Persistence\Factories\RelationTypeFactory.cs" />
     <Compile Include="Persistence\Mappers\ModelDtoMapper.cs" />
+    <Compile Include="Persistence\PetaPocoExtensions.cs" />
     <Compile Include="Persistence\Querying\ExpressionHelper.cs" />
     <Compile Include="Persistence\Querying\IQuery.cs" />
     <Compile Include="Persistence\Querying\Query.cs" />

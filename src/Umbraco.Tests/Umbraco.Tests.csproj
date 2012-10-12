@@ -67,6 +67,7 @@
     <Compile Include="LibraryTests.cs" />
     <Compile Include="Models\ContentTests.cs" />
     <Compile Include="Models\StylesheetTests.cs" />
+    <Compile Include="Persistence\DatabaseExtensionsTest.cs" />
     <Compile Include="Persistence\DatabaseFactoryTests.cs" />
     <Compile Include="Persistence\RepositoryResolverTests.cs" />
     <Compile Include="Resolvers\ActionsResolverTests.cs" />

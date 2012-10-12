@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence
     {
         #region Singleton
 
-        private static readonly Database _database = new Database(GlobalSettings.DbDsn);
+        private static readonly Database _database = new Database("umbracoDbDSN");
         private static readonly Lazy<DatabaseFactory> lazy = new Lazy<DatabaseFactory>(() => new DatabaseFactory());
 
         public static DatabaseFactory Current { get { return lazy.Value; } }
