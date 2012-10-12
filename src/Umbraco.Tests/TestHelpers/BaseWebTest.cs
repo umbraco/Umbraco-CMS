@@ -40,13 +40,14 @@ namespace Umbraco.Tests.TestHelpers
 		[TearDown]
 		public virtual void TearDown()
 		{
-			AppDomain.CurrentDomain.SetData("DataDirectory", null);
-
 			//reset the app context
 			ApplicationContext.Current = null;
 			Resolution.IsFrozen = false;
 			if (RequiresDbSetup)
 				TestHelper.ClearDatabase();
+
+            AppDomain.CurrentDomain.SetData("DataDirectory", null);
+
 			Cache.ClearAllCache();
 		}	
 
