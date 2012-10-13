@@ -64,6 +64,11 @@ namespace umbraco.cms.businesslogic.datatype
             }
             set
             {
+				if (SqlHelper == null)
+					throw new InvalidOperationException("Cannot execute a SQL command when the SqlHelper is null");
+				if (value == null)
+					throw new InvalidOperationException("The value passed in is null. The DataType property cannot be set to a null value");
+
                 SqlHelper.ExecuteNonQuery("update cmsDataType set controlId = @id where nodeID = " + this.Id.ToString(),
                     SqlHelper.CreateParameter("@id", value.Id));
                 _controlId = value.Id;
@@ -167,7 +172,11 @@ namespace umbraco.cms.businesslogic.datatype
 
 
                 DataTypeDefinition dtd = MakeNew(u, _name, new Guid(_def));
-                dtd.DataType = f.DataType(new Guid(_id));
+				var dataType = f.DataType(new Guid(_id));
+				if (dataType == null)
+					throw new NullReferenceException("Could not resolve a data type with id " + _id);
+
+	            dtd.DataType = dataType;
                 dtd.Save();
 
                 //add prevalues
