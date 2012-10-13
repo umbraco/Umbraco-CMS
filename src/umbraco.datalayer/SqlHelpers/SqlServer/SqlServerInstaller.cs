@@ -24,8 +24,10 @@ namespace umbraco.DataLayer.SqlHelpers.SqlServer
 
         /// <summary>The specifications to determine the database version.</summary>
         private static readonly VersionSpecs[] m_VersionSpecs = new VersionSpecs[] {
-					new VersionSpecs("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'cmsContentType2ContentType'", 0, DatabaseVersion.Version4_9), 
-					new VersionSpecs("SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS LEFT OUTER JOIN umbracoApp ON appAlias = appAlias WHERE CONSTRAINT_NAME = 'FK_umbracoUser2app_umbracoApp'", 0, DatabaseVersion.Version4_8), 
+					new VersionSpecs("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'cmsContentType2ContentType'", 1, DatabaseVersion.Version4_9), 
+					//This will throw an exception and will only ever have one row if it is installed, on exception the database version returned is unkown so will still work.
+					//NOTE: before this was set to zero and only worked by fluke!
+					new VersionSpecs("SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS LEFT OUTER JOIN umbracoApp ON appAlias = appAlias WHERE CONSTRAINT_NAME = 'FK_umbracoUser2app_umbracoApp'", 1, DatabaseVersion.Version4_8), 
 					new VersionSpecs("SELECT id FROM umbracoNode WHERE id = -21", 1, DatabaseVersion.Version4_1),        
 					new VersionSpecs("SELECT action FROM umbracoAppTree", DatabaseVersion.Version4),
                     new VersionSpecs("SELECT description FROM cmsContentType", DatabaseVersion.Version3),
