@@ -134,11 +134,14 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		internal IEnumerable<T> CreateInstances<T>(IEnumerable<Type> types, bool throwException = false)
 		{
+			//Have removed logging because it doesn't really need to be logged since the time taken is generally 0ms.
+			//we want to know if it fails ever, not how long it took if it is only 0.
+
 			var typesAsArray = types.ToArray();
-			using (DisposableTimer.DebugDuration<PluginManager>(
-				String.Format("Starting instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName),
-				String.Format("Completed instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName)))
-			{
+			//using (DisposableTimer.DebugDuration<PluginManager>(
+			//	String.Format("Starting instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName),
+			//	String.Format("Completed instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName)))
+			//{
 				var instances = new List<T>();
 				foreach (var t in typesAsArray)
 				{
@@ -159,7 +162,7 @@ namespace Umbraco.Core
 					}
 				}
 				return instances;
-			}
+			//}
 		}
 
 		/// <summary>
