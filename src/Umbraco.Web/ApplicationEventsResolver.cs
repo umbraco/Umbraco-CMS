@@ -30,24 +30,24 @@ namespace Umbraco.Web
 			get { return Values.OfType<IApplicationEventHandler>(); }
 		}
 
-		public override void Clear()
+		protected override bool SupportsClear
 		{
-			throw new NotSupportedException("This class does not support this method");
+			get { return false; }
 		}
 
-		public override void AddType(Type value)
+		protected override bool SupportsAdd
 		{
-			throw new NotSupportedException("This class does not support this method");
+			get { return false; }
 		}
 
-		public override void InsertType(int index, Type value)
+		protected override bool SupportsInsert
 		{
-			throw new NotSupportedException("This class does not support this method");
+			get { return false; }			
 		}
 
-		public override void RemoveType(Type value)
+		protected override bool SupportsRemove
 		{
-			throw new NotSupportedException("This class does not support this method");
+			get { return false; }
 		}
 
 	}

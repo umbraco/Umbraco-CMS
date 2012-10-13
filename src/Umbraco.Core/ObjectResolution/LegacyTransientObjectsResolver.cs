@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace Umbraco.Core.ObjectResolution
@@ -20,7 +21,7 @@ namespace Umbraco.Core.ObjectResolution
 		where TResolved : class
 		where TResolver : class
 	{
-
+		
 		#region Constructors
 		
 		/// <summary>
@@ -35,10 +36,7 @@ namespace Umbraco.Core.ObjectResolution
 		protected LegacyTransientObjectsResolver(IEnumerable<Type> refreshers)
 			: base(ObjectLifetimeScope.Transient) //  new objects every time
 		{
-			foreach (var l in refreshers)
-			{
-				this.AddType(l);
-			}
+			AddTypes(refreshers);
 		}
 		#endregion
 
@@ -63,16 +61,16 @@ namespace Umbraco.Core.ObjectResolution
 		/// <returns></returns>
 		public TResolved GetById(Guid id)
 		{
-			EnsureRefreshersList();
+			EnsureIdsAreTracked();
 			return !_trackIdToType.ContainsKey(id)
 			       	? null
 					: PluginManager.Current.CreateInstance<TResolved>(_trackIdToType[id]);
 		}
 
 		/// <summary>
-		/// Populates the refreshers dictionary to allow us to instantiate a type by Id since the ICacheRefresher type doesn't contain any metadata
+		/// Populates the ids -> Type dictionary to allow us to instantiate a type by Id since these legacy types doesn't contain any metadata
 		/// </summary>
-		protected void EnsureRefreshersList()
+		protected void EnsureIdsAreTracked()
 		{
 			using (var l = new UpgradeableReadLock(_lock))
 			{

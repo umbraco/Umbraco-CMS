@@ -97,6 +97,10 @@ namespace Umbraco.Core.ObjectResolution
 		protected ObjectLifetimeScope LifetimeScope { get; private set; }
 
 		private int _defaultPluginWeight = 10;
+		private bool _supportsAdd = true;
+		private bool _supportsInsert = true;
+		private bool _supportsClear = true;
+		private bool _supportsRemove = true;
 
 		/// <summary>
 		/// Used in conjunction with GetSortedValues and WeightedPluginAttribute, if any of the objects
@@ -185,11 +189,14 @@ namespace Umbraco.Core.ObjectResolution
 		/// Removes a type.
 		/// </summary>
 		/// <param name="value">The type to remove.</param>
-		public virtual void RemoveType(Type value)
-		{	
-			EnsureCorrectType(value);
+		public void RemoveType(Type value)
+		{
+			if (!SupportsRemove)
+				throw new InvalidOperationException("This resolver does not support Removing types");
+
 			using (new WriteLock(_lock))
 			{
+				EnsureCorrectType(value);
 				InstanceTypes.Remove(value);
 			}
 		}
@@ -204,20 +211,41 @@ namespace Umbraco.Core.ObjectResolution
 		}
 
 		/// <summary>
+		/// protected method allow the inheritor to add many types at once
+		/// </summary>
+		/// <param name="types"></param>
+		protected void AddTypes(IEnumerable<Type> types)
+		{			
+			using (var l = new WriteLock(_lock))
+			{
+				foreach(var t in types)
+				{
+					EnsureCorrectType(t);
+					if (InstanceTypes.Contains(t))
+					{
+						throw new InvalidOperationException("The Type " + t + " already exists in the collection");
+					};
+					InstanceTypes.Add(t);	
+				}				
+			}
+		}
+
+		/// <summary>
 		/// Adds a Type to the end of the list.
 		/// </summary>
 		/// <param name="value">The object to be added.</param>
-		public virtual void AddType(Type value)
+		public void AddType(Type value)
 		{
-			EnsureCorrectType(value);
-			using (var l = new UpgradeableReadLock(_lock))
+			if (!SupportsAdd)
+				throw new InvalidOperationException("This resolver does not support Adding new types");
+
+			using (var l = new WriteLock(_lock))
 			{
+				EnsureCorrectType(value);
 				if (InstanceTypes.Contains(value))
 				{
 					throw new InvalidOperationException("The Type " + value + " already exists in the collection");
 				};
-
-				l.UpgradeToWriteLock();
 				InstanceTypes.Add(value);
 			}
 		}
@@ -234,8 +262,11 @@ namespace Umbraco.Core.ObjectResolution
 		/// <summary>
 		/// Clears the list.
 		/// </summary>
-		public virtual void Clear()
+		public void Clear()
 		{
+			if (!SupportsClear)
+				throw new InvalidOperationException("This resolver does not support Clearing types");
+
 			using (new WriteLock(_lock))
 			{
 				InstanceTypes.Clear();
@@ -247,11 +278,14 @@ namespace Umbraco.Core.ObjectResolution
 		/// </summary>
 		/// <param name="index">The zero-based index at which the object should be inserted.</param>
 		/// <param name="value">The object to insert.</param>
-		public virtual void InsertType(int index, Type value)
-		{
-			EnsureCorrectType(value);
+		public void InsertType(int index, Type value)
+		{			
+			if (!SupportsInsert)
+				throw new InvalidOperationException("This resolver does not support Inserting new types");
+
 			using (var l = new UpgradeableReadLock(_lock))
 			{
+				EnsureCorrectType(value);
 				if (InstanceTypes.Contains(value))
 				{
 					throw new InvalidOperationException("The Type " + value + " already exists in the collection");
@@ -278,5 +312,24 @@ namespace Umbraco.Core.ObjectResolution
 				throw new InvalidOperationException("The resolver " + this.GetType() + " can only accept types of " + typeof(TResolved) + ". The Type passed in to this method is " + t);
 		}
 
+		protected virtual bool SupportsAdd
+		{
+			get { return _supportsAdd; }
+		}
+
+		protected virtual bool SupportsInsert
+		{
+			get { return _supportsInsert; }
+		}
+
+		protected virtual bool SupportsClear
+		{
+			get { return _supportsClear; }
+		}
+
+		protected virtual bool SupportsRemove
+		{
+			get { return _supportsRemove; }
+		}
 	}
 }
