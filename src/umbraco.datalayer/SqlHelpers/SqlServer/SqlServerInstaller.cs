@@ -20,7 +20,7 @@ namespace umbraco.DataLayer.SqlHelpers.SqlServer
         #region Private Constants
        
         /// <summary>The latest database version this installer supports.</summary>
-        private const DatabaseVersion LatestVersionSupported = DatabaseVersion.Version4_8;
+        private const DatabaseVersion LatestVersionSupported = DatabaseVersion.Version4_9;
 
         /// <summary>The specifications to determine the database version.</summary>
         private static readonly VersionSpecs[] m_VersionSpecs = new VersionSpecs[] {
