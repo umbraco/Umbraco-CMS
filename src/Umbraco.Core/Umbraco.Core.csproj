@@ -105,6 +105,7 @@
     <Compile Include="Persistence\Caching\NullCacheProvider.cs" />
     <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\AttributeExtensions.cs" />
+    <Compile Include="Persistence\DatabaseAnnotations\ChangeTypes.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ConstraintAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\DatabaseTypeAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\DatabaseTypes.cs" />
@@ -116,6 +117,7 @@
     <Compile Include="Persistence\DatabaseAnnotations\PrimaryKeyColumnAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ReferencesAttribute.cs" />
     <Compile Include="Persistence\DatabaseFactory.cs" />
+    <Compile Include="Persistence\DatabaseProviders.cs" />
     <Compile Include="Persistence\Factories\ContentFactory.cs" />
     <Compile Include="Persistence\Factories\ContentTypeFactory.cs" />
     <Compile Include="Persistence\Factories\DataTypeDefinitionFactory.cs" />
@@ -130,6 +132,15 @@
     <Compile Include="Persistence\Factories\RelationFactory.cs" />
     <Compile Include="Persistence\Factories\RelationTypeFactory.cs" />
     <Compile Include="Persistence\Mappers\ModelDtoMapper.cs" />
+    <Compile Include="Persistence\Migrations\AddColumnChange.cs" />
+    <Compile Include="Persistence\Migrations\BaseChange.cs" />
+    <Compile Include="Persistence\Migrations\ConstraintChange.cs" />
+    <Compile Include="Persistence\Migrations\DatabaseTypeChange.cs" />
+    <Compile Include="Persistence\Migrations\DropColumnChange.cs" />
+    <Compile Include="Persistence\Migrations\ForeignKeyChange.cs" />
+    <Compile Include="Persistence\Migrations\IDatabaseChange.cs" />
+    <Compile Include="Persistence\Migrations\IndexChange.cs" />
+    <Compile Include="Persistence\Migrations\TableChange.cs" />
     <Compile Include="Persistence\PetaPocoExtensions.cs" />
     <Compile Include="Persistence\Querying\ExpressionHelper.cs" />
     <Compile Include="Persistence\Querying\IQuery.cs" />

@@ -14,5 +14,13 @@ namespace Umbraco.Tests.Persistence
 
             Assert.AreSame(db1, db2);
         }
+
+        [Test]
+        public void Can_Assert_DatabaseProvider()
+        {
+            var provider = DatabaseFactory.Current.DatabaseProvider;
+
+            Assert.AreEqual(DatabaseProviders.SqlServerCE, provider);
+        }
     }
 }

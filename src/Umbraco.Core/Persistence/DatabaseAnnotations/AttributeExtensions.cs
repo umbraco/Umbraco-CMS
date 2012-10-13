@@ -2,15 +2,20 @@
 {
     public static class AttributeExtensions
     {
-        public static string ToSqlSyntax(this NullSettingAttribute attribute)
+        public static string ToSqlSyntax(this NullSettings settings)
         {
-            return attribute.NullSetting == NullSettings.Null ? "NULL" : "NOT NULL";
+            return settings == NullSettings.Null ? "NULL" : "NOT NULL";
         }
 
-        public static string ToSqlSyntax(this DatabaseTypeAttribute attribute)
+        public static string ToSqlSyntax(this NullSettingAttribute attribute)
+        {
+            return attribute.NullSetting.ToSqlSyntax();
+        }
+
+        public static string ToSqlSyntax(this DatabaseTypes databaseTypes, int length)
         {
             string syntax = string.Empty;
-            switch (attribute.DatabaseType)
+            switch (databaseTypes)
             {
                 case DatabaseTypes.Bool:
                     syntax = "[bit]";
@@ -32,11 +37,16 @@
                     break;
                 case DatabaseTypes.Nvarchar:
                     syntax = "[nvarchar]";
-                    if (attribute.Length > 0)
-                        syntax += string.Format(" ({0})", attribute.Length);
+                    if (length > 0)
+                        syntax += string.Format(" ({0})", length);
                     break;
             }
             return syntax;
+        }
+
+        public static string ToSqlSyntax(this DatabaseTypeAttribute attribute)
+        {
+            return attribute.DatabaseType.ToSqlSyntax(attribute.Length);
         }
 
         public static string ToSqlSyntax(this PrimaryKeyColumnAttribute attribute)
@@ -53,6 +63,10 @@
         {
             string constraintName = string.IsNullOrEmpty(attribute.Name) ? string.Format("PK_{0}", tableName) : attribute.Name;
             string clustered = attribute.Clustered ? "CLUSTERED" : "NONCLUSTERED";
+
+            if (DatabaseFactory.Current.DatabaseProvider == DatabaseProviders.SqlServerCE)
+                clustered = string.Empty;
+
             string syntax = string.Format("ALTER TABLE [{0}] ADD CONSTRAINT [{1}] PRIMARY KEY {2} ([{3}])", tableName,
                                           constraintName, clustered, propertyName);
 
@@ -62,7 +76,7 @@
         public static string ToSqlSyntax(this ConstraintAttribute attribute, string tableName, string propertyName)
         {
             if (!string.IsNullOrEmpty(attribute.Name))
-                return attribute.Name;
+                return string.Format("CONSTRAINT [{0}] DEFAULT ({1})", attribute.Name, attribute.Default);
             
             return string.Format("CONSTRAINT [DF_{0}_{1}] DEFAULT ({2})", tableName, propertyName, attribute.Default);
         }
