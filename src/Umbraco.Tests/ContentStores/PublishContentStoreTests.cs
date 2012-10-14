@@ -103,7 +103,9 @@ namespace Umbraco.Tests.ContentStores
 		[TearDown]
 		public void TearDown()
 		{
-			
+			//TODO: need to reset everything!
+
+			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
 		}
 
 		[Test]
