@@ -121,7 +121,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                string.Format("DELETE FROM cmsTagRelationship WHERE nodeId = @Id"),
                                string.Format("DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @Id"),
                                string.Format("DELETE FROM cmsPropertyType WHERE contentTypeId = @Id"),
-                               string.Format("DELETE FROM cmsTab WHERE contenttypeNodeId = @Id"),
+                               string.Format("DELETE FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @Id"),
                                string.Format("DELETE FROM cmsDocumentType WHERE contentTypeNodeId = @Id"),
                                string.Format("DELETE FROM cmsContentType WHERE NodeId = @Id"),
                                string.Format("DELETE FROM umbracoNode WHERE id = @Id")
