@@ -105,7 +105,7 @@
     <Compile Include="Persistence\Caching\NullCacheProvider.cs" />
     <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\AttributeExtensions.cs" />
-    <Compile Include="Persistence\DatabaseAnnotations\ChangeTypes.cs" />
+    <Compile Include="Persistence\Migrations\ChangeTypes.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ConstraintAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\DatabaseTypeAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\DatabaseTypes.cs" />
@@ -140,6 +140,7 @@
     <Compile Include="Persistence\Migrations\ForeignKeyChange.cs" />
     <Compile Include="Persistence\Migrations\IDatabaseChange.cs" />
     <Compile Include="Persistence\Migrations\IndexChange.cs" />
+    <Compile Include="Persistence\Migrations\Initial\DatabaseCreation.cs" />
     <Compile Include="Persistence\Migrations\TableChange.cs" />
     <Compile Include="Persistence\PetaPocoExtensions.cs" />
     <Compile Include="Persistence\Querying\ExpressionHelper.cs" />

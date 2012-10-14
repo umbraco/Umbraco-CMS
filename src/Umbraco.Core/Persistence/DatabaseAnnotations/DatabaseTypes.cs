@@ -4,6 +4,7 @@
     {
         Integer,
         SmallInteger,
+        TinyInteger,
         UniqueIdentifier,
         DateTime,
         Ntext,

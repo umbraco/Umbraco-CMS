@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Persistence.DatabaseAnnotations
+﻿namespace Umbraco.Core.Persistence.Migrations
 {
     public enum ChangeTypes
     {

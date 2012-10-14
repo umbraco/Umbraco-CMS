@@ -32,6 +32,9 @@
                 case DatabaseTypes.SmallInteger:
                     syntax = "[smallint]";
                     break;
+                case DatabaseTypes.TinyInteger:
+                    syntax = "[tinyint]";
+                    break;
                 case DatabaseTypes.Integer:
                     syntax = "[int]";
                     break;

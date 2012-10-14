@@ -18,27 +18,45 @@ namespace Umbraco.Tests.Persistence
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
+            //Delete database file before continueing
             string filePath = string.Concat(path, "\\test.sdf");
             if(File.Exists(filePath))
             {
                 File.Delete(filePath);
             }
 
-            string connectionString = "Datasource=|DataDirectory|test.sdf";
-            var engine = new SqlCeEngine(connectionString);
+            //Get the connectionstring settings from config
+            var settings = ConfigurationManager.ConnectionStrings["umbracoDbDsn"];
+
+            //Create the Sql CE database
+            var engine = new SqlCeEngine(settings.ConnectionString);
             engine.CreateDatabase();
+
+            //Create the umbraco database
+            DatabaseFactory.Current.Database.Initialize();
         }
 
         [Test]
         public void Can_Create_umbracoNode_Table()
         {
             var factory = DatabaseFactory.Current;
-            //var database = new Database("Datasource=|DataDirectory|test.sdf", "System.Data.SqlServerCe.4.0");
             using(Transaction transaction = factory.Database.GetTransaction())
             {
                 factory.Database.CreateTable<NodeDto>();
 
-                transaction.Complete();
+                //transaction.Complete();
+            }
+        }
+
+        [Test]
+        public void Can_Create_umbracoApp_Table()
+        {
+            var factory = DatabaseFactory.Current;
+            using (Transaction transaction = factory.Database.GetTransaction())
+            {
+                factory.Database.CreateTable<AppDto>();
+
+                //transaction.Complete();
             }
         }
     }

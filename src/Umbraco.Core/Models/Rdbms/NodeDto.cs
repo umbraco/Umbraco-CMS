@@ -12,18 +12,15 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("id")]
         [PrimaryKeyColumn(Name = "PK_structure")]
         [DatabaseType(DatabaseTypes.Integer)]
-        [NullSetting(NullSetting = NullSettings.NotNull)]
         public int NodeId { get; set; }
 
         [Column("trashed")]
         [DatabaseType(DatabaseTypes.Bool)]
-        [NullSetting(NullSetting = NullSettings.NotNull)]
         [Constraint(Default = "0")]
         public bool Trashed { get; set; }
 
         [Column("parentID")]
         [DatabaseType(DatabaseTypes.Integer)]
-        [NullSetting(NullSetting = NullSettings.NotNull)]
         [ForeignKey(typeof(NodeDto))]
         [IndexAttribute(IndexTypes.Nonclustered, Name = "IX_umbracoNodeParentId")]
         public int ParentId { get; set; }
@@ -35,17 +32,14 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("level")]
         [DatabaseType(DatabaseTypes.SmallInteger)]
-        [NullSetting(NullSetting = NullSettings.NotNull)]
         public short Level { get; set; }
 
         [Column("path")]
         [DatabaseType(DatabaseTypes.Nvarchar, Length = 150)]
-        [NullSetting(NullSetting = NullSettings.NotNull)]
         public string Path { get; set; }
 
         [Column("sortOrder")]
         [DatabaseType(DatabaseTypes.Integer)]
-        [NullSetting(NullSetting = NullSettings.NotNull)]
         public int SortOrder { get; set; }
 
         [Column("uniqueID")]
@@ -66,7 +60,6 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("createDate")]
         [DatabaseType(DatabaseTypes.DateTime)]
-        [NullSetting(NullSetting = NullSettings.NotNull)]
         [Constraint(Default = "getdate()")]
         public DateTime CreateDate { get; set; }
     }

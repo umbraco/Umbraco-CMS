@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Core.Persistence.Migrations.Initial;
 
 namespace Umbraco.Core.Persistence
 {
@@ -45,11 +46,24 @@ namespace Umbraco.Core.Persistence
 
                 var databaseTypeAttribute = propertyInfo.FirstAttribute<DatabaseTypeAttribute>();
                 if (databaseTypeAttribute != null)
+                {
                     sb.AppendFormat(" {0}", databaseTypeAttribute.ToSqlSyntax());
+                }
+                else
+                {
+                    //Convetion - Use property's Type to set/find db type
+                }
 
                 var nullSettingAttribute = propertyInfo.FirstAttribute<NullSettingAttribute>();
                 if(nullSettingAttribute != null)
+                {
                     sb.AppendFormat(" {0}", nullSettingAttribute.ToSqlSyntax());
+                }
+                else
+                {
+                    //Convention - Use "NOT NULL" if nothing is specified
+                    sb.AppendFormat(" {0}", NullSettings.NotNull.ToSqlSyntax());
+                }
 
                 var primaryKeyColumnAttribute = propertyInfo.FirstAttribute<PrimaryKeyColumnAttribute>();
                 if(primaryKeyColumnAttribute != null)
@@ -153,6 +167,12 @@ namespace Umbraco.Core.Persistence
                                        new {tableName = tableName});
 
             return scalar > 0;
+        }
+
+        public static void Initialize(this Database db)
+        {
+            var creation = new DatabaseCreation(db);
+            creation.InitializeDatabase();
         }
     }
 }
