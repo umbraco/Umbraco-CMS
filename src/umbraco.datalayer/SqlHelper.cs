@@ -238,7 +238,6 @@ namespace umbraco.DataLayer
             P[] parametersConverted = ConvertParameters(parameters);
             try
             {
-                LogHelper.Info<SqlHelper<P>>(string.Format("Executing query {0}", commandText));
                 return ExecuteReader(commandConverted.TrimToOneLine(), parametersConverted);
             }
             catch (Exception e)
