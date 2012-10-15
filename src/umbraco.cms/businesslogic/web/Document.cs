@@ -402,10 +402,11 @@ namespace umbraco.cms.businesslogic.web
             tmp.CreateContent(dct);
 
             //now create the document data
-            SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, Text) values (1, " +
+            SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, updateDate, Text) values (1, " +
                                       tmp.Id + ", 0, " +
-                                      u.Id + ", @versionId, @text)",
+                                      u.Id + ", @versionId, @updateDate, @text)",
                                       SqlHelper.CreateParameter("@versionId", tmp.Version),
+                                      SqlHelper.CreateParameter("@updateDate", DateTime.Now),
                                       SqlHelper.CreateParameter("@text", tmp.Text));
 
             //read the whole object from the db
@@ -996,18 +997,20 @@ namespace umbraco.cms.businesslogic.web
 
                 _published = true;
                 string tempVersion = Version.ToString();
-                Guid newVersion = createNewVersion();
+                DateTime versionDate = DateTime.Now;
+                Guid newVersion = createNewVersion(versionDate);
 
                 Log.Add(LogTypes.Publish, u, Id, "");
 
                 //PPH make sure that there is only 1 newest node, this is important in regard to schedueled publishing...
                 SqlHelper.ExecuteNonQuery("update cmsDocument set newest = 0 where nodeId = " + Id);
 
-                SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, Text, TemplateId) values (1,@id, 0, @userId, @versionId, @text, @template)",
+                SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, updateDate, Text, TemplateId) values (1,@id, 0, @userId, @versionId, @updateDate, @text, @template)",
                     SqlHelper.CreateParameter("@id", Id),
                     SqlHelper.CreateParameter("@template", _template > 0 ? (object)_template : (object)DBNull.Value), //pass null in if the template doesn't have a valid id
                     SqlHelper.CreateParameter("@userId", u.Id),
                     SqlHelper.CreateParameter("@versionId", newVersion),
+                    SqlHelper.CreateParameter("@updateDate", versionDate),
                     SqlHelper.CreateParameter("@text", Text));
 
                 SqlHelper.ExecuteNonQuery("update cmsDocument set published = 0 where nodeId = " + Id);
@@ -1064,23 +1067,26 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                Guid newVersion = createNewVersion();
+                DateTime versionDate = DateTime.Now;
+                Guid newVersion = createNewVersion(versionDate);
 
                 if (_template != 0)
                 {
-                    SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, Text, TemplateId) values (" +
+                    SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, updateDate, Text, TemplateId) values (" +
                                               Id +
                                               ", 0, " + u.Id + ", @versionId, @text, " +
                                               _template + ")",
                                               SqlHelper.CreateParameter("@versionId", newVersion),
+                                              SqlHelper.CreateParameter("@updateDate", versionDate),
                                               SqlHelper.CreateParameter("@text", Text));
                 }
                 else
                 {
-                    SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, Text) values (" +
+                    SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, updateDate, Text) values (" +
                                              Id +
                                              ", 0, " + u.Id + ", @versionId, @text )",
                                              SqlHelper.CreateParameter("@versionId", newVersion),
+                                             SqlHelper.CreateParameter("@updateDate", versionDate),
                                              SqlHelper.CreateParameter("@text", Text));
                 }
 
@@ -1125,12 +1131,14 @@ namespace umbraco.cms.businesslogic.web
             {
                 _published = true;
                 string tempVersion = Version.ToString();
-                Guid newVersion = createNewVersion();
+                DateTime versionDate = DateTime.Now;
+                Guid newVersion = createNewVersion(versionDate);
 
-                SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, Text) values (" +
+                SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, updateDate, Text) values (" +
                                           Id + ", 0, " + u.Id +
                                           ", @versionId, @text)",
                                           SqlHelper.CreateParameter("@versionId", newVersion),
+                                          SqlHelper.CreateParameter("@updateDate", versionDate),
                                           SqlHelper.CreateParameter("@text", Text));
 
                 SqlHelper.ExecuteNonQuery("update cmsDocument set published = 0 where nodeId = " + Id);
@@ -1201,13 +1209,14 @@ namespace umbraco.cms.businesslogic.web
 
         /// <summary>
         /// Pending changes means that there have been property/data changes since the last published version.
-        /// This is determined by the comparing the version date to the updated date. if they are different by .5 seconds, 
+        /// This is determined by the comparing the version date to the updated date. if they are different by more than 2 seconds, 
         /// then this is considered a change.
         /// </summary>
         /// <returns></returns>
         public bool HasPendingChanges()
         {
-            return new TimeSpan(UpdateDate.Ticks - VersionDate.Ticks).TotalMilliseconds > 2000;
+            double timeDiff = new TimeSpan(UpdateDate.Ticks - VersionDate.Ticks).TotalMilliseconds;
+            return timeDiff > 2000;
         }
 
         /// <summary>
