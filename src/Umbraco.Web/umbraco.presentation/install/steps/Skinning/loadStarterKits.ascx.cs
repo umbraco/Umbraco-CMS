@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.IO;
 using System.IO;
@@ -14,6 +15,11 @@ namespace umbraco.presentation.install.steps.Skinning
 
 	public partial class loadStarterKits : System.Web.UI.UserControl
 	{
+
+		/// <summary>
+		/// Flag to show if we can connect to the repo or not
+		/// </summary>
+		protected bool CannotConnect { get; private set; }
 
 		public event StarterKitInstalledEventHandler StarterKitInstalled;
 
@@ -58,23 +64,25 @@ namespace umbraco.presentation.install.steps.Skinning
 				}
 				catch (Exception ex)
 				{
-					Log.Add(LogTypes.Debug, -1, ex.ToString());
-					ShowConnectionError();
+					LogHelper.Error<loadStarterKits>("Cannot connect to package repository", ex);
+					CannotConnect = true;
+					//ShowConnectionError();
 
 				}
 			}
 			else
 			{
-				ShowConnectionError();
+				CannotConnect = true;
+				//ShowConnectionError();
 			}
 		}
 
-		private void ShowConnectionError()
-		{
+		//private void ShowConnectionError()
+		//{
 
-			pl_starterKitsConnectionError.Visible = true;
+		//	pl_starterKitsConnectionError.Visible = true;
 
-		}
+		//}
 
 		protected void gotoLastStep(object sender, EventArgs e)
 		{
@@ -151,14 +159,14 @@ namespace umbraco.presentation.install.steps.Skinning
 		/// </remarks>
 		protected global::System.Web.UI.WebControls.Repeater rep_starterKits;
 
-		/// <summary>
-		/// pl_starterKitsConnectionError control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.WebControls.PlaceHolder pl_starterKitsConnectionError;
+		///// <summary>
+		///// pl_starterKitsConnectionError control.
+		///// </summary>
+		///// <remarks>
+		///// Auto-generated field.
+		///// To modify move field declaration from designer file to code-behind file.
+		///// </remarks>
+		//protected global::System.Web.UI.WebControls.PlaceHolder pl_starterKitsConnectionError;
 
 		/// <summary>
 		/// LinkButton1 control.
