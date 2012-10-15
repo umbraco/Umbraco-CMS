@@ -268,7 +268,7 @@ namespace umbraco.cms.businesslogic
         /// <returns>The Id of the Tab on which the PropertyType is placed</returns>
         public static int getTabIdFromPropertyType(PropertyType pt)
         {
-            object tmp = SqlHelper.ExecuteScalar<object>("Select tabId from cmsPropertyType where id = " + pt.Id.ToString());
+            object tmp = SqlHelper.ExecuteScalar<object>("Select propertyTypeGroupId from cmsPropertyType where id = " + pt.Id.ToString());
             if (tmp == DBNull.Value)
                 return 0;
             else return int.Parse(tmp.ToString());
