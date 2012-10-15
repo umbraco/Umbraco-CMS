@@ -239,6 +239,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="ApplicationEventsResolver.cs" />
     <Compile Include="Dynamics\DynamicExpression.cs" />
     <Compile Include="Dynamics\DynamicGrouping.cs" />
@@ -248,6 +249,7 @@
     <Compile Include="Dynamics\ExpressionParser.cs" />
     <Compile Include="Dynamics\ExtensionMethods.cs" />
     <Compile Include="Dynamics\Grouping.cs" />
+    <Compile Include="Install\InstallPackageController.cs" />
     <Compile Include="Models\DynamicPublishedContent.cs" />
     <Compile Include="Models\DynamicPublishedContentList.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
@@ -312,6 +314,12 @@
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\install\Default.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\install\steps\Skinning\loadStarterKits.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\LibraryCacheRefresher.cs" />
@@ -426,13 +434,6 @@
     <Compile Include="umbraco.presentation\install\steps\Skinning\loadStarterKitDesigns.ascx.designer.cs">
       <DependentUpon>loadStarterKitDesigns.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\install\steps\Skinning\loadStarterKits.ascx.cs">
-      <DependentUpon>loadStarterKits.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\Skinning\loadStarterKits.ascx.designer.cs">
-      <DependentUpon>loadStarterKits.ascx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\install\utills\FilePermissions.cs" />
     <Compile Include="umbraco.presentation\install\utills\Helper.cs" />
     <Compile Include="umbraco.presentation\install\utills\p.aspx.cs">
@@ -451,13 +452,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\helper.cs">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\default.aspx.cs">
-      <DependentUpon>default.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\default.aspx.designer.cs">
-      <DependentUpon>default.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\install\steps\defaultUser.ascx.cs">
       <DependentUpon>defaultUser.ascx</DependentUpon>
@@ -1846,11 +1840,12 @@
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\RelationTypesWebService.asmx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\DesktopMediaUploader.ascx" />
-    <Content Include="umbraco.presentation\install\steps\database.ascx" />
+    <Content Include="umbraco.presentation\install\steps\database.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\install\steps\renaming.ascx" />
     <Content Include="umbraco.presentation\install\steps\skinning.ascx" />
     <Content Include="umbraco.presentation\install\steps\Skinning\loadStarterKitDesigns.ascx" />
-    <Content Include="umbraco.presentation\install\steps\Skinning\loadStarterKits.ascx" />
     <Content Include="umbraco.presentation\install\Title.ascx" />
     <Content Include="umbraco.presentation\install\utills\p.aspx">
       <SubType>ASPXCodeBehind</SubType>
@@ -1897,7 +1892,6 @@
     <Content Include="umbraco.presentation\umbraco\controls\Images\UploadMediaImage.ascx" />
     <Content Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx" />
     <Content Include="umbraco.presentation\umbraco\Search\QuickSearch.ascx" />
-    <Content Include="umbraco.presentation\install\default.aspx" />
     <Content Include="umbraco.presentation\install\steps\license.ascx" />
     <Content Include="umbraco.presentation\umbraco\actions\delete.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\editContent.aspx" />

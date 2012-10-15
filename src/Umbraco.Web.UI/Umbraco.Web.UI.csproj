@@ -259,6 +259,18 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="install\Default.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="install\Default.aspx.designer.cs">
+      <DependentUpon>default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="install\steps\Skinning\LoadStarterKits.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="install\steps\Skinning\LoadStarterKits.ascx.designer.cs">
+      <DependentUpon>loadStarterKits.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="umbraco\developer\Macros\EditMacro.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -599,6 +611,7 @@
     <Content Include="umbraco_client\Installer\images\btn-buisness-repeat.png" />
     <Content Include="umbraco_client\Installer\images\btn-confirm.png" />
     <Content Include="umbraco_client\Installer\images\pbar.gif" />
+    <Content Include="umbraco_client\Installer\js\PackageInstaller.js" />
     <Content Include="umbraco_client\splitbutton\jquery.splitbutton.js" />
     <Content Include="umbraco_client\tags\css\jquery.tagsinput.css" />
     <Content Include="umbraco_client\tags\js\jquery.tagsinput.js" />

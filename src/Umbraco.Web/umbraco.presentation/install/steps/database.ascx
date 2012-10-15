@@ -299,7 +299,7 @@
 	    jQuery.getJSON('utills/p.aspx?feed=progress', function (data) {
 
 	      updateProgressBar(data.percentage);
-	      updateStatusMessage(data.message)
+	        updateStatusMessage(data.message);
 
 	      if (data.error != "") {
 	        clearInterval(intervalId);

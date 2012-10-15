@@ -1,4 +1,4 @@
-<%@ Page Language="c#" CodeBehind="default.aspx.cs" AutoEventWireup="True" Inherits="umbraco.presentation.install._default" EnableViewState="False" %>
+<%@ Page Language="c#" CodeBehind="Default.aspx.cs" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Install.Default" EnableViewState="False" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <%@ Register Src="~/install/Title.ascx" TagPrefix="umb1" TagName="PageTitle" %>
@@ -15,12 +15,15 @@
 	<link media="all" type="text/css" rel="stylesheet" href="../umbraco_client/installer/css/reset.css" />
 	<link media="all" rel="stylesheet" href="../umbraco_client/installer/css/all.css">
 	<link media="all" type="text/css" rel="stylesheet" href="../umbraco_client/installer/css/form.css" />
-
+    
+    <script src="../umbraco_client/Application/NamespaceManager.js" type="text/javascript"></script>
+    <script src="../umbraco_client/ui/base2.js" type="text/javascript"></script>
 	<script src="../umbraco_client/installer/js/jquery.1.4.4.js" type="text/javascript"></script>
 	<script src="../umbraco_client/installer/js/jquery.ui.selectmenu.js" type="text/javascript"></script>
 	<script src="../umbraco_client/installer/js/jquery.main.js" type="text/javascript"></script>
-
     <script src="../umbraco_client/passwordStrength/passwordstrength.js" type="text/javascript"></script>
+    
+    <script src="../umbraco_client/installer/js/PackageInstaller.js" type="text/javascript"></script>
 
 	<!--[if lt IE 9]>
 		<link media="all" rel="stylesheet" href="../umbraco_client/installer/css/lt7.css">
@@ -138,7 +141,7 @@
 	<div class="b">&nbsp;</div>
 </div>
 
-	<input type="hidden" runat="server" value="welcome" id="step">
+	    <input type="hidden" runat="server" value="welcome" id="step"/>
 	
 	</form>
 </body>
