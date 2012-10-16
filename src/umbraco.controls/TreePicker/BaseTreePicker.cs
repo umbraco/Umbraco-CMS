@@ -141,13 +141,14 @@ namespace umbraco.uicontrols.TreePicker
         /// </summary>
         protected virtual void RenderJSComponents()
         {
+            const string scriptKey = "BaseTreePickerScripts";
             if (ScriptManager.GetCurrent(Page).IsInAsyncPostBack)
             {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), this.GetType().ToString(), BaseTreePickerScripts.BaseTreePicker, true);
+                ScriptManager.RegisterStartupScript(this, this.GetType(), scriptKey, BaseTreePickerScripts.BaseTreePicker, true);
             }
             else
             {
-                Page.ClientScript.RegisterClientScriptBlock(typeof(BaseTreePicker), this.GetType().ToString(), BaseTreePickerScripts.BaseTreePicker, true);
+                Page.ClientScript.RegisterClientScriptBlock(typeof(BaseTreePicker), scriptKey, BaseTreePickerScripts.BaseTreePicker, true);
             }
         }
 
