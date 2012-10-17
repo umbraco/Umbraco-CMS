@@ -61,7 +61,7 @@ namespace Umbraco.Tests
 			var foundTypes2 = PluginManager.Current.ResolveFindMeTypes();
 			Assert.AreEqual(1,
 			                PluginManager.Current.GetTypeLists()
-			                	.Count(x => x.GetListType() == typeof (IFindMe)));
+			                	.Count(x => x.IsTypeList<IFindMe>(PluginManager.TypeResolutionKind.FindAllTypes)));
 		}
 
 		[Test]
