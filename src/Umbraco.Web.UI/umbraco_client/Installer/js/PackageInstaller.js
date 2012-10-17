@@ -24,12 +24,19 @@
                 throw "option " + name + " must be a function";
         },
         _showServerError: function (msg) {
-            self._opts.serverError.find(".error-message").html(msg);
-            self._opts.serverError.show();
+            this._opts.serverError.find(".error-message").html(msg);
+            //this._opts.serverError.parent.parent.show();
+            this._opts.serverError.parent().parent().next().hide();
+            this._opts.serverError.parent().find(".zoom-list").hide();
+            this._opts.serverError.parent().find(".container").hide();
+            this._opts.serverError.parent().show();
+            this._opts.serverError.show();
+            
+
         },
         _setProgress: function (perc, msg) {
-            self._opts.setProgress.apply(this, [perc]);
-            self._opts.setStatusMessage.apply(this, [msg]);
+            this._opts.setProgress.apply(this, [perc]);
+            this._opts.setStatusMessage.apply(this, [msg]);
         },
 
         // Constructor
@@ -75,7 +82,7 @@
             var self = this;
             $.ajax({
                 type: 'POST',
-                data: "{'kitGuid': " + self._packageId + "}",
+                data: "{'kitGuid': '" + self._packageId + "'}",
                 url: self._opts.baseUrl + '/DownloadPackageFiles',
                 success: function (r) {
                     if (r && r.success) {
@@ -102,7 +109,7 @@
             var self = this;
             $.ajax({
                 type: 'POST',
-                data: "{'kitGuid': " + self._packageId + ", 'manifestId': " + self._manifestId + ", 'packageFile': " + self._packageFile + "}",
+                data: "{'kitGuid': '" + self._packageId + "', 'manifestId': '" + self._manifestId + "', 'packageFile': '" + escape(self._packageFile) + "'}",
                 url: self._opts.baseUrl + '/InstallPackageFiles',
                 success: function (r) {
                     if (r && r.success) {
@@ -168,7 +175,7 @@
             var self = this;
             $.ajax({
                 type: 'POST',
-                data: "{'kitGuid': " + self._packageId + ", 'manifestId': " + self._manifestId + ", 'packageFile': " + self._packageFile + "}",
+                data: "{'kitGuid': '" + self._packageId + "', 'manifestId': '" + self._manifestId + "', 'packageFile': '" + escape(self._packageFile) + "'}",
                 url: self._opts.baseUrl + '/InstallBusinessLogic',
                 success: function (r) {
                     if (r && r.success) {
@@ -188,7 +195,7 @@
             var self = this;
             $.ajax({
                 type: 'POST',
-                data: "{'kitGuid': " + self._packageId + ", 'manifestId': " + self._manifestId + ", 'packageFile': " + self._packageFile + "}",
+                data: "{'kitGuid': '" + self._packageId + "', 'manifestId': '" + self._manifestId + "', 'packageFile': '" + escape(self._packageFile) + "'}",
                 url: self._opts.baseUrl + '/CleanupInstallation',
                 success: function (r) {
                     if (r && r.success) {
@@ -211,7 +218,7 @@
             //and will automatically show the skin installer screen.
             //TODO: Once the skinning is refactored to use this class this will probably change, we'll probably have to 
             //inject via 'opts' as to where we are redirecting
-            window.location.uri = window.location.uri;
+            window.location.reload();
         }
         
     });

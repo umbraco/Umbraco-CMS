@@ -77,7 +77,9 @@ namespace Umbraco.Web.Install
 		[HttpPost]
 		public JsonResult InstallPackageFiles(Guid kitGuid, int manifestId, string packageFile)
 		{
+			packageFile = Server.UrlDecode(packageFile);
 			var installer = new global::umbraco.cms.businesslogic.packager.Installer();
+			installer.LoadConfig(packageFile);
 			installer.InstallFiles(manifestId, packageFile);
 			return Json(new
 				{
@@ -134,8 +136,10 @@ namespace Umbraco.Web.Install
 		[HttpPost]
 		public JsonResult InstallBusinessLogic(Guid kitGuid, int manifestId, string packageFile)
 		{
+			packageFile = Server.UrlDecode(packageFile);
 			var installer = new global::umbraco.cms.businesslogic.packager.Installer();
-			installer.InstallFiles(manifestId, packageFile);
+			installer.LoadConfig(packageFile);
+			installer.InstallBusinessLogic(manifestId, packageFile);
 			return Json(new
 			{
 				success = true,
@@ -153,7 +157,9 @@ namespace Umbraco.Web.Install
 		[HttpPost]
 		public JsonResult CleanupInstallation(Guid kitGuid, int manifestId, string packageFile)
 		{
+			packageFile = Server.UrlDecode(packageFile);
 			var installer = new global::umbraco.cms.businesslogic.packager.Installer();
+			installer.LoadConfig(packageFile);
 			installer.InstallCleanUp(manifestId, packageFile);
 
 			library.RefreshContent();
