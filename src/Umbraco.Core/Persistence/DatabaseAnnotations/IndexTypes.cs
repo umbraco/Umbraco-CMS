@@ -3,8 +3,8 @@
     public enum IndexTypes
     {
         Clustered,
-        Nonclustered,
-        UniqueNonclustered,
+        NonClustered,
+        UniqueNonClustered,
         PrimaryXml,
         Spartial
     }

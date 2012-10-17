@@ -38,6 +38,11 @@ namespace Umbraco.Core.Persistence
             var last = objProperties.Last();
             foreach (var propertyInfo in objProperties)
             {
+                //If current property is a ResultColumn then skip it
+                var resultColumnAttribute = propertyInfo.FirstAttribute<ResultColumnAttribute>();
+                if(resultColumnAttribute != null) continue;
+
+                //Assumes ExplicitColumn attribute and thus having a ColumnAttribute with the name of the column
                 var columnAttribute = propertyInfo.FirstAttribute<ColumnAttribute>();
                 if(columnAttribute == null) continue;
 
@@ -52,6 +57,31 @@ namespace Umbraco.Core.Persistence
                 else
                 {
                     //Convetion - Use property's Type to set/find db type
+                    //TODO Improve :)
+                    if(propertyInfo.PropertyType == typeof(string))
+                    {
+                        sb.AppendFormat(" [nvarchar] (255)");
+                    }
+                    else if (propertyInfo.PropertyType == typeof(int))
+                    {
+                        sb.AppendFormat(" [int]");
+                    }
+                    else if (propertyInfo.PropertyType == typeof(bool))
+                    {
+                        sb.AppendFormat(" [bit]");
+                    }
+                    else if (propertyInfo.PropertyType == typeof(byte))
+                    {
+                        sb.AppendFormat(" [tinyint]");
+                    }
+                    else if (propertyInfo.PropertyType == typeof(DateTime))
+                    {
+                        sb.AppendFormat(" [datetime]");
+                    }
+                    else if (propertyInfo.PropertyType == typeof(Guid))
+                    {
+                        sb.AppendFormat(" [uniqueidentifier]");
+                    }
                 }
 
                 var nullSettingAttribute = propertyInfo.FirstAttribute<NullSettingAttribute>();
@@ -68,7 +98,7 @@ namespace Umbraco.Core.Persistence
                 var primaryKeyColumnAttribute = propertyInfo.FirstAttribute<PrimaryKeyColumnAttribute>();
                 if(primaryKeyColumnAttribute != null)
                 {
-                    sb.AppendFormat(" {0}", primaryKeyColumnAttribute.ToSqlSyntax());
+                    sb.Append(primaryKeyColumnAttribute.ToSqlSyntax());
                     //Add to list of primary key constraints
                     primaryKeyConstraints.Add(new Sql(primaryKeyColumnAttribute.ToSqlSyntax(tableName, columnAttribute.Name)));
                 }

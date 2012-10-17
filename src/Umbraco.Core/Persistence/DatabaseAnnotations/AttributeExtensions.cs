@@ -57,7 +57,7 @@
             string syntax = string.Empty;
 
             if (attribute.AutoIncrement)
-                syntax = "IDENTITY(1, 1)";
+                syntax = " IDENTITY(1, 1)";
 
             return syntax;
         }
@@ -70,8 +70,11 @@
             if (DatabaseFactory.Current.DatabaseProvider == DatabaseProviders.SqlServerCE)
                 clustered = string.Empty;
 
-            string syntax = string.Format("ALTER TABLE [{0}] ADD CONSTRAINT [{1}] PRIMARY KEY {2} ([{3}])", tableName,
-                                          constraintName, clustered, propertyName);
+            string syntax = string.IsNullOrEmpty(attribute.OnColumns)
+                                ? string.Format("ALTER TABLE [{0}] ADD CONSTRAINT [{1}] PRIMARY KEY {2} ([{3}])",
+                                                tableName, constraintName, clustered, propertyName)
+                                : string.Format("ALTER TABLE [{0}] ADD CONSTRAINT [{1}] PRIMARY KEY {2} ({3})",
+                                                tableName, constraintName, clustered, attribute.OnColumns);
 
             return syntax;
         }
@@ -90,7 +93,9 @@
             var primaryKeyAttribute = attribute.Type.FirstAttribute<PrimaryKeyAttribute>();
             var referencedTableName = tableNameAttribute.Value;
 
-            string constraintName = string.Format("FK_{0}_{1}", tableName, referencedTableName);
+            string constraintName = string.IsNullOrEmpty(attribute.Name)
+                                        ? string.Format("FK_{0}_{1}", tableName, referencedTableName)
+                                        : attribute.Name;
             string syntax =
                 string.Format(
                     "ALTER TABLE [{0}] ADD CONSTRAINT [{1}] FOREIGN KEY ([{2}]) REFERENCES [{3}] ([{4}])",
@@ -107,7 +112,7 @@
                 case IndexTypes.Clustered:
                     indexType = "CLUSTERED";
                     break;
-                case IndexTypes.Nonclustered:
+                case IndexTypes.NonClustered:
                     indexType = "NONCLUSTERED";
                     break;
                 case IndexTypes.PrimaryXml:
@@ -116,8 +121,8 @@
                 case IndexTypes.Spartial:
                     indexType = "SPARTIAL";
                     break;
-                case IndexTypes.UniqueNonclustered:
-                    indexType = "UNIQUENONCLUSTERED";
+                case IndexTypes.UniqueNonClustered:
+                    indexType = "UNIQUE NONCLUSTERED";
                     break;
             }
             string name = string.IsNullOrEmpty(attribute.Name) ? string.Format("IX_{0}_{1}", tableName, propertyName) : attribute.Name;

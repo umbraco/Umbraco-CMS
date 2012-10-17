@@ -12,6 +12,6 @@ namespace Umbraco.Core.Persistence.DatabaseAnnotations
         public string OnDelete { get; set; }
         public string OnUpdate { get; set; }
 
-        //Default naming: FK_thisTableName_refTableName
+        public string Name { get; set; }//Used to override Default naming: FK_thisTableName_refTableName
     }
 }

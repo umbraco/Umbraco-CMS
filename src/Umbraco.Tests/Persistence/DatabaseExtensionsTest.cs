@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Persistence
             engine.CreateDatabase();
 
             //Create the umbraco database
-            DatabaseFactory.Current.Database.Initialize();
+            //DatabaseFactory.Current.Database.Initialize();
         }
 
         [Test]
@@ -55,6 +55,43 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = factory.Database.GetTransaction())
             {
                 factory.Database.CreateTable<AppDto>();
+
+                //transaction.Complete();
+            }
+        }
+
+        [Test]
+        public void Can_Create_umbracoAppTree_Table()
+        {
+            var factory = DatabaseFactory.Current;
+            using (Transaction transaction = factory.Database.GetTransaction())
+            {
+                factory.Database.CreateTable<AppTreeDto>();
+
+                //transaction.Complete();
+            }
+        }
+
+        [Test]
+        public void Can_Create_cmsContentType2ContentType_Table()
+        {
+            var factory = DatabaseFactory.Current;
+            using (Transaction transaction = factory.Database.GetTransaction())
+            {
+                factory.Database.CreateTable<ContentType2ContentTypeDto>();
+
+                //transaction.Complete();
+            }
+        }
+
+        [Test, NUnit.Framework.Ignore]
+        public void Can_Create_cmsContentTypeAllowedContentType_Table()
+        {
+            var factory = DatabaseFactory.Current;
+            using (Transaction transaction = factory.Database.GetTransaction())
+            {
+                //Requires the cmsContentType table in order to create refecences
+                factory.Database.CreateTable<ContentTypeAllowedContentTypeDto>();
 
                 //transaction.Complete();
             }

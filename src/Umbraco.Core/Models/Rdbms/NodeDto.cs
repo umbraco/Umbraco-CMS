@@ -22,7 +22,7 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("parentID")]
         [DatabaseType(DatabaseTypes.Integer)]
         [ForeignKey(typeof(NodeDto))]
-        [IndexAttribute(IndexTypes.Nonclustered, Name = "IX_umbracoNodeParentId")]
+        [IndexAttribute(IndexTypes.NonClustered, Name = "IX_umbracoNodeParentId")]
         public int ParentId { get; set; }
 
         [Column("nodeUser")]
@@ -55,7 +55,7 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("nodeObjectType")]
         [DatabaseType(DatabaseTypes.UniqueIdentifier)]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [IndexAttribute(IndexTypes.Nonclustered, Name = "IX_umbracoNodeObjectType")]
+        [IndexAttribute(IndexTypes.NonClustered, Name = "IX_umbracoNodeObjectType")]
         public Guid? NodeObjectType { get; set; }
 
         [Column("createDate")]
