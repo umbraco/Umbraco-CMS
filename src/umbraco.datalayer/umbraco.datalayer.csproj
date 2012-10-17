@@ -64,9 +64,6 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.ApplicationBlocks.Data, Version=1.0.1559.20655, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Microsoft.ApplicationBlocks.Data.dll</HintPath>
@@ -97,7 +94,6 @@
     <Compile Include="IRecordsReader.cs" />
     <Compile Include="ISqlHelper.cs" />
     <Compile Include="IParameterContainer.cs" />
-    <Compile Include="LogHelper.cs" />
     <Compile Include="SqlHelperException.cs" />
     <Compile Include="SqlHelpers\MySql\MySqlInstaller.cs" />
     <Compile Include="SqlHelpers\MySql\MySqlParser.cs" />
@@ -197,6 +193,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="SqlHelpers\SqlServer\Sql\Version4_8_Upgrade.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
+      <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
+      <Name>Umbraco.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
