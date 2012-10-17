@@ -2188,9 +2188,9 @@
     <Content Include="config\log4net.config" />
     <Content Include="config\FileSystemProviders.config" />
     <Content Include="config\EmbeddedMedia.config" />
-    <Content Include="web.config">
+    <None Include="web.config">
       <SubType>Designer</SubType>
-    </Content>
+    </None>
     <None Include="web.Template.BODENKO-04.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
