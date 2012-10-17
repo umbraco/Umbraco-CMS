@@ -218,7 +218,12 @@
             //and will automatically show the skin installer screen.
             //TODO: Once the skinning is refactored to use this class this will probably change, we'll probably have to 
             //inject via 'opts' as to where we are redirecting
-            window.location.reload();
+
+            //we're going to put in a timeout here to ensure the DOM is properly up to date
+            setTimeout(function() {
+                window.location.reload();
+            }, 1000);
+            
         }
         
     });
