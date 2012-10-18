@@ -1,6 +1,3 @@
-syntax: regex
-^src/packages/(?!repositories.config$)
-
 syntax: glob
 *.obj
 *.exe
@@ -41,7 +38,6 @@ src\Umbraco.Web.UI\media\*
 src\Umbraco.Web.UI\masterpages\*
 src\Umbraco.Web.UI\macroScripts\*
 src\Umbraco.Web.UI\xslt\*
-
 umbraco\presentation\umbraco\plugins\uComponents\uComponentsInstaller.ascx
 umbraco\presentation\packages\uComponents\MultiNodePicker\CustomTreeService.asmx
 _BuildOutput/*
