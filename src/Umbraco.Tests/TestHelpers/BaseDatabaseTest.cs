@@ -8,8 +8,10 @@ namespace Umbraco.Tests.TestHelpers
 {
     /// <summary>
     /// Use this abstract class for tests that requires direct access to the PetaPoco <see cref="Database"/> object.
-    /// This base test class uses Sql Ce populated with the umbraco db schema.
+    /// This base test class will use the database setup with ConnectionString and ProviderName from the test implementation
+    /// populated with the umbraco db schema.
     /// </summary>
+    /// <remarks>Can be used to test against an Sql Ce, Sql Server and MySql database</remarks>
     [TestFixture]
     public abstract class BaseDatabaseTest
     {
@@ -21,25 +23,28 @@ namespace Umbraco.Tests.TestHelpers
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            //Delete database file before continueing
-            string filePath = string.Concat(path, "\\test.sdf");
-            if (File.Exists(filePath))
+            //If the Database Provider is Sql Ce we need to ensure the database
+            if (ProviderName.Contains("SqlServerCe"))
             {
-                File.Delete(filePath);
+                //Delete database file before continueing
+                string filePath = string.Concat(path, "\\test.sdf");
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
+
+                //Create the Sql CE database
+                var engine = new SqlCeEngine(ConnectionString);
+                engine.CreateDatabase();
             }
 
-            //Get the connectionstring settings from config
-            var connectionstring = "Datasource=|DataDirectory|test.sdf";
-            var providerName = "System.Data.SqlServerCe.4.0";
-
-            //Create the Sql CE database
-            var engine = new SqlCeEngine(connectionstring);
-            engine.CreateDatabase();
-
             //Create the umbraco database
-            _database = new Database(connectionstring, providerName);
+            _database = new Database(ConnectionString, ProviderName);
             _database.Initialize();
         }
+
+        public abstract string ConnectionString { get; }
+        public abstract string ProviderName { get; }
 
         protected Database Database
         {
