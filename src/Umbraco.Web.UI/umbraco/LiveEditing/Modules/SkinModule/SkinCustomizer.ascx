@@ -27,6 +27,8 @@
     function cancelSkinCustomization() {
         jQuery('#cancelSkinCustomization').trigger('click');
     }
+    
+    jQuery('body div').css('z-index', 'auto');
 </script>
 
 <asp:Panel ID="pnl_connectionerror" runat="server" Visible="false">
