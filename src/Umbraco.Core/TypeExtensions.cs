@@ -205,8 +205,7 @@ namespace Umbraco.Core
 
 		}
 
-
-		/// <summary>
+        /// <summary>
 		/// Determines whether the specified actual type is type.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
@@ -219,27 +218,37 @@ namespace Umbraco.Core
 			return TypeHelper.IsTypeAssignableFrom<T>(actualType);
 		}
 
-		//internal static string GetCacheKeyFromParameters(this MemberInfo info)
-		//{
-		//    var methodInfo = info as MethodInfo;
-		//    if (methodInfo != null)
-		//        return GetCacheKeyFromParameters(methodInfo.GetParameters());
-		//    return string.Empty;
-		//}
+        public static TAttribute FirstAttribute<TAttribute>(this Type type)
+        {
+            return type.FirstAttribute<TAttribute>(true);
+        }
 
-		//internal static string GetCacheKeyFromParameters(IEnumerable<ParameterInfo> parameters)
-		//{
-		//    var sb = new StringBuilder();
-		//    sb.Append("(");
-		//    foreach (var parameter in parameters)
-		//    {
-		//        sb.Append(parameter.ParameterType);
-		//        sb.Append(" ");
-		//        sb.Append(parameter.Name);
-		//        sb.Append(",");
-		//    }
-		//    sb.Append(")");
-		//    return sb.ToString();
-		//}
+        public static TAttribute FirstAttribute<TAttribute>(this Type type, bool inherit)
+        {
+            var attrs = type.GetCustomAttributes(typeof(TAttribute), inherit);
+            return (TAttribute)(attrs.Length > 0 ? attrs[0] : null);
+        }
+
+        public static TAttribute FirstAttribute<TAttribute>(this PropertyInfo propertyInfo)
+        {
+            return propertyInfo.FirstAttribute<TAttribute>(true);
+        }
+
+        public static TAttribute FirstAttribute<TAttribute>(this PropertyInfo propertyInfo, bool inherit)
+        {
+            var attrs = propertyInfo.GetCustomAttributes(typeof(TAttribute), inherit);
+            return (TAttribute)(attrs.Length > 0 ? attrs[0] : null);
+        }
+
+        public static IEnumerable<TAttribute> MultipleAttribute<TAttribute>(this PropertyInfo propertyInfo)
+        {
+            return propertyInfo.MultipleAttribute<TAttribute>(true);
+        }
+
+        public static IEnumerable<TAttribute> MultipleAttribute<TAttribute>(this PropertyInfo propertyInfo, bool inherit)
+        {
+            var attrs = propertyInfo.GetCustomAttributes(typeof(TAttribute), inherit);
+            return (attrs.Length > 0 ? attrs.ToList().ConvertAll(input => (TAttribute)input) : null);
+        }
 	}
 }

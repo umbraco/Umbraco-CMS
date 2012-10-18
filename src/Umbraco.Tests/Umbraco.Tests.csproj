@@ -14,6 +14,21 @@
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -46,6 +61,14 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\SQLCE4\System.Data.SqlServerCe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SqlServerCe.Entity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\SQLCE4\System.Data.SqlServerCe.Entity.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -67,6 +90,7 @@
     <Compile Include="LibraryTests.cs" />
     <Compile Include="Models\ContentTests.cs" />
     <Compile Include="Models\StylesheetTests.cs" />
+    <Compile Include="Persistence\DatabaseExtensionsTest.cs" />
     <Compile Include="Persistence\DatabaseFactoryTests.cs" />
     <Compile Include="Persistence\RepositoryResolverTests.cs" />
     <Compile Include="Resolvers\ActionsResolverTests.cs" />
@@ -89,6 +113,7 @@
     <Compile Include="Services\ContentServiceTests.cs" />
     <Compile Include="Surface\PluginControllerAreaTests.cs" />
     <Compile Include="Templates\MasterPageHelperTests.cs" />
+    <Compile Include="TestHelpers\BaseDatabaseFactoryTest.cs" />
     <Compile Include="TestHelpers\BaseRoutingTest.cs" />
     <Compile Include="GlobalSettingsTests.cs" />
     <Compile Include="Routing\LookupByAliasTests.cs" />
@@ -101,6 +126,7 @@
     <Compile Include="Routing\RouteTestExtensions.cs" />
     <Compile Include="Stubs\TestControllerFactory.cs" />
     <Compile Include="TestHelpers\BaseWebTest.cs" />
+    <Compile Include="TestHelpers\BaseDatabaseTest.cs" />
     <Compile Include="TestHelpers\Entities\MockedContent.cs" />
     <Compile Include="TestHelpers\Entities\MockedContentTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
@@ -185,7 +211,33 @@
       <Name>Umbraco.Web</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.SQL.Server.Compact.4.0">
+      <Visible>False</Visible>
+      <ProductName>SQL Server Compact 4.0 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.4.5">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 4.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Masterpages\dummy.txt" />
     <Content Include="Views\dummy.txt" />

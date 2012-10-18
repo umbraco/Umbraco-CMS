@@ -88,7 +88,7 @@ namespace Umbraco.Core.Persistence.Factories
                                           Mandatory = propertyType.Mandatory,
                                           Name = propertyType.Name,
                                           SortOrder = propertyType.SortOrder,
-                                          TabId = tabId
+                                          PropertyTypeGroupId = tabId
                                       };
 
             if (propertyType.HasIdentity)

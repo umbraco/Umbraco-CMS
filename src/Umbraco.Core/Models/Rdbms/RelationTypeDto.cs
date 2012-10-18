@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
@@ -9,6 +10,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class RelationTypeDto
     {
         [Column("id")]
+        [PrimaryKeyColumn]
         public int Id { get; set; }
 
         [Column("dual")]
@@ -24,6 +26,8 @@ namespace Umbraco.Core.Models.Rdbms
         public string Name { get; set; }
 
         [Column("alias")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [DatabaseType(DatabaseTypes.Nvarchar, Length = 100)]
         public string Alias { get; set; }
     }
 }

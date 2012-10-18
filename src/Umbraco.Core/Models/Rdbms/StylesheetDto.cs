@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
@@ -8,12 +9,17 @@ namespace Umbraco.Core.Models.Rdbms
     public class StylesheetDto
     {
         [Column("nodeId")]
+        [PrimaryKeyColumn(AutoIncrement = false)]
+        [ForeignKey(typeof(NodeDto))]
         public int NodeId { get; set; }
 
         [Column("filename")]
+        [DatabaseType(DatabaseTypes.Nvarchar, Length = 100)]
         public string Filename { get; set; }
 
         [Column("content")]
+        [DatabaseType(DatabaseTypes.Ntext)]
+        [NullSetting(NullSetting = NullSettings.Null)]
         public string Content { get; set; }
     }
 }

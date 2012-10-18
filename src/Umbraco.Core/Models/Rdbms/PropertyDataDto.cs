@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
@@ -9,27 +10,41 @@ namespace Umbraco.Core.Models.Rdbms
     internal class PropertyDataDto
     {
         [Column("id")]
+        [PrimaryKeyColumn]
+        [Index(IndexTypes.NonClustered, Name = "IX_cmsPropertyData")]
         public int Id { get; set; }
 
         [Column("contentNodeId")]
+        [ForeignKey(typeof(NodeDto))]
+        [Index(IndexTypes.NonClustered, Name = "IX_cmsPropertyData_1")]
         public int NodeId { get; set; }
 
         [Column("versionId")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Index(IndexTypes.NonClustered, Name = "IX_cmsPropertyData_2")]
         public Guid? VersionId { get; set; }
 
         [Column("propertytypeid")]
+        [ForeignKey(typeof(PropertyTypeDto))]
+        [Index(IndexTypes.NonClustered, Name = "IX_cmsPropertyData_3")]
         public int PropertyTypeId { get; set; }
 
         [Column("dataInt")]
+        [NullSetting(NullSetting = NullSettings.Null)]
         public int? Integer { get; set; }
 
         [Column("dataDate")]
+        [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? Date { get; set; }
 
         [Column("dataNvarchar")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [DatabaseType(DatabaseTypes.Nvarchar, Length = 500)]
         public string VarChar { get; set; }
 
         [Column("dataNtext")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [DatabaseType(DatabaseTypes.Ntext)]
         public string Text { get; set; }
 
         [ResultColumn]

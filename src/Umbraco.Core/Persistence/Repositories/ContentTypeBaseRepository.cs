@@ -183,8 +183,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var propertySql = new Sql();
             propertySql.Select("*");
-            propertySql.From("cmsTab");
-            propertySql.RightJoin("cmsPropertyType ON [cmsTab].[id] = [cmsPropertyType].[tabId]");
+            propertySql.From("cmsPropertyTypeGroup");
+            propertySql.RightJoin("cmsPropertyType ON [cmsPropertyTypeGroup].[id] = [cmsPropertyType].[propertyTypeGroupId]");
             propertySql.InnerJoin("cmsDataType ON [cmsPropertyType].[dataTypeId] = [cmsDataType].[nodeId]");
             propertySql.Where("[cmsPropertyType].[contentTypeId] = @Id", new { Id = id });
 
