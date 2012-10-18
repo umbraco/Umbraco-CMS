@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
@@ -9,12 +10,17 @@ namespace Umbraco.Core.Models.Rdbms
     internal class PropertyTypeGroupDto
     {
         [Column("id")]
+        [PrimaryKeyColumn]
         public int Id { get; set; }
 
         [Column("parentGroupId")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Constraint(Default = "NULL")]
+        [ForeignKey(typeof(PropertyTypeGroupDto))]
         public int? ParentGroupId { get; set; }
 
         [Column("contenttypeNodeId")]
+        [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
         public int ContentTypeNodeId { get; set; }
 
         [Column("text")]

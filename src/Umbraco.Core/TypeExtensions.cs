@@ -239,5 +239,16 @@ namespace Umbraco.Core
             var attrs = propertyInfo.GetCustomAttributes(typeof(TAttribute), inherit);
             return (TAttribute)(attrs.Length > 0 ? attrs[0] : null);
         }
+
+        public static IEnumerable<TAttribute> MultipleAttribute<TAttribute>(this PropertyInfo propertyInfo)
+        {
+            return propertyInfo.MultipleAttribute<TAttribute>(true);
+        }
+
+        public static IEnumerable<TAttribute> MultipleAttribute<TAttribute>(this PropertyInfo propertyInfo, bool inherit)
+        {
+            var attrs = propertyInfo.GetCustomAttributes(typeof(TAttribute), inherit);
+            return (attrs.Length > 0 ? attrs.ToList().ConvertAll(input => (TAttribute)input) : null);
+        }
 	}
 }

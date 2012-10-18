@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Persistence.DatabaseAnnotations
 {
-    public static class AttributeExtensions
+    internal static class AttributeExtensions
     {
         public static string ToSqlSyntax(this NullSettings settings)
         {
@@ -37,6 +37,11 @@
                     break;
                 case DatabaseTypes.Integer:
                     syntax = "[int]";
+                    break;
+                case DatabaseTypes.Nchar:
+                    syntax = "[nchar]";
+                    if (length > 0)
+                        syntax += string.Format(" ({0})", length);
                     break;
                 case DatabaseTypes.Nvarchar:
                     syntax = "[nvarchar]";
@@ -96,10 +101,15 @@
             string constraintName = string.IsNullOrEmpty(attribute.Name)
                                         ? string.Format("FK_{0}_{1}", tableName, referencedTableName)
                                         : attribute.Name;
+
+            string referencedColumn = string.IsNullOrEmpty(attribute.Column)
+                                          ? primaryKeyAttribute.Value
+                                          : attribute.Column;
             string syntax =
                 string.Format(
                     "ALTER TABLE [{0}] ADD CONSTRAINT [{1}] FOREIGN KEY ([{2}]) REFERENCES [{3}] ([{4}])",
-                    tableName, constraintName, propertyName, referencedTableName, primaryKeyAttribute.Value);
+                    tableName, constraintName, propertyName, referencedTableName, referencedColumn);
+
             return syntax;
         }
 
@@ -126,7 +136,12 @@
                     break;
             }
             string name = string.IsNullOrEmpty(attribute.Name) ? string.Format("IX_{0}_{1}", tableName, propertyName) : attribute.Name;
-            string syntax = string.Format("CREATE {0} INDEX [{1}] ON [{2}] ([{3}])", indexType, name, tableName, propertyName);
+
+            string syntax = string.IsNullOrEmpty(attribute.ForColumns)
+                                ? string.Format("CREATE {0} INDEX [{1}] ON [{2}] ([{3}])", indexType, name, tableName,
+                                                propertyName)
+                                : string.Format("CREATE {0} INDEX [{1}] ON [{2}] ({3})", indexType, name, tableName,
+                                                attribute.ForColumns);
             return syntax;
         }
     }

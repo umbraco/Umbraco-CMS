@@ -35,18 +35,21 @@ namespace Umbraco.Core.Persistence
             var foreignKeyConstraints = new List<Sql>();
             var indexes = new List<Sql>();
 
-            var last = objProperties.Last();
+            var sb = new StringBuilder();
+
             foreach (var propertyInfo in objProperties)
             {
                 //If current property is a ResultColumn then skip it
                 var resultColumnAttribute = propertyInfo.FirstAttribute<ResultColumnAttribute>();
-                if(resultColumnAttribute != null) continue;
+                if(resultColumnAttribute != null)
+                {
+                    continue;
+                }
 
                 //Assumes ExplicitColumn attribute and thus having a ColumnAttribute with the name of the column
                 var columnAttribute = propertyInfo.FirstAttribute<ColumnAttribute>();
                 if(columnAttribute == null) continue;
 
-                var sb = new StringBuilder();
                 sb.AppendFormat("[{0}]", columnAttribute.Name);
 
                 var databaseTypeAttribute = propertyInfo.FirstAttribute<DatabaseTypeAttribute>();
@@ -66,19 +69,47 @@ namespace Umbraco.Core.Persistence
                     {
                         sb.AppendFormat(" [int]");
                     }
+                    else if (propertyInfo.PropertyType == typeof(int?))
+                    {
+                        sb.AppendFormat(" [int]");
+                    }
+                    else if (propertyInfo.PropertyType == typeof(long))
+                    {
+                        sb.AppendFormat(" [bigint]");
+                    }
                     else if (propertyInfo.PropertyType == typeof(bool))
+                    {
+                        sb.AppendFormat(" [bit]");
+                    }
+                    else if (propertyInfo.PropertyType == typeof(bool?))
                     {
                         sb.AppendFormat(" [bit]");
                     }
                     else if (propertyInfo.PropertyType == typeof(byte))
                     {
-                        sb.AppendFormat(" [tinyint]");
+                        sb.AppendFormat(DatabaseFactory.Current.DatabaseProvider == DatabaseProviders.SqlServer
+                                            ? " [tinyint]"
+                                            : " [int]");
+                    }
+                    else if (propertyInfo.PropertyType == typeof(short))
+                    {
+                        sb.AppendFormat(DatabaseFactory.Current.DatabaseProvider == DatabaseProviders.SqlServer
+                                            ? " [smallint]"
+                                            : " [int]");
                     }
                     else if (propertyInfo.PropertyType == typeof(DateTime))
                     {
                         sb.AppendFormat(" [datetime]");
                     }
+                    else if (propertyInfo.PropertyType == typeof(DateTime?))
+                    {
+                        sb.AppendFormat(" [datetime]");
+                    }
                     else if (propertyInfo.PropertyType == typeof(Guid))
+                    {
+                        sb.AppendFormat(" [uniqueidentifier]");
+                    }
+                    else if (propertyInfo.PropertyType == typeof(Guid?))
                     {
                         sb.AppendFormat(" [uniqueidentifier]");
                     }
@@ -107,16 +138,15 @@ namespace Umbraco.Core.Persistence
                 if(constraintAttribute != null)
                     sb.AppendFormat(" {0}", constraintAttribute.ToSqlSyntax(tableName, columnAttribute.Name));
 
-                if (propertyInfo != last)
-                    sb.Append(", ");
-
-                sql.Append(sb.ToString());
+                sb.Append(", ");
 
                 //Look for foreign keys
-                var foreignKeyAttribute = propertyInfo.FirstAttribute<ForeignKeyAttribute>();
-                if (foreignKeyAttribute != null)
+                var foreignKeyAttributes = propertyInfo.MultipleAttribute<ForeignKeyAttribute>();
+                if (foreignKeyAttributes != null)
                 {
-                    foreignKeyConstraints.Add(new Sql(foreignKeyAttribute.ToSqlSyntax(tableName, columnAttribute.Name)));
+                    foreignKeyConstraints.AddRange(
+                        foreignKeyAttributes.Select(
+                            attribute => new Sql(attribute.ToSqlSyntax(tableName, columnAttribute.Name))));
                 }
 
                 //Look for indexes
@@ -127,6 +157,7 @@ namespace Umbraco.Core.Persistence
                 }
             }
 
+            sql.Append(sb.ToString().TrimEnd(", ".ToCharArray()));
             sql.Append(")");//End
 
             var tableExist = db.TableExist(tableName);

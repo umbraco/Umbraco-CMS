@@ -1,5 +1,10 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Configuration;
+using System.Data.SqlServerCe;
+using System.IO;
+using NUnit.Framework;
 using Umbraco.Core.Persistence;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence
 {
@@ -21,6 +26,38 @@ namespace Umbraco.Tests.Persistence
             var provider = DatabaseFactory.Current.DatabaseProvider;
 
             Assert.AreEqual(DatabaseProviders.SqlServerCE, provider);
+        }
+
+        [Test]
+        public void Can_Assert_Created_Database()
+        {
+            string path = TestHelper.CurrentAssemblyDirectory;
+            AppDomain.CurrentDomain.SetData("DataDirectory", path);
+
+            //Delete database file before continueing
+            string filePath = string.Concat(path, "\\test.sdf");
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+
+            //Get the connectionstring settings from config
+            var settings = ConfigurationManager.ConnectionStrings["umbracoDbDsn"];
+
+            //Create the Sql CE database
+            var engine = new SqlCeEngine(settings.ConnectionString);
+            engine.CreateDatabase();
+
+            //Create the umbraco database
+            DatabaseFactory.Current.Database.Initialize();
+
+            bool umbracoNodeTable = DatabaseFactory.Current.Database.TableExist("umbracoNode");
+            bool umbracoUserTable = DatabaseFactory.Current.Database.TableExist("umbracoUser");
+            bool cmsTagsTable = DatabaseFactory.Current.Database.TableExist("cmsTags");
+
+            Assert.That(umbracoNodeTable, Is.True);
+            Assert.That(umbracoUserTable, Is.True);
+            Assert.That(cmsTagsTable, Is.True);
         }
     }
 }

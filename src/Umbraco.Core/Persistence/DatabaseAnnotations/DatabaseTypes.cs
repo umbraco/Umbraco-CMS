@@ -9,6 +9,7 @@
         DateTime,
         Ntext,
         Nvarchar,
-        Bool
+        Bool,
+        Nchar
     }
 }

@@ -113,6 +113,7 @@
     <Compile Include="Services\ContentServiceTests.cs" />
     <Compile Include="Surface\PluginControllerAreaTests.cs" />
     <Compile Include="Templates\MasterPageHelperTests.cs" />
+    <Compile Include="TestHelpers\BaseDatabaseFactoryTest.cs" />
     <Compile Include="TestHelpers\BaseRoutingTest.cs" />
     <Compile Include="GlobalSettingsTests.cs" />
     <Compile Include="Routing\LookupByAliasTests.cs" />
@@ -125,6 +126,7 @@
     <Compile Include="Routing\RouteTestExtensions.cs" />
     <Compile Include="Stubs\TestControllerFactory.cs" />
     <Compile Include="TestHelpers\BaseWebTest.cs" />
+    <Compile Include="TestHelpers\BaseDatabaseTest.cs" />
     <Compile Include="TestHelpers\Entities\MockedContent.cs" />
     <Compile Include="TestHelpers\Entities\MockedContentTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />

@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
@@ -8,18 +9,26 @@ namespace Umbraco.Core.Models.Rdbms
     internal class TemplateDto
     {
         [Column("pk")]
+        [PrimaryKeyColumn]
         public int PrimaryKey { get; set; }
 
         [Column("nodeId")]
+        [Index(IndexTypes.UniqueNonClustered)]
+        [ForeignKey(typeof(NodeDto))]
         public int NodeId { get; set; }
 
         [Column("master")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [ForeignKey(typeof(TemplateDto))]
         public int? Master { get; set; }
 
         [Column("alias")]
+        [DatabaseType(DatabaseTypes.Nvarchar, Length = 100)]
+        [NullSetting(NullSetting = NullSettings.Null)]
         public string Alias { get; set; }
 
         [Column("design")]
+        [DatabaseType(DatabaseTypes.Ntext)]
         public string Design { get; set; }
     }
 }

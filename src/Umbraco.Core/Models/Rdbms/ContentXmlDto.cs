@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
@@ -8,6 +9,8 @@ namespace Umbraco.Core.Models.Rdbms
     internal class ContentXmlDto
     {
         [Column("nodeId")]
+        [PrimaryKeyColumn(AutoIncrement = false)]
+        [ForeignKey(typeof(ContentDto))]
         public int NodeId { get; set; }
 
         [Column("xml")]
