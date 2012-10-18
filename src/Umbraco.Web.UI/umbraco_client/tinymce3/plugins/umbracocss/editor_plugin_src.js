@@ -35,7 +35,7 @@
 
                 if (c) {
                     // check for element
-                    var el = tinymce.DOM.getParent(n, tinymce.DOM.isBlock);
+                    var el = tinymce.DOM.getParent(n, ed.dom.isBlock);
                     if (el) {
                         for (var i = 0; i < c.items.length; i++) {
                             if (c.items[i].value == el.nodeName.toLowerCase()) {
