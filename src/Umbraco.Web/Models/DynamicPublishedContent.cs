@@ -624,6 +624,39 @@ namespace Umbraco.Web.Models
 		} 
 		#endregion
 
+		public string GetTemplateAlias()
+		{
+			return PublishedContentExtensions.GetTemplateAlias(this);
+		}
+
+		#region Search
+
+		public DynamicPublishedContentList Search(string term, bool useWildCards = true, string searchProvider = null)
+		{
+			return new DynamicPublishedContentList(
+				PublishedContentExtensions.Search(this, term, useWildCards, searchProvider));
+		}
+
+		public DynamicPublishedContentList SearchDescendants(string term, bool useWildCards = true, string searchProvider = null)
+		{
+			return new DynamicPublishedContentList(
+				PublishedContentExtensions.SearchDescendants(this, term, useWildCards, searchProvider));
+		}
+
+		public DynamicPublishedContentList SearchChildren(string term, bool useWildCards = true, string searchProvider = null)
+		{
+			return new DynamicPublishedContentList(
+				PublishedContentExtensions.SearchChildren(this, term, useWildCards, searchProvider));
+		}
+
+		public DynamicPublishedContentList Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+		{
+			return new DynamicPublishedContentList(
+				PublishedContentExtensions.Search(this, criteria, searchProvider));
+		}
+
+		#endregion
+
 		#region GetProperty methods which can be used with the dynamic object
 
 		public IPublishedContentProperty GetProperty(string alias)
