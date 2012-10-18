@@ -75,6 +75,19 @@ namespace Umbraco.Web
 
 		protected void Application_Error(object sender, EventArgs e)
 		{
+			// Code that runs when an unhandled error occurs
+
+			// Get the exception object.
+			var exc = Server.GetLastError();
+
+			// Ignore HTTP errors
+			if (exc.GetType() == typeof(HttpException))
+			{
+				return;
+			}
+			
+			LogHelper.Error<UmbracoApplication>("An unhandled exception occurred", exc);
+			
 			OnApplicationError(sender, e);
 		}
 

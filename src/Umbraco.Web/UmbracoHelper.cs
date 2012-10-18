@@ -547,12 +547,8 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public dynamic Search(string term, bool useWildCards = true, string searchProvider = null)
 		{
-			var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
-			if (!string.IsNullOrEmpty(searchProvider))
-				searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
-
-			var results = searcher.Search(term, useWildCards);
-			return results.ConvertSearchResultToDynamicDocument(PublishedContentStoreResolver.Current.PublishedContentStore);
+			return new DynamicPublishedContentList(
+				TypedSearch(term, useWildCards, searchProvider));
 		}
 
 		/// <summary>
@@ -563,12 +559,41 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public dynamic Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
 		{
+			return new DynamicPublishedContentList(
+				TypedSearch(criteria, searchProvider));
+		}
+
+		/// <summary>
+		/// Searches content
+		/// </summary>
+		/// <param name="term"></param>
+		/// <param name="useWildCards"></param>
+		/// <param name="searchProvider"></param>
+		/// <returns></returns>
+		public IEnumerable<IPublishedContent> TypedSearch(string term, bool useWildCards = true, string searchProvider = null)
+		{
+			var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
+			if (!string.IsNullOrEmpty(searchProvider))
+				searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
+
+			var results = searcher.Search(term, useWildCards);
+			return results.ConvertSearchResultToPublishedContent(PublishedContentStoreResolver.Current.PublishedContentStore);
+		}
+
+		/// <summary>
+		/// Searhes content
+		/// </summary>
+		/// <param name="criteria"></param>
+		/// <param name="searchProvider"></param>
+		/// <returns></returns>
+		public IEnumerable<IPublishedContent> TypedSearch(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+		{
 			var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
 			if (searchProvider != null)
 				s = searchProvider;
 
 			var results = s.Search(criteria);
-			return results.ConvertSearchResultToDynamicDocument(PublishedContentStoreResolver.Current.PublishedContentStore);
+			return results.ConvertSearchResultToPublishedContent(PublishedContentStoreResolver.Current.PublishedContentStore);
 		}
 
 		#endregion

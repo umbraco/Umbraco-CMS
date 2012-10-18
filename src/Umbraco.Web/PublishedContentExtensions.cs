@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Web;
+using Examine.LuceneEngine.SearchCriteria;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
+using umbraco;
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
 using ContentType = umbraco.cms.businesslogic.ContentType;
@@ -22,6 +24,65 @@ namespace Umbraco.Web
 	/// </remarks>
 	public static class PublishedContentExtensions
 	{
+		/// <summary>
+		/// Returns the current template Alias
+		/// </summary>
+		/// <param name="doc"></param>
+		/// <returns></returns>
+		public static string GetTemplateAlias(this IPublishedContent doc)
+		{
+			var template = new template(doc.TemplateId);
+			return template.TemplateAlias;			
+		}
+
+		#region Search
+		public static IEnumerable<IPublishedContent> Search(this IPublishedContent d, string term, bool useWildCards = true, string searchProvider = null)
+		{
+			var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
+			if (!string.IsNullOrEmpty(searchProvider))
+				searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
+
+			var t = term.Escape().Value;
+			if (useWildCards)
+				t = term.MultipleCharacterWildcard().Value;
+
+			string luceneQuery = "+__Path:(" + d.Path.Replace("-", "\\-") + "*) +" + t;
+			var crit = searcher.CreateSearchCriteria().RawQuery(luceneQuery);
+
+			return d.Search(crit, searcher);
+		}
+
+		public static IEnumerable<IPublishedContent> SearchDescendants(this IPublishedContent d, string term, bool useWildCards = true, string searchProvider = null)
+		{
+			return d.Search(term, useWildCards, searchProvider);
+		}
+
+		public static IEnumerable<IPublishedContent> SearchChildren(this IPublishedContent d, string term, bool useWildCards = true, string searchProvider = null)
+		{
+			var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
+			if (!string.IsNullOrEmpty(searchProvider))
+				searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
+
+			var t = term.Escape().Value;
+			if (useWildCards)
+				t = term.MultipleCharacterWildcard().Value;
+
+			string luceneQuery = "+parentID:" + d.Id.ToString() + " +" + t;
+			var crit = searcher.CreateSearchCriteria().RawQuery(luceneQuery);
+
+			return d.Search(crit, searcher);
+		}
+
+		public static IEnumerable<IPublishedContent> Search(this IPublishedContent d, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+		{
+			var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
+			if (searchProvider != null)
+				s = searchProvider;
+
+			var results = s.Search(criteria);
+			return results.ConvertSearchResultToPublishedContent(PublishedContentStoreResolver.Current.PublishedContentStore);
+		} 
+		#endregion
 
 		#region List Extensions
 

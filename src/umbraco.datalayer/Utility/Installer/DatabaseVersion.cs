@@ -24,6 +24,8 @@ namespace umbraco.DataLayer.Utility.Installer
 		/// <summary>Umbraco version 4.1.</summary>
         Version4_1,
         /// <summary>Umbraco version 4.8.</summary>
-        Version4_8
+        Version4_8,
+        /// <summary>Umbraco version 4.9.</summary>
+        Version4_9
     }
 }

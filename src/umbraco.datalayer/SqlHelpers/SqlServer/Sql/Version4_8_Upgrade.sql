@@ -4,7 +4,7 @@
  
 	IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
  
-    Database version: 4.8.0.0
+    Database version: 4.10.0.0
     
     Please increment this version number if ANY change is made to this script,
     so compatibility with scripts for other database systems can be verified easily.
@@ -32,7 +32,7 @@ ADD [parentGroupId] int NULL
 CONSTRAINT [df_cmsPropertyTypeGroup_parentGroupId] DEFAULT NULL
 ;
 ALTER TABLE [cmsPropertyTypeGroup] 
-WITH CHECK ADD CONSTRAINT [FK_cmsPropertyTypeGroup_cmsPropertyTypeGroup] FOREIGN KEY([parentGroupId])
+ADD CONSTRAINT [FK_cmsPropertyTypeGroup_cmsPropertyTypeGroup] FOREIGN KEY([parentGroupId])
 REFERENCES [cmsPropertyTypeGroup] ([id])
 ;                                 
 -- add sortOrder to cmsContentTypeAllowedContentType
@@ -49,15 +49,11 @@ ALTER TABLE [cmsContentType]
 ADD [allowAtRoot] bit NOT NULL 
 CONSTRAINT [df_cmsContentType_allowAtRoot] DEFAULT 0
 ;
+--TODO: Temporarily disabled these two to make it CE compliant..
 -- Create a new cmsContentType2ContentType table
-CREATE TABLE [cmsContentType2ContentType](
-	[parentContentTypeId] [int] NOT NULL,
-	[childContentTypeId] [int] NOT NULL,
- CONSTRAINT [PK_cmsContentType2ContentType] PRIMARY KEY CLUSTERED 
-(
-	[parentContentTypeId] ASC,
-	[childContentTypeId] ASC
-))
+CREATE TABLE [cmsContentType2ContentType] ([parentContentTypeId] int NOT NULL,[childContentTypeId] int NOT NULL)
+;
+ALTER TABLE [cmsContentType2ContentType] ADD CONSTRAINT  [cmsContentType2ContentType_PK] PRIMARY KEY ([parentContentTypeId],[childContentTypeId])
 ;
 -- move all masterContentType information to new cmsContentType2ContentType table
 INSERT INTO [cmsContentType2ContentType] (parentContentTypeId, childContentTypeId)
@@ -69,5 +65,11 @@ ALTER TABLE [cmsContentType] DROP CONSTRAINT [DF_cmsContentType_masterContentTyp
 ALTER TABLE [cmsContentType] DROP COLUMN [masterContentType]
 ;
 -- rename tab to propertyGroup on propertyType
-SP_RENAME 'cmsPropertyType.tabId', 'propertyTypeGroupId', 'COLUMN'
+ALTER TABLE [cmsPropertyType] ADD [propertyTypeGroupId] int
+;
+UPDATE [cmsPropertyType] SET [propertyTypeGroupId] = [tabId]
+;
+ALTER TABLE [cmsPropertyType] DROP CONSTRAINT [FK_cmsPropertyType_cmsTab]
+;
+ALTER TABLE [cmsPropertyType] DROP COLUMN [tabId]
 ;

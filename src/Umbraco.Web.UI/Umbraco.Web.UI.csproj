@@ -210,6 +210,10 @@
       <Project>{5BA5425F-27A7-4677-865E-82246498AA2E}</Project>
       <Name>SqlCE4Umbraco</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
+      <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
+      <Name>Umbraco.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\umbraco.editorControls\umbraco.editorControls.csproj">
       <Project>{255F5DF1-4E43-4758-AC05-7A0B68EB021B}</Project>
       <Name>umbraco.editorControls</Name>
@@ -260,6 +264,18 @@
   <ItemGroup>
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
+    <Compile Include="install\Default.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="install\Default.aspx.designer.cs">
+      <DependentUpon>default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="install\steps\Skinning\LoadStarterKits.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="install\steps\Skinning\LoadStarterKits.ascx.designer.cs">
+      <DependentUpon>loadStarterKits.ascx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="umbraco\developer\Macros\EditMacro.aspx.cs">
@@ -404,6 +420,8 @@
     <Content Include="umbraco\images\thumbs_med.png" />
     <Content Include="umbraco\images\thumbs_smll.png" />
     <Content Include="umbraco\images\umbraco\settingView.gif" />
+    <Content Include="umbraco\LiveEditing\Modules\ItemEditing\ItemEditing.js" />
+    <Content Include="umbraco\LiveEditing\Modules\ItemEditing\ItemEditingInvoke.js" />
     <Content Include="umbraco\plugins\uGoLive\cog.png" />
     <Content Include="umbraco\plugins\uGoLive\cross.png" />
     <Content Include="umbraco\plugins\uGoLive\Dashboard.ascx" />
@@ -599,6 +617,8 @@
     <Content Include="umbraco_client\Installer\images\btn-buisness-repeat.png" />
     <Content Include="umbraco_client\Installer\images\btn-confirm.png" />
     <Content Include="umbraco_client\Installer\images\pbar.gif" />
+    <Content Include="umbraco_client\Installer\js\PackageInstaller.js" />
+    <Content Include="umbraco_client\splitbutton\jquery.splitbutton.js" />
     <Content Include="umbraco_client\tags\css\jquery.tagsinput.css" />
     <Content Include="umbraco_client\tags\js\jquery.tagsinput.js" />
     <Content Include="umbraco_client\tags\js\jquery.tagsinput.min.js">
@@ -2170,9 +2190,9 @@
     <Content Include="config\log4net.config" />
     <Content Include="config\FileSystemProviders.config" />
     <Content Include="config\EmbeddedMedia.config" />
-    <Content Include="web.config">
+    <None Include="web.config">
       <SubType>Designer</SubType>
-    </Content>
+    </None>
     <None Include="web.Template.BODENKO-04.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>

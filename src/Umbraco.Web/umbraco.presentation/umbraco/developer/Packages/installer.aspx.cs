@@ -3,6 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Threading;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -274,6 +275,12 @@ namespace umbraco.presentation.developer.packages
 
             //and then copy over the files. This will take some time if it contains .dlls that will reboot the system..
             _installer.InstallFiles(pId, tempFile.Value);
+
+			//TODO: This is a total hack, we need to refactor the installer to be just like the package installer during the 
+			// install process and use AJAX to ensure that app pool restarts and restarts PROPERLY before installing the business
+			// logic. Until then, we are going to put a thread sleep here for 2 seconds in hopes that we always fluke out and the app 
+			// pool will be restarted after redirect.
+	        Thread.Sleep(2000);
 
             Response.Redirect("installer.aspx?installing=businesslogic&dir=" + tempFile.Value + "&pId=" + pId.ToString());
         }

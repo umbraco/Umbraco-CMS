@@ -343,8 +343,15 @@ namespace umbraco.cms.businesslogic.packager
                     template.Template masterTemplate = template.Template.GetByAlias(master);
                     if (masterTemplate != null) {
                         t.MasterTemplate = template.Template.GetByAlias(master).Id;
-                        if (UmbracoSettings.UseAspNetMasterPages)
-                            t.SaveMasterPageFile(t.Design);
+						//SD: This appears to always just save an empty template because the design isn't set yet
+						// this fixes an issue now that we have MVC because if there is an empty template and MVC is 
+						// the default, it will create a View not a master page and then the system will try to route via
+						// MVC which means that the package will not work anymore.
+						// The code below that imports the templates should suffice because it's actually importing 
+						// template data not just blank data.
+
+						//if (UmbracoSettings.UseAspNetMasterPages)
+						//	t.SaveMasterPageFile(t.Design);
                     }
                 }
                 // Master templates can only be generated when their master is known

@@ -133,8 +133,9 @@ namespace Umbraco.Web
 		/// </summary>
 		protected internal void CreateRoutes()
 		{
+			var umbracoPath = GlobalSettings.UmbracoMvcArea;
 
-			//set routes
+			//Create the front-end route
 			var defaultRoute = RouteTable.Routes.MapRoute(
 				"Umbraco_default",
 				"Umbraco/RenderMvc/{action}/{id}",
@@ -142,7 +143,13 @@ namespace Umbraco.Web
 				);
 			defaultRoute.RouteHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory());
 
-			var umbracoPath = GlobalSettings.UmbracoMvcArea;
+			//Create the install routes
+			var installPackageRoute = RouteTable.Routes.MapRoute(
+				"Umbraco_install_packages",
+				"Install/PackageInstaller/{action}/{id}",
+				new { controller = "InstallPackage", action = "Index", id = UrlParameter.Optional }
+				);
+			installPackageRoute.DataTokens.Add("area", umbracoPath);
 
 			//we need to find the surface controllers and route them
 			var surfaceControllers = SurfaceControllerResolver.Current.RegisteredSurfaceControllers.ToArray();

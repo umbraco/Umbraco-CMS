@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Xml;
 using umbraco.DataLayer.Utility;
+using Umbraco.Core.Logging;
 
 namespace umbraco.DataLayer
 {
@@ -123,18 +124,13 @@ namespace umbraco.DataLayer
                 throw new ArgumentNullException("parameters");
 
             // Add raw types of parameters to an array
-            P[] newParams = new P[parameters.Length];
-            for (int index = 0; index < parameters.Length; index++)
+            var newParams = new P[parameters.Length];
+            for (var index = 0; index < parameters.Length; index++)
             {
                 // Get raw type out of container
-                IParameterContainer<P> parameter = parameters[index] as IParameterContainer<P>;
+                var parameter = parameters[index] as IParameterContainer<P>;
                 if (parameter == null)
-                    throw new ArgumentException(
-                        String.Format("Element {0} of parameters has the wrong type. Expected: IParameterContainer<{1}>. Received: {2}.",
-                                       index,
-                                       typeof(P).Name,
-                                       (parameter==null ? "null" : parameter.GetType().Name)),
-                        "parameters");
+                    throw new ArgumentException(String.Format("Element {0} of parameters has the wrong type. Expected: IParameterContainer<{1}>. Received: null.", index, typeof(P).Name), "parameters");
                 newParams[index] = parameter.RawParameter;
             }
             return newParams;
@@ -198,6 +194,7 @@ namespace umbraco.DataLayer
             }
             catch (Exception e)
             {
+                LogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
                 throw new SqlHelperException("ExecuteScalar", commandText, parameters, e);
             }
         }
@@ -221,6 +218,7 @@ namespace umbraco.DataLayer
             }
             catch (Exception e)
             {
+                LogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
                 throw new SqlHelperException("ExecuteNonQuery", commandText, parameters, e);
             }
         }
@@ -244,6 +242,7 @@ namespace umbraco.DataLayer
             }
             catch (Exception e)
             {
+                LogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
                 throw new SqlHelperException("ExecuteReader", commandText, parameters, e);
             }
         }
@@ -267,6 +266,7 @@ namespace umbraco.DataLayer
             }
             catch (Exception e)
             {
+                LogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
                 throw new SqlHelperException("ExecuteXmlReader", commandText, parameters, e);
             }
         }
@@ -313,7 +313,7 @@ namespace umbraco.DataLayer
         /// </returns>
         protected virtual XmlReader ExecuteXmlReader(string commandText, params P[] parameters)
         {
-            string xmlString = (string)ExecuteScalar(commandText, parameters);
+            var xmlString = (string)ExecuteScalar(commandText, parameters);
             if (xmlString == null)
                 throw new ArgumentException("The query didn't return a value.");
 

@@ -313,7 +313,7 @@ namespace Umbraco.Tests.DynamicDocument
 
 			Assert.IsNotNull(result);
 
-			Assert.AreEqual(7, result.Count());
+			Assert.AreEqual(8, result.Count());
 			Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1046, 1173, 1174, 1176, 1175 }));
 		}
 

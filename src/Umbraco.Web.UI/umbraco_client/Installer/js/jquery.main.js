@@ -18,7 +18,7 @@ function initProgressBar() {
 
 
 function updateProgressBar(percent) {
-    jQuery('.loader').each(function () {
+    jQuery('.loader').each(function() {
         var set = jQuery(this);
         var _loader = set.find('.progress-bar');
         var _loaderValue = set.find('.progress-bar-value');
@@ -26,7 +26,7 @@ function updateProgressBar(percent) {
             value: parseInt(percent)
         });
         _loaderValue.text(percent + '%');
-    })
+    });
 }
 
 function updateStatusMessage(message) {
@@ -63,13 +63,13 @@ function initButtonHover() {
 function ieHover(_selector, _class) {
     if (_class == null) _class = 'hover';
     if (jQuery.browser.msie && jQuery.browser.version < 7) {
-        jQuery(_selector).each(function () {
-            jQuery(this).mouseenter(function () {
-                jQuery(this).addClass(_class)
-            }).mouseleave(function () {
-                jQuery(this).removeClass(_class)
-            })
-        })
+        jQuery(_selector).each(function() {
+            jQuery(this).mouseenter(function() {
+                jQuery(this).addClass(_class);
+            }).mouseleave(function() {
+                jQuery(this).removeClass(_class);
+            });
+        });
     }
 }
 function clearInputs() {
@@ -84,29 +84,29 @@ function clearInputs() {
     });
 }
 function initStep() {
-    jQuery('.tabset').each(function () {
+    jQuery('.tabset').each(function() {
         var set = jQuery(this);
         var link = set.find('ul > li');
         var ind = link.index(link.filter('.active:eq(0)'));
-        link.each(function (i, el) {
+        link.each(function(i, el) {
             if (i < ind) link.eq(i).addClass('disable');
             else link.eq(i).removeClass('disable');
         });
-        link.bind('click', function () {
+        link.bind('click', function() {
             return false;
-        })
-    })
+        });
+    });
 }
 function initTabs() {
     jQuery('.database-hold').each(function () {
         var _list = $(this);
         var _links = _list.find('a.database-tab');
         var _select = _list.find('.sel');
-        var _currentDatabase
+        var _currentDatabase;
         var selectVal;
         var selectValNew;
 
-        _select.each(function () {
+        _select.each(function() {
             var select = $(this);
             selectVal = select.val();
 
@@ -114,12 +114,12 @@ function initTabs() {
             jQuery('#database-step1-2').hide();
             jQuery('#database-step2').hide();
 
-            select.change(function () {
+            select.change(function() {
                 selectValNew = jQuery(this).val();
 
                 toggleDatabaseOption(selectValNew);
             });
-        })
+        });
         _links.each(function () {
             var _link = $(this);
             var _href = _link.attr('href');
@@ -199,34 +199,35 @@ function showDatabaseSettings() {
 
 
 function initSingleTab() {
-    jQuery('a.single-tab').each(function () {
+    jQuery('a.single-tab').each(function() {
         var _links = jQuery(this);
-        _links.each(function () {
+        _links.each(function() {
             var _link = $(this);
             var _href = _link.attr('href');
+            if (_href == "#") return;
             var _tab = $(_href);
             _tab.hide();
-            _link.click(function () {
-                _links.filter('.active').each(function () {
+            _link.click(function() {
+                _links.filter('.active').each(function() {
                     $($(this).removeClass('active').attr('href')).hide();
                 });
                 _link.addClass('active');
                 _tab.show();
                 jQuery(this).parents('div.main-tabinfo').hide();
                 jQuery(this).parents('div.install-tab').hide();
-                setTimeout(function () {
-                    jQuery('html').scrollTop(0)
-                }, 1)
+                setTimeout(function() {
+                    jQuery('html').scrollTop(0);
+                }, 1);
             });
         });
         if (_links.parents('.lightbox').length) {
-            jQuery('.lightbox').each(function () {
-                jQuery(this).find('.single-tab').bind('click', function () {
+            jQuery('.lightbox').each(function() {
+                jQuery(this).find('.single-tab').bind('click', function() {
                     jQuery('#single-tab2').hide();
-                })
-            })
+                });
+            });
         }
-    })
+    });
     jQuery('.bg-main').each(function () {
         var set = jQuery(this);
         var _nav = jQuery('.add-nav > ul');
@@ -254,7 +255,7 @@ function initSingleTab() {
 }
 function initZoomList() {
     var _speed = 250;
-    jQuery('.zoom-list').each(function () {
+    jQuery('.zoom-list').each(function() {
         var set = jQuery(this);
         var link = set.find('ul > li');
         var zoomImg = link.find('.zoom-img');
@@ -264,41 +265,40 @@ function initZoomList() {
         var dropBox = set.find('.drop-hold');
         if (jQuery.browser.msie && jQuery.browser.version < 7) {
             return;
-        }
-        else {
+        } else {
             link.hover(
-				function () {
-				    zoomImg = jQuery(this).find('.zoom-img');
-				    zoomImg.animate({
-				        width: 202,
-				        height: 275,
-				        top: -stepZoom / 2,
-				        left: -stepZoom / 2
-				    }, { queue: false, duration: _speed });
-				},
-				function () {
-				    zoomImg.animate({
-				        width: imgWidth,
-				        height: imgHeight,
-				        top: 0,
-				        left: 0
-				    }, { queue: false, duration: _speed, complete: function () { zoomImg.removeAttr('style') } });
-				}
-			)
-            dropBox.bind('mouseout', function () {
+                function() {
+                    zoomImg = jQuery(this).find('.zoom-img');
+                    zoomImg.animate({
+                        width: 202,
+                        height: 275,
+                        top: -stepZoom / 2,
+                        left: -stepZoom / 2
+                    }, { queue: false, duration: _speed });
+                },
+                function() {
+                    zoomImg.animate({
+                        width: imgWidth,
+                        height: imgHeight,
+                        top: 0,
+                        left: 0
+                    }, { queue: false, duration: _speed, complete: function() { zoomImg.removeAttr('style') } });
+                }
+            );
+            dropBox.bind('mouseout', function() {
                 zoomImg.animate({
                     width: imgWidth,
                     height: imgHeight,
                     top: 0,
                     left: 0
-                }, { queue: false, duration: _speed, complete: function () { zoomImg.removeAttr('style') } });
-            })
+                }, { queue: false, duration: _speed, complete: function() { zoomImg.removeAttr('style') } });
+            });
         }
-    })
+    });
 }
 function initZoomList2() {
     var _speed = 250;
-    jQuery('.zoom-list2').each(function () {
+    jQuery('.zoom-list2').each(function() {
         var set = jQuery(this);
         var link = set.find('.image-hold');
         var faikMask = link.find('.faik-mask');
@@ -314,142 +314,141 @@ function initZoomList2() {
         var timer;
         if (jQuery.browser.msie && jQuery.browser.version < 7) {
             link.hover(
-				function () {
-				    dropBox.removeAttr('style').hide();
-				    faikMask = jQuery(this).find('.faik-mask');
-				    faikMaskIE6 = jQuery(this).find('.faik-mask-ie6');
-				    zoomImg = jQuery(this).find('.zoom-img');
-				    dropBox = jQuery(this).find('.gal-drop');
-				    dropBox.css({
-				        top: 12,
-				        left: 12
-				    }).show();
-				    faikMask.hide();
-				    jQuery(this).css({
-				        marginTop: -stepZoom / 4,
-				        marginLeft: -stepZoom / 4
-				    });
-				    faikMaskIE6.css({
-				        top: 0,
-				        left: 0
-				    })
-				    zoomImg.css({
-				        width: imgWidth + stepZoom,
-				        height: imgHeight + stepZoom - 10,
-				        marginTop: 10,
-				        marginLeft: 3,
-				        marginBottom: -stepZoom
-				    });
-				},
-				function () {
-				    dropBox.removeAttr('style').hide();
-				    faikMask.show();
-				    jQuery(this).css({
-				        marginTop: 0,
-				        marginLeft: 0
-				    });
-				    faikMaskIE6.css({
-				        top: -9999,
-				        left: -9999,
-				        marginBottom: 0
-				    })
-				    zoomImg.css({
-				        width: imgWidth,
-				        height: imgHeight,
-				        top: 0,
-				        left: 0,
-				        marginTop: 0,
-				        marginLeft: 0,
-				        marginBottom: 0
-				    });
-				}
-			)
-            set.bind('mouseleave', function () {
+                function() {
+                    dropBox.removeAttr('style').hide();
+                    faikMask = jQuery(this).find('.faik-mask');
+                    faikMaskIE6 = jQuery(this).find('.faik-mask-ie6');
+                    zoomImg = jQuery(this).find('.zoom-img');
+                    dropBox = jQuery(this).find('.gal-drop');
+                    dropBox.css({
+                        top: 12,
+                        left: 12
+                    }).show();
+                    faikMask.hide();
+                    jQuery(this).css({
+                        marginTop: -stepZoom / 4,
+                        marginLeft: -stepZoom / 4
+                    });
+                    faikMaskIE6.css({
+                        top: 0,
+                        left: 0
+                    })
+                    zoomImg.css({
+                        width: imgWidth + stepZoom,
+                        height: imgHeight + stepZoom - 10,
+                        marginTop: 10,
+                        marginLeft: 3,
+                        marginBottom: -stepZoom
+                    });
+                },
+                function() {
+                    dropBox.removeAttr('style').hide();
+                    faikMask.show();
+                    jQuery(this).css({
+                        marginTop: 0,
+                        marginLeft: 0
+                    });
+                    faikMaskIE6.css({
+                        top: -9999,
+                        left: -9999,
+                        marginBottom: 0
+                    })
+                    zoomImg.css({
+                        width: imgWidth,
+                        height: imgHeight,
+                        top: 0,
+                        left: 0,
+                        marginTop: 0,
+                        marginLeft: 0,
+                        marginBottom: 0
+                    });
+                }
+            );
+            set.bind('mouseleave', function() {
                 if (timer) clearTimeout(timer);
                 dropBox.removeAttr('style').hide();
-            })
+            });
             dropBox.hover(
-				function () {
-				    if (timer) clearTimeout(timer);
-				    jQuery(this).show();
-				},
-				function () {
-				    if (timer) clearTimeout(timer);
-				    dropBox.removeAttr('style').hide();
-				}
-			)
-        }
-        else {
+                function() {
+                    if (timer) clearTimeout(timer);
+                    jQuery(this).show();
+                },
+                function() {
+                    if (timer) clearTimeout(timer);
+                    dropBox.removeAttr('style').hide();
+                }
+            );
+        } else {
             link.hover(
-				function () {
-				    if (timer) clearTimeout(timer);
-				    dropBox.stop().hide();
-				    faikMask = jQuery(this).find('.faik-mask').removeAttr('style');
-				    zoomImg = jQuery(this).find('.zoom-img').removeAttr('style');
-				    dropBox = jQuery(this).find('.gal-drop').hide();
-				    //Image holder animate
-				    jQuery(this).animate({
-				        marginTop: -stepZoom / 4,
-				        marginLeft: -stepZoom / 4
-				    }, { queue: false, duration: _speed });
-				    //Zoom mask
-				    timer = setTimeout(function () {
-				        dropBox.fadeIn(_speed);
-				    }, _speed)
-				    faikMask.animate({
-				        width: maskWidth + stepZoom + 5,
-				        height: maskHeight + stepZoom + 5,
-				        top: -stepZoom / 2,
-				        left: -stepZoom / 2,
-				        marginBottom: -stepZoom
-				    }, { queue: false, duration: _speed });
-				    //Zoom image
-				    zoomImg.animate({
-				        width: imgWidth + stepZoom,
-				        height: imgHeight + stepZoom - 10,
-				        marginTop: 5,
-				        marginLeft: 3,
-				        marginBottom: -stepZoom
-				    }, { queue: false, duration: _speed });
-				    if (jQuery.browser.msie && jQuery.browser.version == 7) {
-				        zoomImg.animate({
-				            width: imgWidth + stepZoom,
-				            height: imgHeight + stepZoom - 10,
-				            marginTop: 11,
-				            marginLeft: 3,
-				            marginBottom: -stepZoom
-				        }, { queue: false, duration: _speed });
-				    }
-				},
-				function () {
-				    if (timer) clearTimeout(timer);
-				    dropBox.hide();
-				    jQuery(this).animate({
-				        marginTop: 0,
-				        marginLeft: 0
-				    }, { queue: false, duration: _speed });
-				    faikMask.animate({
-				        width: maskWidth,
-				        height: maskHeight,
-				        top: 0,
-				        left: 0,
-				        marginTop: 0,
-				        marginLeft: 0,
-				        marginBottom: 0
-				    }, { queue: false, duration: _speed, complete: function () { faikMask.removeAttr('style') } });
+                function() {
+                    if (timer) clearTimeout(timer);
+                    dropBox.stop().hide();
+                    faikMask = jQuery(this).find('.faik-mask').removeAttr('style');
+                    zoomImg = jQuery(this).find('.zoom-img').removeAttr('style');
+                    dropBox = jQuery(this).find('.gal-drop').hide();
+                    //Image holder animate
+                    jQuery(this).animate({
+                        marginTop: -stepZoom / 4,
+                        marginLeft: -stepZoom / 4
+                    }, { queue: false, duration: _speed });
+                    //Zoom mask
+                    timer = setTimeout(function() {
+                        dropBox.fadeIn(_speed);
+                    }, _speed)
+                    faikMask.animate({
+                        width: maskWidth + stepZoom + 5,
+                        height: maskHeight + stepZoom + 5,
+                        top: -stepZoom / 2,
+                        left: -stepZoom / 2,
+                        marginBottom: -stepZoom
+                    }, { queue: false, duration: _speed });
+                    //Zoom image
+                    zoomImg.animate({
+                        width: imgWidth + stepZoom,
+                        height: imgHeight + stepZoom - 10,
+                        marginTop: 5,
+                        marginLeft: 3,
+                        marginBottom: -stepZoom
+                    }, { queue: false, duration: _speed });
+                    if (jQuery.browser.msie && jQuery.browser.version == 7) {
+                        zoomImg.animate({
+                            width: imgWidth + stepZoom,
+                            height: imgHeight + stepZoom - 10,
+                            marginTop: 11,
+                            marginLeft: 3,
+                            marginBottom: -stepZoom
+                        }, { queue: false, duration: _speed });
+                    }
+                },
+                function() {
+                    if (timer) clearTimeout(timer);
+                    dropBox.hide();
+                    jQuery(this).animate({
+                        marginTop: 0,
+                        marginLeft: 0
+                    }, { queue: false, duration: _speed });
+                    faikMask.animate({
+                        width: maskWidth,
+                        height: maskHeight,
+                        top: 0,
+                        left: 0,
+                        marginTop: 0,
+                        marginLeft: 0,
+                        marginBottom: 0
+                    }, { queue: false, duration: _speed, complete: function() { faikMask.removeAttr('style') } });
 
-				    zoomImg.animate({
-				        width: imgWidth,
-				        height: imgHeight,
-				        top: 0,
-				        left: 0,
-				        marginTop: 0,
-				        marginLeft: 0,
-				        marginBottom: 0
-				    }, { queue: false, duration: _speed, complete: function () { zoomImg.removeAttr('style') } });
-				}
-			)
-            set.bind('mouseleave', function () {
+                    zoomImg.animate({
+                        width: imgWidth,
+                        height: imgHeight,
+                        top: 0,
+                        left: 0,
+                        marginTop: 0,
+                        marginLeft: 0,
+                        marginBottom: 0
+                    }, { queue: false, duration: _speed, complete: function() { zoomImg.removeAttr('style') } });
+                }
+            );
+            set.bind('mouseleave', function() {
                 if (timer) clearTimeout(timer);
                 dropBox.hide();
                 link.animate({
@@ -464,7 +463,7 @@ function initZoomList2() {
                     marginTop: 0,
                     marginLeft: 0,
                     marginBottom: 0
-                }, { queue: false, duration: _speed, complete: function () { faikMask.removeAttr('style') } });
+                }, { queue: false, duration: _speed, complete: function() { faikMask.removeAttr('style') } });
                 zoomImg.animate({
                     width: imgWidth,
                     height: imgHeight,
@@ -473,13 +472,13 @@ function initZoomList2() {
                     marginTop: 0,
                     marginLeft: 0,
                     marginBottom: 0
-                }, { queue: false, duration: _speed, complete: function () { zoomImg.removeAttr('style') } });
-            })
+                }, { queue: false, duration: _speed, complete: function() { zoomImg.removeAttr('style') } });
+            });
         }
-    })
+    });
 }
 function initSlide() {
-    jQuery('.gallery').each(function () {
+    jQuery('.gallery').each(function() {
         var set = jQuery(this);
         var btnPrev = set.find('.btn-prev');
         var btnNext = set.find('.btn-next');
@@ -503,11 +502,11 @@ function initSlide() {
             manualTrump: false,
             pager: swicher,
             activePagerClass: 'active',
-            pagerAnchorBuilder: function (index) {
+            pagerAnchorBuilder: function(index) {
                 return '<li><a href="#">' + (index + 1) + '</a></li>';
             }
         });
-    })
+    });
 }
 
 function initLightBox() {
@@ -560,7 +559,7 @@ function initLightBox() {
 
 
 /* simpleLightbox v.1.2. */
-jQuery.fn.simpleLightbox = function (_options) {
+jQuery.fn.simpleLightbox = function(_options) {
     // defaults options
     var _options = jQuery.extend({
         lightboxContentBlock: '.lightbox',
@@ -571,7 +570,7 @@ jQuery.fn.simpleLightbox = function (_options) {
         onClick: null
     }, _options);
 
-    return this.each(function (i, _this) {
+    return this.each(function(i, _this) {
         var _this = jQuery(_this);
         if (!_options.href)
             _this.lightboxContentBlock = _options.lightboxContentBlock;
@@ -599,35 +598,35 @@ jQuery.fn.simpleLightbox = function (_options) {
                 textIndent: -9999
             }).text('$nbsp');
             _lightbox.shownFlag = false;
-            _this.click(function () {
+            _this.click(function() {
                 if (jQuery.isFunction(_options.onClick)) {
                     _options.onClick.apply(_this);
                 }
                 _lightbox.shownFlag = true;
                 _lightbox.hide();
                 jQuery.fn.simpleLightbox.positionLightbox(_lightbox);
-                _fader.fadeIn(300, function () {
+                _fader.fadeIn(300, function() {
                     _lightbox.fadeIn(400);
                     jQuery.fn.simpleLightbox.positionLightbox(_lightbox);
                 });
                 jQuery('span.playButton').click();
                 return false;
             });
-            jQuery(_this.closeLink).click(function () {
-                _lightbox.fadeOut(400, function () {
+            jQuery(_this.closeLink).click(function() {
+                _lightbox.fadeOut(400, function() {
                     _fader.fadeOut(300);
                     _scroll = false;
                 });
                 return false;
             });
-            _fader.click(function () {
-                _lightbox.fadeOut(400, function () {
+            _fader.click(function() {
+                _lightbox.fadeOut(400, function() {
                     _fader.fadeOut(300);
                 });
                 return false;
             });
             var _scroll = false;
-            jQuery.fn.simpleLightbox.positionLightbox = function (_lbox) {
+            jQuery.fn.simpleLightbox.positionLightbox = function(_lbox) {
                 if (!_lbox.shownFlag) return false;
                 var _height = 0;
                 var _width = 0;
@@ -643,8 +642,12 @@ jQuery.fn.simpleLightbox = function (_options) {
                 var _page = $('body');
                 if (_lbox.length) {
                     //Fader style
-                    if (_width < _minWidth) { _fader.css('width', _minWidth); }
-                    else { _fader.css('width', '100%'); };
+                    if (_width < _minWidth) {
+                        _fader.css('width', _minWidth);
+                    } else {
+                        _fader.css('width', '100%');
+                    }
+                    ;
                     if (_height > _page.innerHeight()) _fader.css('height', _height);
                     else _fader.css('height', _page.height());
 
@@ -660,8 +663,7 @@ jQuery.fn.simpleLightbox = function (_options) {
                                 top: ((_height - _lbox.outerHeight()) / 2) + "px"
                             });
                         }
-                    }
-                    else {
+                    } else {
                         var _fh = parseInt(_fader.css('height'));
                         if (!_scroll) {
                             if (_fh - _thisHeight > parseInt($(document).scrollTop())) {
@@ -681,27 +683,27 @@ jQuery.fn.simpleLightbox = function (_options) {
                 }
             }
 
-            jQuery(window).resize(function () {
+            jQuery(window).resize(function() {
                 if (_lightbox.is(':visible'))
                     jQuery.fn.simpleLightbox.positionLightbox(_lightbox);
             });
-            jQuery(window).scroll(function () {
+            jQuery(window).scroll(function() {
                 if (_lightbox.is(':visible'))
                     jQuery.fn.simpleLightbox.positionLightbox(_lightbox);
             });
 
             jQuery.fn.simpleLightbox.positionLightbox(_lightbox);
-            $(document).keydown(function (e) {
+            $(document).keydown(function(e) {
                 if (!e) evt = window.event;
                 if (e.keyCode == 27) {
-                    _lightbox.fadeOut(400, function () {
+                    _lightbox.fadeOut(400, function() {
                         _fader.fadeOut(300);
                     });
                 }
             });
         }
     });
-}
+};
 
 function initCustomForms() {
     jQuery('select.sel').selectmenu();

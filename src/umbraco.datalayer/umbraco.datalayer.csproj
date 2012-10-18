@@ -78,6 +78,7 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -141,6 +142,7 @@
     <Compile Include="SqlHelpers\SqlServer\SqlServerParameter.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="SqlHelpers\SqlServer\Sql\Total.sql" />
   </ItemGroup>
   <ItemGroup>
@@ -191,6 +193,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="SqlHelpers\SqlServer\Sql\Version4_8_Upgrade.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
+      <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
+      <Name>Umbraco.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

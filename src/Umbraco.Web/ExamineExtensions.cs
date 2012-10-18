@@ -14,7 +14,7 @@ namespace Umbraco.Web
 	/// </summary>
 	internal static class ExamineExtensions
 	{
-		internal static DynamicPublishedContentList ConvertSearchResultToDynamicDocument(
+		internal static IEnumerable<IPublishedContent> ConvertSearchResultToPublishedContent(
 			this IEnumerable<SearchResult> results,
 			IPublishedStore store)
 		{
@@ -22,9 +22,8 @@ namespace Umbraco.Web
 			// however thsi is currently not the case: 
 			// http://examine.codeplex.com/workitem/10350
 
-			var list = new DynamicPublishedContentList();
-			var xd = new XmlDocument();
-
+			var list = new List<IPublishedContent>();
+			
 			foreach (var result in results.OrderByDescending(x => x.Score))
 			{
 				var doc = store.GetDocumentById(
@@ -32,9 +31,8 @@ namespace Umbraco.Web
 					result.Id);
 				if (doc == null) continue; //skip if this doesn't exist in the cache				
 				doc.Properties.Add(
-					new PropertyResult("examineScore", result.Score.ToString(), Guid.Empty, PropertyResultType.CustomProperty));
-				var dynamicDoc = new DynamicPublishedContent(doc);
-				list.Add(dynamicDoc);
+					new PropertyResult("examineScore", result.Score.ToString(), Guid.Empty, PropertyResultType.CustomProperty));				
+				list.Add(doc);
 			}
 			return list;
 		}

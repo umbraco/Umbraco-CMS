@@ -134,11 +134,14 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		internal IEnumerable<T> CreateInstances<T>(IEnumerable<Type> types, bool throwException = false)
 		{
+			//Have removed logging because it doesn't really need to be logged since the time taken is generally 0ms.
+			//we want to know if it fails ever, not how long it took if it is only 0.
+
 			var typesAsArray = types.ToArray();
-			using (DisposableTimer.DebugDuration<PluginManager>(
-				String.Format("Starting instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName),
-				String.Format("Completed instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName)))
-			{
+			//using (DisposableTimer.DebugDuration<PluginManager>(
+			//	String.Format("Starting instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName),
+			//	String.Format("Completed instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName)))
+			//{
 				var instances = new List<T>();
 				foreach (var t in typesAsArray)
 				{
@@ -159,7 +162,7 @@ namespace Umbraco.Core
 					}
 				}
 				return instances;
-			}
+			//}
 		}
 
 		/// <summary>
@@ -175,7 +178,10 @@ namespace Umbraco.Core
 			return instances.FirstOrDefault();
 		}
 
-		private IEnumerable<Type> ResolveTypes<T>(Func<IEnumerable<Type>> finder, bool typeIsAttribute = false)
+		private IEnumerable<Type> ResolveTypes<T>(
+			Func<IEnumerable<Type>> finder, 
+			TypeResolutionKind resolutionType,
+			bool cacheResult)
 		{
 			using (var readLock = new UpgradeableReadLock(_lock))
 			{
@@ -184,21 +190,26 @@ namespace Umbraco.Core
 					String.Format("Completed resolution of types of {0}", typeof(T).FullName)))
 				{
 					//check if the TypeList already exists, if so return it, if not we'll create it
-					var typeList = _types.SingleOrDefault(x => x.GetListType().IsType<T>());
-					if (typeList == null)
+					var typeList = _types.SingleOrDefault(x => x.IsTypeList<T>(resolutionType));
+					//if we're not caching the result then proceed, or if the type list doesn't exist then proceed
+					if (!cacheResult || typeList == null)
 					{
 						//upgrade to a write lock since we're adding to the collection
 						readLock.UpgradeToWriteLock();
 
-						typeList = new TypeList<T>(typeIsAttribute);
+						typeList = new TypeList<T>(resolutionType);
 
 						foreach (var t in finder())
 						{
 							typeList.AddType(t);
 						}
 
-						//add the type list to the collection
-						_types.Add(typeList);
+						//only add the cache if we are to cache the results
+						if (cacheResult)
+						{
+							//add the type list to the collection
+							_types.Add(typeList);	
+						}						
 					}
 					return typeList.GetTypes();
 				}
@@ -210,9 +221,12 @@ namespace Umbraco.Core
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		internal IEnumerable<Type> ResolveTypes<T>()
+		internal IEnumerable<Type> ResolveTypes<T>(bool cacheResult = true)
 		{
-			return ResolveTypes<T>(() => TypeFinder.FindClassesOfType<T>(AssembliesToScan));
+			return ResolveTypes<T>(
+				() => TypeFinder.FindClassesOfType<T>(AssembliesToScan), 
+				TypeResolutionKind.FindAllTypes,
+				cacheResult);
 		}
 
 		/// <summary>
@@ -221,10 +235,13 @@ namespace Umbraco.Core
 		/// <typeparam name="T"></typeparam>
 		/// <typeparam name="TAttribute"></typeparam>
 		/// <returns></returns>
-		internal IEnumerable<Type> ResolveTypesWithAttribute<T, TAttribute>()
+		internal IEnumerable<Type> ResolveTypesWithAttribute<T, TAttribute>(bool cacheResult = true)
 			where TAttribute : Attribute
 		{
-			return ResolveTypes<T>(() => TypeFinder.FindClassesOfTypeWithAttribute<T, TAttribute>(AssembliesToScan));
+			return ResolveTypes<T>(
+				() => TypeFinder.FindClassesOfTypeWithAttribute<T, TAttribute>(AssembliesToScan),
+				TypeResolutionKind.FindTypesWithAttribute,
+				cacheResult);
 		}
 
 		/// <summary>
@@ -232,12 +249,13 @@ namespace Umbraco.Core
 		/// </summary>
 		/// <typeparam name="TAttribute"></typeparam>
 		/// <returns></returns>
-		internal IEnumerable<Type> ResolveAttributedTypes<TAttribute>()
+		internal IEnumerable<Type> ResolveAttributedTypes<TAttribute>(bool cacheResult = true)
 			where TAttribute : Attribute
 		{
 			return ResolveTypes<TAttribute>(
 				() => TypeFinder.FindClassesWithAttribute<TAttribute>(AssembliesToScan),
-				true);
+				TypeResolutionKind.FindAttributedTypes,
+				cacheResult);
 		}
 
 		/// <summary>
@@ -251,38 +269,55 @@ namespace Umbraco.Core
 
 
 
-		#region Private classes
+		#region Private classes/Enums
+
+		/// <summary>
+		/// The type of resolution being invoked
+		/// </summary>
+		internal enum TypeResolutionKind
+		{
+			FindAllTypes,
+			FindAttributedTypes,
+			FindTypesWithAttribute
+		}
+
 		internal abstract class TypeList
 		{
 			public abstract void AddType(Type t);
-			public abstract Type GetListType();
+			public abstract bool IsTypeList<TLookup>(TypeResolutionKind resolutionType);
 			public abstract IEnumerable<Type> GetTypes();
 		}
 
 		internal class TypeList<T> : TypeList
 		{
-			private readonly bool _typeIsAttribute;
+			private readonly TypeResolutionKind _resolutionType;
 
-			public TypeList(bool typeIsAttribute = false)
+			public TypeList(TypeResolutionKind resolutionType)
 			{
-				_typeIsAttribute = typeIsAttribute;
+				_resolutionType = resolutionType;
 			}
 
 			private readonly List<Type> _types = new List<Type>();
 
 			public override void AddType(Type t)
 			{
-
-				//if the type is an attribute type we won't do the type check
-				if (_typeIsAttribute || t.IsType<T>())
+				//if the type is an attribute type we won't do the type check because typeof<T> is going to be the 
+				//attribute type whereas the 't' type is the object type found with the attribute.
+				if (_resolutionType == TypeResolutionKind.FindAttributedTypes || t.IsType<T>())
 				{
 					_types.Add(t);
 				}
 			}
 
-			public override Type GetListType()
+			/// <summary>
+			/// Returns true if the current TypeList is of the same type and of the same type
+			/// </summary>
+			/// <typeparam name="TLookup"></typeparam>
+			/// <param name="resolutionType"></param>
+			/// <returns></returns>
+			public override bool IsTypeList<TLookup>(TypeResolutionKind resolutionType)
 			{
-				return typeof(T);
+				return _resolutionType == resolutionType && (typeof (T)).IsType<TLookup>();
 			}
 
 			public override IEnumerable<Type> GetTypes()

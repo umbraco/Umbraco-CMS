@@ -29,7 +29,7 @@ namespace Umbraco.Core
 		{
 			get
 			{
-				EnsureRefreshersList();
+				EnsureIdsAreTracked();
 				return Values;
 			}
 		}
