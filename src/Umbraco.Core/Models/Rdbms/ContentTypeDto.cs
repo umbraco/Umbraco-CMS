@@ -32,7 +32,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("description")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(DatabaseTypes.Nvarchar, Length = 1500)]
+        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 1500)]
         public string Description { get; set; }
 
         [Column("isContainer")]

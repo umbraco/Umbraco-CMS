@@ -27,7 +27,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("alias")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(DatabaseTypes.Nvarchar, Length = 100)]
+        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 100)]
         public string Alias { get; set; }
     }
 }

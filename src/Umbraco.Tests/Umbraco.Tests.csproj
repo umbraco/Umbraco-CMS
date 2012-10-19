@@ -52,6 +52,10 @@
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="MySql.Data, Version=5.1.2.2, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.0.12054\lib\nunit.framework.dll</HintPath>
     </Reference>
@@ -92,6 +96,7 @@
     <Compile Include="Models\StylesheetTests.cs" />
     <Compile Include="Persistence\DatabaseExtensionsTest.cs" />
     <Compile Include="Persistence\DatabaseFactoryTests.cs" />
+    <Compile Include="Persistence\MySqlDatabaseCreationTest.cs" />
     <Compile Include="Persistence\RepositoryResolverTests.cs" />
     <Compile Include="Resolvers\ActionsResolverTests.cs" />
     <Compile Include="AsynchronousRollingFileAppenderTests.cs" />

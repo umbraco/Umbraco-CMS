@@ -21,7 +21,7 @@ namespace Umbraco.Core.Models.Rdbms
         public Guid UniqueId { get; set; }
 
         [Column("value")]
-        [DatabaseType(DatabaseTypes.Nvarchar, Length = 1000)]
+        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 1000)]
         public string Value { get; set; }
     }
 }

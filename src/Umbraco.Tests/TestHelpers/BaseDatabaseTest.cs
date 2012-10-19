@@ -3,6 +3,7 @@ using System.Data.SqlServerCe;
 using System.IO;
 using NUnit.Framework;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -38,6 +39,8 @@ namespace Umbraco.Tests.TestHelpers
                 engine.CreateDatabase();
             }
 
+            SyntaxConfig.SqlSyntaxProvider = SyntaxProvider;
+
             //Create the umbraco database
             _database = new Database(ConnectionString, ProviderName);
             _database.Initialize();
@@ -45,6 +48,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public abstract string ConnectionString { get; }
         public abstract string ProviderName { get; }
+        public abstract ISqlSyntaxProvider SyntaxProvider { get; }
 
         protected Database Database
         {

@@ -18,7 +18,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int NodeId { get; set; }
 
         [Column("action")]
-        [DatabaseType(DatabaseTypes.Nchar, Length = 1)]
+        [DatabaseType(DatabaseTypes.NCHAR, Length = 1)]
         public string Action { get; set; }
     }
 }

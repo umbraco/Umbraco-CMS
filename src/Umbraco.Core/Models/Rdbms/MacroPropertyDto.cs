@@ -29,7 +29,7 @@ namespace Umbraco.Core.Models.Rdbms
         public byte SortOrder { get; set; }
 
         [Column("macroPropertyAlias")]
-        [DatabaseType(DatabaseTypes.Nvarchar, Length = 50)]
+        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 50)]
         public string Alias { get; set; }
 
         [Column("macroPropertyName")]

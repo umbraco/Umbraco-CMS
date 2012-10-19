@@ -14,11 +14,11 @@ namespace Umbraco.Core.Models.Rdbms
         public int NodeId { get; set; }
 
         [Column("filename")]
-        [DatabaseType(DatabaseTypes.Nvarchar, Length = 100)]
+        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 100)]
         public string Filename { get; set; }
 
         [Column("content")]
-        [DatabaseType(DatabaseTypes.Ntext)]
+        [DatabaseType(DatabaseTypes.NTEXT)]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Content { get; set; }
     }

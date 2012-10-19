@@ -4,8 +4,6 @@
     {
         Clustered,
         NonClustered,
-        UniqueNonClustered,
-        PrimaryXml,
-        Spartial
+        UniqueNonClustered
     }
 }

@@ -30,7 +30,7 @@ namespace Umbraco.Core.Models.Rdbms
         public DateTime Datetime { get; set; }
 
         [Column("comment")]
-        [DatabaseType(DatabaseTypes.Nvarchar, Length = 1000)]
+        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 1000)]
         public string Comment { get; set; }
     }
 }

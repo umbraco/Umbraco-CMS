@@ -15,12 +15,12 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("languageISOCode")]
         [Index(IndexTypes.UniqueNonClustered)]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(DatabaseTypes.Nvarchar, Length = 10)]
+        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 10)]
         public string IsoCode { get; set; }
 
         [Column("languageCultureName")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(DatabaseTypes.Nvarchar, Length = 100)]
+        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 100)]
         public string CultureName { get; set; }
     }
 }

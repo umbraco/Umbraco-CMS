@@ -2,14 +2,14 @@
 {
     public enum DatabaseTypes
     {
-        Integer,
-        SmallInteger,
-        TinyInteger,
-        UniqueIdentifier,
-        DateTime,
-        Ntext,
-        Nvarchar,
-        Bool,
-        Nchar
+        INTEGER,
+        SMALLINTEGER,
+        TINYINTEGER,
+        UNIQUEIDENTIFIER,
+        DATETIME,
+        NTEXT,
+        NVARCHAR,
+        BOOL,
+        NCHAR
     }
 }
