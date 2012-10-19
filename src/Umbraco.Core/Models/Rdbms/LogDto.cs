@@ -25,12 +25,12 @@ namespace Umbraco.Core.Models.Rdbms
         public DateTime Datestamp { get; set; }
 
         [Column("logHeader")]
-        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 50)]
+        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 50)]
         public string Header { get; set; }
 
         [Column("logComment")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 4000)]
+        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 4000)]
         public string Comment { get; set; }
     }
 }

@@ -27,12 +27,12 @@ namespace Umbraco.Core.Models.Rdbms
         public string Icon { get; set; }
 
         [Column("thumbnail")]
-        [Constraint(Default = "'folder.png'")]
+        [Constraint(Default = "folder.png")]
         public string Thumbnail { get; set; }
 
         [Column("description")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 1500)]
+        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 1500)]
         public string Description { get; set; }
 
         [Column("isContainer")]

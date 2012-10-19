@@ -22,6 +22,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string GetColumnDefinition(ColumnDefinition column, string tableName);
         string GetPrimaryKeyStatement(ColumnDefinition column, string tableName);
         string ToCreatePrimaryKeyStatement(TableDefinition table);
+        string GetSpecialDbType(SpecialDbTypes dbTypes);
+        string GetConstraintDefinition(ColumnDefinition column, string tableName);
     }
 
     internal abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
@@ -110,6 +112,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return string.Format("\"{0}\"", name);
         }
 
+        public virtual string GetQuotedValue(string value)
+        {
+            return string.Format("'{0}'", value);
+        }
+
         public virtual string GetIndexType(IndexTypes indexTypes)
         {
             string indexType;
@@ -127,14 +134,33 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return indexType;
         }
 
+        public virtual string GetSpecialDbType(SpecialDbTypes dbTypes)
+        {
+            if (dbTypes == SpecialDbTypes.NCHAR)
+            {
+                return "NCHAR";
+            }
+            else if (dbTypes == SpecialDbTypes.NTEXT)
+                return "NTEXT";
+
+            return "NVARCHAR";
+        }
+
         public virtual string GetColumnDefinition(ColumnDefinition column, string tableName)
         {
             string dbTypeDefinition;
-            if(!string.IsNullOrEmpty(column.DbType))
+            if (column.HasSpecialDbType)
             {
-                dbTypeDefinition = column.DbType;//Translate
                 if (column.DbTypeLength.HasValue)
-                    dbTypeDefinition = string.Format("{0}({1})", column.DbType, column.DbTypeLength.Value);
+                {
+                    dbTypeDefinition = string.Format("{0}({1})",
+                                                     GetSpecialDbType(column.DbType),
+                                                     column.DbTypeLength.Value);
+                }
+                else
+                {
+                    dbTypeDefinition = GetSpecialDbType(column.DbType);
+                }
             }
             else if (column.PropertyType == typeof(string))
             {
@@ -162,14 +188,25 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
             if(column.HasConstraint)
             {
-                sql.AppendFormat(" CONSTRAINT {0}",
+                sql.Append(GetConstraintDefinition(column, tableName));
+            }
+
+            return sql.ToString();
+        }
+
+        public virtual string GetConstraintDefinition(ColumnDefinition column, string tableName)
+        {
+            var sql = new StringBuilder();
+            sql.AppendFormat(" CONSTRAINT {0}",
                                  string.IsNullOrEmpty(column.ConstraintName)
                                      ? GetQuotedName(string.Format("DF_{0}_{1}", tableName, column.ColumnName))
                                      : column.ConstraintName);
 
-                sql.AppendFormat(DefaultValueFormat, column.ConstraintDefaultValue);
-            }
+            string value = column.PropertyType == typeof (string)
+                               ? GetQuotedValue(column.ConstraintDefaultValue)
+                               : column.ConstraintDefaultValue;
 
+            sql.AppendFormat(DefaultValueFormat, value);
             return sql.ToString();
         }
 

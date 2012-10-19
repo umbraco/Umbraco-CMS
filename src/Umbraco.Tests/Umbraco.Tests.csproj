@@ -94,10 +94,13 @@
     <Compile Include="LibraryTests.cs" />
     <Compile Include="Models\ContentTests.cs" />
     <Compile Include="Models\StylesheetTests.cs" />
-    <Compile Include="Persistence\DatabaseExtensionsTest.cs" />
+    <Compile Include="Persistence\BaseTableByTableTest.cs" />
     <Compile Include="Persistence\DatabaseFactoryTests.cs" />
     <Compile Include="Persistence\MySqlDatabaseCreationTest.cs" />
+    <Compile Include="Persistence\MySqlTableByTableTest.cs" />
     <Compile Include="Persistence\RepositoryResolverTests.cs" />
+    <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
+    <Compile Include="Persistence\SqlTableByTableTest.cs" />
     <Compile Include="Resolvers\ActionsResolverTests.cs" />
     <Compile Include="AsynchronousRollingFileAppenderTests.cs" />
     <Compile Include="BusinessLogic\ApplicationTest.cs" />

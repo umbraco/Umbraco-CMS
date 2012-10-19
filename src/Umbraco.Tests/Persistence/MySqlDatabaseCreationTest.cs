@@ -12,7 +12,7 @@ namespace Umbraco.Tests.Persistence
 
         public override string ConnectionString
         {
-            get { return "Server = 192.168.1.5; Database = testDb; Uid = umbraco; Pwd = umbraco"; }
+            get { return "Server = 192.168.1.108; Database = testDb; Uid = umbraco; Pwd = umbraco"; }
         }
 
         public override string ProviderName

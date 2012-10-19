@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models.Rdbms
     {
         [Column("appAlias")]
         [PrimaryKeyColumn(AutoIncrement = false, Clustered = true)]
-        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 50)]
+        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 50)]
         public string AppAlias { get; set; }
 
         [Column("appIcon")]

@@ -34,7 +34,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions
                  var databaseTypeAttribute = propertyInfo.FirstAttribute<DatabaseTypeAttribute>();
                  if (databaseTypeAttribute != null)
                  {
-                     columnDefinition.DbType = databaseTypeAttribute.DatabaseType.ToString();
+                     columnDefinition.HasSpecialDbType = true;
+                     columnDefinition.DbType = databaseTypeAttribute.DatabaseType;
+
                      if (databaseTypeAttribute.Length > 0)
                         columnDefinition.DbTypeLength = databaseTypeAttribute.Length;
                  }

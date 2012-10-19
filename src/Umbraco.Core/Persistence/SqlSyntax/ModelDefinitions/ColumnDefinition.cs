@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions
 {
@@ -7,7 +8,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions
         public string ColumnName { get; set; }
 
         public Type PropertyType { get; set; }
-        public string DbType { get; set; }
+        public bool HasSpecialDbType { get; set; }
+        public SpecialDbTypes DbType { get; set; }
         public int? DbTypeLength { get; set; }
         
         public bool IsNullable { get; set; }

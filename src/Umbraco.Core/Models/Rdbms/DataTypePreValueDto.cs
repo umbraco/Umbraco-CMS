@@ -18,7 +18,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("value")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 2500)]
+        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 2500)]
         public string Value { get; set; }
 
         [Column("sortorder")]
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("alias")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 50)]
+        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 50)]
         public string Alias { get; set; }
     }
 }

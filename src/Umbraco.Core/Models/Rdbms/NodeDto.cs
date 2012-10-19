@@ -35,7 +35,7 @@ namespace Umbraco.Core.Models.Rdbms
         public short Level { get; set; }
 
         [Column("path")]
-        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 150)]
+        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 150)]
         public string Path { get; set; }
 
         [Column("sortOrder")]

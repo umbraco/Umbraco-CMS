@@ -23,12 +23,12 @@ namespace Umbraco.Core.Models.Rdbms
         public int? Master { get; set; }
 
         [Column("alias")]
-        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 100)]
+        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 100)]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Alias { get; set; }
 
         [Column("design")]
-        [DatabaseType(DatabaseTypes.NTEXT)]
+        [DatabaseType(SpecialDbTypes.NTEXT)]
         public string Design { get; set; }
     }
 }

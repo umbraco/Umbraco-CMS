@@ -5,12 +5,12 @@ namespace Umbraco.Core.Persistence.DatabaseAnnotations
     [AttributeUsage(AttributeTargets.Property)]
     public class DatabaseTypeAttribute : Attribute
     {
-        public DatabaseTypeAttribute(DatabaseTypes databaseType)
+        public DatabaseTypeAttribute(SpecialDbTypes databaseType)
         {
             DatabaseType = databaseType;
         }
 
-        public DatabaseTypes DatabaseType { get; private set; }
+        public SpecialDbTypes DatabaseType { get; set; }
         public int Length { get; set; }
     }
 }

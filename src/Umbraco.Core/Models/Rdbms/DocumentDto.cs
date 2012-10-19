@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("nodeId")]
         [ForeignKey(typeof(ContentDto))]
         [ForeignKey(typeof(NodeDto))]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsDocument", ForColumns = "[nodeId], [versionId]")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsDocument", ForColumns = "nodeId, versionId")]
         public int NodeId { get; set; }
 
         [Column("published")]
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models.Rdbms
         public Guid VersionId { get; set; }
 
         [Column("text")]
-        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 255)]
+        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 255)]
         public string Text { get; set; }
 
         [Column("releaseDate")]
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("alias")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 255)]
+        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 255)]
         public string Alias { get; set; }
 
         [Column("newest")]

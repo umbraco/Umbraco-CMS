@@ -18,12 +18,12 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("stylesheetPropertyAlias")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 50)]
+        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 50)]
         public string Alias { get; set; }
 
         [Column("stylesheetPropertyValue")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 400)]
+        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 400)]
         public string Value { get; set; }
     }
 }

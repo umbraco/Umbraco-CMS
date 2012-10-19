@@ -39,12 +39,12 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("dataNvarchar")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(DatabaseTypes.NVARCHAR, Length = 500)]
+        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 500)]
         public string VarChar { get; set; }
 
         [Column("dataNtext")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(DatabaseTypes.NTEXT)]
+        [DatabaseType(SpecialDbTypes.NTEXT)]
         public string Text { get; set; }
 
         [ResultColumn]
