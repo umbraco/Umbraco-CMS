@@ -24,51 +24,45 @@
 
 ********************************************************************************************/
 -- rename cmsTab
-SP_RENAME 'cmsTab', 'cmsPropertyTypeGroup'
+RENAME TABLE cmsTab TO cmsPropertyTypeGroup;
 ;
 -- add parent Group to new cmsPropertyTypeGroup
-ALTER TABLE [cmsPropertyTypeGroup] 
-ADD [parentGroupId] int NULL 
-CONSTRAINT [df_cmsPropertyTypeGroup_parentGroupId] DEFAULT NULL
+ALTER TABLE cmsPropertyTypeGroup
+ADD parentGroupId int NULL DEFAULT NULL
 ;
-ALTER TABLE [cmsPropertyTypeGroup] 
-ADD CONSTRAINT [FK_cmsPropertyTypeGroup_cmsPropertyTypeGroup] FOREIGN KEY([parentGroupId])
-REFERENCES [cmsPropertyTypeGroup] ([id])
+ALTER TABLE cmsPropertyType 
+ADD FOREIGN KEY (propertyTypeGroupId) 
+REFERENCES cmsPropertyTypeGroup (id) 
 ;                                 
 -- add sortOrder to cmsContentTypeAllowedContentType
-ALTER TABLE [cmsContentTypeAllowedContentType] 
-ADD [sortOrder] int NOT NULL 
-CONSTRAINT [df_cmsContentTypeAllowedContentType_sortOrder] DEFAULT 1
+ALTER TABLE cmsContentTypeAllowedContentType
+ADD sortOrder int NOT NULL DEFAULT 1
 ;
 -- add container and allowAtRoot to cmsContentType
-ALTER TABLE [cmsContentType] 
-ADD [isContainer] bit NOT NULL 
-CONSTRAINT [df_cmsContentType_isContainer] DEFAULT 0
+ALTER TABLE cmsContentType
+ADD isContainer int NOT NULL DEFAULT 0
 ;
-ALTER TABLE [cmsContentType] 
-ADD [allowAtRoot] bit NOT NULL 
-CONSTRAINT [df_cmsContentType_allowAtRoot] DEFAULT 0
+ALTER TABLE cmsContentType
+ADD allowAtRoot int NOT NULL DEFAULT 0
 ;
--- Create a new cmsContentType2ContentType table
-CREATE TABLE [cmsContentType2ContentType] ([parentContentTypeId] int NOT NULL,[childContentTypeId] int NOT NULL)
-;
-ALTER TABLE [cmsContentType2ContentType] ADD CONSTRAINT  [cmsContentType2ContentType_PK] PRIMARY KEY ([parentContentTypeId],[childContentTypeId])
+CREATE TABLE cmsContentType2ContentType 
+(parentContentTypeId int NOT NULL, childContentTypeId int NOT NULL) 
+; 
+ALTER TABLE cmsContentType2ContentType ADD CONSTRAINT PK_cmsContentType2ContentType PRIMARY KEY CLUSTERED  (parentContentTypeId, childContentTypeId) 
 ;
 -- move all masterContentType information to new cmsContentType2ContentType table
-INSERT INTO [cmsContentType2ContentType] (parentContentTypeId, childContentTypeId)
-select masterContentType, nodeId from [cmsContentType] WHERE not [masterContentType] is null and [masterContentType] != 0
+INSERT INTO cmsContentType2ContentType (parentContentTypeId, childContentTypeId)
+select masterContentType, nodeId from cmsContentType WHERE not masterContentType is null and masterContentType != 0
 ;
 -- remove masterContentType column from cmsContentType now that it's replaced by a separate table
-ALTER TABLE [cmsContentType] DROP CONSTRAINT [DF_cmsContentType_masterContentType]
-;
-ALTER TABLE [cmsContentType] DROP COLUMN [masterContentType]
+ALTER TABLE cmsContentType DROP COLUMN masterContentType
 ;
 -- rename tab to propertyGroup on propertyType
-ALTER TABLE [cmsPropertyType] ADD [propertyTypeGroupId] int
+ALTER TABLE cmsPropertyType ADD propertyTypeGroupId int
 ;
-UPDATE [cmsPropertyType] SET [propertyTypeGroupId] = [tabId]
+UPDATE cmsPropertyType SET propertyTypeGroupId = tabId
 ;
-ALTER TABLE [cmsPropertyType] DROP CONSTRAINT [FK_cmsPropertyType_cmsTab]
+ALTER TABLE cmsPropertyType DROP FOREIGN KEY FK_cmsPropertyType_cmsTab
 ;
-ALTER TABLE [cmsPropertyType] DROP COLUMN [tabId]
+ALTER TABLE cmsPropertyType DROP COLUMN tabId
 ;
