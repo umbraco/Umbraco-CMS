@@ -43,7 +43,7 @@ namespace Umbraco.Web.Routing
 				return;
 			}
 
-			var templateAlias = _publishedContentRequest.Template.Alias;
+			var templateAlias = _publishedContentRequest.Template.Alias.Replace(" ", string.Empty);
 
 			Func<DirectoryInfo, string, string[], RenderingEngine, bool> determineEngine =
 				(directory, alias, extensions, renderingEngine) =>
