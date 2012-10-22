@@ -35,12 +35,12 @@ namespace Umbraco.Core.Models.Rdbms
         public string UserName { get; set; }
 
         [Column("userLogin")]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 125)]
+        [Length(125)]
         [Index(IndexTypes.NonClustered)]
         public string Login { get; set; }
 
         [Column("userPassword")]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 125)]
+        [Length(125)]
         public string Password { get; set; }
 
         [Column("userEmail")]
@@ -48,12 +48,12 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("userDefaultPermissions")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 50)]
+        [Length(50)]
         public string DefaultPermissions { get; set; }
 
         [Column("userLanguage")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 10)]
+        [Length(10)]
         public string UserLanguage { get; set; }
 
         [Column("defaultToLiveEditing")]

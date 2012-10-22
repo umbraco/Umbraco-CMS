@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models.Rdbms
         public short Id { get; set; }
 
         [Column("macroPropertyTypeAlias")]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 50)]
+        [Length(50)]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Alias { get; set; }
 

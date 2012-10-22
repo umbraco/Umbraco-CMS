@@ -22,7 +22,7 @@ namespace Umbraco.Core.Models.Rdbms
         public DateTime Timestamp { get; set; }
 
         [Column("xml")]
-        [DatabaseType(SpecialDbTypes.NTEXT)]
+        [SpecialDbType(SpecialDbTypes.NTEXT)]
         public string Xml { get; set; }
     }
 }

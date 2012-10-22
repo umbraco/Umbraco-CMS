@@ -26,7 +26,6 @@ namespace Umbraco.Core.Models.Rdbms
         public Guid VersionId { get; set; }
 
         [Column("text")]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 255)]
         public string Text { get; set; }
 
         [Column("releaseDate")]
@@ -48,7 +47,6 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("alias")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 255)]
         public string Alias { get; set; }
 
         [Column("newest")]

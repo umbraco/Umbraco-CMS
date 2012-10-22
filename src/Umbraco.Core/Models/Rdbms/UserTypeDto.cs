@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models.Rdbms
         public short Id { get; set; }
 
         [Column("userTypeAlias")]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 50)]
+        [Length(50)]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Alias { get; set; }
 
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Models.Rdbms
         public string Name { get; set; }
 
         [Column("userTypeDefaultPermissions")]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 50)]
+        [Length(50)]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string DefaultPermissions { get; set; }
     }

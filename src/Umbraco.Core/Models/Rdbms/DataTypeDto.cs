@@ -22,8 +22,8 @@ namespace Umbraco.Core.Models.Rdbms
         public Guid ControlId { get; set; }
 
         [Column("dbType")]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 50)]//NOTE Is set to [varchar] (50) in Sql Server script
-        public string DbType { get; set; }
+        [Length(50)]
+        public string DbType { get; set; }//NOTE Is set to [varchar] (50) in Sql Server script
 
         [ResultColumn]
         public NodeDto NodeDto { get; set; }

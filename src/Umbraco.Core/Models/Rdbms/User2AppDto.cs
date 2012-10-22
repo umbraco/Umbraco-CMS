@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int UserId { get; set; }
 
         [Column("app")]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 50)]
+        [Length(50)]
         public string AppAlias { get; set; }
     }
 }

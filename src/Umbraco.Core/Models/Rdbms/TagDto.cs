@@ -14,8 +14,8 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("tag")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 200)]//NOTE Is set to [varchar] (200) in Sql Server script
-        public string Tag { get; set; }
+        [Length(200)]
+        public string Tag { get; set; }//NOTE Is set to [varchar] (200) in Sql Server script
 
         [Column("ParentId")]
         [NullSetting(NullSetting = NullSettings.Null)]
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("group")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 100)]//NOTE Is set to [varchar] (100) in Sql Server script
-        public string Group { get; set; }
+        [Length(100)]
+        public string Group { get; set; }//NOTE Is set to [varchar] (100) in Sql Server script
     }
 }

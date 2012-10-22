@@ -39,7 +39,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("Comment")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 500)]
+        [Length(500)]
         public string Comment { get; set; }
     }
 }

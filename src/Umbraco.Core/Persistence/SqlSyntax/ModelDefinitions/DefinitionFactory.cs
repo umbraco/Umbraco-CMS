@@ -31,14 +31,17 @@ namespace Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions
                  };
 
                  //Look for specific DbType attributed a column
-                 var databaseTypeAttribute = propertyInfo.FirstAttribute<DatabaseTypeAttribute>();
+                 var databaseTypeAttribute = propertyInfo.FirstAttribute<SpecialDbTypeAttribute>();
                  if (databaseTypeAttribute != null)
                  {
                      columnDefinition.HasSpecialDbType = true;
                      columnDefinition.DbType = databaseTypeAttribute.DatabaseType;
+                 }
 
-                     if (databaseTypeAttribute.Length > 0)
-                        columnDefinition.DbTypeLength = databaseTypeAttribute.Length;
+                 var lengthAttribute = propertyInfo.FirstAttribute<LengthAttribute>();
+                 if(lengthAttribute != null)
+                 {
+                     columnDefinition.DbTypeLength = lengthAttribute.Length;
                  }
 
                  //Look for specific Null setting attributed a column

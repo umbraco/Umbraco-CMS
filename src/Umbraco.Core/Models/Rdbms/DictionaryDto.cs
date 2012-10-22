@@ -22,7 +22,7 @@ namespace Umbraco.Core.Models.Rdbms
         public Guid Parent { get; set; }
 
         [Column("key")]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 1000)]
+        [Length(1000)]
         public string Key { get; set; }
 
         [ResultColumn]

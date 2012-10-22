@@ -34,7 +34,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("helpText")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 1000)]
+        [Length(1000)]
         public string HelpText { get; set; }
 
         [Column("sortOrder")]
@@ -51,7 +51,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("Description")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 2000)]
+        [Length(2000)]
         public string Description { get; set; }
 
         [ResultColumn]

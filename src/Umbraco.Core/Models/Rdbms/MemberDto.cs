@@ -15,17 +15,17 @@ namespace Umbraco.Core.Models.Rdbms
         public int NodeId { get; set; }
 
         [Column("Email")]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 1000)]
+        [Length(1000)]
         [Constraint(Default = "''")]
         public string Email { get; set; }
 
         [Column("LoginName")]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 1000)]
+        [Length(1000)]
         [Constraint(Default = "''")]
         public string LoginName { get; set; }
 
         [Column("Password")]
-        [DatabaseType(SpecialDbTypes.NVARCHAR, Length = 1000)]
+        [Length(1000)]
         [Constraint(Default = "''")]
         public string Password { get; set; }
     }

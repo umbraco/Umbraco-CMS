@@ -105,7 +105,8 @@
     <Compile Include="Persistence\Caching\NullCacheProvider.cs" />
     <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ConstraintAttribute.cs" />
-    <Compile Include="Persistence\DatabaseAnnotations\DatabaseTypeAttribute.cs" />
+    <Compile Include="Persistence\DatabaseAnnotations\SpecialDbTypeAttribute.cs" />
+    <Compile Include="Persistence\DatabaseAnnotations\LengthAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\SpecialDbTypes.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ForeignKeyAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\IndexAttribute.cs" />
