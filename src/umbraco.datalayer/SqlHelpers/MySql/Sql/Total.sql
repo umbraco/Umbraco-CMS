@@ -136,10 +136,23 @@ CREATE TABLE cmsContentType
 pk int NOT NULL PRIMARY KEY AUTO_INCREMENT, 
 nodeId int NOT NULL, 
 alias nvarchar (255) NULL, 
-icon nvarchar (255) NULL 
+icon nvarchar (255) NULL,
+isContainer bit NOT NULL DEFAULT 0,
+allowAtRoot bit NOT NULL DEFAULT 0
 ) 
  
 ; 
+
+CREATE TABLE cmsContentType2ContentType 
+( 
+parentContentTypeId int NOT NULL, 
+childContentTypeId int NOT NULL
+) 
+ 
+; 
+ALTER TABLE cmsContentType2ContentType ADD CONSTRAINT PK_cmsContentType2ContentType PRIMARY KEY CLUSTERED  (parentContentTypeId, childContentTypeId) 
+;
+
 CREATE TABLE cmsMacroPropertyType 
 ( 
 id smallint NOT NULL PRIMARY KEY AUTO_INCREMENT, 
@@ -165,9 +178,10 @@ stylesheetPropertyValue nvarchar (400) NULL
 
 */
 
-CREATE TABLE cmsTab 
+CREATE TABLE cmsPropertyTypeGroup 
 ( 
 id int NOT NULL PRIMARY KEY AUTO_INCREMENT, 
+parentGroupId int NULL DEFAULT NULL, 
 contenttypeNodeId int NOT NULL, 
 text nvarchar (255) NOT NULL, 
 sortorder int NOT NULL 
@@ -274,7 +288,7 @@ CREATE TABLE cmsPropertyType
 id int NOT NULL PRIMARY KEY AUTO_INCREMENT, 
 dataTypeId int NOT NULL, 
 contentTypeId int NOT NULL, 
-tabId int NULL, 
+propertyTypeGroupId int NULL, 
 Alias nvarchar (255) NOT NULL, 
 Name nvarchar (255) NULL, 
 helpText nvarchar (1000) NULL, 
@@ -343,7 +357,8 @@ ALTER TABLE umbracoAppTree ADD CONSTRAINT PK_umbracoAppTree PRIMARY KEY CLUSTERE
 CREATE TABLE cmsContentTypeAllowedContentType 
 ( 
 Id int NOT NULL, 
-AllowedId int NOT NULL 
+AllowedId int NOT NULL,
+SortOrder int NOT NULL DEFAULT 1
 ) 
  
 ; 
@@ -519,10 +534,10 @@ INSERT INTO umbracoNode (id, trashed, parentID, nodeUser, level, path, sortOrder
 	(1043, 0, -1, 0, 1, '-1,1042', 2, '1df9f033-e6d4-451f-b8d2-e0cbc50a836f', 'Image Cropper', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2006/01/03 13:07:55.250')
 ;
 
-INSERT INTO cmsContentType (pk, nodeId, alias, icon) VALUES
-	(532, 1031, 'Folder', 'folder.gif'),
-	(533, 1032, 'Image', 'mediaPhoto.gif'),
-	(534, 1033, 'File', 'mediaFile.gif')
+INSERT INTO cmsContentType (pk, nodeId, alias, icon, isContainer, allowAtRoot) VALUES
+	(532, 1031, 'Folder', 'folder.gif', 1, 1),
+	(533, 1032, 'Image', 'mediaPhoto.gif', 0, 0),
+	(534, 1033, 'File', 'mediaFile.gif', 0, 0)
 ;
 INSERT INTO umbracoUserType (id, userTypeAlias, userTypeName, userTypeDefaultPermissions) VALUES
 	(1, 'admin', 'Administrators', 'CADMOSKTPIURZ5:'),
@@ -600,12 +615,12 @@ INSERT INTO cmsMacroPropertyType (id, macroPropertyTypeAlias, macroPropertyTypeR
 	(24, 'propertyTypePickerMultiple', 'umbraco.macroRenderings', 'propertyTypePickerMultiple', 'String'),
 	(25, 'textMultiLine', 'umbraco.macroRenderings', 'textMultiple', 'String')
 ;
-INSERT INTO cmsTab (id, contenttypeNodeId, text, sortorder) VALUES
+INSERT INTO cmsPropertyTypeGroup (id, contenttypeNodeId, text, sortorder) VALUES
 	(3, 1032, 'Image', 1),
 	(4, 1033, 'File', 1),
 	(5, 1031, 'Contents', 1) 
 ;
-INSERT INTO cmsPropertyType (id, dataTypeId, contentTypeId, tabId, Alias, Name, helpText, sortOrder, mandatory, validationRegExp, Description) VALUES
+INSERT INTO cmsPropertyType (id, dataTypeId, contentTypeId, propertyTypeGroupId, Alias, Name, helpText, sortOrder, mandatory, validationRegExp, Description) VALUES
 	(6, -90, 1032, 3, 'umbracoFile', 'Upload image', NULL, 0, 0, NULL, NULL),
 	(7, -92, 1032, 3, 'umbracoWidth', 'Width', NULL, 0, 0, NULL, NULL),
 	(8, -92, 1032, 3, 'umbracoHeight', 'Height', NULL, 0, 0, NULL, NULL),
@@ -684,7 +699,7 @@ ALTER TABLE cmsContentType ADD FOREIGN KEY (nodeId) REFERENCES umbracoNode (id)
 ;
 ALTER TABLE umbracoNode ADD FOREIGN KEY (parentID) REFERENCES umbracoNode (id) 
 ; 
-ALTER TABLE cmsPropertyType ADD FOREIGN KEY (tabId) REFERENCES cmsTab (id) 
+ALTER TABLE cmsPropertyType ADD FOREIGN KEY (propertyTypeGroupId) REFERENCES cmsPropertyTypeGroup (id) 
 ; 
 ALTER TABLE cmsContent ADD FOREIGN KEY (nodeId) REFERENCES umbracoNode (id) 
 ; 
@@ -733,8 +748,6 @@ INSERT INTO umbracoAppTree(treeSilent, treeInitialize, treeSortOrder, appAlias, 
 alter TABLE cmsContentType add thumbnail nvarchar(255) NOT NULL DEFAULT 'folder.png'
 ;
 alter TABLE cmsContentType add description nvarchar(1500) NULL
-;
-alter TABLE cmsContentType add masterContentType int NULL
 ;
 insert into cmsDataTypePreValues (id, dataTypeNodeId, value, sortorder, alias) values 
 (3,-87,',code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,|1|1,2,3,|0|500,400|1049,|true|', 0, ''),
@@ -843,5 +856,8 @@ CREATE INDEX IX_Icon ON cmsContentType(nodeId, icon)
 /* Create Custom Index to speed up tree loading */
 CREATE INDEX IX_contentid_versiondate ON cmscontentversion(CONTENTID, VERSIONDATE)
 ;
+ALTER TABLE cmsPropertyTypeGroup ADD FOREIGN KEY (parentGroupId) REFERENCES cmsPropertyTypeGroup (id) 
+;
+
 /* CHANGE:End */
 
