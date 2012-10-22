@@ -1346,9 +1346,9 @@ namespace umbraco.cms.businesslogic
             /// </summary>
             public void Delete()
             {
-                SqlHelper.ExecuteNonQuery("update cmsPropertyType set tabId = NULL where tabid = @id",
+                SqlHelper.ExecuteNonQuery("update cmsPropertyType set propertyTypeGroupId = NULL where propertyTypeGroupId = @id",
                                           SqlHelper.CreateParameter("@id", Id));
-                SqlHelper.ExecuteNonQuery("delete from cmsTab where id = @id",
+                SqlHelper.ExecuteNonQuery("delete from cmsPropertyTypeGroup where id = @id",
                                           SqlHelper.CreateParameter("@id", Id));
             }
 
@@ -1361,7 +1361,7 @@ namespace umbraco.cms.businesslogic
             {
                 try
                 {
-                    string tempCaption = SqlHelper.ExecuteScalar<string>("Select text from cmsTab where id = " + id.ToString());
+                    string tempCaption = SqlHelper.ExecuteScalar<string>("Select text from cmsPropertyTypeGroup where id = " + id.ToString());
                     if (!tempCaption.StartsWith("#"))
                         return tempCaption;
                     else
@@ -1396,13 +1396,13 @@ namespace umbraco.cms.businesslogic
                 {
                     if (!_sortOrder.HasValue)
                     {
-                        _sortOrder = SqlHelper.ExecuteScalar<int>("select sortOrder from cmsTab where id = " + _id);
+                        _sortOrder = SqlHelper.ExecuteScalar<int>("select sortOrder from cmsPropertyTypeGroup where id = " + _id);
                     }
                     return _sortOrder.Value;
                 }
                 set
                 {
-                    SqlHelper.ExecuteNonQuery("update cmsTab set sortOrder = " + value + " where id =" + _id);
+                    SqlHelper.ExecuteNonQuery("update cmsPropertyTypeGroup set sortOrder = " + value + " where id =" + _id);
                 }
             }
 
