@@ -88,7 +88,7 @@
     <key alias="itemNotPublished">This item is not published</key>
     <key alias="lastPublished">Last published</key>
     <key alias="mediatype">Media Type</key>
-    <key alias="mediaLinks">Link to media item(s)</key>
+	<key alias="mediaLinks">Link to media item(s)</key>
     <key alias="membergroup">Member Group</key>
     <key alias="memberrole">Role</key>
     <key alias="membertype">Member Type</key>
@@ -729,7 +729,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="chooseField">Choose field</key>
     <key alias="convertLineBreaks">Convert Linebreaks</key>
     <key alias="convertLineBreaksHelp">Replaces linebreaks with html-tag &amp;lt;br&amp;gt;</key>
-    <key alias="customFields">Custom Fields</key>
+	<key alias="customFields">Custom Fields</key>
     <key alias="dateOnly">Yes, Date only</key>
     <key alias="formatAsDate">Format as date</key>
     <key alias="htmlEncode">HTML encode</key>
@@ -743,7 +743,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="recursive">Recursive</key>
     <key alias="removeParagraph">Remove Paragraph tags</key>
     <key alias="removeParagraphHelp">Will remove any &amp;lt;P&amp;gt; in the beginning and end of the text</key>
-    <key alias="standardFields">Standard Fields</key>
+	<key alias="standardFields">Standard Fields</key>
     <key alias="uppercase">Uppercase</key>
     <key alias="urlEncode">URL encode</key>
     <key alias="urlEncodeHelp">Will format special characters in URLs</key>
@@ -856,8 +856,9 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="passwordChanged">Your password has been changed!</key>
     <key alias="passwordConfirm">Please confirm the new password</key>
     <key alias="passwordEnterNew">Enter your new password</key>
-    <key alias="passwordCurrent">Current password</key>
-    <key alias="passwordInvalid">Invalid current password</key>
+	<key alias="passwordIsBlank">Your new password cannot be blank!</key>
+	<key alias="passwordCurrent">Current password</key>
+	<key alias="passwordInvalid">Invalid current password</key>
     <key alias="passwordIsDifferent">There was a difference between the new password and the confirmed password. Please try again!</key>
     <key alias="passwordMismatch">The confirmed password doesn't match the new password!</key>
     <key alias="permissionReplaceChildren">Replace child node permssions</key>
