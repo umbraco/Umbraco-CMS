@@ -103,24 +103,5 @@ namespace SQLCE4Umbraco {
                 return ResourceManager.GetString("Version4_1_Upgrade", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to /*******************************************************************************************
-        ///
-        ///    Umbraco database installation script for SQL Server (upgrade from Umbraco 4.0.x)
-        /// 
-        ///	IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
-        /// 
-        ///    Database version: 4.8.0.0
-        ///    
-        ///    Please increment this version number if ANY change is made to this script,
-        ///    so compatibility with scripts for other database systems can be verified easily.
-        ///    The first 3 digits depict [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string Version4_8_Upgrade {
-            get {
-                return ResourceManager.GetString("Version4_8_Upgrade", resourceCulture);
-            }
-        }
     }
 }

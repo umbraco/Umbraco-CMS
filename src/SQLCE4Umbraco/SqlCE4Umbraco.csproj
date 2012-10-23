@@ -73,7 +73,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Sql\Total.sql" />
-    <Content Include="Sql\Version4_8_Upgrade.sql" />
     <None Include="Sql\Version4_1_Upgrade.sql" />
   </ItemGroup>
   <ItemGroup>

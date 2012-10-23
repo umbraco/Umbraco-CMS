@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Runtime.CompilerServices;
 using System.Linq;
@@ -76,17 +75,14 @@ namespace umbraco.cms.businesslogic
         /// all of the properties that are initialized normally from the database.
         /// This is used for performance reasons.
         /// </remarks>
-        internal ContentType(int id, string alias, string icon, string thumbnail, int? masterContentType, bool? isContainer)
+        internal ContentType(int id, string alias, string icon, string thumbnail, int? masterContentType)
             : base(id, true)
         {
             _alias = alias;
             _iconurl = icon;
             _thumbnail = thumbnail;
             if (masterContentType.HasValue)
-                MasterContentType = masterContentType.Value;
-
-            if (isContainer.HasValue)
-                _isContainerContentType = isContainer.Value;
+                m_masterContentType = masterContentType.Value;
         }
 
         #endregion
@@ -95,7 +91,7 @@ namespace umbraco.cms.businesslogic
 
         protected internal const string m_SQLOptimizedGetAll = @"
             SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text,
-                allowAtRoot, isContainer, Alias,icon,thumbnail,description 
+                masterContentType,Alias,icon,thumbnail,description 
             FROM umbracoNode INNER JOIN cmsContentType ON umbracoNode.id = cmsContentType.nodeId
             WHERE nodeObjectType = @nodeObjectType";
 
@@ -168,23 +164,73 @@ namespace umbraco.cms.businesslogic
                 return _propertyTypeCache[key];
             }
 
-            // With 4.10 we can't do this via direct SQL as we have content type mixins
+            //Instead of going via API, run this query to find the control type
+            //by-passes a lot of queries just to determine if this is a true/false data type
+
+            //This SQL returns a larger recordset than intended 
+            //causing controlId to sometimes be null instead of correct
+            //because all properties for the type are returned
+            //side effect of changing inner join to left join when adding masterContentType
+            //string sql = "select " +
+            //    "cmsDataType.controlId, masterContentType.alias as masterAlias " +
+            //    "from " +
+            //    "cmsContentType " +
+            //    "inner join cmsPropertyType on (cmsContentType.nodeId = cmsPropertyType.contentTypeId) " +
+            //    "left join cmsDataType on (cmsPropertyType.dataTypeId = cmsDataType.nodeId) and cmsPropertyType.Alias = @propertyAlias " +
+            //    "left join cmsContentType masterContentType on masterContentType.nodeid = cmsContentType.masterContentType " +
+            //    "where cmsContentType.alias = @contentTypeAlias";
+
+            //this SQL correctly returns a single row when the property exists, but still returns masterAlias if it doesn't
+            string sql = "select  cmsDataType.controlId, masterContentType.alias as masterAlias  " +
+                "from  " +
+                "cmsContentType  " +
+                "left join cmsPropertyType on (cmsContentType.nodeId = cmsPropertyType.contentTypeId and cmsPropertyType.Alias = @propertyAlias)  " +
+                "left join cmsDataType on (cmsPropertyType.dataTypeId = cmsDataType.nodeId) " +
+                "left join cmsContentType masterContentType on masterContentType.nodeid = cmsContentType.masterContentType  " +
+                "where  " +
+                "cmsContentType.alias = @contentTypeAlias";
+
+            //Ensure that getdatatype doesn't throw an exception
+            //http://our.umbraco.org/forum/developers/razor/18085-Access-custom-node-properties-with-Razor
+
+            //grab the controlid or test for parent
             Guid controlId = Guid.Empty;
-            ContentType ct = GetByAlias(contentTypeAlias);
-            PropertyType pt = ct.getPropertyType(propertyTypeAlias);
-            if (pt != null)
+            IRecordsReader reader = null;
+            try
             {
-                controlId = pt.DataTypeDefinition.DataType.Id;
+                reader = Application.SqlHelper.ExecuteReader(sql,
+                    Application.SqlHelper.CreateParameter("@contentTypeAlias", contentTypeAlias),
+                    Application.SqlHelper.CreateParameter("@propertyAlias", propertyTypeAlias)
+                    );
+                if (reader.Read())
+                {
+                    if (!reader.IsNull("controlId"))
+                        controlId = reader.GetGuid("controlId");
+                    else if (!reader.IsNull("masterAlias") && !String.IsNullOrEmpty(reader.GetString("masterAlias")))
+                    {
+                        controlId = GetDataType(reader.GetString("masterAlias"), propertyTypeAlias);
+                    }
+
+                }
+            }
+            catch (UmbracoException)
+            {
+                _propertyTypeCache.Add(key, controlId);
+            }
+            finally
+            {
+                if (reader != null)
+                {
+                    reader.Close();
+                }
             }
 
-            //add to cache (even if empty!)
+            //add to cache
             if (!_propertyTypeCache.ContainsKey(key))
             {
                 _propertyTypeCache.Add(key, controlId);
             }
-
             return controlId;
-
 
         }
 
@@ -268,7 +314,7 @@ namespace umbraco.cms.businesslogic
         /// <returns>The Id of the Tab on which the PropertyType is placed</returns>
         public static int getTabIdFromPropertyType(PropertyType pt)
         {
-            object tmp = SqlHelper.ExecuteScalar<object>("Select propertyTypeGroupId from cmsPropertyType where id = " + pt.Id.ToString());
+            object tmp = SqlHelper.ExecuteScalar<object>("Select tabId from cmsPropertyType where id = " + pt.Id.ToString());
             if (tmp == DBNull.Value)
                 return 0;
             else return int.Parse(tmp.ToString());
@@ -279,12 +325,11 @@ namespace umbraco.cms.businesslogic
         #region Private Members
 
         //private bool _optimizedMode = false;
-        private bool _allowAtRoot;
         private string _alias;
         private string _iconurl;
         private string _description;
         private string _thumbnail;
-        List<int> m_masterContentTypes;
+        private int m_masterContentType = 0;
         private bool _isContainerContentType = false;
 
         private List<int> m_AllowedChildContentTypeIDs = null;
@@ -307,24 +352,12 @@ namespace umbraco.cms.businesslogic
             {
                 _isContainerContentType = value;
                 SqlHelper.ExecuteNonQuery(
-                                          "update cmsContentType set isContainer = @isContainer where nodeId = @id",
-                                          SqlHelper.CreateParameter("@isContainer", value),
+                                          "update cmsContentType set isContainerContentType = @isContainerContentType where nodeId = @id",
+                                          SqlHelper.CreateParameter("@isContainerContentType", value),
                                           SqlHelper.CreateParameter("@id", Id));
             }
         }
 
-        public bool AllowAtRoot
-        {
-            get { return _allowAtRoot; }
-            set
-            {
-                _allowAtRoot = value;
-                SqlHelper.ExecuteNonQuery(
-                                          "update cmsContentType set allowAtRoot = @allowAtRoot where nodeId = @id",
-                                          SqlHelper.CreateParameter("@allowAtRoot", value),
-                                          SqlHelper.CreateParameter("@id", Id));
-            }
-        }
         /// <summary>
         /// Gets or sets the description.
         /// </summary>
@@ -469,15 +502,11 @@ namespace umbraco.cms.businesslogic
                         }
 
                         // Get Property Types from the master content type
-                        if (MasterContentTypes.Count > 0)
+                        if (MasterContentType != 0)
                         {
-                            foreach (var mct in MasterContentTypes)
+                            foreach (PropertyType pt in ContentType.GetContentType(MasterContentType).PropertyTypes)
                             {
-                                List<PropertyType> pts = ContentType.GetContentType(mct).PropertyTypes;
-                                foreach (PropertyType pt in pts)
-                                {
-                                    result.Add(pt);
-                                }
+                                result.Add(pt);
                             }
                         }
                         return result;
@@ -533,158 +562,28 @@ namespace umbraco.cms.businesslogic
         /// Gets or sets the Master Content Type for inheritance of tabs and properties.
         /// </summary>
         /// <value>The ID of the Master Content Type</value>
-        public List<int> MasterContentTypes
-        {
-            get
-            {
-                if (m_masterContentTypes == null)
-                {
-                    m_masterContentTypes = new List<int>();
-                    using (IRecordsReader dr =
-    SqlHelper.ExecuteReader(@"
-                    SELECT 
-                        parentContentTypeId 
-                    FROM 
-                        cmsContentType2ContentType 
-                    WHERE childContentTypeId = @id", SqlHelper.CreateParameter("@id", Id))
-    )
-                    {
-                        while (dr.Read())
-                        {
-                            m_masterContentTypes.Add(dr.GetInt("parentContentTypeId"));
-                        }
-                    }
-
-
-                }
-                return m_masterContentTypes;
-            }
-        }
-
         public int MasterContentType
         {
             get
             {
-                if (MasterContentTypes.Count > 0)
-                    return MasterContentTypes[0];
-
-                return 0;
+                return m_masterContentType;
             }
             set
             {
-                if (value != MasterContentType)
-                {
-                    //TODO: Add support for multiple masters
-                    foreach (var mct in MasterContentTypes)
-                    {
-                        RemoveParentContentType(mct);
-                    }
-                    AddParentContentType(value);
-                }
+                m_masterContentType = value;
+
+                SqlHelper.ExecuteNonQuery("update cmsContentType set masterContentType = @masterContentType where nodeId = @nodeId",
+                    SqlHelper.CreateParameter("@masterContentType", value),
+                    SqlHelper.CreateParameter("@nodeId", Id));
+
+                // Remove from cache
+                FlushFromCache(Id);
             }
-        }
-
-        public void AddParentContentType(int parentContentTypeId)
-        {
-            if (MasterContentTypes.Contains(parentContentTypeId))
-            {
-                // Should we throw an exception if you try to add something that already exist?
-            }
-            else
-            {
-                SqlHelper.ExecuteNonQuery(
-                                          "INSERT INTO [cmsContentType2ContentType] (parentContentTypeId, childContentTypeId) VALUES (@parentContentTypeId, @childContentTypeId)",
-                                          SqlHelper.CreateParameter("@parentContentTypeId", parentContentTypeId),
-                                          SqlHelper.CreateParameter("@childContentTypeId", Id));
-                MasterContentTypes.Add(parentContentTypeId);
-            }
-        }
-
-        public bool IsMaster()
-        {
-            return
-                SqlHelper.ExecuteScalar<int>(
-                    "select count(*) from cmsContentType2ContentType where parentContentTypeId = @parentContentTypeId",
-                    SqlHelper.CreateParameter("@parentContentTypeId", this.Id)) > 0;
-        }
-
-        public IEnumerable<ContentType> GetChildTypes()
-        {
-            var cts = new List<ContentType>();
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(@"
-                    SELECT 
-                        childContentTypeId 
-                    FROM 
-                        cmsContentType2ContentType 
-                    WHERE parentContentTypeId = @parentContentTypeId",
-                                                                     SqlHelper.CreateParameter("@parentContentTypeId", Id))
-                )
-            {
-                while (dr.Read())
-                {
-                    cts.Add(GetContentType(dr.GetInt("childContentTypeId")));
-                }
-            }
-
-            return cts;
-        }
-
-        public void RemoveParentContentType(int parentContentTypeId)
-        {
-            if (!MasterContentTypes.Contains(parentContentTypeId))
-            {
-                // Should we throw an exception if you're trying to remove something that doesn't exist?
-            }
-            else
-            {
-                
-                // Clean up property data (when we remove a reference we also need to remove all data relating to the doc type!
-                // So that would be all propertyData that uses a propertyType from the content type with 'parentContentTypeId' and 
-                // has a nodetype of this id
-                var contentTypeToRemove = new ContentType(parentContentTypeId);
-
-                RemoveMasterPropertyTypeData(contentTypeToRemove, this);
-
-                SqlHelper.ExecuteNonQuery(
-                                          "DELETE FROM [cmsContentType2ContentType] WHERE parentContentTypeId = @parentContentTypeId AND childContentTypeId = @childContentTypeId",
-                                          SqlHelper.CreateParameter("@parentContentTypeId", parentContentTypeId),
-                                          SqlHelper.CreateParameter("@childContentTypeId", Id));
-                MasterContentTypes.Remove(parentContentTypeId);
-            }
-        }
-
-        private void RemoveMasterPropertyTypeData(ContentType contentTypeToRemove, ContentType currentContentType)
-        {
-            foreach (var pt in contentTypeToRemove.PropertyTypes)
-            {
-                if (pt.ContentTypeId == contentTypeToRemove.Id)
-                {
-                    // before we can remove a parent content type we need to remove all data that 
-                    // relates to property types
-                    SqlHelper.ExecuteNonQuery(
-                        @"delete cmsPropertyData from cmsPropertyData
-                            inner join cmsContent on cmsContent.nodeId = cmsPropertyData.contentNodeId
-                            where cmsPropertyData.propertyTypeId = @propertyType
-                            and contentType = @contentType",
-                        SqlHelper.CreateParameter("@contentType", currentContentType.Id),
-                        SqlHelper.CreateParameter("@propertyType", pt.Id));
-                }
-            }
-            // remove sub data too
-            foreach(var ct in currentContentType.GetChildTypes())
-                RemoveMasterPropertyTypeData(contentTypeToRemove, ct);
-        }
-
-        public IEnumerable<PropertyTypeGroup> PropertyTypeGroups
-        {
-            get { return PropertyTypeGroup.GetPropertyTypeGroupsFromContentType(Id); }
         }
 
         /// <summary>
         /// Retrieve a list of all Tabs on the current ContentType
         /// </summary>
-        [Obsolete("Use PropertyTypeGroup methods instead", false)]
         public TabI[] getVirtualTabs
         {
             get
@@ -698,7 +597,6 @@ namespace umbraco.cms.businesslogic
         /// <summary>
         /// Clears the locally loaded tabs which forces them to be reloaded next time they requested
         /// </summary>
-        [Obsolete("Use PropertyTypeGroup methods instead", false)]
         public void ClearVirtualTabs()
         {
             // zb-00040 #29889 : clear the right cache! t.contentType is the ctype which _defines_ the tab, not the current one.
@@ -833,7 +731,6 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         /// <param name="pt">The PropertyType</param>
         /// <param name="TabId">The Id of the Tab</param>
-        [Obsolete("Use PropertyTypeGroup methods instead", false)]
         public void SetTabOnPropertyType(PropertyType pt, int TabId)
         {
             // This is essentially just a wrapper for the property
@@ -846,7 +743,6 @@ namespace umbraco.cms.businesslogic
         /// Removing a PropertyType from the associated Tab
         /// </summary>
         /// <param name="pt">The PropertyType which should be freed from its tab</param>
-        [Obsolete("Use PropertyTypeGroup methods instead", false)]
         public void removePropertyTypeFromTab(PropertyType pt)
         {
             pt.TabId = 0; //this will set to null in the database.
@@ -860,29 +756,43 @@ namespace umbraco.cms.businesslogic
         /// <param name="Caption">Returns the Id of the new Tab</param>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.Synchronized)]
-        [Obsolete("Use PropertyTypeGroup methods instead", false)]
         public int AddVirtualTab(string Caption)
         {
 
             // Get tab count
+            int tabCount = SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsTab WHERE contenttypeNodeId = @nodeId",
+                SqlHelper.CreateParameter("@nodeId", Id));
+
             // The method is synchronized
-            PropertyTypeGroup ptg = new PropertyTypeGroup(0, Id, Caption);
-            ptg.Save();
+            SqlHelper.ExecuteNonQuery("INSERT INTO cmsTab (contenttypeNodeId,text,sortorder) VALUES (@nodeId,@text,@sortorder)",
+                    SqlHelper.CreateParameter("@nodeId", Id),
+                    SqlHelper.CreateParameter("@text", Caption),
+                    SqlHelper.CreateParameter("@sortorder", tabCount + 1));
 
             // Remove from cache
             FlushFromCache(Id);
 
-            return ptg.Id;
+            return SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsTab");
         }
 
         /// <summary>
         /// Releases all PropertyTypes on tab (this does not delete the PropertyTypes) and then Deletes the Tab
         /// </summary>
         /// <param name="id">The Id of the Tab to be deleted.</param>
-        [Obsolete("Use PropertyTypeGroup methods instead", false)]
         public void DeleteVirtualTab(int id)
         {
-            PropertyTypeGroup.GetPropertyTypeGroup(id).Delete();
+            //set each property on the tab to have a tab id of zero
+            // zb-00036 #29889 : fix property types getter
+            this.getVirtualTabs.ToList()
+                .Where(x => x.Id == id)
+                .Single()
+                .GetAllPropertyTypes()
+                .ForEach(x =>
+                {
+                    x.TabId = 0;
+                });
+
+            SqlHelper.ExecuteNonQuery("delete from cmsTab where id =" + id);
 
             // Remove from cache
             FlushFromCache(Id);
@@ -893,12 +803,11 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         /// <param name="tabId">The Id of the Tab to be updated</param>
         /// <param name="Caption">The new Caption</param>
-        [Obsolete("Use PropertyTypeGroup methods instead", false)]
-        public void SetTabName(int tabId, string caption)
+        public void SetTabName(int tabId, string Caption)
         {
-            var ptg = PropertyTypeGroup.GetPropertyTypeGroup(tabId);
-            ptg.Name = caption;
-            ptg.Save();
+            SqlHelper.ExecuteNonQuery("Update cmsTab set text = @text where id = @id",
+            SqlHelper.CreateParameter("@text", Caption),
+            SqlHelper.CreateParameter("@id", tabId));
 
             // Remove from cache
             FlushFromCache(Id);
@@ -909,12 +818,10 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         /// <param name="tabId">The Id of the Tab to be updated</param>
         /// <param name="Caption">The new order number</param>
-        [Obsolete("Use PropertyTypeGroup methods instead", false)]
         public void SetTabSortOrder(int tabId, int sortOrder)
         {
-            var ptg = PropertyTypeGroup.GetPropertyTypeGroup(tabId);
-            ptg.SortOrder = sortOrder;
-            ptg.Save();
+            SqlHelper.ExecuteNonQuery(
+                                      "Update  cmsTab set sortOrder = " + sortOrder + " where id = " + tabId);
 
             // Remove from cache
             FlushFromCache(Id);
@@ -969,11 +876,11 @@ namespace umbraco.cms.businesslogic
             }
 
             // delete all tabs
-            foreach (PropertyTypeGroup ptg in PropertyTypeGroups)
+            foreach (Tab t in getVirtualTabs.ToList())
             {
-                if (ptg.ContentTypeId == this.Id)
+                if (t.ContentType == this.Id)
                 {
-                    ptg.Delete();
+                    t.Delete();
                 }
             }
 
@@ -997,8 +904,8 @@ namespace umbraco.cms.businesslogic
         {
             _alias = dr.GetString("Alias");
             _iconurl = dr.GetString("icon");
-            _isContainerContentType = dr.GetBoolean("isContainer");
-            _allowAtRoot = dr.GetBoolean("allowAtRoot");
+            if (!dr.IsNull("masterContentType"))
+                m_masterContentType = dr.GetInt("masterContentType");
 
             if (!dr.IsNull("thumbnail"))
                 _thumbnail = dr.GetString("thumbnail");
@@ -1013,9 +920,8 @@ namespace umbraco.cms.businesslogic
         {
             base.setupNode();
 
-            // TODO: Load master content types
             using (IRecordsReader dr =
-                SqlHelper.ExecuteReader("Select allowAtRoot, isContainer, Alias,icon,thumbnail,description from cmsContentType where nodeid=" + Id)
+                SqlHelper.ExecuteReader("Select masterContentType,Alias,icon,thumbnail,description from cmsContentType where nodeid=" + Id)
                 )
             {
                 if (dr.Read())
@@ -1053,7 +959,6 @@ namespace umbraco.cms.businesslogic
             RemoveFromDataTypeCache(ct.Alias);
 
             // clear anything that uses this as master content type
-            //TODO: Update to load all content types 
             if (ct.nodeObjectType == DocumentType._objectType)
             {
                 List<DocumentType> cacheToFlush = DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == id);
@@ -1092,7 +997,6 @@ namespace umbraco.cms.businesslogic
         /// <summary>
         /// Checks if we've loaded the virtual tabs into memory and if not gets them from the databse.
         /// </summary>
-        [Obsolete("Use PropertyTypeGroup methods instead", false)]
         private void EnsureVirtualTabs()
         {
             // This class can be cached and potentially shared between multiple threads.
@@ -1112,37 +1016,44 @@ namespace umbraco.cms.businesslogic
                 }
             }
         }
-        
+
+
         /// <summary>
         /// Loads the tabs into memory from the database and stores them in a local list for retreival
         /// </summary>
-        [Obsolete("Use PropertyTypeGroup methods instead", false)]
         private void InitializeVirtualTabs()
         {
-            m_VirtualTabs = new List<TabI>();
-            foreach (PropertyTypeGroup ptg in PropertyTypeGroups.Where(x => x.ParentId == 0 && x.ContentTypeId == this.Id))
-                m_VirtualTabs.Add(new Tab(ptg.Id, ptg.Name, ptg.SortOrder, this));
+            // While we are initialising, we should not use the class-scoped list, as it may be used by other threads
+            var temporaryList = new List<TabI>();
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(
+                                                              string.Format(
+                                                                  "Select Id,text,sortOrder from cmsTab where contenttypeNodeId = {0} order by sortOrder",
+                                                                  Id)))
+            {
+                while (dr.Read())
+                {
+                    temporaryList.Add(new Tab(dr.GetInt("id"), dr.GetString("text"), dr.GetInt("sortOrder"), this));
+                }
+            }
 
             // Master Content Type
-            if (MasterContentTypes.Count > 0)
+            if (MasterContentType != 0)
             {
-                foreach (var mct in MasterContentTypes)
-                    foreach (TabI t in ContentType.GetContentType(mct).getVirtualTabs.ToList())
-                    {
-                        m_VirtualTabs.Add(t);
-                    }
+                temporaryList.AddRange(GetContentType(MasterContentType).getVirtualTabs.ToList());
             }
 
             // sort all tabs
-            m_VirtualTabs.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
+            temporaryList.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
+
+            // now that we aren't going to modify the list, we can set it to the class-scoped variable.
+            m_VirtualTabs = temporaryList;
         }
 
         private void populateMasterContentTypes(PropertyType pt, int docTypeId)
         {
             foreach (web.DocumentType docType in web.DocumentType.GetAllAsList())
             {
-                //TODO: Check for multiple references (mixins) not causing endless loops!
-                if (docType.MasterContentTypes.Contains(docTypeId))
+                if (docType.MasterContentType == docTypeId)
                 {
                     populatePropertyData(pt, docType.Id);
                     populateMasterContentTypes(pt, docType.Id);
@@ -1236,7 +1147,6 @@ namespace umbraco.cms.businesslogic
         /// A tab is merely a way to organize data on a ContentType to make it more
         /// human friendly
         /// </summary>
-        [Obsolete("Please use PropertyTypes instead", false)]
         public class Tab : TabI
         {
             private ContentType _contenttype;
@@ -1261,11 +1171,16 @@ namespace umbraco.cms.businesslogic
             public static Tab GetTab(int id)
             {
                 Tab tab = null;
-                // Tabs have been replaced with PropertyTypeGroups, so we use the new api to provide legacy support
-                PropertyTypeGroup ptg = PropertyTypeGroup.GetPropertyTypeGroup(id);
-                if (ptg != null)
+                using (IRecordsReader dr = SqlHelper.ExecuteReader(
+                                                  string.Format(
+                                                      "Select Id, text, contenttypeNodeId, sortOrder from cmsTab where Id = {0} order by sortOrder",
+                                                      id)))
                 {
-                    tab = new Tab(id, ptg.Name, ptg.SortOrder, new ContentType(ptg.ContentTypeId));
+                    if (dr.Read())
+                    {
+                        tab = new Tab(id, dr.GetString("text"), dr.GetInt("sortOrder"), new ContentType(dr.GetInt("contenttypeNodeId")));
+                    }
+                    dr.Close();
                 }
 
                 return tab;
@@ -1283,21 +1198,53 @@ namespace umbraco.cms.businesslogic
             // Also this is public now because we removed the PropertyTypes property (not making sense).
             public PropertyType[] GetPropertyTypes(int contentTypeId, bool includeInheritedProperties)
             {
+                // zb-00040 #29889 : fix cache key issues!
+                // now maintaining a cache of local properties per contentTypeId, then merging when required
+                // another way would be to maintain a cache of *all* properties, then filter when required
+                // however it makes it more difficult to figure out what to clear (ie needs to find all children...)
 
-                // NH, temp fix for 4.9 to use the new PropertyTypeGroup API
-                var pts = PropertyTypeGroup.GetPropertyTypeGroup(this.Id).GetPropertyTypes();
+                var tmp = new List<PropertyType>();
+                var ctypes = new List<int>();
+
                 if (includeInheritedProperties)
                 {
-                    // we need to 
-                    cms.businesslogic.ContentType ct = cms.businesslogic.ContentType.GetContentType(contentTypeId);
-                    return
-                        pts.Where(
-                            x =>
-                            ct.MasterContentTypes.Contains(
-                                x.ContentTypeId) || x.ContentTypeId == contentTypeId).ToArray();
+                    // start from contentTypeId and list all ctypes, going up
+                    int c = contentTypeId;
+                    while (c != 0)
+                    {
+                        ctypes.Add(c);
+                        c = umbraco.cms.businesslogic.ContentType.GetContentType(c).MasterContentType;
+                    }
+                    ctypes.Reverse(); // order from the top
+                }
+                else
+                {
+                    // just that one
+                    ctypes.Add(contentTypeId);
                 }
 
-                return pts.Where(x => x.ContentTypeId == contentTypeId).ToArray();
+                foreach (var ctype in ctypes)
+                {
+                    var ptypes = Cache.GetCacheItem<List<PropertyType>>(
+                        generateCacheKey(Id, ctype), propertyTypesCacheSyncLock, TimeSpan.FromMinutes(10),
+                        delegate
+                        {
+                            var tmp1 = new List<PropertyType>();
+
+                            using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(
+                                @"select id from cmsPropertyType where tabId = {0} and contentTypeId = {1}
+									order by sortOrder", _id, ctype)))
+                            {
+                                while (dr.Read())
+                                    tmp1.Add(PropertyType.GetPropertyType(dr.GetInt("id")));
+                            }
+                            return tmp1;
+                        });
+
+                    tmp.AddRange(ptypes);
+                }
+
+                return tmp.ToArray();
             }
 
             // zb-00036 #29889 : yet we may want to be able to get *all* property types
@@ -1306,7 +1253,7 @@ namespace umbraco.cms.businesslogic
                 var tmp = new List<PropertyType>();
 
                 using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(
-                    @"select id from cmsPropertyType where propertyTypeGroupId = {0}", _id)))
+                    @"select id from cmsPropertyType where tabId = {0}", _id)))
                 {
                     while (dr.Read())
                         tmp.Add(PropertyType.GetPropertyType(dr.GetInt("id")));
@@ -1346,9 +1293,9 @@ namespace umbraco.cms.businesslogic
             /// </summary>
             public void Delete()
             {
-                SqlHelper.ExecuteNonQuery("update cmsPropertyType set propertyTypeGroupId = NULL where propertyTypeGroupId = @id",
+                SqlHelper.ExecuteNonQuery("update cmsPropertyType set tabId = NULL where tabid = @id",
                                           SqlHelper.CreateParameter("@id", Id));
-                SqlHelper.ExecuteNonQuery("delete from cmsPropertyTypeGroup where id = @id",
+                SqlHelper.ExecuteNonQuery("delete from cmsTab where id = @id",
                                           SqlHelper.CreateParameter("@id", Id));
             }
 
@@ -1361,7 +1308,7 @@ namespace umbraco.cms.businesslogic
             {
                 try
                 {
-                    string tempCaption = SqlHelper.ExecuteScalar<string>("Select text from cmsPropertyTypeGroup where id = " + id.ToString());
+                    string tempCaption = SqlHelper.ExecuteScalar<string>("Select text from cmsTab where id = " + id.ToString());
                     if (!tempCaption.StartsWith("#"))
                         return tempCaption;
                     else
@@ -1396,20 +1343,19 @@ namespace umbraco.cms.businesslogic
                 {
                     if (!_sortOrder.HasValue)
                     {
-                        _sortOrder = SqlHelper.ExecuteScalar<int>("select sortOrder from cmsPropertyTypeGroup where id = " + _id);
+                        _sortOrder = SqlHelper.ExecuteScalar<int>("select sortOrder from cmsTab where id = " + _id);
                     }
                     return _sortOrder.Value;
                 }
                 set
                 {
-                    SqlHelper.ExecuteNonQuery("update cmsPropertyTypeGroup set sortOrder = " + value + " where id =" + _id);
+                    SqlHelper.ExecuteNonQuery("update cmsTab set sortOrder = " + value + " where id =" + _id);
                 }
             }
 
             /// <summary>
             /// Moves the Tab up
             /// </summary>
-            [Obsolete("Please use GetPropertyTypes() instead", false)]
             public void MoveUp()
             {
                 FixTabOrder();
@@ -1432,7 +1378,6 @@ namespace umbraco.cms.businesslogic
             /// <summary>
             /// Moves the Tab down
             /// </summary>
-            [Obsolete("Please use GetPropertyTypes() instead", false)]
             public void MoveDown()
             {
                 FixTabOrder();

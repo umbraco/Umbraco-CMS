@@ -66,10 +66,6 @@ namespace umbraco.controls
             if (!HideStructure)
             {
                 setupStructurePane();
-            } else
-            {
-                // When we hide the structure, we'll also hide the container option (as we're on a member type)
-                pp_container.Visible = false;
             }
             setupGenericPropertiesPane();
             setupTabPane();
@@ -93,23 +89,11 @@ namespace umbraco.controls
             pp_icon.Text = umbraco.ui.Text("icon", umbraco.BasePages.UmbracoEnsuredPage.CurrentUser);
             pp_thumbnail.Text = umbraco.ui.Text("editcontenttype", "thumbnail");
 
-            // we'll disable this...
-            if (!Page.IsPostBack && cType.MasterContentTypes.Count > 0)
-            {
-                string masterName = String.Empty;
-                for(int i=0; i<cType.MasterContentTypes.Count;i++)
-                {
-                    masterName += string.Format("<a href=\"editNodeTypeNew.aspx?id={0}\">{1}</a>", 
-                        cType.MasterContentTypes[i], 
-                        cms.businesslogic.ContentType.GetContentType(cType.MasterContentTypes[i]).Text);
 
-                    if (i == cType.MasterContentTypes.Count-2)
-                        masterName += " and ";
-                    else if (cType.MasterContentTypes.Count > 1 && i < cType.MasterContentTypes.Count-1)
-                    {
-                        masterName += ", ";
-                    }
-                }
+            // we'll disable this...
+            if (!Page.IsPostBack && cType.MasterContentType != 0)
+            {
+                string masterName = cms.businesslogic.ContentType.GetContentType(cType.MasterContentType).Text;
                 tabsMasterContentTypeName.Text = masterName;
                 propertiesMasterContentTypeName.Text = masterName;
                 PaneTabsInherited.Visible = true;
@@ -134,7 +118,6 @@ namespace umbraco.controls
             cType.IconUrl = ddlIcons.SelectedValue;
             cType.Description = description.Text;
             cType.Thumbnail = ddlThumbnails.SelectedValue;
-            cType.IsContainerContentType = isContainer.Checked;
             SaveClickEventArgs ea = new SaveClickEventArgs("Saved");
             ea.IconType = umbraco.BasePages.BasePage.speechBubbleIcon.success;
 
@@ -252,7 +235,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             txtName.Text = cType.GetRawText();
             txtAlias.Text = cType.Alias;
             description.Text = cType.GetRawDescription();
-            isContainer.Checked = cType.IsContainerContentType;
 
         }
         #endregion
@@ -292,8 +274,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 }
                 dualAllowedContentTypes.Value = chosenContentTypeIDs;
             }
-
-            allowAtRoot.Checked = cType.AllowAtRoot;
         }
 
         private void SaveAllowedChildTypes()
@@ -307,7 +287,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             int[] ids = new int[tmp.Count];
             for (int i = 0; i < tmp.Count; i++) ids[i] = (int)tmp[i];
             cType.AllowedChildContentTypeIDs = ids;
-            cType.AllowAtRoot = allowAtRoot.Checked;
         }
 
         #endregion

@@ -22,15 +22,15 @@ namespace umbraco.cms.businesslogic.media
         #region Constants and static members
         private const string m_SQLOptimizedMany = @"
 			select 
-				count(children.id) as children, cmsContentType.isContainer, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate, umbracoNode.nodeUser, umbracoNode.text, 
-				cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.nodeId as contentTypeId
+				count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate, umbracoNode.nodeUser, umbracoNode.text, 
+				cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId
 			from umbracoNode 
 			left join umbracoNode children on children.parentId = umbracoNode.id
 			inner join cmsContent on cmsContent.nodeId = umbracoNode.id
 			inner join cmsContentType on cmsContentType.nodeId = cmsContent.contentType
 			where umbracoNode.nodeObjectType = @nodeObjectType AND {0}
-			group by cmsContentType.isContainer, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate, umbracoNode.nodeUser, umbracoNode.text, 
-				cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.nodeId
+			group by umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate, umbracoNode.nodeUser, umbracoNode.text, 
+				cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId
 			order by {1}"; 
         #endregion
 
@@ -270,6 +270,8 @@ namespace umbraco.cms.businesslogic.media
             if (dr.GetInt("children") > 0)
                 _hc = true;
             int? masterContentType = null;
+            if (!dr.IsNull("masterContentType"))
+                masterContentType = dr.GetInt("masterContentType");
             SetupMediaForTree(dr.GetGuid("uniqueId")
                 , dr.GetShort("level")
                 , dr.GetInt("parentId")
@@ -283,18 +285,17 @@ namespace umbraco.cms.businesslogic.media
                 , dr.GetString("thumbnail")
                 , dr.GetString("description")
                 , masterContentType
-                , dr.GetInt("contentTypeId")
-                , dr.GetBoolean("isContainer"));
+                , dr.GetInt("contentTypeId"));
         } 
         #endregion
 
         #region Private methods
         private void SetupMediaForTree(Guid uniqueId, int level, int parentId, int user, string path,
                                           string text, DateTime createDate, string icon, bool hasChildren, string contentTypeAlias, string contentTypeThumb,
-                                            string contentTypeDesc, int? masterContentType, int contentTypeId, bool isContainer)
+                                            string contentTypeDesc, int? masterContentType, int contentTypeId)
         {
             SetupNodeForTree(uniqueId, _objectType, level, parentId, user, path, text, createDate, hasChildren);
-            ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, masterContentType, isContainer);
+            ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, masterContentType);
             ContentTypeIcon = icon;
         }
 

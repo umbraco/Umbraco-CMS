@@ -35,7 +35,6 @@ namespace umbraco.cms.businesslogic.propertytype
         private string _name;
         private int _sortOrder;
         private int _tabId;
-        private int _propertyTypeGroup;
         private string _validationRegExp = "";
 
         #endregion
@@ -50,19 +49,15 @@ namespace umbraco.cms.businesslogic.propertytype
         public PropertyType(int id)
         {
             using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                "Select mandatory, DataTypeId, propertyTypeGroupId, ContentTypeId, sortOrder, alias, name, validationRegExp, description from cmsPropertyType where id=@id",
+                "Select mandatory, DataTypeId, tabId, ContentTypeId, sortOrder, alias, name, validationRegExp, description from cmsPropertyType where id=@id",
                 SqlHelper.CreateParameter("@id", id)))
             {
                 if (!dr.Read())
                     throw new ArgumentException("Propertytype with id: " + id + " doesnt exist!");
                 _mandatory = dr.GetBoolean("mandatory");
                 _id = id;
-                if (!dr.IsNull("propertyTypeGroupId"))
-                {
-                    _propertyTypeGroup = dr.GetInt("propertyTypeGroupId");
-                    //TODO: Remove after refactoring!
-                    _tabId = _propertyTypeGroup;
-                }
+                if (!dr.IsNull("tabId"))
+                    _tabId = dr.GetInt("tabId");
                 _sortOrder = dr.GetInt("sortOrder");
                 _alias = dr.GetString("alias");
                 _name = dr.GetString("Name");
@@ -101,33 +96,22 @@ namespace umbraco.cms.businesslogic.propertytype
         /// <remarks>
         /// Setting the tab id to a negative value will actually set the value to NULL in the database
         /// </remarks>
-        [Obsolete("Use the new PropertyTypeGroup parameter", false)]
         public int TabId
         {
             get { return _tabId; }
             set
             {
                 _tabId = value;
-                PropertyTypeGroup = value;
                 InvalidateCache();
-            }
-        }
-
-        public int PropertyTypeGroup
-        {
-            get { return _propertyTypeGroup; }
-            set
-            {
-                _propertyTypeGroup = value;
-
-                object dbPropertyTypeGroup = value;
+                object tabId = value;
                 if (value < 1)
                 {
-                    dbPropertyTypeGroup = DBNull.Value;
+                    tabId = DBNull.Value;
                 }
-                SqlHelper.ExecuteNonQuery("Update cmsPropertyType set propertyTypeGroupId = @propertyTypeGroupId where id = @id",
-                              SqlHelper.CreateParameter("@propertyTypeGroupId", dbPropertyTypeGroup),
-                              SqlHelper.CreateParameter("@id", Id));
+
+                SqlHelper.ExecuteNonQuery("Update cmsPropertyType set tabId = @tabId where id = @id",
+                                          SqlHelper.CreateParameter("@tabId", tabId),
+                                          SqlHelper.CreateParameter("@id", Id));
             }
         }
 
@@ -311,46 +295,18 @@ namespace umbraco.cms.businesslogic.propertytype
 
         public static PropertyType[] GetAll()
         {
-            var result = GetPropertyTypes();
+            var result = new List<PropertyType>();
+            using (IRecordsReader dr =
+                SqlHelper.ExecuteReader("select id, Name from cmsPropertyType order by Name"))
+            {
+                while (dr.Read())
+                {
+                    PropertyType pt = GetPropertyType(dr.GetInt("id"));
+                    if (pt != null)
+                        result.Add(pt);
+                }
+            }
             return result.ToArray();
-        }
-
-        public static IEnumerable<PropertyType> GetPropertyTypes()
-        {
-            var result = new List<PropertyType>();
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader("select id from cmsPropertyType order by Name"))
-            {
-                while (dr.Read())
-                {
-                    PropertyType pt = GetPropertyType(dr.GetInt("id"));
-                    if (pt != null)
-                        result.Add(pt);
-                }
-            }
-            return result;
-        }
-
-		public static IEnumerable<PropertyType> GetPropertyTypesByGroup(int groupId, List<int> contentTypeIds)
-        {
-            return GetPropertyTypesByGroup(groupId).Where(x => contentTypeIds.Contains(x.ContentTypeId));
-        }
-
-		public static IEnumerable<PropertyType> GetPropertyTypesByGroup(int groupId)
-        {
-            var result = new List<PropertyType>();
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader("SELECT id FROM cmsPropertyType WHERE propertyTypeGroupId = @groupId order by SortOrder",
-                    SqlHelper.CreateParameter("@groupId", groupId)))
-            {
-                while (dr.Read())
-                {
-                    PropertyType pt = GetPropertyType(dr.GetInt("id"));
-                    if (pt != null)
-                        result.Add(pt);
-                }
-            }
-            return result;
         }
 
         /// <summary>
@@ -382,11 +338,11 @@ namespace umbraco.cms.businesslogic.propertytype
             FlushCache();
 
             // clean all properties on inherited document types (if this propertytype is removed from a master)
-            CleanPropertiesOnDeletion(_contenttypeid);
+            cleanPropertiesOnDeletion(_contenttypeid);
             //            DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == _contenttypeid).ForEach(dt => cleanPropertiesOnDeletion(dt.Id));
 
             // Delete all properties of propertytype
-            CleanPropertiesOnDeletion(_contenttypeid);
+            cleanPropertiesOnDeletion(_contenttypeid);
 
             // Delete PropertyType ..
             SqlHelper.ExecuteNonQuery("Delete from cmsPropertyType where id = " + Id);
@@ -409,12 +365,11 @@ namespace umbraco.cms.businesslogic.propertytype
             }
         }
 
-        private void CleanPropertiesOnDeletion(int contentTypeId)
+        private void cleanPropertiesOnDeletion(int contentTypeId)
         {
             // first delete from all master document types
-            //TODO: Verify no endless loops with mixins
-            DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentTypes.Contains(contentTypeId)).ForEach(
-                dt => CleanPropertiesOnDeletion(dt.Id));
+            DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == contentTypeId).ForEach(
+                dt => cleanPropertiesOnDeletion(dt.Id));
 
             // then remove from the current doc type
             Content[] objs = Content.getContentOfContentType(new ContentType(contentTypeId));
@@ -466,9 +421,9 @@ namespace umbraco.cms.businesslogic.propertytype
             Cache.ClearCacheItem("ContentType_PropertyTypes_Content:" + _contenttypeid);
 
             // clear cache in tab
-            // zb-00040 #29889 : clear the right cache! t.ContentType is the ctype which _defines_ the tab, not the current one.
-            //            foreach (ContentType.TabI t in new ContentType(ContentTypeId).getVirtualTabs)
-            //				ContentType.FlushTabCache(t.Id, ContentTypeId);
+			// zb-00040 #29889 : clear the right cache! t.ContentType is the ctype which _defines_ the tab, not the current one.
+            foreach (ContentType.TabI t in new ContentType(ContentTypeId).getVirtualTabs)
+				ContentType.FlushTabCache(t.Id, ContentTypeId);
         }
 
         public static PropertyType GetPropertyType(int id)

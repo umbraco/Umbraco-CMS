@@ -34,7 +34,7 @@ namespace umbraco.cms.businesslogic.web
 
         new internal const string m_SQLOptimizedGetAll = @"
             SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text,
-                allowAtRoot, isContainer, Alias,icon,thumbnail,description,
+                masterContentType,Alias,icon,thumbnail,description,
                 templateNodeId, IsDefault
             FROM umbracoNode 
             INNER JOIN cmsContentType ON umbracoNode.id = cmsContentType.nodeId
@@ -201,7 +201,7 @@ namespace umbraco.cms.businesslogic.web
             {
                 if (!_hasChildrenInitialized)
                 {
-                    HasChildren = SqlHelper.ExecuteScalar<int>("select count(childContentTypeId) as tmp from cmsContentType2ContentType where parentContentTypeId = @id", SqlHelper.CreateParameter("@id", Id)) > 0;
+                    HasChildren = SqlHelper.ExecuteScalar<int>("select count(NodeId) as tmp from cmsContentType where masterContentType = " + Id) > 0;
                 }
                 return _hasChildren;
             }
@@ -326,7 +326,7 @@ namespace umbraco.cms.businesslogic.web
                 // check that no document types uses me as a master
                 foreach (DocumentType dt in DocumentType.GetAllAsList())
                 {
-                    if (dt.MasterContentTypes.Contains(this.Id))
+                    if (dt.MasterContentType == this.Id)
                     {
                         //this should be InvalidOperationException (or something other than ArgumentException)!
                         throw new ArgumentException("Can't delete a Document Type used as a Master Content Type. Please remove all references first!");
@@ -364,7 +364,6 @@ namespace umbraco.cms.businesslogic.web
             info.AppendChild(xmlHelper.addTextNode(xd, "Thumbnail", Thumbnail));
             info.AppendChild(xmlHelper.addTextNode(xd, "Description", Description));
 
-            //TODO: Add support for mixins!
             if (this.MasterContentType > 0)
             {
                 DocumentType dt = new DocumentType(this.MasterContentType);
@@ -418,14 +417,14 @@ namespace umbraco.cms.businesslogic.web
 
             // tabs
             XmlElement tabs = xd.CreateElement("Tabs");
-            foreach (PropertyTypeGroup t in PropertyTypeGroups)
+            foreach (TabI t in getVirtualTabs.ToList())
             {
                 //only add tabs that aren't from a master doctype
-                if (t.ContentTypeId == this.Id)
+                if (t.ContentType == this.Id)
                 {
                     XmlElement tabx = xd.CreateElement("Tab");
                     tabx.AppendChild(xmlHelper.addTextNode(xd, "Id", t.Id.ToString()));
-                    tabx.AppendChild(xmlHelper.addTextNode(xd, "Caption", t.Name));
+                    tabx.AppendChild(xmlHelper.addTextNode(xd, "Caption", t.Caption));
                     tabs.AppendChild(tabx);
                 }
             }
