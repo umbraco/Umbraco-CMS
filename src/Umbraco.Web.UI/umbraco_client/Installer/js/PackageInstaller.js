@@ -109,7 +109,7 @@
             var self = this;
             $.ajax({
                 type: 'POST',
-                data: "{'kitGuid': '" + self._packageId + "', 'manifestId': '" + self._manifestId + "', 'packageFile': '" + escape(self._packageFile) + "'}",
+                data: "{'kitGuid': '" + self._packageId + "', 'manifestId': '" + self._manifestId + "', 'packageFile': '" + encodeURIComponent(self._packageFile) + "'}",
                 url: self._opts.baseUrl + '/InstallPackageFiles',
                 success: function (r) {
                     if (r && r.success) {
@@ -175,7 +175,7 @@
             var self = this;
             $.ajax({
                 type: 'POST',
-                data: "{'kitGuid': '" + self._packageId + "', 'manifestId': '" + self._manifestId + "', 'packageFile': '" + escape(self._packageFile) + "'}",
+                data: "{'kitGuid': '" + self._packageId + "', 'manifestId': '" + self._manifestId + "', 'packageFile': '" + encodeURIComponent(self._packageFile) + "'}",
                 url: self._opts.baseUrl + '/InstallBusinessLogic',
                 success: function (r) {
                     if (r && r.success) {
@@ -195,7 +195,7 @@
             var self = this;
             $.ajax({
                 type: 'POST',
-                data: "{'kitGuid': '" + self._packageId + "', 'manifestId': '" + self._manifestId + "', 'packageFile': '" + escape(self._packageFile) + "'}",
+                data: "{'kitGuid': '" + self._packageId + "', 'manifestId': '" + self._manifestId + "', 'packageFile': '" + encodeURIComponent(self._packageFile) + "'}",
                 url: self._opts.baseUrl + '/CleanupInstallation',
                 success: function (r) {
                     if (r && r.success) {
