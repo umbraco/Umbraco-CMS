@@ -4,6 +4,9 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
+    /// <summary>
+    /// Public api models to DTO mapper used by PetaPoco to map Properties to Columns
+    /// </summary>
     internal class ModelDtoMapper : IMapper
     {
         public void GetTableInfo(Type t, TableInfo ti)
@@ -13,61 +16,44 @@ namespace Umbraco.Core.Persistence.Mappers
         {
             if (pi.DeclaringType == typeof(Content) || pi.DeclaringType == typeof(IContent))
             {
-                switch (pi.Name)
-                {
-                    case "Trashed":
-                        columnName = "[umbracoNode].[trashed]";
-                        return true;
-                    case "ParentId":
-                        columnName = "[umbracoNode].[parentID]";
-                        return true;
-                    case "UserId":
-                        columnName = "[umbracoNode].[nodeUser]";
-                        return true;
-                    case "Level":
-                        columnName = "[umbracoNode].[level]";
-                        return true;
-                    case "Path":
-                        columnName = "[umbracoNode].[path]";
-                        return true;
-                    case "SortOrder":
-                        columnName = "[umbracoNode].[sortOrder]";
-                        return true;
-                    case "NodeId":
-                        columnName = "[umbracoNode].[id]";
-                        return true;
-                    case "Published":
-                        columnName = "[cmsDocument].[published]";
-                        return true;
-                    case "Key":
-                        columnName = "[umbracoNode].[uniqueID]";
-                        return true;
-                    case "CreateDate":
-                        columnName = "[umbracoNode].[createDate]";
-                        return true;
-                    case "Name":
-                        columnName = "[umbracoNode].[text]";
-                        return true;
-                }
+                columnName = ContentMapper.Instance.Map(pi.Name);
+                return true;
             }
 
-            if (pi.DeclaringType == typeof(ContentType) || pi.DeclaringType == typeof(IContentType))
+            if (pi.DeclaringType == typeof(Models.Media) || pi.DeclaringType == typeof(IMedia))
             {
-                switch (pi.Name)
-                {
-                    case "Alias":
-                        columnName = "[cmsContentType].[alias]";
-                        return true;
-                    case "Icon":
-                        columnName = "[cmsContentType].[icon]";
-                        return true;
-                    case "Thumbnail":
-                        columnName = "[cmsContentType].[thumbnail]";
-                        return true;
-                    case "Description":
-                        columnName = "[cmsContentType].[description]";
-                        return true;
-                }
+                columnName = MediaMapper.Instance.Map(pi.Name);
+                return true;
+            }
+
+            if (pi.DeclaringType == typeof(ContentType) || pi.DeclaringType == typeof(IContentType) || pi.DeclaringType == typeof(IMediaType))
+            {
+                columnName = ContentTypeMapper.Instance.Map(pi.Name);
+            }
+
+            if (pi.DeclaringType == typeof(DataTypeDefinition))
+            {
+                columnName = DataTypeDefinitionMapper.Instance.Map(pi.Name);
+            }
+
+            if (pi.DeclaringType == typeof(DictionaryItem))
+            {
+                columnName = DictionaryMapper.Instance.Map(pi.Name);
+            }
+
+            if (pi.DeclaringType == typeof(Language))
+            {
+                columnName = LanguageMapper.Instance.Map(pi.Name);
+            }
+
+            if (pi.DeclaringType == typeof(Relation))
+            {
+                columnName = RelationMapper.Instance.Map(pi.Name);
+            }
+
+            if (pi.DeclaringType == typeof(RelationType))
+            {
+                columnName = RelationTypeMapper.Instance.Map(pi.Name);
             }
 
             return true;

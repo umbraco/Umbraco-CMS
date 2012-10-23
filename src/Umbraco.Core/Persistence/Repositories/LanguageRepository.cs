@@ -10,6 +10,9 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
+    /// <summary>
+    /// Represents a repository for doing CRUD operations for <see cref="Language"/>
+    /// </summary>
     internal class LanguageRepository : PetaPocoRepositoryBase<int, Language>, ILanguageRepository
     {
         public LanguageRepository(IUnitOfWork work) : base(work)

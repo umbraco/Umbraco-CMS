@@ -38,6 +38,8 @@ namespace Umbraco.Core.Persistence.Factories
                                           dto.NodeDto.UserId.HasValue
                                               ? dto.NodeDto.UserId.Value
                                               : 0,
+                                      AllowedAsRoot = dto.AllowAtRoot,
+                                      IsContainer = dto.IsContainer,
                                       Trashed = dto.NodeDto.Trashed
                                   };
             return contentType;
@@ -52,6 +54,8 @@ namespace Umbraco.Core.Persistence.Factories
                                          Icon = entity.Icon,
                                          Thumbnail = entity.Thumbnail,
                                          NodeId = entity.Id,
+                                         AllowAtRoot = entity.AllowedAsRoot,
+                                         IsContainer = entity.IsContainer,
                                          NodeDto = BuildNodeDto(entity)
                                      };
             return contentTypeDto;

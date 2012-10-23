@@ -60,6 +60,19 @@ namespace Umbraco.Core.Models
         int UserId { get; set; }
 
         /// <summary>
+        /// Gets or Sets a boolean indicating whether this ContentType is allowed at the root
+        /// </summary>
+        bool AllowedAsRoot { get; set; }
+
+        /// <summary>
+        /// Gets or Sets a boolean indicating whether this ContentType is a Container
+        /// </summary>
+        /// <remarks>
+        /// ContentType Containers doesn't show children in the tree, but rather in grid-type view.
+        /// </remarks>
+        bool IsContainer { get; set; }
+
+        /// <summary>
         /// Gets or Sets a list of integer Ids of the ContentTypes allowed under the ContentType
         /// </summary>
         IEnumerable<ContentTypeSort> AllowedContentTypes { get; set; }

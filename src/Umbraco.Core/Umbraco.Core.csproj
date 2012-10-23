@@ -130,7 +130,17 @@
     <Compile Include="Persistence\Factories\PropertyGroupFactory.cs" />
     <Compile Include="Persistence\Factories\RelationFactory.cs" />
     <Compile Include="Persistence\Factories\RelationTypeFactory.cs" />
+    <Compile Include="Persistence\Mappers\BaseMapper.cs" />
+    <Compile Include="Persistence\Mappers\ContentMapper.cs" />
+    <Compile Include="Persistence\Mappers\ContentTypeMapper.cs" />
+    <Compile Include="Persistence\Mappers\DataTypeDefinitionMapper.cs" />
+    <Compile Include="Persistence\Mappers\DictionaryMapper.cs" />
+    <Compile Include="Persistence\Mappers\DtoMapModel.cs" />
+    <Compile Include="Persistence\Mappers\LanguageMapper.cs" />
+    <Compile Include="Persistence\Mappers\MediaMapper.cs" />
     <Compile Include="Persistence\Mappers\ModelDtoMapper.cs" />
+    <Compile Include="Persistence\Mappers\RelationMapper.cs" />
+    <Compile Include="Persistence\Mappers\RelationTypeMapper.cs" />
     <Compile Include="Persistence\Migrations\Initial\BaseDataCreation.cs" />
     <Compile Include="Persistence\Migrations\Initial\DatabaseCreation.cs" />
     <Compile Include="Persistence\PetaPocoExtensions.cs" />

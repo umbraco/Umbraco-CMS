@@ -22,6 +22,8 @@ namespace Umbraco.Core.Models
         private string _icon;
         private string _thumbnail;
         private int _userId;
+        private bool _allowedAsRoot;
+        private bool _isContainer;
         private bool _trashed;
         private PropertyGroupCollection _propertyGroups;
         private IEnumerable<ContentTypeSort> _allowedContentTypes;
@@ -43,6 +45,8 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo IconSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Icon);
         private static readonly PropertyInfo ThumbnailSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Thumbnail);
         private static readonly PropertyInfo UserIdSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.UserId);
+        private static readonly PropertyInfo AllowedAsRootSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.AllowedAsRoot);
+        private static readonly PropertyInfo IsContainerSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.IsContainer);
         private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.Trashed);
         private static readonly PropertyInfo AllowedContentTypesSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<ContentTypeSort>>(x => x.AllowedContentTypes);
         private static readonly PropertyInfo PropertyGroupCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, PropertyGroupCollection>(x => x.PropertyGroups);
@@ -190,6 +194,37 @@ namespace Umbraco.Core.Models
             {
                 _userId = value;
                 OnPropertyChanged(UserIdSelector);
+            }
+        }
+
+        /// <summary>
+        /// Gets or Sets a boolean indicating whether this ContentType is allowed at the root
+        /// </summary>
+        [DataMember]
+        public virtual bool AllowedAsRoot
+        {
+            get { return _allowedAsRoot; }
+            set
+            {
+                _allowedAsRoot = value;
+                OnPropertyChanged(AllowedAsRootSelector);
+            }
+        }
+
+        /// <summary>
+        /// Gets or Sets a boolean indicating whether this ContentType is a Container
+        /// </summary>
+        /// <remarks>
+        /// ContentType Containers doesn't show children in the tree, but rather in grid-type view.
+        /// </remarks>
+        [DataMember]
+        public virtual bool IsContainer
+        {
+            get { return _isContainer; }
+            set
+            {
+                _isContainer = value;
+                OnPropertyChanged(IsContainerSelector);
             }
         }
 
