@@ -174,6 +174,7 @@
     <Compile Include="Persistence\Repositories\TemplateRepository.cs" />
     <Compile Include="Persistence\RepositoryResolver.cs" />
     <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />
+    <Compile Include="Persistence\SqlSyntax\ISqlSyntaxProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\ModelDefinitions\ColumnDefinition.cs" />
     <Compile Include="Persistence\SqlSyntax\ModelDefinitions\DefinitionFactory.cs" />
     <Compile Include="Persistence\SqlSyntax\ModelDefinitions\ForeignKeyDefinition.cs" />

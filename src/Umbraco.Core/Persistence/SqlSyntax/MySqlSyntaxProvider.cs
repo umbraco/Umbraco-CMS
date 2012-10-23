@@ -5,11 +5,17 @@ using Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
+    /// <summary>
+    /// Static class that provides simple access to the MySql SqlSyntax Providers singleton
+    /// </summary>
     internal static class MySqlSyntax
     {
         public static ISqlSyntaxProvider Provider { get { return MySqlSyntaxProvider.Instance; } }
     }
 
+    /// <summary>
+    /// Represents an SqlSyntaxProvider for MySql
+    /// </summary>
     internal class MySqlSyntaxProvider : SqlSyntaxProviderBase<MySqlSyntaxProvider>
     {
         public static MySqlSyntaxProvider Instance = new MySqlSyntaxProvider();
@@ -71,11 +77,6 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             {
                 sql.AppendFormat(DefaultValueFormat, column.ConstraintDefaultValue);
             }
-
-            /*sql.AppendFormat(DefaultValueFormat,
-                             column.ConstraintDefaultValue.Equals("getdate()")
-                                 ? "CURRENT_TIMESTAMP"
-                                 : column.ConstraintDefaultValue);*/
 
             return sql.ToString();
         }

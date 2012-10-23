@@ -1,7 +1,16 @@
-﻿using Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions;
-
-namespace Umbraco.Core.Persistence.SqlSyntax
+﻿namespace Umbraco.Core.Persistence.SqlSyntax
 {
+    /// <summary>
+    /// Static class that provides simple access to the Sql Server SqlSyntax Providers singleton
+    /// </summary>
+    internal static class SqlServerSyntax
+    {
+        public static ISqlSyntaxProvider Provider { get { return SqlServerSyntaxProvider.Instance; } }
+    }
+
+    /// <summary>
+    /// Represents an SqlSyntaxProvider for Sql Server
+    /// </summary>
     internal class SqlServerSyntaxProvider : SqlSyntaxProviderBase<SqlServerSyntaxProvider>
     {
         public static SqlServerSyntaxProvider Instance = new SqlServerSyntaxProvider();

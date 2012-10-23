@@ -2,6 +2,9 @@
 
 namespace Umbraco.Core.Persistence.DatabaseAnnotations
 {
+    /// <summary>
+    /// Attribute that represents a Foreign Key reference
+    /// </summary>
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
     public class ForeignKeyAttribute : ReferencesAttribute
     {
@@ -9,10 +12,22 @@ namespace Umbraco.Core.Persistence.DatabaseAnnotations
         {
         }
 
-        public string OnDelete { get; set; }
-        public string OnUpdate { get; set; }
+        internal string OnDelete { get; set; }
+        internal string OnUpdate { get; set; }
 
-        public string Name { get; set; }//Used to override Default naming: FK_thisTableName_refTableName
-        public string Column { get; set; }//Used to point foreign key to a specific Column. PrimaryKey column is used by default
+        /// <summary>
+        /// Gets or sets the name of the foreign key refence
+        /// </summary>
+        /// <remarks>
+        /// Overrides the default naming of a foreign key reference:
+        /// FK_thisTableName_refTableName
+        /// </remarks>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the Column that this foreign key should reference.
+        /// </summary>
+        /// <remarks>PrimaryKey column is used by default</remarks>
+        public string Column { get; set; }
     }
 }

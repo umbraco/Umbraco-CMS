@@ -2,6 +2,17 @@
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
+    /// <summary>
+    /// Static class that provides simple access to the Sql CE SqlSyntax Providers singleton
+    /// </summary>
+    internal static class SqlCeSyntax
+    {
+        public static ISqlSyntaxProvider Provider { get { return SqlCeSyntaxProvider.Instance; } }
+    }
+
+    /// <summary>
+    /// Represents an SqlSyntaxProvider for Sql Ce
+    /// </summary>
     internal class SqlCeSyntaxProvider : SqlSyntaxProviderBase<SqlCeSyntaxProvider>
     {
         public static SqlCeSyntaxProvider Instance = new SqlCeSyntaxProvider();

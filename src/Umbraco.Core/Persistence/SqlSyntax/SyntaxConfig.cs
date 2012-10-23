@@ -2,6 +2,9 @@
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
+    /// <summary>
+    /// Singleton to handle the configuration of an SqlSyntaxProvider
+    /// </summary>
     internal static class SyntaxConfig
     {
         private static ISqlSyntaxProvider _sqlSyntaxProvider;
