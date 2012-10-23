@@ -315,6 +315,7 @@
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
     <Compile Include="Services\ContentService.cs" />
     <Compile Include="Services\IContentService.cs" />
+    <Compile Include="Services\IContentTypeService.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
