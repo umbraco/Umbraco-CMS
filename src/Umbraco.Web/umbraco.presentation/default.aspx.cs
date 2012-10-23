@@ -110,8 +110,12 @@ namespace umbraco
 		{
 			base.OnLoad(e);
 
-			if (ValidateRequest)
+			// do not validate when liveEditing because there may be a RTE with markup
+			var liveEditing = umbraco.presentation.UmbracoContext.Current.LiveEditingContext.Enabled;
+
+			if (!liveEditing && ValidateRequest)
 				Request.ValidateInput();
+
 			// handle the infamous umbDebugShowTrace, etc
 			Page.Trace.IsEnabled &= GlobalSettings.DebugMode && !String.IsNullOrWhiteSpace(Request["umbDebugShowTrace"]);
 		}
