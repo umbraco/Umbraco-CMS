@@ -41,6 +41,11 @@ namespace Umbraco.Core.Persistence.Mappers
                 columnName = DictionaryMapper.Instance.Map(pi.Name);
             }
 
+            if (pi.DeclaringType == typeof(DictionaryTranslation))
+            {
+                columnName = DictionaryTranslationMapper.Instance.Map(pi.Name);
+            }
+
             if (pi.DeclaringType == typeof(Language))
             {
                 columnName = LanguageMapper.Instance.Map(pi.Name);

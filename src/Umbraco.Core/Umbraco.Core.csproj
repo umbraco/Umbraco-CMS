@@ -135,6 +135,7 @@
     <Compile Include="Persistence\Mappers\ContentTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\DataTypeDefinitionMapper.cs" />
     <Compile Include="Persistence\Mappers\DictionaryMapper.cs" />
+    <Compile Include="Persistence\Mappers\DictionaryTranslationMapper.cs" />
     <Compile Include="Persistence\Mappers\DtoMapModel.cs" />
     <Compile Include="Persistence\Mappers\LanguageMapper.cs" />
     <Compile Include="Persistence\Mappers\MediaMapper.cs" />

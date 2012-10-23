@@ -7,16 +7,16 @@ using Umbraco.Core.Models.Rdbms;
 namespace Umbraco.Core.Persistence.Mappers
 {
     /// <summary>
-    /// Represents a <see cref="DictionaryItem"/> to DTO mapper used to translate the properties of the public api 
+    /// Represents a <see cref="DictionaryTranslation"/> to DTO mapper used to translate the properties of the public api 
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
-    internal sealed class DictionaryMapper : BaseMapper
+    public class DictionaryTranslationMapper : BaseMapper
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache = new ConcurrentDictionary<string, DtoMapModel>();
 
-        internal static DictionaryMapper Instance = new DictionaryMapper();
+        internal static DictionaryTranslationMapper Instance = new DictionaryTranslationMapper();
 
-        private DictionaryMapper()
+        private DictionaryTranslationMapper()
         {
             BuildMap();
         }
@@ -25,10 +25,10 @@ namespace Umbraco.Core.Persistence.Mappers
 
         internal override void BuildMap()
         {
-            CacheMap<DictionaryItem, DictionaryDto>(src => src.Id, dto => dto.PrimaryKey);
-            CacheMap<DictionaryItem, DictionaryDto>(src => src.Key, dto => dto.Id);
-            CacheMap<DictionaryItem, DictionaryDto>(src => src.ItemKey, dto => dto.Key);
-            CacheMap<DictionaryItem, DictionaryDto>(src => src.ParentId, dto => dto.Parent);
+            CacheMap<DictionaryTranslation, LanguageTextDto>(src => src.Id, dto => dto.PrimaryKey);
+            CacheMap<DictionaryTranslation, LanguageTextDto>(src => src.Key, dto => dto.UniqueId);
+            CacheMap<DictionaryTranslation, LanguageTextDto>(src => src.Language, dto => dto.LanguageId);
+            CacheMap<DictionaryTranslation, LanguageTextDto>(src => src.Value, dto => dto.Value);
         }
 
         internal override string Map(string propertyName)

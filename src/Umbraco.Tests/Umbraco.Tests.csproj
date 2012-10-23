@@ -96,6 +96,15 @@
     <Compile Include="Models\StylesheetTests.cs" />
     <Compile Include="Persistence\BaseTableByTableTest.cs" />
     <Compile Include="Persistence\DatabaseFactoryTests.cs" />
+    <Compile Include="Persistence\Mappers\ContentMapperTest.cs" />
+    <Compile Include="Persistence\Mappers\ContentTypeMapperTest.cs" />
+    <Compile Include="Persistence\Mappers\DataTypeDefinitionMapperTest.cs" />
+    <Compile Include="Persistence\Mappers\DictionaryMapperTest.cs" />
+    <Compile Include="Persistence\Mappers\DictionaryTranslationMapperTest.cs" />
+    <Compile Include="Persistence\Mappers\LanguageMapperTest.cs" />
+    <Compile Include="Persistence\Mappers\MediaMapperTest.cs" />
+    <Compile Include="Persistence\Mappers\RelationMapperTest.cs" />
+    <Compile Include="Persistence\Mappers\RelationTypeMapperTest.cs" />
     <Compile Include="Persistence\MySqlDatabaseCreationTest.cs" />
     <Compile Include="Persistence\MySqlTableByTableTest.cs" />
     <Compile Include="Persistence\RepositoryResolverTests.cs" />

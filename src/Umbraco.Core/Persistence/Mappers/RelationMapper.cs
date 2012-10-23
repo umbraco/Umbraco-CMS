@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<Relation, RelationDto>(src => src.Comment, dto => dto.Comment);
             CacheMap<Relation, RelationDto>(src => src.CreateDate, dto => dto.Datetime);
             CacheMap<Relation, RelationDto>(src => src.ParentId, dto => dto.ParentId);
-            CacheMap<Relation, RelationDto>(src => src.RelationType.Id, dto => dto.RelationType);
+            CacheMap<Relation, RelationDto>(src => src.RelationType, dto => dto.RelationType);
         }
 
         internal override string Map(string propertyName)
