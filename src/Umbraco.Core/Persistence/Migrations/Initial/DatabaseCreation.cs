@@ -3,7 +3,7 @@
 namespace Umbraco.Core.Persistence.Migrations.Initial
 {
     /// <summary>
-    /// Represents the initial database creation by running CreateTable for all DTOs against the db.
+    /// Represents the initial database schema creation by running CreateTable for all DTOs against the db.
     /// </summary>
     internal class DatabaseCreation
     {
@@ -14,7 +14,10 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database = database;
         }
 
-        public void InitializeDatabase()
+        /// <summary>
+        /// Initialize the database by creating the umbraco db schema
+        /// </summary>
+        public void InitializeDatabaseSchema()
         {
             //NOTE Please mind the order of the table creation, as some references requires other tables.
             using(var transaction = _database.GetTransaction())

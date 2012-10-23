@@ -97,7 +97,7 @@ namespace Umbraco.Core.Persistence
         public static void Initialize(this Database db)
         {
             var creation = new DatabaseCreation(db);
-            creation.InitializeDatabase();
+            creation.InitializeDatabaseSchema();
         }
     }
 }
