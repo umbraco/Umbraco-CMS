@@ -8,17 +8,23 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Web.Services
 {
+    /// <summary>
+    /// Represents the ContentType Service, which is an easy access to operations involving <see cref="IContentType"/>
+    /// </summary>
     public class ContentTypeService : IContentTypeService
     {
         private readonly IUnitOfWorkProvider _provider;
         private readonly IContentService _contentService;
+        private readonly IMediaService _mediaService;
 
-        public ContentTypeService(IContentService contentService) : this(contentService, new PetaPocoUnitOfWorkProvider())
+        public ContentTypeService(IContentService contentService, IMediaService mediaService)
+            : this(contentService, mediaService, new PetaPocoUnitOfWorkProvider())
         {}
 
-        public ContentTypeService(IContentService contentService, IUnitOfWorkProvider provider)
+        public ContentTypeService(IContentService contentService, IMediaService mediaService, IUnitOfWorkProvider provider)
         {
             _contentService = contentService;
+            _mediaService = mediaService;
             _provider = provider;
         }
 
@@ -236,8 +242,7 @@ namespace Umbraco.Web.Services
         /// <remarks>Deleting a <see cref="IMediaType"/> will delete all the <see cref="IMedia"/> objects based on this <see cref="IMediaType"/></remarks>
         public void Delete(IMediaType mediaType)
         {
-            //TODO
-            //_mediaService.DeleteMediaOfType(mediaType.Id);
+            _mediaService.DeleteMediaOfType(mediaType.Id);
             var unitOfWork = _provider.GetUnitOfWork();
             var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
 
@@ -252,19 +257,16 @@ namespace Umbraco.Web.Services
         /// <remarks>Deleting a <see cref="IMediaType"/> will delete all the <see cref="IMedia"/> objects based on this <see cref="IMediaType"/></remarks>
         public void Delete(IEnumerable<IMediaType> mediaTypes)
         {
-            //TODO
-            /*
             var mediaTypeList = mediaTypes.ToList();
             foreach (var mediaType in mediaTypeList)
             {
                 _mediaService.DeleteMediaOfType(mediaType.Id);
             }
-             */
 
             var unitOfWork = _provider.GetUnitOfWork();
             var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
 
-            foreach (var mediaType in mediaTypes)
+            foreach (var mediaType in mediaTypeList)
             {
                 repository.Delete(mediaType);
             }

@@ -11,6 +11,9 @@ using Content = Umbraco.Core.Models.Content;
 
 namespace Umbraco.Web.Services
 {
+    /// <summary>
+    /// Represents the Content Service, which is an easy access to operations involving <see cref="IContent"/>
+    /// </summary>
     public class ContentService : IContentService
     {
         private readonly IUnitOfWorkProvider _provider;
@@ -66,6 +69,22 @@ namespace Umbraco.Web.Services
             var unitOfWork = _provider.GetUnitOfWork();
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
             return repository.Get(id);
+        }
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by the Id of the <see cref="IContentType"/>
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContentType"/></param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetContentOfContentType(int id)
+        {
+            var unitOfWork = _provider.GetUnitOfWork();
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
+
+            var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == id);
+            var contents = repository.GetByQuery(query);
+
+            return contents;
         }
 
         /// <summary>
@@ -369,7 +388,9 @@ namespace Umbraco.Web.Services
         /// <param name="userId">Id of the User deleting the Content</param>
         public void Delete(IContent content, int userId)
         {
+            //TODO Ensure that content is unpublished when deleted
             //TODO This method should handle/react to errors when there is a constraint issue with the content being deleted
+            //TODO Children should either be deleted or moved to the recycle bin
             var unitOfWork = _provider.GetUnitOfWork();
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
             repository.Delete(content);
@@ -384,6 +405,8 @@ namespace Umbraco.Web.Services
         /// <param name="userId">Id of the User deleting the Content</param>
         public void MoveToRecycleBin(IContent content, int userId)
         {
+            //TODO If content item has children those should also be moved to the recycle bin
+            //TODO Unpublish deleted content + children
             var unitOfWork = _provider.GetUnitOfWork();
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
             ((Content)content).ChangeTrashedState(true);
@@ -401,6 +424,24 @@ namespace Umbraco.Web.Services
         {
             content.ParentId = parentId;
             SaveAndPublish(content, userId);
+        }
+
+        /// <summary>
+        /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
+        /// </summary>
+        public void EmptyRecycleBin()
+        {
+            var unitOfWork = _provider.GetUnitOfWork();
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
+
+            var query = Query<IContent>.Builder.Where(x => x.ParentId == -20);
+            var contents = repository.GetByQuery(query);
+
+            foreach (var content in contents)
+            {
+                repository.Delete(content);
+            }
+            unitOfWork.Commit();
         }
 
         /// <summary>

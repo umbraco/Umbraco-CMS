@@ -30,6 +30,13 @@ namespace Umbraco.Web.Services
         IContent GetById(int id);
 
         /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by the Id of the <see cref="IContentType"/>
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContentType"/></param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetContentOfContentType(int id);
+
+        /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by Level
         /// </summary>
         /// <param name="level">The level to retrieve Content from</param>
@@ -157,6 +164,11 @@ namespace Umbraco.Web.Services
         /// <param name="parentId">Id of the Content's new Parent</param>
         /// <param name="userId">Id of the User moving the Content</param>
         void Move(IContent content, int parentId, int userId);
+
+        /// <summary>
+        /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
+        /// </summary>
+        void EmptyRecycleBin();
 
         /// <summary>
         /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current 

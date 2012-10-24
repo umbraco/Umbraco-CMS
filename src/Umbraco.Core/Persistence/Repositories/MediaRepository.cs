@@ -42,7 +42,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
-            var contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentType);
+            var contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
 
             var factory = new MediaFactory(contentType, NodeObjectTypeId, id);
             var content = factory.BuildEntity(dto);
@@ -201,7 +201,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var o = Database.Update(nodeDto);
 
             //Only update this DTO if the contentType has actually changed
-            if (contentDto.ContentType != entity.ContentTypeId)
+            if (contentDto.ContentTypeId != entity.ContentTypeId)
             {
                 //Create the Content specific data - cmsContent
                 var newContentDto = dto.ContentDto;

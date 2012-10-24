@@ -92,7 +92,7 @@ namespace Umbraco.Core.Persistence.Factories
             var contentDto = new ContentDto
                                  {
                                      NodeId = entity.Id,
-                                     ContentType = entity.ContentTypeId,
+                                     ContentTypeId = entity.ContentTypeId,
                                      NodeDto = BuildNodeDto(entity)
                                  };
 

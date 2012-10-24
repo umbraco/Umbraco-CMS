@@ -18,7 +18,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int NodeId { get; set; }
 
         [Column("contentType")]
-        public int ContentType { get; set; }
+        public int ContentTypeId { get; set; }
 
         [ResultColumn]
         public NodeDto NodeDto { get; set; }

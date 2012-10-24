@@ -78,6 +78,26 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Changes the Trashed state of the content object
+        /// </summary>
+        /// <param name="isTrashed">Boolean indicating whether content is trashed (true) or not trashed (false)</param>
+        /// <param name="parentId"> </param>
+        internal void ChangeTrashedState(bool isTrashed, int parentId = -1)
+        {
+            Trashed = isTrashed;
+
+            //If Content is trashed the parent id should be set to that of the RecycleBin
+            if (isTrashed)
+            {
+                ParentId = -20;
+            }
+            else//otherwise set the parent id to the optional parameter, -1 being the fallback
+            {
+                ParentId = parentId;
+            }
+        }
+
+        /// <summary>
         /// Method to call when Entity is being saved
         /// </summary>
         /// <remarks>Created date is set and a Unique key is assigned</remarks>

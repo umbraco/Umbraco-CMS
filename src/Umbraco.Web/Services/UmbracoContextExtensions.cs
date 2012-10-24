@@ -18,10 +18,16 @@ namespace Umbraco.Web
             return new ContentService(new PetaPocoUnitOfWorkProvider(), new PublishingStrategy());
         }
 
+        public static IMediaService MediaService(this UmbracoContext umbracoContext)
+        {
+            return new MediaService(new PetaPocoUnitOfWorkProvider());
+        }
+
         public static IContentTypeService ContentTypeService(this UmbracoContext umbracoContext)
         {
             var contentService = umbracoContext.ContentService();
-            return new ContentTypeService(contentService, new PetaPocoUnitOfWorkProvider());
+            var mediaService = umbracoContext.MediaService();
+            return new ContentTypeService(contentService, mediaService, new PetaPocoUnitOfWorkProvider());
         }
     }
 }
