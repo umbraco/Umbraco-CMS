@@ -7,7 +7,7 @@ namespace Umbraco.Web.Services
     /// <summary>
     /// Defines the ContentService, which is an easy access to operations involving <see cref="IContent"/>
     /// </summary>
-    public interface IContentService
+    public interface IContentService : IService
     {
         /// <summary>
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
