@@ -237,6 +237,7 @@ namespace Umbraco.Web.Services
 
             foreach (var item in list)
             {
+                //TODO Test and correct this so children of unpublished content isn't published.
                 //Only publish valid content - Might need to change the flat list as it could pose problems for children of invalid content
                 if (item.IsValid())
                 {
@@ -295,6 +296,8 @@ namespace Umbraco.Web.Services
         {
             var unitOfWork = _provider.GetUnitOfWork();
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
+
+            //NOTE: Should also check if parent is published - if parent isn't published this Content cannot be published
 
             if (!content.IsValid())
                 return false;//Content contains invalid property values and can therefore not be published

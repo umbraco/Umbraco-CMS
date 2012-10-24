@@ -20,7 +20,7 @@ namespace Umbraco.Core.Models.Css
         private readonly List<ParseException> errors = new List<ParseException>();
         private LineReader reader;
         private CssStyleSheet styleSheet;
-        private string filePath;
+        private string fileContent;
         private string source;
 
         #endregion Fields
@@ -30,20 +30,20 @@ namespace Umbraco.Core.Models.Css
         /// <summary>
         /// Ctor.
         /// </summary>
-        /// <param name="filePath">path to source</param>
-        public CssParser(string filePath)
-            : this(filePath, null)
+        /// <param name="fileContent">path to source</param>
+        public CssParser(string fileContent)
+            : this(fileContent, null)
         {
         }
 
         /// <summary>
         /// Ctor.
         /// </summary>
-        /// <param name="filePath">path to source</param>
+        /// <param name="fileContent">path to source</param>
         /// <param name="source">actual source</param>
-        public CssParser(string filePath, string source)
+        public CssParser(string fileContent, string source)
         {
-            this.filePath = filePath;
+            this.fileContent = fileContent;
             this.source = source;
         }
 
@@ -94,7 +94,7 @@ namespace Umbraco.Core.Models.Css
         private CssStyleSheet ParseStyleSheet()
         {
             CssStyleSheet styleSheet = new CssStyleSheet();
-            using (this.reader = new LineReader(this.filePath, this.source, CssParser.ReadFilters))
+            using (this.reader = new LineReader(this.fileContent, this.source, CssParser.ReadFilters))
             {
                 this.reader.NormalizeWhiteSpace = true;
 
