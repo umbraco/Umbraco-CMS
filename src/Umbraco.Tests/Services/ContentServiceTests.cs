@@ -7,7 +7,7 @@ using Umbraco.Web.Services;
 namespace Umbraco.Tests.Services
 {
     [TestFixture]
-    public class ContentServiceTests : BaseWebTest
+    public class ContentServiceTests : BaseDatabaseFactoryTest
     {
         /*[Test]*/
         public void Can_Create_Content()

@@ -4,6 +4,7 @@ using System.Data.SqlServerCe;
 using System.IO;
 using NUnit.Framework;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -34,8 +35,11 @@ namespace Umbraco.Tests.TestHelpers
             var engine = new SqlCeEngine(settings.ConnectionString);
             engine.CreateDatabase();
 
+            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntaxProvider.Instance;
+
             //Create the umbraco database
             DatabaseFactory.Current.Database.Initialize();
+            DatabaseFactory.Current.Database.InstallBaseData();
         }
 
         [TearDown]

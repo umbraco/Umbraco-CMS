@@ -5,7 +5,7 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence
 {
-    [TestFixture]
+    [TestFixture, NUnit.Framework.Ignore]
     public class MySqlDatabaseCreationTest : BaseDatabaseTest
     {
         #region Overrides of BaseDatabaseTest
