@@ -459,16 +459,23 @@ namespace umbraco.cms.businesslogic.template
             }
         }
 
-        public static Template GetByAlias(string Alias)
+        public static Template GetByAlias(string Alias, bool useCache = false)
         {
-            try
-            {
-                return new Template(SqlHelper.ExecuteScalar<int>("select nodeId from cmsTemplate where alias = @alias", SqlHelper.CreateParameter("@alias", Alias)));
-            }
-            catch
-            {
-                return null;
-            }
+			if (!useCache)
+			{
+				try
+				{
+					return new Template(SqlHelper.ExecuteScalar<int>("select nodeId from cmsTemplate where alias = @alias", SqlHelper.CreateParameter("@alias", Alias)));
+				}
+				catch
+				{
+					return null;
+				}	
+			}			
+
+			//return from cache instead
+	        var id = GetTemplateIdFromAlias(Alias);
+			return id == 0 ? null : GetTemplate(id);
         }
 
         [Obsolete("Obsolete, please use GetAllAsList() method instead", true)]
@@ -854,17 +861,11 @@ namespace umbraco.cms.businesslogic.template
                 });
         }
 
-        private void InvalidateCache()
-        {
-            Cache.ClearCacheItem(GetCacheKey(this.Id));
-        }
-
         private static string GetCacheKey(int id)
         {
             return UmbracoTemplateCacheKey + id;
         }
-
-
+		
         public static Template Import(XmlNode n, User u)
         {
             string alias = xmlHelper.GetNodeValue(n.SelectSingleNode("Alias"));

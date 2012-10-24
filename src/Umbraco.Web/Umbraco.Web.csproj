@@ -265,6 +265,7 @@
     <Compile Include="DefaultPublishedMediaStore.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
+    <Compile Include="Mvc\UmbracoViewPage.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="ExamineExtensions.cs" />
     <Compile Include="FormlessPage.cs">
@@ -375,12 +376,12 @@
     <Compile Include="Mvc\MasterControllerFactory.cs" />
     <Compile Include="Mvc\RenderActionInvoker.cs" />
     <Compile Include="Mvc\RenderControllerFactory.cs" />
-    <Compile Include="Mvc\RenderModel.cs" />
+    <Compile Include="Models\RenderModel.cs" />
     <Compile Include="Mvc\RenderModelBinder.cs" />
     <Compile Include="Mvc\RenderMvcController.cs" />
     <Compile Include="Mvc\RenderRouteHandler.cs" />
     <Compile Include="Mvc\RenderViewEngine.cs" />
-    <Compile Include="Mvc\RenderViewPage.cs" />
+    <Compile Include="Mvc\UmbracoTemplatePage.cs" />
     <Compile Include="Mvc\RouteDefinition.cs" />
     <Compile Include="Mvc\RouteValueDictionaryExtensions.cs" />
     <Compile Include="Routing\DocumentLookupBase.cs" />

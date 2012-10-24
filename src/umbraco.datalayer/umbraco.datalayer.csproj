@@ -194,9 +194,6 @@
     <Content Include="SqlHelpers\SqlAzure\Sql\InstallSqlAzure.sql" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="SqlHelpers\SqlServer\Sql\Version4_8_Upgrade.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
       <Name>Umbraco.Core</Name>

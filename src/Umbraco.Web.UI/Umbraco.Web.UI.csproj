@@ -1187,7 +1187,6 @@
     <Content Include="umbraco_client\tinymce3\tiny_mce.js" />
     <Content Include="umbraco_client\tinymce3\tiny_mce_popup.js" />
     <Content Include="umbraco_client\tinymce3\tiny_mce_src.js" />
-    <Content Include="umbraco_client\tinymce3\umbraco-implementation-notes.txt" />
     <Content Include="umbraco_client\tinymce3\utils\editable_selects.js" />
     <Content Include="umbraco_client\tinymce3\utils\form_utils.js" />
     <Content Include="umbraco_client\tinymce3\utils\mctabs.js" />

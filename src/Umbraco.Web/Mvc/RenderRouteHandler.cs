@@ -7,6 +7,7 @@ using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.template;
 
@@ -51,7 +52,7 @@ namespace Umbraco.Web.Mvc
 			//put essential data into the data tokens, the 'umbraco' key is required to be there for the view engine
 			requestContext.RouteData.DataTokens.Add("umbraco", renderModel); //required for the RenderModelBinder
 			requestContext.RouteData.DataTokens.Add("umbraco-doc-request", docRequest); //required for RenderMvcController
-			requestContext.RouteData.DataTokens.Add("umbraco-context", UmbracoContext.Current); //required for RenderViewPage
+			requestContext.RouteData.DataTokens.Add("umbraco-context", UmbracoContext.Current); //required for UmbracoTemplatePage
 
 			return GetHandlerForRoute(requestContext, docRequest);
 			

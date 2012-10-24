@@ -71,7 +71,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             // Hover over code
             var title = $(this).attr('title');
             $(this).data('tipText', title).removeAttr('title');
-            $('<p class="treePickerTooltip"></p>').text(title).appendTo('body').fadeIn('fast');;
+            $('<p class="treePickerTooltip" style="z-index: 1000;"></p>').text(title).appendTo('body').fadeIn('fast');;
         }, function () {
             // Hover out code
             $(this).attr('title', $(this).data('tipText'));

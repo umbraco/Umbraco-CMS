@@ -4,7 +4,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.create;
-using Content = umbraco.cms.businesslogic.Content;
+using Content=umbraco.cms.businesslogic.Content;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
 using umbraco.IO;
@@ -37,7 +37,6 @@ namespace umbraco.cms.presentation.create.controls
                 StringBuilder js = new StringBuilder();
                 foreach (DocumentType dt in DocumentType.GetAllAsList())
                 {
-                    // if we're at root, we'll only allow root types
                     string docDescription = "<em>No description available...</em>";
                     if (dt.Description != null && dt.Description != "")
                         docDescription = dt.Description;
@@ -45,7 +44,7 @@ namespace umbraco.cms.presentation.create.controls
                     docDescription = docDescription.Replace("'", "\\'");
 
                     string docImage = (dt.Thumbnail != "") ? dt.Thumbnail : "../nada.gif";
-                    docImage = IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/images/thumbnails/" + docImage;
+                    docImage = IOHelper.ResolveUrl( SystemDirectories.Umbraco ) + "/images/thumbnails/" + docImage;
 
                     ListItem li = new ListItem();
                     li.Text = dt.Text;
@@ -54,30 +53,29 @@ namespace umbraco.cms.presentation.create.controls
                     if (NodeId > 0)
                     {
                         foreach (int i in allowedIds) if (i == dt.Id)
+                        {
+                            nodeType.Items.Add(li);
+                            js.Append("typeInfo[" + counter + "] = '<img src=\"" + docImage + "\"><p>" +
+                                      docDescription + "</p>'\n");
+
+                            if (!typeInited)
                             {
-                                nodeType.Items.Add(li);
-                                js.Append("typeInfo[" + counter + "] = '<img src=\"" + docImage + "\"><p>" +
-                                          docDescription + "</p>'\n");
-
-                                if (!typeInited)
-                                {
-                                    descr.Text = "<img src=\"" + docImage + "\"><p>" +
-                                                 docDescription + "</p>";
-                                    typeInited = true;
-
-                                }
-                                counter++;
+                                descr.Text = "<img src=\"" + docImage + "\"><p>" +
+                                             docDescription + "</p>";
+                                typeInited = true;
+                                
                             }
+                            counter++;
+                        }
                     }
-                    else if (dt.AllowAtRoot)
-                    {
+                    else {
                         nodeType.Items.Add(li);
                         js.Append("typeInfo[" + counter + "] = '<img src=\"" + docImage + "\"><p>" +
                                   docDescription + "</p>'\n");
                         if (!typeInited)
                         {
                             descr.Text = "<img src=\"" + docImage + "\"><p>" +
-                                         docDescription + "</p>";
+                                         docDescription + "</p>'";
                             typeInited = true;
                         }
                         counter++;
@@ -85,8 +83,7 @@ namespace umbraco.cms.presentation.create.controls
 
 
                 }
-                if (nodeType.Items.Count == 0)
-                {
+                if (nodeType.Items.Count == 0) {
                     sbmt.Enabled = false;
                 }
                 typeJs.Text = "<script type=\"text/javascript\">\nvar typeInfo = new Array(" + counter.ToString() + ");\n " + js.ToString() + "\n</script>\n    ";
@@ -130,9 +127,9 @@ namespace umbraco.cms.presentation.create.controls
                     int.Parse(Request["nodeID"]),
                     rename.Text);
 
-                BasePage.Current.ClientTools
-                    .ChangeContentFrameUrl(returnUrl)
-                    .CloseModalWindow();
+				BasePage.Current.ClientTools
+					.ChangeContentFrameUrl(returnUrl)
+					.CloseModalWindow();
 
             }
         }

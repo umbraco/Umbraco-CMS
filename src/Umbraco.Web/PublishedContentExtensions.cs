@@ -11,7 +11,7 @@ using Umbraco.Web.Routing;
 using umbraco;
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
-using ContentType = umbraco.cms.businesslogic.ContentType;
+using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Web
 {
@@ -25,14 +25,36 @@ namespace Umbraco.Web
 	public static class PublishedContentExtensions
 	{
 		/// <summary>
+		/// Gets the NiceUrl for the content item
+		/// </summary>
+		/// <param name="doc"></param>
+		/// <returns></returns>
+		public static string NiceUrl(this IPublishedContent doc)
+		{
+			var umbHelper = new UmbracoHelper(UmbracoContext.Current);
+			return umbHelper.NiceUrl(doc.Id);
+		}
+
+		/// <summary>
+		/// Gets the NiceUrlWithDomain for the content item
+		/// </summary>
+		/// <param name="doc"></param>
+		/// <returns></returns>
+		public static string NiceUrlWithDomain(this IPublishedContent doc)
+		{
+			var umbHelper = new UmbracoHelper(UmbracoContext.Current);
+			return umbHelper.NiceUrlWithDomain(doc.Id);
+		}
+
+		/// <summary>
 		/// Returns the current template Alias
 		/// </summary>
 		/// <param name="doc"></param>
 		/// <returns></returns>
 		public static string GetTemplateAlias(this IPublishedContent doc)
 		{
-			var template = new template(doc.TemplateId);
-			return template.TemplateAlias;			
+			var template = Template.GetTemplate(doc.TemplateId);
+			return template.Alias;			
 		}
 
 		#region Search

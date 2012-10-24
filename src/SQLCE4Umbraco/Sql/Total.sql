@@ -10,7 +10,7 @@
  
 IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
  
-    Database version: 4.10.0.0
+    Database version: 4.8.0.2
     
     Please increment this version number if ANY change is made to this script,
     so compatibility with scripts for other database systems can be verified easily.
@@ -146,18 +146,12 @@ CREATE TABLE [cmsContentType]
 [pk] [int] NOT NULL IDENTITY(1, 1), 
 [nodeId] [int] NOT NULL, 
 [alias] [nvarchar] (255) NULL, 
-[icon] [nvarchar] (255) NULL,
-[isContainer] bit NOT NULL CONSTRAINT [DF_cmsContentType_isContainer] DEFAULT (0),
-[allowAtRoot] bit NOT NULL  CONSTRAINT [DF_cmsContentType_allowAtRoot] DEFAULT (0)
+[icon] [nvarchar] (255) NULL 
 ) 
  
 ; 
 ALTER TABLE [cmsContentType] ADD CONSTRAINT [PK_cmsContentType] PRIMARY KEY  ([pk]) 
 ; 
-CREATE TABLE [cmsContentType2ContentType] ([parentContentTypeId] int NOT NULL,[childContentTypeId] int NOT NULL)
-;
-ALTER TABLE [cmsContentType2ContentType] ADD CONSTRAINT  [cmsContentType2ContentType_PK] PRIMARY KEY ([parentContentTypeId],[childContentTypeId])
-;
 CREATE TABLE [cmsMacroPropertyType] 
 ( 
 [id] [int] NOT NULL IDENTITY(1, 1), 
@@ -189,19 +183,16 @@ ALTER TABLE [umbracoStylesheetProperty] ADD CONSTRAINT [PK_stylesheetProperty] P
 
 */
  
-CREATE TABLE [cmsPropertyTypeGroup] 
+CREATE TABLE [cmsTab] 
 ( 
 [id] [int] NOT NULL IDENTITY(1, 1), 
 [contenttypeNodeId] [int] NOT NULL, 
 [text] [nvarchar] (255) NOT NULL, 
-[sortorder] [int] NOT NULL,
-[parentGroupId] int NULL CONSTRAINT [DF_cmsPropertyTypeGroup_parentGroupId] DEFAULT NULL
+[sortorder] [int] NOT NULL 
 ) 
  
 ; 
-ALTER TABLE [cmsPropertyTypeGroup] ADD CONSTRAINT [PK_cmsPropertyTypeGroup] PRIMARY KEY  ([id]) 
-; 
-ALTER TABLE [cmsPropertyTypeGroup] ADD CONSTRAINT [FK_cmsPropertyTypeGroup_cmsPropertyTypeGroup] FOREIGN KEY([parentGroupId]) REFERENCES [cmsPropertyTypeGroup] ([id])
+ALTER TABLE [cmsTab] ADD CONSTRAINT [PK_cmsTab] PRIMARY KEY  ([id]) 
 ; 
 CREATE TABLE [cmsTemplate] 
 ( 
@@ -309,7 +300,7 @@ CREATE TABLE [cmsPropertyType]
 [id] [int] NOT NULL IDENTITY(1, 1), 
 [dataTypeId] [int] NOT NULL, 
 [contentTypeId] [int] NOT NULL, 
-[propertyTypeGroupId] int,
+[tabId] [int] NULL, 
 [Alias] [nvarchar] (255) NOT NULL, 
 [Name] [nvarchar] (255) NULL, 
 [helpText] [nvarchar] (1000) NULL, 
@@ -386,8 +377,7 @@ ALTER TABLE [umbracoAppTree] ADD CONSTRAINT [PK_umbracoAppTree] PRIMARY KEY  ([a
 CREATE TABLE [cmsContentTypeAllowedContentType] 
 ( 
 [Id] [int] NOT NULL, 
-[AllowedId] [int] NOT NULL,
-[sortOrder] int NOT NULL CONSTRAINT [DF_cmsContentTypeAllowedContentType_sortOrder] DEFAULT (1)
+[AllowedId] [int] NOT NULL 
 ) 
  
 ; 
@@ -587,6 +577,9 @@ CONSTRAINT [FK_cmsTemplate_umbracoNode] FOREIGN KEY ([nodeId]) REFERENCES [umbra
 ALTER TABLE [cmsContentType] ADD 
 CONSTRAINT [FK_cmsContentType_umbracoNode] FOREIGN KEY ([nodeId]) REFERENCES [umbracoNode] ([id]) 
 ; 
+ALTER TABLE [cmsPropertyType] ADD 
+CONSTRAINT [FK_cmsPropertyType_cmsTab] FOREIGN KEY ([tabId]) REFERENCES [cmsTab] ([id]) 
+; 
 ALTER TABLE [cmsContent] ADD 
 CONSTRAINT [FK_cmsContent_umbracoNode] FOREIGN KEY ([nodeId]) REFERENCES [umbracoNode] ([id]) 
 ; 
@@ -599,6 +592,8 @@ CONSTRAINT [FK_umbracoUser2app_umbracoApp] FOREIGN KEY ([app]) REFERENCES [umbra
 */
  
 ALTER TABLE [cmsTemplate] DROP CONSTRAINT [FK_cmsTemplate_umbracoNode] 
+; 
+ALTER TABLE [cmsPropertyType] DROP CONSTRAINT [FK_cmsPropertyType_cmsTab] 
 ; 
 ALTER TABLE [cmsContent] DROP CONSTRAINT [FK_cmsContent_umbracoNode] 
 ; 
@@ -731,11 +726,11 @@ ALTER TABLE [umbracoNode] DROP CONSTRAINT [FK_umbracoNode_umbracoNode]
 |INSERT INTO [cmsMacroPropertyType] ([id], [macroPropertyTypeAlias], [macroPropertyTypeRenderAssembly], [macroPropertyTypeRenderType], [macroPropertyTypeBaseType]) VALUES (25, N'textMultiLine', N'umbraco.macroRenderings', N'textMultiple', N'String') 
 |SET IDENTITY_INSERT [cmsMacroPropertyType] OFF 
 ;
-!!!SET IDENTITY_INSERT [cmsPropertyTypeGroup] ON 
-|INSERT INTO [cmsPropertyTypeGroup] ([id], [contenttypeNodeId], [text], [sortorder]) VALUES (3, 1032, N'Image', 1) 
-|INSERT INTO [cmsPropertyTypeGroup] ([id], [contenttypeNodeId], [text], [sortorder]) VALUES (4, 1033, N'File', 1) 
-|INSERT INTO [cmsPropertyTypeGroup] ([id], [contenttypeNodeId], [text], [sortorder]) VALUES (5, 1031, N'Contents', 1) 
-|SET IDENTITY_INSERT [cmsPropertyTypeGroup] OFF 
+!!!SET IDENTITY_INSERT [cmsTab] ON 
+|INSERT INTO [cmsTab] ([id], [contenttypeNodeId], [text], [sortorder]) VALUES (3, 1032, N'Image', 1) 
+|INSERT INTO [cmsTab] ([id], [contenttypeNodeId], [text], [sortorder]) VALUES (4, 1033, N'File', 1) 
+|INSERT INTO [cmsTab] ([id], [contenttypeNodeId], [text], [sortorder]) VALUES (5, 1031, N'Contents', 1) 
+|SET IDENTITY_INSERT [cmsTab] OFF 
 ;
 !!!SET IDENTITY_INSERT [cmsPropertyType] ON 
 |INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [tabId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (6, -90, 1032, 3, N'umbracoFile', N'Upload image', NULL, 0, 0, NULL, NULL) 
@@ -795,6 +790,8 @@ INSERT INTO [cmsContentTypeAllowedContentType] ([Id], [AllowedId]) VALUES (1031,
 |SET IDENTITY_INSERT [cmsDataType] OFF 
 ;
 ALTER TABLE [cmsTemplate] ADD CONSTRAINT [FK_cmsTemplate_umbracoNode] FOREIGN KEY ([nodeId]) REFERENCES [umbracoNode] ([id]) 
+;
+ALTER TABLE [cmsPropertyType] ADD CONSTRAINT [FK_cmsPropertyType_cmsTab] FOREIGN KEY ([tabId]) REFERENCES [cmsTab] ([id]) 
 ;
 ALTER TABLE [cmsContent] ADD CONSTRAINT [FK_cmsContent_umbracoNode] FOREIGN KEY ([nodeId]) REFERENCES [umbracoNode] ([id]) 
 ;
@@ -928,6 +925,10 @@ INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias,
 VALUES (0, 1, 2, 'translation','yourTasks', 'Tasks created by you', '.sprTreeFolder', '.sprTreeFolder_o', 'umbraco', 'loadYourTasks');
 ; 
 */
+alter TABLE [cmsContentType]
+add [masterContentType] int NULL CONSTRAINT
+[DF_cmsContentType_masterContentType] DEFAULT (0)
+;
 CREATE TABLE [cmsTagRelationship](
 	[nodeId] [int] NOT NULL,
 	[tagId] [int] NOT NULL)
@@ -961,8 +962,9 @@ CREATE TABLE [cmsPreviewXml](
 	[versionId] [uniqueidentifier] NOT NULL,
 	[timestamp] [datetime] NOT NULL,
 	[xml] [ntext] NOT NULL)
-
 ;
+
+
 
 
 /***********************************************************************************************************************
@@ -989,7 +991,7 @@ ALTER TABLE [umbracoUserType] ALTER COLUMN id IDENTITY(5,1)
 ;
 ALTER TABLE [cmsMacroPropertyType] ALTER COLUMN id IDENTITY(26,1)
 ;
-ALTER TABLE [cmsPropertyTypeGroup] ALTER COLUMN id IDENTITY(6,1)
+ALTER TABLE [cmsTab] ALTER COLUMN id IDENTITY(6,1)
 ;
 ALTER TABLE [cmsPropertyType] ALTER COLUMN id IDENTITY(28,1)
 ;
