@@ -43,7 +43,12 @@ namespace Umbraco.Web.Routing
 				return;
 			}
 
+			//NOTE: Not sure how the alias is actually saved with a space as this shouldn't ever be the case? 
+			// but apparently this happens. I think what should actually be done always is the template alias 
+			// should be saved using the ToUmbracoAlias method and then we can use this here too, that way it
+			// it 100% consistent. I'll leave this here for now until further invenstigation.
 			var templateAlias = _publishedContentRequest.Template.Alias.Replace(" ", string.Empty);
+			//var templateAlias = _publishedContentRequest.Template.Alias.ToUmbracoAlias(StringAliasCaseType.PascalCase);
 
 			Func<DirectoryInfo, string, string[], RenderingEngine, bool> determineEngine =
 				(directory, alias, extensions, renderingEngine) =>
@@ -361,9 +366,11 @@ namespace Umbraco.Web.Routing
 				LogHelper.Debug<PublishedContentRequest>("{0}Look for template id={1}", () => tracePrefix, () => templateId);
 				
 				if (templateId > 0)
-				{
-					//NOTE: This will throw an exception if the template id doesn't exist, but that is ok to inform the front end.
-					var template = new Template(templateId);
+				{					
+					//NOTE: don't use the Template ctor as the result is not cached... instead use this static method
+					var template = Template.GetTemplate(templateId);
+					if (template == null)
+						throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render");
 					_publishedContentRequest.Template = template;
 				}
 			}
@@ -371,7 +378,7 @@ namespace Umbraco.Web.Routing
 			{
 				LogHelper.Debug<PublishedContentRequest>("{0}Look for template alias=\"{1}\" (altTemplate)", () => tracePrefix, () => templateAlias);
 
-				var template = Template.GetByAlias(templateAlias);
+				var template = Template.GetByAlias(templateAlias, true);
 				_publishedContentRequest.Template = template;
 			}
 

@@ -11,6 +11,7 @@ using Umbraco.Web.Routing;
 using umbraco;
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
+using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Web
 {
@@ -52,8 +53,8 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public static string GetTemplateAlias(this IPublishedContent doc)
 		{
-			var template = new template(doc.TemplateId);
-			return template.TemplateAlias;			
+			var template = Template.GetTemplate(doc.TemplateId);
+			return template.Alias;			
 		}
 
 		#region Search

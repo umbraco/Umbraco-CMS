@@ -31,7 +31,7 @@ namespace umbraco.webservices.templates
 
             try
             {
-                template = cms.businesslogic.template.Template.GetByAlias(alias);
+                template = cms.businesslogic.template.Template.GetByAlias(alias, true);
             }
             catch (Exception)
             {
