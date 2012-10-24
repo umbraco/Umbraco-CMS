@@ -12,6 +12,8 @@ using umbraco;
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
 using umbraco.cms.businesslogic.template;
+using ContentType = umbraco.cms.businesslogic.ContentType;
+using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace Umbraco.Web
 {
