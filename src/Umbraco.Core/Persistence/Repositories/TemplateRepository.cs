@@ -63,9 +63,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override Template Get(string id)
         {
-            if (!FileSystem.FileExists(id) && !_viewsFileSystem.FileExists(id))
+            string masterpageName = string.Concat(id, ".master");
+            string viewName = string.Concat(id, ".cshtml");
+            if (!FileSystem.FileExists(masterpageName) && !_viewsFileSystem.FileExists(viewName))
             {
-                throw new Exception(string.Format("The file {0} was not found", id));
+                throw new Exception(string.Format("The file with alias: '{0}' was not found", id));
             }
 
             string content = string.Empty;
@@ -74,28 +76,28 @@ namespace Umbraco.Core.Persistence.Repositories
             DateTime updated = new DateTime();
             string name = string.Empty;
 
-            if(FileSystem.FileExists(id))
+            if (FileSystem.FileExists(masterpageName))
             {
-                var stream = FileSystem.OpenFile(id);
+                var stream = FileSystem.OpenFile(masterpageName);
                 byte[] bytes = new byte[stream.Length];
                 stream.Position = 0;
                 stream.Read(bytes, 0, (int)stream.Length);
                 content = Encoding.UTF8.GetString(bytes);
 
-                path = FileSystem.GetRelativePath(id);
+                path = FileSystem.GetRelativePath(masterpageName);
                 created = FileSystem.GetCreated(path).UtcDateTime;
                 updated = FileSystem.GetLastModified(path).UtcDateTime;
                 name = new FileInfo(path).Name;
             }
             else
             {
-                var stream = _viewsFileSystem.OpenFile(id);
+                var stream = _viewsFileSystem.OpenFile(viewName);
                 byte[] bytes = new byte[stream.Length];
                 stream.Position = 0;
                 stream.Read(bytes, 0, (int)stream.Length);
                 content = Encoding.UTF8.GetString(bytes);
 
-                path = _viewsFileSystem.GetRelativePath(id);
+                path = _viewsFileSystem.GetRelativePath(viewName);
                 created = FileSystem.GetCreated(path).UtcDateTime;
                 updated = FileSystem.GetLastModified(path).UtcDateTime;
                 name = new FileInfo(path).Name;

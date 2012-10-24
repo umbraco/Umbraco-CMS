@@ -4,7 +4,7 @@ using Umbraco.Core.Models;
 namespace Umbraco.Web.Services
 {
     /// <summary>
-    /// Defines the MediaService, which is an easy access to operations involving <see cref="IMedia"/>
+    /// Defines the Media Service, which is an easy access to operations involving <see cref="IMedia"/>
     /// </summary>
     public interface IMediaService : IService
     {

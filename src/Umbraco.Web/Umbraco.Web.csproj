@@ -316,9 +316,12 @@
     <Compile Include="Services\ContentService.cs" />
     <Compile Include="Services\ContentTypeService.cs" />
     <Compile Include="Services\DataTypeService.cs" />
+    <Compile Include="Services\FileService.cs" />
     <Compile Include="Services\IContentService.cs" />
     <Compile Include="Services\IContentTypeService.cs" />
     <Compile Include="Services\IDataTypeService.cs" />
+    <Compile Include="Services\IFileService.cs" />
+    <Compile Include="Services\ILocalizationService.cs" />
     <Compile Include="Services\IMediaService.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\MediaService.cs" />

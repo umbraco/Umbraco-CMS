@@ -121,7 +121,7 @@ namespace Umbraco.Web.Services
         }
 
         /// <summary>
-        /// Retrieves the IDataType specified by it's unique ID
+        /// Gets the <see cref="IDataType"/> specified by it's unique ID
         /// </summary>
         /// <param name="id">Id of the DataType, which corresponds to the Guid Id of the control</param>
         /// <returns><see cref="IDataType"/> object</returns>
@@ -131,7 +131,7 @@ namespace Umbraco.Web.Services
         }
 
         /// <summary>
-        /// Retrieve a complete list of all registered IDataType's
+        /// Gets a complete list of all registered <see cref="IDataType"/>'s
         /// </summary>
         /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
         public IEnumerable<IDataType> GetAllDataTypes()
