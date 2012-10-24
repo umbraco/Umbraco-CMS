@@ -1,0 +1,65 @@
+﻿using System;
+using System.Collections.Generic;
+using Umbraco.Core.Models;
+using umbraco.interfaces;
+
+namespace Umbraco.Web.Services
+{
+    /// <summary>
+    /// Defines the DataType Service, which is an easy access to operations involving <see cref="IDataType"/> and <see cref="IDataTypeDefinition"/>
+    /// </summary>
+    public interface IDataTypeService : IService
+    {
+        /// <summary>
+        /// Gets a <see cref="IDataTypeDefinition"/> by its Id
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IDataTypeDefinition"/></param>
+        /// <returns><see cref="IDataTypeDefinition"/></returns>
+        IDataTypeDefinition GetDataTypeDefinitionById(int id);
+
+        /// <summary>
+        /// Gets a <see cref="IDataTypeDefinition"/> by its control Id
+        /// </summary>
+        /// <param name="id">Id of the DataType control</param>
+        /// <returns><see cref="IDataTypeDefinition"/></returns>
+        IDataTypeDefinition GetDataTypeDefinitionById(Guid id);
+
+        /// <summary>
+        /// Gets all <see cref="IDataTypeDefinition"/> objects or those with the ids passed in
+        /// </summary>
+        /// <param name="ids">Optional array of Ids</param>
+        /// <returns>An enumerable list of <see cref="IDataTypeDefinition"/> objects</returns>
+        IEnumerable<IDataTypeDefinition> GetAllDataTypeDefinitions(params int[] ids);
+
+        /// <summary>
+        /// Saves an <see cref="IDataTypeDefinition"/>
+        /// </summary>
+        /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to save</param>
+        /// <param name="userId">Id of the user issueing the save</param>
+        void Save(IDataTypeDefinition dataTypeDefinition, int userId);
+
+        /// <summary>
+        /// Deletes an <see cref="IDataTypeDefinition"/>
+        /// </summary>
+        /// <remarks>
+        /// Please note that deleting a <see cref="IDataTypeDefinition"/> will remove
+        /// all the <see cref="PropertyType"/> data that references this <see cref="IDataTypeDefinition"/>.
+        /// </remarks>
+        /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to delete</param>
+        /// <param name="userId">Id of the user issueing the deletion</param>
+        void Delete(IDataTypeDefinition dataTypeDefinition, int userId);
+
+        /// <summary>
+        /// Retrieves the IDataType specified by it's unique ID
+        /// </summary>
+        /// <param name="id">Id of the DataType, which corresponds to the Guid Id of the control</param>
+        /// <returns><see cref="IDataType"/> object</returns>
+        IDataType GetDataTypeById(Guid id);
+
+        /// <summary>
+        /// Retrieve a complete list of all registered IDataType's
+        /// </summary>
+        /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
+        IEnumerable<IDataType> GetAllDataTypes();
+    }
+}

@@ -104,9 +104,9 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets of Sets the Id of the DataType, which the PropertyType is "wrapping"
+        /// Gets of Sets the Id of the DataType (Definition), which the PropertyType is "wrapping"
         /// </summary>
-        /// <remarks>This is actually the Id of the DataTypeDefinition</remarks>
+        /// <remarks>This is actually the Id of the <see cref="IDataTypeDefinition"/></remarks>
         [DataMember]
         public int DataTypeId
         {

@@ -103,6 +103,8 @@
     <Compile Include="Persistence\Mappers\DictionaryTranslationMapperTest.cs" />
     <Compile Include="Persistence\Mappers\LanguageMapperTest.cs" />
     <Compile Include="Persistence\Mappers\MediaMapperTest.cs" />
+    <Compile Include="Persistence\Mappers\PropertyGroupMapperTest.cs" />
+    <Compile Include="Persistence\Mappers\PropertyTypeMapperTest.cs" />
     <Compile Include="Persistence\Mappers\RelationMapperTest.cs" />
     <Compile Include="Persistence\Mappers\RelationTypeMapperTest.cs" />
     <Compile Include="Persistence\MySqlDatabaseCreationTest.cs" />

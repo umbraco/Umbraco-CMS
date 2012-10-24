@@ -7,6 +7,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -27,6 +28,25 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected ContentTypeBaseRepository(IUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
         {
+        }
+
+        protected IEnumerable<int> PerformGetByQuery(IQuery<PropertyType> query)
+        {
+            var sqlClause = new Sql();
+            sqlClause.Select("*");
+            sqlClause.From("cmsPropertyTypeGroup");
+            sqlClause.RightJoin("cmsPropertyType ON [cmsPropertyTypeGroup].[id] = [cmsPropertyType].[propertyTypeGroupId]");
+            sqlClause.InnerJoin("cmsDataType ON [cmsPropertyType].[dataTypeId] = [cmsDataType].[nodeId]");
+
+            var translator = new SqlTranslator<PropertyType>(sqlClause, query);
+            var sql = translator.Translate();
+
+            var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
+
+            foreach (var dto in dtos.DistinctBy(x => x.ContentTypeNodeId))
+            {
+                yield return dto.ContentTypeNodeId;
+            }
         }
 
         protected void PersistNewBaseContentType(ContentTypeDto dto, IContentTypeComposition entity)

@@ -88,6 +88,15 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
+        public IEnumerable<IContentType> GetByQuery(IQuery<PropertyType> query)
+        {
+            var ints = PerformGetByQuery(query);
+            foreach (var i in ints)
+            {
+                yield return Get(i);
+            }
+        }
+
         #region Overrides of PetaPocoRepositoryBase<int,IContentType>
 
         protected override Sql GetBaseQuery(bool isCount)

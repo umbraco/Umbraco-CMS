@@ -5,7 +5,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class DataTypeDefinitionFactory : IEntityFactory<DataTypeDefinition, DataTypeDto>
+    internal class DataTypeDefinitionFactory : IEntityFactory<IDataTypeDefinition, DataTypeDto>
     {
         private readonly Guid _nodeObjectTypeId;
         private int _primaryKey;
@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region Implementation of IEntityFactory<DataTypeDefinition,DataTypeDto>
 
-        public DataTypeDefinition BuildEntity(DataTypeDto dto)
+        public IDataTypeDefinition BuildEntity(DataTypeDto dto)
         {
             var dataTypeDefinition = new DataTypeDefinition(dto.ControlId)
                                          {
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Persistence.Factories
             return dataTypeDefinition;
         }
 
-        public DataTypeDto BuildDto(DataTypeDefinition entity)
+        public DataTypeDto BuildDto(IDataTypeDefinition entity)
         {
             var dataTypeDto = new DataTypeDto
                                   {
@@ -66,7 +66,7 @@ namespace Umbraco.Core.Persistence.Factories
             _primaryKey = primaryKey;
         }
 
-        private NodeDto BuildNodeDto(DataTypeDefinition entity)
+        private NodeDto BuildNodeDto(IDataTypeDefinition entity)
         {
             var nodeDto = new NodeDto
                               {

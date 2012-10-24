@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="DataTypeDefinition"/>
     /// </summary>
-    internal class DataTypeDefinitionRepository : PetaPocoRepositoryBase<int, DataTypeDefinition>, IDataTypeDefinitionRepository
+    internal class DataTypeDefinitionRepository : PetaPocoRepositoryBase<int, IDataTypeDefinition>, IDataTypeDefinitionRepository
     {
         public DataTypeDefinitionRepository(IUnitOfWork work) : base(work)
         {
@@ -27,7 +27,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
 
-        protected override DataTypeDefinition PerformGet(int id)
+        protected override IDataTypeDefinition PerformGet(int id)
         {
             var dataTypeSql = GetBaseQuery(false);
             dataTypeSql.Append(GetBaseWhereClause(id));
@@ -39,11 +39,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
             var definition = factory.BuildEntity(dataTypeDto);
-            definition.ResetDirtyProperties();
+            ((DataTypeDefinition)definition).ResetDirtyProperties();
             return definition;
         }
 
-        protected override IEnumerable<DataTypeDefinition> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IDataTypeDefinition> PerformGetAll(params int[] ids)
         {
             if (ids.Any())
             {
@@ -62,10 +62,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        protected override IEnumerable<DataTypeDefinition> PerformGetByQuery(IQuery<DataTypeDefinition> query)
+        protected override IEnumerable<IDataTypeDefinition> PerformGetByQuery(IQuery<IDataTypeDefinition> query)
         {
             var sqlClause = GetBaseQuery(false);
-            var translator = new SqlTranslator<DataTypeDefinition>(sqlClause, query);
+            var translator = new SqlTranslator<IDataTypeDefinition>(sqlClause, query);
             var sql = translator.Translate();
 
             var dataTypeDtos = Database.Fetch<DataTypeDto, NodeDto>(sql);
@@ -110,10 +110,10 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         #region Unit of Work Implementation
-        
-        protected override void PersistNewItem(DataTypeDefinition entity)
+
+        protected override void PersistNewItem(IDataTypeDefinition entity)
         {
-            entity.AddingEntity();
+            ((DataTypeDefinition)entity).AddingEntity();
 
             var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
             var dto = factory.BuildDto(entity);
@@ -144,13 +144,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
             Database.Insert(dto);
 
-            entity.ResetDirtyProperties();
+            ((DataTypeDefinition)entity).ResetDirtyProperties();
         }
 
-        protected override void PersistUpdatedItem(DataTypeDefinition entity)
+        protected override void PersistUpdatedItem(IDataTypeDefinition entity)
         {
             //Updates Modified date and Version Guid
-            entity.UpdatingEntity();
+            ((DataTypeDefinition)entity).UpdatingEntity();
 
             var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
             //Look up DataTypeDefinition entry to get Primary for updating the DTO
@@ -163,10 +163,10 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Update(nodeDto);
             Database.Update(dto);
 
-            entity.ResetDirtyProperties();
+            ((DataTypeDefinition)entity).ResetDirtyProperties();
         }
 
-        protected override void PersistDeletedItem(DataTypeDefinition entity)
+        protected override void PersistDeletedItem(IDataTypeDefinition entity)
         {
             //Remove Notifications
             Database.Delete<User2NodeNotifyDto>("WHERE nodeId = @Id", new { Id = entity.Id });

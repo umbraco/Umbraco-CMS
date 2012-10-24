@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models
     /// </remarks>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class DataTypeDefinition : Entity, IAggregateRoot
+    public class DataTypeDefinition : Entity, IDataTypeDefinition
     {
         private int _parentId;
         private string _name;

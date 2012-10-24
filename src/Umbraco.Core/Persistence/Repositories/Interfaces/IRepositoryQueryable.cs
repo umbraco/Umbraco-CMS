@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Repositories
         where TEntity : IAggregateRoot
     {
         /// <summary>
-        /// Gets all entities of the spefified type and query
+        /// Gets all entities of the specified type and query
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
