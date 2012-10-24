@@ -99,7 +99,7 @@ namespace umbraco.cms.businesslogic.template
             
             if (string.IsNullOrEmpty(design))
             {
-                design = @"@inherits Umbraco.Web.Mvc.RenderViewPage
+                design = @"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 @{
     Layout = null;
 }";
