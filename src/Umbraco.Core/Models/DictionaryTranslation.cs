@@ -10,32 +10,32 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class DictionaryTranslation : Entity
+    public class DictionaryTranslation : Entity, IDictionaryTranslation
     {
-        private Language _language;
+        private ILanguage _language;
         private string _value;
 
-        public DictionaryTranslation(Language language, string value)
+        public DictionaryTranslation(ILanguage language, string value)
         {
             _language = language;
             _value = value;
         }
 
-        public DictionaryTranslation(Language language, string value, Guid uniqueId)
+        public DictionaryTranslation(ILanguage language, string value, Guid uniqueId)
         {
             _language = language;
             _value = value;
             Key = uniqueId;
         }
 
-        private static readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<DictionaryTranslation, Language>(x => x.Language);
+        private static readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<DictionaryTranslation, ILanguage>(x => x.Language);
         private static readonly PropertyInfo ValueSelector = ExpressionHelper.GetPropertyInfo<DictionaryTranslation, string>(x => x.Value);
 
         /// <summary>
         /// Gets or sets the <see cref="Language"/> for the translation
         /// </summary>
         [DataMember]
-        public Language Language
+        public ILanguage Language
         {
             get { return _language; }
             set

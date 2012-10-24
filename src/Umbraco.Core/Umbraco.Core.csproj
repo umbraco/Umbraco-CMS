@@ -88,7 +88,10 @@
     <Compile Include="Models\DictionaryTranslation.cs" />
     <Compile Include="Models\File.cs" />
     <Compile Include="Models\IDataTypeDefinition.cs" />
+    <Compile Include="Models\IDictionaryItem.cs" />
+    <Compile Include="Models\IDictionaryTranslation.cs" />
     <Compile Include="Models\IFile.cs" />
+    <Compile Include="Models\ILanguage.cs" />
     <Compile Include="Models\Language.cs" />
     <Compile Include="Models\Media.cs" />
     <Compile Include="Models\MediaType.cs" />

@@ -4,16 +4,16 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class LanguageFactory : IEntityFactory<Language, LanguageDto>
+    internal class LanguageFactory : IEntityFactory<ILanguage, LanguageDto>
     {
         #region Implementation of IEntityFactory<Language,LanguageDto>
 
-        public Language BuildEntity(LanguageDto dto)
+        public ILanguage BuildEntity(LanguageDto dto)
         {
             return new Language(dto.IsoCode){CultureName = dto.CultureName, Id = dto.Id};
         }
 
-        public LanguageDto BuildDto(Language entity)
+        public LanguageDto BuildDto(ILanguage entity)
         {
             var dto = new LanguageDto{ CultureName = entity.CultureName, IsoCode = entity.IsoCode};
             if (entity.HasIdentity)

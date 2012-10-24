@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, DictionaryItem, int>(uow);
+            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -107,7 +107,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<ILanguageRepository, Language, int>(uow);
+            var repository = RepositoryResolver.ResolveByType<ILanguageRepository, ILanguage, int>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);

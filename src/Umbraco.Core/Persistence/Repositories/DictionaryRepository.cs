@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
@@ -14,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="DictionaryItem"/>
     /// </summary>
-    internal class DictionaryRepository : PetaPocoRepositoryBase<int, DictionaryItem>, IDictionaryRepository
+    internal class DictionaryRepository : PetaPocoRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
     {
         private readonly ILanguageRepository _languageRepository;
 
@@ -31,7 +32,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of RepositoryBase<int,DictionaryItem>
 
-        protected override DictionaryItem PerformGet(int id)
+        protected override IDictionaryItem PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
             sql.Append(GetBaseWhereClause(id));
@@ -43,7 +44,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new DictionaryItemFactory();
             var entity = factory.BuildEntity(dto);
 
-            var list = new List<DictionaryTranslation>();
+            var list = new List<IDictionaryTranslation>();
             foreach (var textDto in dto.LanguageTextDtos)
             {
                 var language = _languageRepository.Get(textDto.LanguageId);
@@ -55,7 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return entity;
         }
 
-        protected override IEnumerable<DictionaryItem> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IDictionaryItem> PerformGetAll(params int[] ids)
         {
             if (ids.Any())
             {
@@ -74,10 +75,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        protected override IEnumerable<DictionaryItem> PerformGetByQuery(IQuery<DictionaryItem> query)
+        protected override IEnumerable<IDictionaryItem> PerformGetByQuery(IQuery<IDictionaryItem> query)
         {
             var sqlClause = GetBaseQuery(false);
-            var translator = new SqlTranslator<DictionaryItem>(sqlClause, query);
+            var translator = new SqlTranslator<IDictionaryItem>(sqlClause, query);
             var sql = translator.Translate();
 
             var dtos = Database.Fetch<DictionaryDto, LanguageTextDto>(sql);
@@ -125,9 +126,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Unit of Work Implementation
 
-        protected override void PersistNewItem(DictionaryItem entity)
+        protected override void PersistNewItem(IDictionaryItem entity)
         {
-            entity.AddingEntity();
+            ((Entity)entity).AddingEntity();
 
             var factory = new DictionaryItemFactory();
             var dto = factory.BuildDto(entity);
@@ -142,12 +143,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 translation.Id = Convert.ToInt32(Database.Insert(textDto));
             }
 
-            entity.ResetDirtyProperties();
+            ((Entity)entity).ResetDirtyProperties();
         }
 
-        protected override void PersistUpdatedItem(DictionaryItem entity)
+        protected override void PersistUpdatedItem(IDictionaryItem entity)
         {
-            entity.UpdatingEntity();
+            ((Entity)entity).UpdatingEntity();
 
             var factory = new DictionaryItemFactory();
             var dto = factory.BuildDto(entity);
@@ -168,10 +169,10 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            entity.ResetDirtyProperties();
+            ((Entity)entity).ResetDirtyProperties();
         }
 
-        protected override void PersistDeletedItem(DictionaryItem entity)
+        protected override void PersistDeletedItem(IDictionaryItem entity)
         {
             RecursiveDelete(entity.Key);
 

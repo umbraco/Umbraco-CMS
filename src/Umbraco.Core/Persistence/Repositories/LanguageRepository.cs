@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
@@ -13,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="Language"/>
     /// </summary>
-    internal class LanguageRepository : PetaPocoRepositoryBase<int, Language>, ILanguageRepository
+    internal class LanguageRepository : PetaPocoRepositoryBase<int, ILanguage>, ILanguageRepository
     {
         public LanguageRepository(IUnitOfWork work) : base(work)
         {
@@ -26,7 +27,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of RepositoryBase<int,Language>
 
-        protected override Language PerformGet(int id)
+        protected override ILanguage PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
             sql.Append(GetBaseWhereClause(id));
@@ -40,7 +41,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return entity;
         }
 
-        protected override IEnumerable<Language> PerformGetAll(params int[] ids)
+        protected override IEnumerable<ILanguage> PerformGetAll(params int[] ids)
         {
             if (ids.Any())
             {
@@ -59,10 +60,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        protected override IEnumerable<Language> PerformGetByQuery(IQuery<Language> query)
+        protected override IEnumerable<ILanguage> PerformGetByQuery(IQuery<ILanguage> query)
         {
             var sqlClause = GetBaseQuery(false);
-            var translator = new SqlTranslator<Language>(sqlClause, query);
+            var translator = new SqlTranslator<ILanguage>(sqlClause, query);
             var sql = translator.Translate();
 
             var dtos = Database.Fetch<LanguageDto>(sql);
@@ -111,9 +112,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Unit of Work Implementation
 
-        protected override void PersistNewItem(Language entity)
+        protected override void PersistNewItem(ILanguage entity)
         {
-            entity.AddingEntity();
+            ((Entity)entity).AddingEntity();
 
             var factory = new LanguageFactory();
             var dto = factory.BuildDto(entity);
@@ -121,19 +122,19 @@ namespace Umbraco.Core.Persistence.Repositories
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
 
-            entity.ResetDirtyProperties();
+            ((Entity)entity).ResetDirtyProperties();
         }
 
-        protected override void PersistUpdatedItem(Language entity)
+        protected override void PersistUpdatedItem(ILanguage entity)
         {
-            entity.UpdatingEntity();
+            ((Entity)entity).UpdatingEntity();
 
             var factory = new LanguageFactory();
             var dto = factory.BuildDto(entity);
 
             Database.Update(dto);
 
-            entity.ResetDirtyProperties();
+            ((Entity)entity).ResetDirtyProperties();
         }
 
         #endregion

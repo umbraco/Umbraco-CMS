@@ -11,22 +11,22 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class DictionaryItem : Entity, IAggregateRoot
+    public class DictionaryItem : Entity, IDictionaryItem
     {
         private Guid _parentId;
         private string _itemKey;
-        private IEnumerable<DictionaryTranslation> _translations;
+        private IEnumerable<IDictionaryTranslation> _translations;
 
         public DictionaryItem(Guid parentId, string itemKey)
         {
             _parentId = parentId;
             _itemKey = itemKey;
-            _translations = new List<DictionaryTranslation>();
+            _translations = new List<IDictionaryTranslation>();
         }
 
         private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, Guid>(x => x.ParentId);
         private static readonly PropertyInfo ItemKeySelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, string>(x => x.ItemKey);
-        private static readonly PropertyInfo TranslationsSelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, IEnumerable<DictionaryTranslation>>(x => x.Translations);
+        private static readonly PropertyInfo TranslationsSelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, IEnumerable<IDictionaryTranslation>>(x => x.Translations);
 
         /// <summary>
         /// Gets or Sets the Parent Id of the Dictionary Item
@@ -60,7 +60,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets a list of translations for the Dictionary Item
         /// </summary>
         [DataMember]
-        public IEnumerable<DictionaryTranslation> Translations
+        public IEnumerable<IDictionaryTranslation> Translations
         {
             get { return _translations; }
             set
