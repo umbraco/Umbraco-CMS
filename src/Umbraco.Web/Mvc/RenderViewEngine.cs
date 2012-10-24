@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Mvc
 {

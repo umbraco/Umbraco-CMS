@@ -24,6 +24,28 @@ namespace Umbraco.Web
 	public static class PublishedContentExtensions
 	{
 		/// <summary>
+		/// Gets the NiceUrl for the content item
+		/// </summary>
+		/// <param name="doc"></param>
+		/// <returns></returns>
+		public static string NiceUrl(this IPublishedContent doc)
+		{
+			var umbHelper = new UmbracoHelper(UmbracoContext.Current);
+			return umbHelper.NiceUrl(doc.Id);
+		}
+
+		/// <summary>
+		/// Gets the NiceUrlWithDomain for the content item
+		/// </summary>
+		/// <param name="doc"></param>
+		/// <returns></returns>
+		public static string NiceUrlWithDomain(this IPublishedContent doc)
+		{
+			var umbHelper = new UmbracoHelper(UmbracoContext.Current);
+			return umbHelper.NiceUrlWithDomain(doc.Id);
+		}
+
+		/// <summary>
 		/// Returns the current template Alias
 		/// </summary>
 		/// <param name="doc"></param>

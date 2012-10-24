@@ -1,10 +1,7 @@
 using System.Globalization;
-using System.Xml;
 using Umbraco.Core.Models;
-using umbraco;
-using umbraco.interfaces;
 
-namespace Umbraco.Web.Mvc
+namespace Umbraco.Web.Models
 {
 	/// <summary>
 	/// Represents the model for the current rendering page in Umbraco

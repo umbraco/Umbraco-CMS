@@ -10,6 +10,7 @@ using Umbraco.Core.Dynamics;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Media.ThumbnailProviders;
+using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Routing;

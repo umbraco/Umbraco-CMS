@@ -1,33 +1,22 @@
 using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Dynamics;
-using Umbraco.Core.Models;
-using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Mvc
 {
 	/// <summary>
-	/// The View that front-end templates inherit from
+	/// The View that umbraco front-end views inherit from
 	/// </summary>
-	public abstract class RenderViewPage : WebViewPage<RenderModel>
+	public abstract class UmbracoViewPage<T> : WebViewPage<T>
 	{
-		protected RenderViewPage()
+		protected UmbracoViewPage()
 		{
 
 		}
 
 		protected override void InitializePage()
 		{
-			//set the model to the current node if it is not set, this is generally not the case
-			if (Model != null)
-			{
-				////this.ViewData.Model = Model;
-				//var backingItem = new DynamicBackingItem(Model.CurrentNode);
-				var dynamicNode = new DynamicPublishedContent(Model.Content);
-				CurrentPage = dynamicNode.AsDynamic();
-			}
+			base.InitializePage();
 			PublishedContentRequest = (PublishedContentRequest)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-doc-request");
 			UmbracoContext = (UmbracoContext)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-context");
 			ApplicationContext = UmbracoContext.Application;
@@ -46,12 +35,7 @@ namespace Umbraco.Web.Mvc
 		/// <summary>
 		/// Returns the current PublishedContentRequest
 		/// </summary>
-		internal PublishedContentRequest PublishedContentRequest { get; private set; }
-
-		/// <summary>
-		/// Returns the a DynamicPublishedContent object
-		/// </summary>
-		public dynamic CurrentPage { get; private set; }		
+		internal PublishedContentRequest PublishedContentRequest { get; private set; }		
 
 		private UmbracoHelper _helper;
 

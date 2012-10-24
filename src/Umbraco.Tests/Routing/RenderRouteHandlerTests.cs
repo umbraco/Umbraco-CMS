@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Tests.Stubs;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;

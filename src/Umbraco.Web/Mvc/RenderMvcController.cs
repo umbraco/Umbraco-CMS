@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Web.Mvc;
 using Umbraco.Core.Logging;
+using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Mvc
