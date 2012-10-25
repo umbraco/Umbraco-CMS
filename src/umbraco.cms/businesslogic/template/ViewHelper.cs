@@ -86,6 +86,16 @@ namespace umbraco.cms.businesslogic.template
             return t.Design;
         }
 
+		internal static void RemoveViewFile(string alias)
+		{
+			if (!string.IsNullOrWhiteSpace(alias))
+			{
+				var file = IOHelper.MapPath(ViewPath(alias));
+				if (System.IO.File.Exists(file))
+					System.IO.File.Delete(file);
+			}
+		}
+
         public static string ViewPath(string alias)
         {
 			return Umbraco.Core.IO.SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
