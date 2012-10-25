@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Umbraco.Core.IO;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.datatype.controls;
@@ -16,8 +16,8 @@ using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using umbraco.uicontrols;
+using Umbraco.Core.IO;
 using Content = umbraco.cms.businesslogic.Content;
-using System.Linq;
 using SystemDirectories = umbraco.IO.SystemDirectories;
 
 namespace umbraco.controls

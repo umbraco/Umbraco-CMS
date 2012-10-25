@@ -19,6 +19,10 @@ namespace umbraco.cms.presentation
 	/// </summary>
 	public partial class editMedia : BasePages.UmbracoEnsuredPage
 	{
+        private uicontrols.Pane mediaPropertyPane = new uicontrols.Pane();
+        private LiteralControl updateDateLiteral = new LiteralControl();
+
+
 	    public editMedia()
 	    {
 	        CurrentApp = BusinessLogic.DefaultApps.media.ToString();
@@ -29,7 +33,51 @@ namespace umbraco.cms.presentation
 		controls.ContentControl tmp;
 
 		//protected System.Web.UI.WebControls.Literal SyncPath;
-		
+
+        override protected void OnInit(EventArgs e)
+        {
+            //
+            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
+            //
+            InitializeComponent();
+            base.OnInit(e);
+
+            _media = new cms.businesslogic.media.Media(int.Parse(Request.QueryString["id"]));
+
+            // Save media on first load
+            bool exists = SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @nodeId",
+                                       SqlHelper.CreateParameter("@nodeId", _media.Id)) > 0;
+            if (!exists)
+                _media.XmlGenerate(new XmlDocument());
+
+
+            tmp = new controls.ContentControl(_media, controls.ContentControl.publishModes.NoPublish, "TabView1");
+            tmp.Width = Unit.Pixel(666);
+            tmp.Height = Unit.Pixel(666);
+            plc.Controls.Add(tmp);
+
+            tmp.Save += new System.EventHandler(Save);
+
+            updateDateLiteral.ID = "updateDate";
+            updateDateLiteral.Text = _media.VersionDate.ToShortDateString() + " " + _media.VersionDate.ToShortTimeString();
+
+            mediaPropertyPane.addProperty(ui.Text("content", "updateDate", base.getUser()), updateDateLiteral);
+
+            // TODO: move the LinkToMediaItem property here - that way it's updated after save, rather than relying on a reload
+
+            // add the property pane to the page rendering
+            tmp.tpProp.Controls.AddAt(1, mediaPropertyPane);                       
+        }
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+
+        }
+
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 			//if (!IsPostBack) 
@@ -64,44 +112,11 @@ namespace umbraco.cms.presentation
                 }
             }
             _media.Save();
+
+            this.updateDateLiteral.Text = _media.VersionDate.ToShortDateString() + " " + _media.VersionDate.ToShortTimeString();
+
 			_media.XmlGenerate(new XmlDocument());
 			ClientTools.SyncTree(_media.Path, true);
 		}
-
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-
-			_media = new cms.businesslogic.media.Media(int.Parse(Request.QueryString["id"]));
-
-            // Save media on first load
-            bool exists = SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @nodeId",
-                                       SqlHelper.CreateParameter("@nodeId", _media.Id)) > 0;
-            if (!exists)
-                _media.XmlGenerate(new XmlDocument());
-
-
-			tmp = new controls.ContentControl(_media,controls.ContentControl.publishModes.NoPublish, "TabView1");
-			tmp.Width = Unit.Pixel(666);
-			tmp.Height = Unit.Pixel(666);
-			plc.Controls.Add(tmp);
-
-			tmp.Save += new System.EventHandler(Save);
-		}
-		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
-
-		}
-		#endregion
 	}
 }
