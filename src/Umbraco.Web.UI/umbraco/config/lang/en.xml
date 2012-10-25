@@ -652,6 +652,10 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="tab">Tab</key>
     <key alias="tabname">Tab Title</key>
     <key alias="tabs">Tabs</key>
+    <key alias="contentTypeEnabled">Master Content Type enabled</key>
+    <key alias="contentTypeUses">This Content Type uses</key>
+    <key alias="asAContentMasterType">as a Master Content Type. Tabs from Master Content Types are not shown and can only be edited on the Master Content Type itself</key>
+    
   </area>
   <area alias="sort">
     <key alias="sortDone">Sorting complete.</key>
@@ -842,6 +846,8 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Category field</key>
     <key alias="changePassword">Change Your Password</key>
+    <key alias="newPassword">Change Your Password</key>
+    <key alias="confirmNewPassword">Confirm new password</key>
     <key alias="changePasswordDescription">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
     <key alias="contentChannel">Content Channel</key>
     <key alias="defaultToLiveEditing">Redirect to canvas on login</key>

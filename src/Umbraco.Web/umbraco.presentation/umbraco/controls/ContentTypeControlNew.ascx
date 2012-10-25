@@ -10,7 +10,7 @@
 <asp:Panel ID="pnlTab" Style="text-align: left" runat="server">
 
   <cc2:Pane ID="PaneTabsInherited" runat="server" Visible="false">
-  <p><strong>Master Content Type enabled</strong><br />This Content Type uses <em><asp:Literal ID="tabsMasterContentTypeName" runat="server"></asp:Literal></em> as a Master Content Type. Tabs from Master Content Types are not shown and can only be edited on the Master Content Type itself</p>
+  <p><strong><%=umbraco.ui.GetText("settings", "contentTypeEnabled")%></strong><br /><%=umbraco.ui.GetText("settings", "contentTypeUses")%> <em><asp:Literal ID="tabsMasterContentTypeName" runat="server"></asp:Literal></em> <%=umbraco.ui.GetText("settings", "asAContentMasterType")%></p>
   </cc2:Pane>
   
   <cc2:Pane ID="Pane2" runat="server">
