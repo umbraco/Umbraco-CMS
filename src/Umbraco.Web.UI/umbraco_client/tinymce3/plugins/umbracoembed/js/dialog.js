@@ -86,7 +86,13 @@ var UmbracoEmbedDialog = {
         else {
             $('#insert').attr('disabled', 'disabled');
         }
-
+    },
+    updatePreviewFromSource: function (type) {
+        var sourceVal = $('#source').val();
+        
+        if (sourceVal != '') {
+            $('#preview').html(sourceVal);
+        }
     }
 };
 
