@@ -399,20 +399,38 @@ namespace umbraco.BusinessLogic
 
         }
 
-        /// <summary>
+		/// <summary>
         /// Gets all users by email.
         /// </summary>
         /// <param name="email">The email.</param>
         /// <returns></returns>
-        public static User[] getAllByEmail(string email)
+		public static User[] getAllByEmail(string email)
+		{
+			return getAllByEmail(email, false);
+		}
+
+        /// <summary>
+        /// Gets all users by email.
+        /// </summary>
+        /// <param name="email">The email.</param>
+       /// <param name="useExactMatch">match exact email address or partial email address.</param>
+        /// <returns></returns>
+        public static User[] getAllByEmail(string email, bool useExactMatch)
         {
             List<User> retVal = new List<User>();
             System.Collections.ArrayList tmpContainer = new System.Collections.ArrayList();
+			
+			IRecordsReader dr;
 
-            IRecordsReader dr;
-            dr = SqlHelper.ExecuteReader(
-            "Select id from umbracoUser where userEmail LIKE @email", SqlHelper.CreateParameter("@email", String.Format("%{0}%", email)));
-
+			if (useExactMatch == true)
+			{
+				dr = SqlHelper.ExecuteReader("Select id from umbracoUser where userEmail = @email", SqlHelper.CreateParameter("@email", email));
+			}
+			else
+			{
+				dr = SqlHelper.ExecuteReader("Select id from umbracoUser where userEmail LIKE {0} @email", SqlHelper.CreateParameter("@email", String.Format("%{0}%", email)));
+			}
+            
             while (dr.Read())
             {
                 retVal.Add(BusinessLogic.User.GetUser(dr.GetInt("id")));
@@ -431,6 +449,17 @@ namespace umbraco.BusinessLogic
         {
             return GetAllByLoginName(login, false).ToArray();
         }
+
+		/// <summary>
+		/// Gets all users by login name.
+		/// </summary>
+		/// <param name="login">The login.</param>
+		/// <param name="">whether to use a partial match</param>
+		/// <returns></returns>
+		public static User[] getAllByLoginName(string login, bool partialMatch)
+		{
+			return GetAllByLoginName(login, partialMatch).ToArray();
+		}
 
         public static IEnumerable<User> GetAllByLoginName(string login, bool partialMatch)
         {
