@@ -5,6 +5,7 @@ using umbraco.BusinessLogic;
 using umbraco.editorControls;
 using umbraco.DataLayer;
 using umbraco.interfaces;
+using umbraco.macroRenderings;
 
 namespace umbraco.editorControls.imagecropper
 {
@@ -12,7 +13,9 @@ namespace umbraco.editorControls.imagecropper
     {
         private readonly umbraco.cms.businesslogic.datatype.BaseDataType _dataType;
 
-        private TextBox txtPropertyAlias;
+        private propertyTypePicker imagePropertyTypePicker; // this has replaced txtPropertyAlias (a textbox used to enter a property alias)
+        private RequiredFieldValidator imagePropertyRequiredFieldValidator;
+       
         private CheckBox chkGenerateCrops;
         private CheckBox chkShowLabel;
         private Literal litQuality;
@@ -44,7 +47,15 @@ namespace umbraco.editorControls.imagecropper
 
         public void SetupChildControls() 
         {
-            txtPropertyAlias = new TextBox {ID = "upload", Width = Unit.Pixel(100)};
+            this.imagePropertyTypePicker = new propertyTypePicker() { ID = "imagePropertyTypePicker" };
+            this.imagePropertyRequiredFieldValidator = new RequiredFieldValidator()
+                                                            {
+                                                                ID = "imagePropertyRequiredFieldValidator",
+                                                                Text = " Required",
+                                                                InitialValue = string.Empty,
+                                                                ControlToValidate = this.imagePropertyTypePicker.ID
+                                                            };
+            
             chkGenerateCrops = new CheckBox {ID = "generateimg", AutoPostBack = true};
             litQuality = new Literal {ID = "qualityLiteral", Text = " Quality ", Visible = false};
             txtQuality = new TextBox {ID = "quality", Width = Unit.Pixel(30), Visible = false};
@@ -90,7 +101,9 @@ namespace umbraco.editorControls.imagecropper
             //                   AssociatedControlID = txtCropName.ID
             //               };
 
-            Controls.Add(txtPropertyAlias);
+            Controls.Add(this.imagePropertyTypePicker);
+            Controls.Add(this.imagePropertyRequiredFieldValidator);
+
             Controls.Add(chkGenerateCrops);
             Controls.Add(litQuality);
             Controls.Add(txtQuality);
@@ -121,9 +134,7 @@ namespace umbraco.editorControls.imagecropper
             
             //btnGenerate.Click += _generateButton_Click;
 
-            chkGenerateCrops.CheckedChanged += _generateImagesCheckBox_CheckedChanged;
-
-            
+            chkGenerateCrops.CheckedChanged += _generateImagesCheckBox_CheckedChanged;            
         }
 
 #if false
@@ -254,7 +265,11 @@ namespace umbraco.editorControls.imagecropper
             {
                 Config config = new Config(Configuration);
 
-                txtPropertyAlias.Text = config.UploadPropertyAlias;
+                if (this.imagePropertyTypePicker.Items.Contains(new ListItem(config.UploadPropertyAlias)))
+                {
+                    this.imagePropertyTypePicker.SelectedValue = config.UploadPropertyAlias;
+                }
+
                 chkGenerateCrops.Checked = config.GenerateImages;
                 chkShowLabel.Checked = config.ShowLabel;
                 txtQuality.Visible = chkShowLabel.Checked;
@@ -297,10 +312,10 @@ namespace umbraco.editorControls.imagecropper
         /// </summary>
         public void Save()
         {
-            _dataType.DBType = (umbraco.cms.businesslogic.datatype.DBTypes)Enum.Parse(
-                                                                               typeof(umbraco.cms.businesslogic.datatype.DBTypes), DBTypes.Ntext.ToString(), true);
+            _dataType.DBType = (umbraco.cms.businesslogic.datatype.DBTypes)Enum.Parse(typeof(umbraco.cms.businesslogic.datatype.DBTypes), DBTypes.Ntext.ToString(), true);
+
             string generalData = String.Format("{0},{1},{2},{3}",
-                                               txtPropertyAlias.Text,
+                                               this.imagePropertyTypePicker.SelectedValue,
                                                chkGenerateCrops.Checked ? "1" : "0",
                                                chkShowLabel.Checked ? "1" : "0",
                                                txtQuality.Text
@@ -328,10 +343,14 @@ namespace umbraco.editorControls.imagecropper
             writer.Write("<p><strong>General</strong></p>");
             writer.Write("<table>");
 
-            writer.Write("  <tr><td>Property alias: (eg. 'umbracoFile'):</td><td>");
-            txtPropertyAlias.RenderControl(writer);
-            writer.Write("  </td></tr>");
-
+            writer.Write(@" <tr>
+                                <td>Property alias: </td>");
+            writer.Write("      <td>");
+            this.imagePropertyTypePicker.RenderControl(writer);
+            this.imagePropertyRequiredFieldValidator.RenderControl(writer);            
+            writer.Write(@"      </td>
+                            </tr>");
+            
             writer.Write("  <tr><td>Save crop images (/media/(imageid)/(filename)_(cropname).jpg):</td><td>");
             chkGenerateCrops.RenderControl(writer);
             litQuality.RenderControl(writer);
@@ -383,9 +402,7 @@ namespace umbraco.editorControls.imagecropper
             
             //_generateButton.RenderControl(writer);
             //_vsErrors.RenderControl(writer);
-            //_revName.RenderControl(writer);
-            
-
+            //_revName.RenderControl(writer);           
         }
 
         public string Configuration

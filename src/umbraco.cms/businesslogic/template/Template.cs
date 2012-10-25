@@ -270,10 +270,18 @@ namespace umbraco.cms.businesslogic.template
 
 
                 //we only switch to MVC View editing if the template has a view file, and MVC editing is enabled
-                if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && !MasterPageHelper.IsMasterPageSyntax(_design))
+				if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && !MasterPageHelper.IsMasterPageSyntax(_design))
+				{
+					MasterPageHelper.RemoveMasterPageFile(this.Alias);
+					MasterPageHelper.RemoveMasterPageFile(_oldAlias);
 					_design = ViewHelper.UpdateViewFile(this, _oldAlias);
-                else if (UmbracoSettings.UseAspNetMasterPages)
-                    _design = MasterPageHelper.UpdateMasterPageFile(this, _oldAlias);
+				}
+				else if (UmbracoSettings.UseAspNetMasterPages)
+				{
+					ViewHelper.RemoveViewFile(this.Alias);
+					ViewHelper.RemoveViewFile(_oldAlias);
+					_design = MasterPageHelper.UpdateMasterPageFile(this, _oldAlias);
+				}
                 
 
                 SqlHelper.ExecuteNonQuery("Update cmsTemplate set design = @design where NodeId = @id",
@@ -459,7 +467,12 @@ namespace umbraco.cms.businesslogic.template
             }
         }
 
-        public static Template GetByAlias(string Alias, bool useCache = false)
+        public static Template GetByAlias(string Alias)
+        {
+            return GetByAlias(Alias, false);
+        }
+
+        public static Template GetByAlias(string Alias, bool useCache)
         {
 			if (!useCache)
 			{

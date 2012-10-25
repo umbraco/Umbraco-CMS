@@ -160,15 +160,32 @@ namespace umbraco.cms.businesslogic
             {
                 if (!_versionDateInitialized)
                 {
-                    object o = SqlHelper.ExecuteScalar<object>(
-                        "select VersionDate from cmsContentVersion where versionId = '" + this.Version.ToString() + "'");
-                    if (o == null)
+                    // A Media item only contains a single version (which relates to it's creation) so get this value from the media xml fragment instead
+                    if (this is media.Media)
                     {
-                        _versionDate = DateTime.Now;
+                        // get the xml fragment from cmsXmlContent
+                        string xmlFragment = SqlHelper.ExecuteScalar<string>(@"SELECT [xml] FROM cmsContentXml WHERE nodeId = " + this.Id);
+                        if (!string.IsNullOrWhiteSpace(xmlFragment))
+                        {
+                            XmlDocument xmlDocument = new XmlDocument();
+                            xmlDocument.LoadXml(xmlFragment);                            
+
+                            _versionDateInitialized = DateTime.TryParse(xmlDocument.SelectSingleNode("//*[1]").Attributes["updateDate"].Value, out _versionDate);
+                        }
                     }
-                    else
+
+                    if (!_versionDateInitialized)
                     {
-                        _versionDateInitialized = DateTime.TryParse(o.ToString(), out _versionDate);
+                        object o = SqlHelper.ExecuteScalar<object>(
+                            "select VersionDate from cmsContentVersion where versionId = '" + this.Version.ToString() + "'");
+                        if (o == null)
+                        {
+                            _versionDate = DateTime.Now;
+                        }
+                        else
+                        {
+                            _versionDateInitialized = DateTime.TryParse(o.ToString(), out _versionDate);
+                        }
                     }
                 }
                 return _versionDate;

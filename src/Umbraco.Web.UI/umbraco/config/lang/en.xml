@@ -69,6 +69,7 @@
     <key alias="saveAndPublish">Save and publish</key>
     <key alias="saveToPublish">Save and send for approval</key>
     <key alias="showPage">Preview</key>
+    <key alias="showPageDisabled">Preview is disabled because there's no template assigned</key>
     <key alias="styleChoose">Choose style</key>
     <key alias="styleShow">Show styles</key>
     <key alias="tableInsert">Insert table</key>
@@ -684,6 +685,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="editTemplateSaved">Template saved</key>
     <key alias="editUserError">Error saving user (check log)</key>
     <key alias="editUserSaved">User Saved</key>
+    <key alias="editUserTypeSaved">User type saved</key>
     <key alias="fileErrorHeader">File not saved</key>
     <key alias="fileErrorText">file could not be saved. Please check file permissions</key>
     <key alias="fileSavedHeader">File saved</key>

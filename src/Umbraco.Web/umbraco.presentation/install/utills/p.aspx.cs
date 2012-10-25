@@ -41,7 +41,7 @@ namespace umbraco.presentation.install.utills
 
                 string XmlResponse = library.GetXmlDocumentByUrl(url).Current.OuterXml;
 
-                if(!XmlResponse.Contains("System.Net.WebException"))
+                if (!XmlResponse.Contains("System.Net.WebException"))
                 {
                     Response.Write(library.GetXmlDocumentByUrl(url).Current.OuterXml);
                 }
@@ -63,7 +63,7 @@ namespace umbraco.presentation.install.utills
 
             // Build the new connection string
             //DbConnectionStringBuilder connectionStringBuilder = CreateConnectionString();
-            Helper.setProgress( 5, "Connecting...", "");
+            Helper.setProgress(5, "Connecting...", "");
 
             // Try to connect to the database
             try
@@ -74,12 +74,13 @@ namespace umbraco.presentation.install.utills
                 if (!installer.CanConnect)
                     throw new Exception("The installer cannot connect to the database.");
                 else
-                    Helper.setProgress( 20, "Connection opened", "");
+                    Helper.setProgress(20, "Connection opened", "");
             }
             catch (Exception ex)
             {
                 var error = new Exception("Database connection initialisation failed.", ex);
-                Helper.setProgress( -5, "Database connection initialisation failed.", error.Message);
+                Helper.setProgress(-5, "Database connection initialisation failed.", 
+                    string.Format("{0}<br />Connection string: {1}", error.InnerException.Message, GlobalSettings.DbDSN));
 
                 return error.Message;
             }
@@ -87,49 +88,60 @@ namespace umbraco.presentation.install.utills
 
             if (installer.CanConnect)
             {
-              if (installer.IsLatestVersion) {
+                if (installer.IsLatestVersion)
+                {
 
-                Helper.setProgress(90, "Refreshing content cache", "");
+                    Helper.setProgress(90, "Refreshing content cache", "");
 
-                library.RefreshContent();
+                    library.RefreshContent();
 
-                Helper.setProgress(100, "Database is up-to-date", "");
-                
-              } else {
-                if (installer.IsEmpty) {
-                  Helper.setProgress(35, "Installing tables...", "");
-                  //do install
-                  installer.Install();
+                    Helper.setProgress(100, "Database is up-to-date", "");
 
-                  Helper.setProgress(100, "Installation completed!", "");
+                }
+                else
+                {
+                    if (installer.IsEmpty)
+                    {
+                        Helper.setProgress(35, "Installing tables...", "");
+                        //do install
+                        try
+                        {
+                            installer.Install();
+                            Helper.setProgress(100, "Installation completed!", "");
+                            installer = null;
 
-                  installer = null;
+                            library.RefreshContent();
+                            return "installed";
+                        }
+                        catch (Exception SqlExp)
+                        {
+                            Helper.setProgress(35, "Error installing tables", SqlExp.InnerException.ToString());
+                            return "error";
+                        }
+ 
+                    } //else if (m_Installer.CurrentVersion == DatabaseVersion.None || m_Installer.CanUpgrade) {
+                    //Helper.setProgress(35, "Updating database tables...", "");
+                    //m_Installer.Install();
 
-                      library.RefreshContent();
-                  return "installed";
-                } //else if (m_Installer.CurrentVersion == DatabaseVersion.None || m_Installer.CanUpgrade) {
-                  //Helper.setProgress(35, "Updating database tables...", "");
-                  //m_Installer.Install();
-                  
-                  //      library.RefreshContent();
-                  //      return "installed";
-                  //  }
+                      //      library.RefreshContent();
+                    //      return "installed";
+                    //  }
                     else if (installer.CurrentVersion == DatabaseVersion.None || installer.CanUpgrade)
                     {
-                        Helper.setProgress( 35, "Updating database tables...", "");
+                        Helper.setProgress(35, "Updating database tables...", "");
                         installer.Install();
 
-                  Helper.setProgress(100, "Upgrade completed!", "");
+                        Helper.setProgress(100, "Upgrade completed!", "");
 
-                  installer = null;
+                        installer = null;
 
-                  library.RefreshContent();
-                  return "upgraded";
+                        library.RefreshContent();
+                        return "upgraded";
+                    }
                 }
-              }
 
-                
-                
+
+
             }
 
             return "no connection;";

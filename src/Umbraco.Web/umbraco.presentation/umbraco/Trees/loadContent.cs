@@ -87,7 +87,7 @@ namespace umbraco
                 allowedRootActions.Add(ActionSort.Instance);
                 List<IAction> allowedMenu = GetUserAllowedActions(allowedRootActions, nodeActions);
                 actions.AddRange(allowedMenu);
-                if (allowedMenu.Count > 0 )
+                if (allowedMenu.Count > 0)
                     actions.Add(ContextMenuSeperator.Instance);
 
                 // default actions for all users
@@ -102,7 +102,10 @@ namespace umbraco
         {
             actions.Clear();
             actions.Add(ActionNew.Instance);
-            actions.Add(ActionLiveEdit.Instance);
+            if (UmbracoSettings.EnableCanvasEditing)
+            {
+                actions.Add(ActionLiveEdit.Instance);
+            }
             actions.Add(ContextMenuSeperator.Instance);
             actions.Add(ActionDelete.Instance);
             actions.Add(ContextMenuSeperator.Instance);
@@ -124,7 +127,7 @@ namespace umbraco
             actions.Add(ActionNotify.Instance);
             actions.Add(ActionSendToTranslate.Instance);
             actions.Add(ContextMenuSeperator.Instance);
-            actions.Add(ActionRefresh.Instance);           
+            actions.Add(ActionRefresh.Instance);
         }
 
         /// <summary>
@@ -147,7 +150,7 @@ namespace umbraco
                 }
                 else
                 {
-                    rootNode = CreateNode(doc, RootNodeActions); 
+                    rootNode = CreateNode(doc, RootNodeActions);
                 }
             }
             else

@@ -13,30 +13,42 @@ namespace umbraco.editorControls.numberfield
 
 		public override string DataTypeName 
 		{
-			get {return "Integer";}
+			get 
+            {
+                return "Integer";
+            }
 		}
 
 		public override Guid Id 
 		{
-			get {return new Guid("1413afcb-d19a-4173-8e9a-68288d2a73b8");}
+			get
+            {
+                return new Guid("1413afcb-d19a-4173-8e9a-68288d2a73b8");
+            }
 		}
 
-		public override interfaces.IDataPrevalue PrevalueEditor 
-		{
-			get 
-			{
-				if (_prevalueeditor == null)
-					_prevalueeditor = new DefaultPrevalueEditor(this,true);
-				return _prevalueeditor;
-			}
-		}
+        public override interfaces.IDataPrevalue PrevalueEditor
+        {
+            get
+            {
+                if (_prevalueeditor == null)
+                {
+                    _prevalueeditor = new DefaultPrevalueEditor(this, false);
+                }
+
+                return _prevalueeditor;
+            }
+        }
 
 		public override interfaces.IDataEditor DataEditor 
 		{
 			get
 			{
-				if (_Editor == null)
-					_Editor = new numberField(Data);
+                if (_Editor == null)
+                {
+                    _Editor = new numberField(Data);
+                }
+
 				return _Editor;
 			}
 		}
@@ -45,11 +57,13 @@ namespace umbraco.editorControls.numberfield
 		{
 			get 
 			{
-				if (_baseData == null)
-					_baseData = new DataInteger(this);
+                if (_baseData == null)
+                {
+                    _baseData = new DataInteger(this);
+                }
+
 				return _baseData;
 			}
 		}
-
 	}
 }

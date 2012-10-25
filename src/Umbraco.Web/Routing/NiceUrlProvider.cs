@@ -234,22 +234,24 @@ namespace Umbraco.Web.Routing
 			if (domainUri == null)
 			{
 				// no domain was found : return an absolute or relative url
-				// handle vdir if any
+				// ignore vdir at that point
 				if (!absolute || current == null)
-					uri = new Uri(UriUtility.ToAbsolute(path), UriKind.Relative);
+					uri = new Uri(path, UriKind.Relative);
 				else
-					uri = new Uri(current.GetLeftPart(UriPartial.Authority) + UriUtility.ToAbsolute(path));
+					uri = new Uri(current.GetLeftPart(UriPartial.Authority) + path);
 			}
 			else
 			{
 				// a domain was found : return an absolute or relative url
-				// cannot handle vdir, has to be in domain uri
+				// ignore vdir at that point
 				if (!absolute && current != null && domainUri.GetLeftPart(UriPartial.Authority) == current.GetLeftPart(UriPartial.Authority))
 					uri = new Uri(CombinePaths(domainUri.AbsolutePath, path), UriKind.Relative); // relative
 				else
 					uri = new Uri(CombinePaths(domainUri.GetLeftPart(UriPartial.Path), path)); // absolute
 			}
 
+			// UriFromUmbraco will handle vdir
+			// meaning it will add vdir into domain urls too!
 			return UriUtility.UriFromUmbraco(uri);
 		}
 
@@ -266,18 +268,21 @@ namespace Umbraco.Web.Routing
 			if (!domainUris.Any())
 			{
 				// no domain was found : return an absolute or relative url
-				// handle vdir if any
+				// ignore vdir at that point
 				if (current == null)
-					uris.Add(new Uri(UriUtility.ToAbsolute(path), UriKind.Relative));
+					uris.Add(new Uri(path, UriKind.Relative));
 				else
-					uris.Add(new Uri(current.GetLeftPart(UriPartial.Authority) + UriUtility.ToAbsolute(path)));
+					uris.Add(new Uri(current.GetLeftPart(UriPartial.Authority) + path));
 			}
 			else
 			{
-				// domains were found : return -- FIXME?
+				// domains were found : return absolute urls
+				// ignore vdir at that point
 				uris.AddRange(domainUris.Select(domainUri => new Uri(domainUri.GetLeftPart(UriPartial.Path).TrimEnd('/') + path)));
 			}
 
+			// UriFromUmbraco will handle vdir
+			// meaning it will add vdir into domain urls too!
 			return uris.Select(uri => UriUtility.UriFromUmbraco(uri));
 		}
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Script.Serialization;
 using System.Web.UI;
 
 namespace umbraco.presentation.install {
@@ -43,13 +44,28 @@ namespace umbraco.presentation.install {
     }
 
     public static string getProgress(){
-        string json = @"{
-                            'percentage': '%p',
-                            'message': '%m',
-                            'error': '%e'
-                        }";
-        string retval = json.Replace("%p", Percentage.ToString()).Replace("%m", Description).Replace("%e", Error).Replace("'", "\"");
-        return retval;
+        ProgressResult pr = new ProgressResult(Percentage, Description, Error);
+        JavaScriptSerializer js = new JavaScriptSerializer();
+        return js.Serialize(pr);
     }
   }
+
+    public class ProgressResult
+    {
+        public string Error { get; set; }
+        public int Percentage { get; set; }
+        public string Description { get; set; }
+        public ProgressResult()
+        {
+            
+        }
+
+        public ProgressResult(int percentage, string description, string error)
+        {
+            Percentage = percentage;
+            Description = description;
+            Error = error;
+        }
+
+    }
 }
