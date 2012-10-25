@@ -293,6 +293,9 @@ namespace umbraco.cms.businesslogic
 
             public void setValue(int languageId, string value)
             {
+                // Calling Save method triggers the Saving event
+                Save();
+
                 if (Item.hasText(UniqueId, languageId))
                     Item.setText(languageId, UniqueId, value);
                 else
@@ -310,6 +313,9 @@ namespace umbraco.cms.businesslogic
             /// <param name="value"></param>
             public void setValue(string value)
             {
+                // Calling Save method triggers the Saving event
+                Save();
+
                 if (Item.hasText(UniqueId, 0))
                     Item.setText(0, UniqueId, value);
                 else
@@ -354,6 +360,7 @@ namespace umbraco.cms.businesslogic
                 DictionaryItems.Remove(key);
             }
 
+            [Obsolete("Does not save the dictionary item, use setValue() instead.")]
             public void Save()
             {
                 OnSaving(EventArgs.Empty);
