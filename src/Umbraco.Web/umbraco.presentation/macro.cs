@@ -323,8 +323,18 @@ namespace umbraco
                     // An empty reference (null) means: macroHtml has NOT been cached before
                     if (macroHtml != null)
                     {
-                        UmbracoContext.Current.Trace.Write("renderMacro",
-                            string.Format("Macro Content loaded from cache '{0}'.", Model.CacheIdentifier));
+                        if (MacroNeedsToBeClearedFromCache(Model, "macroHtml_DateAdded_" + Model.CacheIdentifier))
+                        {
+                            macroHtml = null;
+                            UmbracoContext.Current.Trace.Write("renderMacro",
+                                   string.Format("Macro removed from cache due to file change '{0}'.", Model.CacheIdentifier));
+                        }
+                        else
+                        {
+                            UmbracoContext.Current.Trace.Write("renderMacro",
+                                   string.Format("Macro Content loaded from cache '{0}'.", Model.CacheIdentifier));
+                        }
+
                     }
                 }
                 else
@@ -336,8 +346,18 @@ namespace umbraco
                         macroControl = cacheContent.Content;
                         macroControl.ID = cacheContent.ID;
 
-                        UmbracoContext.Current.Trace.Write("renderMacro",
-                            string.Format("Macro Control loaded from cache '{0}'.", Model.CacheIdentifier));
+                        if (MacroNeedsToBeClearedFromCache(Model, "macroControl_DateAdded_" + Model.CacheIdentifier))
+                        {
+                            UmbracoContext.Current.Trace.Write("renderMacro",
+                                  string.Format("Macro removed from cache due to file change '{0}'.", Model.CacheIdentifier));
+                            macroControl = null;
+                        }
+                        else
+                        {
+                            UmbracoContext.Current.Trace.Write("renderMacro",
+                                    string.Format("Macro Control loaded from cache '{0}'.", Model.CacheIdentifier));
+                        }
+    
                     }
                 }
             }
@@ -478,6 +498,16 @@ namespace umbraco
 
 
 
+                                                macroCache.Insert("macroHtml_DateAdded_" + Model.CacheIdentifier,
+                                                DateTime.Now,
+
+                                                null,
+                                                DateTime.Now.AddSeconds(Model.CacheDuration),
+                                                TimeSpan.Zero,
+                                                CacheItemPriority.NotRemovable, //FlorisRobbemont: issue #27610 -> Macro output cache should not be removable
+
+                                                null);
+
                                 // zb-00003 #29470 : replace by text if not already text
                                 // otherwise it is rendered twice
                                 if (!(macroControl is LiteralControl))
@@ -497,6 +527,14 @@ namespace umbraco
 
                                                 null);
 
+
+                                macroCache.Insert("macroControl_DateAdded_" + Model.CacheIdentifier,
+                                                 DateTime.Now, null,
+                                                 DateTime.Now.AddSeconds(Model.CacheDuration), TimeSpan.Zero,
+                                                 CacheItemPriority.NotRemovable, //FlorisRobbemont: issue #27610 -> Macro output cache should not be removable
+
+                                                 null);
+
                                 UmbracoContext.Current.Trace.Write("renderMacro",
                                     string.Format("Macro Control saved to cache '{0}'.", Model.CacheIdentifier));
                             }
@@ -511,6 +549,57 @@ namespace umbraco
             }
 
             return macroControl;
+        }
+
+        /// <summary>
+        /// check that the file has not recently changed
+        /// </summary>
+        /// <param name="Model"></param>
+        /// <returns></returns>
+        private bool MacroNeedsToBeClearedFromCache(MacroModel Model,string dateAddedKey)
+        {
+            
+            if(MacroIsFileBased(Model))
+            {
+                if(macroCache[dateAddedKey]!=null)
+                {
+                    DateTime dateMacroAdded = DateTime.Parse(macroCache[dateAddedKey].ToString());
+
+                    string macroFile = GetMacroFile(Model);
+                    FileInfo fileInfo = new FileInfo(HttpContext.Current.Server.MapPath(macroFile));
+
+
+                    if (fileInfo.LastWriteTime.CompareTo(dateMacroAdded) ==1)
+                    {
+                        UmbracoContext.Current.Trace.Write("renderMacro",
+                                   string.Format("Macro needs to be removed from cache due to file change '{0}'.", Model.CacheIdentifier));
+                        return true;
+                    }
+                  
+                }
+
+            }
+
+            return false;
+        }
+
+        private string GetMacroFile(MacroModel Model)
+        {
+           if(Model.Xslt!=string.Empty)
+           {
+               return string.Concat("/xslt/", Model.Xslt);
+           }
+           if(Model.ScriptName!=string.Empty)
+           {
+               return string.Concat("/macroScripts/" + Model.ScriptName);
+           }
+            //??
+            return "/" + Model.TypeName;
+        }
+
+        private static bool MacroIsFileBased(MacroModel Model)
+        {
+            return Model.MacroType!=MacroTypes.CustomControl;
         }
 
         private bool cacheMacroAsString(MacroModel model)
