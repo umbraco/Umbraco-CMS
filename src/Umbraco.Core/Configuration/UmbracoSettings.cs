@@ -221,22 +221,37 @@ namespace Umbraco.Core.Configuration
 			}
 		}
 
-		/// <summary>
-		/// Keep user alive as long as they have their browser open? Default is true
-		/// </summary>
-		public static bool KeepUserLoggedIn
-		{
-			get
-			{
-				var value = GetKey("/settings/security/keepUserLoggedIn");
-				bool result;
-				if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out result))
-					return result;
-				return true;
-			}
-		}
+        /// <summary>
+        /// Keep user alive as long as they have their browser open? Default is true
+        /// </summary>
+        public static bool KeepUserLoggedIn
+        {
+            get
+            {
+                var value = GetKey("/settings/security/keepUserLoggedIn");
+                bool result;
+                if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out result))
+                    return result;
+                return true;
+            }
+        }
 
-		/// <summary>
+        /// <summary>
+        /// Enables the experimental canvas (live) editing on the frontend of the website
+        /// </summary>
+        public static bool EnableCanvasEditing
+        {
+            get
+            {
+                var value = GetKey("/settings/content/EnableCanvasEditing");
+                bool result;
+                if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out result))
+                    return result;
+                return true;
+            }
+        }
+
+        /// <summary>
 		/// Show disabled users in the tree in the Users section in the backoffice
 		/// </summary>
 		public static bool HideDisabledUsersInBackoffice

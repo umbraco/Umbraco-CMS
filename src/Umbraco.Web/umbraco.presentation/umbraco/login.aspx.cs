@@ -25,18 +25,18 @@ namespace umbraco.cms.presentation
     {
         protected umbWindow treeWindow;
 
-		protected override void OnLoad(EventArgs e)
-		{
-			base.OnLoad(e);
-			ClientLoader.DataBind();
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            ClientLoader.DataBind();
 
             // validate redirect url
-		    string redirUrl = Request["redir"];
+            string redirUrl = Request["redir"];
             if (!String.IsNullOrEmpty(redirUrl))
             {
                 validateRedirectUrl(redirUrl);
             }
-		}
+        }
 
 
         protected override void OnPreRender(EventArgs e)
@@ -90,7 +90,7 @@ namespace umbraco.cms.presentation
                 doLogin(u);
 
                 // Check if the user should be redirected to live editing
-                if (u.DefaultToLiveEditing)
+                if (UmbracoSettings.EnableCanvasEditing && u.DefaultToLiveEditing)
                 {
                     int startNode = u.StartNodeId;
                     // If the startnode is -1 (access to all content), we'll redirect to the top root node
@@ -110,6 +110,11 @@ namespace umbraco.cms.presentation
                     string redir = String.Format("{0}/canvas.aspx?redir=/{1}.aspx", SystemDirectories.Umbraco, startNode);
                     Response.Redirect(redir, true);
                 }
+                else if (u.DefaultToLiveEditing)
+                {
+                    throw new UserAuthorizationException(
+    "Canvas editing isn't enabled. It can be enabled via the UmbracoSettings.config");
+                }
 
                 if (hf_height.Value != "undefined")
                 {
@@ -126,7 +131,8 @@ namespace umbraco.cms.presentation
                     Response.Redirect(redirUrl, true);
                 }
             }
-            else {
+            else
+            {
                 loginError.Visible = true;
             }
         }
@@ -158,7 +164,7 @@ namespace umbraco.cms.presentation
                 return String.Equals(HttpContext.Current.Request.Url.Host, absoluteUri.Host,
                             StringComparison.OrdinalIgnoreCase);
             }
-            
+
             bool isLocal = !url.StartsWith("http:", StringComparison.OrdinalIgnoreCase)
                            && !url.StartsWith("https:", StringComparison.OrdinalIgnoreCase)
                            && Uri.IsWellFormedUriString(url, UriKind.Relative);
