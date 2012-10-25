@@ -459,7 +459,12 @@ namespace umbraco.cms.businesslogic.template
             }
         }
 
-        public static Template GetByAlias(string Alias, bool useCache = false)
+        public static Template GetByAlias(string Alias)
+        {
+            return GetByAlias(Alias, false);
+        }
+
+        public static Template GetByAlias(string Alias, bool useCache)
         {
 			if (!useCache)
 			{
