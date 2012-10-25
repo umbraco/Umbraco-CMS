@@ -11,6 +11,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Reflection;
 using umbraco.BusinessLogic.Actions;
+using umbraco.cms.businesslogic.language;
 using umbraco.cms.helpers;
 using umbraco.IO;
 using umbraco.uicontrols.DatePicker;
@@ -21,6 +22,7 @@ using umbraco.presentation;
 using umbraco.cms.businesslogic.skinning;
 using System.Collections.Generic;
 using System.Linq;
+using Image = System.Web.UI.WebControls.Image;
 
 namespace umbraco.cms.presentation
 {
@@ -216,11 +218,11 @@ namespace umbraco.cms.presentation
 
         }
 
-		protected override void OnPreRender(EventArgs e)
-		{
-			base.OnPreRender(e);
-			UpdateNiceUrls();
-		}
+        protected override void OnPreRender(EventArgs e)
+        {
+            base.OnPreRender(e);
+            UpdateNiceUrls();
+        }
 
         protected void Save(object sender, System.EventArgs e)
         {
@@ -264,9 +266,9 @@ namespace umbraco.cms.presentation
                 _document.ExpireDate = new DateTime(1, 1, 1, 0, 0, 0);
 
             // Update default template
-            if (ddlDefaultTemplate.SelectedIndex > 0) 
+            if (ddlDefaultTemplate.SelectedIndex > 0)
             {
-                _document.Template = int.Parse(ddlDefaultTemplate.SelectedValue); 
+                _document.Template = int.Parse(ddlDefaultTemplate.SelectedValue);
             }
             else
             {
@@ -343,70 +345,70 @@ namespace umbraco.cms.presentation
             _document.UnPublish();
             littPublishStatus.Text = ui.Text("content", "itemNotPublished", base.getUser());
             UnPublish.Visible = false;
-			_documentHasPublishedVersion = false;
+            _documentHasPublishedVersion = false;
 
             library.UnPublishSingleNode(_document.Id);
 
             //newPublishStatus.Text = "0";
         }
 
-		void UpdateNiceUrlProperties(string niceUrlText, string altUrlsText)
-		{
-			Literal lit;
+        void UpdateNiceUrlProperties(string niceUrlText, string altUrlsText)
+        {
+            Literal lit;
 
-			linkProps.Controls.Clear();
+            linkProps.Controls.Clear();
 
-			lit = new Literal();
-			lit.Text = niceUrlText;
-			linkProps.addProperty(ui.Text("content", "urls", base.getUser()), lit);
+            lit = new Literal();
+            lit.Text = niceUrlText;
+            linkProps.addProperty(ui.Text("content", "urls", base.getUser()), lit);
 
-			if (!string.IsNullOrWhiteSpace(altUrlsText))
-			{
-				lit = new Literal();
-				lit.Text = altUrlsText;
-				linkProps.addProperty(ui.Text("content", "alternativeUrls", base.getUser()), lit);
-			}
-		}
+            if (!string.IsNullOrWhiteSpace(altUrlsText))
+            {
+                lit = new Literal();
+                lit.Text = altUrlsText;
+                linkProps.addProperty(ui.Text("content", "alternativeUrls", base.getUser()), lit);
+            }
+        }
 
-		void UpdateNiceUrls()
-		{
-			if (!_documentHasPublishedVersion)
-			{
-				UpdateNiceUrlProperties("<i>" + ui.Text("content", "itemNotPublished", base.getUser()) + "</i>", null);
-				return;
-			}
+        void UpdateNiceUrls()
+        {
+            if (!_documentHasPublishedVersion)
+            {
+                UpdateNiceUrlProperties("<i>" + ui.Text("content", "itemNotPublished", base.getUser()) + "</i>", null);
+                return;
+            }
 
-			var niceUrlProvider = Umbraco.Web.UmbracoContext.Current.RoutingContext.NiceUrlProvider;
-			var url = niceUrlProvider.GetNiceUrl(_document.Id);
-			string niceUrlText = null;
-			var altUrlsText = new System.Text.StringBuilder();
+            var niceUrlProvider = Umbraco.Web.UmbracoContext.Current.RoutingContext.NiceUrlProvider;
+            var url = niceUrlProvider.GetNiceUrl(_document.Id);
+            string niceUrlText = null;
+            var altUrlsText = new System.Text.StringBuilder();
 
-			if (url == "#")
-			{
-				// document as a published version yet it's url is "#" => a parent must be
-				// unpublished, walk up the tree until we find it, and report.
-				var parent = _document;
-				do
-				{
-					parent = parent.ParentId > 0 ? new Document(parent.ParentId) : null;
-				}
-				while (parent != null && parent.Published);
+            if (url == "#")
+            {
+                // document as a published version yet it's url is "#" => a parent must be
+                // unpublished, walk up the tree until we find it, and report.
+                var parent = _document;
+                do
+                {
+                    parent = parent.ParentId > 0 ? new Document(parent.ParentId) : null;
+                }
+                while (parent != null && parent.Published);
 
-				if (parent == null) // oops - internal error
-					niceUrlText = "<i>" + ui.Text("content", "parentNotPublished", "???", base.getUser()) + "</i>";
-				else
-					niceUrlText = "<i>" + ui.Text("content", "parentNotPublished", parent.Text, base.getUser()) + "</i>";
-			}
-			else
-			{
-				niceUrlText = string.Format("<a href=\"{0}\" target=\"_blank\">{0}</a>", url);
+                if (parent == null) // oops - internal error
+                    niceUrlText = "<i>" + ui.Text("content", "parentNotPublished", "???", base.getUser()) + "</i>";
+                else
+                    niceUrlText = "<i>" + ui.Text("content", "parentNotPublished", parent.Text, base.getUser()) + "</i>";
+            }
+            else
+            {
+                niceUrlText = string.Format("<a href=\"{0}\" target=\"_blank\">{0}</a>", url);
 
-				foreach (var altUrl in niceUrlProvider.GetAllAbsoluteNiceUrls(_document.Id).Where(u => u != url))
-					altUrlsText.AppendFormat("<a href=\"{0}\" target=\"_blank\">{0}</a><br />", altUrl);
-			}
+                foreach (var altUrl in niceUrlProvider.GetAllAbsoluteNiceUrls(_document.Id).Where(u => u != url))
+                    altUrlsText.AppendFormat("<a href=\"{0}\" target=\"_blank\">{0}</a><br />", altUrl);
+            }
 
-			UpdateNiceUrlProperties(niceUrlText, altUrlsText.ToString());
-		}
+            UpdateNiceUrlProperties(niceUrlText, altUrlsText.ToString());
+        }
 
         /// <summary>
         /// Clears the page of all controls and shows a simple message. Used if users don't have visible access to the page.
@@ -448,9 +450,22 @@ namespace umbraco.cms.presentation
         {
             menu.InsertSplitter(2);
             uicontrols.MenuIconI menuItem = menu.NewIcon(3);
-            menuItem.AltText = ui.Text("buttons", "showPage", this.getUser());
-            menuItem.OnClickCommand = "window.open('dialogs/preview.aspx?id=" + id + "','umbPreview')";
             menuItem.ImageURL = SystemDirectories.Umbraco + "/images/editor/vis.gif";
+            // Fix for U4-682, if there's no template, disable the preview button
+            if (_document.Template != -1)
+            {
+                menuItem.AltText = ui.Text("buttons", "showPage", this.getUser());
+                menuItem.OnClickCommand = "window.open('dialogs/preview.aspx?id=" + id + "','umbPreview')";
+            }
+            else
+            {
+                string showPageDisabledText = ui.Text("buttons", "showPageDisabled", this.getUser());
+                if (showPageDisabledText.StartsWith("["))
+                    showPageDisabledText = ui.GetText("buttons", "showPageDisabled", null, "en"); ;
+                menu.NewElement("PreviewDisabled", "previewDisabled", "disabled", 0);
+                menuItem.AltText = showPageDisabledText;
+                ((Image) menuItem).Attributes.Add("style", "opacity: 0.5");
+            }
         }
 
     }

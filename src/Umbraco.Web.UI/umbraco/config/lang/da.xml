@@ -71,6 +71,7 @@
     <key alias="saveAndPublish">Gem og udgiv</key>
     <key alias="saveToPublish">Gem og send til udgivelse</key>
     <key alias="showPage">Se siden</key>
+    <key alias="showPageDisabled">Se siden (du kan ikke se siden, da der ikke er valgt nogen skabelon)</key>
     <key alias="styleChoose">Vælg formattering</key>
     <key alias="styleShow">Vis koder</key>
     <key alias="tableInsert">Indsæt tabel</key>
