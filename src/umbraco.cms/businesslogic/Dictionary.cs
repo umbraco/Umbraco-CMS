@@ -304,7 +304,12 @@ namespace umbraco.cms.businesslogic
 
             public string Value()
             {
-                return Item.Text(UniqueId, 1);
+                if (Item.hasText(UniqueId, 1))
+                {
+                    return Item.Text(UniqueId, 1);
+                }
+
+                return string.Empty;
             }
 
             /// <summary>
