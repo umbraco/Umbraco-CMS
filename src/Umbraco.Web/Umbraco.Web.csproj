@@ -327,6 +327,7 @@
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\LocalizationService.cs" />
     <Compile Include="Services\MediaService.cs" />
+    <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>

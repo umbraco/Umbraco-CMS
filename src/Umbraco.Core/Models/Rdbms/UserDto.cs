@@ -4,12 +4,12 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 namespace Umbraco.Core.Models.Rdbms
 {
     [TableName("umbracoUser")]
-    [PrimaryKey("id")]
+    [PrimaryKey("id", autoIncrement = true)]
     [ExplicitColumns]
     internal class UserDto
     {
         [Column("id")]
-        [PrimaryKeyColumn]
+        [PrimaryKeyColumn(Name = "PK_user")]
         public int Id { get; set; }
 
         [Column("userDisabled")]

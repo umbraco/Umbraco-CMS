@@ -2,6 +2,7 @@
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Services;
 using umbraco;
 using umbraco.IO;
 using umbraco.presentation;
@@ -50,6 +51,8 @@ namespace Umbraco.Web
             HttpContext = httpContext;            
             Application = applicationContext;
         	RoutesCache = routesCache;
+
+    	    Services = ServiceContext.Current;
 
 			// set the urls
 			this.RequestUrl = httpContext.Request.Url;
@@ -112,6 +115,11 @@ namespace Umbraco.Web
         /// Gets the current ApplicationContext
         /// </summary>
         public ApplicationContext Application { get; private set; }
+
+        /// <summary>
+        /// Gets the current ServiceContext, which exposes the various services
+        /// </summary>
+        public ServiceContext Services { get; private set; }
 
 		internal IRoutesCache RoutesCache { get; private set; }
 

@@ -7,6 +7,10 @@ namespace Umbraco.Core.Persistence
 {
     public static class PetaPocoExtensions
     {
+        internal delegate void CreateTableEventHandler(string tableName, Database db, TableCreationEventArgs e);
+
+        internal static event CreateTableEventHandler NewTable;
+
         public static void CreateTable<T>(this Database db)
            where T : new()
         {
@@ -54,6 +58,15 @@ namespace Umbraco.Core.Persistence
             {
                 int created = db.Execute(new Sql(createSql));
 
+                if (NewTable != null)
+                {
+                    var e = new TableCreationEventArgs();
+                    NewTable(tableName, db, e);
+                }
+
+                //TODO Figure out how to deal with base data before/after db and constraint creation
+                //Possibly add an internal task to trigger the data creation prior to creating constraints?
+                
                 if(!string.IsNullOrEmpty(createPrimaryKeySql))
                     db.Execute(new Sql(createPrimaryKeySql));
                 
@@ -96,14 +109,18 @@ namespace Umbraco.Core.Persistence
 
         public static void Initialize(this Database db)
         {
+            NewTable += PetaPocoExtensions_NewTable;
+
             var creation = new DatabaseCreation(db);
             creation.InitializeDatabaseSchema();
         }
 
-        public static void InstallBaseData(this Database db)
+        static void PetaPocoExtensions_NewTable(string tableName, Database db, TableCreationEventArgs e)
         {
             var baseDataCreation = new BaseDataCreation(db);
-            baseDataCreation.InitializeBaseData();
+            baseDataCreation.InitializeBaseData(tableName);
         }
     }
+
+    internal class TableCreationEventArgs : System.ComponentModel.CancelEventArgs{}
 }

@@ -9,11 +9,11 @@ namespace Umbraco.Tests.Services
     [TestFixture]
     public class ContentServiceTests : BaseDatabaseFactoryTest
     {
-        /*[Test]*/
+        [Test]
         public void Can_Create_Content()
         {
             // Arrange
-            var contentService = new ContentService();
+            var contentService = GetUmbracoContext("/test", 1234).Services.ContentService;
 
             // Act
             IContent content = contentService.CreateContent(-1, "umbTextpage");

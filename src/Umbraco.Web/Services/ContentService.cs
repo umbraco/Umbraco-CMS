@@ -49,12 +49,12 @@ namespace Umbraco.Web.Services
             var contentTypes = repository.GetByQuery(query);
 
             if (!contentTypes.Any())
-                throw new Exception(string.Format("No ContentType matching the passed in Alias: {0} was found", contentTypeAlias));
+                throw new Exception(string.Format("No ContentType matching the passed in Alias: '{0}' was found", contentTypeAlias));
 
             var contentType = contentTypes.First();
 
             if (contentType == null)
-                throw new Exception(string.Format("No ContentType matching the passed in Alias: {0} was found", contentTypeAlias));
+                throw new Exception(string.Format("No ContentType matching the passed in Alias: '{0}' was found", contentTypeAlias));
 
             return new Content(parentId, contentType);
         }
