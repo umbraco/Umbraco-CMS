@@ -65,7 +65,7 @@ namespace umbraco
 				this.MasterPageFile = template.GetMasterPageName(_upage.Template);
 
 				// reset the friendly path so it's used by forms, etc.			
-				Context.RewritePath(UmbracoContext.Current.RequestUrl.PathAndQuery);
+				Context.RewritePath(UmbracoContext.Current.OriginalRequestUrl.PathAndQuery);
 
 				//fire the init finished event
 				FireAfterRequestInit(args);	

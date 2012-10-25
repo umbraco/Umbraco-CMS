@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Routing
 		public void Lookup_By_Url_Alias(string urlAsString, int nodeMatch)
 		{
 			var routingContext = GetRoutingContext(urlAsString);
-			var url = routingContext.UmbracoContext.UmbracoUrl; //very important to use the cleaned up umbraco url
+			var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
 			var docRequest = new PublishedContentRequest(url, routingContext);
 			var lookup = new LookupByAlias();
 			

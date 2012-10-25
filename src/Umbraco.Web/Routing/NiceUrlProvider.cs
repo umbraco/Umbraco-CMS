@@ -48,7 +48,7 @@ namespace Umbraco.Web.Routing
 		public string GetNiceUrl(int nodeId)
 		{
 			var absolute = UmbracoSettings.UseDomainPrefixes || this.EnforceAbsoluteUrls;
-			return GetNiceUrl(nodeId, _umbracoContext.UmbracoUrl, absolute);
+			return GetNiceUrl(nodeId, _umbracoContext.CleanedUmbracoUrl, absolute);
 		}
 
 		/// <summary>
@@ -60,7 +60,7 @@ namespace Umbraco.Web.Routing
 		/// <remarks>The url is absolute or relative depending on the current url, unless <c>absolute</c> is true, in which case the url is always absolute.</remarks>
 		public string GetNiceUrl(int nodeId, bool absolute)
 		{
-			return GetNiceUrl(nodeId, _umbracoContext.UmbracoUrl, absolute);
+			return GetNiceUrl(nodeId, _umbracoContext.CleanedUmbracoUrl, absolute);
 		}
 
 		/// <summary>
@@ -145,7 +145,7 @@ namespace Umbraco.Web.Routing
 
 		public IEnumerable<string> GetAllAbsoluteNiceUrls(int nodeId)
 		{
-			return GetAllAbsoluteNiceUrls(nodeId, _umbracoContext.UmbracoUrl);
+			return GetAllAbsoluteNiceUrls(nodeId, _umbracoContext.CleanedUmbracoUrl);
 		}
 
 		/// <summary>

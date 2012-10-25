@@ -50,13 +50,13 @@ namespace Umbraco.Tests.Routing
 			var route = RouteTable.Routes["Umbraco_default"];
 			var routeData = new RouteData() { Route = route };
 			var routingContext = GetRoutingContext("~/dummy-page", template, routeData);
-			var docRequest = new PublishedContentRequest(routingContext.UmbracoContext.UmbracoUrl, routingContext)
+			var docRequest = new PublishedContentRequest(routingContext.UmbracoContext.CleanedUmbracoUrl, routingContext)
 			{
 				PublishedContent = routingContext.PublishedContentStore.GetDocumentById(routingContext.UmbracoContext, 1174),
 				Template = template
 			};
 
-			var handler = new RenderRouteHandler(new TestControllerFactory());
+			var handler = new RenderRouteHandler(new TestControllerFactory(), routingContext.UmbracoContext);
 
 			handler.GetHandlerForRoute(routingContext.UmbracoContext.HttpContext.Request.RequestContext, docRequest);
 			Assert.AreEqual("RenderMvc", routeData.Values["controller"].ToString());
@@ -74,13 +74,13 @@ namespace Umbraco.Tests.Routing
 			var route = RouteTable.Routes["Umbraco_default"];
 			var routeData = new RouteData() {Route = route};
 			var routingContext = GetRoutingContext("~/dummy-page", template, routeData);
-			var docRequest = new PublishedContentRequest(routingContext.UmbracoContext.UmbracoUrl, routingContext)
+			var docRequest = new PublishedContentRequest(routingContext.UmbracoContext.CleanedUmbracoUrl, routingContext)
 				{
 					PublishedContent = routingContext.PublishedContentStore.GetDocumentById(routingContext.UmbracoContext, 1172), 
 					Template = template
 				};
 
-			var handler = new RenderRouteHandler(new TestControllerFactory());
+			var handler = new RenderRouteHandler(new TestControllerFactory(), routingContext.UmbracoContext);
 
 			handler.GetHandlerForRoute(routingContext.UmbracoContext.HttpContext.Request.RequestContext, docRequest);
 			Assert.AreEqual("CustomDocument", routeData.Values["controller"].ToString());
