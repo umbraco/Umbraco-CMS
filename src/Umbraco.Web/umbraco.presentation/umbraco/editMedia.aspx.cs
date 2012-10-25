@@ -11,6 +11,12 @@ using System.Web.UI.HtmlControls;
 
 using System.Xml;
 using umbraco.cms.helpers;
+using umbraco.cms.businesslogic.datatype.controls;
+using System.Collections.Generic;
+using System.Linq;
+using System.IO;
+using Umbraco.Core.IO;
+using umbraco.cms.businesslogic.property;
 
 namespace umbraco.cms.presentation
 {
@@ -19,14 +25,15 @@ namespace umbraco.cms.presentation
 	/// </summary>
 	public partial class editMedia : BasePages.UmbracoEnsuredPage
 	{
-        private uicontrols.Pane mediaPropertyPane = new uicontrols.Pane();
+        private uicontrols.Pane mediaPropertiesPane = new uicontrols.Pane();
         private LiteralControl updateDateLiteral = new LiteralControl();
-
+        private LiteralControl mediaFileLinksLiteral = new LiteralControl();
 
 	    public editMedia()
 	    {
 	        CurrentApp = BusinessLogic.DefaultApps.media.ToString();
 	    }
+
 		protected uicontrols.TabView TabView1;
 		protected System.Web.UI.WebControls.TextBox documentName;
 		private cms.businesslogic.media.Media _media;
@@ -58,15 +65,17 @@ namespace umbraco.cms.presentation
 
             tmp.Save += new System.EventHandler(Save);
 
-            updateDateLiteral.ID = "updateDate";
-            updateDateLiteral.Text = _media.VersionDate.ToShortDateString() + " " + _media.VersionDate.ToShortTimeString();
+            this.updateDateLiteral.ID = "updateDate";
+            this.updateDateLiteral.Text = _media.VersionDate.ToShortDateString() + " " + _media.VersionDate.ToShortTimeString();
 
-            mediaPropertyPane.addProperty(ui.Text("content", "updateDate", base.getUser()), updateDateLiteral);
+            this.mediaFileLinksLiteral.ID = "mediaFileLinks";
+            mediaPropertiesPane.addProperty(ui.Text("content", "updateDate", base.getUser()), this.updateDateLiteral);
 
-            // TODO: move the LinkToMediaItem property here - that way it's updated after save, rather than relying on a reload
+            this.UpdateMediaFileLinksLiteral();
+            mediaPropertiesPane.addProperty(ui.Text("content", "mediaLinks"), this.mediaFileLinksLiteral);
 
             // add the property pane to the page rendering
-            tmp.tpProp.Controls.AddAt(1, mediaPropertyPane);                       
+            tmp.tpProp.Controls.AddAt(1, mediaPropertiesPane);                       
         }
 
         /// <summary>
@@ -114,9 +123,46 @@ namespace umbraco.cms.presentation
             _media.Save();
 
             this.updateDateLiteral.Text = _media.VersionDate.ToShortDateString() + " " + _media.VersionDate.ToShortTimeString();
+            this.UpdateMediaFileLinksLiteral();
 
 			_media.XmlGenerate(new XmlDocument());
 			ClientTools.SyncTree(_media.Path, true);
 		}
+
+
+        private void UpdateMediaFileLinksLiteral()
+        {
+            var uploadField = new Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+
+            // always clear, incase the upload file was removed
+            this.mediaFileLinksLiteral.Text = string.Empty;
+
+            try
+            {
+                var uploadProperties = _media.GenericProperties
+                    .Where(p => p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id
+                                && p.Value.ToString() != ""
+                                && File.Exists(IOHelper.MapPath(p.Value.ToString())));
+
+                var properties = uploadProperties as List<Property> ?? uploadProperties.ToList();
+
+                if (properties.Any())
+                {
+                    this.mediaFileLinksLiteral.Text += "<table>";
+
+                    foreach (var property in properties)
+                    {
+                        this.mediaFileLinksLiteral.Text += string.Format("<tr><td>{0}&nbsp;</td><td><a href=\"{1}\" target=\"_blank\">{1}</a></td></tr>", property.PropertyType.Name, property.Value);
+                    }
+                    
+                    this.mediaFileLinksLiteral.Text += "</table>";
+                }
+            }
+            catch
+            {
+                //the data type definition may not exist anymore at this point because another thread may
+                //have deleted it.
+            }
+        }
 	}
 }
