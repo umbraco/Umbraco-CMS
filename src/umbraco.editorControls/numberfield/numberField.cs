@@ -1,62 +1,85 @@
 using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.ComponentModel;
 
 namespace umbraco.editorControls
 {
-	public class numberField : System.Web.UI.WebControls.TextBox, interfaces.IDataEditor
+	public class numberField : TextBox, interfaces.IDataEditor
 	{
 		private interfaces.IData _data;
-		public numberField(interfaces.IData Data) {
+
+		public numberField(interfaces.IData Data) 
+        {
 			_data = Data;
 		}
-
 	
-		public Control Editor {
-			get{return this;}
-	
+		public Control Editor 
+        {
+			get
+            {
+                return this;
+            }	
 		}
+
 		public virtual bool TreatAsRichTextEditor 
 		{
-			get {return false;}
+			get 
+            {
+                return false;
+            }
 		}
+
 		public bool ShowLabel 
 		{
-			get {return true;}
+			get 
+            {
+                return true;
+            }
 		}
 		
 		public void Save() 
 		{
             if (Text.Trim() != "")
-			    _data.Value = Text;
+            {
+                _data.Value = Text;
+            }
             else
+            {
                 _data.Value = null;
+            }
 		}
 
 		protected override void OnInit(EventArgs e)
 		{
 			base.OnInit (e);
-            CssClass = "umbEditorNumberField";
+            
+            this.CssClass = "umbEditorNumberField";
+
 			// load data
-			if (_data != null && _data.Value != null)
-				this.Text = _data.Value.ToString();
+            if (_data != null && _data.Value != null)
+            {
+                this.Text = _data.Value.ToString();
+            }
 		}
 
-		public override string Text
-		{
-			get { return base.Text; }
-			set 	{
-				try 	{
-					if (value != null)
-					    base.Text = Convert.ToInt32(value).ToString();
-				} 
-				catch {
-					base.Text = "";
-					System.Web.HttpContext.Current.Trace.Warn("Numberfield", "Value has to be an integer (" + value + ")");
-				}
-			}
-		}
-
+        /// <summary>
+        /// The setter ensures that only valid integers are saved - this is to prevent invalid types from being saved into an int db field
+        /// </summary>
+        public override string Text
+        {
+            get
+            {
+                return base.Text;
+            }           
+            set
+            {
+                int integer;
+                
+                if (int.TryParse(value, out integer))
+                {
+                    base.Text = integer.ToString();
+                }
+            }
+        }
 	}
 }
