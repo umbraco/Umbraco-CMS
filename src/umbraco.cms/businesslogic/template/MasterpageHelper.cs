@@ -58,6 +58,16 @@ namespace umbraco.cms.businesslogic.template
             return SaveTemplateToFile(t, currentAlias);
         }
 
+		internal static void RemoveMasterPageFile(string alias)
+		{
+			if (!string.IsNullOrWhiteSpace(alias))
+			{
+				string file = IOHelper.MapPath(SystemDirectories.Masterpages + "/" + alias.Replace(" ", "") + ".master");
+				if (System.IO.File.Exists(file))
+					System.IO.File.Delete(file);
+			}
+		}
+
         internal static string SaveTemplateToFile(Template template, string currentAlias)
         {
             var masterPageContent = template.Design;
