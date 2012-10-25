@@ -113,7 +113,15 @@ namespace umbraco
         /// </summary>
         public static bool KeepUserLoggedIn
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.KeepUserLoggedIn; }
+            get { return Umbraco.Core.Configuration.UmbracoSettings.KeepUserLoggedIn; }
+        }
+
+        /// <summary>
+        /// Enables the experimental canvas (live) editing on the frontend of the website
+        /// </summary>
+        public static bool EnableCanvasEditing
+        {
+            get { return Umbraco.Core.Configuration.UmbracoSettings.EnableCanvasEditing; }
         }
 
         /// <summary>

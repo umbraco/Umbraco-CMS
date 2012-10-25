@@ -29,8 +29,11 @@ function updateProgressBar(percent) {
     });
 }
 
-function updateStatusMessage(message) {
+function updateStatusMessage(message, error) {
     jQuery(".loader > strong").text(message);
+    if (error != undefined) {
+        jQuery(".loader").append("<p>" + error + "</p>");
+    }
 }
 
 

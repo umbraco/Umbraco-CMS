@@ -66,7 +66,7 @@ namespace umbraco.cms.businesslogic.macro
                     if (languages.Find(t => t.Extension == lang) == null)
                         languages.Add(new MacroEngineLanguage(lang, engine.Name));
             }
-            return languages;
+            return languages.OrderBy(s => s.Extension);
         }
 
         public static List<IMacroEngine> GetAll()
