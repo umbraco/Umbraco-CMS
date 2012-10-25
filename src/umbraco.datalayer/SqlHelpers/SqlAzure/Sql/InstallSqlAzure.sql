@@ -427,8 +427,8 @@ BEGIN
 		;
 		SET IDENTITY_INSERT [cmsContentType] ON
 		INSERT [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail], [description], [masterContentType]) VALUES (532, 1031, N'Folder', N'folder.gif', N'folder.png', NULL, NULL)
-		INSERT [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail], [description], [masterContentType]) VALUES (533, 1032, N'Image', N'mediaPhoto.gif', N'folder.png', NULL, NULL)
-		INSERT [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail], [description], [masterContentType]) VALUES (534, 1033, N'File', N'mediaMulti.gif', N'folder.png', NULL, NULL)
+		INSERT [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail], [description], [masterContentType]) VALUES (533, 1032, N'Image', N'mediaPhoto.gif', N'mediaPhoto.png', NULL, NULL)
+		INSERT [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail], [description], [masterContentType]) VALUES (534, 1033, N'File', N'mediaMulti.gif', N'mediaMulti.png', NULL, NULL)
 		SET IDENTITY_INSERT [cmsContentType] OFF
 
 		SET ANSI_NULLS ON
