@@ -62,7 +62,7 @@
                 IsDialog="true" DialogMode="id" ShowContextMenu="false" FunctionToCall="dialogHandler"
                 Height="200"></umbraco:TreeControl>
 		</cc1:PropertyPanel>
-		<cc1:PropertyPanel runat="server" ID="pp_relate" Text="Relate copied items to original">
+		<cc1:PropertyPanel runat="server" ID="pp_relate" Text="relateToOriginal">
 			<asp:CheckBox runat="server" ID="RelateDocuments" Checked="false" />
 		</cc1:PropertyPanel>
 	</cc1:Pane>
