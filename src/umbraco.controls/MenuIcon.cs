@@ -60,7 +60,7 @@ namespace umbraco.uicontrols {
                 this.Attributes.Add("onMouseout", "this.className='editorIcon'");
                 this.Attributes.Add("onMouseup", "this.className='editorIcon'");
 //            }
-            this.Attributes.Add("onMouseDown", "this.className='editorIconDown'");
+            this.Attributes.Add("onMouseDown", "this.className='editorIconDown'; return false;");
             this.AlternateText = _AltText;
             this.Attributes.Add("title", _AltText);
 
