@@ -117,7 +117,7 @@ namespace umbraco.cms.businesslogic
         }
 
         /// <summary>
-        /// Returns the number of leaf nodes from the parent id for a given object type
+        /// Returns the number of leaf nodes from the newParent id for a given object type
         /// </summary>
         /// <param name="parentId"></param>
         /// <param name="objectType"></param>
@@ -235,7 +235,7 @@ namespace umbraco.cms.businesslogic
         /// Given the protected modifier the CMSNode.MakeNew method can only be accessed by
         /// derived classes &gt; who by definition knows of its own objectType.
         /// </summary>
-        /// <param name="parentId">The parent CMSNode id</param>
+        /// <param name="parentId">The newParent CMSNode id</param>
         /// <param name="objectType">The objecttype identifier</param>
         /// <param name="userId">Creator</param>
         /// <param name="level">The level in the tree hieararchy</param>
@@ -495,30 +495,32 @@ order by level,sortOrder";
             return base.ToString();
         }
 
-        private void Move(CMSNode parent)
+        private void Move(CMSNode newParent)
         {
             MoveEventArgs e = new MoveEventArgs();
             FireBeforeMove(e);
 
             if (!e.Cancel)
             {
-                //first we need to establish if the node already exists under the parent node
-                var isSameParent = (Path.Contains("," + parent.Id + ","));
+                //first we need to establish if the node already exists under the newParent node
+                //var isNewParentInPath = (Path.Contains("," + newParent.Id + ","));
 
-                //if it's the same parent, we can save some SQL calls since we know these wont change.
-                //level and path might change even if it's the same parent because the parent could be moving somewhere.
-                if (!isSameParent)
+                //if it's the same newParent, we can save some SQL calls since we know these wont change.
+                //level and path might change even if it's the same newParent because the newParent could be moving somewhere.
+                if (ParentId != newParent.Id)
                 {
                     int maxSortOrder = SqlHelper.ExecuteScalar<int>("select coalesce(max(sortOrder),0) from umbracoNode where parentid = @parentId",
-                        SqlHelper.CreateParameter("@parentId", parent.Id));
+                        SqlHelper.CreateParameter("@parentId", newParent.Id));
 
-                    this.Parent = parent;
+                    this.Parent = newParent;
                     this.sortOrder = maxSortOrder + 1;
+                    this.Level = newParent.Level + 1;
+                    this.Path = newParent.Path + "," + this.Id.ToString();
                 }
 
-                this.Parent = parent;
-                this.Level = parent.Level + 1;
-                this.Path = parent.Path + "," + this.Id.ToString();
+                //this.Parent = newParent;
+                //this.Level = newParent.Level + 1;
+                //this.Path = newParent.Path + "," + this.Id.ToString();
 
                 //this code block should not be here but since the class structure is very poor and doesn't use 
                 //overrides (instead using shadows/new) for the Children property, when iterating over the children
@@ -537,16 +539,16 @@ order by level,sortOrder";
                 }
 
                 //make sure the node type is a document/media, if it is a recycle bin then this will not be equal
-                if (!IsTrashed && parent.nodeObjectType == Document._objectType)
+                if (!IsTrashed && newParent.nodeObjectType == Document._objectType)
                 {
-                    //regenerate the xml for the parent node
-                    var d = new Document(parent.Id);
+                    //regenerate the xml for the newParent node
+                    var d = new Document(newParent.Id);
                     d.XmlGenerate(new XmlDocument());
                 }
-                else if (!IsTrashed && parent.nodeObjectType == Media._objectType)
+                else if (!IsTrashed && newParent.nodeObjectType == Media._objectType)
                 {
-                    //regenerate the xml for the parent node
-                    var m = new Media(parent.Id);
+                    //regenerate the xml for the newParent node
+                    var m = new Media(newParent.Id);
                     m.XmlGenerate(new XmlDocument());
                 }
 
@@ -732,7 +734,7 @@ order by level,sortOrder";
         }
 
         /// <summary>
-        /// Get the parent id of the node
+        /// Get the newParent id of the node
         /// </summary>
         public int ParentId
         {
@@ -740,14 +742,14 @@ order by level,sortOrder";
         }
 
         /// <summary>
-        /// Given the hierarchical tree structure a CMSNode has only one parent but can have many children
+        /// Given the hierarchical tree structure a CMSNode has only one newParent but can have many children
         /// </summary>
-        /// <value>The parent.</value>
+        /// <value>The newParent.</value>
         public CMSNode Parent
         {
             get
             {
-                if (Level == 1) throw new ArgumentException("No parent node");
+                if (Level == 1) throw new ArgumentException("No newParent node");
                 return new CMSNode(_parentid);
             }
             set
@@ -981,7 +983,7 @@ order by level,sortOrder";
         /// <param name="uniqueID">The unique ID.</param>
         /// <param name="nodeObjectType">Type of the node object.</param>
         /// <param name="Level">The level.</param>
-        /// <param name="ParentId">The parent id.</param>
+        /// <param name="ParentId">The newParent id.</param>
         /// <param name="UserId">The user id.</param>
         /// <param name="Path">The path.</param>
         /// <param name="Text">The text.</param>
@@ -1046,7 +1048,7 @@ order by level,sortOrder";
         protected void PopulateCMSNodeFromReader(IRecordsReader dr)
         {
             // testing purposes only > original umbraco data hasn't any unique values ;)
-            // And we need to have a parent in order to create a new node ..
+            // And we need to have a newParent in order to create a new node ..
             // Should automatically add an unique value if no exists (or throw a decent exception)
             if (dr.IsNull("uniqueID")) _uniqueID = Guid.NewGuid();
             else _uniqueID = dr.GetGuid("uniqueID");
