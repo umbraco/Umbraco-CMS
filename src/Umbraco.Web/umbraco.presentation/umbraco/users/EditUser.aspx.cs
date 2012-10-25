@@ -77,6 +77,9 @@ namespace umbraco.cms.presentation.user
                 throw new Exception("Admin users can only be edited by admins");
             }
 
+            // check if canvas editing is enabled
+            DefaultToLiveEditing.Visible = UmbracoSettings.EnableCanvasEditing;
+
             // Populate usertype list
             foreach (UserType ut in UserType.getAll)
             {
@@ -152,7 +155,10 @@ namespace umbraco.cms.presentation.user
 
             //Generel umrbaco access
             Pane ppAccess = new Pane();
-            ppAccess.addProperty(ui.Text("user", "defaultToLiveEditing", base.getUser()), DefaultToLiveEditing);
+            if (UmbracoSettings.EnableCanvasEditing)
+            {
+                ppAccess.addProperty(ui.Text("user", "defaultToLiveEditing", base.getUser()), DefaultToLiveEditing);
+            }
             ppAccess.addProperty(ui.Text("user", "noConsole", base.getUser()), NoConsole);
             ppAccess.addProperty(ui.Text("user", "disabled", base.getUser()), Disabled);
 
@@ -183,13 +189,14 @@ namespace umbraco.cms.presentation.user
             setupForm();
             setupChannel();
 
-			ClientTools
-			    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadUsers>().Tree.Alias)
+            ClientTools
+                .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadUsers>().Tree.Alias)
                 .SyncTree(UID.ToString(), IsPostBack);
         }
 
 
-        void sectionValidator_ServerValidate(object source, ServerValidateEventArgs args) {
+        void sectionValidator_ServerValidate(object source, ServerValidateEventArgs args)
+        {
             args.IsValid = false;
 
             if (lapps.SelectedIndex >= 0)
@@ -382,20 +389,24 @@ namespace umbraco.cms.presentation.user
         /// <param name="e">The <see cref="System.Web.UI.ImageClickEventArgs"/> instance containing the event data.</param>
         private void saveUser_Click(object sender, ImageClickEventArgs e)
         {
-            if (base.IsValid) {
-                try {
+            if (base.IsValid)
+            {
+                try
+                {
                     MembershipUser user = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(u.LoginName, true);
 
 
                     string tempPassword = ((controls.passwordChanger)passw.Controls[0]).Password;
-                    if (!string.IsNullOrEmpty(tempPassword.Trim())) {
+                    if (!string.IsNullOrEmpty(tempPassword.Trim()))
+                    {
                         // make sure password is not empty
                         if (string.IsNullOrEmpty(u.Password)) u.Password = "default";
                         user.ChangePassword(u.Password, tempPassword);
                     }
 
                     // Is it using the default membership provider
-                    if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is UsersMembershipProvider) {
+                    if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is UsersMembershipProvider)
+                    {
                         // Save user in membership provider
                         UsersMembershipUser umbracoUser = user as UsersMembershipUser;
                         umbracoUser.FullName = uname.Text.Trim();
@@ -406,7 +417,9 @@ namespace umbraco.cms.presentation.user
                         // Save user details
                         u.Email = email.Text.Trim();
                         u.Language = userLanguage.SelectedValue;
-                    } else {
+                    }
+                    else
+                    {
                         u.Name = uname.Text.Trim();
                         u.Language = userLanguage.SelectedValue;
                         u.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
@@ -417,11 +430,11 @@ namespace umbraco.cms.presentation.user
                     u.LoginName = lname.Text;
                     //u.StartNodeId = int.Parse(startNode.Value);
 
-                   
+
                     int startNode;
-                    if(!int.TryParse(contentPicker.Value, out startNode))
+                    if (!int.TryParse(contentPicker.Value, out startNode))
                     {
-                         //set to default if nothing is choosen
+                        //set to default if nothing is choosen
                         if (u.StartNodeId > 0)
                             startNode = u.StartNodeId;
                         else
@@ -449,18 +462,23 @@ namespace umbraco.cms.presentation.user
 
                     u.clearApplications();
 
-                    foreach (ListItem li in lapps.Items) {
+                    foreach (ListItem li in lapps.Items)
+                    {
                         if (li.Selected) u.addApplication(li.Value);
                     }
 
                     u.Save();
 
                     // save data
-                    if (cName.Text != "") {
+                    if (cName.Text != "")
+                    {
                         Channel c;
-                        try {
+                        try
+                        {
                             c = new Channel(u.Id);
-                        } catch {
+                        }
+                        catch
+                        {
                             c = new Channel();
                             c.User = u;
                         }
@@ -484,11 +502,15 @@ namespace umbraco.cms.presentation.user
                     }
 
                     speechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editUserSaved", base.getUser()), "");
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     speechBubble(speechBubbleIcon.error, ui.Text("speechBubbles", "editUserError", base.getUser()), "");
                     Log.Add(LogTypes.Error, 0, ex.Message);
                 }
-            } else {
+            }
+            else
+            {
                 speechBubble(speechBubbleIcon.error, ui.Text("speechBubbles", "editUserError", base.getUser()), "");
             }
         }
