@@ -462,7 +462,7 @@ namespace umbraco.cms.presentation
                 string showPageDisabledText = ui.Text("buttons", "showPageDisabled", this.getUser());
                 if (showPageDisabledText.StartsWith("["))
                     showPageDisabledText = ui.GetText("buttons", "showPageDisabled", null, "en"); ;
-                menu.NewElement("PreviewDisabled", "previewDisabled", "disabled", 0);
+
                 menuItem.AltText = showPageDisabledText;
                 ((Image) menuItem).Attributes.Add("style", "opacity: 0.5");
             }

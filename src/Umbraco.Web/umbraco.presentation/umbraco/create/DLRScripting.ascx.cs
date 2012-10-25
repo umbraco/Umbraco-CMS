@@ -25,7 +25,7 @@ namespace umbraco.presentation.create
             sbmt.Text = ui.Text("create");
             if (!Page.IsPostBack) {
                 foreach (MacroEngineLanguage lang in MacroEngineFactory.GetSupportedUILanguages()) {
-                    filetype.Items.Add(new ListItem(string.Format("{0} by {1}", helper.SpaceCamelCasing(lang.Extension), lang.EngineName), lang.Extension));
+                    filetype.Items.Add(new ListItem(string.Format(".{0} ({1})", lang.Extension.ToLowerInvariant(), lang.EngineName), lang.Extension));
                 }
                 filetype.SelectedIndex = 0;
             }
