@@ -85,7 +85,7 @@ namespace Umbraco.Core.IO
         public static string MapPath(string path, bool useHttpContext)
         {
             // Check if the path is already mapped
-            if (path.Length >= 2 && path[1] == Path.VolumeSeparatorChar)
+            if ((path.Length >= 2 && path[1] == Path.VolumeSeparatorChar) || path.StartsWith("\\"))
                 return path;
 
 			// Check that we even have an HttpContext! otherwise things will fail anyways
