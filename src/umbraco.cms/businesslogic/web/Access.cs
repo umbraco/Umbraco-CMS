@@ -48,7 +48,7 @@ namespace umbraco.cms.businesslogic.web
                             if (_accessXmlSource == null)
                             {
                                 //if we pop it here it'll make for better stack traces ;)
-                                _accessXmlSource = IOHelper.MapPath(SystemFiles.AccessXml, false);
+                                _accessXmlSource = IOHelper.MapPath(SystemFiles.AccessXml, true);
                             }
 
                             _accessXmlContent = new XmlDocument();
