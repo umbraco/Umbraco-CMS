@@ -82,6 +82,8 @@ namespace Umbraco.Web
 		// ie no virtual directory, no .aspx, lowercase...
 		public static Uri UriToUmbraco(Uri uri)
     	{
+			// note: no need to decode uri here because we're returning a uri
+			// so it will be re-encoded anyway
     		var path = uri.GetSafeAbsolutePath();
 
     		path = path.ToLower();

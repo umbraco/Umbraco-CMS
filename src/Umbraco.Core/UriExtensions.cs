@@ -59,6 +59,16 @@ namespace Umbraco.Core
 			}
 		}
 
+		public static string GetAbsolutePathDecoded(this Uri uri)
+		{
+			return System.Web.HttpUtility.UrlDecode(uri.AbsolutePath);
+		}
+
+		public static string GetSafeAbsolutePathDecoded(this Uri uri)
+		{
+			return System.Web.HttpUtility.UrlDecode(uri.GetSafeAbsolutePath());
+		}
+
 		// Creates a new Uri with path ending with a slash
 		// Everything else is unchanged but for the fragment which is lost
 		public static Uri EndPathWithSlash(this Uri uri)
