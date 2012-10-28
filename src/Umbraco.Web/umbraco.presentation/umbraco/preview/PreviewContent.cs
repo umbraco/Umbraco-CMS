@@ -54,13 +54,13 @@ namespace umbraco.presentation.preview
 
             // inject current document xml
             int parentId = documentObject.Level == 1 ? -1 : documentObject.Parent.Id;
-            content.AppendDocumentXml(documentObject.Id, documentObject.Level, parentId, documentObject.ToPreviewXml(XmlContent), XmlContent);
+            XmlContent = content.AppendDocumentXml(documentObject.Id, documentObject.Level, parentId, documentObject.ToPreviewXml(XmlContent), XmlContent);
 
             if (includeSubs)
             {
                 foreach (CMSPreviewNode prevNode in documentObject.GetNodesForPreview(true))
                 {
-                    content.AppendDocumentXml(prevNode.NodeId, prevNode.Level, prevNode.ParentId, XmlContent.ReadNode(XmlReader.Create(new StringReader(prevNode.Xml))), XmlContent);
+                    XmlContent = content.AppendDocumentXml(prevNode.NodeId, prevNode.Level, prevNode.ParentId, XmlContent.ReadNode(XmlReader.Create(new StringReader(prevNode.Xml))), XmlContent);
                 }
             }
 
