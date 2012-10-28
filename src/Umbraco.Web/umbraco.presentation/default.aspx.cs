@@ -135,7 +135,7 @@ namespace umbraco
 			{
 				LogHelper.Debug<UmbracoDefault>("Umbraco is running in preview mode.", Context.Trace);
 
-				if (Response.ContentType == "text/HTML") // ASP.NET default value
+				if (Response.ContentType == "text/html") // ASP.NET default value
 				{
 					int pos = text.ToLower().IndexOf("</body>");
 					if (pos > -1)
