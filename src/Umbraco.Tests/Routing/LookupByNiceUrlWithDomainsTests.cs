@@ -157,7 +157,7 @@ namespace Umbraco.Tests.Routing
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
 
 			var routingContext = GetRoutingContext(url);
-			var uri = routingContext.UmbracoContext.UmbracoUrl; //very important to use the cleaned up umbraco url
+			var uri = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
 			var docreq = new PublishedContentRequest(uri, routingContext);
 
 			// must lookup domain else lookup by url fails
@@ -196,7 +196,7 @@ namespace Umbraco.Tests.Routing
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
 
 			var routingContext = GetRoutingContext(url);
-			var uri = routingContext.UmbracoContext.UmbracoUrl; //very important to use the cleaned up umbraco url
+			var uri = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
 			var docreq = new PublishedContentRequest(uri, routingContext);
 
 			// must lookup domain else lookup by url fails

@@ -27,7 +27,7 @@ namespace Umbraco.Web.Routing
 
 			response.Write("<html><body><h1>Page not found</h1>");
 			response.Write("<h3>");
-			response.Write(string.Format(reason, HttpUtility.HtmlEncode(UmbracoContext.Current.ClientUrl)));
+			response.Write(string.Format(reason, HttpUtility.HtmlEncode(UmbracoContext.Current.OriginalRequestUrl)));
 			response.Write("</h3");
 			response.Write("<p>This page can be replaced with a custom 404. Check the documentation for \"custom 404\".</p>");
 			response.Write("<p style=\"border-top: 1px solid #ccc; padding-top: 10px\"><small>This page is intentionally left ugly ;-)</small></p>");

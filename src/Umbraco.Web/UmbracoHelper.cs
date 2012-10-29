@@ -36,7 +36,7 @@ namespace Umbraco.Web
 		private readonly UmbracoContext _umbracoContext;
 		private readonly IPublishedContent _currentPage;
 
-		internal UmbracoHelper(UmbracoContext umbracoContext)
+		public UmbracoHelper(UmbracoContext umbracoContext)
 		{
 			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
 			if (umbracoContext.RoutingContext == null) throw new NullReferenceException("The RoutingContext on the UmbracoContext cannot be null");

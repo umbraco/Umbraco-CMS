@@ -65,7 +65,7 @@ namespace umbraco
 				this.MasterPageFile = template.GetMasterPageName(_upage.Template);
 
 				// reset the friendly path so it's used by forms, etc.			
-				Context.RewritePath(UmbracoContext.Current.RequestUrl.PathAndQuery);
+				Context.RewritePath(UmbracoContext.Current.OriginalRequestUrl.PathAndQuery);
 
 				//fire the init finished event
 				FireAfterRequestInit(args);	
@@ -135,7 +135,7 @@ namespace umbraco
 			{
 				LogHelper.Debug<UmbracoDefault>("Umbraco is running in preview mode.", Context.Trace);
 
-				if (Response.ContentType == "text/HTML") // ASP.NET default value
+				if (Response.ContentType == "text/html") // ASP.NET default value
 				{
 					int pos = text.ToLower().IndexOf("</body>");
 					if (pos > -1)

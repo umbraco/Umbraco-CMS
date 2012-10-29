@@ -311,7 +311,7 @@ namespace umbraco.cms.presentation
                 {
                     Trace.Warn("before d.publish");
 
-                    if (_document.PublishWithResult(base.getUser()))
+                    if (_document.Id != 1061 && _document.PublishWithResult(base.getUser()))
                     {
 
                         ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));
@@ -326,7 +326,7 @@ namespace umbraco.cms.presentation
                     }
                     else
                     {
-                        ClientTools.ShowSpeechBubble(speechBubbleIcon.warning, ui.Text("publish"), ui.Text("contentPublishedFailedByEvent"));
+                        ClientTools.ShowSpeechBubble(speechBubbleIcon.warning, ui.Text("publish"), ui.Text("speechBubbles", "contentPublishedFailedByEvent"));
                     }
                 }
                 else

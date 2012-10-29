@@ -100,7 +100,7 @@ namespace Umbraco.Web.Routing
 			LogHelper.Debug<PublishedContentRequest>("{0}Uri=\"{1}\"", () => tracePrefix, () => _publishedContentRequest.Uri);
 
 			// try to find a domain matching the current request
-			var domainAndUri = DomainHelper.DomainMatch(Domain.GetDomains(), _umbracoContext.UmbracoUrl, false);
+			var domainAndUri = DomainHelper.DomainMatch(Domain.GetDomains(), _umbracoContext.CleanedUmbracoUrl, false);
 
 			// handle domain
 			if (domainAndUri != null)

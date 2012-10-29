@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Routing
 		public void Match_Document_By_Url_Hide_Top_Level(string urlString, int expectedId)
 		{
 			var routingContext = GetRoutingContext(urlString);
-			var url = routingContext.UmbracoContext.UmbracoUrl; //very important to use the cleaned up umbraco url
+			var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
 			var docreq = new PublishedContentRequest(url, routingContext);
 			var lookup = new LookupByNiceUrl();
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Routing
 		public void Match_Document_By_Url(string urlString, int expectedId)
 		{
 			var routingContext = GetRoutingContext(urlString);
-			var url = routingContext.UmbracoContext.UmbracoUrl;	//very important to use the cleaned up umbraco url		
+			var url = routingContext.UmbracoContext.CleanedUmbracoUrl;	//very important to use the cleaned up umbraco url		
 			var docreq = new PublishedContentRequest(url, routingContext);			
 			var lookup = new LookupByNiceUrl();
 

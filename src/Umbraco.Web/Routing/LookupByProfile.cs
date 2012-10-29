@@ -3,6 +3,7 @@ using System.Xml;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using umbraco;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Routing
 {
@@ -25,13 +26,14 @@ namespace Umbraco.Web.Routing
 		public override bool TrySetDocument(PublishedContentRequest docRequest)
         {
             IPublishedContent node = null;
+			var path = docRequest.Uri.GetAbsolutePathDecoded();
 
             bool isProfile = false;
-			var pos = docRequest.Uri.AbsolutePath.LastIndexOf('/');
+			var pos = path.LastIndexOf('/');
             if (pos > 0)
             {
-				var memberLogin = docRequest.Uri.AbsolutePath.Substring(pos + 1);
-				var path = docRequest.Uri.AbsolutePath.Substring(0, pos);
+				var memberLogin = path.Substring(pos + 1);
+				path = path.Substring(0, pos);
 
                 if (path == GlobalSettings.ProfileUrl)
                 {

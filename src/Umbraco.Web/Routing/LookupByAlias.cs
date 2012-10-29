@@ -3,6 +3,7 @@ using System.Xml;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using umbraco.interfaces;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Routing
 {
@@ -31,7 +32,7 @@ namespace Umbraco.Web.Routing
 				node = docRequest.RoutingContext.PublishedContentStore.GetDocumentByUrlAlias(
 					docRequest.RoutingContext.UmbracoContext, 
 					docRequest.HasDomain ? docRequest.Domain.RootNodeId : 0, 
-					docRequest.Uri.AbsolutePath);
+					docRequest.Uri.GetAbsolutePathDecoded());
 
 				if (node != null)
 				{					

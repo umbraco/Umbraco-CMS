@@ -3,6 +3,7 @@ using System.Xml;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using umbraco.interfaces;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Routing
 {
@@ -24,10 +25,10 @@ namespace Umbraco.Web.Routing
         {
 			string route;
 			if (docRequest.HasDomain)
-				route = docRequest.Domain.RootNodeId.ToString() + DomainHelper.PathRelativeToDomain(docRequest.DomainUri, docRequest.Uri.AbsolutePath);
+				route = docRequest.Domain.RootNodeId.ToString() + DomainHelper.PathRelativeToDomain(docRequest.DomainUri, docRequest.Uri.GetAbsolutePathDecoded());
 			else
-				route = docRequest.Uri.AbsolutePath;
-			
+				route = docRequest.Uri.GetAbsolutePathDecoded();
+
 			var node = LookupDocumentNode(docRequest, route);
             return node != null;
         }

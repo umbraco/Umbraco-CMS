@@ -18,10 +18,33 @@ namespace Umbraco.Web.Mvc
 		
 		public RenderRouteHandler(IControllerFactory controllerFactory)
 		{
+			if (controllerFactory == null) throw new ArgumentNullException("controllerFactory");			
 			_controllerFactory = controllerFactory;
 		}
 
+		/// <summary>
+		/// Contructor generally used for unit testing
+		/// </summary>
+		/// <param name="controllerFactory"></param>
+		/// <param name="umbracoContext"></param>
+		internal RenderRouteHandler(IControllerFactory controllerFactory, UmbracoContext umbracoContext)
+		{
+			if (controllerFactory == null) throw new ArgumentNullException("controllerFactory");
+			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+			_controllerFactory = controllerFactory;
+			_umbracoContext = umbracoContext;
+		}
+
 		private readonly IControllerFactory _controllerFactory;
+		private readonly UmbracoContext _umbracoContext;
+		
+		/// <summary>
+		/// Returns the current UmbracoContext
+		/// </summary>
+		public UmbracoContext UmbracoContext
+		{
+			get { return _umbracoContext ?? UmbracoContext.Current; }			
+		}
 
 		#region IRouteHandler Members
 
@@ -33,11 +56,11 @@ namespace Umbraco.Web.Mvc
 		/// <returns></returns>
 		public IHttpHandler GetHttpHandler(RequestContext requestContext)
 		{			
-			if (UmbracoContext.Current == null)
-			{
+			if (UmbracoContext == null)
+			{			
 				throw new NullReferenceException("There is not current UmbracoContext, it must be initialized before the RenderRouteHandler executes");
 			}
-			var docRequest = UmbracoContext.Current.PublishedContentRequest;
+			var docRequest = UmbracoContext.PublishedContentRequest;
 			if (docRequest == null)
 			{
 				throw new NullReferenceException("There is not current PublishedContentRequest, it must be initialized before the RenderRouteHandler executes");
@@ -52,7 +75,7 @@ namespace Umbraco.Web.Mvc
 			//put essential data into the data tokens, the 'umbraco' key is required to be there for the view engine
 			requestContext.RouteData.DataTokens.Add("umbraco", renderModel); //required for the RenderModelBinder
 			requestContext.RouteData.DataTokens.Add("umbraco-doc-request", docRequest); //required for RenderMvcController
-			requestContext.RouteData.DataTokens.Add("umbraco-context", UmbracoContext.Current); //required for UmbracoTemplatePage
+			requestContext.RouteData.DataTokens.Add("umbraco-context", UmbracoContext); //required for UmbracoTemplatePage
 
 			return GetHandlerForRoute(requestContext, docRequest);
 			
@@ -256,6 +279,11 @@ namespace Umbraco.Web.Mvc
 			{
 				requestContext.RouteData.Values["action"] = routeDef.ActionName;
 			}
+
+			// reset the friendly path so in the controllers and anything occuring after this point in time,
+			//the URL is reset back to the original request.
+			requestContext.HttpContext.RewritePath(UmbracoContext.OriginalRequestUrl.PathAndQuery);
+
 			return new MvcHandler(requestContext);
 		}
 	}

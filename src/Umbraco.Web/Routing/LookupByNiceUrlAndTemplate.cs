@@ -3,6 +3,7 @@ using System.Xml;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using umbraco.cms.businesslogic.template;
+using Umbraco.Core;
 using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace Umbraco.Web.Routing
@@ -26,14 +27,15 @@ namespace Umbraco.Web.Routing
 		public override bool TrySetDocument(PublishedContentRequest docRequest)
         {
             IPublishedContent node = null;
-			string path = docRequest.Uri.AbsolutePath;
+			string path = docRequest.Uri.GetAbsolutePathDecoded();
 
 			if (docRequest.HasDomain)
 				path = DomainHelper.PathRelativeToDomain(docRequest.DomainUri, path);
+
 			if (path != "/") // no template if "/"
             {
-				var pos = docRequest.Uri.AbsolutePath.LastIndexOf('/');
-				var templateAlias = docRequest.Uri.AbsolutePath.Substring(pos + 1);
+				var pos = path.LastIndexOf('/');
+				var templateAlias = path.Substring(pos + 1);
 				path = pos == 0 ? "/" : path.Substring(0, pos);
 
 				//TODO: We need to check if the altTemplate is for MVC or not, though I'm not exactly sure how the best

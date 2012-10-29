@@ -37,7 +37,7 @@ namespace Umbraco.Web
 		{
 			// do not process if client-side request
 			if (IsClientSideRequest(httpContext.Request.Url))
-				return;
+				return;			
 
 			// ok, process
 
@@ -76,11 +76,15 @@ namespace Umbraco.Web
 			if (IsClientSideRequest(httpContext.Request.Url))
 				return;
 
-			var umbracoContext = UmbracoContext.Current;
-			var routingContext = umbracoContext.RoutingContext;
+			if (UmbracoContext.Current == null)
+				throw new NullReferenceException("The UmbracoContext.Current is null, ProcessRequest cannot proceed unless there is a current UmbracoContext");
+			if (UmbracoContext.Current.RoutingContext == null)
+				throw new NullReferenceException("The UmbracoContext.RoutingContext has not been assigned, ProcessRequest cannot proceed unless there is a RoutingContext assigned to the UmbracoContext");
+
+			var umbracoContext = UmbracoContext.Current;		
 
 			// do not process but remap to handler if it is a base rest request
-			if (BaseRest.BaseRestHandler.IsBaseRestRequest(umbracoContext.RequestUrl))
+			if (BaseRest.BaseRestHandler.IsBaseRestRequest(umbracoContext.OriginalRequestUrl))
 			{
 				httpContext.RemapHandler(new BaseRest.BaseRestHandler());
 				return;
@@ -92,80 +96,17 @@ namespace Umbraco.Web
 
 			// ok, process
 
-			var uri = umbracoContext.RequestUrl;
+			var uri = umbracoContext.OriginalRequestUrl;
 
-			// legacy - no idea what this is
+			// legacy - no idea what this is but does something with the query strings
 			LegacyCleanUmbPageFromQueryString(ref uri);
 
-			// create the new document request since we're rendering a document on the front-end
-			var docreq = new PublishedContentRequest(
-				umbracoContext.UmbracoUrl, //very important to use this url! it is the path only lowercased version of the current URL. 
-				routingContext);
-			//assign the document request to the umbraco context now that we know its a front end request
-			umbracoContext.PublishedContentRequest = docreq;
-
-			// note - at that point the original legacy module did something do handle IIS custom 404 errors
-			//   ie pages looking like /anything.aspx?404;/path/to/document - I guess the reason was to support
-			//   "directory urls" without having to do wildcard mapping to ASP.NET on old IIS. This is a pain
-			//   to maintain and probably not used anymore - removed as of 06/2012. @zpqrtbnk.
-			//
-			//   to trigger Umbraco's not-found, one should configure IIS and/or ASP.NET custom 404 errors
-			//   so that they point to a non-existing page eg /redirect-404.aspx
-			//   TODO: SD: We need more information on this for when we release 4.10.0 as I'm not sure what this means.
-
-			//create the searcher
-			var searcher = new PublishedContentRequestBuilder(docreq);
-			//find domain
-			searcher.LookupDomain();
-			// redirect if it has been flagged
-			if (docreq.IsRedirect)
-				httpContext.Response.Redirect(docreq.RedirectUrl, true);
-			//set the culture on the thread
-			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = docreq.Culture;
-			//find the document, found will be true if the doc request has found BOTH a node and a template
-			// though currently we don't use this value.
-			var found = searcher.LookupDocument();
-			//this could be called in the LookupDocument method, but I've just put it here for clarity.
-			searcher.DetermineRenderingEngine();
-
-			//TODO: here we should launch an event so that people can modify the doc request to do whatever they want.
-
-			// redirect if it has been flagged
-			if (docreq.IsRedirect)
-				httpContext.Response.Redirect(docreq.RedirectUrl, true);
-
-			// handle 404
-			if (docreq.Is404)
-			{
-				httpContext.Response.StatusCode = 404;
-
-				if (!docreq.HasNode)
-				{
-					httpContext.RemapHandler(new PublishedContentNotFoundHandler());
-					return;
-				}
-
-				// else we have a document to render
-				// not having a template is ok here, MVC will take care of it
-			}
-
-			// just be safe - should never ever happen
-			if (!docreq.HasNode)
-				throw new Exception("No document to render.");
-
-			// render even though we might have no template
-			// to give MVC a chance to hijack routes
-			// pass off to our handlers (mvc or webforms)
-
-			// assign the legacy page back to the docrequest
-			// handlers like default.aspx will want it and most macros currently need it
-			docreq.UmbracoPage = new page(docreq);
-
-			// these two are used by many legacy objects
-			httpContext.Items["pageID"] = docreq.DocumentId;
-			httpContext.Items["pageElements"] = docreq.UmbracoPage.Elements;
-
-			RewriteToUmbracoHandler(HttpContext.Current, uri.Query, docreq.RenderingEngine);
+			//process the request and on success, call the callback method: RewriteToUmbracoHandler
+			PublishedContentRequest.ProcessRequest(
+				httpContext, 
+				umbracoContext,
+				umbracoContext.CleanedUmbracoUrl, //very important to use this url! it is the path only lowercased version of the current URL. 
+				docreq => RewriteToUmbracoHandler(HttpContext.Current, uri.Query, docreq.RenderingEngine));
 		}
 
 		/// <summary>
@@ -210,7 +151,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		internal bool EnsureUmbracoRoutablePage(UmbracoContext context, HttpContextBase httpContext)
 		{
-			var uri = context.RequestUrl;
+			var uri = context.OriginalRequestUrl;
 
 			// ensure this is a document request
 			if (!EnsureDocumentRequest(httpContext, uri))
@@ -378,7 +319,7 @@ namespace Umbraco.Web
 					//then we should be rendering the MVC stuff in that location.
 					rewritePath = "~/"
 						+ GlobalSettings.Path.TrimStart(new[] { '~', '/' }).TrimEnd(new[] { '/' })
-						+ "/RenderMvc" + currentQuery;
+						+ "/RenderMvc";
 					//First we rewrite the path to the path of the handler (i.e. default.aspx or /umbraco/RenderMvc )
 					context.RewritePath(rewritePath, "", currentQuery.TrimStart(new[] { '?' }), false);
 
@@ -388,14 +329,17 @@ namespace Umbraco.Web
 					//an instance of the UrlRoutingModule and call it's PostResolveRequestCache method. This does:
 					// * Looks up the route based on the new rewritten URL
 					// * Creates the RequestContext with all route parameters and then executes the correct handler that matches the route
-					//we could have re-written this functionality, but the code inside the PostResolveRequestCache is exactly what we want.					
+					//we also cannot re-create this functionality because the setter for the HttpContext.Request.RequestContext is internal
+					//so really, this is pretty much the only way without using Server.TransferRequest and if we did that, we'd have to rethink
+					//a bunch of things!
+
 					var urlRouting = new UrlRoutingModule();
 					urlRouting.PostResolveRequestCache(new HttpContextWrapper(context));
 
 					break;
 				case RenderingEngine.WebForms:
 				default:
-					rewritePath = "~/default.aspx" + currentQuery;
+					rewritePath = "~/default.aspx";
 					//First we rewrite the path to the path of the handler (i.e. default.aspx or /umbraco/RenderMvc )
 					context.RewritePath(rewritePath, "", currentQuery.TrimStart(new[] { '?' }), false);
 

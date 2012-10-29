@@ -4,6 +4,7 @@ using System.Xml;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using umbraco.interfaces;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Routing
 {
@@ -24,11 +25,12 @@ namespace Umbraco.Web.Routing
 		public bool TrySetDocument(PublishedContentRequest docRequest)
         {
             IPublishedContent node = null;
+			var path = docRequest.Uri.GetAbsolutePathDecoded();
 
             int nodeId = -1;
-			if (docRequest.Uri.AbsolutePath != "/") // no id if "/"
+			if (path != "/") // no id if "/"
             {
-				string noSlashPath = docRequest.Uri.AbsolutePath.Substring(1);
+				string noSlashPath = path.Substring(1);
 
                 if (!Int32.TryParse(noSlashPath, out nodeId))
                     nodeId = -1;

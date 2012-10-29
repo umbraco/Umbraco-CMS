@@ -204,7 +204,7 @@ namespace umbraco
 		{
 			var uri = new Uri(url, UriKind.RelativeOrAbsolute);
 			if (!uri.IsAbsoluteUri)
-				uri = uri.MakeAbsolute(Umbraco.Web.UmbracoContext.Current.UmbracoUrl);
+				uri = uri.MakeAbsolute(Umbraco.Web.UmbracoContext.Current.CleanedUmbracoUrl);
 			uri = Umbraco.Web.UriUtility.UriToUmbraco(uri);
 
 			var docreq = new Umbraco.Web.Routing.PublishedContentRequest(uri, Umbraco.Web.UmbracoContext.Current.RoutingContext);
