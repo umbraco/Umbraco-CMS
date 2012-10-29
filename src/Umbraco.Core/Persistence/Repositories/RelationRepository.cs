@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
@@ -45,6 +46,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var factory = new RelationFactory(relationType);
             var entity = factory.BuildEntity(dto);
+
+            entity.ResetDirtyProperties();
 
             return entity;
         }

@@ -46,6 +46,9 @@ namespace Umbraco.Core.Persistence.Repositories
                                      CreateDate = created,
                                      UpdateDate = updated
                                  };
+
+            stylesheet.ResetDirtyProperties();
+
             return stylesheet;
         }
 

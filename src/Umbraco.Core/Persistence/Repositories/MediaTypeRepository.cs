@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
@@ -49,7 +50,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //Do something if adding fails? (Should hopefully not be possible unless someone create a circular reference)
             }
 
-            ((MediaType)contentType).ResetDirtyProperties();
+            ((ICanBeDirty)contentType).ResetDirtyProperties();
             return contentType;
         }
 
@@ -152,7 +153,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             PersistNewBaseContentType(dto, entity);
 
-            ((MediaType)entity).ResetDirtyProperties();
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IMediaType entity)
@@ -165,7 +166,7 @@ namespace Umbraco.Core.Persistence.Repositories
             
             PersistUpdatedBaseContentType(dto, entity);
 
-            ((MediaType)entity).ResetDirtyProperties();
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
         #endregion

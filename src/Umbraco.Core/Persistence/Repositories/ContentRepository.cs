@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
@@ -50,7 +51,7 @@ namespace Umbraco.Core.Persistence.Repositories
             
             content.Properties = GetPropertyCollection(id, dto.ContentVersionDto.VersionId, contentType);
 
-            ((Content)content).ResetDirtyProperties();
+            ((ICanBeDirty)content).ResetDirtyProperties();
             return content;
         }
 
@@ -192,7 +193,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Insert(propertyDataDto);
             }
 
-            ((Content)entity).ResetDirtyProperties();
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IContent entity)
@@ -245,7 +246,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Insert(propertyDataDto);
             }
 
-            ((Content)entity).ResetDirtyProperties();
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
         
         #endregion

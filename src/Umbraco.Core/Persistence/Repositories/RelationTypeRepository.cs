@@ -38,6 +38,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new RelationTypeFactory();
             var entity = factory.BuildEntity(dto);
 
+            entity.ResetDirtyProperties();
+
             return entity;
         }
 

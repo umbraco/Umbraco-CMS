@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -44,7 +45,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var name = string.Concat(id, ".macro");
             Stream file = _fileSystem.OpenFile(name);
             var o = _serializationService.FromStream(file, typeof(IMacro));
-            return o as IMacro;
+            var macro = o as IMacro;
+
+            ((ICanBeDirty)macro).ResetDirtyProperties();
+
+            return macro;
         }
 
         protected override IEnumerable<IMacro> PerformGetAll(params string[] ids)
@@ -93,6 +98,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var name = string.Concat(entity.Alias, ".macro");
             var json = _serializationService.ToStream(entity);
             _fileSystem.AddFile(name, json.ResultStream, true);
+
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IMacro entity)
@@ -102,6 +109,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var name = string.Concat(entity.Alias, ".macro");
             var json = _serializationService.ToStream(entity);
             _fileSystem.AddFile(name, json.ResultStream, true);
+
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
         protected override void PersistDeletedItem(IMacro entity)

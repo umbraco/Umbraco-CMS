@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
@@ -39,7 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
             var definition = factory.BuildEntity(dataTypeDto);
-            ((DataTypeDefinition)definition).ResetDirtyProperties();
+            ((ICanBeDirty)definition).ResetDirtyProperties();
             return definition;
         }
 
@@ -144,7 +145,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             Database.Insert(dto);
 
-            ((DataTypeDefinition)entity).ResetDirtyProperties();
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IDataTypeDefinition entity)
@@ -163,7 +164,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Update(nodeDto);
             Database.Update(dto);
 
-            ((DataTypeDefinition)entity).ResetDirtyProperties();
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
         protected override void PersistDeletedItem(IDataTypeDefinition entity)

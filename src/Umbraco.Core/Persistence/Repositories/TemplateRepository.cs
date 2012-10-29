@@ -36,6 +36,8 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 FileSystem.AddFile(entity.Name, stream, true);
             }
+
+            entity.ResetDirtyProperties();
         }
 
         public override void Delete(Template entity)
@@ -110,6 +112,9 @@ namespace Umbraco.Core.Persistence.Repositories
                                    CreateDate = created,
                                    UpdateDate = updated
                                };
+
+            template.ResetDirtyProperties();
+
             return template;
         }
 

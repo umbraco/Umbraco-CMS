@@ -53,6 +53,8 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             entity.Translations = list;
 
+            ((ICanBeDirty)entity).ResetDirtyProperties();
+
             return entity;
         }
 
@@ -143,7 +145,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 translation.Id = Convert.ToInt32(Database.Insert(textDto));
             }
 
-            ((Entity)entity).ResetDirtyProperties();
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IDictionaryItem entity)
@@ -169,7 +171,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            ((Entity)entity).ResetDirtyProperties();
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
         protected override void PersistDeletedItem(IDictionaryItem entity)

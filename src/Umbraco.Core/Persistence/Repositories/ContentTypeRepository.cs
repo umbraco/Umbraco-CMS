@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
@@ -49,7 +50,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //Do something if adding fails? (Should hopefully not be possible unless someone create a circular reference)
             }
 
-            ((ContentType)contentType).ResetDirtyProperties();
+            ((ICanBeDirty)contentType).ResetDirtyProperties();
             return contentType;
         }
 
@@ -160,8 +161,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //TODO Insert new DocumentType entries - NOTE only seems relevant as long as Templates resides in the DB?
             //TODO Insert allowed Templates
-            
-            ((ContentType)entity).ResetDirtyProperties();
+
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(IContentType entity)
@@ -179,7 +180,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //TODO Update new DocumentType entries - NOTE only seems relevant as long as Templates resides in the DB?
             //TODO Update allowed Templates
 
-            ((ContentType)entity).ResetDirtyProperties();
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
         #endregion

@@ -38,6 +38,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var factory = new LanguageFactory();
             var entity = factory.BuildEntity(languageDto);
+
+            ((ICanBeDirty)entity).ResetDirtyProperties();
+
             return entity;
         }
 
@@ -122,7 +125,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
 
-            ((Entity)entity).ResetDirtyProperties();
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(ILanguage entity)
@@ -134,7 +137,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             Database.Update(dto);
 
-            ((Entity)entity).ResetDirtyProperties();
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
         #endregion
