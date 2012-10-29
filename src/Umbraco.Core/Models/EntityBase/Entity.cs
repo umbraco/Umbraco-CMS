@@ -136,7 +136,7 @@ namespace Umbraco.Core.Models.EntityBase
         /// <summary>
         /// Resets dirty properties by clearing the dictionary used to track changes.
         /// </summary>
-        internal void ResetDirtyProperties()
+        public void ResetDirtyProperties()
         {
             _propertyChangedInfo.Clear();
         }

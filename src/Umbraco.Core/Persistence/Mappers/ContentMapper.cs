@@ -52,6 +52,9 @@ namespace Umbraco.Core.Persistence.Mappers
 
         internal override string Map(string propertyName)
         {
+            if (!PropertyInfoCache.ContainsKey(propertyName))
+                return string.Empty;
+
             var dtoTypeProperty = PropertyInfoCache[propertyName];
 
             return base.GetColumnName(dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo);

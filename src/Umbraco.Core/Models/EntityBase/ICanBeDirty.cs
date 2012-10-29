@@ -7,5 +7,6 @@
     {
         bool IsDirty();
         bool IsPropertyDirty(string propName);
+        void ResetDirtyProperties();
     }
 }

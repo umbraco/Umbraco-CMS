@@ -2,6 +2,10 @@
 
 namespace Umbraco.Core.Persistence.Querying
 {
+    /// <summary>
+    /// Represents the Sql Translator for translating a <see cref="IQuery"/> object to Sql
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class SqlTranslator<T>
     {
         private readonly Sql _sql;

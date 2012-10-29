@@ -7,7 +7,6 @@ namespace Umbraco.Web.Publishing
     {
         bool Publish(IContent content, int userId);
         bool PublishWithChildren(IEnumerable<IContent> children, int userId);
-        void PublishWithSubs(IContent content, int userId);
         bool UnPublish(IContent content, int userId);
     }
 }

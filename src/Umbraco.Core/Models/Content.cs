@@ -225,7 +225,7 @@ namespace Umbraco.Core.Models
         /// Changes the Published state of the content object
         /// </summary>
         /// <param name="isPublished">Boolean indicating whether content is published (true) or unpublished (false)</param>
-        internal void ChangePublishedState(bool isPublished)
+        public void ChangePublishedState(bool isPublished)
         {
             Published = isPublished;
             //NOTE Should this be checked against the Expire/Release dates?
@@ -237,7 +237,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="isTrashed">Boolean indicating whether content is trashed (true) or not trashed (false)</param>
         /// <param name="parentId"> </param>
-        internal void ChangeTrashedState(bool isTrashed, int parentId = -1)
+        public void ChangeTrashedState(bool isTrashed, int parentId = -1)
         {
             Trashed = isTrashed;
 

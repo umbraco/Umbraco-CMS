@@ -12,29 +12,29 @@ namespace Umbraco.Core.Persistence.Mappers
         public void GetTableInfo(Type t, TableInfo ti)
         { }
 
-        public bool MapPropertyToColumn(PropertyInfo pi, ref string columnName, ref bool resultColumn)
+        public bool MapPropertyToColumn(Type t, PropertyInfo pi, ref string columnName, ref bool resultColumn)
         {
-            if (pi.DeclaringType == typeof(Content) || pi.DeclaringType == typeof(IContent))
+            if (t == typeof(Content) || t == typeof(IContent))
             {
                 var mappedName = ContentMapper.Instance.Map(pi.Name);
-                if (mappedName == string.Empty)
-                    return false;
-
-                columnName = mappedName;
+                if (!string.IsNullOrEmpty(mappedName))
+                {
+                    columnName = mappedName;
+                }
                 return true;
             }
 
-            if (pi.DeclaringType == typeof(Models.Media) || pi.DeclaringType == typeof(IMedia))
+            if (t == typeof(Models.Media) || t == typeof(IMedia))
             {
                 var mappedName = MediaMapper.Instance.Map(pi.Name);
-                if (mappedName == string.Empty)
-                    return false;
-
-                columnName = mappedName;
+                if (!string.IsNullOrEmpty(mappedName))
+                {
+                    columnName = mappedName;
+                }
                 return true;
             }
 
-            if (pi.DeclaringType == typeof(ContentType) || pi.DeclaringType == typeof(IContentType) || pi.DeclaringType == typeof(IMediaType))
+            if (t == typeof(ContentType) || t == typeof(IContentType) || t == typeof(IMediaType))
             {
                 var mappedName = ContentTypeMapper.Instance.Map(pi.Name);
                 if (!string.IsNullOrEmpty(mappedName))
@@ -44,47 +44,47 @@ namespace Umbraco.Core.Persistence.Mappers
                 return true;
             }
 
-            if (pi.DeclaringType == typeof(DataTypeDefinition) || pi.DeclaringType == typeof(IDataTypeDefinition))
+            if (t == typeof(DataTypeDefinition) || t == typeof(IDataTypeDefinition))
             {
                 var mappedName = DataTypeDefinitionMapper.Instance.Map(pi.Name);
-                if (mappedName == string.Empty)
-                    return false;
-
-                columnName = mappedName;
+                if (!string.IsNullOrEmpty(mappedName))
+                {
+                    columnName = mappedName;
+                }
                 return true;
             }
 
-            if (pi.DeclaringType == typeof(DictionaryItem) || pi.DeclaringType == typeof(IDictionaryItem))
+            if (t == typeof(DictionaryItem) || t == typeof(IDictionaryItem))
             {
                 var mappedName = DictionaryMapper.Instance.Map(pi.Name);
-                if (mappedName == string.Empty)
-                    return false;
-
-                columnName = mappedName;
+                if (!string.IsNullOrEmpty(mappedName))
+                {
+                    columnName = mappedName;
+                }
                 return true;
             }
 
-            if (pi.DeclaringType == typeof(DictionaryTranslation) || pi.DeclaringType == typeof(IDictionaryTranslation))
+            if (t == typeof(DictionaryTranslation) || t == typeof(IDictionaryTranslation))
             {
                 var mappedName = DictionaryTranslationMapper.Instance.Map(pi.Name);
-                if (mappedName == string.Empty)
-                    return false;
-
-                columnName = mappedName;
+                if (!string.IsNullOrEmpty(mappedName))
+                {
+                    columnName = mappedName;
+                }
                 return true;
             }
 
-            if (pi.DeclaringType == typeof(Language) || pi.DeclaringType == typeof(ILanguage))
+            if (t == typeof(Language) || t == typeof(ILanguage))
             {
                 var mappedName = LanguageMapper.Instance.Map(pi.Name);
-                if (mappedName == string.Empty)
-                    return false;
-
-                columnName = mappedName;
+                if (!string.IsNullOrEmpty(mappedName))
+                {
+                    columnName = mappedName;
+                }
                 return true;
             }
 
-            if (pi.DeclaringType == typeof(Relation))
+            if (t == typeof(Relation))
             {
                 var mappedName = RelationMapper.Instance.Map(pi.Name);
                 if (!string.IsNullOrEmpty(mappedName))
@@ -94,33 +94,33 @@ namespace Umbraco.Core.Persistence.Mappers
                 return true;
             }
 
-            if (pi.DeclaringType == typeof(RelationType))
+            if (t == typeof(RelationType))
             {
                 var mappedName = RelationTypeMapper.Instance.Map(pi.Name);
-                if (mappedName == string.Empty)
-                    return false;
-
-                columnName = mappedName;
+                if (!string.IsNullOrEmpty(mappedName))
+                {
+                    columnName = mappedName;
+                }
                 return true;
             }
 
-            if (pi.DeclaringType == typeof(PropertyType))
+            if (t == typeof(PropertyType))
             {
                 var mappedName = PropertyTypeMapper.Instance.Map(pi.Name);
-                if (mappedName == string.Empty)
-                    return false;
-
-                columnName = mappedName;
+                if (!string.IsNullOrEmpty(mappedName))
+                {
+                    columnName = mappedName;
+                }
                 return true;
             }
 
-            if (pi.DeclaringType == typeof(PropertyGroup))
+            if (t == typeof(PropertyGroup))
             {
                 var mappedName = PropertyGroupMapper.Instance.Map(pi.Name);
-                if (mappedName == string.Empty)
-                    return false;
-
-                columnName = mappedName;
+                if (!string.IsNullOrEmpty(mappedName))
+                {
+                    columnName = mappedName;
+                }
                 return true;
             }
 

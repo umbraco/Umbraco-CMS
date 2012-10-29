@@ -52,5 +52,18 @@ namespace Umbraco.Core.Models
         /// <param name="contentType">New ContentType for this content</param>
         /// <param name="clearProperties">Boolean indicating whether to clear PropertyTypes upon change</param>
         void ChangeContentType(IContentType contentType, bool clearProperties);
+
+        /// <summary>
+        /// Changes the Published state of the content object
+        /// </summary>
+        /// <param name="isPublished">Boolean indicating whether content is published (true) or unpublished (false)</param>
+        void ChangePublishedState(bool isPublished);
+
+        /// <summary>
+        /// Changes the Trashed state of the content object
+        /// </summary>
+        /// <param name="isTrashed">Boolean indicating whether content is trashed (true) or not trashed (false)</param>
+        /// <param name="parentId"> </param>
+        void ChangeTrashedState(bool isTrashed, int parentId = -1);
     }
 }

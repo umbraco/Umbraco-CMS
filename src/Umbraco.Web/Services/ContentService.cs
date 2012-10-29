@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
@@ -204,27 +205,34 @@ namespace Umbraco.Web.Services
 
             var list = new List<IContent>();
 
-            //Consider creating a Path query instead of recursive method
+            //Consider creating a Path query instead of recursive method:
             //var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith("-1"));
+
             var rootContent = GetRootContent();
             foreach (var content in rootContent)
             {
-                list.AddRange(GetChildrenDeep(content.Id));
-            }
-
-            foreach (var item in list)
-            {
-                //Only publish valid content - Might need to change the flat list as it could pose problems for children of invalid content
-                if(item.IsValid())
+                if(content.IsValid())
                 {
-                    ((Content)item).ChangePublishedState(true);
-                    repository.AddOrUpdate(item);
+                    list.AddRange(GetChildrenDeep(content.Id));
                 }
             }
 
-            unitOfWork.Commit();
+            //Publish and then update the database with new status
+            var published = _publishingStrategy.PublishWithChildren(list, userId);
+            if (published)
+            {
+                foreach (var item in list)
+                {
+                    repository.AddOrUpdate(item);
+                }
 
-            return _publishingStrategy.PublishWithChildren(list, userId);
+                unitOfWork.Commit();
+
+                //TODO Change this so we can avoid a depencency to the horrible library method / umbraco.content (singleton) class.
+                global::umbraco.library.RefreshContent();
+            }
+
+            return published;
         }
 
         /// <summary>
@@ -249,25 +257,48 @@ namespace Umbraco.Web.Services
             var unitOfWork = _provider.GetUnitOfWork();
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
-            //Consider creating a Path query instead of recursive method
+            //Check if parent is published - if parent isn't published this Content cannot be published
+            var parent = GetById(content.ParentId);
+            if (!parent.Published)
+            {
+                LogHelper.Info<ContentService>(
+                    string.Format("Content '{0}' with Id '{1}' could not be published because its parent is not published.",
+                                  content.Name, content.Id));
+                return false;
+            }
+
+            //Content contains invalid property values and can therefore not be published - fire event?
+            if (!content.IsValid())
+            {
+                LogHelper.Info<ContentService>(
+                    string.Format("Content '{0}' with Id '{1}' could not be published because of invalid properties.",
+                                  content.Name, content.Id));
+                return false;
+            }
+
+            //Consider creating a Path query instead of recursive method:
             //var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(content.Path));
+
             var list = GetChildrenDeep(content.Id);
             list.Add(content);
 
-            foreach (var item in list)
+            //Publish and then update the database with new status
+            var published = _publishingStrategy.PublishWithChildren(list, userId);
+            if (published)
             {
-                //TODO Test and correct this so children of unpublished content isn't published.
-                //Only publish valid content - Might need to change the flat list as it could pose problems for children of invalid content
-                if (item.IsValid())
+                foreach (var item in list)
                 {
-                    ((Content) item).ChangePublishedState(true);
                     repository.AddOrUpdate(item);
                 }
+
+                unitOfWork.Commit();
+
+                //TODO Change this so we can avoid a depencency to the horrible library method / umbraco.content (singleton) class.
+                //TODO Need to investigate if it will also update the cache for children of the Content object
+                global::umbraco.library.UpdateDocumentCache(content.Id);
             }
 
-            unitOfWork.Commit();
-
-            return _publishingStrategy.PublishWithChildren(list, userId);
+            return published;
         }
 
         /// <summary>
@@ -281,26 +312,42 @@ namespace Umbraco.Web.Services
             var unitOfWork = _provider.GetUnitOfWork();
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
-            ((Content)content).ChangePublishedState(false);
-            repository.AddOrUpdate(content);
-            unitOfWork.Commit();
+            var unpublished = _publishingStrategy.UnPublish(content, userId);
 
-            return _publishingStrategy.UnPublish(content, userId);
+            if (unpublished)
+            {
+                repository.AddOrUpdate(content);
+                unitOfWork.Commit();
+
+                //TODO Change this so we can avoid a depencency to the horrible library method / umbraco.content class.
+                global::umbraco.library.UnPublishSingleNode(content.Id);
+            }
+
+            return unpublished;
         }
 
         /// <summary>
         /// Gets a flat list of decendents of content from parent id
         /// </summary>
-        /// <param name="parentId"></param>
-        /// <returns></returns>
+        /// <remarks>
+        /// Only contains valid <see cref="IContent"/> objects, which means
+        /// that everything in the returned list can be published.
+        /// If an invalid <see cref="IContent"/> object is found it will not
+        /// be added to the list neither will its children.
+        /// </remarks>
+        /// <param name="parentId">Id of the parent to retrieve children from</param>
+        /// <returns>A list of valid <see cref="IContent"/> that can be published</returns>
         private List<IContent> GetChildrenDeep(int parentId)
         {
             var list = new List<IContent>();
             var children = GetChildren(parentId);
             foreach (var child in children)
             {
-                list.Add(child);
-                list.AddRange(GetChildrenDeep(child.Id));
+                if (child.IsValid())
+                {
+                    list.Add(child);
+                    list.AddRange(GetChildrenDeep(child.Id));
+                }
             }
             return list;
         }
@@ -316,16 +363,37 @@ namespace Umbraco.Web.Services
             var unitOfWork = _provider.GetUnitOfWork();
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
-            //NOTE: Should also check if parent is published - if parent isn't published this Content cannot be published
+            //Check if parent is published - if parent isn't published this Content cannot be published
+            var parent = GetById(content.ParentId);
+            if(!parent.Published)
+            {
+                LogHelper.Info<ContentService>(
+                    string.Format("Content '{0}' with Id '{1}' could not be published because its parent is not published.",
+                                  content.Name, content.Id));
+                return false;
+            }
 
+            //Content contains invalid property values and can therefore not be published - fire event?
             if (!content.IsValid())
-                return false;//Content contains invalid property values and can therefore not be published
+            {
+                LogHelper.Info<ContentService>(
+                    string.Format("Content '{0}' with Id '{1}' could not be published because of invalid properties.",
+                                  content.Name, content.Id));
+                return false;
+            }
 
-            ((Content)content).ChangePublishedState(true);
-            repository.AddOrUpdate(content);
-            unitOfWork.Commit();
+            //Publish and then update the database with new status
+            bool published = _publishingStrategy.Publish(content, userId);
+            if (published)
+            {
+                repository.AddOrUpdate(content);
+                unitOfWork.Commit();
 
-            return _publishingStrategy.Publish(content, userId);
+                //TODO Change this so we can avoid a depencency to the horrible library method / umbraco.content (singleton) class.
+                global::umbraco.library.UpdateDocumentCache(content.Id);
+            }
+
+            return published;
         }
 
         /// <summary>

@@ -4,6 +4,10 @@ using System.Linq.Expressions;
 
 namespace Umbraco.Core.Persistence.Querying
 {
+    /// <summary>
+    /// Represents the Query Builder for building LINQ translatable queries
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class Query<T> : IQuery<T>
     {
         private readonly ExpressionHelper<T> _expresionist = new ExpressionHelper<T>();
@@ -32,7 +36,7 @@ namespace Umbraco.Core.Persistence.Querying
             }
             return this;
         }
-
+        
         public List<string> WhereClauses()
         {
             return _wheres;

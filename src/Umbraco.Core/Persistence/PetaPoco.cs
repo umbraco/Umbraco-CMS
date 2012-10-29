@@ -118,7 +118,7 @@ namespace Umbraco.Core.Persistence
 	public interface IMapper
 	{
 		void GetTableInfo(Type t, TableInfo ti);
-		bool MapPropertyToColumn(PropertyInfo pi, ref string columnName, ref bool resultColumn);
+        bool MapPropertyToColumn(Type t, PropertyInfo pi, ref string columnName, ref bool resultColumn);
 		Func<object, object> GetFromDbConverter(PropertyInfo pi, Type SourceType);
 		Func<object, object> GetToDbConverter(Type SourceType);
 	}
@@ -1802,7 +1802,7 @@ namespace Umbraco.Core.Persistence
 					if (pc.ColumnName == null)
 					{
 						pc.ColumnName = pi.Name;
-						if (Database.Mapper != null && !Database.Mapper.MapPropertyToColumn(pi, ref pc.ColumnName, ref pc.ResultColumn))
+						if (Database.Mapper != null && !Database.Mapper.MapPropertyToColumn(t, pi, ref pc.ColumnName, ref pc.ResultColumn))
 							continue;
 					}
 
