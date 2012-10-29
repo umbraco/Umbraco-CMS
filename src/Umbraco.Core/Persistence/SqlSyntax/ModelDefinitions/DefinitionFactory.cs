@@ -19,14 +19,15 @@ namespace Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions
                  var resultColumnAttribute = propertyInfo.FirstAttribute<ResultColumnAttribute>();
                  if (resultColumnAttribute != null) continue;
 
-                 //Assumes ExplicitColumn attribute and thus having a ColumnAttribute with the name of the column
+                 //Looks for ColumnAttribute with the name of the column, which would exist with ExplicitColumns
+                 //Otherwise use the name of the property itself as the default convention
                  var columnAttribute = propertyInfo.FirstAttribute<ColumnAttribute>();
-                 if (columnAttribute == null) continue;
+                 string columnName = columnAttribute != null ? columnAttribute.Name : propertyInfo.Name;
 
                  //Creates a column definition and adds it to the collection on the table definition
                  var columnDefinition = new ColumnDefinition
                  {
-                     ColumnName = columnAttribute.Name,
+                     ColumnName = columnName,
                      PropertyType = propertyInfo.PropertyType
                  };
 
@@ -87,7 +88,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions
 
                          var foreignKeyDefinition = new ForeignKeyDefinition
                          {
-                             ColumnName = columnAttribute.Name,
+                             ColumnName = columnName,
                              ConstraintName = foreignKeyAttribute.Name,
                              ReferencedColumnName = referencedColumn,
                              ReferencedTableName = referencedTable.Value
@@ -105,7 +106,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions
                          ColumnNames = indexAttribute.ForColumns,
                          IndexName = indexAttribute.Name,
                          IndexType = indexAttribute.IndexType,
-                         IndexForColumn = columnAttribute.Name
+                         IndexForColumn = columnName
                      };
                      tableDefinition.IndexDefinitions.Add(indexDefinition);
                  }

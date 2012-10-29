@@ -163,6 +163,8 @@ namespace Umbraco.Core.Configuration
             }
         }
 
+        public const string UmbracoConnectionName = "umbracoDbDSN";
+
         /// <summary>
         /// Gets or sets the configuration status. This will return the version number of the currently installed umbraco instance.
         /// </summary>

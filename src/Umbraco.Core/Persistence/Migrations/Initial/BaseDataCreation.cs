@@ -6,7 +6,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
     /// <summary>
     /// Represents the initial data creation by running Insert for the base data.
     /// </summary>
-    public class BaseDataCreation
+    internal class BaseDataCreation
     {
         private readonly Database _database;
 
@@ -233,6 +233,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 9, DataTypeId = -88, ControlId = new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea"), DbType = "Nvarchar" });
                 _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 10, DataTypeId = -89, ControlId = new Guid("67db8357-ef57-493e-91ac-936d305e0f2a"), DbType = "Ntext" });
                 _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 11, DataTypeId = -90, ControlId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"), DbType = "Nvarchar" });
+                //Dropdown list
                 //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 12, DataTypeId = -91, ControlId = new Guid("a74ea9c9-8e18-4d2a-8cf6-73c6206c5da6"), DbType = "Nvarchar" });
                 _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 13, DataTypeId = -92, ControlId = new Guid("6c738306-4c17-4d88-b9bd-6546f3771597"), DbType = "Nvarchar" });
                 _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 14, DataTypeId = -36, ControlId = new Guid("b6fb1622-afa5-4bbf-a3cc-d9672a442222"), DbType = "Date" });
@@ -243,14 +244,23 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 19, DataTypeId = -41, ControlId = new Guid("23e93522-3200-44e2-9f29-e61a6fcbb79a"), DbType = "Date" });
                 _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 20, DataTypeId = -42, ControlId = new Guid("a74ea9c9-8e18-4d2a-8cf6-73c6206c5da6"), DbType = "Integer" });
                 _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 21, DataTypeId = -43, ControlId = new Guid("b4471851-82b6-4c75-afa4-39fa9c6a75e9"), DbType = "Nvarchar" });
+                // Fix for rich text editor backwards compatibility -> 83722133-f80c-4273-bdb6-1befaa04a612 TinyMCE DataType
                 //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 22, DataTypeId = -44, ControlId = new Guid("a3776494-0574-4d93-b7de-efdfdec6f2d1"), DbType = "Ntext" });
+                //Radiobutton list
                 //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 23, DataTypeId = -128, ControlId = new Guid("a52c7c1c-c330-476e-8605-d63d3b84b6a6"), DbType = "Nvarchar" });
+                //Dropdown list multiple
                 //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 24, DataTypeId = -129, ControlId = new Guid("928639ed-9c73-4028-920c-1e55dbb68783"), DbType = "Nvarchar" });
+                //Dropdown list
                 //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 25, DataTypeId = -130, ControlId = new Guid("a74ea9c9-8e18-4d2a-8cf6-73c6206c5da6"), DbType = "Nvarchar" });
+                //Dropdown list
                 //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 26, DataTypeId = -131, ControlId = new Guid("a74ea9c9-8e18-4d2a-8cf6-73c6206c5da6"), DbType = "Nvarchar" });
+                //Dropdown list
                 //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 27, DataTypeId = -132, ControlId = new Guid("a74ea9c9-8e18-4d2a-8cf6-73c6206c5da6"), DbType = "Nvarchar" });
+                //No edit
                 //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 28, DataTypeId = -133, ControlId = new Guid("6c738306-4c17-4d88-b9bd-6546f3771597"), DbType = "Ntext" });
+                //Dropdown list multiple
                 //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 29, DataTypeId = -134, ControlId = new Guid("928639ed-9c73-4028-920c-1e55dbb68783"), DbType = "Nvarchar" });
+                //Not found - maybe a legacy thing?
                 //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 30, DataTypeId = -50, ControlId = new Guid("aaf99bb2-dbbe-444d-a296-185076bf0484"), DbType = "Date" });
                 _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 31, DataTypeId = 1034, ControlId = new Guid("158aa029-24ed-4948-939e-c3da209e5fba"), DbType = "Integer" });
                 _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 32, DataTypeId = 1035, ControlId = new Guid("ead69342-f06d-4253-83ac-28000225583b"), DbType = "Integer" });

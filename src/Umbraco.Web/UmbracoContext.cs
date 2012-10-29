@@ -52,7 +52,9 @@ namespace Umbraco.Web
             Application = applicationContext;
         	RoutesCache = routesCache;
 
+            //Consider moving these two contexts to the constructor for proper DI
     	    Services = ServiceContext.Current;
+    	    DatabaseContext = DatabaseContext.Current;
 
 			// set the urls
 			this.RequestUrl = httpContext.Request.Url;
@@ -121,6 +123,14 @@ namespace Umbraco.Web
         /// </summary>
         public ServiceContext Services { get; private set; }
 
+        /// <summary>
+        /// Gets the current ServiceContext, which exposes the various services
+        /// </summary>
+        public DatabaseContext DatabaseContext { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="IRoutesCache"/>
+        /// </summary>
 		internal IRoutesCache RoutesCache { get; private set; }
 
     	/// <summary>

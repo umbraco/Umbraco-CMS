@@ -58,14 +58,12 @@ namespace Umbraco.Core.Persistence
             {
                 int created = db.Execute(new Sql(createSql));
 
+                //Fires the NewTable event, which is used internally to insert base data before adding constrants to the schema
                 if (NewTable != null)
                 {
                     var e = new TableCreationEventArgs();
                     NewTable(tableName, db, e);
                 }
-
-                //TODO Figure out how to deal with base data before/after db and constraint creation
-                //Possibly add an internal task to trigger the data creation prior to creating constraints?
                 
                 if(!string.IsNullOrEmpty(createPrimaryKeySql))
                     db.Execute(new Sql(createPrimaryKeySql));
@@ -115,7 +113,7 @@ namespace Umbraco.Core.Persistence
             creation.InitializeDatabaseSchema();
         }
 
-        static void PetaPocoExtensions_NewTable(string tableName, Database db, TableCreationEventArgs e)
+        private static void PetaPocoExtensions_NewTable(string tableName, Database db, TableCreationEventArgs e)
         {
             var baseDataCreation = new BaseDataCreation(db);
             baseDataCreation.InitializeBaseData(tableName);

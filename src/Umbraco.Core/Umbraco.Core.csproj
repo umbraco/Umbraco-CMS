@@ -41,7 +41,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Transactions" />
@@ -66,6 +65,7 @@
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
     <Compile Include="Configuration\InfrastructureSettings\Infrastructure.cs" />
     <Compile Include="CoreBootManager.cs" />
+    <Compile Include="DatabaseContext.cs" />
     <Compile Include="DataTableExtensions.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />

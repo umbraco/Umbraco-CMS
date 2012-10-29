@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Data.Common;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Persistence
 {
@@ -12,8 +13,7 @@ namespace Umbraco.Core.Persistence
     {
         #region Singleton
 
-        private const string ConnectionStringName = "umbracoDbDSN";
-        private static readonly Database _database = new Database(ConnectionStringName);
+        private static readonly Database _database = new Database(GlobalSettings.UmbracoConnectionName);
         private static readonly Lazy<DatabaseFactory> lazy = new Lazy<DatabaseFactory>(() => new DatabaseFactory());
 
         public static DatabaseFactory Current { get { return lazy.Value; } }
@@ -40,14 +40,14 @@ namespace Umbraco.Core.Persistence
             get
             {
                 var providerName = "System.Data.SqlClient";
-                if (ConfigurationManager.ConnectionStrings[ConnectionStringName] != null)
+                if (ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName] != null)
                 {
-                    if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[ConnectionStringName].ProviderName))
-                        providerName = ConfigurationManager.ConnectionStrings[ConnectionStringName].ProviderName;
+                    if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName))
+                        providerName = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName;
                 }
                 else
                 {
-                    throw new InvalidOperationException("Can't find a connection string with the name '" + ConnectionStringName + "'");
+                    throw new InvalidOperationException("Can't find a connection string with the name '" + GlobalSettings.UmbracoConnectionName + "'");
                 }
                 return providerName;
             }

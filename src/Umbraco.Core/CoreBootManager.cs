@@ -23,6 +23,7 @@ namespace Umbraco.Core
 		private bool _isComplete = false;
 
 		protected ApplicationContext ApplicationContext { get; private set; }
+        protected DatabaseContext DatabaseContext { get; private set; }
 
 		public virtual IBootManager Initialize()
 		{
@@ -34,6 +35,10 @@ namespace Umbraco.Core
 
 			//create the ApplicationContext
 			ApplicationContext = ApplicationContext.Current = new ApplicationContext();
+
+            //create and initialize the DatabaseContext
+		    DatabaseContext = DatabaseContext.Current = new DatabaseContext();
+            DatabaseContext.Initialize();
 
 			InitializeResolvers();
 
