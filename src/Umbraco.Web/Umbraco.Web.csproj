@@ -313,7 +313,6 @@
     <Compile Include="RenderFieldEncodingType.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Routing\LookupByPageIdQuery.cs" />
-    <Compile Include="Routing\NoTemplateHandler.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
     <Compile Include="Services\ContentService.cs" />
     <Compile Include="Services\ContentTypeService.cs" />

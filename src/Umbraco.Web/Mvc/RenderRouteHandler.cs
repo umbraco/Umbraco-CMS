@@ -269,7 +269,21 @@ namespace Umbraco.Web.Mvc
 			//we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
 			if (!publishedContentRequest.HasTemplate && !routeDef.HasHijackedRoute)
 			{
-				return new NoTemplateHandler();
+				var handler = publishedContentRequest.ProcessNoTemplateInMvc(requestContext.HttpContext);
+
+				// if it's not null it can be either the PublishedContentNotFoundHandler (no document was
+				// found to handle 404, or document with no template was found) or the WebForms handler 
+				// (a document was found and its template is WebForms)
+
+				// if it's null it means that a document was found and its template is Mvc
+
+				// if we have a handler, return now
+				if (handler != null)
+					return handler;
+
+				// else we are running Mvc
+				// update the route definition
+				routeDef = GetUmbracoRouteDefinition(requestContext, publishedContentRequest);
 			}
 
 			//no post values, just route to the controller/action requried (local)

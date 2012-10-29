@@ -28,27 +28,22 @@ namespace Umbraco.Web.Routing
 	/// </summary>
 	internal class PublishedContentRequest
     {
-		
 		/// <summary>
-		/// This creates a PublishedContentRequest and assigns it to the current HttpContext and then proceeds to 
-		/// process the request using the PublishedContentRequestBuilder. If everything is successful, the callback 
-		/// method will be called.
+		/// Assigns the request to the http context and proceeds to process the request. If everything is successful, invoke the callback.
 		/// </summary>
 		/// <param name="httpContext"></param>
 		/// <param name="umbracoContext"></param>
 		/// <param name="uri"></param>
 		/// <param name="onSuccess"></param>
-		internal static void ProcessRequest(HttpContextBase httpContext, UmbracoContext umbracoContext, Uri uri, Action<PublishedContentRequest> onSuccess)
+		internal void ProcessRequest(HttpContextBase httpContext, UmbracoContext umbracoContext, Action<PublishedContentRequest> onSuccess)
 		{
 			if (umbracoContext == null)
 				throw new NullReferenceException("The UmbracoContext.Current is null, ProcessRequest cannot proceed unless there is a current UmbracoContext");
-			if (uri == null) throw new ArgumentNullException("uri");
 			if (umbracoContext.RoutingContext == null)
 				throw new NullReferenceException("The UmbracoContext.RoutingContext has not been assigned, ProcessRequest cannot proceed unless there is a RoutingContext assigned to the UmbracoContext");
 
-			var docreq = new PublishedContentRequest(uri, umbracoContext.RoutingContext);
 			//assign back since this is a front-end request
-			umbracoContext.PublishedContentRequest = docreq;
+			umbracoContext.PublishedContentRequest = this;
 
 			// note - at that point the original legacy module did something do handle IIS custom 404 errors
 			//   ie pages looking like /anything.aspx?404;/path/to/document - I guess the reason was to support
@@ -59,33 +54,31 @@ namespace Umbraco.Web.Routing
 			//   so that they point to a non-existing page eg /redirect-404.aspx
 			//   TODO: SD: We need more information on this for when we release 4.10.0 as I'm not sure what this means.
 
-			//create the searcher
-			var searcher = new PublishedContentRequestBuilder(docreq);
 			//find domain
-			searcher.LookupDomain();
+			_builder.LookupDomain();
 			// redirect if it has been flagged
-			if (docreq.IsRedirect)
-				httpContext.Response.Redirect(docreq.RedirectUrl, true);
+			if (this.IsRedirect)
+				httpContext.Response.Redirect(this.RedirectUrl, true);
 			//set the culture on the thread
-			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = docreq.Culture;
+			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = this.Culture;
 			//find the document, found will be true if the doc request has found BOTH a node and a template
 			// though currently we don't use this value.
-			var found = searcher.LookupDocument();
+			var found = _builder.LookupDocument();
 			//this could be called in the LookupDocument method, but I've just put it here for clarity.
-			searcher.DetermineRenderingEngine();
+			_builder.DetermineRenderingEngine();
 
 			//TODO: here we should launch an event so that people can modify the doc request to do whatever they want.
 
 			// redirect if it has been flagged
-			if (docreq.IsRedirect)
-				httpContext.Response.Redirect(docreq.RedirectUrl, true);
+			if (this.IsRedirect)
+				httpContext.Response.Redirect(this.RedirectUrl, true);
 
 			// handle 404
-			if (docreq.Is404)
+			if (this.Is404)
 			{
 				httpContext.Response.StatusCode = 404;
 
-				if (!docreq.HasNode)
+				if (!this.HasNode)
 				{
 					httpContext.RemapHandler(new PublishedContentNotFoundHandler());
 					return;
@@ -96,7 +89,7 @@ namespace Umbraco.Web.Routing
 			}
 
 			// just be safe - should never ever happen
-			if (!docreq.HasNode)
+			if (!this.HasNode)
 				throw new Exception("No document to render.");
 
 			// render even though we might have no template
@@ -105,67 +98,135 @@ namespace Umbraco.Web.Routing
 
 			// assign the legacy page back to the docrequest
 			// handlers like default.aspx will want it and most macros currently need it
-			docreq.UmbracoPage = new page(docreq);
+			this.UmbracoPage = new page(this);
 
 			// these two are used by many legacy objects
-			httpContext.Items["pageID"] = docreq.DocumentId;
-			httpContext.Items["pageElements"] = docreq.UmbracoPage.Elements;
+			httpContext.Items["pageID"] = this.DocumentId;
+			httpContext.Items["pageElements"] = this.UmbracoPage.Elements;
 
 			if (onSuccess != null)
-				onSuccess(docreq);
+				onSuccess(this);
 		}
 
+		internal IHttpHandler ProcessNoTemplateInMvc(HttpContextBase httpContext)
+		{
+			var content = this.PublishedContent;
+			this.PublishedContent = null;
+
+			_builder.LookupDocument2();
+			_builder.DetermineRenderingEngine();
+
+			// redirect if it has been flagged
+			if (this.IsRedirect)
+				httpContext.Response.Redirect(this.RedirectUrl, true);
+
+			// here .Is404 _has_ to be true
+			httpContext.Response.StatusCode = 404;
+
+			if (!this.HasNode)
+			{
+				// means the builder could not find a proper document to handle 404
+				// restore the saved content so we know it exists
+				this.PublishedContent = content;
+				return new PublishedContentNotFoundHandler();
+			}
+
+			if (!this.HasTemplate)
+			{
+				// means the builder could find a proper document, but the document has no template
+				// at that point there isn't much we can do and there is no point returning
+				// to Mvc since Mvc can't do much
+				return new PublishedContentNotFoundHandler("In addition, no template exists to render the custom 404.");
+			}
+
+			// render even though we might have no template
+			// to give MVC a chance to hijack routes
+			// pass off to our handlers (mvc or webforms)
+
+			// assign the legacy page back to the docrequest
+			// handlers like default.aspx will want it and most macros currently need it
+			this.UmbracoPage = new page(this);
+
+			// these two are used by many legacy objects
+			httpContext.Items["pageID"] = this.DocumentId;
+			httpContext.Items["pageElements"] = this.UmbracoPage.Elements;
+
+			switch (this.RenderingEngine)
+			{
+				case Core.RenderingEngine.Mvc:
+					return null;
+				case Core.RenderingEngine.WebForms:
+				default:
+					return (global::umbraco.UmbracoDefault)System.Web.Compilation.BuildManager.CreateInstanceFromVirtualPath("~/default.aspx", typeof(global::umbraco.UmbracoDefault));
+			}
+		}
+
+		private PublishedContentRequestBuilder _builder;
 
 		/// <summary>
-		/// Create a content request for a specific URL
+		/// Initializes a new instance of the <see cref="PublishedContentRequest"/> class with a specific Uri and routing context.
 		/// </summary>
-		/// <param name="uri"></param>
-		/// <param name="routingContext"></param>
+		/// <param name="uri">The request <c>Uri</c>.</param>
+		/// <param name="routingContext">A routing context.</param>
 		public PublishedContentRequest(Uri uri, RoutingContext routingContext)
         {
 			if (uri == null) throw new ArgumentNullException("uri");
 			if (routingContext == null) throw new ArgumentNullException("routingContext");
 
 			this.Uri = uri;
-			RoutingContext = routingContext;
-			
-			//set default
-			RenderingEngine = RenderingEngine.Mvc;			
-        }
+			this.RoutingContext = routingContext;
 
-		/// <summary>
-		/// the id of the requested node, if any, else zero.
-		/// </summary>
-		int _nodeId = 0;
-		
-		private IPublishedContent _publishedContent = null;
+			_builder = new PublishedContentRequestBuilder(this);
+			
+			// set default
+			this.RenderingEngine = RenderingEngine.Mvc;			
+        }
 
         #region Properties
 
 		/// <summary>
-		/// Returns the current RoutingContext
+		/// The identifier of the requested node, if any, else zero.
+		/// </summary>
+		int _nodeId = 0;
+
+		/// <summary>
+		/// The requested node, if any, else <c>null</c>.
+		/// </summary>
+		private IPublishedContent _publishedContent = null;
+
+		/// <summary>
+		/// The "umbraco page" object.
+		/// </summary>
+		private page _umbracoPage;
+
+		/// <summary>
+		/// Gets or sets the current RoutingContext.
 		/// </summary>
 		public RoutingContext RoutingContext { get; private set; }
 		
 		/// <summary>
-		/// The cleaned up Uri used for routing
+		/// Gets or sets the cleaned up Uri used for routing.
 		/// </summary>
 		public Uri Uri { get; private set; }
 
         /// <summary>
-        /// Gets or sets the document request's domain.
+        /// Gets or sets the content request's domain.
         /// </summary>
         public Domain Domain { get; internal set; }
 
+		/// <summary>
+		/// Gets or sets the content request's domain Uri.
+		/// </summary>
+		/// <remarks>The <c>Domain</c> may contain "example.com" whereas the <c>Uri</c> will be fully qualified eg "http://example.com/".</remarks>
 		public Uri DomainUri { get; internal set; }
 
 		/// <summary>
-		/// Gets or sets whether the rendering engine is MVC or WebForms
+		/// Gets or sets whether the rendering engine is MVC or WebForms.
 		/// </summary>
 		public RenderingEngine RenderingEngine { get; internal set; }
 
         /// <summary>
-        /// Gets a value indicating whether the document request has a domain.
+        /// Gets a value indicating whether the content request has a domain.
         /// </summary>
         public bool HasDomain
         {
@@ -173,14 +234,12 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Gets or sets the document request's culture
+        /// Gets or sets the content request's culture.
         /// </summary>
         public CultureInfo Culture { get; set; }
 
-		private page _umbracoPage;
-
 		/// <summary>
-		/// Returns the Umbraco page object
+		/// Gets or sets the "umbraco page" object.
 		/// </summary>
 		/// <remarks>
 		/// This value is only used for legacy/webforms code.
@@ -190,9 +249,8 @@ namespace Umbraco.Web.Routing
 			get
 			{
 				if (_umbracoPage == null)
-				{
 					throw new InvalidOperationException("The umbraco page object is only available once Finalize()");
-				}
+
 				return _umbracoPage;
 			}
 			set { _umbracoPage = value; }
@@ -201,6 +259,9 @@ namespace Umbraco.Web.Routing
 		// TODO: fixme - do we want to have an ordered list of alternate cultures,
         //         to allow for fallbacks when doing dictionnary lookup and such?
 
+		/// <summary>
+		/// Gets or sets the requested content.
+		/// </summary>
 		public IPublishedContent PublishedContent
 		{			
 			get { return _publishedContent; }
@@ -213,12 +274,12 @@ namespace Umbraco.Web.Routing
 		}
 
         /// <summary>
-        /// Gets or sets the document request's template lookup
+        /// Gets or sets the template to use to display the requested content.
         /// </summary>
 		public Template Template { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether the document request has a template.
+        /// Gets a value indicating whether the content request has a template.
         /// </summary>
         public bool HasTemplate
         {
@@ -226,9 +287,9 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Gets the id of the document.
+        /// Gets the identifier of the requested content.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown when the document request has no document.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the content request has no content.</exception>
         public int DocumentId
         {
             get
@@ -240,7 +301,7 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Gets a value indicating whether the document request has a document.
+        /// Gets a value indicating whether the content request has a content.
         /// </summary>
         public bool HasNode
         {
@@ -248,21 +309,21 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the requested document could not be found. This is set in the PublishedContentRequestBuilder.
+        /// Gets or sets a value indicating whether the requested content could not be found.
         /// </summary>
+		/// <remarks>This is set in the <c>PublishedContentRequestBuilder</c>.</remarks>
         internal bool Is404 { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether the document request triggers a redirect.
+        /// Gets a value indicating whether the content request triggers a redirect.
         /// </summary>
         public bool IsRedirect { get { return !string.IsNullOrWhiteSpace(this.RedirectUrl); } }
 
         /// <summary>
-        /// Gets the url to redirect to, when the document request triggers a redirect.
+        /// Gets or sets the url to redirect to, when the content request triggers a redirect.
         /// </summary>
         public string RedirectUrl { get; set; }
 
-        #endregion
-		
+        #endregion		
     }
 }

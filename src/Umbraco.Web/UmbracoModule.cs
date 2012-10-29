@@ -101,12 +101,10 @@ namespace Umbraco.Web
 			// legacy - no idea what this is but does something with the query strings
 			LegacyCleanUmbPageFromQueryString(ref uri);
 
-			//process the request and on success, call the callback method: RewriteToUmbracoHandler
-			PublishedContentRequest.ProcessRequest(
-				httpContext, 
-				umbracoContext,
-				umbracoContext.CleanedUmbracoUrl, //very important to use this url! it is the path only lowercased version of the current URL. 
-				docreq => RewriteToUmbracoHandler(HttpContext.Current, uri.Query, docreq.RenderingEngine));
+			// instanciate a request a process
+			// important to use CleanedUmbracoUrl - lowercase path-only version of the current url
+			var docreq = new PublishedContentRequest(umbracoContext.CleanedUmbracoUrl, umbracoContext.RoutingContext);
+			docreq.ProcessRequest(httpContext, umbracoContext, docreq2 => RewriteToUmbracoHandler(HttpContext.Current, uri.Query, docreq2.RenderingEngine));
 		}
 
 		/// <summary>
@@ -320,7 +318,7 @@ namespace Umbraco.Web
 					rewritePath = "~/"
 						+ GlobalSettings.Path.TrimStart(new[] { '~', '/' }).TrimEnd(new[] { '/' })
 						+ "/RenderMvc";
-					//First we rewrite the path to the path of the handler (i.e. default.aspx or /umbraco/RenderMvc )
+					// we rewrite the path to the path of the handler (i.e. default.aspx or /umbraco/RenderMvc )
 					context.RewritePath(rewritePath, "", currentQuery.TrimStart(new[] { '?' }), false);
 
 					//if it is MVC we need to do something special, we are not using TransferRequest as this will 
@@ -340,12 +338,9 @@ namespace Umbraco.Web
 				case RenderingEngine.WebForms:
 				default:
 					rewritePath = "~/default.aspx";
-					//First we rewrite the path to the path of the handler (i.e. default.aspx or /umbraco/RenderMvc )
+					// rewrite the path to the path of the handler (i.e. default.aspx or /umbraco/RenderMvc )
 					context.RewritePath(rewritePath, "", currentQuery.TrimStart(new[] { '?' }), false);
 
-					//now, execute the handler
-					var webFormshandler = (global::umbraco.UmbracoDefault)BuildManager.CreateInstanceFromVirtualPath("~/default.aspx", typeof(global::umbraco.UmbracoDefault));
-					context.RemapHandler(webFormshandler);
 					break;
 			}
 
