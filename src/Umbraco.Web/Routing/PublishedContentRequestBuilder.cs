@@ -175,7 +175,7 @@ namespace Umbraco.Web.Routing
 		/// Performs the document resolution second pass.
 		/// </summary>
 		/// <remarks>The second pass consists in handling "not found", internal redirects, access validation, and template.</remarks>
-		private void LookupDocument2()
+		internal void LookupDocument2()
 		{
 			const string tracePrefix = "LookupDocument2: ";
 
