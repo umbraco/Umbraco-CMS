@@ -270,6 +270,12 @@ namespace Umbraco.Web.Mvc
 			if (!publishedContentRequest.HasTemplate && !routeDef.HasHijackedRoute)
 			{
 				var handler = publishedContentRequest.ProcessNoTemplateInMvc(requestContext.HttpContext);
+				//though this code should never execute if the ProcessNoTemplateInMvc method redirects, it seems that we should check it
+				//and return null, this could be required for unit testing as well
+				if (publishedContentRequest.IsRedirect)
+				{
+					return null;
+				}
 
 				// if it's not null it can be either the PublishedContentNotFoundHandler (no document was
 				// found to handle 404, or document with no template was found) or the WebForms handler 

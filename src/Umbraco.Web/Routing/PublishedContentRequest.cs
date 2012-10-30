@@ -32,7 +32,6 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		/// <param name="httpContext"></param>
 		/// <param name="umbracoContext"></param>
-		/// <param name="uri"></param>
 		/// <param name="onSuccess"></param>
 		internal void ProcessRequest(HttpContextBase httpContext, UmbracoContext umbracoContext, Action<PublishedContentRequest> onSuccess)
 		{
@@ -107,6 +106,13 @@ namespace Umbraco.Web.Routing
 				onSuccess(this);
 		}
 
+		/// <summary>
+		/// After execution is handed off to MVC, we can finally check if the request has: No Template assigned and also the 
+		/// route is not hijacked. When this occurs, we need to send the routing back through the builder to check for 
+		/// not found handlers.
+		/// </summary>
+		/// <param name="httpContext"></param>
+		/// <returns></returns>
 		internal IHttpHandler ProcessNoTemplateInMvc(HttpContextBase httpContext)
 		{
 			var content = this.PublishedContent;
@@ -117,7 +123,10 @@ namespace Umbraco.Web.Routing
 
 			// redirect if it has been flagged
 			if (this.IsRedirect)
+			{
 				httpContext.Response.Redirect(this.RedirectUrl, true);
+			}
+				
 
 			// here .Is404 _has_ to be true
 			httpContext.Response.StatusCode = 404;
