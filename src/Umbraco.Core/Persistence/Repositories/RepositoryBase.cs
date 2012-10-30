@@ -55,8 +55,6 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 _work.RegisterChanged(entity, this);
             }
-
-            _cache.Save(typeof(TEntity), entity);
         }
 
         /// <summary>
@@ -65,7 +63,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public void Delete(TEntity entity)
         {
-            _cache.Delete(typeof(TEntity), entity);
             if(_work != null)
             {
                 _work.RegisterRemoved(entity, this);
@@ -186,28 +183,31 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Unit of work method that tells the repository to persist the new entity
         /// </summary>
-        /// <param name="item"></param>
-        public virtual void PersistNewItem(IEntity item)
+        /// <param name="entity"></param>
+        public virtual void PersistNewItem(IEntity entity)
         {
-            PersistNewItem((TEntity)item);
+            PersistNewItem((TEntity)entity);
+            _cache.Save(typeof(TEntity), entity);
         }
 
         /// <summary>
         /// Unit of work method that tells the repository to persist the updated entity
         /// </summary>
-        /// <param name="item"></param>
-        public virtual void PersistUpdatedItem(IEntity item)
+        /// <param name="entity"></param>
+        public virtual void PersistUpdatedItem(IEntity entity)
         {
-            PersistUpdatedItem((TEntity)item);
+            PersistUpdatedItem((TEntity)entity);
+            _cache.Save(typeof(TEntity), entity);
         }
 
         /// <summary>
         /// Unit of work method that tells the repository to persist the deletion of the entity
         /// </summary>
-        /// <param name="item"></param>
-        public virtual void PersistDeletedItem(IEntity item)
+        /// <param name="entity"></param>
+        public virtual void PersistDeletedItem(IEntity entity)
         {
-            PersistDeletedItem((TEntity)item);
+            PersistDeletedItem((TEntity)entity);
+            _cache.Delete(typeof(TEntity), entity);
         }
 
         #endregion

@@ -22,7 +22,7 @@ namespace Umbraco.Tests.TestHelpers
     /// Use this abstract class for tests that requires a Sql Ce database populated with the umbraco db schema.
     /// The PetaPoco Database class should be used through the <see cref="DatabaseFactory"/> singleton.
     /// </summary>
-    [TestFixture]
+    [TestFixture, RequiresSTA]
     public abstract class BaseDatabaseFactoryTest
     {
         [SetUp]
@@ -62,8 +62,6 @@ namespace Umbraco.Tests.TestHelpers
             DatabaseContext.Initialize();
             //Create the umbraco database and its base data
             DatabaseContext.Database.Initialize();
-
-            CreateTestData();
         }
 
         [TearDown]
@@ -84,8 +82,6 @@ namespace Umbraco.Tests.TestHelpers
                 File.Delete(filePath);
             }
         }
-
-        public abstract void CreateTestData();
 
         protected ApplicationContext ApplicationContext { get; private set; }
 

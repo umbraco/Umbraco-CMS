@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IContent PerformGet(int id)
         {
             var contentSql = GetBaseQuery(false);
-            contentSql.Append(GetBaseWhereClause(id));
+            contentSql.Where("[umbracoNode].[id] = @Id", new { Id = id });
             contentSql.OrderBy("[cmsContentVersion].[VersionDate] DESC");
 
             var dto = Database.Query<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(contentSql).FirstOrDefault();

@@ -1,16 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Web;
-using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.Services
 {
     [TestFixture]
     public class ContentServiceTests : BaseDatabaseFactoryTest
     {
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            CreateTestData();
+        }
+
         [Test]
         public void Can_Create_Content()
         {
@@ -35,11 +42,33 @@ namespace Umbraco.Tests.Services
             Assert.Throws<Exception>(() => contentService.CreateContent(-1, "umbAliasDoesntExist"));
         }
 
+        [Test]
         public void Can_Get_Content_By_Id()
-        { }
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
 
+            // Act
+            IContent content = contentService.GetById(1046);
+
+            // Assert
+            Assert.That(content, Is.Not.Null);
+            Assert.That(content.Id, Is.EqualTo(1046));
+        }
+
+        [Test]
         public void Can_Get_Content_By_Level()
-        { }
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+
+            // Act
+            IEnumerable<IContent> contents = contentService.GetByLevel(1);
+
+            // Assert
+            Assert.That(contents, Is.Not.Null);
+            Assert.That(contents.Any(), Is.True);
+        }
 
         public void Can_Get_Children_Of_Content_Id()
         { }
@@ -98,31 +127,21 @@ namespace Umbraco.Tests.Services
         public void Can_Rollback_Version_On_Content()
         { }
 
-        public override void CreateTestData()
+        public void CreateTestData()
         {
             //NOTE Maybe not the best way to create/save test data as we are using the services, which are being tested.
 
-            //Create and Save ContentType "umbTextpage"
+            //Create and Save ContentType "umbTextpage" -> 1045
             ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
             ServiceContext.ContentTypeService.Save(contentType);
 
-            //Create and Save Content "Homepage" based on "umbTextpage"
+            //Create and Save Content "Homepage" based on "umbTextpage" -> 1046
             Content textpage = MockedContent.CreateTextpageContent(contentType);
             ServiceContext.ContentService.Save(textpage, 0);
 
-            //Create and Save Content "Text Page 1" based on "umbTextpage"
+            //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1047
             Content subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", textpage.Id);
-            ServiceContext.ContentService.Save(subpage, 0);
-        }
-
-        private UmbracoContext UmbracoContext
-        {
-            get { return GetUmbracoContext("/test", 1234); }
-        }
-
-        private ServiceContext ServiceContext
-        {
-            get { return UmbracoContext.Services; }
+            ServiceContext.ContentService.Save(subpage, 0);//This content object is currently not saved!? Have to figure out why
         }
     }
 }

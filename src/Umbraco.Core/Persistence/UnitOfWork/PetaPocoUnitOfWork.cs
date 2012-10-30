@@ -11,12 +11,12 @@ namespace Umbraco.Core.Persistence.UnitOfWork
     internal class PetaPocoUnitOfWork : IUnitOfWork
     {
         private Guid _key;
-        private List<Operation> _operations;
+        private readonly List<Operation> _operations = new List<Operation>();
 
         public PetaPocoUnitOfWork()
         {
             _key = Guid.NewGuid();
-            _operations = new List<Operation>();
+            //_operations = new List<Operation>();
         }
 
         /// <summary>
