@@ -32,7 +32,7 @@ namespace Umbraco.Tests.TestHelpers
 			Resolution.Freeze();
 			ApplicationContext = new ApplicationContext() { IsReady = true };
 		    ServiceContext = ServiceContext.Current;
-		    DatabaseContext = DatabaseContext.Current;
+		    DatabaseContext = new DatabaseContext();
 			//we need to clear out all currently created template files
 			var masterPages = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Masterpages));
 			masterPages.GetFiles().ForEach(x => x.Delete());

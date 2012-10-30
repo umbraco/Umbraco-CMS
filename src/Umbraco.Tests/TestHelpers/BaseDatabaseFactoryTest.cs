@@ -36,7 +36,7 @@ namespace Umbraco.Tests.TestHelpers
             Resolution.Freeze();
             ApplicationContext = new ApplicationContext() { IsReady = true };
             ServiceContext = ServiceContext.Current;
-            DatabaseContext = DatabaseContext.Current;
+            DatabaseContext = new DatabaseContext();
 
             //we need to clear out all currently created template files
             var masterPages = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Masterpages));
@@ -58,10 +58,10 @@ namespace Umbraco.Tests.TestHelpers
             var engine = new SqlCeEngine(settings.ConnectionString);
             engine.CreateDatabase();
 
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntaxProvider.Instance;
-
-            //Create the umbraco database
-            DatabaseFactory.Current.Database.Initialize();
+            //Configure the Database and Sql Syntax based on connection string set in config
+            DatabaseContext.Initialize();
+            //Create the umbraco database and its base data
+            DatabaseContext.Database.Initialize();
 
             CreateTestData();
         }

@@ -72,7 +72,7 @@ namespace Umbraco.Tests.ContentStores
 			_umbracoContext = new UmbracoContext(_httpContextFactory.HttpContext, 
 				new ApplicationContext(), 
                 ServiceContext.Current,
-                DatabaseContext.Current,
+                new DatabaseContext(),
 				new DefaultRoutesCache(false));
 
 			_umbracoContext.GetXmlDelegate = () =>
