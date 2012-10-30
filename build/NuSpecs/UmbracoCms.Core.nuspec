@@ -25,6 +25,7 @@
 		<file src="..\_BuildOutput\WebApp\bin\HtmlAgilityPack.dll" target="lib\HtmlAgilityPack.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\ICSharpCode.SharpZipLib.dll" target="lib\ICSharpCode.SharpZipLib.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\interfaces.dll" target="lib\interfaces.dll" />
+		<file src="..\_BuildOutput\WebApp\bin\log4net.dll" target="lib\log4net.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\Lucene.Net.dll" target="lib\Lucene.Net.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\Microsoft.ApplicationBlocks.Data.dll" target="lib\Microsoft.ApplicationBlocks.Data.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\Microsoft.Web.Helpers.dll" target="lib\Microsoft.Web.Helpers.dll" />
