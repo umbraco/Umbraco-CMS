@@ -15,20 +15,17 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class PetaPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
         where TEntity : IAggregateRoot
     {
-        private readonly Database _database;
-
         protected PetaPocoRepositoryBase(IUnitOfWork work) : base(work)
         {
         }
 
         protected PetaPocoRepositoryBase(IUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
         {
-            _database = DatabaseFactory.Current.Database;
         }
 
         protected Database Database
         {
-            get { return _database; }
+            get { return DatabaseFactory.Current.Database; }
         }
 
         #region Abstract Methods
@@ -46,7 +43,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(true);
             sql.Append(GetBaseWhereClause(id));
-            var count = _database.ExecuteScalar<int>(sql);
+            var count = Database.ExecuteScalar<int>(sql);
             return count == 1;
         }
 
@@ -56,7 +53,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<TEntity>(sqlClause, query);
             var sql = translator.Translate();
 
-            return _database.ExecuteScalar<int>(sql);
+            return Database.ExecuteScalar<int>(sql);
         }
 
         protected override void PersistDeletedItem(TEntity entity)
@@ -64,7 +61,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var deletes = GetDeleteClauses();
             foreach (var delete in deletes)
             {
-                _database.Execute(delete, new {Id = entity.Id});
+                Database.Execute(delete, new {Id = entity.Id});
             }
         }
     }

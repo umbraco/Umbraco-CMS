@@ -68,6 +68,7 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(contents, Is.Not.Null);
             Assert.That(contents.Any(), Is.True);
+            Assert.That(contents.Count(), Is.EqualTo(1));
         }
 
         public void Can_Get_Children_Of_Content_Id()

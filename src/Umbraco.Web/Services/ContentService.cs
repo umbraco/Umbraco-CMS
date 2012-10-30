@@ -19,6 +19,7 @@ namespace Umbraco.Web.Services
     {
         private readonly IUnitOfWorkProvider _provider;
         private readonly IPublishingStrategy _publishingStrategy;
+        private readonly IUnitOfWork _unitOfWork;
 
         public ContentService() : this(new PetaPocoUnitOfWorkProvider())
         {
@@ -33,6 +34,7 @@ namespace Umbraco.Web.Services
         {
             _provider = provider;
             _publishingStrategy = publishingStrategy;
+            _unitOfWork = provider.GetUnitOfWork();
         }
 
         /// <summary>
@@ -403,10 +405,10 @@ namespace Umbraco.Web.Services
         /// <param name="userId">Id of the User saving the Content</param>
         public void Save(IContent content, int userId)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
+            //var unitOfWork = _provider.GetUnitOfWork();
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
             repository.AddOrUpdate(content);
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>

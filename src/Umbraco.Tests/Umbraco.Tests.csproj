@@ -110,6 +110,7 @@
     <Compile Include="Persistence\MySqlDatabaseCreationTest.cs" />
     <Compile Include="Persistence\MySqlTableByTableTest.cs" />
     <Compile Include="Persistence\Querying\QueryBuilderTests.cs" />
+    <Compile Include="Persistence\Repositories\ContentRepositoryTest.cs" />
     <Compile Include="Persistence\RepositoryResolverTests.cs" />
     <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\SqlTableByTableTest.cs" />
@@ -263,9 +264,7 @@
     <Content Include="Masterpages\dummy.txt" />
     <Content Include="Views\dummy.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Persistence\Repositories\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(ProjectDir)"..\..\lib\SQLCE4\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /D
