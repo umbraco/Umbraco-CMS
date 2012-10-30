@@ -12,9 +12,24 @@ namespace Umbraco.Tests.TestHelpers.Entities
                     {
                         title = "Welcome to our Home page",
                         bodyText = "This is the welcome message on the first page",
-                        keywords = "text,home,page",
-                        metaDescription = "The Lorem Ipsum company"
+                        author = "John Doe"
                     };
+
+            content.PropertyValues(obj);
+
+            return content;
+        }
+
+        public static Content CreateTextpageContent(ContentType contentType, string name, int parentId)
+        {
+            var content = new Content(parentId, contentType) { Name = name, Language = "en-US", ParentId = parentId, Template = "~/masterpages/umbTextPage.master", UserId = 0 };
+            object obj =
+                new
+                {
+                    title = name + " Subpage",
+                    bodyText = "This is a subpage",
+                    author = "John Doe"
+                };
 
             content.PropertyValues(obj);
 

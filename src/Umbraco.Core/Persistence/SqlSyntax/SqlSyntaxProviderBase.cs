@@ -8,6 +8,13 @@ using Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
+    /// <summary>
+    /// Represents the Base Sql Syntax provider implementation.
+    /// </summary>
+    /// <remarks>
+    /// All Sql Syntax provider implementations should derive from this abstract class.
+    /// </remarks>
+    /// <typeparam name="TSyntax"></typeparam>
     internal abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         where TSyntax : ISqlSyntaxProvider
     {
@@ -278,6 +285,24 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                                      columns));
             }
             return indexes;
+        }
+
+        public virtual List<string> ToAlterIdentitySeedStatements(TableDefinition table)
+        {
+            var seeds = new List<string>();
+
+            foreach (var definition in table.ColumnDefinitions)
+            {
+                if (definition.PrimaryKeySeeding > 0)
+                {
+                    seeds.Add(string.Format("ALTER TABLE {0} ALTER COLUMN {1} IDENTITY({2},1); \n",
+                                            GetQuotedTableName(table.TableName),
+                                            GetQuotedColumnName(definition.ColumnName),
+                                            definition.PrimaryKeySeeding));
+                }
+            }
+
+            return seeds;
         }
 
         public virtual bool DoesTableExist(Database db, string tableName)

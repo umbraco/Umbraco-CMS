@@ -15,7 +15,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions
              var objProperties = modelType.GetProperties().ToList();
              foreach (var propertyInfo in objProperties)
              {
-                 //If current property is a ResultColumn then skip it
+                 //If current property has an IgnoreAttribute then skip it
+                 var ignoreAttribute = propertyInfo.FirstAttribute<IgnoreAttribute>();
+                 if (ignoreAttribute != null) continue;
+
+                 //If current property has a ResultColumnAttribute then skip it
                  var resultColumnAttribute = propertyInfo.FirstAttribute<ResultColumnAttribute>();
                  if (resultColumnAttribute != null) continue;
 
@@ -61,6 +65,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions
                      columnDefinition.IsPrimaryKeyClustered = primaryKeyColumnAttribute.Clustered;
                      columnDefinition.PrimaryKeyName = primaryKeyColumnAttribute.Name ?? string.Empty;
                      columnDefinition.PrimaryKeyColumns = primaryKeyColumnAttribute.OnColumns ?? string.Empty;
+                     columnDefinition.PrimaryKeySeeding = primaryKeyColumnAttribute.IdentitySeed;
                  }
 
                  //Look for Constraint for the current column

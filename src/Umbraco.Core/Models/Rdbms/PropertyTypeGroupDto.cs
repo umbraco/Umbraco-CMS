@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class PropertyTypeGroupDto
     {
         [Column("id")]
-        [PrimaryKeyColumn]
+        [PrimaryKeyColumn(IdentitySeed = 6)]
         public int Id { get; set; }
 
         [Column("parentGroupId")]

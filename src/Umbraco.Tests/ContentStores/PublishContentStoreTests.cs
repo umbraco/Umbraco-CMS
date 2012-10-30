@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Services;
 using umbraco.BusinessLogic;
 
 namespace Umbraco.Tests.ContentStores
@@ -70,6 +71,8 @@ namespace Umbraco.Tests.ContentStores
 			
 			_umbracoContext = new UmbracoContext(_httpContextFactory.HttpContext, 
 				new ApplicationContext(), 
+                ServiceContext.Current,
+                DatabaseContext.Current,
 				new DefaultRoutesCache(false));
 
 			_umbracoContext.GetXmlDelegate = () =>

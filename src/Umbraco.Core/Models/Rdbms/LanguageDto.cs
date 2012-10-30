@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class LanguageDto
     {
         [Column("id")]
-        [PrimaryKeyColumn]
+        [PrimaryKeyColumn(IdentitySeed = 2)]
         public short Id { get; set; }
 
         [Column("languageISOCode")]

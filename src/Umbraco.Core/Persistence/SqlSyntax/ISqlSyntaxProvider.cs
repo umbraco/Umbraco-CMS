@@ -25,5 +25,6 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string ToCreatePrimaryKeyStatement(TableDefinition table);
         string GetSpecialDbType(SpecialDbTypes dbTypes);
         string GetConstraintDefinition(ColumnDefinition column, string tableName);
+        List<string> ToAlterIdentitySeedStatements(TableDefinition table);
     }
 }

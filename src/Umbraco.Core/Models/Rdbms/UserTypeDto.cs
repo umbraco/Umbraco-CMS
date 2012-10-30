@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class UserTypeDto
     {
         [Column("id")]
-        [PrimaryKeyColumn]
+        [PrimaryKeyColumn(IdentitySeed = 5)]
         public short Id { get; set; }
 
         [Column("userTypeAlias")]

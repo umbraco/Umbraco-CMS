@@ -76,6 +76,7 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.Level = level;
 
             //Insert new ContentType entry
+            dto.NodeId = nodeDto.NodeId;
             Database.Insert(dto);
 
             //Insert ContentType composition in new table

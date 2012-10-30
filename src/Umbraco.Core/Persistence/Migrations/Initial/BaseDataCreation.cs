@@ -85,6 +85,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 _database.Execute(new Sql("SET IDENTITY_INSERT [umbracoNode] ON "));
                 _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = -1, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1", SortOrder = 0, UniqueId = new Guid("916724a5-173d-4619-b97e-b9de133dd6f5"), Text = "SYSTEM DATA: umbraco master root", NodeObjectType = new Guid("ea7d8624-4cfe-4578-a871-24aa946bf34d"), CreateDate = DateTime.UtcNow });
                 _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = -20, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1,-20", SortOrder = 0, UniqueId = new Guid("0F582A79-1E41-4CF0-BFA0-76340651891A"), Text = "Recycle Bin", NodeObjectType = new Guid("01BB7FF2-24DC-4C0C-95A2-C24EF72BBAC8"), CreateDate = DateTime.UtcNow });
+                _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = -21, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1,-21", SortOrder = 0, UniqueId = new Guid("BF7C7CBC-952F-4518-97A2-69E9C7B33842"), Text = "Recycle Bin", NodeObjectType = new Guid("CF3D8E34-1C1C-41e9-AE56-878B57B32113"), CreateDate = DateTime.UtcNow });
                 _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = -92, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,-92", SortOrder = 35, UniqueId = new Guid("f0bc4bfb-b499-40d6-ba86-058885a5178c"), Text = "Label", NodeObjectType = new Guid("30a2a501-1978-4ddb-a57b-f7efed43ba3c"), CreateDate = DateTime.UtcNow });
                 _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = -90, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,-90", SortOrder = 34, UniqueId = new Guid("84c6b441-31df-4ffe-b67e-67d5bc3ae65a"), Text = "Upload", NodeObjectType = new Guid("30a2a501-1978-4ddb-a57b-f7efed43ba3c"), CreateDate = DateTime.UtcNow });
                 _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = -89, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,-89", SortOrder = 33, UniqueId = new Guid("c6bac0dd-4ab9-45b1-8e30-e4b619ee5da3"), Text = "Textbox multiple", NodeObjectType = new Guid("30a2a501-1978-4ddb-a57b-f7efed43ba3c"), CreateDate = DateTime.UtcNow });
@@ -112,7 +113,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1041, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1041", SortOrder = 2, UniqueId = new Guid("b6b73142-b9c1-4bf8-a16d-e1c23320b549"), Text = "Tags", NodeObjectType = new Guid("30a2a501-1978-4ddb-a57b-f7efed43ba3c"), CreateDate = DateTime.UtcNow });
                 _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1042, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1042", SortOrder = 2, UniqueId = new Guid("0a452bd5-83f9-4bc3-8403-1286e13fb77e"), Text = "Macro Container", NodeObjectType = new Guid("30a2a501-1978-4ddb-a57b-f7efed43ba3c"), CreateDate = DateTime.UtcNow });
                 _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1043, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1043", SortOrder = 2, UniqueId = new Guid("1df9f033-e6d4-451f-b8d2-e0cbc50a836f"), Text = "Image Cropper", NodeObjectType = new Guid("30a2a501-1978-4ddb-a57b-f7efed43ba3c"), CreateDate = DateTime.UtcNow });
-                _database.Execute(new Sql("SET IDENTITY_INSERT [umbracoNode] OFF "));
+                _database.Execute(new Sql("SET IDENTITY_INSERT [umbracoNode] OFF;"));
 
                 transaction.Complete();
             }
@@ -131,7 +132,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             {
                 _database.Execute(new Sql("SET IDENTITY_INSERT [umbracoUser] ON "));
                 _database.Insert("umbracoUser", "id", false, new UserDto { Id = 0, Disabled = false, NoConsole = false, Type = 1, ContentStartId = -1, MediaStartId = -1, UserName = "Administrator", Login = "admin", Password = "default", Email = "", UserLanguage = "en", DefaultPermissions = null, DefaultToLiveEditing = false });
-                _database.Execute(new Sql("SET IDENTITY_INSERT [umbracoUser] OFF "));
+                _database.Execute(new Sql("SET IDENTITY_INSERT [umbracoUser] OFF;"));
 
                 transaction.Complete();
             }
@@ -139,9 +140,10 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         
         private void CreateUmbracoUserTypeData()
         {
-            _database.Insert(new UserTypeDto { Id = 1, Alias = "admin", Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:" });
-            _database.Insert(new UserTypeDto { Id = 2, Alias = "writer", Name = "Writer", DefaultPermissions = "CAH:" });
-            _database.Insert(new UserTypeDto { Id = 3, Alias = "editor", Name = "Editors", DefaultPermissions = "CADMOSKTPUZ:" });
+            _database.Insert(new UserTypeDto { Id = 1, Alias = "admin", Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:5F" });
+            _database.Insert(new UserTypeDto { Id = 2, Alias = "writer", Name = "Writer", DefaultPermissions = "CAH:F" });
+            _database.Insert(new UserTypeDto { Id = 3, Alias = "editor", Name = "Editors", DefaultPermissions = "CADMOSKTPUZ:5F" });
+            _database.Insert(new UserTypeDto { Id = 4, Alias = "translator", Name = "Translator", DefaultPermissions = "AF" });
         }
 
         private void CreateUmbracoUser2AppData()
@@ -183,7 +185,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 _database.Insert("cmsPropertyTypeGroup", "id", false, new PropertyTypeGroupDto { Id = 3, ContentTypeNodeId = 1032, Text = "Image", SortOrder = 1 });
                 _database.Insert("cmsPropertyTypeGroup", "id", false, new PropertyTypeGroupDto { Id = 4, ContentTypeNodeId = 1033, Text = "File", SortOrder = 1 });
                 _database.Insert("cmsPropertyTypeGroup", "id", false, new PropertyTypeGroupDto { Id = 5, ContentTypeNodeId = 1031, Text = "Contents", SortOrder = 1 });
-                _database.Execute(new Sql("SET IDENTITY_INSERT [cmsPropertyTypeGroup] OFF "));
+                _database.Execute(new Sql("SET IDENTITY_INSERT [cmsPropertyTypeGroup] OFF;"));
 
                 transaction.Complete();
             }
@@ -203,7 +205,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 25, DataTypeId = -92, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = "umbracoExtension", Name = "Type", HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
                 _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 26, DataTypeId = -92, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = "umbracoBytes", Name = "Size", HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
                 _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 27, DataTypeId = -38, ContentTypeId = 1031, PropertyTypeGroupId = 5, Alias = "contents", Name = "Contents:", HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
-                _database.Execute(new Sql("SET IDENTITY_INSERT [cmsPropertyType] OFF "));
+                _database.Execute(new Sql("SET IDENTITY_INSERT [cmsPropertyType] OFF;"));
 
                 transaction.Complete();
             }
@@ -271,10 +273,42 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 38, DataTypeId = 1041, ControlId = new Guid("4023e540-92f5-11dd-ad8b-0800200c9a66"), DbType = "Ntext" });
                 _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 39, DataTypeId = 1042, ControlId = new Guid("474FCFF8-9D2D-11DE-ABC6-AD7A56D89593"), DbType = "Ntext" });
                 _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 40, DataTypeId = 1043, ControlId = new Guid("7A2D436C-34C2-410F-898F-4A23B3D79F54"), DbType = "Ntext" });
-                _database.Execute(new Sql("SET IDENTITY_INSERT [cmsDataType] OFF "));
+                _database.Execute(new Sql("SET IDENTITY_INSERT [cmsDataType] OFF;"));
 
                 transaction.Complete();
             }
         }
+
+        private void CreateCmsDataTypePreValuesData()
+        {}
+
+        private void CreateUmbracoRelationTypeData()
+        {}
+
+        private void CreateCmsTaskTypeData()
+        { }
+
+        /*
+         
+         * SET IDENTITY_INSERT [cmsDataTypePreValues] ON 
+insert into cmsDataTypePreValues (id, dataTypeNodeId, [value], sortorder, alias)
+values (3,-87,',code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,' + char(124) + '1' + char(124) + '1,2,3,' + char(124) + '0' + char(124) + '500,400' + char(124) + '1049,' + char(124) + 'true' + char(124) + '', 0, '')
+
+insert into cmsDataTypePreValues (id, dataTypeNodeId, [value], sortorder, alias)
+values (4,1041,'default', 0, 'group')
+
+SET IDENTITY_INSERT [cmsDataTypePreValues] OFF
+;
+         
+         * 
+         * 
+         
+insert into umbracoRelationType (dual, parentObjectType, childObjectType, name, alias) values (1, 'c66ba18e-eaf3-4cff-8a22-41b16d66a972', 'c66ba18e-eaf3-4cff-8a22-41b16d66a972', 'Relate Document On Copy','relateDocumentOnCopy')
+;
+         * 
+         * 
+         
+         insert into cmsTaskType (alias) values ('toTranslate');
+         */
     }
 }

@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int Id { get; set; }
 
         [Column("ContentId")]
-        [ForeignKey(typeof(ContentDto))]
+        [ForeignKey(typeof(ContentDto), Column = "nodeId")]
         public int NodeId { get; set; }
 
         [Column("VersionId")]

@@ -19,6 +19,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions
         public bool IsPrimaryKeyClustered { get; set; }
         public string PrimaryKeyName { get; set; }
         public string PrimaryKeyColumns { get; set; }
+        public int PrimaryKeySeeding { get; set; }
 
         public string ConstraintName { get; set; }
         public string ConstraintDefaultValue { get; set; }

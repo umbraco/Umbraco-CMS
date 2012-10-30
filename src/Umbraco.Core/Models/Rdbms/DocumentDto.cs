@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class DocumentDto
     {
         [Column("nodeId")]
-        [ForeignKey(typeof(ContentDto))]
+        [ForeignKey(typeof(ContentDto), Column = "nodeId")]
         [ForeignKey(typeof(NodeDto))]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsDocument", ForColumns = "nodeId, versionId")]
         public int NodeId { get; set; }

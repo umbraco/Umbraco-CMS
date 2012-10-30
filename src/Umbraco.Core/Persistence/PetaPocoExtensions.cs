@@ -56,6 +56,7 @@ namespace Umbraco.Core.Persistence
 
             if (!tableExist)
             {
+                //Execute the Create Table sql
                 int created = db.Execute(new Sql(createSql));
 
                 //Fires the NewTable event, which is used internally to insert base data before adding constrants to the schema
@@ -65,16 +66,29 @@ namespace Umbraco.Core.Persistence
                     NewTable(tableName, db, e);
                 }
                 
+                //If any statements exists for the primary key execute them here
                 if(!string.IsNullOrEmpty(createPrimaryKeySql))
                     db.Execute(new Sql(createPrimaryKeySql));
                 
+                //Loop through foreignkey statements and execute sql
                 foreach (var sql in foreignSql)
                 {
                     int createdFk = db.Execute(new Sql(sql));
                 }
+                //Loop through index statements and execute sql
                 foreach (var sql in indexSql)
                 {
                     int createdIndex = db.Execute(new Sql(sql));
+                }
+
+                //Specific to Sql Ce - look for changes to Identity Seed
+                if(DatabaseFactory.Current.DatabaseProvider == DatabaseProviders.SqlServerCE)
+                {
+                    var seedSql = SyntaxConfig.SqlSyntaxProvider.ToAlterIdentitySeedStatements(tableDefinition);
+                    foreach (var sql in seedSql)
+                    {
+                        int createdSeed = db.Execute(new Sql(sql));
+                    }
                 }
             }
         }

@@ -50,6 +50,7 @@ namespace Umbraco.Core.Models.Rdbms
         [ResultColumn]
         public PropertyTypeDto PropertyTypeDto { get; set; }
 
+        [Ignore]
         public object GetValue
         {
             get

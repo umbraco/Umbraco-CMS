@@ -34,15 +34,19 @@ namespace Umbraco.Web
         /// </summary>
         private static UmbracoContext _umbracoContext;
 
-    	/// <summary>
-    	/// Creates a new Umbraco context.
-    	/// </summary>
-    	/// <param name="httpContext"></param>
-    	/// <param name="applicationContext"> </param>
-    	/// <param name="routesCache"> </param>
-    	internal UmbracoContext(
+        /// <summary>
+        /// Creates a new Umbraco context.
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <param name="applicationContext"> </param>
+        /// <param name="databaseContext"> </param>
+        /// <param name="routesCache"> </param>
+        /// <param name="serviceContext"> </param>
+        internal UmbracoContext(
 			HttpContextBase httpContext, 
 			ApplicationContext applicationContext,
+            ServiceContext serviceContext,
+            DatabaseContext databaseContext,
 			IRoutesCache routesCache)
         {
             if (httpContext == null) throw new ArgumentNullException("httpContext");
@@ -52,9 +56,8 @@ namespace Umbraco.Web
             Application = applicationContext;
         	RoutesCache = routesCache;
 
-            //Consider moving these two contexts to the constructor for proper DI
-    	    Services = ServiceContext.Current;
-    	    DatabaseContext = DatabaseContext.Current;
+            Services = serviceContext;
+            DatabaseContext = databaseContext;
 
 			// set the urls...
 			//original request url

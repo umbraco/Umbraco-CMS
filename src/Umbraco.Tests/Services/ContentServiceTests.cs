@@ -2,6 +2,8 @@
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Web;
 using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.Services
@@ -13,7 +15,7 @@ namespace Umbraco.Tests.Services
         public void Can_Create_Content()
         {
             // Arrange
-            var contentService = GetUmbracoContext("/test", 1234).Services.ContentService;
+            var contentService = ServiceContext.ContentService;
 
             // Act
             IContent content = contentService.CreateContent(-1, "umbTextpage");
@@ -23,11 +25,11 @@ namespace Umbraco.Tests.Services
             Assert.That(content.HasIdentity, Is.False);
         }
 
-        /*[Test]*/
+        [Test]
         public void Cannot_Create_Content_With_Non_Existing_ContentType_Alias()
         {
             // Arrange
-            var contentService = new ContentService();
+            var contentService = ServiceContext.ContentService;
 
             // Act & Assert
             Assert.Throws<Exception>(() => contentService.CreateContent(-1, "umbAliasDoesntExist"));
@@ -95,5 +97,32 @@ namespace Umbraco.Tests.Services
 
         public void Can_Rollback_Version_On_Content()
         { }
+
+        public override void CreateTestData()
+        {
+            //NOTE Maybe not the best way to create/save test data as we are using the services, which are being tested.
+
+            //Create and Save ContentType "umbTextpage"
+            ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            //Create and Save Content "Homepage" based on "umbTextpage"
+            Content textpage = MockedContent.CreateTextpageContent(contentType);
+            ServiceContext.ContentService.Save(textpage, 0);
+
+            //Create and Save Content "Text Page 1" based on "umbTextpage"
+            Content subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", textpage.Id);
+            ServiceContext.ContentService.Save(subpage, 0);
+        }
+
+        private UmbracoContext UmbracoContext
+        {
+            get { return GetUmbracoContext("/test", 1234); }
+        }
+
+        private ServiceContext ServiceContext
+        {
+            get { return UmbracoContext.Services; }
+        }
     }
 }

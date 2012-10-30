@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Services;
 using umbraco.BusinessLogic;
 
 namespace Umbraco.Tests.TestHelpers
@@ -27,11 +28,16 @@ namespace Umbraco.Tests.TestHelpers
         [SetUp]
         public virtual void Initialize()
         {
+            TestHelper.SetupLog4NetForTests();
+
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
             Resolution.Freeze();
             ApplicationContext = new ApplicationContext() { IsReady = true };
+            ServiceContext = ServiceContext.Current;
+            DatabaseContext = DatabaseContext.Current;
+
             //we need to clear out all currently created template files
             var masterPages = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Masterpages));
             masterPages.GetFiles().ForEach(x => x.Delete());
@@ -56,21 +62,44 @@ namespace Umbraco.Tests.TestHelpers
 
             //Create the umbraco database
             DatabaseFactory.Current.Database.Initialize();
+
+            CreateTestData();
         }
 
         [TearDown]
         public virtual void TearDown()
         {
+            //reset the app context
+            ServiceContext = null;
+            DatabaseContext = null;
+            ApplicationContext.Current = null;
+            Resolution.IsFrozen = false;
+
+            string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
+
+            string filePath = string.Concat(path, "\\test.sdf");
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
         }
 
+        public abstract void CreateTestData();
+
         protected ApplicationContext ApplicationContext { get; private set; }
+
+        protected ServiceContext ServiceContext { get; private set; }
+
+        protected DatabaseContext DatabaseContext { get; private set; }
 
         protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null)
         {
             var ctx = new UmbracoContext(
                 GetHttpContextFactory(url, routeData).HttpContext,
                 ApplicationContext,
+                ServiceContext,
+                DatabaseContext,
                 GetRoutesCache());
             SetupUmbracoContextForTest(ctx, templateId);
             return ctx;

@@ -12,6 +12,7 @@ using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Services;
 using umbraco;
 using umbraco.IO;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
@@ -50,6 +51,8 @@ namespace Umbraco.Web
 			var umbracoContext = new UmbracoContext(
 				httpContext,
 				ApplicationContext.Current,
+                ServiceContext.Current,
+                DatabaseContext.Current,
 				RoutesCacheResolver.Current.RoutesCache);
 			UmbracoContext.Current = umbracoContext;
 

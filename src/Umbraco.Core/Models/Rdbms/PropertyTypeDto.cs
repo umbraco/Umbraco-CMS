@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class PropertyTypeDto
     {
         [Column("id")]
-        [PrimaryKeyColumn]
+        [PrimaryKeyColumn(IdentitySeed = 28)]
         public int Id { get; set; }
 
         [Column("dataTypeId")]

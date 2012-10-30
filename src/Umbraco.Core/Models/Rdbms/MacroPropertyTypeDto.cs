@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class MacroPropertyTypeDto
     {
         [Column("id")]
-        [PrimaryKeyColumn]
+        [PrimaryKeyColumn(IdentitySeed = 26)]
         public short Id { get; set; }
 
         [Column("macroPropertyTypeAlias")]
