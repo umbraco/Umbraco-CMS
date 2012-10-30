@@ -89,6 +89,6 @@ namespace Umbraco.Core.Models
         /// Returns an enum <see cref="MacroTypes"/> based on the properties on the Macro
         /// </summary>
         /// <returns><see cref="MacroTypes"/></returns>
-        MacroTypes FindMacroType();
+        MacroTypes MacroType();
     }
 }

@@ -6,11 +6,14 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Web.Services
 {
+    /// <summary>
+    /// Represents the File Service, which is an easy access to operations involving <see cref="IFile"/> objects like Scripts, Stylesheets and Templates
+    /// </summary>
     public class FileService : IFileService
     {
         private readonly IUnitOfWorkProvider _provider;
 
-        public FileService() : this(new PetaPocoUnitOfWorkProvider())
+        public FileService() : this(new FileUnitOfWorkProvider())
         {
         }
 

@@ -113,6 +113,9 @@ namespace Umbraco.Core
 			ActionsResolver.Current = new ActionsResolver(
 				PluginManager.Current.ResolveActions());
 
+            MacroPropertyTypeResolver.Current = new MacroPropertyTypeResolver(
+                PluginManager.Current.ResolveMacroPropertyTypes());
+
 			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
 				new []
 					{

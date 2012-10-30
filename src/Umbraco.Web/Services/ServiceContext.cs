@@ -34,6 +34,7 @@ namespace Umbraco.Web.Services
         private void BuildServiceCache()
         {
             var provider = new PetaPocoUnitOfWorkProvider();
+            var fileProvider = new FileUnitOfWorkProvider();
             var publishingStrategy = new PublishingStrategy();
 
             var contentService = new ContentService(provider, publishingStrategy);
@@ -42,13 +43,16 @@ namespace Umbraco.Web.Services
             var mediaService = new MediaService(provider);
             _cache.AddOrUpdate(typeof(IMediaService).Name, mediaService, (x, y) => mediaService);
 
+            var macroService = new MacroService(fileProvider);
+            _cache.AddOrUpdate(typeof (IMacroService).Name, macroService, (x, y) => macroService);
+
             var contentTypeService = new ContentTypeService(contentService, mediaService, provider);
             _cache.AddOrUpdate(typeof(IContentTypeService).Name, contentTypeService, (x, y) => contentTypeService);
 
             var dataTypeService = new DataTypeService(provider);
             _cache.AddOrUpdate(typeof(IDataTypeService).Name, dataTypeService, (x, y) => dataTypeService);
 
-            var fileService = new FileService(provider);
+            var fileService = new FileService(fileProvider);
             _cache.AddOrUpdate(typeof(IFileService).Name, fileService, (x, y) => fileService);
             
             var localizationService = new LocalizationService(provider);
@@ -101,6 +105,14 @@ namespace Umbraco.Web.Services
         public IMediaService MediaService
         {
             get { return _cache[typeof(IMediaService).Name] as IMediaService; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IMacroService"/>
+        /// </summary>
+        public IMacroService MacroService
+        {
+            get { return _cache[typeof(IMacroService).Name] as IMacroService; }
         }
     }
 }

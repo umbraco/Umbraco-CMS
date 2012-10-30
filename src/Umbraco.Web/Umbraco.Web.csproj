@@ -323,11 +323,14 @@
     <Compile Include="Services\IDataTypeService.cs" />
     <Compile Include="Services\IFileService.cs" />
     <Compile Include="Services\ILocalizationService.cs" />
+    <Compile Include="Services\IMacroService.cs" />
     <Compile Include="Services\IMediaService.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\LocalizationService.cs" />
+    <Compile Include="Services\MacroService.cs" />
     <Compile Include="Services\MediaService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
+    <Compile Include="Services\ServiceFactory.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
