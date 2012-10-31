@@ -159,6 +159,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var dto = factory.BuildDto(entity);
 
             PersistNewBaseContentType(dto.ContentTypeDto, entity);
+            //Inserts data into the cmsDocumentType table - currently only the ContentTypeNodeId is added/updated
+            dto.ContentTypeNodeId = entity.Id;
+            Database.Insert(dto);
 
             //TODO Insert new DocumentType entries - NOTE only seems relevant as long as Templates resides in the DB?
             //TODO Insert allowed Templates

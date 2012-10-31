@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            IContent content = contentService.GetById(1046);
+            var content = contentService.GetById(1046);
 
             // Assert
             Assert.That(content, Is.Not.Null);
@@ -63,16 +63,28 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            IEnumerable<IContent> contents = contentService.GetByLevel(1);
+            var contents = contentService.GetByLevel(2);
 
             // Assert
             Assert.That(contents, Is.Not.Null);
             Assert.That(contents.Any(), Is.True);
-            Assert.That(contents.Count(), Is.EqualTo(1));
+            Assert.That(contents.Count(), Is.GreaterThanOrEqualTo(2));
         }
 
+        [Test]
         public void Can_Get_Children_Of_Content_Id()
-        { }
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+
+            // Act
+            var contents = contentService.GetChildren(1046);
+
+            // Assert
+            Assert.That(contents, Is.Not.Null);
+            Assert.That(contents.Any(), Is.True);
+            Assert.That(contents.Count(), Is.GreaterThanOrEqualTo(2));
+        }
 
         public void Can_Get_All_Versions_Of_Content()
         { }
@@ -142,7 +154,11 @@ namespace Umbraco.Tests.Services
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1047
             Content subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", textpage.Id);
-            ServiceContext.ContentService.Save(subpage, 0);//This content object is currently not saved!? Have to figure out why
+            ServiceContext.ContentService.Save(subpage, 0);
+
+            //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1048
+            Content subpage2 = MockedContent.CreateTextpageContent(contentType, "Text Page 2", textpage.Id);
+            ServiceContext.ContentService.Save(subpage2, 0);
         }
     }
 }
