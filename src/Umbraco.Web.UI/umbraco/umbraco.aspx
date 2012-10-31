@@ -173,7 +173,7 @@
                 //    .ModalWindowShow("", false, 300, 100, 300, 0)
                 //    .closest(".umbModalBox").css("border", "none");
 
-                UmbClientMgr.appActions().shiftApp(app, uiKeys['sections_' + app]);
+                UmbClientMgr.appActions().shiftApp(app, uiKeys['sections_' + app] || app);
             });
 
 
