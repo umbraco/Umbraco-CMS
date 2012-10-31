@@ -62,7 +62,7 @@ namespace Umbraco.Web
 		/// <param name="htmlHelper"></param>
 		/// <param name="partialViewName"></param>
 		/// <param name="model"></param>
-		/// <param name="cacheMilliseconds"></param>
+		/// <param name="cachedSeconds"></param>
 		/// <param name="cacheKey">used to cache the partial view, this key could change if it is cached by page or by member</param>
 		/// <param name="viewData"></param>
 		/// <returns></returns>
@@ -71,7 +71,7 @@ namespace Umbraco.Web
 			HtmlHelper htmlHelper,
 			string partialViewName,
 			object model,
-			int cacheMilliseconds,
+			int cachedSeconds,
 			string cacheKey,
 			ViewDataDictionary viewData = null)
 		{
@@ -79,7 +79,7 @@ namespace Umbraco.Web
 				PartialViewCacheKey + cacheKey,
 				CacheItemPriority.NotRemovable, //not removable, the same as macros (apparently issue #27610)
 				null,
-				new TimeSpan(0, 0, 0, 0, cacheMilliseconds),
+				new TimeSpan(0, 0, 0, cachedSeconds),
 				() => htmlHelper.Partial(partialViewName, model, viewData));
 		}
 
