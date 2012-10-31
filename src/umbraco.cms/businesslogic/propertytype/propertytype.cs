@@ -338,11 +338,13 @@ namespace umbraco.cms.businesslogic.propertytype
             FlushCache();
 
             // clean all properties on inherited document types (if this propertytype is removed from a master)
-            cleanPropertiesOnDeletion(_contenttypeid);
+            //cleanPropertiesOnDeletion(_contenttypeid);
             //            DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == _contenttypeid).ForEach(dt => cleanPropertiesOnDeletion(dt.Id));
 
             // Delete all properties of propertytype
-            cleanPropertiesOnDeletion(_contenttypeid);
+            cleanPropertiesOnDeletion(_contenttypeid, DocumentType.GetAllAsList());
+
+            ContentType.FlushFromCache(_contenttypeid);
 
             // Delete PropertyType ..
             SqlHelper.ExecuteNonQuery("Delete from cmsPropertyType where id = " + Id);
@@ -365,11 +367,11 @@ namespace umbraco.cms.businesslogic.propertytype
             }
         }
 
-        private void cleanPropertiesOnDeletion(int contentTypeId)
+        private void cleanPropertiesOnDeletion(int contentTypeId, List<DocumentType> documentTypes )
         {
             // first delete from all master document types
-            DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == contentTypeId).ForEach(
-                dt => cleanPropertiesOnDeletion(dt.Id));
+            documentTypes.FindAll(dt => dt.MasterContentType == contentTypeId).ForEach(
+                dt => cleanPropertiesOnDeletion(dt.Id, documentTypes));
 
             // then remove from the current doc type
             Content[] objs = Content.getContentOfContentType(new ContentType(contentTypeId));
@@ -380,10 +382,10 @@ namespace umbraco.cms.businesslogic.propertytype
                 {
                     prop.delete();
                 }
-            }
+            } 
 
             // invalidate content type cache
-            ContentType.FlushFromCache(contentTypeId);
+            //ContentType.FlushFromCache(contentTypeId);
         }
 
         public IDataType GetEditControl(object value, bool isPostBack)

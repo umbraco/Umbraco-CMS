@@ -146,7 +146,8 @@ CREATE TABLE [cmsContentType]
 [pk] [int] NOT NULL IDENTITY(1, 1), 
 [nodeId] [int] NOT NULL, 
 [alias] [nvarchar] (255) NULL, 
-[icon] [nvarchar] (255) NULL 
+[icon] [nvarchar] (255) NULL,
+[thumbnail] nvarchar(255) NOT NULL CONSTRAINT [DF_cmsContentType_thumbnail] DEFAULT ('folder.png')
 ) 
  
 ; 
@@ -657,9 +658,9 @@ ALTER TABLE [umbracoNode] DROP CONSTRAINT [FK_umbracoNode_umbracoNode]
 |SET IDENTITY_INSERT [umbracoNode] OFF 
 ;
 !!!SET IDENTITY_INSERT [cmsContentType] ON 
-|INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon]) VALUES (532, 1031, N'Folder', N'folder.gif') 
-|INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon]) VALUES (533, 1032, N'Image', N'mediaPhoto.gif') 
-|INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon]) VALUES (534, 1033, N'File', N'mediaFile.gif') 
+|INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail]) VALUES (532, 1031, N'Folder', N'folder.gif', N'folder.png') 
+|INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail]) VALUES (533, 1032, N'Image', N'mediaPhoto.gif', N'mediaPhoto.png') 
+|INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail]) VALUES (534, 1033, N'File', N'mediaFile.gif', N'mediaFile.png') 
 |SET IDENTITY_INSERT [cmsContentType] OFF 
 ;
 !!!SET IDENTITY_INSERT [umbracoUser] ON 
@@ -863,10 +864,10 @@ INSERT INTO [umbracoAppTree]([treeSilent], [treeInitialize], [treeSortOrder], [a
 INSERT INTO [umbracoAppTree]([treeSilent], [treeInitialize], [treeSortOrder], [appAlias], [treeAlias], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES(0, 1, 2, 'settings', 'scripts', 'Scripts', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadScripts') 
 ;
 */
-alter TABLE [cmsContentType]
+/*alter TABLE [cmsContentType]
 add [thumbnail] nvarchar(255) NOT NULL CONSTRAINT
 [DF_cmsContentType_thumbnail] DEFAULT ('folder.png')
-;
+;*/
 alter TABLE [cmsContentType]
 add [description] nvarchar(1500) NULL
 ;

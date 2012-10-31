@@ -52,15 +52,23 @@ namespace umbraco
             int createFolder = ParentID;
 
             string basePath = IOHelper.MapPath(SystemDirectories.Scripts + "/" + relPath + fileName);
-
-            if (createFolder == 1)
+            if (System.IO.File.Exists(basePath))
             {
-                System.IO.Directory.CreateDirectory(basePath);
+                m_returnUrl = string.Format("settings/scripts/editScript.aspx?file={0}{1}.{2}", relPath, fileName, fileType);
+                return true;
             }
             else
             {
-                System.IO.File.Create(basePath + "." + fileType).Close();
-                m_returnUrl = string.Format("settings/scripts/editScript.aspx?file={0}{1}.{2}", relPath, fileName, fileType);
+                if (createFolder == 1)
+                {
+                    System.IO.Directory.CreateDirectory(basePath);
+                }
+                else
+                {
+                    System.IO.File.Create(basePath + "." + fileType).Close();
+                    m_returnUrl = string.Format("settings/scripts/editScript.aspx?file={0}{1}.{2}", relPath, fileName,
+                                                fileType);
+                }
             }
             return true;
         }

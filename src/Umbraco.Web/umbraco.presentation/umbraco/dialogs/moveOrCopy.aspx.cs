@@ -33,7 +33,10 @@ namespace umbraco.dialogs
             JTree.DataBind();
 
 			// Put user code to initialize the page here
-            if (!IsPostBack) {
+            if (!IsPostBack)
+            {
+                pp_relate.Text = ui.Text("moveOrCopy", "relateToOriginal");
+
                 //Document Type copy Hack...
                 string app = helper.Request("app");
 

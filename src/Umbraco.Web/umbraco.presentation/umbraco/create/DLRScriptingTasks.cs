@@ -77,32 +77,34 @@ namespace umbraco
                 templateFile.Close();
             }
 
+			string abFileName = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + fileName);
 
-            if (fileName.Contains("/")) //if there's a / create the folder structure for it
-            {
-                string[] folders = fileName.Split("/".ToCharArray());
-                string basePath = IOHelper.MapPath(SystemDirectories.MacroScripts);
-                for (int i = 0; i < folders.Length - 1; i++)
-                {
-                    basePath = System.IO.Path.Combine(basePath, folders[i]);
-                    System.IO.Directory.CreateDirectory(basePath);
-                }
-            }
+			if (!System.IO.File.Exists(abFileName))
+			{
+				if (fileName.Contains("/")) //if there's a / create the folder structure for it
+				{
+					string[] folders = fileName.Split("/".ToCharArray());
+					string basePath = IOHelper.MapPath(SystemDirectories.MacroScripts);
+					for (int i = 0; i < folders.Length - 1; i++)
+					{
+						basePath = System.IO.Path.Combine(basePath, folders[i]);
+						System.IO.Directory.CreateDirectory(basePath);
+					}
+				}
 
-            string abFileName = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + fileName);
-
-            System.IO.StreamWriter scriptWriter = System.IO.File.CreateText(abFileName);
-            scriptWriter.Write(scriptContent);
-            scriptWriter.Flush();
-            scriptWriter.Close();
+				System.IO.StreamWriter scriptWriter = System.IO.File.CreateText(abFileName);
+				scriptWriter.Write(scriptContent);
+				scriptWriter.Flush();
+				scriptWriter.Close();
 
 
-            if (ParentID == 1)
-            {
-                cms.businesslogic.macro.Macro m = cms.businesslogic.macro.Macro.MakeNew(
-                    helper.SpaceCamelCasing(fileName.Substring(0, (fileName.LastIndexOf('.') + 1)).Trim('.')));
-                m.ScriptingFile = fileName;
-            }
+				if (ParentID == 1)
+				{
+					cms.businesslogic.macro.Macro m = cms.businesslogic.macro.Macro.MakeNew(
+						helper.SpaceCamelCasing(fileName.Substring(0, (fileName.LastIndexOf('.') + 1)).Trim('.')));
+					m.ScriptingFile = fileName;
+				}
+			}
 
             m_returnUrl = string.Format(SystemDirectories.Umbraco + "/developer/python/editPython.aspx?file={0}", fileName);
             return true;
