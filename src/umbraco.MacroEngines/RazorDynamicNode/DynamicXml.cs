@@ -83,7 +83,7 @@ namespace umbraco.MacroEngines
 
         public IEnumerator GetEnumerator()
         {
-        	return _inner.GetEnumerator();
+			return this.BaseElement.Elements().Select(e => new DynamicXml(e)).GetEnumerator();
         }
         public int Count()
         {
