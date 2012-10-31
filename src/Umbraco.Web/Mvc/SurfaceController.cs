@@ -20,6 +20,12 @@ namespace Umbraco.Web.Mvc
 	//		ModelState.AddModelError("name", "bad name!");
 	//		return CurrentUmbracoPage();
 	//	}
+
+	//	[ChildActionOnly]
+	//	public ActionResult DoThis(string asdf)
+	//	{
+	//		return PartialView("DoThis", asdf + " DONE!");
+	//	}
 	//}
 
 	//public class LocalSurfaceController : SurfaceController
@@ -33,6 +39,12 @@ namespace Umbraco.Web.Mvc
 	//	{
 	//		ModelState.AddModelError("name", "you suck!");
 	//		return this.RedirectToCurrentUmbracoPage();
+	//	}
+
+	//	[ChildActionOnly]
+	//	public ActionResult DoThis(string asdf)
+	//	{
+	//		return PartialView("DoThis", asdf + " DONE Again!");
 	//	}
 	//}
 

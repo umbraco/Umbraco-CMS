@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Web;
 using System.Web.Caching;
+using Umbraco.Core.Logging;
 using global::umbraco.BusinessLogic;
 
 namespace Umbraco.Web
@@ -14,7 +15,7 @@ namespace Umbraco.Web
 	//   and it needs to be manually registered - which we want to avoid, in order
 	//   to be as unobtrusive as possible
 
-	public sealed class LegacyScheduledTasks : IApplicationEventHandler
+	internal sealed class LegacyScheduledTasks : IApplicationEventHandler
 	{
 		Timer pingTimer;
 		Timer publishingTimer;
@@ -62,9 +63,9 @@ namespace Umbraco.Web
 				if (global::umbraco.UmbracoSettings.CleaningMiliseconds > -1)
 					interval = global::umbraco.UmbracoSettings.CleaningMiliseconds;
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-				Log.Add(LogTypes.System, -1, "Unable to locate a log scrubbing interval.  Defaulting to 24 horus");
+				LogHelper.Error<LegacyScheduledTasks>("Unable to locate a log scrubbing interval.  Defaulting to 24 horus", e);
 			}
 			return interval;
 		}
@@ -77,9 +78,9 @@ namespace Umbraco.Web
 				if (global::umbraco.UmbracoSettings.MaxLogAge > -1)
 					maximumAge = global::umbraco.UmbracoSettings.MaxLogAge;
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-				Log.Add(LogTypes.System, -1, "Unable to locate a log scrubbing maximum age.  Defaulting to 24 horus");
+				LogHelper.Error<LegacyScheduledTasks>("Unable to locate a log scrubbing maximum age.  Defaulting to 24 horus", e);
 			}
 			return maximumAge;
 
