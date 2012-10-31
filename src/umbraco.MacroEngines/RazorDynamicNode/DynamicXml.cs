@@ -90,6 +90,11 @@ namespace umbraco.MacroEngines
         	return _inner.Count();
         }
 
+        public bool Any()
+        {
+            return _inner.Any();
+        }
+
         public bool IsNull()
         {
         	return _inner.IsNull();
