@@ -1,12 +1,18 @@
 using System;
 using System.Web.Caching;
 using System.Web;
+using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.cache
 {
     /// <summary>
     /// Used to easily store and retreive items from the cache.
     /// </summary>
+    /// <remarks>
+    /// This whole class will become obsolete, however one of the methods is still used that is not ported over to the new CacheHelper
+    /// class so that is why the class declaration is not marked obsolete.
+    /// We haven't migrated it because I don't know why it is needed.
+    /// </remarks>
     public class Cache
     {
         private static readonly object m_Locker = new object();
@@ -16,40 +22,22 @@ namespace umbraco.cms.businesslogic.cache
         /// umbraco content is removed, but also other cache items from pages running in
         /// the same application / website. Use with care :-)
         /// </summary>
+        [Obsolete("Use the ApplicationContext.Cache.ClearAllCache instead")]
         public static void ClearAllCache()
         {
-            System.Web.Caching.Cache c = System.Web.HttpRuntime.Cache;
-            if (c != null)
-            {
-                System.Collections.IDictionaryEnumerator cacheEnumerator = c.GetEnumerator();
-                while (cacheEnumerator.MoveNext())
-                {
-                    c.Remove(cacheEnumerator.Key.ToString());
-                }
-            }
+	        var helper = new CacheHelper(System.Web.HttpRuntime.Cache);
+			helper.ClearAllCache();
         }
 
         /// <summary>
         /// Clears the item in umbraco's runtime cache with the given key 
         /// </summary>
         /// <param name="key">Key</param>
+		[Obsolete("Use the ApplicationContext.Cache.ClearCacheItem instead")]
         public static void ClearCacheItem(string key)
         {
-            // NH 10 jan 2012
-            // Patch by the always wonderful Stéphane Gay to avoid cache null refs
-            lock (m_Locker)
-            {
-                var cache = HttpRuntime.Cache;
-                if (cache[key] != null)
-                {
-                    cache.Remove(key);
-                    var context = HttpContext.Current;
-                    if (context != null)
-                    {
-                        context.Trace.Warn("Cache", "Item " + key + " removed from cache");
-                    }
-                }
-            }
+			var helper = new CacheHelper(System.Web.HttpRuntime.Cache);
+	        helper.ClearCacheItem(key);
         }
 
 
@@ -58,48 +46,22 @@ namespace umbraco.cms.businesslogic.cache
         /// input parameter. (using [object].GetType())
         /// </summary>
         /// <param name="TypeName">The name of the System.Type which should be cleared from cache ex "System.Xml.XmlDocument"</param>
+		[Obsolete("Use the ApplicationContext.Cache.ClearCacheObjectTypes instead")]
         public static void ClearCacheObjectTypes(string TypeName)
         {
-            System.Web.Caching.Cache c = System.Web.HttpRuntime.Cache;
-            try
-            {
-                if (c != null)
-                {
-                    System.Collections.IDictionaryEnumerator cacheEnumerator = c.GetEnumerator();
-                    while (cacheEnumerator.MoveNext())
-                    {
-                        if (cacheEnumerator.Key != null && c[cacheEnumerator.Key.ToString()] != null && c[cacheEnumerator.Key.ToString()].GetType() != null && c[cacheEnumerator.Key.ToString()].GetType().ToString() == TypeName)
-                        {
-                            c.Remove(cacheEnumerator.Key.ToString());
-                        }
-                    }
-                }
-            }
-            catch (Exception CacheE)
-            {
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, BusinessLogic.User.GetUser(0), -1, "CacheClearing : " + CacheE.ToString());
-            }
+			var helper = new CacheHelper(System.Web.HttpRuntime.Cache);
+			helper.ClearCacheObjectTypes(TypeName);
         }
 
         /// <summary>
         /// Clears all cache items that starts with the key passed.
         /// </summary>
         /// <param name="KeyStartsWith">The start of the key</param>
+		[Obsolete("Use the ApplicationContext.Cache.ClearCacheByKeySearch instead")]
         public static void ClearCacheByKeySearch(string KeyStartsWith)
         {
-            System.Web.Caching.Cache c = System.Web.HttpRuntime.Cache;
-            if (c != null)
-            {
-                System.Collections.IDictionaryEnumerator cacheEnumerator = c.GetEnumerator();
-                while (cacheEnumerator.MoveNext())
-                {
-                    if (cacheEnumerator.Key is string && ((string)cacheEnumerator.Key).StartsWith(KeyStartsWith))
-                    {
-                        Cache.ClearCacheItem((string)cacheEnumerator.Key);
-                    }
-                }
-            }
-
+			var helper = new CacheHelper(System.Web.HttpRuntime.Cache);
+			helper.ClearCacheByKeySearch(KeyStartsWith);
         }
 
         /// <summary>
@@ -124,15 +86,16 @@ namespace umbraco.cms.businesslogic.cache
             return ht;
         }
 
-
         public delegate TT GetCacheItemDelegate<TT>();
 
+		[Obsolete("Use the ApplicationContext.Cache.GetCacheItem instead")]
         public static TT GetCacheItem<TT>(string cacheKey, object syncLock,
             TimeSpan timeout, GetCacheItemDelegate<TT> getCacheItem)
         {
             return GetCacheItem(cacheKey, syncLock, null, timeout, getCacheItem);
         }
 
+		[Obsolete("Use the ApplicationContext.Cache.GetCacheItem instead")]
         public static TT GetCacheItem<TT>(string cacheKey, object syncLock,
             CacheItemRemovedCallback refreshAction, TimeSpan timeout,
             GetCacheItemDelegate<TT> getCacheItem)
@@ -140,6 +103,7 @@ namespace umbraco.cms.businesslogic.cache
             return GetCacheItem(cacheKey, syncLock, CacheItemPriority.Normal, refreshAction, timeout, getCacheItem);
         }
 
+		[Obsolete("Use the ApplicationContext.Cache.GetCacheItem instead")]
         public static TT GetCacheItem<TT>(string cacheKey, object syncLock,
             CacheItemPriority priority, CacheItemRemovedCallback refreshAction, TimeSpan timeout,
             GetCacheItemDelegate<TT> getCacheItem)
@@ -147,28 +111,14 @@ namespace umbraco.cms.businesslogic.cache
             return GetCacheItem(cacheKey, syncLock, priority, refreshAction, null, timeout, getCacheItem);
         }
 
+		[Obsolete("Use the ApplicationContext.Cache.GetCacheItem instead")]
         public static TT GetCacheItem<TT>(string cacheKey, object syncLock,
             CacheItemPriority priority, CacheItemRemovedCallback refreshAction,
             CacheDependency cacheDependency, TimeSpan timeout, GetCacheItemDelegate<TT> getCacheItem)
         {
-            object result = System.Web.HttpRuntime.Cache.Get(cacheKey);
-            if (result == null)
-            {
-                lock (syncLock)
-                {
-                    result = System.Web.HttpRuntime.Cache.Get(cacheKey);
-                    if (result == null)
-                    {
-                        result = getCacheItem();
-                        if (result != null)
-                        {
-                            System.Web.HttpRuntime.Cache.Add(cacheKey, result, cacheDependency,
-                                DateTime.Now.Add(timeout), TimeSpan.Zero, priority, refreshAction);
-                        }
-                    }
-                }
-            }
-            return (TT)result;
+			var helper = new CacheHelper(System.Web.HttpRuntime.Cache);
+			Func<TT> f = () => getCacheItem();
+			return helper.GetCacheItem(cacheKey, priority, refreshAction, cacheDependency, timeout, f, syncLock);
         }
     }
 }

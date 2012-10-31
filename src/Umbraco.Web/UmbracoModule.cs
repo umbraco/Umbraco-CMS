@@ -107,7 +107,8 @@ namespace Umbraco.Web
 			// instanciate a request a process
 			// important to use CleanedUmbracoUrl - lowercase path-only version of the current url
 			var docreq = new PublishedContentRequest(umbracoContext.CleanedUmbracoUrl, umbracoContext.RoutingContext);
-			docreq.ProcessRequest(httpContext, umbracoContext, docreq2 => RewriteToUmbracoHandler(HttpContext.Current, uri.Query, docreq2.RenderingEngine));
+			docreq.ProcessRequest(httpContext, umbracoContext, 
+				docreq2 => RewriteToUmbracoHandler(HttpContext.Current, uri.Query, docreq2.RenderingEngine));
 		}
 
 		/// <summary>

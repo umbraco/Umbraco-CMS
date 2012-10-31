@@ -78,11 +78,15 @@ namespace Umbraco.Web
 			//it is a special resolver where they need to be instantiated first before any other resolvers in order to bind to 
 			//events and to call their events during bootup.
 			//ApplicationStartupHandler.RegisterHandlers();
+			//... and set the special flag to let us resolve before frozen resolution
 			ApplicationEventsResolver.Current = new ApplicationEventsResolver(
-				PluginManager.Current.ResolveApplicationStartupHandlers());
-
-			//set the special flag to let us resolve before frozen resolution
-			ApplicationEventsResolver.Current.CanResolveBeforeFrozen = true;
+				PluginManager.Current.ResolveApplicationStartupHandlers())
+				{
+					CanResolveBeforeFrozen = true
+				};
+			//add the internal types since we don't want to mark these public
+			ApplicationEventsResolver.Current.AddType<CacheHelperExtensions.CacheHelperApplicationEventListener>();
+			ApplicationEventsResolver.Current.AddType<LegacyScheduledTasks>();
 
 			//now we need to call the initialize methods
 			ApplicationEventsResolver.Current.ApplicationEventHandlers
@@ -165,7 +169,6 @@ namespace Umbraco.Web
 					umbracoPath + "/Surface/" + meta.ControllerName + "/{action}/{id}",//url to match
 					new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
 					new[] { meta.ControllerNamespace }); //only match this namespace
-				route.DataTokens.Add("area", umbracoPath); //only match this area
 				route.DataTokens.Add("umbraco", "surface"); //ensure the umbraco token is set
 			}
 			

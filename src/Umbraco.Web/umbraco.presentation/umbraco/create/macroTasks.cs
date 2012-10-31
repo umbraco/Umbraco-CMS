@@ -49,7 +49,12 @@ namespace umbraco
 
         public bool Save()
         {
-            int id = umbraco.cms.businesslogic.macro.Macro.MakeNew(_alias).Id;
+            int id = -1;
+            umbraco.cms.businesslogic.macro.Macro checkingMacro =umbraco.cms.businesslogic.macro.Macro.GetByAlias(_alias);
+            if (checkingMacro!=null)
+                id =checkingMacro.Id;
+            else      
+            id = umbraco.cms.businesslogic.macro.Macro.MakeNew(_alias).Id;
             m_returnUrl = string.Format("developer/Macros/editMacro.aspx?macroID={0}", id);
             return true;
         }

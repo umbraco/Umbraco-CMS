@@ -60,6 +60,7 @@
     <Compile Include="ApplicationContext.cs" />
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Attempt.cs" />
+    <Compile Include="CacheHelper.cs" />
     <Compile Include="Configuration\FileSystemProviderElement.cs" />
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />

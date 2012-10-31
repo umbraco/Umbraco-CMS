@@ -33,12 +33,7 @@ namespace Umbraco.Web
 		protected override bool SupportsClear
 		{
 			get { return false; }
-		}
-
-		protected override bool SupportsAdd
-		{
-			get { return false; }
-		}
+		}		
 
 		protected override bool SupportsInsert
 		{

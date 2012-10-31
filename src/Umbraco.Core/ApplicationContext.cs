@@ -4,6 +4,8 @@ using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Web;
+using System.Web.Caching;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -22,21 +24,32 @@ namespace Umbraco.Core
     	/// <summary>
         /// Constructor
         /// </summary>
-        public ApplicationContext()
-        {
-         
-        }
+        internal ApplicationContext()
+    	{
+			//create a new application cache from the HttpRuntime.Cache
+    		ApplicationCache = HttpRuntime.Cache == null 
+				? new CacheHelper(new Cache()) 
+				: new CacheHelper(HttpRuntime.Cache);
+    	}
 
-    	/// <summary>
+		/// <summary>
     	/// Singleton accessor
     	/// </summary>
     	public static ApplicationContext Current { get; internal set; }
+
+		/// <summary>
+		/// Returns the application wide cache accessor
+		/// </summary>
+		/// <remarks>
+		/// Any caching that is done in the application (app wide) should be done through this property
+		/// </remarks>
+		internal CacheHelper ApplicationCache { get; private set; }
 
     	// IsReady is set to true by the boot manager once it has successfully booted
         // note - the original umbraco module checks on content.Instance in umbraco.dll
         //   now, the boot task that setup the content store ensures that it is ready
         bool _isReady = false;
-		System.Threading.ManualResetEventSlim _isReadyEvent = new System.Threading.ManualResetEventSlim(false);
+		readonly System.Threading.ManualResetEventSlim _isReadyEvent = new System.Threading.ManualResetEventSlim(false);
         public bool IsReady
         {
             get

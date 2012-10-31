@@ -1,4 +1,4 @@
-<%@ Page language="c#" Codebehind="EditMember.aspx.cs" MasterPageFile="../masterpages/umbracoPage.Master" AutoEventWireup="True" Inherits="umbraco.cms.presentation.members.EditMember" %>
+<%@ Page language="c#" Codebehind="EditMember.aspx.cs" MasterPageFile="../masterpages/umbracoPage.Master" ValidateRequest="false" AutoEventWireup="True" Inherits="umbraco.cms.presentation.members.EditMember" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
 		<script type="text/javascript">

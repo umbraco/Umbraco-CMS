@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using Umbraco.Web.Mvc;
 using umbraco;
+using umbraco.cms.businesslogic.member;
 
 namespace Umbraco.Web
 {
@@ -17,6 +19,31 @@ namespace Umbraco.Web
 	/// </summary>
 	public static class HtmlHelperRenderExtensions
 	{
+		public static IHtmlString CachedPartial(
+			this HtmlHelper htmlHelper, 
+			string partialViewName, 
+			object model, 
+			int cachedSeconds,
+			bool cacheByPage = false,
+			bool cacheByMember = false,
+			ViewDataDictionary viewData = null)
+		{
+			var cacheKey = new StringBuilder(partialViewName);
+			if (cacheByPage)
+			{
+				if (UmbracoContext.Current == null)
+				{
+					throw new InvalidOperationException("Cannot cache by page if the UmbracoContext has not been initialized, this parameter can only be used in the context of an Umbraco request");
+				}
+				cacheKey.AppendFormat("{0}-", UmbracoContext.Current.PageId);
+			}
+			if (cacheByMember)
+			{
+				var currentMember = Member.GetCurrentMember();
+				cacheKey.AppendFormat("m{0}-", currentMember == null ? 0 : currentMember.Id);
+			}			
+			return ApplicationContext.Current.ApplicationCache.CachedPartialView(htmlHelper, partialViewName, model, cachedSeconds, cacheKey.ToString(), viewData);
+		}
 
 		public static MvcHtmlString EditorFor<T>(this HtmlHelper htmlHelper, string templateName = "", string htmlFieldName = "", object additionalViewData = null)
 			where T : new()

@@ -77,6 +77,22 @@ var UmbracoEmbedDialog = {
         if ($('#url').val() != '') {
             UmbracoEmbedDialog.showPreview();
         }
+
+    },
+    changeSource: function (type) {
+        if ($('#source').val() != '') {
+            $('#insert').removeAttr('disabled');
+        }
+        else {
+            $('#insert').attr('disabled', 'disabled');
+        }
+    },
+    updatePreviewFromSource: function (type) {
+        var sourceVal = $('#source').val();
+        
+        if (sourceVal != '') {
+            $('#preview').html(sourceVal);
+        }
     }
 };
 

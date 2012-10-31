@@ -190,6 +190,11 @@ namespace Umbraco.Core.Dynamics
             return this.BaseElement.Elements().Count();
         }
 
+        public bool Any()
+        {
+            return this.BaseElement.Elements().Any();
+        }
+
         public bool IsNull()
         {
             return false;

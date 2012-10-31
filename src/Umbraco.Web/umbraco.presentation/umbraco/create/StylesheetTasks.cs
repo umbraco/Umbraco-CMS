@@ -43,7 +43,12 @@ namespace umbraco
         public bool Save()
         {
 
-            int id = cms.businesslogic.web.StyleSheet.MakeNew(BusinessLogic.User.GetUser(_userID), Alias, "", "").Id;
+            int id = -1;
+            umbraco.cms.businesslogic.web.StyleSheet checkingSheet =umbraco.cms.businesslogic.web.StyleSheet.GetByName(Alias);
+            if (checkingSheet != null)
+                id = checkingSheet.Id;
+            else
+                id =cms.businesslogic.web.StyleSheet.MakeNew(BusinessLogic.User.GetUser(_userID), Alias, "", "").Id;            
             m_returnUrl = string.Format("settings/stylesheet/editStylesheet.aspx?id={0}", id);
             return true;
         }

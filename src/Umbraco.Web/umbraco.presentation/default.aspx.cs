@@ -6,6 +6,7 @@ using System.Web.UI;
 using System.IO;
 using System.Xml;
 using System.Text.RegularExpressions;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -135,7 +136,7 @@ namespace umbraco
 			{
 				LogHelper.Debug<UmbracoDefault>("Umbraco is running in preview mode.", Context.Trace);
 
-				if (Response.ContentType == "text/html") // ASP.NET default value
+				if (Response.ContentType.InvariantEquals("text/html")) // ASP.NET default value
 				{
 					int pos = text.ToLower().IndexOf("</body>");
 					if (pos > -1)
