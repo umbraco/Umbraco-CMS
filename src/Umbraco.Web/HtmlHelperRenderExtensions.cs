@@ -23,7 +23,7 @@ namespace Umbraco.Web
 			this HtmlHelper htmlHelper, 
 			string partialViewName, 
 			object model, 
-			int cacheMilliseconds,
+			int cachedSeconds,
 			bool cacheByPage = false,
 			bool cacheByMember = false,
 			ViewDataDictionary viewData = null)
@@ -42,7 +42,7 @@ namespace Umbraco.Web
 				var currentMember = Member.GetCurrentMember();
 				cacheKey.AppendFormat("m{0}-", currentMember == null ? 0 : currentMember.Id);
 			}			
-			return ApplicationContext.Current.ApplicationCache.CachedPartialView(htmlHelper, partialViewName, model, cacheMilliseconds, cacheKey.ToString(), viewData);
+			return ApplicationContext.Current.ApplicationCache.CachedPartialView(htmlHelper, partialViewName, model, cachedSeconds, cacheKey.ToString(), viewData);
 		}
 
 		public static MvcHtmlString EditorFor<T>(this HtmlHelper htmlHelper, string templateName = "", string htmlFieldName = "", object additionalViewData = null)
