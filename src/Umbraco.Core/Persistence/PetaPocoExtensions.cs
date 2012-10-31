@@ -35,6 +35,7 @@ namespace Umbraco.Core.Persistence
             var foreignSql = SyntaxConfig.SqlSyntaxProvider.ToCreateForeignKeyStatements(tableDefinition);
             var indexSql = SyntaxConfig.SqlSyntaxProvider.ToCreateIndexStatements(tableDefinition);
 
+            /*
 #if DEBUG
             Console.WriteLine(createSql);
             Console.WriteLine(createPrimaryKeySql);
@@ -47,6 +48,7 @@ namespace Umbraco.Core.Persistence
                 Console.WriteLine(sql);
             }
 #endif
+            */
 
             var tableExist = db.TableExist(tableName);
             if (overwrite && tableExist)

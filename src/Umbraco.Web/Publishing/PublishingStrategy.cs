@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -59,7 +60,8 @@ namespace Umbraco.Web.Publishing
             if (e.Cancel)
                 return false;
 
-            foreach (var content in children)
+            //Only update content thats not already been published
+            foreach (var content in children.Where(x => x.Published == false))
             {
                 FireBeforePublish(content, e);
 

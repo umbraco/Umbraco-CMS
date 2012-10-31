@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
@@ -144,28 +145,28 @@ namespace Umbraco.Web.Services
         }
 
         /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects, which has an expiration date greater then today
+        /// Gets a collection of <see cref="IContent"/> objects, which has an expiration date less than or equal to today.
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetContentForExpiration()
         {
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
 
-            var query = Query<IContent>.Builder.Where(x => x.Published == true && x.ExpireDate != null && x.ExpireDate.Value <= DateTime.Now);
+            var query = Query<IContent>.Builder.Where(x => x.Published == true && x.ExpireDate <= DateTime.UtcNow);
             var contents = repository.GetByQuery(query);
 
             return contents;
         }
 
         /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects, which has a release date greater then today
+        /// Gets a collection of <see cref="IContent"/> objects, which has a release date less than or equal to today.
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetContentForRelease()
         {
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
 
-            var query = Query<IContent>.Builder.Where(x => x.Published == true && x.ReleaseDate != null && x.ReleaseDate.Value <= DateTime.Now);
+            var query = Query<IContent>.Builder.Where(x => x.Published == false && x.ReleaseDate <= DateTime.UtcNow);
             var contents = repository.GetByQuery(query);
 
             return contents;
@@ -204,6 +205,7 @@ namespace Umbraco.Web.Services
             {
                 if(content.IsValid())
                 {
+                    list.Add(content);
                     list.AddRange(GetChildrenDeep(content.Id));
                 }
             }
@@ -212,7 +214,8 @@ namespace Umbraco.Web.Services
             var published = _publishingStrategy.PublishWithChildren(list, userId);
             if (published)
             {
-                foreach (var item in list)
+                //Only loop through content where the Published property has been updated
+                foreach (var item in list.Where(x => ((ICanBeDirty)x).IsPropertyDirty("Published")))
                 {
                     repository.AddOrUpdate(item);
                 }
@@ -220,7 +223,7 @@ namespace Umbraco.Web.Services
                 _unitOfWork.Commit();
 
                 //TODO Change this so we can avoid a depencency to the horrible library method / umbraco.content (singleton) class.
-                global::umbraco.library.RefreshContent();
+                //global::umbraco.library.RefreshContent();
             }
 
             return published;
@@ -276,7 +279,8 @@ namespace Umbraco.Web.Services
             var published = _publishingStrategy.PublishWithChildren(list, userId);
             if (published)
             {
-                foreach (var item in list)
+                //Only loop through content where the Published property has been updated
+                foreach (var item in list.Where(x => ((ICanBeDirty)x).IsPropertyDirty("Published")))
                 {
                     repository.AddOrUpdate(item);
                 }
@@ -285,7 +289,7 @@ namespace Umbraco.Web.Services
 
                 //TODO Change this so we can avoid a depencency to the horrible library method / umbraco.content (singleton) class.
                 //TODO Need to investigate if it will also update the cache for children of the Content object
-                global::umbraco.library.UpdateDocumentCache(content.Id);
+                //global::umbraco.library.UpdateDocumentCache(content.Id);
             }
 
             return published;
@@ -301,6 +305,7 @@ namespace Umbraco.Web.Services
         {
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
 
+            //TODO Look for children and unpublish them if any exists
             var unpublished = _publishingStrategy.UnPublish(content, userId);
 
             if (unpublished)
@@ -309,7 +314,7 @@ namespace Umbraco.Web.Services
                 _unitOfWork.Commit();
 
                 //TODO Change this so we can avoid a depencency to the horrible library method / umbraco.content class.
-                global::umbraco.library.UnPublishSingleNode(content.Id);
+                //global::umbraco.library.UnPublishSingleNode(content.Id);
             }
 
             return unpublished;
@@ -378,7 +383,7 @@ namespace Umbraco.Web.Services
                 _unitOfWork.Commit();
 
                 //TODO Change this so we can avoid a depencency to the horrible library method / umbraco.content (singleton) class.
-                global::umbraco.library.UpdateDocumentCache(content.Id);
+                //global::umbraco.library.UpdateDocumentCache(content.Id);
             }
 
             return published;
@@ -460,7 +465,7 @@ namespace Umbraco.Web.Services
             //TODO If content item has children those should also be moved to the recycle bin
             //TODO Unpublish deleted content + children
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
-            ((Content)content).ChangeTrashedState(true);
+            content.ChangeTrashedState(true);
             repository.AddOrUpdate(content);
             _unitOfWork.Commit();
         }
@@ -478,7 +483,17 @@ namespace Umbraco.Web.Services
         /// <param name="userId">Id of the User moving the Content</param>
         public void Move(IContent content, int parentId, int userId)
         {
-            content.ParentId = parentId;
+            //If Content is being moved away from Recycle Bin, its state should be un-trashed
+            if(content.Trashed && parentId != -20)
+            {
+                content.ChangeTrashedState(false, parentId);
+            }
+            else
+            {
+                content.ParentId = parentId;
+            }
+
+            //If Content is published, it should be (re)published from its new location
             if(content.Published)
             {
                 SaveAndPublish(content, userId);
@@ -518,6 +533,7 @@ namespace Umbraco.Web.Services
         {
             var copy = ((Content) content).Clone();
             copy.ParentId = parentId;
+            copy.Name = copy.Name + " (1)";
 
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
 
@@ -554,13 +570,16 @@ namespace Umbraco.Web.Services
         /// Rollback an <see cref="IContent"/> object to a previous version.
         /// This will create a new version, which is a copy of all the old data.
         /// </summary>
+        /// <remarks>
+        /// The way data is stored actually only allows us to rollback on properties
+        /// and not data like Name and Alias of the Content.
+        /// </remarks>
         /// <param name="id">Id of the <see cref="IContent"/>being rolled back</param>
         /// <param name="versionId">Id of the version to rollback to</param>
         /// <param name="userId">Id of the User issueing the rollback of the Content</param>
         /// <returns>The newly created <see cref="IContent"/> object</returns>
         public IContent Rollback(int id, Guid versionId, int userId)
         {
-            //TODO Need to test if this actually works
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
             var content = repository.GetByVersion(id, versionId);
             

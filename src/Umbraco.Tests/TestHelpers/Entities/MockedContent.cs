@@ -4,7 +4,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
 {
     public class MockedContent
     {
-        public static Content CreateTextpageContent(ContentType contentType)
+        public static Content CreateTextpageContent(IContentType contentType)
         {
             var content = new Content(-1, contentType) {Name = "Home", Language = "en-US", Level = 1, ParentId = -1, SortOrder = 1, Template = "~/masterpages/umbTextPage.master", UserId = 0};
             object obj =
@@ -20,7 +20,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return content;
         }
 
-        public static Content CreateTextpageContent(ContentType contentType, string name, int parentId)
+        public static Content CreateTextpageContent(IContentType contentType, string name, int parentId)
         {
             var content = new Content(parentId, contentType) { Name = name, Language = "en-US", ParentId = parentId, Template = "~/masterpages/umbTextPage.master", UserId = 0 };
             object obj =

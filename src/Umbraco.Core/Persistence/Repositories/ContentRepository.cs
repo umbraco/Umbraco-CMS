@@ -83,7 +83,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //NOTE: This doesn't allow properties to be part of the query
             var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
 
-            foreach (var dto in dtos)
+            foreach (var dto in dtos.DistinctBy(x => x.NodeId))
             {
                 yield return Get(dto.NodeId);
             }
@@ -259,7 +259,8 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IContent> GetAllVersions(int id)
         {
             var contentSql = GetBaseQuery(false);
-            contentSql.Append(GetBaseWhereClause(id));
+            //contentSql.Append(GetBaseWhereClause(id));
+            contentSql.Where("[umbracoNode].[id] = @Id", new { Id = id });
             contentSql.OrderBy("[cmsContentVersion].[VersionDate] DESC");
 
             var documentDtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(contentSql);
@@ -272,7 +273,8 @@ namespace Umbraco.Core.Persistence.Repositories
         public IContent GetByVersion(int id, Guid versionId)
         {
             var contentSql = GetBaseQuery(false);
-            contentSql.Append(GetBaseWhereClause(id));
+            //contentSql.Append(GetBaseWhereClause(id));
+            contentSql.Where("[umbracoNode].[id] = @Id", new { Id = id });
             contentSql.Where("[cmsContentVersion].[VersionId] = @VersionId", new { VersionId = versionId });
             contentSql.OrderBy("[cmsContentVersion].[VersionDate] DESC");
 

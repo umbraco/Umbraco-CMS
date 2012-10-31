@@ -55,19 +55,19 @@ namespace Umbraco.Core.Persistence.Factories
                     var result = service.ToStream(property.Value);
                     dto.Text = result.ResultStream.ToJsonString();
                 }*/
-                if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer)
+                if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer && property.Value != null)
                 {
                     dto.Integer = int.Parse(property.Value.ToString());
                 }
-                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Date)
+                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Date && property.Value != null)
                 {
                     dto.Date = DateTime.Parse(property.Value.ToString());
                 }
-                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Ntext)
+                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Ntext && property.Value != null)
                 {
                     dto.Text = property.Value.ToString();
                 }
-                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Nvarchar)
+                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Nvarchar && property.Value != null)
                 {
                     dto.VarChar = property.Value.ToString();
                 }
