@@ -414,6 +414,8 @@
     <Content Include="umbraco\images\information.png" />
     <Content Include="umbraco\images\listItemOrange.gif" />
     <Content Include="umbraco\images\pencil.png" />
+    <Content Include="umbraco\images\thumbnails\mediaFile.png" />
+    <Content Include="umbraco\images\thumbnails\mediaPhoto.png" />
     <Content Include="umbraco\images\thumbs_lrg.png" />
     <Content Include="umbraco\images\thumbs_med.png" />
     <Content Include="umbraco\images\thumbs_smll.png" />
