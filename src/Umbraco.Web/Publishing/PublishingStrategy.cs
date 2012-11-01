@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -16,27 +17,27 @@ namespace Umbraco.Web.Publishing
         }
 
         /// <summary>
-        /// Publishes a single piece of content
+        /// Publishes a single piece of Content
         /// </summary>
         /// <param name="content"><see cref="IContent"/> to publish</param>
-        /// <param name="userId">Id of the user issueing the publish</param>
-        /// <returns>True if the content was published, otherwise false</returns>
+        /// <param name="userId">Id of the User issueing the publish operation</param>
+        /// <returns>True if the publish operation was successfull and not cancelled, otherwise false</returns>
         public override bool Publish(IContent content, int userId)
         {
-            //Fire BeforePublish event
             var e = new PublishEventArgs();
+            //Fire BeforePublish event
             FireBeforePublish(content, e);
 
             if (!e.Cancel)
             {
                 content.ChangePublishedState(true);
 
-                //Fire AfterPublish event
-                FireAfterPublish(content, e);
-
                 LogHelper.Info<PublishingStrategy>(
                     string.Format("Content '{0}' with Id '{1}' has been published.",
                                   content.Name, content.Id));
+
+                //Fire AfterPublish event
+                FireAfterPublish(content, e);
 
                 //NOTE: Ideally the xml cache should be refreshed here - as part of the publishing
 
@@ -47,32 +48,31 @@ namespace Umbraco.Web.Publishing
         }
 
         /// <summary>
-        /// Publishes a list of content
+        /// Publishes a list of Content
         /// </summary>
-        /// <param name="children">List of <see cref="IContent"/> to publish</param>
-        /// <param name="userId">Id of the user issueing the publish</param>
-        /// <returns>True if the content was published, otherwise false</returns>
-        public override bool PublishWithChildren(IEnumerable<IContent> children, int userId)
+        /// <param name="content">An enumerable list of <see cref="IContent"/></param>
+        /// <param name="userId">Id of the User issueing the publish operation</param>
+        /// <returns>True if the publish operation was successfull and not cancelled, otherwise false</returns>
+        public override bool PublishWithChildren(IEnumerable<IContent> content, int userId)
         {
-            //Fire BeforePublish event
             var e = new PublishEventArgs();
 
-            if (e.Cancel)
-                return false;
-
             //Only update content thats not already been published
-            foreach (var content in children.Where(x => x.Published == false))
+            foreach (var item in content.Where(x => x.Published == false))
             {
-                FireBeforePublish(content, e);
+                //Fire BeforePublish event
+                FireBeforePublish(item, e);
+                if (e.Cancel)
+                    return false;
 
-                content.ChangePublishedState(true);
+                item.ChangePublishedState(true);
                 
-                //Fire AfterPublish event
-                FireAfterPublish(content, e);
-
                 LogHelper.Info<PublishingStrategy>(
                     string.Format("Content '{0}' with Id '{1}' has been published.",
-                                  content.Name, content.Id));
+                                  item.Name, item.Id));
+
+                //Fire AfterPublish event
+                FireAfterPublish(item, e);
             }
 
             //NOTE: Ideally the xml cache should be refreshed here - as part of the publishing
@@ -81,25 +81,32 @@ namespace Umbraco.Web.Publishing
         }
 
         /// <summary>
-        /// Unpublishes a single piece of content
+        /// Unpublishes a single piece of Content
         /// </summary>
         /// <param name="content"><see cref="IContent"/> to unpublish</param>
-        /// <param name="userId">Id of the user issueing the unpublish</param>
-        /// <returns>True is the content was unpublished, otherwise false</returns>
+        /// <param name="userId">Id of the User issueing the unpublish operation</param>
+        /// <returns>True if the unpublish operation was successfull and not cancelled, otherwise false</returns>
         public override bool UnPublish(IContent content, int userId)
         {
             var e = new UnPublishEventArgs();
+            //Fire BeforeUnPublish event
             FireBeforeUnPublish(content, e);
 
             if (!e.Cancel)
             {
+                //If Content has a release date set to before now, it should be removed so it doesn't interrupt an unpublish
+                //Otherwise it would remain released == published
+                if (content.ReleaseDate.HasValue && content.ReleaseDate.Value <= DateTime.UtcNow)
+                    content.ReleaseDate = null;
+
                 content.ChangePublishedState(false);
-                
-                FireAfterUnPublish(content, e);
 
                 LogHelper.Info<PublishingStrategy>(
                     string.Format("Content '{0}' with Id '{1}' has been unpublished.",
                                   content.Name, content.Id));
+
+                //Fire AfterUnPublish event
+                FireAfterUnPublish(content, e);
 
                 //NOTE: Ideally the xml cache should be refreshed here - as part of the unpublishing
 
@@ -107,6 +114,44 @@ namespace Umbraco.Web.Publishing
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Unpublishes a list of Content
+        /// </summary>
+        /// <param name="content">An enumerable list of <see cref="IContent"/></param>
+        /// <param name="userId">Id of the User issueing the unpublish operation</param>
+        /// <returns>True if the unpublish operation was successfull and not cancelled, otherwise false</returns>
+        public override bool UnPublish(IEnumerable<IContent> content, int userId)
+        {
+            var e = new UnPublishEventArgs();
+
+            //Only update content thats already been published
+            foreach (var item in content.Where(x => x.Published == true))
+            {
+                //Fire BeforeUnPublish event
+                FireBeforeUnPublish(item, e);
+                if (e.Cancel)
+                    return false;
+
+                //If Content has a release date set to before now, it should be removed so it doesn't interrupt an unpublish
+                //Otherwise it would remain released == published
+                if (item.ReleaseDate.HasValue && item.ReleaseDate.Value <= DateTime.UtcNow)
+                    item.ReleaseDate = null;
+
+                item.ChangePublishedState(false);
+
+                LogHelper.Info<PublishingStrategy>(
+                    string.Format("Content '{0}' with Id '{1}' has been unpublished.",
+                                  item.Name, item.Id));
+
+                //Fire AfterUnPublish event
+                FireAfterUnPublish(item, e);
+            }
+
+            //NOTE: Ideally the xml cache should be refreshed here - as part of the publishing
+
+            return true;
         }
     }
 }

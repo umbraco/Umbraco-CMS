@@ -250,9 +250,8 @@ namespace Umbraco.Web.Services
         {
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
 
-            //Check if parent is published - if parent isn't published this Content cannot be published
-            var parent = GetById(content.ParentId);
-            if (!parent.Published)
+            //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
+            if (content.ParentId != -1 && !GetById(content.ParentId).Published)
             {
                 LogHelper.Info<ContentService>(
                     string.Format("Content '{0}' with Id '{1}' could not be published because its parent is not published.",
@@ -272,8 +271,9 @@ namespace Umbraco.Web.Services
             //Consider creating a Path query instead of recursive method:
             //var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(content.Path));
 
-            var list = GetChildrenDeep(content.Id);
+            var list = new List<IContent>();
             list.Add(content);
+            list.AddRange(GetChildrenDeep(content.Id));
 
             //Publish and then update the database with new status
             var published = _publishingStrategy.PublishWithChildren(list, userId);
@@ -305,12 +305,29 @@ namespace Umbraco.Web.Services
         {
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
 
-            //TODO Look for children and unpublish them if any exists
-            var unpublished = _publishingStrategy.UnPublish(content, userId);
+            //Look for children and unpublish them if any exists, otherwise just unpublish the passed in Content.
+            var children = GetChildrenDeep(content.Id);
+            var hasChildren = children.Any();
+            
+            if(hasChildren)
+                children.Add(content);
+
+            var unpublished = hasChildren
+                                  ? _publishingStrategy.UnPublish(children, userId)
+                                  : _publishingStrategy.UnPublish(content, userId);
 
             if (unpublished)
             {
                 repository.AddOrUpdate(content);
+
+                if (hasChildren)
+                {
+                    foreach (var child in children)
+                    {
+                        repository.AddOrUpdate(child);
+                    }
+                }
+
                 _unitOfWork.Commit();
 
                 //TODO Change this so we can avoid a depencency to the horrible library method / umbraco.content class.
@@ -356,9 +373,8 @@ namespace Umbraco.Web.Services
         {
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
 
-            //Check if parent is published - if parent isn't published this Content cannot be published
-            var parent = GetById(content.ParentId);
-            if(!parent.Published)
+            //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
+            if (content.ParentId != -1 && GetById(content.ParentId).Published == false)
             {
                 LogHelper.Info<ContentService>(
                     string.Format("Content '{0}' with Id '{1}' could not be published because its parent is not published.",

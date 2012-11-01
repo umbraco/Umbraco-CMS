@@ -16,6 +16,7 @@ namespace Umbraco.Web.Services
         private readonly IUnitOfWorkProvider _provider;
         private readonly IContentService _contentService;
         private readonly IMediaService _mediaService;
+        private readonly IUnitOfWork _unitOfWork;
 
         public ContentTypeService(IContentService contentService, IMediaService mediaService)
             : this(contentService, mediaService, new PetaPocoUnitOfWorkProvider())
@@ -26,6 +27,7 @@ namespace Umbraco.Web.Services
             _contentService = contentService;
             _mediaService = mediaService;
             _provider = provider;
+            _unitOfWork = provider.GetUnitOfWork();
         }
 
         /// <summary>
@@ -35,8 +37,7 @@ namespace Umbraco.Web.Services
         /// <returns><see cref="IContentType"/></returns>
         public IContentType GetContentType(int id)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(_unitOfWork);
             return repository.Get(id);
         }
 
@@ -47,8 +48,7 @@ namespace Umbraco.Web.Services
         /// <returns><see cref="IContentType"/></returns>
         public IContentType GetContentType(string alias)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(_unitOfWork);
 
             var query = Query<IContentType>.Builder.Where(x => x.Alias == alias);
             var contentTypes = repository.GetByQuery(query);
@@ -63,8 +63,7 @@ namespace Umbraco.Web.Services
         /// <returns>An Enumerable list of <see cref="IContentType"/> objects</returns>
         public IEnumerable<IContentType> GetAllContentTypes(params int[] ids)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(_unitOfWork);
             return repository.GetAll(ids);
         }
 
@@ -75,8 +74,7 @@ namespace Umbraco.Web.Services
         /// <returns>An Enumerable list of <see cref="IContentType"/> objects</returns>
         public IEnumerable<IContentType> GetContentTypeChildren(int id)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(_unitOfWork);
 
             var query = Query<IContentType>.Builder.Where(x => x.ParentId == id);
             var contentTypes = repository.GetByQuery(query);
@@ -89,11 +87,10 @@ namespace Umbraco.Web.Services
         /// <param name="contentType"><see cref="IContentType"/> to save</param>
         public void Save(IContentType contentType)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(_unitOfWork);
 
             repository.AddOrUpdate(contentType);
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -102,14 +99,13 @@ namespace Umbraco.Web.Services
         /// <param name="contentTypes">Collection of <see cref="IContentType"/> to save</param>
         public void Save(IEnumerable<IContentType> contentTypes)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(_unitOfWork);
 
             foreach (var contentType in contentTypes)
             {
                 repository.AddOrUpdate(contentType);
             }
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -121,18 +117,19 @@ namespace Umbraco.Web.Services
         {
             _contentService.DeleteContentOfType(contentType.Id);
 
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(_unitOfWork);
 
             repository.Delete(contentType);
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>
-        /// Deletes a collection of <see cref="IContentType"/> objects
+        /// Deletes a collection of <see cref="IContentType"/> objects.
         /// </summary>
         /// <param name="contentTypes">Collection of <see cref="IContentType"/> to delete</param>
-        /// <remarks>Deleting a <see cref="IContentType"/> will delete all the <see cref="IContent"/> objects based on this <see cref="IContentType"/></remarks>
+        /// <remarks>
+        /// Deleting a <see cref="IContentType"/> will delete all the <see cref="IContent"/> objects based on this <see cref="IContentType"/>
+        /// </remarks>
         public void Delete(IEnumerable<IContentType> contentTypes)
         {
             var contentTypeList = contentTypes.ToList();
@@ -141,14 +138,13 @@ namespace Umbraco.Web.Services
                 _contentService.DeleteContentOfType(contentType.Id);
             }
 
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(_unitOfWork);
 
             foreach (var contentType in contentTypeList)
             {
                 repository.Delete(contentType);
             }
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -158,8 +154,7 @@ namespace Umbraco.Web.Services
         /// <returns><see cref="IMediaType"/></returns>
         public IMediaType GetMediaType(int id)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(_unitOfWork);
             return repository.Get(id);
         }
 
@@ -170,8 +165,7 @@ namespace Umbraco.Web.Services
         /// <returns><see cref="IMediaType"/></returns>
         public IMediaType GetMediaType(string alias)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(_unitOfWork);
 
             var query = Query<IMediaType>.Builder.Where(x => x.Alias == alias);
             var contentTypes = repository.GetByQuery(query);
@@ -186,8 +180,7 @@ namespace Umbraco.Web.Services
         /// <returns>An Enumerable list of <see cref="IMediaType"/> objects</returns>
         public IEnumerable<IMediaType> GetAllMediaTypes(params int[] ids)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(_unitOfWork);
             return repository.GetAll(ids);
         }
 
@@ -198,8 +191,7 @@ namespace Umbraco.Web.Services
         /// <returns>An Enumerable list of <see cref="IMediaType"/> objects</returns>
         public IEnumerable<IMediaType> GetMediaTypeChildren(int id)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(_unitOfWork);
 
             var query = Query<IMediaType>.Builder.Where(x => x.ParentId == id);
             var contentTypes = repository.GetByQuery(query);
@@ -212,11 +204,10 @@ namespace Umbraco.Web.Services
         /// <param name="mediaType"><see cref="IMediaType"/> to save</param>
         public void Save(IMediaType mediaType)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(_unitOfWork);
 
             repository.AddOrUpdate(mediaType);
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -225,14 +216,13 @@ namespace Umbraco.Web.Services
         /// <param name="mediaTypes">Collection of <see cref="IMediaType"/> to save</param>
         public void Save(IEnumerable<IMediaType> mediaTypes)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(_unitOfWork);
 
             foreach (var mediaType in mediaTypes)
             {
                 repository.AddOrUpdate(mediaType);
             }
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -243,11 +233,11 @@ namespace Umbraco.Web.Services
         public void Delete(IMediaType mediaType)
         {
             _mediaService.DeleteMediaOfType(mediaType.Id);
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
+            
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(_unitOfWork);
 
             repository.Delete(mediaType);
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -263,14 +253,13 @@ namespace Umbraco.Web.Services
                 _mediaService.DeleteMediaOfType(mediaType.Id);
             }
 
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(_unitOfWork);
 
             foreach (var mediaType in mediaTypeList)
             {
                 repository.Delete(mediaType);
             }
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
     }
 }

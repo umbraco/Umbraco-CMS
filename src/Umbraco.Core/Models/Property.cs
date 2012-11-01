@@ -98,8 +98,8 @@ namespace Umbraco.Core.Models
                 if (!typeValidation)
                     throw new Exception(
                         string.Format(
-                            "Type validation failed. The value type: {0} does not match the DataType in PropertyType with alias: {1}",
-                            value.GetType(), Alias));
+                            "Type validation failed. The value type: '{0}' does not match the DataType in PropertyType with alias: '{1}'",
+                            value == null ? "null" : value.GetType().Name, Alias));
 
                 _value = value;
                 OnPropertyChanged(ValueSelector);

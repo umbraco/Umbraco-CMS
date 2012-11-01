@@ -256,6 +256,9 @@ namespace Umbraco.Core.Models
         /// <returns>True if valid, otherwise false</returns>
         public bool IsPropertyTypeValid(object value)
         {
+            if (value == null)
+                return false;
+
             //Check type if the type of the value match the type from the DataType/PropertyEditor
             Type type = value.GetType();
 

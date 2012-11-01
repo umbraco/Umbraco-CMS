@@ -14,6 +14,7 @@ namespace Umbraco.Web.Services
     public class MacroService : IMacroService
     {
         private readonly IUnitOfWorkProvider _provider;
+        private readonly IUnitOfWork _unitOfWork;
 
         public MacroService()
             : this(new FileUnitOfWorkProvider())
@@ -23,6 +24,7 @@ namespace Umbraco.Web.Services
         public MacroService(IUnitOfWorkProvider provider)
         {
             _provider = provider;
+            _unitOfWork = _provider.GetUnitOfWork();
             EnsureMacroCache();
         }
 
@@ -42,8 +44,7 @@ namespace Umbraco.Web.Services
         /// <returns>An <see cref="IMacro"/> object</returns>
         public IMacro GetByAlias(string alias)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMacroRepository, IMacro, string>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMacroRepository, IMacro, string>(_unitOfWork);
             return repository.Get(alias);
         }
 
@@ -54,8 +55,7 @@ namespace Umbraco.Web.Services
         /// <returns>An enumerable list of <see cref="IMacro"/> objects</returns>
         public IEnumerable<IMacro> GetAll(params string[] aliases)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMacroRepository, IMacro, string>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMacroRepository, IMacro, string>(_unitOfWork);
             return repository.GetAll(aliases);
         }
 
@@ -65,10 +65,9 @@ namespace Umbraco.Web.Services
         /// <param name="macro"><see cref="IMacro"/> to delete</param>
         public void Delete(IMacro macro)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMacroRepository, IMacro, string>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMacroRepository, IMacro, string>(_unitOfWork);
             repository.Delete(macro);
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -77,10 +76,9 @@ namespace Umbraco.Web.Services
         /// <param name="macro"><see cref="IMacro"/> to save</param>
         public void Save(IMacro macro)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMacroRepository, IMacro, string>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMacroRepository, IMacro, string>(_unitOfWork);
             repository.AddOrUpdate(macro);
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>

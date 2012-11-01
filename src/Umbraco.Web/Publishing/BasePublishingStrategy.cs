@@ -7,8 +7,9 @@ namespace Umbraco.Web.Publishing
     public abstract class BasePublishingStrategy : IPublishingStrategy
     {
         public abstract bool Publish(IContent content, int userId);
-        public abstract bool PublishWithChildren(IEnumerable<IContent> children, int userId);
+        public abstract bool PublishWithChildren(IEnumerable<IContent> content, int userId);
         public abstract bool UnPublish(IContent content, int userId);
+        public abstract bool UnPublish(IEnumerable<IContent> content, int userId);
 
         /// <summary>
         /// The publish event handler

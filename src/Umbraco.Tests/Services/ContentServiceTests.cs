@@ -16,11 +16,18 @@ namespace Umbraco.Tests.Services
     [TestFixture]
     public class ContentServiceTests : BaseDatabaseFactoryTest
     {
+        [SetUp]
         public override void Initialize()
         {
             base.Initialize();
 
             CreateTestData();
+        }
+
+        [TearDown]
+        public override void TearDown()
+        {
+            base.TearDown();
         }
 
         [Test]
@@ -172,6 +179,49 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_UnPublish_Content()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.GetById(1046);
+            bool published = contentService.Publish(content, 0);
+
+            // Act
+            bool unpublished = contentService.UnPublish(content, 0);
+
+            // Assert
+            Assert.That(published, Is.True);
+            Assert.That(unpublished, Is.True);
+            Assert.That(content.Published, Is.False);
+        }
+
+        [Test]
+        public void Can_UnPublish_Root_Content_And_Verify_Children_Is_UnPublished()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var published = contentService.RePublishAll(0);
+            var content = contentService.GetById(1046);
+
+            // Act
+            bool unpublished = contentService.UnPublish(content, 0);
+            var children = contentService.GetChildren(1046);
+
+            // Assert
+            Assert.That(published, Is.True);//Verify that everything was published
+            
+            //Verify that content with Id 1046 was unpublished
+            Assert.That(unpublished, Is.True);
+            Assert.That(content.Published, Is.False);
+
+            //Verify that all children was unpublished
+            Assert.That(children.Any(x => x.Published), Is.False);
+            Assert.That(children.First(x => x.Id == 1047).Published, Is.False);//Released 5 mins ago, but should be unpublished
+            Assert.That(children.First(x => x.Id == 1047).ReleaseDate.HasValue, Is.False);//Verify that the release date has been removed
+            Assert.That(children.First(x => x.Id == 1048).Published, Is.False);//Expired 5 mins ago, so isn't be published
+        }
+
+        [Test]
         public void Can_RePublish_All_Content()
         {
             // Arrange
@@ -180,27 +230,93 @@ namespace Umbraco.Tests.Services
             var contentType = contentTypeService.GetContentType("umbTextpage");
 
             // Act
-            contentService.RePublishAll(0);
+            var published = contentService.RePublishAll(0);
             var contents = contentService.GetContentOfContentType(contentType.Id);
 
             // Assert
+            Assert.That(published, Is.True);
             Assert.That(contents.First(x => x.Id == 1046).Published, Is.True);//No restrictions, so should be published
             Assert.That(contents.First(x => x.Id == 1047).Published, Is.True);//Released 5 mins ago, so should be published
             Assert.That(contents.First(x => x.Id == 1048).Published, Is.False);//Expired 5 mins ago, so shouldn't be published
             Assert.That(contents.First(x => x.Id == 1049).Published, Is.False);//Trashed content, so shouldn't be published
         }
 
+        [Test]
         public void Can_Publish_Content()
-        { }
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.GetById(1046);
 
+            // Act
+            bool published = contentService.Publish(content, 0);
+
+            // Assert
+            Assert.That(published, Is.True);
+            Assert.That(content.Published, Is.True);
+        }
+
+        [Test]
         public void Can_Publish_Only_Valid_Content()
-        { }
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
+            contentTypeService.Save(contentType);
 
+            Content content = MockedContent.CreateTextpageContent(contentType, "Invalid Content", 1046);
+            content.SetValue("author", string.Empty);
+            contentService.Save(content, 0);
+
+            // Act
+            var parent = contentService.GetById(1046);
+            bool parentPublished = contentService.Publish(parent, 0);
+            bool published = contentService.Publish(content, 0);
+
+            // Assert
+            Assert.That(parentPublished, Is.True);
+            Assert.That(published, Is.False);
+            Assert.That(content.IsValid(), Is.False);
+            Assert.That(parent.Published, Is.True);
+            Assert.That(content.Published, Is.False);
+        }
+
+        [Test]
         public void Can_Publish_Content_Children()
-        { }
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.GetById(1046);
 
+            // Act
+            bool published = contentService.PublishWithChildren(content, 0);
+            var children = contentService.GetChildren(1046);
+
+            // Assert
+            Assert.That(published, Is.True);//Nothing was cancelled, so should be true
+            Assert.That(content.Published, Is.True);//No restrictions, so should be published
+            Assert.That(children.First(x => x.Id == 1047).Published, Is.True);//Released 5 mins ago, so should be published
+            Assert.That(children.First(x => x.Id == 1048).Published, Is.False);//Expired 5 mins ago, so shouldn't be published
+        }
+
+        [Test]
         public void Can_Save_And_Publish_Content()
-        { }
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.CreateContent(-1, "umbTextpage");
+            content.Name = "Home US";
+            content.SetValue("author", "Barack Obama");
+
+            // Act
+            bool published = contentService.SaveAndPublish(content, 0);
+
+            // Assert
+            Assert.That(content.HasIdentity, Is.True);
+            Assert.That(content.Published, Is.True);
+            Assert.That(published, Is.True);
+        }
 
         [Test]
         public void Can_Save_Content()
