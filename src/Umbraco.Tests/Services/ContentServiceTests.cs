@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Services
     /// This is more of an integration test as it involves multiple layers
     /// as well as configuration.
     /// </summary>
-    [TestFixture]
+    [TestFixture, RequiresSTA]
     public class ContentServiceTests : BaseDatabaseFactoryTest
     {
         [SetUp]

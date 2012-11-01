@@ -9,7 +9,6 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -33,11 +32,6 @@ namespace Umbraco.Tests.TestHelpers
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            Resolution.Freeze();
-            ApplicationContext = new ApplicationContext() { IsReady = true };
-            ServiceContext = ServiceContext.Current;
-            DatabaseContext = new DatabaseContext();
-
             //we need to clear out all currently created template files
             var masterPages = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Masterpages));
             masterPages.GetFiles().ForEach(x => x.Delete());
@@ -57,6 +51,11 @@ namespace Umbraco.Tests.TestHelpers
             //Create the Sql CE database
             var engine = new SqlCeEngine(settings.ConnectionString);
             engine.CreateDatabase();
+
+            Resolution.Freeze();
+            ApplicationContext = new ApplicationContext() { IsReady = true };
+            ServiceContext = ServiceContext.Current;
+            DatabaseContext = new DatabaseContext();
 
             //Configure the Database and Sql Syntax based on connection string set in config
             DatabaseContext.Initialize();
