@@ -84,7 +84,8 @@ namespace umbraco.uicontrols
 
 
                 ClientDependencyLoader.Instance.RegisterDependency(2, "CodeMirror/js/lib/codemirror.css", "UmbracoClient", ClientDependencyType.Css);
-                ClientDependencyLoader.Instance.RegisterDependency(3, "CodeArea/styles.css", "UmbracoClient", ClientDependencyType.Css);
+                ClientDependencyLoader.Instance.RegisterDependency(3, "CodeMirror/css/umbracoCustom.css", "UmbracoClient", ClientDependencyType.Css);
+                ClientDependencyLoader.Instance.RegisterDependency(4, "CodeArea/styles.css", "UmbracoClient", ClientDependencyType.Css);
 
 
 
@@ -169,18 +170,21 @@ namespace umbraco.uicontrols
                     OffSetX += 20;
                 }
 
-                jsEventCode += @"                    
-
-                    //create the editor
-                   var UmbEditor = new Umbraco.Controls.CodeEditor.UmbracoEditor(" + (!CodeMirrorEnabled).ToString().ToLower() + @", '" + this.ClientID + @"');
-                   var m_textEditor = jQuery('#" + this.ClientID + @"');
+                jsEventCode += @"   
+					//TODO: for now this is a global var, need to refactor all this so that is using proper js standards
+					//with correct objects, and proper accessors to these objects.
+					var UmbEditor;                 
+                    $(document).ready(function () {
+                        //create the editor
+                       UmbEditor = new Umbraco.Controls.CodeEditor.UmbracoEditor(" + (!CodeMirrorEnabled).ToString().ToLower() + @", '" + this.ClientID + @"');
+                       var m_textEditor = jQuery('#" + this.ClientID + @"');
                    
-                   //with codemirror adding divs for line numbers, we need to target a different element
-                   m_textEditor = m_textEditor.find('iframe').length > 0 ? m_textEditor.children('div').get(0) : m_textEditor.get(0);
+                       //with codemirror adding divs for line numbers, we need to target a different element
+                       m_textEditor = m_textEditor.find('iframe').length > 0 ? m_textEditor.children('div').get(0) : m_textEditor.get(0);
                    
-                   jQuery(window).resize(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });
-            	   jQuery(document).ready(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });";
-
+                       jQuery(window).resize(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });
+            	       jQuery(document).ready(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });
+                    });";
                 /* 
                if (!UmbracoSettings.ScriptDisableEditor && HttpContext.Current.Request.Browser.Browser == "IE")
                {
@@ -252,9 +256,9 @@ namespace umbraco.uicontrols
             string[] cssFile = new string[] { "jscolors.css", "umbracoCustom.css" };
 
             switch (CodeBase)
-            {
+            {                    
                 case EditorType.JavaScript:
-                    parserFiles = new string[] { "tokenizejavascript.js", "parsejavascript.js" };
+parserFiles = new string[] { "tokenizejavascript.js", "parsejavascript.js" };
                     cssFile = new string[] { "jscolors.css", "umbracoCustom.css" };
                     break;
                 case EditorType.Css:

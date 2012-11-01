@@ -131,6 +131,24 @@ namespace umbraco.presentation.webservices
 
         [WebMethod]
         [ScriptMethod]
+        public string[] GetNodeBreadcrumbs(int nodeId)
+        {
+
+            Authorize();
+
+            var node = new cms.businesslogic.CMSNode(nodeId);
+            var crumbs = new System.Collections.Generic.List<string>() { node.Text };
+            while (node != null && node.Level > 1)
+            {
+                node = node.Parent;
+                crumbs.Add(node.Text);
+            }
+            crumbs.Reverse();
+            return crumbs.ToArray();
+        }
+
+        [WebMethod]
+        [ScriptMethod]
         public string NiceUrl(int nodeId)
         {
 

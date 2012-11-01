@@ -40,7 +40,7 @@
         if (!query || state.query) return;
         state.query = parseQuery(query);
         if (cm.lineCount() < 2000) { // This is too expensive on big documents.
-          for (var cursor = getSearchCursor(cm, query); cursor.findNext();)
+          for (var cursor = getSearchCursor(cm, state.query); cursor.findNext();)
             state.marked.push(cm.markText(cursor.from(), cursor.to(), "CodeMirror-searching"));
         }
         state.posFrom = state.posTo = cm.getCursor();
@@ -57,14 +57,14 @@
     }
     cm.setSelection(cursor.from(), cursor.to());
     state.posFrom = cursor.from(); state.posTo = cursor.to();
-  })}
+  });}
   function clearSearch(cm) {cm.operation(function() {
     var state = getSearchState(cm);
     if (!state.query) return;
     state.query = null;
     for (var i = 0; i < state.marked.length; ++i) state.marked[i].clear();
     state.marked.length = 0;
-  })}
+  });}
 
   var replaceQueryDialog =
     'Replace: <input type="text" style="width: 10em"/> <span style="color: #888">(Use /re/ syntax for regexp search)</span>';
@@ -83,7 +83,7 @@
                 cursor.replace(text.replace(/\$(\d)/, function(w, i) {return match[i];}));
               } else cursor.replace(text);
             }
-          })});
+          });});
         } else {
           clearSearch(cm);
           var cursor = getSearchCursor(cm, query, cm.getCursor());

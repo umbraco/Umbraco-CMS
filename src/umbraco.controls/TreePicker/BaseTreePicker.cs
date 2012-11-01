@@ -65,9 +65,8 @@ namespace umbraco.uicontrols.TreePicker
         public abstract string ModalWindowTitle { get; }
 
         /// <summary>
-        /// If item has been selected or stored, this will query the db for it's title
+        /// If item has been selected or stored, this will query the db for its title
         /// </summary>
-        /// <returns></returns>
         protected virtual string GetItemTitle()
         {
             if (!string.IsNullOrEmpty(ItemIdValue.Value))
@@ -75,6 +74,31 @@ namespace umbraco.uicontrols.TreePicker
                 try
                 {
                     return new CMSNode(int.Parse(ItemIdValue.Value)).Text;
+                }
+                catch (ArgumentException) { /*the node does not exist! we will ignore*/ }
+            }
+            return "";
+        }
+
+        /// <summary>
+        /// Just like GetItemTitle, except returns the full path (breadcrumbs) of the node
+        /// </summary>
+        protected virtual string GetItemBreadcrumbs()
+        {
+            if (!string.IsNullOrEmpty(ItemIdValue.Value))
+            {
+                try
+                {
+                    int nodeId = int.Parse(ItemIdValue.Value);
+                    CMSNode node = new CMSNode(nodeId);
+                    string title = node.Text;
+                    string separator = " > ";
+                    while (node != null && node.Level > 1)
+                    {
+                        node = node.Parent;
+                        title = node.Text + separator + title;
+                    }
+                    return title;
                 }
                 catch (ArgumentException) { /*the node does not exist! we will ignore*/ }
             }
@@ -117,13 +141,14 @@ namespace umbraco.uicontrols.TreePicker
         /// </summary>
         protected virtual void RenderJSComponents()
         {
+            const string scriptKey = "BaseTreePickerScripts";
             if (ScriptManager.GetCurrent(Page).IsInAsyncPostBack)
             {
-                ScriptManager.RegisterStartupScript(this, this.GetType(), this.GetType().ToString(), BaseTreePickerScripts.BaseTreePicker, true);
+                ScriptManager.RegisterStartupScript(this, this.GetType(), scriptKey, BaseTreePickerScripts.BaseTreePicker, true);
             }
             else
             {
-                Page.ClientScript.RegisterClientScriptBlock(typeof(BaseTreePicker), this.GetType().ToString(), BaseTreePickerScripts.BaseTreePicker, true);
+                Page.ClientScript.RegisterClientScriptBlock(typeof(BaseTreePicker), scriptKey, BaseTreePickerScripts.BaseTreePicker, true);
             }
         }
 
@@ -156,6 +181,7 @@ namespace umbraco.uicontrols.TreePicker
             ItemTitle = new HtmlGenericControl("span");
             ItemTitle.ID = "title";
             ItemTitle.Style.Add(HtmlTextWriterStyle.FontWeight, "bold");
+            ItemTitle.Attributes.Add("class", "treePickerTitle");      // solely for styling, e.g. with an underline or dotted border, etc.
             ButtonContainer.Controls.Add(ItemTitle);
             ButtonContainer.Controls.Add(new LiteralControl("&nbsp;"));
             ButtonContainer.Controls.Add(new LiteralControl("&nbsp;"));
@@ -200,6 +226,7 @@ namespace umbraco.uicontrols.TreePicker
             else
             {
                 ItemTitle.InnerText = GetItemTitle();
+                ItemTitle.Attributes.Add("title", GetItemBreadcrumbs());   // Adding full path/meta info (Issue U4-192)
             }  
 
             ChooseLink.HRef = string.Format("javascript:mc_{0}.LaunchPicker();", this.ClientID);
