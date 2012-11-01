@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>UmbracoCms.Core</id>
-        <version>4.10.0-beta</version>
+        <version>6.0.0-alpha</version>
         <title>Umbraco Cms Core Binaries</title>
         <authors>Morten Christensen</authors>
         <owners>Umbraco HQ</owners>
@@ -34,6 +34,7 @@
 		<file src="..\_BuildOutput\WebApp\bin\Our.Umbraco.uGoLive.47x.dll" target="lib\Our.Umbraco.uGoLive.47x.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\Our.Umbraco.uGoLive.Checks.dll" target="lib\Our.Umbraco.uGoLive.Checks.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\Our.Umbraco.uGoLive.dll" target="lib\Our.Umbraco.uGoLive.dll" />
+		<file src="..\_BuildOutput\WebApp\bin\ServiceStack.Text.dll" target="lib\ServiceStack.Text.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\SQLCE4Umbraco.dll" target="lib\SQLCE4Umbraco.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.dll" target="lib\System.Data.SqlServerCe.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.Entity.dll" target="lib\System.Data.SqlServerCe.Entity.dll" />
