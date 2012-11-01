@@ -88,6 +88,9 @@ namespace Umbraco.Web.BaseRest
 
 			var config = (Configuration.BaseRestSection)System.Configuration.ConfigurationManager.GetSection("BaseRestExtensions");
 
+			if (config == null)
+				return null; // does not exist
+
 			// fixme - at the moment we reload the config file each time
 			//   we have to support live edits of the config file for backward compatibility reason
 			//   so if we want to cache, we'd also need to implement a watcher on the config file...
@@ -110,6 +113,9 @@ namespace Umbraco.Web.BaseRest
 
 			string typeName = eNode.Attributes["type"].Value;
 			Type type = assembly.GetType(typeName);
+
+			if (type == null)
+				return null; // does not exist
 
 			var method = type.GetMethod(methodName);
 
@@ -134,6 +140,9 @@ namespace Umbraco.Web.BaseRest
 		static RestExtensionMethodInfo GetFromConfiguration(string extensionAlias, string methodName)
 		{
 			var config = (Configuration.BaseRestSection)System.Configuration.ConfigurationManager.GetSection("BaseRestExtensions");
+
+			if (config == null)
+				return null; // does not exist
 
 			Configuration.ExtensionElement configExtension = config.Items[extensionAlias];
 			if (configExtension == null)
