@@ -251,7 +251,7 @@ namespace Umbraco.Web.Services
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
 
             //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
-            if (content.ParentId != -1 && !GetById(content.ParentId).Published)
+            if (content.ParentId != -1 && content.ParentId != -20 && !GetById(content.ParentId).Published)
             {
                 LogHelper.Info<ContentService>(
                     string.Format("Content '{0}' with Id '{1}' could not be published because its parent is not published.",
@@ -374,7 +374,7 @@ namespace Umbraco.Web.Services
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
 
             //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
-            if (content.ParentId != -1 && GetById(content.ParentId).Published == false)
+            if (content.ParentId != -1 && content.ParentId != -20 && GetById(content.ParentId).Published == false)
             {
                 LogHelper.Info<ContentService>(
                     string.Format("Content '{0}' with Id '{1}' could not be published because its parent is not published.",

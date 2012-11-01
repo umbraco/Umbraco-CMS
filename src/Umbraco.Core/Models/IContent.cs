@@ -39,6 +39,11 @@ namespace Umbraco.Core.Models
         IContentType ContentType { get; }
 
         /// <summary>
+        /// Gets the current status of the Content
+        /// </summary>
+        ContentStatus Status { get; }
+
+        /// <summary>
         /// Changes the <see cref="IContentType"/> for the current content object
         /// </summary>
         /// <param name="contentType">New ContentType for this content</param>

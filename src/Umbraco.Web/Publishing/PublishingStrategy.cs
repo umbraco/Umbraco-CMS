@@ -30,6 +30,33 @@ namespace Umbraco.Web.Publishing
 
             if (!e.Cancel)
             {
+                //Check if the Content is Expired to verify that it can in fact be published
+                if(content.Status == ContentStatus.Expired)
+                {
+                    LogHelper.Info<PublishingStrategy>(
+                        string.Format("Content '{0}' with Id '{1}' has expired and could not be published.",
+                                      content.Name, content.Id));
+                    return false;
+                }
+
+                //Check if the Content is Awaiting Release to verify that it can in fact be published
+                if (content.Status == ContentStatus.AwaitingRelease)
+                {
+                    LogHelper.Info<PublishingStrategy>(
+                        string.Format("Content '{0}' with Id '{1}' is awaiting release and could not be published.",
+                                      content.Name, content.Id));
+                    return false;
+                }
+
+                //Check if the Content is Trashed to verify that it can in fact be published
+                if (content.Status == ContentStatus.Trashed)
+                {
+                    LogHelper.Info<PublishingStrategy>(
+                        string.Format("Content '{0}' with Id '{1}' is trashed and could not be published.",
+                                      content.Name, content.Id));
+                    return false;
+                }
+
                 content.ChangePublishedState(true);
 
                 LogHelper.Info<PublishingStrategy>(
@@ -57,13 +84,42 @@ namespace Umbraco.Web.Publishing
         {
             var e = new PublishEventArgs();
 
-            //Only update content thats not already been published
+            /* Only update content thats not already been published - we want to loop through
+             * all unpublished content to write skipped content (expired and awaiting release) to log.
+             */
             foreach (var item in content.Where(x => x.Published == false))
             {
                 //Fire BeforePublish event
                 FireBeforePublish(item, e);
                 if (e.Cancel)
                     return false;
+
+                //Check if the Content is Expired to verify that it can in fact be published
+                if (item.Status == ContentStatus.Expired)
+                {
+                    LogHelper.Info<PublishingStrategy>(
+                        string.Format("Content '{0}' with Id '{1}' has expired and could not be published.",
+                                      item.Name, item.Id));
+                    continue;
+                }
+
+                //Check if the Content is Awaiting Release to verify that it can in fact be published
+                if (item.Status == ContentStatus.AwaitingRelease)
+                {
+                    LogHelper.Info<PublishingStrategy>(
+                        string.Format("Content '{0}' with Id '{1}' is awaiting release and could not be published.",
+                                      item.Name, item.Id));
+                    continue;
+                }
+
+                //Check if the Content is Trashed to verify that it can in fact be published
+                if (item.Status == ContentStatus.Trashed)
+                {
+                    LogHelper.Info<PublishingStrategy>(
+                        string.Format("Content '{0}' with Id '{1}' is trashed and could not be published.",
+                                      item.Name, item.Id));
+                    continue;
+                }
 
                 item.ChangePublishedState(true);
                 
@@ -97,7 +153,14 @@ namespace Umbraco.Web.Publishing
                 //If Content has a release date set to before now, it should be removed so it doesn't interrupt an unpublish
                 //Otherwise it would remain released == published
                 if (content.ReleaseDate.HasValue && content.ReleaseDate.Value <= DateTime.UtcNow)
+                {
                     content.ReleaseDate = null;
+
+                    LogHelper.Info<PublishingStrategy>(
+                        string.Format(
+                            "Content '{0}' with Id '{1}' had its release date removed, because it was unpublished.",
+                            content.Name, content.Id));
+                }
 
                 content.ChangePublishedState(false);
 
@@ -137,7 +200,13 @@ namespace Umbraco.Web.Publishing
                 //If Content has a release date set to before now, it should be removed so it doesn't interrupt an unpublish
                 //Otherwise it would remain released == published
                 if (item.ReleaseDate.HasValue && item.ReleaseDate.Value <= DateTime.UtcNow)
+                {
                     item.ReleaseDate = null;
+
+                    LogHelper.Info<PublishingStrategy>(
+                        string.Format("Content '{0}' with Id '{1}' had its release date removed, because it was unpublished.",
+                                      item.Name, item.Id));
+                }
 
                 item.ChangePublishedState(false);
 

@@ -69,6 +69,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the current status of the Content
         /// </summary>
+        [IgnoreDataMember]
         public ContentStatus Status
         {
             get

@@ -301,6 +301,79 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Cannot_Publish_Expired_Content()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.GetById(1048); //This Content expired 5min ago
+
+            var parent = contentService.GetById(1046);
+            bool parentPublished = contentService.Publish(parent, 0);//Publish root Home node to enable publishing of '1048'
+
+            // Act
+            bool published = contentService.Publish(content, 0);
+
+            // Assert
+            Assert.That(parentPublished, Is.True);
+            Assert.That(published, Is.False);
+            Assert.That(content.Published, Is.False);
+        }
+
+        [Test]
+        public void Cannot_Publish_Content_Awaiting_Release()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.GetById(1047);
+            content.ReleaseDate = DateTime.UtcNow.AddHours(2);
+            contentService.Save(content, 0);
+
+            var parent = contentService.GetById(1046);
+            bool parentPublished = contentService.Publish(parent, 0);//Publish root Home node to enable publishing of '1048'
+
+            // Act
+            bool published = contentService.Publish(content, 0);
+
+            // Assert
+            Assert.That(parentPublished, Is.True);
+            Assert.That(published, Is.False);
+            Assert.That(content.Published, Is.False);
+        }
+
+        [Test]
+        public void Cannot_Publish_Content_Where_Parent_Is_Unpublished()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.CreateContent(1046, "umbTextpage");
+            content.Name = "Subpage with Unpublisehed Parent";
+            contentService.Save(content, 0);
+
+            // Act
+            bool published = contentService.PublishWithChildren(content, 0);
+
+            // Assert
+            Assert.That(published, Is.False);
+            Assert.That(content.Published, Is.False);
+        }
+
+        [Test]
+        public void Cannot_Publish_Trashed_Content()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.GetById(1049);
+
+            // Act
+            bool published = contentService.Publish(content, 0);
+
+            // Assert
+            Assert.That(published, Is.False);
+            Assert.That(content.Published, Is.False);
+            Assert.That(content.Trashed, Is.True);
+        }
+
+        [Test]
         public void Can_Save_And_Publish_Content()
         {
             // Arrange
@@ -487,6 +560,7 @@ namespace Umbraco.Tests.Services
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1047
             Content subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", textpage.Id);
             subpage.ReleaseDate = DateTime.UtcNow.AddMinutes(-5);
+            subpage.ChangePublishedState(false);
             ServiceContext.ContentService.Save(subpage, 0);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1048
