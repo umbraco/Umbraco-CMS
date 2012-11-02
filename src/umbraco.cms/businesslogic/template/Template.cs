@@ -387,29 +387,26 @@ namespace umbraco.cms.businesslogic.template
 			return engine;
 		}
 
-		public static Template MakeNew(string Name, BusinessLogic.User u, Template master, string design = null)
+		public static Template MakeNew(string Name, BusinessLogic.User u, Template master)
+		{
+		    return MakeNew(Name, u, master, null);
+		}
+
+		private static Template MakeNew(string Name, BusinessLogic.User u, Template master, string design)
         {
-			Template t = MakeNew(Name, u, design);
+            Template t = MakeNew(Name, u, design);
             t.MasterTemplate = master.Id;			
-
-            /*
-            if (UmbracoSettings.UseAspNetMasterPages)
-            {
-                string design = t.getMasterPageHeader() + "\n";
-
-                foreach (string cpId in master.contentPlaceholderIds())
-                {
-                    design += "<asp:content ContentPlaceHolderId=\"" + cpId + "\" runat=\"server\">\n\t\n</asp:content>\n\n";
-                }
-
-                t.Design = design;
-            }*/
 
             t.Save();
             return t;
         }
 
-        public static Template MakeNew(string name, BusinessLogic.User u, string design = null)
+        public static Template MakeNew(string name, BusinessLogic.User u)
+        {
+            return MakeNew(name, u, design: null);
+        }
+
+        private static Template MakeNew(string name, BusinessLogic.User u, string design)
         {
 
             // CMSNode MakeNew(int parentId, Guid objectType, int userId, int level, string text, Guid uniqueID)
