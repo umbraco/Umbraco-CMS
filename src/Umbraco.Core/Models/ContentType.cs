@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 
@@ -47,6 +48,56 @@ namespace Umbraco.Core.Models
             {
                 _allowedTemplates = value;
                 OnPropertyChanged(AllowedTemplatesSelector);
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether a specific property on the current <see cref="IContent"/> entity is dirty.
+        /// </summary>
+        /// <param name="propertyName">Name of the property to check</param>
+        /// <returns>True if Property is dirty, otherwise False</returns>
+        public override bool IsPropertyDirty(string propertyName)
+        {
+            bool existsInEntity = base.IsPropertyDirty(propertyName);
+
+            bool anyDirtyGroups = PropertyGroups.Any(x => x.IsPropertyDirty(propertyName));
+            bool anyDirtyTypes = PropertyTypes.Any(x => x.IsPropertyDirty(propertyName));
+
+            return existsInEntity || anyDirtyGroups || anyDirtyTypes;
+        }
+
+        /// <summary>
+        /// Indicates whether the current entity is dirty.
+        /// </summary>
+        /// <returns>True if entity is dirty, otherwise False</returns>
+        public override bool IsDirty()
+        {
+            bool dirtyEntity = base.IsDirty();
+
+            bool dirtyGroups = PropertyGroups.Any(x => x.IsDirty());
+            bool dirtyTypes = PropertyTypes.Any(x => x.IsDirty());
+
+            return dirtyEntity || dirtyGroups || dirtyTypes;
+        }
+
+        /// <summary>
+        /// Resets dirty properties by clearing the dictionary used to track changes.
+        /// </summary>
+        /// <remarks>
+        /// Please note that resetting the dirty properties could potentially
+        /// obstruct the saving of a new or updated entity.
+        /// </remarks>
+        public override void ResetDirtyProperties()
+        {
+            base.ResetDirtyProperties();
+
+            foreach (var propertyGroup in PropertyGroups)
+            {
+                propertyGroup.ResetDirtyProperties();
+                foreach (var propertyType in propertyGroup.PropertyTypes)
+                {
+                    propertyType.ResetDirtyProperties();
+                }
             }
         }
 

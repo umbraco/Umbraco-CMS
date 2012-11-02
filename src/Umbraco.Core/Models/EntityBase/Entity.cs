@@ -115,20 +115,20 @@ namespace Umbraco.Core.Models.EntityBase
         private readonly IDictionary<string, bool> _propertyChangedInfo = new Dictionary<string, bool>();
 
         /// <summary>
-        /// Returns true if the property referenced by the name has been changed on the class
+        /// Indicates whether a specific property on the current entity is dirty.
         /// </summary>
-        /// <param name="propertyName"></param>
-        /// <returns></returns>
-        public bool IsPropertyDirty(string propertyName)
+        /// <param name="propertyName">Name of the property to check</param>
+        /// <returns>True if Property is dirty, otherwise False</returns>
+        public virtual bool IsPropertyDirty(string propertyName)
         {
             return _propertyChangedInfo.Any(x => x.Key == propertyName);
         }
 
         /// <summary>
-        /// Returns true if any properties have been changed on the class
+        /// Indicates whether the current entity is dirty.
         /// </summary>
-        /// <returns></returns>
-        public bool IsDirty()
+        /// <returns>True if entity is dirty, otherwise False</returns>
+        public virtual bool IsDirty()
         {
             return _propertyChangedInfo.Any();
         }
@@ -136,7 +136,11 @@ namespace Umbraco.Core.Models.EntityBase
         /// <summary>
         /// Resets dirty properties by clearing the dictionary used to track changes.
         /// </summary>
-        public void ResetDirtyProperties()
+        /// <remarks>
+        /// Please note that resetting the dirty properties could potentially
+        /// obstruct the saving of a new or updated entity.
+        /// </remarks>
+        public virtual void ResetDirtyProperties()
         {
             _propertyChangedInfo.Clear();
         }

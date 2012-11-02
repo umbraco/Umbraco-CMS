@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 
@@ -200,28 +201,6 @@ namespace Umbraco.Core.Models
             ChangeContentType(contentType);
         }
 
-        //TODO Possibly add a ToXml method, which will generate valid xml for the current Content object
-
-        /// <summary>
-        /// Method to call when Entity is being saved
-        /// </summary>
-        /// <remarks>Created date is set and a Unique key is assigned</remarks>
-        internal override void AddingEntity()
-        {
-            base.AddingEntity();
-            Key = Guid.NewGuid();
-        }
-
-        /// <summary>
-        /// Method to call when Entity is being updated
-        /// </summary>
-        /// <remarks>Modified Date is set and a new Version guid is set</remarks>
-        internal override void UpdatingEntity()
-        {
-            base.UpdatingEntity();
-            Version = Guid.NewGuid();
-        }
-
         /// <summary>
         /// Changes the Published state of the content object
         /// </summary>
@@ -271,6 +250,70 @@ namespace Umbraco.Core.Models
             clone.ResetIdentity();
 
             return clone;
+        }
+
+        /// <summary>
+        /// Indicates whether a specific property on the current <see cref="IContent"/> entity is dirty.
+        /// </summary>
+        /// <param name="propertyName">Name of the property to check</param>
+        /// <returns>True if Property is dirty, otherwise False</returns>
+        public override bool IsPropertyDirty(string propertyName)
+        {
+            bool existsInEntity = base.IsPropertyDirty(propertyName);
+
+            bool anyDirtyProperties = Properties.Any(x => x.IsPropertyDirty(propertyName));
+
+            return existsInEntity || anyDirtyProperties;
+        }
+
+        /// <summary>
+        /// Indicates whether the current entity is dirty.
+        /// </summary>
+        /// <returns>True if entity is dirty, otherwise False</returns>
+        public override bool IsDirty()
+        {
+            bool dirtyEntity = base.IsDirty();
+
+            bool dirtyProperties = Properties.Any(x => x.IsDirty());
+
+            return dirtyEntity || dirtyProperties;
+        }
+
+        /// <summary>
+        /// Resets dirty properties by clearing the dictionary used to track changes.
+        /// </summary>
+        /// <remarks>
+        /// Please note that resetting the dirty properties could potentially
+        /// obstruct the saving of a new or updated entity.
+        /// </remarks>
+        public override void ResetDirtyProperties()
+        {
+            base.ResetDirtyProperties();
+
+            foreach (var property in Properties)
+            {
+                property.ResetDirtyProperties();
+            }
+        }
+
+        /// <summary>
+        /// Method to call when Entity is being saved
+        /// </summary>
+        /// <remarks>Created date is set and a Unique key is assigned</remarks>
+        internal override void AddingEntity()
+        {
+            base.AddingEntity();
+            Key = Guid.NewGuid();
+        }
+
+        /// <summary>
+        /// Method to call when Entity is being updated
+        /// </summary>
+        /// <remarks>Modified Date is set and a new Version guid is set</remarks>
+        internal override void UpdatingEntity()
+        {
+            base.UpdatingEntity();
+            Version = Guid.NewGuid();
         }
     }
 }

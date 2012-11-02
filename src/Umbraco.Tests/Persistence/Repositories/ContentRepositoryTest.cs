@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var repository = new ContentRepository(unitOfWork, InMemoryCacheProvider.Current, contentTypeRepository);
 
             ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
-            Content textpage = MockedContent.CreateTextpageContent(contentType);
+            Content textpage = MockedContent.CreateSimpleContent(contentType);
 
             // Act
             contentTypeRepository.AddOrUpdate(contentType);
@@ -44,14 +44,14 @@ namespace Umbraco.Tests.Persistence.Repositories
             var repository = new ContentRepository(unitOfWork, InMemoryCacheProvider.Current, contentTypeRepository);
 
             ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
-            Content textpage = MockedContent.CreateTextpageContent(contentType);
+            Content textpage = MockedContent.CreateSimpleContent(contentType);
             
             // Act
             contentTypeRepository.AddOrUpdate(contentType);
             repository.AddOrUpdate(textpage);
             unitOfWork.Commit();
             
-            Content subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", textpage.Id);
+            Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
             repository.AddOrUpdate(subpage);
             unitOfWork.Commit();
 
@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
             ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
-            Content textpage = MockedContent.CreateTextpageContent(contentType);
+            Content textpage = MockedContent.CreateSimpleContent(contentType);
 
             // Act
             contentTypeRepository.AddOrUpdate(contentType);
@@ -80,7 +80,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             unitOfWork.Commit();
 
             var repository2 = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
-            Content subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", textpage.Id);
+            Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
             repository2.AddOrUpdate(subpage);
             unitOfWork.Commit();
 

@@ -70,18 +70,17 @@ namespace Umbraco.Core
                 if (providerName.StartsWith("MySql"))
                 {
                     SyntaxConfig.SqlSyntaxProvider = MySqlSyntax.Provider;
-                    _configured = true;
                 }
                 else if (providerName.Contains("SqlServerCe"))
                 {
                     SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
-                    _configured = true;
                 }
                 else
                 {
                     SyntaxConfig.SqlSyntaxProvider = SqlServerSyntax.Provider;
-                    _configured = true;
                 }
+
+                _configured = true;
             }
             else
             {

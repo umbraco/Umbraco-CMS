@@ -265,7 +265,7 @@ namespace Umbraco.Tests.Services
             var contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
             contentTypeService.Save(contentType);
 
-            Content content = MockedContent.CreateTextpageContent(contentType, "Invalid Content", 1046);
+            Content content = MockedContent.CreateSimpleContent(contentType, "Invalid Content", 1046);
             content.SetValue("author", string.Empty);
             contentService.Save(content, 0);
 
@@ -415,8 +415,8 @@ namespace Umbraco.Tests.Services
             var contentTypeService = ServiceContext.ContentTypeService;
 
             var contentType = contentTypeService.GetContentType("umbTextpage");
-            Content subpage = MockedContent.CreateTextpageContent(contentType, "Text Subpage 1", 1047);
-            Content subpage2 = MockedContent.CreateTextpageContent(contentType, "Text Subpage 2", 1047);
+            Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Subpage 1", 1047);
+            Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Subpage 2", 1047);
             var list = new List<IContent> {subpage, subpage2};
 
             // Act
@@ -554,23 +554,23 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentTypeService.Save(contentType);
 
             //Create and Save Content "Homepage" based on "umbTextpage" -> 1046
-            Content textpage = MockedContent.CreateTextpageContent(contentType);
+            Content textpage = MockedContent.CreateSimpleContent(contentType);
             ServiceContext.ContentService.Save(textpage, 0);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1047
-            Content subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", textpage.Id);
+            Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
             subpage.ReleaseDate = DateTime.UtcNow.AddMinutes(-5);
             subpage.ChangePublishedState(false);
             ServiceContext.ContentService.Save(subpage, 0);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1048
-            Content subpage2 = MockedContent.CreateTextpageContent(contentType, "Text Page 2", textpage.Id);
+            Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
             subpage2.ExpireDate = DateTime.UtcNow.AddMinutes(-5);
             subpage2.ChangePublishedState(true);
             ServiceContext.ContentService.Save(subpage2, 0);
 
             //Create and Save Content "Text Page Deleted" based on "umbTextpage" -> 1049
-            Content trashed = MockedContent.CreateTextpageContent(contentType, "Text Page Deleted", -20);
+            Content trashed = MockedContent.CreateSimpleContent(contentType, "Text Page Deleted", -20);
             trashed.Trashed = true;
             ServiceContext.ContentService.Save(trashed, 0);
         }

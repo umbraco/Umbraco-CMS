@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Configuration;
-using System.Data.Common;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Persistence
@@ -60,15 +59,13 @@ namespace Umbraco.Core.Persistence
         {
             get
             {
-                var factory = DbProviderFactories.GetFactory(ProviderName);
-
-                string dbtype = (factory.GetType()).Name;
+                string dbtype = _database.Connection == null ? ProviderName : _database.Connection.GetType().Name;
 
                 if (dbtype.StartsWith("MySql")) return DatabaseProviders.MySql;
-                if (dbtype.StartsWith("SqlCe")) return DatabaseProviders.SqlServerCE;
-                /*if (dbtype.StartsWith("Npgsql")) return DatabaseProviders.PostgreSQL;
+                if (dbtype.StartsWith("SqlCe") || dbtype.Contains("SqlServerCe")) return DatabaseProviders.SqlServerCE;
+                if (dbtype.StartsWith("Npgsql")) return DatabaseProviders.PostgreSQL;
                 if (dbtype.StartsWith("Oracle")) return DatabaseProviders.Oracle;
-                if (dbtype.StartsWith("SQLite")) return DatabaseProviders.SQLite;*/
+                if (dbtype.StartsWith("SQLite")) return DatabaseProviders.SQLite;
 
                 return DatabaseProviders.SqlServer;
             }

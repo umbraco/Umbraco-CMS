@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, INotifyCollectionChanged
     {
-         private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
+        private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
         internal Action OnAdd;
 
         internal PropertyGroupCollection()
