@@ -481,6 +481,7 @@
     <key alias="notAllowedByContentType">Текущий узел не может быть размещён в выбранном Вами из-за несоответствия типов.</key>
     <key alias="notAllowedByPath">Текущий узел не может быть перемещен внутрь своих дочерних узлов</key>
     <key alias="notValid">Данное действие не может быть осуществлено, так как Вы не имеете достаточных прав для совершения действий над одним или более дочерними документами.</key>
+    <key alias="relateToOriginal">Связать новые копии с оригиналами</key>
   </area>
   <area alias="notifications">
     <key alias="editNotifications">Вы можете изменить уведомление для %0%</key>
@@ -684,6 +685,7 @@
     <key alias="editTemplateSaved">Шаблон сохранен</key>
     <key alias="editUserError">Произошла ошибка при сохранении пользователя (проверьте журналы ошибок)</key>
     <key alias="editUserSaved">Пользователь сохранен</key>
+    <key alias="editUserTypeSaved">Тип пользователей сохранен</key>
     <key alias="fileErrorHeader">Файл не сохранен</key>
     <key alias="fileErrorText">Файл не может быть сохранен. Пожалуйста, проверьте установки файловых разрешений</key>
     <key alias="fileSavedHeader">Файл сохранен</key>
@@ -855,8 +857,10 @@
     <key alias="password">Пароль</key>
     <key alias="passwordChanged">Ваш пароль доступа изменен!</key>
     <key alias="passwordConfirm">Подвердите новый пароль</key>
-    <key alias="passwordEnterNew">Укажите новый пароль</key>
-    <key alias="passwordIsBlank">Пароль не может быть пустым</key>
+		<key alias="passwordCurrent">Текущий пароль</key>
+		<key alias="passwordEnterNew">Укажите новый пароль</key>
+		<key alias="passwordInvalid">Текущий пароль указан неверно</key>
+		<key alias="passwordIsBlank">Пароль не может быть пустым</key>
     <key alias="passwordIsDifferent">Новый пароль и его подтверждение не совпадают. Попробуйте еще раз</key>
     <key alias="passwordMismatch">Новый пароль и его подтверждение не совпадают</key>
     <key alias="permissionReplaceChildren">Заменить разрешения для дочерних документов</key>

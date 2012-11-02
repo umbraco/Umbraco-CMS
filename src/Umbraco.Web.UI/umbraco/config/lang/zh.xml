@@ -75,7 +75,7 @@
   </area>
   <area alias="content">
     <key alias="about">关于本页</key>
-    <key alias="alias">替代链接</key>
+    <key alias="alias">别名</key>
     <key alias="alternativeTextHelp">（图片的替代文本）</key>
     <key alias="alternativeUrls">替代链接</key>
     <key alias="clickToEdit">点击编辑</key>
@@ -475,6 +475,7 @@
     <key alias="notAllowedByContentType">类型不符不允许选择</key>
     <key alias="notAllowedByPath">该项不能移到其子项</key>
     <key alias="notValid">您在子项的权限不够，不允许该操作。</key>
+    <key alias="relateToOriginal">复本和原本建立关联</key>
   </area>
   <area alias="notifications">
     <key alias="editNotifications">为 %0% 编写通知</key>
@@ -672,6 +673,7 @@
     <key alias="editTemplateSaved">模板已保存</key>
     <key alias="editUserError">保存用户出错（请查看日志）</key>
     <key alias="editUserSaved">用户已保存</key>
+    <key alias="editUserTypeSaved">用户类型已保存</key>
     <key alias="fileErrorHeader">文件未保存</key>
     <key alias="fileErrorText">文件无法保存，请检查权限。</key>
     <key alias="fileSavedHeader">文件保存</key>
@@ -840,7 +842,9 @@
     <key alias="password">密码</key>
     <key alias="passwordChanged">您的密码已更改！</key>
     <key alias="passwordConfirm">重输密码</key>
+    <key alias="passwordCurrent">当前密码</key>
     <key alias="passwordEnterNew">输入新密码</key>
+    <key alias="passwordInvalid">密码错误</key>
     <key alias="passwordIsBlank">新密码不能为空！</key>
     <key alias="passwordIsDifferent">新密码和重输入的密码不一致，请重试！</key>
     <key alias="passwordMismatch">重输的密码和原密码不一致！</key>
