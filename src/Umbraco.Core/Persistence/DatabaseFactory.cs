@@ -64,7 +64,7 @@ namespace Umbraco.Core.Persistence
                 if (dbtype.StartsWith("MySql")) return DatabaseProviders.MySql;
                 if (dbtype.StartsWith("SqlCe") || dbtype.Contains("SqlServerCe")) return DatabaseProviders.SqlServerCE;
                 if (dbtype.StartsWith("Npgsql")) return DatabaseProviders.PostgreSQL;
-                if (dbtype.StartsWith("Oracle")) return DatabaseProviders.Oracle;
+                if (dbtype.StartsWith("Oracle") || dbtype.Contains("OracleClient")) return DatabaseProviders.Oracle;
                 if (dbtype.StartsWith("SQLite")) return DatabaseProviders.SQLite;
 
                 return DatabaseProviders.SqlServer;

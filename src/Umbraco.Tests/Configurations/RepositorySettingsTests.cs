@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Configurations
             Assert.That(repository, Is.Not.Null);
             Assert.AreEqual(repository.InterfaceShortTypeName, "IContentRepository");
             Assert.AreEqual(repository.RepositoryFullTypeName, "Umbraco.Core.Persistence.Repositories.ContentRepository, Umbraco.Core");
-            Assert.AreEqual(repository.CacheProviderFullTypeName, "Umbraco.Core.Persistence.Caching.RuntimeCacheProvider, Umbraco.Core");
+            Assert.AreEqual(repository.CacheProviderFullTypeName, "Umbraco.Core.Persistence.Caching.NullCacheProvider, Umbraco.Core");
         }
 
         [Test]

@@ -197,12 +197,13 @@ namespace Umbraco.Core.Persistence
 			EnableNamedParams = true;
 			ForceDateTimesToUtc = true;
 
-			if (_providerName != null)
+            if (_providerName != null)
 				_factory = DbProviderFactories.GetFactory(_providerName);
+			
+            string dbtype = (_factory == null ? _sharedConnection.GetType() : _factory.GetType()).Name;
 
-			string dbtype = (_factory == null ? _sharedConnection.GetType() : _factory.GetType()).Name;
 			if (dbtype.StartsWith("MySql")) _dbType = DBType.MySql;
-			else if (dbtype.StartsWith("SqlCe")) _dbType = DBType.SqlServerCE;
+            else if (dbtype.StartsWith("SqlCe")) _dbType = DBType.SqlServerCE;
 			else if (dbtype.StartsWith("Npgsql")) _dbType = DBType.PostgreSQL;
 			else if (dbtype.StartsWith("Oracle")) _dbType = DBType.Oracle;
             else if (dbtype.StartsWith("SQLite")) _dbType = DBType.SQLite;

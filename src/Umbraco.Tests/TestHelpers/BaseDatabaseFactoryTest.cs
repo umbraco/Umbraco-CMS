@@ -6,6 +6,7 @@ using System.Web.Routing;
 using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
@@ -31,6 +32,8 @@ namespace Umbraco.Tests.TestHelpers
 
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
+
+            UmbracoSettings.UseLegacyXmlSchema = false;
 
             //we need to clear out all currently created template files
             var masterPages = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Masterpages));
