@@ -190,5 +190,37 @@ namespace Umbraco.Tests.Persistence
             // Assert
             Assert.That(repository, Is.Not.Null);
         }
+
+        [Test]
+        public void Can_Verify_UOW_In_Repository()
+        {
+            // Arrange
+            var uow = new PetaPocoUnitOfWork();
+
+            // Act
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(uow);
+
+            // Assert
+            Assert.That(repository, Is.Not.Null);
+            Assert.That(uow.Key, Is.EqualTo(((RepositoryBase<int, IContent>)repository).UnitKey));
+        }
+
+        [Test]
+        public void Type_Checking()
+        {
+            var repositoryType = typeof (IContentRepository);
+            bool isSubclassOf = repositoryType.IsSubclassOf(typeof(IRepository<int, IContent>));
+            bool isAssignableFrom = typeof(IRepository<int, IContent>).IsAssignableFrom(repositoryType);
+
+            Assert.That(isSubclassOf, Is.False);
+            Assert.That(isAssignableFrom, Is.True);
+            
+            var uow = new PetaPocoUnitOfWork();
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(uow);
+            bool subclassOf = repository.GetType().IsSubclassOf(typeof (IRepository<int, IContent>));
+
+            Assert.That(subclassOf, Is.False);
+            Assert.That((typeof(IRepository<int, IContent>).IsInstanceOfType(repository)), Is.True);
+        }
     }
 }

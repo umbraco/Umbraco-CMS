@@ -36,6 +36,8 @@ namespace Umbraco.Core.Models
         /// <param name="properties">Collection of properties</param>
         public Content(int parentId, IContentType contentType, PropertyCollection properties) : base(parentId, contentType, properties)
         {
+            Mandate.ParameterNotNull(contentType, "contentType");
+
             _contentType = contentType;
         }
         

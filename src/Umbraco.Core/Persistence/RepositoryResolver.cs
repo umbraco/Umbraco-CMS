@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence
             if (Repositories.ContainsKey(interfaceShortName))
             {
                 repository = (TRepository)Repositories[interfaceShortName];
-                if (unitOfWork != null && repository.GetType().IsSubclassOf(typeof(IRepository<TId, TEntity>)))
+                if (unitOfWork != null && (typeof(IRepository<TId, TEntity>).IsInstanceOfType(repository)))
                 {
                     repository.SetUnitOfWork(unitOfWork);
                 }

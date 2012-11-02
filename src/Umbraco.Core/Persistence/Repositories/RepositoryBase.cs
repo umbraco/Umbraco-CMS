@@ -38,6 +38,14 @@ namespace Umbraco.Core.Persistence.Repositories
             get { return _work; }
         }
 
+        /// <summary>
+        /// Internal for testing purposes
+        /// </summary>
+        internal Guid UnitKey
+        {
+            get { return (Guid)_work.Key; }
+        }
+
         #region IRepository<TEntity> Members
 
         /// <summary>
