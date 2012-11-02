@@ -67,16 +67,12 @@ namespace Umbraco.Core
                 if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName))
                         providerName = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName;
 
-                var factory = DbProviderFactories.GetFactory(providerName);
-
-                string dbtype = (factory.GetType()).Name;
-
-                if (dbtype.StartsWith("MySql"))
+                if (providerName.StartsWith("MySql"))
                 {
                     SyntaxConfig.SqlSyntaxProvider = MySqlSyntax.Provider;
                     _configured = true;
                 }
-                else if (dbtype.StartsWith("SqlCe"))
+                else if (providerName.Contains("SqlServerCe"))
                 {
                     SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
                     _configured = true;
