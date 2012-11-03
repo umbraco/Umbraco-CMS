@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" MasterPageFile="../../masterpages/umbracoPage.Master" Title="Install starter kit" CodeBehind="StarterKits.aspx.cs" Inherits="umbraco.presentation.umbraco.developer.Packages.StarterKits" %>
+﻿<%@ Page Language="C#" AutoEventWireup="True" MasterPageFile="../../masterpages/umbracoPage.Master" Title="Install starter kit" CodeBehind="StarterKits.aspx.cs" Inherits="Umbraco.Web.UI.Umbraco.Developer.Packages.StarterKits" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
@@ -7,19 +7,33 @@
 <umb:JsInclude ID="JsInclude1" runat="server" FilePath="ui/jqueryui.js" PathNameAlias="UmbracoClient" />
 
 <script type="text/javascript">
-    function showProgress(button, elementId) {
-        var img = document.getElementById(elementId);
-        img.style.visibility = "visible";
-        button.style.display = "none";
 
+    var percentComplete = 0;
+
+    jQuery(document).ready(function() {
+        //bind to button click events
+        jQuery("a.selectStarterKit").click(function() {
+            jQuery(".progress-status").siblings(".install-dialog").hide();
+            jQuery(".progress-status").show();
+        });
+    });
+
+    function updateProgressBar(percent) {
+        percentComplete = percent;
+    }
+    function updateStatusMessage(message, error) {
+        if (message != null && message != undefined) {
+            jQuery(".progress-status").text(message + " (" + percentComplete + "%)");
+        }        
     }
 
-  
-    function InstallPackages(button, elementId) {
-        showProgress(button, elementId);
-    }
 </script>
 <style type="text/css">
+    
+    .progress-status {
+	    display: none;
+    }
+
     .add-thanks
     {
         position:absolute;
@@ -48,16 +62,26 @@
     
     <cc1:Pane id="StarterKitInstalled" Text="Install skin" runat="server">
         <h3>Available skins</h3>
-        <p>You can choose from the following skins.</p>
-        <asp:PlaceHolder ID="ph_skins" runat="server"></asp:PlaceHolder>
+        <p>You can choose from the following skins.</p>        
+        <div class="progress-status">Please wait...</div>
+        <div id="connectionError"></div>
+        <div id="serverError"></div>        
+        <div class="install-dialog">
+            <asp:PlaceHolder ID="ph_skins" runat="server"></asp:PlaceHolder>
+        </div>
     </cc1:Pane>
     
     
     
     <cc1:Pane id="StarterKitNotInstalled" Text="Install starter kit" runat="server">
         <h3>Available starter kits</h3>
-        <p>You can choose from the following starter kits, each having specific functionality.</p>
-         <asp:PlaceHolder ID="ph_starterkits" runat="server"></asp:PlaceHolder>
+        <p>You can choose from the following starter kits, each having specific functionality.</p>        
+        <div class="progress-status">Please wait...</div>
+        <div id="connectionError"></div>
+        <div id="serverError"></div>       
+        <div class="install-dialog">
+            <asp:PlaceHolder ID="ph_starterkits" runat="server"></asp:PlaceHolder>
+        </div>
     </cc1:Pane>
 
     <cc1:Pane id="installationCompleted" Text="Installation completed" runat="server" Visible="false">

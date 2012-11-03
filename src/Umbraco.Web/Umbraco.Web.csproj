@@ -326,6 +326,9 @@
     <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\developer\Packages\StarterKits.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\editXslt.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -791,13 +794,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\StartupDashboardVideos.ascx.designer.cs">
       <DependentUpon>StartupDashboardVideos.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\StarterKits.aspx.cs">
-      <DependentUpon>StarterKits.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\StarterKits.aspx.designer.cs">
-      <DependentUpon>StarterKits.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx.cs">
       <DependentUpon>EditRelationType.aspx</DependentUpon>
@@ -1864,7 +1860,6 @@
     <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardIntro.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardKits.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardVideos.ascx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Packages\StarterKits.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\TemplateSkinning.aspx" />
     <Content Include="umbraco.presentation\umbraco\helpRedirect.aspx" />
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\CssParser.aspx" />

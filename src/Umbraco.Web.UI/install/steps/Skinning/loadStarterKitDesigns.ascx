@@ -26,8 +26,8 @@
 	<ItemTemplate>
 	<li>
 	<div class="image-hold">
-	<img class="faik-mask" src="../umbraco_client/installer/images/bg-img.png" alt="image description" width="152" height="129">
-	<img class="faik-mask-ie6" src="../umbraco_client/installer/images/bg-img-ie.png" alt="image description" width="201" height="178">
+	<img class="faik-mask" src="<%=umbraco.GlobalSettings.ClientPath + "/installer/images/bg-img.png" %>" alt="image description" width="152" height="129">
+	<img class="faik-mask-ie6" src="<%=umbraco.GlobalSettings.ClientPath + "/installer/images/bg-img-ie.png" %>" alt="image description" width="201" height="178">
 
 	<div class="image">
 	<img class="zoom-img" src="<%# ((Skin)Container.DataItem).Thumbnail %>" alt="<%# ((Skin)Container.DataItem).Text %>" width="134" height="103">

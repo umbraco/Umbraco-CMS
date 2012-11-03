@@ -282,6 +282,13 @@
     <Compile Include="umbraco\developer\Macros\EditMacro.aspx.designer.cs">
       <DependentUpon>editMacro.aspx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\developer\Packages\StarterKits.aspx.cs">
+      <DependentUpon>StarterKits.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\developer\Packages\StarterKits.aspx.designer.cs">
+      <DependentUpon>StarterKits.aspx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\masterpages\UmbracoDialog.master.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
