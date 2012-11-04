@@ -57,6 +57,7 @@
     <Compile Include="ContentStores\PublishMediaStoreTests.cs" />
     <Compile Include="DynamicDocument\PublishedContentDataTableTests.cs" />
     <Compile Include="DynamicDocument\PublishedContentTests.cs" />
+    <Compile Include="DynamicDocument\StronglyTypedQueryTests.cs" />
     <Compile Include="HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="IO\IOHelperTest.cs" />
     <Compile Include="LibraryTests.cs" />
