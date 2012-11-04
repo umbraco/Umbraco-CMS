@@ -6,7 +6,7 @@ namespace Umbraco.Web
 	/// <summary>
 	/// Defines the methods for published documents
 	/// </summary>
-	public interface IPublishedStore
+	internal interface IPublishedStore
 	{
 		IPublishedContent GetDocumentById(UmbracoContext umbracoContext, int nodeId);
 		IEnumerable<IPublishedContent> GetRootDocuments(UmbracoContext umbracoContext);
