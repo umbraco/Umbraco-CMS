@@ -16,7 +16,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         public PetaPocoUnitOfWork()
         {
             _key = Guid.NewGuid();
-            //_operations = new List<Operation>();
         }
 
         /// <summary>

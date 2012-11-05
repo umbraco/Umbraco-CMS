@@ -24,6 +24,7 @@ namespace Umbraco.Core.Persistence.Caching
         #endregion
 
         private readonly ObjectCache _memoryCache = new MemoryCache("in-memory");
+        //TODO Save this in cache as well, so its not limited to a single server usage
         private ConcurrentDictionary<string, string> _keyTracker = new ConcurrentDictionary<string, string>();
 
         public IEntity GetById(Type type, Guid id)
