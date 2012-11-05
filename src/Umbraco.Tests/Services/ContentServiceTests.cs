@@ -30,6 +30,10 @@ namespace Umbraco.Tests.Services
             base.TearDown();
         }
 
+        //TODO Write a test that creates content, but uses the HttpContext to resolve the backoffice user
+        //Just need to add a contextId cookie to the FakeHttpContextFactory in Umbraco.Tests.TestHelpers
+        //Create/insert a new UserDto for testing.
+
         [Test]
         public void Can_Create_Content()
         {
@@ -37,7 +41,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var content = contentService.CreateContent(-1, "umbTextpage");
+            var content = contentService.CreateContent(-1, "umbTextpage", 0);
 
             // Assert
             Assert.That(content, Is.Not.Null);
@@ -345,7 +349,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.CreateContent(1046, "umbTextpage");
+            var content = contentService.CreateContent(1046, "umbTextpage", 0);
             content.Name = "Subpage with Unpublisehed Parent";
             contentService.Save(content, 0);
 
@@ -378,7 +382,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.CreateContent(-1, "umbTextpage");
+            var content = contentService.CreateContent(-1, "umbTextpage", 0);
             content.Name = "Home US";
             content.SetValue("author", "Barack Obama");
 
@@ -396,7 +400,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.CreateContent(-1, "umbTextpage");
+            var content = contentService.CreateContent(-1, "umbTextpage", 0);
             content.Name = "Home US";
             content.SetValue("author", "Barack Obama");
 
