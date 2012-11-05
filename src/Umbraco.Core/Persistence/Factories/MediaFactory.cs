@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
@@ -11,10 +12,18 @@ namespace Umbraco.Core.Persistence.Factories
         private readonly Guid _nodeObjectTypeId;
         private readonly int _id;
         private int _primaryKey;
+        private readonly IProfile _user;
 
-        public MediaFactory(IMediaType contentType, Guid nodeObjectTypeId, int id)
+        public MediaFactory(IMediaType contentType, Guid nodeObjectTypeId, int id, IProfile user)
         {
             _contentType = contentType;
+            _nodeObjectTypeId = nodeObjectTypeId;
+            _id = id;
+            _user = user;
+        }
+
+        public MediaFactory(Guid nodeObjectTypeId, int id)
+        {
             _nodeObjectTypeId = nodeObjectTypeId;
             _id = id;
         }
@@ -32,10 +41,7 @@ namespace Umbraco.Core.Persistence.Factories
                                    : _id.ToGuid(),
                            Name = dto.ContentDto.NodeDto.Text,
                            Path = dto.ContentDto.NodeDto.Path,
-                           UserId =
-                               dto.ContentDto.NodeDto.UserId.HasValue
-                                   ? dto.ContentDto.NodeDto.UserId.Value
-                                   : 0,
+                           User = _user,
                            Level = dto.ContentDto.NodeDto.Level,
                            ParentId = dto.ContentDto.NodeDto.ParentId,
                            SortOrder = dto.ContentDto.NodeDto.SortOrder,
@@ -96,7 +102,7 @@ namespace Umbraco.Core.Persistence.Factories
                                   Text = entity.Name,
                                   Trashed = entity.Trashed,
                                   UniqueId = entity.Key,
-                                  UserId = entity.UserId
+                                  UserId = entity.User.Id.SafeCast<int>()
                               };
 
             return nodeDto;

@@ -6,12 +6,14 @@
     /// </summary>
     public static class ServiceFactory
     {
+        private static readonly ServiceContext ServiceContext = new ServiceContext(null);
+
         /// <summary>
         /// Gets the <see cref="IContentService"/>
         /// </summary>
         public static IContentService ContentService
         {
-            get { return ServiceContext.Current.ContentService; }
+            get { return ServiceContext.ContentService; }
         }
 
         /// <summary>
@@ -19,7 +21,7 @@
         /// </summary>
         public static IContentTypeService ContentTypeService
         {
-            get { return ServiceContext.Current.ContentTypeService; }
+            get { return ServiceContext.ContentTypeService; }
         }
 
         /// <summary>
@@ -27,7 +29,7 @@
         /// </summary>
         public static IDataTypeService DataTypeService
         {
-            get { return ServiceContext.Current.DataTypeService; }
+            get { return ServiceContext.DataTypeService; }
         }
 
         /// <summary>
@@ -35,7 +37,7 @@
         /// </summary>
         public static IFileService FileService
         {
-            get { return ServiceContext.Current.FileService; }
+            get { return ServiceContext.FileService; }
         }
 
         /// <summary>
@@ -43,7 +45,7 @@
         /// </summary>
         public static ILocalizationService LocalizationService
         {
-            get { return ServiceContext.Current.LocalizationService; }
+            get { return ServiceContext.LocalizationService; }
         }
 
         /// <summary>
@@ -51,7 +53,7 @@
         /// </summary>
         public static IMediaService MediaService
         {
-            get { return ServiceContext.Current.MediaService; }
+            get { return ServiceContext.MediaService; }
         }
 
         /// <summary>
@@ -59,7 +61,7 @@
         /// </summary>
         public static IMacroService MacroService
         {
-            get { return ServiceContext.Current.MacroService; }
+            get { return ServiceContext.MacroService; }
         }
     }
 }

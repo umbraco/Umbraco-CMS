@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models.Rdbms
         public bool Published { get; set; }
 
         [Column("documentUser")]
-        public int UserId { get; set; }
+        public int WriterUserId { get; set; }
 
         [Column("versionId")]
         [PrimaryKeyColumn(AutoIncrement = false)]

@@ -12,77 +12,72 @@ namespace Umbraco.Web.Publishing
         public abstract bool UnPublish(IEnumerable<IContent> content, int userId);
 
         /// <summary>
-        /// The publish event handler
+        /// The publishing event handler used for publish and unpublish events
         /// </summary>
-        public delegate void PublishEventHandler(IContent sender, PublishEventArgs e);
-
-        /// <summary>
-        /// The unpublish event handler
-        /// </summary>
-        public delegate void UnPublishEventHandler(IContent sender, UnPublishEventArgs e);
+        public delegate void PublishingEventHandler(IContent sender, PublishingEventArgs e);
 
         /// <summary>
         /// Occurs before publish
         /// </summary>
-        public static event PublishEventHandler BeforePublish;
+        public static event PublishingEventHandler Publishing;
 
         /// <summary>
-        /// Raises the <see cref="E:BeforePublish"/> event
+        /// Raises the <see cref="Publishing"/> event
         /// </summary>
         /// <param name="content"> </param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforePublish(IContent content, PublishEventArgs e)
+        protected virtual void OnPublish(IContent content, PublishingEventArgs e)
         {
-            if (BeforePublish != null)
-                BeforePublish(content, e);
+            if (Publishing != null)
+                Publishing(content, e);
         }
 
         /// <summary>
         /// Occurs after publish
         /// </summary>
-        public static event PublishEventHandler AfterPublish;
+        public static event PublishingEventHandler Published;
 
         /// <summary>
-        /// Raises the <see cref="E:AfterPublish"/> event
+        /// Raises the <see cref="Published"/> event
         /// </summary>
         /// <param name="content"> </param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterPublish(IContent content, PublishEventArgs e)
+        protected virtual void OnPublished(IContent content, PublishingEventArgs e)
         {
-            if (AfterPublish != null)
-                AfterPublish(content, e);
+            if (Published != null)
+                Published(content, e);
         }
 
         /// <summary>
         /// Occurs before unpublish
         /// </summary>
-        public static event UnPublishEventHandler BeforeUnPublish;
+        public static event PublishingEventHandler UnPublishing;
 
         /// <summary>
-        /// Raises the <see cref="E:BeforeUnPublish"/> event
+        /// Raises the <see cref="UnPublishing"/> event
         /// </summary>
         /// <param name="content"> </param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeUnPublish(IContent content, UnPublishEventArgs e)
+        protected virtual void OnUnPublish(IContent content, PublishingEventArgs e)
         {
-            if (BeforeUnPublish != null)
-                BeforeUnPublish(content, e);
+            if (UnPublishing != null)
+                UnPublishing(content, e);
         }
 
         /// <summary>
         /// Occurs after unpublish
         /// </summary>
-        public static event UnPublishEventHandler AfterUnPublish;
+        public static event PublishingEventHandler UnPublished;
 
         /// <summary>
-        /// Raises the <see cref="E:AfterUnPublish"/> event
+        /// Raises the <see cref="UnPublished"/> event
         /// </summary>
         /// <param name="content"> </param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterUnPublish(IContent content, UnPublishEventArgs e)
+        protected virtual void OnUnPublished(IContent content, PublishingEventArgs e)
         {
-            if (AfterUnPublish != null)
-                AfterUnPublish(content, e);
+            if (UnPublished != null)
+                UnPublished(content, e);
         }
     }
 }

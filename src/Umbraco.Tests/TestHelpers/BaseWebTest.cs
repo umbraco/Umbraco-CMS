@@ -31,7 +31,6 @@ namespace Umbraco.Tests.TestHelpers
 				TestHelper.InitializeDatabase();
 			Resolution.Freeze();
 			ApplicationContext = new ApplicationContext() { IsReady = true };
-		    ServiceContext = ServiceContext.Current;
 		    DatabaseContext = DatabaseContext.Current;
 			//we need to clear out all currently created template files
 			var masterPages = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Masterpages));
@@ -45,7 +44,6 @@ namespace Umbraco.Tests.TestHelpers
 		{
 			//reset the app context
 			ApplicationContext.Current = null;
-		    ServiceContext = null;
 		    DatabaseContext = null;
 			Resolution.IsFrozen = false;
 			if (RequiresDbSetup)
@@ -78,8 +76,6 @@ namespace Umbraco.Tests.TestHelpers
 		}
 
 		protected ApplicationContext ApplicationContext { get; private set; }
-
-        protected ServiceContext ServiceContext { get; private set; }
 
         protected DatabaseContext DatabaseContext { get; private set; }
 

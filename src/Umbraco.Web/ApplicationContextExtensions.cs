@@ -2,7 +2,6 @@
 using System.IO;
 using System.Web;
 using Umbraco.Core;
-using Umbraco.Web.Services;
 
 namespace Umbraco.Web
 {
@@ -27,16 +26,6 @@ namespace Umbraco.Web
 			var configPath = http.Request.PhysicalApplicationPath + "\\web.config";
 			File.SetLastWriteTimeUtc(configPath, DateTime.UtcNow);
 		}
-
-        /// <summary>
-        /// Adds the ServiceContext to the ApplicationContext
-        /// </summary>
-        /// <param name="appContext"></param>
-        /// <returns></returns>
-        public static ServiceContext ServiceContext(this ApplicationContext appContext)
-        {
-            return Services.ServiceContext.Current;
-        }
 
         /// <summary>
         /// Adds the DatabaseContext to the ApplicationContext

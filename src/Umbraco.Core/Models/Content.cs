@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Models
 {
@@ -18,6 +19,7 @@ namespace Umbraco.Core.Models
         private string _language;
         private DateTime? _releaseDate;
         private DateTime? _expireDate;
+        private IProfile _writer;
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -46,6 +48,7 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Language);
         private static readonly PropertyInfo ReleaseDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ReleaseDate);
         private static readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
+        private static readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, IProfile>(x => x.Writer);
 
         /// <summary>
         /// Path to the template used by this Content
@@ -132,10 +135,10 @@ namespace Umbraco.Core.Models
             set
             {
                 if(value.HasValue && value.Value > DateTime.UtcNow && Published)
-                    ChangePublishedState(false);
+                    _published = false;
 
                 if (value.HasValue && value.Value < DateTime.UtcNow && !Published)
-                    ChangePublishedState(true);
+                    _published = true;
 
                 _releaseDate = value;
                 OnPropertyChanged(ReleaseDateSelector);
@@ -152,10 +155,24 @@ namespace Umbraco.Core.Models
             set
             {
                 if(value.HasValue && DateTime.UtcNow > value.Value && Published)
-                    ChangePublishedState(false);
+                    _published = false;
 
                 _expireDate = value;
                 OnPropertyChanged(ExpireDateSelector);
+            }
+        }
+
+        /// <summary>
+        /// IProfile of the user who wrote/updated this Content
+        /// </summary>
+        [DataMember]
+        public virtual IProfile Writer
+        {
+            get { return _writer; }
+            set
+            {
+                _writer = value;
+                OnPropertyChanged(WriterSelector);
             }
         }
 

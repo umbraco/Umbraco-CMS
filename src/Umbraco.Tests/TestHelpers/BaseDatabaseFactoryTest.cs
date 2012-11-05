@@ -57,7 +57,6 @@ namespace Umbraco.Tests.TestHelpers
 
             Resolution.Freeze();
             ApplicationContext = new ApplicationContext() { IsReady = true };
-            ServiceContext = ServiceContext.Current;
             DatabaseContext = DatabaseContext.Current;
 
             //Configure the Database and Sql Syntax based on connection string set in config
@@ -70,7 +69,6 @@ namespace Umbraco.Tests.TestHelpers
         public virtual void TearDown()
         {
             //reset the app context
-            ServiceContext = null;
             DatabaseContext = null;
             ApplicationContext.Current = null;
             Resolution.IsFrozen = false;
@@ -87,7 +85,10 @@ namespace Umbraco.Tests.TestHelpers
 
         protected ApplicationContext ApplicationContext { get; private set; }
 
-        protected ServiceContext ServiceContext { get; private set; }
+        protected ServiceContext ServiceContext
+        {
+            get { return GetUmbracoContext("/test", 1234).ServiceContext; }
+        }
 
         protected DatabaseContext DatabaseContext { get; private set; }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Web;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Web.Publishing;
 
@@ -12,19 +13,19 @@ namespace Umbraco.Web.Services
     /// </summary>
     public class ServiceContext
     {
-        #region Singleton
-        private static readonly Lazy<ServiceContext> lazy = new Lazy<ServiceContext>(() => new ServiceContext());
-        
-        public static ServiceContext Current { get { return lazy.Value; } }
-
-        private ServiceContext()
+        internal ServiceContext(HttpContextBase httpContext)
         {
-            if(_cache.IsEmpty)
+            _httpContext = httpContext;
+
+            if (_cache.IsEmpty)
             {
                 BuildServiceCache();
             }
         }
-        #endregion
+
+        public static ServiceContext Current { get; internal set; }
+
+        private readonly HttpContextBase _httpContext;
 
         private readonly ConcurrentDictionary<string, IService> _cache = new ConcurrentDictionary<string, IService>();
 
@@ -37,7 +38,9 @@ namespace Umbraco.Web.Services
             var fileProvider = new FileUnitOfWorkProvider();
             var publishingStrategy = new PublishingStrategy();
 
-            var contentService = new ContentService(provider, publishingStrategy);
+            var userService = new UserService(_httpContext);
+
+            var contentService = new ContentService(provider, publishingStrategy, userService);
             _cache.AddOrUpdate(typeof (IContentService).Name, contentService, (x, y) => contentService);
 
             var mediaService = new MediaService(provider);

@@ -3,8 +3,7 @@
 namespace Umbraco.Core
 {
     //Publishing Events
-    public class PublishEventArgs : System.ComponentModel.CancelEventArgs { }
-    public class UnPublishEventArgs : System.ComponentModel.CancelEventArgs { }
+    public class PublishingEventArgs : System.ComponentModel.CancelEventArgs { }
     public class SendToPublishEventArgs : System.ComponentModel.CancelEventArgs { }
 
     //Moving Content Events

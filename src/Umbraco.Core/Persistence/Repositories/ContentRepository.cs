@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
@@ -46,7 +47,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
 
-            var factory = new ContentFactory(contentType, NodeObjectTypeId, id);
+            //NOTE: Should eventually be moved to a UserRepository like is the case with ContentType
+            var userDto = Database.FirstOrDefault<UserDto>("WHERE id = @Id", new { Id = dto.ContentVersionDto.ContentDto.NodeDto.UserId });
+            var user = new Profile(userDto.Id, userDto.UserName);
+            var writerDto = Database.FirstOrDefault<UserDto>("WHERE id = @Id", new { Id = dto.WriterUserId });
+            var writer = new Profile(writerDto.Id, writerDto.UserName);
+
+            var factory = new ContentFactory(contentType, NodeObjectTypeId, id, user, writer);
             var content = factory.BuildEntity(dto);
             
             content.Properties = GetPropertyCollection(id, dto.ContentVersionDto.VersionId, contentType);
@@ -141,7 +148,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((Content)entity).AddingEntity();
 
-            var factory = new ContentFactory(null, NodeObjectTypeId, entity.Id);
+            var factory = new ContentFactory(NodeObjectTypeId, entity.Id);
             var dto = factory.BuildDto(entity);
 
             //NOTE Should the logic below have some kind of fallback for empty parent ids ?
@@ -202,7 +209,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Updates Modified date and Version Guid
             ((Content)entity).UpdatingEntity();
 
-            var factory = new ContentFactory(null, NodeObjectTypeId, entity.Id);
+            var factory = new ContentFactory(NodeObjectTypeId, entity.Id);
             //Look up Content entry to get Primary for updating the DTO
             var contentDto = Database.SingleOrDefault<ContentDto>("WHERE nodeId = @Id", new { Id = entity.Id });
             factory.SetPrimaryKey(contentDto.PrimaryKey);
@@ -281,12 +288,18 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
 
-            var factory = new ContentFactory(contentType, NodeObjectTypeId, id);
+            //NOTE: Should eventually be moved to a UserRepository like is the case with ContentType
+            var userDto = Database.FirstOrDefault<UserDto>("WHERE id = @Id", new { Id = dto.ContentVersionDto.ContentDto.NodeDto.UserId });
+            var user = new Profile(userDto.Id, userDto.UserName);
+            var writerDto = Database.FirstOrDefault<UserDto>("WHERE id = @Id", new { Id = dto.WriterUserId });
+            var writer = new Profile(writerDto.Id, writerDto.UserName);
+
+            var factory = new ContentFactory(contentType, NodeObjectTypeId, id, user, writer);
             var content = factory.BuildEntity(dto);
 
             content.Properties = GetPropertyCollection(id, versionId, contentType);
 
-            ((Content)content).ResetDirtyProperties();
+            ((ICanBeDirty)content).ResetDirtyProperties();
             return content;
         }
 

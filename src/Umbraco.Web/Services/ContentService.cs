@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
@@ -21,6 +23,7 @@ namespace Umbraco.Web.Services
         private readonly IUnitOfWorkProvider _provider;
         private readonly IPublishingStrategy _publishingStrategy;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserService _userService;
 
         public ContentService() : this(new PetaPocoUnitOfWorkProvider())
         {
@@ -31,11 +34,16 @@ namespace Umbraco.Web.Services
             
         }
 
-        public ContentService(IUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy)
+        public ContentService(IUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy) : this(provider, publishingStrategy, null)
+        {
+        }
+
+        public ContentService(IUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy, IUserService userService)
         {
             _provider = provider;
             _publishingStrategy = publishingStrategy;
             _unitOfWork = provider.GetUnitOfWork();
+            _userService = userService;
         }
 
         /// <summary>
@@ -44,8 +52,9 @@ namespace Umbraco.Web.Services
         /// </summary>
         /// <param name="parentId">Id of Parent for content</param>
         /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
         /// <returns><see cref="IContent"/></returns>
-        public IContent CreateContent(int parentId, string contentTypeAlias)
+        public IContent CreateContent(int parentId, string contentTypeAlias, int userId = -1)
         {
             var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(_unitOfWork);
             var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
@@ -59,7 +68,10 @@ namespace Umbraco.Web.Services
             if (contentType == null)
                 throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null", contentTypeAlias));
 
-            return new Content(parentId, contentType);
+            var content = new Content(parentId, contentType);
+            SetUser(content, userId);
+            SetWriter(content, userId);
+            return content;
         }
 
         /// <summary>
@@ -189,9 +201,9 @@ namespace Umbraco.Web.Services
         /// <summary>
         /// Re-Publishes all Content
         /// </summary>
-        /// <param name="userId">Id of the User issueing the publishing</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        public bool RePublishAll(int userId)
+        public bool RePublishAll(int userId = -1)
         {
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
 
@@ -217,6 +229,7 @@ namespace Umbraco.Web.Services
                 //Only loop through content where the Published property has been updated
                 foreach (var item in list.Where(x => ((ICanBeDirty)x).IsPropertyDirty("Published")))
                 {
+                    SetWriter(item, userId);
                     repository.AddOrUpdate(item);
                 }
 
@@ -233,9 +246,9 @@ namespace Umbraco.Web.Services
         /// Publishes a single <see cref="IContent"/> object
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to publish</param>
-        /// <param name="userId">Id of the User issueing the publishing</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        public bool Publish(IContent content, int userId)
+        public bool Publish(IContent content, int userId = -1)
         {
             return SaveAndPublish(content, userId);
         }
@@ -244,9 +257,9 @@ namespace Umbraco.Web.Services
         /// Publishes a <see cref="IContent"/> object and all its children
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
-        /// <param name="userId">Id of the User issueing the publishing</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        public bool PublishWithChildren(IContent content, int userId)
+        public bool PublishWithChildren(IContent content, int userId = -1)
         {
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
 
@@ -282,6 +295,7 @@ namespace Umbraco.Web.Services
                 //Only loop through content where the Published property has been updated
                 foreach (var item in list.Where(x => ((ICanBeDirty)x).IsPropertyDirty("Published")))
                 {
+                    SetWriter(item, userId);
                     repository.AddOrUpdate(item);
                 }
 
@@ -299,9 +313,9 @@ namespace Umbraco.Web.Services
         /// UnPublishes a single <see cref="IContent"/> object
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to publish</param>
-        /// <param name="userId">Id of the User issueing the publishing</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
-        public bool UnPublish(IContent content, int userId)
+        public bool UnPublish(IContent content, int userId = -1)
         {
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
 
@@ -324,6 +338,7 @@ namespace Umbraco.Web.Services
                 {
                     foreach (var child in children)
                     {
+                        SetWriter(child, userId);
                         repository.AddOrUpdate(child);
                     }
                 }
@@ -367,9 +382,9 @@ namespace Umbraco.Web.Services
         /// Saves and Publishes a single <see cref="IContent"/> object
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to save and publish</param>
-        /// <param name="userId">Id of the User issueing the publishing</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        public bool SaveAndPublish(IContent content, int userId)
+        public bool SaveAndPublish(IContent content, int userId = -1)
         {
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
 
@@ -395,6 +410,7 @@ namespace Umbraco.Web.Services
             bool published = _publishingStrategy.Publish(content, userId);
             if (published)
             {
+                SetWriter(content, userId);
                 repository.AddOrUpdate(content);
                 _unitOfWork.Commit();
 
@@ -409,10 +425,13 @@ namespace Umbraco.Web.Services
         /// Saves a single <see cref="IContent"/> object
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to save</param>
-        /// <param name="userId">Id of the User saving the Content</param>
-        public void Save(IContent content, int userId)
+        /// <param name="userId">Optional Id of the User saving the Content</param>
+        public void Save(IContent content, int userId = -1)
         {
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
+
+            SetWriter(content, userId);
+
             repository.AddOrUpdate(content);
             _unitOfWork.Commit();
         }
@@ -421,12 +440,13 @@ namespace Umbraco.Web.Services
         /// Saves a collection of <see cref="IContent"/> objects
         /// </summary>
         /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
-        /// <param name="userId">Id of the User saving the Content</param>
-        public void Save(IEnumerable<IContent> contents, int userId)
+        /// <param name="userId">Optional Id of the User saving the Content</param>
+        public void Save(IEnumerable<IContent> contents, int userId = -1)
         {
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
             foreach (var content in contents)
             {
+                SetWriter(content, userId);
                 repository.AddOrUpdate(content);
             }
             _unitOfWork.Commit();
@@ -459,13 +479,14 @@ namespace Umbraco.Web.Services
         /// </summary>
         /// <remarks>Please note that this method will completely remove the Content from the database</remarks>
         /// <param name="content">The <see cref="IContent"/> to delete</param>
-        /// <param name="userId">Id of the User deleting the Content</param>
-        public void Delete(IContent content, int userId)
+        /// <param name="userId">Optional Id of the User deleting the Content</param>
+        public void Delete(IContent content, int userId = -1)
         {
             //TODO Ensure that content is unpublished when deleted
             //TODO This method should handle/react to errors when there is a constraint issue with the content being deleted
             //TODO Children should either be deleted or moved to the recycle bin
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
+            SetWriter(content, userId);
             repository.Delete(content);
             _unitOfWork.Commit();
         }
@@ -475,12 +496,13 @@ namespace Umbraco.Web.Services
         /// </summary>
         /// <remarks>Move an item to the Recycle Bin will result in the item being unpublished</remarks>
         /// <param name="content">The <see cref="IContent"/> to delete</param>
-        /// <param name="userId">Id of the User deleting the Content</param>
-        public void MoveToRecycleBin(IContent content, int userId)
+        /// <param name="userId">Optional Id of the User deleting the Content</param>
+        public void MoveToRecycleBin(IContent content, int userId = -1)
         {
             //TODO If content item has children those should also be moved to the recycle bin
             //TODO Unpublish deleted content + children
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
+            SetWriter(content, userId);
             content.ChangeTrashedState(true);
             repository.AddOrUpdate(content);
             _unitOfWork.Commit();
@@ -496,9 +518,11 @@ namespace Umbraco.Web.Services
         /// </remarks>
         /// <param name="content">The <see cref="IContent"/> to move</param>
         /// <param name="parentId">Id of the Content's new Parent</param>
-        /// <param name="userId">Id of the User moving the Content</param>
-        public void Move(IContent content, int parentId, int userId)
+        /// <param name="userId">Optional Id of the User moving the Content</param>
+        public void Move(IContent content, int parentId, int userId = -1)
         {
+            SetWriter(content, userId);
+
             //If Content is being moved away from Recycle Bin, its state should be un-trashed
             if(content.Trashed && parentId != -20)
             {
@@ -543,15 +567,17 @@ namespace Umbraco.Web.Services
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to copy</param>
         /// <param name="parentId">Id of the Content's new Parent</param>
-        /// <param name="userId">Id of the User copying the Content</param>
+        /// <param name="userId">Optional Id of the User copying the Content</param>
         /// <returns>The newly created <see cref="IContent"/> object</returns>
-        public IContent Copy(IContent content, int parentId, int userId)
+        public IContent Copy(IContent content, int parentId, int userId = -1)
         {
             var copy = ((Content) content).Clone();
             copy.ParentId = parentId;
             copy.Name = copy.Name + " (1)";
 
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
+
+            SetWriter(content, userId);
 
             repository.AddOrUpdate(copy);
             _unitOfWork.Commit();
@@ -563,9 +589,9 @@ namespace Umbraco.Web.Services
         /// Sends an <see cref="IContent"/> to Publication, which executes handlers and events for the 'Send to Publication' action.
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to send to publication</param>
-        /// <param name="userId">Id of the User issueing the send to publication</param>
+        /// <param name="userId">Optional Id of the User issueing the send to publication</param>
         /// <returns>True if sending publication was succesfull otherwise false</returns>
-        public bool SendToPublication(IContent content, int userId)
+        public bool SendToPublication(IContent content, int userId = -1)
         {
             //TODO Implement something similar to this
             /*SendToPublishEventArgs e = new SendToPublishEventArgs();
@@ -592,17 +618,70 @@ namespace Umbraco.Web.Services
         /// </remarks>
         /// <param name="id">Id of the <see cref="IContent"/>being rolled back</param>
         /// <param name="versionId">Id of the version to rollback to</param>
-        /// <param name="userId">Id of the User issueing the rollback of the Content</param>
+        /// <param name="userId">Optional Id of the User issueing the rollback of the Content</param>
         /// <returns>The newly created <see cref="IContent"/> object</returns>
-        public IContent Rollback(int id, Guid versionId, int userId)
+        public IContent Rollback(int id, Guid versionId, int userId = -1)
         {
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
             var content = repository.GetByVersion(id, versionId);
             
+            SetUser(content, userId);
+            SetWriter(content, userId);
+
             repository.AddOrUpdate(content);
             _unitOfWork.Commit();
 
             return content;
+        }
+
+        /// <summary>
+        /// Updates a content object with the User (id), who created the content.
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> object to update</param>
+        /// <param name="userId">Optional Id of the User</param>
+        private void SetUser(IContent content, int userId)
+        {
+            if(userId > -1)
+            {
+                //If a user id was passed in we use that
+                content.User = new Profile(userId, "");
+            }
+            else if(_userService != null)
+            {
+                //If the UserService has been set for this instance of the ServiceContext
+                //we retrieve the current users id from there.
+                content.User = _userService.GetCurrentBackOfficeUser();
+            }
+            else
+            {
+                //Otherwise we default to Admin user, which should always exist (almost always)
+                content.User = new Profile(0, "Administrator");
+            }
+        }
+
+        /// <summary>
+        /// Updates a content object with a Writer (user id), who updated the content.
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> object to update</param>
+        /// <param name="userId">Optional Id of the Writer</param>
+        private void SetWriter(IContent content, int userId)
+        {
+            if (userId > -1)
+            {
+                //If a user id was passed in we use that
+                content.Writer = new Profile(userId, "");
+            }
+            else if (_userService != null)
+            {
+                //If the UserService has been set for this instance of the ServiceContext
+                //we retrieve the current users id from there.
+                content.Writer = _userService.GetCurrentBackOfficeUser();
+            }
+            else
+            {
+                //Otherwise we default to Admin user, which should always exist (almost always)
+                content.Writer = new Profile(0, "Administrator");
+            }
         }
     }
 }

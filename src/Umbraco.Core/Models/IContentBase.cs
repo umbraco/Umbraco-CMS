@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Models
 {
@@ -41,9 +42,9 @@ namespace Umbraco.Core.Models
         string Path { get; set; }
 
         /// <summary>
-        /// Id of the user who created the Content
+        /// Profile of the user who created the Content
         /// </summary>
-        int UserId { get; set; }
+        IProfile User { get; set; }
 
         /// <summary>
         /// Boolean indicating whether this Content is Trashed or not.

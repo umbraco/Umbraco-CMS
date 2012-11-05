@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Models
 {
@@ -20,7 +21,7 @@ namespace Umbraco.Core.Models
         private int _sortOrder;
         private int _level;
         private string _path;
-        private int _userId;
+        private IProfile _user;
         private bool _trashed;
         private int _contentTypeId;
         private PropertyCollection _properties;
@@ -44,7 +45,7 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.SortOrder);
         private static readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.Level);
         private static readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Path);
-        private static readonly PropertyInfo UserIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.UserId);
+        private static readonly PropertyInfo UserSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IProfile>(x => x.User);
         private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentBase, bool>(x => x.Trashed);
         private static readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
         private readonly static PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
@@ -136,16 +137,16 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Id of the user who created this Content
+        /// IProfile of the user who created this Content
         /// </summary>
         [DataMember]
-        public virtual int UserId
+        public virtual IProfile User
         {
-            get { return _userId; }
+            get { return _user; }
             set
             {
-                _userId = value;
-                OnPropertyChanged(UserIdSelector);
+                _user = value;
+                OnPropertyChanged(UserSelector);
             }
         }
         

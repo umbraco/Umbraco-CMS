@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Models
 {
@@ -32,6 +33,11 @@ namespace Umbraco.Core.Models
         /// Gets or Sets the date the Content should expire and thus be unpublished
         /// </summary>
         DateTime? ExpireDate { get; set; }
+
+        /// <summary>
+        /// Profile of the user who wrote the Content
+        /// </summary>
+        IProfile Writer { get; set; }
 
         /// <summary>
         /// Gets the ContentType used by this content object

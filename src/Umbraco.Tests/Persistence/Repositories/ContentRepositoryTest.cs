@@ -2,6 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
@@ -173,7 +174,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var contentType = contentTypeRepository.Get(1045);
             var content = new Content(1048, contentType);
             content.Name = "Textpage 2 Child Node";
-            content.UserId = 0;
+            content.User = new Profile(0, "Administrator");
 
             // Act
             repository.AddOrUpdate(content);

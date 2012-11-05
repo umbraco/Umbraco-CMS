@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
@@ -44,8 +45,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 return null;
 
             var contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
+            
+            //NOTE: Should eventually be moved to a UserRepository like is the case with ContentType
+            var userDto = Database.FirstOrDefault<UserDto>("WHERE id = @Id", new {Id = dto.ContentDto.NodeDto.UserId});
+            var user = new Profile(userDto.Id, userDto.UserName);
 
-            var factory = new MediaFactory(contentType, NodeObjectTypeId, id);
+            var factory = new MediaFactory(contentType, NodeObjectTypeId, id, user);
             var content = factory.BuildEntity(dto);
 
             content.Properties = GetPropertyCollection(id, dto.VersionId, contentType);
@@ -136,7 +141,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((Models.Media)entity).AddingEntity();
 
-            var factory = new MediaFactory(null, NodeObjectTypeId, entity.Id);
+            var factory = new MediaFactory(NodeObjectTypeId, entity.Id);
             var dto = factory.BuildDto(entity);
 
             //NOTE Should the logic below have some kind of fallback for empty parent ids ?
@@ -189,7 +194,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Updates Modified date and Version Guid
             ((Models.Media)entity).UpdatingEntity();
 
-            var factory = new MediaFactory(null, NodeObjectTypeId, entity.Id);
+            var factory = new MediaFactory(NodeObjectTypeId, entity.Id);
             //Look up Content entry to get Primary for updating the DTO
             var contentDto = Database.SingleOrDefault<ContentDto>("WHERE nodeId = @Id", new { Id = entity.Id });
             factory.SetPrimaryKey(contentDto.PrimaryKey);

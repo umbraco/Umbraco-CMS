@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Tests.TestHelpers.Entities
 {
@@ -6,7 +7,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
     {
         public static Content CreateSimpleContent(IContentType contentType)
         {
-            var content = new Content(-1, contentType) {Name = "Home", Language = "en-US", Level = 1, ParentId = -1, SortOrder = 1, Template = "~/masterpages/umbTextPage.master", UserId = 0};
+            var content = new Content(-1, contentType) { Name = "Home", Language = "en-US", Level = 1, ParentId = -1, SortOrder = 1, Template = "~/masterpages/umbTextPage.master", User = new Profile(0, "Administrator"), Writer = new Profile(0, "Administrator") };
             object obj =
                 new
                     {
@@ -22,7 +23,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
         public static Content CreateSimpleContent(IContentType contentType, string name, int parentId)
         {
-            var content = new Content(parentId, contentType) { Name = name, Language = "en-US", ParentId = parentId, Template = "~/masterpages/umbTextPage.master", UserId = 0 };
+            var content = new Content(parentId, contentType) { Name = name, Language = "en-US", ParentId = parentId, Template = "~/masterpages/umbTextPage.master", User = new Profile(0, "Administrator"), Writer = new Profile(0, "Administrator") };
             object obj =
                 new
                 {
@@ -38,7 +39,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
         public static Content CreateTextpageContent(IContentType contentType, string name, int parentId)
         {
-            var content = new Content(parentId, contentType) { Name = name, Language = "en-US", ParentId = parentId, Template = "~/masterpages/umbTextPage.master", UserId = 0 };
+            var content = new Content(parentId, contentType) { Name = name, Language = "en-US", ParentId = parentId, Template = "~/masterpages/umbTextPage.master", User = new Profile(0, "Administrator"), Writer = new Profile(0, "Administrator")};
             object obj =
                 new
                 {

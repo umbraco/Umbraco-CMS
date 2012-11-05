@@ -24,9 +24,9 @@ namespace Umbraco.Web.Publishing
         /// <returns>True if the publish operation was successfull and not cancelled, otherwise false</returns>
         public override bool Publish(IContent content, int userId)
         {
-            var e = new PublishEventArgs();
-            //Fire BeforePublish event
-            FireBeforePublish(content, e);
+            var e = new PublishingEventArgs();
+            //Fire Publishing event
+            OnPublish(content, e);
 
             if (!e.Cancel)
             {
@@ -63,8 +63,8 @@ namespace Umbraco.Web.Publishing
                     string.Format("Content '{0}' with Id '{1}' has been published.",
                                   content.Name, content.Id));
 
-                //Fire AfterPublish event
-                FireAfterPublish(content, e);
+                //Fire Published event
+                OnPublished(content, e);
 
                 //NOTE: Ideally the xml cache should be refreshed here - as part of the publishing
 
@@ -82,15 +82,15 @@ namespace Umbraco.Web.Publishing
         /// <returns>True if the publish operation was successfull and not cancelled, otherwise false</returns>
         public override bool PublishWithChildren(IEnumerable<IContent> content, int userId)
         {
-            var e = new PublishEventArgs();
+            var e = new PublishingEventArgs();
 
             /* Only update content thats not already been published - we want to loop through
              * all unpublished content to write skipped content (expired and awaiting release) to log.
              */
             foreach (var item in content.Where(x => x.Published == false))
             {
-                //Fire BeforePublish event
-                FireBeforePublish(item, e);
+                //Fire Publishing event
+                OnPublish(item, e);
                 if (e.Cancel)
                     return false;
 
@@ -127,8 +127,8 @@ namespace Umbraco.Web.Publishing
                     string.Format("Content '{0}' with Id '{1}' has been published.",
                                   item.Name, item.Id));
 
-                //Fire AfterPublish event
-                FireAfterPublish(item, e);
+                //Fire Published event
+                OnPublished(item, e);
             }
 
             //NOTE: Ideally the xml cache should be refreshed here - as part of the publishing
@@ -144,9 +144,9 @@ namespace Umbraco.Web.Publishing
         /// <returns>True if the unpublish operation was successfull and not cancelled, otherwise false</returns>
         public override bool UnPublish(IContent content, int userId)
         {
-            var e = new UnPublishEventArgs();
+            var e = new PublishingEventArgs();
             //Fire BeforeUnPublish event
-            FireBeforeUnPublish(content, e);
+            OnUnPublish(content, e);
 
             if (!e.Cancel)
             {
@@ -168,8 +168,8 @@ namespace Umbraco.Web.Publishing
                     string.Format("Content '{0}' with Id '{1}' has been unpublished.",
                                   content.Name, content.Id));
 
-                //Fire AfterUnPublish event
-                FireAfterUnPublish(content, e);
+                //Fire UnPublishing event
+                OnUnPublished(content, e);
 
                 //NOTE: Ideally the xml cache should be refreshed here - as part of the unpublishing
 
@@ -187,13 +187,13 @@ namespace Umbraco.Web.Publishing
         /// <returns>True if the unpublish operation was successfull and not cancelled, otherwise false</returns>
         public override bool UnPublish(IEnumerable<IContent> content, int userId)
         {
-            var e = new UnPublishEventArgs();
+            var e = new PublishingEventArgs();
 
             //Only update content thats already been published
             foreach (var item in content.Where(x => x.Published == true))
             {
-                //Fire BeforeUnPublish event
-                FireBeforeUnPublish(item, e);
+                //Fire UnPublished event
+                OnUnPublish(item, e);
                 if (e.Cancel)
                     return false;
 
@@ -215,7 +215,7 @@ namespace Umbraco.Web.Publishing
                                   item.Name, item.Id));
 
                 //Fire AfterUnPublish event
-                FireAfterUnPublish(item, e);
+                OnUnPublished(item, e);
             }
 
             //NOTE: Ideally the xml cache should be refreshed here - as part of the publishing

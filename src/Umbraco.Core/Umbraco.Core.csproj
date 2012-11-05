@@ -98,6 +98,12 @@
     <Compile Include="Models\Language.cs" />
     <Compile Include="Models\Media.cs" />
     <Compile Include="Models\MediaType.cs" />
+    <Compile Include="Models\Membership\IMembershipUser.cs" />
+    <Compile Include="Models\Membership\IMembershipUserId.cs" />
+    <Compile Include="Models\Membership\IProfile.cs" />
+    <Compile Include="Models\Membership\Profile.cs" />
+    <Compile Include="Models\Membership\User.cs" />
+    <Compile Include="Models\Membership\UserProfile.cs" />
     <Compile Include="Models\PropertyTypeExtensions.cs" />
     <Compile Include="Models\Rdbms\ContentType2ContentTypeDto.cs" />
     <Compile Include="Models\Rdbms\PropertyTypeGroupDto.cs" />
