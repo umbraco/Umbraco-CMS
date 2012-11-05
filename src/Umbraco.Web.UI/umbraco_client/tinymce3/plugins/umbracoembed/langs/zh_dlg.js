@@ -1,4 +1,4 @@
-tinyMCE.addI18n('en.embed_dlg', {
+tinyMCE.addI18n('zh.embed_dlg', {
     title: '嵌入第三方媒体',
     general: '普通',
     url: '链接：',
