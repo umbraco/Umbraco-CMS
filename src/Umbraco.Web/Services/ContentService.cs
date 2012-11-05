@@ -644,18 +644,18 @@ namespace Umbraco.Web.Services
             if(userId > -1)
             {
                 //If a user id was passed in we use that
-                content.User = new Profile(userId, "");
+                content.Creator = new Profile(userId, "");
             }
             else if(_userService != null)
             {
                 //If the UserService has been set for this instance of the ServiceContext
                 //we retrieve the current users id from there.
-                content.User = _userService.GetCurrentBackOfficeUser();
+                content.Creator = _userService.GetCurrentBackOfficeUser();
             }
             else
             {
                 //Otherwise we default to Admin user, which should always exist (almost always)
-                content.User = new Profile(0, "Administrator");
+                content.Creator = new Profile(0, "Administrator");
             }
         }
 

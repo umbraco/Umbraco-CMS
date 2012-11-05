@@ -44,7 +44,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Profile of the user who created the Content
         /// </summary>
-        IProfile User { get; set; }
+        IProfile Creator { get; set; }
 
         /// <summary>
         /// Boolean indicating whether this Content is Trashed or not.

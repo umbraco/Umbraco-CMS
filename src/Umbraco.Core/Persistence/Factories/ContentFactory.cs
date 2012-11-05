@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.Factories
                                    : _id.ToGuid(),
                            Name = dto.ContentVersionDto.ContentDto.NodeDto.Text,
                            Path = dto.ContentVersionDto.ContentDto.NodeDto.Path,
-                           User = _user,
+                           Creator = _user,
                            Writer = _writer,
                            Level = dto.ContentVersionDto.ContentDto.NodeDto.Level,
                            ParentId = dto.ContentVersionDto.ContentDto.NodeDto.ParentId,
@@ -127,7 +127,7 @@ namespace Umbraco.Core.Persistence.Factories
                                   Text = entity.Name,
                                   Trashed = entity.Trashed,
                                   UniqueId = entity.Key,
-                                  UserId = entity.User.Id.SafeCast<int>()
+                                  UserId = entity.Creator.Id.SafeCast<int>()
                               };
 
             return nodeDto;

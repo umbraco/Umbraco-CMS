@@ -21,7 +21,7 @@ namespace Umbraco.Core.Models
         private int _sortOrder;
         private int _level;
         private string _path;
-        private IProfile _user;
+        private IProfile _creator;
         private bool _trashed;
         private int _contentTypeId;
         private PropertyCollection _properties;
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.SortOrder);
         private static readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.Level);
         private static readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Path);
-        private static readonly PropertyInfo UserSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IProfile>(x => x.User);
+        private static readonly PropertyInfo UserSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IProfile>(x => x.Creator);
         private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentBase, bool>(x => x.Trashed);
         private static readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
         private readonly static PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
@@ -140,12 +140,12 @@ namespace Umbraco.Core.Models
         /// IProfile of the user who created this Content
         /// </summary>
         [DataMember]
-        public virtual IProfile User
+        public virtual IProfile Creator
         {
-            get { return _user; }
+            get { return _creator; }
             set
             {
-                _user = value;
+                _creator = value;
                 OnPropertyChanged(UserSelector);
             }
         }
