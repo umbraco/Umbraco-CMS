@@ -39,14 +39,10 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="httpContext"></param>
         /// <param name="applicationContext"> </param>
-        /// <param name="databaseContext"> </param>
         /// <param name="routesCache"> </param>
-        /// <param name="serviceContext"> </param>
         internal UmbracoContext(
 			HttpContextBase httpContext, 
 			ApplicationContext applicationContext,
-            ServiceContext serviceContext,
-            DatabaseContext databaseContext,
 			IRoutesCache routesCache)
         {
             if (httpContext == null) throw new ArgumentNullException("httpContext");
@@ -55,9 +51,6 @@ namespace Umbraco.Web
             HttpContext = httpContext;            
             Application = applicationContext;
         	RoutesCache = routesCache;
-
-            Services = serviceContext;
-            DatabaseContext = databaseContext;
 
 			// set the urls...
 			//original request url
@@ -111,16 +104,6 @@ namespace Umbraco.Web
         /// Gets the current ApplicationContext
         /// </summary>
         public ApplicationContext Application { get; private set; }
-
-        /// <summary>
-        /// Gets the current ServiceContext, which exposes the various services
-        /// </summary>
-        public ServiceContext Services { get; private set; }
-
-        /// <summary>
-        /// Gets the current ServiceContext, which exposes the various services
-        /// </summary>
-        public DatabaseContext DatabaseContext { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="IRoutesCache"/>

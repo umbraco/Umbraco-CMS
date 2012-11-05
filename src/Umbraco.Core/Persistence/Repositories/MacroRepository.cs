@@ -47,7 +47,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var o = _serializationService.FromStream(file, typeof(IMacro));
             var macro = o as IMacro;
 
-            ((ICanBeDirty)macro).ResetDirtyProperties();
+            if(macro != null)
+                ((ICanBeDirty)macro).ResetDirtyProperties();
 
             return macro;
         }

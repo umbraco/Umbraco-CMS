@@ -30,8 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IContentType PerformGet(int id)
         {
             var contentTypeSql = GetBaseQuery(false);
-            contentTypeSql.Where("[umbracoNode].[id] = @Id", new {Id = id});
-            //contentTypeSql.Append(GetBaseWhereClause(id));
+            contentTypeSql.Where(GetBaseWhereClause(), new { Id = id });
 
             var dto = Database.Query<DocumentTypeDto, ContentTypeDto, NodeDto>(contentTypeSql).FirstOrDefault();
 
@@ -116,11 +115,9 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected override Sql GetBaseWhereClause(object id)
+        protected override string GetBaseWhereClause()
         {
-            var sql = new Sql();
-            sql.Where("[umbracoNode].[id] = @Id", new { Id = id });
-            return sql;
+            return "[umbracoNode].[id] = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

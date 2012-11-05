@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Repositories
         #region Abstract Methods
         
         protected abstract Sql GetBaseQuery(bool isCount);
-        protected abstract Sql GetBaseWhereClause(object id);
+        protected abstract string GetBaseWhereClause();
         protected abstract IEnumerable<string> GetDeleteClauses();
         protected abstract Guid NodeObjectTypeId { get; }
         protected abstract override void PersistNewItem(TEntity entity);
@@ -42,7 +42,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override bool PerformExists(TId id)
         {
             var sql = GetBaseQuery(true);
-            sql.Append(GetBaseWhereClause(id));
+            sql.Where(GetBaseWhereClause(), new { Id = id});
             var count = Database.ExecuteScalar<int>(sql);
             return count == 1;
         }

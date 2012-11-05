@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override RelationType PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
-            sql.Append(GetBaseWhereClause(id));
+            sql.Append(GetBaseWhereClause(), new { Id = id });
 
             var dto = Database.FirstOrDefault<RelationTypeDto>(sql);
             if (dto == null)
@@ -88,11 +88,9 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected override Sql GetBaseWhereClause(object id)
+        protected override string GetBaseWhereClause()
         {
-            var sql = new Sql();
-            sql.Where("[umbracoRelationType].[id] = @Id", new { Id = id });
-            return sql;
+            return "[umbracoRelationType].[id] = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

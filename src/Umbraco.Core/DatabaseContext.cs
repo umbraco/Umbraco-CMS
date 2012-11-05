@@ -17,17 +17,18 @@ namespace Umbraco.Core
     {
         private bool _configured;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        internal DatabaseContext()
-        {
-        }
+        #region Singleton
+        private static readonly Lazy<DatabaseContext> lazy = new Lazy<DatabaseContext>(() => new DatabaseContext());
 
         /// <summary>
         /// Gets the current Database Context.
         /// </summary>
-        public static DatabaseContext Current { get; internal set; }
+        public static DatabaseContext Current { get { return lazy.Value; } }
+
+        private DatabaseContext()
+        {
+        }
+        #endregion
 
         /// <summary>
         /// Gets the <see cref="Database"/> object for doing CRUD operations

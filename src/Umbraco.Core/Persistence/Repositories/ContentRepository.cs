@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IContent PerformGet(int id)
         {
             var contentSql = GetBaseQuery(false);
-            contentSql.Where("[umbracoNode].[id] = @Id", new { Id = id });
+            contentSql.Where(GetBaseWhereClause(), new { Id = id });
             contentSql.OrderBy("[cmsContentVersion].[VersionDate] DESC");
 
             var dto = Database.Query<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(contentSql).FirstOrDefault();
@@ -105,11 +105,9 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected override Sql GetBaseWhereClause(object id)
+        protected override string GetBaseWhereClause()
         {
-            var sql = new Sql();
-            sql.Where("[umbracoNode].[id] = @Id", new { Id = id });
-            return sql;
+            return "[umbracoNode].[id] = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -259,8 +257,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IContent> GetAllVersions(int id)
         {
             var contentSql = GetBaseQuery(false);
-            //contentSql.Append(GetBaseWhereClause(id));
-            contentSql.Where("[umbracoNode].[id] = @Id", new { Id = id });
+            contentSql.Where(GetBaseWhereClause(), new { Id = id });
             contentSql.OrderBy("[cmsContentVersion].[VersionDate] DESC");
 
             var documentDtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(contentSql);
@@ -273,8 +270,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public IContent GetByVersion(int id, Guid versionId)
         {
             var contentSql = GetBaseQuery(false);
-            //contentSql.Append(GetBaseWhereClause(id));
-            contentSql.Where("[umbracoNode].[id] = @Id", new { Id = id });
+            contentSql.Where(GetBaseWhereClause(), new { Id = id });
             contentSql.Where("[cmsContentVersion].[VersionId] = @VersionId", new { VersionId = versionId });
             contentSql.OrderBy("[cmsContentVersion].[VersionDate] DESC");
 

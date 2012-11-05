@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override ILanguage PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
-            sql.Append(GetBaseWhereClause(id));
+            sql.Append(GetBaseWhereClause(), new { Id = id });
 
             var languageDto = Database.First<LanguageDto>(sql);
             if (languageDto == null)
@@ -89,11 +89,9 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected override Sql GetBaseWhereClause(object id)
+        protected override string GetBaseWhereClause()
         {
-            var sql = new Sql();
-            sql.Where("[cmsLanguageText].[id] = @Id", new { Id = id });
-            return sql;
+            return "[cmsLanguageText].[id] = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

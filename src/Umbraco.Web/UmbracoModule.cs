@@ -51,8 +51,6 @@ namespace Umbraco.Web
 			var umbracoContext = new UmbracoContext(
 				httpContext,
 				ApplicationContext.Current,
-                ServiceContext.Current,
-                DatabaseContext.Current,
 				RoutesCacheResolver.Current.RoutesCache);
 			UmbracoContext.Current = umbracoContext;
 

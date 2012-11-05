@@ -58,7 +58,7 @@ namespace Umbraco.Tests.TestHelpers
             Resolution.Freeze();
             ApplicationContext = new ApplicationContext() { IsReady = true };
             ServiceContext = ServiceContext.Current;
-            DatabaseContext = new DatabaseContext();
+            DatabaseContext = DatabaseContext.Current;
 
             //Configure the Database and Sql Syntax based on connection string set in config
             DatabaseContext.Initialize();
@@ -96,8 +96,6 @@ namespace Umbraco.Tests.TestHelpers
             var ctx = new UmbracoContext(
                 GetHttpContextFactory(url, routeData).HttpContext,
                 ApplicationContext,
-                ServiceContext,
-                DatabaseContext,
                 GetRoutesCache());
             SetupUmbracoContextForTest(ctx, templateId);
             return ctx;
