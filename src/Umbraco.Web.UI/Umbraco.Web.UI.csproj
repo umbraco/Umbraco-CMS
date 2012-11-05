@@ -1531,7 +1531,6 @@
     <Content Include="Umbraco\config\lang\no.xml" />
     <Content Include="Umbraco\config\lang\sv.xml" />
     <Content Include="Umbraco\css\permissionsEditor.css" />
-    <Content Include="Umbraco\dialogs\ExportCode.aspx" />
     <Content Include="Umbraco\dialogs\mediaPicker.aspx" />
     <Content Include="Umbraco\images\editor\spellchecker.gif" />
     <Content Include="Umbraco\webservices\MacroContainerService.asmx" />
