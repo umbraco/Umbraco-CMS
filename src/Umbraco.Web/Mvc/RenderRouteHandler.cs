@@ -66,11 +66,7 @@ namespace Umbraco.Web.Mvc
 				throw new NullReferenceException("There is not current PublishedContentRequest, it must be initialized before the RenderRouteHandler executes");
 			}
 
-			var renderModel = new RenderModel()
-			{
-				Content = docRequest.PublishedContent,
-				CurrentCulture = docRequest.Culture
-			};
+			var renderModel = new RenderModel(docRequest.PublishedContent, docRequest.Culture);
 
 			//put essential data into the data tokens, the 'umbraco' key is required to be there for the view engine
 			requestContext.RouteData.DataTokens.Add("umbraco", renderModel); //required for the RenderModelBinder

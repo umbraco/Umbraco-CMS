@@ -36,6 +36,22 @@ namespace Umbraco.Web
 		private readonly UmbracoContext _umbracoContext;
 		private readonly IPublishedContent _currentPage;
 
+		/// <summary>
+		/// Custom constructor setting the current page to the parameter passed in
+		/// </summary>
+		/// <param name="umbracoContext"></param>
+		/// <param name="content"></param>
+		public UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content)
+			: this(umbracoContext)
+		{			
+			if (content == null) throw new ArgumentNullException("content");
+			_currentPage = content;
+		}
+
+		/// <summary>
+		/// Standard constructor setting the current page to the page that has been routed to
+		/// </summary>
+		/// <param name="umbracoContext"></param>
 		public UmbracoHelper(UmbracoContext umbracoContext)
 		{
 			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
@@ -43,7 +59,7 @@ namespace Umbraco.Web
 			_umbracoContext = umbracoContext;
 			if (_umbracoContext.IsFrontEndUmbracoRequest)
 			{
-				_currentPage = _umbracoContext.PublishedContentRequest.PublishedContent;	
+				_currentPage = _umbracoContext.PublishedContentRequest.PublishedContent;
 			}
 		}
 
