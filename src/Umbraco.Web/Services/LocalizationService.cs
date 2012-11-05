@@ -16,6 +16,7 @@ namespace Umbraco.Web.Services
     {
         private static readonly Guid RootParentId = new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde");
         private readonly IUnitOfWorkProvider _provider;
+        private readonly IUnitOfWork _unitOfWork;
 
         public LocalizationService() : this(new PetaPocoUnitOfWorkProvider())
         {
@@ -24,6 +25,7 @@ namespace Umbraco.Web.Services
         public LocalizationService(IUnitOfWorkProvider provider)
         {
             _provider = provider;
+            _unitOfWork = provider.GetUnitOfWork();
         }
 
         /// <summary>
@@ -33,8 +35,7 @@ namespace Umbraco.Web.Services
         /// <returns><see cref="IDictionaryItem"/></returns>
         public IDictionaryItem GetDictionaryItemById(int id)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(_unitOfWork);
             return repository.Get(id);
         }
 
@@ -45,8 +46,7 @@ namespace Umbraco.Web.Services
         /// <returns><see cref="DictionaryItem"/></returns>
         public IDictionaryItem GetDictionaryItemById(Guid id)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(_unitOfWork);
 
             var query = Query<IDictionaryItem>.Builder.Where(x => x.Key == id);
             var items = repository.GetByQuery(query);
@@ -61,8 +61,7 @@ namespace Umbraco.Web.Services
         /// <returns><see cref="IDictionaryItem"/></returns>
         public IDictionaryItem GetDictionaryItemByKey(string key)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(_unitOfWork);
 
             var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == key);
             var items = repository.GetByQuery(query);
@@ -77,8 +76,7 @@ namespace Umbraco.Web.Services
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
         public IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(_unitOfWork);
 
             var query = Query<IDictionaryItem>.Builder.Where(x => x.ParentId == parentId);
             var items = repository.GetByQuery(query);
@@ -92,8 +90,7 @@ namespace Umbraco.Web.Services
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
         public IEnumerable<IDictionaryItem> GetRootDictionaryItems()
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(_unitOfWork);
 
             var query = Query<IDictionaryItem>.Builder.Where(x => x.ParentId == RootParentId);
             var items = repository.GetByQuery(query);
@@ -108,8 +105,7 @@ namespace Umbraco.Web.Services
         /// <returns>True if a <see cref="IDictionaryItem"/> exists, otherwise false</returns>
         public bool DictionaryItemExists(string key)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(_unitOfWork);
 
             var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == key);
             var items = repository.GetByQuery(query);
@@ -123,11 +119,10 @@ namespace Umbraco.Web.Services
         /// <param name="dictionaryItem"><see cref="IDictionaryItem"/> to save</param>
         public void Save(IDictionaryItem dictionaryItem)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(_unitOfWork);
 
             repository.AddOrUpdate(dictionaryItem);
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -137,12 +132,11 @@ namespace Umbraco.Web.Services
         /// <param name="dictionaryItem"><see cref="IDictionaryItem"/> to delete</param>
         public void Delete(IDictionaryItem dictionaryItem)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(_unitOfWork);
 
             //NOTE: The recursive delete is done in the repository
             repository.Delete(dictionaryItem);
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -152,8 +146,7 @@ namespace Umbraco.Web.Services
         /// <returns><see cref="Language"/></returns>
         public ILanguage GetLanguageById(int id)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<ILanguageRepository, ILanguage, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<ILanguageRepository, ILanguage, int>(_unitOfWork);
             return repository.Get(id);
         }
 
@@ -164,8 +157,7 @@ namespace Umbraco.Web.Services
         /// <returns><see cref="Language"/></returns>
         public ILanguage GetLanguageByCultureCode(string culture)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<ILanguageRepository, ILanguage, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<ILanguageRepository, ILanguage, int>(_unitOfWork);
 
             var query = Query<ILanguage>.Builder.Where(x => x.CultureName == culture);
             var items = repository.GetByQuery(query);
@@ -179,8 +171,7 @@ namespace Umbraco.Web.Services
         /// <returns>An enumerable list of <see cref="ILanguage"/> objects</returns>
         public IEnumerable<ILanguage> GetAllLanguages()
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<ILanguageRepository, ILanguage, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<ILanguageRepository, ILanguage, int>(_unitOfWork);
             var languages = repository.GetAll();
             return languages;
         }
@@ -191,11 +182,10 @@ namespace Umbraco.Web.Services
         /// <param name="language"><see cref="ILanguage"/> to save</param>
         public void Save(ILanguage language)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<ILanguageRepository, ILanguage, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<ILanguageRepository, ILanguage, int>(_unitOfWork);
 
             repository.AddOrUpdate(language);
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -204,12 +194,11 @@ namespace Umbraco.Web.Services
         /// <param name="language"><see cref="ILanguage"/> to delete</param>
         public void Delete(ILanguage language)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<ILanguageRepository, ILanguage, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<ILanguageRepository, ILanguage, int>(_unitOfWork);
 
             //NOTE: There isn't any constraints in the db, so possible references aren't deleted
             repository.Delete(language);
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
     }
 }

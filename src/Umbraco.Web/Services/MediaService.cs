@@ -13,6 +13,7 @@ namespace Umbraco.Web.Services
     public class MediaService : IMediaService
     {
         private readonly IUnitOfWorkProvider _provider;
+        private readonly IUnitOfWork _unitOfWork;
 
         public MediaService() : this(new PetaPocoUnitOfWorkProvider())
         {
@@ -21,6 +22,7 @@ namespace Umbraco.Web.Services
         public MediaService(IUnitOfWorkProvider provider)
         {
             _provider = provider;
+            _unitOfWork = provider.GetUnitOfWork();
         }
 
         /// <summary>
@@ -30,8 +32,7 @@ namespace Umbraco.Web.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia GetById(int id)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(_unitOfWork);
             return repository.Get(id);
         }
 
@@ -42,8 +43,7 @@ namespace Umbraco.Web.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetChildren(int id)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(_unitOfWork);
 
             var query = Query<IMedia>.Builder.Where(x => x.ParentId == id);
             var medias = repository.GetByQuery(query);
@@ -58,8 +58,7 @@ namespace Umbraco.Web.Services
         /// <returns>An Enumerable flat list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetDescendants(int id)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(_unitOfWork);
             
             var media = repository.Get(id);
 
@@ -76,8 +75,7 @@ namespace Umbraco.Web.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetMediaOfMediaType(int id)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(_unitOfWork);
 
             var query = Query<IMedia>.Builder.Where(x => x.ContentTypeId == id);
             var medias = repository.GetByQuery(query);
@@ -91,8 +89,7 @@ namespace Umbraco.Web.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetRootMedia()
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(_unitOfWork);
 
             var query = Query<IMedia>.Builder.Where(x => x.ParentId == -1);
             var medias = repository.GetByQuery(query);
@@ -106,8 +103,7 @@ namespace Umbraco.Web.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetMediaInRecycleBin()
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(_unitOfWork);
 
             var query = Query<IMedia>.Builder.Where(x => x.ParentId == -20);
             var medias = repository.GetByQuery(query);
@@ -135,11 +131,10 @@ namespace Umbraco.Web.Services
         public void MoveToRecycleBin(IMedia media, int userId)
         {
             //TODO If media item has children those should also be moved to the recycle bin as well
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(_unitOfWork);
             ((Core.Models.Media)media).ChangeTrashedState(true);
             repository.AddOrUpdate(media);
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -147,8 +142,7 @@ namespace Umbraco.Web.Services
         /// </summary>
         public void EmptyRecycleBin()
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(_unitOfWork);
 
             var query = Query<IMedia>.Builder.Where(x => x.ParentId == -20);
             var contents = repository.GetByQuery(query);
@@ -157,7 +151,7 @@ namespace Umbraco.Web.Services
             {
                 repository.Delete(content);
             }
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -167,8 +161,7 @@ namespace Umbraco.Web.Services
         /// <param name="mediaTypeId">Id of the <see cref="IMediaType"/></param>
         public void DeleteMediaOfType(int mediaTypeId)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(_unitOfWork);
 
             //NOTE What about media that has the contenttype as part of its composition?
             //The ContentType has to be removed from the composition somehow as it would otherwise break
@@ -182,7 +175,7 @@ namespace Umbraco.Web.Services
                 repository.AddOrUpdate(content);
             }
 
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -196,10 +189,9 @@ namespace Umbraco.Web.Services
         /// <param name="userId">Id of the User deleting the Media</param>
         public void Delete(IMedia media, int userId)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(_unitOfWork);
             repository.Delete(media);
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -209,10 +201,9 @@ namespace Umbraco.Web.Services
         /// <param name="userId">Id of the User saving the Content</param>
         public void Save(IMedia media, int userId)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(_unitOfWork);
             repository.AddOrUpdate(media);
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -222,13 +213,12 @@ namespace Umbraco.Web.Services
         /// <param name="userId">Id of the User saving the Content</param>
         public void Save(IEnumerable<IMedia> medias, int userId)
         {
-            var unitOfWork = _provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(_unitOfWork);
             foreach (var media in medias)
             {
                 repository.AddOrUpdate(media);
             }
-            unitOfWork.Commit();
+            _unitOfWork.Commit();
         }
     }
 }
