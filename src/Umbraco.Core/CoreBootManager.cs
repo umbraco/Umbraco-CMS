@@ -109,12 +109,11 @@ namespace Umbraco.Core
 				PluginManager.Current.ResolveActions());
 
 			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
-				new []
-					{
-						typeof(DatePickerPropertyEditorValueConverter),
-						typeof(TinyMcePropertyEditorValueConverter),
-						typeof(YesNoPropertyEditorValueConverter)
-					});
+				PluginManager.Current.ResolvePropertyEditorValueConverters());
+			//add the internal ones, these are not public currently so need to add them manually
+			PropertyEditorValueConvertersResolver.Current.AddType<DatePickerPropertyEditorValueConverter>();
+			PropertyEditorValueConvertersResolver.Current.AddType<TinyMcePropertyEditorValueConverter>();
+			PropertyEditorValueConvertersResolver.Current.AddType<YesNoPropertyEditorValueConverter>();
 		}
 	}
 }
