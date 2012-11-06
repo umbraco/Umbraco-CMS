@@ -32,8 +32,9 @@ namespace Umbraco.Core.Models
             Value = value;
         }
 
-        public Property(PropertyType propertyType, object value, Guid version)
+        public Property(int id, Guid version, PropertyType propertyType, object value)
         {
+            Id = id;
             _propertyType = propertyType;
             _version = version;
             Value = value;

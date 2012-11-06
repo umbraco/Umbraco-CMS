@@ -115,5 +115,17 @@ namespace Umbraco.Core.Services
         /// <param name="mediaTypes">Collection of <see cref="IMediaType"/> to delete</param>
         /// <remarks>Deleting a <see cref="IMediaType"/> will delete all the <see cref="IMedia"/> objects based on this <see cref="IMediaType"/></remarks>
         void Delete(IEnumerable<IMediaType> mediaTypes);
+
+        /// <summary>
+        /// Generates the complete (simplified) XML DTD.
+        /// </summary>
+        /// <returns>The DTD as a string</returns>
+        string GetDtd();
+
+        /// <summary>
+        /// Generates the complete XML DTD without the root.
+        /// </summary>
+        /// <returns>The DTD as a string</returns>
+        string GetContentTypesDtd();
     }
 }

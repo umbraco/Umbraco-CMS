@@ -1,11 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
+using umbraco;
 
 namespace Umbraco.Web.Services
 {
@@ -259,6 +263,62 @@ namespace Umbraco.Web.Services
                 repository.Delete(mediaType);
             }
             _unitOfWork.Commit();
+        }
+
+        /// <summary>
+        /// Generates the complete (simplified) XML DTD.
+        /// </summary>
+        /// <returns>The DTD as a string</returns>
+        public string GetDtd()
+        {
+            var dtd = new StringBuilder();
+            dtd.AppendLine("<!DOCTYPE root [ ");
+
+            dtd.AppendLine(GetContentTypesDtd());
+            dtd.AppendLine("]>");
+
+            return dtd.ToString();
+        }
+
+        /// <summary>
+        /// Generates the complete XML DTD without the root.
+        /// </summary>
+        /// <returns>The DTD as a string</returns>
+        public string GetContentTypesDtd()
+        {
+            var dtd = new StringBuilder();
+            if (UmbracoSettings.UseLegacyXmlSchema)
+            {
+                dtd.AppendLine("<!ELEMENT node ANY> <!ATTLIST node id ID #REQUIRED>  <!ELEMENT data ANY>");
+            }
+            else
+            {
+                try
+                {
+                    var strictSchemaBuilder = new StringBuilder();
+
+                    var contentTypes = GetAllContentTypes();
+                    foreach (ContentType contentType in contentTypes)
+                    {
+                        string safeAlias = contentType.Alias.ToUmbracoAlias(StringAliasCaseType.CamelCase, true);
+                        if (safeAlias != null)
+                        {
+                            strictSchemaBuilder.AppendLine(String.Format("<!ELEMENT {0} ANY>", safeAlias));
+                            strictSchemaBuilder.AppendLine(String.Format("<!ATTLIST {0} id ID #REQUIRED>", safeAlias));
+                        }
+                    }
+
+                    // Only commit the strong schema to the container if we didn't generate an error building it
+                    dtd.Append(strictSchemaBuilder);
+                }
+                catch (Exception exception)
+                {
+                    // Note, Log.Add quietly swallows the exception if it can't write to the database
+                    //Log.Add(LogTypes.System, -1, string.Format("{0} while trying to build DTD for Xml schema; is Umbraco installed correctly and the connection string configured?", exception.Message));
+                }
+
+            }
+            return dtd.ToString();
         }
     }
 }

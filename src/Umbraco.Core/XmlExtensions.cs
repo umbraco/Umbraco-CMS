@@ -39,7 +39,16 @@ namespace Umbraco.Core
             {
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.Load(xmlReader);
-                return xmlDoc;
+                return xmlDoc.FirstChild;
+            }
+        }
+
+        public static XmlNode GetXmlNode(this XElement element, XmlDocument xmlDoc)
+        {
+            using (XmlReader xmlReader = element.CreateReader())
+            {
+                xmlDoc.Load(xmlReader);
+                return xmlDoc.DocumentElement;
             }
         }
 	}

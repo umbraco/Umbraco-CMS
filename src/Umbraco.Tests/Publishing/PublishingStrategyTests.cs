@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Web;
+using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Strategies;
@@ -38,10 +40,19 @@ namespace Umbraco.Tests.Publishing
         [TearDown]
         public override void TearDown()
         {
-            base.TearDown();
+            DatabaseContext.Database.Dispose();
+
+            //TestHelper.ClearDatabase();
+
+            //reset the app context
+            ApplicationContext.Current = null;
+            Resolution.IsFrozen = false;
+
+            string path = TestHelper.CurrentAssemblyDirectory;
+            AppDomain.CurrentDomain.SetData("DataDirectory", null);
         }
 
-        [Test, Ignore]
+        [Test]
         public void Can_Publish_And_Update_Xml_Cache()
         {
             // Arrange
@@ -56,6 +67,11 @@ namespace Umbraco.Tests.Publishing
             // Assert
             Assert.That(published, Is.True);
             Assert.That(content.Published, Is.True);
+            Assert.IsTrue(httpContext.Items.Contains("UmbracoXmlContextContent"));
+
+            var document = httpContext.Items["UmbracoXmlContextContent"] as XmlDocument;
+            Console.Write(document.OuterXml);
+            document.Save("umbraco.config");
         }
 
         public void CreateTestData()

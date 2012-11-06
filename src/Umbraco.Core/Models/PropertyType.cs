@@ -209,10 +209,12 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>Can be used for the "old" values where no serialization type exists</remarks>
         /// <param name="value"></param>
+        /// <param name="version"> </param>
+        /// <param name="id"> </param>
         /// <returns></returns>
-        internal Property CreatePropertyFromRawValue(object value)
+        internal Property CreatePropertyFromRawValue(object value, Guid version, int id)
         {
-            return new Property(this, value);
+            return new Property(id, version, this, value);
         }
 
         /// <summary>

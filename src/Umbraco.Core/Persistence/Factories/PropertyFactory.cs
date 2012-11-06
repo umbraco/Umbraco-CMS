@@ -35,7 +35,9 @@ namespace Umbraco.Core.Persistence.Factories
             foreach (var dto in dtos)
             {
                 var propertyType = _contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Id == dto.PropertyTypeId);
-                properties.Add(propertyType.CreatePropertyFromRawValue(dto.GetValue));
+                var property = propertyType.CreatePropertyFromRawValue(dto.GetValue, dto.VersionId.Value, dto.Id);
+                property.ResetDirtyProperties();
+                properties.Add(property);
             }
             return properties;
         }
@@ -85,7 +87,9 @@ namespace Umbraco.Core.Persistence.Factories
             foreach (var dto in dtos)
             {
                 var propertyType = _mediaType.PropertyTypes.FirstOrDefault(x => x.Id == dto.PropertyTypeId);
-                properties.Add(propertyType.CreatePropertyFromRawValue(dto.GetValue));
+                var property = propertyType.CreatePropertyFromRawValue(dto.GetValue, dto.VersionId.Value, dto.Id);
+                property.ResetDirtyProperties();
+                properties.Add(property);
             }
             return properties;
         }

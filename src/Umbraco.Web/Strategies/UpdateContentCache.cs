@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Web;
 using System.Web.Caching;
 using System.Xml;
@@ -9,22 +8,25 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Web.Publishing;
+using Umbraco.Web.Services;
 using umbraco.interfaces;
 using umbraco.presentation.nodeFactory;
 using Node = umbraco.NodeFactory.Node;
 
 namespace Umbraco.Web.Strategies
 {
-    public class UpdateContentCache : IApplicationStartupHandler
+    internal class UpdateContentCache : IApplicationStartupHandler
     {
         // Sync access to internal cache
         private static readonly object XmlContentInternalSyncLock = new object();
         private const string XmlContextContentItemKey = "UmbracoXmlContextContent";
         private readonly HttpContextBase _httpContext;
+        private readonly ServiceContext _serviceContext;
 
         public UpdateContentCache()
         {
             _httpContext = new HttpContextWrapper(HttpContext.Current);
+            _serviceContext = new ServiceContext(_httpContext);
 
             PublishingStrategy.Published += PublishingStrategy_Published;
         }
@@ -32,6 +34,7 @@ namespace Umbraco.Web.Strategies
         public UpdateContentCache(HttpContextBase httpContext)
         {
             _httpContext = httpContext;
+            _serviceContext = new ServiceContext(_httpContext);
 
             PublishingStrategy.Published += PublishingStrategy_Published;
         }
@@ -57,7 +60,7 @@ namespace Umbraco.Web.Strategies
 
                 ClearContextCache();
 
-                XmlContent = UpdateXmlAndSitemap(content, wip, true);
+                XmlContent = UpdateXmlAndSitemap(content, wip, false);//Update sitemap is usually set to true
             }
 
             // clear cached field values
@@ -88,7 +91,9 @@ namespace Umbraco.Web.Strategies
             if (content.Published)
             {
                 int parentId = content.Level == 1 ? -1 : content.ParentId;
-                xmlContentCopy = AppendContentXml(content.Id, content.Level, parentId, content.ToXml(false).GetXmlNode(), xmlContentCopy);
+                var contentXmlNode = content.ToXml(false).GetXmlNode();
+                var xmlNode = xmlContentCopy.ImportNode(contentXmlNode, true);
+                xmlContentCopy = AppendContentXml(content.Id, content.Level, parentId, xmlNode, xmlContentCopy);
 
                 // update sitemapprovider
                 if (updateSitemapProvider && SiteMap.Provider is UmbracoSiteMapProvider)
@@ -96,7 +101,7 @@ namespace Umbraco.Web.Strategies
                     try
                     {
                         var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
-                        global::umbraco.NodeFactory.Node n = new Node(content.Id, true);
+                        var n = new Node(content.Id, true);
                         if (!String.IsNullOrEmpty(n.Url) && n.Url != "/#")
                         {
                             prov.UpdateNode(n);
@@ -127,7 +132,8 @@ namespace Umbraco.Web.Strategies
             if (x == null && UmbracoSettings.UseLegacyXmlSchema == false)
             {
                 //TODO Look into the validate schema method - seems a bit odd
-                //xmlContentCopy = ValidateSchema(docNode.Name, xmlContentCopy);
+                //Move to Contract ?
+                xmlContentCopy = ValidateSchema(docNode.Name, xmlContentCopy);
                 if (xmlContentCopy != xmlContentCopy2)
                     docNode = xmlContentCopy.ImportNode(docNode, true);
             }
@@ -148,6 +154,7 @@ namespace Umbraco.Web.Strategies
                 }
                 else
                 {
+                    //TODO
                     //TransferValuesFromDocumentXmlToPublishedXml(docNode, x); 
                 }
 
@@ -218,12 +225,7 @@ namespace Umbraco.Web.Strategies
                 if (content == null)
                 {
                     //content = global::umbraco.content.Instance.XmlContent;
-
-                    //TODO Move this to an extension method for the ContentType
-                    var dtd = new StringBuilder();
-                    dtd.AppendLine("<!DOCTYPE root [ ");
-                    dtd.AppendLine("<!ELEMENT node ANY> <!ATTLIST node id ID #REQUIRED>  <!ELEMENT data ANY>");
-                    dtd.AppendLine("]>");
+                    var dtd = _serviceContext.ContentTypeService.GetDtd();
 
                     content = new XmlDocument();
                     content.LoadXml(
