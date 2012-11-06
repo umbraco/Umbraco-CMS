@@ -111,6 +111,11 @@ namespace Umbraco.Core.Persistence.Repositories
                     var propertyTypeDto = propertyFactory.BuildPropertyTypeDto(propertyGroup.Id, propertyType);
                     var primaryKey = Convert.ToInt32(Database.Insert(propertyTypeDto));
                     propertyType.Id = primaryKey;//Set Id on PropertyType
+
+                    //Update the current PropertyType with correct ControlId and DatabaseType
+                    var dataTypeDto = Database.FirstOrDefault<DataTypeDto>("WHERE nodeId = @Id", new { Id = propertyTypeDto.DataTypeId });
+                    propertyType.DataTypeControlId = dataTypeDto.ControlId;
+                    propertyType.DataTypeDatabaseType = dataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true);
                 }
             }
         }

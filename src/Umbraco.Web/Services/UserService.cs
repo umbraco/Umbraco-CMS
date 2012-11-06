@@ -4,6 +4,8 @@ using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 using umbraco;
 
 namespace Umbraco.Web.Services
@@ -14,9 +16,13 @@ namespace Umbraco.Web.Services
     public class UserService : IUserService
     {
         private readonly HttpContextBase _httpContext;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UserService(HttpContextBase httpContext)
+        public UserService(IUnitOfWorkProvider provider) : this(provider, null) { }
+
+        public UserService(IUnitOfWorkProvider provider, HttpContextBase httpContext)
         {
+            _unitOfWork = provider.GetUnitOfWork();
             _httpContext = httpContext;
         }
 
@@ -28,9 +34,16 @@ namespace Umbraco.Web.Services
         /// <returns><see cref="IProfile"/> containing the Name and Id of the logged in BackOffice User</returns>
         public IProfile GetCurrentBackOfficeUser()
         {
-            var cookie = _httpContext.Request.Cookies["UMB_UCONTEXT"];
+            Mandate.That(_httpContext != null,
+                         () =>
+                         new ArgumentException(
+                             "The HttpContext which is used to retrieve information about the currently logged in backoffice user was null and can therefor not be used",
+                             "HttpContextBase"));
+            if (_httpContext == null) return null;
 
+            var cookie = _httpContext.Request.Cookies["UMB_UCONTEXT"];
             Mandate.That(cookie != null, () => new ArgumentException("The Cookie containing the UserContext Guid Id was null", "Cookie"));
+            if (cookie == null) return null;
 
             string contextId = cookie.Value;
             string cacheKey = string.Concat("UmbracoUserContext", contextId);

@@ -4,6 +4,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Services
 {
@@ -12,7 +13,6 @@ namespace Umbraco.Web.Services
     /// </summary>
     public class MediaService : IMediaService
     {
-        private readonly IUnitOfWorkProvider _provider;
         private readonly IUnitOfWork _unitOfWork;
 
         public MediaService() : this(new PetaPocoUnitOfWorkProvider())
@@ -21,7 +21,6 @@ namespace Umbraco.Web.Services
 
         public MediaService(IUnitOfWorkProvider provider)
         {
-            _provider = provider;
             _unitOfWork = provider.GetUnitOfWork();
         }
 

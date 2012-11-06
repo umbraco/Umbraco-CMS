@@ -5,6 +5,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Services
 {
@@ -13,7 +14,6 @@ namespace Umbraco.Web.Services
     /// </summary>
     public class ContentTypeService : IContentTypeService
     {
-        private readonly IUnitOfWorkProvider _provider;
         private readonly IContentService _contentService;
         private readonly IMediaService _mediaService;
         private readonly IUnitOfWork _unitOfWork;
@@ -26,7 +26,6 @@ namespace Umbraco.Web.Services
         {
             _contentService = contentService;
             _mediaService = mediaService;
-            _provider = provider;
             _unitOfWork = provider.GetUnitOfWork();
         }
 

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 
-namespace Umbraco.Web.Publishing
+namespace Umbraco.Core.Publishing
 {
     /// <summary>
     /// Defines the Publishing Strategy

@@ -307,8 +307,6 @@
     <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="PropertyEditors\RteMacroRenderingPropertyEditorValueConverter.cs" />
     <Compile Include="PublishedMediaStoreResolver.cs" />
-    <Compile Include="Publishing\BasePublishingStrategy.cs" />
-    <Compile Include="Publishing\IPublishingStrategy.cs" />
     <Compile Include="Publishing\PublishingStrategy.cs" />
     <Compile Include="RenderFieldCaseType.cs" />
     <Compile Include="RenderFieldEncodingType.cs" />
@@ -319,15 +317,6 @@
     <Compile Include="Services\ContentTypeService.cs" />
     <Compile Include="Services\DataTypeService.cs" />
     <Compile Include="Services\FileService.cs" />
-    <Compile Include="Services\IContentService.cs" />
-    <Compile Include="Services\IContentTypeService.cs" />
-    <Compile Include="Services\IDataTypeService.cs" />
-    <Compile Include="Services\IFileService.cs" />
-    <Compile Include="Services\ILocalizationService.cs" />
-    <Compile Include="Services\IMacroService.cs" />
-    <Compile Include="Services\IMediaService.cs" />
-    <Compile Include="Services\IService.cs" />
-    <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\LocalizationService.cs" />
     <Compile Include="Services\MacroService.cs" />
     <Compile Include="Services\MediaService.cs" />

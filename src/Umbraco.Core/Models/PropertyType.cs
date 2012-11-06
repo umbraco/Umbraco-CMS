@@ -126,7 +126,7 @@ namespace Umbraco.Core.Models
         internal Guid DataTypeControlId
         {
             get { return _dataTypeControlId; }
-            private set
+            set
             {
                 _dataTypeControlId = value;
                 OnPropertyChanged(DataTypeControlIdSelector);
@@ -140,7 +140,7 @@ namespace Umbraco.Core.Models
         internal DataTypeDatabaseType DataTypeDatabaseType
         {
             get { return _dataTypeDatabaseType; }
-            private set
+            set
             {
                 _dataTypeDatabaseType = value;
                 OnPropertyChanged(DataTypeDatabaseTypeSelector);

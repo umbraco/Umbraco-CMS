@@ -47,7 +47,7 @@ namespace Umbraco.Core.Persistence.Repositories
             foreach (var contentTypeDto in list)
             {
                 bool result = contentType.AddContentType(Get(contentTypeDto.ParentId));
-                //Do something if adding fails? (Should hopefully not be possible unless someone create a circular reference)
+                //Do something if adding fails? (Should hopefully not be possible unless someone created a circular reference)
             }
 
             ((ICanBeDirty)contentType).ResetDirtyProperties();

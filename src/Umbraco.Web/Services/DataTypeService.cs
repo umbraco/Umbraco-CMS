@@ -7,6 +7,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 using umbraco.interfaces;
 
 namespace Umbraco.Web.Services
@@ -16,7 +17,6 @@ namespace Umbraco.Web.Services
     /// </summary>
     public class DataTypeService : IDataTypeService
     {
-        private readonly IUnitOfWorkProvider _provider;
         private readonly IUnitOfWork _unitOfWork;
 
         public DataTypeService() : this(new PetaPocoUnitOfWorkProvider())
@@ -25,8 +25,7 @@ namespace Umbraco.Web.Services
 
         public DataTypeService(IUnitOfWorkProvider provider)
         {
-            _provider = provider;
-            _unitOfWork = _provider.GetUnitOfWork();
+            _unitOfWork = provider.GetUnitOfWork();
         }
 
         /// <summary>

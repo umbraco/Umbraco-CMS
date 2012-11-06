@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 
-namespace Umbraco.Web.Services
+namespace Umbraco.Core.Services
 {
     /// <summary>
     /// Defines the Localization Service, which is an easy access to operations involving Languages and Dictionary

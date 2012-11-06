@@ -6,6 +6,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Services
 {
@@ -15,7 +16,6 @@ namespace Umbraco.Web.Services
     public class LocalizationService : ILocalizationService
     {
         private static readonly Guid RootParentId = new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde");
-        private readonly IUnitOfWorkProvider _provider;
         private readonly IUnitOfWork _unitOfWork;
 
         public LocalizationService() : this(new PetaPocoUnitOfWorkProvider())
@@ -24,7 +24,6 @@ namespace Umbraco.Web.Services
 
         public LocalizationService(IUnitOfWorkProvider provider)
         {
-            _provider = provider;
             _unitOfWork = provider.GetUnitOfWork();
         }
 

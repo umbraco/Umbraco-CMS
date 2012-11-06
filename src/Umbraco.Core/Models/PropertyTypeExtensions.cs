@@ -8,6 +8,7 @@ namespace Umbraco.Core.Models
         /// Resolves the IDataType for a PropertyType.
         /// </summary>
         /// <param name="propertyType">PropertyType that references a DataType</param>
+        /// <param name="propertyId">Id of the Property which references this DataType through its PropertyType</param>
         /// <returns><see cref="IDataType"/></returns>
         /// <remarks>
         /// This extension method is left internal because we don't want to take
@@ -15,11 +16,12 @@ namespace Umbraco.Core.Models
         /// be replaced by PropertyEditors. It is however needed to generate xml
         /// for a property/propertytype when publishing.
         /// </remarks>
-        internal static IDataType DataType(this PropertyType propertyType)
+        internal static IDataType DataType(this PropertyType propertyType, int propertyId)
         {
             Mandate.ParameterNotNull(propertyType, "propertyType");
             var dataType = DataTypesResolver.Current.GetById(propertyType.DataTypeControlId);
             dataType.DataTypeDefinitionId = propertyType.DataTypeId;
+            dataType.Data.PropertyId = propertyId;
             return dataType;
         }
     }

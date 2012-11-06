@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Web;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 using Umbraco.Web.Publishing;
 
 namespace Umbraco.Web.Services
@@ -13,32 +14,33 @@ namespace Umbraco.Web.Services
     /// </summary>
     public class ServiceContext
     {
-        internal ServiceContext(HttpContextBase httpContext)
+        private readonly ConcurrentDictionary<string, IService> _cache = new ConcurrentDictionary<string, IService>();
+        private readonly HttpContextBase _httpContext;
+
+        public ServiceContext() : this(null)
+        {
+        }
+
+        public ServiceContext(HttpContextBase httpContext)
         {
             _httpContext = httpContext;
-
-            if (_cache.IsEmpty)
-            {
-                BuildServiceCache();
-            }
+            BuildServiceCache();
         }
 
         public static ServiceContext Current { get; internal set; }
-
-        private readonly HttpContextBase _httpContext;
-
-        private readonly ConcurrentDictionary<string, IService> _cache = new ConcurrentDictionary<string, IService>();
 
         /// <summary>
         /// Builds the various services and adds them to the internal cache
         /// </summary>
         private void BuildServiceCache()
         {
+            if (_cache.IsEmpty == false) return;//Only proceed to build cache if cache is empty
+
             var provider = new PetaPocoUnitOfWorkProvider();
             var fileProvider = new FileUnitOfWorkProvider();
             var publishingStrategy = new PublishingStrategy();
 
-            var userService = new UserService(_httpContext);
+            var userService = new UserService(provider, _httpContext);
 
             var contentService = new ContentService(provider, publishingStrategy, userService);
             _cache.AddOrUpdate(typeof (IContentService).Name, contentService, (x, y) => contentService);

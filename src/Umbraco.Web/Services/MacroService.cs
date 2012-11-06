@@ -5,6 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Services
 {
@@ -13,7 +14,6 @@ namespace Umbraco.Web.Services
     /// </summary>
     public class MacroService : IMacroService
     {
-        private readonly IUnitOfWorkProvider _provider;
         private readonly IUnitOfWork _unitOfWork;
 
         public MacroService()
@@ -23,8 +23,7 @@ namespace Umbraco.Web.Services
 
         public MacroService(IUnitOfWorkProvider provider)
         {
-            _provider = provider;
-            _unitOfWork = _provider.GetUnitOfWork();
+            _unitOfWork = provider.GetUnitOfWork();
             EnsureMacroCache();
         }
 

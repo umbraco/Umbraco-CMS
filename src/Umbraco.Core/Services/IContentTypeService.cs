@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Umbraco.Core.Models;
 
-namespace Umbraco.Web.Services
+namespace Umbraco.Core.Services
 {
     /// <summary>
     /// Defines the ContentTypeService, which is an easy access to operations involving <see cref="IContentType"/>

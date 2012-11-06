@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Web.Services
+﻿using Umbraco.Core.Services;
+
+namespace Umbraco.Web.Services
 {
     /// <summary>
     /// Represents the ServiceFactory, which provides access to the various services in
@@ -6,7 +8,7 @@
     /// </summary>
     public static class ServiceFactory
     {
-        private static readonly ServiceContext ServiceContext = new ServiceContext(null);
+        private static readonly ServiceContext ServiceContext = new ServiceContext();
 
         /// <summary>
         /// Gets the <see cref="IContentService"/>

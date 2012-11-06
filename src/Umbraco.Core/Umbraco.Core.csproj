@@ -104,6 +104,7 @@
     <Compile Include="Models\Membership\Profile.cs" />
     <Compile Include="Models\Membership\User.cs" />
     <Compile Include="Models\Membership\UserProfile.cs" />
+    <Compile Include="Models\PropertyExtensions.cs" />
     <Compile Include="Models\PropertyTypeExtensions.cs" />
     <Compile Include="Models\Rdbms\ContentType2ContentTypeDto.cs" />
     <Compile Include="Models\Rdbms\PropertyTypeGroupDto.cs" />
@@ -376,6 +377,8 @@
     <Compile Include="ObjectResolution\Resolution.cs" />
     <Compile Include="ObjectResolution\ResolverBase.cs" />
     <Compile Include="ObjectResolution\SingleObjectResolverBase.cs" />
+    <Compile Include="Publishing\BasePublishingStrategy.cs" />
+    <Compile Include="Publishing\IPublishingStrategy.cs" />
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="Serialization\AbstractSerializationService.cs" />
     <Compile Include="Serialization\Formatter.cs" />
@@ -387,6 +390,15 @@
     <Compile Include="Serialization\ServiceStackJsonSerializer.cs" />
     <Compile Include="Serialization\ServiceStackXmlSerializer.cs" />
     <Compile Include="Serialization\StreamedResult.cs" />
+    <Compile Include="Services\IContentService.cs" />
+    <Compile Include="Services\IContentTypeService.cs" />
+    <Compile Include="Services\IDataTypeService.cs" />
+    <Compile Include="Services\IFileService.cs" />
+    <Compile Include="Services\ILocalizationService.cs" />
+    <Compile Include="Services\IMacroService.cs" />
+    <Compile Include="Services\IMediaService.cs" />
+    <Compile Include="Services\IService.cs" />
+    <Compile Include="Services\IUserService.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="ReadLock.cs" />
     <Compile Include="TypeFinder.cs" />

@@ -26,15 +26,5 @@ namespace Umbraco.Web
 			var configPath = http.Request.PhysicalApplicationPath + "\\web.config";
 			File.SetLastWriteTimeUtc(configPath, DateTime.UtcNow);
 		}
-
-        /// <summary>
-        /// Adds the DatabaseContext to the ApplicationContext
-        /// </summary>
-        /// <param name="appContext"></param>
-        /// <returns></returns>
-        public static DatabaseContext DatabaseContext(this ApplicationContext appContext)
-        {
-            return Umbraco.Core.DatabaseContext.Current;
-        }
 	}
 }

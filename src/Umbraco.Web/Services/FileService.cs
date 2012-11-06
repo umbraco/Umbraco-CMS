@@ -3,6 +3,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Services
 {
@@ -11,7 +12,6 @@ namespace Umbraco.Web.Services
     /// </summary>
     public class FileService : IFileService
     {
-        private readonly IUnitOfWorkProvider _provider;
         private readonly IUnitOfWork _unitOfWork;
 
         public FileService() : this(new FileUnitOfWorkProvider())
@@ -20,7 +20,6 @@ namespace Umbraco.Web.Services
 
         public FileService(IUnitOfWorkProvider provider)
         {
-            _provider = provider;
             _unitOfWork = provider.GetUnitOfWork();
         }
 

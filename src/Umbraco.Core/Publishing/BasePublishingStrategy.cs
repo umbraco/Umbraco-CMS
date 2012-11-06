@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models;
-using Umbraco.Core;
 
-namespace Umbraco.Web.Publishing
+namespace Umbraco.Core.Publishing
 {
+    /// <summary>
+    /// Abstract class for the implementation of an <see cref="IPublishingStrategy"/>, which provides the events used for publishing/unpublishing.
+    /// </summary>
     public abstract class BasePublishingStrategy : IPublishingStrategy
     {
         public abstract bool Publish(IContent content, int userId);
@@ -12,14 +15,9 @@ namespace Umbraco.Web.Publishing
         public abstract bool UnPublish(IEnumerable<IContent> content, int userId);
 
         /// <summary>
-        /// The publishing event handler used for publish and unpublish events
-        /// </summary>
-        public delegate void PublishingEventHandler(IContent sender, PublishingEventArgs e);
-
-        /// <summary>
         /// Occurs before publish
         /// </summary>
-        public static event PublishingEventHandler Publishing;
+        public static event EventHandler<PublishingEventArgs> Publishing;
 
         /// <summary>
         /// Raises the <see cref="Publishing"/> event
@@ -35,7 +33,7 @@ namespace Umbraco.Web.Publishing
         /// <summary>
         /// Occurs after publish
         /// </summary>
-        public static event PublishingEventHandler Published;
+        public static event EventHandler<PublishingEventArgs> Published;
 
         /// <summary>
         /// Raises the <see cref="Published"/> event
@@ -51,7 +49,7 @@ namespace Umbraco.Web.Publishing
         /// <summary>
         /// Occurs before unpublish
         /// </summary>
-        public static event PublishingEventHandler UnPublishing;
+        public static event EventHandler<PublishingEventArgs> UnPublishing;
 
         /// <summary>
         /// Raises the <see cref="UnPublishing"/> event
@@ -67,7 +65,7 @@ namespace Umbraco.Web.Publishing
         /// <summary>
         /// Occurs after unpublish
         /// </summary>
-        public static event PublishingEventHandler UnPublished;
+        public static event EventHandler<PublishingEventArgs> UnPublished;
 
         /// <summary>
         /// Raises the <see cref="UnPublished"/> event

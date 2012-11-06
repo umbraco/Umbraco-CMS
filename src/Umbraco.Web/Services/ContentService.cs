@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -10,6 +9,8 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Publishing;
+using Umbraco.Core.Services;
 using Umbraco.Web.Publishing;
 using Content = Umbraco.Core.Models.Content;
 
@@ -20,7 +21,6 @@ namespace Umbraco.Web.Services
     /// </summary>
     public class ContentService : IContentService
     {
-        private readonly IUnitOfWorkProvider _provider;
         private readonly IPublishingStrategy _publishingStrategy;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
@@ -40,7 +40,6 @@ namespace Umbraco.Web.Services
 
         public ContentService(IUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy, IUserService userService)
         {
-            _provider = provider;
             _publishingStrategy = publishingStrategy;
             _unitOfWork = provider.GetUnitOfWork();
             _userService = userService;

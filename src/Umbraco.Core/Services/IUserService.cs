@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models.Membership;
 
-namespace Umbraco.Web.Services
+namespace Umbraco.Core.Services
 {
     /// <summary>
     /// Defines the UserService, which is an easy access to operations involving <see cref="IProfile"/> and eventually Users and Members.

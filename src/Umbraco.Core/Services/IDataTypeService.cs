@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 using umbraco.interfaces;
 
-namespace Umbraco.Web.Services
+namespace Umbraco.Core.Services
 {
     /// <summary>
     /// Defines the DataType Service, which is an easy access to operations involving <see cref="IDataType"/> and <see cref="IDataTypeDefinition"/>
