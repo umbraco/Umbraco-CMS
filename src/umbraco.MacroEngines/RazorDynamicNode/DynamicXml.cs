@@ -11,7 +11,6 @@ using System.Web;
 
 namespace umbraco.MacroEngines
 {
-
 	[Obsolete("This class has been superceded by Umbraco.Core.Dynamics.DynamicXml")]	
     public class DynamicXml : DynamicObject, IEnumerable
 	{
@@ -45,15 +44,27 @@ namespace umbraco.MacroEngines
         }
         public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
         {
-        	return _inner.TryGetIndex(binder, indexes, out result);
+        	var innerResult = _inner.TryGetIndex(binder, indexes, out result);
+			//special case, we need to check if the result is of a non-legacy dynamic type because if it is, we need 
+			//to return the legacy type
+			result = LegacyConverter.ConvertToLegacy(result);
+			return innerResult;
         }
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
-        	return _inner.TryInvokeMember(binder, args, out result);
+        	var innerResult = _inner.TryInvokeMember(binder, args, out result);
+			//special case, we need to check if the result is of a non-legacy dynamic type because if it is, we need 
+			//to return the legacy type
+			result = LegacyConverter.ConvertToLegacy(result);
+			return innerResult;
         }
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-        	return _inner.TryGetMember(binder, out result);
+			var innerResult = _inner.TryGetMember(binder, out result);
+			//special case, we need to check if the result is of a non-legacy dynamic type because if it is, we need 
+			//to return the legacy type
+			result = LegacyConverter.ConvertToLegacy(result);
+	        return innerResult;
         }
 
         public DynamicXml XPath(string expression)

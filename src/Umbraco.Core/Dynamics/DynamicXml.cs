@@ -81,7 +81,7 @@ namespace Umbraco.Core.Dynamics
             }
             //Go ahead and try to fetch all of the elements matching the member name, and wrap them
             var elements = BaseElement.Elements(binder.Name);
-            if (elements.Count() == 0 && BaseElement.Name == "root" && BaseElement.Elements().Count() == 1)
+            if (!elements.Any() && BaseElement.Name == "root" && BaseElement.Elements().Count() == 1)
             {
                 //no elements matched, lets try first child
                 elements = BaseElement.Elements().ElementAt(0).Elements(binder.Name);
