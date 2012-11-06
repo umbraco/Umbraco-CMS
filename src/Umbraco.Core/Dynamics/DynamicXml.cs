@@ -10,7 +10,7 @@ using System.Web;
 
 namespace Umbraco.Core.Dynamics
 {
-    internal class DynamicXml : DynamicObject, IEnumerable
+    public class DynamicXml : DynamicObject, IEnumerable
     {
         public XElement BaseElement { get; set; }
 
