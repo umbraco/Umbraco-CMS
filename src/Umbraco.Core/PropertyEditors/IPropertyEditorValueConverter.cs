@@ -3,11 +3,8 @@ using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Core.PropertyEditors
 {
-	internal interface IPropertyEditorValueConverter
+	public interface IPropertyEditorValueConverter
 	{
-		//TODO: SD: I thinnk this should only support propertyEditorId since I see no reason why we would want 
-		// type converters specifically for docTypeAlias of property Alias!
-		// need to ask Gareth about his original intention.
 
 		/// <summary>
 		/// Returns true if this converter can perform the value conversion for the specified property editor id

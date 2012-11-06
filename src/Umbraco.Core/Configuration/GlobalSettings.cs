@@ -100,7 +100,7 @@ namespace Umbraco.Core.Configuration
             get
             {
 				return ConfigurationManager.AppSettings.ContainsKey("umbracoPath")
-					? ConfigurationManager.AppSettings["umbracoPath"]
+					? IOHelper.ResolveUrl(ConfigurationManager.AppSettings["umbracoPath"])
 					: string.Empty;	                
             }
         }

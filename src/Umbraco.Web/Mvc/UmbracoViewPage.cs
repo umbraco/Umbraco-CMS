@@ -13,36 +13,40 @@ namespace Umbraco.Web.Mvc
 		{
 
 		}
-
-		protected override void InitializePage()
-		{
-			base.InitializePage();
-			PublishedContentRequest = (PublishedContentRequest)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-doc-request");
-			UmbracoContext = (UmbracoContext)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-context");
-			ApplicationContext = UmbracoContext.Application;
-		}
-
+		
 		/// <summary>
 		/// Returns the current UmbracoContext
 		/// </summary>
-		public UmbracoContext UmbracoContext { get; private set; }
+		public UmbracoContext UmbracoContext
+		{
+			get { return (UmbracoContext) ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-context"); }
+		}
 
 		/// <summary>
 		/// Returns the current ApplicationContext
 		/// </summary>
-		public ApplicationContext ApplicationContext { get; private set; }
+		public ApplicationContext ApplicationContext
+		{
+			get { return UmbracoContext.Application; }
+		}
 
 		/// <summary>
 		/// Returns the current PublishedContentRequest
 		/// </summary>
-		internal PublishedContentRequest PublishedContentRequest { get; private set; }		
+		internal PublishedContentRequest PublishedContentRequest
+		{
+			get { return (PublishedContentRequest)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-doc-request"); }
+		}
 
 		private UmbracoHelper _helper;
 
 		/// <summary>
 		/// Gets an UmbracoHelper
 		/// </summary>
-		public UmbracoHelper Umbraco
+		/// <remarks>
+		/// This constructs the UmbracoHelper with the content model of the page routed to
+		/// </remarks>
+		public virtual UmbracoHelper Umbraco
 		{
 			get { return _helper ?? (_helper = new UmbracoHelper(UmbracoContext)); }
 		}

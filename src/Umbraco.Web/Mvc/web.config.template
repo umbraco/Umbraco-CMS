@@ -19,6 +19,7 @@
 				<add namespace="Umbraco.Web" />
 				<add namespace="Umbraco.Core" />
 				<add namespace="Umbraco.Core.Models" />
+				<add namespace="Umbraco.Web.Mvc" />
       </namespaces>
     </pages>
   </system.web.webPages.razor>

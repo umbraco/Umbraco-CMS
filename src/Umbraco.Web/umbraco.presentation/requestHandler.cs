@@ -33,8 +33,8 @@ namespace umbraco {
 
 
         private static string pageXPathQueryStart = "/root";
-        private static string _urlName = string.Empty;
-        private static bool _urlNameInitialized = false;
+		private static string _urlName = "@urlName";
+		private static bool _urlNameInitialized = true;
         private static XmlDocument _customHandlers;
 
         private string _pageXPathQuery = string.Empty;
@@ -76,6 +76,9 @@ namespace umbraco {
         // Init urlName to correspond to web.config entries (umbracoUrlForbittenCharacters and umbracoUrlSpaceCharacter).
         // Needed to compensate for known asp.net framework error KB826437:
         // http://support.microsoft.com/default.aspx?scid=kb;EN-US;826437
+		// note: obsoleted, everything was commented out anyway since long, so it just
+		//   initializes _urlName, which we can do in the variable definition.
+		[Obsolete("This method did nothing anyway...")]
         private static void InitializeUrlName() {
             /*			string toReplace = string.Empty;
 			string replaceWith = string.Empty;
@@ -197,8 +200,9 @@ namespace umbraco {
             bool getByID = false;
             string currentDomain = HttpContext.Current.Request.ServerVariables["SERVER_NAME"];
 
-            if (!_urlNameInitialized)
-                InitializeUrlName();
+			// obsoleted
+            //if (!_urlNameInitialized)
+            //    InitializeUrlName();
 
             // The url exists in cache, and the domain doesn't exists (which makes it ok to do a cache look up on the url alone)
             // TODO: NH: Remove the flag for friendlyxmlschema when real schema is implemented

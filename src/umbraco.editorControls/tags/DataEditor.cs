@@ -126,7 +126,7 @@ namespace umbraco.editorControls.tags
             this.ContentTemplateContainer.Controls.Add(tagBox);
 
             string tagsAutoCompleteScript =
-                "jQuery('.umbTagBox').tagsInput({ width: '400px', defaultText: 'Add a tag', minChars: 2, autocomplete_url: '" +
+                "jQuery('#" + tagBox.ClientID + "').tagsInput({ width: '400px', defaultText: 'Add a tag', minChars: 2, autocomplete_url: '" +
                 umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)
                 + "/webservices/TagsAutoCompleteHandler.ashx?group=" + _group + "&id=" + pageId + "&rnd=" +
                 DateTime.Now.Ticks + "&format=json' });";

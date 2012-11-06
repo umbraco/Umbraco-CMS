@@ -41,7 +41,7 @@ namespace Umbraco.Core
 		/// <summary>
 		/// Represents an unsuccessful parse operation
 		/// </summary>
-		public static readonly Attempt<T> False;
+		public static readonly Attempt<T> False = new Attempt<T>(false, default(T));
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Attempt{T}"/> struct.

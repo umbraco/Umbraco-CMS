@@ -1,4 +1,4 @@
-tinyMCE.addI18n('en.umbraco_dlg', {"link_list":"链接列表",
+tinyMCE.addI18n('zh.umbraco_dlg', {"link_list":"链接列表",
 "link_is_external":"您输入的好像是外部链接，是否需要在前面添加 http://？",
 "link_is_email":"您输入的好像是邮箱地址，是否需要在前面添加mailto:？",
 "link_titlefield":"标题",

@@ -341,11 +341,17 @@
     <Compile Include="umbraco.presentation\install\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\install\steps\Skinning\loadStarterKitDesigns.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\install\steps\Skinning\loadStarterKits.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\LibraryCacheRefresher.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\developer\Packages\StarterKits.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\editXslt.aspx.cs">
@@ -448,13 +454,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\install\steps\skinning.ascx.designer.cs">
       <DependentUpon>skinning.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\Skinning\loadStarterKitDesigns.ascx.cs">
-      <DependentUpon>loadStarterKitDesigns.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\Skinning\loadStarterKitDesigns.ascx.designer.cs">
-      <DependentUpon>loadStarterKitDesigns.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\install\utills\FilePermissions.cs" />
     <Compile Include="umbraco.presentation\install\utills\Helper.cs" />
@@ -813,13 +812,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\StartupDashboardVideos.ascx.designer.cs">
       <DependentUpon>StartupDashboardVideos.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\StarterKits.aspx.cs">
-      <DependentUpon>StarterKits.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\StarterKits.aspx.designer.cs">
-      <DependentUpon>StarterKits.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx.cs">
       <DependentUpon>EditRelationType.aspx</DependentUpon>
@@ -1867,7 +1859,6 @@
     </Content>
     <Content Include="umbraco.presentation\install\steps\renaming.ascx" />
     <Content Include="umbraco.presentation\install\steps\skinning.ascx" />
-    <Content Include="umbraco.presentation\install\steps\Skinning\loadStarterKitDesigns.ascx" />
     <Content Include="umbraco.presentation\install\Title.ascx" />
     <Content Include="umbraco.presentation\install\utills\p.aspx">
       <SubType>ASPXCodeBehind</SubType>
@@ -1886,7 +1877,6 @@
     <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardIntro.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardKits.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardVideos.ascx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Packages\StarterKits.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\TemplateSkinning.aspx" />
     <Content Include="umbraco.presentation\umbraco\helpRedirect.aspx" />
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\CssParser.aspx" />

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using umbraco.interfaces;
 
 namespace Umbraco.Core
@@ -67,6 +68,15 @@ namespace Umbraco.Core
 		{
 			return ResolveTypes<ICacheRefresher>();
 		}
+
+		/// <summary>
+		/// Returns all available IPropertyEditorValueConverter
+		/// </summary>
+		/// <returns></returns>
+		internal IEnumerable<Type> ResolvePropertyEditorValueConverters()
+		{
+			return ResolveTypes<IPropertyEditorValueConverter>();
+		} 
 
 		/// <summary>
 		/// Returns all available IDataType in application

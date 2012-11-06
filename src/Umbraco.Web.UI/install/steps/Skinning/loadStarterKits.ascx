@@ -1,8 +1,11 @@
 <%@ Control Language="C#" AutoEventWireup="True" CodeBehind="LoadStarterKits.ascx.cs" Inherits="Umbraco.Web.UI.Install.Steps.Skinning.LoadStarterKits" %>
 <%@ Import Namespace="umbraco.cms.businesslogic.packager.repositories" %>
+<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <asp:PlaceHolder ID="pl_loadStarterKits" runat="server">
     
+    <umb:JsInclude ID="JsInclude1" runat="server" FilePath="installer/js/PackageInstaller.js" PathNameAlias="UmbracoClient" />
+
     <% if (!CannotConnect) { %>
     <script type="text/javascript">
         (function ($) {
@@ -58,7 +61,7 @@
 
             <li class="add-thanks">
                 <asp:LinkButton runat="server" class="single-tab declineStarterKits" ID="declineStarterKits" OnClientClick="return confirm('Are you sure you do not want to install a starter kit?');" OnClick="NextStep">
-            <img class="zoom-img" src="../umbraco_client/installer/images/btn-no-thanks.png" alt="image description" width="150" height="204">
+            <img class="zoom-img" src="<%# umbraco.GlobalSettings.ClientPath + "/installer/images/btn-no-thanks.png" %>" alt="image description" width="150" height="204">
                 </asp:LinkButton>
 
                 <em>&nbsp;</em>

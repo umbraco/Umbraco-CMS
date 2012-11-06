@@ -1,4 +1,4 @@
-tinyMCE.addI18n('en.umbraco',{"underline_desc":"下划线 (Ctrl+U)",
+tinyMCE.addI18n('zh.umbraco',{"underline_desc":"下划线 (Ctrl+U)",
 "italic_desc":"斜体 (Ctrl+I)",
 "bold_desc":"粗体 (Ctrl+B)",
 dd:"定义描述",
