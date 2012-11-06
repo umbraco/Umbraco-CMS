@@ -3,11 +3,12 @@ using System.IO;
 using System.Text;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal abstract class FileRepository<TId, TEntity> : IRepository<TId, TEntity> 
+    internal abstract class FileRepository<TId, TEntity> : IUnitOfWorkRepository, IRepository<TId, TEntity> 
         where TEntity : IFile
     {
         private IUnitOfWork _work;
@@ -36,19 +37,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual void AddOrUpdate(TEntity entity)
         {
-            var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content));
-            FileSystem.AddFile(entity.Name, stream, true);
+            _work.RegisterAdded(entity, this);
         }
 
         public virtual void Delete(TEntity entity)
         {
-            if (_fileSystem.FileExists(entity.Name))
+            if (_work != null)
             {
-                _fileSystem.DeleteFile(entity.Name);
-            }
-            else if(_fileSystem.FileExists(entity.Path))
-            {
-                _fileSystem.DeleteFile(entity.Path);
+                _work.RegisterRemoved(entity, this);
             }
         }
 
@@ -64,6 +60,53 @@ namespace Umbraco.Core.Persistence.Repositories
         public void SetUnitOfWork(IUnitOfWork work)
         {
             _work = work;
+        }
+
+        #endregion
+
+        #region Implementation of IUnitOfWorkRepository
+
+        public void PersistNewItem(IEntity entity)
+        {
+            PersistNewItem((TEntity)entity);
+        }
+
+        public void PersistUpdatedItem(IEntity entity)
+        {
+            PersistUpdatedItem((TEntity)entity);
+        }
+
+        public void PersistDeletedItem(IEntity entity)
+        {
+            PersistDeletedItem((TEntity)entity);
+        }
+
+        #endregion
+
+        #region Abstract IUnitOfWorkRepository Methods
+
+        protected virtual void PersistNewItem(TEntity entity)
+        {
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content));
+            FileSystem.AddFile(entity.Name, stream, true);
+        }
+
+        protected virtual void PersistUpdatedItem(TEntity entity)
+        {
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content));
+            FileSystem.AddFile(entity.Name, stream, true);
+        }
+
+        protected virtual void PersistDeletedItem(TEntity entity)
+        {
+            if (_fileSystem.FileExists(entity.Name))
+            {
+                _fileSystem.DeleteFile(entity.Name);
+            }
+            else if (_fileSystem.FileExists(entity.Path))
+            {
+                _fileSystem.DeleteFile(entity.Path);
+            }
         }
 
         #endregion

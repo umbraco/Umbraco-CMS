@@ -25,44 +25,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Overrides of FileRepository<string,Template>
 
-        public override void AddOrUpdate(Template entity)
-        {
-            var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content));
-            if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
-            {
-                _viewsFileSystem.AddFile(entity.Name, stream, true);
-            }
-            else
-            {
-                FileSystem.AddFile(entity.Name, stream, true);
-            }
-
-            entity.ResetDirtyProperties();
-        }
-
-        public override void Delete(Template entity)
-        {
-            //Check for file under the Masterpages filesystem
-            if (FileSystem.FileExists(entity.Name))
-            {
-                FileSystem.DeleteFile(entity.Name);
-            }
-            else if (FileSystem.FileExists(entity.Path))
-            {
-                FileSystem.DeleteFile(entity.Path);
-            }
-
-            //Check for file under the Views/Mvc filesystem
-            if (_viewsFileSystem.FileExists(entity.Name))
-            {
-                _viewsFileSystem.DeleteFile(entity.Name);
-            }
-            else if (_viewsFileSystem.FileExists(entity.Path))
-            {
-                _viewsFileSystem.DeleteFile(entity.Path);
-            }
-        }
-
         public override Template Get(string id)
         {
             string masterpageName = string.Concat(id, ".master");
@@ -141,6 +103,63 @@ namespace Umbraco.Core.Persistence.Repositories
         public override bool Exists(string id)
         {
             return FileSystem.FileExists(id) || _viewsFileSystem.FileExists(id);
+        }
+
+        #endregion
+
+        #region Abstract IUnitOfWorkRepository Methods
+
+        protected override void PersistNewItem(Template entity)
+        {
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content));
+            if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
+            {
+                _viewsFileSystem.AddFile(entity.Name, stream, true);
+            }
+            else
+            {
+                FileSystem.AddFile(entity.Name, stream, true);
+            }
+
+            entity.ResetDirtyProperties();
+        }
+
+        protected override void PersistUpdatedItem(Template entity)
+        {
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content));
+            if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
+            {
+                _viewsFileSystem.AddFile(entity.Name, stream, true);
+            }
+            else
+            {
+                FileSystem.AddFile(entity.Name, stream, true);
+            }
+
+            entity.ResetDirtyProperties();
+        }
+
+        protected override void PersistDeletedItem(Template entity)
+        {
+            //Check for file under the Masterpages filesystem
+            if (FileSystem.FileExists(entity.Name))
+            {
+                FileSystem.DeleteFile(entity.Name);
+            }
+            else if (FileSystem.FileExists(entity.Path))
+            {
+                FileSystem.DeleteFile(entity.Path);
+            }
+
+            //Check for file under the Views/Mvc filesystem
+            if (_viewsFileSystem.FileExists(entity.Name))
+            {
+                _viewsFileSystem.DeleteFile(entity.Name);
+            }
+            else if (_viewsFileSystem.FileExists(entity.Path))
+            {
+                _viewsFileSystem.DeleteFile(entity.Path);
+            }
         }
 
         #endregion
