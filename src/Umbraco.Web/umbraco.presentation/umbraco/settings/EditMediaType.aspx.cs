@@ -55,7 +55,7 @@ namespace umbraco.cms.presentation.settings
                 }
                 else if (sce.Message.Contains("Tab"))
                 {
-                    speechBubble(speechBubbleIcon.info, "Tab added", sce.Message);
+                    base.speechBubble(sce.IconType, sce.Message, "");
                 }
                 else
                 {
