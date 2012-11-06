@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using umbraco.editorControls.tinyMCE3;
-using umbraco.interfaces;
 
 namespace Umbraco.Tests.Services
 {
@@ -23,19 +20,6 @@ namespace Umbraco.Tests.Services
         [SetUp]
         public override void Initialize()
         {
-            //this ensures its reset
-            PluginManager.Current = new PluginManager();
-
-            //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-            PluginManager.Current.AssembliesToScan = new[]
-				{
-                    typeof(IDataType).Assembly,
-                    typeof(tinyMCE3dataType).Assembly
-				};
-
-            DataTypesResolver.Current = new DataTypesResolver(
-                PluginManager.Current.ResolveDataTypes());
-
             base.Initialize();
 
             CreateTestData();
@@ -44,14 +28,8 @@ namespace Umbraco.Tests.Services
         [TearDown]
         public override void TearDown()
         {
-            TestHelper.ClearDatabase();
-
             base.TearDown();
         }
-
-        //TODO Write a test that creates content, but uses the HttpContext to resolve the backoffice user
-        //Just need to add a contextId cookie to the FakeHttpContextFactory in Umbraco.Tests.TestHelpers
-        //Create/insert a new UserDto for testing.
 
         [Test]
         public void Can_Create_Content()
@@ -65,6 +43,44 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(content, Is.Not.Null);
             Assert.That(content.HasIdentity, Is.False);
+        }
+
+        [Test]
+        public void Can_Create_Content_Using_HttpContext()
+        {
+            // Arrange
+            var userId =
+                Convert.ToInt32(
+                    DatabaseContext.Database.Insert(new UserDto
+                                                        {
+                                                            ContentStartId = -1,
+                                                            DefaultPermissions = null,
+                                                            DefaultToLiveEditing = false,
+                                                            Disabled = false,
+                                                            Email = "my@email.com",
+                                                            Login = "editor",
+                                                            MediaStartId = -1,
+                                                            NoConsole = false,
+                                                            Password = "1234",
+                                                            Type = 3,
+                                                            UserLanguage = "en",
+                                                            UserName = "John Doe the Editor"
+                                                        }));
+            DatabaseContext.Database.Insert(new UserLoginDto
+                                                {
+                                                    UserId = userId,
+                                                    ContextId = new Guid("FBA996E7-D6BE-489B-B199-2B0F3D2DD826"),
+                                                    Timeout = 634596443995451258
+                                                });
+            var contentService = ServiceContext.ContentService;
+
+            // Act
+            var content = contentService.CreateContent(-1, "umbTextpage");
+
+            // Assert
+            Assert.That(content, Is.Not.Null);
+            Assert.That(content.HasIdentity, Is.False);
+            Assert.That(content.Creator.Id, Is.EqualTo(userId));
         }
 
         [Test]
@@ -566,26 +582,6 @@ namespace Umbraco.Tests.Services
             Assert.AreNotEqual(rollback.Version, version);
             Assert.That(rollback.GetValue<string>("author"), Is.Not.EqualTo("Jane Doe"));
             Assert.AreEqual(subpage2.Name, rollback.Name);
-        }
-
-        [Test]
-        public void Can_Generate_Xml_Representation_Of_Content()
-        {
-            // Arrange
-            var contentType = MockedContentTypes.CreateTextpageContentType();
-            ServiceContext.ContentTypeService.Save(contentType);
-
-            var content = MockedContent.CreateTextpageContent(contentType, "Root Home", -1);
-            ServiceContext.ContentService.Save(content, 0);
-
-            var nodeName = content.ContentType.Alias.ToUmbracoAlias(StringAliasCaseType.CamelCase, true);
-
-            // Act
-            XElement element = content.ToXml();
-
-            // Assert
-            Assert.That(element, Is.Not.Null);
-            Assert.That(element.Name.LocalName, Is.EqualTo(nodeName));
         }
 
         public void CreateTestData()
