@@ -319,6 +319,9 @@
     <Compile Include="umbraco.presentation\install\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\install\steps\Skinning\loadStarterKitDesigns.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\install\steps\Skinning\loadStarterKits.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -429,13 +432,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\install\steps\skinning.ascx.designer.cs">
       <DependentUpon>skinning.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\Skinning\loadStarterKitDesigns.ascx.cs">
-      <DependentUpon>loadStarterKitDesigns.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\Skinning\loadStarterKitDesigns.ascx.designer.cs">
-      <DependentUpon>loadStarterKitDesigns.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\install\utills\FilePermissions.cs" />
     <Compile Include="umbraco.presentation\install\utills\Helper.cs" />
@@ -1841,7 +1837,6 @@
     </Content>
     <Content Include="umbraco.presentation\install\steps\renaming.ascx" />
     <Content Include="umbraco.presentation\install\steps\skinning.ascx" />
-    <Content Include="umbraco.presentation\install\steps\Skinning\loadStarterKitDesigns.ascx" />
     <Content Include="umbraco.presentation\install\Title.ascx" />
     <Content Include="umbraco.presentation\install\utills\p.aspx">
       <SubType>ASPXCodeBehind</SubType>

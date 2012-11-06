@@ -269,6 +269,13 @@
     <Compile Include="install\Default.aspx.designer.cs">
       <DependentUpon>default.aspx</DependentUpon>
     </Compile>
+    <Compile Include="install\steps\Skinning\loadStarterKitDesigns.ascx.cs">
+      <DependentUpon>loadStarterKitDesigns.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="install\steps\Skinning\loadStarterKitDesigns.ascx.designer.cs">
+      <DependentUpon>loadStarterKitDesigns.ascx</DependentUpon>
+    </Compile>
     <Compile Include="install\steps\Skinning\LoadStarterKits.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

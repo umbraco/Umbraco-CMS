@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="loadStarterKitDesigns.ascx.cs" Inherits="umbraco.presentation.install.steps.Skinning.loadStarterKitDesigns" %>
+﻿<%@ Control Language="C#" AutoEventWireup="True" CodeBehind="LoadStarterKitDesigns.ascx.cs" Inherits="Umbraco.Web.UI.Install.Steps.Skinning.LoadStarterKitDesigns" %>
 <%@ Import Namespace="umbraco.cms.businesslogic.packager.repositories"  %>
 
 <asp:PlaceHolder ID="pl_loadStarterKitDesigns" runat="server">
