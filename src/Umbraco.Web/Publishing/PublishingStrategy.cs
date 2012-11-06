@@ -132,6 +132,8 @@ namespace Umbraco.Web.Publishing
                 OnPublished(item, e);
             }
 
+            OnPublished(content, e);
+
             //NOTE: Ideally the xml cache should be refreshed here - as part of the publishing
 
             return true;

@@ -175,17 +175,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             var content = new Content(1048, contentType);
             content.Name = "Textpage 2 Child Node";
             content.Creator = new Profile(0, "Administrator");
+            content.Writer = new Profile(0, "Administrator");
 
             // Act
             repository.AddOrUpdate(content);
             unitOfWork.Commit();
             var id = content.Id;
 
-            var unitOfWork2 = provider.GetUnitOfWork();
-            var contentTypeRepository2 = new ContentTypeRepository(unitOfWork2);
-            var repository2 = new ContentRepository(unitOfWork2, InMemoryCacheProvider.Current, contentTypeRepository2);
+            var contentTypeRepository2 = new ContentTypeRepository(unitOfWork);
+            var repository2 = new ContentRepository(unitOfWork, InMemoryCacheProvider.Current, contentTypeRepository2);
             repository2.Delete(content);
-            unitOfWork2.Commit();
+            unitOfWork.Commit();
 
             var content1 = repository2.Get(id);
 

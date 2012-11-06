@@ -60,7 +60,7 @@ namespace Umbraco.Core.Models
                                    new XAttribute("writerID", content.Writer.Id),
                                    new XAttribute("creatorID", content.Creator.Id),
                                    new XAttribute("nodeType", content.ContentType.Id),
-                                   new XAttribute("template", content.Template),//Template name versus Id
+                                   new XAttribute("template", content.Template ?? string.Empty),//Template name versus Id - note that the template name/alias isn't saved in the db.
                                    new XAttribute("sortOrder", content.SortOrder),
                                    new XAttribute("createDate", content.CreateDate),
                                    new XAttribute("updateDate", content.UpdateDate),
@@ -81,6 +81,18 @@ namespace Umbraco.Core.Models
             }
 
             return xml;
+        }
+
+        /// <summary>
+        /// Creates the xml representation for the <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> to generate xml for</param>
+        /// <param name="isPreview">Boolean indicating whether the xml should be generated for preview</param>
+        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        public static XElement ToXml(this IContent content, bool isPreview)
+        {
+            //TODO Do a proper implementation of this
+            return content.ToXml();
         }
     }
 }

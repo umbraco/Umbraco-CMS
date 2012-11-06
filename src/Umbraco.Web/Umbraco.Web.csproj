@@ -323,6 +323,9 @@
     <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Services\ServiceFactory.cs" />
     <Compile Include="Services\UserService.cs" />
+    <Compile Include="Strategies\TrashedContent.cs" />
+    <Compile Include="Strategies\UpdateContentCache.cs" />
+    <Compile Include="Strategies\UpdateMultipleContentCache.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>

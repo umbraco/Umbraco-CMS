@@ -47,6 +47,17 @@ namespace Umbraco.Core.Publishing
         }
 
         /// <summary>
+        /// Raises the <see cref="Published"/> event
+        /// </summary>
+        /// <param name="content"> </param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        protected virtual void OnPublished(IEnumerable<IContent> content, PublishingEventArgs e)
+        {
+            if (Published != null)
+                Published(content, e);
+        }
+
+        /// <summary>
         /// Occurs before unpublish
         /// </summary>
         public static event EventHandler<PublishingEventArgs> UnPublishing;
