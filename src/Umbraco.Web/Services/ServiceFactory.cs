@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Services;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Services
 {
@@ -8,14 +8,12 @@ namespace Umbraco.Web.Services
     /// </summary>
     public static class ServiceFactory
     {
-        private static readonly ServiceContext ServiceContext = new ServiceContext();
-
         /// <summary>
         /// Gets the <see cref="IContentService"/>
         /// </summary>
         public static IContentService ContentService
         {
-            get { return ServiceContext.ContentService; }
+            get { return ServiceContext.Current.ContentService; }
         }
 
         /// <summary>
@@ -23,7 +21,7 @@ namespace Umbraco.Web.Services
         /// </summary>
         public static IContentTypeService ContentTypeService
         {
-            get { return ServiceContext.ContentTypeService; }
+            get { return ServiceContext.Current.ContentTypeService; }
         }
 
         /// <summary>
@@ -31,7 +29,7 @@ namespace Umbraco.Web.Services
         /// </summary>
         public static IDataTypeService DataTypeService
         {
-            get { return ServiceContext.DataTypeService; }
+            get { return ServiceContext.Current.DataTypeService; }
         }
 
         /// <summary>
@@ -39,7 +37,7 @@ namespace Umbraco.Web.Services
         /// </summary>
         public static IFileService FileService
         {
-            get { return ServiceContext.FileService; }
+            get { return ServiceContext.Current.FileService; }
         }
 
         /// <summary>
@@ -47,7 +45,7 @@ namespace Umbraco.Web.Services
         /// </summary>
         public static ILocalizationService LocalizationService
         {
-            get { return ServiceContext.LocalizationService; }
+            get { return ServiceContext.Current.LocalizationService; }
         }
 
         /// <summary>
@@ -55,7 +53,7 @@ namespace Umbraco.Web.Services
         /// </summary>
         public static IMediaService MediaService
         {
-            get { return ServiceContext.MediaService; }
+            get { return ServiceContext.Current.MediaService; }
         }
 
         /// <summary>
@@ -63,7 +61,7 @@ namespace Umbraco.Web.Services
         /// </summary>
         public static IMacroService MacroService
         {
-            get { return ServiceContext.MacroService; }
+            get { return ServiceContext.Current.MacroService; }
         }
     }
 }

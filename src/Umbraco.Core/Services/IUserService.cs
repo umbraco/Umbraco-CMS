@@ -1,3 +1,4 @@
+using System.Web;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Services
@@ -10,7 +11,8 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets an <see cref="IProfile"/> for the current BackOffice User
         /// </summary>
+        /// <param name="httpContext">HttpContext to fetch the user through</param>
         /// <returns><see cref="IProfile"/> containing the Name and Id of the logged in BackOffice User</returns>
-        IProfile GetCurrentBackOfficeUser();
+        IProfile GetCurrentBackOfficeUser(HttpContextBase httpContext);
     }
 }

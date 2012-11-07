@@ -87,7 +87,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected ServiceContext ServiceContext
         {
-            get { return GetUmbracoContext("/test", 1234).ServiceContext; }
+            get { return ServiceContext.Current; }
         }
 
         protected DatabaseContext DatabaseContext { get; private set; }

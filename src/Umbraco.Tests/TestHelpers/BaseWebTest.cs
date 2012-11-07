@@ -9,7 +9,6 @@ using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Services;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.template;

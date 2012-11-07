@@ -50,7 +50,6 @@ namespace Umbraco.Web
 
             HttpContext = httpContext;            
             Application = applicationContext;
-            ServiceContext = new ServiceContext(httpContext);
         	RoutesCache = routesCache;
 
 			// set the urls...
@@ -109,7 +108,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the current ServiceContext
         /// </summary>
-        public ServiceContext ServiceContext { get; private set; }
+        public ServiceContext Services { get { return ServiceContext.Current; } }
 
         /// <summary>
         /// Gets the <see cref="IRoutesCache"/>

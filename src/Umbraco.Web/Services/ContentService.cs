@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -11,8 +12,6 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
-using Umbraco.Web.Publishing;
-using Content = Umbraco.Core.Models.Content;
 
 namespace Umbraco.Web.Services
 {
@@ -24,15 +23,7 @@ namespace Umbraco.Web.Services
         private readonly IPublishingStrategy _publishingStrategy;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
-
-        public ContentService() : this(new PetaPocoUnitOfWorkProvider())
-        {
-        }
-
-        public ContentService(IUnitOfWorkProvider provider) : this(provider, new PublishingStrategy())
-        {
-            
-        }
+        private HttpContextBase _httpContext;
 
         public ContentService(IUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy) : this(provider, publishingStrategy, null)
         {
@@ -634,6 +625,15 @@ namespace Umbraco.Web.Services
         }
 
         /// <summary>
+        /// Internal method to set the HttpContext for testing
+        /// </summary>
+        /// <param name="httpContext"><see cref="HttpContextBase"/></param>
+        internal void SetHttpContext(HttpContextBase httpContext)
+        {
+            _httpContext = httpContext;
+        }
+
+        /// <summary>
         /// Updates a content object with the User (id), who created the content.
         /// </summary>
         /// <param name="content"><see cref="IContent"/> object to update</param>
@@ -649,7 +649,9 @@ namespace Umbraco.Web.Services
             {
                 //If the UserService has been set for this instance of the ServiceContext
                 //we retrieve the current users id from there.
-                content.Creator = _userService.GetCurrentBackOfficeUser();
+                content.Creator = _httpContext == null
+                                      ? _userService.GetCurrentBackOfficeUser()
+                                      : _userService.GetCurrentBackOfficeUser(_httpContext);
             }
             else
             {
@@ -674,7 +676,9 @@ namespace Umbraco.Web.Services
             {
                 //If the UserService has been set for this instance of the ServiceContext
                 //we retrieve the current users id from there.
-                content.Writer = _userService.GetCurrentBackOfficeUser();
+                content.Writer = _httpContext == null
+                                     ? _userService.GetCurrentBackOfficeUser()
+                                     : _userService.GetCurrentBackOfficeUser(_httpContext);
             }
             else
             {

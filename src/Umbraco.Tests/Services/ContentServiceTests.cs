@@ -4,8 +4,10 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.Services
 {
@@ -73,6 +75,7 @@ namespace Umbraco.Tests.Services
                                                     Timeout = 634596443995451258
                                                 });
             var contentService = ServiceContext.ContentService;
+            ((ContentService)contentService).SetHttpContext(base.GetUmbracoContext("/test.aspx", 1234).HttpContext);
 
             // Act
             var content = contentService.CreateContent(-1, "umbTextpage");

@@ -6,7 +6,6 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
-using umbraco;
 
 namespace Umbraco.Web.Services
 {
@@ -15,15 +14,11 @@ namespace Umbraco.Web.Services
     /// </summary>
     public class UserService : IUserService
     {
-        private readonly HttpContextBase _httpContext;
         private readonly IUnitOfWork _unitOfWork;
 
-        public UserService(IUnitOfWorkProvider provider) : this(provider, null) { }
-
-        public UserService(IUnitOfWorkProvider provider, HttpContextBase httpContext)
+        public UserService(IUnitOfWorkProvider provider)
         {
             _unitOfWork = provider.GetUnitOfWork();
-            _httpContext = httpContext;
         }
 
         #region Implementation of IUserService
@@ -31,17 +26,18 @@ namespace Umbraco.Web.Services
         /// <summary>
         /// Gets an <see cref="IProfile"/> for the current BackOffice User
         /// </summary>
+        /// <param name="httpContext">HttpContext to fetch the user through</param>
         /// <returns><see cref="IProfile"/> containing the Name and Id of the logged in BackOffice User</returns>
-        public IProfile GetCurrentBackOfficeUser()
+        public IProfile GetCurrentBackOfficeUser(HttpContextBase httpContext)
         {
-            Mandate.That(_httpContext != null,
+            Mandate.That(httpContext != null,
                          () =>
                          new ArgumentException(
                              "The HttpContext which is used to retrieve information about the currently logged in backoffice user was null and can therefor not be used",
                              "HttpContextBase"));
-            if (_httpContext == null) return null;
+            if (httpContext == null) return null;
 
-            var cookie = _httpContext.Request.Cookies["UMB_UCONTEXT"];
+            var cookie = httpContext.Request.Cookies["UMB_UCONTEXT"];
             Mandate.That(cookie != null, () => new ArgumentException("The Cookie containing the UserContext Guid Id was null", "Cookie"));
             if (cookie == null) return null;
 
@@ -60,7 +56,7 @@ namespace Umbraco.Web.Services
                 HttpRuntime.Cache.Insert(cacheKey, userId,
                                          null,
                                          System.Web.Caching.Cache.NoAbsoluteExpiration,
-                                         new TimeSpan(0, (int) (GlobalSettings.TimeOutInMinutes/10), 0));
+                                         new TimeSpan(0, (int)(Umbraco.Core.Configuration.GlobalSettings.TimeOutInMinutes / 10), 0));
             }
             else
             {

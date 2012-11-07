@@ -26,7 +26,7 @@ namespace Umbraco.Web.Strategies
         public UpdateContentCache()
         {
             _httpContext = new HttpContextWrapper(HttpContext.Current);
-            _serviceContext = new ServiceContext(_httpContext);
+            _serviceContext = ServiceContext.Current;
 
             PublishingStrategy.Published += PublishingStrategy_Published;
         }
@@ -34,7 +34,7 @@ namespace Umbraco.Web.Strategies
         public UpdateContentCache(HttpContextBase httpContext)
         {
             _httpContext = httpContext;
-            _serviceContext = new ServiceContext(_httpContext);
+            _serviceContext = ServiceContext.Current;
 
             PublishingStrategy.Published += PublishingStrategy_Published;
         }
