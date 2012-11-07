@@ -54,6 +54,9 @@
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Attempt.cs" />
     <Compile Include="CacheHelper.cs" />
+    <Compile Include="CodeAnnotations\UmbracoDeprecateAttribute.cs" />
+    <Compile Include="CodeAnnotations\UmbracoExperimentalFeatureAttribute.cs" />
+    <Compile Include="CodeAnnotations\UmbracoProposedPublicAttribute.cs" />
     <Compile Include="Configuration\FileSystemProviderElement.cs" />
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
