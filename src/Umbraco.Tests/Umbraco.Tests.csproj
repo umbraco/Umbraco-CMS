@@ -118,6 +118,7 @@
     <Compile Include="Persistence\Repositories\ContentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MacroRepositoryTest.cs" />
+    <Compile Include="Persistence\Repositories\MediaTypeRepositoryTest.cs" />
     <Compile Include="Persistence\RepositoryResolverTests.cs" />
     <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\SqlTableByTableTest.cs" />

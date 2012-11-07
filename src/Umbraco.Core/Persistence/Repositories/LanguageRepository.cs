@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override ILanguage PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
-            sql.Append(GetBaseWhereClause(), new { Id = id });
+            sql.Where(GetBaseWhereClause(), new { Id = id });
 
             var languageDto = Database.First<LanguageDto>(sql);
             if (languageDto == null)

@@ -152,5 +152,28 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
             return contentType;
         }
+
+        public static MediaType CreateVideoMediaType()
+        {
+            var mediaType = new MediaType(-1)
+                                {
+                                    Alias = "video",
+                                    Name = "Video",
+                                    Description = "ContentType used for videos",
+                                    Icon = ".sprTreeDoc3",
+                                    Thumbnail = "doc.png",
+                                    SortOrder = 1,
+                                    UserId = 0,
+                                    Trashed = false
+                                };
+
+            var contentCollection = new PropertyTypeCollection();
+            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Nvarchar) { Alias = "videoFile", Name = "Video File", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeId = -90 });
+
+            mediaType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Media", SortOrder = 1 });
+
+            return mediaType;
+        }
     }
 }

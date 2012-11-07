@@ -135,6 +135,7 @@ namespace Umbraco.Web.Publishing
             OnPublished(content, e);
 
             //NOTE: Ideally the xml cache should be refreshed here - as part of the publishing
+            //OnCacheContentAfterPublish(content, e)
 
             return true;
         }
@@ -175,6 +176,7 @@ namespace Umbraco.Web.Publishing
                 OnUnPublished(content, e);
 
                 //NOTE: Ideally the xml cache should be refreshed here - as part of the unpublishing
+                //OnRemoveCacheContentAfterPublish(content, e)
 
                 return true;
             }
@@ -220,6 +222,8 @@ namespace Umbraco.Web.Publishing
                 //Fire AfterUnPublish event
                 OnUnPublished(item, e);
             }
+
+            OnUnPublished(content, e);
 
             //NOTE: Ideally the xml cache should be refreshed here - as part of the publishing
 

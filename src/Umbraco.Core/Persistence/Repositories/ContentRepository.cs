@@ -236,8 +236,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Update(newContentDto);
             }
 
-            //Look up entries in cmsDocument table to set newest = false
-            var documentDtos = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND newest = '1'", new { Id = entity.Id });
+            //Look up (newest) entries by id in cmsDocument table to set newest = false
+            var documentDtos = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND newest = @IsNewest", new { Id = entity.Id, IsNewest = true });
             foreach (var documentDto in documentDtos)
             {
                 var docDto = documentDto;

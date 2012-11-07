@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IMedia PerformGet(int id)
         {
             var contentSql = GetBaseQuery(false);
-            contentSql.Append(GetBaseWhereClause(), new { Id = id });
+            contentSql.Where(GetBaseWhereClause(), new { Id = id });
             contentSql.OrderBy("[cmsContentVersion].[VersionDate] DESC");
 
             var dto = Database.Query<ContentVersionDto, ContentDto, NodeDto>(contentSql).FirstOrDefault();

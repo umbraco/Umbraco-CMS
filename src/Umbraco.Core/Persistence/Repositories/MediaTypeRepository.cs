@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IMediaType PerformGet(int id)
         {
             var contentTypeSql = GetBaseQuery(false);
-            contentTypeSql.Append(GetBaseWhereClause(), new { Id = id});
+            contentTypeSql.Where(GetBaseWhereClause(), new { Id = id});
 
             var dto = Database.Query<ContentTypeDto, NodeDto>(contentTypeSql).FirstOrDefault();
 
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.Repositories
             contentType.AllowedContentTypes = GetAllowedContentTypeIds(id);
             contentType.PropertyGroups = GetPropertyGroupCollection(id);
 
-            var list = Database.Fetch<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id");
+            var list = Database.Fetch<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id", new{ Id = id});
             foreach (var contentTypeDto in list)
             {
                 bool result = contentType.AddContentType(Get(contentTypeDto.ParentId));

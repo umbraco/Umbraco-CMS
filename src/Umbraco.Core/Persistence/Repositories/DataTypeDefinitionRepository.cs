@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IDataTypeDefinition PerformGet(int id)
         {
             var dataTypeSql = GetBaseQuery(false);
-            dataTypeSql.Append(GetBaseWhereClause(), new { Id = id });
+            dataTypeSql.Where(GetBaseWhereClause(), new { Id = id });
 
             var dataTypeDto = Database.Query<DataTypeDto, NodeDto>(dataTypeSql).FirstOrDefault();
 

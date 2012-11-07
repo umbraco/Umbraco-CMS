@@ -88,5 +88,16 @@ namespace Umbraco.Core.Publishing
             if (UnPublished != null)
                 UnPublished(content, e);
         }
+
+        /// <summary>
+        /// Raises the <see cref="UnPublished"/> event
+        /// </summary>
+        /// <param name="content"> </param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        protected virtual void OnUnPublished(IEnumerable<IContent> content, PublishingEventArgs e)
+        {
+            if (UnPublished != null)
+                UnPublished(content, e);
+        }
     }
 }

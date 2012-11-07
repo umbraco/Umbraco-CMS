@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override RelationType PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
-            sql.Append(GetBaseWhereClause(), new { Id = id });
+            sql.Where(GetBaseWhereClause(), new { Id = id });
 
             var dto = Database.FirstOrDefault<RelationTypeDto>(sql);
             if (dto == null)
