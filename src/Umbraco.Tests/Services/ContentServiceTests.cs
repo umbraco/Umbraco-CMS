@@ -27,11 +27,7 @@ namespace Umbraco.Tests.Services
             CreateTestData();
         }
 
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
+        //TODO Add test to verify there is only ONE newest document/content in cmsDocument table after updating.
 
         [Test]
         public void Can_Create_Content()
@@ -585,6 +581,12 @@ namespace Umbraco.Tests.Services
             Assert.AreNotEqual(rollback.Version, version);
             Assert.That(rollback.GetValue<string>("author"), Is.Not.EqualTo("Jane Doe"));
             Assert.AreEqual(subpage2.Name, rollback.Name);
+        }
+
+        [TearDown]
+        public override void TearDown()
+        {
+            base.TearDown();
         }
 
         public void CreateTestData()
