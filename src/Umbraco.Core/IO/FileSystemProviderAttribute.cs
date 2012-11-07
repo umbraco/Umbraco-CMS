@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Umbraco.Core.IO
 {
-    [AttributeUsage(AttributeTargets.Interface, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     internal class FileSystemProviderAttribute : Attribute
     {
         public string Alias { get; set; }

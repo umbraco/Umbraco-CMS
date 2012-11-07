@@ -63,6 +63,7 @@
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
     <Compile Include="Enum.cs" />
+    <Compile Include="IO\FileSystemWrapper.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dynamics\ClassFactory.cs" />
@@ -76,10 +77,9 @@
     <Compile Include="Dynamics\ExtensionMethodFinder.cs" />
     <Compile Include="Dynamics\ExtensionMethods.cs" />
     <Compile Include="Dynamics\PropertyResultType.cs" />
-    <Compile Include="DynamicWrapper.cs" />
     <Compile Include="IO\FileSystemProviderAttribute.cs" />
     <Compile Include="IO\IFileSystemExtensions.cs" />
-    <Compile Include="IO\IMediaFileSystem.cs" />
+    <Compile Include="IO\MediaFileSystem.cs" />
     <Compile Include="Macros\MacroTagParser.cs" />
     <Compile Include="Mandate.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />

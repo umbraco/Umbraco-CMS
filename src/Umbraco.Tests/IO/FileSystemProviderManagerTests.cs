@@ -21,7 +21,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void Can_Get_Typed_File_System()
         {
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
             Assert.NotNull(fs);
         }

@@ -136,7 +136,7 @@ namespace umbraco.editorControls.tinymce
 
         private static string doResize(Hashtable attributes, out int finalWidth, out int finalHeight)
         {
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
             string resizeDim = helper.FindAttribute(attributes, "width") + "," +
                                helper.FindAttribute(attributes, "height");
