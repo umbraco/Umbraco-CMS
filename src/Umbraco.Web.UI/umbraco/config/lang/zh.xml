@@ -105,7 +105,7 @@
     <key alias="statistics">统计</key>
     <key alias="titleOptional">标题（可选）</key>
     <key alias="type">类型</key>
-    <key alias="unPublish">未发布</key>
+    <key alias="unPublish">取消发布</key>
     <key alias="updateDate">最近编辑</key>
     <key alias="uploadClear">移除文件</key>
     <key alias="urls">链接到文档</key>
