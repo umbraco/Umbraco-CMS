@@ -32,9 +32,9 @@ namespace Umbraco.Core
 			var prop = content.GetPropertyRecursive(alias);
 			while (prop == null || prop.Value == null || prop.Value.ToString().IsNullOrWhiteSpace())
 			{
-				var parent = context.Parent;
-				if (parent == null) break;
-				prop = context.GetPropertyRecursive(alias);
+                if (context.Parent == null) break;
+                context = context.Parent;
+                prop = context.GetPropertyRecursive(alias);
 			}
 			return prop;
 		} 

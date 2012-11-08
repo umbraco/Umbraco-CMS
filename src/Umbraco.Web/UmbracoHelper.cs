@@ -249,6 +249,8 @@ namespace Umbraco.Web
 				attributesForItem.Add(i.Key, i.Value);
 			}
 
+
+
 		    var item = new Item()
 		                   {
 		                       //NodeId = currentPage.Id.ToString();
@@ -256,6 +258,11 @@ namespace Umbraco.Web
 		                       TextIfEmpty = altText,
 		                       LegacyAttributes = attributesForItem
 		                   };
+
+            //this is here to figure out if this request is in the context of a partial
+            if (_umbracoContext.PublishedContentRequest.PublishedContent.Id != _currentPage.Id)
+                item.NodeId = _currentPage.Id.ToString();
+            
 		
 			var containerPage = new FormlessPage();
 			containerPage.Controls.Add(item);

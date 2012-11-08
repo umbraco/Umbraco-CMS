@@ -420,6 +420,7 @@
     <key alias="notAllowedByContentType">Den aktuella sidan får inte vara undersida till den valda sidan eftersom den har fel dokumenttyp.</key>
     <key alias="notAllowedByPath">Den aktuella sidan kan inte flyttas till en av sina egna undersidor.</key>
     <key alias="notValid">Händelsen är inte tillåten på grund av att du inte har tillräckliga rättigheter till 1 eller flera underliggande sidor</key>
+	<key alias="relateToOriginal">Relatera kopierat objekt till orginalet</key>	
   </area>
   <area alias="notifications">
     <key alias="editNotifications">Inställningar för notifieringar gällande %0%</key>
@@ -571,6 +572,7 @@
     <key alias="editTemplateSaved">Sidmallen har sparats</key>
     <key alias="editUserError">Ett fel inträffade när användaren sparades (läs logg-filen)</key>
     <key alias="editUserSaved">Användaren har sparats</key>
+	<key alias="editUserTypeSaved">Användartypen har sparats</key>	
     <key alias="fileErrorHeader">Filen sparades inte</key>
     <key alias="fileErrorText">filen kunde inte sparas. Kontrollera filrättigheterna</key>
     <key alias="fileSavedHeader">Filen har sparats</key>
@@ -724,6 +726,8 @@
     <key alias="passwordConfirm">Vänligen bekräfta ditt nya lösenord</key>
     <key alias="passwordEnterNew">Vänligen fyll i ditt nya lösenord</key>
     <key alias="passwordIsBlank">Ditt nya lösenord kan inte vara tomt!</key>
+	<key alias="passwordCurrent">Nuvarande lösenord</key>
+	<key alias="passwordInvalid">Nuvarande lösenord är ogiltigt</key>	
     <key alias="passwordIsDifferent">Lösenorden matchar inte. Vänligen försök igen!</key>
     <key alias="passwordMismatch">Det bekräftade lösenordet matchar inte det nya lösenordet!</key>
     <key alias="permissionReplaceChildren">Ersätt rättigheterna på underliggande noder</key>

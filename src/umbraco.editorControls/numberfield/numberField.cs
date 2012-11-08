@@ -1,6 +1,7 @@
 using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Globalization;
 
 namespace umbraco.editorControls
 {
@@ -75,7 +76,7 @@ namespace umbraco.editorControls
             {
                 int integer;
                 
-                if (int.TryParse(value, out integer))
+                if (int.TryParse(value, NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out integer))
                 {
                     base.Text = integer.ToString();
                 }
