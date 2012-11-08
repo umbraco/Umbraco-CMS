@@ -141,6 +141,7 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.SortOrder = sortOrder;
             entity.Level = level;
 
+            dto.DataTypeId = nodeDto.NodeId;
             Database.Insert(dto);
 
             ((ICanBeDirty)entity).ResetDirtyProperties();

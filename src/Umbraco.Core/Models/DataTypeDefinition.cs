@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Models
 {
@@ -21,13 +22,14 @@ namespace Umbraco.Core.Models
         private int _sortOrder;
         private int _level;
         private string _path;
-        private int _userId;
+        private IProfile _creator;
         private bool _trashed;
         private Guid _controlId;
         private DataTypeDatabaseType _databaseType;
 
-        public DataTypeDefinition(Guid controlId)
+        public DataTypeDefinition(int parentId, Guid controlId)
         {
+            _parentId = parentId;
             _controlId = controlId;
         }
 
@@ -36,7 +38,7 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<DataTypeDefinition, int>(x => x.SortOrder);
         private static readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<DataTypeDefinition, int>(x => x.Level);
         private static readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<DataTypeDefinition, string>(x => x.Path);
-        private static readonly PropertyInfo UserIdSelector = ExpressionHelper.GetPropertyInfo<DataTypeDefinition, int>(x => x.UserId);
+        private static readonly PropertyInfo UserIdSelector = ExpressionHelper.GetPropertyInfo<DataTypeDefinition, IProfile>(x => x.Creator);
         private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<DataTypeDefinition, bool>(x => x.Trashed);
         private static readonly PropertyInfo ControlIdSelector = ExpressionHelper.GetPropertyInfo<DataTypeDefinition, Guid>(x => x.ControlId);
         private static readonly PropertyInfo DatabaseTypeSelector = ExpressionHelper.GetPropertyInfo<DataTypeDefinition, DataTypeDatabaseType>(x => x.DatabaseType);
@@ -116,12 +118,12 @@ namespace Umbraco.Core.Models
         /// Id of the user who created this entity
         /// </summary>
         [DataMember]
-        public int UserId
+        public IProfile Creator
         {
-            get { return _userId; }
+            get { return _creator; }
             set
             {
-                _userId = value;
+                _creator = value;
                 OnPropertyChanged(UserIdSelector);
             }
         }

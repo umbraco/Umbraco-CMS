@@ -34,7 +34,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<DataTypeDefinition, NodeDto>(src => src.Name, dto => dto.Text);
             CacheMap<DataTypeDefinition, NodeDto>(src => src.Trashed, dto => dto.Trashed);
             CacheMap<DataTypeDefinition, NodeDto>(src => src.Key, dto => dto.UniqueId);
-            CacheMap<DataTypeDefinition, NodeDto>(src => src.UserId, dto => dto.UserId);
+            CacheMap<DataTypeDefinition, NodeDto>(src => src.Creator, dto => dto.UserId);
             CacheMap<DataTypeDefinition, DataTypeDto>(src => src.ControlId, dto => dto.ControlId);
             CacheMap<DataTypeDefinition, DataTypeDto>(src => src.DatabaseType, dto => dto.DbType);
 
@@ -42,6 +42,9 @@ namespace Umbraco.Core.Persistence.Mappers
 
         internal override string Map(string propertyName)
         {
+            if (!PropertyInfoCache.ContainsKey(propertyName))
+                return string.Empty;
+
             var dtoTypeProperty = PropertyInfoCache[propertyName];
 
             return base.GetColumnName(dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo);

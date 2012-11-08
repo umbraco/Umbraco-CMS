@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
@@ -19,7 +20,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IDataTypeDefinition BuildEntity(DataTypeDto dto)
         {
-            var dataTypeDefinition = new DataTypeDefinition(dto.ControlId)
+            var dataTypeDefinition = new DataTypeDefinition(dto.NodeDto.ParentId, dto.ControlId)
                                          {
                                              CreateDate = dto.NodeDto.CreateDate,
                                              DatabaseType = dto.DbType.EnumParse<DataTypeDatabaseType>(true),
@@ -35,7 +36,7 @@ namespace Umbraco.Core.Persistence.Factories
                                              Path = dto.NodeDto.Path,
                                              SortOrder = dto.NodeDto.SortOrder,
                                              Trashed = dto.NodeDto.Trashed,
-                                             UserId = dto.NodeDto.UserId.HasValue ? dto.NodeDto.UserId.Value : 0
+                                             Creator = new Profile(dto.NodeDto.UserId.Value, "")
                                          };
 
             return dataTypeDefinition;
@@ -80,7 +81,7 @@ namespace Umbraco.Core.Persistence.Factories
                                   Text = entity.Name,
                                   Trashed = entity.Trashed,
                                   UniqueId = entity.Key,
-                                  UserId = entity.UserId
+                                  UserId = entity.Creator.Id.SafeCast<int>()
                               };
 
             return nodeDto;

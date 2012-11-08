@@ -117,6 +117,9 @@
     <Compile Include="Persistence\Querying\QueryBuilderTests.cs" />
     <Compile Include="Persistence\Repositories\ContentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeRepositoryTest.cs" />
+    <Compile Include="Persistence\Repositories\DataTypeDefinitionRepositoryTest.cs" />
+    <Compile Include="Persistence\Repositories\DictionaryRepositoryTest.cs" />
+    <Compile Include="Persistence\Repositories\LanguageRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MacroRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MediaRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MediaTypeRepositoryTest.cs" />

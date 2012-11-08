@@ -112,14 +112,22 @@ namespace Umbraco.Core.Persistence.Repositories
             if (ids.Any())
             {
                 var entities = _cache.GetByIds(typeof(TEntity), ids.Select(id => id is int ? ConvertIdToGuid(id) : ConvertStringIdToGuid(id.ToString())).ToList());
-                if (ids.Count().Equals(entities.Count()))
+                if (ids.Count().Equals(entities.Count()) && entities.Any(x => x == null) == false)
                     return entities.Select(x => (TEntity)x);
             }
             else
             {
                 var allEntities = _cache.GetAllByType(typeof(TEntity));
+                
                 if (allEntities.Any())
-                    return allEntities.Select(x => (TEntity)x);
+                {
+                    //Get count of all entities of current type (TEntity) to ensure cached result is correct
+                    var query = Query<TEntity>.Builder.Where(x => x.Id != 0);
+                    int totalCount = PerformCount(query);
+
+                    if(allEntities.Count() == totalCount)
+                        return allEntities.Select(x => (TEntity)x);
+                }
             }
 
             var entityCollection = PerformGetAll(ids);

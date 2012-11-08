@@ -31,6 +31,21 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Instantiate_Repository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+
+            // Act
+            var contentTypeRepository = new ContentTypeRepository(unitOfWork);
+            var repository = new ContentRepository(unitOfWork, contentTypeRepository);
+
+            // Assert
+            Assert.That(repository, Is.Not.Null);
+        }
+
+        [Test]
         public void Can_Perform_Add_On_ContentRepository()
         {
             // Arrange
@@ -107,21 +122,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(textpage.HasIdentity, Is.True);
             Assert.That(subpage.HasIdentity, Is.True);
             Assert.That(textpage.Id, Is.EqualTo(subpage.ParentId));
-        }
-
-        [Test]
-        public void Can_Instantiate_Repository()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-
-            // Act
-            var contentTypeRepository = new ContentTypeRepository(unitOfWork);
-            var repository = new ContentRepository(unitOfWork, contentTypeRepository);
-
-            // Assert
-            Assert.That(repository, Is.Not.Null);
         }
 
         [Test]
