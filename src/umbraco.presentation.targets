@@ -71,7 +71,7 @@
         OverwriteReadOnlyFiles="true"
         SkipUnchangedFiles="false"
         Condition="!Exists('$(OutputFileName)')"
-            />
+    />
   </Target>
 
   <Target Name="CustomTarget" AfterTargets="CopyWebConfig">
@@ -86,7 +86,8 @@
     <Message Text="$(OriginalFileName)" Importance="high" />
     <Message Text="$(OutputFileName)" Importance="high" />
     
-    <TransformXml Source="$(OriginalFileName)" Transform="$(WebConfigSource)" Destination="$(OutputFileName)" />
+    <TransformXml Condition="$(BuildingInsideVisualStudio) == ''" Source="$(OriginalFileName)" Transform="$(WebConfigSource)" Destination="$(OutputFileName)" />
+    <TransformXml Condition="$(BuildingInsideVisualStudio) == 'true'" Source="$(OutputFileName)" Transform="$(WebConfigSource)" Destination="$(OutputFileName)" />
   </Target>
 
   <Target Name="ResetConfigFiles" Condition="$(ProjDir) != $(ProjOutputDir)" BeforeTargets="Build;Rebuild" Inputs="@(ConfigFiles)" Outputs="%(Identity).Dummy">
@@ -105,7 +106,7 @@
       OverwriteReadOnlyFiles="true"
       SkipUnchangedFiles="false"
       Condition="Exists('$(ModifiedFileName)')"/>
-    
+
   </Target>
   
 </Project>
