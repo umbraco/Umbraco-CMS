@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.IO
 {
@@ -14,6 +15,7 @@ namespace Umbraco.Core.IO
 	/// 
 	/// This abstract class just wraps the 'real' IFileSystem object passed in to its constructor.
 	/// </remarks>
+	[UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1156", "Will be declared public after 4.10")]
 	internal abstract class FileSystemWrapper : IFileSystem
 	{
 		private readonly IFileSystem _wrapped;

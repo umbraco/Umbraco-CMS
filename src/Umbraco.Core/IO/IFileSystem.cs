@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.IO
 {
+	[UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1156", "Will be declared public after 4.10")]
     internal interface IFileSystem
     {
         IEnumerable<string> GetDirectories(string path);

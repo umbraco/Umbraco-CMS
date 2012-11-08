@@ -5,10 +5,12 @@ using System.Configuration;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.IO
 {
+	[UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1156", "Will be declared public after 4.10")]
     internal class FileSystemProviderManager
     {
         private readonly FileSystemProvidersSection _config;
