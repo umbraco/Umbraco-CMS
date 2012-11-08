@@ -96,27 +96,36 @@ namespace umbraco.presentation.templateControls
 				int? tempNodeId = item.GetParsedNodeId();
 				if (tempNodeId != null && tempNodeId.Value != 0)
 				{
-					string currentField = helper.FindAttribute(item.LegacyAttributes, "field");
+
+                    //moved the following from the catch block up as this will allow fallback options alt text etc to work
+
+                    page itemPage = new page(content.Instance.XmlContent.GetElementById(tempNodeId.ToString()));
+                    tempElementContent = new item(itemPage.Elements, item.LegacyAttributes).FieldContent;
+
+                    /*removed as would fail as there is a incorrect cast in the method called.  
+                      Also the following code does not respect any of Umbraco Items fallback and formatting options */
+
+					//string currentField = helper.FindAttribute(item.LegacyAttributes, "field");
 					// check for a cached instance of the content
-					object contents = GetContentFromCache(tempNodeId.Value, currentField);
-					if (contents != null)
-						tempElementContent = (string)contents;
-					else
-					{
-						// as the field can be used for both documents, media and even members we'll use the 
-						// content class to lookup field items
-						try
-						{
-							tempElementContent = GetContentFromDatabase(item.LegacyAttributes, tempNodeId.Value, currentField);
-						}
-						catch
-						{
-							// content was not found in property fields,
-							// so the last place to look for is page fields
-							page itemPage = new page(content.Instance.XmlContent.GetElementById(tempNodeId.ToString()));
-							tempElementContent = new item(itemPage.Elements, item.LegacyAttributes).FieldContent;
-						}
-					}
+					//object contents = GetContentFromCache(tempNodeId.Value, currentField);
+                    //if (contents != null)
+                    //    tempElementContent = (string)contents;
+                    //else
+                    //{
+                    //    // as the field can be used for both documents, media and even members we'll use the 
+                    //    // content class to lookup field items
+                    //    try
+                    //    {
+                    //        tempElementContent = GetContentFromDatabase(item.LegacyAttributes, tempNodeId.Value, currentField);
+                    //    }
+                    //    catch
+                    //    {
+                    //        // content was not found in property fields,
+                    //        // so the last place to look for is page fields
+                    //        page itemPage = new page(content.Instance.XmlContent.GetElementById(tempNodeId.ToString()));
+                    //        tempElementContent = new item(itemPage.Elements, item.LegacyAttributes).FieldContent;
+                    //    }
+                    //}
 				}
 
 			}
