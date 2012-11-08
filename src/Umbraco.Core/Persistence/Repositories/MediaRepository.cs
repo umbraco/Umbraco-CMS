@@ -171,10 +171,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Create the Content specific data - cmsContent
             var contentDto = dto.ContentDto;
+            contentDto.NodeId = nodeDto.NodeId;
             Database.Insert(contentDto);
 
             //Create the first version - cmsContentVersion
             //Assumes a new Version guid and Version date (modified date) has been set
+            dto.NodeId = nodeDto.NodeId;
             Database.Insert(dto);
 
             //Create the PropertyData for this version - cmsPropertyData
