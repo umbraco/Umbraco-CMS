@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models;
+﻿using System.Collections.Generic;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Tests.TestHelpers.Entities
@@ -52,6 +53,30 @@ namespace Umbraco.Tests.TestHelpers.Entities
             content.PropertyValues(obj);
 
             return content;
+        }
+
+        public static IEnumerable<Content> CreateTextpageContent(IContentType contentType, int parentId, int amount)
+        {
+            var list = new List<Content>();
+
+            for (int i = 0; i < amount; i++)
+            {
+                var name = "Textpage No-" + i;
+                var content = new Content(parentId, contentType) { Name = name, Language = "en-US", ParentId = parentId, Template = "~/masterpages/umbTextPage.master", Creator = new Profile(0, "Administrator"), Writer = new Profile(0, "Administrator") };
+                object obj =
+                    new
+                    {
+                        title = name + " title",
+                        bodyText = string.Format("This is a textpage based on the {0} ContentType", contentType.Alias),
+                        keywords = "text,page,meta",
+                        metaDescription = "This is the meta description for a textpage"
+                    };
+
+                content.PropertyValues(obj);
+                list.Add(content);
+            }
+
+            return list;
         }
     }
 }
