@@ -308,6 +308,13 @@
     <Compile Include="Umbraco\masterpages\UmbracoPage.master.designer.cs">
       <DependentUpon>umbracoPage.Master</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Search\QuickSearch.ascx.cs">
+      <DependentUpon>QuickSearch.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Search\QuickSearch.ascx.designer.cs">
+      <DependentUpon>QuickSearch.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\settings\EditTemplate.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
