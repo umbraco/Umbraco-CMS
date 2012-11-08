@@ -96,6 +96,7 @@
     <Compile Include="LibraryTests.cs" />
     <Compile Include="Models\ContentTests.cs" />
     <Compile Include="Models\ContentXmlTest.cs" />
+    <Compile Include="Models\MacroTests.cs" />
     <Compile Include="Models\StylesheetTests.cs" />
     <Compile Include="Persistence\BaseTableByTableTest.cs" />
     <Compile Include="Persistence\Caching\InMemoryCacheProviderTest.cs" />

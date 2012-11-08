@@ -44,7 +44,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var name = string.Concat(id, ".macro");
             Stream file = _fileSystem.OpenFile(name);
-            var o = _serializationService.FromStream(file, typeof(IMacro));
+            var o = _serializationService.FromStream(file, typeof(Macro));
             var macro = o as IMacro;
 
             if(macro != null)
