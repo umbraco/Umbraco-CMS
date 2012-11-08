@@ -85,13 +85,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*");
-            sql.From("cmsLanguageText");
+            sql.From("umbracoLanguage");
             return sql;
         }
 
         protected override string GetBaseWhereClause()
         {
-            return "[cmsLanguageText].[id] = @Id";
+            return "[umbracoLanguage].[id] = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
