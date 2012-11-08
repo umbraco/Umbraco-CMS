@@ -48,7 +48,7 @@ namespace Umbraco.Core.Persistence.Repositories
             foreach (var textDto in dto.LanguageTextDtos)
             {
                 var language = _languageRepository.Get(textDto.LanguageId);
-                var translationFactory = new DictionaryTranslationFactory(dto.Id, language);
+                var translationFactory = new DictionaryTranslationFactory(dto.UniqueId, language);
                 list.Add(translationFactory.BuildEntity(textDto));
             }
             entity.Translations = list;
@@ -83,7 +83,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IDictionaryItem>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.Fetch<DictionaryDto, LanguageTextDto>(sql);
+            var dtos = Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql);
 
             foreach (var dto in dtos)
             {
@@ -98,15 +98,23 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*");
-            sql.From("cmsDictionary");
-            sql.InnerJoin("cmsLanguageText ON ([cmsDictionary].[id] = [cmsLanguageText].[UniqueId])");
+            if(isCount)
+            {
+                sql.Select("COUNT(*)");
+                sql.From("cmsDictionary");
+            }
+            else
+            {
+                sql.Select("*");
+                sql.From("cmsDictionary");
+                sql.InnerJoin("cmsLanguageText ON ([cmsDictionary].[id] = [cmsLanguageText].[UniqueId])");
+            }
             return sql;
         }
 
         protected override string GetBaseWhereClause()
         {
-            return "[cmsDictionary].[id] = @Id";
+            return "[cmsDictionary].[pk] = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -128,7 +136,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(IDictionaryItem entity)
         {
-            ((Entity)entity).AddingEntity();
+            ((DictionaryItem)entity).AddingEntity();
 
             var factory = new DictionaryItemFactory();
             var dto = factory.BuildDto(entity);
@@ -141,6 +149,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var textDto = translationFactory.BuildDto(translation);
                 translation.Id = Convert.ToInt32(Database.Insert(textDto));
+                translation.Key = entity.Key;
             }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
@@ -166,6 +175,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 else
                 {
                     translation.Id = Convert.ToInt32(Database.Insert(dto));
+                    translation.Key = entity.Key;
                 }
             }
 
@@ -186,10 +196,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var list = Database.Fetch<DictionaryDto>("WHERE parent = @ParentId", new {ParentId = parentId});
             foreach (var dto in list)
             {
-                RecursiveDelete(dto.Id);
+                RecursiveDelete(dto.UniqueId);
 
-                Database.Delete<LanguageTextDto>("WHERE UniqueId = @Id", new { Id = dto.Id });
-                Database.Delete<DictionaryDto>("WHERE id = @Id", new { Id = dto.Id });
+                Database.Delete<LanguageTextDto>("WHERE UniqueId = @Id", new { Id = dto.UniqueId });
+                Database.Delete<DictionaryDto>("WHERE id = @Id", new { Id = dto.UniqueId });
             }
         }
 

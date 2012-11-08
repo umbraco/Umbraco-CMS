@@ -17,6 +17,10 @@ namespace Umbraco.Core.Models
         private string _itemKey;
         private IEnumerable<IDictionaryTranslation> _translations;
 
+        public DictionaryItem(string itemKey)
+            : this(new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde"), itemKey)
+        {}
+
         public DictionaryItem(Guid parentId, string itemKey)
         {
             _parentId = parentId;
@@ -76,6 +80,8 @@ namespace Umbraco.Core.Models
         internal override void AddingEntity()
         {
             base.AddingEntity();
+
+            Key = Guid.NewGuid();
 
             //If ParentId is not set we should default to the root parent id
             if(ParentId == Guid.Empty)

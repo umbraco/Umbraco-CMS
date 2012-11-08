@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Mappers
         internal override void BuildMap()
         {
             CacheMap<DictionaryItem, DictionaryDto>(src => src.Id, dto => dto.PrimaryKey);
-            CacheMap<DictionaryItem, DictionaryDto>(src => src.Key, dto => dto.Id);
+            CacheMap<DictionaryItem, DictionaryDto>(src => src.Key, dto => dto.UniqueId);
             CacheMap<DictionaryItem, DictionaryDto>(src => src.ItemKey, dto => dto.Key);
             CacheMap<DictionaryItem, DictionaryDto>(src => src.ParentId, dto => dto.Parent);
         }

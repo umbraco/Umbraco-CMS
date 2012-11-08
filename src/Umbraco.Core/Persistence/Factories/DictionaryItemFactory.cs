@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Factories
             return new DictionaryItem(dto.Parent, dto.Key)
                        {
                            Id = dto.PrimaryKey, 
-                           Key = dto.Id
+                           Key = dto.UniqueId
                        };
         }
 
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Factories
         {
             return new DictionaryDto
                        {
-                           Id = entity.Key,
+                           UniqueId = entity.Key,
                            Key = entity.ItemKey,
                            Parent = entity.ParentId,
                            PrimaryKey = entity.Id,

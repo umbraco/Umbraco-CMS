@@ -85,7 +85,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override int PerformCount(IQuery<IMacro> query)
         {
-            throw new NotImplementedException();
+            var files = _fileSystem.GetFiles("", "*.macro");
+            return files.Count();
         }
 
         #endregion

@@ -172,8 +172,9 @@ namespace Umbraco.Core.Persistence.Querying
 
             if (m.Expression != null && m.Expression.NodeType != ExpressionType.Constant)
             {
-                Database.Mapper = new ModelDtoMapper();
-                var def = new Database.PocoData(m.Expression.Type);
+                //Database.Mapper = new ModelDtoMapper();
+                //var def = new Database.PocoData(m.Expression.Type);
+                var def = new Database.PocoData(typeof(T));
                 string field = GetFieldName(def, m.Member.Name);
                 return field;
             }

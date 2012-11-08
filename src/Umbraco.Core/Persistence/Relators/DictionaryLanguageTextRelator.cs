@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Relators
                 return Current;
 
             // Is this the same DictionaryItem as the current one we're processing
-            if (Current != null && Current.Id == a.Id)
+            if (Current != null && Current.UniqueId == a.UniqueId)
             {
                 // Yes, just add this LanguageTextDto to the current DictionaryItem's collection
                 Current.LanguageTextDtos.Add(p);

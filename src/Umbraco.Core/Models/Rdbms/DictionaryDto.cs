@@ -16,7 +16,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("id")]
         [Index(IndexTypes.UniqueNonClustered)]
-        public Guid Id { get; set; }
+        public Guid UniqueId { get; set; }
 
         [Column("parent")]
         public Guid Parent { get; set; }

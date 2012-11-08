@@ -117,7 +117,8 @@ namespace Umbraco.Core.IO
 
         public Stream OpenFile(string path)
         {
-            return File.OpenRead(GetFullPath(path));
+            var fullPath = GetFullPath(path);
+            return File.OpenRead(fullPath);
         }
 
         public void DeleteFile(string path)

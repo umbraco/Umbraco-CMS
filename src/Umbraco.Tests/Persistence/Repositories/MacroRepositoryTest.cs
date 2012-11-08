@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            var repository = new MacroRepository(unitOfWork, InMemoryCacheProvider.Current);
+            var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new MacroRepository(unitOfWork, InMemoryCacheProvider.Current);
+            var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current);
 
             // Act
             bool exists = repository.Exists("commentList");
@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new MacroRepository(unitOfWork, InMemoryCacheProvider.Current);
+            var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current);
 
             // Act
             bool exists = repository.Exists("testMacro");
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new MacroRepository(unitOfWork, InMemoryCacheProvider.Current);
+            var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current);
 
             // Act
             var macro = new Macro { Alias = "testMacro", CacheByPage = false, CacheByMember = false, DontRender = true, Name = "Test Macro", Xslt = "/xslt/testMacro.xslt", UseInEditor = false };
@@ -84,7 +84,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new MacroRepository(unitOfWork, InMemoryCacheProvider.Current);
+            var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current);
             var macro = CreateMacro("updateMacro", "Update Macro");
             repository.AddOrUpdate(macro);
             unitOfWork.Commit();
@@ -109,7 +109,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new MacroRepository(unitOfWork, InMemoryCacheProvider.Current);
+            var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current);
             var macro = CreateMacro("deleteMacro", "Delete Macro");
             repository.AddOrUpdate(macro);
             unitOfWork.Commit();
@@ -129,14 +129,14 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new MacroRepository(unitOfWork, InMemoryCacheProvider.Current);
+            var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current);
             var macro = CreateMacro("getMacro", "Get Macro");
             repository.AddOrUpdate(macro);
             unitOfWork.Commit();
 
             // Act
             var unitOfWork2 = provider.GetUnitOfWork();
-            var repository2 = new MacroRepository(unitOfWork2, InMemoryCacheProvider.Current);
+            var repository2 = new MacroRepository(unitOfWork2, NullCacheProvider.Current);
             var macro1 = repository2.Get("getMacro");
 
             // Assert
@@ -153,7 +153,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new MacroRepository(unitOfWork, InMemoryCacheProvider.Current);
+            var repository = new MacroRepository(unitOfWork, NullCacheProvider.Current);
 
             // Act
             var macros = repository.GetAll();
