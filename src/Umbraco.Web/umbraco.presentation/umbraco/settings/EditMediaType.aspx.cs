@@ -48,18 +48,19 @@ namespace umbraco.cms.presentation.settings
                 {
                     int mtid = 0;
 
-                    speechBubble(speechBubbleIcon.save, "Mediatype saved", "Mediatype was successfully saved");
+                    ClientTools.ShowSpeechBubble(speechBubbleIcon.save, "Mediatype saved", "Mediatype was successfully saved");
+
                     if (int.TryParse(Request.QueryString["id"], out mtid))
                         new cms.businesslogic.media.MediaType(mtid).Save();
 
                 }
                 else if (sce.Message.Contains("Tab"))
                 {
-                    speechBubble(speechBubbleIcon.info, "Tab added", sce.Message);
+                    ClientTools.ShowSpeechBubble(sce.IconType, sce.Message, "");
                 }
                 else
                 {
-                    base.speechBubble(sce.IconType, sce.Message, "");
+                    ClientTools.ShowSpeechBubble(sce.IconType, sce.Message, "");
                 }
 
                 return true;

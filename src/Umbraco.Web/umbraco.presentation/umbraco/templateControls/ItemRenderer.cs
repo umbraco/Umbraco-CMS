@@ -107,7 +107,7 @@ namespace umbraco.presentation.templateControls
 						// content class to lookup field items
 						try
 						{
-							tempElementContent = GetContentFromDatabase(item.Attributes, tempNodeId.Value, currentField);
+							tempElementContent = GetContentFromDatabase(item.LegacyAttributes, tempNodeId.Value, currentField);
 						}
 						catch
 						{
@@ -248,7 +248,7 @@ namespace umbraco.presentation.templateControls
 		/// <param name="nodeIdInt">The node id.</param>
 		/// <param name="currentField">The field that should be fetched.</param>
 		/// <returns>The contents of the <paramref name="currentField"/> from the <paramref name="nodeIdInt"/> content object</returns>
-		protected virtual string GetContentFromDatabase(AttributeCollection itemAttributes, int nodeIdInt, string currentField)
+        protected virtual string GetContentFromDatabase(AttributeCollectionAdapter itemAttributes, int nodeIdInt, string currentField)
 		{
 			Content c = new Content(nodeIdInt);
 
@@ -256,7 +256,7 @@ namespace umbraco.presentation.templateControls
 			if (property == null)
 				throw new ArgumentException(String.Format("Could not find property {0} of node {1}.", currentField, nodeIdInt));
 
-			item umbItem = new item(property.Value.ToString(), new AttributeCollectionAdapter(itemAttributes));
+			item umbItem = new item(property.Value.ToString(), itemAttributes);
 			string tempElementContent = umbItem.FieldContent;
 
 			// If the current content object is a document object, we'll only output it if it's published

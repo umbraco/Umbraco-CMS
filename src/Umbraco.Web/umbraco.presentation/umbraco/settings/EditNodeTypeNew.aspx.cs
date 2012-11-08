@@ -103,7 +103,7 @@ namespace umbraco.settings
                     if (int.TryParse(Request.QueryString["id"], out dtid))
                         new cms.businesslogic.web.DocumentType(dtid).Save();
 
-                    base.speechBubble(e.IconType, ui.Text("contentTypeSavedHeader"), "");
+                    ClientTools.ShowSpeechBubble(e.IconType, ui.Text("contentTypeSavedHeader"), "");
 
                     ArrayList tmp = new ArrayList();
 
@@ -132,7 +132,7 @@ namespace umbraco.settings
                 }
                 else
                 {
-                    base.speechBubble(e.IconType, e.Message, "");
+                    ClientTools.ShowSpeechBubble(e.IconType, e.Message, "");
                 }
                 handled = true;
             }

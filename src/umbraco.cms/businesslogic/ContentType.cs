@@ -794,6 +794,7 @@ namespace umbraco.cms.businesslogic
 
             SqlHelper.ExecuteNonQuery("delete from cmsTab where id =" + id);
 
+            InitializeVirtualTabs();
             // Remove from cache
             FlushFromCache(Id);
         }
