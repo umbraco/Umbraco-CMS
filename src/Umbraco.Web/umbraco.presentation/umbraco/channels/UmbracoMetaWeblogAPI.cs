@@ -25,11 +25,11 @@ namespace umbraco.presentation.channels
 {
     public abstract class UmbracoMetaWeblogAPI : XmlRpcService, IMetaWeblog
     {
-        internal readonly IMediaFileSystem _fs;
+        internal readonly MediaFileSystem _fs;
 
         protected UmbracoMetaWeblogAPI()
         {
-            _fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+            _fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
         }
 
         [XmlRpcMethod("blogger.deletePost",

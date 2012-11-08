@@ -21,7 +21,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
 {
     public class TinyMCEWebControl : System.Web.UI.WebControls.TextBox
     {
-        internal readonly IMediaFileSystem _fs;
+        internal readonly MediaFileSystem _fs;
 
         public NameValueCollection config = new NameValueCollection();
         private string temp;
@@ -67,7 +67,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
         public TinyMCEWebControl()
             : base()
         {
-            _fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+            _fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
             base.TextMode = TextBoxMode.MultiLine;
             base.Attributes.Add("style", "visibility: hidden");

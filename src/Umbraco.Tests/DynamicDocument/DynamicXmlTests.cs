@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Xml;
 using System.Xml.Linq;
 using Microsoft.CSharp.RuntimeBinder;
@@ -11,13 +12,41 @@ namespace Umbraco.Tests.DynamicDocument
 	public class DynamicXmlTests
 	{
 
+		[Test]
+		public void Ensure_Legacy_Objects_Are_Returned()
+		{
+			var xml = "<DAMP fullMedia=\"\"><mediaItem><Image id=\"1057\" version=\"d58d5c16-153e-4896-892f-a722e45a69af\" parentID=\"-1\" level=\"1\" writerID=\"0\" nodeType=\"1032\" template=\"0\" sortOrder=\"1\" createDate=\"2012-11-05T16:55:29\" updateDate=\"2012-11-05T16:55:44\" nodeName=\"test12\" urlName=\"test12\" writerName=\"admin\" nodeTypeAlias=\"Image\" path=\"-1,1057\"><umbracoFile>/media/54/tulips.jpg</umbracoFile><umbracoWidth>1024</umbracoWidth><umbracoHeight>768</umbracoHeight><umbracoBytes>620888</umbracoBytes><umbracoExtension>jpg</umbracoExtension><newsCrops><crops date=\"2012-11-05T16:55:34\"><crop name=\"thumbCrop\" x=\"154\" y=\"1\" x2=\"922\" y2=\"768\" url=\"/media/54/tulips_thumbCrop.jpg\" /></crops></newsCrops></Image></mediaItem><mediaItem><Image id=\"1055\" version=\"4df1f08a-3552-45f2-b4bf-fa980c762f4a\" parentID=\"-1\" level=\"1\" writerID=\"0\" nodeType=\"1032\" template=\"0\" sortOrder=\"1\" createDate=\"2012-11-05T16:29:58\" updateDate=\"2012-11-05T16:30:27\" nodeName=\"Test\" urlName=\"test\" writerName=\"admin\" nodeTypeAlias=\"Image\" path=\"-1,1055\"><umbracoFile>/media/41/hydrangeas.jpg</umbracoFile><umbracoWidth>1024</umbracoWidth><umbracoHeight>768</umbracoHeight><umbracoBytes>595284</umbracoBytes><umbracoExtension>jpg</umbracoExtension><newsCrops><crops date=\"2012-11-05T16:30:18\"><crop name=\"thumbCrop\" x=\"133\" y=\"0\" x2=\"902\" y2=\"768\" url=\"/media/41/hydrangeas_thumbCrop.jpg\" /></crops></newsCrops></Image></mediaItem></DAMP>";
+			var mediaItems = new global::umbraco.MacroEngines.DynamicXml(xml);
+			//Debug.WriteLine("full xml = {0}", mediaItems.ToXml());
+
+			if (mediaItems.Count() != 0)
+			{
+				foreach (dynamic item in mediaItems)
+				{
+					Type itemType = item.GetType();
+					Debug.WriteLine("item type = {0}", itemType);
+					dynamic image = item.Image;
+
+					Type imageType = image.GetType();
+					Debug.WriteLine("image type = {0}", imageType);
+					
+					//ensure they are the same
+					Assert.AreEqual(itemType, imageType);
+
+					//ensure they are legacy
+					Assert.AreEqual(typeof(global::umbraco.MacroEngines.DynamicXml), itemType);
+					Assert.AreEqual(typeof(global::umbraco.MacroEngines.DynamicXml), imageType);
+				}
+			}
+		}
+
 		/// <summary>
 		/// Test the current Core class
 		/// </summary>
 		[Test]
 		public void Find_Test_Core_Class()
 		{
-			RunFindTest(x => new DynamicXml(x));	
+			RunFindTest(x => new DynamicXml(x));
 		}
 
 		/// <summary>

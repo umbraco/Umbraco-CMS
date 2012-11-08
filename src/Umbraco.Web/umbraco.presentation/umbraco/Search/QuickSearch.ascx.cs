@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Drawing;
 using System.Web;
@@ -17,9 +17,25 @@ namespace umbraco.presentation.Search
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-            
+
 		}
 
-		
+		/// <summary>
+		/// JsInclude1 control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::ClientDependency.Core.Controls.JsInclude JsInclude1;
+
+		/// <summary>
+		/// JsInclude3 control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::ClientDependency.Core.Controls.JsInclude JsInclude3;
 	}
 }

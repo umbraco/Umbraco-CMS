@@ -1288,7 +1288,7 @@ namespace umbraco.cms.businesslogic.web
         /// <param name="RelateToOrignal"></param>
         public Document Copy(int CopyTo, User u, bool RelateToOrignal)
         {
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
             CopyEventArgs e = new CopyEventArgs();
             e.CopyTo = CopyTo;

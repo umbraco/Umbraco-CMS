@@ -22,7 +22,11 @@ namespace umbraco.MacroEngines
         }
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-        	return _internal.TryGetMember(binder, out result);
+        	var innerResult = _internal.TryGetMember(binder, out result);
+			//special case, we need to check if the result is of a non-legacy dynamic type because if it is, we need 
+			//to return the legacy type
+			result = LegacyConverter.ConvertToLegacy(result);
+	        return innerResult;
         }
     }
 }

@@ -86,6 +86,7 @@
     <Compile Include="RazorDynamicNode\DynamicBackingItem.cs" />
     <Compile Include="RazorDynamicNode\DynamicBackingItemType.cs" />
     <Compile Include="RazorDynamicNode\DynamicClass.cs" />
+    <Compile Include="RazorDynamicNode\LegacyConverter.cs" />
     <Compile Include="RazorDynamicNode\PublishedContentExtensions.cs" />
     <Compile Include="RazorDynamicNode\DynamicExpression.cs" />
     <Compile Include="RazorDynamicNode\DynamicGrouping.cs" />

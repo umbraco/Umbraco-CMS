@@ -162,7 +162,10 @@ namespace umbraco.presentation.umbraco.webservices
                         {
                             // Ensure we get the filename without the path in IE in intranet mode 
                             // http://stackoverflow.com/questions/382464/httppostedfile-filename-different-from-ie
-                            var fileName = new FileInfo(uploadFile.FileName).Name;
+                            var fileName = uploadFile.FileName;
+                            if(fileName.LastIndexOf(@"\") > 0) 
+                                fileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
+
                             fileName = Umbraco.Core.IO.IOHelper.SafeFileName(fileName);
 
                             var postedMediaFile = new PostedMediaFile

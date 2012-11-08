@@ -5,28 +5,29 @@ namespace Umbraco.Core.Dynamics
 {
     public class DynamicDictionary : DynamicObject
     {
-    	readonly Dictionary<string, object> _dictionary;
+    	internal readonly Dictionary<string, object> SourceItems;
+
         public DynamicDictionary(Dictionary<string, object> sourceItems)
         {
-            _dictionary = sourceItems;
+            SourceItems = sourceItems;
         }
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
-            if (_dictionary.ContainsKey(binder.Name))
+            if (SourceItems.ContainsKey(binder.Name))
             {
-                _dictionary[binder.Name.ToLower()] = value;
+                SourceItems[binder.Name.ToLower()] = value;
             }
             else
             {
-                _dictionary.Add(binder.Name.ToLower(), value);
+                SourceItems.Add(binder.Name.ToLower(), value);
             }
             return true;
         }
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            if (_dictionary != null)
+            if (SourceItems != null)
             {
-                if (_dictionary.TryGetValue(binder.Name.ToLower(), out result))
+                if (SourceItems.TryGetValue(binder.Name.ToLower(), out result))
                 {
                     return true;
                 }

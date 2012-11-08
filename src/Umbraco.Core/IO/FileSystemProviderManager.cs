@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.IO
 {
+	[UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1156", "Will be declared public after 4.10")]
     internal class FileSystemProviderManager
     {
         private readonly FileSystemProvidersSection _config;
@@ -31,44 +35,85 @@ namespace Umbraco.Core.IO
 
         #endregion
 
+		/// <summary>
+		/// used to cache the lookup of how to construct this object so we don't have to reflect each time.
+		/// </summary>
+		private class ProviderConstructionInfo
+		{
+			public object[] Parameters { get; set; }
+			public ConstructorInfo Constructor { get; set; }
+			public string ProviderAlias { get; set; }
+		}
+
+		private readonly ConcurrentDictionary<string, ProviderConstructionInfo> _providerLookup = new ConcurrentDictionary<string, ProviderConstructionInfo>();
+		private readonly ConcurrentDictionary<Type, string> _wrappedProviderLookup = new ConcurrentDictionary<Type, string>(); 
+
         public IFileSystem GetFileSystemProvider(string alias)
         {
-            var providerConfig = _config.Providers[alias];
-            if(providerConfig == null)
-                throw new ArgumentException(string.Format("No provider found with the alias '{0}'", alias));
+			//either get the constructor info from cache or create it and add to cache
+	        var ctorInfo = _providerLookup.GetOrAdd(alias, s =>
+		        {
+			        var providerConfig = _config.Providers[s];
+			        if (providerConfig == null)
+				        throw new ArgumentException(string.Format("No provider found with the alias '{0}'", s));
 
-            var providerType = Type.GetType(providerConfig.Type);
-            if(providerType == null)
-                throw new InvalidOperationException(string.Format("Could not find type '{0}'", providerConfig.Type));
+			        var providerType = Type.GetType(providerConfig.Type);
+			        if (providerType == null)
+				        throw new InvalidOperationException(string.Format("Could not find type '{0}'", providerConfig.Type));
 
-            if (providerType.IsAssignableFrom(typeof(IFileSystem)))
-                throw new InvalidOperationException(string.Format("The type '{0}' does not implement IFileSystem", providerConfig.Type));
+			        if (providerType.IsAssignableFrom(typeof (IFileSystem)))
+				        throw new InvalidOperationException(string.Format("The type '{0}' does not implement IFileSystem", providerConfig.Type));
 
-            var paramCount = providerConfig.Parameters != null ? providerConfig.Parameters.Count : 0;
-            var constructor = providerType.GetConstructors()
-                .SingleOrDefault(x => x.GetParameters().Count() == paramCount 
-                    && x.GetParameters().All(y => providerConfig.Parameters.AllKeys.Contains(y.Name)));
-            if(constructor == null)
-                throw new InvalidOperationException(string.Format("Could not find constructor for type '{0}' which accepts {1} parameters", providerConfig.Type, paramCount));
+			        var paramCount = providerConfig.Parameters != null ? providerConfig.Parameters.Count : 0;
+			        var constructor = providerType.GetConstructors()
+				        .SingleOrDefault(x => x.GetParameters().Count() == paramCount
+				                              && x.GetParameters().All(y => providerConfig.Parameters.AllKeys.Contains(y.Name)));
+			        if (constructor == null)
+				        throw new InvalidOperationException(string.Format("Could not find constructor for type '{0}' which accepts {1} parameters", providerConfig.Type, paramCount));
 
-            var parameters = new object[paramCount];
-            for(var i = 0; i < paramCount; i++)
-                parameters[i] = providerConfig.Parameters[providerConfig.Parameters.AllKeys[i]].Value;
+			        var parameters = new object[paramCount];
+			        for (var i = 0; i < paramCount; i++)
+				        parameters[i] = providerConfig.Parameters[providerConfig.Parameters.AllKeys[i]].Value;			
 
-            return (IFileSystem) constructor.Invoke(parameters);
+			        //return the new constructor info class to cache so we don't have to do this again.
+			        return new ProviderConstructionInfo()
+				        {
+					        Constructor = constructor,
+					        Parameters = parameters,
+					        ProviderAlias = s
+				        };
+		        });
+
+			var fs = (IFileSystem)ctorInfo.Constructor.Invoke(ctorInfo.Parameters);
+	        return fs;
         }
 
         public TProviderTypeFilter GetFileSystemProvider<TProviderTypeFilter>()
-            where TProviderTypeFilter : class, IFileSystem
+			where TProviderTypeFilter : FileSystemWrapper
         {
-            var attr =
-                (FileSystemProviderAttribute)typeof(TProviderTypeFilter).GetCustomAttributes(typeof(FileSystemProviderAttribute), false).
-                    SingleOrDefault();
+			//get the alias for the type from cache or look it up and add it to the cache, then we don't have to reflect each time
+	        var alias = _wrappedProviderLookup.GetOrAdd(typeof (TProviderTypeFilter), fsType =>
+		        {
+					//validate the ctor
+					var constructor = fsType.GetConstructors()
+						.SingleOrDefault(x =>
+										 x.GetParameters().Count() == 1 && TypeHelper.IsTypeAssignableFrom<IFileSystem>(x.GetParameters().Single().ParameterType));
+					if (constructor == null)
+						throw new InvalidOperationException("The type of " + fsType + " must inherit from FileSystemWrapper and must have a constructor that accepts one parameter of type " + typeof(IFileSystem));
 
-            if (attr == null)
-                throw new InvalidOperationException(string.Format("The provider type filter '{0}' is missing the required FileSystemProviderAttribute", typeof(FileSystemProviderAttribute).FullName));
+					var attr =
+						(FileSystemProviderAttribute)fsType.GetCustomAttributes(typeof(FileSystemProviderAttribute), false).
+							SingleOrDefault();
 
-            return GetFileSystemProvider(attr.Alias).As<TProviderTypeFilter>();
+					if (attr == null)
+						throw new InvalidOperationException(string.Format("The provider type filter '{0}' is missing the required FileSystemProviderAttribute", typeof(FileSystemProviderAttribute).FullName));
+
+			        return attr.Alias;
+		        });
+			
+            var innerFs = GetFileSystemProvider(alias);
+	        var outputFs = Activator.CreateInstance(typeof (TProviderTypeFilter), innerFs);
+	        return (TProviderTypeFilter)outputFs;
         }
     }
 }

@@ -249,13 +249,14 @@ namespace Umbraco.Web
 				attributesForItem.Add(i.Key, i.Value);
 			}
 
-			var item = new Item()
-				{
-                    NodeId = currentPage.Id.ToString(),
-					Field = fieldAlias,
-					TextIfEmpty = altText,
-					LegacyAttributes = attributesForItem
-				};
+		    var item = new Item()
+		                   {
+		                       //NodeId = currentPage.Id.ToString();
+		                       Field = fieldAlias,
+		                       TextIfEmpty = altText,
+		                       LegacyAttributes = attributesForItem
+		                   };
+		
 			var containerPage = new FormlessPage();
 			containerPage.Controls.Add(item);
 

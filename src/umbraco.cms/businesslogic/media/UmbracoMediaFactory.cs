@@ -16,11 +16,11 @@ namespace umbraco.cms.businesslogic.media
         public virtual int Priority { get { return 1000; } }
         public abstract string MediaTypeAlias { get; }
 
-        internal readonly IMediaFileSystem FileSystem;
+        internal readonly MediaFileSystem FileSystem;
 
         protected UmbracoMediaFactory()
         {
-            FileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+            FileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
         }
 
         public virtual bool CanHandleMedia(int parentNodeId, PostedMediaFile postedFile, User user)
