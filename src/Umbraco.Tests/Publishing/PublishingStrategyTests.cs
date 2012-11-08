@@ -45,6 +45,7 @@ namespace Umbraco.Tests.Publishing
             //TestHelper.ClearDatabase();
 
             //reset the app context
+            DataTypesResolver.Reset();
             ApplicationContext.Current = null;
             Resolution.IsFrozen = false;
 
