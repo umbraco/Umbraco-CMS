@@ -14,6 +14,7 @@ namespace umbraco.presentation
     /// it still has a reliance on the real HttpResponse object which means that the UmbracoContext still has 
     /// a reliance on the real HttpContext.
     /// </summary>
+    [Obsolete("This class is no longer used")]
     public class UmbracoResponse : HttpResponseBase
     {
         private readonly HttpResponseBase _response;

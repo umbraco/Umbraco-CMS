@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Xml;
+using Umbraco.Core;
 using umbraco.BusinessLogic;
 using umbraco.interfaces;
 using umbraco.IO;
@@ -234,8 +235,8 @@ namespace umbraco.presentation.cache
         }
 
         private static string GetFactoryObjectName(Guid uniqueIdentifier)
-        {
-            ICacheRefresher cacheRefresher = new Factory().GetNewObject(uniqueIdentifier);
+        {            
+        	var cacheRefresher = CacheRefreshersResolver.Current.GetById(uniqueIdentifier);
 
             return cacheRefresher != null ? cacheRefresher.Name : "<error determining factory type>";
         }

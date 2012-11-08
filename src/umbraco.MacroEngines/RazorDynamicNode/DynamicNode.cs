@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Threading;
 using System.Web;
+using Umbraco.Core;
+using Umbraco.Core.Dynamics;
+using Umbraco.Core.Logging;
 using umbraco.interfaces;
 using System.Collections;
 using System.Reflection;
@@ -24,8 +28,14 @@ using Examine.LuceneEngine.SearchCriteria;
 
 namespace umbraco.MacroEngines
 {
-    public class DynamicNode : DynamicObject
+    public class DynamicNode : DynamicObject, INode
     {
+		/// <summary>
+		/// This callback is used only so we can set it dynamically for use in unit tests
+		/// </summary>
+		internal static Func<string, string, Guid> GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
+			ContentType.GetDataType(docTypeAlias, propertyAlias);
+
         #region consts
         // these are private readonlys as const can't be Guids
         private readonly Guid DATATYPE_YESNO_GUID = new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a");
@@ -271,7 +281,7 @@ namespace umbraco.MacroEngines
                 s = searchProvider;
             
             var results = s.Search(criteria);
-            return ExamineSearchUtill.convertSearchResultToDynamicNode(results);
+            return ExamineSearchUtill.ConvertSearchResultToDynamicNode(results);
         }
 
 
@@ -309,7 +319,6 @@ namespace umbraco.MacroEngines
                 result = typeof(DynamicNode).InvokeMember(binder.Name,
                                                   System.Reflection.BindingFlags.Instance |
                                                   System.Reflection.BindingFlags.Public |
-                                                  System.Reflection.BindingFlags.NonPublic |
                                                   System.Reflection.BindingFlags.GetProperty,
                                                   null,
                                                   this,
@@ -324,7 +333,6 @@ namespace umbraco.MacroEngines
                     result = typeof(DynamicNode).InvokeMember(binder.Name,
                                                   System.Reflection.BindingFlags.Instance |
                                                   System.Reflection.BindingFlags.Public |
-                                                  System.Reflection.BindingFlags.NonPublic |
                                                   System.Reflection.BindingFlags.Static |
                                                   System.Reflection.BindingFlags.InvokeMethod,
                                                   null,
@@ -409,6 +417,12 @@ namespace umbraco.MacroEngines
                     CMSNode working = ContentType.GetByAlias(node.NodeTypeAlias);
                     while (working != null)
                     {
+						//NOTE: I'm not sure if anyone has ever tested this but if you get working.Parent it will return a CMSNode and
+						// it will never be castable to a 'ContentType' object
+						// pretty sure the only reason why this method works for the one place that it is used is that it returns
+						// the current node's alias which is all that is actually requried, this is just added overhead for no 
+						// reason
+
                         if ((working as ContentType) != null)
                         {
                             list.Add((working as ContentType).Alias);
@@ -430,7 +444,76 @@ namespace umbraco.MacroEngines
             }
             return list;
         }
-        static Dictionary<System.Tuple<Guid, int>, Type> RazorDataTypeModelTypes = null;
+
+    	private static Dictionary<System.Tuple<Guid, int>, Type> _razorDataTypeModelTypes = null;
+    	private static readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
+
+    	internal static Dictionary<System.Tuple<Guid, int>, Type> RazorDataTypeModelTypes
+    	{
+    		get
+    		{
+    			using (var l = new UpgradeableReadLock(_locker))
+    			{
+    				if (_razorDataTypeModelTypes == null)
+    				{
+    					l.UpgradeToWriteLock();
+
+    					var foundTypes = new Dictionary<System.Tuple<Guid, int>, Type>();
+
+						try
+						{
+							PluginManager.Current.ResolveRazorDataTypeModels()
+								.ToList()
+								.ConvertAll(type =>
+								{
+									var razorDataTypeModelAttributes = type.GetCustomAttributes<RazorDataTypeModel>(true);
+									return razorDataTypeModelAttributes.ToList().ConvertAll(razorDataTypeModelAttribute =>
+									{
+										var g = razorDataTypeModelAttribute.DataTypeEditorId;
+										var priority = razorDataTypeModelAttribute.Priority;
+										return new KeyValuePair<System.Tuple<Guid, int>, Type>(new System.Tuple<Guid, int>(g, priority), type);
+									});
+								})
+								.SelectMany(item => item)
+								.ToList()
+								.ForEach(item =>
+								{
+									System.Tuple<Guid, int> key = item.Key;
+									if (!foundTypes.ContainsKey(key))
+									{
+										foundTypes.Add(key, item.Value);
+									}
+								});
+
+							//NOTE: We really dont need to log this?
+							//var i = 1;
+							//foreach (var item in foundTypes)
+							//{
+							//    HttpContext.Current.Trace.Write(string.Format("{0}/{1}: {2}@{4} => {3}", i, foundTypes.Count, item.Key.Item1, item.Value.FullName, item.Key.Item2));
+							//    i++;
+							//}
+
+							//there is no error, so set the collection
+							_razorDataTypeModelTypes = foundTypes;
+
+						}
+						catch (Exception ex)
+						{
+							LogHelper.Warn<DynamicNode>("Exception occurred while populating cache, will keep RazorDataTypeModelTypes to null so that this error remains visible and you don't end up with an empty cache with silent failure."
+								+ string.Format("The exception was {0} and the message was {1}. {2}", ex.GetType().FullName, ex.Message, ex.StackTrace));							
+						}
+
+    				}
+					return _razorDataTypeModelTypes;
+    			}
+    		}
+    	}
+
+		private static Guid GetDataType(string docTypeAlias, string propertyAlias)
+		{
+			return GetDataTypeCallback(docTypeAlias, propertyAlias);
+		}
+
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
 
@@ -470,63 +553,16 @@ namespace umbraco.MacroEngines
                     }
 
                     //contextAlias is the node which the property data was returned from
-                    Guid dataType = ContentType.GetDataType(data.ContextAlias, data.Alias);
-                    HttpContext.Current.Trace.Write(string.Format("RazorDynamicNode got datatype {0} for {1} on {2}", dataType, data.Alias, data.ContextAlias));
-                    if (RazorDataTypeModelTypes == null)
-                    {
-                        HttpContext.Current.Trace.Write("RazorDataTypeModelTypes cache is empty, populating cache using TypeFinder...");
-                        try
-                        {
-                            RazorDataTypeModelTypes = new Dictionary<System.Tuple<Guid, int>, Type>();
-
-                            TypeFinder.FindClassesMarkedWithAttribute(typeof(RazorDataTypeModel))
-                            .ToList()
-                            .FindAll(type => typeof(IRazorDataTypeModel).IsAssignableFrom(type))
-                            .ConvertAll(type =>
-                            {
-                                IEnumerable<RazorDataTypeModel> RazorDataTypeModelAttributes = Attribute.GetCustomAttributes(type, typeof(RazorDataTypeModel)).Cast<RazorDataTypeModel>();
-                                return RazorDataTypeModelAttributes.ToList().ConvertAll(RazorDataTypeModelAttribute =>
-                                {
-                                    Guid g = RazorDataTypeModelAttribute.DataTypeEditorId;
-                                    int priority = RazorDataTypeModelAttribute.Priority;
-                                    return new KeyValuePair<System.Tuple<Guid, int>, Type>(new System.Tuple<Guid, int>(g, priority), type);
-                                });
-                            })
-                            .SelectMany(item => item)
-                            .ToList()
-                            .ForEach(item =>
-                            {
-                                System.Tuple<Guid, int> key = item.Key;
-                                if (!RazorDataTypeModelTypes.ContainsKey(key))
-                                {
-                                    RazorDataTypeModelTypes.Add(key, item.Value);
-                                }
-                            });
-                            HttpContext.Current.Trace.Write(string.Format("{0} items added to cache...", RazorDataTypeModelTypes.Count));
-                            int i = 1;
-                            foreach (KeyValuePair<System.Tuple<Guid, int>, Type> item in RazorDataTypeModelTypes)
-                            {
-                                HttpContext.Current.Trace.Write(string.Format("{0}/{1}: {2}@{4} => {3}", i, RazorDataTypeModelTypes.Count, item.Key.Item1, item.Value.FullName, item.Key.Item2));
-                                i++;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            HttpContext.Current.Trace.Warn("Exception occurred while populating cache, Will set RazorDataTypeModelTypes to null so that this error remains visible and you don't end up with an empty cache with silent failure.");
-                            HttpContext.Current.Trace.Warn(string.Format("The exception was {0} and the message was {1}. {2}", ex.GetType().FullName, ex.Message, ex.StackTrace));
-                            RazorDataTypeModelTypes = null;
-                        }
-                    }
-                    HttpContext.Current.Trace.Write(string.Format("Checking for a RazorDataTypeModel for data type guid {0}...", dataType));
-                    HttpContext.Current.Trace.Write("Checking the RazorDataTypeModelTypes static mappings to see if there is a static mapping...");
-
-                    RazorDataTypeModelStaticMappingItem staticMapping = UmbracoSettings.RazorDataTypeModelStaticMapping.FirstOrDefault(mapping =>
+                    //Guid dataType = ContentType.GetDataType(data.ContextAlias, data.Alias);					
+                	var dataType = GetDataType(data.ContextAlias, data.Alias);
+                    
+                    var staticMapping = UmbracoSettings.RazorDataTypeModelStaticMapping.FirstOrDefault(mapping =>
                     {
                         return mapping.Applies(dataType, data.ContextAlias, data.Alias);
                     });
                     if (staticMapping != null)
                     {
-                        HttpContext.Current.Trace.Write(string.Format("Found a staticMapping defined {0}, instantiating type and attempting to apply model...", staticMapping.Raw));
+
                         Type dataTypeType = Type.GetType(staticMapping.TypeName);
                         if (dataTypeType != null)
                         {
@@ -538,22 +574,16 @@ namespace umbraco.MacroEngines
                             }
                             else
                             {
-                                HttpContext.Current.Trace.Write("Failed");
-                                HttpContext.Current.Trace.Warn(string.Format("Failed to create the instance of the model binder"));
+								LogHelper.Warn<DynamicNode>(string.Format("Failed to create the instance of the model binder"));                            
                             }
                         }
                         else
                         {
-                            HttpContext.Current.Trace.Warn(string.Format("staticMapping type name {0} came back as null from Type.GetType; check the casing, assembly presence, assembly framework version, namespace", staticMapping.TypeName));
+							LogHelper.Warn<DynamicNode>(string.Format("staticMapping type name {0} came back as null from Type.GetType; check the casing, assembly presence, assembly framework version, namespace", staticMapping.TypeName));                            
                         }
                     }
-                    else
-                    {
-                        HttpContext.Current.Trace.Write(string.Format("There isn't a staticMapping defined so checking the RazorDataTypeModelTypes cache..."));
-                    }
-
-
-                    if (RazorDataTypeModelTypes != null && RazorDataTypeModelTypes.Where(model => model.Key.Item1 == dataType).Any() && dataType != Guid.Empty)
+                    
+                    if (RazorDataTypeModelTypes != null && RazorDataTypeModelTypes.Any(model => model.Key.Item1 == dataType) && dataType != Guid.Empty)
                     {
                         var razorDataTypeModelDefinition = RazorDataTypeModelTypes.Where(model => model.Key.Item1 == dataType).OrderByDescending(model => model.Key.Item2).FirstOrDefault();
                         if (!(razorDataTypeModelDefinition.Equals(default(KeyValuePair<System.Tuple<Guid, int>, Type>))))
@@ -567,26 +597,25 @@ namespace umbraco.MacroEngines
                             }
                             else
                             {
-                                HttpContext.Current.Trace.Write("Failed");
-                                HttpContext.Current.Trace.Warn(string.Format("Failed to create the instance of the model binder"));
+								LogHelper.Warn<DynamicNode>(string.Format("Failed to create the instance of the model binder"));
                             }
                         }
                         else
                         {
-                            HttpContext.Current.Trace.Write("Failed");
-                            HttpContext.Current.Trace.Warn(string.Format("Could not get the dataTypeType for the RazorDataTypeModel"));
+							LogHelper.Warn<DynamicNode>(string.Format("Could not get the dataTypeType for the RazorDataTypeModel"));                            
                         }
                     }
                     else
                     {
-                        if (RazorDataTypeModelTypes == null)
-                        {
-                            HttpContext.Current.Trace.Write(string.Format("RazorDataTypeModelTypes is null, probably an exception while building the cache, falling back to ConvertPropertyValueByDataType", dataType));
-                        }
-                        else
-                        {
-                            HttpContext.Current.Trace.Write(string.Format("GUID {0} does not have a DataTypeModel, falling back to ConvertPropertyValueByDataType", dataType));
-                        }
+						//NOTE: Do we really want to log this? I'm not sure.
+						//if (RazorDataTypeModelTypes == null)
+						//{
+						//    HttpContext.Current.Trace.Write(string.Format("RazorDataTypeModelTypes is null, probably an exception while building the cache, falling back to ConvertPropertyValueByDataType", dataType));
+						//}
+						//else
+						//{
+						//    HttpContext.Current.Trace.Write(string.Format("GUID {0} does not have a DataTypeModel, falling back to ConvertPropertyValueByDataType", dataType));
+						//}
 
                     }
 
@@ -622,8 +651,7 @@ namespace umbraco.MacroEngines
                     result = n.GetType().InvokeMember(binder.Name,
                                                       System.Reflection.BindingFlags.GetProperty |
                                                       System.Reflection.BindingFlags.Instance |
-                                                      System.Reflection.BindingFlags.Public |
-                                                      System.Reflection.BindingFlags.NonPublic,
+                                                      System.Reflection.BindingFlags.Public,
                                                       null,
                                                       n,
                                                       null);
@@ -653,43 +681,30 @@ namespace umbraco.MacroEngines
         }
         private bool TryCreateInstanceRazorDataTypeModel(Guid dataType, Type dataTypeType, string value, out object result)
         {
-            HttpContext.Current.Trace.Write(string.Format("Found dataType {0} for GUID {1}", dataTypeType.FullName, dataType));
             IRazorDataTypeModel razorDataTypeModel = Activator.CreateInstance(dataTypeType, false) as IRazorDataTypeModel;
-            HttpContext.Current.Trace.Write(string.Format("Instantiating {0}...", dataTypeType.FullName));
             if (razorDataTypeModel != null)
             {
-                HttpContext.Current.Trace.Write("Success");
                 object instance = null;
-                HttpContext.Current.Trace.Write("Calling Init on razorDataTypeModel");
                 if (razorDataTypeModel.Init(n.Id, value, out instance))
                 {
-                    if (instance != null)
+                    if (instance == null)
                     {
-                        HttpContext.Current.Trace.Write(string.Format("razorDataTypeModel successfully instantiated and returned a valid instance of type {0}", instance.GetType().FullName));
+						LogHelper.Warn<DynamicNode>("razorDataTypeModel successfully instantiated but returned null for instance");
                     }
-                    else
-                    {
-                        HttpContext.Current.Trace.Warn("razorDataTypeModel successfully instantiated but returned null for instance");
-                    }
-                    result = instance;
+                	result = instance;
                     return true;
                 }
                 else
                 {
-                    if (instance != null)
+                    if (instance == null)
                     {
-                        HttpContext.Current.Trace.Write(string.Format("razorDataTypeModel returned false but returned a valid instance of type {0}", instance.GetType().FullName));
-                    }
-                    else
-                    {
-                        HttpContext.Current.Trace.Warn("razorDataTypeModel successfully instantiated but returned null for instance");
+						LogHelper.Warn<DynamicNode>("razorDataTypeModel successfully instantiated but returned null for instance");
                     }
                 }
             }
             else
             {
-                HttpContext.Current.Trace.Write("Failed");
-                HttpContext.Current.Trace.Warn(string.Format("DataTypeModel {0} failed to instantiate, perhaps it is lacking a parameterless constructor or doesn't implement IRazorDataTypeModel?", dataTypeType.FullName));
+				LogHelper.Warn<DynamicNode>(string.Format("DataTypeModel {0} failed to instantiate, perhaps it is lacking a parameterless constructor or doesn't implement IRazorDataTypeModel?", dataTypeType.FullName));
             }
             result = null;
             return false;
@@ -1310,10 +1325,19 @@ namespace umbraco.MacroEngines
             get { if (n == null) return null; return n.PropertiesAsList; }
         }
 
-        public List<DynamicBackingItem> ChildrenAsList
+        public DynamicNodeList ChildrenAsList
         {
-            get { if (n == null) return null; return n.ChildrenAsList; }
+            get
+            {
+            	return GetChildrenAsList;
+            	//if (n == null) return null; return n.ChildrenAsList;
+            }
         }
+
+	    public DynamicNodeList Children
+	    {
+		    get { return ChildrenAsList; }
+	    }
 
         public IProperty GetProperty(string alias)
         {
@@ -1413,7 +1437,7 @@ namespace umbraco.MacroEngines
         {
             if (this.ownerList == null && this.Parent != null)
             {
-                var list = this.Parent.ChildrenAsList.ConvertAll(n => new DynamicNode(n));
+                var list = this.Parent.ChildrenAsList.Select(n => new DynamicNode(n));
                 this.ownerList = new DynamicNodeList(list);
             }
             if (this.ownerList != null)
@@ -1754,5 +1778,129 @@ namespace umbraco.MacroEngines
             }
             return false;
         }
-    }
+
+		#region Explicit INode implementation
+		INode INode.Parent
+		{
+			get { return Parent; }
+		}
+
+		int INode.Id
+		{
+			get { return Id; }
+		}
+
+		int INode.template
+		{
+			get { return template; }
+		}
+
+		int INode.SortOrder
+		{
+			get { return SortOrder; }
+		}
+
+		string INode.Name
+		{
+			get { return Name; }
+		}
+
+		string INode.Url
+		{
+			get { return Url; }
+		}
+
+		string INode.UrlName
+		{
+			get { return UrlName; }
+		}
+
+		string INode.NodeTypeAlias
+		{
+			get { return NodeTypeAlias; }
+		}
+
+		string INode.WriterName
+		{
+			get { return WriterName; }
+		}
+
+		string INode.CreatorName
+		{
+			get { return CreatorName; }
+		}
+
+		int INode.WriterID
+		{
+			get { return WriterID; }
+		}
+
+		int INode.CreatorID
+		{
+			get { return CreatorID; }
+		}
+
+		string INode.Path
+		{
+			get { return Path; }
+		}
+
+		DateTime INode.CreateDate
+		{
+			get { return CreateDate; }
+		}
+
+		DateTime INode.UpdateDate
+		{
+			get { return UpdateDate; }
+		}
+
+		Guid INode.Version
+		{
+			get { return Version; }
+		}
+
+		string INode.NiceUrl
+		{
+			get { return NiceUrl; }
+		}
+
+		int INode.Level
+		{
+			get { return Level; }
+		}
+
+		List<IProperty> INode.PropertiesAsList
+		{
+			get { return PropertiesAsList; }
+		}
+
+		List<INode> INode.ChildrenAsList
+		{
+			get { return new List<INode>(ChildrenAsList.Select(x => x).ToList()); }
+		}
+
+		IProperty INode.GetProperty(string Alias)
+		{
+			return GetProperty(Alias);
+		}
+
+		IProperty INode.GetProperty(string Alias, out bool propertyExists)
+		{
+			var p = GetProperty(Alias, false);
+			propertyExists = p != null;
+			return p;
+		}
+
+		System.Data.DataTable INode.ChildrenAsTable()
+		{
+			return ChildrenAsTable();
+		}
+
+		System.Data.DataTable INode.ChildrenAsTable(string nodeTypeAliasFilter)
+		{
+			return ChildrenAsTable(nodeTypeAliasFilter);
+		} 
+		#endregion
+	}
 }

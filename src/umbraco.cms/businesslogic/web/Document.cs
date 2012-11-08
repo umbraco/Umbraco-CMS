@@ -185,7 +185,7 @@ namespace umbraco.cms.businesslogic.web
                 select count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, 
 	                cmsDocument.documentUser, coalesce(cmsDocument.templateId, cmsDocumentType.templateNodeId) as templateId, 
 	                umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as isPublished, umbracoNode.createDate, 
-	                cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, 
+                    cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsDocument.releaseDate, cmsDocument.expireDate, cmsContentType.icon, cmsContentType.alias,
 	                cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId,
                     umbracoNode.nodeUser
                 from umbracoNode
@@ -202,7 +202,7 @@ namespace umbraco.cms.businesslogic.web
 	                cmsDocument.templateId, cmsDocumentType.templateNodeId, umbracoNode.path, umbracoNode.sortOrder, 
 	                coalesce(publishCheck.published,0), umbracoNode.createDate, cmsDocument.text, 
 	                cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, 
-	                cmsContentType.masterContentType, cmsContentType.nodeId, cmsDocument.updateDate, cmsContentVersion.versionDate, umbracoNode.nodeUser
+                    cmsContentType.masterContentType, cmsContentType.nodeId, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsDocument.releaseDate, cmsDocument.expireDate, umbracoNode.nodeUser
                 order by {1}
                 ";
 
@@ -999,7 +999,7 @@ namespace umbraco.cms.businesslogic.web
                 string tempVersion = Version.ToString();
                 DateTime versionDate = DateTime.Now;
                 Guid newVersion = createNewVersion(versionDate);
-
+                
                 Log.Add(LogTypes.Publish, u, Id, "");
 
                 //PPH make sure that there is only 1 newest node, this is important in regard to schedueled publishing...
@@ -1069,7 +1069,7 @@ namespace umbraco.cms.businesslogic.web
             {
                 DateTime versionDate = DateTime.Now;
                 Guid newVersion = createNewVersion(versionDate);
-
+ 
                 if (_template != 0)
                 {
                     SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, updateDate, Text, TemplateId) values (" +
@@ -1288,7 +1288,7 @@ namespace umbraco.cms.businesslogic.web
         /// <param name="RelateToOrignal"></param>
         public Document Copy(int CopyTo, User u, bool RelateToOrignal)
         {
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
             CopyEventArgs e = new CopyEventArgs();
             e.CopyTo = CopyTo;
@@ -1706,6 +1706,11 @@ namespace umbraco.cms.businesslogic.web
                 , masterContentType
                 , dr.GetInt("contentTypeId")
                 , dr.GetInt("templateId"));
+
+            if (!dr.IsNull("releaseDate"))
+                _release = dr.GetDateTime("releaseDate");
+            if (!dr.IsNull("expireDate"))
+                _expire = dr.GetDateTime("expireDate");
         }
 
         protected void SaveXmlPreview(XmlDocument xd)

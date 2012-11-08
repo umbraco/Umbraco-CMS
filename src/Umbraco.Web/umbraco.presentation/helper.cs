@@ -36,18 +36,16 @@ namespace umbraco
             return String.Empty;
         }
 
+		[Obsolete("Has been superceded by Umbraco.Core.XmlHelper.GetAttributesFromElement")]
         public static Hashtable ReturnAttributes(String tag)
-        {
-            Hashtable ht = new Hashtable();
-            MatchCollection m =
-                Regex.Matches(tag, "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"",
-                              RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-            // fix for issue 14862: return lowercase attributes for case insensitive matching
-            foreach (Match attributeSet in m)
-                ht.Add(attributeSet.Groups["attributeName"].Value.ToString().ToLower(), attributeSet.Groups["attributeValue"].Value.ToString());
-
-            return ht;
-        }
+		{
+			var h = new Hashtable();
+            foreach(var i in Umbraco.Core.XmlHelper.GetAttributesFromElement(tag))
+            {
+            	h.Add(i.Key, i.Value);
+            }
+			return h;
+		}
 
         public static String FindAttribute(IDictionary attributes, String key)
         {

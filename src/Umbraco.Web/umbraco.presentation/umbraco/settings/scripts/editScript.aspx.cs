@@ -10,6 +10,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.IO;
+using Umbraco.Core;
 using umbraco.cms.presentation.Trees;
 using umbraco.IO;
 using System.Linq;
@@ -42,25 +43,36 @@ namespace umbraco.cms.presentation.settings.scripts
 
             NameTxt.Text = file;
 
-
-
             string path = "";
             if (file.StartsWith("~/"))
-                path = IOHelper.ResolveUrl(file);
+				path = Umbraco.Core.IO.IOHelper.ResolveUrl(file);
             else
-                path = IOHelper.ResolveUrl(SystemDirectories.Scripts + "/" + file);
+				path = Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Scripts + "/" + file);
 
 
             lttPath.Text = "<a target='_blank' href='" + path + "'>" + path + "</a>";
 
+            var exts = UmbracoSettings.ScriptFileTypes.Split(',').ToList();
+            if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
+            {
+                exts.Add("cshtml");
+                exts.Add("vbhtml");
+            }
+
+            var dirs = Umbraco.Core.IO.SystemDirectories.Scripts;
+			if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
+                dirs += "," + Umbraco.Core.IO.SystemDirectories.MvcViews;
+
             // validate file
-            IOHelper.ValidateEditPath(IOHelper.MapPath(path), SystemDirectories.Scripts);
+			Umbraco.Core.IO.IOHelper.ValidateEditPath(Umbraco.Core.IO.IOHelper.MapPath(path), dirs.Split(','));
+            
             // validate extension
-            IOHelper.ValidateFileExtension(IOHelper.MapPath(path), UmbracoSettings.ScriptFileTypes.Split(',').ToList());
+			Umbraco.Core.IO.IOHelper.ValidateFileExtension(Umbraco.Core.IO.IOHelper.MapPath(path), exts);
+
 
             StreamReader SR;
             string S;
-            SR = File.OpenText(IOHelper.MapPath(path));
+			SR = File.OpenText(Umbraco.Core.IO.IOHelper.MapPath(path));
             S = SR.ReadToEnd();
             SR.Close();
 

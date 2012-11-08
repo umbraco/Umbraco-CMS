@@ -29,6 +29,14 @@ namespace umbraco.cms.businesslogic.web
             get { return Application.SqlHelper; }
         }
 
+		/// <summary>
+		/// Empty ctor used for unit tests to create a custom domain
+		/// </summary>
+		internal Domain()
+		{
+			
+		}
+
 		public Domain(int Id)
         {
             initDomain(Id);

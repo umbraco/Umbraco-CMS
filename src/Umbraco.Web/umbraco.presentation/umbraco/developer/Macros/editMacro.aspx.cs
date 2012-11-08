@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Data;
 using System.Web;
@@ -17,354 +17,604 @@ using umbraco.IO;
 
 namespace umbraco.cms.presentation.developer
 {
-    /// <summary>
-    /// Summary description for editMacro.
-    /// </summary>
-    public partial class editMacro : UmbracoEnsuredPage
-    {
-        public editMacro()
-        {
-            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+	/// <summary>
+	/// Summary description for editMacro.
+	/// </summary>
+	public partial class editMacro : UmbracoEnsuredPage
+	{
+		public editMacro()
+		{
+			CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
 
-        }
+		}
 
-        protected PlaceHolder buttons;
-        protected Table macroElements;
-        protected Macro m_macro;
+		protected PlaceHolder buttons;
+		protected Table macroElements;
+		protected Macro m_macro;
 
-        public TabPage InfoTabPage;
-        public TabPage Parameters;
+		public TabPage InfoTabPage;
+		public TabPage Parameters;
 
-        protected void Page_Load(object sender, EventArgs e)
-        {
-            m_macro = new Macro(Convert.ToInt32(Request.QueryString["macroID"]));
+		protected void Page_Load(object sender, EventArgs e)
+		{
+			m_macro = new Macro(Convert.ToInt32(Request.QueryString["macroID"]));
 
-            if (!IsPostBack)
-            {
+			if (!IsPostBack)
+			{
 
-                ClientTools
-                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadMacros>().Tree.Alias)
-                    .SyncTree("-1,init," + m_macro.Id.ToString(), false);
+				ClientTools
+					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadMacros>().Tree.Alias)
+					.SyncTree("-1,init," + m_macro.Id.ToString(), false);
 
-                macroName.Text = m_macro.Name;
-                macroAlias.Text = m_macro.Alias;
-                string tempMacroAssembly = m_macro.Assembly == null ? "" : m_macro.Assembly;
-                string tempMacroType = m_macro.Type == null ? "" : m_macro.Type;
-                macroXslt.Text = m_macro.Xslt;
-                macroPython.Text = m_macro.ScriptingFile;
-                cachePeriod.Text = m_macro.RefreshRate.ToString();
+				macroName.Text = m_macro.Name;
+				macroAlias.Text = m_macro.Alias;
+				string tempMacroAssembly = m_macro.Assembly == null ? "" : m_macro.Assembly;
+				string tempMacroType = m_macro.Type == null ? "" : m_macro.Type;
+				macroXslt.Text = m_macro.Xslt;
+				macroPython.Text = m_macro.ScriptingFile;
+				cachePeriod.Text = m_macro.RefreshRate.ToString();
 
-                macroRenderContent.Checked = m_macro.RenderContent;
-                macroEditor.Checked = m_macro.UseInEditor;
-                cacheByPage.Checked = m_macro.CacheByPage;
-                cachePersonalized.Checked = m_macro.CachePersonalized;
+				macroRenderContent.Checked = m_macro.RenderContent;
+				macroEditor.Checked = m_macro.UseInEditor;
+				cacheByPage.Checked = m_macro.CacheByPage;
+				cachePersonalized.Checked = m_macro.CachePersonalized;
 
-                // Populate either user control or custom control
-                if (tempMacroType != string.Empty && tempMacroAssembly != string.Empty)
-                {
-                    macroAssembly.Text = tempMacroAssembly;
-                    macroType.Text = tempMacroType;
-                }
-                else
-                {
-                    macroUserControl.Text = tempMacroType;
-                }
+				// Populate either user control or custom control
+				if (tempMacroType != string.Empty && tempMacroAssembly != string.Empty)
+				{
+					macroAssembly.Text = tempMacroAssembly;
+					macroType.Text = tempMacroType;
+				}
+				else
+				{
+					macroUserControl.Text = tempMacroType;
+				}
 
-                // Check for assemblyBrowser
-                if (tempMacroType.IndexOf(".ascx") > 0)
-                    assemblyBrowserUserControl.Controls.Add(
-                        new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('" + umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/developer/macros/assemblyBrowser.aspx?fileName=" + macroUserControl.Text +
-                                           "&macroID=" + m_macro.Id.ToString() +
-                                           "', 'Browse Properties', true, 475,500); return false;\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
-                else if (tempMacroType != string.Empty && tempMacroAssembly != string.Empty)
-                    assemblyBrowser.Controls.Add(
-                        new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('" + umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/developer/macros/assemblyBrowser.aspx?fileName=" + macroAssembly.Text +
-                                           "&macroID=" + m_macro.Id.ToString() + "&type=" + macroType.Text +
-                                           "', 'Browse Properties', true, 475,500); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
+				// Check for assemblyBrowser
+				if (tempMacroType.IndexOf(".ascx") > 0)
+					assemblyBrowserUserControl.Controls.Add(
+						new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('" + umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/developer/macros/assemblyBrowser.aspx?fileName=" + macroUserControl.Text +
+										   "&macroID=" + m_macro.Id.ToString() +
+										   "', 'Browse Properties', true, 475,500); return false;\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
+				else if (tempMacroType != string.Empty && tempMacroAssembly != string.Empty)
+					assemblyBrowser.Controls.Add(
+						new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('" + umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/developer/macros/assemblyBrowser.aspx?fileName=" + macroAssembly.Text +
+										   "&macroID=" + m_macro.Id.ToString() + "&type=" + macroType.Text +
+										   "', 'Browse Properties', true, 475,500); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
 
-                // Load elements from macro
-                macroPropertyBind();
+				// Load elements from macro
+				macroPropertyBind();
 
-                // Load xslt files from default dir
-                populateXsltFiles();
+				// Load xslt files from default dir
+				populateXsltFiles();
 
-                // Load python files from default dir
-                populatePythonFiles();
+				// Load python files from default dir
+				populatePythonFiles();
 
-                // Load usercontrols
-                populateUserControls(IOHelper.MapPath(SystemDirectories.Usercontrols));
-                userControlList.Items.Insert(0, new ListItem("Browse usercontrols on server...", string.Empty));
-                userControlList.Attributes.Add("onChange",
-                    "document.getElementById('" + macroUserControl.ClientID + "').value = this[this.selectedIndex].value;");
-
-
-            }
-            else
-            {
-                int macroID = Convert.ToInt32(Request.QueryString["macroID"]);
-                string tempMacroAssembly = macroAssembly.Text;
-                string tempMacroType = macroType.Text;
-                string tempCachePeriod = cachePeriod.Text;
-
-                if (tempCachePeriod == string.Empty)
-                    tempCachePeriod = "0";
-
-                if (tempMacroAssembly == string.Empty && macroUserControl.Text != string.Empty)
-                    tempMacroType = macroUserControl.Text;
-
-                // Save macro
-                m_macro.UseInEditor = macroEditor.Checked;
-                m_macro.RenderContent = macroRenderContent.Checked;
-                m_macro.CacheByPage = cacheByPage.Checked;
-                m_macro.CachePersonalized = cachePersonalized.Checked;
-                m_macro.RefreshRate = Convert.ToInt32(tempCachePeriod);
-                m_macro.Alias = macroAlias.Text;
-                m_macro.Name = macroName.Text;
-                m_macro.Assembly = tempMacroAssembly;
-                m_macro.Type = tempMacroType;
-                m_macro.Xslt = macroXslt.Text;
-                m_macro.ScriptingFile = macroPython.Text;
-                m_macro.Save();
-
-                // Save elements
-                foreach (RepeaterItem item in macroProperties.Items)
-                {
-                    HtmlInputHidden macroPropertyID = (HtmlInputHidden)item.FindControl("macroPropertyID");
-                    TextBox macroElementName = (TextBox)item.FindControl("macroPropertyName");
-                    TextBox macroElementAlias = (TextBox)item.FindControl("macroPropertyAlias");
-                    CheckBox macroElementShow = (CheckBox)item.FindControl("macroPropertyHidden");
-                    DropDownList macroElementType = (DropDownList)item.FindControl("macroPropertyType");
-
-                    MacroProperty mp = new MacroProperty(int.Parse(macroPropertyID.Value));
-                    mp.Public = macroElementShow.Checked;
-                    mp.Type = new MacroPropertyType(int.Parse(macroElementType.SelectedValue));
-                    mp.Alias = macroElementAlias.Text;
-                    mp.Name = macroElementName.Text;
-                    mp.Save();
-
-                }
-                // Flush macro from cache!
-                if (UmbracoSettings.UseDistributedCalls)
-                    dispatcher.Refresh(
-                        new Guid("7B1E683C-5F34-43dd-803D-9699EA1E98CA"),
-                        macroID);
-                else
-                    macro.GetMacro(macroID).removeFromCache();
-
-                base.speechBubble(speechBubbleIcon.save, "Macro saved", "");
+				// Load usercontrols
+				populateUserControls(IOHelper.MapPath(SystemDirectories.Usercontrols));
+				userControlList.Items.Insert(0, new ListItem("Browse usercontrols on server...", string.Empty));
+				userControlList.Attributes.Add("onChange",
+					"document.getElementById('" + macroUserControl.ClientID + "').value = this[this.selectedIndex].value;");
 
 
-                // Check for assemblyBrowser
-                if (tempMacroType.IndexOf(".ascx") > 0)
-                    assemblyBrowserUserControl.Controls.Add(
-                        new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('developer/macros/assemblyBrowser.aspx?fileName=" + macroUserControl.Text +
-                            "&macroID=" + Request.QueryString["macroID"] +
-                                "', 'Browse Properties', true, 500, 475); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
-                else if (tempMacroType != string.Empty && tempMacroAssembly != string.Empty)
-                    assemblyBrowser.Controls.Add(
-                        new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('developer/macros/assemblyBrowser.aspx?fileName=" + macroAssembly.Text +
-                            "&macroID=" + Request.QueryString["macroID"] + "&type=" + macroType.Text +
-                                "', 'Browse Properties', true, 500, 475); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
-            }
-        }
+			}
+			else
+			{
+				int macroID = Convert.ToInt32(Request.QueryString["macroID"]);
+				string tempMacroAssembly = macroAssembly.Text;
+				string tempMacroType = macroType.Text;
+				string tempCachePeriod = cachePeriod.Text;
 
-        private void getXsltFilesFromDir(string orgPath, string path, ArrayList files)
-        {
-            DirectoryInfo dirInfo = new DirectoryInfo(path);
+				if (tempCachePeriod == string.Empty)
+					tempCachePeriod = "0";
 
-            // Populate subdirectories
-            DirectoryInfo[] dirInfos = dirInfo.GetDirectories();
-            foreach (DirectoryInfo dir in dirInfos)
-                getXsltFilesFromDir(orgPath, path + "/" + dir.Name, files);
+				if (tempMacroAssembly == string.Empty && macroUserControl.Text != string.Empty)
+					tempMacroType = macroUserControl.Text;
 
-            FileInfo[] fileInfo = dirInfo.GetFiles("*.xsl*");
+				// Save macro
+				m_macro.UseInEditor = macroEditor.Checked;
+				m_macro.RenderContent = macroRenderContent.Checked;
+				m_macro.CacheByPage = cacheByPage.Checked;
+				m_macro.CachePersonalized = cachePersonalized.Checked;
+				m_macro.RefreshRate = Convert.ToInt32(tempCachePeriod);
+				m_macro.Alias = macroAlias.Text;
+				m_macro.Name = macroName.Text;
+				m_macro.Assembly = tempMacroAssembly;
+				m_macro.Type = tempMacroType;
+				m_macro.Xslt = macroXslt.Text;
+				m_macro.ScriptingFile = macroPython.Text;
+				m_macro.Save();
 
-            foreach (FileInfo file in fileInfo)
-                files.Add((path.Replace(orgPath, string.Empty).Trim('/') + "/" + file.Name).Trim('/'));
-        }
+				// Save elements
+				foreach (RepeaterItem item in macroProperties.Items)
+				{
+					HtmlInputHidden macroPropertyID = (HtmlInputHidden)item.FindControl("macroPropertyID");
+					TextBox macroElementName = (TextBox)item.FindControl("macroPropertyName");
+					TextBox macroElementAlias = (TextBox)item.FindControl("macroPropertyAlias");
+					CheckBox macroElementShow = (CheckBox)item.FindControl("macroPropertyHidden");
+					DropDownList macroElementType = (DropDownList)item.FindControl("macroPropertyType");
 
-        private void populateXsltFiles()
-        {
-            ArrayList xslts = new ArrayList();
-            string xsltDir = IOHelper.MapPath(SystemDirectories.Xslt + "/");
-            getXsltFilesFromDir(xsltDir, xsltDir, xslts);
-            xsltFiles.DataSource = xslts;
-            xsltFiles.DataBind();
-            xsltFiles.Items.Insert(0, new ListItem("Browse xslt files on server...", string.Empty));
-            xsltFiles.Attributes.Add("onChange",
-                "document.getElementById('" + macroXslt.ClientID + "').value = this[this.selectedIndex].value; document.getElementById('" + macroPython.ClientID + "').value =''");
-        }
+					MacroProperty mp = new MacroProperty(int.Parse(macroPropertyID.Value));
+					mp.Type = new MacroPropertyType(int.Parse(macroElementType.SelectedValue));
+					mp.Alias = macroElementAlias.Text;
+					mp.Name = macroElementName.Text;
+					mp.Save();
 
-        private void getPythonFilesFromDir(string orgPath, string path, ArrayList files)
-        {
-            var dirInfo = new DirectoryInfo(path);
-            if (!dirInfo.Exists)
-                return;
+				}
+				// Flush macro from cache!
+				if (UmbracoSettings.UseDistributedCalls)
+					dispatcher.Refresh(
+						new Guid("7B1E683C-5F34-43dd-803D-9699EA1E98CA"),
+						macroID);
+				else
+					macro.GetMacro(macroID).removeFromCache();
 
-            FileInfo[] fileInfo = dirInfo.GetFiles("*.*");
-            foreach (FileInfo file in fileInfo)
-                files.Add(path.Replace(orgPath, string.Empty) + file.Name);
-
-            // Populate subdirectories
-            var dirInfos = dirInfo.GetDirectories();
-            foreach (var dir in dirInfos)
-                getPythonFilesFromDir(orgPath, path + "/" + dir.Name + "/", files);
-        }
-
-        private void populatePythonFiles()
-        {
-            ArrayList pythons = new ArrayList();
-            string pythonDir = IOHelper.MapPath(SystemDirectories.MacroScripts + "/");
-            getPythonFilesFromDir(pythonDir, pythonDir, pythons);
-            pythonFiles.DataSource = pythons;
-            pythonFiles.DataBind();
-            pythonFiles.Items.Insert(0, new ListItem("Browse scripting files on server...", string.Empty));
-            pythonFiles.Attributes.Add("onChange",
-                "document.getElementById('" + macroPython.ClientID + "').value = this[this.selectedIndex].value; document.getElementById('" + macroXslt.ClientID + "').value = ''");
-        }
-
-        public void deleteMacroProperty(object sender, EventArgs e)
-        {
-            HtmlInputHidden macroPropertyID = (HtmlInputHidden)((Control)sender).Parent.FindControl("macroPropertyID");
-            SqlHelper.ExecuteNonQuery("delete from cmsMacroProperty where id = @id", SqlHelper.CreateParameter("@id", macroPropertyID.Value));
-
-            macroPropertyBind();
-        }
-
-        public void macroPropertyBind()
-        {
-            macroProperties.DataSource = m_macro.Properties;
-            macroProperties.DataBind();
-        }
-
-        public object CheckNull(object test)
-        {
-            if (Convert.IsDBNull(test))
-                return 0;
-            else
-                return test;
-        }
-
-        public IRecordsReader GetMacroPropertyTypes()
-        {
-            // Load dataChildTypes	
-            return SqlHelper.ExecuteReader("select id, macroPropertyTypeAlias from cmsMacroPropertyType order by macroPropertyTypeAlias");
-        }
-
-        public void macroPropertyCreate(object sender, EventArgs e)
-        {
-            CheckBox macroPropertyHiddenNew = (CheckBox)((Control)sender).Parent.FindControl("macroPropertyHiddenNew");
-            TextBox macroPropertyAliasNew = (TextBox)((Control)sender).Parent.FindControl("macroPropertyAliasNew");
-            TextBox macroPropertyNameNew = (TextBox)((Control)sender).Parent.FindControl("macroPropertyNameNew");
-            DropDownList macroPropertyTypeNew = (DropDownList)((Control)sender).Parent.FindControl("macroPropertyTypeNew");
-            bool _goAhead = true;
-            if (macroPropertyAliasNew.Text !=
-                ui.Text("general", "new", this.getUser()) + " " + ui.Text("general", "alias", this.getUser()))
-            {
+				base.speechBubble(speechBubbleIcon.save, "Macro saved", "");
 
 
-                foreach (cms.businesslogic.macro.MacroProperty mp in m_macro.Properties)
-                {
-                    if (mp.Alias == macroPropertyAliasNew.Text)
-                    {
-                        _goAhead = false;
-                        break;
+				// Check for assemblyBrowser
+				if (tempMacroType.IndexOf(".ascx") > 0)
+					assemblyBrowserUserControl.Controls.Add(
+						new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('developer/macros/assemblyBrowser.aspx?fileName=" + macroUserControl.Text +
+							"&macroID=" + Request.QueryString["macroID"] +
+								"', 'Browse Properties', true, 500, 475); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
+				else if (tempMacroType != string.Empty && tempMacroAssembly != string.Empty)
+					assemblyBrowser.Controls.Add(
+						new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('developer/macros/assemblyBrowser.aspx?fileName=" + macroAssembly.Text +
+							"&macroID=" + Request.QueryString["macroID"] + "&type=" + macroType.Text +
+								"', 'Browse Properties', true, 500, 475); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
+			}
+		}
 
-                    }
-                }
+		private void getXsltFilesFromDir(string orgPath, string path, ArrayList files)
+		{
+			DirectoryInfo dirInfo = new DirectoryInfo(path);
 
-                if (_goAhead)
-                {
-                    MacroProperty mp = new MacroProperty();
-                    mp.Macro = m_macro;
-                    mp.Public = macroPropertyHiddenNew.Checked;
-                    mp.Type = new MacroPropertyType(int.Parse(macroPropertyTypeNew.SelectedValue));
-                    mp.Alias = macroPropertyAliasNew.Text;
-                    mp.Name = macroPropertyNameNew.Text;
-                    mp.Save();
+			// Populate subdirectories
+			DirectoryInfo[] dirInfos = dirInfo.GetDirectories();
+			foreach (DirectoryInfo dir in dirInfos)
+				getXsltFilesFromDir(orgPath, path + "/" + dir.Name, files);
 
-                    m_macro.RefreshProperties();
-                    macroPropertyBind();
-                }
-            }
-        }
+			FileInfo[] fileInfo = dirInfo.GetFiles("*.xsl*");
 
-        public bool macroIsVisible(object IsChecked)
-        {
-            if (Convert.ToBoolean(IsChecked))
-                return true;
-            else
-                return false;
-        }
+			foreach (FileInfo file in fileInfo)
+				files.Add((path.Replace(orgPath, string.Empty).Trim('/') + "/" + file.Name).Trim('/'));
+		}
 
-        public void AddChooseList(Object Sender, EventArgs e)
-        {
-            if (!IsPostBack)
-            {
-                DropDownList dropDown = (DropDownList)Sender;
-                dropDown.Items.Insert(0, new ListItem("Choose...", string.Empty));
-            }
-        }
+		private void populateXsltFiles()
+		{
+			ArrayList xslts = new ArrayList();
+			string xsltDir = IOHelper.MapPath(SystemDirectories.Xslt + "/");
+			getXsltFilesFromDir(xsltDir, xsltDir, xslts);
+			xsltFiles.DataSource = xslts;
+			xsltFiles.DataBind();
+			xsltFiles.Items.Insert(0, new ListItem("Browse xslt files on server...", string.Empty));
+			xsltFiles.Attributes.Add("onChange",
+				"document.getElementById('" + macroXslt.ClientID + "').value = this[this.selectedIndex].value; document.getElementById('" + macroPython.ClientID + "').value =''");
+		}
 
-        private void populateUserControls(string path)
-        {
-            DirectoryInfo di = new DirectoryInfo(path);
+		private void getPythonFilesFromDir(string orgPath, string path, ArrayList files)
+		{
+			var dirInfo = new DirectoryInfo(path);
+			if (!dirInfo.Exists)
+				return;
 
-            string rootDir = IOHelper.MapPath(SystemDirectories.Root);
+			FileInfo[] fileInfo = dirInfo.GetFiles("*.*");
+			foreach (FileInfo file in fileInfo)
+				files.Add(path.Replace(orgPath, string.Empty) + file.Name);
 
-            foreach (FileInfo uc in di.GetFiles("*.ascx"))
-            {
-                userControlList.Items.Add(
-                    new ListItem(
-                            uc.FullName.Substring(rootDir.Length).Replace(IOHelper.DirSepChar, '/')));
-                /*
-                                        uc.FullName.IndexOf(usercontrolsDir), 
-                                        uc.FullName.Length - uc.FullName.IndexOf(usercontrolsDir)).Replace(IOHelper.DirSepChar, '/')));
-                */
+			// Populate subdirectories
+			var dirInfos = dirInfo.GetDirectories();
+			foreach (var dir in dirInfos)
+				getPythonFilesFromDir(orgPath, path + "/" + dir.Name + "/", files);
+		}
 
-            }
-            foreach (DirectoryInfo dir in di.GetDirectories())
-                populateUserControls(dir.FullName);
-        }
+		private void populatePythonFiles()
+		{
+			ArrayList pythons = new ArrayList();
+			string pythonDir = IOHelper.MapPath(SystemDirectories.MacroScripts + "/");
+			getPythonFilesFromDir(pythonDir, pythonDir, pythons);
+			pythonFiles.DataSource = pythons;
+			pythonFiles.DataBind();
+			pythonFiles.Items.Insert(0, new ListItem("Browse scripting files on server...", string.Empty));
+			pythonFiles.Attributes.Add("onChange",
+				"document.getElementById('" + macroPython.ClientID + "').value = this[this.selectedIndex].value; document.getElementById('" + macroXslt.ClientID + "').value = ''");
+		}
 
-        #region Web Form Designer generated code
+		public void deleteMacroProperty(object sender, EventArgs e)
+		{
+			HtmlInputHidden macroPropertyID = (HtmlInputHidden)((Control)sender).Parent.FindControl("macroPropertyID");
+			SqlHelper.ExecuteNonQuery("delete from cmsMacroProperty where id = @id", SqlHelper.CreateParameter("@id", macroPropertyID.Value));
 
-        protected override void OnInit(EventArgs e)
-        {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
+			macroPropertyBind();
+		}
 
-            // Tab setup
-            InfoTabPage = TabView1.NewTabPage("Macro Properties");
-            InfoTabPage.Controls.Add(Pane1);
-            InfoTabPage.Controls.Add(Pane1_2);
-            InfoTabPage.Controls.Add(Pane1_3);
-            InfoTabPage.Controls.Add(Pane1_4);
+		public void macroPropertyBind()
+		{
+			macroProperties.DataSource = m_macro.Properties;
+			macroProperties.DataBind();
+		}
 
-            Parameters = TabView1.NewTabPage("Parameters");
-            Parameters.Controls.Add(Panel2);
+		public object CheckNull(object test)
+		{
+			if (Convert.IsDBNull(test))
+				return 0;
+			else
+				return test;
+		}
 
-            ImageButton save = InfoTabPage.Menu.NewImageButton();
-            save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
-            save.ID = "save";
+		public IRecordsReader GetMacroPropertyTypes()
+		{
+			// Load dataChildTypes	
+			return SqlHelper.ExecuteReader("select id, macroPropertyTypeAlias from cmsMacroPropertyType order by macroPropertyTypeAlias");
+		}
 
-            ImageButton save2 = Parameters.Menu.NewImageButton();
-            save2.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
+		public void macroPropertyCreate(object sender, EventArgs e)
+		{
+			TextBox macroPropertyAliasNew = (TextBox)((Control)sender).Parent.FindControl("macroPropertyAliasNew");
+			TextBox macroPropertyNameNew = (TextBox)((Control)sender).Parent.FindControl("macroPropertyNameNew");
+			DropDownList macroPropertyTypeNew = (DropDownList)((Control)sender).Parent.FindControl("macroPropertyTypeNew");
+			bool _goAhead = true;
+			if (macroPropertyAliasNew.Text !=
+				ui.Text("general", "new", this.getUser()) + " " + ui.Text("general", "alias", this.getUser()))
+			{
 
-            base.OnInit(e);
-        }
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-        }
+				foreach (cms.businesslogic.macro.MacroProperty mp in m_macro.Properties)
+				{
+					if (mp.Alias == macroPropertyAliasNew.Text)
+					{
+						_goAhead = false;
+						break;
 
-        #endregion
-    }
+					}
+				}
+
+				if (_goAhead)
+				{
+					MacroProperty mp = new MacroProperty();
+					mp.Macro = m_macro;
+					mp.Public = true;
+					mp.Type = new MacroPropertyType(int.Parse(macroPropertyTypeNew.SelectedValue));
+					mp.Alias = macroPropertyAliasNew.Text;
+					mp.Name = macroPropertyNameNew.Text;
+					mp.Save();
+
+					m_macro.RefreshProperties();
+					macroPropertyBind();
+				}
+			}
+		}
+
+		public bool macroIsVisible(object IsChecked)
+		{
+			if (Convert.ToBoolean(IsChecked))
+				return true;
+			else
+				return false;
+		}
+
+		public void AddChooseList(Object Sender, EventArgs e)
+		{
+			if (!IsPostBack)
+			{
+				DropDownList dropDown = (DropDownList)Sender;
+				dropDown.Items.Insert(0, new ListItem("Choose...", string.Empty));
+			}
+		}
+
+		private void populateUserControls(string path)
+		{
+			DirectoryInfo di = new DirectoryInfo(path);
+
+			string rootDir = IOHelper.MapPath(SystemDirectories.Root);
+
+			foreach (FileInfo uc in di.GetFiles("*.ascx"))
+			{
+				userControlList.Items.Add(
+					new ListItem(
+							uc.FullName.Substring(rootDir.Length).Replace(IOHelper.DirSepChar, '/')));
+				/*
+										uc.FullName.IndexOf(usercontrolsDir), 
+										uc.FullName.Length - uc.FullName.IndexOf(usercontrolsDir)).Replace(IOHelper.DirSepChar, '/')));
+				*/
+
+			}
+			foreach (DirectoryInfo dir in di.GetDirectories())
+				populateUserControls(dir.FullName);
+		}
+
+		#region Web Form Designer generated code
+
+		protected override void OnInit(EventArgs e)
+		{
+			//
+			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
+			//
+			InitializeComponent();
+
+			// Tab setup
+			InfoTabPage = TabView1.NewTabPage("Macro Properties");
+			InfoTabPage.Controls.Add(Pane1);
+			InfoTabPage.Controls.Add(Pane1_2);
+			InfoTabPage.Controls.Add(Pane1_3);
+			InfoTabPage.Controls.Add(Pane1_4);
+
+			Parameters = TabView1.NewTabPage("Parameters");
+			Parameters.Controls.Add(Panel2);
+
+			ImageButton save = InfoTabPage.Menu.NewImageButton();
+			save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
+			save.ID = "save";
+
+			ImageButton save2 = Parameters.Menu.NewImageButton();
+			save2.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
+
+			base.OnInit(e);
+		}
+
+		/// <summary>
+		/// Required method for Designer support - do not modify
+		/// the contents of this method with the code editor.
+		/// </summary>
+		private void InitializeComponent()
+		{
+		}
+
+		#endregion
+
+		/// <summary>
+		/// TabView1 control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::umbraco.uicontrols.TabView TabView1;
+
+		/// <summary>
+		/// Pane1 control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::umbraco.uicontrols.Pane Pane1;
+
+		/// <summary>
+		/// macroPane control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.HtmlControls.HtmlTable macroPane;
+
+		/// <summary>
+		/// macroName control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.TextBox macroName;
+
+		/// <summary>
+		/// macroAlias control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.TextBox macroAlias;
+
+		/// <summary>
+		/// Pane1_2 control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::umbraco.uicontrols.Pane Pane1_2;
+
+		/// <summary>
+		/// Table2 control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.HtmlControls.HtmlTable Table2;
+
+		/// <summary>
+		/// macroXslt control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.TextBox macroXslt;
+
+		/// <summary>
+		/// xsltFiles control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.DropDownList xsltFiles;
+
+		/// <summary>
+		/// macroUserControl control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.TextBox macroUserControl;
+
+		/// <summary>
+		/// userControlList control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.DropDownList userControlList;
+
+		/// <summary>
+		/// assemblyBrowserUserControl control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.PlaceHolder assemblyBrowserUserControl;
+
+		/// <summary>
+		/// macroAssembly control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.TextBox macroAssembly;
+
+		/// <summary>
+		/// macroType control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.TextBox macroType;
+
+		/// <summary>
+		/// assemblyBrowser control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.PlaceHolder assemblyBrowser;
+
+		/// <summary>
+		/// macroPython control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.TextBox macroPython;
+
+		/// <summary>
+		/// pythonFiles control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.DropDownList pythonFiles;
+
+		/// <summary>
+		/// Pane1_3 control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::umbraco.uicontrols.Pane Pane1_3;
+
+		/// <summary>
+		/// Table1 control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.HtmlControls.HtmlTable Table1;
+
+		/// <summary>
+		/// macroEditor control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.CheckBox macroEditor;
+
+		/// <summary>
+		/// macroRenderContent control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.CheckBox macroRenderContent;
+
+		/// <summary>
+		/// Pane1_4 control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::umbraco.uicontrols.Pane Pane1_4;
+
+		/// <summary>
+		/// Table3 control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.HtmlControls.HtmlTable Table3;
+
+		/// <summary>
+		/// cachePeriod control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.TextBox cachePeriod;
+
+		/// <summary>
+		/// cacheByPage control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.CheckBox cacheByPage;
+
+		/// <summary>
+		/// cachePersonalized control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.CheckBox cachePersonalized;
+
+		/// <summary>
+		/// Panel2 control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::umbraco.uicontrols.Pane Panel2;
+
+		/// <summary>
+		/// macroProperties control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::System.Web.UI.WebControls.Repeater macroProperties;
+	}
 
 }

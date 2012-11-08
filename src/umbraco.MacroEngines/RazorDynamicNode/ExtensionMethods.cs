@@ -8,32 +8,15 @@ namespace umbraco.MacroEngines
 {
     public static class ExtensionMethods
     {
+		[Obsolete("This has been superceded by Umbraco.Core.Dynamics.ExtensionMethods.Map method")]
         public static IEnumerable<TSource> Map<TSource>(
             this IEnumerable<TSource> source,
             Func<TSource, bool> selectorFunction,
             Func<TSource, IEnumerable<TSource>> getChildrenFunction)
         {
-            if (source.Count() == 0)
-            {
-                return source;
-            }
-            // Add what we have to the stack   
-            var flattenedList = source.Where(selectorFunction);
-            // Go through the input enumerable looking for children,   
-            // and add those if we have them   
-            foreach (TSource element in source)
-            {
-                var secondInner = getChildrenFunction(element);
-                if (secondInner.Count() > 0)
-                {
-                    secondInner = secondInner.Map(selectorFunction, getChildrenFunction);
-                }
-                flattenedList = flattenedList.Concat(secondInner);
-            }
-            return flattenedList;
+        	return Umbraco.Core.Dynamics.ExtensionMethods.Map<TSource>(source, selectorFunction, getChildrenFunction);
         }
-
-
+		
         public static DynamicNodeList Random(this DynamicNodeList all, int Min, int Max)
         {
             //get a random number generator
@@ -54,62 +37,40 @@ namespace umbraco.MacroEngines
             return all.Items.OrderBy(x => Guid.NewGuid()).First();
         }
 
+		[Obsolete("This has been superceded by Umbraco.Core.Dynamics.ExtensionMethods.ContainsAny method")]
         public static bool ContainsAny(this string haystack, List<string> needles)
-        {
-            if (!string.IsNullOrEmpty(haystack) || needles.Count > 0)
-            {
-                foreach (string value in needles)
-                {
-                    if (haystack.Contains(value))
-                        return true;
-                }
-            }
-            return false;
-        }
+		{
+			return Umbraco.Core.Dynamics.ExtensionMethods.ContainsAny(haystack, needles);
+		}
+
+		[Obsolete("This has been superceded by Umbraco.Core.Dynamics.ExtensionMethods.ContainsAny method")]
         public static bool ContainsAny(this string haystack, params string[] needles)
         {
-            if (!string.IsNullOrEmpty(haystack) || needles.Length > 0)
-            {
-                foreach (string value in needles)
-                {
-                    if (haystack.Contains(value))
-                        return true;
-                }
-            }
-            return false;
-        }
-        public static bool ContainsAny(this string haystack, StringComparison comparison, List<string> needles)
-        {
-            if (!string.IsNullOrEmpty(haystack) || needles.Count > 0)
-            {
-                foreach (string value in needles)
-                {
-                    if (haystack.IndexOf(value, comparison) >= 0)
-                        return true;
-                }
-            }
-            return false;
-        }
-        public static bool ContainsAny(this string haystack, StringComparison comparison, params string[] needles)
-        {
-            if (!string.IsNullOrEmpty(haystack) || needles.Length > 0)
-            {
-                foreach (string value in needles)
-                {
-                    if (haystack.IndexOf(value, comparison) >= 0)
-                        return true;
-                }
-            }
-            return false;
-        }
-        public static bool ContainsInsensitive(this string haystack, string needle)
-        {
-            return haystack.IndexOf(needle, StringComparison.CurrentCultureIgnoreCase) >= 0;
+			return Umbraco.Core.Dynamics.ExtensionMethods.ContainsAny(haystack, needles);
         }
 
+		[Obsolete("This has been superceded by Umbraco.Core.Dynamics.ExtensionMethods.ContainsAny method")]
+        public static bool ContainsAny(this string haystack, StringComparison comparison, List<string> needles)
+        {
+			return Umbraco.Core.Dynamics.ExtensionMethods.ContainsAny(haystack, comparison, needles);
+        }
+
+		[Obsolete("This has been superceded by Umbraco.Core.Dynamics.ExtensionMethods.ContainsAny method")]
+        public static bool ContainsAny(this string haystack, StringComparison comparison, params string[] needles)
+        {
+			return Umbraco.Core.Dynamics.ExtensionMethods.ContainsAny(haystack, comparison, needles);
+        }
+
+		[Obsolete("This has been superceded by Umbraco.Core.Dynamics.ExtensionMethods.ContainsInsensitive method")]
+        public static bool ContainsInsensitive(this string haystack, string needle)
+        {
+			return Umbraco.Core.Dynamics.ExtensionMethods.ContainsInsensitive(haystack, needle);
+        }
+
+		[Obsolete("This has been superceded by Umbraco.Core.Dynamics.ExtensionMethods.HasValue method")]
         public static bool HasValue(this string s)
         {
-            return !string.IsNullOrWhiteSpace(s);
+			return Umbraco.Core.Dynamics.ExtensionMethods.HasValue(s);
         }
 
     }

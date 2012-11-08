@@ -2,56 +2,38 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Web;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Utils;
 using umbraco.interfaces;
 
 namespace umbraco.businesslogic
 {
-    /// <summary>
-    /// ApplicationStartupHandler provides an easy to use base class to install event handlers in umbraco.
-    /// Class inhiriting from ApplicationStartupHandler are automaticly registered and instantiated by umbraco on application start.
-    /// To use, inhirite the ApplicationStartupHandler Class and add an empty constructor. 
-    /// </summary>
-    public abstract class ApplicationStartupHandler : IApplicationStartupHandler
-    {
-        private static readonly IList<IApplicationStartupHandler> _handlers = new List<IApplicationStartupHandler>(); 
+	/// <summary>
+	/// ApplicationStartupHandler provides an easy to use base class to install event handlers in umbraco.
+	/// Class inhiriting from ApplicationStartupHandler are automaticly registered and instantiated by umbraco on application start.
+	/// To use, inhirite the ApplicationStartupHandler Class and add an empty constructor. 
+	/// </summary>
+	[Obsolete("This class is no longer used, implement IApplicationEvents instead")]
+	public abstract class ApplicationStartupHandler : IApplicationStartupHandler
+	{
 
-        static ApplicationStartupHandler()
-        {
-            if (!GlobalSettings.Configured)
-                return;
+		[Obsolete("This method is no longer used, use the Umbraco.Web.ApplicationEventsResolver to create the handlers")]
+		public static void RegisterHandlers()
+		{
+			if (ApplicationContext.Current == null || !ApplicationContext.Current.IsConfigured)
+				return;
 
-            var types = TypeFinder.FindClassesOfType<IApplicationStartupHandler>();
+			//now we just create the types... this is kind of silly since these objects don't actually do anything
+			//except run their constructors.
 
-            foreach (var t in types)
-            {
-                try
-                {
-                    var typeInstance = Activator.CreateInstance(t) as IApplicationStartupHandler;
-                    if (typeInstance != null)
-                    {
-                        _handlers.Add(typeInstance);
+			var instances = PluginManager.Current.CreateInstances<IApplicationStartupHandler>(
+				PluginManager.Current.ResolveApplicationStartupHandlers());
 
-                        if (HttpContext.Current != null)
-                            HttpContext.Current.Trace.Write("registerApplicationStartupHandlers",
-                                                            " + Adding application startup handler '" +
-                                                            t.FullName);
-                    }
-                }
-                catch (Exception ee)
-                {
-                    Log.Add(LogTypes.Error, -1, "Error loading application startup handler: " + ee.ToString());
-                }
-            }
-        }
-
-        public static void RegisterHandlers()
-        {
-            // We don't actually do anything in this method, it's just a handle to force the static constructor to fire.
-            // this ensures that the registration code only occurs once.
-        }
-    }
+		}
+	}
 
 }

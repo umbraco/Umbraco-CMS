@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Xml;
+using Umbraco.Core;
 using umbraco.DataLayer;
 using System.Text.RegularExpressions;
 using System.IO;
@@ -44,10 +45,30 @@ namespace umbraco.cms.businesslogic.template
 
         #endregion
 
+		[Obsolete("Use TemplateFilePath instead")]
         public string MasterPageFile
         {
-            get { return IOHelper.MapPath(SystemDirectories.Masterpages + "/" + Alias.Replace(" ", "") + ".master"); }
+            get { return TemplateFilePath; }
         }
+
+		/// <summary>
+		/// Returns the file path for the current template
+		/// </summary>
+	    public string TemplateFilePath
+	    {
+		    get
+		    {
+				switch (DetermineRenderingEngine(this))
+				{
+					case RenderingEngine.Mvc:
+						return ViewHelper.GetFilePath(this);
+					case RenderingEngine.WebForms:
+						return MasterPageHelper.GetFilePath(this);
+					default:
+						throw new ArgumentOutOfRangeException();
+				}	  
+		    }
+	    }
 
         public static Hashtable TemplateAliases
         {
@@ -133,30 +154,13 @@ namespace umbraco.cms.businesslogic.template
             }
             dr.Close();
 
-            // test for masterpages
-            if (UmbracoSettings.UseAspNetMasterPages)
-            {
-                _design = getMasterPageContent();
-            }
+			if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(this))
+                _design = ViewHelper.GetFileContents(this);
+            else
+                _design = MasterPageHelper.GetFileContents(this);
+
         }
-
-        private bool isMasterPageSyntax(string code)
-        {
-            return code.Contains("<%@ Master") || code.Contains("<umbraco:Item") || code.Contains("<asp:") || code.Contains("<umbraco:Macro");
-        }
-
-        private string getMasterPageContent()
-        {
-            string masterpageContent = "";
-            if (!File.Exists(MasterPageFile))
-                SaveAsMasterPage();
-
-            System.IO.TextReader tr = new StreamReader(MasterPageFile);
-            masterpageContent = tr.ReadToEnd();
-            tr.Close();
-            return masterpageContent;
-        }
-
+		
         public new string Path
         {
             get
@@ -257,24 +261,31 @@ namespace umbraco.cms.businesslogic.template
             set
             {
                 FlushCache();
+
                 _design = value.Trim(Environment.NewLine.ToCharArray());
                 // NH: Removing an generating the directive can mess up code behind
                 // We don't store the masterpage directive in the design value
                 //                if (_design.StartsWith("<%@"))
                 //                    _design = _design.Substring(_design.IndexOf("%>") + 3).Trim(Environment.NewLine.ToCharArray());
 
-                if (UmbracoSettings.UseAspNetMasterPages && isMasterPageSyntax(_design))
-                {
-                    SaveMasterPageFile(_design);
 
-                    SqlHelper.ExecuteNonQuery("Update cmsTemplate set design = @design where NodeId = @id",
-                        SqlHelper.CreateParameter("@design", value),
-                        SqlHelper.CreateParameter("@id", Id));
+                //we only switch to MVC View editing if the template has a view file, and MVC editing is enabled
+				if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && !MasterPageHelper.IsMasterPageSyntax(_design))
+				{
+					MasterPageHelper.RemoveMasterPageFile(this.Alias);
+					MasterPageHelper.RemoveMasterPageFile(_oldAlias);
+					_design = ViewHelper.UpdateViewFile(this, _oldAlias);
+				}
+				else if (UmbracoSettings.UseAspNetMasterPages)
+				{
+					ViewHelper.RemoveViewFile(this.Alias);
+					ViewHelper.RemoveViewFile(_oldAlias);
+					_design = MasterPageHelper.UpdateMasterPageFile(this, _oldAlias);
+				}
+                
 
-                }
-                else
-                    SqlHelper.ExecuteNonQuery("Update cmsTemplate set design = @design where NodeId = @id",
-                        SqlHelper.CreateParameter("@design", value),
+                SqlHelper.ExecuteNonQuery("Update cmsTemplate set design = @design where NodeId = @id",
+                        SqlHelper.CreateParameter("@design", _design),
                         SqlHelper.CreateParameter("@id", Id));
             }
         }
@@ -329,30 +340,73 @@ namespace umbraco.cms.businesslogic.template
             return DocumentType.GetAllAsList().Where(x => x.allowedTemplates.Select(t => t.Id).Contains(this.Id));
         }
 
-        public static Template MakeNew(string Name, BusinessLogic.User u, Template master)
+	    /// <summary>
+	    /// This checks what the default rendering engine is set in config but then also ensures that there isn't already 
+	    /// a template that exists in the opposite rendering engine's template folder, then returns the appropriate 
+	    /// rendering engine to use.
+	    /// </summary>
+	    /// <param name="t"></param>
+	    /// <param name="design">If a template body is specified we'll check if it contains master page markup, if it does we'll auto assume its webforms </param>
+	    /// <returns></returns>
+	    /// <remarks>
+	    /// The reason this is required is because for example, if you have a master page file already existing under ~/masterpages/Blah.aspx
+	    /// and then you go to create a template in the tree called Blah and the default rendering engine is MVC, it will create a Blah.cshtml 
+	    /// empty template in ~/Views. This means every page that is using Blah will go to MVC and render an empty page. 
+	    /// This is mostly related to installing packages since packages install file templates to the file system and then create the 
+	    /// templates in business logic. Without this, it could cause the wrong rendering engine to be used for a package.
+	    /// </remarks>
+	    private static RenderingEngine DetermineRenderingEngine(Template t, string design = null)
+		{
+			var engine = Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine;
+
+			if (!design.IsNullOrWhiteSpace() && MasterPageHelper.IsMasterPageSyntax(design))
+			{
+				//there is a design but its definitely a webforms design
+				return RenderingEngine.WebForms;
+			}
+
+			switch (engine)
+			{
+				case RenderingEngine.Mvc:
+					//check if there's a view in ~/masterpages
+					if (MasterPageHelper.MasterPageExists(t) && !ViewHelper.ViewExists(t))
+					{
+						//change this to webforms since there's already a file there for this template alias
+						engine = RenderingEngine.WebForms;
+					}
+					break;
+				case RenderingEngine.WebForms:
+					//check if there's a view in ~/views
+					if (ViewHelper.ViewExists(t) && !MasterPageHelper.MasterPageExists(t))
+					{
+						//change this to mvc since there's already a file there for this template alias
+						engine = RenderingEngine.Mvc;
+					}
+					break;
+			}
+			return engine;
+		}
+
+		public static Template MakeNew(string Name, BusinessLogic.User u, Template master)
+		{
+		    return MakeNew(Name, u, master, null);
+		}
+
+		private static Template MakeNew(string Name, BusinessLogic.User u, Template master, string design)
         {
-
-            Template t = MakeNew(Name, u);
-            t.MasterTemplate = master.Id;
-            t.Design = "";
-
-            if (UmbracoSettings.UseAspNetMasterPages)
-            {
-                string design = t.getMasterPageHeader() + "\n";
-
-                foreach (string cpId in master.contentPlaceholderIds())
-                {
-                    design += "<asp:content ContentPlaceHolderId=\"" + cpId + "\" runat=\"server\">\n\t\n</asp:content>\n\n";
-                }
-
-                t.Design = design;
-            }
+            Template t = MakeNew(Name, u, design);
+            t.MasterTemplate = master.Id;			
 
             t.Save();
             return t;
         }
 
         public static Template MakeNew(string name, BusinessLogic.User u)
+        {
+            return MakeNew(name, u, design: null);
+        }
+
+        private static Template MakeNew(string name, BusinessLogic.User u, string design)
         {
 
             // CMSNode MakeNew(int parentId, Guid objectType, int userId, int level, string text, Guid uniqueID)
@@ -367,6 +421,8 @@ namespace umbraco.cms.businesslogic.template
             if (name.Length > 100)
                 name = name.Substring(0, 95) + "...";
 
+          
+
 
             SqlHelper.ExecuteNonQuery("INSERT INTO cmsTemplate (NodeId, Alias, design, master) VALUES (@nodeId, @alias, @design, @master)",
                                       SqlHelper.CreateParameter("@nodeId", n.Id),
@@ -377,6 +433,22 @@ namespace umbraco.cms.businesslogic.template
             Template t = new Template(n.Id);
             NewEventArgs e = new NewEventArgs();
             t.OnNew(e);
+
+			switch (DetermineRenderingEngine(t, design))
+			{
+				case RenderingEngine.Mvc:
+					ViewHelper.CreateViewFile(t, true);
+					break;
+				case RenderingEngine.WebForms:
+					MasterPageHelper.CreateMasterPage(t, true);
+					break;
+			}
+
+			//if a design is supplied ensure it is updated.
+			if (!design.IsNullOrWhiteSpace())
+			{
+				t.ImportDesign(design);
+			}
 
             return t;
         }
@@ -394,14 +466,26 @@ namespace umbraco.cms.businesslogic.template
 
         public static Template GetByAlias(string Alias)
         {
-            try
-            {
-                return new Template(SqlHelper.ExecuteScalar<int>("select nodeId from cmsTemplate where alias = @alias", SqlHelper.CreateParameter("@alias", Alias)));
-            }
-            catch
-            {
-                return null;
-            }
+            return GetByAlias(Alias, false);
+        }
+
+        public static Template GetByAlias(string Alias, bool useCache)
+        {
+			if (!useCache)
+			{
+				try
+				{
+					return new Template(SqlHelper.ExecuteScalar<int>("select nodeId from cmsTemplate where alias = @alias", SqlHelper.CreateParameter("@alias", Alias)));
+				}
+				catch
+				{
+					return null;
+				}	
+			}			
+
+			//return from cache instead
+	        var id = GetTemplateIdFromAlias(Alias);
+			return id == 0 ? null : GetTemplate(id);
         }
 
         [Obsolete("Obsolete, please use GetAllAsList() method instead", true)]
@@ -504,13 +588,17 @@ namespace umbraco.cms.businesslogic.template
                 if (System.IO.File.Exists(MasterPageFile))
                     System.IO.File.Delete(MasterPageFile);
 
+				if (System.IO.File.Exists(Umbraco.Core.IO.IOHelper.MapPath(ViewHelper.ViewPath(this.Alias))))
+                    System.IO.File.Delete(Umbraco.Core.IO.IOHelper.MapPath(ViewHelper.ViewPath(this.Alias)));
+
                 FireAfterDelete(e);
             }
         }
 
-        public void SaveAsMasterPage()
+        [Obsolete("This method, doesnt actually do anything, as the file is created when the design is set", false)]
+        public void _SaveAsMasterPage()
         {
-            SaveMasterPageFile(ConvertToMasterPageSyntax(Design));
+            //SaveMasterPageFile(ConvertToMasterPageSyntax(Design));
         }
 
         public string GetMasterContentElement(int masterTemplateId)
@@ -526,7 +614,6 @@ namespace umbraco.cms.businesslogic.template
                 return
                     String.Format("<asp:Content ContentPlaceHolderID=\"ContentPlaceHolderDefault\" runat=\"server\">",
                     Alias.Replace(" ", ""));
-
         }
 
         public List<string> contentPlaceholderIds()
@@ -573,17 +660,17 @@ namespace umbraco.cms.businesslogic.template
 
         public string EnsureMasterPageSyntax(string masterPageContent)
         {
-            replaceElement(ref masterPageContent, "?UMBRACO_GETITEM", "umbraco:Item", true);
-            replaceElement(ref masterPageContent, "?UMBRACO_GETITEM", "umbraco:Item", false);
+            ReplaceElement(ref masterPageContent, "?UMBRACO_GETITEM", "umbraco:Item", true);
+            ReplaceElement(ref masterPageContent, "?UMBRACO_GETITEM", "umbraco:Item", false);
 
             // Parse the design for macros
-            replaceElement(ref masterPageContent, "?UMBRACO_MACRO", "umbraco:Macro", true);
-            replaceElement(ref masterPageContent, "?UMBRACO_MACRO", "umbraco:Macro", false);
+            ReplaceElement(ref masterPageContent, "?UMBRACO_MACRO", "umbraco:Macro", true);
+            ReplaceElement(ref masterPageContent, "?UMBRACO_MACRO", "umbraco:Macro", false);
 
             // Parse the design for load childs
-            masterPageContent = masterPageContent.Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD/>", getAspNetMasterPageContentContainer()).Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD />", getAspNetMasterPageContentContainer());
+            masterPageContent = masterPageContent.Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD/>", GetAspNetMasterPageContentContainer()).Replace("<?UMBRACO_TEMPLATE_LOAD_CHILD />", GetAspNetMasterPageContentContainer());
             // Parse the design for aspnet forms
-            getAspNetMasterPageForm(ref masterPageContent);
+            GetAspNetMasterPageForm(ref masterPageContent);
             masterPageContent = masterPageContent.Replace("</?ASPNET_FORM>", "</form>");
             // Parse the design for aspnet heads
             masterPageContent = masterPageContent.Replace("</ASPNET_HEAD>", String.Format("<head id=\"{0}Head\" runat=\"server\">", Alias.Replace(" ", "")));
@@ -591,8 +678,13 @@ namespace umbraco.cms.businesslogic.template
             return masterPageContent;
         }
 
+
+
         public void ImportDesign(string design)
         {
+            Design = design; 
+
+            /*
             if (!isMasterPageSyntax(design))
             {
                 Design = ConvertToMasterPageSyntax(design);
@@ -600,26 +692,17 @@ namespace umbraco.cms.businesslogic.template
             else
             {
                 Design = design;
-            }
+            }*/
 
-        }
-
-        private string getMasterPageHeader()
-        {
-            return String.Format("<%@ Master Language=\"C#\" MasterPageFile=\"{0}\" AutoEventWireup=\"true\" %>",
-                currentMasterTemplateFileName()) + Environment.NewLine;
-        }
-
-        private string currentMasterTemplateFileName()
-        {
-            if (MasterTemplate != 0)
-                return SystemDirectories.Masterpages + "/" + new Template(MasterTemplate).Alias.Replace(" ", "") + ".master";
-            else
-                return UmbracoMasterTemplate;
         }
 
         public void SaveMasterPageFile(string masterPageContent)
         {
+            //this will trigger the helper and store everything
+            this.Design = masterPageContent;
+
+            /*
+
             // Add header to master page if it doesn't exist
             if (!masterPageContent.StartsWith("<%@"))
             {
@@ -681,11 +764,20 @@ namespace umbraco.cms.businesslogic.template
             // save the file in UTF-8
 
             File.WriteAllText(MasterPageFile, masterPageContent, System.Text.Encoding.UTF8);
+             * */
+        }        
+
+        private string CurrentMasterTemplateFileName()
+        {
+            if (MasterTemplate != 0)
+                return SystemDirectories.Masterpages + "/" + new Template(MasterTemplate).Alias.Replace(" ", "") + ".master";
+            else
+                return UmbracoMasterTemplate;
         }
 
-        private void getAspNetMasterPageForm(ref string design)
+        private void GetAspNetMasterPageForm(ref string design)
         {
-            Match formElement = Regex.Match(design, getElementRegExp("?ASPNET_FORM", false), RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+            Match formElement = Regex.Match(design, GetElementRegExp("?ASPNET_FORM", false), RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
             if (formElement != null && formElement.Value != "")
             {
                 string formReplace = String.Format("<form id=\"{0}Form\" runat=\"server\">", Alias.Replace(" ", ""));
@@ -697,17 +789,17 @@ namespace umbraco.cms.businesslogic.template
             }
         }
 
-        private string getAspNetMasterPageContentContainer()
+        private string GetAspNetMasterPageContentContainer()
         {
             return String.Format(
                 "<asp:ContentPlaceHolder ID=\"{0}ContentPlaceHolder\" runat=\"server\"></asp:ContentPlaceHolder>",
                 Alias.Replace(" ", ""));
         }
 
-        private void replaceElement(ref string design, string elementName, string newElementName, bool checkForQuotes)
+        private void ReplaceElement(ref string design, string elementName, string newElementName, bool checkForQuotes)
         {
             MatchCollection m =
-                Regex.Matches(design, getElementRegExp(elementName, checkForQuotes),
+                Regex.Matches(design, GetElementRegExp(elementName, checkForQuotes),
                   RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
             foreach (Match match in m)
@@ -746,7 +838,7 @@ namespace umbraco.cms.businesslogic.template
 
 
 
-        private string getElementRegExp(string elementName, bool checkForQuotes)
+        private string GetElementRegExp(string elementName, bool checkForQuotes)
         {
             if (checkForQuotes)
                 return String.Format("\"<[^>\\s]*\\b{0}(\\b[^>]*)>\"", elementName);
@@ -779,34 +871,30 @@ namespace umbraco.cms.businesslogic.template
                 });
         }
 
-        private void InvalidateCache()
-        {
-            Cache.ClearCacheItem(GetCacheKey(this.Id));
-        }
-
         private static string GetCacheKey(int id)
         {
             return UmbracoTemplateCacheKey + id;
         }
-
-
+		
         public static Template Import(XmlNode n, User u)
         {
             string alias = xmlHelper.GetNodeValue(n.SelectSingleNode("Alias"));
 
             Template t = Template.GetByAlias(alias);
+	        var design = xmlHelper.GetNodeValue(n.SelectSingleNode("Design"));
 
             if (t == null)
             {
-                t = MakeNew(xmlHelper.GetNodeValue(n.SelectSingleNode("Name")), u);
+				//create the template with the design if one is specified
+				t = MakeNew(xmlHelper.GetNodeValue(n.SelectSingleNode("Name")), u, 
+					design.IsNullOrWhiteSpace() ? null : design);
             }
 
             t.Alias = alias;
 
-            t.ImportDesign(xmlHelper.GetNodeValue(n.SelectSingleNode("Design")));
-
             return t;
         }
+        
 
         #region Events
         //EVENTS

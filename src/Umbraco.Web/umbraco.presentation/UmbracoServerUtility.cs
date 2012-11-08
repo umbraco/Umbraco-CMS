@@ -24,6 +24,7 @@ namespace umbraco.presentation
     /// 
     /// This now needs to exist only because of backwards compatibility
     /// </remarks>
+    [Obsolete("This class is no longer used, for the overridden MapPath methods and custom methods use IOHelper")]
     public class UmbracoServerUtility : HttpServerUtilityBase
     {
         private readonly HttpServerUtilityBase _server;
@@ -252,12 +253,14 @@ namespace umbraco.presentation
             }
         }
 
+		[Obsolete("This is no longer used in the codebase and will be removed. ")]
         private const string XDocumentCacheKey = "XDocumentCache";
 
         /// <summary>
         /// Gets the Umbraco XML cache
         /// </summary>
         /// <value>The content XML.</value>
+        [Obsolete("This is no longer used in the codebase and will be removed. If you need to access the current XML cache document you can use the Umbraco.Web.Umbraco.Context.GetXml() method.")]
         public XDocument ContentXml
         {
             get

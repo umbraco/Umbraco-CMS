@@ -153,6 +153,10 @@
       <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
       <Name>umbraco.controls</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
+      <Project>{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}</Project>
+      <Name>Umbraco.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\umbraco.datalayer\umbraco.datalayer.csproj">
       <Project>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</Project>
       <Name>umbraco.datalayer</Name>
@@ -269,9 +273,7 @@
     <Compile Include="macrocontainer\DataType.cs" />
     <Compile Include="macrocontainer\Editor.cs" />
     <Compile Include="macrocontainer\MacroContainerEvent.cs" />
-    <Compile Include="macrocontainer\MacroControlFactory.cs" />
     <Compile Include="macrocontainer\MacroEditor.cs" />
-    <Compile Include="macrocontainer\PersistableMacroProperty.cs" />
     <Compile Include="macrocontainer\PrevalueEditor.cs" />
     <Compile Include="mediapicker\mediaChooser.cs">
       <SubType>Code</SubType>
@@ -413,6 +415,7 @@
     <Compile Include="userControlWrapper\usercontrolDataType.cs" />
     <Compile Include="userControlWrapper\usercontrolPrevalueEditor.cs" />
     <Compile Include="XmlData.cs" />
+    <Compile Include="XPathCheckBoxList\XPathCheckBoxList.cs" />
     <Compile Include="XPathCheckBoxList\XPathCheckBoxListDataEditor.cs" />
     <Compile Include="XPathCheckBoxList\XPathCheckBoxListDataType.cs" />
     <Compile Include="XPathCheckBoxList\XPathCheckBoxListOptions.cs" />

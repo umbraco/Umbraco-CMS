@@ -14,9 +14,4 @@ namespace umbraco.interfaces
 		bool Delete();
 		int UserId {set;}
 	}
-
-	public interface ITaskReturnUrl : ITask
-	{
-		string ReturnUrl {get;}
-	}
 }

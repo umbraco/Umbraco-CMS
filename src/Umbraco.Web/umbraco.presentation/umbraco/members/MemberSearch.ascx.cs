@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Examine.LuceneEngine.SearchCriteria;
 using umbraco.cms.businesslogic.member;
 using System.Web.Security;
 
@@ -49,8 +50,9 @@ namespace umbraco.presentation.umbraco.members
                 IEnumerable<MemberSearchResult> results;
                 if (!String.IsNullOrEmpty(query))
                 {
-
-                    results = internalSearcher.Search(query, false).Select(x => new MemberSearchResult()
+                    var criteria = internalSearcher.CreateSearchCriteria("member", Examine.SearchCriteria.BooleanOperation.And);
+                    var operation = criteria.Field("__nodeName", query.MultipleCharacterWildcard());
+                    results = internalSearcher.Search(operation.Compile()).Select(x => new MemberSearchResult()
                     {
                         Id = x["id"],
                         Name = x["nodeName"],

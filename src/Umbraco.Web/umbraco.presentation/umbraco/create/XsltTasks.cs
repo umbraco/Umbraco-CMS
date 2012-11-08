@@ -54,40 +54,44 @@ namespace umbraco
             string xsltTemplateSource = IOHelper.MapPath(SystemDirectories.Umbraco + "/xslt/templates/" + template);
             string xsltNewFilename = IOHelper.MapPath(SystemDirectories.Xslt + "/" + fileName + ".xslt");
 
-            if (fileName.Contains("/")) //if there's a / create the folder structure for it
-            {
-                string[] folders = fileName.Split("/".ToCharArray());
-                string xsltBasePath = IOHelper.MapPath(SystemDirectories.Xslt);
-                for (int i = 0; i < folders.Length - 1; i++)
-                {
-                    xsltBasePath = System.IO.Path.Combine(xsltBasePath, folders[i]);
-                    System.IO.Directory.CreateDirectory(xsltBasePath);
-                }
-            }
 
-            //            System.IO.File.Copy(xsltTemplateSource, xsltNewFilename, false);
+			if (!System.IO.File.Exists(xsltNewFilename))
+			{
+				if (fileName.Contains("/")) //if there's a / create the folder structure for it
+				{
+					string[] folders = fileName.Split("/".ToCharArray());
+					string xsltBasePath = IOHelper.MapPath(SystemDirectories.Xslt);
+					for (int i = 0; i < folders.Length - 1; i++)
+					{
+						xsltBasePath = System.IO.Path.Combine(xsltBasePath, folders[i]);
+						System.IO.Directory.CreateDirectory(xsltBasePath);
+					}
+				}
 
-            // update with xslt references
-            string xslt = "";
-            System.IO.StreamReader xsltFile = System.IO.File.OpenText(xsltTemplateSource);
-            xslt = xsltFile.ReadToEnd();
-            xsltFile.Close();
+				//            System.IO.File.Copy(xsltTemplateSource, xsltNewFilename, false);
 
-            // prepare support for XSLT extensions
-            xslt = macro.AddXsltExtensionsToHeader(xslt);
-            System.IO.StreamWriter xsltWriter = System.IO.File.CreateText(xsltNewFilename);
-            xsltWriter.Write(xslt);
-            xsltWriter.Flush();
-            xsltWriter.Close();
+				// update with xslt references
+				string xslt = "";
+				System.IO.StreamReader xsltFile = System.IO.File.OpenText(xsltTemplateSource);
+				xslt = xsltFile.ReadToEnd();
+				xsltFile.Close();
 
-            // Create macro?
-            if (ParentID == 1)
-            {
-                cms.businesslogic.macro.Macro m =
-                    cms.businesslogic.macro.Macro.MakeNew(
-                    helper.SpaceCamelCasing(_alias.Substring(_alias.IndexOf("|||") + 3, _alias.Length - _alias.IndexOf("|||") - 3)));
-                m.Xslt = fileName + ".xslt";
-            }
+				// prepare support for XSLT extensions
+				xslt = macro.AddXsltExtensionsToHeader(xslt);
+				System.IO.StreamWriter xsltWriter = System.IO.File.CreateText(xsltNewFilename);
+				xsltWriter.Write(xslt);
+				xsltWriter.Flush();
+				xsltWriter.Close();
+
+				// Create macro?
+				if (ParentID == 1)
+				{
+					cms.businesslogic.macro.Macro m =
+						cms.businesslogic.macro.Macro.MakeNew(
+						helper.SpaceCamelCasing(_alias.Substring(_alias.IndexOf("|||") + 3, _alias.Length - _alias.IndexOf("|||") - 3)));
+					m.Xslt = fileName + ".xslt";
+				}
+			}
 
             m_returnUrl = string.Format(SystemDirectories.Umbraco + "/developer/xslt/editXslt.aspx?file={0}.xslt", fileName);
 

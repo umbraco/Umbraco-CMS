@@ -9,11 +9,15 @@ namespace umbraco.editorControls.numberfield
 	{
 		public DataInteger(cms.businesslogic.datatype.BaseDataType DataType) : base(DataType) {}
 
-		public override void MakeNew(int PropertyId) {
+		public override void MakeNew(int PropertyId) 
+        {
 			this.PropertyId = PropertyId;
 		    string defaultValue = ((DefaultPrevalueEditor) _dataType.PrevalueEditor).Prevalue;
+            
             if (defaultValue.Trim() != "")
-			    this.Value = defaultValue;
+            {
+                this.Value = defaultValue;
+            }
 		}
 	} 
 }

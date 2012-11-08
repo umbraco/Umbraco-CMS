@@ -1,0 +1,122 @@
+﻿using System;
+using System.Web;
+using System.Web.SessionState;
+using System.Reflection;
+using System.Xml;
+using System.IO;
+using System.Linq;
+
+namespace Umbraco.Web.BaseRest
+{
+	internal class BaseRestHandler : IHttpHandler, IRequiresSessionState
+	{
+		static string _baseUrl;
+
+		static BaseRestHandler()
+		{
+			_baseUrl = UriUtility.ToAbsolute(Umbraco.Core.IO.SystemDirectories.Base).ToLower();
+			if (!_baseUrl.EndsWith("/"))
+				_baseUrl += "/";
+		}
+
+		public bool IsReusable
+		{
+			get { return true; }
+		}
+
+		/// <summary>
+		/// Returns a value indicating whether a specified Uri should be routed to the BaseRestHandler.
+		/// </summary>
+		/// <param name="uri">The specified Uri.</param>
+		/// <returns>A value indicating whether the specified Uri should be routed to the BaseRestHandler.</returns>
+		public static bool IsBaseRestRequest(Uri uri)
+		{
+			return Umbraco.Core.Configuration.UmbracoSettings.EnableBaseRestHandler
+				&& uri.AbsolutePath.ToLowerInvariant().StartsWith(_baseUrl);
+		}
+
+		public void ProcessRequest(HttpContext context)
+		{
+			string url = context.Request.RawUrl;
+
+			// sanitize and split the url
+			url = url.Substring(_baseUrl.Length);
+			if (url.ToLower().Contains(".aspx"))
+				url = url.Substring(0, url.IndexOf(".aspx"));
+			if (url.ToLower().Contains("?"))
+				url = url.Substring(0, url.IndexOf("?"));
+			var urlParts = url.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+
+			// by default, return xml content
+			context.Response.ContentType = "text/xml";
+
+			// ensure that we have a valid request ie /base/library/method/[parameter].aspx
+			if (urlParts.Length < 2)
+			{
+				context.Response.Write("<error>Invalid request, missing parts.</error>");
+				context.Response.StatusCode = 400;
+				context.Response.StatusDescription = "Bad Request";
+				context.Response.End();
+				return;
+			}
+
+			string extensionAlias = urlParts[0];
+			string methodName = urlParts[1];
+
+			var method = RestExtensionMethodInfo.GetMethod(extensionAlias, methodName);
+
+			if (!method.Exists)
+			{
+				context.Response.StatusCode = 500;
+				context.Response.StatusDescription = "Internal Server Error";
+				context.Response.Output.Write("<error>Extension or method not found.</error>");
+			}
+			else if (!method.CanBeInvokedByCurrentMember)
+			{
+				context.Response.StatusCode = 500;
+				context.Response.StatusDescription = "Internal Server Error";
+				context.Response.Output.Write("<error>Permission denied.</error>");
+			}
+			else
+			{
+				if (!method.ReturnXml)
+					context.Response.ContentType = "text/html";
+
+				TrySetCulture();
+
+				string result = method.Invoke(urlParts.Skip(2).ToArray());
+				if (result.Length >= 7 && result.Substring(0, 7) == "<error>")
+				{
+					context.Response.StatusCode = 500;
+					context.Response.StatusDescription = "Internal Server Error";
+				}
+				context.Response.Output.Write(result);
+			}
+
+			context.Response.End();
+		}
+
+		#region from baseHttpModule.cs
+
+		// fixme - is this ok?
+
+		private static void TrySetCulture()
+		{
+			string domain = HttpContext.Current.Request.Url.Host; // host only
+			if (TrySetCulture(domain)) return;
+
+			domain = HttpContext.Current.Request.Url.Authority; // host with port
+			if (TrySetCulture(domain)) return;
+		}
+
+		private static bool TrySetCulture(string domain)
+		{
+			var uDomain = global::umbraco.cms.businesslogic.web.Domain.GetDomain(domain);
+			if (uDomain == null) return false;
+			System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(uDomain.Language.CultureAlias);
+			return true;
+		}
+
+		#endregion
+	}
+}

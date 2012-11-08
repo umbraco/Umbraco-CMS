@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Web;
 using System.Xml;
+using Umbraco.Core;
 
 namespace umbraco
 {
@@ -121,10 +122,12 @@ namespace umbraco
 			}
 
             // CASING
-            if (helper.FindAttribute(attributes, "case") == "lower")
-                _fieldContent = _fieldContent.ToLower();
-            else if (helper.FindAttribute(attributes, "case") == "upper")
-                _fieldContent = _fieldContent.ToUpper();
+			if (helper.FindAttribute(attributes, "case") == "lower")
+				_fieldContent = _fieldContent.ToLower();
+			else if (helper.FindAttribute(attributes, "case") == "upper")
+				_fieldContent = _fieldContent.ToUpper();
+			else if (helper.FindAttribute(attributes, "case") == "title")
+				_fieldContent = _fieldContent.ConvertCase(StringAliasCaseType.PascalCase);
 
 			// OTHER FORMATTING FUNCTIONS
             // If we use masterpages, this is moved to the ItemRenderer to add support for before/after in inline XSLT

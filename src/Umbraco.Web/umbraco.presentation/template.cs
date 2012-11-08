@@ -375,19 +375,11 @@ namespace umbraco
 
         }
 
+		[Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ParseInternalLinks instead")]
         public static string ParseInternalLinks(string pageContents)
-        {
-            // Parse internal links
-            MatchCollection tags = Regex.Matches(pageContents, @"href=""[/]?(?:\{|\%7B)localLink:([0-9]+)(?:\}|\%7D)", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-            foreach (Match tag in tags)
-                if (tag.Groups.Count > 0)
-                {
-                    string id = tag.Groups[1].Value; //.Remove(tag.Groups[1].Value.Length - 1, 1);
-                    string newLink = library.NiceUrl(int.Parse(id));
-                    pageContents = pageContents.Replace(tag.Value.ToString(), "href=\"" + newLink);
-                }
-            return pageContents;
-        }
+		{
+			return Umbraco.Web.Templates.TemplateUtilities.ParseInternalLinks(pageContents);
+		}
 
         /// <summary>
         /// Parses the content of the templateOutput stringbuilder, and matches any tags given in the

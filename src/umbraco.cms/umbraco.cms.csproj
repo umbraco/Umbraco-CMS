@@ -171,7 +171,6 @@
     <Compile Include="Actions\ActionAssignDomain.cs" />
     <Compile Include="Actions\ActionAudit.cs" />
     <Compile Include="Actions\ActionBrowse.cs" />
-    <Compile Include="Actions\ActionCodeExport.cs" />
     <Compile Include="Actions\ActionCopy.cs" />
     <Compile Include="Actions\ActionDelete.cs" />
     <Compile Include="Actions\ActionDisable.cs" />
@@ -262,12 +261,15 @@
     <Compile Include="businesslogic\skinning\TaskType.cs" />
     <Compile Include="businesslogic\Tags\Tag.cs" />
     <Compile Include="businesslogic\task\Tasks.cs" />
+    <Compile Include="businesslogic\template\MasterpageHelper.cs" />
+    <Compile Include="businesslogic\template\ViewHelper.cs" />
     <Compile Include="businesslogic\Tuple.cs" />
     <Compile Include="businesslogic\web\DocumentVersionList.cs" />
     <Compile Include="businesslogic\skinning\Skinning.cs" />
     <Compile Include="helpers\Casing.cs" />
     <Compile Include="helpers\DeepLink.cs" />
     <Compile Include="helpers\DeepLinkType.cs" />
+    <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

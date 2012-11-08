@@ -65,7 +65,7 @@ namespace umbraco.editorControls.XPathCheckBoxList
 					if (this.options == null)
 					{
 						// Create a new Options data object with the default values
-						this.options = new XPathCheckBoxListOptions();
+						this.options = new XPathCheckBoxListOptions(true);
 					}
 				}
 				return this.options;
@@ -178,7 +178,10 @@ namespace umbraco.editorControls.XPathCheckBoxList
 		protected override void RenderContents(HtmlTextWriter writer)
 		{
 			//writer.AddPrevalueRow("Database Type", this.dbTypeDropDownList);
-			writer.AddPrevalueRow("XPath Expression", this.xPathTextBox, this.xPathRequiredFieldValidator, this.xPathCustomValidator);
+            writer.AddPrevalueRow("XPath Expression", @"can use the tokens <strong>$ancestorOrSelf</strong>, <strong>$parentPage</strong> and <strong>$currentPage</strong>, eg.<br />
+                                                        <br />                                            
+                                                        all siblings: $parentPage//*[@id != $currentPage/@id] <br />                                                        
+                                                        ", this.xPathTextBox, this.xPathRequiredFieldValidator, this.xPathCustomValidator);
 			writer.AddPrevalueRow("Storage Type", this.storageTypeRadioButtonList);
 			writer.AddPrevalueRow("Values", this.valueTypeDropDownList);
 		}

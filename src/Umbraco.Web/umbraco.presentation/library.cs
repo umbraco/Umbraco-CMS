@@ -9,10 +9,9 @@ using System.Web;
 using System.Web.UI;
 using System.Xml;
 using System.Xml.XPath;
-
-
+using Umbraco.Core;
+using Umbraco.Web;
 using umbraco.BusinessLogic;
-using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.member;
@@ -26,11 +25,11 @@ using umbraco.DataLayer;
 using System.Web.Security;
 using umbraco.cms.businesslogic.language;
 using umbraco.IO;
-using umbraco.presentation;
 using System.Collections;
 using System.Collections.Generic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.NodeFactory;
+using UmbracoContext = umbraco.presentation.UmbracoContext;
 
 namespace umbraco
 {
@@ -43,15 +42,14 @@ namespace umbraco
     /// </summary>
     public class library
     {
-        internal static void ClearNiceUrlCache()
-        {
-            lock (locker)
-            {
-                niceUrlCache.Clear();
-            }
-        }
-
-        private static object locker = new object();
+		/// <summary>
+		/// Returns a new UmbracoHelper so that we can start moving the logic from some of these methods to it
+		/// </summary>
+		/// <returns></returns>
+		private static UmbracoHelper GetUmbracoHelper()
+		{
+			return new UmbracoHelper(Umbraco.Web.UmbracoContext.Current);
+		}
 
         #region Declarations
 
@@ -201,15 +199,31 @@ namespace umbraco
         /// Publishes a Document by adding it to the runtime xml index. Note, prior to this the Document should be 
         /// marked published by calling Publish(User u) on the document object.
         /// </summary>
-        /// <param name="DocumentId">The Id of the Document to be published</param>
-        public static void UpdateDocumentCache(int DocumentId)
+        /// <param name="documentId">The Id of the Document to be published</param>
+        public static void UpdateDocumentCache(int documentId)
+        {
+            var d = new Document(documentId);
+            UpdateDocumentCache(d);
+        }
+
+        /// <summary>
+        /// Publishes a Document by adding it to the runtime xml index. Note, prior to this the Document should be 
+        /// marked published by calling Publish(User u) on the document object.
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <remarks>
+        /// NOTE: This method was created because before it was always calling the method with the documentId as a parameter 
+        /// which means we have to re-look up the document in the db again when we already have it, this should save on a few 
+        /// dozen sql calls when publishing.
+        /// </remarks>
+        internal static void UpdateDocumentCache(Document doc)
         {
             if (UmbracoSettings.UseDistributedCalls)
                 dispatcher.Refresh(
                     new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"),
-                    DocumentId);
+                    doc.Id);
             else
-                content.Instance.UpdateDocumentCache(DocumentId);
+                content.Instance.UpdateDocumentCache(doc);
         }
 
 
@@ -364,18 +378,7 @@ namespace umbraco
         /// <returns>String with a friendly url from a node</returns>
         public static string NiceUrl(int nodeID)
         {
-            try
-            {
-                int startNode = 1;
-                if (GlobalSettings.HideTopLevelNodeFromPath)
-                    startNode = 2;
-
-                return niceUrlDo(nodeID, startNode, false);
-            }
-            catch
-            {
-                return "#";
-            }
+        	return GetUmbracoHelper().NiceUrl(nodeID);            
         }
 
         /// <summary>
@@ -384,165 +387,41 @@ namespace umbraco
         /// </summary>
         /// <param name="nodeID">Identifier for the node that should be returned</param>
         /// <returns>String with a friendly url from a node</returns>
+        [Obsolete]
         public static string NiceUrlFullPath(int nodeID)
         {
-            return niceUrlDo(nodeID, 1, false);
+            throw new NotImplementedException("It was broken anyway...");
+        }
+
+        /// <summary>
+        /// This method will always add the domain to the path if the hostnames are set up correctly. 
+        /// </summary>
+        /// <param name="nodeID">Identifier for the node that should be returned</param>
+        /// <returns>String with a friendly url with full domain from a node</returns>
+        public static string NiceUrlWithDomain(int nodeID)
+        {
+        	return GetUmbracoHelper().NiceUrlWithDomain(nodeID);
         }
 
         /// <summary>
         /// This method will always add the domain to the path. 
         /// </summary>
         /// <param name="nodeID">Identifier for the node that should be returned</param>
+        /// <param name="ignoreUmbracoHostNames">Ignores the umbraco hostnames and returns the url prefixed with the requested host (including scheme and port number)</param>
         /// <returns>String with a friendly url with full domain from a node</returns>
-        public static string NiceUrlWithDomain(int nodeID)
+        internal static string NiceUrlWithDomain(int nodeID, bool ignoreUmbracoHostNames)
         {
-            return niceUrlDo(nodeID, 1, true);
-        }
+            if (ignoreUmbracoHostNames)
+                return HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority) + NiceUrl(nodeID);
 
+            return NiceUrlWithDomain(nodeID);
+        }
 
         public static string ResolveVirtualPath(string path)
         {
-            return IOHelper.ResolveUrl(path);
+			return Umbraco.Core.IO.IOHelper.ResolveUrl(path);
         }
 
-        private static IDictionary<int, string> niceUrlCache = new Dictionary<int, string>();
-
-        /// <summary>
-        /// This is used in the requesthandler for domain lookups to ensure that we don't use the cache 
-        /// </summary>
-        /// <param name="nodeID"></param>
-        /// <param name="startNodeDepth"></param>
-        /// <param name="byPassCache"></param>
-        /// <returns></returns>
-        private static string niceUrlDo(int nodeID, int startNodeDepth, bool forceDomain)
-        {
-            int key = nodeID + (forceDomain ? 9999999 : 0);
-            if (!niceUrlCache.ContainsKey(key))
-            {
-                lock (locker)
-                {
-                    if (!niceUrlCache.ContainsKey(key))
-                    {
-                        string tempUrl = NiceUrlFetch(nodeID, startNodeDepth, forceDomain);
-                        if (!String.IsNullOrEmpty(tempUrl))
-                        {
-                            niceUrlCache.Add(key, tempUrl);
-                        }
-                    }
-                }
-            }
-
-            return niceUrlCache[key];
-        }
-
-        internal static string niceUrlJuno(int nodeId, int startNodeDepth, string currentDomain, bool forceDomain)
-        {
-            string parentUrl = String.Empty;
-            XmlElement node = UmbracoContext.Current.GetXml().GetElementById(nodeId.ToString());
-
-            if (node == null)
-            {
-                ArgumentException arEx =
-                    new ArgumentException(
-                        string.Format(
-                            "Couldn't find any page with the nodeId = {0}. This is most likely caused by the page isn't published!",
-                            nodeId), "nodeId");
-                Log.Add(LogTypes.Error, nodeId, arEx.Message);
-                throw arEx;
-            }
-            if (node.ParentNode.Name.ToLower() != "root" || UmbracoSettings.UseDomainPrefixes || forceDomain)
-            {
-                if (UmbracoSettings.UseDomainPrefixes || forceDomain)
-                {
-                    Domain[] domains =
-                        Domain.GetDomainsById(nodeId);
-                    // when there's a domain on a url we'll just return the domain rather than the parent path
-                    if (domains.Length > 0)
-                    {
-                        return GetDomainIfExists(currentDomain, nodeId);
-                    }
-                }
-
-                if (parentUrl == String.Empty && (int.Parse(node.Attributes.GetNamedItem("level").Value) > startNodeDepth || UmbracoSettings.UseDomainPrefixes || forceDomain))
-                {
-                    if (node.ParentNode.Name != "root")
-                    {
-                        parentUrl = niceUrlJuno(int.Parse(node.ParentNode.Attributes.GetNamedItem("id").Value), startNodeDepth, currentDomain, forceDomain);
-                    }
-                }
-            }
-
-            // only return the current node url if we're at the startnodedepth or higher
-            if (int.Parse(node.Attributes.GetNamedItem("level").Value) >= startNodeDepth)
-                return parentUrl + "/" + node.Attributes.GetNamedItem("urlName").Value;
-            else if (node.PreviousSibling != null)
-                return "/" + node.Attributes.GetNamedItem("urlName").Value;
-            else
-                return "/";
-        }
-
-        private static string GetDomainIfExists(string currentDomain, int nodeId)
-        {
-            Domain[] domains = Domain.GetDomainsById(nodeId);
-            if (domains.Length > 0)
-            {
-                if (currentDomain != String.Empty)
-                {
-                    foreach (Domain d in domains)
-                    {
-                        // if there's multiple domains we'll prefer to use the same domain as the current request
-                        if (currentDomain == d.Name.ToLower() || d.Name.EndsWith(currentDomain, StringComparison.CurrentCultureIgnoreCase))
-                        {
-                            if (d.Name.StartsWith("http", StringComparison.CurrentCultureIgnoreCase))
-                            {
-                                return d.Name;
-                            }
-                            else
-                            {
-                                return string.Format("{0}://{1}", UmbracoContext.Current.Request.Url.Scheme, d.Name);
-                            }
-                        }
-                    }
-                }
-
-                if (domains[0].Name.StartsWith("http", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return domains[0].Name;
-                }
-                else
-                {
-                    return string.Format("{0}://{1}", UmbracoContext.Current.Request.Url.Scheme, domains[0].Name);
-                }
-            }
-            return null;
-        }
-
-        internal static string NiceUrlFetch(int nodeID, int startNodeDepth, bool forceDomain)
-        {
-            bool directoryUrls = GlobalSettings.UseDirectoryUrls;
-            string baseUrl = SystemDirectories.Root; // SystemDirectories.Umbraco;
-            string junoUrl = niceUrlJuno(nodeID, startNodeDepth, HttpContext.Current.Request.ServerVariables["SERVER_NAME"].ToLower(), forceDomain);
-            return appendUrlExtension(baseUrl, directoryUrls, junoUrl);
-
-        }
-
-        private static string appendUrlExtension(string baseUrl, bool directoryUrls, string tempUrl)
-        {
-            if (!directoryUrls)
-            {
-                // append .aspx extension if the url includes other than just the domain name
-                if (!String.IsNullOrEmpty(tempUrl) && tempUrl != "/" &&
-                    (!tempUrl.StartsWith("http://") || tempUrl.LastIndexOf("/") > 7))
-                    tempUrl = baseUrl + tempUrl + ".aspx";
-            }
-            else
-            {
-                tempUrl = baseUrl + tempUrl;
-                if (tempUrl != "/" && UmbracoSettings.AddTrailingSlash)
-                    tempUrl += "/";
-            }
-            return tempUrl;
-        }
 
         /// <summary>
         /// Returns a string with the data from the given element of a node. Both elements (data-fields)
@@ -555,26 +434,46 @@ namespace umbraco
         /// <returns>Returns a string with the data from the given element of a node</returns>
         public static string GetItem(int nodeID, String alias)
         {
-            XmlDocument umbracoXML = UmbracoContext.Current.GetXml();
+	        var doc = PublishedContentStoreResolver.Current.PublishedContentStore.GetDocumentById(
+		        Umbraco.Web.UmbracoContext.Current,
+		        nodeID);
 
-            string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data [@alias='{0}']" : "./{0}";
+			if (doc == null)
+				return string.Empty;
 
-            if (umbracoXML.GetElementById(nodeID.ToString()) != null)
-                if (
-                    ",id,version,parentID,level,writerID,editDataType,template,sortOrder,createDate,updateDate,nodeName,writerName,path,"
-                        .
-                        IndexOf("," + alias + ",") > -1)
-                    return umbracoXML.GetElementById(nodeID.ToString()).Attributes.GetNamedItem(alias).Value;
-                else if (
-                    umbracoXML.GetElementById(nodeID.ToString()).SelectSingleNode(string.Format(xpath,alias)) !=
-                    null)
-                    return
-                        umbracoXML.GetElementById(nodeID.ToString()).SelectSingleNode(string.Format(xpath, alias)).ChildNodes[0].
-                            Value; //.Value + "*";
-                else
-                    return string.Empty;
-            else
-                return string.Empty;
+	        switch (alias)
+	        {
+				case "id":
+			        return doc.Id.ToString();
+				case "version":
+			        return doc.Version.ToString();
+				case "parentID":
+			        return doc.Parent.Id.ToString();
+				case "level":
+			        return doc.Level.ToString();
+				case "writerID":
+			        return doc.WriterId.ToString();
+				case "template":
+			        return doc.TemplateId.ToString();
+				case "sortOrder":
+			        return doc.SortOrder.ToString();
+				case "createDate":
+					return doc.CreateDate.ToString("yyyy-MM-dd'T'HH:mm:ss");
+				case "updateDate":
+					return doc.UpdateDate.ToString("yyyy-MM-dd'T'HH:mm:ss");
+				case "nodeName":
+			        return doc.Name;
+				case "writerName":
+			        return doc.WriterName;
+				case "path":
+			        return doc.Path;
+				case "creatorName":
+			        return doc.CreatorName;
+	        }
+
+	        var prop = doc.GetProperty(alias);
+	        return prop == null ? string.Empty : prop.Value.ToString();
+
         }
 
         /// <summary>
@@ -786,12 +685,7 @@ namespace umbraco
         /// <returns>True is the current user is logged in</returns>
         public static bool IsLoggedOn()
         {
-            /*
-               MembershipUser u = Membership.GetUser();
-               return u != null;           
-            */
-
-            return Member.IsLoggedOn();
+        	return GetUmbracoHelper().MemberIsLoggedOn();
         }
 
         public static XPathNodeIterator AllowedGroups(int documentId, string path)
@@ -811,7 +705,7 @@ namespace umbraco
         /// <returns>True if the document object is protected</returns>
         public static bool IsProtected(int DocumentId, string Path)
         {
-            return Access.IsProtected(DocumentId, Path);
+        	return GetUmbracoHelper().IsProtected(DocumentId, Path);
         }
 
         /// <summary>
@@ -822,39 +716,18 @@ namespace umbraco
         /// <returns>True if the current user has access or if the current document isn't protected</returns>
         public static bool HasAccess(int NodeId, string Path)
         {
-            if (IsProtected(NodeId, Path))
-            {
-                if (Member.IsLoggedOn())
-                    return Access.HasAccess(NodeId, Path, Membership.GetUser());
-                else
-                    return false;
-            }
-            else
-                return true;
-
+        	return GetUmbracoHelper().MemberHasAccess(NodeId, Path);
         }
 
 
         /// <summary>
-        /// Encrypts the string using md5
+        /// Returns an MD5 hash of the string specified
         /// </summary>
-        /// <param name="text">The text.</param>
-        /// <returns>Md5 encrupted string</returns>
+        /// <param name="text">The text to create a hash from</param>
+        /// <returns>Md5 has of the string</returns>
         public static string md5(string text)
         {
-            System.Security.Cryptography.MD5CryptoServiceProvider x = new System.Security.Cryptography.MD5CryptoServiceProvider();
-            byte[] bs = System.Text.Encoding.UTF8.GetBytes(text);
-
-            bs = x.ComputeHash(bs);
-
-            System.Text.StringBuilder s = new System.Text.StringBuilder();
-
-            foreach (byte b in bs)
-            {
-                s.Append(b.ToString("x2").ToLower());
-            }
-
-            return s.ToString();
+			return text.ToMd5();
         }
 
         /// <summary>
@@ -1187,10 +1060,7 @@ namespace umbraco
         /// <returns>The text with text line breaks replaced with html linebreaks (<br/>)</returns>
         public static string ReplaceLineBreaks(string text)
         {
-            if (bool.Parse(GlobalSettings.EditXhtmlMode))
-                return text.Replace("\n", "<br/>\n");
-            else
-                return text.Replace("\n", "<br />\n");
+        	return GetUmbracoHelper().ReplaceLineBreaksForHtml(text);
         }
 
         /// <summary>
@@ -1335,7 +1205,7 @@ namespace umbraco
                     {
                         sw.Write("<!-- Error generating macroContent: '{0}' -->", ee);
                     }
-   
+
                     // update the local page items again
                     updateLocalContextItems(items, Context);
 
@@ -1642,17 +1512,7 @@ namespace umbraco
         /// <returns>A dictionary items value as a string.</returns>
         public static string GetDictionaryItem(string Key)
         {
-            try
-            {
-                Language l = Language.GetByCultureCode(System.Threading.Thread.CurrentThread.CurrentUICulture.Name);
-                return new Dictionary.DictionaryItem(Key).Value(l.id);
-                //return new Dictionary.DictionaryItem(Key).Value(GetCurrentLanguageId());
-            }
-            catch (Exception errDictionary)
-            {
-                HttpContext.Current.Trace.Warn("library", "Error returning dictionary item '" + Key + "'", errDictionary);
-                return string.Empty;
-            }
+	        return GetUmbracoHelper().GetDictionaryValue(Key);			
         }
 
         /// <summary>
@@ -1719,6 +1579,8 @@ namespace umbraco
             }
         }
 
+        //TODO: WTF, why is this here? This won't matter if there's an UmbracoContext or not, it will call the same underlying method!
+        // only difference is that the UmbracoContext way will check if its in preview mode.
         private static XmlDocument GetThreadsafeXmlDocument()
         {
             return UmbracoContext.Current != null
@@ -2238,7 +2100,7 @@ namespace umbraco
         {
             string error404 = "";
             XmlNode error404Node = UmbracoSettings.GetKeyAsNode("/settings/content/errors/error404");
-            if (error404Node.ChildNodes.Count > 0 && error404Node.ChildNodes[0].HasChildNodes)
+            if (error404Node.SelectNodes("errorPage").Count > 0 && error404Node.SelectNodes("errorPage")[0].HasChildNodes)
             {
                 // try to get the 404 based on current culture (via domain)
                 XmlNode cultureErrorNode;
@@ -2250,10 +2112,10 @@ namespace umbraco
                     if (cultureErrorNode != null && cultureErrorNode.FirstChild != null)
                         error404 = cultureErrorNode.FirstChild.Value;
                 }
-                else if(error404Node.SelectSingleNode(string.Format("errorPage [@culture = '{0}']",System.Threading.Thread.CurrentThread.CurrentUICulture.Name)) != null)
+                else if (error404Node.SelectSingleNode(string.Format("errorPage [@culture = '{0}']", System.Threading.Thread.CurrentThread.CurrentUICulture.Name)) != null)
                 {
                     cultureErrorNode = error404Node.SelectSingleNode(string.Format("errorPage [@culture = '{0}']", System.Threading.Thread.CurrentThread.CurrentUICulture.Name));
-                    if(cultureErrorNode.FirstChild != null)
+                    if (cultureErrorNode.FirstChild != null)
                         error404 = cultureErrorNode.FirstChild.Value;
                 }
                 else
@@ -2321,55 +2183,5 @@ namespace umbraco
         }
 
         #endregion
-    }
-
-    /// <summary>
-    /// Special class made to listen to save events on objects where umbraco.library caches some of their objects
-    /// </summary>
-    public class LibraryCacheRefresher : ApplicationStartupHandler
-    {
-        public LibraryCacheRefresher()
-        {
-            if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
-            {
-                Member.AfterSave += new Member.SaveEventHandler(Member_AfterSave);
-                Member.BeforeDelete += new Member.DeleteEventHandler(Member_BeforeDelete);
-                Media.AfterSave += new Media.SaveEventHandler(Media_AfterSave);
-                Media.BeforeDelete += new Media.DeleteEventHandler(Media_BeforeDelete);
-            }
-
-            content.AfterUpdateDocumentCache += new content.DocumentCacheEventHandler(content_AfterUpdateDocumentCache);
-            content.AfterRefreshContent += new content.RefreshContentEventHandler(content_AfterRefreshContent);
-        }
-
-        void content_AfterRefreshContent(Document sender, RefreshContentEventArgs e)
-        {
-            library.ClearNiceUrlCache();
-        }
-
-        void content_AfterUpdateDocumentCache(Document sender, DocumentCacheEventArgs e)
-        {
-            library.ClearNiceUrlCache();
-        }
-
-        void Member_BeforeDelete(Member sender, DeleteEventArgs e)
-        {
-            library.ClearLibraryCacheForMember(sender.Id);
-        }
-
-        void Media_BeforeDelete(Media sender, DeleteEventArgs e)
-        {
-            library.ClearLibraryCacheForMedia(sender.Id);
-        }
-
-        void Media_AfterSave(Media sender, SaveEventArgs e)
-        {
-            library.ClearLibraryCacheForMedia(sender.Id);
-        }
-
-        void Member_AfterSave(Member sender, SaveEventArgs e)
-        {
-            library.ClearLibraryCacheForMember(sender.Id);
-        }
     }
 }

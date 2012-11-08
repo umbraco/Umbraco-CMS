@@ -4,13 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Umbraco.Core;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
-    internal abstract class AbstractThumbnailProvider : IThumbnailProvider
+    public abstract class AbstractThumbnailProvider : IThumbnailProvider
     {
-        public abstract int Priority { get; }
-
         protected abstract IEnumerable<string> SupportedExtensions { get; }
 
         public bool CanProvideThumbnail(string fileUrl)

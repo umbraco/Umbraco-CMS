@@ -155,7 +155,7 @@ namespace umbraco
                     {
                         Cache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
                     }
-                    requestHandler.ClearProcessedRequests();
+
                     _xmlContent = value;
 
                     if (!UmbracoSettings.isXmlContentCacheDisabled && UmbracoSettings.continouslyUpdateXmlDiskCache)
@@ -257,16 +257,27 @@ namespace umbraco
             xmlDoc.InsertAfter(docType, xmlDoc.FirstChild);
         }
 
-        protected static void ValidateSchema(string docTypeAlias, XmlDocument xmlDoc)
+        protected static XmlDocument ValidateSchema(string docTypeAlias, XmlDocument xmlDoc)
         {
-            // if doctype is not defined i)n schema, then regenerate it
-            if (
-                !xmlDoc.DocumentType.InternalSubset.Contains(String.Format("<!ATTLIST {0} id ID #REQUIRED>",
-                                                                           docTypeAlias)))
-            {
-                // we need to re-load the content, else the dtd changes won't be picked up by the XmlDocument
-                Instance.XmlContentInternal = Instance.LoadContentFromDatabase();
-            }
+			// check if doctype is defined in schema else add it
+			// can't edit the doctype of an xml document, must create a new document
+
+			var doctype = xmlDoc.DocumentType;
+			var subset = doctype.InternalSubset;
+			if (!subset.Contains(string.Format("<!ATTLIST {0} id ID #REQUIRED>", docTypeAlias)))
+			{
+				subset = string.Format("<!ELEMENT {0} ANY>\r\n<!ATTLIST {0} id ID #REQUIRED>\r\n{1}", docTypeAlias, subset);
+				var xmlDoc2 = new XmlDocument();
+				doctype = xmlDoc2.CreateDocumentType("root", null, null, subset);
+				xmlDoc2.AppendChild(doctype);
+				var root = xmlDoc2.ImportNode(xmlDoc.DocumentElement, true);
+				xmlDoc2.AppendChild(root);
+
+				// apply
+				xmlDoc = xmlDoc2;
+			}
+
+			return xmlDoc;
         }
 
         #region Public Methods
@@ -344,13 +355,13 @@ namespace umbraco
         /// </summary>
         /// <param name="d"></param>
         /// <param name="xmlContentCopy"></param>
-        public static void PublishNodeDo(Document d, XmlDocument xmlContentCopy, bool updateSitemapProvider)
+        public static XmlDocument PublishNodeDo(Document d, XmlDocument xmlContentCopy, bool updateSitemapProvider)
         {
             // check if document *is* published, it could be unpublished by an event
             if (d.Published)
             {
                 int parentId = d.Level == 1 ? -1 : d.Parent.Id;
-                AppendDocumentXml(d.Id, d.Level, parentId, getPreviewOrPublishedNode(d, xmlContentCopy, false),
+				xmlContentCopy = AppendDocumentXml(d.Id, d.Level, parentId, getPreviewOrPublishedNode(d, xmlContentCopy, false),
                                   xmlContentCopy);
 
                 // update sitemapprovider
@@ -373,18 +384,24 @@ namespace umbraco
                     }
                 }
             }
-        }
 
-        public static void AppendDocumentXml(int id, int level, int parentId, XmlNode docXml, XmlDocument xmlContentCopy)
+			return xmlContentCopy;
+		}
+
+        public static XmlDocument AppendDocumentXml(int id, int level, int parentId, XmlNode docNode, XmlDocument xmlContentCopy)
         {
-            // Validate schema (that a definition of the current document type exists in the DTD
-            if (!UmbracoSettings.UseLegacyXmlSchema)
-            {
-                ValidateSchema(docXml.Name, xmlContentCopy);
-            }
-
             // Find the document in the xml cache
             XmlNode x = xmlContentCopy.GetElementById(id.ToString());
+
+			// if the document is not there already then it's a new document
+			// we must make sure that its document type exists in the schema
+			var xmlContentCopy2 = xmlContentCopy;
+			if (x == null && !UmbracoSettings.UseLegacyXmlSchema)
+			{
+				xmlContentCopy = ValidateSchema(docNode.Name, xmlContentCopy);
+				if (xmlContentCopy != xmlContentCopy2)
+					docNode = xmlContentCopy.ImportNode(docNode, true);
+			}
 
             // Find the parent (used for sortering and maybe creation of new node)
             XmlNode parentNode;
@@ -397,11 +414,11 @@ namespace umbraco
             {
                 if (x == null)
                 {
-                    x = docXml;
+                    x = docNode;
                     parentNode.AppendChild(x);
                 }
                 else
-                    TransferValuesFromDocumentXmlToPublishedXml(docXml, x);
+                    TransferValuesFromDocumentXmlToPublishedXml(docNode, x);
 
                 // TODO: Update with new schema!
                 string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./node" : "./* [@id]";
@@ -419,6 +436,8 @@ namespace umbraco
                     }
                 }
             }
+
+			return xmlContentCopy;
         }
 
         private static XmlNode getPreviewOrPublishedNode(Document d, XmlDocument xmlContentCopy, bool isPreview)
@@ -479,25 +498,18 @@ namespace umbraco
 
             if (!e.Cancel)
             {
-                // We need to lock content cache here, because we cannot allow other threads
-                // making changes at the same time, they need to be queued
-                // Adding log entry before locking the xmlfile
+				// lock the xml cache so no other thread can write to it at the same time
+				// note that some threads could read from it while we hold the lock, though
                 lock (_xmlContentInternalSyncLock)
                 {
-                    // Make copy of memory content, we cannot make changes to the same document
-                    // the is read from elsewhere
-                    if (UmbracoSettings.CloneXmlCacheOnPublish)
-                    {
-                        XmlDocument xmlContentCopy = CloneXmlDoc(XmlContentInternal);
+					// modify a clone of the cache because even though we're into the write-lock
+					// we may have threads reading at the same time. why is this an option?
+					XmlDocument wip = UmbracoSettings.CloneXmlCacheOnPublish
+						? CloneXmlDoc(XmlContentInternal)
+						: XmlContentInternal;
 
-                        PublishNodeDo(d, xmlContentCopy, true);
-                        XmlContentInternal = xmlContentCopy;
-                    }
-                    else
-                    {
-                        PublishNodeDo(d, XmlContentInternal, true);
-                        XmlContentInternal = _xmlContent;
-                    }
+					wip = PublishNodeDo(d, wip, true);
+					XmlContentInternal = wip;
 
                     ClearContextCache();
                 }
@@ -896,6 +908,16 @@ namespace umbraco
 
         internal const string PersistenceFlagContextKey = "vnc38ykjnkjdnk2jt98ygkxjng";
 
+		/// <summary>
+		/// Removes the flag that queues the file for persistence
+		/// </summary>
+		internal void RemoveXmlFilePersistenceQueue()
+		{
+			HttpContext.Current.Application.Lock();
+			HttpContext.Current.Application[PersistenceFlagContextKey] = null;
+			HttpContext.Current.Application.UnLock();
+		}
+
         internal bool IsXmlQueuedForPersistenceToFile
         {
             get
@@ -915,9 +937,7 @@ namespace umbraco
                             }
                             else
                             {
-                                HttpContext.Current.Application.Lock();
-                                HttpContext.Current.Application[PersistenceFlagContextKey] = null;
-                                HttpContext.Current.Application.UnLock();
+                                RemoveXmlFilePersistenceQueue();
                             }
                         }
                         catch

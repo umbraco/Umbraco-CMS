@@ -36,7 +36,7 @@ namespace umbraco.presentation.tinymce3
 
         protected void Page_Load(object sender, EventArgs e)
         {
-			ClientLoader.DataBind();
+            ClientLoader.DataBind();
 
             _scriptOnLoad = "";
 
@@ -96,7 +96,7 @@ namespace umbraco.presentation.tinymce3
                         macroType = mp.Type.Type;
                         try
                         {
-                            Assembly assembly = Assembly.LoadFrom( IOHelper.MapPath(SystemDirectories.Bin + "/" + macroAssembly + ".dll"));
+                            Assembly assembly = Assembly.LoadFrom(IOHelper.MapPath(SystemDirectories.Bin + "/" + macroAssembly + ".dll"));
 
                             Type type = assembly.GetType(macroAssembly + "." + macroType);
                             IMacroGuiRendering typeInstance = Activator.CreateInstance(type) as IMacroGuiRendering;
@@ -133,7 +133,7 @@ namespace umbraco.presentation.tinymce3
                                 pp.Text = mp.Name;
                                 pp.Controls.Add(control);
                                 _scriptOnLoad += "\t\tregisterAlias('" + control.ID + "');\n";
-//                                pp.Controls.Add(new LiteralControl("<script type=\"text/javascript\"></script>\n"));
+                                //                                pp.Controls.Add(new LiteralControl("<script type=\"text/javascript\"></script>\n"));
                                 macroProperties.Controls.Add(pp);
 
                                 _dataFields.Add(control);
@@ -175,56 +175,40 @@ namespace umbraco.presentation.tinymce3
         protected void renderMacro_Click(object sender, EventArgs e)
         {
             int pageID = int.Parse(UmbracoContext.Current.Request["umbPageId"]);
-            string macroAttributes = "macroAlias=\"" + m.Alias + "\"";
+
+            string macroAttributes = string.Format("macroAlias=\"{0}\"", m.Alias);
 
             Guid pageVersion = new Guid(UmbracoContext.Current.Request["umbVersionId"]);
 
-            Hashtable attributes = new Hashtable();
-            attributes.Add("macroAlias", m.Alias);
+            Hashtable attributes = new Hashtable { { "macroAlias", m.Alias } };
 
-            macro mRender = macro.GetMacro(m.Id);
             foreach (Control c in _dataFields)
             {
                 try
                 {
                     IMacroGuiRendering ic = (IMacroGuiRendering)c;
                     attributes.Add(c.ID.ToLower(), ic.Value);
-                    macroAttributes += " " + c.ID + "=\"" +
-                                       ic.Value.Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "\\r") + "\"";
+                    macroAttributes += string.Format(" {0}=\"{1}\"", c.ID, ic.Value.Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "\\r"));
                 }
                 catch
                 {
                 }
             }
 
-            // document this, for gods sake!
             HttpContext.Current.Items["macrosAdded"] = 0;
             HttpContext.Current.Items["pageID"] = pageID.ToString();
 
-
-            page p = new page(pageID, pageVersion);
-
             string div = macro.renderMacroStartTag(attributes, pageID, pageVersion).Replace("\\", "\\\\").Replace("'", "\\'");
 
-            string macroContent =
-                macro.MacroContentByHttp(pageID, pageVersion, attributes).Replace("\\", "\\\\").Replace("'", "\\'").
-                    Replace("/", "\\/").Replace("\n", "\\n");
+            string macroContent = macro.MacroContentByHttp(pageID, pageVersion, attributes).Replace("\\", "\\\\").Replace("'", "\\'").Replace("/", "\\/").Replace("\n", "\\n");
 
             if (macroContent.Length > 0 && macroContent.ToLower().IndexOf("<script") > -1)
-                macroContent =
-                    "<b>Macro rendering contains script code</b><br/>This macro won\\'t be rendered in the editor because it contains script code. It will render correct during runtime.";
+                macroContent = "<b>Macro rendering contains script code</b><br/>This macro won\\'t be rendered in the editor because it contains script code. It will render correct during runtime.";
+
             div += macroContent;
             div += macro.renderMacroEndTag();
 
-            _scriptOnLoad += "\t\tumbracoEditMacroDo('" + macroAttributes.Replace("'", "\\'") +
-                                               "', '" + m.Name.Replace("'", "\\'") + "', '" + div + "');\n";
-/*
-            ClientScript.RegisterStartupScript(GetType(), "postbackScript",
-                                               "<script>\n umbracoEditMacroDo('" + macroAttributes.Replace("'", "\\'") +
-                                               "', '" + m.Name.Replace("'", "\\'") + "', '" + div + "');\n</script>");
-            ClientScript.RegisterStartupScript(GetType(), "postbackScriptWindowClose",
-                                               "<script>\n //setTimeout('window.close()',300);\n</script>");
-*/            //theForm.Visible = false;
+            _scriptOnLoad += string.Format("\t\tumbracoEditMacroDo('{0}', '{1}', '{2}');\n", macroAttributes.Replace("'", "\\'"), m.Name.Replace("'", "\\'"), div);
         }
     }
 }

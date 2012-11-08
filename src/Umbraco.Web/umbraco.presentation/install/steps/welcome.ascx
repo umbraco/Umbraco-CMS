@@ -34,7 +34,7 @@
             </p>
             <p>
                 As this is an upgrade, <strong>the wizard might skip steps</strong> that are only needed for new umbraco installations. It might also ask you questions you've already answered once. But do not worry, 
-                everything is in order. Click <strong>Lets get started</strong> below to begin your upgrade.
+                everything is in order. Click <strong>Let's get started</strong> below to begin your upgrade.
             </p>
 		<span class="enjoy">Enjoy!</span>
          </asp:PlaceHolder>
@@ -43,7 +43,7 @@
 	<!-- btn box -->
 	<footer class="btn-box">
         <div class="t">&nbsp;</div>
-        <asp:LinkButton ID="btnNext" CssClass="btn btn-get" runat="server" OnClick="gotoNextStep"><span>Lets get started!</span></asp:LinkButton>
+        <asp:LinkButton ID="btnNext" CssClass="btn btn-get" runat="server" OnClick="gotoNextStep"><span>Let's get started!</span></asp:LinkButton>
     </footer>
 
 </div>

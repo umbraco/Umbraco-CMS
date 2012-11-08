@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2010
+# Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F0242771-6DE6-4E03-BD3A-7B79BA79105B}"
 	ProjectSection(SolutionItems) = preProject
 		INDIGO64.testrunconfig = INDIGO64.testrunconfig
@@ -24,17 +24,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-1
 		..\docs\License.txt = ..\docs\License.txt
 		..\docs\README.txt = ..\docs\README.txt
 		..\docs\ReleaseNotes.txt = ..\docs\ReleaseNotes.txt
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nant", "Nant", "{17E547B1-D89B-4C76-AB9C-F05888397FA4}"
-	ProjectSection(SolutionItems) = preProject
-		..\build\Nant\aspnet35.build = ..\build\Nant\aspnet35.build
-		..\build\Nant\aspnet35.config = ..\build\Nant\aspnet35.config
-		..\build\Nant\build.xml = ..\build\Nant\build.xml
-		..\build\Nant\default.build = ..\build\Nant\default.build
-		..\build\Nant\nuget.build = ..\build\Nant\nuget.build
-		..\build\Nant\umbraco weekly.build = ..\build\Nant\umbraco weekly.build
-		..\build\Nant\umbraco.build = ..\build\Nant\umbraco.build
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.UI", "Umbraco.Web.UI\Umbraco.Web.UI.csproj", "{4C4C194C-B5E4-4991-8F87-4373E24CC19F}"
@@ -64,8 +53,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.MacroEngines", "umbraco.MacroEngines\umbraco.MacroEngines.csproj", "{89C09045-1064-466B-B94A-DB3AFE2A5853}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.MacroEngines.Iron", "umbraco.MacroEngines.Iron\umbraco.MacroEngines.Iron.csproj", "{98CBA7E2-1B62-497C-8AA3-B868704068D7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.LegacyTests", "..\test\umbraco.Test\Umbraco.LegacyTests.csproj", "{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{B5BD12C1-A454-435E-8A46-FF4A364C0382}"
 EndProject
@@ -134,10 +121,6 @@ Global
 		{98CBA7E2-1B62-497C-8AA3-B868704068D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98CBA7E2-1B62-497C-8AA3-B868704068D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98CBA7E2-1B62-497C-8AA3-B868704068D7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -155,8 +138,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{17E547B1-D89B-4C76-AB9C-F05888397FA4} = {2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}
-		{6277C9FB-3A9A-4537-AA86-82DA9B2527FD} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{5D3B8245-ADA6-453F-A008-50ED04BFE770} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 	EndGlobalSection
 EndGlobal

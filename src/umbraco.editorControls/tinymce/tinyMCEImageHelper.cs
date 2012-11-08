@@ -122,7 +122,7 @@ namespace umbraco.editorControls.tinymce
         {
             string src = helper.FindAttribute(ht, "src");
             //get the media folder, minus the starting '~'
-			string mediaRoot = Umbraco.Core.IO.SystemDirectories.Media.Replace("~", string.Empty);
+			string mediaRoot = global::Umbraco.Core.IO.SystemDirectories.Media.Replace("~", string.Empty);
 
             // update orgSrc to remove umbraco reference
             int mediaRootIndex = src.IndexOf(mediaRoot);
@@ -136,7 +136,7 @@ namespace umbraco.editorControls.tinymce
 
         private static string doResize(Hashtable attributes, out int finalWidth, out int finalHeight)
         {
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
             string resizeDim = helper.FindAttribute(attributes, "width") + "," +
                                helper.FindAttribute(attributes, "height");

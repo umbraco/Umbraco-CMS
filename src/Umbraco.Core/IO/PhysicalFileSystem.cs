@@ -4,9 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
+using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.IO
 {
+
+	[UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1156", "Will be declared public after 4.10")]
     internal class PhysicalFileSystem : IFileSystem
     {
         private readonly string _rootPath;

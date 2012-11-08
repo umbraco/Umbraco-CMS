@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Xml.Linq;
+using Umbraco.Core;
 using umbraco.BusinessLogic.Utils;
 using umbraco.DataLayer;
 using umbraco.businesslogic;
@@ -8,7 +9,7 @@ using umbraco.interfaces;
 
 namespace umbraco.BusinessLogic
 {
-    public class ApplicationTreeRegistrar : ApplicationStartupHandler
+    public class ApplicationTreeRegistrar : IApplicationStartupHandler
     {
         private ISqlHelper _sqlHelper;
         protected ISqlHelper SqlHelper
@@ -29,13 +30,17 @@ namespace umbraco.BusinessLogic
 
         public ApplicationTreeRegistrar()
         {
-            // Load all Applications by attribute and add them to the XML config
-            var types = TypeFinder.FindClassesOfType<ITree>()
-                .Where(x => x.GetCustomAttributes(typeof(TreeAttribute), false).Any());
+			//don't do anything if the application is not configured!
+			if (!ApplicationContext.Current.IsConfigured)
+				return;
 
-            var items = types.Select(x => new Tuple<Type, TreeAttribute>(x,
-                                                                         (TreeAttribute)x.GetCustomAttributes(typeof(TreeAttribute), false).Single()))
-                .Where(x => ApplicationTree.getByAlias(x.Item2.Alias) == null);
+            // Load all Trees by attribute and add them to the XML config
+			var types = PluginManager.Current.ResolveAttributedTrees();
+
+        	var items = types
+        		.Select(x =>
+        		        new Tuple<Type, TreeAttribute>(x, x.GetCustomAttributes<TreeAttribute>(false).Single()))
+        		.Where(x => ApplicationTree.getByAlias(x.Item2.Alias) == null);
 
             var allAliases = ApplicationTree.getAll().Select(x => x.Alias).Concat(items.Select(x => x.Item2.Alias));
             var inString = "'" + string.Join("','", allAliases) + "'";

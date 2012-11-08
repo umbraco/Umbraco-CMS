@@ -20,7 +20,7 @@ namespace dashboardUtilities
 		// Find current user
 		private System.Collections.ArrayList printedIds = new System.Collections.ArrayList();
 		private int count = 0;
-		private int maxRecords = 5;
+        public int MaxRecords { get; set; }
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
@@ -32,7 +32,7 @@ namespace dashboardUtilities
 
 		public string PrintNodeName(object NodeId, object Date) 
 		{
-			if (!printedIds.Contains(NodeId) && count < maxRecords) 
+			if (!printedIds.Contains(NodeId) && count < MaxRecords) 
 			{
 				printedIds.Add(NodeId);
 				try 

@@ -113,7 +113,15 @@ namespace umbraco
         /// </summary>
         public static bool KeepUserLoggedIn
         {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.KeepUserLoggedIn; }
+            get { return Umbraco.Core.Configuration.UmbracoSettings.KeepUserLoggedIn; }
+        }
+
+        /// <summary>
+        /// Enables the experimental canvas (live) editing on the frontend of the website
+        /// </summary>
+        public static bool EnableCanvasEditing
+        {
+            get { return Umbraco.Core.Configuration.UmbracoSettings.EnableCanvasEditing; }
         }
 
         /// <summary>
@@ -322,16 +330,7 @@ namespace umbraco
         {
 			get { return Umbraco.Core.Configuration.UmbracoSettings.ScriptDisableEditor; }
         }
-
-        /// <summary>
-        /// Gets the graphic headline format - png or gif
-        /// </summary>
-        /// <value>The graphic headline format.</value>
-        public static string GraphicHeadlineFormat
-        {
-			get { return Umbraco.Core.Configuration.UmbracoSettings.GraphicHeadlineFormat; }
-        }
-
+        
         /// <summary>
         /// Gets a value indicating whether umbraco will ensure unique node naming.
         /// This will ensure that nodes cannot have the same url, but will add extra characters to a url.

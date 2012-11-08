@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Dynamic;
+using Umbraco.Core;
 using umbraco.interfaces;
 using System.Collections;
 using System.Reflection;
@@ -10,15 +11,18 @@ using System.Runtime.CompilerServices;
 using System.Web.Compilation;
 using System.Linq.Expressions;
 using System.Linq.Dynamic;
+using Umbraco.Core;
 namespace umbraco.MacroEngines
 {
-    public class DynamicNodeList : DynamicObject, IEnumerable
+    public class DynamicNodeList : DynamicObject, IEnumerable<DynamicNode>
     {
-        public List<DynamicNode> Items;
-        public List<DynamicNode> get_Items()
-        {
-            return Items;
-        }
+    	public List<DynamicNode> Items;
+
+		[Obsolete("Use the Items property instead")]
+		public List<DynamicNode> get_Items()
+		{
+			return Items;
+		}
 
         public DynamicNodeList()
         {
@@ -65,23 +69,97 @@ namespace umbraco.MacroEngines
         }
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
+	        var firstArg = args.FirstOrDefault();
+			//this is to check for 'DocumentTypeAlias' vs 'NodeTypeAlias' for compatibility
+			if (firstArg != null && firstArg.ToString().InvariantStartsWith("DocumentTypeAlias"))
+			{
+				firstArg = "NodeTypeAlias" + firstArg.ToString().Substring("DocumentTypeAlias".Length);
+			}
+
             var name = binder.Name;
+			if (name == "Single")
+			{
+				string predicate = firstArg == null ? "" : firstArg.ToString();
+				var values = predicate.IsNullOrWhiteSpace() ? new object[] { } : args.Skip(1).ToArray();
+				var single = this.Single<DynamicNode>(predicate, values);
+				result = new DynamicNode(single);
+				return true;
+			}
+			if (name == "SingleOrDefault")
+			{
+				string predicate = firstArg == null ? "" : firstArg.ToString();
+				var values = predicate.IsNullOrWhiteSpace() ? new object[] { } : args.Skip(1).ToArray();
+				var single = this.SingleOrDefault<DynamicNode>(predicate, values);
+				if (single == null)
+					result = new DynamicNull();
+				else
+					result = new DynamicNode(single);
+				return true;
+			}
+			if (name == "First")
+			{
+				string predicate = firstArg == null ? "" : firstArg.ToString();
+				var values = predicate.IsNullOrWhiteSpace() ? new object[] { } : args.Skip(1).ToArray();
+				var first = this.First<DynamicNode>(predicate, values);
+				result = new DynamicNode(first);
+				return true;
+			}
+			if (name == "FirstOrDefault")
+			{
+				string predicate = firstArg == null ? "" : firstArg.ToString();
+				var values = predicate.IsNullOrWhiteSpace() ? new object[] { } : args.Skip(1).ToArray();
+				var first = this.FirstOrDefault<DynamicNode>(predicate, values);
+				if (first == null)
+					result = new DynamicNull();
+				else
+					result = new DynamicNode(first);
+				return true;
+			}
+			if (name == "Last")
+			{
+				string predicate = firstArg == null ? "" : firstArg.ToString();
+				var values = predicate.IsNullOrWhiteSpace() ? new object[] { } : args.Skip(1).ToArray();
+				var last = this.Last<DynamicNode>(predicate, values);
+				result = new DynamicNode(last);
+				return true;
+			}
+			if (name == "LastOrDefault")
+			{
+				string predicate = firstArg == null ? "" : firstArg.ToString();
+				var values = predicate.IsNullOrWhiteSpace() ? new object[] { } : args.Skip(1).ToArray();
+				var last = this.LastOrDefault<DynamicNode>(predicate, values);
+				if (last == null)
+					result = new DynamicNull();
+				else
+					result = new DynamicNode(last);
+				return true;
+			}
             if (name == "Where")
             {
-                string predicate = args.First().ToString();
+				string predicate = firstArg.ToString();
                 var values = args.Skip(1).ToArray();
                 result = new DynamicNodeList(this.Where<DynamicNode>(predicate, values).ToList());
                 return true;
             }
             if (name == "OrderBy")
             {
-                result = new DynamicNodeList(this.OrderBy<DynamicNode>(args.First().ToString()).ToList());
+				result = new DynamicNodeList(this.OrderBy<DynamicNode>(firstArg.ToString()).ToList());
                 return true;
             }
+			if (name == "Take")
+			{
+				result = new DynamicNodeList(this.Take((int)firstArg));
+				return true;
+			}
+			if (name == "Skip")
+			{
+				result = new DynamicNodeList(this.Skip((int)firstArg));
+				return true;
+			}
             if (name == "InGroupsOf")
             {
                 int groupSize = 0;
-                if (int.TryParse(args.First().ToString(), out groupSize))
+				if (int.TryParse(firstArg.ToString(), out groupSize))
                 {
                     result = this.InGroupsOf<DynamicNode>(groupSize);
                     return true;
@@ -92,7 +170,7 @@ namespace umbraco.MacroEngines
             if (name == "GroupedInto")
             {
                 int groupCount = 0;
-                if (int.TryParse(args.First().ToString(), out groupCount))
+				if (int.TryParse(firstArg.ToString(), out groupCount))
                 {
                     result = this.GroupedInto<DynamicNode>(groupCount);
                     return true;
@@ -102,7 +180,7 @@ namespace umbraco.MacroEngines
             }
             if (name == "GroupBy")
             {
-                result = this.GroupBy<DynamicNode>(args.First().ToString());
+				result = this.GroupBy<DynamicNode>(firstArg.ToString());
                 return true;
             }
             if (name == "Average" || name == "Min" || name == "Max" || name == "Sum")
@@ -112,40 +190,40 @@ namespace umbraco.MacroEngines
             }
             if (name == "Union")
             {
-                if ((args.First() as IEnumerable<DynamicNode>) != null)
+				if ((firstArg as IEnumerable<DynamicNode>) != null)
                 {
-                    result = new DynamicNodeList(this.Items.Union(args.First() as IEnumerable<DynamicNode>));
+					result = new DynamicNodeList(this.Items.Union(firstArg as IEnumerable<DynamicNode>));
                     return true;
                 }
-                if ((args.First() as DynamicNodeList) != null)
+				if ((firstArg as DynamicNodeList) != null)
                 {
-                    result = new DynamicNodeList(this.Items.Union((args.First() as DynamicNodeList).Items));
+					result = new DynamicNodeList(this.Items.Union((firstArg as DynamicNodeList).Items));
                     return true;
                 }
             }
             if (name == "Except")
             {
-                if ((args.First() as IEnumerable<DynamicNode>) != null)
+				if ((firstArg as IEnumerable<DynamicNode>) != null)
                 {
-                    result = new DynamicNodeList(this.Items.Except(args.First() as IEnumerable<DynamicNode>, new DynamicNodeIdEqualityComparer()));
+					result = new DynamicNodeList(this.Items.Except(firstArg as IEnumerable<DynamicNode>, new DynamicNodeIdEqualityComparer()));
                     return true;
                 }
-                if ((args.First() as DynamicNodeList) != null)
+				if ((firstArg as DynamicNodeList) != null)
                 {
-                    result = new DynamicNodeList(this.Items.Except((args.First() as DynamicNodeList).Items, new DynamicNodeIdEqualityComparer()));
+					result = new DynamicNodeList(this.Items.Except((firstArg as DynamicNodeList).Items, new DynamicNodeIdEqualityComparer()));
                     return true;
                 }
             }
             if (name == "Intersect")
             {
-                if ((args.First() as IEnumerable<DynamicNode>) != null)
+				if ((firstArg as IEnumerable<DynamicNode>) != null)
                 {
-                    result = new DynamicNodeList(this.Items.Intersect(args.First() as IEnumerable<DynamicNode>, new DynamicNodeIdEqualityComparer()));
+					result = new DynamicNodeList(this.Items.Intersect(firstArg as IEnumerable<DynamicNode>, new DynamicNodeIdEqualityComparer()));
                     return true;
                 }
-                if ((args.First() as DynamicNodeList) != null)
+				if ((firstArg as DynamicNodeList) != null)
                 {
-                    result = new DynamicNodeList(this.Items.Intersect((args.First() as DynamicNodeList).Items, new DynamicNodeIdEqualityComparer()));
+					result = new DynamicNodeList(this.Items.Intersect((firstArg as DynamicNodeList).Items, new DynamicNodeIdEqualityComparer()));
                     return true;
                 }
             }
@@ -165,7 +243,6 @@ namespace umbraco.MacroEngines
                 result = Items.GetType().InvokeMember(binder.Name,
                                                   System.Reflection.BindingFlags.Instance |
                                                   System.Reflection.BindingFlags.Public |
-                                                  System.Reflection.BindingFlags.NonPublic |
                                                   System.Reflection.BindingFlags.GetProperty,
                                                   null,
                                                   Items,
@@ -180,7 +257,6 @@ namespace umbraco.MacroEngines
                     result = Items.GetType().InvokeMember(binder.Name,
                                                   System.Reflection.BindingFlags.Instance |
                                                   System.Reflection.BindingFlags.Public |
-                                                  System.Reflection.BindingFlags.NonPublic |
                                                   System.Reflection.BindingFlags.Static |
                                                   System.Reflection.BindingFlags.InvokeMethod,
                                                   null,
@@ -377,6 +453,12 @@ namespace umbraco.MacroEngines
                     var genericArgs = (new[] { this }).Concat(args);
                     result = methodToExecute.Invoke(null, genericArgs.ToArray());
                 }
+				else if (TypeHelper.IsTypeAssignableFrom<IQueryable>(methodToExecute.GetParameters().First().ParameterType))
+				{
+					//if it is IQueryable, we'll need to cast Items AsQueryable
+					var genericArgs = (new[] { Items.AsQueryable() }).Concat(args);
+					result = methodToExecute.Invoke(null, genericArgs.ToArray());
+				}
                 else
                 {
                     var genericArgs = (new[] { Items }).Concat(args);
@@ -405,11 +487,52 @@ namespace umbraco.MacroEngines
             return result;
         }
 
-        public IEnumerator GetEnumerator()
-        {
-            return Items.GetEnumerator();
-        }
+		public IEnumerator<DynamicNode> GetEnumerator()
+		{
+			return Items.GetEnumerator();
+		}
 
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+
+		public T Single<T>(string predicate, params object[] values)
+		{
+			return predicate.IsNullOrWhiteSpace()
+				? ((IQueryable<T>)Items.AsQueryable()).Single()
+				: Where<T>(predicate, values).Single();
+		}
+		public T SingleOrDefault<T>(string predicate, params object[] values)
+		{
+			return predicate.IsNullOrWhiteSpace()
+				? ((IQueryable<T>)Items.AsQueryable()).SingleOrDefault()
+				: Where<T>(predicate, values).SingleOrDefault();
+		}
+		public T First<T>(string predicate, params object[] values)
+		{
+			return predicate.IsNullOrWhiteSpace()
+				? ((IQueryable<T>)Items.AsQueryable()).First()
+				: Where<T>(predicate, values).First();
+		}
+		public T FirstOrDefault<T>(string predicate, params object[] values)
+		{
+			return predicate.IsNullOrWhiteSpace()
+				? ((IQueryable<T>)Items.AsQueryable()).FirstOrDefault()
+				: Where<T>(predicate, values).FirstOrDefault();
+		}
+		public T Last<T>(string predicate, params object[] values)
+		{
+			return predicate.IsNullOrWhiteSpace()
+				? ((IQueryable<T>)Items.AsQueryable()).Last()
+				: Where<T>(predicate, values).Last();
+		}
+		public T LastOrDefault<T>(string predicate, params object[] values)
+		{
+			return predicate.IsNullOrWhiteSpace()
+				? ((IQueryable<T>)Items.AsQueryable()).LastOrDefault()
+				: Where<T>(predicate, values).LastOrDefault();
+		}
         public IQueryable<T> Where<T>(string predicate, params object[] values)
         {
             return ((IQueryable<T>)Items.AsQueryable()).Where(predicate, values);

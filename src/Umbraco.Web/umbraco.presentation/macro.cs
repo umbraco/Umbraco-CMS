@@ -16,6 +16,8 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml;
 using System.Xml.Xsl;
+using Umbraco.Core;
+using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.businesslogic.macro;
@@ -321,8 +323,18 @@ namespace umbraco
                     // An empty reference (null) means: macroHtml has NOT been cached before
                     if (macroHtml != null)
                     {
-                        UmbracoContext.Current.Trace.Write("renderMacro",
-                            string.Format("Macro Content loaded from cache '{0}'.", Model.CacheIdentifier));
+                        if (MacroNeedsToBeClearedFromCache(Model, "macroHtml_DateAdded_" + Model.CacheIdentifier))
+                        {
+                            macroHtml = null;
+                            UmbracoContext.Current.Trace.Write("renderMacro",
+                                   string.Format("Macro removed from cache due to file change '{0}'.", Model.CacheIdentifier));
+                        }
+                        else
+                        {
+                            UmbracoContext.Current.Trace.Write("renderMacro",
+                                   string.Format("Macro Content loaded from cache '{0}'.", Model.CacheIdentifier));
+                        }
+
                     }
                 }
                 else
@@ -334,8 +346,18 @@ namespace umbraco
                         macroControl = cacheContent.Content;
                         macroControl.ID = cacheContent.ID;
 
-                        UmbracoContext.Current.Trace.Write("renderMacro",
-                            string.Format("Macro Control loaded from cache '{0}'.", Model.CacheIdentifier));
+                        if (MacroNeedsToBeClearedFromCache(Model, "macroControl_DateAdded_" + Model.CacheIdentifier))
+                        {
+                            UmbracoContext.Current.Trace.Write("renderMacro",
+                                  string.Format("Macro removed from cache due to file change '{0}'.", Model.CacheIdentifier));
+                            macroControl = null;
+                        }
+                        else
+                        {
+                            UmbracoContext.Current.Trace.Write("renderMacro",
+                                    string.Format("Macro Control loaded from cache '{0}'.", Model.CacheIdentifier));
+                        }
+    
                     }
                 }
             }
@@ -476,6 +498,16 @@ namespace umbraco
 
 
 
+                                                macroCache.Insert("macroHtml_DateAdded_" + Model.CacheIdentifier,
+                                                DateTime.Now,
+
+                                                null,
+                                                DateTime.Now.AddSeconds(Model.CacheDuration),
+                                                TimeSpan.Zero,
+                                                CacheItemPriority.NotRemovable, //FlorisRobbemont: issue #27610 -> Macro output cache should not be removable
+
+                                                null);
+
                                 // zb-00003 #29470 : replace by text if not already text
                                 // otherwise it is rendered twice
                                 if (!(macroControl is LiteralControl))
@@ -495,6 +527,14 @@ namespace umbraco
 
                                                 null);
 
+
+                                macroCache.Insert("macroControl_DateAdded_" + Model.CacheIdentifier,
+                                                 DateTime.Now, null,
+                                                 DateTime.Now.AddSeconds(Model.CacheDuration), TimeSpan.Zero,
+                                                 CacheItemPriority.NotRemovable, //FlorisRobbemont: issue #27610 -> Macro output cache should not be removable
+
+                                                 null);
+
                                 UmbracoContext.Current.Trace.Write("renderMacro",
                                     string.Format("Macro Control saved to cache '{0}'.", Model.CacheIdentifier));
                             }
@@ -509,6 +549,57 @@ namespace umbraco
             }
 
             return macroControl;
+        }
+
+        /// <summary>
+        /// check that the file has not recently changed
+        /// </summary>
+        /// <param name="Model"></param>
+        /// <returns></returns>
+        private bool MacroNeedsToBeClearedFromCache(MacroModel Model,string dateAddedKey)
+        {
+            
+            if(MacroIsFileBased(Model))
+            {
+                if(macroCache[dateAddedKey]!=null)
+                {
+                    DateTime dateMacroAdded = DateTime.Parse(macroCache[dateAddedKey].ToString());
+
+                    string macroFile = GetMacroFile(Model);
+                    FileInfo fileInfo = new FileInfo(HttpContext.Current.Server.MapPath(macroFile));
+
+
+                    if (fileInfo.LastWriteTime.CompareTo(dateMacroAdded) ==1)
+                    {
+                        UmbracoContext.Current.Trace.Write("renderMacro",
+                                   string.Format("Macro needs to be removed from cache due to file change '{0}'.", Model.CacheIdentifier));
+                        return true;
+                    }
+                  
+                }
+
+            }
+
+            return false;
+        }
+
+        private string GetMacroFile(MacroModel Model)
+        {
+           if(Model.Xslt!=string.Empty)
+           {
+               return string.Concat("/xslt/", Model.Xslt);
+           }
+           if(Model.ScriptName!=string.Empty)
+           {
+               return string.Concat("/macroScripts/" + Model.ScriptName);
+           }
+            //??
+            return "/" + Model.TypeName;
+        }
+
+        private static bool MacroIsFileBased(MacroModel Model)
+        {
+            return Model.MacroType!=MacroTypes.CustomControl;
         }
 
         private bool cacheMacroAsString(MacroModel model)
@@ -756,7 +847,7 @@ namespace umbraco
             // Do transformation
             UmbracoContext.Current.Trace.Write("umbracoMacro", "Before performing transformation");
             xslt.Transform(macroXML.CreateNavigator(), xslArgs, tw);
-            return IOHelper.ResolveUrlsFromTextString(tw.ToString());
+			return TemplateUtilities.ResolveUrlsFromTextString(tw.ToString());
         }
 
         public static XsltArgumentList AddXsltExtensions()
@@ -775,6 +866,10 @@ namespace umbraco
             // We could cache the extensions in a static variable but then the cache
             // would not be refreshed when the .config file is modified. An application
             // restart would be required. Better use the cache and add a dependency.
+			
+			// SD: Not sure what is meant by the above statement? Having these in a static variable would be preferred!
+			//  If you modify a config file, the app restarts and thus all static variables are reset.
+			//  Having this stuff in cache just adds to the gigantic amount of cache data and will cause more cache turnover to happen.
 
             return cms.businesslogic.cache.Cache.GetCacheItem(
                 _xsltExtensionsCacheKey, _xsltExtensionsSyncLock,
@@ -782,7 +877,7 @@ namespace umbraco
                 null, // no refresh action
                 _xsltExtensionsDependency.Value, // depends on the .config file
                 TimeSpan.FromDays(1), // expires in 1 day (?)
-                () => { return GetXsltExtensionsImpl(); });
+                GetXsltExtensionsImpl);
         }
 
         // zb-00041 #29966 : cache the extensions
@@ -840,12 +935,16 @@ namespace umbraco
             //also get types marked with XsltExtension attribute
 
             // zb-00042 #29949 : do not hide errors, refactor
-            foreach (Type xsltType in TypeFinder.FindClassesMarkedWithAttribute(typeof(XsltExtensionAttribute)))
+        	
+			var foundExtensions = Umbraco.Web.PluginManagerExtensions.ResolveXsltExtensions(PluginManager.Current);
+			foreach (var xsltType in foundExtensions)
             {
-                object[] tpAttributes = xsltType.GetCustomAttributes(typeof(XsltExtensionAttribute), true);
+                var tpAttributes = xsltType.GetCustomAttributes(typeof(XsltExtensionAttribute), true);
                 foreach (XsltExtensionAttribute tpAttribute in tpAttributes)
                 {
-                    string ns = !string.IsNullOrEmpty(tpAttribute.Namespace) ? tpAttribute.Namespace : xsltType.FullName;
+                    var ns = !string.IsNullOrEmpty(tpAttribute.Namespace) 
+						? tpAttribute.Namespace 
+						: xsltType.FullName;
                     extensions.Add(ns, Activator.CreateInstance(xsltType));
                 }
             }
@@ -949,7 +1048,7 @@ namespace umbraco
                         currentNode = macroXML.ImportNode(umbracoXML.GetElementById(currentID.ToString()), true);
 
                     // remove all sub content nodes
-                    foreach (XmlNode n in currentNode.SelectNodes("./node"))
+                    foreach (XmlNode n in currentNode.SelectNodes("node|*[@isDoc]"))
                         currentNode.RemoveChild(n);
 
                     macroXmlNode.AppendChild(currentNode);
@@ -970,7 +1069,7 @@ namespace umbraco
                     XmlNode source = umbracoXML.GetElementById(macroPropertyValue);
                     if (source != null)
                     {
-                        XmlNodeList sourceList = source.SelectNodes("node");
+                        XmlNodeList sourceList = source.SelectNodes("node|*[@isDoc]");
                         if (sourceList.Count > 0)
                         {
                             int rndNumber;
@@ -981,7 +1080,7 @@ namespace umbraco
                             }
                             XmlNode node = macroXML.ImportNode(sourceList[rndNumber], true);
                             // remove all sub content nodes
-                            foreach (XmlNode n in node.SelectNodes("./node"))
+                            foreach (XmlNode n in node.SelectNodes("node|*[@isDoc]"))
                                 node.RemoveChild(n);
 
                             macroXmlNode.AppendChild(node);

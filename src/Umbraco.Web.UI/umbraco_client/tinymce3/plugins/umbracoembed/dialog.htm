@@ -76,7 +76,7 @@
             <div id="source_panel" class="panel">
                 <fieldset>
                     <legend>{#embed_dlg.source}</legend>
-                    <textarea id="source"></textarea>
+                    <textarea id="source" onkeyup="UmbracoEmbedDialog.changeSource();" onchange="UmbracoEmbedDialog.updatePreviewFromSource();"></textarea>
                 </fieldset>
             </div>
         </div>    

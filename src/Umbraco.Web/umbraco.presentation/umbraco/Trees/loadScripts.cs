@@ -33,7 +33,6 @@ namespace umbraco
     public class loadScripts : FileSystemTree
 	{
         public loadScripts(string application) : base(application) { }
-
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
         {            
 			rootNode.NodeType = "init" + TreeAlias;

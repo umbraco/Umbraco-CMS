@@ -1,4 +1,5 @@
-<%@ Page Language="c#" CodeBehind="default.aspx.cs" AutoEventWireup="True" Inherits="umbraco.presentation.install._default" EnableViewState="False" %>
+<%@ Page Language="c#" CodeBehind="Default.aspx.cs" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Install.Default" EnableViewState="False" %>
+
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <%@ Register Src="~/install/Title.ascx" TagPrefix="umb1" TagName="PageTitle" %>
@@ -7,140 +8,149 @@
 <html>
 <head runat="server">
 
-	<meta charset="utf-8">
+    <meta charset="utf-8">
 
-	<umb1:PageTitle runat="server" />
+    <umb1:PageTitle runat="server" />
 
-	<link media="all" rel="stylesheet" href="../umbraco_client/installer/css/jquery-ui-1.8.6.custom.css">
-	<link media="all" type="text/css" rel="stylesheet" href="../umbraco_client/installer/css/reset.css" />
-	<link media="all" rel="stylesheet" href="../umbraco_client/installer/css/all.css">
-	<link media="all" type="text/css" rel="stylesheet" href="../umbraco_client/installer/css/form.css" />
+    <link media="all" rel="stylesheet" href="../umbraco_client/installer/css/jquery-ui-1.8.6.custom.css">
+    <link media="all" type="text/css" rel="stylesheet" href="../umbraco_client/installer/css/reset.css" />
+    <link media="all" rel="stylesheet" href="../umbraco_client/installer/css/all.css">
+    <link media="all" type="text/css" rel="stylesheet" href="../umbraco_client/installer/css/form.css" />
 
-	<script src="../umbraco_client/installer/js/jquery.1.4.4.js" type="text/javascript"></script>
-	<script src="../umbraco_client/installer/js/jquery.ui.selectmenu.js" type="text/javascript"></script>
-	<script src="../umbraco_client/installer/js/jquery.main.js" type="text/javascript"></script>
-
+    <script src="../umbraco_client/Application/NamespaceManager.js" type="text/javascript"></script>
+    <script src="../umbraco_client/ui/base2.js" type="text/javascript"></script>
+    <script src="../umbraco_client/installer/js/jquery.1.4.4.js" type="text/javascript"></script>
+    <script src="../umbraco_client/installer/js/jquery.ui.selectmenu.js" type="text/javascript"></script>
+    <script src="../umbraco_client/installer/js/jquery.main.js" type="text/javascript"></script>
     <script src="../umbraco_client/passwordStrength/passwordstrength.js" type="text/javascript"></script>
 
-	<!--[if lt IE 9]>
+    <script src="../umbraco_client/installer/js/PackageInstaller.js" type="text/javascript"></script>
+
+    <!--[if lt IE 9]>
 		<link media="all" rel="stylesheet" href="../umbraco_client/installer/css/lt7.css">
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 
-	<!--[if lt IE 7]><script type="text/javascript" src="../umbraco_client/installer/js/ie-png.js"></script><![endif]-->
+    <!--[if lt IE 7]><script type="text/javascript" src="../umbraco_client/installer/js/ie-png.js"></script><![endif]-->
 </head>
 
 <body class="<%= currentStepClass %>">
 
-   
-	<form runat="server">
-	<asp:ScriptManager ID="ScriptManager1"  EnablePageMethods="true" runat="server"/>
-    <!-- all page -->
 
-	<section id="wrapper">
+    <form runat="server">
+        <asp:ScriptManager ID="ScriptManager1" EnablePageMethods="true" runat="server" />
+        <!-- all page -->
 
-		<div class="wholder">
+        <section id="wrapper">
 
-			<!-- header -->
+            <div class="wholder">
 
-			<header id="header">
+                <!-- header -->
 
-				<div class="holder">
+                <header id="header">
 
-					<strong class="logo"><a href="#">Umbraco</a></strong>
+                    <div class="holder">
 
-				</div>
+                        <strong class="logo"><a href="#">Umbraco</a></strong>
 
-			</header>
+                    </div>
 
-			<!-- all content -->
+                </header>
 
-			<section id="main">
+                <!-- all content -->
 
-				<!-- tabset -->
+                <section id="main">
 
-				<nav class="tabset">
+                    <!-- tabset -->
 
-					<asp:Repeater ID="rp_steps" runat="server" OnItemDataBound="bindStep">
-					<HeaderTemplate><ul></HeaderTemplate>
-					<FooterTemplate></ul></FooterTemplate>
-					<ItemTemplate>
-						<li class="<asp:literal runat='server' ID='lt_class' />"><asp:Literal ID="lt_name" runat="server" /><em>&nbsp;</em></li>
-					</ItemTemplate>
-					</asp:Repeater>
-					
-					<div class="b">&nbsp;</div>
+                    <nav class="tabset">
 
-				</nav>
+                        <asp:Repeater ID="rp_steps" runat="server" OnItemDataBound="bindStep">
+                            <HeaderTemplate>
+                                <ul>
+                            </HeaderTemplate>
+                            <FooterTemplate></ul></FooterTemplate>
+                            <ItemTemplate>
+                                <li class="<asp:literal runat='server' ID='lt_class' />">
+                                    <asp:Literal ID="lt_name" runat="server" /><em>&nbsp;</em></li>
+                            </ItemTemplate>
+                        </asp:Repeater>
 
-				<!-- content -->
+                        <div class="b">&nbsp;</div>
 
-				<section class="content">
-					<asp:PlaceHolder ID="PlaceHolderStep" runat="server"></asp:PlaceHolder>
-				</section>
-			</section>
-		</div>
-	</section>
+                    </nav>
 
-	
+                    <!-- content -->
 
-	<!-- bg page -->
-	<div class="bg-main">
-		<div class="color2">
-			
-			<div class="bg-c"></div>
-		</div>
+                    <section class="content">
+                        <asp:PlaceHolder ID="PlaceHolderStep" runat="server"></asp:PlaceHolder>
+                    </section>
+                </section>
+            </div>
+        </section>
 
-		<div class="color3">
-			
-			<div class="bg-c"></div>
-		</div>
 
-		<div class="color1">
-			
-			<div class="bg-c"></div>
-		</div>
 
-		<div class="color4">
-			
-			<div class="bg-c"></div>
-		</div>
+        <!-- bg page -->
+        <div class="bg-main">
+            <div class="color2">
 
-		<div class="color5">
-			
-			<div class="bg-c"></div>
-		</div>
+                <div class="bg-c"></div>
+            </div>
 
-	</div>
-	
+            <div class="color3">
 
-    <!-- lightbox -->
-<div class="lightbox" id="lightbox">
-	<a href="#" class="btn-close btn-close-box">close</a>
-	<div class="t">&nbsp;</div>
-	<div class="c">
-		<div class="heading">
-			<strong class="title">Name of skin</strong>
-			<span class="create">Created by: <a href="#">Cogworks</a></span>
-		</div>
-		<div class="carusel">
-			<ul>
-				<li><img src="../umbraco_client/installer/images/img09.jpg" alt="image description"></li>
-				<li><img src="../umbraco_client/installer/images/img10.jpg" alt="image description"></li>
-				<li><img src="../umbraco_client/installer/images/img11.jpg" alt="image description"></li>
-			</ul>
-		</div>
+                <div class="bg-c"></div>
+            </div>
 
-		<footer class="btn-box">
-			<a href="#single-tab4" class="single-tab btn-install btn-close-box">Install</a>
-		</footer>
-	</div>
-	<div class="b">&nbsp;</div>
-</div>
+            <div class="color1">
 
-	<input type="hidden" runat="server" value="welcome" id="step">
-	
-	</form>
+                <div class="bg-c"></div>
+            </div>
+
+            <div class="color4">
+
+                <div class="bg-c"></div>
+            </div>
+
+            <div class="color5">
+
+                <div class="bg-c"></div>
+            </div>
+
+        </div>
+
+
+        <!-- lightbox -->
+        <div class="lightbox" id="lightbox">
+            <a href="#" class="btn-close btn-close-box">close</a>
+            <div class="t">&nbsp;</div>
+            <div class="c">
+                <div class="heading">
+                    <strong class="title">Name of skin</strong>
+                    <span class="create">Created by: <a href="#">Cogworks</a></span>
+                </div>
+                <div class="carusel">
+                    <ul>
+                        <li>
+                            <img src="../umbraco_client/installer/images/img09.jpg" alt="image description"></li>
+                        <li>
+                            <img src="../umbraco_client/installer/images/img10.jpg" alt="image description"></li>
+                        <li>
+                            <img src="../umbraco_client/installer/images/img11.jpg" alt="image description"></li>
+                    </ul>
+                </div>
+
+                <footer class="btn-box">
+                    <a href="#single-tab4" class="single-tab btn-install btn-close-box">Install</a>
+                </footer>
+            </div>
+            <div class="b">&nbsp;</div>
+        </div>
+
+        <input type="hidden" runat="server" value="welcome" id="step" />
+
+    </form>
 </body>
 
 </html>

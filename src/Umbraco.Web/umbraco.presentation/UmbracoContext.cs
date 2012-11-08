@@ -15,6 +15,7 @@ namespace umbraco.presentation
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request.
     /// </summary>
+    [Obsolete("Use Umbraco.Web.UmbracoContext instead")]
     public class UmbracoContext
     {
         private UmbracoServerUtility _server;
@@ -55,7 +56,7 @@ namespace umbraco.presentation
                 return null;
             }
 
-            set
+            internal set
             {
                 if (Current != null)
                     throw new ApplicationException("The current httpContext can only be set once during a request.");

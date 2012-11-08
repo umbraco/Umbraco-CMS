@@ -79,6 +79,7 @@
     <EmbeddedResource Include="SqlCEResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>SqlCEResources1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

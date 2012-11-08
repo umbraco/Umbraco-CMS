@@ -2,12 +2,15 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using Umbraco.Core;
+using Umbraco.Web;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.businesslogic.member;
 using umbraco.IO;
 
 namespace umbraco.presentation.umbracobase
 {
+	[Obsolete]
     public class restExtension
     {
         private Type _type;
@@ -95,13 +98,14 @@ namespace umbraco.presentation.umbracobase
             {
                 //check for RestExtensionAttribute
 
-                foreach (Type t in TypeFinder.FindClassesMarkedWithAttribute(typeof(RestExtension)))
+            	var restExtensions = PluginManager.Current.ResolveRestExtensions();
+
+				foreach (var t in restExtensions)
                 {
 
                     var temp = t.GetCustomAttributes(typeof(RestExtension), false).OfType<RestExtension>();
 
-                    if (temp.Where(x => x.GetAlias() == extensionAlias)
-                        .Any())
+                    if (temp.Any(x => x.GetAlias() == extensionAlias))
                     {
 
                         MethodInfo mi = t.GetMethod(methodName);
@@ -109,7 +113,9 @@ namespace umbraco.presentation.umbracobase
                         if (mi != null)
                         {
                             //check allowed
-                            var attributes = mi.GetCustomAttributes(typeof(RestExtensionMethod), false).OfType<RestExtensionMethod>();
+                        	var attributes = mi.GetCustomAttributes(typeof (RestExtensionMethod), false)
+                        		.OfType<RestExtensionMethod>()
+                        		.ToArray();
 
                             //check to make sure the method was decorated properly
                             if (attributes.Any())
@@ -138,10 +144,10 @@ namespace umbraco.presentation.umbracobase
 
                                 if (allowed)
                                 {
-                                    this.isAllowed = true;
+									this.method = t.GetMethod(methodName);
+									this.isAllowed = this.method != null;
                                     this.alias = extensionAlias;
                                     this.assembly = t.Assembly;
-                                    this.method = t.GetMethod(methodName);
                                     this.type = t;
                                     this.returnXML = attribute.returnXml;
                                 } 
@@ -167,10 +173,10 @@ namespace umbraco.presentation.umbracobase
                     if (baseExt.Attributes["returnXml"] != null && baseExt.Attributes["returnXml"].Value.ToLower() == "false")
                         this.returnXML = false;
 
-                    this.isAllowed = true;
+					this.method = returnType.GetMethod(methodName);
+					this.isAllowed = this.method != null;
                     this.alias = extensionAlias;
                     this.assembly = returnAssembly;
-                    this.method = returnType.GetMethod(methodName);
                     this.type = returnType;
                 }
             }

@@ -16,6 +16,7 @@ namespace umbraco {
     /// <summary>
     /// Summary description for requestHandler.
     /// </summary>
+    [Obsolete("This class is no longer used and will be removed in future versions")]
     public class requestHandler {
         #region public properties
 
@@ -32,8 +33,8 @@ namespace umbraco {
 
 
         private static string pageXPathQueryStart = "/root";
-        private static string _urlName = string.Empty;
-        private static bool _urlNameInitialized = false;
+		private static string _urlName = "@urlName";
+		private static bool _urlNameInitialized = true;
         private static XmlDocument _customHandlers;
 
         private string _pageXPathQuery = string.Empty;
@@ -75,6 +76,9 @@ namespace umbraco {
         // Init urlName to correspond to web.config entries (umbracoUrlForbittenCharacters and umbracoUrlSpaceCharacter).
         // Needed to compensate for known asp.net framework error KB826437:
         // http://support.microsoft.com/default.aspx?scid=kb;EN-US;826437
+		// note: obsoleted, everything was commented out anyway since long, so it just
+		//   initializes _urlName, which we can do in the variable definition.
+		[Obsolete("This method did nothing anyway...")]
         private static void InitializeUrlName() {
             /*			string toReplace = string.Empty;
 			string replaceWith = string.Empty;
@@ -196,8 +200,9 @@ namespace umbraco {
             bool getByID = false;
             string currentDomain = HttpContext.Current.Request.ServerVariables["SERVER_NAME"];
 
-            if (!_urlNameInitialized)
-                InitializeUrlName();
+			// obsoleted
+            //if (!_urlNameInitialized)
+            //    InitializeUrlName();
 
             // The url exists in cache, and the domain doesn't exists (which makes it ok to do a cache look up on the url alone)
             // TODO: NH: Remove the flag for friendlyxmlschema when real schema is implemented
@@ -285,21 +290,21 @@ namespace umbraco {
                     IOHelper.MapPath( SystemFiles.NotFoundhandlersConfig ) );
                 }
 
-                for (int i = 0; i < _customHandlers.DocumentElement.ChildNodes.Count; i++) {
+                foreach (XmlNode notFoundHandler in _customHandlers.DocumentElement.SelectNodes("notFound")) 
+                {
+
                     // Load handler
-                    string _chAssembly =
-                        _customHandlers.DocumentElement.ChildNodes[i].Attributes.GetNamedItem("assembly").Value;
-                    string _chType = _customHandlers.DocumentElement.ChildNodes[i].Attributes.GetNamedItem("type").Value;
+                    string _chAssembly = notFoundHandler.Attributes.GetNamedItem("assembly").Value;
+                    string _chType = notFoundHandler.Attributes.GetNamedItem("type").Value;
                     // check for namespace
                     string _chNameSpace = _chAssembly;
-                    if (_customHandlers.DocumentElement.ChildNodes[i].Attributes.GetNamedItem("namespace") != null)
-                        _chNameSpace =
-                            _customHandlers.DocumentElement.ChildNodes[i].Attributes.GetNamedItem("namespace").Value;
+                    if (notFoundHandler.Attributes.GetNamedItem("namespace") != null)
+                        _chNameSpace = notFoundHandler.Attributes.GetNamedItem("namespace").Value;
+
                     try {
                         // Reflect to execute and check whether the type is umbraco.main.IFormhandler
                         HttpContext.Current.Trace.Write("notFoundHandler",
-                                                        string.Format("Trying NotFoundHandler '{0}.{1}'...", _chAssembly,
-                                                                      _chType));
+                                                string.Format("Trying NotFoundHandler '{0}.{1}'...", _chAssembly, _chType));
                         Assembly assembly =
                             Assembly.LoadFrom(
                                 IOHelper.MapPath( SystemDirectories.Bin + "/" + _chAssembly + ".dll"));
@@ -312,9 +317,8 @@ namespace umbraco {
                                 int redirectID = typeInstance.redirectID;
                                 currentPage = umbracoContent.GetElementById(redirectID.ToString());
                                 HttpContext.Current.Trace.Write("notFoundHandler",
-                                                                string.Format(
-                                                                    "NotFoundHandler '{0}.{1} found node matching {2} with id: {3}",
-                                                                    _chAssembly, _chType, url, redirectID));
+                                                string.Format("NotFoundHandler '{0}.{1} found node matching {2} with id: {3}",
+                                                              _chAssembly, _chType, url, redirectID));
 
                                 // check for caching
                                 if (typeInstance.CacheUrl) {

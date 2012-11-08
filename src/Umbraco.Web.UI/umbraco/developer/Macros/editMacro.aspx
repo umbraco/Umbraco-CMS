@@ -1,5 +1,5 @@
 <%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master" Title="Edit macro"
-    CodeBehind="editMacro.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.developer.editMacro" %>
+    CodeBehind="EditMacro.aspx.cs" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Umbraco.Developer.Macros.EditMacro" %>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
@@ -137,9 +137,6 @@
                 <table cellspacing="0" cellpadding="2" width="98%" border="0">
                     <tr>
                         <td class="propertyHeader">
-                            <%=umbraco.ui.Text("show",this.getUser())%>
-                        </td>
-                        <td class="propertyHeader">
                             <%=umbraco.ui.Text("general", "alias",this.getUser())%>
                         </td>
                         <td class="propertyHeader">
@@ -153,9 +150,6 @@
             </HeaderTemplate>
             <ItemTemplate>
                 <tr>
-                    <td class="propertyContent">
-                        <asp:CheckBox runat="server" ID="macroPropertyHidden" Checked='<%# macroIsVisible (DataBinder.Eval(Container.DataItem, "Public"))%>' />
-                    </td>
                     <td class="propertyContent">
                         <input type="hidden" id="macroPropertyID" runat="server" value='<%#DataBinder.Eval(Container.DataItem, "id")%>'
                             name="macroPropertyID" />
@@ -178,9 +172,6 @@
             </ItemTemplate>
             <FooterTemplate>
                 <tr>
-                    <td class="propertyContent">
-                        <asp:CheckBox runat="server" ID="macroPropertyHiddenNew" />
-                    </td>
                     <td class="propertyContent">
                         <asp:TextBox runat="server" ID="macroPropertyAliasNew" Text='New Alias' OnTextChanged="macroPropertyCreate" />
                     </td>

@@ -191,10 +191,10 @@ namespace umbraco.presentation.developer.packages
             else
             {
                 if (e.CommandName == "save")
-                    savePackage(true);
+                    SavePackage(true);
 
                 if (e.CommandName == "publish") {
-                    savePackage(false);
+                    SavePackage(false);
                     int packageID = int.Parse(Request.QueryString["id"]);
                     //string packFileName = cms.businesslogic.packager. Publish.publishPackage(packageID);
 
@@ -216,7 +216,7 @@ namespace umbraco.presentation.developer.packages
         protected void generateXML(object sender, EventArgs e) {
         }
 
-        private void savePackage(bool showNotification) {
+        private void SavePackage(bool showNotification) {
             pack.Author = packageAuthorName.Text;
             pack.AuthorUrl = packageAuthorUrl.Text;
 
@@ -345,7 +345,7 @@ namespace umbraco.presentation.developer.packages
             packageFilesRepeater.DataBind();
         }
 
-        private static string joinList(List<string> list, char seperator) {
+        private static string JoinList(List<string> list, char seperator) {
             string retVal = "";
             foreach (string str in list) {
                 retVal += str + seperator.ToString();

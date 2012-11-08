@@ -6,7 +6,7 @@ using System.Collections;
 
 namespace umbraco.MacroEngines
 {
-    public class DynamicGrouping : IEnumerable
+	public class DynamicGrouping : IEnumerable<IGrouping<object, DynamicNode>>, IEnumerable<Grouping<object, DynamicNode>>
     {
         public IEnumerable<Grouping<object, DynamicNode>> Inner;
 
@@ -45,7 +45,17 @@ namespace umbraco.MacroEngines
             this.Inner = source;
         }
 
-        public IEnumerator GetEnumerator()
+		IEnumerator<Grouping<object, DynamicNode>> IEnumerable<Grouping<object, DynamicNode>>.GetEnumerator()
+		{
+			return Inner.GetEnumerator();
+		}
+
+		IEnumerator<IGrouping<object, DynamicNode>> IEnumerable<IGrouping<object, DynamicNode>>.GetEnumerator()
+		{
+			return Inner.GetEnumerator();
+		}
+
+		public IEnumerator GetEnumerator()
         {
             return Inner.GetEnumerator();
         }

@@ -71,6 +71,7 @@
     <key alias="saveAndPublish">Gem og udgiv</key>
     <key alias="saveToPublish">Gem og send til udgivelse</key>
     <key alias="showPage">Se siden</key>
+    <key alias="showPageDisabled">Se siden (du kan ikke se siden, da der ikke er valgt nogen skabelon)</key>
     <key alias="styleChoose">Vælg formattering</key>
     <key alias="styleShow">Vis koder</key>
     <key alias="tableInsert">Indsæt tabel</key>
@@ -736,6 +737,8 @@ Mange hilsner fra umbraco robotten
     <key alias="passwordChanged">Dit kodeord er blevet ændret!</key>
     <key alias="passwordConfirm">Bekræft venligst dit nye kodeord</key>
     <key alias="passwordEnterNew">Indtast dit nye kodeord</key>
+	<key alias="passwordCurrent">Nuværende kodeord</key>
+	<key alias="passwordInvalid">ugyldig nuværende kodeord</key>
     <key alias="passwordIsBlank">Dit nye kodeord må ikke være tomt!</key>
     <key alias="passwordIsDifferent">Dit nye kodeord og dit bekræftede kodeord var ikke ens, forsøg venligst igen!</key>
     <key alias="passwordMismatch">Det bekræftede kodeord matcher ikke det nye kodeord</key>

@@ -92,7 +92,7 @@ namespace umbraco.presentation.install.steps
                 }
 
 
-                if (GlobalSettings.ConfigurationStatus.Trim() == "")
+                if (String.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus))
                     BasePages.UmbracoEnsuredPage.doLogin(u);
 
                 Helper.RedirectToNextStep(this.Page);                

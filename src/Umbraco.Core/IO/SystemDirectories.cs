@@ -10,7 +10,7 @@ using System.IO;
 namespace Umbraco.Core.IO
 {
     //all paths has a starting but no trailing /
-	internal class SystemDirectories
+	public class SystemDirectories
     {
         public static string Bin
         {
@@ -68,6 +68,15 @@ namespace Umbraco.Core.IO
             }
         }
 
+		public static string MvcViews
+		{
+			get
+			{
+				//NOTE: this is not configurable and shouldn't need to be
+				return "~/Views";
+			}
+		}
+
        
         public static string Media
         {
@@ -77,8 +86,9 @@ namespace Umbraco.Core.IO
             }
         }
 
+		//have changed to internal so nobody uses this anymore since this is a new class.
         [Obsolete("Please use MacroScripts instead!", true)]
-        public static string Python
+        internal static string Python
         {
             get
             {

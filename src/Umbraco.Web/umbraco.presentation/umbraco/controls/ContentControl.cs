@@ -2,19 +2,23 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic;
+using umbraco.cms.businesslogic.datatype.controls;
+using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using umbraco.uicontrols;
+using Umbraco.Core.IO;
 using Content = umbraco.cms.businesslogic.Content;
-using System.Linq;
-using umbraco.IO;
+using SystemDirectories = umbraco.IO.SystemDirectories;
 
 namespace umbraco.controls
 {
@@ -212,9 +216,13 @@ namespace umbraco.controls
                 ltt.Text = _content.Id.ToString();
                 PropertiesPane.addProperty("Id", ltt);
 
+                if (_content is Media)
+                {
+                    PropertiesPane.addProperty(ui.Text("content", "mediatype"), new LiteralControl(_content.ContentType.Alias));
+                }
+
                 tpProp.Controls.AddAt(0, PropertiesPane);
                 tpProp.Style.Add("text-align", "center");
-                //tpProp.Style.Add("padding", "10px");
             }
         }
 
@@ -245,7 +253,7 @@ namespace umbraco.controls
                 df.Save();
             }
 
-            if(!string.IsNullOrEmpty(NameTxt.Text))
+            if (!string.IsNullOrEmpty(NameTxt.Text))
                 _content.Text = NameTxt.Text;
 
             Save(this, new EventArgs());

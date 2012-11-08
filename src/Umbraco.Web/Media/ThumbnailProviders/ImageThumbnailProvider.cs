@@ -5,17 +5,14 @@ using System.Linq;
 using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.ObjectResolution;
 using umbraco.IO;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
-    internal class ImageThumbnailProvider : AbstractThumbnailProvider
-    {
-        public override int Priority
-        {
-            get { return 1000; }
-        }
-
+	[WeightedPlugin(1000)]
+    public class ImageThumbnailProvider : AbstractThumbnailProvider
+    {        
         protected override IEnumerable<string> SupportedExtensions
         {
             get { return new List<string> { ".jpeg", ".jpg", ".gif", ".bmp", ".png", ".tiff", ".tif" }; }
@@ -40,7 +37,7 @@ namespace Umbraco.Web.Media.ThumbnailProviders
 
             try
             {
-                var fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+                var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
                 var relativeThumbPath = fs.GetRelativePath(tmpThumbUrl);
                 if (!fs.FileExists(relativeThumbPath))
                     return false;

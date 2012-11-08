@@ -3,12 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Web;
 using System.Reflection;
+using Umbraco.Core;
 using umbraco.BasePages;
 using umbraco.BusinessLogic.Utils;
+using umbraco.cms;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.workflow;
 using umbraco.interfaces;
 using System.Text.RegularExpressions;
+using System.Linq;
+using TypeFinder = Umbraco.Core.TypeFinder;
 
 namespace umbraco.BusinessLogic.Actions
 {
@@ -27,82 +31,50 @@ namespace umbraco.BusinessLogic.Actions
     /// </summary>
     public class Action
     {
-        private static List<IAction> _actions = new List<IAction>();
-        private static List<IActionHandler> _actionHandlers = new List<IActionHandler>();
+        private static readonly List<IActionHandler> ActionHandlers = new List<IActionHandler>();
+        private static readonly Dictionary<string, string> ActionJs = new Dictionary<string, string>();
 
-        private static readonly List<string> _actionJSReference = new List<string>();
-        private static readonly Dictionary<string, string> _actionJs = new Dictionary<string, string>();
-
-        private static readonly object m_Lock = new object();
-        private static readonly object m_LockerReRegister = new object();
+        private static readonly object Lock = new object();
 
         static Action()
         {
             ReRegisterActionsAndHandlers();
         }
 
-        /// <summary>
-        /// This is used when an IAction or IActionHandler is installed into the system
-        /// and needs to be loaded into memory.
-        /// </summary>
-        public static void ReRegisterActionsAndHandlers()
-        {
-            lock (m_Lock)
-            {
-                _actions.Clear();
-                _actionHandlers.Clear();
-                RegisterIActions();
-                RegisterIActionHandlers();
-            }
-        }
+		/// <summary>
+		/// This is used when an IAction or IActionHandler is installed into the system
+		/// and needs to be loaded into memory.
+		/// </summary>
+		/// <remarks>
+		/// TODO: this shouldn't be needed... we should restart the app pool when a package is installed!
+		/// </remarks>
+		public static void ReRegisterActionsAndHandlers()
+		{
+			lock (Lock)
+			{
+
+				//TODO: Based on the above, this is a big hack as types should all be cleared on package install!
+				ActionsResolver.Reset();
+				ActionHandlers.Clear();
+
+				//TODO: Based on the above, this is a big hack as types should all be cleared on package install!
+				ActionsResolver.Current = new ActionsResolver(
+					TypeFinder.FindClassesOfType<IAction>(PluginManager.Current.AssembliesToScan));
+
+				RegisterIActionHandlers();
+			}
+		}
 
         /// <summary>
         /// Stores all IActionHandlers that have been loaded into memory into a list
         /// </summary>
         private static void RegisterIActionHandlers()
         {
-
-            if (_actionHandlers.Count == 0)
+            if (ActionHandlers.Count == 0)
             {
-
-                List<Type> foundIActionHandlers = TypeFinder.FindClassesOfType<IActionHandler>(true);
-                foreach (Type type in foundIActionHandlers)
-                {
-                    IActionHandler typeInstance;
-                    typeInstance = Activator.CreateInstance(type) as IActionHandler;
-                    if (typeInstance != null)
-                        _actionHandlers.Add(typeInstance);
-                }
-            }
-
-        }
-
-        /// <summary>
-        /// Stores all IActions that have been loaded into memory into a list
-        /// </summary>
-        private static void RegisterIActions()
-        {
-
-            if (_actions.Count == 0)
-            {
-                List<Type> foundIActions = TypeFinder.FindClassesOfType<IAction>(true);
-                foreach (Type type in foundIActions)
-                {
-                    IAction typeInstance;
-                    PropertyInfo instance = type.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
-                    //if the singletone initializer is not found, try simply creating an instance of the IAction if it supports public constructors
-                    if (instance == null)
-                        typeInstance = Activator.CreateInstance(type) as IAction;
-                    else
-                        typeInstance = instance.GetValue(null, null) as IAction;
-
-                    if (typeInstance != null)
-                    {
-                        if (!string.IsNullOrEmpty(typeInstance.JsSource))
-                            _actionJSReference.Add(typeInstance.JsSource);
-                        _actions.Add(typeInstance);
-                    }
-                }
+            	ActionHandlers.AddRange(
+            		PluginManager.Current.CreateInstances<IActionHandler>(
+            			PluginManager.Current.ResolveActionHandlers()));                
             }
 
         }
@@ -115,7 +87,7 @@ namespace umbraco.BusinessLogic.Actions
         /// <param name="action">The action triggered</param>
         public static void RunActionHandlers(Document d, IAction action)
         {
-            foreach (IActionHandler ia in _actionHandlers)
+            foreach (IActionHandler ia in ActionHandlers)
             {
                 try
                 {
@@ -175,7 +147,10 @@ namespace umbraco.BusinessLogic.Actions
         /// <returns></returns>
         public static List<string> GetJavaScriptFileReferences()
         {
-            return _actionJSReference;
+        	return ActionsResolver.Current.Actions
+				.Where(x => !string.IsNullOrWhiteSpace(x.JsSource))
+				.Select(x => x.JsSource).ToList();
+        	//return ActionJsReference;
         }
 
         /// <summary>
@@ -188,11 +163,11 @@ namespace umbraco.BusinessLogic.Actions
         /// <returns></returns>
         private static string findActions(string language)
         {
-            if (!_actionJs.ContainsKey(language))
+            if (!ActionJs.ContainsKey(language))
             {
                 string _actionJsList = "";
 
-                foreach (IAction action in _actions)
+				foreach (IAction action in ActionsResolver.Current.Actions)
                 {
                     // Adding try/catch so this rutine doesn't fail if one of the actions fail
                     // Add to language JsList
@@ -218,10 +193,10 @@ namespace umbraco.BusinessLogic.Actions
                     _actionJsList = _actionJsList.Substring(2, _actionJsList.Length - 2);
 
                 _actionJsList = "\nvar menuMethods = new Array(\n" + _actionJsList + "\n)\n";
-                _actionJs.Add(language, _actionJsList);
+                ActionJs.Add(language, _actionJsList);
             }
 
-            return _actionJs[language];
+            return ActionJs[language];
 
         }
 
@@ -229,9 +204,10 @@ namespace umbraco.BusinessLogic.Actions
         /// 
         /// </summary>
         /// <returns>An arraylist containing all javascript variables for the contextmenu in the tree</returns>
+		[Obsolete("Use ActionsResolver.Current.Actions instead")]
         public static ArrayList GetAll()
         {
-            return new ArrayList(_actions);
+			return new ArrayList(ActionsResolver.Current.Actions.ToList());
         }
 
         /// <summary>
@@ -245,7 +221,7 @@ namespace umbraco.BusinessLogic.Actions
             List<IAction> list = new List<IAction>();
             foreach (char c in actions.ToCharArray())
             {
-                IAction action = _actions.Find(
+				IAction action = ActionsResolver.Current.Actions.ToList().Find(
                     delegate(IAction a)
                     {
                         return a.Letter == c;
@@ -273,7 +249,7 @@ namespace umbraco.BusinessLogic.Actions
         /// <returns></returns>
         public static List<IAction> GetPermissionAssignable()
         {
-            return _actions.FindAll(
+			return ActionsResolver.Current.Actions.ToList().FindAll(
                 delegate(IAction a)
                 {
                     return (a.CanBePermissionAssigned);

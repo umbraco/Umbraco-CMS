@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Xml.XPath;
 using umbraco;
 using umbraco.NodeFactory;
+using Umbraco.Core;
 
 namespace umbraco
 {
@@ -200,21 +202,16 @@ namespace umbraco
 		/// </remarks>
 		public static int GetNodeIdByUrl(string url)
 		{
-			var xpathQuery = GetXPathQuery(url);
-			var xmlNode = content.Instance.XmlContent.SelectSingleNode(xpathQuery);
+			var uri = new Uri(url, UriKind.RelativeOrAbsolute);
+			if (!uri.IsAbsoluteUri)
+				uri = uri.MakeAbsolute(Umbraco.Web.UmbracoContext.Current.CleanedUmbracoUrl);
+			uri = Umbraco.Web.UriUtility.UriToUmbraco(uri);
 
-			if (xmlNode != null && xmlNode.Attributes.Count > 0)
-			{
-				int nodeId;
-				var id = xmlNode.Attributes.GetNamedItem("id").Value;
-
-				if (int.TryParse(id, out nodeId))
-				{
-					return nodeId;
-				}
-			}
-
-			return uQuery.RootNodeId;
+			var docreq = new Umbraco.Web.Routing.PublishedContentRequest(uri, Umbraco.Web.UmbracoContext.Current.RoutingContext);
+			var builder = new Umbraco.Web.Routing.PublishedContentRequestBuilder(docreq);
+			builder.LookupDomain();
+			builder.LookupDocument();
+			return docreq.HasNode ? docreq.DocumentId : uQuery.RootNodeId;
 		}
 
 		/// <summary>
@@ -356,22 +353,6 @@ namespace umbraco
 			}
 
 			return dictionary;
-		}
-
-		/// <summary>
-		/// Gets the XPath query.
-		/// </summary>
-		/// <param name="url">The specified URL.</param>
-		/// <returns>
-		/// Returns an XPath query for the specified URL.
-		/// </returns>
-		private static string GetXPathQuery(string url)
-		{
-			// strip the ASP.NET file-extension from the URL.
-			url = url.Replace(".aspx", string.Empty);
-
-			// return the XPath query.
-			return requestHandler.CreateXPathQuery(url, true);
 		}
 	}
 }

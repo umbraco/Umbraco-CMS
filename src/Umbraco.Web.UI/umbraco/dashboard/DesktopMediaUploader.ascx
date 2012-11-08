@@ -1,5 +1,10 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="DesktopMediaUploader.ascx.cs" Inherits="umbraco.presentation.umbraco.dashboard.DesktopMediaUploader" %>
-<script type="text/javascript" src="/umbraco/dashboard/scripts/swfobject.js"></script>
+<%@ Register Assembly="controls" Namespace="umbraco.uicontrols" TagPrefix="umb" %>
+<%@ Register Assembly="ClientDependency.Core" Namespace="ClientDependency.Core.Controls" TagPrefix="umb" %>
+
+<umb:CssInclude runat="server" FilePath="propertypane/style.css" PathNameAlias="UmbracoClient" />
+<umb:JsInclude runat="server" FilePath="dashboard/scripts/swfobject.js" PathNameAlias="UmbracoRoot" />
+
 <div class="dashboardWrapper">
     <h2>Desktop Media Uploader</h2>
     <img src="./dashboard/images/dmu.png" alt="Umbraco" class="dashboardIcon" />
@@ -9,8 +14,7 @@
     <div class="dashboardColWrapper">
         <div class="dashboardCols">
             <div class="dashboardCol">
-                <asp:Panel ID="Panel1" runat="server">
-                </asp:Panel>
+                <asp:Panel ID="Panel1" runat="server"></asp:Panel>
                 <asp:Panel ID="Panel2" runat="server">
                     <p>
                         <div id="dmu-badge">
@@ -19,7 +23,6 @@
                     </p>
                     <script type="text/javascript">
                     // <![CDATA[
-
                         var flashvars = {
                             appid: "org.umbraco.DesktopMediaUploader",
                             appname: "Desktop Media Uploader",
@@ -38,7 +41,6 @@
                         };
 
                         swfobject.embedSWF("/umbraco/dashboard/swfs/airinstallbadge.swf", "dmu-badge", "215", "180", "9.0.115", "/umbraco/dashboard/swfs/expressinstall.swf", flashvars, params, attributes);
-
                     // ]]>
                     </script>
                 </asp:Panel>

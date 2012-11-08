@@ -12,11 +12,54 @@ using System.Web;
 
 namespace Umbraco.Core
 {
+
     ///<summary>
     /// String extension methods
     ///</summary>
     public static class StringExtensions
     {
+		//this is from SqlMetal and just makes it a bit of fun to allow pluralisation
+		public static string MakePluralName(this string name)
+		{
+			if ((name.EndsWith("x", StringComparison.OrdinalIgnoreCase) || name.EndsWith("ch", StringComparison.OrdinalIgnoreCase)) || (name.EndsWith("ss", StringComparison.OrdinalIgnoreCase) || name.EndsWith("sh", StringComparison.OrdinalIgnoreCase)))
+			{
+				name = name + "es";
+				return name;
+			}
+			if ((name.EndsWith("y", StringComparison.OrdinalIgnoreCase) && (name.Length > 1)) && !IsVowel(name[name.Length - 2]))
+			{
+				name = name.Remove(name.Length - 1, 1);
+				name = name + "ies";
+				return name;
+			}
+			if (!name.EndsWith("s", StringComparison.OrdinalIgnoreCase))
+			{
+				name = name + "s";
+			}
+			return name;
+		}
+
+		public static bool IsVowel(this char c)
+		{
+			switch (c)
+			{
+				case 'O':
+				case 'U':
+				case 'Y':
+				case 'A':
+				case 'E':
+				case 'I':
+				case 'o':
+				case 'u':
+				case 'y':
+				case 'a':
+				case 'e':
+				case 'i':
+					return true;
+			}
+			return false;
+		}
+
         /// <summary>
         /// Trims the specified value from a string; accepts a string input whereas the in-built implementation only accepts char or char[].
         /// </summary>
@@ -28,6 +71,50 @@ namespace Umbraco.Core
             if (string.IsNullOrEmpty(value)) return value;
             return value.TrimEnd(forRemoving).TrimStart(forRemoving);
         }
+
+		public static string EncodeJsString(this string s)
+		{
+			var sb = new StringBuilder();
+			foreach (var c in s)
+			{
+				switch (c)
+				{
+					case '\"':
+						sb.Append("\\\"");
+						break;
+					case '\\':
+						sb.Append("\\\\");
+						break;
+					case '\b':
+						sb.Append("\\b");
+						break;
+					case '\f':
+						sb.Append("\\f");
+						break;
+					case '\n':
+						sb.Append("\\n");
+						break;
+					case '\r':
+						sb.Append("\\r");
+						break;
+					case '\t':
+						sb.Append("\\t");
+						break;
+					default:
+						int i = (int)c;
+						if (i < 32 || i > 127)
+						{
+							sb.AppendFormat("\\u{0:X04}", i);
+						}
+						else
+						{
+							sb.Append(c);
+						}
+						break;
+				}
+			}
+			return sb.ToString();
+		}
 
         public static string TrimEnd(this string value, string forRemoving)
         {
@@ -55,10 +142,25 @@ namespace Umbraco.Core
             return toStartWith + input.TrimStart(toStartWith.ToArray()); // Ensure each char is removed first from input, e.g. ~/ plus /Path will equal ~/Path not ~//Path
         }
 
+		public static string EnsureStartsWith(this string input, char value)
+		{
+			return input.StartsWith(value.ToString()) ? input : value + input;
+		}
+
+		public static string EnsureEndsWith(this string input, char value)
+		{
+			return input.EndsWith(value.ToString()) ? input : input + value;
+		}
+
         public static bool IsLowerCase(this char ch)
         {
             return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToLower();
         }
+
+		public static bool IsUpperCase(this char ch)
+		{
+			return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToUpper();
+		}
 
         /// <summary>Is null or white space.</summary>
         /// <param name="str">The str.</param>
@@ -349,6 +451,11 @@ namespace Umbraco.Core
         {
             return String.Equals(compare, compareTo, StringComparison.InvariantCultureIgnoreCase);
         }
+
+		public static bool InvariantStartsWith(this string compare, string compareTo)
+		{
+			return compare.StartsWith(compareTo, StringComparison.InvariantCultureIgnoreCase);			
+		}
 
         public static bool InvariantContains(this string compare, string compareTo)
         {

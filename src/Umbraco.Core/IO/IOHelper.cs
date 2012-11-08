@@ -9,12 +9,14 @@ using System.Configuration;
 using System.Web;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
 {
-	internal static class IOHelper
+	public static class IOHelper
     {
         private static string _rootDir = "";
+
         // static compiled regex for faster performance
         private readonly static Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
@@ -49,46 +51,33 @@ namespace Umbraco.Core.IO
                 return VirtualPathUtility.ToAbsolute(virtualPath, SystemDirectories.Root);
         }
 
-
-        public static string ResolveUrlsFromTextString(string text)
+		[Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ResolveUrlsFromTextString instead, this method on this class will be removed in future versions")]
+        internal static string ResolveUrlsFromTextString(string text)
         {
             if (UmbracoSettings.ResolveUrlsFromTextString)
-            {
-                var sw = new Stopwatch();
-                sw.Start();
-                Debug.WriteLine("Start: " + sw.ElapsedMilliseconds);
+            {				
+				using (var timer = DisposableTimer.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
+				{
+					// find all relative urls (ie. urls that contain ~)
+					var tags = ResolveUrlPattern.Matches(text);
+					LogHelper.Debug(typeof(IOHelper), "After regex: " + timer.Stopwatch.ElapsedMilliseconds + " matched: " + tags.Count);
+					foreach (Match tag in tags)
+					{						
+						string url = "";
+						if (tag.Groups[1].Success)
+							url = tag.Groups[1].Value;
 
-                // find all relative urls (ie. urls that contain ~)
-                var tags =
-                    ResolveUrlPattern.Matches(text);
-                Debug.WriteLine("After regex: " + sw.ElapsedMilliseconds);
-                foreach (Match tag in tags)
-                {
-                    Debug.WriteLine("-- inside regex: " + sw.ElapsedMilliseconds);
-                    string url = "";
-                    if (tag.Groups[1].Success)
-                        url = tag.Groups[1].Value;
-
-                    // The richtext editor inserts a slash in front of the url. That's why we need this little fix
-                    //                if (url.StartsWith("/"))
-                    //                    text = text.Replace(url, ResolveUrl(url.Substring(1)));
-                    //                else
-                    if (!String.IsNullOrEmpty(url))
-                    {
-                        Debug.WriteLine("---- before resolve: " + sw.ElapsedMilliseconds);
-                        string resolvedUrl = (url.Substring(0, 1) == "/") ? ResolveUrl(url.Substring(1)) : ResolveUrl(url);
-                        Debug.WriteLine("---- after resolve: " + sw.ElapsedMilliseconds);
-                        Debug.WriteLine("---- before replace: " + sw.ElapsedMilliseconds);
-                        text = text.Replace(url, resolvedUrl);
-                        Debug.WriteLine("---- after replace: " + sw.ElapsedMilliseconds);
-                    }
-
-                }
-
-                Debug.WriteLine("total: " + sw.ElapsedMilliseconds);
-                sw.Stop();
-				Debug.WriteLine("Resolve Urls", sw.ElapsedMilliseconds.ToString());
-
+						// The richtext editor inserts a slash in front of the url. That's why we need this little fix
+						//                if (url.StartsWith("/"))
+						//                    text = text.Replace(url, ResolveUrl(url.Substring(1)));
+						//                else
+						if (!String.IsNullOrEmpty(url))
+						{
+							string resolvedUrl = (url.Substring(0, 1) == "/") ? ResolveUrl(url.Substring(1)) : ResolveUrl(url);
+							text = text.Replace(url, resolvedUrl);
+						}
+					}
+				}
             }
             return text;
         }
@@ -96,7 +85,7 @@ namespace Umbraco.Core.IO
         public static string MapPath(string path, bool useHttpContext)
         {
             // Check if the path is already mapped
-            if (path.Length >= 2 && path[1] == Path.VolumeSeparatorChar)
+            if ((path.Length >= 2 && path[1] == Path.VolumeSeparatorChar) || path.StartsWith("\\"))
                 return path;
 
 			// Check that we even have an HttpContext! otherwise things will fail anyways
@@ -128,7 +117,7 @@ namespace Umbraco.Core.IO
         }
 
         //use a tilde character instead of the complete path
-        public static string ReturnPath(string settingsKey, string standardPath, bool useTilde)
+		internal static string ReturnPath(string settingsKey, string standardPath, bool useTilde)
         {
             string retval = ConfigurationManager.AppSettings[settingsKey];
 
@@ -138,13 +127,11 @@ namespace Umbraco.Core.IO
             return retval.TrimEnd('/');
         }
 
-
-        public static string ReturnPath(string settingsKey, string standardPath)
+        internal static string ReturnPath(string settingsKey, string standardPath)
         {
             return ReturnPath(settingsKey, standardPath, false);
 
         }
-
 
         /// <summary>
         /// Validates if the current filepath matches a directory where the user is allowed to edit a file
@@ -152,7 +139,7 @@ namespace Umbraco.Core.IO
         /// <param name="filePath">filepath </param>
         /// <param name="validDir"></param>
         /// <returns>true if valid, throws a FileSecurityException if not</returns>
-        public static bool ValidateEditPath(string filePath, string validDir)
+        internal static bool ValidateEditPath(string filePath, string validDir)
         {
             if (!filePath.StartsWith(MapPath(SystemDirectories.Root)))
                 filePath = MapPath(filePath);
@@ -165,7 +152,24 @@ namespace Umbraco.Core.IO
             return true;
         }
 
-        public static bool ValidateFileExtension(string filePath, List<string> validFileExtensions)
+        internal static bool ValidateEditPath(string filePath, IEnumerable<string> validDirs)
+        {
+            foreach (var dir in validDirs)
+            {
+                var validDir = dir;
+                if (!filePath.StartsWith(MapPath(SystemDirectories.Root)))
+                    filePath = MapPath(filePath);
+                if (!validDir.StartsWith(MapPath(SystemDirectories.Root)))
+                    validDir = MapPath(validDir);
+
+                if (filePath.StartsWith(validDir))
+                    return true;
+            }
+
+           throw new FileSecurityException(String.Format("The filepath '{0}' is not within an allowed directory for this type of files", filePath.Replace(MapPath(SystemDirectories.Root), "")));
+        }
+
+        internal static bool ValidateFileExtension(string filePath, List<string> validFileExtensions)
         {
             if (!filePath.StartsWith(MapPath(SystemDirectories.Root)))
                 filePath = MapPath(filePath);
@@ -202,5 +206,44 @@ namespace Umbraco.Core.IO
 
         }
 
+        /// <summary>
+        /// Check to see if filename passed has any special chars in it and strips them to create a safe filename.  Used to overcome an issue when Umbraco is used in IE in an intranet environment.
+        /// </summary>
+        /// <param name="filePath">The filename passed to the file handler from the upload field.</param>
+        /// <returns>A safe filename without any path specific chars.</returns>
+        internal static string SafeFileName(string filePath)
+        {
+            if (String.IsNullOrEmpty(filePath))
+                return String.Empty;
+
+            if (!String.IsNullOrWhiteSpace(filePath))
+            {
+                foreach (var character in Path.GetInvalidFileNameChars())
+                {
+                    filePath = filePath.Replace(character, '_');
+                }
+            }
+            else
+            {
+                filePath = String.Empty;
+            }
+
+            // Adapted from: http://stackoverflow.com/a/4827510/5018
+            // Combined both Reserved Characters and Character Data 
+            // from http://en.wikipedia.org/wiki/Percent-encoding
+            var stringBuilder = new StringBuilder();
+
+            const string reservedCharacters = "!*'();:@&=+$,/?%#[]-~{}\"<>\\^`| ";
+
+            foreach (var character in filePath)
+            {
+                if (reservedCharacters.IndexOf(character) == -1)
+                    stringBuilder.Append(character);
+                else
+                    stringBuilder.Append("_");
+            }
+
+            return stringBuilder.ToString();
+        }
     }
 }

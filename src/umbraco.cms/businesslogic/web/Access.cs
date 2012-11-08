@@ -24,7 +24,8 @@ namespace umbraco.cms.businesslogic.web
 
 		static private Hashtable _checkedPages = new Hashtable();
 
-		static private XmlDocument _accessXmlContent;
+		//must be volatile for double check lock to work
+		static private volatile XmlDocument _accessXmlContent;
 		static private string _accessXmlSource;
 
 		private static void clearCheckPages() 
@@ -47,13 +48,18 @@ namespace umbraco.cms.businesslogic.web
                             if (_accessXmlSource == null)
                             {
                                 //if we pop it here it'll make for better stack traces ;)
-                                _accessXmlSource = IOHelper.MapPath(SystemFiles.AccessXml, false);
+                                _accessXmlSource = IOHelper.MapPath(SystemFiles.AccessXml, true);
                             }
 
                             _accessXmlContent = new XmlDocument();
 
                             if (!System.IO.File.Exists(_accessXmlSource))
                             {
+                            	var file = new FileInfo(_accessXmlSource);
+								if (!Directory.Exists(file.DirectoryName))
+								{
+									Directory.CreateDirectory(file.Directory.FullName); //ensure the folder exists!	
+								}                            	
                                 System.IO.FileStream f = System.IO.File.Open(_accessXmlSource, FileMode.Create);
                                 System.IO.StreamWriter sw = new StreamWriter(f);
                                 sw.WriteLine("<access/>");

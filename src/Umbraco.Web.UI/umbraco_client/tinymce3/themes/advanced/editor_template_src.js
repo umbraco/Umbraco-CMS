@@ -13,7 +13,7 @@
 
 	// Generates a preview for a format
 	function getPreviewCss(ed, fmt) {
-		var previewElm, dom = ed.dom, previewCss = '', parentFontSize, previewStylesName;
+		var name, previewElm, dom = ed.dom, previewCss = '', parentFontSize, previewStylesName;
 
 		previewStyles = ed.settings.preview_styles;
 
@@ -150,7 +150,7 @@
 
 		init : function(ed, url) {
 			var t = this, s, v, o;
-	
+
 			t.editor = ed;
 			t.url = url;
 			t.onResolveName = new tinymce.util.Dispatcher(this);
@@ -167,7 +167,7 @@
 					theme_advanced_buttons3 : "hr,removeformat,visualaid,|,sub,sup,|,charmap"
 				}, s);
 			}
-	
+
 			// Default settings
 			t.settings = s = extend({
 				theme_advanced_path : true,
@@ -678,7 +678,7 @@
 			if (DOM.get(ed.id + '_path_row')) {
 				Event.add(ed.id + '_tbl', 'mouseover', function(e) {
 					var re;
-	
+
 					e = e.target;
 
 					if (e.nodeName == 'SPAN' && DOM.hasClass(e.parentNode, 'mceButton')) {
@@ -831,6 +831,7 @@
 					var f = Event.add(ed.id + '_external_close', 'click', function() {
 						DOM.hide(ed.id + '_external');
 						Event.remove(ed.id + '_external_close', 'click', f);
+						return false;
 					});
 
 					DOM.show(e);
@@ -955,7 +956,7 @@
 			a = s.theme_advanced_toolbar_align.toLowerCase();
 			a = 'mce' + t._ufirst(a);
 
-			n = DOM.add(DOM.add(c, 'tr', {role: 'presentation'}), 'td', {'class' : 'mceToolbar ' + a, "role":"presentation"});
+			n = DOM.add(DOM.add(c, 'tr', {role: 'toolbar'}), 'td', {'class' : 'mceToolbar ' + a, "role":"toolbar"});
 
 			// Create toolbar and add the controls
 			for (i=1; (v = s['theme_advanced_buttons' + i]); i++) {
@@ -985,7 +986,7 @@
 			var n, t = this, ed = t.editor, s = t.settings, r, mf, me, td;
 
 			n = DOM.add(tb, 'tr');
-			n = td = DOM.add(n, 'td', {'class' : 'mceStatusbar'}); 
+			n = td = DOM.add(n, 'td', {'class' : 'mceStatusbar'});
 			n = DOM.add(n, 'div', {id : ed.id + '_path_row', 'role': 'group', 'aria-labelledby': ed.id + '_path_voice'});
 			if (s.theme_advanced_path) {
 				DOM.add(n, 'span', {id: ed.id + '_path_voice'}, ed.translate('advanced.path'));
@@ -993,7 +994,7 @@
 			} else {
 				DOM.add(n, 'span', {}, '&#160;');
 			}
-			
+
 
 			if (s.theme_advanced_resizing) {
 				DOM.add(td, 'a', {id : ed.id + '_resize', href : 'javascript:;', onclick : "return false;", 'class' : 'mceResize', tabIndex:"-1"});
@@ -1038,6 +1039,8 @@
 							width = startWidth + (e.screenX - startX);
 							height = startHeight + (e.screenY - startY);
 							t.resizeTo(width, height, true);
+
+							ed.nodeChanged();
 						};
 
 						e.preventDefault();
@@ -1151,7 +1154,7 @@
 
 					if (!fn && n.style.fontFamily)
 						fn = n.style.fontFamily.replace(/[\"\']+/g, '').replace(/^([^,]+).*/, '$1').toLowerCase();
-					
+
 					if (!fc && n.style.color)
 						fc = n.style.color;
 
@@ -1182,7 +1185,7 @@
 						return true;
 				});
 			}
-			
+
 			if (s.theme_advanced_show_current_color) {
 				function updateColor(controlId, color) {
 					if (c = cm.get(controlId)) {
@@ -1286,7 +1289,7 @@
 						ti += 'id: ' + v + ' ';
 
 					if (v = n.className) {
-						v = v.replace(/\b\s*(webkit|mce|Apple-)\w+\s*\b/g, '')
+						v = v.replace(/\b\s*(webkit|mce|Apple-)\w+\s*\b/g, '');
 
 						if (v) {
 							ti += 'class: ' + v + ' ';

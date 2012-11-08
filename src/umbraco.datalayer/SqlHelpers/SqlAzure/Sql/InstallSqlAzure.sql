@@ -427,8 +427,8 @@ BEGIN
 		;
 		SET IDENTITY_INSERT [cmsContentType] ON
 		INSERT [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail], [description], [masterContentType]) VALUES (532, 1031, N'Folder', N'folder.gif', N'folder.png', NULL, NULL)
-		INSERT [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail], [description], [masterContentType]) VALUES (533, 1032, N'Image', N'mediaPhoto.gif', N'folder.png', NULL, NULL)
-		INSERT [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail], [description], [masterContentType]) VALUES (534, 1033, N'File', N'mediaMulti.gif', N'folder.png', NULL, NULL)
+		INSERT [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail], [description], [masterContentType]) VALUES (533, 1032, N'Image', N'mediaPhoto.gif', N'mediaPhoto.png', NULL, NULL)
+		INSERT [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail], [description], [masterContentType]) VALUES (534, 1033, N'File', N'mediaMulti.gif', N'mediaMulti.png', NULL, NULL)
 		SET IDENTITY_INSERT [cmsContentType] OFF
 
 		SET ANSI_NULLS ON
@@ -1313,13 +1313,13 @@ BEGIN
 		;
 		ALTER TABLE [cmsTemplate] CHECK CONSTRAINT [FK_cmsTemplate_umbracoNode]
 		;
-
+/*
 		ALTER TABLE [umbracoAppTree]  WITH CHECK ADD  CONSTRAINT [FK_umbracoAppTree_umbracoApp] FOREIGN KEY([appAlias])
 		REFERENCES [umbracoApp] ([appAlias])
 		;
 		ALTER TABLE [umbracoAppTree] CHECK CONSTRAINT [FK_umbracoAppTree_umbracoApp]
 		;
-
+*/
 		ALTER TABLE [umbracoDomains]  WITH CHECK ADD  CONSTRAINT [FK_umbracoDomains_umbracoNode] FOREIGN KEY([domainRootStructureID])
 		REFERENCES [umbracoNode] ([id])
 		;
@@ -1355,13 +1355,13 @@ BEGIN
 		;
 		ALTER TABLE [umbracoUser] CHECK CONSTRAINT [FK_user_userType]
 		;
-
+/*
 		ALTER TABLE [umbracoUser2app]  WITH CHECK ADD  CONSTRAINT [FK_umbracoUser2app_umbracoApp] FOREIGN KEY([app])
 		REFERENCES [umbracoApp] ([appAlias])
 		;
 		ALTER TABLE [umbracoUser2app] CHECK CONSTRAINT [FK_umbracoUser2app_umbracoApp]
 		;
-
+*/
 		ALTER TABLE [umbracoUser2NodeNotify]  WITH CHECK ADD  CONSTRAINT [FK_umbracoUser2NodeNotify_umbracoNode] FOREIGN KEY([nodeId])
 		REFERENCES [umbracoNode] ([id])
 		;

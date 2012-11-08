@@ -534,18 +534,16 @@ namespace umbraco.editorControls.tinyMCE3
             return macroTag;
         }
 
-        public static Hashtable ReturnAttributes(String tag)
-        {
-            var ht = new Hashtable();
-            MatchCollection m =
-                Regex.Matches(tag, "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"",
-                              RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-            foreach (Match attributeSet in m)
-                ht.Add(attributeSet.Groups["attributeName"].Value,
-                       attributeSet.Groups["attributeValue"].Value);
-
-            return ht;
-        }
+		[Obsolete("Has been superceded by Umbraco.Core.XmlHelper.GetAttributesFromElement")]
+		public static Hashtable ReturnAttributes(String tag)
+		{
+			var h = new Hashtable();
+			foreach (var i in Umbraco.Core.XmlHelper.GetAttributesFromElement(tag))
+			{
+				h.Add(i.Key, i.Value);
+			}
+			return h;
+		}
 
         private int findStartTag(string text)
         {

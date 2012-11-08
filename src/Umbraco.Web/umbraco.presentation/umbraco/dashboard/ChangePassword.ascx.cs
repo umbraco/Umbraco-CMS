@@ -19,30 +19,40 @@ namespace umbraco.presentation.umbraco.dashboard
         protected void changePassword_Click(object sender, EventArgs e)
         {
             User u = User.GetCurrent();
-            MembershipUser user = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(u.LoginName, true);
+            MembershipProvider provider = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider];
+            MembershipUser user = provider.GetUser(u.LoginName, true);
 
 
-            string tempPassword = password.Text;
-            if (!string.IsNullOrEmpty(tempPassword.Trim()))
+            string newPass = password.Text;
+            string oldPass = currentpassword.Text;
+            if (!string.IsNullOrEmpty(oldPass) && provider.ValidateUser(u.LoginName, oldPass))
             {
-                if (tempPassword == confirmpassword.Text)
+                if (!string.IsNullOrEmpty(newPass.Trim()))
                 {
-                    // make sure password is not empty
-                    user.ChangePassword(u.Password, tempPassword);
-                    changeForm.Visible = false;
-                    errorPane.Visible = false;
-                    passwordChanged.Visible = true;
+                    if (newPass == confirmpassword.Text)
+                    {
+                        // make sure password is not empty
+                        user.ChangePassword(u.Password, newPass);
+                        changeForm.Visible = false;
+                        errorPane.Visible = false;
+                        passwordChanged.Visible = true;
+                    }
+                    else
+                    {
+                        errorPane.Visible = true;
+                        errorMessage.Text = ui.Text("passwordIsDifferent");
+                    }
                 }
                 else
                 {
                     errorPane.Visible = true;
-                    errorMessage.Text = ui.Text("passwordIsDifferent");
+                    errorMessage.Text = ui.Text("passwordIsBlank");
                 }
             }
             else
             {
                 errorPane.Visible = true;
-                errorMessage.Text = ui.Text("passwordIsBlank");
+                errorMessage.Text = ui.Text("passwordInvalid");
             }
 
         }

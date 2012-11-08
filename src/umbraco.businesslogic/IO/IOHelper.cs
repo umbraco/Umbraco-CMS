@@ -36,7 +36,7 @@ namespace umbraco.IO
 			return Umbraco.Core.IO.IOHelper.ResolveUrl(virtualPath); 
         }
 
-
+		[Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ResolveUrlsFromTextString instead, this method on this class will be removed in future versions")]
         public static string ResolveUrlsFromTextString(string text)
         {
 			return Umbraco.Core.IO.IOHelper.ResolveUrlsFromTextString(text); 
@@ -53,12 +53,13 @@ namespace umbraco.IO
         }
 
         //use a tilde character instead of the complete path
+		[Obsolete("This method is no longer in use and will be removed in future versions")]
         public static string returnPath(string settingsKey, string standardPath, bool useTilde)
         {
 			return Umbraco.Core.IO.IOHelper.ReturnPath(settingsKey, standardPath, useTilde); 
         }
 
-
+		[Obsolete("This method is no longer in use and will be removed in future versions")]
         public static string returnPath(string settingsKey, string standardPath)
         {
 			return Umbraco.Core.IO.IOHelper.ReturnPath(settingsKey, standardPath); 
@@ -77,7 +78,7 @@ namespace umbraco.IO
 			return Umbraco.Core.IO.IOHelper.ValidateEditPath(filePath, validDir); 
         }
 
-        public static bool ValidateFileExtension(string filePath, List<string> validFileExtensions)
+	    public static bool ValidateFileExtension(string filePath, List<string> validFileExtensions)
         {
 			return Umbraco.Core.IO.IOHelper.ValidateFileExtension(filePath, validFileExtensions); 
         }

@@ -11,6 +11,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Reflection;
 using umbraco.BusinessLogic.Actions;
+using umbraco.cms.businesslogic.language;
 using umbraco.cms.helpers;
 using umbraco.IO;
 using umbraco.uicontrols.DatePicker;
@@ -20,6 +21,8 @@ using umbraco.cms.businesslogic.web;
 using umbraco.presentation;
 using umbraco.cms.businesslogic.skinning;
 using System.Collections.Generic;
+using System.Linq;
+using Image = System.Web.UI.WebControls.Image;
 
 namespace umbraco.cms.presentation
 {
@@ -44,8 +47,6 @@ namespace umbraco.cms.presentation
         Button UnPublish = new Button();
         private Literal littPublishStatus = new Literal();
 
-        private Literal l = new Literal();
-        private Literal domainText = new Literal();
         private controls.ContentControl.publishModes _canPublish = controls.ContentControl.publishModes.Publish;
 
         private int? m_ContentId = null;
@@ -179,13 +180,6 @@ namespace umbraco.cms.presentation
             dpExpire.ShowTime = true;
             publishProps.addProperty(ui.Text("content", "expireDate", base.getUser()), dpExpire);
 
-            // url's
-            updateLinks();
-            linkProps.addProperty(ui.Text("content", "urls", base.getUser()), l);
-
-            if (domainText.Text != "")
-                linkProps.addProperty(ui.Text("content", "alternativeUrls", base.getUser()), domainText);
-
             cControl.Save += new System.EventHandler(Save);
             cControl.SaveAndPublish += new System.EventHandler(Publish);
             cControl.SaveToPublish += new System.EventHandler(SendToPublish);
@@ -222,6 +216,12 @@ namespace umbraco.cms.presentation
 
             jsIds.Text = "var umbPageId = " + _document.Id.ToString() + ";\nvar umbVersionId = '" + _document.Version.ToString() + "';\n";
 
+        }
+
+        protected override void OnPreRender(EventArgs e)
+        {
+            base.OnPreRender(e);
+            UpdateNiceUrls();
         }
 
         protected void Save(object sender, System.EventArgs e)
@@ -266,9 +266,9 @@ namespace umbraco.cms.presentation
                 _document.ExpireDate = new DateTime(1, 1, 1, 0, 0, 0);
 
             // Update default template
-            if (ddlDefaultTemplate.SelectedIndex > 0) 
+            if (ddlDefaultTemplate.SelectedIndex > 0)
             {
-                _document.Template = int.Parse(ddlDefaultTemplate.SelectedValue); 
+                _document.Template = int.Parse(ddlDefaultTemplate.SelectedValue);
             }
             else
             {
@@ -311,11 +311,11 @@ namespace umbraco.cms.presentation
                 {
                     Trace.Warn("before d.publish");
 
-                    if (_document.PublishWithResult(base.getUser()))
+                    if (_document.Id != 1061 && _document.PublishWithResult(base.getUser()))
                     {
 
                         ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));
-                        library.UpdateDocumentCache(_document.Id);
+                        library.UpdateDocumentCache(_document);
 
                         littPublishStatus.Text = ui.Text("content", "lastPublished", base.getUser()) + ": " + _document.VersionDate.ToString() + "<br/>";
 
@@ -323,11 +323,10 @@ namespace umbraco.cms.presentation
                             UnPublish.Visible = true;
 
                         _documentHasPublishedVersion = _document.HasPublishedVersion();
-                        updateLinks();
                     }
                     else
                     {
-                        ClientTools.ShowSpeechBubble(speechBubbleIcon.warning, ui.Text("publish"), ui.Text("contentPublishedFailedByEvent"));
+                        ClientTools.ShowSpeechBubble(speechBubbleIcon.warning, ui.Text("publish"), ui.Text("speechBubbles", "contentPublishedFailedByEvent"));
                     }
                 }
                 else
@@ -346,63 +345,69 @@ namespace umbraco.cms.presentation
             _document.UnPublish();
             littPublishStatus.Text = ui.Text("content", "itemNotPublished", base.getUser());
             UnPublish.Visible = false;
+            _documentHasPublishedVersion = false;
 
             library.UnPublishSingleNode(_document.Id);
 
             //newPublishStatus.Text = "0";
-
         }
 
-        private void updateLinks()
+        void UpdateNiceUrlProperties(string niceUrlText, string altUrlsText)
         {
-            if (_documentHasPublishedVersion)
+            Literal lit;
+
+            linkProps.Controls.Clear();
+
+            lit = new Literal();
+            lit.Text = niceUrlText;
+            linkProps.addProperty(ui.Text("content", "urls", base.getUser()), lit);
+
+            if (!string.IsNullOrWhiteSpace(altUrlsText))
             {
-                // zb-00007 #29928 : refactor
-                string currentLink = library.NiceUrl(_document.Id);
-                l.Text = "<a href=\"" + currentLink + "\" target=\"_blank\">" + currentLink + "</a>";
+                lit = new Literal();
+                lit.Text = altUrlsText;
+                linkProps.addProperty(ui.Text("content", "alternativeUrls", base.getUser()), lit);
+            }
+        }
 
-                // domains
-                domainText.Text = "";
-                foreach (string s in _document.Path.Split(','))
+        void UpdateNiceUrls()
+        {
+            if (!_documentHasPublishedVersion)
+            {
+                UpdateNiceUrlProperties("<i>" + ui.Text("content", "itemNotPublished", base.getUser()) + "</i>", null);
+                return;
+            }
+
+            var niceUrlProvider = Umbraco.Web.UmbracoContext.Current.RoutingContext.NiceUrlProvider;
+            var url = niceUrlProvider.GetNiceUrl(_document.Id);
+            string niceUrlText = null;
+            var altUrlsText = new System.Text.StringBuilder();
+
+            if (url == "#")
+            {
+                // document as a published version yet it's url is "#" => a parent must be
+                // unpublished, walk up the tree until we find it, and report.
+                var parent = _document;
+                do
                 {
-                    if (int.Parse(s) > -1)
-                    {
-                        cms.businesslogic.web.Document dChild = new cms.businesslogic.web.Document(int.Parse(s));
-                        if (dChild.Published)
-                        {
-                            cms.businesslogic.web.Domain[] domains = cms.businesslogic.web.Domain.GetDomainsById(int.Parse(s));
-                            if (domains.Length > 0)
-                            {
-                                for (int i = 0; i < domains.Length; i++)
-                                {
-                                    string tempLink = "";
-                                    if (library.NiceUrl(int.Parse(s)) == "")
-                                        tempLink = "<em>N/A</em>";
-                                    else if (int.Parse(s) != _document.Id)
-                                    {
-                                        string tempNiceUrl = library.NiceUrl(int.Parse(s));
-
-                                        string niceUrl = tempNiceUrl != "/" ? currentLink.Replace(tempNiceUrl.Replace(".aspx", ""), "") : currentLink;
-                                        if (!niceUrl.StartsWith("/"))
-                                            niceUrl = "/" + niceUrl;
-
-                                        tempLink = "http://" + domains[i].Name + niceUrl;
-                                    }
-                                    else
-                                        tempLink = "http://" + domains[i].Name;
-
-                                    domainText.Text += "<a href=\"" + tempLink + "\" target=\"_blank\">" + tempLink + "</a><br/>";
-                                }
-                            }
-                        }
-                        else
-                            l.Text = "<i>" + ui.Text("content", "parentNotPublished", dChild.Text, base.getUser()) + "</i>";
-                    }
+                    parent = parent.ParentId > 0 ? new Document(parent.ParentId) : null;
                 }
+                while (parent != null && parent.Published);
 
+                if (parent == null) // oops - internal error
+                    niceUrlText = "<i>" + ui.Text("content", "parentNotPublished", "???", base.getUser()) + "</i>";
+                else
+                    niceUrlText = "<i>" + ui.Text("content", "parentNotPublished", parent.Text, base.getUser()) + "</i>";
             }
             else
-                l.Text = "<i>" + ui.Text("content", "itemNotPublished", base.getUser()) + "</i>";
+            {
+                niceUrlText = string.Format("<a href=\"{0}\" target=\"_blank\">{0}</a>", url);
+
+                foreach (var altUrl in niceUrlProvider.GetAllAbsoluteNiceUrls(_document.Id).Where(u => u != url))
+                    altUrlsText.AppendFormat("<a href=\"{0}\" target=\"_blank\">{0}</a><br />", altUrl);
+            }
+
+            UpdateNiceUrlProperties(niceUrlText, altUrlsText.ToString());
         }
 
         /// <summary>
@@ -445,9 +450,22 @@ namespace umbraco.cms.presentation
         {
             menu.InsertSplitter(2);
             uicontrols.MenuIconI menuItem = menu.NewIcon(3);
-            menuItem.AltText = ui.Text("buttons", "showPage", this.getUser());
-            menuItem.OnClickCommand = "window.open('dialogs/preview.aspx?id=" + id + "','umbPreview')";
             menuItem.ImageURL = SystemDirectories.Umbraco + "/images/editor/vis.gif";
+            // Fix for U4-682, if there's no template, disable the preview button
+            if (_document.Template != -1)
+            {
+                menuItem.AltText = ui.Text("buttons", "showPage", this.getUser());
+                menuItem.OnClickCommand = "window.open('dialogs/preview.aspx?id=" + id + "','umbPreview')";
+            }
+            else
+            {
+                string showPageDisabledText = ui.Text("buttons", "showPageDisabled", this.getUser());
+                if (showPageDisabledText.StartsWith("["))
+                    showPageDisabledText = ui.GetText("buttons", "showPageDisabled", null, "en"); ;
+
+                menuItem.AltText = showPageDisabledText;
+                ((Image) menuItem).Attributes.Add("style", "opacity: 0.5");
+            }
         }
 
     }

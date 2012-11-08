@@ -183,11 +183,15 @@ namespace umbraco.cms.businesslogic.media
         public new Media[] Children
         {
             get
-            {
+            {                
                 //return refactored optimized method
                 return Media.GetChildrenForTree(this.Id).ToArray();
             }
         } 
+
+        
+
+
         #endregion
 
         #region Public methods
@@ -202,6 +206,7 @@ namespace umbraco.cms.businesslogic.media
 
             if (!e.Cancel)
             {
+                this.VersionDate = DateTime.Now;
 
                 base.Save();
 

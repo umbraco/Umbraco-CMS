@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Web;
 using System.Web.Services;
 using System.Xml;
+using Umbraco.Core;
 
 namespace umbraco.presentation.webservices
 {
@@ -53,7 +54,7 @@ namespace umbraco.presentation.webservices
 		{
 			if (BusinessLogic.User.validateCredentials(Login, Password))
 			{
-				interfaces.ICacheRefresher cr = new cache.Factory().GetNewObject(uniqueIdentifier);
+				var cr = CacheRefreshersResolver.Current.GetById(uniqueIdentifier);
 				cr.RefreshAll();
 				
 			}
@@ -64,7 +65,7 @@ namespace umbraco.presentation.webservices
 		{
 			if (BusinessLogic.User.validateCredentials(Login, Password))
 			{
-				interfaces.ICacheRefresher cr = new cache.Factory().GetNewObject(uniqueIdentifier);
+				var cr = CacheRefreshersResolver.Current.GetById(uniqueIdentifier);
 				cr.Refresh(Id);
 				
 			}
@@ -75,7 +76,7 @@ namespace umbraco.presentation.webservices
 		{
 			if (BusinessLogic.User.validateCredentials(Login, Password))
 			{
-				interfaces.ICacheRefresher cr = new cache.Factory().GetNewObject(uniqueIdentifier);
+				var cr = CacheRefreshersResolver.Current.GetById(uniqueIdentifier);
 				cr.Refresh(Id);
 				
 			}
@@ -85,7 +86,7 @@ namespace umbraco.presentation.webservices
         public void RemoveById(Guid uniqueIdentifier, int Id, string Login, string Password) {
 
             if (BusinessLogic.User.validateCredentials(Login, Password)) {
-                interfaces.ICacheRefresher cr = new cache.Factory().GetNewObject(uniqueIdentifier);
+				var cr = CacheRefreshersResolver.Current.GetById(uniqueIdentifier);
                 cr.Remove(Id);
             }
         }
@@ -97,7 +98,7 @@ namespace umbraco.presentation.webservices
 			{
 				XmlDocument xd = new XmlDocument();
 				xd.LoadXml("<cacheRefreshers/>");
-				foreach (interfaces.ICacheRefresher cr in new cache.Factory().GetAll()) 
+				foreach (var cr in CacheRefreshersResolver.Current.CacheResolvers) 
 				{
 					XmlNode n = xmlHelper.addTextNode(xd, "cacheRefresher", cr.Name);
 					n.Attributes.Append(xmlHelper.addAttribute(xd, "uniqueIdentifier", cr.UniqueIdentifier.ToString()));

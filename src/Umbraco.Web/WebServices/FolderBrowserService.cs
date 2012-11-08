@@ -11,14 +11,14 @@ using umbraco.BusinessLogic;
 using umbraco.IO;
 using umbraco.cms.businesslogic.Tags;
 using umbraco.cms.businesslogic.media;
-using umbraco.presentation.umbracobase;
+using Umbraco.Web.BaseRest;
 
 namespace Umbraco.Web.WebServices
 {
     [RestExtension("FolderBrowserService")]
     public class FolderBrowserService
     {
-        [RestExtensionMethod(returnXml = false)]
+        [RestExtensionMethod(ReturnXml = false)]
         public static string GetChildren(int parentId)
         {
             var parentMedia = new global::umbraco.cms.businesslogic.media.Media(parentId);
@@ -43,7 +43,7 @@ namespace Umbraco.Web.WebServices
                         x.PropertyType.DataTypeDefinition.DataType.Id == new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
 
                 var fileUrl = fileProp != null ? fileProp.Value.ToString() : "";
-                var thumbUrl = ThumbnailProviderManager.Current.GetThumbnailUrl(fileUrl);
+                var thumbUrl = ThumbnailProvidersResolver.Current.GetThumbnailUrl(fileUrl);
                 var item = new
                 {
                     Id = child.Id,
@@ -64,7 +64,7 @@ namespace Umbraco.Web.WebServices
             return new JavaScriptSerializer().Serialize(data);
         }
 
-        [RestExtensionMethod(returnXml = false)]
+        [RestExtensionMethod(ReturnXml = false)]
         public static string Delete(string nodeIds)
         {
             var nodeIdParts = nodeIds.Split(',');

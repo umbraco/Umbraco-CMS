@@ -160,15 +160,32 @@ namespace umbraco.cms.businesslogic
             {
                 if (!_versionDateInitialized)
                 {
-                    object o = SqlHelper.ExecuteScalar<object>(
-                        "select VersionDate from cmsContentVersion where versionId = '" + this.Version.ToString() + "'");
-                    if (o == null)
+                    // A Media item only contains a single version (which relates to it's creation) so get this value from the media xml fragment instead
+                    if (this is media.Media)
                     {
-                        _versionDate = DateTime.Now;
+                        // get the xml fragment from cmsXmlContent
+                        string xmlFragment = SqlHelper.ExecuteScalar<string>(@"SELECT [xml] FROM cmsContentXml WHERE nodeId = " + this.Id);
+                        if (!string.IsNullOrWhiteSpace(xmlFragment))
+                        {
+                            XmlDocument xmlDocument = new XmlDocument();
+                            xmlDocument.LoadXml(xmlFragment);                            
+
+                            _versionDateInitialized = DateTime.TryParse(xmlDocument.SelectSingleNode("//*[1]").Attributes["updateDate"].Value, out _versionDate);
+                        }
                     }
-                    else
+
+                    if (!_versionDateInitialized)
                     {
-                        _versionDateInitialized = DateTime.TryParse(o.ToString(), out _versionDate);
+                        object o = SqlHelper.ExecuteScalar<object>(
+                            "select VersionDate from cmsContentVersion where versionId = '" + this.Version.ToString() + "'");
+                        if (o == null)
+                        {
+                            _versionDate = DateTime.Now;
+                        }
+                        else
+                        {
+                            _versionDateInitialized = DateTime.TryParse(o.ToString(), out _versionDate);
+                        }
                     }
                 }
                 return _versionDate;
@@ -508,8 +525,13 @@ namespace umbraco.cms.businesslogic
         /// 
         /// </summary>
         /// <returns>The new version Id</returns>
-        protected Guid createNewVersion(DateTime versionDate)
+		protected Guid createNewVersion(DateTime versionDate = default(DateTime))
         {
+			if (versionDate == default (DateTime))
+			{
+				versionDate = DateTime.Now;
+			}
+
             ClearLoadedProperties();
 
             Guid newVersion = Guid.NewGuid();
@@ -519,7 +541,8 @@ namespace umbraco.cms.businesslogic
             SqlHelper.ExecuteNonQuery("Insert into cmsContentVersion (ContentId,versionId,versionDate) values (" + this.Id + ",'" + newVersion + "', @updateDate)",
                 SqlHelper.CreateParameter("@updateDate", versionDate));
 
-            foreach (propertytype.PropertyType pt in this.ContentType.PropertyTypes)
+            List<PropertyType> pts = ContentType.PropertyTypes;
+            foreach (propertytype.PropertyType pt in pts)
             {
                 object oldValue = "";
                 if (tempHasVersion)
@@ -573,7 +596,7 @@ namespace umbraco.cms.businesslogic
         {
             // Remove all files
 
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
             var uploadField = new Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
              
             foreach (Property p in GenericProperties)
@@ -583,7 +606,7 @@ namespace umbraco.cms.businesslogic
                 {
                     if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id
                          && p.Value.ToString() != ""
-                         && File.Exists(Umbraco.Core.IO.IOHelper.MapPath(p.Value.ToString())))
+                         && File.Exists(global::Umbraco.Core.IO.IOHelper.MapPath(p.Value.ToString())))
                     {
                         isUploadField = true;
                     }

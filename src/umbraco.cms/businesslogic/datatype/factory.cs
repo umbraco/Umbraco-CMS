@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
+using System.Linq;
 using System.Web;
-
+using Umbraco.Core;
 using umbraco.BusinessLogic.Utils;
 using umbraco.interfaces;
 using System.Collections.Generic;
@@ -13,22 +15,9 @@ namespace umbraco.cms.businesslogic.datatype.controls
     /// 
     /// Then registering is done using reflection.
     /// </summary>
+	[Obsolete("Use Umbraco.Core.DataTypesResolver instead")]
     public class Factory
-    {
-        #region Declarations
-
-        private static readonly Dictionary<Guid, Type> _controls = new Dictionary<Guid, Type>();
-
-        #endregion
-
-        #region Constructors
-
-        static Factory()
-        {
-            Initialize();
-        }
-
-        #endregion
+    {        
 
         /// <summary>
         /// Retrieves the IDataType specified by it's unique ID
@@ -47,19 +36,7 @@ namespace umbraco.cms.businesslogic.datatype.controls
         /// <returns></returns>
         public IDataType GetNewObject(Guid DataEditorId)
         {
-            if (DataEditorId == Guid.Empty)
-            {
-                throw new ArgumentException("DataEditorId is empty. This usually means that no data editor was defined for the data type. To correct this update the entry in the cmsDataType table to ensure it matches a Guid from an installed data editor.");
-            }
-            if (_controls.ContainsKey(DataEditorId))
-            {
-                IDataType newObject = Activator.CreateInstance(_controls[DataEditorId]) as IDataType;
-                return newObject;
-            }
-            else
-            {
-                throw new ArgumentException("Could not find a IDataType control matching DataEditorId " + DataEditorId.ToString() + " in the controls collection. To correct this, check the data type definition in the developer section or ensure that the package/control is installed correctly.");
-            }
+        	return DataTypesResolver.Current.GetById(DataEditorId);
         }
 
         /// <summary>
@@ -68,50 +45,9 @@ namespace umbraco.cms.businesslogic.datatype.controls
         /// <returns>A list of IDataType's</returns>
         public IDataType[] GetAll()
         {
-            IDataType[] retVal = new IDataType[_controls.Count];
-            int c = 0;
-
-            foreach (Guid id in _controls.Keys)
-            {
-                retVal[c] = GetNewObject(id);
-                c++;
-            }
-
-            return retVal;
+        	return DataTypesResolver.Current.DataTypes.ToArray();
         }
 
-        private static void Initialize()
-        {
-            // Get all datatypes from interface
-            List<Type> types = TypeFinder.FindClassesOfType<IDataType>();
-            getDataTypes(types);
-        }
-
-        private static void getDataTypes(List<Type> types)
-        {
-            foreach (Type t in types)
-            {
-                IDataType typeInstance = null;
-                try
-                {
-                    if (t.IsVisible)
-                    {
-                        typeInstance = Activator.CreateInstance(t) as IDataType;
-                    }
-                }
-                catch { }
-                if (typeInstance != null)
-                {
-                    try
-                    {
-                        _controls.Add(typeInstance.Id, t);
-                    }
-                    catch (Exception ee)
-                    {
-                        BusinessLogic.Log.Add(umbraco.BusinessLogic.LogTypes.Error, -1, "Can't import datatype '" + t.FullName + "': " + ee.ToString());
-                    }
-                }
-            }
-        }
+        
     }
 }

@@ -1,4 +1,8 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml;
 using Umbraco.Core.IO;
 
@@ -7,7 +11,7 @@ namespace Umbraco.Core
 	/// <summary>
 	/// The XmlHelper class contains general helper methods for working with xml in umbraco.
     /// </summary>
-    internal class XmlHelper
+    public class XmlHelper
     {
 
 		/// <summary>
@@ -16,7 +20,7 @@ namespace Umbraco.Core
         /// <param name="text">The text.</param>
         /// <param name="xmlDoc">The XML doc.</param>
         /// <returns></returns>
-        public static XmlNode ImportXmlNodeFromText(string text, ref XmlDocument xmlDoc)
+        internal static XmlNode ImportXmlNodeFromText(string text, ref XmlDocument xmlDoc)
         {
             xmlDoc.LoadXml(text);
             return xmlDoc.FirstChild;
@@ -88,7 +92,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="n">The XmlNode.</param>
         /// <returns>the value as a string</returns>
-        public static string GetNodeValue(XmlNode n)
+		internal static string GetNodeValue(XmlNode n)
         {
             var value = string.Empty;
             if (n == null || n.FirstChild == null)
@@ -104,7 +108,7 @@ namespace Umbraco.Core
         /// <returns>
         /// 	<c>true</c> if the specified string appears to be XML; otherwise, <c>false</c>.
         /// </returns>
-        public static bool CouldItBeXml(string xml)
+		internal static bool CouldItBeXml(string xml)
         {
             if (!string.IsNullOrEmpty(xml))
             {
@@ -127,7 +131,7 @@ namespace Umbraco.Core
         /// <param name="rootName">Name of the root.</param>
         /// <param name="elementName">Name of the element.</param>
         /// <returns>Returns an <c>System.Xml.XmlDocument</c> representation of the delimited string data.</returns>
-        public static XmlDocument Split(string data, string[] separator, string rootName, string elementName)
+		internal static XmlDocument Split(string data, string[] separator, string rootName, string elementName)
         {
             return Split(new XmlDocument(), data, separator, rootName, elementName);
         }
@@ -141,7 +145,7 @@ namespace Umbraco.Core
         /// <param name="rootName">Name of the root node.</param>
         /// <param name="elementName">Name of the element node.</param>
         /// <returns>Returns an <c>System.Xml.XmlDocument</c> representation of the delimited string data.</returns>
-        public static XmlDocument Split(XmlDocument xml, string data, string[] separator, string rootName, string elementName)
+		internal static XmlDocument Split(XmlDocument xml, string data, string[] separator, string rootName, string elementName)
         {
             // load new XML document.
             xml.LoadXml(string.Concat("<", rootName, "/>"));
@@ -164,5 +168,20 @@ namespace Umbraco.Core
             // return the XML node.
             return xml;
         }
+
+		/// <summary>
+		/// Return a dictionary of attributes found for a string based tag
+		/// </summary>
+		/// <param name="tag"></param>
+		/// <returns></returns>
+		internal static Dictionary<string, string> GetAttributesFromElement(string tag)
+		{
+			var m =
+				Regex.Matches(tag, "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"",
+							  RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+			// fix for issue 14862: return lowercase attributes for case insensitive matching
+			var d = m.Cast<Match>().ToDictionary(attributeSet => attributeSet.Groups["attributeName"].Value.ToString().ToLower(), attributeSet => attributeSet.Groups["attributeValue"].Value.ToString());
+			return d;
+		}
     }
 }

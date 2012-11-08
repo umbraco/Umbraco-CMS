@@ -23,11 +23,11 @@ namespace umbraco.webservices.media
     [ScriptService]
     public class mediaService : BaseWebService
     {
-        internal IMediaFileSystem _fs;
+        internal MediaFileSystem _fs;
 
         public mediaService()
         {
-            _fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+            _fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
         }
 
         override public Services Service
@@ -130,9 +130,9 @@ namespace umbraco.webservices.media
         {
             Authenticate(username, password);
 
-			filename = filename.Replace("/", Umbraco.Core.IO.IOHelper.DirSepChar.ToString());
-			filename = filename.Replace(@"\", Umbraco.Core.IO.IOHelper.DirSepChar.ToString());
-			filename = filename.Substring(filename.LastIndexOf(Umbraco.Core.IO.IOHelper.DirSepChar) + 1, filename.Length - filename.LastIndexOf(Umbraco.Core.IO.IOHelper.DirSepChar) - 1).ToLower();
+			filename = filename.Replace("/", global::Umbraco.Core.IO.IOHelper.DirSepChar.ToString());
+			filename = filename.Replace(@"\", global::Umbraco.Core.IO.IOHelper.DirSepChar.ToString());
+			filename = filename.Substring(filename.LastIndexOf(global::Umbraco.Core.IO.IOHelper.DirSepChar) + 1, filename.Length - filename.LastIndexOf(global::Umbraco.Core.IO.IOHelper.DirSepChar) - 1).ToLower();
 
             Media m = new Media(id);
 

@@ -1,4 +1,4 @@
-<%@ Control Language="c#" AutoEventWireup="True" Codebehind="QuickSearch.ascx.cs" Inherits="umbraco.presentation.Search.QuickSearch" %>
+<%@ Control Language="c#" AutoEventWireup="True" Codebehind="QuickSearch.ascx.cs" Inherits="Umbraco.Web.UI.Umbraco.Search.QuickSearch" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <umb:JsInclude ID="JsInclude1" runat="server" FilePath="Search/quickSearch.js" PathNameAlias="UmbracoRoot" />

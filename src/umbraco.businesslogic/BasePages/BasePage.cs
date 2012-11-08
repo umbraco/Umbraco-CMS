@@ -3,6 +3,7 @@ using System.Data;
 using System.Web;
 using System.Linq;
 using System.Web.Security;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.IO;
@@ -242,7 +243,7 @@ namespace umbraco.BasePages
                     catch (ArgumentException ex)
                     {
                         // we swallow this one because it's 99.99% certaincy is legacy based. We'll still log it, though
-                        Log.Instance.AddException(ex);
+                        LogHelper.Error<BasePage>("An error occurred reading auth cookie value", ex);
 
                     }
                 }

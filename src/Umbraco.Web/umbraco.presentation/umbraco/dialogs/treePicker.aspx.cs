@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Data;
@@ -12,17 +12,26 @@ using umbraco.cms.presentation.Trees;
 
 namespace umbraco.dialogs
 {
-    [Obsolete("Use the TreeControl instead. This does however get used by the TreeService when requesting the tree init url.")]
+	[Obsolete("Use the TreeControl instead. This does however get used by the TreeService when requesting the tree init url.")]
 	public partial class treePicker : BasePages.UmbracoEnsuredPage
 	{
 		protected override void OnLoad(EventArgs e)
 		{
 			base.OnLoad(e);
-            TreeParams = TreeRequestParams.FromQueryStrings().CreateTreeService();
-            DataBind();
+			TreeParams = TreeRequestParams.FromQueryStrings().CreateTreeService();
+			DataBind();
 		}
 
-        protected TreeService TreeParams { get; private set; }        
+		protected TreeService TreeParams { get; private set; }
+
+		/// <summary>
+		/// DialogTree control.
+		/// </summary>
+		/// <remarks>
+		/// Auto-generated field.
+		/// To modify move field declaration from designer file to code-behind file.
+		/// </remarks>
+		protected global::umbraco.controls.Tree.TreeControl DialogTree;
 
 	}
 }

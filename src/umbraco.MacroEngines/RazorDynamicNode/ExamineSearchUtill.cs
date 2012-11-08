@@ -8,23 +8,20 @@ namespace umbraco.MacroEngines
 {
     class ExamineSearchUtill
     {
-
-        internal static DynamicNodeList convertSearchResultToDynamicNode(Examine.ISearchResults results)
+        internal static DynamicNodeList ConvertSearchResultToDynamicNode(Examine.ISearchResults results)
         {
-            DynamicNodeList list = new DynamicNodeList();
-            XmlDocument xd = new XmlDocument();
+            var list = new DynamicNodeList();
+            var xd = new XmlDocument();
 
             foreach (var result in results.OrderByDescending(x => x.Score))
             {
                 var item = new DynamicBackingItem(result.Id);
-                if (item != null && item.Id != 0)
-                {
-                    var node = (NodeFactory.Node)item.content;
-                    XmlNode examineResultXml = xmlHelper.addTextNode(xd, "examineScore", result.Score.ToString());
-                    node.Properties.Add(new NodeFactory.Property(examineResultXml));
+            	if (item.Id == 0) continue;
+            	var node = (NodeFactory.Node)item.content;
+            	var examineResultXml = Umbraco.Core.XmlHelper.AddTextNode(xd, "examineScore", result.Score.ToString());
+            	node.Properties.Add(new NodeFactory.Property(examineResultXml));
 
-                    list.Add(new DynamicNode(item));
-                }
+            	list.Add(new DynamicNode(item));
             }
             return list;
         }

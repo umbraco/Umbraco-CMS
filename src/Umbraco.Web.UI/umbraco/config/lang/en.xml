@@ -15,8 +15,6 @@
     <key alias="disable">Disable</key>
     <key alias="emptyTrashcan">Empty recycle bin</key>
     <key alias="exportDocumentType">Export Document Type</key>
-    <key alias="exportDocumentTypeAsCode">Export to .NET</key>
-    <key alias="exportDocumentTypeAsCode-Full">Export to .NET</key>
     <key alias="importDocumentType">Import Document Type</key>
     <key alias="importPackage">Import Package</key>
     <key alias="liveEdit">Edit in Canvas</key>
@@ -71,13 +69,14 @@
     <key alias="saveAndPublish">Save and publish</key>
     <key alias="saveToPublish">Save and send for approval</key>
     <key alias="showPage">Preview</key>
+    <key alias="showPageDisabled">Preview is disabled because there's no template assigned</key>
     <key alias="styleChoose">Choose style</key>
     <key alias="styleShow">Show styles</key>
     <key alias="tableInsert">Insert table</key>
   </area>
   <area alias="content">
     <key alias="about">About this page</key>
-    <key alias="alias">Alternative link</key>
+    <key alias="alias">Alias</key>
     <key alias="alternativeTextHelp">(how would you describe the picture over the phone)</key>
     <key alias="alternativeUrls">Alternative Links</key>
     <key alias="clickToEdit">Click to edit this item</key>
@@ -90,6 +89,7 @@
     <key alias="itemNotPublished">This item is not published</key>
     <key alias="lastPublished">Last published</key>
     <key alias="mediatype">Media Type</key>
+	<key alias="mediaLinks">Link to media item(s)</key>
     <key alias="membergroup">Member Group</key>
     <key alias="memberrole">Role</key>
     <key alias="membertype">Member Type</key>
@@ -482,6 +482,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="notAllowedByContentType">The current node is not allowed under the chosen node because of its type</key>
     <key alias="notAllowedByPath">The current node cannot be moved to one of its subpages</key>
     <key alias="notValid">The action isn't allowed since you have insufficient permissions on 1 or more child documents.</key>
+    <key alias="relateToOriginal">Relate copied items to original</key>
   </area>
   <area alias="notifications">
     <key alias="editNotifications">Edit your notification for %0%</key>
@@ -651,6 +652,10 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="tab">Tab</key>
     <key alias="tabname">Tab Title</key>
     <key alias="tabs">Tabs</key>
+    <key alias="contentTypeEnabled">Master Content Type enabled</key>
+    <key alias="contentTypeUses">This Content Type uses</key>
+    <key alias="asAContentMasterType">as a Master Content Type. Tabs from Master Content Types are not shown and can only be edited on the Master Content Type itself</key>
+    
   </area>
   <area alias="sort">
     <key alias="sortDone">Sorting complete.</key>
@@ -685,6 +690,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="editTemplateSaved">Template saved</key>
     <key alias="editUserError">Error saving user (check log)</key>
     <key alias="editUserSaved">User Saved</key>
+    <key alias="editUserTypeSaved">User type saved</key>
     <key alias="fileErrorHeader">File not saved</key>
     <key alias="fileErrorText">file could not be saved. Please check file permissions</key>
     <key alias="fileSavedHeader">File saved</key>
@@ -730,6 +736,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="chooseField">Choose field</key>
     <key alias="convertLineBreaks">Convert Linebreaks</key>
     <key alias="convertLineBreaksHelp">Replaces linebreaks with html-tag &amp;lt;br&amp;gt;</key>
+	<key alias="customFields">Custom Fields</key>
     <key alias="dateOnly">Yes, Date only</key>
     <key alias="formatAsDate">Format as date</key>
     <key alias="htmlEncode">HTML encode</key>
@@ -743,6 +750,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="recursive">Recursive</key>
     <key alias="removeParagraph">Remove Paragraph tags</key>
     <key alias="removeParagraphHelp">Will remove any &amp;lt;P&amp;gt; in the beginning and end of the text</key>
+	<key alias="standardFields">Standard Fields</key>
     <key alias="uppercase">Uppercase</key>
     <key alias="urlEncode">URL encode</key>
     <key alias="urlEncodeHelp">Will format special characters in URLs</key>
@@ -838,6 +846,8 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Category field</key>
     <key alias="changePassword">Change Your Password</key>
+    <key alias="newPassword">Change Your Password</key>
+    <key alias="confirmNewPassword">Confirm new password</key>
     <key alias="changePasswordDescription">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
     <key alias="contentChannel">Content Channel</key>
     <key alias="defaultToLiveEditing">Redirect to canvas on login</key>
@@ -855,7 +865,9 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="passwordChanged">Your password has been changed!</key>
     <key alias="passwordConfirm">Please confirm the new password</key>
     <key alias="passwordEnterNew">Enter your new password</key>
-    <key alias="passwordIsBlank">Your new password cannot be blank!</key>
+	<key alias="passwordIsBlank">Your new password cannot be blank!</key>
+	<key alias="passwordCurrent">Current password</key>
+	<key alias="passwordInvalid">Invalid current password</key>
     <key alias="passwordIsDifferent">There was a difference between the new password and the confirmed password. Please try again!</key>
     <key alias="passwordMismatch">The confirmed password doesn't match the new password!</key>
     <key alias="permissionReplaceChildren">Replace child node permssions</key>

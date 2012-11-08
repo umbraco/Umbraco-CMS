@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<build>
-  <version>4.0 Beta 2</version>
-  <assembly>@assembly@</assembly>
-  <date>@date@</date>
-</build>

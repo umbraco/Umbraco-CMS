@@ -10,8 +10,6 @@ using System.Security.Cryptography;
 using System.Web.Util;
 using System.Collections.Specialized;
 using System.Configuration.Provider;
-using umbraco.businesslogic;
-using umbraco.cms.businesslogic;
 using System.Collections;
 #endregion
 
@@ -203,37 +201,6 @@ namespace umbraco.presentation.nodeFactory {
                 throw new ProviderException(String.Format("No parent with id '{0}' is found", id));
             // Return the parent SiteMapNode
             return m_nodes[id];
-        }
-    }
-
-    public class UmbracoSiteMapProviderAccessUpdate : ApplicationStartupHandler
-    {
-        public UmbracoSiteMapProviderAccessUpdate()
-        {
-            // Add events to security
-            if (System.Web.SiteMap.Provider is UmbracoSiteMapProvider)
-            {
-                cms.businesslogic.web.Access.AfterAddMemberShipRoleToDocument += new global::umbraco.cms.businesslogic.web.Access.AddMemberShipRoleToDocumentEventHandler(Access_AfterAddMemberShipRoleToDocument);
-                cms.businesslogic.web.Access.AfterRemoveMemberShipRoleToDocument += new global::umbraco.cms.businesslogic.web.Access.RemoveMemberShipRoleFromDocumentEventHandler(Access_AfterRemoveMemberShipRoleToDocument);
-                cms.businesslogic.web.Access.AfterRemoveProtection += new global::umbraco.cms.businesslogic.web.Access.RemoveProtectionEventHandler(Access_AfterRemoveProtection);
-            }
-
-        }
-
-        void Access_AfterRemoveProtection(global::umbraco.cms.businesslogic.web.Document sender, RemoveProtectionEventArgs e)
-        {
-            ((UmbracoSiteMapProvider)System.Web.SiteMap.Provider).UpdateNode(new NodeFactory.Node(sender.Id));
-        }
-
-
-        void Access_AfterRemoveMemberShipRoleToDocument(global::umbraco.cms.businesslogic.web.Document sender, string role, RemoveMemberShipRoleFromDocumentEventArgs e)
-        {
-            ((UmbracoSiteMapProvider)System.Web.SiteMap.Provider).UpdateNode(new NodeFactory.Node(sender.Id));
-        }
-
-        void Access_AfterAddMemberShipRoleToDocument(global::umbraco.cms.businesslogic.web.Document sender, string role, AddMemberShipRoleToDocumentEventArgs e)
-        {
-            ((UmbracoSiteMapProvider)System.Web.SiteMap.Provider).UpdateNode(new NodeFactory.Node(sender.Id));
         }
     }
 }
