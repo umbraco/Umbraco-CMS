@@ -16,13 +16,18 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class MediaTypeRepository : ContentTypeBaseRepository<int, IMediaType>, IMediaTypeRepository
     {
-        public MediaTypeRepository(IUnitOfWork work) : base(work)
+        private readonly IUserRepository _userRepository;
+
+        public MediaTypeRepository(IUnitOfWork work, IUserRepository userRepository)
+            : base(work)
         {
+            _userRepository = userRepository;
         }
 
-        public MediaTypeRepository(IUnitOfWork work, IRepositoryCacheProvider cache)
+        public MediaTypeRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IUserRepository userRepository)
             : base(work, cache)
         {
+            _userRepository = userRepository;
         }
 
         #region Overrides of RepositoryBase<int,IMedia>
@@ -37,7 +42,9 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
-            var factory = new MediaTypeFactory(NodeObjectTypeId);
+            var creator = _userRepository.GetProfileById(dto.NodeDto.UserId.Value);
+
+            var factory = new MediaTypeFactory(NodeObjectTypeId, creator);
             var contentType = factory.BuildEntity(dto);
             
             contentType.AllowedContentTypes = GetAllowedContentTypeIds(id);

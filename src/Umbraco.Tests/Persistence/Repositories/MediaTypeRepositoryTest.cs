@@ -2,6 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            var repository = new MediaTypeRepository(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -39,7 +40,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new MediaTypeRepository(unitOfWork, InMemoryCacheProvider.Current);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
 
             // Act
             var contentType = MockedContentTypes.CreateVideoMediaType();
@@ -59,9 +60,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var unitOfWork2 = provider.GetUnitOfWork();
-            var repository = new MediaTypeRepository(unitOfWork, InMemoryCacheProvider.Current);
-            var repository2 = new MediaTypeRepository(unitOfWork2, InMemoryCacheProvider.Current);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
             var videoMediaType = MockedContentTypes.CreateVideoMediaType();
             repository.AddOrUpdate(videoMediaType);
             unitOfWork.Commit();
@@ -80,8 +79,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 SortOrder = 1,
                 DataTypeId = -88
             });
-            repository2.AddOrUpdate(mediaType);
-            unitOfWork2.Commit();
+            repository.AddOrUpdate(mediaType);
+            unitOfWork.Commit();
 
             var dirty = ((MediaType)mediaType).IsDirty();
 
@@ -98,22 +97,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var unitOfWork2 = provider.GetUnitOfWork();
-            var unitOfWork3 = provider.GetUnitOfWork();
-            var repository = new MediaTypeRepository(unitOfWork, InMemoryCacheProvider.Current);
-            var repository2 = new MediaTypeRepository(unitOfWork2, InMemoryCacheProvider.Current);
-            var repository3 = new MediaTypeRepository(unitOfWork3, InMemoryCacheProvider.Current);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
 
             // Act
             var mediaType = MockedContentTypes.CreateVideoMediaType();
             repository.AddOrUpdate(mediaType);
             unitOfWork.Commit();
 
-            var contentType2 = repository2.Get(mediaType.Id);
-            repository2.Delete(contentType2);
-            unitOfWork2.Commit();
+            var contentType2 = repository.Get(mediaType.Id);
+            repository.Delete(contentType2);
+            unitOfWork.Commit();
 
-            var exists = repository3.Exists(mediaType.Id);
+            var exists = repository.Exists(mediaType.Id);
 
             // Assert
             Assert.That(exists, Is.False);
@@ -125,7 +120,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new MediaTypeRepository(unitOfWork, InMemoryCacheProvider.Current);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
 
             // Act
             var mediaType = repository.Get(1033);//File
@@ -142,7 +137,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new MediaTypeRepository(unitOfWork, InMemoryCacheProvider.Current);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
             InMemoryCacheProvider.Current.Clear();
 
             // Act
@@ -163,7 +158,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new MediaTypeRepository(unitOfWork, InMemoryCacheProvider.Current);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
 
             // Act
             var exists = repository.Exists(1032);//Image
@@ -178,22 +173,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var unitOfWork2 = provider.GetUnitOfWork();
-            var unitOfWork3 = provider.GetUnitOfWork();
-            var repository = new MediaTypeRepository(unitOfWork, InMemoryCacheProvider.Current);
-            var repository2 = new MediaTypeRepository(unitOfWork2, InMemoryCacheProvider.Current);
-            var repository3 = new MediaTypeRepository(unitOfWork3, InMemoryCacheProvider.Current);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
             var mediaType = MockedContentTypes.CreateVideoMediaType();
             repository.AddOrUpdate(mediaType);
             unitOfWork.Commit();
 
             // Act
-            var mediaTypeV2 = repository2.Get(1045);
+            var mediaTypeV2 = repository.Get(1045);
             mediaTypeV2.PropertyGroups["Media"].PropertyTypes.Remove("title");
-            repository2.AddOrUpdate(mediaTypeV2);
-            unitOfWork2.Commit();
+            repository.AddOrUpdate(mediaTypeV2);
+            unitOfWork.Commit();
 
-            var mediaTypeV3 = repository3.Get(1045);
+            var mediaTypeV3 = repository.Get(1045);
 
             // Assert
             Assert.That(mediaTypeV3.PropertyTypes.Any(x => x.Alias == "title"), Is.False);
@@ -207,7 +198,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new MediaTypeRepository(unitOfWork, InMemoryCacheProvider.Current);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
             var mediaType = MockedContentTypes.CreateVideoMediaType();
             repository.AddOrUpdate(mediaType);
             unitOfWork.Commit();
@@ -226,7 +217,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new MediaTypeRepository(unitOfWork, InMemoryCacheProvider.Current);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
 
             // Act
             var contentType = repository.Get(1033);//File

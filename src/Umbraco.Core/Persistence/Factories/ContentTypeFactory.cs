@@ -9,10 +9,17 @@ namespace Umbraco.Core.Persistence.Factories
     internal class ContentTypeFactory : IEntityFactory<IContentType, DocumentTypeDto>
     {
         private readonly Guid _nodeObjectType;
+        private readonly IProfile _creator;
 
         public ContentTypeFactory(Guid nodeObjectType)
         {
             _nodeObjectType = nodeObjectType;
+        }
+
+        public ContentTypeFactory(Guid nodeObjectType, IProfile creator)
+        {
+            _nodeObjectType = nodeObjectType;
+            _creator = creator;
         }
 
         #region Implementation of IEntityFactory<IContentType,DocumentTypeDto>
@@ -35,7 +42,7 @@ namespace Umbraco.Core.Persistence.Factories
                                       CreateDate = dto.ContentTypeDto.NodeDto.CreateDate,
                                       Path = dto.ContentTypeDto.NodeDto.Path,
                                       Level = dto.ContentTypeDto.NodeDto.Level,
-                                      Creator = new Profile(dto.ContentTypeDto.NodeDto.UserId.Value, ""),
+                                      Creator = _creator,
                                       AllowedAsRoot = dto.ContentTypeDto.AllowAtRoot,
                                       IsContainer = dto.ContentTypeDto.IsContainer,
                                       Trashed = dto.ContentTypeDto.NodeDto.Trashed

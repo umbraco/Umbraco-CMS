@@ -50,11 +50,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
 
-            //NOTE: Should eventually be moved to a UserRepository like is the case with ContentType
-            /*var userDto = Database.FirstOrDefault<UserDto>("WHERE id = @Id", new { Id = dto.ContentVersionDto.ContentDto.NodeDto.UserId });
-            var user = new Profile(userDto.Id, userDto.UserName);
-            var writerDto = Database.FirstOrDefault<UserDto>("WHERE id = @Id", new { Id = dto.WriterUserId });
-            var writer = new Profile(writerDto.Id, writerDto.UserName);*/
             var user = _userRepository.GetProfileById(dto.ContentVersionDto.ContentDto.NodeDto.UserId.Value);
             var writer = _userRepository.GetProfileById(dto.WriterUserId);
 

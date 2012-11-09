@@ -19,16 +19,20 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class MediaRepository : PetaPocoRepositoryBase<int, IMedia>, IMediaRepository
     {
         private readonly IMediaTypeRepository _mediaTypeRepository;
+        private readonly IUserRepository _userRepository;
 
-        public MediaRepository(IUnitOfWork work, IMediaTypeRepository mediaTypeRepository) : base(work)
+        public MediaRepository(IUnitOfWork work, IMediaTypeRepository mediaTypeRepository, IUserRepository userRepository)
+            : base(work)
         {
             _mediaTypeRepository = mediaTypeRepository;
+            _userRepository = userRepository;
         }
 
-        public MediaRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IMediaTypeRepository mediaTypeRepository)
+        public MediaRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IMediaTypeRepository mediaTypeRepository, IUserRepository userRepository)
             : base(work, cache)
         {
             _mediaTypeRepository = mediaTypeRepository;
+            _userRepository = userRepository;
         }
 
         #region Overrides of RepositoryBase<int,IMedia>
@@ -45,10 +49,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 return null;
 
             var contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
-            
-            //NOTE: Should eventually be moved to a UserRepository like is the case with ContentType
-            var userDto = Database.FirstOrDefault<UserDto>("WHERE id = @Id", new {Id = dto.ContentDto.NodeDto.UserId});
-            var user = new Profile(userDto.Id, userDto.UserName);
+
+            var user = _userRepository.GetProfileById(dto.ContentDto.NodeDto.UserId.Value);
 
             var factory = new MediaFactory(contentType, NodeObjectTypeId, id, user);
             var content = factory.BuildEntity(dto);

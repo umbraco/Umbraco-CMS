@@ -16,13 +16,18 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class ContentTypeRepository : ContentTypeBaseRepository<int, IContentType>, IContentTypeRepository
     {
-        public ContentTypeRepository(IUnitOfWork work) : base(work)
+        private readonly IUserRepository _userRepository;
+
+        public ContentTypeRepository(IUnitOfWork work, IUserRepository userRepository)
+            : base(work)
         {
+            _userRepository = userRepository;
         }
 
-        public ContentTypeRepository(IUnitOfWork work, IRepositoryCacheProvider cache)
+        public ContentTypeRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IUserRepository userRepository)
             : base(work, cache)
         {
+            _userRepository = userRepository;
         }
 
         #region Overrides of RepositoryBase<int,IContentType>
@@ -37,7 +42,9 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
-            var factory = new ContentTypeFactory(NodeObjectTypeId);
+            var creator = _userRepository.GetProfileById(dto.ContentTypeDto.NodeDto.UserId.Value);
+
+            var factory = new ContentTypeFactory(NodeObjectTypeId, creator);
             var contentType = factory.BuildEntity(dto);
 
             contentType.AllowedContentTypes = GetAllowedContentTypeIds(id);
