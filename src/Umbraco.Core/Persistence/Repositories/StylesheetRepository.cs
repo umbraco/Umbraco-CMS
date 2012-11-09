@@ -28,11 +28,15 @@ namespace Umbraco.Core.Persistence.Repositories
                 throw new Exception(string.Format("The file {0} was not found", id));
             }
 
-            var stream = FileSystem.OpenFile(id);
-            byte[] bytes = new byte[stream.Length];
-            stream.Position = 0;
-            stream.Read(bytes, 0, (int)stream.Length);
-            var content = Encoding.UTF8.GetString(bytes);
+            var content = string.Empty;
+
+            using (var stream = FileSystem.OpenFile(id))
+            {
+                byte[] bytes = new byte[stream.Length];
+                stream.Position = 0;
+                stream.Read(bytes, 0, (int) stream.Length);
+                content = Encoding.UTF8.GetString(bytes);
+            }
 
             var path = FileSystem.GetRelativePath(id);
             var created = FileSystem.GetCreated(path).UtcDateTime;
