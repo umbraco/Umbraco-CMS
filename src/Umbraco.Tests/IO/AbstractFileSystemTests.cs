@@ -108,7 +108,7 @@ namespace Umbraco.Tests.IO
         [Test]
         public void Can_Get_File_Dates()
         {
-            _fileSystem.AddFile("test.txt", CreateStream());
+            _fileSystem.AddFile("test.txt", CreateStream(), true);
 
             var created = _fileSystem.GetCreated("test.txt");
             var modified = _fileSystem.GetLastModified("test.txt");

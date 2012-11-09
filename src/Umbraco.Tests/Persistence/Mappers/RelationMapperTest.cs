@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = RelationMapper.Instance.Map("RelationType");
+            string column = RelationMapper.Instance.Map("RelationTypeId");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoRelation].[relType]"));
