@@ -14,6 +14,9 @@
         <summary>Contains the core assemblies needed to run Umbraco Cms</summary>
         <language>en-US</language>
         <tags>umbraco</tags>
+		<dependencies>
+            <dependency id="Microsoft.AspNet.Mvc" version="[3.0.20105.1]" />
+        </dependencies>
     </metadata>
 	<files>
 		<file src="..\_BuildOutput\WebApp\bin\businesslogic.dll" target="lib\businesslogic.dll" />
@@ -29,7 +32,6 @@
 		<file src="..\_BuildOutput\WebApp\bin\Lucene.Net.dll" target="lib\Lucene.Net.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\Microsoft.ApplicationBlocks.Data.dll" target="lib\Microsoft.ApplicationBlocks.Data.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\Microsoft.Web.Helpers.dll" target="lib\Microsoft.Web.Helpers.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\Microsoft.Web.Infrastructure.dll" target="lib\Microsoft.Web.Infrastructure.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\MySql.Data.dll" target="lib\MySql.Data.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\Our.Umbraco.uGoLive.47x.dll" target="lib\Our.Umbraco.uGoLive.47x.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\Our.Umbraco.uGoLive.Checks.dll" target="lib\Our.Umbraco.uGoLive.Checks.dll" />
@@ -38,11 +40,6 @@
 		<file src="..\_BuildOutput\WebApp\bin\SQLCE4Umbraco.dll" target="lib\SQLCE4Umbraco.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.dll" target="lib\System.Data.SqlServerCe.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.Entity.dll" target="lib\System.Data.SqlServerCe.Entity.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\System.Web.Helpers.dll" target="lib\System.Web.Helpers.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\System.Web.Razor.dll" target="lib\System.Web.Razor.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\System.Web.WebPages.Deployment.dll" target="lib\System.Web.WebPages.Deployment.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\System.Web.WebPages.dll" target="lib\System.Web.WebPages.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\System.Web.WebPages.Razor.dll" target="lib\System.Web.WebPages.Razor.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\TidyNet.dll" target="lib\TidyNet.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\Umbraco.Core.dll" target="lib\Umbraco.Core.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\umbraco.DataLayer.dll" target="lib\umbraco.DataLayer.dll" />
