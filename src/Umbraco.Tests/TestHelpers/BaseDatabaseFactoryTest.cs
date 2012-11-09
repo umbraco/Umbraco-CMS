@@ -42,7 +42,7 @@ namespace Umbraco.Tests.TestHelpers
             mvcViews.GetFiles().ForEach(x => x.Delete());
 
             //Delete database file before continueing
-            string filePath = string.Concat(path, "\\test.sdf");
+            string filePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
@@ -50,6 +50,7 @@ namespace Umbraco.Tests.TestHelpers
 
             //Get the connectionstring settings from config
             var settings = ConfigurationManager.ConnectionStrings["umbracoDbDsn"];
+            ConfigurationManager.AppSettings.Set("umbracoDbDSN", @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf");
 
             //Create the Sql CE database
             var engine = new SqlCeEngine(settings.ConnectionString);
@@ -76,21 +77,21 @@ namespace Umbraco.Tests.TestHelpers
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
-            string filePath = string.Concat(path, "\\test.sdf");
+            string filePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
             if (File.Exists(filePath))
             {
-                File.Delete(filePath);
+                //File.Delete(filePath);
             }
         }
 
-        protected ApplicationContext ApplicationContext { get; private set; }
+        protected ApplicationContext ApplicationContext { get; set; }
 
         protected ServiceContext ServiceContext
         {
             get { return ServiceContext.Current; }
         }
 
-        protected DatabaseContext DatabaseContext { get; private set; }
+        protected DatabaseContext DatabaseContext { get; set; }
 
         protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null)
         {

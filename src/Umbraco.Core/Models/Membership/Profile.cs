@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models.Membership
 
         public string Name { get; set; }
 
-        internal virtual object ProviderUserKey
+        public virtual object ProviderUserKey
         {
             get { throw new System.NotImplementedException(); }
             set { throw new System.NotImplementedException(); }

@@ -105,6 +105,7 @@
     <Compile Include="Models\Membership\IMembershipUser.cs" />
     <Compile Include="Models\Membership\IMembershipUserId.cs" />
     <Compile Include="Models\Membership\IProfile.cs" />
+    <Compile Include="Models\Membership\IUser.cs" />
     <Compile Include="Models\Membership\Profile.cs" />
     <Compile Include="Models\Membership\User.cs" />
     <Compile Include="Models\Membership\UserProfile.cs" />
@@ -193,6 +194,7 @@
     <Compile Include="Persistence\Repositories\Interfaces\IRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IStylesheetRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITemplateRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IUserRepository.cs" />
     <Compile Include="Persistence\Repositories\LanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\MacroRepository.cs" />
     <Compile Include="Persistence\Repositories\MediaRepository.cs" />
@@ -204,6 +206,7 @@
     <Compile Include="Persistence\Repositories\ScriptRepository.cs" />
     <Compile Include="Persistence\Repositories\StylesheetRepository.cs" />
     <Compile Include="Persistence\Repositories\TemplateRepository.cs" />
+    <Compile Include="Persistence\Repositories\UserRepository.cs" />
     <Compile Include="Persistence\RepositoryResolver.cs" />
     <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />
     <Compile Include="Persistence\SqlSyntax\ISqlSyntaxProvider.cs" />

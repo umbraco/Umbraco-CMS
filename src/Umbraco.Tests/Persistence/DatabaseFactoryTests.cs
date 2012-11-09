@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Persistence
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
             //Delete database file before continueing
-            string filePath = string.Concat(path, "\\test.sdf");
+            string filePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);

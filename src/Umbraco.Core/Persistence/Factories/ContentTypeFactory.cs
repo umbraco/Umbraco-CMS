@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
@@ -34,10 +35,7 @@ namespace Umbraco.Core.Persistence.Factories
                                       CreateDate = dto.ContentTypeDto.NodeDto.CreateDate,
                                       Path = dto.ContentTypeDto.NodeDto.Path,
                                       Level = dto.ContentTypeDto.NodeDto.Level,
-                                      UserId =
-                                          dto.ContentTypeDto.NodeDto.UserId.HasValue
-                                              ? dto.ContentTypeDto.NodeDto.UserId.Value
-                                              : 0,
+                                      Creator = new Profile(dto.ContentTypeDto.NodeDto.UserId.Value, ""),
                                       AllowedAsRoot = dto.ContentTypeDto.AllowAtRoot,
                                       IsContainer = dto.ContentTypeDto.IsContainer,
                                       Trashed = dto.ContentTypeDto.NodeDto.Trashed
@@ -85,7 +83,7 @@ namespace Umbraco.Core.Persistence.Factories
                                   Text = entity.Name,
                                   Trashed = false,
                                   UniqueId = entity.Key,
-                                  UserId = entity.UserId
+                                  UserId = entity.Creator.Id.SafeCast<int>()
                               };
             return nodeDto;
         }

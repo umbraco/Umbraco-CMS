@@ -42,11 +42,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (FileSystem.FileExists(masterpageName))
             {
-                var stream = FileSystem.OpenFile(masterpageName);
-                byte[] bytes = new byte[stream.Length];
-                stream.Position = 0;
-                stream.Read(bytes, 0, (int)stream.Length);
-                content = Encoding.UTF8.GetString(bytes);
+                using (var stream = FileSystem.OpenFile(masterpageName))
+                {
+                    byte[] bytes = new byte[stream.Length];
+                    stream.Position = 0;
+                    stream.Read(bytes, 0, (int) stream.Length);
+                    content = Encoding.UTF8.GetString(bytes);
+                }
 
                 path = FileSystem.GetRelativePath(masterpageName);
                 created = FileSystem.GetCreated(path).UtcDateTime;
@@ -55,11 +57,13 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                var stream = _viewsFileSystem.OpenFile(viewName);
-                byte[] bytes = new byte[stream.Length];
-                stream.Position = 0;
-                stream.Read(bytes, 0, (int)stream.Length);
-                content = Encoding.UTF8.GetString(bytes);
+                using (var stream = _viewsFileSystem.OpenFile(viewName))
+                {
+                    byte[] bytes = new byte[stream.Length];
+                    stream.Position = 0;
+                    stream.Read(bytes, 0, (int) stream.Length);
+                    content = Encoding.UTF8.GetString(bytes);
+                }
 
                 path = _viewsFileSystem.GetRelativePath(viewName);
                 created = FileSystem.GetCreated(path).UtcDateTime;

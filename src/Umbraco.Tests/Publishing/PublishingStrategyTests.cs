@@ -1,8 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Web;
 using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.TestHelpers;
@@ -19,6 +22,8 @@ namespace Umbraco.Tests.Publishing
         [SetUp]
         public override void Initialize()
         {
+            UmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
+
             //this ensures its reset
             PluginManager.Current = new PluginManager();
 
@@ -73,6 +78,8 @@ namespace Umbraco.Tests.Publishing
             var document = httpContext.Items["UmbracoXmlContextContent"] as XmlDocument;
             Console.Write(document.OuterXml);
             document.Save("umbraco.config");
+
+            updateContentCache.Unsubscribe();
         }
 
         public void CreateTestData()

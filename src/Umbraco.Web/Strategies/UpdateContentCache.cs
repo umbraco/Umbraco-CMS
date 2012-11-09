@@ -52,11 +52,7 @@ namespace Umbraco.Web.Strategies
             // note that some threads could read from it while we hold the lock, though
             lock (XmlContentInternalSyncLock)
             {
-                // modify a clone of the cache because even though we're into the write-lock
-                // we may have threads reading at the same time. why is this an option?
-                XmlDocument wip = UmbracoSettings.CloneXmlCacheOnPublish
-                    ? CloneXmlDoc(XmlContent)
-                    : XmlContent;
+                XmlDocument wip = XmlContent;
 
                 ClearContextCache();
 
@@ -178,12 +174,6 @@ namespace Umbraco.Web.Strategies
             return xmlContentCopy;
         }
 
-        private XmlDocument CloneXmlDoc(XmlDocument xmlDoc)
-        {
-            var xmlCopy = (XmlDocument)xmlDoc.CloneNode(true);
-            return xmlCopy;
-        }
-
         /// <summary>
         /// Clear HTTPContext cache if any
         /// </summary>
@@ -238,6 +228,11 @@ namespace Umbraco.Web.Strategies
                 return content;
             }
             set { _httpContext.Items[XmlContextContentItemKey] = value; }
+        }
+
+        internal void Unsubscribe()
+        {
+            PublishingStrategy.Published -= PublishingStrategy_Published;
         }
     }
 }

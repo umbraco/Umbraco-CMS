@@ -41,6 +41,11 @@ namespace Umbraco.Tests.IO
 
             Assert.AreEqual(1, files.Count());
 
+            foreach (var file in files)
+            {
+                _fileSystem.DeleteFile(file);
+            }
+
             _fileSystem.DeleteDirectory("test", true);
         }
 

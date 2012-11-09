@@ -8,6 +8,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.editorControls.tinyMCE3;
 using umbraco.interfaces;
+using File = System.IO.File;
 
 namespace Umbraco.Tests.Models
 {
@@ -38,15 +39,10 @@ namespace Umbraco.Tests.Models
         {
             DatabaseContext.Database.Dispose();
 
-            TestHelper.ClearDatabase();
-
             //reset the app context
             DataTypesResolver.Reset();
-            ApplicationContext.Current = null;
-            Resolution.IsFrozen = false;
-
-            string path = TestHelper.CurrentAssemblyDirectory;
-            AppDomain.CurrentDomain.SetData("DataDirectory", null);
+            
+            base.TearDown();
         }
         [Test]
         public void Can_Generate_Xml_Representation_Of_Content()

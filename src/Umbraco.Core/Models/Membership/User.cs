@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models.Membership
 {
@@ -10,8 +11,32 @@ namespace Umbraco.Core.Models.Membership
     /// Should be internal until a proper user/membership implementation
     /// is part of the roadmap.
     /// </remarks>
-    internal class User : UserProfile, IMembershipUser
+    internal class User : UserProfile, IUser
     {
+        private bool _hasIdentity;
+        private int _id;
+
+        #region Implementation of IEntity
+
+        public bool HasIdentity { get { return Id != null || _hasIdentity; } }
+
+        int IEntity.Id
+        {
+            get
+            {
+                return _id;
+            }
+            set
+            {
+                _id = value;
+                _hasIdentity = true;
+            }
+        }
+
+        public Guid Key { get; set; }
+
+        #endregion
+
         #region Implementation of IMembershipUser
 
         public string Username { get; set; }
@@ -23,20 +48,14 @@ namespace Umbraco.Core.Models.Membership
         public bool IsApproved { get; set; }
         public bool IsOnline { get; set; }
         public bool IsLockedOut { get; set; }
-        public DateTime CreationDate { get; set; }
+        public DateTime CreateDate { get; set; }
+        public DateTime UpdateDate { get; set; }
         public DateTime LastLoginDate { get; set; }
-        public DateTime LastActivityDate { get; set; }
         public DateTime LastPasswordChangeDate { get; set; }
         public DateTime LastLockoutDate { get; set; }
 
         public object ProfileId { get; set; }
         public IEnumerable<object> Groups { get; set; }
-
-        #endregion
-
-        #region Implementation of IMembershipUserId
-
-        public new object ProviderUserKey { get; set; }
 
         #endregion
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Models
 {
@@ -21,7 +22,7 @@ namespace Umbraco.Core.Models
         private int _sortOrder;
         private string _icon;
         private string _thumbnail;
-        private int _userId;
+        private IProfile _creator;
         private bool _allowedAsRoot;
         private bool _isContainer;
         private bool _trashed;
@@ -44,7 +45,7 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo DescriptionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Description);
         private static readonly PropertyInfo IconSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Icon);
         private static readonly PropertyInfo ThumbnailSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Thumbnail);
-        private static readonly PropertyInfo UserIdSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.UserId);
+        private static readonly PropertyInfo CreatorSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IProfile>(x => x.Creator);
         private static readonly PropertyInfo AllowedAsRootSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.AllowedAsRoot);
         private static readonly PropertyInfo IsContainerSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.IsContainer);
         private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.Trashed);
@@ -184,16 +185,16 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Id of the user who created this Content
+        /// Gets or sets the Profile of the user who created this ContentType
         /// </summary>
         [DataMember]
-        public virtual int UserId
+        public virtual IProfile Creator
         {
-            get { return _userId; }
+            get { return _creator; }
             set
             {
-                _userId = value;
-                OnPropertyChanged(UserIdSelector);
+                _creator = value;
+                OnPropertyChanged(CreatorSelector);
             }
         }
 

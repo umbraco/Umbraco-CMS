@@ -38,7 +38,7 @@ namespace Umbraco.Tests.DynamicDocument
 				Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"), 
 				true);
 
-			UmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config, false);
+            UmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
 
 			//for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
 			PluginManager.Current.AssembliesToScan = new[]

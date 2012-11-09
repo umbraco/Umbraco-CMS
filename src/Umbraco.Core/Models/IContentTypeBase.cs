@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Models
 {
@@ -55,9 +56,9 @@ namespace Umbraco.Core.Models
         string Thumbnail { get; set; }
 
         /// <summary>
-        /// Gets or Sets the Id of the User who created the ContentType
+        /// Gets or Sets the Profile of the User who created the ContentType
         /// </summary>
-        int UserId { get; set; }
+        IProfile Creator { get; set; }
 
         /// <summary>
         /// Gets or Sets a boolean indicating whether this ContentType is allowed at the root
