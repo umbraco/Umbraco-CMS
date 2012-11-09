@@ -123,6 +123,8 @@ namespace Umbraco.Core.Persistence.Repositories
                            {
                                string.Format("DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id"),
                                string.Format("DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id"),
+                               string.Format("DELETE FROM umbracoRelation WHERE parentId = @Id"),
+                               string.Format("DELETE FROM umbracoRelation WHERE childId = @Id"),
                                string.Format("DELETE FROM cmsTagRelationship WHERE nodeId = @Id"),
                                string.Format("DELETE FROM cmsDocument WHERE NodeId = @Id"),
                                string.Format("DELETE FROM cmsPropertyData WHERE contentNodeId = @Id"),

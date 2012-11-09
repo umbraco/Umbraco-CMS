@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Factories
             var dto = new RelationDto
                           {
                               ChildId = entity.ChildId,
-                              Comment = entity.Comment,
+                              Comment = string.IsNullOrEmpty(entity.Comment) ? string.Empty : entity.Comment,
                               Datetime = entity.CreateDate,
                               ParentId = entity.ParentId,
                               RelationType = entity.RelationType.Id

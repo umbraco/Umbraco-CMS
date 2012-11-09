@@ -84,5 +84,14 @@ namespace Umbraco.Core.Models
                 OnPropertyChanged(CommentSelector);
             }
         }
+
+        /// <summary>
+        /// Gets the Id of the <see cref="RelationType"/> that this Relation is based on.
+        /// </summary>
+        [IgnoreDataMember]
+        public int RelationTypeId
+        {
+            get { return _relationType.Id; }
+        }
     }
 }
