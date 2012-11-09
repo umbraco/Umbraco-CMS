@@ -19,17 +19,20 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class ContentRepository : PetaPocoRepositoryBase<int, IContent>, IContentRepository
     {
         private readonly IContentTypeRepository _contentTypeRepository;
+        private readonly IUserRepository _userRepository;
 
-        public ContentRepository(IUnitOfWork work, IContentTypeRepository contentTypeRepository)
+        public ContentRepository(IUnitOfWork work, IContentTypeRepository contentTypeRepository, IUserRepository userRepository)
             : base(work)
         {
             _contentTypeRepository = contentTypeRepository;
+            _userRepository = userRepository;
         }
 
-        public ContentRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository)
+        public ContentRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, IUserRepository userRepository)
             : base(work, cache)
         {
             _contentTypeRepository = contentTypeRepository;
+            _userRepository = userRepository;
         }
 
         #region Overrides of RepositoryBase<IContent>
@@ -48,10 +51,12 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
 
             //NOTE: Should eventually be moved to a UserRepository like is the case with ContentType
-            var userDto = Database.FirstOrDefault<UserDto>("WHERE id = @Id", new { Id = dto.ContentVersionDto.ContentDto.NodeDto.UserId });
+            /*var userDto = Database.FirstOrDefault<UserDto>("WHERE id = @Id", new { Id = dto.ContentVersionDto.ContentDto.NodeDto.UserId });
             var user = new Profile(userDto.Id, userDto.UserName);
             var writerDto = Database.FirstOrDefault<UserDto>("WHERE id = @Id", new { Id = dto.WriterUserId });
-            var writer = new Profile(writerDto.Id, writerDto.UserName);
+            var writer = new Profile(writerDto.Id, writerDto.UserName);*/
+            var user = _userRepository.GetProfileById(dto.ContentVersionDto.ContentDto.NodeDto.UserId.Value);
+            var writer = _userRepository.GetProfileById(dto.WriterUserId);
 
             var factory = new ContentFactory(contentType, NodeObjectTypeId, id, user, writer);
             var content = factory.BuildEntity(dto);

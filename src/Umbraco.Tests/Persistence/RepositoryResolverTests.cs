@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -19,7 +20,7 @@ namespace Umbraco.Tests.Persistence
             RepositoryResolver.RegisterRepositories();
             
             // Assert
-            Assert.That(RepositoryResolver.RegisteredRepositories(), Is.EqualTo(13));
+            Assert.That(RepositoryResolver.RegisteredRepositories(), Is.EqualTo(15));
         }
 
         [Test]
@@ -186,6 +187,32 @@ namespace Umbraco.Tests.Persistence
 
             // Act
             var repository = RepositoryResolver.ResolveByType<ITemplateRepository, Template, string>(uow);
+
+            // Assert
+            Assert.That(repository, Is.Not.Null);
+        }
+
+        [Test]
+        public void Can_Resolve_UserRepository()
+        {
+            // Arrange
+            var uow = new PetaPocoUnitOfWork();
+
+            // Act
+            var repository = RepositoryResolver.ResolveByType<IUserRepository, IUser, int>(uow);
+
+            // Assert
+            Assert.That(repository, Is.Not.Null);
+        }
+
+        [Test]
+        public void Can_Resolve_UserTypeRepository()
+        {
+            // Arrange
+            var uow = new PetaPocoUnitOfWork();
+
+            // Act
+            var repository = RepositoryResolver.ResolveByType<IUserTypeRepository, IUserType, int>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);

@@ -1,36 +1,84 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Caching;
+using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
     /// <summary>
-    /// Represents the UserRepository for doing CRUD operations for users
+    /// Represents the UserRepository for doing CRUD operations for <see cref="IUser"/>
     /// </summary>
     internal class UserRepository : PetaPocoRepositoryBase<int, IUser>, IUserRepository
     {
-        public UserRepository(IUnitOfWork work)
+        private readonly IUserTypeRepository _userTypeRepository;
+
+        public UserRepository(IUnitOfWork work, IUserTypeRepository userTypeRepository)
             : base(work)
         {
+            _userTypeRepository = userTypeRepository;
+        }
+
+        public UserRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IUserTypeRepository userTypeRepository)
+            : base(work, cache)
+        {
+            _userTypeRepository = userTypeRepository;
         }
 
         #region Overrides of RepositoryBase<int,IUser>
 
         protected override IUser PerformGet(int id)
         {
-            throw new NotImplementedException();
+            var sql = GetBaseQuery(false);
+            sql.Where(GetBaseWhereClause(), new { Id = id });
+
+            var dto = Database.Query<UserDto>(sql).FirstOrDefault();
+
+            if (dto == null)
+                return null;
+
+            var userType = _userTypeRepository.Get(dto.Type);
+            var userFactory = new UserFactory(userType);
+            var user = userFactory.BuildEntity(dto);
+
+            return user;
         }
 
         protected override IEnumerable<IUser> PerformGetAll(params int[] ids)
         {
-            throw new NotImplementedException();
+            if (ids.Any())
+            {
+                foreach (var id in ids)
+                {
+                    yield return Get(id);
+                }
+            }
+            else
+            {
+                var userDtos = Database.Fetch<UserDto>("WHERE id >= 0");
+                foreach (var userDto in userDtos)
+                {
+                    yield return Get(userDto.Id);
+                }
+            }
         }
 
         protected override IEnumerable<IUser> PerformGetByQuery(IQuery<IUser> query)
         {
-            throw new NotImplementedException();
+            var sqlClause = GetBaseQuery(false);
+            var translator = new SqlTranslator<IUser>(sqlClause, query);
+            var sql = translator.Translate();
+
+            var dtos = Database.Fetch<UserDto>(sql);
+
+            foreach (var dto in dtos.DistinctBy(x => x.Id))
+            {
+                yield return Get(dto.Id);
+            }
         }
 
         #endregion
@@ -39,17 +87,24 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql GetBaseQuery(bool isCount)
         {
-            throw new NotImplementedException();
+            var sql = new Sql();
+            sql.Select(isCount ? "COUNT(*)" : "*");
+            sql.From("umbracoUser");
+            return sql;
         }
 
         protected override string GetBaseWhereClause()
         {
-            throw new NotImplementedException();
+            return "[umbracoUser].[id] = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
-            throw new NotImplementedException();
+            var list = new List<string>
+                           {
+                               string.Format("DELETE FROM umbracoUser WHERE id = @Id")
+                           };
+            return list;
         }
 
         protected override Guid NodeObjectTypeId
@@ -59,12 +114,37 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(IUser entity)
         {
-            throw new NotImplementedException();
+            var userFactory = new UserFactory(entity.UserType);
+            var userDto = userFactory.BuildDto(entity);
+
+            var id = Convert.ToInt32(Database.Insert(userDto));
+            entity.Id = id;
+
         }
 
         protected override void PersistUpdatedItem(IUser entity)
         {
-            throw new NotImplementedException();
+            var userFactory = new UserFactory(entity.UserType);
+            var userDto = userFactory.BuildDto(entity);
+
+            Database.Update(userDto);
+        }
+
+        #endregion
+
+        #region Implementation of IUserRepository
+
+        public IProfile GetProfileById(int id)
+        {
+            var sql = GetBaseQuery(false);
+            sql.Where(GetBaseWhereClause(), new { Id = id });
+
+            var dto = Database.Query<UserDto>(sql).FirstOrDefault();
+
+            if (dto == null)
+                return null;
+
+            return new Profile(dto.Id, dto.UserName);
         }
 
         #endregion

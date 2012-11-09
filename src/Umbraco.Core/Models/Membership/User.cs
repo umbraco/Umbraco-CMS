@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models.Membership
@@ -16,6 +17,11 @@ namespace Umbraco.Core.Models.Membership
         private bool _hasIdentity;
         private int _id;
 
+        public User(IUserType userType)
+        {
+            Groups = new List<object> {userType};
+        }
+
         #region Implementation of IEntity
 
         public bool HasIdentity { get { return Id != null || _hasIdentity; } }
@@ -24,11 +30,11 @@ namespace Umbraco.Core.Models.Membership
         {
             get
             {
-                return _id;
+                return int.Parse(base.Id.ToString());
             }
             set
             {
-                _id = value;
+                base.Id = value;
                 _hasIdentity = true;
             }
         }
@@ -56,6 +62,24 @@ namespace Umbraco.Core.Models.Membership
 
         public object ProfileId { get; set; }
         public IEnumerable<object> Groups { get; set; }
+
+        #endregion
+
+        #region Implementation of IUser
+
+        public string Lanuguage { get; set; }
+        public string Permissions { get; set; }
+        public bool DefaultToLiveEditing { get; set; }
+        public bool NoConsole { get; set; }
+
+        public IUserType UserType
+        {
+            get 
+            { 
+                var type = Groups.FirstOrDefault();
+                return type as IUserType;
+            }
+        }
 
         #endregion
     }

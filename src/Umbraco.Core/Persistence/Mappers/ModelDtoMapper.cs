@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -97,6 +98,26 @@ namespace Umbraco.Core.Persistence.Mappers
             if (t == typeof(RelationType))
             {
                 var mappedName = RelationTypeMapper.Instance.Map(pi.Name);
+                if (!string.IsNullOrEmpty(mappedName))
+                {
+                    columnName = mappedName;
+                }
+                return true;
+            }
+
+            if (t == typeof(User) || t == typeof(IUser))
+            {
+                var mappedName = UserMapper.Instance.Map(pi.Name);
+                if (!string.IsNullOrEmpty(mappedName))
+                {
+                    columnName = mappedName;
+                }
+                return true;
+            }
+
+            if (t == typeof(UserType) || t == typeof(IUserType))
+            {
+                var mappedName = UserTypeMapper.Instance.Map(pi.Name);
                 if (!string.IsNullOrEmpty(mappedName))
                 {
                     columnName = mappedName;

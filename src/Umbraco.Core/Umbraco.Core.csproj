@@ -106,9 +106,11 @@
     <Compile Include="Models\Membership\IMembershipUserId.cs" />
     <Compile Include="Models\Membership\IProfile.cs" />
     <Compile Include="Models\Membership\IUser.cs" />
+    <Compile Include="Models\Membership\IUserType.cs" />
     <Compile Include="Models\Membership\Profile.cs" />
     <Compile Include="Models\Membership\User.cs" />
     <Compile Include="Models\Membership\UserProfile.cs" />
+    <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\PropertyExtensions.cs" />
     <Compile Include="Models\PropertyTypeExtensions.cs" />
     <Compile Include="Models\Rdbms\ContentType2ContentTypeDto.cs" />
@@ -150,6 +152,8 @@
     <Compile Include="Persistence\Factories\PropertyGroupFactory.cs" />
     <Compile Include="Persistence\Factories\RelationFactory.cs" />
     <Compile Include="Persistence\Factories\RelationTypeFactory.cs" />
+    <Compile Include="Persistence\Factories\UserFactory.cs" />
+    <Compile Include="Persistence\Factories\UserTypeFactory.cs" />
     <Compile Include="Persistence\Mappers\BaseMapper.cs" />
     <Compile Include="Persistence\Mappers\ContentMapper.cs" />
     <Compile Include="Persistence\Mappers\ContentTypeMapper.cs" />
@@ -164,6 +168,8 @@
     <Compile Include="Persistence\Mappers\PropertyTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\RelationMapper.cs" />
     <Compile Include="Persistence\Mappers\RelationTypeMapper.cs" />
+    <Compile Include="Persistence\Mappers\UserMapper.cs" />
+    <Compile Include="Persistence\Mappers\UserTypeMapper.cs" />
     <Compile Include="Persistence\Migrations\Initial\BaseDataCreation.cs" />
     <Compile Include="Persistence\Migrations\Initial\DatabaseCreation.cs" />
     <Compile Include="Persistence\PetaPocoExtensions.cs" />
@@ -195,6 +201,7 @@
     <Compile Include="Persistence\Repositories\Interfaces\IStylesheetRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IUserRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IUserTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\LanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\MacroRepository.cs" />
     <Compile Include="Persistence\Repositories\MediaRepository.cs" />
@@ -207,6 +214,7 @@
     <Compile Include="Persistence\Repositories\StylesheetRepository.cs" />
     <Compile Include="Persistence\Repositories\TemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\UserRepository.cs" />
+    <Compile Include="Persistence\Repositories\UserTypeRepository.cs" />
     <Compile Include="Persistence\RepositoryResolver.cs" />
     <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />
     <Compile Include="Persistence\SqlSyntax\ISqlSyntaxProvider.cs" />

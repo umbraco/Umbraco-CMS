@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -69,8 +70,7 @@ namespace Umbraco.Tests.Services
 
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = new ContentTypeRepository(unitOfWork);
-            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
             // Act
             Stopwatch watch = Stopwatch.StartNew();
@@ -85,7 +85,7 @@ namespace Umbraco.Tests.Services
             Assert.That(contents.Any(x => x == null), Is.False);
         }
 
-        [Test, Ignore]
+        [Test, NUnit.Framework.Ignore]
         public void Getting_1000_Uncached_Items()
         {
             // Arrange
@@ -95,8 +95,7 @@ namespace Umbraco.Tests.Services
 
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = new ContentTypeRepository(unitOfWork);
-            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
             // Act
             Stopwatch watch = Stopwatch.StartNew();
@@ -121,8 +120,7 @@ namespace Umbraco.Tests.Services
 
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = new ContentTypeRepository(unitOfWork);
-            var repository = new ContentRepository(unitOfWork, InMemoryCacheProvider.Current, contentTypeRepository);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
             // Act
             var contents = repository.GetAll();
@@ -140,7 +138,7 @@ namespace Umbraco.Tests.Services
             Assert.That(contentsCached.Count(), Is.EqualTo(contents.Count()));
         }
 
-        [Test, Ignore]
+        [Test, NUnit.Framework.Ignore]
         public void Getting_1000_Cached_Items()
         {
             // Arrange
@@ -150,8 +148,7 @@ namespace Umbraco.Tests.Services
 
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = new ContentTypeRepository(unitOfWork);
-            var repository = new ContentRepository(unitOfWork, InMemoryCacheProvider.Current, contentTypeRepository);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
             // Act
             var contents = repository.GetAll();

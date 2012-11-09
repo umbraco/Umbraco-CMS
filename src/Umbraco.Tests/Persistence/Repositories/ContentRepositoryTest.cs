@@ -38,8 +38,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            var contentTypeRepository = new ContentTypeRepository(unitOfWork);
-            var repository = new ContentRepository(unitOfWork, contentTypeRepository);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -52,7 +51,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             var contentTypeRepository = new ContentTypeRepository(unitOfWork);
-            var repository = new ContentRepository(unitOfWork, InMemoryCacheProvider.Current, contentTypeRepository);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
             ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
             Content textpage = MockedContent.CreateSimpleContent(contentType);
@@ -74,7 +73,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             var contentTypeRepository = new ContentTypeRepository(unitOfWork);
-            var repository = new ContentRepository(unitOfWork, InMemoryCacheProvider.Current, contentTypeRepository);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
             ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
             Content textpage = MockedContent.CreateSimpleContent(contentType);
@@ -130,8 +129,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = new ContentTypeRepository(unitOfWork);
-            var repository = new ContentRepository(unitOfWork, InMemoryCacheProvider.Current, contentTypeRepository);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
             // Act
             var content = repository.Get(1048);
@@ -147,8 +145,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = new ContentTypeRepository(unitOfWork);
-            var repository = new ContentRepository(unitOfWork, InMemoryCacheProvider.Current, contentTypeRepository);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
             // Act
             var content = repository.Get(1047);
@@ -169,7 +166,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             var contentTypeRepository = new ContentTypeRepository(unitOfWork);
-            var repository = new ContentRepository(unitOfWork, InMemoryCacheProvider.Current, contentTypeRepository);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
             var contentType = contentTypeRepository.Get(1045);
             var content = new Content(1048, contentType);
@@ -182,8 +179,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             unitOfWork.Commit();
             var id = content.Id;
 
-            var contentTypeRepository2 = new ContentTypeRepository(unitOfWork);
-            var repository2 = new ContentRepository(unitOfWork, InMemoryCacheProvider.Current, contentTypeRepository2);
+            var repository2 = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
             repository2.Delete(content);
             unitOfWork.Commit();
 
@@ -199,8 +195,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = new ContentTypeRepository(unitOfWork);
-            var repository = new ContentRepository(unitOfWork, InMemoryCacheProvider.Current, contentTypeRepository);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
             // Act
             var content = repository.Get(1048);
@@ -224,8 +219,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = new ContentTypeRepository(unitOfWork);
-            var repository = new ContentRepository(unitOfWork, InMemoryCacheProvider.Current, contentTypeRepository);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
             // Act
             var query = Query<IContent>.Builder.Where(x => x.Level == 2);
@@ -241,8 +235,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = new ContentTypeRepository(unitOfWork);
-            var repository = new ContentRepository(unitOfWork, InMemoryCacheProvider.Current, contentTypeRepository);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
             // Act
             var contents = repository.GetAll(1047, 1048);
@@ -259,8 +252,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = new ContentTypeRepository(unitOfWork);
-            var repository = new ContentRepository(unitOfWork, InMemoryCacheProvider.Current, contentTypeRepository);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
             // Act
             var contents = repository.GetAll();
@@ -277,8 +269,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = new ContentTypeRepository(unitOfWork);
-            var repository = new ContentRepository(unitOfWork, InMemoryCacheProvider.Current, contentTypeRepository);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
             // Act
             var exists = repository.Exists(1046);
@@ -293,8 +284,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var contentTypeRepository = new ContentTypeRepository(unitOfWork);
-            var repository = new ContentRepository(unitOfWork, InMemoryCacheProvider.Current, contentTypeRepository);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
 
             // Act
             int level = 2;
