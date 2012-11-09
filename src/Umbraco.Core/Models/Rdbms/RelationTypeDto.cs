@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class RelationTypeDto
     {
         [Column("id")]
-        [PrimaryKeyColumn]
+        [PrimaryKeyColumn(IdentitySeed = 2)]
         public int Id { get; set; }
 
         [Column("dual")]

@@ -76,6 +76,11 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             {
                 CreateCmsDataTypeData();
             }
+
+            if (tableName.Equals("umbracoRelationType"))
+            {
+                CreateUmbracoRelationTypeData();
+            }
         }
 
         private void CreateUmbracNodeData()
@@ -283,7 +288,25 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         {}
 
         private void CreateUmbracoRelationTypeData()
-        {}
+        {
+            using (var transaction = _database.GetTransaction())
+            {
+                _database.Execute(new Sql("SET IDENTITY_INSERT [umbracoRelationType] ON "));
+                _database.Insert("umbracoRelationType", "id", false,
+                                 new RelationTypeDto
+                                     {
+                                         Id = 1,
+                                         Alias = "relateDocumentOnCopy",
+                                         ChildObjectType = new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"),
+                                         ParentObjectType = new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"),
+                                         Dual = true,
+                                         Name = "Relate Document On Copy"
+                                     });
+                _database.Execute(new Sql("SET IDENTITY_INSERT [umbracoRelationType] OFF;"));
+
+                transaction.Complete();
+            }
+        }
 
         private void CreateCmsTaskTypeData()
         { }
@@ -299,12 +322,7 @@ values (4,1041,'default', 0, 'group')
 
 SET IDENTITY_INSERT [cmsDataTypePreValues] OFF
 ;
-         
-         * 
-         * 
-         
-insert into umbracoRelationType (dual, parentObjectType, childObjectType, name, alias) values (1, 'c66ba18e-eaf3-4cff-8a22-41b16d66a972', 'c66ba18e-eaf3-4cff-8a22-41b16d66a972', 'Relate Document On Copy','relateDocumentOnCopy')
-;
+
          * 
          * 
          
