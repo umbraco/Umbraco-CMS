@@ -21,16 +21,7 @@ namespace Umbraco.Core.PropertyEditors
 		/// <returns></returns>
 		public Attempt<object> ConvertPropertyValue(object value)
 		{
-			if (value == null) return new Attempt<object>(false, null);
-			//if its already a DateTime
-			if (TypeHelper.IsTypeAssignableFrom<DateTime>(value))
-				return new Attempt<object>(true, value);
-			//convert to string
-			var asString = Convert.ToString(value);
-			DateTime dt;
-			return DateTime.TryParse(asString, out dt) 
-			       	? new Attempt<object>(true, dt) 
-			       	: new Attempt<object>(false, null);
+			return value.TryConvertTo(typeof(DateTime));
 		}
 	}
 }
