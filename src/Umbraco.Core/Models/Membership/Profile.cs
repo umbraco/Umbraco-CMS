@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Models.Membership
 {
     /// <summary>
     /// Represents a Profile which is shared between Members and Users
     /// </summary>
+    [Serializable]
+    [DataContract(IsReference = true)]
     public class Profile : IProfile
     {
         /// <summary>
@@ -22,10 +25,13 @@ namespace Umbraco.Core.Models.Membership
             Name = name;
         }
 
+        [DataMember]
         public object Id { get; set; }
 
+        [DataMember]
         public string Name { get; set; }
 
+        [IgnoreDataMember]
         public virtual object ProviderUserKey
         {
             get { throw new System.NotImplementedException(); }
@@ -38,6 +44,7 @@ namespace Umbraco.Core.Models.Membership
         /// <value>
         /// The type of the provider user key.
         /// </value>
+        [IgnoreDataMember]
         internal Type ProviderUserKeyType { get; private set; }
 
         /// <summary>

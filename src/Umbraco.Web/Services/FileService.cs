@@ -137,7 +137,7 @@ namespace Umbraco.Web.Services
         /// <returns>An enumerable list of <see cref="Template"/> objects</returns>
         public IEnumerable<Template> GetTemplates(params string[] aliases)
         {
-            var repository = RepositoryResolver.ResolveByType<ITemplateRepository, Template, string>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<ITemplateFileOnlyRepository, Template, string>(_unitOfWork);
             return repository.GetAll(aliases);
         }
 
@@ -148,7 +148,7 @@ namespace Umbraco.Web.Services
         /// <returns>A <see cref="Template"/> object</returns>
         public Template GetTemplateByAlias(string alias)
         {
-            var repository = RepositoryResolver.ResolveByType<ITemplateRepository, Template, string>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<ITemplateFileOnlyRepository, Template, string>(_unitOfWork);
             return repository.Get(alias);
         }
 
@@ -158,7 +158,7 @@ namespace Umbraco.Web.Services
         /// <param name="template"><see cref="Template"/> to save</param>
         public void SaveTemplate(Template template)
         {
-            var repository = RepositoryResolver.ResolveByType<ITemplateRepository, Template, string>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<ITemplateFileOnlyRepository, Template, string>(_unitOfWork);
             repository.AddOrUpdate(template);
             _unitOfWork.Commit();
         }
@@ -169,7 +169,7 @@ namespace Umbraco.Web.Services
         /// <param name="alias">Alias of the <see cref="Template"/> to delete</param>
         public void DeleteTemplate(string alias)
         {
-            var repository = RepositoryResolver.ResolveByType<ITemplateRepository, Template, string>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<ITemplateFileOnlyRepository, Template, string>(_unitOfWork);
             var template = repository.Get(alias);
             repository.Delete(template);
             _unitOfWork.Commit();
@@ -184,5 +184,7 @@ namespace Umbraco.Web.Services
         {
             return template.IsValid();
         }
+
+        //TODO Method to change name and/or alias of view/masterpage template
     }
 }

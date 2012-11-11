@@ -99,6 +99,7 @@
     <Compile Include="Models\IDictionaryTranslation.cs" />
     <Compile Include="Models\IFile.cs" />
     <Compile Include="Models\ILanguage.cs" />
+    <Compile Include="Models\ITemplate.cs" />
     <Compile Include="Models\Language.cs" />
     <Compile Include="Models\Media.cs" />
     <Compile Include="Models\MediaType.cs" />
@@ -199,6 +200,7 @@
     <Compile Include="Persistence\Repositories\Interfaces\IScriptRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IStylesheetRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\ITemplateFileOnlyRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IUserRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IUserTypeRepository.cs" />
@@ -212,6 +214,7 @@
     <Compile Include="Persistence\Repositories\RepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\ScriptRepository.cs" />
     <Compile Include="Persistence\Repositories\StylesheetRepository.cs" />
+    <Compile Include="Persistence\Repositories\TemplateFileOnlyFileOnlyRepository.cs" />
     <Compile Include="Persistence\Repositories\TemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\UserRepository.cs" />
     <Compile Include="Persistence\Repositories\UserTypeRepository.cs" />

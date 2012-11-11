@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Models.Membership
 {
@@ -10,6 +12,8 @@ namespace Umbraco.Core.Models.Membership
     /// Should be internal until a proper user/membership implementation
     /// is part of the roadmap.
     /// </remarks>
+    [Serializable]
+    [DataContract(IsReference = true)]
     internal class UserProfile : Profile
     {
         public UserProfile()
@@ -24,6 +28,7 @@ namespace Umbraco.Core.Models.Membership
         /// <value>
         /// The session timeout.
         /// </value>
+        [DataMember]
         public int SessionTimeout { get; set; }
 
         /// <summary>
@@ -32,6 +37,7 @@ namespace Umbraco.Core.Models.Membership
         /// <value>
         /// The start content id.
         /// </value>
+        [DataMember]
         public int StartContentId { get; set; }
 
         /// <summary>
@@ -40,6 +46,7 @@ namespace Umbraco.Core.Models.Membership
         /// <value>
         /// The start media id.
         /// </value>
+        [DataMember]
         public int StartMediaId { get; set; }
 
         /// <summary>
@@ -48,6 +55,7 @@ namespace Umbraco.Core.Models.Membership
         /// <value>
         /// The applications.
         /// </value>
+        [DataMember]
         public IEnumerable<string> Applications { get; set; }
     }
 }

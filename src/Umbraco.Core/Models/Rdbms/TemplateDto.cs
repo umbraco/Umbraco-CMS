@@ -14,12 +14,13 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("nodeId")]
         [Index(IndexTypes.UniqueNonClustered)]
-        [ForeignKey(typeof(NodeDto))]
+        [ForeignKey(typeof(NodeDto), Name = "FK_cmsTemplate_umbracoNode")]
         public int NodeId { get; set; }
 
         [Column("master")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [ForeignKey(typeof(TemplateDto))]
+        /*[ForeignKey(typeof(TemplateDto), Column = "nodeId")]*/
+        [ForeignKey(typeof(NodeDto), Name = "FK_cmsTemplate_cmsTemplate")]
         public int? Master { get; set; }
 
         [Column("alias")]
@@ -30,5 +31,8 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("design")]
         [SpecialDbType(SpecialDbTypes.NTEXT)]
         public string Design { get; set; }
+
+        [ResultColumn]
+        public NodeDto NodeDto { get; set; }
     }
 }

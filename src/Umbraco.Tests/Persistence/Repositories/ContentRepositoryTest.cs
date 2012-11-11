@@ -171,8 +171,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var contentType = contentTypeRepository.Get(1045);
             var content = new Content(1048, contentType);
             content.Name = "Textpage 2 Child Node";
-            content.Creator = new Profile(0, "Administrator");
-            content.Writer = new Profile(0, "Administrator");
+            content.CreatorId = 0;
+            content.WriterId = 0;
 
             // Act
             repository.AddOrUpdate(content);

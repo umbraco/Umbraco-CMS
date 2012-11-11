@@ -22,7 +22,7 @@ namespace Umbraco.Core.Models
         private int _sortOrder;
         private string _icon;
         private string _thumbnail;
-        private IProfile _creator;
+        private int _creatorId;
         private bool _allowedAsRoot;
         private bool _isContainer;
         private bool _trashed;
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo DescriptionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Description);
         private static readonly PropertyInfo IconSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Icon);
         private static readonly PropertyInfo ThumbnailSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Thumbnail);
-        private static readonly PropertyInfo CreatorSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IProfile>(x => x.Creator);
+        private static readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.CreatorId);
         private static readonly PropertyInfo AllowedAsRootSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.AllowedAsRoot);
         private static readonly PropertyInfo IsContainerSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.IsContainer);
         private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.Trashed);
@@ -185,16 +185,16 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the Profile of the user who created this ContentType
+        /// Gets or sets the Id of the user who created this ContentType
         /// </summary>
         [DataMember]
-        public virtual IProfile Creator
+        public virtual int CreatorId
         {
-            get { return _creator; }
+            get { return _creatorId; }
             set
             {
-                _creator = value;
-                OnPropertyChanged(CreatorSelector);
+                _creatorId = value;
+                OnPropertyChanged(CreatorIdSelector);
             }
         }
 

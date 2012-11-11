@@ -5,7 +5,6 @@ using System.Web;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
@@ -22,18 +21,11 @@ namespace Umbraco.Web.Services
     {
         private readonly IPublishingStrategy _publishingStrategy;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IUserService _userService;
-        private HttpContextBase _httpContext;
 
-        public ContentService(IUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy) : this(provider, publishingStrategy, null)
-        {
-        }
-
-        public ContentService(IUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy, IUserService userService)
+        public ContentService(IUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy)
         {
             _publishingStrategy = publishingStrategy;
             _unitOfWork = provider.GetUnitOfWork();
-            _userService = userService;
         }
 
         /// <summary>
@@ -625,15 +617,6 @@ namespace Umbraco.Web.Services
         }
 
         /// <summary>
-        /// Internal method to set the HttpContext for testing
-        /// </summary>
-        /// <param name="httpContext"><see cref="HttpContextBase"/></param>
-        internal void SetHttpContext(HttpContextBase httpContext)
-        {
-            _httpContext = httpContext;
-        }
-
-        /// <summary>
         /// Updates a content object with the User (id), who created the content.
         /// </summary>
         /// <param name="content"><see cref="IContent"/> object to update</param>
@@ -643,20 +626,12 @@ namespace Umbraco.Web.Services
             if(userId > -1)
             {
                 //If a user id was passed in we use that
-                content.Creator = new Profile(userId, "");
-            }
-            else if(_userService != null)
-            {
-                //If the UserService has been set for this instance of the ServiceContext
-                //we retrieve the current users id from there.
-                content.Creator = _httpContext == null
-                                      ? _userService.GetCurrentBackOfficeUser()
-                                      : _userService.GetCurrentBackOfficeUser(_httpContext);
+                content.CreatorId = userId;
             }
             else
             {
                 //Otherwise we default to Admin user, which should always exist (almost always)
-                content.Creator = new Profile(0, "Administrator");
+                content.CreatorId = 0;
             }
         }
 
@@ -670,21 +645,16 @@ namespace Umbraco.Web.Services
             if (userId > -1)
             {
                 //If a user id was passed in we use that
-                content.Writer = new Profile(userId, "");
-            }
-            else if (_userService != null)
-            {
-                //If the UserService has been set for this instance of the ServiceContext
-                //we retrieve the current users id from there.
-                content.Writer = _httpContext == null
-                                     ? _userService.GetCurrentBackOfficeUser()
-                                     : _userService.GetCurrentBackOfficeUser(_httpContext);
+                content.WriterId = userId;
             }
             else
             {
                 //Otherwise we default to Admin user, which should always exist (almost always)
-                content.Writer = new Profile(0, "Administrator");
+                content.WriterId = 0;
             }
         }
+
+        //TODO Add method to remove versions from Content
+        //TODO Add method to remove versions from all Content - parameters to select date-interval, ea. remove versions older then.
     }
 }

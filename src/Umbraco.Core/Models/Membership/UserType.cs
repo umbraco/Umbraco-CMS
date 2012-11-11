@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Models.EntityBase;
+﻿using System;
+using System.Runtime.Serialization;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models.Membership
 {
@@ -9,10 +11,15 @@ namespace Umbraco.Core.Models.Membership
     /// Should be internal until a proper user/membership implementation
     /// is part of the roadmap.
     /// </remarks>
+    [Serializable]
+    [DataContract(IsReference = true)]
     internal class UserType : Entity, IUserType
     {
+        [DataMember]
         public string Alias { get; set; }
+        [DataMember]
         public string Name { get; set; }
+        [DataMember]
         public string Permissions { get; set; }
     }
 }

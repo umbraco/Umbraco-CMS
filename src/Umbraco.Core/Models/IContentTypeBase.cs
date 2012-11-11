@@ -56,9 +56,9 @@ namespace Umbraco.Core.Models
         string Thumbnail { get; set; }
 
         /// <summary>
-        /// Gets or Sets the Profile of the User who created the ContentType
+        /// Gets or Sets the Id of the User who created the ContentType
         /// </summary>
-        IProfile Creator { get; set; }
+        int CreatorId { get; set; }
 
         /// <summary>
         /// Gets or Sets a boolean indicating whether this ContentType is allowed at the root

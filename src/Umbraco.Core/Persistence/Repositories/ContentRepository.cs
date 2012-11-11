@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
@@ -19,20 +18,17 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class ContentRepository : PetaPocoRepositoryBase<int, IContent>, IContentRepository
     {
         private readonly IContentTypeRepository _contentTypeRepository;
-        private readonly IUserRepository _userRepository;
 
-        public ContentRepository(IUnitOfWork work, IContentTypeRepository contentTypeRepository, IUserRepository userRepository)
+        public ContentRepository(IUnitOfWork work, IContentTypeRepository contentTypeRepository)
             : base(work)
         {
             _contentTypeRepository = contentTypeRepository;
-            _userRepository = userRepository;
         }
 
-        public ContentRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, IUserRepository userRepository)
+        public ContentRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository)
             : base(work, cache)
         {
             _contentTypeRepository = contentTypeRepository;
-            _userRepository = userRepository;
         }
 
         #region Overrides of RepositoryBase<IContent>
@@ -50,10 +46,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
 
-            var user = _userRepository.GetProfileById(dto.ContentVersionDto.ContentDto.NodeDto.UserId.Value);
-            var writer = _userRepository.GetProfileById(dto.WriterUserId);
-
-            var factory = new ContentFactory(contentType, NodeObjectTypeId, id, user, writer);
+            var factory = new ContentFactory(contentType, NodeObjectTypeId, id);
             var content = factory.BuildEntity(dto);
             
             content.Properties = GetPropertyCollection(id, dto.ContentVersionDto.VersionId, contentType);
@@ -299,13 +292,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
 
-            //NOTE: Should eventually be moved to a UserRepository like is the case with ContentType
-            var userDto = Database.FirstOrDefault<UserDto>("WHERE id = @Id", new { Id = dto.ContentVersionDto.ContentDto.NodeDto.UserId });
-            var user = new Profile(userDto.Id, userDto.UserName);
-            var writerDto = Database.FirstOrDefault<UserDto>("WHERE id = @Id", new { Id = dto.WriterUserId });
-            var writer = new Profile(writerDto.Id, writerDto.UserName);
-
-            var factory = new ContentFactory(contentType, NodeObjectTypeId, id, user, writer);
+            var factory = new ContentFactory(contentType, NodeObjectTypeId, id);
             var content = factory.BuildEntity(dto);
 
             content.Properties = GetPropertyCollection(id, versionId, contentType);

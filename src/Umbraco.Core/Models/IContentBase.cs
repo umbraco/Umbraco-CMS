@@ -22,11 +22,6 @@ namespace Umbraco.Core.Models
         string Name { get; set; }
 
         /// <summary>
-        /// Gets the Url name of the Content
-        /// </summary>
-        string UrlName { get; }
-
-        /// <summary>
         /// Gets or Sets the Sort Order of the Content
         /// </summary>
         int SortOrder { get; set; }
@@ -42,9 +37,9 @@ namespace Umbraco.Core.Models
         string Path { get; set; }
 
         /// <summary>
-        /// Profile of the user who created the Content
+        /// Id of the user who created the Content
         /// </summary>
-        IProfile Creator { get; set; }
+        int CreatorId { get; set; }
 
         /// <summary>
         /// Boolean indicating whether this Content is Trashed or not.

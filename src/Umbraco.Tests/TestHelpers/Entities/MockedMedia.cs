@@ -10,7 +10,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
              var media = new Media(parentId, mediaType)
                              {
                                  Name = "Test Image",
-                                 Creator = new Profile(0, "Administrator")
+                                 CreatorId = 0
                              };
 
              media.SetValue("umbracoFile", "/media/test-image.png");
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
              var media = new Media(parentId, mediaType)
                              {
                                  Name = "Test File",
-                                 Creator = new Profile(0, "Administrator")
+                                 CreatorId = 0
                              };
 
              media.SetValue("umbracoFile", "/media/test-file.txt");
@@ -42,7 +42,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
              var media = new Media(parentId, mediaType)
                              {
                                  Name = "Test Folder",
-                                 Creator = new Profile(0, "Administrator")
+                                 CreatorId = 0
                              };
 
              return media;

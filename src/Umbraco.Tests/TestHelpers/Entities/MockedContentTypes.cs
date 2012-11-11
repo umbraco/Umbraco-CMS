@@ -16,7 +16,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                       Icon = ".sprTreeDoc3",
                                       Thumbnail = "doc.png",
                                       SortOrder = 1,
-                                      Creator = new Profile(0, "Administrator"),
+                                      CreatorId = 0,
                                       DefaultTemplate = "~/masterpages/umbTextPage.master",
                                       Trashed = false
                                   };
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                       Icon = ".sprTreeDoc3",
                                       Thumbnail = "doc.png",
                                       SortOrder = 1,
-                                      Creator = new Profile(0, "Administrator"),
+                                      CreatorId = 0,
                                       DefaultTemplate = "",
                                       Trashed = false
                                   };
@@ -69,7 +69,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                       Icon = ".sprTreeDoc3",
                                       Thumbnail = "doc.png",
                                       SortOrder = 1,
-                                      Creator = new Profile(0, "Administrator"),
+                                      CreatorId = 0,
                                       DefaultTemplate = "~/masterpages/umbSimplePage.master",
                                       Trashed = false
                                   };
@@ -94,7 +94,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                       Icon = ".sprTreeDoc3",
                                       Thumbnail = "doc2.png",
                                       SortOrder = 1,
-                                      Creator = new Profile(0, "Administrator"),
+                                      CreatorId = 0,
                                       DefaultTemplate = "~/masterpages/umbSimplePage.master",
                                       Trashed = false
                                   };
@@ -119,7 +119,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                 Icon = ".sprTreeDoc3",
                 Thumbnail = "doc2.png",
                 SortOrder = 1,
-                Creator = new Profile(0, "Administrator"),
+                CreatorId = 0,
                 DefaultTemplate = "~/masterpages/umbSimplePage.master",
                 Trashed = false
             };
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                       Icon = ".sprTreeDoc3",
                                       Thumbnail = "doc3.png",
                                       SortOrder = 1,
-                                      Creator = new Profile(0, "Administrator"),
+                                      CreatorId = 0,
                                       DefaultTemplate = "~/masterpages/umbSimplePage.master",
                                       Trashed = false
                                   };
@@ -164,7 +164,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                     Icon = ".sprTreeDoc3",
                                     Thumbnail = "doc.png",
                                     SortOrder = 1,
-                                    Creator = new Profile(0, "Administrator"),
+                                    CreatorId = 0,
                                     Trashed = false
                                 };
 

@@ -71,7 +71,6 @@ namespace Umbraco.Tests.Services
                                                     Timeout = 634596443995451258
                                                 });
             var contentService = ServiceContext.ContentService;
-            ((ContentService)contentService).SetHttpContext(base.GetUmbracoContext("/test.aspx", 1234).HttpContext);
 
             // Act
             var content = contentService.CreateContent(-1, "umbTextpage");
@@ -79,7 +78,7 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(content, Is.Not.Null);
             Assert.That(content.HasIdentity, Is.False);
-            Assert.That(content.Creator.Id, Is.EqualTo(userId));
+            Assert.That(content.CreatorId, Is.EqualTo(userId));
         }
 
         [Test]

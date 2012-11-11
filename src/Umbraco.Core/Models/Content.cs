@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models
         private string _language;
         private DateTime? _releaseDate;
         private DateTime? _expireDate;
-        private IProfile _writer;
+        private int _writer;
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Language);
         private static readonly PropertyInfo ReleaseDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ReleaseDate);
         private static readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
-        private static readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, IProfile>(x => x.Writer);
+        private static readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.WriterId);
 
         /// <summary>
         /// Path to the template used by this Content
@@ -163,10 +163,10 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// IProfile of the user who wrote/updated this Content
+        /// Id of the user who wrote/updated this Content
         /// </summary>
         [DataMember]
-        public virtual IProfile Writer
+        public virtual int WriterId
         {
             get { return _writer; }
             set

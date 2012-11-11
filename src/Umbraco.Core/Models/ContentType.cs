@@ -25,10 +25,10 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo AllowedTemplatesSelector = ExpressionHelper.GetPropertyInfo<ContentType, IEnumerable<string>>(x => x.AllowedTemplates);
         
         /// <summary>
-        /// Gets or sets the Path to default Template
+        /// Gets or sets the alias of the default Template.
         /// </summary>
         [DataMember]
-        public string DefaultTemplate
+        public string DefaultTemplate//NOTE Use internal extension method to get Id of the Template
         {
             get { return _defaultTemplate; }
             set
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets a list of aliases for allowed Templates
         /// </summary>
-        public IEnumerable<string> AllowedTemplates
+        public IEnumerable<string> AllowedTemplates//NOTE Use internal extension method to get Ids of the Templates
         {
             get { return _allowedTemplates; }
             set

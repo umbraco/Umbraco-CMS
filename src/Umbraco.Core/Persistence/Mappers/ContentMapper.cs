@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence.Mappers
                 CacheMap<Content, NodeDto>(src => src.Name, dto => dto.Text);
                 CacheMap<Content, NodeDto>(src => src.Trashed, dto => dto.Trashed);
                 CacheMap<Content, NodeDto>(src => src.Key, dto => dto.UniqueId);
-                CacheMap<Content, NodeDto>(src => src.Creator, dto => dto.UserId);
+                CacheMap<Content, NodeDto>(src => src.CreatorId, dto => dto.UserId);
                 CacheMap<Content, ContentDto>(src => src.ContentTypeId, dto => dto.ContentTypeId);
                 CacheMap<Content, ContentVersionDto>(src => src.UpdateDate, dto => dto.VersionDate);
                 CacheMap<Content, ContentVersionDto>(src => src.Version, dto => dto.VersionId);

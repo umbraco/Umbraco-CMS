@@ -42,9 +42,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
-            var creator = _userRepository.GetProfileById(dto.ContentTypeDto.NodeDto.UserId.Value);
-
-            var factory = new ContentTypeFactory(NodeObjectTypeId, creator);
+            var factory = new ContentTypeFactory(NodeObjectTypeId);
             var contentType = factory.BuildEntity(dto);
 
             contentType.AllowedContentTypes = GetAllowedContentTypeIds(id);

@@ -6,6 +6,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Web;
 using umbraco.editorControls.tinyMCE3;
 using umbraco.interfaces;
 using File = System.IO.File;

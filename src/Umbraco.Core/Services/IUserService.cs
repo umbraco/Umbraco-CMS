@@ -6,7 +6,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Defines the UserService, which is an easy access to operations involving <see cref="IProfile"/> and eventually Users and Members.
     /// </summary>
-    public interface IUserService : IService
+    internal interface IUserService : IService
     {
         /// <summary>
         /// Gets an <see cref="IProfile"/> for the current BackOffice User
@@ -14,5 +14,12 @@ namespace Umbraco.Core.Services
         /// <param name="httpContext">HttpContext to fetch the user through</param>
         /// <returns><see cref="IProfile"/> containing the Name and Id of the logged in BackOffice User</returns>
         IProfile GetCurrentBackOfficeUser(HttpContextBase httpContext);
+
+        /// <summary>
+        /// Gets an IProfile by User Id.
+        /// </summary>
+        /// <param name="id">Id of the User to retrieve</param>
+        /// <returns><see cref="IProfile"/></returns>
+        IProfile GetProfileById(int id);
     }
 }

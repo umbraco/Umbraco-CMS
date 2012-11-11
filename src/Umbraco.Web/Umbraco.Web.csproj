@@ -242,6 +242,7 @@
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="ApplicationEventsResolver.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
+    <Compile Include="ContentExtensions.cs" />
     <Compile Include="Dynamics\DynamicExpression.cs" />
     <Compile Include="Dynamics\DynamicGrouping.cs" />
     <Compile Include="Dynamics\DynamicPublishedContentIdEqualityComparer.cs" />
@@ -323,7 +324,7 @@
     <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Services\ServiceFactory.cs" />
     <Compile Include="Services\UserService.cs" />
-    <Compile Include="Services\UserServiceExtesions.cs" />
+    <Compile Include="Strategies\DeletedTemplate.cs" />
     <Compile Include="Strategies\TrashedContent.cs" />
     <Compile Include="Strategies\UpdateContentCache.cs" />
     <Compile Include="Strategies\UpdateMultipleContentCache.cs" />

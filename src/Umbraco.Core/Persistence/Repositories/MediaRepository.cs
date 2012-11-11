@@ -50,9 +50,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
 
-            var user = _userRepository.GetProfileById(dto.ContentDto.NodeDto.UserId.Value);
-
-            var factory = new MediaFactory(contentType, NodeObjectTypeId, id, user);
+            var factory = new MediaFactory(contentType, NodeObjectTypeId, id);
             var content = factory.BuildEntity(dto);
 
             content.Properties = GetPropertyCollection(id, dto.VersionId, contentType);

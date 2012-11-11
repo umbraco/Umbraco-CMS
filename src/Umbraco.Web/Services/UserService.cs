@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 
@@ -12,7 +13,7 @@ namespace Umbraco.Web.Services
     /// <summary>
     /// Represents the UserService, which is an easy access to operations involving <see cref="IProfile"/> and eventually Users and Members.
     /// </summary>
-    public class UserService : IUserService
+    internal class UserService : IUserService
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -63,21 +64,19 @@ namespace Umbraco.Web.Services
                 userId = (int) HttpRuntime.Cache[cacheKey];
             }
 
-            //Not too happy with this db lookup, but it'll improve once there is a UserRepository with caching
-            var userDto = GetUserById(userId);
-
-            var profile = new Profile(userId, userDto.UserName);
+            var profile = GetProfileById(userId);
             return profile;
         }
 
         /// <summary>
-        /// Gets a User dto from the database.
+        /// Gets an IProfile by User Id.
         /// </summary>
         /// <param name="id">Id of the User to retrieve</param>
-        /// <returns><see cref="UserDto"/></returns>
-        private UserDto GetUserById(int id)
+        /// <returns><see cref="IProfile"/></returns>
+        public IProfile GetProfileById(int id)
         {
-            return DatabaseFactory.Current.Database.FirstOrDefault<UserDto>("WHERE id = @Id", new {Id = id});
+            var repository = RepositoryResolver.ResolveByType<IUserRepository, IUser, int>(_unitOfWork);
+            return repository.GetProfileById(id);
         }
 
         #endregion

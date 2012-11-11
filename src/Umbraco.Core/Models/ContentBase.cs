@@ -21,7 +21,7 @@ namespace Umbraco.Core.Models
         private int _sortOrder;
         private int _level;
         private string _path;
-        private IProfile _creator;
+        private int _creatorId;
         private bool _trashed;
         private int _contentTypeId;
         private PropertyCollection _properties;
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.SortOrder);
         private static readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.Level);
         private static readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Path);
-        private static readonly PropertyInfo CreatorSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IProfile>(x => x.Creator);
+        private static readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.CreatorId);
         private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentBase, bool>(x => x.Trashed);
         private static readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
         private readonly static PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
@@ -82,16 +82,6 @@ namespace Umbraco.Core.Models
                 _name = value;
                 OnPropertyChanged(NameSelector);
             }
-        }
-
-        /// <summary>
-        /// Gets the Url name of the entity
-        /// </summary>
-        [IgnoreDataMember]
-        public virtual string UrlName
-        {
-            //TODO Needs to implement proper url casing/syntax
-            get { return Name.ToLower().Replace(" ", "-"); }
         }
 
         /// <summary>
@@ -140,13 +130,13 @@ namespace Umbraco.Core.Models
         /// Profile of the user who created this Content
         /// </summary>
         [DataMember]
-        public virtual IProfile Creator
+        public virtual int CreatorId
         {
-            get { return _creator; }
+            get { return _creatorId; }
             set
             {
-                _creator = value;
-                OnPropertyChanged(CreatorSelector);
+                _creatorId = value;
+                OnPropertyChanged(CreatorIdSelector);
             }
         }
         

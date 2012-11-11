@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Xml;
-using System.Xml.Linq;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Core.Models
 {
@@ -44,55 +45,21 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Creates the xml representation for the <see cref="IContent"/> object
+        /// Gets the <see cref="IProfile"/> for the Creator of this content.
         /// </summary>
-        /// <param name="content"><see cref="IContent"/> to generate xml for</param>
-        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
-        public static XElement ToXml(this IContent content)
+        public static IProfile GetCreatorProfile(this IContent content)
         {
-            //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = content.ContentType.Alias.ToUmbracoAlias(StringAliasCaseType.CamelCase, true);
-            
-            var xml = new XElement(nodeName,
-                                   new XAttribute("id", content.Id),
-                                   new XAttribute("parentID", content.Level > 1 ? content.ParentId : -1),
-                                   new XAttribute("level", content.Level),
-                                   new XAttribute("writerID", content.Writer.Id),
-                                   new XAttribute("creatorID", content.Creator.Id),
-                                   new XAttribute("nodeType", content.ContentType.Id),
-                                   new XAttribute("template", content.Template ?? string.Empty),//Template name versus Id - note that the template name/alias isn't saved in the db.
-                                   new XAttribute("sortOrder", content.SortOrder),
-                                   new XAttribute("createDate", content.CreateDate),
-                                   new XAttribute("updateDate", content.UpdateDate),
-                                   new XAttribute("nodeName", content.Name),
-                                   new XAttribute("urlName", content.UrlName),//Format Url ?
-                                   new XAttribute("writerName", content.Writer.Name),
-                                   new XAttribute("creatorName", content.Creator.Name),
-                                   new XAttribute("path", content.Path));
-            
-            foreach (var property in content.Properties)
-            {
-                if (property == null) continue;
-
-                xml.Add(property.ToXml());
-
-                if (property.Alias == "umbracoUrlName" && property.Value.ToString().Trim() != string.Empty)
-                    xml.SetAttributeValue("urlName", property.Value);
-            }
-
-            return xml;
+            var repository = RepositoryResolver.ResolveByType<IUserRepository, IUser, int>(null);
+            return repository.GetProfileById(content.CreatorId);
         }
 
         /// <summary>
-        /// Creates the xml representation for the <see cref="IContent"/> object
+        /// Gets the <see cref="IProfile"/> for the Writer of this content.
         /// </summary>
-        /// <param name="content"><see cref="IContent"/> to generate xml for</param>
-        /// <param name="isPreview">Boolean indicating whether the xml should be generated for preview</param>
-        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
-        public static XElement ToXml(this IContent content, bool isPreview)
+        public static IProfile GetWriterProfile(this IContent content)
         {
-            //TODO Do a proper implementation of this
-            return content.ToXml();
+            var repository = RepositoryResolver.ResolveByType<IUserRepository, IUser, int>(null);
+            return repository.GetProfileById(content.WriterId);
         }
     }
 }

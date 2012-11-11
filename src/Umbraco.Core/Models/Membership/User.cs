@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models.Membership
@@ -12,10 +13,11 @@ namespace Umbraco.Core.Models.Membership
     /// Should be internal until a proper user/membership implementation
     /// is part of the roadmap.
     /// </remarks>
+    [Serializable]
+    [DataContract(IsReference = true)]
     internal class User : UserProfile, IUser
     {
         private bool _hasIdentity;
-        private int _id;
 
         public User(IUserType userType)
         {
@@ -24,8 +26,10 @@ namespace Umbraco.Core.Models.Membership
 
         #region Implementation of IEntity
 
+        [IgnoreDataMember]
         public bool HasIdentity { get { return Id != null || _hasIdentity; } }
 
+        [IgnoreDataMember]
         int IEntity.Id
         {
             get
@@ -45,33 +49,54 @@ namespace Umbraco.Core.Models.Membership
 
         #region Implementation of IMembershipUser
 
+        [DataMember]
         public string Username { get; set; }
+        [DataMember]
         public string Email { get; set; }
+        [DataMember]
         public string Password { get; set; }
+        [DataMember]
         public string PasswordQuestion { get; set; }
+        [DataMember]
         public string PasswordAnswer { get; set; }
+        [DataMember]
         public string Comments { get; set; }
+        [DataMember]
         public bool IsApproved { get; set; }
+        [DataMember]
         public bool IsOnline { get; set; }
+        [DataMember]
         public bool IsLockedOut { get; set; }
+        [DataMember]
         public DateTime CreateDate { get; set; }
+        [DataMember]
         public DateTime UpdateDate { get; set; }
+        [DataMember]
         public DateTime LastLoginDate { get; set; }
+        [DataMember]
         public DateTime LastPasswordChangeDate { get; set; }
+        [DataMember]
         public DateTime LastLockoutDate { get; set; }
 
+        [DataMember]
         public object ProfileId { get; set; }
+        [DataMember]
         public IEnumerable<object> Groups { get; set; }
 
         #endregion
 
         #region Implementation of IUser
 
+        [DataMember]
         public string Lanuguage { get; set; }
+        [DataMember]
         public string Permissions { get; set; }
+        [DataMember]
         public bool DefaultToLiveEditing { get; set; }
+        [DataMember]
         public bool NoConsole { get; set; }
 
+        [IgnoreDataMember]
         public IUserType UserType
         {
             get 

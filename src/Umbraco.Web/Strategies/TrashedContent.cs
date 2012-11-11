@@ -1,6 +1,8 @@
-﻿namespace Umbraco.Web.Strategies
+﻿using umbraco.interfaces;
+
+namespace Umbraco.Web.Strategies
 {
-    public class TrashedContent
+    internal class TrashedContent : IApplicationStartupHandler
     {
          
     }

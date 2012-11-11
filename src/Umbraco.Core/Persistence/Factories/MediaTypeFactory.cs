@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
@@ -9,17 +8,10 @@ namespace Umbraco.Core.Persistence.Factories
     internal class MediaTypeFactory : IEntityFactory<IMediaType, ContentTypeDto>
     {
         private readonly Guid _nodeObjectType;
-        private readonly IProfile _creator;
 
         public MediaTypeFactory(Guid nodeObjectType)
         {
             _nodeObjectType = nodeObjectType;
-        }
-
-        public MediaTypeFactory(Guid nodeObjectType, IProfile creator)
-        {
-            _nodeObjectType = nodeObjectType;
-            _creator = creator;
         }
 
         #region Implementation of IEntityFactory<IMediaType,ContentTypeDto>
@@ -42,7 +34,7 @@ namespace Umbraco.Core.Persistence.Factories
                                       CreateDate = dto.NodeDto.CreateDate,
                                       Path = dto.NodeDto.Path,
                                       Level = dto.NodeDto.Level,
-                                      Creator = _creator,
+                                      CreatorId = dto.NodeDto.UserId.Value,
                                       AllowedAsRoot = dto.AllowAtRoot,
                                       IsContainer = dto.IsContainer,
                                       Trashed = dto.NodeDto.Trashed
@@ -82,7 +74,7 @@ namespace Umbraco.Core.Persistence.Factories
                                   Text = entity.Name,
                                   Trashed = false,
                                   UniqueId = entity.Key,
-                                  UserId = entity.Creator.Id.SafeCast<int>()
+                                  UserId = entity.CreatorId
                               };
             return nodeDto;
         }

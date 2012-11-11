@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
@@ -12,16 +11,12 @@ namespace Umbraco.Core.Persistence.Factories
         private readonly Guid _nodeObjectTypeId;
         private readonly int _id;
         private int _primaryKey;
-        private readonly IProfile _user;
-        private readonly IProfile _writer;
 
-        public ContentFactory(IContentType contentType, Guid nodeObjectTypeId, int id, IProfile user, IProfile writer)
+        public ContentFactory(IContentType contentType, Guid nodeObjectTypeId, int id)
         {
             _contentType = contentType;
             _nodeObjectTypeId = nodeObjectTypeId;
             _id = id;
-            _user = user;
-            _writer = writer;
         }
 
         public ContentFactory(Guid nodeObjectTypeId, int id)
@@ -43,8 +38,8 @@ namespace Umbraco.Core.Persistence.Factories
                                    : _id.ToGuid(),
                            Name = dto.ContentVersionDto.ContentDto.NodeDto.Text,
                            Path = dto.ContentVersionDto.ContentDto.NodeDto.Path,
-                           Creator = _user,
-                           Writer = _writer,
+                           CreatorId = dto.ContentVersionDto.ContentDto.NodeDto.UserId.Value,
+                           WriterId = dto.WriterUserId,
                            Level = dto.ContentVersionDto.ContentDto.NodeDto.Level,
                            ParentId = dto.ContentVersionDto.ContentDto.NodeDto.ParentId,
                            SortOrder = dto.ContentVersionDto.ContentDto.NodeDto.SortOrder,
@@ -70,7 +65,7 @@ namespace Umbraco.Core.Persistence.Factories
                                       ReleaseDate = entity.ReleaseDate,
                                       Text = entity.Name,
                                       UpdateDate = entity.UpdateDate,
-                                      WriterUserId = entity.Writer.Id.SafeCast<int>(),
+                                      WriterUserId = entity.WriterId,
                                       VersionId = entity.Version,
                                       ContentVersionDto = BuildContentVersionDto(entity)
                                   };
@@ -127,7 +122,7 @@ namespace Umbraco.Core.Persistence.Factories
                                   Text = entity.Name,
                                   Trashed = entity.Trashed,
                                   UniqueId = entity.Key,
-                                  UserId = entity.Creator.Id.SafeCast<int>()
+                                  UserId = entity.CreatorId
                               };
 
             return nodeDto;

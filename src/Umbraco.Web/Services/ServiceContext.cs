@@ -41,8 +41,9 @@ namespace Umbraco.Web.Services
             var publishingStrategy = new PublishingStrategy();
 
             var userService = new UserService(provider);
+            _cache.AddOrUpdate(typeof(UserService).Name, userService, (x, y) => userService);
 
-            var contentService = new ContentService(provider, publishingStrategy, userService);
+            var contentService = new ContentService(provider, publishingStrategy);
             _cache.AddOrUpdate(typeof (IContentService).Name, contentService, (x, y) => contentService);
 
             var mediaService = new MediaService(provider);
@@ -118,6 +119,14 @@ namespace Umbraco.Web.Services
         public IMacroService MacroService
         {
             get { return _cache[typeof(IMacroService).Name] as IMacroService; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IMacroService"/>
+        /// </summary>
+        internal IUserService UserService
+        {
+            get { return _cache[typeof(IUserService).Name] as IUserService; }
         }
     }
 }

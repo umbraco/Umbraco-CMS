@@ -35,9 +35,9 @@ namespace Umbraco.Core.Models
         DateTime? ExpireDate { get; set; }
 
         /// <summary>
-        /// Profile of the user who wrote the Content
+        /// Id of the user who wrote/updated the Content
         /// </summary>
-        IProfile Writer { get; set; }
+        int WriterId { get; set; }
 
         /// <summary>
         /// Gets the ContentType used by this content object

@@ -11,12 +11,50 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Template : File
+    public class Template : File, ITemplate
     {
+        private readonly string _alias;
+        private readonly string _name;
+
         public Template(string path)
             : base(path)
         {
             base.Path = path;
+        }
+
+        public Template(string path, string name, string alias)
+            : base(path)
+        {
+            base.Path = path;
+            _name = name;
+            _alias = alias;
+        }
+
+        [DataMember]
+        internal int CreatorId { get; set; }
+
+        [DataMember]
+        internal int MasterTemplateId { get; set; }
+
+        [DataMember]
+        internal string MasterTemplateAlias { get; set; }
+
+        [DataMember]
+        public override string Alias
+        {
+            get
+            {
+                return _alias;
+            }
+        }
+
+        [DataMember]
+        public override string Name
+        {
+            get
+            {
+                return _name;
+            }
         }
 
         /// <summary>
