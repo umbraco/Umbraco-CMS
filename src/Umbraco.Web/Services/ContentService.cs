@@ -485,14 +485,15 @@ namespace Umbraco.Web.Services
         }
 
         /// <summary>
-        /// Permanently deletes a specific version from an <see cref="IContent"/> object.
+        /// Permanently deletes specific version(s) from an <see cref="IContent"/> object.
         /// </summary>
         /// <param name="content">Id of the <see cref="IContent"/> object to delete a version from</param>
         /// <param name="versionId">Id of the version to delete</param>
+        /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        public void Delete(IContent content, Guid versionId, int userId = -1)
+        public void Delete(IContent content, Guid versionId, bool deletePriorVersions, int userId = -1)
         {
-            Delete(content.Id, versionId, userId);
+            Delete(content.Id, versionId, deletePriorVersions, userId);
         }
 
         /// <summary>
@@ -508,14 +509,22 @@ namespace Umbraco.Web.Services
         }
 
         /// <summary>
-        /// Permanently deletes a specific version from an <see cref="IContent"/> object.
+        /// Permanently deletes specific version(s) from an <see cref="IContent"/> object.
         /// </summary>
         /// <param name="id">Id of the <see cref="IContent"/> object to delete a version from</param>
         /// <param name="versionId">Id of the version to delete</param>
+        /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        public void Delete(int id, Guid versionId, int userId = -1)
+        public void Delete(int id, Guid versionId, bool deletePriorVersions, int userId = -1)
         {
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
+
+            if(deletePriorVersions)
+            {
+                var content = repository.GetByVersion(id, versionId);
+                Delete(id, content.UpdateDate, userId);
+            }
+
             repository.Delete(id, versionId);
         }
 
