@@ -151,6 +151,38 @@ namespace Umbraco.Core.Services
         void Delete(IContent content, int userId = -1);
 
         /// <summary>
+        /// Permanently deletes versions from an <see cref="IContent"/> object prior to a specific date.
+        /// </summary>
+        /// <param name="content">Id of the <see cref="IContent"/> object to delete versions from</param>
+        /// <param name="versionDate">Latest version date</param>
+        /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
+        void Delete(IContent content, DateTime versionDate, int userId = -1);
+
+        /// <summary>
+        /// Permanently deletes a specific version from an <see cref="IContent"/> object.
+        /// </summary>
+        /// <param name="content">Id of the <see cref="IContent"/> object to delete a version from</param>
+        /// <param name="versionId">Id of the version to delete</param>
+        /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
+        void Delete(IContent content, Guid versionId, int userId = -1);
+
+        /// <summary>
+        /// Permanently deletes versions from an <see cref="IContent"/> object prior to a specific date.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/> object to delete versions from</param>
+        /// <param name="versionDate">Latest version date</param>
+        /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
+        void Delete(int id, DateTime versionDate, int userId = -1);
+
+        /// <summary>
+        /// Permanently deletes a specific version from an <see cref="IContent"/> object.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/> object to delete a version from</param>
+        /// <param name="versionId">Id of the version to delete</param>
+        /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
+        void Delete(int id, Guid versionId, int userId = -1);
+
+        /// <summary>
         /// Deletes an <see cref="IContent"/> object by moving it to the Recycle Bin
         /// </summary>
         /// <remarks>Move an item to the Recycle Bin will result in the item being unpublished</remarks>

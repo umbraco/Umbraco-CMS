@@ -301,6 +301,48 @@ namespace Umbraco.Core.Persistence.Repositories
             return content;
         }
 
+        public void Delete(int id, Guid versionId)
+        {
+            var documentDto = Database.FirstOrDefault<DocumentDto>("WHERE nodeId = @Id AND versionId = @VersionId AND newest = @Newest", new { Id = id, VersionId = versionId, Newest = false });
+            Mandate.That<Exception>(documentDto != null);
+
+            using(var transaction = Database.GetTransaction())
+            {
+                DeleteVersion(id, versionId);
+
+                transaction.Complete();
+            }
+        }
+
+        public void Delete(int id, DateTime versionDate)
+        {
+            var list = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND VersionDate < @VersionDate", new {Id = id, VersionDate = versionDate});
+            Mandate.That<Exception>(list.Any());
+
+            using (var transaction = Database.GetTransaction())
+            {
+                foreach (var dto in list)
+                {
+                    DeleteVersion(id, dto.VersionId);
+                }
+
+                transaction.Complete();
+            }
+        }
+        
+        /// <summary>
+        /// Private method to execute the delete statements for removing a single version for a Content item.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/> to delete a version from</param>
+        /// <param name="versionId">Guid id of the version to delete</param>
+        private void DeleteVersion(int id, Guid versionId)
+        {
+            Database.Delete<PreviewXmlDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<PropertyDataDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<ContentVersionDto>("WHERE nodeId = @Id AND VersionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<DocumentDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
+        }
+
         #endregion
 
         private PropertyCollection GetPropertyCollection(int id, Guid versionId, IContentType contentType)
