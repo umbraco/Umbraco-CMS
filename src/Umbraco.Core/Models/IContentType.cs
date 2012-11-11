@@ -8,13 +8,13 @@ namespace Umbraco.Core.Models
     public interface IContentType : IContentTypeComposition
     {
         /// <summary>
-        /// Gets or Sets the path to the default Template of the ContentType
+        /// Gets the default Template of the ContentType
         /// </summary>
-        string DefaultTemplate { get; set; }
+        ITemplate DefaultTemplate { get; }
 
         /// <summary>
-        /// Gets or Sets a list of Template names/paths which are allowed for the ContentType
+        /// Gets or Sets a list of Templates which are allowed for the ContentType
         /// </summary>
-        IEnumerable<string> AllowedTemplates { get; set; }
+        IEnumerable<ITemplate> AllowedTemplates { get; set; }
     }
 }

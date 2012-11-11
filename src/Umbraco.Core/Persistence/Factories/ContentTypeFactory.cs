@@ -38,7 +38,8 @@ namespace Umbraco.Core.Persistence.Factories
                                       CreatorId = dto.ContentTypeDto.NodeDto.UserId.Value,
                                       AllowedAsRoot = dto.ContentTypeDto.AllowAtRoot,
                                       IsContainer = dto.ContentTypeDto.IsContainer,
-                                      Trashed = dto.ContentTypeDto.NodeDto.Trashed
+                                      Trashed = dto.ContentTypeDto.NodeDto.Trashed,
+                                      DefaultTemplateId = dto.TemplateNodeId
                                   };
             return contentType;
         }
@@ -47,7 +48,13 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var documentTypeDto = new DocumentTypeDto
                                       {ContentTypeDto = BuildContentTypeDto(entity), ContentTypeNodeId = entity.Id};
-            //NOTE TemplateId and IsDefault currently not added
+            
+            var contentType = entity as ContentType;
+            if(contentType != null)
+            {
+                documentTypeDto.TemplateNodeId = contentType.DefaultTemplateId;
+                documentTypeDto.IsDefault = true;
+            }
             return documentTypeDto;
         }
 

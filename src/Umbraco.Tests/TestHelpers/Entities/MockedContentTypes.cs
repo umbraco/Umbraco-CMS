@@ -17,7 +17,6 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                       Thumbnail = "doc.png",
                                       SortOrder = 1,
                                       CreatorId = 0,
-                                      DefaultTemplate = "~/masterpages/umbTextPage.master",
                                       Trashed = false
                                   };
 
@@ -46,7 +45,6 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                       Thumbnail = "doc.png",
                                       SortOrder = 1,
                                       CreatorId = 0,
-                                      DefaultTemplate = "",
                                       Trashed = false
                                   };
 
@@ -70,7 +68,6 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                       Thumbnail = "doc.png",
                                       SortOrder = 1,
                                       CreatorId = 0,
-                                      DefaultTemplate = "~/masterpages/umbSimplePage.master",
                                       Trashed = false
                                   };
 
@@ -95,7 +92,6 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                       Thumbnail = "doc2.png",
                                       SortOrder = 1,
                                       CreatorId = 0,
-                                      DefaultTemplate = "~/masterpages/umbSimplePage.master",
                                       Trashed = false
                                   };
 
@@ -120,7 +116,6 @@ namespace Umbraco.Tests.TestHelpers.Entities
                 Thumbnail = "doc2.png",
                 SortOrder = 1,
                 CreatorId = 0,
-                DefaultTemplate = "~/masterpages/umbSimplePage.master",
                 Trashed = false
             };
 
@@ -145,7 +140,6 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                       Thumbnail = "doc3.png",
                                       SortOrder = 1,
                                       CreatorId = 0,
-                                      DefaultTemplate = "~/masterpages/umbSimplePage.master",
                                       Trashed = false
                                   };
 

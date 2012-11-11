@@ -16,14 +16,18 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class ContentTypeRepository : ContentTypeBaseRepository<int, IContentType>, IContentTypeRepository
     {
-        public ContentTypeRepository(IUnitOfWork work)
+        private readonly ITemplateRepository _templateRepository;
+
+        public ContentTypeRepository(IUnitOfWork work, ITemplateRepository templateRepository)
             : base(work)
         {
+            _templateRepository = templateRepository;
         }
 
-        public ContentTypeRepository(IUnitOfWork work, IRepositoryCacheProvider cache)
+        public ContentTypeRepository(IUnitOfWork work, IRepositoryCacheProvider cache, ITemplateRepository templateRepository)
             : base(work, cache)
         {
+            _templateRepository = templateRepository;
         }
 
         #region Overrides of RepositoryBase<int,IContentType>
@@ -33,7 +37,6 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentTypeSql = GetBaseQuery(false);
             contentTypeSql.Where(GetBaseWhereClause(), new { Id = id });
 
-            //TODO Test with multiple templates for a single DocType as that would cause problems for the query below
             var dto = Database.Query<DocumentTypeDto, ContentTypeDto, NodeDto>(contentTypeSql).FirstOrDefault();
 
             if (dto == null)
@@ -44,6 +47,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
             contentType.AllowedContentTypes = GetAllowedContentTypeIds(id);
             contentType.PropertyGroups = GetPropertyGroupCollection(id);
+
+            var templates = Database.Fetch<DocumentTypeDto>("WHERE contentTypeNodeId = @Id", new { Id = id });
+            if(templates.Any())
+            {
+                contentType.AllowedTemplates =
+                    templates.Select(template => _templateRepository.Get(template.TemplateNodeId));
+            }
 
             var list = Database.Fetch<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id", new { Id = id});
             foreach (var contentTypeDto in list)
@@ -115,6 +125,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.RightJoin("cmsContentType ON ([cmsContentType].[nodeId] = [cmsDocumentType].[contentTypeNodeId])");
             sql.InnerJoin("umbracoNode ON ([cmsContentType].[nodeId] = [umbracoNode].[id])");
             sql.Where("[umbracoNode].[nodeObjectType] = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
+            sql.Where("[cmsDocumentType].[IsDefault] = @IsDefault", new { IsDefault = true });
             return sql;
         }
 
@@ -159,12 +170,16 @@ namespace Umbraco.Core.Persistence.Repositories
             var dto = factory.BuildDto(entity);
 
             PersistNewBaseContentType(dto.ContentTypeDto, entity);
-            //Inserts data into the cmsDocumentType table - currently only the ContentTypeNodeId is added/updated
+            //Inserts data into the cmsDocumentType table
             dto.ContentTypeNodeId = entity.Id;
             Database.Insert(dto);
 
-            //TODO Insert new DocumentType entries - NOTE only seems relevant as long as Templates resides in the DB?
-            //TODO Insert allowed Templates
+            //Insert allowed Templates not including the default one, as that has already been inserted
+            foreach (var template in entity.AllowedTemplates.Where(x => x.Id != dto.TemplateNodeId))
+            {
+                Database.Insert(new DocumentTypeDto
+                                    {ContentTypeNodeId = entity.Id, TemplateNodeId = template.Id, IsDefault = false});
+            }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }
@@ -180,9 +195,15 @@ namespace Umbraco.Core.Persistence.Repositories
             PersistUpdatedBaseContentType(dto.ContentTypeDto, entity);
 
             //Look up DocumentType entries for updating - this could possibly be a "remove all, insert all"-approach
+            Database.Delete<DocumentTypeDto>("WHERE contentTypeNodeId = @Id", new { Id = entity.Id});
 
-            //TODO Update new DocumentType entries - NOTE only seems relevant as long as Templates resides in the DB?
-            //TODO Update allowed Templates
+            Database.Insert(dto);
+
+            //Insert allowed Templates not including the default one, as that has already been inserted
+            foreach (var template in entity.AllowedTemplates.Where(x => x.Id != dto.TemplateNodeId))
+            {
+                Database.Insert(new DocumentTypeDto { ContentTypeNodeId = entity.Id, TemplateNodeId = template.Id, IsDefault = false });
+            }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }

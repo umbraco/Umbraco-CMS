@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models
     public class Content : ContentBase, IContent
     {
         private IContentType _contentType;
-        private string _template;
+        private ITemplate _template;
         private bool _published;
         private string _language;
         private DateTime? _releaseDate;
@@ -41,8 +41,8 @@ namespace Umbraco.Core.Models
 
             _contentType = contentType;
         }
-        
-        private static readonly PropertyInfo TemplateSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Template);
+
+        private static readonly PropertyInfo TemplateSelector = ExpressionHelper.GetPropertyInfo<Content, ITemplate>(x => x.Template);
         private static readonly PropertyInfo PublishedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.Published);
         private static readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Language);
         private static readonly PropertyInfo ReleaseDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ReleaseDate);
@@ -50,16 +50,19 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.WriterId);
 
         /// <summary>
-        /// Path to the template used by this Content
-        /// This is used to override the default one from the ContentType
+        /// Gets or sets the template used by the Content.
+        /// This is used to override the default one from the ContentType.
         /// </summary>
-        /// <remarks>If no template is explicitly set on the Content object, the Default template from the ContentType will be returned</remarks>
+        /// <remarks>
+        /// If no template is explicitly set on the Content object, 
+        /// the Default template from the ContentType will be returned.
+        /// </remarks>
         [DataMember]
-        public virtual string Template
+        public virtual ITemplate Template
         {
             get
             {
-                if (string.IsNullOrEmpty(_template) || _template == null)
+                if (_template == null)
                     return _contentType.DefaultTemplate;
 
                 return _template;
@@ -111,8 +114,11 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Language of the data contained within this Content object
+        /// Language of the data contained within this Content object.
         /// </summary>
+        /// <remarks>
+        /// Left internal until multilingual support is implemented.
+        /// </remarks>
         [DataMember]
         internal string Language
         {

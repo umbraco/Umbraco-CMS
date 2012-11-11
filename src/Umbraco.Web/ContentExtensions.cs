@@ -30,7 +30,7 @@ namespace Umbraco.Web
                                    new XAttribute("writerID", content.WriterId),
                                    new XAttribute("creatorID", content.CreatorId),
                                    new XAttribute("nodeType", content.ContentType.Id),
-                                   new XAttribute("template", content.Template ?? string.Empty),//Template name versus Id - note that the template name/alias isn't saved in the db.
+                                   new XAttribute("template", content.Template.Id.ToString()),
                                    new XAttribute("sortOrder", content.SortOrder),
                                    new XAttribute("createDate", content.CreateDate),
                                    new XAttribute("updateDate", content.UpdateDate),

@@ -13,22 +13,31 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class ContentType : ContentTypeCompositionBase, IContentType
     {
-        private string _defaultTemplate;
-        private IEnumerable<string> _allowedTemplates;
+        private int _defaultTemplate;
+        private IEnumerable<ITemplate> _allowedTemplates;
 
         public ContentType(int parentId) : base(parentId)
         {
-            _allowedTemplates = new List<string>();
+            _allowedTemplates = new List<ITemplate>();
         }
 
-        private static readonly PropertyInfo DefaultTemplateSelector = ExpressionHelper.GetPropertyInfo<ContentType, string>(x => x.DefaultTemplate);
-        private static readonly PropertyInfo AllowedTemplatesSelector = ExpressionHelper.GetPropertyInfo<ContentType, IEnumerable<string>>(x => x.AllowedTemplates);
+        private static readonly PropertyInfo DefaultTemplateSelector = ExpressionHelper.GetPropertyInfo<ContentType, int>(x => x.DefaultTemplateId);
+        private static readonly PropertyInfo AllowedTemplatesSelector = ExpressionHelper.GetPropertyInfo<ContentType, IEnumerable<ITemplate>>(x => x.AllowedTemplates);
         
         /// <summary>
         /// Gets or sets the alias of the default Template.
         /// </summary>
         [DataMember]
-        public string DefaultTemplate//NOTE Use internal extension method to get Id of the Template
+        public ITemplate DefaultTemplate
+        {
+            get { return AllowedTemplates.FirstOrDefault(x => x.Id == DefaultTemplateId); }
+        }
+
+        /// <summary>
+        /// Internal property to store the Id of the default template
+        /// </summary>
+        [DataMember]
+        internal int DefaultTemplateId
         {
             get { return _defaultTemplate; }
             set
@@ -39,9 +48,10 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets a list of aliases for allowed Templates
+        /// Gets or Sets a list of Templates which are allowed for the ContentType
         /// </summary>
-        public IEnumerable<string> AllowedTemplates//NOTE Use internal extension method to get Ids of the Templates
+        [DataMember]
+        public IEnumerable<ITemplate> AllowedTemplates
         {
             get { return _allowedTemplates; }
             set

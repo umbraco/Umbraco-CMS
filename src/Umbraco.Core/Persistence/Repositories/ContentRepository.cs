@@ -18,17 +18,20 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class ContentRepository : PetaPocoRepositoryBase<int, IContent>, IContentRepository
     {
         private readonly IContentTypeRepository _contentTypeRepository;
+        private readonly ITemplateRepository _templateRepository;
 
-        public ContentRepository(IUnitOfWork work, IContentTypeRepository contentTypeRepository)
+        public ContentRepository(IUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
             : base(work)
         {
             _contentTypeRepository = contentTypeRepository;
+            _templateRepository = templateRepository;
         }
 
-        public ContentRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository)
+        public ContentRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
             : base(work, cache)
         {
             _contentTypeRepository = contentTypeRepository;
+            _templateRepository = templateRepository;
         }
 
         #region Overrides of RepositoryBase<IContent>
@@ -44,11 +47,18 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto == null)
                 return null;
 
+            //Get the ContentType that this Content is based on
             var contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
 
             var factory = new ContentFactory(contentType, NodeObjectTypeId, id);
             var content = factory.BuildEntity(dto);
-            
+
+            //Check if template id is set on DocumentDto, and get ITemplate if it is.
+            if (dto.TemplateId.HasValue)
+            {
+                content.Template = _templateRepository.Get(dto.TemplateId.Value);
+            }
+
             content.Properties = GetPropertyCollection(id, dto.ContentVersionDto.VersionId, contentType);
 
             ((ICanBeDirty)content).ResetDirtyProperties();

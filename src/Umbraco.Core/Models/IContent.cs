@@ -1,5 +1,4 @@
 using System;
-using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Models
 {
@@ -9,10 +8,10 @@ namespace Umbraco.Core.Models
     public interface IContent : IContentBase
     {
         /// <summary>
-        /// Alias of the template used by the Content
-        /// This is used to override the default one from the ContentType
+        /// Gets or sets the template used by the Content.
+        /// This is used to override the default one from the ContentType.
         /// </summary>
-        string Template { get; set; }
+        ITemplate Template { get; set; }
 
         /// <summary>
         /// Boolean indicating whether the Content is Published or not
