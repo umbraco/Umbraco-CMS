@@ -175,7 +175,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Insert(dto);
 
             //Insert allowed Templates not including the default one, as that has already been inserted
-            foreach (var template in entity.AllowedTemplates.Where(x => x.Id != dto.TemplateNodeId))
+            foreach (var template in entity.AllowedTemplates.Where(x => x != null && x.Id != dto.TemplateNodeId))
             {
                 Database.Insert(new DocumentTypeDto
                                     {ContentTypeNodeId = entity.Id, TemplateNodeId = template.Id, IsDefault = false});
@@ -200,7 +200,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Insert(dto);
 
             //Insert allowed Templates not including the default one, as that has already been inserted
-            foreach (var template in entity.AllowedTemplates.Where(x => x.Id != dto.TemplateNodeId))
+            foreach (var template in entity.AllowedTemplates.Where(x => x != null && x.Id != dto.TemplateNodeId))
             {
                 Database.Insert(new DocumentTypeDto { ContentTypeNodeId = entity.Id, TemplateNodeId = template.Id, IsDefault = false });
             }
