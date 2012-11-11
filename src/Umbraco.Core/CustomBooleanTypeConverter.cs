@@ -23,7 +23,7 @@ namespace Umbraco.Core
 			{
 				var str = (string)value;
 				if (str == "1") return true;
-				if (str == "0") return false;
+				if (str == "0" || str == "") return false;
 			}
 
 			return base.ConvertFrom(context, culture, value);
