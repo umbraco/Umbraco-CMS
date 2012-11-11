@@ -175,6 +175,7 @@
     <Compile Include="Persistence\Migrations\Initial\BaseDataCreation.cs" />
     <Compile Include="Persistence\Migrations\Initial\DatabaseCreation.cs" />
     <Compile Include="Persistence\PetaPocoExtensions.cs" />
+    <Compile Include="Persistence\PetaPocoSqlExtensions.cs" />
     <Compile Include="Persistence\Querying\ExpressionHelper.cs" />
     <Compile Include="Persistence\Querying\IQuery.cs" />
     <Compile Include="Persistence\Querying\Query.cs" />

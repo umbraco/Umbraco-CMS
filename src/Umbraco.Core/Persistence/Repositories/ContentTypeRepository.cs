@@ -16,18 +16,14 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class ContentTypeRepository : ContentTypeBaseRepository<int, IContentType>, IContentTypeRepository
     {
-        private readonly IUserRepository _userRepository;
-
-        public ContentTypeRepository(IUnitOfWork work, IUserRepository userRepository)
+        public ContentTypeRepository(IUnitOfWork work)
             : base(work)
         {
-            _userRepository = userRepository;
         }
 
-        public ContentTypeRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IUserRepository userRepository)
+        public ContentTypeRepository(IUnitOfWork work, IRepositoryCacheProvider cache)
             : base(work, cache)
         {
-            _userRepository = userRepository;
         }
 
         #region Overrides of RepositoryBase<int,IContentType>
@@ -37,6 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentTypeSql = GetBaseQuery(false);
             contentTypeSql.Where(GetBaseWhereClause(), new { Id = id });
 
+            //TODO Test with multiple templates for a single DocType as that would cause problems for the query below
             var dto = Database.Query<DocumentTypeDto, ContentTypeDto, NodeDto>(contentTypeSql).FirstOrDefault();
 
             if (dto == null)
@@ -112,6 +109,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Which is why "AND cmsDocumentType.IsDefault = @IsDefault" has been removed from sql below.
             //But might need to add it if we create a MediaTypeRepository
             //NOTE: Think the above is incorrect as ContentType and MediaType have different NodeObjectTypes.
+            //UPDATE The above is no longer relevant as the ContentType/DocumentType and MediaType repos are not the same.
             sql.Select(isCount ? "COUNT(*)" : "*");
             sql.From("cmsDocumentType");
             sql.RightJoin("cmsContentType ON ([cmsContentType].[nodeId] = [cmsDocumentType].[contentTypeNodeId])");

@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
@@ -19,20 +18,17 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class MediaRepository : PetaPocoRepositoryBase<int, IMedia>, IMediaRepository
     {
         private readonly IMediaTypeRepository _mediaTypeRepository;
-        private readonly IUserRepository _userRepository;
 
-        public MediaRepository(IUnitOfWork work, IMediaTypeRepository mediaTypeRepository, IUserRepository userRepository)
+        public MediaRepository(IUnitOfWork work, IMediaTypeRepository mediaTypeRepository)
             : base(work)
         {
             _mediaTypeRepository = mediaTypeRepository;
-            _userRepository = userRepository;
         }
 
-        public MediaRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IMediaTypeRepository mediaTypeRepository, IUserRepository userRepository)
+        public MediaRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IMediaTypeRepository mediaTypeRepository)
             : base(work, cache)
         {
             _mediaTypeRepository = mediaTypeRepository;
-            _userRepository = userRepository;
         }
 
         #region Overrides of RepositoryBase<int,IMedia>

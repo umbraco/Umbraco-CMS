@@ -16,18 +16,14 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class MediaTypeRepository : ContentTypeBaseRepository<int, IMediaType>, IMediaTypeRepository
     {
-        private readonly IUserRepository _userRepository;
-
-        public MediaTypeRepository(IUnitOfWork work, IUserRepository userRepository)
+        public MediaTypeRepository(IUnitOfWork work)
             : base(work)
         {
-            _userRepository = userRepository;
         }
 
-        public MediaTypeRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IUserRepository userRepository)
+        public MediaTypeRepository(IUnitOfWork work, IRepositoryCacheProvider cache)
             : base(work, cache)
         {
-            _userRepository = userRepository;
         }
 
         #region Overrides of RepositoryBase<int,IMedia>
