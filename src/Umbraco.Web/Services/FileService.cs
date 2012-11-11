@@ -132,23 +132,23 @@ namespace Umbraco.Web.Services
         }
 
         /// <summary>
-        /// Gets a list of all <see cref="Template"/> objects
+        /// Gets a list of all <see cref="ITemplate"/> objects
         /// </summary>
-        /// <returns>An enumerable list of <see cref="Template"/> objects</returns>
-        public IEnumerable<Template> GetTemplates(params string[] aliases)
+        /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
+        public IEnumerable<ITemplate> GetTemplates(params string[] aliases)
         {
-            var repository = RepositoryResolver.ResolveByType<ITemplateFileOnlyRepository, Template, string>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<ITemplateRepository, ITemplate, int>(_unitOfWork);
             return repository.GetAll(aliases);
         }
 
         /// <summary>
-        /// Gets a <see cref="Template"/> object by its alias
+        /// Gets a <see cref="ITemplate"/> object by its alias
         /// </summary>
         /// <param name="alias">Alias of the template</param>
         /// <returns>A <see cref="Template"/> object</returns>
-        public Template GetTemplateByAlias(string alias)
+        public ITemplate GetTemplateByAlias(string alias)
         {
-            var repository = RepositoryResolver.ResolveByType<ITemplateFileOnlyRepository, Template, string>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<ITemplateRepository, ITemplate, int>(_unitOfWork);
             return repository.Get(alias);
         }
 
@@ -156,9 +156,9 @@ namespace Umbraco.Web.Services
         /// Saves a <see cref="Template"/>
         /// </summary>
         /// <param name="template"><see cref="Template"/> to save</param>
-        public void SaveTemplate(Template template)
+        public void SaveTemplate(ITemplate template)
         {
-            var repository = RepositoryResolver.ResolveByType<ITemplateFileOnlyRepository, Template, string>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<ITemplateRepository, ITemplate, int>(_unitOfWork);
             repository.AddOrUpdate(template);
             _unitOfWork.Commit();
         }
@@ -166,21 +166,21 @@ namespace Umbraco.Web.Services
         /// <summary>
         /// Deletes a template by its alias
         /// </summary>
-        /// <param name="alias">Alias of the <see cref="Template"/> to delete</param>
+        /// <param name="alias">Alias of the <see cref="ITemplate"/> to delete</param>
         public void DeleteTemplate(string alias)
         {
-            var repository = RepositoryResolver.ResolveByType<ITemplateFileOnlyRepository, Template, string>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<ITemplateRepository, ITemplate, int>(_unitOfWork);
             var template = repository.Get(alias);
             repository.Delete(template);
             _unitOfWork.Commit();
         }
 
         /// <summary>
-        /// Validates a <see cref="Template"/>
+        /// Validates a <see cref="ITemplate"/>
         /// </summary>
-        /// <param name="template"><see cref="Template"/> to validate</param>
+        /// <param name="template"><see cref="ITemplate"/> to validate</param>
         /// <returns>True if Script is valid, otherwise false</returns>
-        public bool ValidateTemplate(Template template)
+        public bool ValidateTemplate(ITemplate template)
         {
             return template.IsValid();
         }

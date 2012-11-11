@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
+using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -52,8 +55,8 @@ namespace Umbraco.Core.Persistence.Repositories
             string vbViewName = string.Concat(dto.Alias, ".vbhtml");
             string masterpageName = string.Concat(dto.Alias, ".master");
 
-            var template = new Template(string.Empty, dto.NodeDto.Text, dto.Alias)
-                               {CreatorId = dto.NodeDto.UserId.Value};
+            var factory = new TemplateFactory();
+            var template = factory.BuildEntity(dto);
 
             if (dto.Master.HasValue)
             {
@@ -120,7 +123,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*");
             sql.From("cmsTemplate");
-            sql.InnerJoin("umbracoNode ON ([cmsTemplate].[nodeId] = [umbracoNode].[id])");
+            sql.InnerJoin("umbracoNode").On("[cmsTemplate].[nodeId] = [umbracoNode].[id]");
             sql.Where("[umbracoNode].[nodeObjectType] = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
             return sql;
         }
@@ -159,9 +162,41 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            //TODO Save to db
+            //Save to db
+            var template = entity as Template;
+            var factory = new TemplateFactory(NodeObjectTypeId);
+            var dto = factory.BuildDto(template);
 
-            //entity.ResetDirtyProperties();
+            //NOTE Should the logic below have some kind of fallback for empty parent ids ?
+            //Logic for setting Path, Level and SortOrder
+            var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = template.ParentId });
+            int level = parent.Level + 1;
+            int sortOrder =
+                Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE parentID = @ParentId AND nodeObjectType = @NodeObjectType",
+                                                      new { ParentId = template.ParentId, NodeObjectType = NodeObjectTypeId });
+
+            //Create the (base) node data - umbracoNode
+            var nodeDto = dto.NodeDto;
+            nodeDto.Path = parent.Path;
+            nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
+            nodeDto.SortOrder = sortOrder;
+            var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
+
+            //Update with new correct path
+            nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
+            Database.Update(nodeDto);
+
+            //Insert template dto
+            dto.NodeId = nodeDto.NodeId;
+            Database.Insert(dto);
+
+            //Update entity with correct values
+            template.Id = nodeDto.NodeId; //Set Id on entity to ensure an Id is set
+            template.Path = nodeDto.Path;
+            template.SortOrder = sortOrder;
+            template.Level = level;
+
+            template.ResetDirtyProperties();
         }
 
         protected override void PersistUpdatedItem(ITemplate entity)
@@ -178,7 +213,17 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            //TODO Save updated entity to db
+            //Get TemplateDto from db to get the Primary key of the entity
+            var templateDto = Database.SingleOrDefault<TemplateDto>("WHERE nodeId = @Id", new { Id = entity.Id });
+            //Save updated entity to db
+            var template = entity as Template;
+            var factory = new TemplateFactory(templateDto.PrimaryKey, NodeObjectTypeId);
+            var dto = factory.BuildDto(template);
+
+            Database.Update(dto.NodeDto);
+            Database.Update(dto);
+
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
         protected override void PersistDeletedItem(ITemplate entity)
@@ -222,9 +267,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             template.Path = _viewsFileSystem.GetRelativePath(fileName);
-            template.CreateDate = _viewsFileSystem.GetCreated(path).UtcDateTime;
             template.UpdateDate = _viewsFileSystem.GetLastModified(path).UtcDateTime;
-            template.Key = new FileInfo(path).Name.EncodeAsGuid();
+            //Currently set with db values, but will eventually be changed
+            //template.CreateDate = _viewsFileSystem.GetCreated(path).UtcDateTime;
+            //template.Key = new FileInfo(path).Name.EncodeAsGuid();
 
             template.Path = path;
             template.Content = content;
@@ -244,12 +290,50 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             template.Path = _masterpagesFileSystem.GetRelativePath(fileName);
-            template.CreateDate = _masterpagesFileSystem.GetCreated(path).UtcDateTime;
             template.UpdateDate = _masterpagesFileSystem.GetLastModified(path).UtcDateTime;
-            template.Key = new FileInfo(path).Name.EncodeAsGuid();
+            //Currently set with db values, but will eventually be changed
+            //template.CreateDate = _masterpagesFileSystem.GetCreated(path).UtcDateTime;
+            //template.Key = new FileInfo(path).Name.EncodeAsGuid();
 
             template.Path = path;
             template.Content = content;
         }
+
+        #region Implementation of ITemplateRepository
+
+        public ITemplate Get(string alias)
+        {
+            var sql = GetBaseQuery(false);
+            sql.Where("[cmsTemplate].[alias] = @Alias", new { Alias = alias });
+
+            var dto = Database.Fetch<TemplateDto, NodeDto>(sql).FirstOrDefault();
+
+            if (dto == null)
+                return null;
+
+            return Get(dto.NodeId);
+        }
+
+        public IEnumerable<ITemplate> GetAll(params string[] aliases)
+        {
+            if(aliases.Any())
+            {
+                foreach (var id in aliases)
+                {
+                    yield return Get(id);
+                }
+            }
+            else
+            {
+                var nodeDtos = Database.Fetch<NodeDto>("WHERE nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
+                foreach (var nodeDto in nodeDtos)
+                {
+                    yield return Get(nodeDto.NodeId);
+                }
+            }
+            
+        }
+
+        #endregion
     }
 }

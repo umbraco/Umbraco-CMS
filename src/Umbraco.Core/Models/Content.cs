@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Models
 {

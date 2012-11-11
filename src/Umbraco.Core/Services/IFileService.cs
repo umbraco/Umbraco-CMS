@@ -73,35 +73,35 @@ namespace Umbraco.Core.Services
         bool ValidateScript(Script script);
 
         /// <summary>
-        /// Gets a list of all <see cref="Template"/> objects
+        /// Gets a list of all <see cref="ITemplate"/> objects
         /// </summary>
-        /// <returns>An enumerable list of <see cref="Template"/> objects</returns>
-        IEnumerable<Template> GetTemplates(params string[] aliases);
+        /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
+        IEnumerable<ITemplate> GetTemplates(params string[] aliases);
 
         /// <summary>
-        /// Gets a <see cref="Template"/> object by its alias
+        /// Gets a <see cref="ITemplate"/> object by its alias
         /// </summary>
         /// <param name="alias">Alias of the template</param>
-        /// <returns>A <see cref="Template"/> object</returns>
-        Template GetTemplateByAlias(string alias);
+        /// <returns>A <see cref="ITemplate"/> object</returns>
+        ITemplate GetTemplateByAlias(string alias);
 
         /// <summary>
-        /// Saves a <see cref="Template"/>
+        /// Saves a <see cref="ITemplate"/>
         /// </summary>
-        /// <param name="template"><see cref="Template"/> to save</param>
-        void SaveTemplate(Template template);
+        /// <param name="template"><see cref="ITemplate"/> to save</param>
+        void SaveTemplate(ITemplate template);
 
         /// <summary>
         /// Deletes a template by its alias
         /// </summary>
-        /// <param name="alias">Alias of the <see cref="Template"/> to delete</param>
+        /// <param name="alias">Alias of the <see cref="ITemplate"/> to delete</param>
         void DeleteTemplate(string alias);
 
         /// <summary>
-        /// Validates a <see cref="Template"/>
+        /// Validates a <see cref="ITemplate"/>
         /// </summary>
-        /// <param name="template"><see cref="Template"/> to validate</param>
+        /// <param name="template"><see cref="ITemplate"/> to validate</param>
         /// <returns>True if Script is valid, otherwise false</returns>
-        bool ValidateTemplate(Template template);
+        bool ValidateTemplate(ITemplate template);
     }
 }

@@ -153,6 +153,7 @@
     <Compile Include="Persistence\Factories\PropertyGroupFactory.cs" />
     <Compile Include="Persistence\Factories\RelationFactory.cs" />
     <Compile Include="Persistence\Factories\RelationTypeFactory.cs" />
+    <Compile Include="Persistence\Factories\TemplateFactory.cs" />
     <Compile Include="Persistence\Factories\UserFactory.cs" />
     <Compile Include="Persistence\Factories\UserTypeFactory.cs" />
     <Compile Include="Persistence\Mappers\BaseMapper.cs" />
@@ -200,7 +201,6 @@
     <Compile Include="Persistence\Repositories\Interfaces\IScriptRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IStylesheetRepository.cs" />
-    <Compile Include="Persistence\Repositories\Interfaces\ITemplateFileOnlyRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IUserRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IUserTypeRepository.cs" />
@@ -214,7 +214,6 @@
     <Compile Include="Persistence\Repositories\RepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\ScriptRepository.cs" />
     <Compile Include="Persistence\Repositories\StylesheetRepository.cs" />
-    <Compile Include="Persistence\Repositories\TemplateFileOnlyFileOnlyRepository.cs" />
     <Compile Include="Persistence\Repositories\TemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\UserRepository.cs" />
     <Compile Include="Persistence\Repositories\UserTypeRepository.cs" />

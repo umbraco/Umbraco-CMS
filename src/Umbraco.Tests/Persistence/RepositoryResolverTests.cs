@@ -186,7 +186,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<ITemplateFileOnlyRepository, Template, string>(uow);
+            var repository = RepositoryResolver.ResolveByType<ITemplateRepository, ITemplate, int>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);

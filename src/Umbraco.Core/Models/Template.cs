@@ -16,22 +16,37 @@ namespace Umbraco.Core.Models
         private readonly string _alias;
         private readonly string _name;
 
-        public Template(string path)
+        internal Template(string path)
             : base(path)
         {
             base.Path = path;
+            ParentId = -1;
         }
 
         public Template(string path, string name, string alias)
             : base(path)
         {
             base.Path = path;
+            ParentId = -1;
+            Key = name.EncodeAsGuid();
             _name = name;
             _alias = alias;
         }
 
         [DataMember]
         internal int CreatorId { get; set; }
+
+        [DataMember]
+        internal int Level { get; set; }
+
+        [DataMember]
+        internal int SortOrder { get; set; }
+
+        [DataMember]
+        internal int ParentId { get; set; }
+
+        [DataMember]
+        internal string NodePath { get; set; }
 
         [DataMember]
         internal int MasterTemplateId { get; set; }
