@@ -396,6 +396,7 @@
     <Compile Include="ObjectResolution\SingleObjectResolverBase.cs" />
     <Compile Include="Publishing\BasePublishingStrategy.cs" />
     <Compile Include="Publishing\IPublishingStrategy.cs" />
+    <Compile Include="Publishing\PublishingStrategy.cs" />
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="Serialization\AbstractSerializationService.cs" />
     <Compile Include="Serialization\Formatter.cs" />
@@ -458,7 +459,9 @@
       <Name>umbraco.interfaces</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Auditing\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

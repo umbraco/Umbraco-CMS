@@ -1,12 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Publishing;
 
-namespace Umbraco.Web.Publishing
+namespace Umbraco.Core.Publishing
 {
     /// <summary>
     /// Currently acts as an interconnection between the new public api and the legacy api for publishing

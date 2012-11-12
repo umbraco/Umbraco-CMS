@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Models;
-using Umbraco.Web.Publishing;
+using Umbraco.Core.Publishing;
 
 namespace Umbraco.Web.Strategies
 {

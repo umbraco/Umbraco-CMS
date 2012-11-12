@@ -32,7 +32,5 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("umbraco.webservices")]
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
 [assembly: InternalsVisibleTo("Umbraco.Core")]
-
+[assembly: InternalsVisibleTo("Umbraco.Web")]
 [assembly: InternalsVisibleTo("Umbraco.Web.UI")]
-
-[assembly: InternalsVisibleTo("Our.Umbraco.AmazonS3FileSystem")]

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Concurrent;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
-using Umbraco.Web.Publishing;
 
 namespace Umbraco.Web.Services
 {

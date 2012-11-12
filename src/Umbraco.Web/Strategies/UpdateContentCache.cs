@@ -7,7 +7,7 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using Umbraco.Web.Publishing;
+using Umbraco.Core.Publishing;
 using Umbraco.Web.Services;
 using umbraco.interfaces;
 using umbraco.presentation.nodeFactory;
