@@ -60,6 +60,8 @@
     <Compile Include="ApplicationContext.cs" />
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Attempt.cs" />
+    <Compile Include="Auditing\Audit.cs" />
+    <Compile Include="Auditing\IAuditWriteProvider.cs" />
     <Compile Include="CacheHelper.cs" />
     <Compile Include="CodeAnnotations\UmbracoDeprecateAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoExperimentalFeatureAttribute.cs" />
@@ -469,9 +471,7 @@
       <Name>umbraco.interfaces</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Auditing\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

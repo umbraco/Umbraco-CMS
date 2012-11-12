@@ -22,7 +22,7 @@ namespace Umbraco.Core.Services
         #region Implementation of IUserService
 
         /// <summary>
-        /// Gets an <see cref="IProfile"/> for the current BackOffice User
+        /// Gets an <see cref="IProfile"/> for the current BackOffice User.
         /// </summary>
         /// <param name="httpContext">HttpContext to fetch the user through</param>
         /// <returns><see cref="IProfile"/> containing the Name and Id of the logged in BackOffice User</returns>
@@ -63,6 +63,22 @@ namespace Umbraco.Core.Services
 
             var profile = GetProfileById(userId);
             return profile;
+        }
+
+        /// <summary>
+        /// Gets an <see cref="IProfile"/> for the current BackOffice User.
+        /// </summary>
+        /// <remarks>
+        /// Requests the current HttpContext, so this method will only work in a web context.
+        /// </remarks>
+        /// <returns><see cref="IProfile"/> containing the Name and Id of the logged in BackOffice User</returns>
+        public IProfile GetCurrentBackOfficeUser()
+        {
+            var context = HttpContext.Current;
+            Mandate.That<Exception>(context != null);
+
+            var wrapper = new HttpContextWrapper(context);
+            return GetCurrentBackOfficeUser(wrapper);
         }
 
         /// <summary>

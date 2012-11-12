@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -18,11 +19,20 @@ namespace Umbraco.Core.Services
     public class ContentService : IContentService
     {
         private readonly IPublishingStrategy _publishingStrategy;
+        private readonly IUserService _userService;
         private readonly IUnitOfWork _unitOfWork;
+        private HttpContextBase _httpContext;
 
         public ContentService(IUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy)
         {
             _publishingStrategy = publishingStrategy;
+            _unitOfWork = provider.GetUnitOfWork();
+        }
+
+        internal ContentService(IUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy, IUserService userService)
+        {
+            _publishingStrategy = publishingStrategy;
+            _userService = userService;
             _unitOfWork = provider.GetUnitOfWork();
         }
 
@@ -672,6 +682,15 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Internal method to set the HttpContextBase for testing.
+        /// </summary>
+        /// <param name="httpContext"><see cref="HttpContextBase"/></param>
+        internal void SetHttpContext(HttpContextBase httpContext)
+        {
+            _httpContext = httpContext;
+        }
+
+        /// <summary>
         /// Updates a content object with the User (id), who created the content.
         /// </summary>
         /// <param name="content"><see cref="IContent"/> object to update</param>
@@ -682,6 +701,13 @@ namespace Umbraco.Core.Services
             {
                 //If a user id was passed in we use that
                 content.CreatorId = userId;
+            }
+            else if(_userService != null)
+            {
+                var profile = _httpContext == null
+                                  ? _userService.GetCurrentBackOfficeUser()
+                                  : _userService.GetCurrentBackOfficeUser(_httpContext);
+                content.CreatorId = profile.Id.SafeCast<int>();
             }
             else
             {
@@ -701,6 +727,13 @@ namespace Umbraco.Core.Services
             {
                 //If a user id was passed in we use that
                 content.WriterId = userId;
+            }
+            else if (_userService != null)
+            {
+                var profile = _httpContext == null
+                                  ? _userService.GetCurrentBackOfficeUser()
+                                  : _userService.GetCurrentBackOfficeUser(_httpContext);
+                content.WriterId = profile.Id.SafeCast<int>();
             }
             else
             {

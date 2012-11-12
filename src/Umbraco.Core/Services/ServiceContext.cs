@@ -42,7 +42,7 @@ namespace Umbraco.Core.Services
             var userService = new UserService(provider);
             _cache.AddOrUpdate(typeof(UserService).Name, userService, (x, y) => userService);
 
-            var contentService = new ContentService(provider, publishingStrategy);
+            var contentService = new ContentService(provider, publishingStrategy, userService);
             _cache.AddOrUpdate(typeof (IContentService).Name, contentService, (x, y) => contentService);
 
             var mediaService = new MediaService(provider);
