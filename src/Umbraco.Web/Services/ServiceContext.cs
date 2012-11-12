@@ -58,7 +58,7 @@ namespace Umbraco.Web.Services
             var dataTypeService = new DataTypeService(provider);
             _cache.AddOrUpdate(typeof(IDataTypeService).Name, dataTypeService, (x, y) => dataTypeService);
 
-            var fileService = new FileService(fileProvider);
+            var fileService = new FileService(fileProvider, provider);
             _cache.AddOrUpdate(typeof(IFileService).Name, fileService, (x, y) => fileService);
             
             var localizationService = new LocalizationService(provider);

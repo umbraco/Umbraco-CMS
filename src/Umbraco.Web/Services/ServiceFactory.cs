@@ -63,5 +63,13 @@ namespace Umbraco.Web.Services
         {
             get { return ServiceContext.Current.MacroService; }
         }
+
+        /// <summary>
+        /// Gets the <see cref="IUserService"/>
+        /// </summary>
+        internal static IUserService UserService
+        {
+            get { return ServiceContext.Current.UserService; }
+        }
     }
 }

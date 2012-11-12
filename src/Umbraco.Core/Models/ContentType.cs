@@ -62,6 +62,21 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Sets the default template for the ContentType
+        /// </summary>
+        /// <param name="template">Default <see cref="ITemplate"/></param>
+        public void SetDefaultTemplate(ITemplate template)
+        {
+            DefaultTemplateId = template.Id;
+            if(_allowedTemplates.Any(x => x.Id == template.Id) == false)
+            {
+                var templates = AllowedTemplates.ToList();
+                templates.Add(template);
+                AllowedTemplates = templates;
+            }
+        }
+
+        /// <summary>
         /// Indicates whether a specific property on the current <see cref="IContent"/> entity is dirty.
         /// </summary>
         /// <param name="propertyName">Name of the property to check</param>

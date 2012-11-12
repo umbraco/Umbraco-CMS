@@ -16,5 +16,11 @@ namespace Umbraco.Core.Models
         /// Gets or Sets a list of Templates which are allowed for the ContentType
         /// </summary>
         IEnumerable<ITemplate> AllowedTemplates { get; set; }
+
+        /// <summary>
+        /// Sets the default template for the ContentType
+        /// </summary>
+        /// <param name="template">Default <see cref="ITemplate"/></param>
+        void SetDefaultTemplate(ITemplate template);
     }
 }
