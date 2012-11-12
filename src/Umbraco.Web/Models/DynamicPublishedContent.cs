@@ -21,12 +21,6 @@ namespace Umbraco.Web.Models
 	/// </summary>
 	public class DynamicPublishedContent : DynamicObject, IPublishedContent
 	{
-		/// <summary>
-		/// This callback is used only so we can set it dynamically for use in unit tests
-		/// </summary>
-		internal static Func<string, string, Guid> GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
-			ContentType.GetDataType(docTypeAlias, propertyAlias);
-		
 		protected IPublishedContent PublishedContent { get; private set; }
 		private DynamicPublishedContentList _cachedChildren;
 		private readonly ConcurrentDictionary<string, object> _cachedMemberOutput = new ConcurrentDictionary<string, object>();
@@ -262,10 +256,10 @@ namespace Umbraco.Web.Models
 			}
 
 			//get the data type id for the current property
-			var dataType = GetDataType(userProperty.DocumentTypeAlias, userProperty.Alias);
+			var dataType = Umbraco.Core.PublishedContentHelper.GetDataType(userProperty.DocumentTypeAlias, userProperty.Alias);
 
 			//convert the string value to a known type
-			var converted = ConvertPropertyValue(result, dataType, userProperty.DocumentTypeAlias, userProperty.Alias);
+			var converted = Umbraco.Core.PublishedContentHelper.ConvertPropertyValue(result, dataType, userProperty.DocumentTypeAlias, userProperty.Alias);
 			if (converted.Success)
 			{
 				result = converted.Result;
@@ -823,87 +817,7 @@ namespace Umbraco.Web.Models
 		} 
 		#endregion
 
-		private static Guid GetDataType(string docTypeAlias, string propertyAlias)
-		{
-			return GetDataTypeCallback(docTypeAlias, propertyAlias);
-		}
-
-		/// <summary>
-		/// Converts the currentValue to a correctly typed value based on known registered converters, then based on known standards.
-		/// </summary>
-		/// <param name="currentValue"></param>
-		/// <param name="dataType"></param>
-		/// <param name="docTypeAlias"></param>
-		/// <param name="propertyTypeAlias"></param>
-		/// <returns></returns>
-		private Attempt<object> ConvertPropertyValue(object currentValue, Guid dataType, string docTypeAlias, string propertyTypeAlias)
-		{
-			if (currentValue == null) return Attempt<object>.False;
-
-			//First lets check all registered converters for this data type.			
-			var converters = PropertyEditorValueConvertersResolver.Current.Converters
-				.Where(x => x.IsConverterFor(dataType, docTypeAlias, propertyTypeAlias))
-				.ToArray();
-
-			//try to convert the value with any of the converters:
-			foreach (var converted in converters
-				.Select(p => p.ConvertPropertyValue(currentValue))
-				.Where(converted => converted.Success))
-			{
-				return new Attempt<object>(true, converted.Result);
-			}
-
-			//if none of the converters worked, then we'll process this from what we know
-
-			var sResult = Convert.ToString(currentValue).Trim();
-
-			//this will eat csv strings, so only do it if the decimal also includes a decimal seperator (according to the current culture)
-			if (sResult.Contains(System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator))
-			{
-				decimal dResult;
-				if (decimal.TryParse(sResult, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out dResult))
-				{
-					return new Attempt<object>(true, dResult);
-				}
-			}
-			//process string booleans as booleans
-			if (sResult.InvariantEquals("true"))
-			{
-				return new Attempt<object>(true, true);
-			}
-			if (sResult.InvariantEquals("false"))
-			{
-				return new Attempt<object>(true, false);
-			}
-
-			//a really rough check to see if this may be valid xml
-			//TODO: This is legacy code, I'm sure there's a better and nicer way
-			if (sResult.StartsWith("<") && sResult.EndsWith(">") && sResult.Contains("/"))
-			{
-				try
-				{
-					var e = XElement.Parse(DynamicXml.StripDashesInElementOrAttributeNames(sResult), LoadOptions.None);
-
-					//check that the document element is not one of the disallowed elements
-					//allows RTE to still return as html if it's valid xhtml
-					var documentElement = e.Name.LocalName;
-
-					//TODO: See note against this setting, pretty sure we don't need this
-					if (!UmbracoSettings.NotDynamicXmlDocumentElements.Any(
-						tag => string.Equals(tag, documentElement, StringComparison.CurrentCultureIgnoreCase)))
-					{
-						return new Attempt<object>(true, new DynamicXml(e));
-					}
-					return Attempt<object>.False;
-				}
-				catch (Exception)
-				{
-					return Attempt<object>.False;
-				}
-			}
-			return Attempt<object>.False;
-		}
-
+		
 		#region Index/Position
 		public int Position()
 		{
