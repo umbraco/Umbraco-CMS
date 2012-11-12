@@ -1,6 +1,4 @@
-using Umbraco.Core.Services;
-
-namespace Umbraco.Web.Services
+namespace Umbraco.Core.Services
 {
     /// <summary>
     /// Represents the ServiceFactory, which provides access to the various services in
@@ -59,7 +57,7 @@ namespace Umbraco.Web.Services
         /// <summary>
         /// Gets the <see cref="IMacroService"/>
         /// </summary>
-        public static IMacroService MacroService
+        internal static IMacroService MacroService
         {
             get { return ServiceContext.Current.MacroService; }
         }

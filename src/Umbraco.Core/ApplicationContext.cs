@@ -4,6 +4,7 @@ using System.Web;
 using System.Web.Caching;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 
 
 namespace Umbraco.Core
@@ -141,5 +142,10 @@ namespace Umbraco.Core
 	    {
 	        get { return DatabaseContext.Current; }
 	    }
+
+        /// <summary>
+        /// Gets the current ServiceContext
+        /// </summary>
+        public ServiceContext Services { get { return ServiceContext.Current; } }
     }
 }

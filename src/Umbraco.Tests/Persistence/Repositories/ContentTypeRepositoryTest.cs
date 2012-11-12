@@ -4,7 +4,6 @@ using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
@@ -28,6 +27,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             base.TearDown();
         }
+
+        //TODO Add test to verify SetDefaultTemplates updates both AllowedTemplates and DefaultTemplate(id).
 
         [Test]
         public void Can_Instantiate_Repository()

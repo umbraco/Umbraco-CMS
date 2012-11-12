@@ -2,9 +2,8 @@ using System;
 using System.Collections.Concurrent;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
-using Umbraco.Core.Services;
 
-namespace Umbraco.Web.Services
+namespace Umbraco.Core.Services
 {
     /// <summary>
     /// The Umbraco ServiceContext, which provides access to the following services:
@@ -116,7 +115,7 @@ namespace Umbraco.Web.Services
         /// <summary>
         /// Gets the <see cref="IMacroService"/>
         /// </summary>
-        public IMacroService MacroService
+        internal IMacroService MacroService
         {
             get { return _cache[typeof(IMacroService).Name] as IMacroService; }
         }

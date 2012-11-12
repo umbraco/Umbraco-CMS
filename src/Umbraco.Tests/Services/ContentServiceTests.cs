@@ -4,10 +4,8 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Web.Services;
 
 namespace Umbraco.Tests.Services
 {
@@ -28,6 +26,7 @@ namespace Umbraco.Tests.Services
         }
 
         //TODO Add test to verify there is only ONE newest document/content in cmsDocument table after updating.
+        //TODO Add test to delete specific version (with and without deleting prior versions) and versions by date.
 
         [Test]
         public void Can_Create_Content()

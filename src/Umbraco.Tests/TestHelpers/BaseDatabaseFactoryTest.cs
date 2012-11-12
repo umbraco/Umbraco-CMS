@@ -10,10 +10,10 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Services;
 using umbraco.BusinessLogic;
 
 namespace Umbraco.Tests.TestHelpers

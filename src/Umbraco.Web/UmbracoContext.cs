@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Services;
 using umbraco;
 using umbraco.IO;
 using umbraco.presentation;
@@ -103,12 +103,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the current ApplicationContext
         /// </summary>
-        public ApplicationContext Application { get; private set; }
-
-        /// <summary>
-        /// Gets the current ServiceContext
-        /// </summary>
-        public ServiceContext Services { get { return ServiceContext.Current; } }
+        public ApplicationContext Application { get; private set; }       
 
         /// <summary>
         /// Gets the <see cref="IRoutesCache"/>

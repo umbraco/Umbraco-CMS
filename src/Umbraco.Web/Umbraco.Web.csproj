@@ -313,16 +313,6 @@
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Routing\LookupByPageIdQuery.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
-    <Compile Include="Services\ContentService.cs" />
-    <Compile Include="Services\ContentTypeService.cs" />
-    <Compile Include="Services\DataTypeService.cs" />
-    <Compile Include="Services\FileService.cs" />
-    <Compile Include="Services\LocalizationService.cs" />
-    <Compile Include="Services\MacroService.cs" />
-    <Compile Include="Services\MediaService.cs" />
-    <Compile Include="Services\ServiceContext.cs" />
-    <Compile Include="Services\ServiceFactory.cs" />
-    <Compile Include="Services\UserService.cs" />
     <Compile Include="Strategies\DeletedTemplate.cs" />
     <Compile Include="Strategies\TrashedContent.cs" />
     <Compile Include="Strategies\UpdateContentCache.cs" />
@@ -2168,9 +2158,7 @@
       <CachedSettingsPropName>umbraco_org_umbraco_update_CheckForUpgrade</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Publishing\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

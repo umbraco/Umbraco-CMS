@@ -8,7 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Publishing;
-using Umbraco.Web.Services;
+using Umbraco.Core.Services;
 using umbraco.interfaces;
 using umbraco.presentation.nodeFactory;
 using Node = umbraco.NodeFactory.Node;

@@ -1,13 +1,11 @@
 using System;
 using System.Web;
-using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Services;
 
-namespace Umbraco.Web.Services
+namespace Umbraco.Core.Services
 {
     /// <summary>
     /// Represents the UserService, which is an easy access to operations involving <see cref="IProfile"/> and eventually Users and Members.

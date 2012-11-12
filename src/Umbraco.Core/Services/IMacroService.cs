@@ -6,7 +6,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Defines the ContentService, which is an easy access to operations involving <see cref="IMacro"/>
     /// </summary>
-    public interface IMacroService : IService
+    internal interface IMacroService : IService
     {
         //TODO Possibly create import macro method and ToXml?
 

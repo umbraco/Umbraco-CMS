@@ -408,6 +408,10 @@
     <Compile Include="Serialization\ServiceStackJsonSerializer.cs" />
     <Compile Include="Serialization\ServiceStackXmlSerializer.cs" />
     <Compile Include="Serialization\StreamedResult.cs" />
+    <Compile Include="Services\ContentService.cs" />
+    <Compile Include="Services\ContentTypeService.cs" />
+    <Compile Include="Services\DataTypeService.cs" />
+    <Compile Include="Services\FileService.cs" />
     <Compile Include="Services\IContentService.cs" />
     <Compile Include="Services\IContentTypeService.cs" />
     <Compile Include="Services\IDataTypeService.cs" />
@@ -417,6 +421,12 @@
     <Compile Include="Services\IMediaService.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\IUserService.cs" />
+    <Compile Include="Services\LocalizationService.cs" />
+    <Compile Include="Services\MacroService.cs" />
+    <Compile Include="Services\MediaService.cs" />
+    <Compile Include="Services\ServiceContext.cs" />
+    <Compile Include="Services\ServiceFactory.cs" />
+    <Compile Include="Services\UserService.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="ReadLock.cs" />
     <Compile Include="TypeFinder.cs" />
