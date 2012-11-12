@@ -144,6 +144,8 @@ namespace Umbraco.Core.Persistence.Repositories
             //TODO check for references in DocumentDto and remove value (nullable)
             var list = new List<string>
                            {
+                               string.Format("DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id"),
+                               string.Format("DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id"),
                                string.Format("DELETE FROM cmsDocumentType WHERE templateNodeId = @Id"),
                                string.Format("DELETE FROM cmsTemplate WHERE nodeId = @Id"),
                                string.Format("DELETE FROM umbracoNode WHERE id = @Id")
