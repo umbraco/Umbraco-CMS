@@ -30,7 +30,7 @@ namespace Umbraco.Web
                                    new XAttribute("writerID", content.WriterId),
                                    new XAttribute("creatorID", content.CreatorId),
                                    new XAttribute("nodeType", content.ContentType.Id),
-                                   new XAttribute("template", content.Template.Id.ToString()),
+                                   new XAttribute("template", content.Template == null ? string.Empty : content.Template.Id.ToString()),
                                    new XAttribute("sortOrder", content.SortOrder),
                                    new XAttribute("createDate", content.CreateDate),
                                    new XAttribute("updateDate", content.UpdateDate),
@@ -63,6 +63,7 @@ namespace Umbraco.Web
         public static XElement ToXml(this IContent content, bool isPreview)
         {
             //TODO Do a proper implementation of this
+            //If current IContent is published we should get latest unpublished version
             return content.ToXml();
         } 
     }

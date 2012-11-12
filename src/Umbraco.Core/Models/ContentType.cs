@@ -30,7 +30,7 @@ namespace Umbraco.Core.Models
         [DataMember]
         public ITemplate DefaultTemplate
         {
-            get { return AllowedTemplates.FirstOrDefault(x => x.Id == DefaultTemplateId); }
+            get { return AllowedTemplates.FirstOrDefault(x => x != null && x.Id == DefaultTemplateId); }
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Umbraco.Core.Models
         public void SetDefaultTemplate(ITemplate template)
         {
             DefaultTemplateId = template.Id;
-            if(_allowedTemplates.Any(x => x.Id == template.Id) == false)
+            if(_allowedTemplates.Any(x => x != null && x.Id == template.Id) == false)
             {
                 var templates = AllowedTemplates.ToList();
                 templates.Add(template);
