@@ -329,9 +329,9 @@ namespace Umbraco.Web
 				ValidateAndSetProperty(valueDictionary, val => DocumentTypeAlias = val, "nodeTypeAlias", "__NodeTypeAlias");
 				ValidateAndSetProperty(valueDictionary, val => DocumentTypeId = int.Parse(val), "nodeType");
 				ValidateAndSetProperty(valueDictionary, val => WriterName = val, "writerName");
-				ValidateAndSetProperty(valueDictionary, val => CreatorName = val, "creatorName");
+				ValidateAndSetProperty(valueDictionary, val => CreatorName = val, "creatorName", "writerName"); //this is a bit of a hack fix for: U4-1132
 				ValidateAndSetProperty(valueDictionary, val => WriterId = int.Parse(val), "writerID");
-				ValidateAndSetProperty(valueDictionary, val => CreatorId = int.Parse(val), "creatorID");
+				ValidateAndSetProperty(valueDictionary, val => CreatorId = int.Parse(val), "creatorID", "writerID"); //this is a bit of a hack fix for: U4-1132
 				ValidateAndSetProperty(valueDictionary, val => Path = val, "path", "__Path");
 				ValidateAndSetProperty(valueDictionary, val => CreateDate = DateTime.Parse(val), "createDate");
 				ValidateAndSetProperty(valueDictionary, val => UpdateDate = DateTime.Parse(val), "updateDate");
