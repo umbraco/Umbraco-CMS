@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -67,7 +68,8 @@ namespace Umbraco.Tests
 					{"FALSE", false},
 					{"False", false},
 					{"false", false},
-					{"0", false}
+					{"0", false},
+					{"", false}
 				};
 
 			foreach (var testCase in testCases)
@@ -76,6 +78,34 @@ namespace Umbraco.Tests
 
 				Assert.IsTrue(result.Success);
 				Assert.AreEqual(testCase.Value, result.Result);
+			}
+		}
+
+		[Test]
+		[TestOnlyInFullTrust]
+		public virtual void CanConvertStringToDateTime()
+		{
+			var dateTime = new DateTime(2012, 11, 10, 13, 14, 15);
+			var testCases = new Dictionary<string, bool>
+			{
+				{"2012-11-10", true},
+				{"2012/11/10", true},
+				{"10/11/2012", true},
+				{"11/10/2012", false},
+				{"Sat 10, Nov 2012", true},
+				{"Saturday 10, Nov 2012", true},
+				{"Sat 10, November 2012", true},
+				{"Saturday 10, November 2012", true},
+				{"2012-11-10 13:14:15", true},
+				{"", false}
+			};
+
+			foreach (var testCase in testCases)
+			{
+				var result = testCase.Key.TryConvertTo<DateTime>();
+
+				Assert.IsTrue(result.Success);
+				Assert.AreEqual(DateTime.Equals(dateTime.Date, result.Result.Date), testCase.Value);
 			}
 		}
 

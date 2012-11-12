@@ -63,6 +63,7 @@
     <Compile Include="HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="IO\IOHelperTest.cs" />
     <Compile Include="LibraryTests.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorValueConverterTests.cs" />
     <Compile Include="Resolvers\ActionsResolverTests.cs" />
     <Compile Include="AsynchronousRollingFileAppenderTests.cs" />
     <Compile Include="BusinessLogic\ApplicationTest.cs" />

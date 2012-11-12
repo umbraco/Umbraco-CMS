@@ -324,6 +324,7 @@ namespace umbraco.editorControls.tinyMCE3
         public virtual void Save()
         {
             string parsedString = base.Text.Trim();
+            string parsedStringForTinyMce = parsedString;
             if (parsedString != string.Empty)
             {
                 parsedString = replaceMacroTags(parsedString).Trim();
@@ -370,19 +371,22 @@ namespace umbraco.editorControls.tinyMCE3
                     parsedString = parsedString.Replace(helper.GetBaseUrl(HttpContext.Current) + "/#", "#");
                     parsedString = parsedString.Replace(helper.GetBaseUrl(HttpContext.Current), "");
                 }
+	            // if a paragraph is empty, remove it
+	            if (parsedString.ToLower() == "<p></p>")
+                parsedString = "";
+	  
+	            // save string after all parsing is done, but before CDATA replacement - to put back into TinyMCE
+	            parsedStringForTinyMce = parsedString;
 
                 //Allow CDATA nested into RTE without exceptions
                 // GE 2012-01-18
                 parsedString = parsedString.Replace("<![CDATA[", "<!--CDATAOPENTAG-->").Replace("]]>", "<!--CDATACLOSETAG-->");
-
-                // if text is an empty parargraph, make it all empty
-                if (parsedString.ToLower() == "<p></p>")
-                    parsedString = "";
             }
+
             _data.Value = parsedString;
 
             // update internal webcontrol value with parsed result
-            base.Text = parsedString;
+            base.Text = parsedStringForTinyMce;
         }
 
         #endregion
