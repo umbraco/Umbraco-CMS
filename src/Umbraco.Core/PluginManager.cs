@@ -7,6 +7,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Web.Caching;
+using System.Web.Compilation;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
@@ -33,8 +35,29 @@ namespace Umbraco.Core
 	/// </remarks>
 	internal class PluginManager
 	{
+		private readonly ApplicationContext _appContext;
 
-		internal PluginManager()
+		/// <summary>
+		/// Creates a new PluginManager with an ApplicationContext instance which ensures that the plugin xml 
+		/// file is cached temporarily until app startup completes.
+		/// </summary>
+		/// <param name="appContext"></param>
+		/// <param name="detectBinChanges"></param>
+		internal PluginManager(ApplicationContext appContext, bool detectBinChanges = true)
+			: this(detectBinChanges)
+		{
+			if (appContext == null) throw new ArgumentNullException("appContext");
+			_appContext = appContext;
+		}
+
+		/// <summary>
+		/// Creates a new PluginManager
+		/// </summary>
+		/// <param name="detectBinChanges">
+		/// If true will detect changes in the /bin folder and therefor load plugins from the 
+		/// cached plugins file if one is found. If false will never use the cache file for plugins
+		/// </param>
+		internal PluginManager(bool detectBinChanges = true)
 		{
 			_tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
 			//create the folder if it doesn't exist
@@ -42,13 +65,24 @@ namespace Umbraco.Core
 			{
 				Directory.CreateDirectory(_tempFolder);
 			}
-			//do the check if they've changed
-			HaveAssembliesChanged = CachedAssembliesHash != CurrentAssembliesHash;
-			//if they have changed, we need to write the new file
-			if (HaveAssembliesChanged)
+
+			if (detectBinChanges)
 			{
-				WriteCachePluginsHash();
+				//first check if the cached hash is 0, if it is then we ne
+				//do the check if they've changed
+				HaveAssembliesChanged = (CachedAssembliesHash != CurrentAssembliesHash) || CachedAssembliesHash == 0;					
+				//if they have changed, we need to write the new file
+				if (HaveAssembliesChanged)
+				{
+					WriteCachePluginsHash();
+				}	
 			}
+			else
+			{
+				//always set to true if we're not detecting (generally only for testing)
+				HaveAssembliesChanged = true;
+			}
+			
 		}
 
 		static PluginManager _resolver;
@@ -72,7 +106,9 @@ namespace Umbraco.Core
 					if (_resolver == null)
 					{
 						l.UpgradeToWriteLock();
-						_resolver = new PluginManager();
+						_resolver = ApplicationContext.Current == null 
+							? new PluginManager() 
+							: new PluginManager(ApplicationContext.Current);
 					}
 					return _resolver;
 				}
@@ -180,37 +216,49 @@ namespace Umbraco.Core
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		internal Attempt<IEnumerable<Tuple<string, string>>> TryGetCachedPluginsFromFile<T>()
+		internal Attempt<IEnumerable<string>> TryGetCachedPluginsFromFile<T>()
 		{
 			var filePath = Path.Combine(_tempFolder, "umbraco-plugins.list");
 			if (!File.Exists(filePath))
-				return Attempt<IEnumerable<Tuple<string, string>>>.False;
+				return Attempt<IEnumerable<string>>.False;
 
 			try
 			{
-				var xml = XDocument.Load(filePath);
+				//we will load the xml document, if the app context exist, we will load it from the cache (which is only around for 5 minutes)
+				//while the app boots up, this should save some IO time on app startup when the app context is there (which is always unless in unit tests)
+				XDocument xml;
+				if (_appContext != null)
+				{
+					xml = _appContext.ApplicationCache.GetCacheItem("umbraco-plugins.list",
+						new TimeSpan(0, 0, 5, 0),
+						() => XDocument.Load(filePath));	
+				}
+				else
+				{
+					xml = XDocument.Load(filePath);
+				}
+
+				
 				if (xml.Root == null)
-					return Attempt<IEnumerable<Tuple<string, string>>>.False;
+					return Attempt<IEnumerable<string>>.False;
 
 				var typeElement = xml.Root.Elements()
 					.SingleOrDefault(x =>
 					                 x.Name.LocalName == "baseType"
 					                 && ((string) x.Attribute("type")) == typeof (T).FullName);
 				if (typeElement == null)
-					return Attempt<IEnumerable<Tuple<string, string>>>.False;
+					return Attempt<IEnumerable<string>>.False;
 
 				//return success
-				return new Attempt<IEnumerable<Tuple<string, string>>>(
+				return new Attempt<IEnumerable<string>>(
 					true,
 					typeElement.Elements("add")
-						.Select(x => new Tuple<string, string>(
-							             (string) x.Attribute("type"),
-							             (string) x.Attribute("assembly"))));
+						.Select(x => (string) x.Attribute("type")));
 			}
 			catch (Exception)
 			{
 				//if the file is corrupted, etc... return false
-				return Attempt<IEnumerable<Tuple<string, string>>>.False;
+				return Attempt<IEnumerable<string>>.False;
 			}
 		}
 
@@ -268,10 +316,9 @@ namespace Umbraco.Core
 
 			//now we have the type element, we need to clear any previous types as children and add/update it with new ones
 			typeElement.ReplaceNodes(typesFound
-										 .Select(x =>
-												 new XElement("add",
-															  new XAttribute("type", x.FullName),
-															  new XAttribute("assembly", x.Assembly.FullName))));
+				                         .Select(x =>
+				                                 new XElement("add",
+				                                              new XAttribute("type", x.AssemblyQualifiedName))));
 			//save the xml file
 			xml.Save(filePath);				
 		}
@@ -444,15 +491,17 @@ namespace Umbraco.Core
 								{
 									try
 									{
-										var type = Assembly.Load(t.Item2).GetType(t.Item1);
-										typeList.AddType(type);
+										//we use the build manager to ensure we get all types loaded, this is slightly slower than
+										//Type.GetType but if the types in the assembly aren't loaded yet then we have problems with that.
+										var type = BuildManager.GetType(t, true);
+										typeList.AddType(type);										
 									}
 									catch (Exception ex)
 									{
 										//if there are any exceptions loading types, we have to exist, this should never happen so 
 										//we will need to revert to scanning for types.
 										successfullyLoadedFromCache = false;
-										LogHelper.Error<PluginManager>("Could not load a cached plugin type: " + t.Item1 + " in assembly: " + t.Item2 + " now reverting to re-scanning assemblies for the base type: " + typeof (T).FullName, ex);
+										LogHelper.Error<PluginManager>("Could not load a cached plugin type: " + t + " now reverting to re-scanning assemblies for the base type: " + typeof (T).FullName, ex);
 										break;
 									}									
 								}
@@ -460,6 +509,10 @@ namespace Umbraco.Core
 								{
 									//we need to manually load by scanning if loading from the file was not successful.
 									LoadViaScanningAndUpdateCacheFile<T>(typeList, finder);	
+								}
+								else
+								{
+									LogHelper.Debug<PluginManager>("Loaded plugin types " + typeof(T).FullName + " from persisted cache");
 								}
 							}
 						}

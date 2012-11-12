@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Web.Compilation;
 using NUnit.Framework;
 using SqlCE4Umbraco;
 using Umbraco.Core;
@@ -15,6 +17,7 @@ using umbraco.MacroEngines.Iron;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.editorControls;
+using umbraco.interfaces;
 using umbraco.uicontrols;
 using umbraco.cms;
 
@@ -31,7 +34,7 @@ namespace Umbraco.Tests
 			TestHelper.SetupLog4NetForTests();
 
 			//this ensures its reset
-			PluginManager.Current = new PluginManager();
+			PluginManager.Current = new PluginManager(false);
 
 			//for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
 			//TODO: Should probably update this so it only searches this assembly and add custom types to be found
@@ -69,19 +72,97 @@ namespace Umbraco.Tests
 			return dir;
 		}
 
+		//[Test]
+		//public void Scan_Vs_Load_Benchmark()
+		//{
+		//	var pluginManager = new PluginManager(false);
+		//	var watch = new Stopwatch();
+		//	watch.Start();
+		//	for (var i = 0; i < 1000; i++)
+		//	{
+		//		var type2 = Type.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+		//		var type3 = Type.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+		//		var type4 = Type.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+		//		var type5 = Type.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+		//	}
+		//	watch.Stop();
+		//	Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
+		//	watch.Start();
+		//	for (var i = 0; i < 1000; i++)
+		//	{
+		//		var type2 = BuildManager.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+		//		var type3 = BuildManager.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+		//		var type4 = BuildManager.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+		//		var type5 = BuildManager.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+		//	}
+		//	watch.Stop();
+		//	Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
+		//	watch.Reset();
+		//	watch.Start();
+		//	for (var i = 0; i < 1000; i++)
+		//	{
+		//		var refreshers = pluginManager.ResolveTypes<ICacheRefresher>(false);
+		//	}
+		//	watch.Stop();
+		//	Debug.WriteLine("TOTAL TIME (2nd round): " + watch.ElapsedMilliseconds);
+		//}
+
+		////NOTE: This test shows that Type.GetType is 100% faster than Assembly.Load(..).GetType(...) so we'll use that :)
+		//[Test]
+		//public void Load_Type_Benchmark()
+		//{
+		//	var watch = new Stopwatch();
+		//	watch.Start();
+		//	for (var i = 0; i < 1000; i++)
+		//	{
+		//		var type2 = Type.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+		//		var type3 = Type.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+		//		var type4 = Type.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+		//		var type5 = Type.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+		//	}
+		//	watch.Stop();
+		//	Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
+		//	watch.Reset();
+		//	watch.Start();
+		//	for (var i = 0; i < 1000; i++)
+		//	{
+		//		var type2 = Assembly.Load("umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null")
+		//			.GetType("umbraco.macroCacheRefresh");
+		//		var type3 = Assembly.Load("umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null")
+		//			.GetType("umbraco.templateCacheRefresh");
+		//		var type4 = Assembly.Load("umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null")
+		//			.GetType("umbraco.presentation.cache.MediaLibraryRefreshers");
+		//		var type5 = Assembly.Load("umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null")
+		//			.GetType("umbraco.presentation.cache.pageRefresher");
+		//	}
+		//	watch.Stop();
+		//	Debug.WriteLine("TOTAL TIME (2nd round): " + watch.ElapsedMilliseconds);
+		//	watch.Reset();
+		//	watch.Start();
+		//	for (var i = 0; i < 1000; i++)
+		//	{
+		//		var type2 = BuildManager.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+		//		var type3 = BuildManager.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+		//		var type4 = BuildManager.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+		//		var type5 = BuildManager.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+		//	}
+		//	watch.Stop();
+		//	Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
+		//}
+
 		[Test]
 		public void Create_Cached_Plugin_File()
 		{
 			var types = new[] {typeof (PluginManager), typeof (PluginManagerTests), typeof (UmbracoContext)};
 
-			var manager = new PluginManager();
+			var manager = new PluginManager(false);
 			//yes this is silly, none of these types inherit from string, but this is just to test the xml file format
 			manager.UpdateCachedPluginsFile<string>(types);
 
 			var plugins = manager.TryGetCachedPluginsFromFile<string>();
 			Assert.IsTrue(plugins.Success);
 			Assert.AreEqual(3, plugins.Result.Count());
-			var shouldContain = types.Select(x => new System.Tuple<string, string>(x.FullName, x.Assembly.FullName));
+			var shouldContain = types.Select(x => x.AssemblyQualifiedName);
 			//ensure they are all found
 			Assert.IsTrue(plugins.Result.ContainsAll(shouldContain));
 		}

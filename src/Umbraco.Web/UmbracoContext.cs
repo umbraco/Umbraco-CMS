@@ -47,6 +47,8 @@ namespace Umbraco.Web
             if (httpContext == null) throw new ArgumentNullException("httpContext");
             if (applicationContext == null) throw new ArgumentNullException("applicationContext");
 
+    		ObjectCreated = DateTime.Now;
+
             HttpContext = httpContext;            
             Application = applicationContext;
         	RoutesCache = routesCache;
@@ -98,6 +100,13 @@ namespace Umbraco.Web
                 }
             }
         }
+
+		/// <summary>
+		/// This is used internally for performance calculations, the ObjectCreated DateTime is set as soon as this
+		/// object is instantiated which in the web site is created during the BeginRequest phase.
+		/// We can then determine complete rendering time from that.
+		/// </summary>
+		internal DateTime ObjectCreated { get; private set; }
 
         /// <summary>
         /// Gets the current ApplicationContext
