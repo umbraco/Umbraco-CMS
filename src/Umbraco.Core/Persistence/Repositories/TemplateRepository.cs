@@ -33,6 +33,12 @@ namespace Umbraco.Core.Persistence.Repositories
             EnsureDepedencies();
         }
 
+        internal TemplateRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem) : base(work, cache)
+        {
+            _masterpagesFileSystem = masterpageFileSystem;
+            _viewsFileSystem = viewFileSystem;
+        }
+
         private void EnsureDepedencies()
         {
             _masterpagesFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider("masterpages");
