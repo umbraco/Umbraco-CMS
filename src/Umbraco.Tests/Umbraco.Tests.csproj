@@ -83,6 +83,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Auditing\AuditTests.cs" />
     <Compile Include="BusinessLogic\DictionaryTest.cs" />
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="Configurations\RepositorySettingsTests.cs" />

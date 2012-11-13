@@ -60,7 +60,10 @@
     <Compile Include="ApplicationContext.cs" />
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Attempt.cs" />
+    <Compile Include="Auditing\AuditTrail.cs" />
     <Compile Include="Auditing\Audit.cs" />
+    <Compile Include="Auditing\AuditTypes.cs" />
+    <Compile Include="Auditing\DataAuditWriteProvider.cs" />
     <Compile Include="Auditing\IAuditWriteProvider.cs" />
     <Compile Include="CacheHelper.cs" />
     <Compile Include="CodeAnnotations\UmbracoDeprecateAttribute.cs" />

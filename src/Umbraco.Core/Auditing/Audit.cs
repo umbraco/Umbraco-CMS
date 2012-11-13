@@ -1,7 +1,10 @@
 ﻿namespace Umbraco.Core.Auditing
 {
-    public class Audit
+    public static class Audit
     {
-        public IAuditWriteProvider WriteProvider { get; set; }
+         public static void Add(AuditTypes type, string comment, int userId, int objectId)
+         {
+             AuditTrail.Current.AddEntry(type, comment, userId, objectId);
+         }
     }
 }

@@ -130,11 +130,26 @@ namespace Umbraco.Core.Services
         void Save(IContent content, int userId = -1);
 
         /// <summary>
-        /// Saves a collection of <see cref="IContent"/> objects
+        /// Saves a collection of <see cref="IContent"/> objects.
         /// </summary>
+        /// <remarks>
+        /// If the collection of content contains new objects that references eachother by Id or ParentId,
+        /// then use the overload Save method with a collection of Lazy <see cref="IContent"/>.
+        /// </remarks>
         /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
         void Save(IEnumerable<IContent> contents, int userId = -1);
+
+        /// <summary>
+        /// Saves a collection of lazy loaded <see cref="IContent"/> objects.
+        /// </summary>
+        /// <remarks>
+        /// This method ensures that Content is saved lazily, so a new graph of <see cref="IContent"/>
+        /// objects can be saved in bulk. But not that objects are saved one at a time to ensure Ids.
+        /// </remarks>
+        /// <param name="contents">Collection of Lazy <see cref="IContent"/> to save</param>
+        /// <param name="userId">Optional Id of the User saving the Content</param>
+        void Save(IEnumerable<Lazy<IContent>> contents, int userId = -1);
 
         /// <summary>
         /// Deletes all content of specified type. All children of deleted content is moved to Recycle Bin.

@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Models
 {
@@ -16,7 +15,7 @@ namespace Umbraco.Core.Models
     public abstract class ContentBase : Entity, IContentBase
     {
         protected IContentTypeComposition ContentTypeBase;
-        private int _parentId;
+        private Lazy<int> _parentId;
         private string _name;
         private int _sortOrder;
         private int _level;
@@ -28,11 +27,13 @@ namespace Umbraco.Core.Models
 
         protected ContentBase(int parentId, IContentTypeComposition contentType, PropertyCollection properties)
         {
-            Mandate.ParameterCondition(parentId != 0, "parentId");
+            //Mandate.ParameterCondition(parentId != 0, "parentId");
             Mandate.ParameterNotNull(contentType, "contentType");
             Mandate.ParameterNotNull(properties, "properties");
 
-            _parentId = parentId;
+            //_parentId = parentId;
+            _parentId = new Lazy<int>(() => parentId);
+
             _contentTypeId = int.Parse(contentType.Id.ToString(CultureInfo.InvariantCulture));
             ContentTypeBase = contentType;
             _properties = properties;
@@ -62,10 +63,10 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual int ParentId
         {
-            get { return _parentId; }
+            get { return _parentId.Value; }
             set
             {
-                _parentId = value;
+                _parentId = new Lazy<int>(() => value);
                 OnPropertyChanged(ParentIdSelector);
             }
         }

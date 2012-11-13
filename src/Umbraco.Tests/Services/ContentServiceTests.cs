@@ -4,6 +4,9 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -467,6 +470,20 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Bulk_Save_New_Hierarchy_Content()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var hierarchy = CreateContentHierarchy();
+
+            // Act
+            contentService.Save(hierarchy, 0);
+
+            Assert.That(hierarchy.Any(), Is.True);
+            Assert.That(hierarchy.Any(x => x.Value.HasIdentity == false), Is.False);
+        }
+
+        [Test]
         public void Can_Delete_Content_Of_Specific_ContentType()
         {
             // Arrange
@@ -561,6 +578,7 @@ namespace Umbraco.Tests.Services
             Assert.AreNotEqual(content.Name, copy.Name);
         }
 
+        [Test, NUnit.Framework.Ignore]
         public void Can_Send_To_Publication()
         { }
 
@@ -583,6 +601,34 @@ namespace Umbraco.Tests.Services
             Assert.AreNotEqual(rollback.Version, version);
             Assert.That(rollback.GetValue<string>("author"), Is.Not.EqualTo("Jane Doe"));
             Assert.AreEqual(subpage2.Name, rollback.Name);
+        }
+
+        [Test]
+        public void Can_Save_Lazy_Content()
+        {
+            var unitOfWork = new PetaPocoUnitOfWork();
+            var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
+            var root = ServiceContext.ContentService.GetById(1046);
+
+            var c = new Lazy<IContent>(() => MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Page", root.Id));
+            var c2 = new Lazy<IContent>(() => MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage", c.Value.Id));
+            var list = new List<Lazy<IContent>> {c, c2};
+
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
+            foreach (var content in list)
+            {
+                repository.AddOrUpdate(content.Value);
+                unitOfWork.Commit();
+            }
+
+            Assert.That(c.Value.HasIdentity, Is.True);
+            Assert.That(c2.Value.HasIdentity, Is.True);
+
+            Assert.That(c.Value.Id > 0, Is.True);
+            Assert.That(c2.Value.Id > 0, Is.True);
+
+            Assert.That(c.Value.ParentId > 0, Is.True);
+            Assert.That(c2.Value.ParentId > 0, Is.True);
         }
 
         [TearDown]
@@ -619,6 +665,39 @@ namespace Umbraco.Tests.Services
             Content trashed = MockedContent.CreateSimpleContent(contentType, "Text Page Deleted", -20);
             trashed.Trashed = true;
             ServiceContext.ContentService.Save(trashed, 0);
+        }
+
+        private IEnumerable<Lazy<IContent>> CreateContentHierarchy()
+        {
+            var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
+            var root = ServiceContext.ContentService.GetById(1046);
+
+            var list = new List<Lazy<IContent>>();
+
+            for (int i = 0; i < 10; i++)
+            {
+                var content = new Lazy<IContent>(
+                    () => MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Page " + i, root.Id));
+                list.Add(content);
+                list.AddRange(CreateChildrenOf(contentType, content, 4));
+
+                Console.WriteLine("Created: 'Hierarchy Simple Text Page {0}'", i);
+            }
+
+            return list;
+        }
+
+        private IEnumerable<Lazy<IContent>> CreateChildrenOf(IContentType contentType, Lazy<IContent> content, int depth)
+        {
+            var list = new List<Lazy<IContent>>();
+            for (int i = 0; i < depth; i++)
+            {
+                var c = new Lazy<IContent>(() => MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage " + i, content.Value.Id));
+                list.Add(c);
+
+                Console.WriteLine("Created: 'Hierarchy Simple Text Subpage {0}' - Depth: {1}", i, depth);
+            }
+            return list;
         }
     }
 }

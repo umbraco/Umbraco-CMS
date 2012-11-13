@@ -429,19 +429,57 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Saves a collection of <see cref="IContent"/> objects
+        /// Saves a collection of <see cref="IContent"/> objects.
         /// </summary>
+        /// <remarks>
+        /// If the collection of content contains new objects that references eachother by Id or ParentId,
+        /// then use the overload Save method with a collection of Lazy <see cref="IContent"/>.
+        /// </remarks>
         /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
         public void Save(IEnumerable<IContent> contents, int userId = -1)
         {
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
+            var containsNew = contents.Any(x => x.HasIdentity == false);
+
+            if (containsNew)
+            {
+                foreach (var content in contents)
+                {
+                    SetWriter(content, userId);
+                    repository.AddOrUpdate(content);
+                    _unitOfWork.Commit();
+                }
+            }
+            else
+            {
+                foreach (var content in contents)
+                {
+                    SetWriter(content, userId);
+                    repository.AddOrUpdate(content);
+                }
+                _unitOfWork.Commit();
+            }
+        }
+
+        /// <summary>
+        /// Saves a collection of lazy loaded <see cref="IContent"/> objects.
+        /// </summary>
+        /// <remarks>
+        /// This method ensures that Content is saved lazily, so a new graph of <see cref="IContent"/>
+        /// objects can be saved in bulk. But not that objects are saved one at a time to ensure Ids.
+        /// </remarks>
+        /// <param name="contents">Collection of Lazy <see cref="IContent"/> to save</param>
+        /// <param name="userId">Optional Id of the User saving the Content</param>
+        public void Save(IEnumerable<Lazy<IContent>> contents, int userId = -1)
+        {
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
             foreach (var content in contents)
             {
-                SetWriter(content, userId);
-                repository.AddOrUpdate(content);
+                SetWriter(content.Value, userId);
+                repository.AddOrUpdate(content.Value);
+                _unitOfWork.Commit();
             }
-            _unitOfWork.Commit();
         }
 
         /// <summary>
