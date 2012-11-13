@@ -93,7 +93,7 @@ namespace umbraco.settings
 					currentItem.setValue(int.Parse(t.ID),t.Text);
 				}
 			}
-            speechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "dictionaryItemSaved"),"");	
+            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "dictionaryItemSaved"), "");	
 		}
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)
