@@ -17,6 +17,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using umbraco.interfaces;
+using File = System.IO.File;
 
 namespace Umbraco.Core
 {

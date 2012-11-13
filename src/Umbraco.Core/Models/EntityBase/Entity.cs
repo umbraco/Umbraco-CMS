@@ -16,7 +16,7 @@ namespace Umbraco.Core.Models.EntityBase
     {
         private bool _hasIdentity;
         private int? _hash;
-        private Lazy<int> _id;
+        private int _id;
         private Guid _key;
 
         /// <summary>
@@ -27,11 +27,11 @@ namespace Umbraco.Core.Models.EntityBase
         {
             get
             {
-                return _id == null ? default(int) : _id.Value;
+                return _id;
             }
             set
             {
-                _id = new Lazy<int>(() => value);
+                _id = value;
                 HasIdentity = true;
             }
         }
@@ -47,7 +47,7 @@ namespace Umbraco.Core.Models.EntityBase
             get
             {
                 if (_key == Guid.Empty)
-                    return _id.Value.ToGuid();
+                    return _id.ToGuid();
 
                 return _key;
             }
@@ -88,7 +88,7 @@ namespace Umbraco.Core.Models.EntityBase
         protected void ResetIdentity()
         {
             _hasIdentity = false;
-            _id = new Lazy<int>(() => default(int));
+            _id = default(int);
         }
 
         /// <summary>
