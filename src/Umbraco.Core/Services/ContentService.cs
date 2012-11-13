@@ -78,6 +78,20 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets an <see cref="IContent"/> object by its 'UniqueId'
+        /// </summary>
+        /// <param name="key">Guid key of the Content to retrieve</param>
+        /// <returns><see cref="IContent"/></returns>
+        public IContent GetById(Guid key)
+        {
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
+            var query = Query<IContent>.Builder.Where(x => x.Key == key);
+            var contents = repository.GetByQuery(query);
+            return contents.SingleOrDefault();
+        }
+
+
+        /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by the Id of the <see cref="IContentType"/>
         /// </summary>
         /// <param name="id">Id of the <see cref="IContentType"/></param>
@@ -740,7 +754,7 @@ namespace Umbraco.Core.Services
                 //If a user id was passed in we use that
                 content.CreatorId = userId;
             }
-            else if(_userService != null)
+            else if (UserServiceOrContext())
             {
                 var profile = _httpContext == null
                                   ? _userService.GetCurrentBackOfficeUser()
@@ -766,7 +780,7 @@ namespace Umbraco.Core.Services
                 //If a user id was passed in we use that
                 content.WriterId = userId;
             }
-            else if (_userService != null)
+            else if (UserServiceOrContext())
             {
                 var profile = _httpContext == null
                                   ? _userService.GetCurrentBackOfficeUser()
@@ -778,6 +792,11 @@ namespace Umbraco.Core.Services
                 //Otherwise we default to Admin user, which should always exist (almost always)
                 content.WriterId = 0;
             }
+        }
+
+        private bool UserServiceOrContext()
+        {
+            return _userService != null && (HttpContext.Current != null || _httpContext != null);
         }
 
         //TODO Add method to remove versions from Content

@@ -32,6 +32,13 @@ namespace Umbraco.Core.Services
         IContent GetById(int id);
 
         /// <summary>
+        /// Gets an <see cref="IContent"/> object by its 'UniqueId'
+        /// </summary>
+        /// <param name="key">Guid key of the Content to retrieve</param>
+        /// <returns><see cref="IContent"/></returns>
+        IContent GetById(Guid key);
+
+        /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by the Id of the <see cref="IContentType"/>
         /// </summary>
         /// <param name="id">Id of the <see cref="IContentType"/></param>

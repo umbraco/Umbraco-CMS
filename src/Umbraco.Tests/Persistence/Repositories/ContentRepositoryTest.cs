@@ -295,18 +295,56 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(result, Is.GreaterThanOrEqualTo(2));
         }
 
+        [Test]
+        public void Can_Verify_Keys_Set()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
+
+            // Act
+            var textpage = repository.Get(1046);
+            var subpage = repository.Get(1047);
+
+            // Assert
+            Assert.That(textpage.Key.ToString().ToUpper(), Is.EqualTo("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+            Assert.That(subpage.Key.ToString().ToUpper(), Is.EqualTo("FF11402B-7E53-4654-81A7-462AC2108059"));
+        }
+
+        [Test]
+        public void Can_Get_Content_By_Guid_Key()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
+
+            // Act
+            var query = Query<IContent>.Builder.Where(x => x.Key == new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
+            var content = repository.GetByQuery(query).SingleOrDefault();
+
+            // Assert
+            Assert.That(content, Is.Not.Null);
+            Assert.That(content.Id, Is.EqualTo(1046));
+
+        }
+
         public void CreateTestData()
         {
             //Create and Save ContentType "umbTextpage" -> 1045
             ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+            contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
             ServiceContext.ContentTypeService.Save(contentType);
 
             //Create and Save Content "Homepage" based on "umbTextpage" -> 1046
             Content textpage = MockedContent.CreateSimpleContent(contentType);
+            textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
             ServiceContext.ContentService.Save(textpage, 0);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1047
             Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
+            subpage.Key = new Guid("FF11402B-7E53-4654-81A7-462AC2108059");
             ServiceContext.ContentService.Save(subpage, 0);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1048

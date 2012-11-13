@@ -327,7 +327,9 @@ namespace Umbraco.Core.Models
         internal override void AddingEntity()
         {
             base.AddingEntity();
-            Key = Guid.NewGuid();
+
+            if(Key == Guid.Empty)
+                Key = Guid.NewGuid();
         }
 
         /// <summary>

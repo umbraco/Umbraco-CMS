@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Can_Create_Content_Using_HttpContext()
+        public void Can_Create_Content_Using_HttpContext_To_Set_User()
         {
             // Arrange
             var userId =
@@ -88,6 +88,44 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Create_Content_Without_HttpContext_To_Set_User()
+        {
+            // Arrange
+            var userId =
+                Convert.ToInt32(
+                    DatabaseContext.Database.Insert(new UserDto
+                                                        {
+                                                            ContentStartId = -1,
+                                                            DefaultPermissions = null,
+                                                            DefaultToLiveEditing = false,
+                                                            Disabled = false,
+                                                            Email = "my@email.com",
+                                                            Login = "editor",
+                                                            MediaStartId = -1,
+                                                            NoConsole = false,
+                                                            Password = "1234",
+                                                            Type = 3,
+                                                            UserLanguage = "en",
+                                                            UserName = "John Doe the Editor"
+                                                        }));
+
+            DatabaseContext.Database.Insert(new UserLoginDto
+                                                {
+                                                    UserId = userId,
+                                                    ContextId = new Guid("FBA996E7-D6BE-489B-B199-2B0F3D2DD826"),
+                                                    Timeout = 634596443995451258
+                                                });
+
+            // Act
+            var content = ServiceContext.ContentService.CreateContent(-1, "umbTextpage");
+
+            // Assert
+            Assert.That(content, Is.Not.Null);
+            Assert.That(content.HasIdentity, Is.False);
+            Assert.That(content.CreatorId, Is.EqualTo(0));//Default to zero/administrator
+        }
+
+        [Test]
         public void Cannot_Create_Content_With_Non_Existing_ContentType_Alias()
         {
             // Arrange
@@ -105,6 +143,20 @@ namespace Umbraco.Tests.Services
 
             // Act
             var content = contentService.GetById(1046);
+
+            // Assert
+            Assert.That(content, Is.Not.Null);
+            Assert.That(content.Id, Is.EqualTo(1046));
+        }
+
+        [Test]
+        public void Can_Get_Content_By_Guid_Key()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+
+            // Act
+            var content = contentService.GetById(new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
 
             // Assert
             Assert.That(content, Is.Not.Null);
@@ -643,10 +695,12 @@ namespace Umbraco.Tests.Services
 
             //Create and Save ContentType "umbTextpage" -> 1045
             ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+            contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
             ServiceContext.ContentTypeService.Save(contentType);
 
             //Create and Save Content "Homepage" based on "umbTextpage" -> 1046
             Content textpage = MockedContent.CreateSimpleContent(contentType);
+            textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
             ServiceContext.ContentService.Save(textpage, 0);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1047
