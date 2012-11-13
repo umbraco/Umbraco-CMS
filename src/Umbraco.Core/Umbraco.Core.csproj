@@ -127,6 +127,7 @@
     <Compile Include="ObjectResolution\SingleObjectResolverBase.cs" />
     <Compile Include="PublishedContentHelper.cs" />
     <Compile Include="RenderingEngine.cs" />
+    <Compile Include="RouteParser.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="ReadLock.cs" />
     <Compile Include="TypeFinder.cs" />

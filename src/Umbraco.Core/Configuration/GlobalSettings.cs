@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Configuration;
+using System.Web.Routing;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.IO;
@@ -57,9 +58,20 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-            	return ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths") 
-					? ConfigurationManager.AppSettings["umbracoReservedPaths"] 
-					: string.Empty;
+				//first we need to get the parsed base path VirtualPaths in the RouteTable.
+				//NOTE: for performance we would normally store this result in a variable, however since this class is static
+				// we cannot gaurantee that all of the routes will be added to the table before this  method is called so 
+				// unfortunately, we are stuck resolving these every single time. I don't think the performance will be bad
+				// but it could be better. Need to fix once we fix up all the configuration classes.
+	            var parser = new RouteParser(RouteTable.Routes);
+	            var reservedFromRouteTable = string.Join(",", parser.ParsedVirtualUrlsFromRouteTable());
+
+	            var config = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths")
+		                         ? ConfigurationManager.AppSettings["umbracoReservedPaths"]
+		                         : string.Empty;
+
+				//now add the reserved paths
+	            return config.IsNullOrWhiteSpace() ? reservedFromRouteTable : config + "," + reservedFromRouteTable;
             }
         }
 
