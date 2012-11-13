@@ -1,4 +1,10 @@
+using System;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Web.Compilation;
 using NUnit.Framework;
 using SqlCE4Umbraco;
 using Umbraco.Core;
@@ -11,6 +17,7 @@ using umbraco.MacroEngines.Iron;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.editorControls;
+using umbraco.interfaces;
 using umbraco.uicontrols;
 using umbraco.cms;
 
@@ -27,7 +34,7 @@ namespace Umbraco.Tests
 			TestHelper.SetupLog4NetForTests();
 
 			//this ensures its reset
-			PluginManager.Current = new PluginManager();
+			PluginManager.Current = new PluginManager(false);
 
 			//for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
 			//TODO: Should probably update this so it only searches this assembly and add custom types to be found
@@ -52,6 +59,160 @@ namespace Umbraco.Tests
 					typeof(UmbracoContext).Assembly,
 					typeof(BaseDataType).Assembly
 			    };
+		}
+
+		private DirectoryInfo PrepareFolder()
+		{
+			var assDir = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
+			var dir = Directory.CreateDirectory(Path.Combine(assDir.FullName, "PluginManager", Guid.NewGuid().ToString("N")));
+			foreach (var f in dir.GetFiles())
+			{
+				f.Delete();
+			}
+			return dir;
+		}
+
+		//[Test]
+		//public void Scan_Vs_Load_Benchmark()
+		//{
+		//	var pluginManager = new PluginManager(false);
+		//	var watch = new Stopwatch();
+		//	watch.Start();
+		//	for (var i = 0; i < 1000; i++)
+		//	{
+		//		var type2 = Type.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+		//		var type3 = Type.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+		//		var type4 = Type.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+		//		var type5 = Type.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+		//	}
+		//	watch.Stop();
+		//	Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
+		//	watch.Start();
+		//	for (var i = 0; i < 1000; i++)
+		//	{
+		//		var type2 = BuildManager.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+		//		var type3 = BuildManager.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+		//		var type4 = BuildManager.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+		//		var type5 = BuildManager.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+		//	}
+		//	watch.Stop();
+		//	Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
+		//	watch.Reset();
+		//	watch.Start();
+		//	for (var i = 0; i < 1000; i++)
+		//	{
+		//		var refreshers = pluginManager.ResolveTypes<ICacheRefresher>(false);
+		//	}
+		//	watch.Stop();
+		//	Debug.WriteLine("TOTAL TIME (2nd round): " + watch.ElapsedMilliseconds);
+		//}
+
+		////NOTE: This test shows that Type.GetType is 100% faster than Assembly.Load(..).GetType(...) so we'll use that :)
+		//[Test]
+		//public void Load_Type_Benchmark()
+		//{
+		//	var watch = new Stopwatch();
+		//	watch.Start();
+		//	for (var i = 0; i < 1000; i++)
+		//	{
+		//		var type2 = Type.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+		//		var type3 = Type.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+		//		var type4 = Type.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+		//		var type5 = Type.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null");
+		//	}
+		//	watch.Stop();
+		//	Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
+		//	watch.Reset();
+		//	watch.Start();
+		//	for (var i = 0; i < 1000; i++)
+		//	{
+		//		var type2 = Assembly.Load("umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null")
+		//			.GetType("umbraco.macroCacheRefresh");
+		//		var type3 = Assembly.Load("umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null")
+		//			.GetType("umbraco.templateCacheRefresh");
+		//		var type4 = Assembly.Load("umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null")
+		//			.GetType("umbraco.presentation.cache.MediaLibraryRefreshers");
+		//		var type5 = Assembly.Load("umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null")
+		//			.GetType("umbraco.presentation.cache.pageRefresher");
+		//	}
+		//	watch.Stop();
+		//	Debug.WriteLine("TOTAL TIME (2nd round): " + watch.ElapsedMilliseconds);
+		//	watch.Reset();
+		//	watch.Start();
+		//	for (var i = 0; i < 1000; i++)
+		//	{
+		//		var type2 = BuildManager.GetType("umbraco.macroCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+		//		var type3 = BuildManager.GetType("umbraco.templateCacheRefresh, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+		//		var type4 = BuildManager.GetType("umbraco.presentation.cache.MediaLibraryRefreshers, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+		//		var type5 = BuildManager.GetType("umbraco.presentation.cache.pageRefresher, umbraco, Version=1.0.4698.259, Culture=neutral, PublicKeyToken=null", true);
+		//	}
+		//	watch.Stop();
+		//	Debug.WriteLine("TOTAL TIME (1st round): " + watch.ElapsedMilliseconds);
+		//}
+
+		[Test]
+		public void Create_Cached_Plugin_File()
+		{
+			var types = new[] {typeof (PluginManager), typeof (PluginManagerTests), typeof (UmbracoContext)};
+
+			var manager = new PluginManager(false);
+			//yes this is silly, none of these types inherit from string, but this is just to test the xml file format
+			manager.UpdateCachedPluginsFile<string>(types);
+
+			var plugins = manager.TryGetCachedPluginsFromFile<string>();
+			Assert.IsTrue(plugins.Success);
+			Assert.AreEqual(3, plugins.Result.Count());
+			var shouldContain = types.Select(x => x.AssemblyQualifiedName);
+			//ensure they are all found
+			Assert.IsTrue(plugins.Result.ContainsAll(shouldContain));
+		}
+
+		[Test]
+		public void PluginHash_From_String()
+		{
+			var s = "hello my name is someone".GetHashCode().ToString("x", CultureInfo.InvariantCulture);
+			var output = PluginManager.ConvertPluginsHashFromHex(s);
+			Assert.AreNotEqual(0, output);
+		}
+
+		[Test]
+		public void Get_Plugins_Hash()
+		{
+			//Arrange
+			var dir = PrepareFolder();
+			var d1 = dir.CreateSubdirectory("1");
+			var d2 = dir.CreateSubdirectory("2");
+			var d3 = dir.CreateSubdirectory("3");
+			var d4 = dir.CreateSubdirectory("4");
+			var f1 = new FileInfo(Path.Combine(d1.FullName, "test1.dll"));
+			var f2 = new FileInfo(Path.Combine(d1.FullName, "test2.dll"));
+			var f3 = new FileInfo(Path.Combine(d2.FullName, "test1.dll"));
+			var f4 = new FileInfo(Path.Combine(d2.FullName, "test2.dll"));
+			var f5 = new FileInfo(Path.Combine(d3.FullName, "test1.dll"));
+			var f6 = new FileInfo(Path.Combine(d3.FullName, "test2.dll"));
+			var f7 = new FileInfo(Path.Combine(d4.FullName, "test1.dll"));
+			f1.CreateText().Close();
+			f2.CreateText().Close();
+			f3.CreateText().Close();
+			f4.CreateText().Close();
+			f5.CreateText().Close();
+			f6.CreateText().Close();
+			f7.CreateText().Close();
+			var list1 = new[] { f1, f2, f3, f4, f5, f6 };
+			var list2 = new[] { f1, f3, f5 };
+			var list3 = new[] { f1, f3, f5, f7 };
+
+			//Act
+			var hash1 = PluginManager.GetAssembliesHash(list1);
+			var hash2 = PluginManager.GetAssembliesHash(list2);
+			var hash3 = PluginManager.GetAssembliesHash(list3);
+
+			//Assert
+
+			//both should be the same since we only create the hash based on the unique folder of the list passed in, yet
+			//all files will exist in those folders still
+			Assert.AreEqual(hash1, hash2);
+			Assert.AreNotEqual(hash1, hash3);
 		}
 
 		[Test]

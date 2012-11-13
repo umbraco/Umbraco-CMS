@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
+using System.Net.Mime;
 using System.Web;
-using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using umbraco.interfaces;
 
@@ -14,6 +13,7 @@ namespace Umbraco.Core
 	/// </summary>
 	public static class PublishedContentExtensions
 	{
+
 		
 
 		#region GetProperty
@@ -41,24 +41,33 @@ namespace Umbraco.Core
 		#endregion
 
 		#region GetPropertyValue
-		public static string GetPropertyValue(this IPublishedContent doc, string alias)
+		public static object GetPropertyValue(this IPublishedContent doc, string alias)
 		{
 			return doc.GetPropertyValue(alias, false);
 		}
-		public static string GetPropertyValue(this IPublishedContent doc, string alias, string fallback)
+		public static object GetPropertyValue(this IPublishedContent doc, string alias, string fallback)
 		{
 			var prop = doc.GetPropertyValue(alias);
-			return !prop.IsNullOrWhiteSpace() ? prop : fallback;
+			return (prop != null && !Convert.ToString(prop).IsNullOrWhiteSpace()) ? prop : fallback;
 		}
-		public static string GetPropertyValue(this IPublishedContent doc, string alias, bool recursive)
+		public static object GetPropertyValue(this IPublishedContent doc, string alias, bool recursive)
 		{
 			var p = doc.GetProperty(alias, recursive);
-			return p == null ? null : Convert.ToString(p.Value);
+			if (p == null) return null;
+
+			//Here we need to put the value through the IPropertyEditorValueConverter's
+			//get the data type id for the current property
+			var dataType = PublishedContentHelper.GetDataType(doc.DocumentTypeAlias, alias);
+			//convert the string value to a known type
+			var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, dataType, doc.DocumentTypeAlias, alias);
+			return converted.Success 
+				? converted.Result
+				: p.Value;
 		}
-		public static string GetPropertyValue(this IPublishedContent doc, string alias, bool recursive, string fallback)
+		public static object GetPropertyValue(this IPublishedContent doc, string alias, bool recursive, string fallback)
 		{
 			var prop = doc.GetPropertyValue(alias, recursive);
-			return !prop.IsNullOrWhiteSpace() ? prop : fallback;
+			return (prop != null && !Convert.ToString(prop).IsNullOrWhiteSpace()) ? prop : fallback;
 		} 
 		#endregion
 
@@ -125,23 +134,51 @@ namespace Umbraco.Core
 		/// then the default value of type T is returned.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
-		/// <param name="prop"></param>
+		/// <param name="doc"></param>
 		/// <param name="alias"></param>
 		/// <returns></returns>
-		public static T GetPropertyValue<T>(this IPublishedContent prop, string alias)
+		public static T GetPropertyValue<T>(this IPublishedContent doc, string alias)
 		{
-			return prop.GetPropertyValue<T>(alias, default(T));
+			return doc.GetPropertyValue<T>(alias, default(T));
+		}
+
+		public static T GetPropertyValue<T>(this IPublishedContent prop, string alias, bool recursive, T ifCannotConvert)
+		{
+			var p = prop.GetProperty(alias, recursive);
+			if (p == null)
+				return ifCannotConvert;
+
+			//before we try to convert it manually, lets see if the PropertyEditorValueConverter does this for us
+			//Here we need to put the value through the IPropertyEditorValueConverter's
+			//get the data type id for the current property
+			var dataType = PublishedContentHelper.GetDataType(prop.DocumentTypeAlias, alias);
+			//convert the value to a known type
+			var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, dataType, prop.DocumentTypeAlias, alias);
+			if (converted.Success)
+			{
+				//if its successful, check if its the correct type and return it
+				if (converted.Result is T)
+				{
+					return (T)converted.Result;
+				}
+				//if that's not correct, try converting the converted type
+				var reConverted = converted.Result.TryConvertTo<T>();
+				if (reConverted.Success)
+				{
+					return reConverted.Result;
+				}
+			}
+
+			//last, if all the above has failed, we'll just try converting the raw value straight to 'T'
+			var manualConverted = p.Value.TryConvertTo<T>();
+			if (manualConverted.Success)
+				return manualConverted.Result;
+			return ifCannotConvert;
 		}
 
 		public static T GetPropertyValue<T>(this IPublishedContent prop, string alias, T ifCannotConvert)
 		{
-			var p = prop.GetProperty(alias);
-			if (p == null)
-				return default(T);
-			var converted = p.Value.TryConvertTo<T>();
-			if (converted.Success)
-				return converted.Result;
-			return ifCannotConvert;
+			return prop.GetPropertyValue<T>(alias, false, ifCannotConvert);
 		}
 		
 	}

@@ -37,7 +37,10 @@ namespace Umbraco.Web
 		{
 			// do not process if client-side request
 			if (IsClientSideRequest(httpContext.Request.Url))
-				return;			
+				return;
+
+			//write the trace output for diagnostics at the end of the request
+			httpContext.Trace.Write("UmbracoModule", "Umbraco request begins");
 
 			// ok, process
 
@@ -93,6 +96,8 @@ namespace Umbraco.Web
 			// do not process if this request is not a front-end routable page
 			if (!EnsureUmbracoRoutablePage(umbracoContext, httpContext))
 				return;
+
+			httpContext.Trace.Write("UmbracoModule", "Umbraco request confirmed");
 
 			// ok, process
 
@@ -400,7 +405,7 @@ namespace Umbraco.Web
 		{
 			app.BeginRequest += (sender, e) =>
 				{
-					var httpContext = ((HttpApplication)sender).Context;
+					var httpContext = ((HttpApplication)sender).Context;					
 					BeginRequest(new HttpContextWrapper(httpContext));
 				};
 
@@ -417,7 +422,16 @@ namespace Umbraco.Web
 					PersistXmlCache(new HttpContextWrapper(httpContext));
 				};
 
-			// todo: initialize request errors handler
+			app.EndRequest += (sender, args) =>
+				{
+					var httpContext = ((HttpApplication)sender).Context;
+					if (UmbracoContext.Current != null && UmbracoContext.Current.IsFrontEndUmbracoRequest)
+					{
+						//write the trace output for diagnostics at the end of the request
+						httpContext.Trace.Write("UmbracoModule", "Umbraco request completed");	
+						LogHelper.Debug<UmbracoModule>("Total milliseconds for umbraco request to process: " + DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
+					}					
+				};
 		}
 
 		public void Dispose()

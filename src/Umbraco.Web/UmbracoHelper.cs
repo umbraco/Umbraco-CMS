@@ -260,8 +260,8 @@ namespace Umbraco.Web
 		                   };
 
             //this is here to figure out if this request is in the context of a partial
-            if (_umbracoContext.PublishedContentRequest.PublishedContent.Id != _currentPage.Id)
-                item.NodeId = _currentPage.Id.ToString();
+            if (_umbracoContext.PublishedContentRequest.PublishedContent.Id != currentPage.Id)
+                item.NodeId = currentPage.Id.ToString();
             
 		
 			var containerPage = new FormlessPage();

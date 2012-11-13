@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -34,7 +35,7 @@ namespace Umbraco.Tests.DynamicDocument
 					});
 
 			//need to specify a custom callback for unit tests
-			DynamicPublishedContent.GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
+			PublishedContentHelper.GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
 				{
 					if (propertyAlias == "content")
 					{
