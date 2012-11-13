@@ -306,10 +306,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Act
             var textpage = repository.Get(1046);
             var subpage = repository.Get(1047);
+            var trashed = repository.Get(1049);
 
             // Assert
             Assert.That(textpage.Key.ToString().ToUpper(), Is.EqualTo("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
             Assert.That(subpage.Key.ToString().ToUpper(), Is.EqualTo("FF11402B-7E53-4654-81A7-462AC2108059"));
+            Assert.That(trashed.Key, Is.Not.EqualTo(Guid.Empty));
         }
 
         [Test]
