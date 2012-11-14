@@ -12,6 +12,7 @@ using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.media;
@@ -1105,25 +1106,21 @@ namespace umbraco
             {
                 if (!UmbracoContext.Current.LiveEditingContext.Enabled)
                 {										
-	                var sw = new StringWriter();
-
-                    try
-                    {
-	                    var altTemplate = TemplateId == -1 ? null : (int?)TemplateId;
-						var templateRenderer = new TemplateRenderer(Umbraco.Web.UmbracoContext.Current)
+	                using (var sw = new StringWriter())
+	                {
+						try
 						{
-							PageId = PageId,
-							AltTemplate = altTemplate
-						};
-						templateRenderer.Render(sw);
-                    }
-                    catch (Exception ee)
-                    {
-                        sw.Write("<!-- Error generating macroContent: '{0}' -->", ee);
-                    }
+							var altTemplate = TemplateId == -1 ? null : (int?)TemplateId;
+							var templateRenderer = new TemplateRenderer(Umbraco.Web.UmbracoContext.Current, PageId, altTemplate);
+							templateRenderer.Render(sw);
+						}
+						catch (Exception ee)
+						{
+							sw.Write("<!-- Error rendering template with id {0}: '{1}' -->", PageId, ee);
+						}
 
-                    return sw.ToString();
-
+						return sw.ToString();    
+	                }
                 }
                 else
                 {
@@ -1136,10 +1133,14 @@ namespace umbraco
                 var p = new page(((IHasXmlNode)GetXmlNodeById(PageId.ToString()).Current).GetNode());
                 p.RenderPage(TemplateId);
                 var c = p.PageContentControl;
-                var sw = new StringWriter();
-                var hw = new HtmlTextWriter(sw);
-                c.RenderControl(hw);
-                return sw.ToString();
+                
+				using (var sw = new StringWriter())
+                using(var hw = new HtmlTextWriter(sw))
+                {
+					c.RenderControl(hw);
+					return sw.ToString();    
+                }
+                
             }
         }
 

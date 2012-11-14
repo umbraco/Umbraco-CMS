@@ -312,7 +312,7 @@
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Routing\LookupByPageIdQuery.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
-    <Compile Include="Routing\TemplateRenderer.cs" />
+    <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>

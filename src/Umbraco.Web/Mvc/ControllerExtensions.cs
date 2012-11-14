@@ -69,23 +69,28 @@ namespace Umbraco.Web.Mvc
 				return sw.ToString().Trim();
 			}
 		}
-
+		
 		/// <summary>
 		/// Renders the partial view to string.
 		/// </summary>
 		/// <param name="controller">The controller context.</param>
 		/// <param name="viewName">Name of the view.</param>
 		/// <param name="model">The model.</param>
+		/// <param name="isPartial">true if it is a Partial view, otherwise false for a normal view </param>
 		/// <returns></returns>
-		internal static string RenderPartialViewToString(this ControllerBase controller, string viewName, object model)
+		internal static string RenderViewToString(this ControllerBase controller, string viewName, object model, bool isPartial = false)
 		{
+			if (controller.ControllerContext == null)
+				throw new ArgumentException("The controller must have an assigned ControllerContext to execute this method.");
 
 			controller.ViewData.Model = model;
 
-			using (StringWriter sw = new StringWriter())
+			using (var sw = new StringWriter())
 			{
-				ViewEngineResult viewResult = ViewEngines.Engines.FindPartialView(controller.ControllerContext, viewName);
-				ViewContext viewContext = new ViewContext(controller.ControllerContext, viewResult.View, controller.ViewData, controller.TempData, sw);
+				var viewResult = !isPartial 
+					? ViewEngines.Engines.FindView(controller.ControllerContext, viewName, null) 
+					: ViewEngines.Engines.FindPartialView(controller.ControllerContext, viewName);
+				var viewContext = new ViewContext(controller.ControllerContext, viewResult.View, controller.ViewData, controller.TempData, sw);
 				viewResult.View.Render(viewContext, sw);
 
 				return sw.GetStringBuilder().ToString();

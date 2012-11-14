@@ -1,23 +1,21 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Web;
 using System.Web.Compilation;
+using System.Web.Mvc;
+using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Web.Models;
+using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
 using umbraco;
-using System.Linq;
 
-namespace Umbraco.Web.Routing
+namespace Umbraco.Web.Templates
 {
 	/// <summary>
 	/// This is used purely for the RenderTemplate functionality in Umbraco
 	/// </summary>
 	/// <remarks>
-	/// Currently the only place where you can use RenderTemplate is from within the library class (which is legacy)
-	/// but i guess we still need to support it. In order to do that we need to be able to render both an MVC and Webforms 
-	/// template. So we will do a Server.Execute to execute this handler, this will then need to find put the 'id' request through
-	/// the routing logic again, the execute the correct handler. 
-	/// Its is pretty round about but is required.
+	/// This allows you to render either an MVC or Webforms template based purely off of a node id and an optional alttemplate id as string output.	
 	/// </remarks>
 	internal class TemplateRenderer
 	{
@@ -27,21 +25,23 @@ namespace Umbraco.Web.Routing
 		private PublishedContentRequest _oldPublishedContentRequest;
 		private object _oldAltTemplate;
 
-		public TemplateRenderer(UmbracoContext umbracoContext)
+		public TemplateRenderer(UmbracoContext umbracoContext, int pageId, int? altTemplateId)
 		{
 			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+			PageId = pageId;
+			AltTemplate = altTemplateId;
 			_umbracoContext = umbracoContext;
 		}
 
 		/// <summary>
 		/// Gets/sets the page id for the template to render
 		/// </summary>
-		public int PageId { get; set; }
+		public int PageId { get; private set; }
 
 		/// <summary>
 		/// Gets/sets the alt template to render if there is one
 		/// </summary>
-		public int? AltTemplate { get; set; }
+		public int? AltTemplate { get; private set; }
 
 		public void Render(StringWriter writer)
 		{
@@ -103,7 +103,7 @@ namespace Umbraco.Web.Routing
 			RestoreItems();
 		}
 
-		private void ExecuteTemplateRendering(StringWriter sw, PublishedContentRequest contentRequest)
+		private void ExecuteTemplateRendering(TextWriter sw, PublishedContentRequest contentRequest)
 		{
 			//NOTE: Before we used to build up the query strings here but this is not necessary because when we do a 
 			// Server.Execute in the TemplateRenderer, we pass in a 'true' to 'preserveForm' which automatically preserves all current
@@ -112,11 +112,29 @@ namespace Umbraco.Web.Routing
 
 			//var queryString = _umbracoContext.HttpContext.Request.QueryString.AllKeys
 			//	.ToDictionary(key => key, key => context.Request.QueryString[key]);
-
+			
 			switch (contentRequest.RenderingEngine)
 			{
 				case RenderingEngine.Mvc:
-					throw new NotImplementedException("Currently the TemplateRender does not support rendering MVC templates");
+					var requestContext = new RequestContext(_umbracoContext.HttpContext, new RouteData()
+					{
+						Route = RouteTable.Routes["Umbraco_default"]
+					});
+					var routeHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory(), _umbracoContext);
+					var routeDef = routeHandler.GetUmbracoRouteDefinition(requestContext, contentRequest);
+					var renderModel = new RenderModel(contentRequest.PublishedContent, contentRequest.Culture);
+					//manually add the action/controller, this is required by mvc
+					requestContext.RouteData.Values.Add("action", routeDef.ActionName);
+					requestContext.RouteData.Values.Add("controller", routeDef.ControllerName);
+					//add the rest of the required route data
+					routeHandler.SetupRouteDataForRequest(renderModel, requestContext, contentRequest);
+					//create and assign the controller context
+					routeDef.Controller.ControllerContext = new ControllerContext(requestContext, routeDef.Controller);
+					//render as string
+					var stringOutput = routeDef.Controller.RenderViewToString(
+						routeDef.ActionName,
+						renderModel);
+					sw.Write(stringOutput);
 					break;
 				case RenderingEngine.WebForms:
 				default:
@@ -126,7 +144,8 @@ namespace Umbraco.Web.Routing
 					// to build up the url again, it will just work.
 					_umbracoContext.HttpContext.Server.Execute(webFormshandler, sw, true);
 					break;
-			}
+			}	
+			
 		}
 
 		private void SetNewItemsOnContextObjects(PublishedContentRequest contentRequest)

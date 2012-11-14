@@ -17,6 +17,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 using umbraco;
 using System.Collections.Generic;
@@ -63,6 +64,28 @@ namespace Umbraco.Web
 			}
 		}
 
+		/// <summary>
+		/// Renders the template for the specified pageId and an optional altTemplateId
+		/// </summary>
+		/// <param name="pageId"></param>
+		/// <param name="altTemplateId">If not specified, will use the template assigned to the node</param>
+		/// <returns></returns>
+		public IHtmlString RenderTemplate(int pageId, int? altTemplateId = null)
+		{
+			var templateRenderer = new TemplateRenderer(_umbracoContext, pageId, altTemplateId);
+			using (var sw = new StringWriter())
+			{
+				try
+				{
+					templateRenderer.Render(sw);					
+				}
+				catch(Exception ex)
+				{
+					sw.Write("<!-- Error rendering template with id {0}: '{1}' -->", pageId, ex);
+				}
+				return new HtmlString(sw.ToString());	
+			}			
+		}
 
 		#region RenderMacro
 

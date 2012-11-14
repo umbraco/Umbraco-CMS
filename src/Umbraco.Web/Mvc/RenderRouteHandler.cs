@@ -65,19 +65,31 @@ namespace Umbraco.Web.Mvc
 			{
 				throw new NullReferenceException("There is not current PublishedContentRequest, it must be initialized before the RenderRouteHandler executes");
 			}
-
-			var renderModel = new RenderModel(docRequest.PublishedContent, docRequest.Culture);
-
-			//put essential data into the data tokens, the 'umbraco' key is required to be there for the view engine
-			requestContext.RouteData.DataTokens.Add("umbraco", renderModel); //required for the RenderModelBinder
-			requestContext.RouteData.DataTokens.Add("umbraco-doc-request", docRequest); //required for RenderMvcController
-			requestContext.RouteData.DataTokens.Add("umbraco-context", UmbracoContext); //required for UmbracoTemplatePage
+			
+			SetupRouteDataForRequest(
+				new RenderModel(docRequest.PublishedContent, docRequest.Culture),
+				requestContext,
+				docRequest);
 
 			return GetHandlerForRoute(requestContext, docRequest);
 			
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Ensures that all of the correct DataTokens are added to the route values which are all required for rendering front-end umbraco views
+		/// </summary>
+		/// <param name="renderModel"></param>
+		/// <param name="requestContext"></param>
+		/// <param name="docRequest"></param>
+		internal void SetupRouteDataForRequest(RenderModel renderModel, RequestContext requestContext, PublishedContentRequest docRequest)
+		{
+			//put essential data into the data tokens, the 'umbraco' key is required to be there for the view engine
+			requestContext.RouteData.DataTokens.Add("umbraco", renderModel); //required for the RenderModelBinder and view engine
+			requestContext.RouteData.DataTokens.Add("umbraco-doc-request", docRequest); //required for RenderMvcController
+			requestContext.RouteData.DataTokens.Add("umbraco-context", UmbracoContext); //required for UmbracoTemplatePage
+		}
 
 		/// <summary>
 		/// Checks the request and query strings to see if it matches the definition of having a Surface controller
