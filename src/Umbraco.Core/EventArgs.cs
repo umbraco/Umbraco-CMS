@@ -6,15 +6,22 @@ namespace Umbraco.Core
     public class PublishingEventArgs : System.ComponentModel.CancelEventArgs { }
     public class SendToPublishEventArgs : System.ComponentModel.CancelEventArgs { }
 
-    //Moving Content Events
-    public class MoveEventArgs : System.ComponentModel.CancelEventArgs { }
-    public class MoveToTrashEventArgs : System.ComponentModel.CancelEventArgs { }
+    //Moving object Events
+    public class MoveEventArgs : System.ComponentModel.CancelEventArgs
+    {
+        /// <summary>
+        /// Gets or Sets the Id of the objects new parent.
+        /// </summary>
+        public int ParentId { get; set; }
+    }
 
-    //Copying Content Events
+    //Copying object Events
     public class CopyEventArgs : System.ComponentModel.CancelEventArgs
     {
-        public int CopyTo { get; set; }
-        public IContent NewContent { get; set; }
+        /// <summary>
+        /// Gets or Sets the Id of the objects new parent.
+        /// </summary>
+        public int ParentId { get; set; }
     }
     
     //Rollback Content Event
@@ -25,7 +32,24 @@ namespace Umbraco.Core
     public class RefreshContentEventArgs : System.ComponentModel.CancelEventArgs { }
 
     //Generel eventArgs
-    public class DeleteEventArgs : System.ComponentModel.CancelEventArgs { }
+    public class DeleteEventArgs : System.ComponentModel.CancelEventArgs
+    {
+        /// <summary>
+        /// Gets or Sets the Id of the object being deleted.
+        /// </summary>
+        public int Id { get; set; }
+    }
     public class SaveEventArgs : System.ComponentModel.CancelEventArgs { }
-    public class NewEventArgs : System.ComponentModel.CancelEventArgs { }
+    public class NewEventArgs : System.ComponentModel.CancelEventArgs
+    {
+        /// <summary>
+        /// Gets or Sets the Alias.
+        /// </summary>
+        public string Alias { get; set; }
+
+        /// <summary>
+        /// Gets or Sets the Id of the parent.
+        /// </summary>
+        public int ParentId { get; set; }
+    }
 }

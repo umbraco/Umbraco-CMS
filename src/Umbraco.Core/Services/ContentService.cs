@@ -60,9 +60,22 @@ namespace Umbraco.Core.Services
             if (contentType == null)
                 throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null", contentTypeAlias));
 
-            var content = new Content(parentId, contentType);
-            SetUser(content, userId);
-            SetWriter(content, userId);
+            IContent content = null;
+
+            var e = new NewEventArgs{Alias = contentTypeAlias, ParentId = parentId};
+            if (Creating != null)
+                Creating(content, e);
+
+            if (!e.Cancel)
+            {
+                content = new Content(parentId, contentType);
+                SetUser(content, userId);
+                SetWriter(content, userId);
+
+                if (Created != null)
+                    Created(content, e);
+            }
+
             return content;
         }
 
@@ -392,39 +405,53 @@ namespace Umbraco.Core.Services
         /// <returns>True if publishing succeeded, otherwise False</returns>
         public bool SaveAndPublish(IContent content, int userId = -1)
         {
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
+            var e = new SaveEventArgs();
+            if (Saving != null)
+                Saving(content, e);
 
-            //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
-            if (content.ParentId != -1 && content.ParentId != -20 && GetById(content.ParentId).Published == false)
+            if (!e.Cancel)
             {
-                LogHelper.Info<ContentService>(
-                    string.Format("Content '{0}' with Id '{1}' could not be published because its parent is not published.",
-                                  content.Name, content.Id));
-                return false;
+                var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
+
+                //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
+                if (content.ParentId != -1 && content.ParentId != -20 && GetById(content.ParentId).Published == false)
+                {
+                    LogHelper.Info<ContentService>(
+                        string.Format(
+                            "Content '{0}' with Id '{1}' could not be published because its parent is not published.",
+                            content.Name, content.Id));
+                    return false;
+                }
+
+                //Content contains invalid property values and can therefore not be published - fire event?
+                if (!content.IsValid())
+                {
+                    LogHelper.Info<ContentService>(
+                        string.Format(
+                            "Content '{0}' with Id '{1}' could not be published because of invalid properties.",
+                            content.Name, content.Id));
+                    return false;
+                }
+
+                //Publish and then update the database with new status
+                bool published = _publishingStrategy.Publish(content, userId);
+                if (published)
+                {
+                    SetWriter(content, userId);
+                    repository.AddOrUpdate(content);
+                    _unitOfWork.Commit();
+
+                    //TODO Change this so we can avoid a depencency to the horrible library method / umbraco.content (singleton) class.
+                    //global::umbraco.library.UpdateDocumentCache(content.Id);
+                }
+
+                if (Saved != null)
+                    Saved(content, e);
+
+                return published;
             }
 
-            //Content contains invalid property values and can therefore not be published - fire event?
-            if (!content.IsValid())
-            {
-                LogHelper.Info<ContentService>(
-                    string.Format("Content '{0}' with Id '{1}' could not be published because of invalid properties.",
-                                  content.Name, content.Id));
-                return false;
-            }
-
-            //Publish and then update the database with new status
-            bool published = _publishingStrategy.Publish(content, userId);
-            if (published)
-            {
-                SetWriter(content, userId);
-                repository.AddOrUpdate(content);
-                _unitOfWork.Commit();
-
-                //TODO Change this so we can avoid a depencency to the horrible library method / umbraco.content (singleton) class.
-                //global::umbraco.library.UpdateDocumentCache(content.Id);
-            }
-
-            return published;
+            return false;
         }
 
         /// <summary>
@@ -434,12 +461,22 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User saving the Content</param>
         public void Save(IContent content, int userId = -1)
         {
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
+            var e = new SaveEventArgs();
+            if (Saving != null)
+                Saving(content, e);
 
-            SetWriter(content, userId);
+            if (!e.Cancel)
+            {
+                var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
 
-            repository.AddOrUpdate(content);
-            _unitOfWork.Commit();
+                SetWriter(content, userId);
+
+                repository.AddOrUpdate(content);
+                _unitOfWork.Commit();
+
+                if (Saved != null)
+                    Saved(content, e);
+            }
         }
 
         /// <summary>
@@ -456,23 +493,38 @@ namespace Umbraco.Core.Services
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
             var containsNew = contents.Any(x => x.HasIdentity == false);
 
-            if (containsNew)
+            var e = new SaveEventArgs();
+            if (Saving != null)
+                Saving(contents, e);
+
+            if (!e.Cancel)
             {
-                foreach (var content in contents)
+                if (containsNew)
                 {
-                    SetWriter(content, userId);
-                    repository.AddOrUpdate(content);
+                    foreach (var content in contents)
+                    {
+
+
+                        SetWriter(content, userId);
+                        repository.AddOrUpdate(content);
+                        _unitOfWork.Commit();
+                    }
+                }
+                else
+                {
+                    foreach (var content in contents)
+                    {
+                        if (Saving != null)
+                            Saving(content, e);
+
+                        SetWriter(content, userId);
+                        repository.AddOrUpdate(content);
+                    }
                     _unitOfWork.Commit();
                 }
-            }
-            else
-            {
-                foreach (var content in contents)
-                {
-                    SetWriter(content, userId);
-                    repository.AddOrUpdate(content);
-                }
-                _unitOfWork.Commit();
+
+                if (Saved != null)
+                    Saved(contents, e);
             }
         }
 
@@ -488,11 +540,21 @@ namespace Umbraco.Core.Services
         public void Save(IEnumerable<Lazy<IContent>> contents, int userId = -1)
         {
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
-            foreach (var content in contents)
+
+            var e = new SaveEventArgs();
+            if (Saving != null)
+                Saving(contents, e);
+
+            if (!e.Cancel)
             {
-                SetWriter(content.Value, userId);
-                repository.AddOrUpdate(content.Value);
-                _unitOfWork.Commit();
+                foreach (var content in contents)
+                {
+                    SetWriter(content.Value, userId);
+                    repository.AddOrUpdate(content.Value);
+                    _unitOfWork.Commit();
+                }
+                if (Saved != null)
+                    Saved(contents, e);
             }
         }
 
@@ -509,13 +571,23 @@ namespace Umbraco.Core.Services
             var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == contentTypeId);
             var contents = repository.GetByQuery(query);
 
-            foreach (var content in contents)
-            {
-                ((Content)content).ChangeTrashedState(true);
-                repository.AddOrUpdate(content);
-            }
+            var e = new DeleteEventArgs { Id = contentTypeId };
+            if (Deleting != null)
+                Deleting(contents, e);
 
-            _unitOfWork.Commit();
+            if (!e.Cancel)
+            {
+                foreach (var content in contents)
+                {
+                    ((Content) content).ChangeTrashedState(true);
+                    repository.AddOrUpdate(content);
+                }
+
+                _unitOfWork.Commit();
+
+                if (Deleted != null)
+                    Deleted(contents, e);
+            }
         }
 
         /// <summary>
@@ -529,10 +601,21 @@ namespace Umbraco.Core.Services
             //TODO Ensure that content is unpublished when deleted
             //TODO This method should handle/react to errors when there is a constraint issue with the content being deleted
             //TODO Children should either be deleted or moved to the recycle bin
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
-            SetWriter(content, userId);
-            repository.Delete(content);
-            _unitOfWork.Commit();
+
+            var e = new DeleteEventArgs { Id = content.Id };
+            if (Deleting != null)
+                Deleting(content, e);
+
+            if (!e.Cancel)
+            {
+                var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
+                SetWriter(content, userId);
+                repository.Delete(content);
+                _unitOfWork.Commit();
+
+                if (Deleted != null)
+                    Deleted(content, e);
+            }
         }
 
         /// <summary>
@@ -566,8 +649,18 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
         public void Delete(int id, DateTime versionDate, int userId = -1)
         {
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
-            repository.Delete(id, versionDate);
+            var e = new DeleteEventArgs { Id = id };
+            if (Deleting != null)
+                Deleting(versionDate, e);
+
+            if (!e.Cancel)
+            {
+                var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
+                repository.Delete(id, versionDate);
+
+                if (Deleted != null)
+                    Deleted(versionDate, e);
+            }
         }
 
         /// <summary>
@@ -587,7 +680,17 @@ namespace Umbraco.Core.Services
                 Delete(id, content.UpdateDate, userId);
             }
 
-            repository.Delete(id, versionId);
+            var e = new DeleteEventArgs {Id = id};
+            if (Deleting != null)
+                Deleting(versionId, e);
+
+            if (!e.Cancel)
+            {
+                repository.Delete(id, versionId);
+
+                if (Deleted != null)
+                    Deleted(versionId, e);
+            }
         }
 
         /// <summary>
@@ -620,26 +723,35 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User moving the Content</param>
         public void Move(IContent content, int parentId, int userId = -1)
         {
-            SetWriter(content, userId);
+            var e = new MoveEventArgs { ParentId = parentId };
+            if (Moving != null)
+                Moving(content, e);
 
-            //If Content is being moved away from Recycle Bin, its state should be un-trashed
-            if(content.Trashed && parentId != -20)
+            if (!e.Cancel)
             {
-                content.ChangeTrashedState(false, parentId);
-            }
-            else
-            {
-                content.ParentId = parentId;
-            }
+                SetWriter(content, userId);
 
-            //If Content is published, it should be (re)published from its new location
-            if(content.Published)
-            {
-                SaveAndPublish(content, userId);
-            }
-            else
-            {
-                Save(content, userId);
+                //If Content is being moved away from Recycle Bin, its state should be un-trashed
+                if (content.Trashed && parentId != -20)
+                {
+                    content.ChangeTrashedState(false, parentId);
+                }
+                else
+                {
+                    content.ParentId = parentId;
+                }
+
+                //If Content is published, it should be (re)published from its new location
+                if (content.Published)
+                {
+                    SaveAndPublish(content, userId);
+                }
+                else
+                {
+                    Save(content, userId);
+                }
+
+                Moved(content, e);
             }
         }
 
@@ -670,17 +782,28 @@ namespace Umbraco.Core.Services
         /// <returns>The newly created <see cref="IContent"/> object</returns>
         public IContent Copy(IContent content, int parentId, int userId = -1)
         {
-            var copy = ((Content) content).Clone();
-            copy.ParentId = parentId;
-            copy.Name = copy.Name + " (1)";
+            var e = new CopyEventArgs{ParentId = parentId};
+            if (Copying != null)
+                Copying(content, e);
 
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
+            IContent copy = null;
 
-            SetWriter(content, userId);
+            if (!e.Cancel)
+            {
+                copy = ((Content) content).Clone();
+                copy.ParentId = parentId;
+                copy.Name = copy.Name + " (1)";
 
-            repository.AddOrUpdate(copy);
-            _unitOfWork.Commit();
-            
+                var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
+
+                SetWriter(content, userId);
+
+                repository.AddOrUpdate(copy);
+                _unitOfWork.Commit();
+            }
+
+            Copied(copy, e);
+
             return copy;
         }
 
@@ -693,6 +816,19 @@ namespace Umbraco.Core.Services
         public bool SendToPublication(IContent content, int userId = -1)
         {
             //TODO Implement something similar to this
+            var e = new SendToPublishEventArgs();
+
+            if (SendingToPublish != null)
+                SendingToPublish(content, e);
+
+            if (!e.Cancel)
+            {
+                // Do some stuff here..
+
+                if (SentToPublish != null)
+                    SentToPublish(content, e);
+            }
+
             /*SendToPublishEventArgs e = new SendToPublishEventArgs();
             FireBeforeSendToPublish(e);
             if (!e.Cancel)
@@ -721,14 +857,25 @@ namespace Umbraco.Core.Services
         /// <returns>The newly created <see cref="IContent"/> object</returns>
         public IContent Rollback(int id, Guid versionId, int userId = -1)
         {
+            var e = new RollbackEventArgs();
+
             var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
             var content = repository.GetByVersion(id, versionId);
-            
-            SetUser(content, userId);
-            SetWriter(content, userId);
 
-            repository.AddOrUpdate(content);
-            _unitOfWork.Commit();
+            if (Rollingback != null)
+                Rollingback(content, e);
+
+            if (!e.Cancel)
+            {
+                SetUser(content, userId);
+                SetWriter(content, userId);
+
+                repository.AddOrUpdate(content);
+                _unitOfWork.Commit();
+
+                if (Rolledback != null)
+                    Rolledback(content, e);
+            }
 
             return content;
         }
@@ -799,7 +946,76 @@ namespace Umbraco.Core.Services
             return _userService != null && (HttpContext.Current != null || _httpContext != null);
         }
 
-        //TODO Add method to remove versions from Content
-        //TODO Add method to remove versions from all Content - parameters to select date-interval, ea. remove versions older then.
+        #region Event Handlers
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>
+        public static event EventHandler<DeleteEventArgs> Deleting;
+
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event EventHandler<DeleteEventArgs> Deleted;
+
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        public static event EventHandler<SaveEventArgs> Saving;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        public static event EventHandler<SaveEventArgs> Saved;
+
+        /// <summary>
+        /// Occurs before Create
+        /// </summary>
+        public static event EventHandler<NewEventArgs> Creating;
+
+        /// <summary>
+        /// Occurs after Create
+        /// </summary>
+        public static event EventHandler<NewEventArgs> Created;
+
+        /// <summary>
+        /// Occurs before Copy
+        /// </summary>
+        public static event EventHandler<CopyEventArgs> Copying;
+
+        /// <summary>
+        /// Occurs after Copy
+        /// </summary>
+        public static event EventHandler<CopyEventArgs> Copied;
+
+        /// <summary>
+        /// Occurs before Move
+        /// </summary>
+        public static event EventHandler<MoveEventArgs> Moving;
+
+        /// <summary>
+        /// Occurs after Move
+        /// </summary>
+        public static event EventHandler<MoveEventArgs> Moved;
+
+        /// <summary>
+        /// Occurs before Rollback
+        /// </summary>
+        public static event EventHandler<RollbackEventArgs> Rollingback;
+
+        /// <summary>
+        /// Occurs after Rollback
+        /// </summary>
+        public static event EventHandler<RollbackEventArgs> Rolledback;
+
+        /// <summary>
+        /// Occurs before Send to Publish
+        /// </summary>
+        public static event EventHandler<SendToPublishEventArgs> SendingToPublish;
+
+        /// <summary>
+        /// Occurs after Send to Publish
+        /// </summary>
+        public static event EventHandler<SendToPublishEventArgs> SentToPublish;
+        #endregion
     }
 }
