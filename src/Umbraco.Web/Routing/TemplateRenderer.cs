@@ -29,6 +29,7 @@ namespace Umbraco.Web.Routing
 
 		public TemplateRenderer(UmbracoContext umbracoContext)
 		{
+			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
 			_umbracoContext = umbracoContext;
 		}
 
@@ -46,6 +47,7 @@ namespace Umbraco.Web.Routing
 
 		public void Render(StringWriter writer)
 		{
+			if (writer == null) throw new ArgumentNullException("writer");
 			// instanciate a request a process
 			// important to use CleanedUmbracoUrl - lowercase path-only version of the current url, though this isn't going to matter
 			// terribly much for this implementation since we are just creating a doc content request to modify it's properties manually.
@@ -112,9 +114,10 @@ namespace Umbraco.Web.Routing
 					break;
 				case RenderingEngine.WebForms:
 				default:
-					//var webFormshandler = (global::umbraco.UmbracoDefault)BuildManager
-					//	.CreateInstanceFromVirtualPath("~/default.aspx", typeof(global::umbraco.UmbracoDefault));
-					var url = ("~/default.aspx?" + QueryStrings.Select(x => x.Key + "=" + x.Value + "&")).TrimEnd("&");
+					var url = ("~/default.aspx?" + 
+						string.Join("", QueryStrings.Select(x => x.Key + "=" + x.Value + "&")))
+						.TrimEnd("&")
+						.TrimEnd("?");
 					_umbracoContext.HttpContext.Server.Execute(url, sw, true);
 					break;
 			}
