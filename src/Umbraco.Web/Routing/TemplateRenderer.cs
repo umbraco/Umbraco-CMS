@@ -43,8 +43,6 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		public int? AltTemplate { get; set; }
 
-		public IDictionary<string, string> QueryStrings { get; set; }
-
 		public void Render(StringWriter writer)
 		{
 			if (writer == null) throw new ArgumentNullException("writer");
@@ -107,6 +105,14 @@ namespace Umbraco.Web.Routing
 
 		private void ExecuteTemplateRendering(StringWriter sw, PublishedContentRequest contentRequest)
 		{
+			//NOTE: Before we used to build up the query strings here but this is not necessary because when we do a 
+			// Server.Execute in the TemplateRenderer, we pass in a 'true' to 'preserveForm' which automatically preserves all current
+			// query strings so there's no need for this. HOWEVER, once we get MVC involved, we might have to do some fun things,
+			// though this will happen in the TemplateRenderer.
+
+			//var queryString = _umbracoContext.HttpContext.Request.QueryString.AllKeys
+			//	.ToDictionary(key => key, key => context.Request.QueryString[key]);
+
 			switch (contentRequest.RenderingEngine)
 			{
 				case RenderingEngine.Mvc:
@@ -114,11 +120,11 @@ namespace Umbraco.Web.Routing
 					break;
 				case RenderingEngine.WebForms:
 				default:
-					var url = ("~/default.aspx?" + 
-						string.Join("", QueryStrings.Select(x => x.Key + "=" + x.Value + "&")))
-						.TrimEnd("&")
-						.TrimEnd("?");
-					_umbracoContext.HttpContext.Server.Execute(url, sw, true);
+					var webFormshandler = (global::umbraco.UmbracoDefault)BuildManager
+						.CreateInstanceFromVirtualPath("~/default.aspx", typeof(global::umbraco.UmbracoDefault));
+					//the 'true' parameter will ensure that the current query strings are carried through, we don't have
+					// to build up the url again, it will just work.
+					_umbracoContext.HttpContext.Server.Execute(webFormshandler, sw, true);
 					break;
 			}
 		}

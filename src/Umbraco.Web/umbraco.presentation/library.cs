@@ -1104,10 +1104,7 @@ namespace umbraco
             if (UmbracoSettings.UseAspNetMasterPages)
             {
                 if (!UmbracoContext.Current.LiveEditingContext.Enabled)
-                {
-                    var context = HttpContext.Current;
-	                var queryString = context.Request.QueryString.AllKeys
-						.ToDictionary(key => key, key => context.Request.QueryString[key]);
+                {										
 	                var sw = new StringWriter();
 
                     try
@@ -1116,8 +1113,7 @@ namespace umbraco
 						var templateRenderer = new TemplateRenderer(Umbraco.Web.UmbracoContext.Current)
 						{
 							PageId = PageId,
-							AltTemplate = altTemplate, 
-							QueryStrings = queryString
+							AltTemplate = altTemplate
 						};
 						templateRenderer.Render(sw);
                     }
