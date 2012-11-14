@@ -12,15 +12,12 @@ namespace Umbraco.Web.Install
 	/// </summary>
 	internal class UmbracoInstallAuthorizeAttribute : AuthorizeAttribute
 	{
-
-		public const string InstallRoleName = "umbraco-install-EF732A6E-AA55-4A93-9F42-6C989D519A4F";
-
-		public ApplicationContext ApplicationContext { get; set; }
+		private readonly ApplicationContext _applicationContext;
 
 		public UmbracoInstallAuthorizeAttribute(ApplicationContext appContext)
 		{
 			if (appContext == null) throw new ArgumentNullException("appContext");
-			ApplicationContext = appContext;
+			_applicationContext = appContext;
 		}
 
 		public UmbracoInstallAuthorizeAttribute()
@@ -44,7 +41,7 @@ namespace Umbraco.Web.Install
 			try
 			{
 				//if its not configured then we can continue
-				if (!ApplicationContext.IsConfigured)
+				if (!_applicationContext.IsConfigured)
 				{
 					return true;
 				}
