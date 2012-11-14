@@ -251,6 +251,7 @@
     <Compile Include="Dynamics\ExtensionMethods.cs" />
     <Compile Include="Dynamics\Grouping.cs" />
     <Compile Include="Install\InstallPackageController.cs" />
+    <Compile Include="Install\UmbracoInstallAuthorizeAttribute.cs" />
     <Compile Include="Models\DynamicPublishedContent.cs" />
     <Compile Include="Models\DynamicPublishedContentList.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />

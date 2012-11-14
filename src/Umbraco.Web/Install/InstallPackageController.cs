@@ -16,6 +16,7 @@ namespace Umbraco.Web.Install
 	/// Currently this is used for web services however we should/could eventually migrate the whole installer to MVC as it
 	/// is a bit of a mess currently.
 	/// </remarks>
+	[UmbracoInstallAuthorize]
 	public class InstallPackageController : Controller
 	{
 		private readonly ApplicationContext _applicationContext;
@@ -173,6 +174,6 @@ namespace Umbraco.Web.Install
 				message = "Starter kit has been installed"
 			});
 		}
-
 	}
+
 }
