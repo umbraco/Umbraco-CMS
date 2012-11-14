@@ -11,6 +11,7 @@ using System.Xml;
 using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Web;
+using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.media;
@@ -30,6 +31,7 @@ using System.Collections.Generic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.NodeFactory;
 using UmbracoContext = umbraco.presentation.UmbracoContext;
+using System.Linq;
 
 namespace umbraco
 {
@@ -1101,35 +1103,28 @@ namespace umbraco
         {
             if (UmbracoSettings.UseAspNetMasterPages)
             {
-                if (!umbraco.presentation.UmbracoContext.Current.LiveEditingContext.Enabled)
+                if (!UmbracoContext.Current.LiveEditingContext.Enabled)
                 {
-                    System.Collections.Generic.Dictionary<object, object> items = getCurrentContextItems();
-                    HttpContext.Current.Items["altTemplate"] = null;
-
-                    HttpContext Context = HttpContext.Current;
-                    StringBuilder queryString = new StringBuilder();
-                    const string ONE_QS_PARAM = "&{0}={1}";
-                    foreach (object key in Context.Request.QueryString.Keys)
-                    {
-                        if (!key.ToString().ToLower().Equals("umbpageid") && !key.ToString().ToLower().Equals("alttemplate"))
-                            queryString.Append(string.Format(ONE_QS_PARAM, key, Context.Request.QueryString[key.ToString()]));
-                    }
-                    StringWriter sw = new StringWriter();
+                    var context = HttpContext.Current;
+	                var queryString = context.Request.QueryString.AllKeys
+						.ToDictionary(key => key, key => context.Request.QueryString[key]);
+	                var sw = new StringWriter();
 
                     try
                     {
-                        Context.Server.Execute(
-                            string.Format("~/default.aspx?umbPageID={0}&alttemplate={1}{2}",
-                            PageId, new template(TemplateId).TemplateAlias, queryString), sw);
-
+	                    var altTemplate = TemplateId == -1 ? null : (int?)TemplateId;
+						var templateRenderer = new TemplateRenderer(Umbraco.Web.UmbracoContext.Current)
+						{
+							PageId = PageId,
+							AltTemplate = altTemplate, 
+							QueryStrings = queryString
+						};
+						templateRenderer.Render(sw);
                     }
                     catch (Exception ee)
                     {
                         sw.Write("<!-- Error generating macroContent: '{0}' -->", ee);
                     }
-
-                    // update the local page items again
-                    updateLocalContextItems(items, Context);
 
                     return sw.ToString();
 
@@ -1141,36 +1136,14 @@ namespace umbraco
             }
             else
             {
-                page p = new page(((IHasXmlNode)GetXmlNodeById(PageId.ToString()).Current).GetNode());
+
+                var p = new page(((IHasXmlNode)GetXmlNodeById(PageId.ToString()).Current).GetNode());
                 p.RenderPage(TemplateId);
-                Control c = p.PageContentControl;
-                StringWriter sw = new StringWriter();
-                HtmlTextWriter hw = new HtmlTextWriter(sw);
+                var c = p.PageContentControl;
+                var sw = new StringWriter();
+                var hw = new HtmlTextWriter(sw);
                 c.RenderControl(hw);
-
                 return sw.ToString();
-            }
-        }
-
-        private static System.Collections.Generic.Dictionary<object, object> getCurrentContextItems()
-        {
-            IDictionary items = HttpContext.Current.Items;
-            System.Collections.Generic.Dictionary<object, object> currentItems = new Dictionary<object, object>();
-            IDictionaryEnumerator ide = items.GetEnumerator();
-            while (ide.MoveNext())
-            {
-                currentItems.Add(ide.Key, ide.Value);
-            }
-            return currentItems;
-        }
-
-        private static void updateLocalContextItems(IDictionary items, HttpContext Context)
-        {
-            Context.Items.Clear();
-            IDictionaryEnumerator ide = items.GetEnumerator();
-            while (ide.MoveNext())
-            {
-                Context.Items.Add(ide.Key, ide.Value);
             }
         }
 
@@ -1181,47 +1154,7 @@ namespace umbraco
         /// <returns>The rendered template as a string.</returns>
         public static string RenderTemplate(int PageId)
         {
-            if (UmbracoSettings.UseAspNetMasterPages)
-            {
-                if (!umbraco.presentation.UmbracoContext.Current.LiveEditingContext.Enabled)
-                {
-                    System.Collections.Generic.Dictionary<object, object> items = getCurrentContextItems();
-                    HttpContext.Current.Items["altTemplate"] = null;
-
-                    HttpContext Context = HttpContext.Current;
-                    StringBuilder queryString = new StringBuilder();
-                    const string ONE_QS_PARAM = "&{0}={1}";
-                    foreach (object key in Context.Request.QueryString.Keys)
-                    {
-                        if (!key.ToString().ToLower().Equals("umbpageid") && !key.ToString().ToLower().Equals("alttemplate"))
-                            queryString.Append(string.Format(ONE_QS_PARAM, key, Context.Request.QueryString[key.ToString()]));
-                    }
-                    StringWriter sw = new StringWriter();
-                    try
-                    {
-                        Context.Server.Execute(string.Format("/default.aspx?umbPageID={0}{1}", PageId, queryString), sw);
-                    }
-                    catch (Exception ee)
-                    {
-                        sw.Write("<!-- Error generating macroContent: '{0}' -->", ee);
-                    }
-
-                    // update the local page items again
-                    updateLocalContextItems(items, Context);
-
-                    return sw.ToString();
-                }
-                else
-                {
-                    return "RenderTemplate not supported in Canvas";
-                }
-            }
-            else
-            {
-                return
-                    RenderTemplate(PageId,
-                                    new page(((IHasXmlNode)GetXmlNodeById(PageId.ToString()).Current).GetNode()).Template);
-            }
+	        return RenderTemplate(PageId, -1);
         }
 
         /// <summary>
