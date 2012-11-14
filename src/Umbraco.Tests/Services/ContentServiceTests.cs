@@ -117,7 +117,9 @@ namespace Umbraco.Tests.Services
                                                 });
 
             // Act
-            var content = ServiceContext.ContentService.CreateContent(-1, "umbTextpage");
+            var contentService = ServiceContext.ContentService as ContentService;
+            contentService.SetHttpContext(null);
+            var content = contentService.CreateContent(-1, "umbTextpage");
 
             // Assert
             Assert.That(content, Is.Not.Null);
@@ -687,6 +689,8 @@ namespace Umbraco.Tests.Services
         public override void TearDown()
         {
             base.TearDown();
+
+            ServiceContext = null;
         }
 
         public void CreateTestData()

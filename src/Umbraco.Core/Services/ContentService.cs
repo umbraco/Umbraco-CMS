@@ -751,7 +751,8 @@ namespace Umbraco.Core.Services
                     Save(content, userId);
                 }
 
-                Moved(content, e);
+                if(Moved != null)
+                    Moved(content, e);
             }
         }
 
@@ -802,7 +803,8 @@ namespace Umbraco.Core.Services
                 _unitOfWork.Commit();
             }
 
-            Copied(copy, e);
+            if(Copied != null)
+                Copied(copy, e);
 
             return copy;
         }
