@@ -7,9 +7,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
-using Umbraco.Web.Models;
 
-namespace Umbraco.Tests.DynamicDocument
+namespace Umbraco.Tests.PublishedContent
 {
 	/// <summary>
 	/// Tests the typed extension methods on IPublishedContent the same way we test the dynamic ones

@@ -55,10 +55,10 @@
   <ItemGroup>
     <Compile Include="BusinessLogic\DictionaryTest.cs" />
     <Compile Include="ContentStores\PublishMediaStoreTests.cs" />
-    <Compile Include="DynamicDocument\DynamicXmlTests.cs" />
-    <Compile Include="DynamicDocument\PublishedContentDataTableTests.cs" />
-    <Compile Include="DynamicDocument\PublishedContentTests.cs" />
-    <Compile Include="DynamicDocument\StronglyTypedQueryTests.cs" />
+    <Compile Include="PublishedContent\DynamicXmlTests.cs" />
+    <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
+    <Compile Include="PublishedContent\PublishedContentTests.cs" />
+    <Compile Include="PublishedContent\StronglyTypedQueryTests.cs" />
     <Compile Include="HashCodeCombinerTests.cs" />
     <Compile Include="HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="IO\IOHelperTest.cs" />
@@ -70,10 +70,10 @@
     <Compile Include="BusinessLogic\ApplicationTreeTest.cs" />
     <Compile Include="BusinessLogic\BaseTest.cs" />
     <Compile Include="CacheRefresherFactoryTests.cs" />
-    <Compile Include="DynamicDocument\DynamicPublishedContentCustomExtensionMethods.cs" />
-    <Compile Include="DynamicDocument\DynamicPublishedContentTests.cs" />
-    <Compile Include="DynamicDocument\DynamicDocumentTestsBase.cs" />
-    <Compile Include="DynamicDocument\DynamicNodeTests.cs" />
+    <Compile Include="PublishedContent\DynamicPublishedContentCustomExtensionMethods.cs" />
+    <Compile Include="PublishedContent\DynamicPublishedContentTests.cs" />
+    <Compile Include="PublishedContent\DynamicDocumentTestsBase.cs" />
+    <Compile Include="PublishedContent\DynamicNodeTests.cs" />
     <Compile Include="ObjectExtensionsTests.cs" />
     <Compile Include="ContentStores\PublishContentStoreTests.cs" />
     <Compile Include="DataTypeFactoryTests.cs" />

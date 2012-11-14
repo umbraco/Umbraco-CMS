@@ -9,7 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 
-namespace Umbraco.Tests.DynamicDocument
+namespace Umbraco.Tests.PublishedContent
 {
 	/// <summary>
 	/// Unit tests for IPublishedContent and extensions

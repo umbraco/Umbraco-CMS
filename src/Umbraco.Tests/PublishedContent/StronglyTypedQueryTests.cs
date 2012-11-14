@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -9,7 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 
-namespace Umbraco.Tests.DynamicDocument
+namespace Umbraco.Tests.PublishedContent
 {
 	[TestFixture]
 	public class StronglyTypedQueryTests : BaseWebTest

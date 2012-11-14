@@ -1,9 +1,7 @@
 using System.Collections.Generic;
-using Umbraco.Core.Dynamics;
-using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 
-namespace Umbraco.Tests.DynamicDocument
+namespace Umbraco.Tests.PublishedContent
 {
 	public static class DynamicPublishedContentCustomExtensionMethods
 	{
