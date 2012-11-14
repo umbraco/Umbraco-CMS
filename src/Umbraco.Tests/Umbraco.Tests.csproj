@@ -58,6 +58,7 @@
     <Compile Include="PublishedContent\DynamicXmlTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
+    <Compile Include="PublishedContent\PublishedMediaTests.cs" />
     <Compile Include="PublishedContent\StronglyTypedQueryTests.cs" />
     <Compile Include="HashCodeCombinerTests.cs" />
     <Compile Include="HtmlHelperExtensionMethodsTests.cs" />

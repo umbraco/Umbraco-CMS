@@ -25,6 +25,18 @@ namespace Umbraco.Core.Configuration
 	/// </summary>
 	internal class UmbracoSettings
 	{
+		/// <summary>
+		/// Used in unit testing to reset all config items that were set with property setters (i.e. did not come from config)
+		/// </summary>
+		internal static void ResetSetters()
+		{
+			_addTrailingSlash = null;			
+			_forceSafeAliases = null;
+			_useLegacySchema = null;
+			_useDomainPrefixes = null;
+			_umbracoLibraryCacheDuration = null;
+		}
+
 		internal const string TempFriendlyXmlChildContainerNodename = ""; // "children";
 
 		/// <summary>
@@ -601,6 +613,8 @@ namespace Umbraco.Core.Configuration
 			}
 		}
 
+		private static bool? _forceSafeAliases;
+
 		/// <summary>
 		/// Whether to force safe aliases (no spaces, no special characters) at businesslogic level on contenttypes and propertytypes
 		/// </summary>
@@ -608,6 +622,9 @@ namespace Umbraco.Core.Configuration
 		{
 			get
 			{
+				if (_forceSafeAliases.HasValue)
+					return _forceSafeAliases.Value;
+
 				string forceSafeAlias = GetKey("/settings/content/ForceSafeAliases");
 				if (String.IsNullOrEmpty(forceSafeAlias))
 					return true;
@@ -622,7 +639,11 @@ namespace Umbraco.Core.Configuration
 						return true;
 					}
 				}
-
+			}
+			internal set
+			{
+				//used for unit  testing
+				_forceSafeAliases = value;
 			}
 		}
 
@@ -645,6 +666,8 @@ namespace Umbraco.Core.Configuration
 			get { return GetKey("/settings/content/scripteditor/scriptFileTypes"); }
 		}
 
+		private static int? _umbracoLibraryCacheDuration;
+
 		/// <summary>
 		/// Gets the duration in seconds to cache queries to umbraco library member and media methods
 		/// Default is 1800 seconds (30 minutes)
@@ -653,6 +676,9 @@ namespace Umbraco.Core.Configuration
 		{
 			get
 			{
+				if (_umbracoLibraryCacheDuration.HasValue)
+					return _umbracoLibraryCacheDuration.Value;
+				
 				string libraryCacheDuration = GetKey("/settings/content/UmbracoLibraryCacheDuration");
 				if (String.IsNullOrEmpty(libraryCacheDuration))
 					return 1800;
@@ -669,6 +695,7 @@ namespace Umbraco.Core.Configuration
 				}
 
 			}
+			internal set { _umbracoLibraryCacheDuration = value; }
 		}
 
 		/// <summary>

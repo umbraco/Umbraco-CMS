@@ -6,13 +6,51 @@ using Examine;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Tests.PublishedContent;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using umbraco.BusinessLogic;
 
-namespace Umbraco.Tests
+namespace Umbraco.Tests.ContentStores
 {
 	[TestFixture]
-	public class PublishMediaStoreTests
+	public class PublishMediaStoreTests : BaseWebTest
 	{
+		public override void Initialize()
+		{
+			base.Initialize();
+			//we're going to use the same initialization as the PublishedMediaTests
+			PublishedMediaTests.DoInitialization(GetUmbracoContext("/test", 1234));			
+		}
+
+		public override void TearDown()
+		{
+			base.TearDown();
+			PublishedMediaTests.DoTearDown();
+		}
+
+		[Test]
+		public void Get_Item_Without_Examine()
+		{
+			var user = new User(0);
+			var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
+			var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
+			var mChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child1", mType, user, mRoot.Id);
+			var publishedMedia = PublishedMediaTests.GetNode(mRoot.Id, GetUmbracoContext("/test", 1234));
+
+			Assert.AreEqual(mRoot.Id, publishedMedia.Id);
+			Assert.AreEqual(mRoot.CreateDateTime.ToString("dd/MM/yyyy HH:mm:ss"), publishedMedia.CreateDate.ToString("dd/MM/yyyy HH:mm:ss"));
+			Assert.AreEqual(mRoot.User.Id, publishedMedia.CreatorId);
+			Assert.AreEqual(mRoot.User.Name, publishedMedia.CreatorName);
+			Assert.AreEqual(mRoot.ContentType.Alias, publishedMedia.DocumentTypeAlias);
+			Assert.AreEqual(mRoot.ContentType.Id, publishedMedia.DocumentTypeId);
+			Assert.AreEqual(mRoot.Level, publishedMedia.Level);
+			Assert.AreEqual(mRoot.Text, publishedMedia.Name);
+			Assert.AreEqual(mRoot.Path, publishedMedia.Path);
+			Assert.AreEqual(mRoot.sortOrder, publishedMedia.SortOrder);
+			Assert.IsNull(publishedMedia.Parent);
+		}
+
 		[TestCase("id")]
 		[TestCase("nodeId")]
 		[TestCase("__NodeId")]

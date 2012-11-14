@@ -11,7 +11,7 @@ using Umbraco.Web;
 namespace Umbraco.Tests.PublishedContent
 {
 	/// <summary>
-	/// Tests the typed extension methods on IPublishedContent the same way we test the dynamic ones
+	/// Tests the methods on IPublishedContent using the DefaultPublishedContentStore
 	/// </summary>
 	[TestFixture]
 	public class PublishedContentTests : BaseWebTest

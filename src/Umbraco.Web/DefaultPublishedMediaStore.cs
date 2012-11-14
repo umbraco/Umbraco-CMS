@@ -41,37 +41,52 @@ namespace Umbraco.Web
 			return result;
 		}
 
-		private IPublishedContent GetUmbracoMedia(int id)
+		private ExamineManager GetExamineManagerSafe()
 		{
-
 			try
 			{
-				//first check in Examine as this is WAY faster
-				var criteria = ExamineManager.Instance
-					.SearchProviderCollection["InternalSearcher"]
-					.CreateSearchCriteria("media");
-				var filter = criteria.Id(id);
-				var results = ExamineManager
-					.Instance.SearchProviderCollection["InternalSearcher"]
-					.Search(filter.Compile());
-				if (results.Any())
-				{
-					return ConvertFromSearchResult(results.First());
-				}
+				return ExamineManager.Instance;
 			}
-			catch (FileNotFoundException)
+			catch (TypeInitializationException)
 			{
-				//Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
-				//See this thread: http://examine.cdodeplex.com/discussions/264341
-				//Catch the exception here for the time being, and just fallback to GetMedia
-				//TODO: Need to fix examine in LB scenarios!
+				return null;
+			}
+		}
+
+		private IPublishedContent GetUmbracoMedia(int id)
+		{
+			var eMgr = GetExamineManagerSafe();
+			if (eMgr != null)
+			{
+				try
+				{
+					//first check in Examine as this is WAY faster
+					var criteria = eMgr
+						.SearchProviderCollection["InternalSearcher"]
+						.CreateSearchCriteria("media");
+					var filter = criteria.Id(id);
+					var results = eMgr
+						.SearchProviderCollection["InternalSearcher"]
+						.Search(filter.Compile());
+					if (results.Any())
+					{
+						return ConvertFromSearchResult(results.First());
+					}
+				}
+				catch (FileNotFoundException)
+				{
+					//Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
+					//See this thread: http://examine.cdodeplex.com/discussions/264341
+					//Catch the exception here for the time being, and just fallback to GetMedia
+					//TODO: Need to fix examine in LB scenarios!
+				}	
 			}
 
 			var media = global::umbraco.library.GetMedia(id, true);
 			if (media != null && media.Current != null)
 			{
-				if (media.MoveNext())
-				{
+				//if (media.MoveNext())
+				//{
 					var current = media.Current;
 					//error check
 					if (media.Current.MoveToFirstChild() && media.Current.Name.InvariantEquals("error"))
@@ -80,7 +95,7 @@ namespace Umbraco.Web
 					}
 
 					return ConvertFromXPathNavigator(current);
-				}				
+				//}				
 			}
 
 			return null;
@@ -240,27 +255,32 @@ namespace Umbraco.Web
 			//if there is no navigator, try examine first, then re-look it up
 			if (xpath == null)
 			{
-				try
+				var eMgr = GetExamineManagerSafe();
+
+				if (eMgr != null)
 				{
-					//first check in Examine as this is WAY faster
-					var criteria = ExamineManager.Instance
-						.SearchProviderCollection["InternalSearcher"]
-						.CreateSearchCriteria("media");
-					var filter = criteria.ParentId(parentId);
-					var results = ExamineManager
-						.Instance.SearchProviderCollection["InternalSearcher"]
-						.Search(filter.Compile());
-					if (results.Any())
+					try
 					{
-						return results.Select(ConvertFromSearchResult);
+						//first check in Examine as this is WAY faster
+						var criteria = eMgr
+							.SearchProviderCollection["InternalSearcher"]
+							.CreateSearchCriteria("media");
+						var filter = criteria.ParentId(parentId);
+						var results = eMgr
+							.SearchProviderCollection["InternalSearcher"]
+							.Search(filter.Compile());
+						if (results.Any())
+						{
+							return results.Select(ConvertFromSearchResult);
+						}
 					}
-				}
-				catch (FileNotFoundException)
-				{
-					//Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
-					//See this thread: http://examine.cdodeplex.com/discussions/264341
-					//Catch the exception here for the time being, and just fallback to GetMedia
-				}
+					catch (FileNotFoundException)
+					{
+						//Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
+						//See this thread: http://examine.cdodeplex.com/discussions/264341
+						//Catch the exception here for the time being, and just fallback to GetMedia
+					}	
+				}				
 
 				var media = library.GetMedia(parentId, true);
 				if (media != null && media.Current != null)
