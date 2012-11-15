@@ -247,10 +247,12 @@ namespace Umbraco.Tests.ContentStores
 						a => null,
 					//we're not going to test this so ignore
 						a => new List<IPublishedContent>(),
-						(dd, a) => dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(a))),
+						(dd, a) => dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(a)), 
+						false),
 				//callback to get the children
 				d => children,
-				(dd, a) => dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(a)));
+				(dd, a) => dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(a)), 
+				false);
 			return dicDoc;
 		}
 
