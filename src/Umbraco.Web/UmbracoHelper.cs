@@ -119,7 +119,7 @@ namespace Umbraco.Web
 		public IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters)
 		{
 			if (alias == null) throw new ArgumentNullException("alias");
-			var containerPage = new FormlessPage();
+
 			var m = macro.GetMacro(alias);
 			if (_umbracoContext.PageId == null)
 			{
@@ -139,16 +139,41 @@ namespace Umbraco.Web
 			var macroControl = m.renderMacro(macroProps,
 				UmbracoContext.Current.PublishedContentRequest.UmbracoPage.Elements,
 				_umbracoContext.PageId.Value);
-			containerPage.Controls.Add(macroControl);
-			using (var output = new StringWriter())
-			{
-				_umbracoContext.HttpContext.Server.Execute(containerPage, output, false);
 
-				//Now, we need to ensure that local links are parsed
-				return new HtmlString(
-					TemplateUtilities.ParseInternalLinks(
-						output.ToString()));
+			string html;
+			if (macroControl is LiteralControl)
+			{
+				// no need to execute, we already have text
+				html = (macroControl as LiteralControl).Text;
 			}
+			else
+			{
+				var containerPage = new FormlessPage();
+				containerPage.Controls.Add(macroControl);
+
+				using (var output = new StringWriter())
+				{
+					// .Execute() does a PushTraceContext/PopTraceContext and writes trace output straight into 'output'
+					// and I do not see how we could wire the trace context to the current context... so it creates dirty
+					// trace output right in the middle of the page.
+					//
+					// The only thing we can do is fully disable trace output while .Execute() runs and restore afterwards
+					// which means trace output is lost if the macro is a control (.ascx or user control) that is invoked
+					// from within Razor -- which makes sense anyway because the control can _not_ run correctly from
+					// within Razor since it will never be inserted into the page pipeline (which may even not exist at all
+					// if we're running MVC).
+					//
+					var traceIsEnabled = containerPage.Trace.IsEnabled;
+					containerPage.Trace.IsEnabled = false;
+					_umbracoContext.HttpContext.Server.Execute(containerPage, output, false);
+					containerPage.Trace.IsEnabled = traceIsEnabled;
+
+					//Now, we need to ensure that local links are parsed
+					html = TemplateUtilities.ParseInternalLinks(output.ToString());
+				}
+			}
+
+			return new HtmlString(html);
 		}
 
 		#endregion
