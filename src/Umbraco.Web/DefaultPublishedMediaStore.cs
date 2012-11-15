@@ -85,17 +85,15 @@ namespace Umbraco.Web
 			var media = global::umbraco.library.GetMedia(id, true);
 			if (media != null && media.Current != null)
 			{
-				//if (media.MoveNext())
+				media.MoveNext();
+				////error check
+				//if (media.Current.MoveToFirstChild() && media.Current.Name.InvariantEquals("error"))
 				//{
-					var current = media.Current;
-					//error check
-					if (media.Current.MoveToFirstChild() && media.Current.Name.InvariantEquals("error"))
-					{
-						return null;
-					}
+				//	return null;
+				//}
+				//var current = media.Current;
 
-					return ConvertFromXPathNavigator(current);
-				//}				
+				return ConvertFromXPathNavigator(media.Current);
 			}
 
 			return null;
@@ -195,7 +193,8 @@ namespace Umbraco.Web
 					? GetUmbracoMedia(d.ParentId) 
 					: null,
 				//callback to return the children of the current node based on the xml structure already found
-				d => GetChildrenMedia(d.ParentId, xpath),
+				//d => GetChildrenMedia(d.ParentId, xpath),
+				d => GetChildrenMedia(d.Id, xpath),
 				GetProperty);
 		}
 
@@ -285,32 +284,36 @@ namespace Umbraco.Web
 				var media = library.GetMedia(parentId, true);
 				if (media != null && media.Current != null)
 				{
-					if (!media.MoveNext())
-						return null;
 					xpath = media.Current;
+				}
+				else
+				{
+					return null;
 				}
 			}
 
-			var children = xpath.SelectChildren(XPathNodeType.Element);
-			var mediaList = new List<IPublishedContent>();
-			while (children.Current != null)
+			//The xpath might be the whole xpath including the current ones ancestors so we need to select the current node
+			var item = xpath.Select("//*[@id='" + parentId + "']");
+			if (item.Current == null)
 			{
-				if (!children.MoveNext())
-				{
-					break;
-				}
+				return null;
+			}
+			var children = item.Current.SelectChildren(XPathNodeType.Element);
 
+			var mediaList = new List<IPublishedContent>();
+			foreach(XPathNavigator x in children)
+			{
 				//NOTE: I'm not sure why this is here, it is from legacy code of ExamineBackedMedia, but
 				// will leave it here as it must have done something!
-				if (children.Current.Name != "contents")
+				if (x.Name != "contents")
 				{
 					//make sure it's actually a node, not a property 
-					if (!string.IsNullOrEmpty(children.Current.GetAttribute("path", "")) &&
-						!string.IsNullOrEmpty(children.Current.GetAttribute("id", "")))
+					if (!string.IsNullOrEmpty(x.GetAttribute("path", "")) &&
+						!string.IsNullOrEmpty(x.GetAttribute("id", "")))
 					{
-						mediaList.Add(ConvertFromXPathNavigator(children.Current));
+						mediaList.Add(ConvertFromXPathNavigator(x));
 					}
-				}
+				}	
 			}
 			return mediaList;
 		}

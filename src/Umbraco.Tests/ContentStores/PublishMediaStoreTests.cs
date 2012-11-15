@@ -30,6 +30,24 @@ namespace Umbraco.Tests.ContentStores
 		}
 
 		[Test]
+		public void Get_Root_Docs()
+		{
+			var user = new User(0);
+			var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
+			var mRoot1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot1", mType, user, -1);
+			var mRoot2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot2", mType, user, -1);
+			var mChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child1", mType, user, mRoot1.Id);
+			var mChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child2", mType, user, mRoot2.Id);
+			
+			var ctx = GetUmbracoContext("/test", 1234);
+			var mediaStore = new DefaultPublishedMediaStore();
+			var roots = mediaStore.GetRootDocuments(ctx);
+			Assert.AreEqual(2, roots.Count());
+			Assert.IsTrue(roots.Select(x => x.Id).ContainsAll(new[] {mRoot1.Id, mRoot2.Id}));
+
+		}
+
+		[Test]
 		public void Get_Item_Without_Examine()
 		{
 			var user = new User(0);
