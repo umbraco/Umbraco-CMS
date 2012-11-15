@@ -61,19 +61,32 @@ namespace Umbraco.Web.Mvc
 		}
 
 		/// <summary>
-		/// The default action to render the front-end view
+		/// Returns an ActionResult based on the template name found in the route values and the given model.
 		/// </summary>
+		/// <typeparam name="T"></typeparam>
 		/// <param name="model"></param>
 		/// <returns></returns>
-		public virtual ActionResult Index(RenderModel model)
+		/// <remarks>
+		/// If the template found in the route values doesn't physically exist, then an empty ContentResult will be returned.
+		/// </remarks>
+		protected ActionResult CurrentTemplate<T>(T model)
 		{
 			var template = ControllerContext.RouteData.Values["action"].ToString();
 			if (!EnsurePhsyicalViewExists(template))
 			{
 				return Content("");
 			}
-
 			return View(template, model);
+		}
+
+		/// <summary>
+		/// The default action to render the front-end view
+		/// </summary>
+		/// <param name="model"></param>
+		/// <returns></returns>
+		public virtual ActionResult Index(RenderModel model)
+		{
+			return CurrentTemplate(model);
 		}
 
 	}

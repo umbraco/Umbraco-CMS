@@ -125,6 +125,20 @@ namespace Umbraco.Web
 			if (media != null && media.Current != null)
 			{
 				media.MoveNext();
+				var moved = media.Current.MoveToFirstChild();
+				//first check if we have an error
+				if (moved)
+				{
+					if (media.Current.Name.InvariantEquals("error"))
+					{
+						return null;
+					}	
+				}
+				if (moved)
+				{
+					//move back to the parent and return
+					media.Current.MoveToParent();	
+				}
 				return ConvertFromXPathNavigator(media.Current);
 			}
 
