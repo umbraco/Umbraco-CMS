@@ -136,10 +136,22 @@ namespace umbraco.cms.businesslogic.datatype
                     {
                         //CHANGE:by Allan Laustsen to fix copy nodes
                         //if (value == null)
-                        if (value == null || (string.IsNullOrEmpty(value.ToString()) && (this._dataType.DBType == DBTypes.Integer || this._dataType.DBType == DBTypes.Date)))
-                            SqlHelper.ExecuteNonQuery("update cmsPropertyData set " + _dataType.DataFieldName + " = NULL where id = " + m_PropertyId);
+                        if (value == null ||
+                            (string.IsNullOrEmpty(value.ToString()) &&
+                             (this._dataType.DBType == DBTypes.Integer || this._dataType.DBType == DBTypes.Date)))
+                            SqlHelper.ExecuteNonQuery("update cmsPropertyData set " + _dataType.DataFieldName +
+                                                      " = NULL where id = " + m_PropertyId);
                         else
-                            SqlHelper.ExecuteNonQuery("update cmsPropertyData set " + _dataType.DataFieldName + " = @value where id = " + m_PropertyId, SqlHelper.CreateParameter("@value", value));
+                        {
+                            // we need to be sure that the value doesn't contain malformatted xml
+                            if (_dataType.DBType == DBTypes.Ntext || _dataType.DBType == DBTypes.Nvarchar)
+                            {
+                                value = cms.helpers.xhtml.RemoveTroublesomeCharacters(value.ToString());
+                            }
+                            SqlHelper.ExecuteNonQuery(
+                                "update cmsPropertyData set " + _dataType.DataFieldName + " = @value where id = " +
+                                m_PropertyId, SqlHelper.CreateParameter("@value", value));
+                        }
                     }
                     catch (Exception e)
                     {

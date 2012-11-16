@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 
@@ -146,6 +147,28 @@ namespace umbraco.cms.helpers
 				newTag += " " + attributeSet.Groups["attributeName"].Value.ToString().ToLower() + "=\"" + attributeSet.Groups["attributeValue"].Value.ToString() + "\"";
 
 			return newTag;
-		}	
+		}
+
+        public static string RemoveTroublesomeCharacters(string inString)
+        {
+            if (inString == null) return null;
+
+            StringBuilder newString = new StringBuilder();
+            char ch;
+
+            for (int i = 0; i < inString.Length; i++)
+            {
+
+                ch = inString[i];
+                // remove any characters outside the valid UTF-8 range as well as all control characters
+                // except tabs and new lines
+                if ((ch < 0x00FD && ch > 0x001F) || ch == '\t' || ch == '\n' || ch == '\r')
+                {
+                    newString.Append(ch);
+                }
+            }
+            return newString.ToString();
+
+        }
 	}
 }
