@@ -149,25 +149,29 @@ namespace umbraco.cms.helpers
 			return newTag;
 		}
 
+        // helper method gotten from:
+        // http://stackoverflow.com/questions/20762/how-do-you-remove-invalid-hexadecimal-characters-from-an-xml-based-data-source-p#comment8130028_641632
         public static string RemoveTroublesomeCharacters(string inString)
         {
+
             if (inString == null) return null;
 
-            StringBuilder newString = new StringBuilder();
+            StringBuilder sbOutput = new StringBuilder();
             char ch;
 
             for (int i = 0; i < inString.Length; i++)
             {
-
                 ch = inString[i];
-                // remove any characters outside the valid UTF-8 range as well as all control characters
-                // except tabs and new lines
-                if ((ch < 0x00FD && ch > 0x001F) || ch == '\t' || ch == '\n' || ch == '\r')
+                if ((ch >= 0x0020 && ch <= 0xD7FF) ||
+                    (ch >= 0xE000 && ch <= 0xFFFD) ||
+                    ch == 0x0009 ||
+                    ch == 0x000A ||
+                    ch == 0x000D)
                 {
-                    newString.Append(ch);
+                    sbOutput.Append(ch);
                 }
             }
-            return newString.ToString();
+            return sbOutput.ToString();
 
         }
 	}
