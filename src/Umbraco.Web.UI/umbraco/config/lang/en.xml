@@ -592,6 +592,11 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="contentPublishedFailedByEvent"><![CDATA[
       %0% could not be published, due to a 3rd party extension cancelling the action.
     ]]></key>
+    <key alias="contentPublishedFailedByParent">
+      <![CDATA[
+      %0% can not be published, because a parent page is not published.
+    ]]>
+    </key>
     <key alias="includeUnpublished">Include unpublished child pages</key>
     <key alias="inProgress">Publishing in progress - please wait...</key>
     <key alias="inProgressCounter">%0% out of %1% pages have been published...</key>

@@ -402,12 +402,11 @@ namespace umbraco.cms.businesslogic.web
             tmp.CreateContent(dct);
 
             //now create the document data
-            SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, updateDate, Text) values (1, " +
-                                      tmp.Id + ", 0, " +
-                                      u.Id + ", @versionId, @updateDate, @text)",
-                                      SqlHelper.CreateParameter("@versionId", tmp.Version),
-                                      SqlHelper.CreateParameter("@updateDate", DateTime.Now),
-                                      SqlHelper.CreateParameter("@text", tmp.Text));
+            SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, updateDate, Text) "
+				+ "values (1, " + tmp.Id + ", 0, " + u.Id + ", @versionId, @updateDate, @text)",
+                SqlHelper.CreateParameter("@versionId", tmp.Version),
+                SqlHelper.CreateParameter("@updateDate", DateTime.Now),
+                SqlHelper.CreateParameter("@text", tmp.Text));
 
             //read the whole object from the db
             Document d = new Document(newId);
@@ -757,8 +756,11 @@ namespace umbraco.cms.businesslogic.web
         }
 
         /// <summary>
-        /// Published flag is on if the document are published
+        /// Gets or sets a value indicating whether the document is published.
         /// </summary>
+		/// <remarks>A document can be published yet not visible, because of one or more of its
+		/// parents being unpublished. Use <c>PathPublished</c> to get a value indicating whether
+		/// the node and all its parents are published, and therefore whether the node is visible.</remarks>
         public bool Published
         {
             get { return _published; }
@@ -770,6 +772,21 @@ namespace umbraco.cms.businesslogic.web
                     string.Format("update cmsDocument set published = {0} where nodeId = {1}", Id, value ? 1 : 0));
             }
         }
+
+		/// <summary>
+		/// Gets a value indicating whether the document and all its parents are published.
+		/// </summary>
+		public bool PathPublished
+		{
+			get
+			{
+				int x = SqlHelper.ExecuteScalar<int>(@"select count(node.id) - count(doc.nodeid)
+from umbracoNode as node 
+left join cmsDocument as doc on (node.id=doc.nodeId and doc.published=1)
+where '" + Path + ",' like " + SqlHelper.Concat("node.path", "'%'"));
+				return (x == 1);
+			}
+		}
 
         public override string Text
         {
@@ -1005,13 +1022,15 @@ namespace umbraco.cms.businesslogic.web
                 //PPH make sure that there is only 1 newest node, this is important in regard to schedueled publishing...
                 SqlHelper.ExecuteNonQuery("update cmsDocument set newest = 0 where nodeId = " + Id);
 
-                SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, updateDate, Text, TemplateId) values (1,@id, 0, @userId, @versionId, @updateDate, @text, @template)",
+                SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, updateDate, Text, TemplateId) "
+					+ "values (1, @id, 0, @userId, @versionId, @updateDate, @text, @template)",
                     SqlHelper.CreateParameter("@id", Id),
-                    SqlHelper.CreateParameter("@template", _template > 0 ? (object)_template : (object)DBNull.Value), //pass null in if the template doesn't have a valid id
                     SqlHelper.CreateParameter("@userId", u.Id),
                     SqlHelper.CreateParameter("@versionId", newVersion),
                     SqlHelper.CreateParameter("@updateDate", versionDate),
-                    SqlHelper.CreateParameter("@text", Text));
+                    SqlHelper.CreateParameter("@text", Text),
+                    SqlHelper.CreateParameter("@template", _template > 0 ? (object)_template : (object)DBNull.Value) //pass null in if the template doesn't have a valid id
+					);
 
                 SqlHelper.ExecuteNonQuery("update cmsDocument set published = 0 where nodeId = " + Id);
                 SqlHelper.ExecuteNonQuery("update cmsDocument set published = 1, newest = 0 where versionId = @versionId",
@@ -1072,22 +1091,24 @@ namespace umbraco.cms.businesslogic.web
  
                 if (_template != 0)
                 {
-                    SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, updateDate, Text, TemplateId) values (" +
-                                              Id +
-                                              ", 0, " + u.Id + ", @versionId, @text, " +
-                                              _template + ")",
-                                              SqlHelper.CreateParameter("@versionId", newVersion),
-                                              SqlHelper.CreateParameter("@updateDate", versionDate),
-                                              SqlHelper.CreateParameter("@text", Text));
+                    SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, updateDate, Text, TemplateId) "
+						+ "values (@nodeId, 0, @userId, @versionId, @updateDate, @text, @templateId)",
+						SqlHelper.CreateParameter("@nodeId", Id),
+						SqlHelper.CreateParameter("@userId", u.Id),
+                        SqlHelper.CreateParameter("@versionId", newVersion),
+                        SqlHelper.CreateParameter("@updateDate", versionDate),
+                        SqlHelper.CreateParameter("@text", Text),
+						SqlHelper.CreateParameter("@templateId", _template));
                 }
                 else
                 {
-                    SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, updateDate, Text) values (" +
-                                             Id +
-                                             ", 0, " + u.Id + ", @versionId, @text )",
-                                             SqlHelper.CreateParameter("@versionId", newVersion),
-                                             SqlHelper.CreateParameter("@updateDate", versionDate),
-                                             SqlHelper.CreateParameter("@text", Text));
+                    SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, updateDate, Text) "
+						+ "values (@nodeId, 0, @userId, @versionId, @updateDate, @text)",
+						SqlHelper.CreateParameter("@nodeId", Id),
+						SqlHelper.CreateParameter("@userId", u.Id),
+                        SqlHelper.CreateParameter("@versionId", newVersion),
+                        SqlHelper.CreateParameter("@updateDate", versionDate),
+                        SqlHelper.CreateParameter("@text", Text));
                 }
 
                 // Get new version
@@ -1134,12 +1155,11 @@ namespace umbraco.cms.businesslogic.web
                 DateTime versionDate = DateTime.Now;
                 Guid newVersion = createNewVersion(versionDate);
 
-                SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, updateDate, Text) values (" +
-                                          Id + ", 0, " + u.Id +
-                                          ", @versionId, @text)",
-                                          SqlHelper.CreateParameter("@versionId", newVersion),
-                                          SqlHelper.CreateParameter("@updateDate", versionDate),
-                                          SqlHelper.CreateParameter("@text", Text));
+                SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, updateDate, Text) "
+					+ "values (" + Id + ", 0, " + u.Id + ", @versionId, @text)",
+                    SqlHelper.CreateParameter("@versionId", newVersion),
+                    SqlHelper.CreateParameter("@updateDate", versionDate),
+                    SqlHelper.CreateParameter("@text", Text));
 
                 SqlHelper.ExecuteNonQuery("update cmsDocument set published = 0 where nodeId = " + Id);
                 SqlHelper.ExecuteNonQuery("update cmsDocument set published = 1 where versionId = @versionId", SqlHelper.CreateParameter("@versionId", tempVersion));

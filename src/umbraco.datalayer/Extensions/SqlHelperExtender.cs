@@ -119,7 +119,18 @@ namespace umbraco.DataLayer.Extensions
             return m_SqlHelper.CreateParameter(parameterName, value);
         }
 
-        /// <summary>
+		/// <summary>
+		/// Creates a concatenation fragment for use in an SQL query.
+		/// </summary>
+		/// <param name="values">The values that need to be concatenated</param>
+		/// <returns>The SQL query fragment.</returns>
+		/// <remarks>SQL Server uses a+b, MySql uses concat(a,b), Oracle uses a||b...</remarks>
+		public virtual string Concat(params string[] values)
+		{
+			return m_SqlHelper.Concat(values);
+		}
+		
+		/// <summary>
         /// Escapes a string for use in an SQL query.
         /// </summary>
         /// <param name="text">The text to be escaped.</param>

@@ -48,6 +48,14 @@ namespace umbraco.DataLayer
         [Obsolete("You should use parameters instead. (see CreateParameter)", false)]
         string EscapeString(string value);
 
+		/// <summary>
+		/// Creates a concatenation fragment for use in an SQL query.
+		/// </summary>
+		/// <param name="values">The values that need to be concatenated</param>
+		/// <returns>The SQL query fragment.</returns>
+		/// <remarks>SQL Server uses a+b, MySql uses concat(a,b), Oracle uses a||b...</remarks>
+		string Concat(params string[] values);
+
         /// <summary>
         /// Executes a command and returns the number of rows affected.
         /// </summary>
