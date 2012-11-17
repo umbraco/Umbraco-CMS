@@ -219,7 +219,6 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="TestHelpers\ExamineHelpers\umbraco.config" />
     <None Include="unit-test-log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -274,6 +273,7 @@
     <EmbeddedResource Include="TestHelpers\ExamineHelpers\ExamineResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ExamineResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
