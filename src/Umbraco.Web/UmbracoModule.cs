@@ -319,11 +319,8 @@ namespace Umbraco.Web
 			switch (engine)
 			{
 				case RenderingEngine.Mvc:
-					//the Path is normally ~/umbraco but we need to remove the start ~/ of it and if someone modifies this
-					//then we should be rendering the MVC stuff in that location.
-					rewritePath = "~/"
-						+ GlobalSettings.Path.TrimStart(new[] { '~', '/' }).TrimEnd(new[] { '/' })
-						+ "/RenderMvc";
+					// GlobalSettings.Path has already been through IOHelper.ResolveUrl() so it begins with / and vdir (if any)
+					rewritePath = GlobalSettings.Path.TrimEnd(new[] { '/' }) + "/RenderMvc";
 					// we rewrite the path to the path of the handler (i.e. default.aspx or /umbraco/RenderMvc )
 					context.RewritePath(rewritePath, "", currentQuery.TrimStart(new[] { '?' }), false);
 

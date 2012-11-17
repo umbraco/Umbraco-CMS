@@ -6,13 +6,69 @@ using Examine;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Tests.PublishedContent;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using umbraco.BusinessLogic;
 
-namespace Umbraco.Tests
+namespace Umbraco.Tests.ContentStores
 {
 	[TestFixture]
-	public class PublishMediaStoreTests
+	public class PublishMediaStoreTests : BaseWebTest
 	{
+		public override void Initialize()
+		{
+			base.Initialize();
+			//we're going to use the same initialization as the PublishedMediaTests
+			PublishedMediaTests.DoInitialization(GetUmbracoContext("/test", 1234));			
+		}
+
+		public override void TearDown()
+		{
+			base.TearDown();
+			PublishedMediaTests.DoTearDown();
+		}
+
+		[Test]
+		public void Get_Root_Docs()
+		{
+			var user = new User(0);
+			var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
+			var mRoot1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot1", mType, user, -1);
+			var mRoot2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot2", mType, user, -1);
+			var mChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child1", mType, user, mRoot1.Id);
+			var mChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child2", mType, user, mRoot2.Id);
+			
+			var ctx = GetUmbracoContext("/test", 1234);
+			var mediaStore = new DefaultPublishedMediaStore();
+			var roots = mediaStore.GetRootDocuments(ctx);
+			Assert.AreEqual(2, roots.Count());
+			Assert.IsTrue(roots.Select(x => x.Id).ContainsAll(new[] {mRoot1.Id, mRoot2.Id}));
+
+		}
+
+		[Test]
+		public void Get_Item_Without_Examine()
+		{
+			var user = new User(0);
+			var mType = global::umbraco.cms.businesslogic.media.MediaType.MakeNew(user, "TestMediaType");
+			var mRoot = global::umbraco.cms.businesslogic.media.Media.MakeNew("MediaRoot", mType, user, -1);
+			var mChild1 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child1", mType, user, mRoot.Id);
+			var publishedMedia = PublishedMediaTests.GetNode(mRoot.Id, GetUmbracoContext("/test", 1234));
+
+			Assert.AreEqual(mRoot.Id, publishedMedia.Id);
+			Assert.AreEqual(mRoot.CreateDateTime.ToString("dd/MM/yyyy HH:mm:ss"), publishedMedia.CreateDate.ToString("dd/MM/yyyy HH:mm:ss"));
+			Assert.AreEqual(mRoot.User.Id, publishedMedia.CreatorId);
+			Assert.AreEqual(mRoot.User.Name, publishedMedia.CreatorName);
+			Assert.AreEqual(mRoot.ContentType.Alias, publishedMedia.DocumentTypeAlias);
+			Assert.AreEqual(mRoot.ContentType.Id, publishedMedia.DocumentTypeId);
+			Assert.AreEqual(mRoot.Level, publishedMedia.Level);
+			Assert.AreEqual(mRoot.Text, publishedMedia.Name);
+			Assert.AreEqual(mRoot.Path, publishedMedia.Path);
+			Assert.AreEqual(mRoot.sortOrder, publishedMedia.SortOrder);
+			Assert.IsNull(publishedMedia.Parent);
+		}
+
 		[TestCase("id")]
 		[TestCase("nodeId")]
 		[TestCase("__NodeId")]
@@ -191,10 +247,12 @@ namespace Umbraco.Tests
 						a => null,
 					//we're not going to test this so ignore
 						a => new List<IPublishedContent>(),
-						(dd, a) => dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(a))),
+						(dd, a) => dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(a)), 
+						false),
 				//callback to get the children
 				d => children,
-				(dd, a) => dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(a)));
+				(dd, a) => dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(a)), 
+				false);
 			return dicDoc;
 		}
 

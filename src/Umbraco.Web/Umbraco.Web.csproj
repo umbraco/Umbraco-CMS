@@ -252,6 +252,7 @@
     <Compile Include="Dynamics\ExtensionMethods.cs" />
     <Compile Include="Dynamics\Grouping.cs" />
     <Compile Include="Install\InstallPackageController.cs" />
+    <Compile Include="Install\UmbracoInstallAuthorizeAttribute.cs" />
     <Compile Include="Models\DynamicPublishedContent.cs" />
     <Compile Include="Models\DynamicPublishedContentList.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
@@ -313,6 +314,7 @@
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Routing\LookupByPageIdQuery.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
+    <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Strategies\DeletedTemplate.cs" />
     <Compile Include="Strategies\TrashedContent.cs" />
     <Compile Include="Strategies\UpdateContentCache.cs" />

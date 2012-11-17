@@ -52,9 +52,9 @@
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="MySql.Data, Version=5.1.2.2, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+    <Reference Include="Lucene.Net, Version=2.9.4.1, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\MySql.Data.dll</HintPath>
+      <HintPath>..\Umbraco.Web.UI\bin\Lucene.Net.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.0.12054\lib\nunit.framework.dll</HintPath>
@@ -81,6 +81,10 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="UmbracoExamine, Version=0.1.42.2941, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Umbraco.Web.UI\bin\UmbracoExamine.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auditing\AuditTests.cs" />
@@ -88,10 +92,11 @@
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="Configurations\RepositorySettingsTests.cs" />
     <Compile Include="ContentStores\PublishMediaStoreTests.cs" />
-    <Compile Include="DynamicDocument\DynamicXmlTests.cs" />
-    <Compile Include="DynamicDocument\PublishedContentDataTableTests.cs" />
-    <Compile Include="DynamicDocument\PublishedContentTests.cs" />
-    <Compile Include="DynamicDocument\StronglyTypedQueryTests.cs" />
+    <Compile Include="PublishedContent\DynamicXmlTests.cs" />
+    <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
+    <Compile Include="PublishedContent\PublishedContentTests.cs" />
+    <Compile Include="PublishedContent\PublishedMediaTests.cs" />
+    <Compile Include="PublishedContent\StronglyTypedQueryTests.cs" />
     <Compile Include="HashCodeCombinerTests.cs" />
     <Compile Include="HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="IO\IOHelperTest.cs" />
@@ -142,13 +147,14 @@
     <Compile Include="BusinessLogic\ApplicationTreeTest.cs" />
     <Compile Include="BusinessLogic\BaseTest.cs" />
     <Compile Include="CacheRefresherFactoryTests.cs" />
-    <Compile Include="DynamicDocument\DynamicPublishedContentCustomExtensionMethods.cs" />
-    <Compile Include="DynamicDocument\DynamicPublishedContentTests.cs" />
-    <Compile Include="DynamicDocument\DynamicDocumentTestsBase.cs" />
-    <Compile Include="DynamicDocument\DynamicNodeTests.cs" />
+    <Compile Include="PublishedContent\DynamicPublishedContentCustomExtensionMethods.cs" />
+    <Compile Include="PublishedContent\DynamicPublishedContentTests.cs" />
+    <Compile Include="PublishedContent\DynamicDocumentTestsBase.cs" />
+    <Compile Include="PublishedContent\DynamicNodeTests.cs" />
     <Compile Include="ObjectExtensionsTests.cs" />
     <Compile Include="ContentStores\PublishContentStoreTests.cs" />
     <Compile Include="DataTypeFactoryTests.cs" />
+    <Compile Include="RouteParserTests.cs" />
     <Compile Include="Routing\LookupByNiceUrlWithDomainsTests.cs" />
     <Compile Include="Routing\NiceUrlsProviderWithDomainsTests.cs" />
     <Compile Include="Routing\uQueryGetNodeIdByUrlTests.cs" />
@@ -171,11 +177,17 @@
     <Compile Include="Stubs\TestControllerFactory.cs" />
     <Compile Include="TestHelpers\BaseUsingSqlCeSyntax.cs" />
     <Compile Include="TestHelpers\BaseWebTest.cs" />
+    <Compile Include="TestHelpers\ExamineHelpers\ExamineResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ExamineResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="TestHelpers\BaseDatabaseTest.cs" />
     <Compile Include="TestHelpers\Entities\MockedContent.cs" />
     <Compile Include="TestHelpers\Entities\MockedContentTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
     <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
+    <Compile Include="TestHelpers\ExamineHelpers\IndexInitializer.cs" />
     <Compile Include="UriUtilityTests.cs" />
     <Compile Include="Resolvers\MacroFieldEditorsResolverTests.cs" />
     <Compile Include="MacroEngineFactoryTests.cs" />
@@ -207,6 +219,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="TestHelpers\ExamineHelpers\umbraco.config" />
     <None Include="unit-test-log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -257,7 +270,12 @@
       <Name>Umbraco.Web</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="TestHelpers\ExamineHelpers\ExamineResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ExamineResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
       <Visible>False</Visible>

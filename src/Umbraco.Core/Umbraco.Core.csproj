@@ -405,6 +405,7 @@
     <Compile Include="Publishing\IPublishingStrategy.cs" />
     <Compile Include="Publishing\PublishingStrategy.cs" />
     <Compile Include="RenderingEngine.cs" />
+    <Compile Include="RouteParser.cs" />
     <Compile Include="Serialization\AbstractSerializationService.cs" />
     <Compile Include="Serialization\Formatter.cs" />
     <Compile Include="Serialization\IFormatter.cs" />

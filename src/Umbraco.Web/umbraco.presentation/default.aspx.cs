@@ -45,6 +45,9 @@ namespace umbraco
 		{
 			base.OnPreInit(e);
 
+			// handle the infamous umbDebugShowTrace, etc
+			Page.Trace.IsEnabled &= GlobalSettings.DebugMode && !String.IsNullOrWhiteSpace(Request["umbDebugShowTrace"]);
+
 			// get the document request and the page
 			_docRequest = UmbracoContext.Current.PublishedContentRequest;
 			_upage = _docRequest.UmbracoPage;
@@ -116,9 +119,6 @@ namespace umbraco
 
 			if (!liveEditing && ValidateRequest)
 				Request.ValidateInput();
-
-			// handle the infamous umbDebugShowTrace, etc
-			Page.Trace.IsEnabled &= GlobalSettings.DebugMode && !String.IsNullOrWhiteSpace(Request["umbDebugShowTrace"]);
 		}
 
 		protected override void Render(HtmlTextWriter writer)

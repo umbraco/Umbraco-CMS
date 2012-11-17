@@ -1,6 +1,7 @@
 using System;
 using System.Configuration;
 using NUnit.Framework;
+using Umbraco.Core.Configuration;
 using Umbraco.Web;
 
 namespace Umbraco.Tests
@@ -10,6 +11,13 @@ namespace Umbraco.Tests
 	[TestFixture]
 	public class UriUtilityTests
 	{
+
+		[TearDown]
+		public void TearDown()
+		{
+			UmbracoSettings.ResetSetters();
+		}
+
 		// test normal urls
 		[TestCase("http://LocalHost/", "http://localhost/")]
 		[TestCase("http://LocalHost/?x=y", "http://localhost/?x=y")]

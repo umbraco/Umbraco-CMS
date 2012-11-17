@@ -23,6 +23,7 @@ namespace Umbraco.Web.Routing
 
 		public PublishedContentRequestBuilder(PublishedContentRequest publishedContentRequest)
 		{
+			if (publishedContentRequest == null) throw new ArgumentNullException("publishedContentRequest");
 			_publishedContentRequest = publishedContentRequest;
 			_umbracoContext = publishedContentRequest.RoutingContext.UmbracoContext;
 			_routingContext = publishedContentRequest.RoutingContext;

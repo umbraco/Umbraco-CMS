@@ -1,12 +1,10 @@
 using System;
 using System.Diagnostics;
-using System.Xml;
-using System.Xml.Linq;
 using Microsoft.CSharp.RuntimeBinder;
 using NUnit.Framework;
 using Umbraco.Core.Dynamics;
 
-namespace Umbraco.Tests.DynamicDocument
+namespace Umbraco.Tests.PublishedContent
 {
 	[TestFixture]
 	public class DynamicXmlTests

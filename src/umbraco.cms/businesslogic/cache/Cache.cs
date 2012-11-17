@@ -22,7 +22,7 @@ namespace umbraco.cms.businesslogic.cache
         /// umbraco content is removed, but also other cache items from pages running in
         /// the same application / website. Use with care :-)
         /// </summary>
-        [Obsolete("Use the ApplicationContext.Cache.ClearAllCache instead")]
+        [Obsolete("Use the ApplicationContext.Current.ApplicationCache.ClearAllCache instead")]
         public static void ClearAllCache()
         {
 	        var helper = new CacheHelper(System.Web.HttpRuntime.Cache);
@@ -33,7 +33,7 @@ namespace umbraco.cms.businesslogic.cache
         /// Clears the item in umbraco's runtime cache with the given key 
         /// </summary>
         /// <param name="key">Key</param>
-		[Obsolete("Use the ApplicationContext.Cache.ClearCacheItem instead")]
+        [Obsolete("Use the ApplicationContext.Current.ApplicationCache.ClearCacheItem instead")]
         public static void ClearCacheItem(string key)
         {
 			var helper = new CacheHelper(System.Web.HttpRuntime.Cache);
@@ -46,7 +46,7 @@ namespace umbraco.cms.businesslogic.cache
         /// input parameter. (using [object].GetType())
         /// </summary>
         /// <param name="TypeName">The name of the System.Type which should be cleared from cache ex "System.Xml.XmlDocument"</param>
-		[Obsolete("Use the ApplicationContext.Cache.ClearCacheObjectTypes instead")]
+        [Obsolete("Use the ApplicationContext.Current.ApplicationCache.ClearCacheObjectTypes instead")]
         public static void ClearCacheObjectTypes(string TypeName)
         {
 			var helper = new CacheHelper(System.Web.HttpRuntime.Cache);
@@ -57,7 +57,7 @@ namespace umbraco.cms.businesslogic.cache
         /// Clears all cache items that starts with the key passed.
         /// </summary>
         /// <param name="KeyStartsWith">The start of the key</param>
-		[Obsolete("Use the ApplicationContext.Cache.ClearCacheByKeySearch instead")]
+        [Obsolete("Use the ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch instead")]
         public static void ClearCacheByKeySearch(string KeyStartsWith)
         {
 			var helper = new CacheHelper(System.Web.HttpRuntime.Cache);
@@ -88,22 +88,22 @@ namespace umbraco.cms.businesslogic.cache
 
         public delegate TT GetCacheItemDelegate<TT>();
 
-		[Obsolete("Use the ApplicationContext.Cache.GetCacheItem instead")]
+        [Obsolete("Use the ApplicationContext.Current.ApplicationCache.GetCacheItem instead")]
         public static TT GetCacheItem<TT>(string cacheKey, object syncLock,
             TimeSpan timeout, GetCacheItemDelegate<TT> getCacheItem)
         {
             return GetCacheItem(cacheKey, syncLock, null, timeout, getCacheItem);
         }
 
-		[Obsolete("Use the ApplicationContext.Cache.GetCacheItem instead")]
+        [Obsolete("Use the ApplicationContext.Current.ApplicationCache.GetCacheItem instead")]
         public static TT GetCacheItem<TT>(string cacheKey, object syncLock,
             CacheItemRemovedCallback refreshAction, TimeSpan timeout,
             GetCacheItemDelegate<TT> getCacheItem)
         {
             return GetCacheItem(cacheKey, syncLock, CacheItemPriority.Normal, refreshAction, timeout, getCacheItem);
         }
-
-		[Obsolete("Use the ApplicationContext.Cache.GetCacheItem instead")]
+        
+        [Obsolete("Use the ApplicationContext.Current.ApplicationCache.GetCacheItem instead")]
         public static TT GetCacheItem<TT>(string cacheKey, object syncLock,
             CacheItemPriority priority, CacheItemRemovedCallback refreshAction, TimeSpan timeout,
             GetCacheItemDelegate<TT> getCacheItem)
@@ -111,7 +111,7 @@ namespace umbraco.cms.businesslogic.cache
             return GetCacheItem(cacheKey, syncLock, priority, refreshAction, null, timeout, getCacheItem);
         }
 
-		[Obsolete("Use the ApplicationContext.Cache.GetCacheItem instead")]
+        [Obsolete("Use the ApplicationContext.Current.ApplicationCache.GetCacheItem instead")]
         public static TT GetCacheItem<TT>(string cacheKey, object syncLock,
             CacheItemPriority priority, CacheItemRemovedCallback refreshAction,
             CacheDependency cacheDependency, TimeSpan timeout, GetCacheItemDelegate<TT> getCacheItem)

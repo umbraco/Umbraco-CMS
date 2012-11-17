@@ -5,17 +5,12 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
-using Umbraco.Web.Models;
-using umbraco.BusinessLogic;
 using umbraco.IO;
 using umbraco.MacroEngines;
 using umbraco.NodeFactory;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.template;
 using System.Linq;
-using umbraco.cms.businesslogic.web;
 
-namespace Umbraco.Tests.DynamicDocument
+namespace Umbraco.Tests.PublishedContent
 {
 	[TestFixture]
 	public class DynamicNodeTests : DynamicDocumentTestsBase<DynamicNode, DynamicNodeList>

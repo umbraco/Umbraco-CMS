@@ -6,10 +6,9 @@ using System.Web;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Dynamics;
-using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.DynamicDocument
+namespace Umbraco.Tests.PublishedContent
 {
 	[TestFixture]
 	public abstract class DynamicDocumentTestsBase<TDocument, TDocumentList> : BaseRoutingTest

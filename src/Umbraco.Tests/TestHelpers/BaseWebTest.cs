@@ -4,6 +4,7 @@ using System.Web.Routing;
 using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.Stubs;
@@ -42,6 +43,7 @@ namespace Umbraco.Tests.TestHelpers
 		public virtual void TearDown()
 		{
 			//reset the app context
+			ApplicationContext.ApplicationCache.ClearAllCache();
 			ApplicationContext.Current = null;
 		    DatabaseContext = null;
 			Resolution.IsFrozen = false;
@@ -51,6 +53,8 @@ namespace Umbraco.Tests.TestHelpers
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
 			Cache.ClearAllCache();
+
+			UmbracoSettings.ResetSetters();
 		}	
 
 		/// <summary>
