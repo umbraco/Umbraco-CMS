@@ -13,6 +13,7 @@ namespace umbraco.cms.businesslogic.template
     internal class MasterPageHelper
     {
         internal static readonly string DefaultMasterTemplate = SystemDirectories.Umbraco + "/masterpages/default.master";
+		private static readonly char[] NewLineChars = Environment.NewLine.ToCharArray();
         
 		internal static bool MasterPageExists(Template t)
 		{
@@ -77,14 +78,13 @@ namespace umbraco.cms.businesslogic.template
             // Add header to master page if it doesn't exist
             if (!masterPageContent.TrimStart().StartsWith("<%@"))
             {
-                masterPageContent = GetMasterPageHeader(template) + "\n" + masterPageContent;
+                masterPageContent = GetMasterPageHeader(template) + Environment.NewLine + masterPageContent;
             }
             else
             {
                 // verify that the masterpage attribute is the same as the masterpage
                 string masterHeader =
-                    masterPageContent.Substring(0, masterPageContent.IndexOf("%>") + 2).Trim(
-                        Environment.NewLine.ToCharArray());
+                    masterPageContent.Substring(0, masterPageContent.IndexOf("%>") + 2).Trim(NewLineChars);
 
                 // find the masterpagefile attribute
                 MatchCollection m = Regex.Matches(masterHeader, "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"",
@@ -140,7 +140,7 @@ namespace umbraco.cms.businesslogic.template
 
         internal static string ConvertToMasterPageSyntax(Template template)
         {
-            string masterPageContent = GetMasterContentElement(template) + "\n";
+            string masterPageContent = GetMasterContentElement(template) + Environment.NewLine;
 
             masterPageContent += template.Design;
 
@@ -148,7 +148,7 @@ namespace umbraco.cms.businesslogic.template
             masterPageContent = EnsureMasterPageSyntax(template.Alias, masterPageContent);
 
             // append ending asp:content element
-            masterPageContent += "\n</asp:Content>" + Environment.NewLine;
+            masterPageContent += Environment.NewLine + "</asp:Content>" + Environment.NewLine;
 
             return masterPageContent;
         }

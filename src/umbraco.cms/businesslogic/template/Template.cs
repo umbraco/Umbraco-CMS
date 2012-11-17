@@ -42,6 +42,7 @@ namespace umbraco.cms.businesslogic.template
         private static readonly string UmbracoTemplateCacheKey = "UmbracoTemplateCache";
         private static object _templateLoaderLocker = new object();
         private static Guid _objectType = new Guid("6fbde604-4178-42ce-a10b-8a2600a2f07d");
+		private static readonly char[] NewLineChars = Environment.NewLine.ToCharArray();
 
         #endregion
 
@@ -262,7 +263,7 @@ namespace umbraco.cms.businesslogic.template
             {
                 FlushCache();
 
-                _design = value.Trim(Environment.NewLine.ToCharArray());
+                _design = value.Trim(NewLineChars);
 
                 //we only switch to MVC View editing if the template has a view file, and MVC editing is enabled
 				if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && !MasterPageHelper.IsMasterPageSyntax(_design))
