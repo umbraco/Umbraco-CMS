@@ -307,7 +307,7 @@ namespace umbraco.cms.presentation
         {
             if (Page.IsValid)
             {
-                if (_document.Level == 1 || new cms.businesslogic.web.Document(_document.Parent.Id).Published)
+                if (_document.Level == 1 || new cms.businesslogic.web.Document(_document.Parent.Id).PathPublished)
                 {
                     Trace.Warn("before d.publish");
 
