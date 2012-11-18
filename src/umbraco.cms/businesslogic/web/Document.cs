@@ -1187,7 +1187,7 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "'%'"));
                 SqlHelper.ExecuteNonQuery(string.Format("update cmsDocument set published = 0 where nodeId = {0}", Id));
 
 				foreach (var d in Children) {
-					if (!d.Published) {
+					if (d.Published) {
 						d.UnPublish();
 					}
 				}
