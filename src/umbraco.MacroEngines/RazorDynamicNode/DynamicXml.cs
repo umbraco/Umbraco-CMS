@@ -11,8 +11,8 @@ using System.Web;
 
 namespace umbraco.MacroEngines
 {
-	[Obsolete("This class has been superceded by Umbraco.Core.Dynamics.DynamicXml")]	
-    public class DynamicXml : DynamicObject, IEnumerable
+	[Obsolete("This class has been superceded by Umbraco.Core.Dynamics.DynamicXml")]
+	public class DynamicXml : DynamicObject, IEnumerable<DynamicXml>, IEnumerable<XElement>
 	{
 		private readonly Umbraco.Core.Dynamics.DynamicXml _inner;
 
@@ -92,10 +92,21 @@ namespace umbraco.MacroEngines
 			return new DynamicXml(_inner.BaseElement.XPathSelectElements(expression).FirstOrDefault());
         }
 
-        public IEnumerator GetEnumerator()
-        {
+		IEnumerator<XElement> IEnumerable<XElement>.GetEnumerator()
+		{
+			return this.BaseElement.Elements().GetEnumerator();
+		}
+
+		public IEnumerator<DynamicXml> GetEnumerator()
+		{
 			return this.BaseElement.Elements().Select(e => new DynamicXml(e)).GetEnumerator();
-        }
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+
         public int Count()
         {
         	return _inner.Count();
@@ -114,6 +125,16 @@ namespace umbraco.MacroEngines
         {
         	return _inner.HasValue();
         }
+
+		public IEnumerable<DynamicXml> Take(int count)
+		{
+			return _inner.Take(count).Select(x => new DynamicXml(x.BaseElement));
+		}
+
+		public IEnumerable<DynamicXml> Skip(int count)
+		{
+			return _inner.Skip(count).Select(x => new DynamicXml(x.BaseElement));
+		}
 
         public bool IsFirst()
         {

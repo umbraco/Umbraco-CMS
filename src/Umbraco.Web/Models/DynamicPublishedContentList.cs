@@ -46,9 +46,6 @@ namespace Umbraco.Web.Models
         }
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
-
-			//TODO: We MUST cache the result here, it is very expensive to keep finding extension methods and processing this stuff!
-
 			//TODO: Nowhere here are we checking if args is the correct length!
 
 			//NOTE: For many of these we could actually leave them out since we are executing custom extension methods and because
@@ -197,22 +194,12 @@ namespace Umbraco.Web.Models
 					result = new DynamicPublishedContentList(this.Items.Except(firstArg as IEnumerable<DynamicPublishedContent>, new DynamicPublishedContentIdEqualityComparer()));					
                     return true;
                 }
-				if ((firstArg as DynamicPublishedContentList) != null)
-                {
-					result = new DynamicPublishedContentList(this.Items.Except((firstArg as DynamicPublishedContentList).Items, new DynamicPublishedContentIdEqualityComparer()));
-                    return true;
-                }
             }
             if (name == "Intersect")
             {
 				if ((firstArg as IEnumerable<DynamicPublishedContent>) != null)
                 {
 					result = new DynamicPublishedContentList(this.Items.Intersect(firstArg as IEnumerable<DynamicPublishedContent>, new DynamicPublishedContentIdEqualityComparer()));					
-                    return true;
-                }
-				if ((firstArg as DynamicPublishedContentList) != null)
-                {
-					result = new DynamicPublishedContentList(this.Items.Intersect((firstArg as DynamicPublishedContentList).Items, new DynamicPublishedContentIdEqualityComparer()));
                     return true;
                 }
             }
@@ -226,65 +213,50 @@ namespace Umbraco.Web.Models
                 result = Pluck(args);
                 return true;
             }
-            try
-            {
-                //Property?
-                result = Items.GetType().InvokeMember(binder.Name,
-                                                  System.Reflection.BindingFlags.Instance |
-                                                  System.Reflection.BindingFlags.Public |
-                                                  System.Reflection.BindingFlags.GetProperty,
-                                                  null,
-                                                  Items,
-                                                  args);
-                return true;
-            }
-            catch (MissingMethodException)
-            {
-                try
-                {
-                    //Static or Instance Method?
-                    result = Items.GetType().InvokeMember(binder.Name,
-                                                  System.Reflection.BindingFlags.Instance |
-                                                  System.Reflection.BindingFlags.Public |
-                                                  System.Reflection.BindingFlags.Static |
-                                                  System.Reflection.BindingFlags.InvokeMethod,
-                                                  null,
-                                                  Items,
-                                                  args);
-                    return true;
-                }
-                catch (MissingMethodException)
-                {
 
-                    try
-                    {
-                        result = ExecuteExtensionMethod(args, name);
-                        return true;
-                    }
-                    catch (TargetInvocationException)
-                    {
-                        //We do this to enable error checking of Razor Syntax when a method e.g. ElementAt(2) is used.
-                        //When the Script is tested, there's no Children which means ElementAt(2) is invalid (IndexOutOfRange)
-                        //Instead, we are going to return DynamicNull;
-	                    result = new DynamicNull();
-                        return true;
-                    }
+			//ok, now lets try to match by member, property, extensino method
+			var attempt = DynamicInstanceHelper.TryInvokeMember(this, binder, args, new[]
+				{
+					typeof (IEnumerable<DynamicPublishedContent>),
+					typeof (DynamicPublishedContentList)
+				});
 
-                    catch
-                    {
-                        result = null;
-                        return false;
-                    }
+			if (attempt.Success)
+			{
+				result = attempt.Result.ObjectResult;
 
-                }
+				//need to check the return type and possibly cast if result is from an extension method found
+				if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod)
+				{
+					if (attempt.Result.ObjectResult != null)
+					{
+						if (attempt.Result.ObjectResult is IPublishedContent)
+						{
+							result = new DynamicPublishedContent((IPublishedContent)attempt.Result.ObjectResult);
+						}
+						if (attempt.Result.ObjectResult is IEnumerable<IPublishedContent>)
+						{
+							result = new DynamicPublishedContentList((IEnumerable<IPublishedContent>)attempt.Result.ObjectResult);
+						}
+						if (attempt.Result.ObjectResult is IEnumerable<DynamicPublishedContent>)
+						{
+							result = new DynamicPublishedContentList((IEnumerable<DynamicPublishedContent>)attempt.Result.ObjectResult);
+						}
+					}
+				}
+				return true;
+			}
 
+			//this is the result of an extension method execution gone wrong so we return dynamic null
+			if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod
+				&& attempt.Error != null && attempt.Error is TargetInvocationException)
+			{
+				result = new DynamicNull();
+				return true;
+			}
 
-            }
-            catch
-            {
-                result = null;
-                return false;
-            }
+			result = null;
+			return false;
 
         }
         private T Aggregate<T>(IEnumerable<T> data, string name) where T : struct
@@ -425,67 +397,7 @@ namespace Umbraco.Web.Models
             }
             return result;
         }
-
-        private object ExecuteExtensionMethod(object[] args, string name)
-        {
-            object result = null;
-
-        	var methodTypesToFind = new[]
-        		{
-					typeof(IEnumerable<DynamicPublishedContent>),
-					typeof(DynamicPublishedContentList)
-        		};
-
-			//find known extension methods that match the first type in the list
-        	MethodInfo toExecute = null;
-			foreach(var t in methodTypesToFind)
-			{
-				toExecute = ExtensionMethodFinder.FindExtensionMethod(t, args, name, false);
-				if (toExecute != null)
-					break;
-			}
-
-			if (toExecute != null)
-            {
-				if (toExecute.GetParameters().First().ParameterType == typeof(DynamicPublishedContentList))
-                {
-                    var genericArgs = (new[] { this }).Concat(args);
-					result = toExecute.Invoke(null, genericArgs.ToArray());
-                }
-				else if (TypeHelper.IsTypeAssignableFrom<IQueryable>(toExecute.GetParameters().First().ParameterType))
-				{
-					//if it is IQueryable, we'll need to cast Items AsQueryable
-					var genericArgs = (new[] { Items.AsQueryable() }).Concat(args);
-					result = toExecute.Invoke(null, genericArgs.ToArray());
-				}
-				else
-				{
-					var genericArgs = (new[] { Items }).Concat(args);
-					result = toExecute.Invoke(null, genericArgs.ToArray());
-				}
-            }
-            else
-            {
-                throw new MissingMethodException();
-            }
-            if (result != null)
-            {
-				if (result is IPublishedContent)
-				{
-					result = new DynamicPublishedContent((IPublishedContent)result);
-				}
-				if (result is IEnumerable<IPublishedContent>)
-				{
-					result = new DynamicPublishedContentList((IEnumerable<IPublishedContent>)result);
-				}
-				if (result is IEnumerable<DynamicPublishedContent>)
-				{
-					result = new DynamicPublishedContentList((IEnumerable<DynamicPublishedContent>)result);
-				}		
-            }
-            return result;
-        }
-
+		
 		public T Single<T>(string predicate, params object[] values)
 		{
 			return predicate.IsNullOrWhiteSpace() 
