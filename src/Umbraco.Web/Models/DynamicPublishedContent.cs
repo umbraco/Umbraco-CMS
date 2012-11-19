@@ -66,20 +66,21 @@ namespace Umbraco.Web.Models
 				//need to check the return type and possibly cast if result is from an extension method found
 				if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod)
 				{					
-					if (attempt.Result.ObjectResult != null)
+					//we don't need to cast if it is already DynamicPublishedContent
+					if (attempt.Result.ObjectResult != null && (!(attempt.Result.ObjectResult is DynamicPublishedContent)))
 					{
 						if (attempt.Result.ObjectResult is IPublishedContent)
 						{
 							result = new DynamicPublishedContent((IPublishedContent)attempt.Result.ObjectResult);
 						}
-						if (attempt.Result.ObjectResult is IEnumerable<IPublishedContent>)
+						else if (attempt.Result.ObjectResult is IEnumerable<DynamicPublishedContent>)
+						{
+							result = new DynamicPublishedContentList((IEnumerable<DynamicPublishedContent>)attempt.Result.ObjectResult);
+						}	
+						else if (attempt.Result.ObjectResult is IEnumerable<IPublishedContent>)
 						{
 							result = new DynamicPublishedContentList((IEnumerable<IPublishedContent>)attempt.Result.ObjectResult);
 						}
-						if (attempt.Result.ObjectResult is IEnumerable<DynamicPublishedContent>)
-						{
-							result = new DynamicPublishedContentList((IEnumerable<DynamicPublishedContent>)attempt.Result.ObjectResult);
-						}					
 					}	
 				}
 				return true;

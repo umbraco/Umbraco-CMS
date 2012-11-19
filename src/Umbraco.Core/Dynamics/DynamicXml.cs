@@ -75,6 +75,7 @@ namespace Umbraco.Core.Dynamics
 			//ok, now lets try to match by member, property, extensino method
 			var attempt = DynamicInstanceHelper.TryInvokeMember(this, binder, args, new[]
 				{
+					typeof (IEnumerable<DynamicXml>),
 					typeof (IEnumerable<XElement>),
 					typeof (DynamicXml)
 				});
@@ -86,17 +87,18 @@ namespace Umbraco.Core.Dynamics
 				//need to check the return type and possibly cast if result is from an extension method found
 				if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod)
 				{
-					if (attempt.Result.ObjectResult != null)
+					//if the result is already a DynamicXml instance, then we do not need to cast
+					if (attempt.Result.ObjectResult != null && !(attempt.Result.ObjectResult is DynamicXml))
 					{
 						if (attempt.Result.ObjectResult is XElement)
 						{
-							result = new DynamicXml((XElement) attempt.Result.ObjectResult);
+							result = new DynamicXml((XElement)attempt.Result.ObjectResult);
 						}
-						if (attempt.Result.ObjectResult is IEnumerable<XElement>)
+						else if (attempt.Result.ObjectResult is IEnumerable<XElement>)
 						{
-							result = ((IEnumerable<XElement>) attempt.Result.ObjectResult).Select(x => new DynamicXml(x));
+							result = ((IEnumerable<XElement>)attempt.Result.ObjectResult).Select(x => new DynamicXml(x));
 						}
-						if (attempt.Result.ObjectResult is IEnumerable<DynamicXml>)
+						else if (attempt.Result.ObjectResult is IEnumerable<DynamicXml>)
 						{
 							result = ((IEnumerable<DynamicXml>)attempt.Result.ObjectResult).Select(x => new DynamicXml(x.BaseElement));
 						}
