@@ -213,7 +213,7 @@ namespace Umbraco.Web
 			// at that point, either we have no extension, or it is .aspx
 
 			// if the path is reserved then it cannot be a document request
-			if (maybeDoc && GlobalSettings.IsReservedPathOrUrl(lpath))
+			if (maybeDoc && GlobalSettings.IsReservedPathOrUrl(lpath, httpContext, RouteTable.Routes))
 				maybeDoc = false;
 
 			//NOTE: No need to warn, plus if we do we should log the document, as this message doesn't really tell us anything :)
