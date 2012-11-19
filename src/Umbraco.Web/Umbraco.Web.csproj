@@ -2170,7 +2170,7 @@ xcopy /s /y "$(ProjectDir)umbraco.presentation\*.asmx" "$(ProjectDir)..\Umbraco.
 xcopy /s /y "$(ProjectDir)umbraco.presentation\*.ashx" "$(ProjectDir)..\Umbraco.Web.UI\"
 xcopy /s /y "$(ProjectDir)umbraco.presentation\*.master" "$(ProjectDir)..\Umbraco.Web.UI\"</PostBuildEvent>
   </PropertyGroup>
-  <Import Project="$(ProjectDir)..\..\tools\BuildTargets\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
   <ProjectExtensions />
   <PropertyGroup>
