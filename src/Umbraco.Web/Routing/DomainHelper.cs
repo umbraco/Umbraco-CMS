@@ -51,9 +51,6 @@ namespace Umbraco.Web.Routing
 		/// <returns>The domain and its normalized uri, that best matches the current uri, else the first domain (if <c>defaultToFirst</c> is <c>true</c>), else null.</returns>
 		public static DomainAndUri DomainMatch(IEnumerable<Domain> domains, Uri current, bool defaultToFirst)
 		{
-			if (!domains.Any())
-				return null;
-
 			// sanitize the list to have proper uris for comparison (scheme, path end with /)
 			// we need to end with / because example.com/foo cannot match example.com/foobar
 			// we need to order so example.com/foo matches before example.com/
@@ -63,6 +60,9 @@ namespace Umbraco.Web.Routing
 				.Select(d => new { Domain = d, UriString = UriUtility.EndPathWithSlash(UriUtility.StartWithScheme(d.Name, scheme)) })
 				.OrderByDescending(t => t.UriString)
 				.Select(t => new DomainAndUri { Domain = t.Domain, Uri = new Uri(t.UriString) });
+
+			if (!domainsAndUris.Any())
+				return null;
 
 			DomainAndUri domainAndUri;
 			if (current == null)
