@@ -57,11 +57,13 @@ namespace Umbraco.Web.Routing
 			// redirect if it has been flagged
 			if (this.IsRedirect)
 				httpContext.Response.Redirect(this.RedirectUrl, true);
-			//set the culture on the thread
+			//set the culture on the thread - once, so it's set when running document lookups
 			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = this.Culture;
 			//find the document, found will be true if the doc request has found BOTH a node and a template
 			// though currently we don't use this value.
 			var found = _builder.LookupDocument();
+			//set the culture on the thread -- again, 'cos it might have changed due to a wildcard domain
+			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = this.Culture;
 			//this could be called in the LookupDocument method, but I've just put it here for clarity.
 			_builder.DetermineRenderingEngine();
 
@@ -89,6 +91,9 @@ namespace Umbraco.Web.Routing
 			// just be safe - should never ever happen
 			if (!this.HasNode)
 				throw new Exception("No document to render.");
+
+			// trigger PublishedContentRequest.Rendering event?
+			// with complete access to the content request?
 
 			// render even though we might have no template
 			// to give MVC a chance to hijack routes

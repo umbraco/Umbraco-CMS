@@ -59,6 +59,7 @@ namespace Umbraco.Web.Routing
 			// we need to order so example.com/foo matches before example.com/
 			var scheme = current == null ? Uri.UriSchemeHttp : current.Scheme;
 			var domainsAndUris = domains
+				.Where(d => !string.IsNullOrEmpty(d.Name) && d.Name != "*")
 				.Select(d => new { Domain = d, UriString = UriUtility.EndPathWithSlash(UriUtility.StartWithScheme(d.Name, scheme)) })
 				.OrderByDescending(t => t.UriString)
 				.Select(t => new DomainAndUri { Domain = t.Domain, Uri = new Uri(t.UriString) });
@@ -95,6 +96,7 @@ namespace Umbraco.Web.Routing
 		{
 			var scheme = current == null ? Uri.UriSchemeHttp : current.Scheme;
 			var domainsAndUris = domains
+				.Where(d => !string.IsNullOrEmpty(d.Name) && d.Name != "*")
 				.Select(d => new { Domain = d, UriString = UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(d.Name, scheme)) })
 				.OrderByDescending(t => t.UriString)
 				.Select(t => new DomainAndUri { Domain = t.Domain, Uri = new Uri(t.UriString) });
@@ -115,7 +117,33 @@ namespace Umbraco.Web.Routing
 				.Reverse()
 				.Select(id => int.Parse(id))
 				.TakeWhile(id => id != current.RootNodeId)
-				.Any(id => domains.Any(d => d.RootNodeId == id));
+				.Any(id => domains.Any(d => d.RootNodeId == id && !string.IsNullOrEmpty(d.Name) && d.Name != "*"));
+		}
+
+		/// <summary>
+		/// Gets the deepest wildcard <see cref="Domain"/> in a node path.
+		/// </summary>
+		/// <param name="domains">The enumeration of Umbraco domains.</param>
+		/// <param name="path">The node path.</param>
+		/// <param name="rootNodeId">The current domain root node identifier, or null.</param>
+		/// <returns>The deepest wildcard <see cref="Domain"/> in the path, or null.</returns>
+		public static Domain LookForWildcardDomain(IEnumerable<Domain> domains, string path, int? rootNodeId)
+		{
+			var nodeIds = path.Split(',').Select(p => int.Parse(p)).Reverse();
+			rootNodeId = rootNodeId ?? -1; // every paths begin with -1
+
+			foreach (var nodeId in nodeIds)
+			{
+				if (nodeId == rootNodeId) // stop at current domain or root
+					break;
+
+				// supporting null or whitespace for backward compatibility, 
+				// although we should not allow ppl to create them anymore
+				var domain = domains.Where(d => d.RootNodeId == nodeId && (string.IsNullOrWhiteSpace(d.Name) || d.Name == "*")).FirstOrDefault();
+				if (domain != null)
+					return domain;
+			}
+			return null;
 		}
 
 		/// <summary>

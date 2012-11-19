@@ -168,6 +168,9 @@ namespace Umbraco.Web.Routing
 			// handle umbracoRedirect (moved from umbraco.page)
 			FollowRedirect();
 
+			// handle wildcard domains
+			HandleWildcardDomains();
+
 			bool resolved = _publishedContentRequest.HasNode && _publishedContentRequest.HasTemplate;
 			return resolved;
 		}
@@ -357,6 +360,9 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		private void LookupTemplate()
 		{
+			// HERE we should let people register their own way of finding a template, same as with documents!!!!
+			// do we?
+
 			//return if the request already has a template assigned, this can be possible if an ILookup assigns one
 			if (_publishedContentRequest.HasTemplate) return;
 
@@ -424,6 +430,33 @@ namespace Umbraco.Web.Routing
 					redirectUrl = _routingContext.NiceUrlProvider.GetNiceUrl(redirectId);
 				if (redirectUrl != "#")
 					_publishedContentRequest.RedirectUrl = redirectUrl;
+			}
+		}
+
+		/// <summary>
+		/// Looks for wildcard domains in the path and updates <c>Culture</c> accordingly.
+		/// </summary>
+		private void HandleWildcardDomains()
+		{
+			const string tracePrefix = "HandleWildcardDomains: ";
+
+			if (!_publishedContentRequest.HasNode)
+				return;
+
+			var nodePath = _publishedContentRequest.PublishedContent.Path;
+			LogHelper.Debug<PublishedContentRequest>("{0}Path=\"{1}\"", () => tracePrefix, () => nodePath);
+			var rootNodeId = _publishedContentRequest.HasDomain ? _publishedContentRequest.Domain.RootNodeId : (int?)null;
+			var domain = DomainHelper.LookForWildcardDomain(Domain.GetDomains(), nodePath, rootNodeId);
+
+			if (domain != null)
+			{
+				_publishedContentRequest.Culture = new CultureInfo(domain.Language.CultureAlias);
+				LogHelper.Debug<PublishedContentRequest>("{0}Got domain on node {1}, set culture to \"{2}\".", () => tracePrefix,
+					() => domain.RootNodeId, () => _publishedContentRequest.Culture.Name);
+			}
+			else
+			{
+				LogHelper.Debug<PublishedContentRequest>("{0}No match.", () => tracePrefix);
 			}
 		}
 	}
