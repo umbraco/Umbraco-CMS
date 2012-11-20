@@ -149,9 +149,7 @@
       <Name>System.Drawing</Name>
     </Reference>
     <Reference Include="System.EnterpriseServices" />
-    <Reference Include="System.Web">
-      <Name>System.Web</Name>
-    </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -1951,7 +1949,9 @@
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertLink.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertMacro.aspx" />
+    <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertMacro.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx" />
     <None Include="Mvc\web.config.template" />
     <None Include="Web References\org.umbraco.update\UpgradeResult1.datasource">
