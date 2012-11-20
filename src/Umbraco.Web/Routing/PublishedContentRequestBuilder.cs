@@ -152,8 +152,8 @@ namespace Umbraco.Web.Routing
 			// some lookups may implement caching
 
 			using (DisposableTimer.DebugDuration<PluginManager>(
-				string.Format("{0}Begin resolvers", tracePrefix),
-				string.Format("{0}End resolvers, {1}", tracePrefix, (_publishedContentRequest.HasNode ? "a document was found" : "no document was found"))))
+				() => string.Format("{0}Begin resolvers", tracePrefix),
+				() => string.Format("{0}End resolvers, {1}", tracePrefix, (_publishedContentRequest.HasNode ? "a document was found" : "no document was found"))))
 			{
 				_routingContext.DocumentLookups.Any(lookup => lookup.TrySetDocument(_publishedContentRequest));
 			}
@@ -236,6 +236,7 @@ namespace Umbraco.Web.Routing
 				LogHelper.Debug<PublishedContentRequest>("{0}Looks like we're running into an infinite loop, abort", () => tracePrefix);
 				_publishedContentRequest.PublishedContent = null;
 			}
+
 			LogHelper.Debug<PublishedContentRequest>("{0}End", () => tracePrefix);
 		}
 
