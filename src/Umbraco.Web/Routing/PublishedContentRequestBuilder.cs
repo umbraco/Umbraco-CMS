@@ -147,20 +147,11 @@ namespace Umbraco.Web.Routing
 			const string tracePrefix = "LookupDocument: ";
 			LogHelper.Debug<PublishedContentRequest>("{0}Path=\"{1}\"", () => tracePrefix, () => _publishedContentRequest.Uri.AbsolutePath);
 
-			// look for the document
-			// the first successful resolver, if any, will set this.Node, and may also set this.Template
-			// some lookups may implement caching
+			// run the document lookups
+			LookupDocument1();
 
-			using (DisposableTimer.DebugDuration<PluginManager>(
-				() => string.Format("{0}Begin resolvers", tracePrefix),
-				() => string.Format("{0}End resolvers, {1}", tracePrefix, (_publishedContentRequest.HasNode ? "a document was found" : "no document was found"))))
-			{
-				_routingContext.DocumentLookups.Any(lookup => lookup.TrySetDocument(_publishedContentRequest));
-			}
-
-			// fixme - not handling umbracoRedirect
-			// should come after internal redirects
-			// so after ResolveDocument2() => docreq.IsRedirect => handled by the module!
+			// not handling umbracoRedirect here but after LookupDocument2
+			// so internal redirect, 404, etc has precedence over redirect
 
 			// handle not-found, redirects, access, template
 			LookupDocument2();
@@ -173,6 +164,26 @@ namespace Umbraco.Web.Routing
 
 			bool resolved = _publishedContentRequest.HasNode && _publishedContentRequest.HasTemplate;
 			return resolved;
+		}
+
+		/// <summary>
+		/// Performs the document resolution first pass.
+		/// </summary>
+		/// <remarks>The first past consists in running the document lookups.</remarks>
+		internal void LookupDocument1()
+		{
+			const string tracePrefix = "LookupDocument: ";
+
+			// look for the document
+			// the first successful resolver, if any, will set this.Node, and may also set this.Template
+			// some lookups may implement caching
+
+			using (DisposableTimer.DebugDuration<PluginManager>(
+				() => string.Format("{0}Begin resolvers", tracePrefix),
+				() => string.Format("{0}End resolvers, {1}", tracePrefix, (_publishedContentRequest.HasNode ? "a document was found" : "no document was found"))))
+			{
+				_routingContext.DocumentLookups.Any(lookup => lookup.TrySetDocument(_publishedContentRequest));
+			}
 		}
 
 		/// <summary>
@@ -221,10 +232,6 @@ namespace Umbraco.Web.Routing
 				if (_publishedContentRequest.HasNode)
 					EnsureNodeAccess();
 
-				// resolve template
-				if (_publishedContentRequest.HasNode)
-					LookupTemplate();
-
 				// loop while we don't have page, ie the redirect or access
 				// got us to nowhere and now we need to run the notFoundLookup again
 				// as long as it's not running out of control ie infinite loop of some sort
@@ -237,6 +244,12 @@ namespace Umbraco.Web.Routing
 				_publishedContentRequest.PublishedContent = null;
 			}
 
+			// resolve template - will do nothing if a template is already set
+			// moved out of the loop because LookupTemplate does set .PublishedContent to null anymore
+			// (see node in LookupTemplate)
+			if (_publishedContentRequest.HasNode)
+				LookupTemplate();
+			
 			LogHelper.Debug<PublishedContentRequest>("{0}End", () => tracePrefix);
 		}
 
