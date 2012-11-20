@@ -134,9 +134,12 @@
       <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
     </ProjectReference>
     <ProjectReference Include="..\umbraco.cms\umbraco.cms.csproj">
+      <Project>{ccd75ec3-63db-4184-b49d-51c1dd337230}</Project>
       <Name>umbraco.cms</Name>
-      <Project>{CCD75EC3-63DB-4184-B49D-51C1DD337230}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+    </ProjectReference>
+    <ProjectReference Include="..\umbraco.controls\umbraco.controls.csproj">
+      <Project>{6edd2061-82f2-461b-bb6e-879245a832de}</Project>
+      <Name>umbraco.controls</Name>
     </ProjectReference>
     <ProjectReference Include="..\umbraco.datalayer\umbraco.datalayer.csproj">
       <Project>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</Project>
@@ -146,10 +149,6 @@
       <Name>umbraco.interfaces</Name>
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.controls\umbraco.controls.csproj">
-      <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
-      <Name>umbraco.controls</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

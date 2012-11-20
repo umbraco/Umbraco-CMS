@@ -120,7 +120,7 @@
       <Name>umbraco.businesslogic</Name>
     </ProjectReference>
     <ProjectReference Include="..\umbraco.cms\umbraco.cms.csproj">
-      <Project>{CCD75EC3-63DB-4184-B49D-51C1DD337230}</Project>
+      <Project>{ccd75ec3-63db-4184-b49d-51c1dd337230}</Project>
       <Name>umbraco.cms</Name>
     </ProjectReference>
     <ProjectReference Include="..\umbraco.datalayer\umbraco.datalayer.csproj">
