@@ -36,6 +36,8 @@ src\Umbraco.Web.UI\media\*
 src\Umbraco.Web.UI\masterpages\*
 src\Umbraco.Web.UI\macroScripts\*
 src\Umbraco.Web.UI\xslt\*
+src\Umbraco.Web.UI\images\*
+src\Umbraco.Web.UI\scripts\*
 
 umbraco\presentation\umbraco\plugins\uComponents\uComponentsInstaller.ascx
 umbraco\presentation\packages\uComponents\MultiNodePicker\CustomTreeService.asmx
