@@ -470,7 +470,7 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
 
                 SetWriter(content, userId);
-
+				content.ChangePublishedState(false);
                 repository.AddOrUpdate(content);
                 _unitOfWork.Commit();
 
@@ -503,9 +503,8 @@ namespace Umbraco.Core.Services
                 {
                     foreach (var content in contents)
                     {
-
-
                         SetWriter(content, userId);
+						content.ChangePublishedState(false);
                         repository.AddOrUpdate(content);
                         _unitOfWork.Commit();
                     }
@@ -550,6 +549,7 @@ namespace Umbraco.Core.Services
                 foreach (var content in contents)
                 {
                     SetWriter(content.Value, userId);
+					content.Value.ChangePublishedState(false);
                     repository.AddOrUpdate(content.Value);
                     _unitOfWork.Commit();
                 }

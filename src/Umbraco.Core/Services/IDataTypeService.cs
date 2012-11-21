@@ -18,9 +18,9 @@ namespace Umbraco.Core.Services
         IDataTypeDefinition GetDataTypeDefinitionById(int id);
 
         /// <summary>
-        /// Gets a <see cref="IDataTypeDefinition"/> by its control Id
+        /// Gets a <see cref="IDataTypeDefinition"/> by its unique guid Id
         /// </summary>
-        /// <param name="id">Id of the DataType control</param>
+        /// <param name="id">Unique guid Id of the DataType</param>
         /// <returns><see cref="IDataTypeDefinition"/></returns>
         IDataTypeDefinition GetDataTypeDefinitionById(Guid id);
 
@@ -61,5 +61,12 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
         IEnumerable<IDataType> GetAllDataTypes();
+
+        /// <summary>
+        /// Gets a <see cref="IDataTypeDefinition"/> by its control Id
+        /// </summary>
+        /// <param name="id">Id of the DataType control</param>
+        /// <returns><see cref="IDataTypeDefinition"/></returns>
+        IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByControlId(Guid id);
     }
 }

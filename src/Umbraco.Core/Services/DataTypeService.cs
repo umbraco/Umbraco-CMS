@@ -38,18 +38,33 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets a <see cref="IDataTypeDefinition"/> by its unique guid Id
+        /// </summary>
+        /// <param name="id">Unique guid Id of the DataType</param>
+        /// <returns><see cref="IDataTypeDefinition"/></returns>
+        public IDataTypeDefinition GetDataTypeDefinitionById(Guid id)
+        {
+            var repository = RepositoryResolver.ResolveByType<IDataTypeDefinitionRepository, IDataTypeDefinition, int>(_unitOfWork);
+
+            var query = Query<IDataTypeDefinition>.Builder.Where(x => x.Key == id);
+            var definitions = repository.GetByQuery(query);
+
+            return definitions.FirstOrDefault();
+        }
+
+        /// <summary>
         /// Gets a <see cref="IDataTypeDefinition"/> by its control Id
         /// </summary>
         /// <param name="id">Id of the DataType control</param>
-        /// <returns><see cref="IDataTypeDefinition"/></returns>
-        public IDataTypeDefinition GetDataTypeDefinitionById(Guid id)
+        /// <returns>Collection of <see cref="IDataTypeDefinition"/> objects with a matching contorl id</returns>
+        public IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByControlId(Guid id)
         {
             var repository = RepositoryResolver.ResolveByType<IDataTypeDefinitionRepository, IDataTypeDefinition, int>(_unitOfWork);
 
             var query = Query<IDataTypeDefinition>.Builder.Where(x => x.ControlId == id);
             var definitions = repository.GetByQuery(query);
 
-            return definitions.FirstOrDefault();
+            return definitions;
         }
 
         /// <summary>

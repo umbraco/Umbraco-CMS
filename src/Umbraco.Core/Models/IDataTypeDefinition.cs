@@ -36,8 +36,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the path
         /// </summary>
         [DataMember]
-        string Path //Setting this value should be handled by the class not the user
-        { get; set; }
+        string Path { get; set; }
 
         /// <summary>
         /// Id of the user who created this entity
