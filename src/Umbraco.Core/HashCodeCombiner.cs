@@ -17,7 +17,7 @@ namespace Umbraco.Core
 	/// </remarks>
 	internal class HashCodeCombiner
 	{
-		private int _combinedHash;
+		private long _combinedHash = 5381L;
 
 		internal void AddInt(int i)
 		{
@@ -40,27 +40,41 @@ namespace Umbraco.Core
 				AddInt((StringComparer.InvariantCultureIgnoreCase).GetHashCode(s));
 		}
 
-		internal void AddFile(FileInfo f)
+		internal void AddFileSystemItem(FileSystemInfo f)
 		{
 			AddCaseInsensitiveString(f.FullName);
 			AddDateTime(f.CreationTimeUtc);
 			AddDateTime(f.LastWriteTimeUtc);
-			AddInt(f.Length.GetHashCode());
+			
+			//check if it is a file or folder 
+			var fileInfo = f as FileInfo;
+			if (fileInfo != null)
+			{
+				AddInt(fileInfo.Length.GetHashCode());
+			}
+			
+			var dirInfo = f as DirectoryInfo;
+			if (dirInfo != null)
+			{
+				foreach (var d in dirInfo.GetFiles())
+				{
+					AddFile(d);
+				}
+				foreach (var s in dirInfo.GetDirectories())
+				{
+					AddFolder(s);
+				}
+			}
+		}
+
+		internal void AddFile(FileInfo f)
+		{
+			AddFileSystemItem(f);			
 		}
 
 		internal void AddFolder(DirectoryInfo d)
 		{
-			AddCaseInsensitiveString(d.FullName);
-			AddDateTime(d.CreationTimeUtc);
-			AddDateTime(d.LastWriteTimeUtc);
-			foreach (var f in d.GetFiles())
-			{
-				AddFile(f);
-			}
-			foreach (var s in d.GetDirectories())
-			{
-				AddFolder(s);
-			}
+			AddFileSystemItem(d);			
 		}
 
 		/// <summary>

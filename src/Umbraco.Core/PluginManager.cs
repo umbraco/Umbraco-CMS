@@ -53,11 +53,11 @@ namespace Umbraco.Core
 		/// <summary>
 		/// Creates a new PluginManager
 		/// </summary>
-		/// <param name="detectBinChanges">
+		/// <param name="detectCodeChanges">
 		/// If true will detect changes in the /bin folder and therefor load plugins from the 
 		/// cached plugins file if one is found. If false will never use the cache file for plugins
 		/// </param>
-		internal PluginManager(bool detectBinChanges = true)
+		internal PluginManager(bool detectCodeChanges = true)
 		{
 			_tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
 			//create the folder if it doesn't exist
@@ -66,7 +66,7 @@ namespace Umbraco.Core
 				Directory.CreateDirectory(_tempFolder);
 			}
 
-			if (detectBinChanges)
+			if (detectCodeChanges)
 			{
 				//first check if the cached hash is 0, if it is then we ne
 				//do the check if they've changed
@@ -161,7 +161,17 @@ namespace Umbraco.Core
 				if (_currentAssembliesHash != -1)
 					return _currentAssembliesHash;
 
-				_currentAssembliesHash = GetAssembliesHash(new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Bin)).GetFiles("*.dll"));
+				_currentAssembliesHash = GetAssembliesHash(
+					new FileSystemInfo[]
+						{
+							//add the bin folder and everything in it
+							new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Bin)),
+							//add the app code folder and everything in it
+							new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Root + "/App_Code")),
+							//add the global.asax (the app domain also monitors this, if it changes will do a full restart)
+							new FileInfo(IOHelper.MapPath(SystemDirectories.Root + "/global.asax"))
+						}
+					);
 				return _currentAssembliesHash;
 			}
 		}
@@ -178,17 +188,17 @@ namespace Umbraco.Core
 		/// <summary>
 		/// Returns a unique hash for the combination of FileInfo objects passed in
 		/// </summary>
-		/// <param name="plugins"></param>
+		/// <param name="filesAndFolders"></param>
 		/// <returns></returns>
-		internal static long GetAssembliesHash(IEnumerable<FileInfo> plugins)
+		internal static long GetAssembliesHash(IEnumerable<FileSystemInfo> filesAndFolders)
 		{
-			using (DisposableTimer.TraceDuration<PluginManager>("Determining hash of plugins on disk", "Hash determined"))
+			using (DisposableTimer.TraceDuration<PluginManager>("Determining hash of code files on disk", "Hash determined"))
 			{
 				var hashCombiner = new HashCodeCombiner();
 				//add each unique folder to the hash
-				foreach (var i in plugins.Select(x => x.Directory).DistinctBy(x => x.FullName))
+				foreach (var i in filesAndFolders.DistinctBy(x => x.FullName))
 				{
-					hashCombiner.AddFolder(i);
+					hashCombiner.AddFileSystemItem(i);
 				}
 				return ConvertPluginsHashFromHex(hashCombiner.GetCombinedHashCode());
 			}
