@@ -146,7 +146,7 @@ namespace umbraco.cms.businesslogic.datatype
                             // we need to be sure that the value doesn't contain malformatted xml
                             if (_dataType.DBType == DBTypes.Ntext || _dataType.DBType == DBTypes.Nvarchar)
                             {
-                                value = cms.helpers.xhtml.RemoveTroublesomeCharacters(value.ToString());
+                                value = cms.helpers.xhtml.RemoveIllegalXmlCharacters(value.ToString());
                             }
                             SqlHelper.ExecuteNonQuery(
                                 "update cmsPropertyData set " + _dataType.DataFieldName + " = @value where id = " +
