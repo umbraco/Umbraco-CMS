@@ -1559,7 +1559,7 @@ namespace umbraco
                 string querystring = "umbPageId=" + PageID + "&umbVersionId=" + PageVersion;
                 IDictionaryEnumerator ide = attributes.GetEnumerator();
                 while (ide.MoveNext())
-                    querystring += "&umb_" + ide.Key + "=" + HttpContext.Current.Server.UrlEncode((ide.Value ?? string.Empty).ToString()));
+                    querystring += "&umb_" + ide.Key + "=" + HttpContext.Current.Server.UrlEncode((ide.Value ?? string.Empty).ToString());
 
                 // Create a new 'HttpWebRequest' Object to the mentioned URL.
                 string retVal = string.Empty;
