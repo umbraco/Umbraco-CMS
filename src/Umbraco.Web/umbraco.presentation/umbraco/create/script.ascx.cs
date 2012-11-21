@@ -72,6 +72,9 @@ namespace umbraco.presentation.umbraco.create
 
 			string[] fileTypes = UmbracoSettings.ScriptFileTypes.Split(',');
 
+            scriptType.Items.Add(new ListItem(ui.Text("folder"), ""));
+		    scriptType.Items.FindByText(ui.Text("folder")).Selected = true;
+
 			foreach (string str in fileTypes)
 			{
 				scriptType.Items.Add(new ListItem("." + str + " file", str));
