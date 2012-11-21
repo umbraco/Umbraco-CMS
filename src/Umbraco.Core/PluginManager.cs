@@ -167,9 +167,9 @@ namespace Umbraco.Core
 							//add the bin folder and everything in it
 							new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Bin)),
 							//add the app code folder and everything in it
-							new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Root + "/App_Code")),
+							new DirectoryInfo(IOHelper.MapPath("~/App_Code")),
 							//add the global.asax (the app domain also monitors this, if it changes will do a full restart)
-							new FileInfo(IOHelper.MapPath(SystemDirectories.Root + "/global.asax"))
+							new FileInfo(IOHelper.MapPath("~/global.asax"))
 						}
 					);
 				return _currentAssembliesHash;

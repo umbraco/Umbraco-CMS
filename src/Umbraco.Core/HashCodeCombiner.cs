@@ -12,8 +12,8 @@ namespace Umbraco.Core
 	/// </summary>
 	/// <remarks>
 	/// .Net has a class the same as this: System.Web.Util.HashCodeCombiner and of course it works for all sorts of things
-	/// and is probably more stable in general, however we just need a quick easy class for this in order to create a unique
-	/// hash of plugins to see if they've changed.
+	/// which we've not included here as we just need a quick easy class for this in order to create a unique
+	/// hash of directories/files to see if they have changed.
 	/// </remarks>
 	internal class HashCodeCombiner
 	{
@@ -42,6 +42,10 @@ namespace Umbraco.Core
 
 		internal void AddFileSystemItem(FileSystemInfo f)
 		{
+			//if it doesn't exist, don't proceed.
+			if (!f.Exists)
+				return;
+
 			AddCaseInsensitiveString(f.FullName);
 			AddDateTime(f.CreationTimeUtc);
 			AddDateTime(f.LastWriteTimeUtc);
