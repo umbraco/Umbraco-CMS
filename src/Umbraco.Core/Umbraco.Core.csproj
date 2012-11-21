@@ -69,6 +69,7 @@
     <Compile Include="Enum.cs" />
     <Compile Include="HashCodeCombiner.cs" />
     <Compile Include="IO\FileSystemWrapper.cs" />
+    <Compile Include="Media\IImageUrlProvider.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dynamics\ClassFactory.cs" />
