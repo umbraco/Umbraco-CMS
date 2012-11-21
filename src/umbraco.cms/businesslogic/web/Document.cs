@@ -1272,6 +1272,28 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "'%'"));
         }
 
         /// <summary>
+        /// Returns the published version of this document
+        /// </summary>
+        /// <returns>The published version of this document</returns>
+        public DocumentVersionList GetPublishedVersion()
+        {
+            using (IRecordsReader dr =
+                SqlHelper.ExecuteReader("select top 1 documentUser, versionId, updateDate, text from cmsDocument where nodeId = @nodeId and published = 1 order by updateDate desc",
+                                        SqlHelper.CreateParameter("@nodeId", Id)))
+            {
+                if (dr.Read())
+                {
+                    return new DocumentVersionList(dr.GetGuid("versionId"),
+                                                dr.GetDateTime("updateDate"),
+                                                dr.GetString("text"),
+                                                User.GetUser(dr.GetInt("documentUser")));
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <returns>Returns a breadcrumlike path for the document like: /ancestorname/ancestorname</returns>

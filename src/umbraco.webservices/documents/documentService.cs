@@ -88,6 +88,37 @@ namespace umbraco.webservices.documents
             return carrier;
         }
 
+        [WebMethod]
+        public documentCarrier readPublished(int id, string username, string password)
+        {
+            Authenticate(username, password);
+
+            umbraco.cms.businesslogic.web.Document doc = null;
+
+            try
+            {
+                doc = new umbraco.cms.businesslogic.web.Document(id, true);
+                var publishedDoc = doc.GetPublishedVersion();
+                if (publishedDoc == null)
+                {
+                    // loading last version of document (default behaviour)
+                    doc = new Document(id);
+                }
+                else
+                {
+                    // loading last published version
+                    doc = new Document(id, publishedDoc.Version);
+                }
+            }
+            catch
+            { }
+
+            if (doc == null)
+                throw new Exception("Could not load Document with ID: " + id);
+
+            documentCarrier carrier = createCarrier(doc);
+            return carrier;
+        }
 
         [WebMethod]
         public List<documentCarrier> readList(int parentid, string username, string password)
