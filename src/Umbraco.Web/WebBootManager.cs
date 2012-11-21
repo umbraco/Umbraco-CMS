@@ -9,6 +9,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Dictionary;
+using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
@@ -238,6 +239,9 @@ namespace Umbraco.Web
 
 			ThumbnailProvidersResolver.Current = new ThumbnailProvidersResolver(
 				PluginManager.Current.ResolveThumbnailProviders());
+
+            ImageUrlProviderResolver.Current = new ImageUrlProviderResolver(
+                PluginManager.Current.ResolveImageUrlProviders());
 
 			CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(
 				new DefaultCultureDictionaryFactory());

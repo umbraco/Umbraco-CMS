@@ -5,15 +5,15 @@ using umbraco;
 
 namespace Umbraco.Web.Media.ImageUrlProviders
 {
-    public class ImageUrlProvider : ImageUrlProviderBase
+    public class ImageUrlProvider : IImageUrlProvider
     {
-        public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
+        public const string DefaultName = "umbracoUpload";
+        public string Name
         {
-            //Get default values from the provider config here?
-            base.Initialize(name, config);
+            get { return DefaultName; }
         }
 
-        public override string GetImageUrlFromMedia(int mediaId, NameValueCollection parameters)
+        public string GetImageUrlFromMedia(int mediaId, NameValueCollection parameters)
         {
             string url = string.Empty;
             var nodeIterator = library.GetMedia(mediaId, false);
@@ -27,7 +27,7 @@ namespace Umbraco.Web.Media.ImageUrlProviders
             return url;
         }
 
-        public override string GetImageUrlFromFileName(string specifiedSrc, NameValueCollection parameters)
+        public string GetImageUrlFromFileName(string specifiedSrc, NameValueCollection parameters)
         {
             string withThumb = addThumbInfo(specifiedSrc, parameters);
             return addCropInfo(withThumb, parameters);

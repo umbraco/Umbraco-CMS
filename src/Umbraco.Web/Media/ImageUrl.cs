@@ -13,30 +13,23 @@ using umbraco;
 
 namespace Umbraco.Web.Media
 {
-    public class ImageUrl : ProviderFeature<ImageUrlProviderBase>
+    public class ImageUrl
     {
 
-        private static IHttpContextFactory _contextFactory;
-
-        static ImageUrl()
-        {
-            _contextFactory = new WebHttpContextFactory();
-            Initialize("ImageUrl");
-        }
-
-        public static string GetImageUrl(string specifiedSrc, string field, string provider, string parameters, int? nodeId = null)
+        public static string GetImageUrl(string specifiedSrc, string field, string provider, string parameters,
+                                         int? nodeId = null)
         {
             string url;
-            ImageUrlProviderBase p = GetProvider(provider);
+            IImageUrlProvider p = GetProvider(provider);
 
-            NameValueCollection parsedParameters = string.IsNullOrEmpty(parameters)?
-                new NameValueCollection() : 
-                HttpUtility.ParseQueryString(parameters);
+            NameValueCollection parsedParameters = string.IsNullOrEmpty(parameters)
+                                                       ? new NameValueCollection()
+                                                       : HttpUtility.ParseQueryString(parameters);
 
-            string fieldValue = string.Empty;
             if (!string.IsNullOrEmpty(field))
             {
-                if(nodeId.HasValue)
+                string fieldValue = string.Empty;
+                if (nodeId.HasValue)
                 {
                     var contentFromCache = GetContentFromCache(nodeId.GetValueOrDefault(), field);
                     if (contentFromCache != null)
@@ -45,17 +38,23 @@ namespace Umbraco.Web.Media
                     }
                     else
                     {
-                        page itemPage =new page(content.Instance.XmlContent.GetElementById(nodeId.GetValueOrDefault().ToString(CultureInfo.InvariantCulture)));
+                        var itemPage = new page(content.Instance.XmlContent.GetElementById(nodeId.GetValueOrDefault().ToString(CultureInfo.InvariantCulture)));
                         var value = itemPage.Elements[field];
                         fieldValue = value != null ? value.ToString() : string.Empty;
                     }
                 }
                 else
                 {
-                    var context = _contextFactory.Context;
-                    Hashtable elements = context.Items["pageElements"] as Hashtable;
-                    var value = elements[field];
-                    fieldValue = value != null ? value.ToString() : string.Empty;
+                    var context = HttpContext.Current;
+                    if (context != null)
+                    {
+                        var elements = context.Items["pageElements"] as Hashtable;
+                        if (elements != null)
+                        {
+                            var value = elements[field];
+                            fieldValue = value != null ? value.ToString() : string.Empty;
+                        }
+                    }
                 }
                 int mediaId;
                 if (int.TryParse(fieldValue, out mediaId))
@@ -66,7 +65,7 @@ namespace Umbraco.Web.Media
                 else
                 {
                     //assume file path
-                    url =  p.GetImageUrlFromFileName(fieldValue, parsedParameters);
+                    url = p.GetImageUrlFromFileName(fieldValue, parsedParameters);
                 }
 
             }
@@ -77,18 +76,17 @@ namespace Umbraco.Web.Media
             return url;
         }
 
-        private static ImageUrlProviderBase GetProvider(string provider)
+        private static IImageUrlProvider GetProvider(string provider)
         {
-            return string.IsNullOrEmpty(provider) ?
-                Provider :
-                Providers[provider];
+            return ImageUrlProviderResolver.Current.Provider(provider);
         }
 
         private static object GetContentFromCache(int nodeIdInt, string field)
         {
-            object content = _contextFactory.Context.Cache[String.Format("contentItem{0}_{1}", nodeIdInt.ToString(CultureInfo.InvariantCulture), field)];
+            object content =
+                ContextFactory.Context.Cache[
+                    String.Format("contentItem{0}_{1}", nodeIdInt.ToString(CultureInfo.InvariantCulture), field)];
             return content;
         }
-
     }
 }
