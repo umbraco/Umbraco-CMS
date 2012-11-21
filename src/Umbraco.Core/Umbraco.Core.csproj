@@ -60,6 +60,7 @@
     <Compile Include="Configuration\FileSystemProviderElement.cs" />
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
+    <Compile Include="Configuration\ProviderFeatureSection.cs" />
     <Compile Include="CoreBootManager.cs" />
     <Compile Include="DataTableExtensions.cs" />
     <Compile Include="DictionaryExtensions.cs" />
