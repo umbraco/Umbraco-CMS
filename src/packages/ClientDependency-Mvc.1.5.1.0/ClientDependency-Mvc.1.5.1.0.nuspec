@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>ClientDependency-Mvc</id>
+    <version>1.5.1.0</version>
+    <authors>Aaron Powell,  Shannon Deminick</authors>
+    <owners>Aaron Powell,  Shannon Deminick</owners>
+    <licenseUrl>http://www.opensource.org/licenses/ms-pl</licenseUrl>
+    <projectUrl>http://clientdependency.codeplex.com/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>An extension for the ClientDependency framework to support ASP.NET MVC.</description>
+    <summary>ClientDependency for MVC</summary>
+    <tags>mvc css html javascript</tags>
+    <dependencies>
+      <dependency id="ClientDependency" version="1.5.1.0" />
+    </dependencies>
+  </metadata>
+</package>
