@@ -220,6 +220,7 @@ namespace Umbraco.Core.Logging
 		{
 			if (trace != null)
 			{
+				// must .ToArray() here else string.Format sees only one parameter
 				trace.Write(string.Format(generateMessageFormat, formatItems.Select(x => x()).ToArray()));	
 			}			
 			Debug(typeof(T), generateMessageFormat, formatItems);

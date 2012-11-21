@@ -150,10 +150,12 @@
     <Reference Include="System.Data.SqlServerCe, Version=4.0.0.1, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\SQLCE4\System.Data.SqlServerCe.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Data.SqlServerCe.Entity, Version=4.0.0.1, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\SQLCE4\System.Data.SqlServerCe.Entity.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing">
@@ -2323,6 +2325,10 @@
     <None Include="web.Template.NILSJO.Debug.config">
       <DependentUpon>web.Template.config</DependentUpon>
     </None>
+    <None Include="web.Template.wulff-Pc.Debug.config">
+      <DependentUpon>web.Template.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Code\" />
@@ -2349,7 +2355,7 @@
     <PostBuildEvent>xcopy "$(ProjectDir)"..\..\lib\SQLCE4\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /D
 xcopy "$(ProjectDir)"..\..\lib\SQLCE4\x86\*.* "$(TargetDir)x86\" /Y /F /E /D</PostBuildEvent>
   </PropertyGroup>
-  <Import Project="$(ProjectDir)..\..\tools\BuildTargets\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
   <ProjectExtensions>
     <VisualStudio>

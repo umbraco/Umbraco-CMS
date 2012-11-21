@@ -143,16 +143,16 @@ namespace umbraco.presentation.templateControls
 		/// </summary>
 		/// <param name="item">The item.</param>
 		public virtual void Init(Item item)
-		{
-			ParseMacros(item);
-		}
+		{ }
 
 		/// <summary>
 		/// Loads the specified item. To be called from the OnLoad method of Item.
 		/// </summary>
 		/// <param name="item">The item.</param>
 		public virtual void Load(Item item)
-		{ }
+		{
+            ParseMacros(item);
+		}
 
 		/// <summary>
 		/// Parses the macros inside the text, by creating child elements for each item.

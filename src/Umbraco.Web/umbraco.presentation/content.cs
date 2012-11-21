@@ -1097,9 +1097,12 @@ namespace umbraco
                     InitContentDocument(xmlDoc, dtd);
 
                     // Esben Carlsen: At some point we really need to put all data access into to a tier of its own.
+                    // CLN - added checks that document xml is for a document that is actually published.
                     string sql =
                         @"select umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, cmsContentXml.xml from umbracoNode 
 inner join cmsContentXml on cmsContentXml.nodeId = umbracoNode.id and umbracoNode.nodeObjectType = @type
+inner join cmsDocument on cmsDocument.nodeId = umbracoNode.id
+where cmsDocument.published = 1 
 order by umbracoNode.level, umbracoNode.sortOrder";
 
                     lock (_dbReadSyncLock)

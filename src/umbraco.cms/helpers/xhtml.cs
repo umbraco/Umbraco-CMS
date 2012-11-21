@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 
@@ -146,6 +147,32 @@ namespace umbraco.cms.helpers
 				newTag += " " + attributeSet.Groups["attributeName"].Value.ToString().ToLower() + "=\"" + attributeSet.Groups["attributeValue"].Value.ToString() + "\"";
 
 			return newTag;
-		}	
+		}
+
+        // helper method gotten from:
+        // http://stackoverflow.com/questions/20762/how-do-you-remove-invalid-hexadecimal-characters-from-an-xml-based-data-source-p#comment8130028_641632
+	    internal static string RemoveIllegalXmlCharacters(string inString)
+        {
+
+            if (inString == null) return null;
+
+            StringBuilder sbOutput = new StringBuilder();
+            char ch;
+
+            for (int i = 0; i < inString.Length; i++)
+            {
+                ch = inString[i];
+                if ((ch >= 0x0020 && ch <= 0xD7FF) ||
+                    (ch >= 0xE000 && ch <= 0xFFFD) ||
+                    ch == 0x0009 ||
+                    ch == 0x000A ||
+                    ch == 0x000D)
+                {
+                    sbOutput.Append(ch);
+                }
+            }
+            return sbOutput.ToString();
+
+        }
 	}
 }
