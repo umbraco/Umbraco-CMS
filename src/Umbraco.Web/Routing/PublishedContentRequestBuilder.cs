@@ -197,6 +197,12 @@ namespace Umbraco.Web.Routing
 		{
 			const string tracePrefix = "LookupDocument2: ";
 
+			// at that point if we have a .PublishedContent then it is the "expected" document
+			// time to read the alternate template alias, from querystring, form, cookie or server vars.
+			// it will be cleared as soon as .PublishedContent change, because then it's not the
+			// expected content anymore and the alternate template does not apply.
+			_publishedContentRequest.AlternateTemplateAlias = _umbracoContext.HttpContext.Request["altTemplate"];
+
 			// handle "not found", follow internal redirects, validate access, template
 			// because these might loop, we have to have some sort of infinite loop detection 
 			int i = 0, j = 0;
@@ -377,46 +383,70 @@ namespace Umbraco.Web.Routing
 			// HERE we should let people register their own way of finding a template, same as with documents!!!!
 			// do we?
 
-			//return if the request already has a template assigned, this can be possible if an ILookup assigns one
-			if (_publishedContentRequest.HasTemplate) return;
-
 			const string tracePrefix = "LookupTemplate: ";
 
 			if (_publishedContentRequest.PublishedContent == null)
 				throw new InvalidOperationException("There is no node.");
 
-			//gets item from query string, form, cookie or server vars
-			var templateAlias = _umbracoContext.HttpContext.Request["altTemplate"];
-
-			if (templateAlias.IsNullOrWhiteSpace())
+			if (_publishedContentRequest.AlternateTemplateAlias.IsNullOrWhiteSpace())
 			{
-				//we don't have an alt template specified, so lookup the template id on the document and then lookup the template
-				// associated with it.
-				//TODO: When we remove the need for a database for templates, then this id should be irrelavent, not sure how were going to do this nicely.
+				// we don't have an alternate template specified. use the current one if there's one already,
+				// which can happen if a content lookup also set the template (LookupByNiceUrlAndTemplate...),
+				// else lookup the template id on the document then lookup the template with that id.
+
+				if (_publishedContentRequest.HasTemplate)
+				{
+					LogHelper.Debug<PublishedContentRequest>("{0}Has a template already, and no alternate template.", () => tracePrefix);
+					return;
+				}
+
+				// TODO: When we remove the need for a database for templates, then this id should be irrelavent,
+				// not sure how were going to do this nicely.
 
 				var templateId = _publishedContentRequest.PublishedContent.TemplateId;
-				LogHelper.Debug<PublishedContentRequest>("{0}Look for template id={1}", () => tracePrefix, () => templateId);
-				
+
 				if (templateId > 0)
-				{					
-					//NOTE: don't use the Template ctor as the result is not cached... instead use this static method
+				{
+					LogHelper.Debug<PublishedContentRequest>("{0}Look for template id={1}", () => tracePrefix, () => templateId);
+					// don't use the Template ctor as the result is not cached... instead use this static method
 					var template = Template.GetTemplate(templateId);
 					if (template == null)
 						throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render");
 					_publishedContentRequest.Template = template;
+					LogHelper.Debug<PublishedContentRequest>("{0}Got template id={1} alias=\"{2}\"", () => tracePrefix, () => template.Id, () => template.Alias);
+				}
+				else
+				{
+					LogHelper.Debug<PublishedContentRequest>("{0}No specified template.", () => tracePrefix);
 				}
 			}
 			else
 			{
-				LogHelper.Debug<PublishedContentRequest>("{0}Look for template alias=\"{1}\" (altTemplate)", () => tracePrefix, () => templateAlias);
+				// we have an alternate template specified. lookup the template with that alias
+				// this means the we override any template that a content lookup might have set
+				// so /path/to/page/template1?altTemplate=template2 will use template2
 
-				var template = Template.GetByAlias(templateAlias, true);
-				_publishedContentRequest.Template = template;
+				// ignore if the alias does not match - just trace
+
+				if (_publishedContentRequest.HasTemplate)
+					LogHelper.Debug<PublishedContentRequest>("{0}Has a template already, but also an alternate template.", () => tracePrefix);
+				LogHelper.Debug<PublishedContentRequest>("{0}Look for alternate template alias=\"{1}\"", () => tracePrefix, () => _publishedContentRequest.AlternateTemplateAlias);
+
+				var template = Template.GetByAlias(_publishedContentRequest.AlternateTemplateAlias, true);
+				if (template != null)
+				{
+					_publishedContentRequest.Template = template;
+					LogHelper.Debug<PublishedContentRequest>("{0}Got template id={1} alias=\"{2}\"", () => tracePrefix, () => template.Id, () => template.Alias);
+				}
+				else
+				{
+					LogHelper.Debug<PublishedContentRequest>("{0}The template with alias=\"{1}\" does not exist, ignoring.", () => tracePrefix, () => _publishedContentRequest.AlternateTemplateAlias);
+				}
 			}
 
 			if (!_publishedContentRequest.HasTemplate)
 			{
-				LogHelper.Debug<PublishedContentRequest>("{0}No template was found.");
+				LogHelper.Debug<PublishedContentRequest>("{0}No template was found.", () => tracePrefix);
 
 				// initial idea was: if we're not already 404 and UmbracoSettings.HandleMissingTemplateAs404 is true
 				// then reset _publishedContentRequest.Document to null to force a 404.
@@ -426,6 +456,10 @@ namespace Umbraco.Web.Routing
 				// care of everything.
 				//
 				// so, don't set _publishedContentRequest.Document to null here
+			}
+			else
+			{
+				LogHelper.Debug<PublishedContentRequest>("{0}Running with template id={1} alias=\"{2}\"", () => tracePrefix, () => _publishedContentRequest.Template.Id, () => _publishedContentRequest.Template.Alias);
 			}
 		}
 

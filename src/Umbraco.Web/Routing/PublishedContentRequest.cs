@@ -275,6 +275,7 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Gets or sets the requested content.
 		/// </summary>
+		/// <remarks>Setting the requested content clears both <c>Template</c> and <c>AlternateTemplateAlias</c>.</remarks>
 		public IPublishedContent PublishedContent
 		{			
 			get { return _publishedContent; }
@@ -282,6 +283,7 @@ namespace Umbraco.Web.Routing
 			{
 				_publishedContent = value;
 				this.Template = null;
+				this.AlternateTemplateAlias = null;
 				_nodeId = _publishedContent != null ? _publishedContent.Id : 0;
 			}
 		}
@@ -298,6 +300,16 @@ namespace Umbraco.Web.Routing
         {
             get { return this.Template != null ; }
         }
+
+		/// <summary>
+		/// Gets or sets the alternate template alias.
+		/// </summary>
+		/// <remarks>
+		/// <para>When <c>null</c> or empty, use the default template.</para>
+		/// <para>Alternate template works only when displaying the intended document and should be set
+		/// after <c>PublishedContent</c> since setting <c>PublishedContent</c> clears the alternate template.</para>
+		/// </remarks>
+		public string AlternateTemplateAlias { get; set; }
 
         /// <summary>
         /// Gets the identifier of the requested content.
