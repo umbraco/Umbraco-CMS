@@ -89,35 +89,20 @@ namespace umbraco.webservices.documents
         }
 
         [WebMethod]
-        public documentCarrier readPublished(int id, string username, string password)
+        public documentCarrier ReadPublished(int id, string username, string password)
         {
             Authenticate(username, password);
 
-            umbraco.cms.businesslogic.web.Document doc = null;
+            var doc = new Document(id, true);
 
-            try
-            {
-                doc = new umbraco.cms.businesslogic.web.Document(id, true);
-                var publishedDoc = doc.GetPublishedVersion();
-                if (publishedDoc == null)
-                {
-                    // loading last version of document (default behaviour)
-                    doc = new Document(id);
-                }
-                else
-                {
-                    // loading last published version
-                    doc = new Document(id, publishedDoc.Version);
-                }
-            }
-            catch
-            { }
+            var publishedDoc = doc.GetPublishedVersion();
 
+            doc = publishedDoc == null ? new Document(id) : new Document(id, publishedDoc.Version);
+            
             if (doc == null)
                 throw new Exception("Could not load Document with ID: " + id);
 
-            documentCarrier carrier = createCarrier(doc);
-            return carrier;
+            return createCarrier(doc);
         }
 
         [WebMethod]
