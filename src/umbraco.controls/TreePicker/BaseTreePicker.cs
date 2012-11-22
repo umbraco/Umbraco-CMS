@@ -89,16 +89,24 @@ namespace umbraco.uicontrols.TreePicker
             {
                 try
                 {
-                    int nodeId = int.Parse(ItemIdValue.Value);
-                    CMSNode node = new CMSNode(nodeId);
-                    string title = node.Text;
-                    string separator = " > ";
-                    while (node != null && node.Level > 1)
+                    int nodeId = -1;
+                    if (int.TryParse(ItemIdValue.Value, out nodeId))
                     {
-                        node = node.Parent;
-                        title = node.Text + separator + title;
+                        CMSNode node = new CMSNode(nodeId);
+                        string title = node.Text;
+                        string separator = " > ";
+                        while (node != null && node.Level > 1)
+                        {
+                            node = node.Parent;
+                            title = node.Text + separator + title;
+                        }
+                        return title;
                     }
-                    return title;
+                    else
+                    {
+                        return ItemIdValue.Value;
+                    }
+                    
                 }
                 catch (ArgumentException) { /*the node does not exist! we will ignore*/ }
             }
