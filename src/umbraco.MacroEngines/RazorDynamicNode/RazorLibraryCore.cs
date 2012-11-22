@@ -145,18 +145,36 @@ namespace umbraco.MacroEngines.Library
 
         public dynamic Search(string term, bool useWildCards = true, string searchProvider = null)
         {
-			//wraps the functionality in UmbracoHelper but still returns the legacy DynamicNodeList
-			var nodes = ((DynamicPublishedContentList)_umbracoHelper.Search(term, useWildCards, searchProvider))
-				.Select(x => x.ConvertToNode());
-			return new DynamicNodeList(nodes);
+            var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
+            if (!string.IsNullOrEmpty(searchProvider))
+                searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
+
+            var results = searcher.Search(term, useWildCards);
+            return ExamineSearchUtill.ConvertSearchResultToDynamicNode(results);
+
+            //TODO: Does NOT return legacy DynamicNodeList, old code is back in place
+
+            ////wraps the functionality in UmbracoHelper but still returns the legacy DynamicNodeList
+            //var nodes = ((DynamicPublishedContentList)_umbracoHelper.Search(term, useWildCards, searchProvider))
+            //    .Select(x => x.ConvertToNode());
+            //return new DynamicNodeList(nodes);
         }
 
         public dynamic Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
         {
-			//wraps the functionality in UmbracoHelper but still returns the legacy DynamicNodeList
-        	var nodes = ((DynamicPublishedContentList) _umbracoHelper.Search(criteria, searchProvider))
-        		.Select(x => x.ConvertToNode());
-        	return new DynamicNodeList(nodes);
+            var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
+            if (searchProvider != null)
+                s = searchProvider;
+
+            var results = s.Search(criteria);
+            return ExamineSearchUtill.ConvertSearchResultToDynamicNode(results);
+
+            //TODO: Does NOT return legacy DynamicNodeList, old code is back in place
+
+            ////wraps the functionality in UmbracoHelper but still returns the legacy DynamicNodeList
+            //var nodes = ((DynamicPublishedContentList) _umbracoHelper.Search(criteria, searchProvider))
+            //    .Select(x => x.ConvertToNode());
+            //return new DynamicNodeList(nodes);
         }
 
 
