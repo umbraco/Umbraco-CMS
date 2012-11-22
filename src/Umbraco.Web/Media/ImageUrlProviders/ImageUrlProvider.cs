@@ -1,4 +1,4 @@
-﻿using System.Collections.Specialized;
+﻿using System.Collections.Generic;
 using System.Xml.XPath;
 using Umbraco.Core.Media;
 using umbraco;
@@ -8,74 +8,83 @@ namespace Umbraco.Web.Media.ImageUrlProviders
     public class ImageUrlProvider : IImageUrlProvider
     {
         public const string DefaultName = "umbracoUpload";
+
         public string Name
         {
             get { return DefaultName; }
         }
 
-        public string GetImageUrlFromMedia(int mediaId, NameValueCollection parameters)
+        public string GetImageUrlFromMedia(int mediaId, IDictionary<string, string> parameters)
         {
-            string url = string.Empty;
+            var url = string.Empty;
+
             var nodeIterator = library.GetMedia(mediaId, false);
+
             if (nodeIterator.Current != null)
             {
-                var filename = getProperty(nodeIterator, "umbracoFile");
-                string withThumb = addThumbInfo(filename, parameters);
-                url = addCropInfo(withThumb, parameters);
+                var filename = GetProperty(nodeIterator, "umbracoFile");
+                var withThumb = AddThumbInfo(filename, parameters);
+                url = AddCropInfo(withThumb, parameters);
             }
 
             return url;
         }
 
-        public string GetImageUrlFromFileName(string specifiedSrc, NameValueCollection parameters)
+        public string GetImageUrlFromFileName(string specifiedSrc, IDictionary<string, string> parameters)
         {
-            string withThumb = addThumbInfo(specifiedSrc, parameters);
-            return addCropInfo(withThumb, parameters);
+            var withThumb = AddThumbInfo(specifiedSrc, parameters);
+            return AddCropInfo(withThumb, parameters);
         }
 
-        private string addThumbInfo(string filename, NameValueCollection parameters)
+        private static string AddThumbInfo(string filename, IDictionary<string, string> parameters)
         {
-            string thumb = string.Empty;
-            if (!string.IsNullOrEmpty(parameters["thumb"]))
-            {
+            var thumb = string.Empty;
+            if (parameters.ContainsKey("thumb"))
                 thumb = parameters["thumb"];
-            }
 
-            if(!string.IsNullOrEmpty(thumb))
+            if (!string.IsNullOrEmpty(thumb))
             {
-                int lastIndexOf = filename.LastIndexOf('.');
-                string name = filename.Substring(0, lastIndexOf);
-                string extension = filename.Substring(lastIndexOf, filename.Length - lastIndexOf);
+                var lastIndexOf = filename.LastIndexOf('.');
+                var name = filename.Substring(0, lastIndexOf);
+                var extension = filename.Substring(lastIndexOf, filename.Length - lastIndexOf);
                 return string.Format("{0}_thumb_{1}{2}", name, thumb, extension);
             }
             return filename;
         }
 
-        private string addCropInfo(string filename, NameValueCollection parameters)
+        private static string AddCropInfo(string filename, IDictionary<string, string> parameters)
         {
-            string crop = string.Empty;
-            if (!string.IsNullOrEmpty(parameters["crop"]))
-            {
+            var crop = string.Empty;
+            if (parameters.ContainsKey("crop"))
                 crop = parameters["crop"];
-            }
 
             if (!string.IsNullOrEmpty(crop))
             {
-                int lastIndexOf = filename.LastIndexOf('.');
-                string name = filename.Substring(0, lastIndexOf);
-                string extension = filename.Substring(lastIndexOf, filename.Length - lastIndexOf);
+                var lastIndexOf = filename.LastIndexOf('.');
+                var name = filename.Substring(0, lastIndexOf);
+                
+                //var extension = filename.Substring(lastIndexOf, filename.Length - lastIndexOf);
+                //Built in cropper currently always uses jpg as an extension
+
+                const string extension = ".jpg";
                 return string.Format("{0}_{1}{2}", name, crop, extension);
             }
+
             return filename;
         }
 
 
-        private static string getProperty(XPathNodeIterator nodeIterator, string fileProp)
+        private static string GetProperty(XPathNodeIterator nodeIterator, string fileProp)
         {
-            string xpath = UmbracoSettings.UseLegacyXmlSchema
+            var xpath = UmbracoSettings.UseLegacyXmlSchema
                                ? string.Format(".//data[@alias = '{0}']", fileProp)
                                : string.Format(".//{0}", fileProp);
-            var file = nodeIterator.Current.SelectSingleNode(xpath).InnerXml;
+
+            var file = string.Empty;
+            var selectSingleNode = nodeIterator.Current.SelectSingleNode(xpath);
+            if (selectSingleNode != null)
+                file = selectSingleNode.InnerXml;
+
             return file;
         }
     }

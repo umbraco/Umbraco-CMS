@@ -1,31 +1,33 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Specialized;
-using System.Configuration;
 using System.Globalization;
+using System.Linq;
 using System.Web;
-using System.Web.Configuration;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Media;
-using Umbraco.Core.ObjectResolution;
 using umbraco;
 
 namespace Umbraco.Web.Media
 {
     public class ImageUrl
     {
-
         public static string GetImageUrl(string specifiedSrc, string field, string provider, string parameters, int? nodeId = null)
         {
             string url;
-            IImageUrlProvider p = GetProvider(provider);
 
-            NameValueCollection parsedParameters = string.IsNullOrEmpty(parameters) ? new NameValueCollection() : HttpUtility.ParseQueryString(parameters);
+            var imageUrlProvider = GetProvider(provider);
 
-            if (!string.IsNullOrEmpty(field))
+            var parsedParameters = string.IsNullOrEmpty(parameters) ? new NameValueCollection() : HttpUtility.ParseQueryString(parameters);
+
+            var queryValues = parsedParameters.Keys.Cast<string>().ToDictionary(key => key, key => parsedParameters[key]);
+
+            if (string.IsNullOrEmpty(field))
             {
-                string fieldValue = string.Empty;
+                url = imageUrlProvider.GetImageUrlFromFileName(specifiedSrc, queryValues);
+            }
+            else
+            {
+                var fieldValue = string.Empty;
                 if (nodeId.HasValue)
                 {
                     var contentFromCache = GetContentFromCache(nodeId.GetValueOrDefault(), field);
@@ -53,43 +55,30 @@ namespace Umbraco.Web.Media
                         }
                     }
                 }
-                int mediaId;
-                if (int.TryParse(fieldValue, out mediaId))
-                {
-                    //Fetch media
-                    url = p.GetImageUrlFromMedia(mediaId, parsedParameters);
-                }
-                else
-                {
-                    //assume file path
-                    url = p.GetImageUrlFromFileName(fieldValue, parsedParameters);
-                }
 
+                int mediaId;
+                url = int.TryParse(fieldValue, out mediaId)
+                          ? imageUrlProvider.GetImageUrlFromMedia(mediaId, queryValues)
+                          : imageUrlProvider.GetImageUrlFromFileName(fieldValue, queryValues);
             }
-            else
-            {
-                url = p.GetImageUrlFromFileName(specifiedSrc, parsedParameters);
-            }
+
             return url;
         }
 
         private static IImageUrlProvider GetProvider(string provider)
         {
-            return ImageUrlProviderResolver.Current.Provider(provider);
+            return ImageUrlProviderResolver.Current.GetProvider(provider);
         }
 
         private static object GetContentFromCache(int nodeIdInt, string field)
         {
-            HttpContext context = HttpContext.Current;
-            if (context != null)
-            {
-                object content = context.Cache[String.Format("contentItem{0}_{1}", nodeIdInt.ToString(CultureInfo.InvariantCulture), field)];
-                return content;
-            }
-            else
-            {
+            var context = HttpContext.Current;
+            
+            if (context == null)
                 return string.Empty;
-            }
+            
+            var content = context.Cache[String.Format("contentItem{0}_{1}", nodeIdInt.ToString(CultureInfo.InvariantCulture), field)];
+            return content;
         }
     }
 }

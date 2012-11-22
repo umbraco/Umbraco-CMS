@@ -1,11 +1,11 @@
-﻿using System.Collections.Specialized;
+﻿using System.Collections.Generic;
 
 namespace Umbraco.Core.Media
 {
     public interface IImageUrlProvider
     {
         string Name { get; }
-        string GetImageUrlFromMedia(int mediaId, NameValueCollection parameters);
-        string GetImageUrlFromFileName(string specifiedSrc, NameValueCollection parameters);
+        string GetImageUrlFromMedia(int mediaId, IDictionary<string, string> parameters);
+        string GetImageUrlFromFileName(string specifiedSrc, IDictionary<string, string> parameters);
     }
 }

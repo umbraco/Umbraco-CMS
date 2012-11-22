@@ -11,7 +11,7 @@ namespace Umbraco.Web.Media
     {
         internal ImageUrlProviderResolver(IEnumerable<Type> value) : base(value) { }
 
-        public IImageUrlProvider Provider(string provider)
+        public IImageUrlProvider GetProvider(string provider)
         {
             return string.IsNullOrEmpty(provider) ? 
                 Values.First(v => v.Name.Equals(ImageUrlProvider.DefaultName, StringComparison.InvariantCultureIgnoreCase)) : 
