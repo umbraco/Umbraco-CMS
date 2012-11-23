@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -233,8 +234,14 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
+            var root = contentService.GetById(1046);
+            contentService.SaveAndPublish(root);
+            var content = contentService.GetById(1048);
+            content.ExpireDate = DateTime.UtcNow.AddSeconds(1);
+            contentService.SaveAndPublish(content);
 
             // Act
+            Thread.Sleep(new TimeSpan(0, 0, 0, 2));
             var contents = contentService.GetContentForExpiration();
 
             // Assert
@@ -334,7 +341,6 @@ namespace Umbraco.Tests.Services
             Assert.That(published, Is.True);
             Assert.That(contents.First(x => x.Id == 1046).Published, Is.True);//No restrictions, so should be published
             Assert.That(contents.First(x => x.Id == 1047).Published, Is.True);//Released 5 mins ago, so should be published
-            Assert.That(contents.First(x => x.Id == 1048).Published, Is.False);//Expired 5 mins ago, so shouldn't be published
             Assert.That(contents.First(x => x.Id == 1049).Published, Is.False);//Trashed content, so shouldn't be published
         }
 
@@ -394,7 +400,6 @@ namespace Umbraco.Tests.Services
             Assert.That(published, Is.True);//Nothing was cancelled, so should be true
             Assert.That(content.Published, Is.True);//No restrictions, so should be published
             Assert.That(children.First(x => x.Id == 1047).Published, Is.True);//Released 5 mins ago, so should be published
-            Assert.That(children.First(x => x.Id == 1048).Published, Is.False);//Expired 5 mins ago, so shouldn't be published
         }
 
         [Test]
@@ -403,6 +408,8 @@ namespace Umbraco.Tests.Services
             // Arrange
             var contentService = ServiceContext.ContentService;
             var content = contentService.GetById(1048); //This Content expired 5min ago
+            content.ExpireDate = DateTime.UtcNow.AddMinutes(-5);
+            contentService.Save(content);
 
             var parent = contentService.GetById(1046);
             bool parentPublished = contentService.Publish(parent, 0);//Publish root Home node to enable publishing of '1048'
@@ -715,8 +722,6 @@ namespace Umbraco.Tests.Services
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1048
             Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
-            subpage2.ExpireDate = DateTime.UtcNow.AddMinutes(-5);
-            subpage2.ChangePublishedState(true);
             ServiceContext.ContentService.Save(subpage2, 0);
 
             //Create and Save Content "Text Page Deleted" based on "umbTextpage" -> 1049
