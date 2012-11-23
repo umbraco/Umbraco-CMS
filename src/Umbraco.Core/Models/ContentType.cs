@@ -27,7 +27,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the alias of the default Template.
         /// </summary>
-        [DataMember]
+        [IgnoreDataMember]
         public ITemplate DefaultTemplate
         {
             get { return AllowedTemplates.FirstOrDefault(x => x != null && x.Id == DefaultTemplateId); }

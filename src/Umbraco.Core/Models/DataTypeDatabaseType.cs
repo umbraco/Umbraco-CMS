@@ -11,12 +11,16 @@ namespace Umbraco.Core.Models
     /// but will be saved under the Ntext column.
     /// </remarks>
     [Serializable]
-    [DataContract(IsReference = true)]
+    [DataContract]
     public enum DataTypeDatabaseType
     {
+        [EnumMember]
         Integer,
+        [EnumMember]
         Date,
+        [EnumMember]
         Nvarchar,
+        [EnumMember]
         Ntext /*, Object*/
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 
@@ -86,6 +87,8 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets an enumerable list of Property Types aggregated for all groups
         /// </summary>
-        IEnumerable<PropertyType> PropertyTypes { get; } 
+        IEnumerable<PropertyType> PropertyTypes { get; }
+
+        void SetLazyParentId(Lazy<int> id);
     }
 }

@@ -110,6 +110,26 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Saves a collection of lazy loaded <see cref="IContentType"/> objects.
+        /// </summary>
+        /// <remarks>
+        /// This method ensures that ContentType is saved lazily, so a new graph of <see cref="IContentType"/>
+        /// objects can be saved in bulk. But note that objects are saved one at a time to ensure Ids.
+        /// </remarks>
+        /// <param name="contentTypes">Collection of Lazy <see cref="IContentType"/> to save</param>
+        /// <param name="userId">Optional Id of the User saving the ContentTypes</param>
+        public void Save(IEnumerable<Lazy<IContentType>> contentTypes, int userId = -1)
+        {
+            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(_unitOfWork);
+            foreach (var content in contentTypes)
+            {
+                content.Value.CreatorId = 0;
+                repository.AddOrUpdate(content.Value);
+                _unitOfWork.Commit();
+            }
+        }
+
+        /// <summary>
         /// Deletes a single <see cref="IContentType"/> object
         /// </summary>
         /// <param name="contentType"><see cref="IContentType"/> to delete</param>

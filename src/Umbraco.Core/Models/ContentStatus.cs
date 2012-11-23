@@ -7,9 +7,18 @@ namespace Umbraco.Core.Models
     /// Enum for the various statuses a Content object can have
     /// </summary>
     [Serializable]
-    [DataContract(IsReference = true)]
+    [DataContract]
     public enum ContentStatus
     {
-        Unpublished, Published, Expired, Trashed, AwaitingRelease
+        [EnumMember]
+        Unpublished,
+        [EnumMember]
+        Published,
+        [EnumMember]
+        Expired,
+        [EnumMember]
+        Trashed,
+        [EnumMember]
+        AwaitingRelease
     }
 }

@@ -1,19 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Represents an abstract class for base ContentType properties and methods
     /// </summary>
+    [Serializable]
+    [DataContract(IsReference = true)]
     public abstract class ContentTypeBase : Entity, IContentTypeBase
     {
-        private int _parentId;
+        private Lazy<int> _parentId;
         private string _name;
         private int _level;
         private string _path;
@@ -31,7 +33,7 @@ namespace Umbraco.Core.Models
 
         protected ContentTypeBase(int parentId)
         {
-            _parentId = parentId;
+            _parentId = new Lazy<int>(() => parentId);
             _allowedContentTypes = new List<ContentTypeSort>();
             _propertyGroups = new PropertyGroupCollection();
         }
@@ -64,12 +66,17 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual int ParentId
         {
-            get { return _parentId; }
+            get { return _parentId.Value; }
             set
             {
-                _parentId = value;
+                _parentId = new Lazy<int>(() => value);
                 OnPropertyChanged(ParentIdSelector);
             }
+        }
+
+        public void SetLazyParentId(Lazy<int> id)
+        {
+            _parentId = id;
         }
 
         /// <summary>

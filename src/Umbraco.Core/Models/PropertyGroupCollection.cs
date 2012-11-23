@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models
     /// Represents a collection of <see cref="PropertyGroup"/> objects
     /// </summary>
     [Serializable]
-    [DataContract(IsReference = true)]
+    [DataContract]
     public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, INotifyCollectionChanged
     {
         private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();

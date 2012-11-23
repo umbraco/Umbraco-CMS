@@ -323,6 +323,17 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Splits a Pascal cased string into a phrase seperated by spaces.
+        /// </summary>
+        /// <param name="phrase">String to split</param>
+        /// <returns></returns>
+        public static string SplitPascalCasing(this string phrase)
+        {
+            string result = Regex.Replace(phrase, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
+            return result;
+        }
+
+        /// <summary>
         /// Converts the phrase to specified convention.
         /// </summary>
         /// <param name="phrase"></param>

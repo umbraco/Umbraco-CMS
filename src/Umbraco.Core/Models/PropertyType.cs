@@ -25,7 +25,7 @@ namespace Umbraco.Core.Models
         private int _sortOrder;
         private string _validationRegExp;
 
-        public PropertyType(DataTypeDefinition dataTypeDefinition)
+        public PropertyType(IDataTypeDefinition dataTypeDefinition)
         {
             if(dataTypeDefinition.HasIdentity)
                 DataTypeId = dataTypeDefinition.Id;

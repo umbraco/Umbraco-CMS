@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -8,6 +9,8 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Represents an abstract class for composition specific ContentType properties and methods
     /// </summary>
+    [Serializable]
+    [DataContract(IsReference = true)]
     public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentTypeComposition
     {
         private List<IContentTypeComposition> _contentTypeComposition;

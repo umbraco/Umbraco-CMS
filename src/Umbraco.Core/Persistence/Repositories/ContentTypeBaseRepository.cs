@@ -90,7 +90,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Insert collection of allowed content types
             foreach (var allowedContentType in entity.AllowedContentTypes)
             {
-                Database.Insert(new ContentTypeAllowedContentTypeDto { Id = entity.Id, AllowedId = allowedContentType.Id, SortOrder = allowedContentType.SortOrder });
+                Database.Insert(new ContentTypeAllowedContentTypeDto { Id = entity.Id, AllowedId = allowedContentType.Id.Value, SortOrder = allowedContentType.SortOrder });
             }
 
             var propertyFactory = new PropertyGroupFactory(nodeDto.NodeId);
@@ -145,7 +145,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Insert collection of allowed content types
             foreach (var allowedContentType in entity.AllowedContentTypes)
             {
-                Database.Insert(new ContentTypeAllowedContentTypeDto { Id = entity.Id, AllowedId = allowedContentType.Id, SortOrder = allowedContentType.SortOrder });
+                Database.Insert(new ContentTypeAllowedContentTypeDto { Id = entity.Id, AllowedId = allowedContentType.Id.Value, SortOrder = allowedContentType.SortOrder });
             }
 
             //Check Dirty properties for Tabs/Groups and PropertyTypes - insert and delete accordingly
@@ -202,7 +202,7 @@ namespace Umbraco.Core.Persistence.Repositories
             allowedContentTypesSql.Where("[cmsContentTypeAllowedContentType].[Id] = @Id", new { Id = id });
 
             var allowedContentTypeDtos = Database.Fetch<ContentTypeAllowedContentTypeDto>(allowedContentTypesSql);
-            return allowedContentTypeDtos.Select(x => new ContentTypeSort { Id = x.AllowedId, SortOrder = x.SortOrder }).ToList();
+            return allowedContentTypeDtos.Select(x => new ContentTypeSort { Id = new Lazy<int>(() => x.AllowedId), SortOrder = x.SortOrder }).ToList();
         }
 
         protected PropertyGroupCollection GetPropertyGroupCollection(int id)

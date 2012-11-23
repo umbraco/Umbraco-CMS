@@ -532,7 +532,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <remarks>
         /// This method ensures that Content is saved lazily, so a new graph of <see cref="IContent"/>
-        /// objects can be saved in bulk. But not that objects are saved one at a time to ensure Ids.
+        /// objects can be saved in bulk. But note that objects are saved one at a time to ensure Ids.
         /// </remarks>
         /// <param name="contents">Collection of Lazy <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>

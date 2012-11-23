@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 
@@ -47,6 +48,17 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="contentTypes">Collection of <see cref="IContentType"/> to save</param>
         void Save(IEnumerable<IContentType> contentTypes);
+
+        /// <summary>
+        /// Saves a collection of lazy loaded <see cref="IContentType"/> objects.
+        /// </summary>
+        /// <remarks>
+        /// This method ensures that ContentType is saved lazily, so a new graph of <see cref="IContentType"/>
+        /// objects can be saved in bulk. But note that objects are saved one at a time to ensure Ids.
+        /// </remarks>
+        /// <param name="contentTypes">Collection of Lazy <see cref="IContentType"/> to save</param>
+        /// <param name="userId">Optional Id of the User saving the ContentTypes</param>
+        void Save(IEnumerable<Lazy<IContentType>> contentTypes, int userId = -1);
 
         /// <summary>
         /// Deletes a single <see cref="IContentType"/> object

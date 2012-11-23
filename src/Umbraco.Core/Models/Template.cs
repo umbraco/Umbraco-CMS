@@ -31,6 +31,9 @@ namespace Umbraco.Core.Models
             Key = name.EncodeAsGuid();
             _name = name;
             _alias = alias;
+
+            CreateDate = DateTime.UtcNow;
+            UpdateDate = DateTime.UtcNow;
         }
 
         [DataMember]

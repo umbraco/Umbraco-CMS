@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models
     /// Represents a collection of <see cref="PropertyType"/> objects
     /// </summary>
     [Serializable]
-    [DataContract(IsReference = true)]
+    [DataContract]
     public class PropertyTypeCollection : KeyedCollection<string, PropertyType>, INotifyCollectionChanged
     {
         private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();

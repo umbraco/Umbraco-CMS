@@ -89,6 +89,25 @@
   <ItemGroup>
     <Compile Include="Auditing\AuditTests.cs" />
     <Compile Include="BusinessLogic\DictionaryTest.cs" />
+    <Compile Include="CodeFirst\Attributes\AliasAttribute.cs" />
+    <Compile Include="CodeFirst\Attributes\ContentTypeAttribute.cs" />
+    <Compile Include="CodeFirst\Attributes\DescriptionAttribute.cs" />
+    <Compile Include="CodeFirst\Attributes\PropertyTypeAttribute.cs" />
+    <Compile Include="CodeFirst\Attributes\RichtextAttribute.cs" />
+    <Compile Include="CodeFirst\Attributes\SortOrderAttribute.cs" />
+    <Compile Include="CodeFirst\CodeFirstTests.cs" />
+    <Compile Include="CodeFirst\ContentTypeBase.cs" />
+    <Compile Include="CodeFirst\Definitions\ContentTypeDefinitionFactory.cs" />
+    <Compile Include="CodeFirst\Definitions\DependencyField.cs" />
+    <Compile Include="CodeFirst\Definitions\PropertyDefinition.cs" />
+    <Compile Include="CodeFirst\TestModels\AdvancedContentPage.cs" />
+    <Compile Include="CodeFirst\TestModels\ContentPage.cs" />
+    <Compile Include="CodeFirst\TestModels\DecoratedModelPage.cs" />
+    <Compile Include="CodeFirst\TestModels\Home.cs" />
+    <Compile Include="CodeFirst\TestModels\PlainPocoType.cs" />
+    <Compile Include="CodeFirst\TestModels\SimpleContentPage.cs" />
+    <Compile Include="CodeFirst\TestModels\TextPage.cs" />
+    <Compile Include="CodeFirst\TopologicalSorter.cs" />
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="Configurations\RepositorySettingsTests.cs" />
     <Compile Include="ContentStores\PublishMediaStoreTests.cs" />
