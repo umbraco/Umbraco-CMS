@@ -25,15 +25,18 @@ namespace umbraco.cms.businesslogic.template
 			return IOHelper.MapPath(SystemDirectories.Masterpages + "/" + t.Alias.Replace(" ", "") + ".master");
 		}
 
-	    internal static string CreateMasterPage(Template t, bool overWrite = false)
+        internal static string CreateMasterPage(Template t, bool overWrite = false)
         {
             string masterpageContent = "";
 
-			if (!File.Exists(GetFilePath(t)) || overWrite)
-                masterpageContent = SaveTemplateToFile(t, t.Alias);
+            if (!File.Exists(GetFilePath(t)) || overWrite)
+            {
+                masterpageContent = CreateDefaultMasterPageContent(t, t.Alias);
+                saveDesignToFile(t, null, masterpageContent);
+            }
             else
             {
-				System.IO.TextReader tr = new StreamReader(GetFilePath(t));
+                System.IO.TextReader tr = new StreamReader(GetFilePath(t));
                 masterpageContent = tr.ReadToEnd();
                 tr.Close();
             }
@@ -56,7 +59,152 @@ namespace umbraco.cms.businesslogic.template
 
         internal static string UpdateMasterPageFile(Template t, string currentAlias)
         {
-            return SaveTemplateToFile(t, currentAlias);
+            var template = updateMasterPageContent(t, currentAlias);
+            updateChildTemplates(t, currentAlias);
+            saveDesignToFile(t, currentAlias, template);
+
+            return template;
+        }
+
+        internal static string CreateDefaultMasterPageContent(Template template, string currentAlias)
+        {
+            string design = GetMasterPageHeader(template) + "\n";
+
+            if (template.HasMasterTemplate)
+            {
+                var master = new Template(template.MasterTemplate);
+
+                foreach (string cpId in master.contentPlaceholderIds())
+                {
+                    design += "<asp:content ContentPlaceHolderId=\"" + cpId +
+                              "\" runat=\"server\">\n\t\n</asp:content>\n\n";
+                }
+            }
+            else
+            {
+                design += GetMasterContentElement(template) + "\n";
+                design += template.Design;
+                design += "\n</asp:Content>" + Environment.NewLine;
+            }
+
+            return design;
+
+
+            /*
+            var masterPageContent = template.Design;
+
+            if (!IsMasterPageSyntax(masterPageContent))
+                masterPageContent = ConvertToMasterPageSyntax(template);
+
+            // Add header to master page if it doesn't exist
+            if (!masterPageContent.TrimStart().StartsWith("<%@"))
+            {
+                masterPageContent = GetMasterPageHeader(template) + "\n" + masterPageContent;
+            }
+            else
+            {
+                // verify that the masterpage attribute is the same as the masterpage
+                string masterHeader =
+                    masterPageContent.Substring(0, masterPageContent.IndexOf("%>") + 2).Trim(
+                        Environment.NewLine.ToCharArray());
+
+                // find the masterpagefile attribute
+                MatchCollection m = Regex.Matches(masterHeader, "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"",
+                                                  RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+                
+                foreach (Match attributeSet in m)
+                {
+                    if (attributeSet.Groups["attributeName"].Value.ToLower() == "masterpagefile")
+                    {
+                        // validate the masterpagefile
+                        string currentMasterPageFile = attributeSet.Groups["attributeValue"].Value;
+                        string currentMasterTemplateFile = ParentTemplatePath(template);
+
+                        if (currentMasterPageFile != currentMasterTemplateFile)
+                        {
+                            masterPageContent =
+                                masterPageContent.Replace(
+                                    attributeSet.Groups["attributeName"].Value + "=\"" + currentMasterPageFile + "\"",
+                                    attributeSet.Groups["attributeName"].Value + "=\"" + currentMasterTemplateFile +
+                                    "\"");
+                        }
+                    }
+                }
+
+            }
+            
+            return masterPageContent;
+             * */
+        }
+
+        internal static string updateMasterPageContent(Template template, string currentAlias)
+        {
+            var masterPageContent = template.Design;
+
+            if (!string.IsNullOrEmpty(currentAlias) && currentAlias != template.Alias)
+            {
+                string masterHeader =
+                   masterPageContent.Substring(0, masterPageContent.IndexOf("%>") + 2).Trim(
+                       Environment.NewLine.ToCharArray());
+
+                // find the masterpagefile attribute
+                MatchCollection m = Regex.Matches(masterHeader, "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"",
+                                                  RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+
+                foreach (Match attributeSet in m)
+                {
+                    if (attributeSet.Groups["attributeName"].Value.ToLower() == "masterpagefile")
+                    {
+                        // validate the masterpagefile
+                        string currentMasterPageFile = attributeSet.Groups["attributeValue"].Value;
+                        string currentMasterTemplateFile = ParentTemplatePath(template);
+
+                        if (currentMasterPageFile != currentMasterTemplateFile)
+                        {
+                            masterPageContent =
+                                masterPageContent.Replace(
+                                    attributeSet.Groups["attributeName"].Value + "=\"" + currentMasterPageFile + "\"",
+                                    attributeSet.Groups["attributeName"].Value + "=\"" + currentMasterTemplateFile +
+                                    "\"");
+                        }
+                    }
+                }
+            }
+
+            return masterPageContent;
+        }
+
+        private static void updateChildTemplates(Template t, string currentAlias)
+        {
+            //if we have a Old Alias if the alias and therefor the masterpage file name has changed...
+            //so before we save the new masterfile, we'll clear the old one, so we don't up with 
+            //Unused masterpage files
+            if (!string.IsNullOrEmpty(currentAlias) && currentAlias != t.Alias)
+            {
+                //Ensure that child templates have the right master masterpage file name
+                if (t.HasChildren)
+                {
+                    var c = t.Children;
+                    foreach (CMSNode cmn in c)
+                        UpdateMasterPageFile(new Template(cmn.Id), null);
+                }
+            }
+        }
+
+
+        private static void saveDesignToFile(Template t, string currentAlias, string design)
+        {
+            //kill the old file..
+            if (!string.IsNullOrEmpty(currentAlias) && currentAlias != t.Alias)
+            {
+                string _oldFile =
+                    IOHelper.MapPath(SystemDirectories.Masterpages + "/" + currentAlias.Replace(" ", "") + ".master");
+                if (System.IO.File.Exists(_oldFile))
+                    System.IO.File.Delete(_oldFile);
+            }
+
+            // save the file in UTF-8
+            System.IO.File.WriteAllText(GetFilePath(t), design, System.Text.Encoding.UTF8);
         }
 
 		internal static void RemoveMasterPageFile(string alias)

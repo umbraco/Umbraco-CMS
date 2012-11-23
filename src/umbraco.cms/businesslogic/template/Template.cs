@@ -383,18 +383,15 @@ namespace umbraco.cms.businesslogic.template
 			return engine;
 		}
 
-		public static Template MakeNew(string Name, BusinessLogic.User u, Template master)
-		{
-		    return MakeNew(Name, u, master, null);
-		}
-
-		private static Template MakeNew(string Name, BusinessLogic.User u, Template master, string design)
+        public static Template MakeNew(string Name, BusinessLogic.User u, Template master)
         {
-            Template t = MakeNew(Name, u, design);
-            t.MasterTemplate = master.Id;			
+            return MakeNew(Name, u, master, null);
+        }
 
-            t.Save();
-            return t;
+
+        private static Template MakeNew(string name, BusinessLogic.User u, string design)
+        {
+            return MakeNew(name, u, null, design);
         }
 
         public static Template MakeNew(string name, BusinessLogic.User u)
@@ -402,7 +399,7 @@ namespace umbraco.cms.businesslogic.template
             return MakeNew(name, u, design: null);
         }
 
-        private static Template MakeNew(string name, BusinessLogic.User u, string design)
+        private static Template MakeNew(string name, BusinessLogic.User u, Template master, string design)
         {
 
             // CMSNode MakeNew(int parentId, Guid objectType, int userId, int level, string text, Guid uniqueID)
@@ -418,8 +415,6 @@ namespace umbraco.cms.businesslogic.template
                 name = name.Substring(0, 95) + "...";
 
           
-
-
             SqlHelper.ExecuteNonQuery("INSERT INTO cmsTemplate (NodeId, Alias, design, master) VALUES (@nodeId, @alias, @design, @master)",
                                       SqlHelper.CreateParameter("@nodeId", n.Id),
                                       SqlHelper.CreateParameter("@alias", name),
@@ -429,6 +424,9 @@ namespace umbraco.cms.businesslogic.template
             Template t = new Template(n.Id);
             NewEventArgs e = new NewEventArgs();
             t.OnNew(e);
+
+            if (master != null)
+                t.MasterTemplate = master.Id;
 
 			switch (DetermineRenderingEngine(t, design))
 			{
