@@ -1,3 +1,5 @@
+using System.IO;
+using Umbraco.Core.IO;
 using umbraco.BusinessLogic;
 
 namespace umbraco.presentation.install.steps
@@ -32,7 +34,9 @@ namespace umbraco.presentation.install.steps
             if (!cms.businesslogic.skinning.Skinning.IsStarterKitInstalled())
                 customizeSite.Visible = false;
 
-            var initTrees = new ApplicationTreeRegistrar();
+            var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
+            if(Directory.Exists(tempFolder))
+                Directory.Delete(tempFolder, true);
         }
 
         #region Web Form Designer generated code
