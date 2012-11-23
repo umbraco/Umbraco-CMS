@@ -43,7 +43,7 @@ namespace Umbraco.Core
 		/// <remarks>
 		/// Any caching that is done in the application (app wide) should be done through this property
 		/// </remarks>
-		internal CacheHelper ApplicationCache { get; private set; }
+		public CacheHelper ApplicationCache { get; private set; }
 
     	// IsReady is set to true by the boot manager once it has successfully booted
         // note - the original umbraco module checks on content.Instance in umbraco.dll
@@ -111,6 +111,7 @@ namespace Umbraco.Core
 				}
 			}
 		}
+
 		private string ConfigurationStatus
 		{
 			get

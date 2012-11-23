@@ -151,7 +151,7 @@ namespace umbraco.cms.helpers
 
         // helper method gotten from:
         // http://stackoverflow.com/questions/20762/how-do-you-remove-invalid-hexadecimal-characters-from-an-xml-based-data-source-p#comment8130028_641632
-        public static string RemoveTroublesomeCharacters(string inString)
+	    internal static string RemoveIllegalXmlCharacters(string inString)
         {
 
             if (inString == null) return null;

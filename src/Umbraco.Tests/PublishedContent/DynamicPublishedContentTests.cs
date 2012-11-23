@@ -1,22 +1,13 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using NUnit.Framework;
-using Umbraco.Core.Dynamics;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Tests.Routing;
 using Umbraco.Web;
 using Umbraco.Web.Models;
-using Umbraco.Web.Routing;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.template;
-using umbraco.cms.businesslogic.web;
 
-namespace Umbraco.Tests.DynamicDocument
+namespace Umbraco.Tests.PublishedContent
 {
 	[TestFixture]
 	public class DynamicPublishedContentTests : DynamicDocumentTestsBase<DynamicPublishedContent, DynamicPublishedContentList>
@@ -34,7 +25,7 @@ namespace Umbraco.Tests.DynamicDocument
 					});
 
 			//need to specify a custom callback for unit tests
-			DynamicPublishedContent.GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
+			PublishedContentHelper.GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
 				{
 					if (propertyAlias == "content")
 					{
@@ -86,6 +77,7 @@ namespace Umbraco.Tests.DynamicDocument
 			Assert.AreEqual("Hello world!" + 123 + false, asDynamic.DynamicDocumentMultiParam("Hello world!", 123, false));
 			Assert.AreEqual("Hello world!" + 123 + false, asDynamic.Children.DynamicDocumentListMultiParam("Hello world!", 123, false));
 			Assert.AreEqual("Hello world!" + 123 + false, asDynamic.Children.DynamicDocumentEnumerableMultiParam("Hello world!", 123, false));
+			
 		}
 
 		[Test]

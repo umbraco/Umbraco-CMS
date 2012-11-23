@@ -69,5 +69,16 @@ namespace Umbraco.Web
 		{
 			return resolver.ResolveTypes<IThumbnailProvider>();
 		}
-	}
+
+        /// <summary>
+        /// Returns all IImageUrlProvider classes
+        /// </summary>
+        /// <param name="resolver"></param>
+        /// <returns></returns>
+        internal static IEnumerable<Type> ResolveImageUrlProviders(this PluginManager resolver)
+        {
+            return resolver.ResolveTypes<IImageUrlProvider>();
+        }
+
+    }
 }

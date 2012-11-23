@@ -42,6 +42,7 @@ namespace umbraco.cms.businesslogic.template
         private static readonly string UmbracoTemplateCacheKey = "UmbracoTemplateCache";
         private static object _templateLoaderLocker = new object();
         private static Guid _objectType = new Guid("6fbde604-4178-42ce-a10b-8a2600a2f07d");
+		private static readonly char[] NewLineChars = Environment.NewLine.ToCharArray();
 
         #endregion
 
@@ -262,12 +263,7 @@ namespace umbraco.cms.businesslogic.template
             {
                 FlushCache();
 
-                _design = value.Trim(Environment.NewLine.ToCharArray());
-                // NH: Removing an generating the directive can mess up code behind
-                // We don't store the masterpage directive in the design value
-                //                if (_design.StartsWith("<%@"))
-                //                    _design = _design.Substring(_design.IndexOf("%>") + 3).Trim(Environment.NewLine.ToCharArray());
-
+                _design = value.Trim(NewLineChars);
 
                 //we only switch to MVC View editing if the template has a view file, and MVC editing is enabled
 				if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && !MasterPageHelper.IsMasterPageSyntax(_design))
@@ -387,18 +383,15 @@ namespace umbraco.cms.businesslogic.template
 			return engine;
 		}
 
-		public static Template MakeNew(string Name, BusinessLogic.User u, Template master)
-		{
-		    return MakeNew(Name, u, master, null);
-		}
-
-		private static Template MakeNew(string Name, BusinessLogic.User u, Template master, string design)
+        public static Template MakeNew(string Name, BusinessLogic.User u, Template master)
         {
-            Template t = MakeNew(Name, u, design);
-            t.MasterTemplate = master.Id;			
+            return MakeNew(Name, u, master, null);
+        }
 
-            t.Save();
-            return t;
+
+        private static Template MakeNew(string name, BusinessLogic.User u, string design)
+        {
+            return MakeNew(name, u, null, design);
         }
 
         public static Template MakeNew(string name, BusinessLogic.User u)
@@ -406,7 +399,7 @@ namespace umbraco.cms.businesslogic.template
             return MakeNew(name, u, design: null);
         }
 
-        private static Template MakeNew(string name, BusinessLogic.User u, string design)
+        private static Template MakeNew(string name, BusinessLogic.User u, Template master, string design)
         {
 
             // CMSNode MakeNew(int parentId, Guid objectType, int userId, int level, string text, Guid uniqueID)
@@ -422,8 +415,6 @@ namespace umbraco.cms.businesslogic.template
                 name = name.Substring(0, 95) + "...";
 
           
-
-
             SqlHelper.ExecuteNonQuery("INSERT INTO cmsTemplate (NodeId, Alias, design, master) VALUES (@nodeId, @alias, @design, @master)",
                                       SqlHelper.CreateParameter("@nodeId", n.Id),
                                       SqlHelper.CreateParameter("@alias", name),
@@ -433,6 +424,9 @@ namespace umbraco.cms.businesslogic.template
             Template t = new Template(n.Id);
             NewEventArgs e = new NewEventArgs();
             t.OnNew(e);
+
+            if (master != null)
+                t.MasterTemplate = master.Id;
 
 			switch (DetermineRenderingEngine(t, design))
 			{
@@ -549,26 +543,7 @@ namespace umbraco.cms.businesslogic.template
             // NH: Changed this; if you delete a template we'll remove all references instead of 
             // throwing an exception
             if (DocumentType.GetAllAsList().Where(x => x.allowedTemplates.Select(t => t.Id).Contains(this.Id)).Count() > 0)
-            {
-                // the uncommented code below have been refactored into removeAllReferences method that clears template
-                // from documenttypes, subtemplates and documents.
                 RemoveAllReferences();
-                /*
-
-                // Added to remove template doctype relationship
-                SqlHelper.ExecuteNonQuery("delete from cmsDocumentType where templateNodeId =" + this.Id);
-
-                // Need to update any other template that references this one as it's master to NULL
-                SqlHelper.ExecuteNonQuery("update cmsTemplate set [master] = NULL where [master] = " + this.Id);
-                */
-
-                // don't allow template deletion if it is in use
-                // (get all doc types and filter based on any that have the template id of this one)
-                /*
-                Log.Add(LogTypes.Error, this.Id, "Can't delete a template that is assigned to existing content");
-                throw new InvalidOperationException("Can't delete a template that is assigned to existing content");
-            */
-            }
 
             DeleteEventArgs e = new DeleteEventArgs();
             FireBeforeDelete(e);
@@ -645,7 +620,7 @@ namespace umbraco.cms.businesslogic.template
 
         public string ConvertToMasterPageSyntax(string templateDesign)
         {
-            string masterPageContent = GetMasterContentElement(MasterTemplate) + "\n";
+            string masterPageContent = GetMasterContentElement(MasterTemplate) + Environment.NewLine;
 
             masterPageContent += templateDesign;
 
@@ -653,7 +628,9 @@ namespace umbraco.cms.businesslogic.template
             masterPageContent = EnsureMasterPageSyntax(masterPageContent);
 
             // append ending asp:content element
-            masterPageContent += "\n</asp:Content>" + Environment.NewLine;
+            masterPageContent += Environment.NewLine
+                + "</asp:Content>" 
+                + Environment.NewLine;
 
             return masterPageContent;
         }
@@ -683,98 +660,14 @@ namespace umbraco.cms.businesslogic.template
         public void ImportDesign(string design)
         {
             Design = design; 
-
-            /*
-            if (!isMasterPageSyntax(design))
-            {
-                Design = ConvertToMasterPageSyntax(design);
-            }
-            else
-            {
-                Design = design;
-            }*/
-
         }
 
         public void SaveMasterPageFile(string masterPageContent)
         {
             //this will trigger the helper and store everything
             this.Design = masterPageContent;
-
-            /*
-
-            // Add header to master page if it doesn't exist
-            if (!masterPageContent.StartsWith("<%@"))
-            {
-                masterPageContent = getMasterPageHeader() + "\n" + masterPageContent;
-            }
-            else
-            {
-                // verify that the masterpage attribute is the same as the masterpage
-                string masterHeader = masterPageContent.Substring(0, masterPageContent.IndexOf("%>") + 2).Trim(Environment.NewLine.ToCharArray());
-                // find the masterpagefile attribute
-                MatchCollection m = Regex.Matches(masterHeader, "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"",
-                                  RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-                foreach (Match attributeSet in m)
-                {
-                    if (attributeSet.Groups["attributeName"].Value.ToLower() == "masterpagefile")
-                    {
-                        // validate the masterpagefile
-                        string currentMasterPageFile = attributeSet.Groups["attributeValue"].Value;
-                        string currentMasterTemplateFile = currentMasterTemplateFileName();
-                        if (currentMasterPageFile != currentMasterTemplateFile)
-                        {
-                            masterPageContent =
-                                masterPageContent.Replace(
-                                attributeSet.Groups["attributeName"].Value + "=\"" + currentMasterPageFile + "\"",
-                                attributeSet.Groups["attributeName"].Value + "=\"" + currentMasterTemplateFile + "\"");
-
-                        }
-                    }
-                }
-
-            }
-
-            //we have a Old Alias if the alias and therefor the masterpage file name has changed...
-            //so before we save the new masterfile, we'll clear the old one, so we don't up with 
-            //Unused masterpage files
-            if (!string.IsNullOrEmpty(_oldAlias) && _oldAlias != _alias)
-            {
-
-                //Ensure that child templates have the right master masterpage file name
-                if (HasChildren)
-                {
-                    //store children array here because iterating over an Array property object is very inneficient.
-                    var c = Children;
-                    foreach (CMSNode cmn in c)
-                    {
-                        Template t = new Template(cmn.Id);
-                        t.SaveAsMasterPage();
-                        t.Save();
-                    }
-                }
-
-                //then kill the old file.. 
-                string _oldFile = IOHelper.MapPath(SystemDirectories.Masterpages + "/" + _oldAlias.Replace(" ", "") + ".master");
-
-                if (System.IO.File.Exists(_oldFile))
-                    System.IO.File.Delete(_oldFile);
-            }
-
-            // save the file in UTF-8
-
-            File.WriteAllText(MasterPageFile, masterPageContent, System.Text.Encoding.UTF8);
-             * */
         }        
-
-        private string CurrentMasterTemplateFileName()
-        {
-            if (MasterTemplate != 0)
-                return SystemDirectories.Masterpages + "/" + new Template(MasterTemplate).Alias.Replace(" ", "") + ".master";
-            else
-                return UmbracoMasterTemplate;
-        }
-
+        
         private void GetAspNetMasterPageForm(ref string design)
         {
             Match formElement = Regex.Match(design, GetElementRegExp("?ASPNET_FORM", false), RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);

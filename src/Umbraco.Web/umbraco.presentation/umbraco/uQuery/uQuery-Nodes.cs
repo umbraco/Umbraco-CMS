@@ -198,7 +198,9 @@ namespace umbraco
 		/// <param name="url">The URL to get the XML node from.</param>
 		/// <returns>Returns the node Id.</returns>
 		/// <remarks>
-		/// Thanks to Jonas Eriksson http://our.umbraco.org/member/4853
+		/// <para>Thanks to Jonas Eriksson http://our.umbraco.org/member/4853 </para>
+		/// <para>Just runs lookups to find the document, does not follow internal redirects, 404 handlers,
+		/// page access verification, wildcard domains -- nothing.</para>
 		/// </remarks>
 		public static int GetNodeIdByUrl(string url)
 		{
@@ -210,7 +212,7 @@ namespace umbraco
 			var docreq = new Umbraco.Web.Routing.PublishedContentRequest(uri, Umbraco.Web.UmbracoContext.Current.RoutingContext);
 			var builder = new Umbraco.Web.Routing.PublishedContentRequestBuilder(docreq);
 			builder.LookupDomain();
-			builder.LookupDocument();
+			builder.LookupDocument1(); // will _not_ follow redirects, handle 404, nothing - just run lookups
 			return docreq.HasNode ? docreq.DocumentId : uQuery.RootNodeId;
 		}
 

@@ -17,6 +17,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 using umbraco;
 using System.Collections.Generic;
@@ -63,6 +64,28 @@ namespace Umbraco.Web
 			}
 		}
 
+		/// <summary>
+		/// Renders the template for the specified pageId and an optional altTemplateId
+		/// </summary>
+		/// <param name="pageId"></param>
+		/// <param name="altTemplateId">If not specified, will use the template assigned to the node</param>
+		/// <returns></returns>
+		public IHtmlString RenderTemplate(int pageId, int? altTemplateId = null)
+		{
+			var templateRenderer = new TemplateRenderer(_umbracoContext, pageId, altTemplateId);
+			using (var sw = new StringWriter())
+			{
+				try
+				{
+					templateRenderer.Render(sw);					
+				}
+				catch(Exception ex)
+				{
+					sw.Write("<!-- Error rendering template with id {0}: '{1}' -->", pageId, ex);
+				}
+				return new HtmlString(sw.ToString());	
+			}			
+		}
 
 		#region RenderMacro
 
@@ -96,7 +119,7 @@ namespace Umbraco.Web
 		public IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters)
 		{
 			if (alias == null) throw new ArgumentNullException("alias");
-			var containerPage = new FormlessPage();
+
 			var m = macro.GetMacro(alias);
 			if (_umbracoContext.PageId == null)
 			{
@@ -116,16 +139,41 @@ namespace Umbraco.Web
 			var macroControl = m.renderMacro(macroProps,
 				UmbracoContext.Current.PublishedContentRequest.UmbracoPage.Elements,
 				_umbracoContext.PageId.Value);
-			containerPage.Controls.Add(macroControl);
-			using (var output = new StringWriter())
-			{
-				_umbracoContext.HttpContext.Server.Execute(containerPage, output, false);
 
-				//Now, we need to ensure that local links are parsed
-				return new HtmlString(
-					TemplateUtilities.ParseInternalLinks(
-						output.ToString()));
+			string html;
+			if (macroControl is LiteralControl)
+			{
+				// no need to execute, we already have text
+				html = (macroControl as LiteralControl).Text;
 			}
+			else
+			{
+				var containerPage = new FormlessPage();
+				containerPage.Controls.Add(macroControl);
+
+				using (var output = new StringWriter())
+				{
+					// .Execute() does a PushTraceContext/PopTraceContext and writes trace output straight into 'output'
+					// and I do not see how we could wire the trace context to the current context... so it creates dirty
+					// trace output right in the middle of the page.
+					//
+					// The only thing we can do is fully disable trace output while .Execute() runs and restore afterwards
+					// which means trace output is lost if the macro is a control (.ascx or user control) that is invoked
+					// from within Razor -- which makes sense anyway because the control can _not_ run correctly from
+					// within Razor since it will never be inserted into the page pipeline (which may even not exist at all
+					// if we're running MVC).
+					//
+					var traceIsEnabled = containerPage.Trace.IsEnabled;
+					containerPage.Trace.IsEnabled = false;
+					_umbracoContext.HttpContext.Server.Execute(containerPage, output, false);
+					containerPage.Trace.IsEnabled = traceIsEnabled;
+
+					//Now, we need to ensure that local links are parsed
+					html = TemplateUtilities.ParseInternalLinks(output.ToString());
+				}
+			}
+
+			return new HtmlString(html);
 		}
 
 		#endregion
@@ -260,8 +308,8 @@ namespace Umbraco.Web
 		                   };
 
             //this is here to figure out if this request is in the context of a partial
-            if (_umbracoContext.PublishedContentRequest.PublishedContent.Id != _currentPage.Id)
-                item.NodeId = _currentPage.Id.ToString();
+            if (_umbracoContext.PublishedContentRequest.PublishedContent.Id != currentPage.Id)
+                item.NodeId = currentPage.Id.ToString();
             
 		
 			var containerPage = new FormlessPage();
@@ -375,6 +423,11 @@ namespace Umbraco.Web
 
 		#region Content
 
+		public IPublishedContent TypedContent(object id)
+		{
+			return TypedDocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
+		}
+
 		public IPublishedContent TypedContent(int id)
 		{
 			return TypedDocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
@@ -383,6 +436,11 @@ namespace Umbraco.Web
 		public IPublishedContent TypedContent(string id)
 		{
 			return TypedDocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
+		}
+
+		public IEnumerable<IPublishedContent> TypedContent(params object[] ids)
+		{
+			return TypedDocumentsbyIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
 		}
 
 		public IEnumerable<IPublishedContent> TypedContent(params int[] ids)
@@ -395,6 +453,11 @@ namespace Umbraco.Web
 			return TypedDocumentsbyIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
 		}
 
+		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<object> ids)
+		{
+			return TypedContent(ids.ToArray());
+		}
+
 		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<string> ids)
 		{
 			return TypedContent(ids.ToArray());
@@ -403,6 +466,11 @@ namespace Umbraco.Web
 		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<int> ids)
 		{
 			return TypedContent(ids.ToArray());
+		}
+
+		public dynamic Content(object id)
+		{
+			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
 		}
 
 		public dynamic Content(int id)
@@ -415,6 +483,11 @@ namespace Umbraco.Web
 			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
 		}
 
+		public dynamic Content(params object[] ids)
+		{
+			return DocumentByIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
+		}
+
 		public dynamic Content(params int[] ids)
 		{
 			return DocumentByIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
@@ -423,6 +496,11 @@ namespace Umbraco.Web
 		public dynamic Content(params string[] ids)
 		{
 			return DocumentByIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
+		}
+
+		public dynamic Content(IEnumerable<object> ids)
+		{
+			return Content(ids.ToArray());
 		}
 
 		public dynamic Content(IEnumerable<int> ids)
@@ -439,6 +517,21 @@ namespace Umbraco.Web
 
 		#region Media
 
+		/// <summary>
+		/// Overloaded method accepting an 'object' type
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass 
+		/// this result in to this method.
+		/// This method will throw an exception if the value is not of type int or string.
+		/// </remarks>
+		public IPublishedContent TypedMedia(object id)
+		{
+			return TypedDocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
+		}
+
 		public IPublishedContent TypedMedia(int id)
 		{
 			return TypedDocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
@@ -447,6 +540,11 @@ namespace Umbraco.Web
 		public IPublishedContent TypedMedia(string id)
 		{
 			return TypedDocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
+		}
+
+		public IEnumerable<IPublishedContent> TypedMedia(params object[] ids)
+		{
+			return TypedDocumentsbyIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
 		}
 
 		public IEnumerable<IPublishedContent> TypedMedia(params int[] ids)
@@ -459,6 +557,11 @@ namespace Umbraco.Web
 			return TypedDocumentsbyIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
 		}
 
+		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<object> ids)
+		{
+			return TypedMedia(ids.ToArray());
+		}
+
 		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<int> ids)
 		{
 			return TypedMedia(ids.ToArray());
@@ -467,6 +570,11 @@ namespace Umbraco.Web
 		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<string> ids)
 		{
 			return TypedMedia(ids.ToArray());
+		}
+
+		public dynamic Media(object id)
+		{
+			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
 		}
 
 		public dynamic Media(int id)
@@ -479,6 +587,11 @@ namespace Umbraco.Web
 			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
 		}
 
+		public dynamic Media(params object[] ids)
+		{
+			return DocumentByIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
+		}
+
 		public dynamic Media(params int[] ids)
 		{
 			return DocumentByIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
@@ -487,6 +600,11 @@ namespace Umbraco.Web
 		public dynamic Media(params string[] ids)
 		{
 			return DocumentByIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
+		}
+
+		public dynamic Media(IEnumerable<object> ids)
+		{
+			return Media(ids.ToArray());
 		}
 
 		public dynamic Media(IEnumerable<int> ids)
@@ -503,6 +621,26 @@ namespace Umbraco.Web
 
 		#region Used by Content/Media
 
+		/// <summary>
+		/// Overloaded method accepting an 'object' type
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="store"> </param>
+		/// <returns></returns>
+		/// <remarks>
+		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass 
+		/// this result in to this method.
+		/// This method will throw an exception if the value is not of type int or string.
+		/// </remarks>
+		private IPublishedContent TypedDocumentById(object id, IPublishedStore store)
+		{
+			if (id is string)
+				return TypedDocumentById((string)id, store);
+			if (id is int)
+				return TypedDocumentById((int)id, store);
+			throw new InvalidOperationException("The value of parameter 'id' must be either a string or an integer");
+		}
+
 		private IPublishedContent TypedDocumentById(int id, IPublishedStore store)
 		{
 			var doc = store.GetDocumentById(UmbracoContext.Current, id);
@@ -517,6 +655,22 @@ namespace Umbraco.Web
 				       : null;
 		}
 
+		/// <summary>
+		/// Overloaded method accepting an 'object' type
+		/// </summary>
+		/// <param name="ids"></param>
+		/// <param name="store"> </param>
+		/// <returns></returns>
+		/// <remarks>
+		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass 
+		/// this result in to this method.
+		/// This method will throw an exception if the value is not of type int or string.
+		/// </remarks>
+		private IEnumerable<IPublishedContent> TypedDocumentsbyIds(IPublishedStore store, params object[] ids)
+		{
+			return ids.Select(eachId => TypedDocumentById(eachId, store));
+		}
+
 		private IEnumerable<IPublishedContent> TypedDocumentsbyIds(IPublishedStore store, params int[] ids)
 		{
 			return ids.Select(eachId => TypedDocumentById(eachId, store));
@@ -525,6 +679,26 @@ namespace Umbraco.Web
 		private IEnumerable<IPublishedContent> TypedDocumentsbyIds(IPublishedStore store, params string[] ids)
 		{
 			return ids.Select(eachId => TypedDocumentById(eachId, store));
+		}
+
+		/// <summary>
+		/// Overloaded method accepting an 'object' type
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="store"> </param>
+		/// <returns></returns>
+		/// <remarks>
+		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass 
+		/// this result in to this method.
+		/// This method will throw an exception if the value is not of type int or string.
+		/// </remarks>
+		private dynamic DocumentById(object id, IPublishedStore store)
+		{
+			if (id is string)
+				return DocumentById((string)id, store);
+			if (id is int)
+				return DocumentById((int)id, store);
+			throw new InvalidOperationException("The value of parameter 'id' must be either a string or an integer");
 		}
 
 		private dynamic DocumentById(int id, IPublishedStore store)
@@ -541,6 +715,25 @@ namespace Umbraco.Web
 			return int.TryParse(id, out docId)
 				? DocumentById(docId, store)
 				: new DynamicNull();
+		}
+
+		/// <summary>
+		/// Overloaded method accepting an 'object' type
+		/// </summary>
+		/// <param name="ids"></param>
+		/// <param name="store"> </param>
+		/// <returns></returns>
+		/// <remarks>
+		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass 
+		/// this result in to this method.
+		/// This method will throw an exception if the value is not of type int or string.
+		/// </remarks>
+		private dynamic DocumentByIds(IPublishedStore store, params object[] ids)
+		{
+			var nodes = ids.Select(eachId => DocumentById(eachId, store))
+				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
+				.Cast<DynamicPublishedContent>();
+			return new DynamicPublishedContentList(nodes);
 		}
 
 		private dynamic DocumentByIds(IPublishedStore store, params int[] ids)

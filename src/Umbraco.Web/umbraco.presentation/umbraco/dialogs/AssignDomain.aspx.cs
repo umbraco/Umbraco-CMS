@@ -82,7 +82,7 @@ namespace umbraco.dialogs
                 allDomains.Text = "<table border=\"0\" cellspacing=\"10\">";
 
                 foreach (Domain d in domainList) {
-                    allDomains.Text += "<tr><td>" + d.Name + "</td><td><a href=\"?id=" + currentID + "&editDomain=" +
+                    allDomains.Text += "<tr><td>" + d.Name + "</td><td>(" + d.Language.CultureAlias + ")</td><td><a href=\"?id=" + currentID + "&editDomain=" +
                                        d.Id.ToString() + "\">" + ui.Text("edit") + "</a></td><td><a href=\"?id=" + currentID +
                                        "&delDomain=" + d.Id.ToString() + "\" onClick=\"return confirm('" +
                                        ui.Text("defaultdialogs", "confirmdelete", base.getUser()) +

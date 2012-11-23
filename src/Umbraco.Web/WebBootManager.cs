@@ -9,12 +9,14 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Dictionary;
+using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Routing;
 using umbraco.businesslogic;
+using umbraco.cms.businesslogic;
 
 
 namespace Umbraco.Web
@@ -195,6 +197,10 @@ namespace Umbraco.Web
 		{
 			base.InitializeResolvers();
 
+			//TODO: This needs to be removed in future versions (i.e. 6.0 when the PublishedContentHelper can access the business logic)
+			// see the TODO noted in the PublishedContentHelper.
+			PublishedContentHelper.GetDataTypeCallback = ContentType.GetDataType;
+
 			SurfaceControllerResolver.Current = new SurfaceControllerResolver(
 				PluginManager.Current.ResolveSurfaceControllers());
 
@@ -233,6 +239,9 @@ namespace Umbraco.Web
 
 			ThumbnailProvidersResolver.Current = new ThumbnailProvidersResolver(
 				PluginManager.Current.ResolveThumbnailProviders());
+
+            ImageUrlProviderResolver.Current = new ImageUrlProviderResolver(
+                PluginManager.Current.ResolveImageUrlProviders());
 
 			CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(
 				new DefaultCultureDictionaryFactory());

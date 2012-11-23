@@ -17,7 +17,7 @@ namespace umbraco.businesslogic
 	/// Class inhiriting from ApplicationStartupHandler are automaticly registered and instantiated by umbraco on application start.
 	/// To use, inhirite the ApplicationStartupHandler Class and add an empty constructor. 
 	/// </summary>
-	[Obsolete("This class is no longer used, implement IApplicationEvents instead")]
+    [Obsolete("This class is no longer used, implement IApplicationEventHandler instead")]
 	public abstract class ApplicationStartupHandler : IApplicationStartupHandler
 	{
 

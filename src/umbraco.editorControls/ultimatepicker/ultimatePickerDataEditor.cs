@@ -394,7 +394,7 @@ namespace umbraco.editorControls.ultimatepicker
             {
                 try
                 {
-                    CMSNode firstSaved = new CMSNode(Convert.ToInt32(_data.Value.ToString().Substring(0, 4)));
+                    CMSNode firstSaved = new CMSNode(Convert.ToInt32(_data.Value.ToString()));
                     childtxt.Text = firstSaved.Text;
                 }
                 catch

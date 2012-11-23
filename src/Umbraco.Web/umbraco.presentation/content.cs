@@ -7,6 +7,7 @@ using System.Threading;
 using System.Web;
 using System.Xml;
 using System.Xml.XPath;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.BusinessLogic.Utils;
@@ -211,10 +212,14 @@ namespace umbraco
                 {
                     if (isInitializing)
                     {
-                        Trace.WriteLine(string.Format("Initializing content on thread '{0}' (Threadpool? {1})",
-                                                      Thread.CurrentThread.Name, Thread.CurrentThread.IsThreadPoolThread));
+						LogHelper.Debug<content>("Initializing content on thread '{0}' (Threadpool? {1})", 
+							HttpContext.Current == null ? null : HttpContext.Current.Trace,
+							() => Thread.CurrentThread.Name,
+							() => Thread.CurrentThread.IsThreadPoolThread);
+                        
                         _xmlContent = LoadContent();
-                        Trace.WriteLine("Content initialized (loaded)");
+						LogHelper.Debug<content>("Content initialized (loaded)", 
+							HttpContext.Current == null ? null : HttpContext.Current.Trace);
 
                         FireAfterRefreshContent(new RefreshContentEventArgs());
 
@@ -1092,9 +1097,12 @@ namespace umbraco
                     InitContentDocument(xmlDoc, dtd);
 
                     // Esben Carlsen: At some point we really need to put all data access into to a tier of its own.
+                    // CLN - added checks that document xml is for a document that is actually published.
                     string sql =
                         @"select umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, cmsContentXml.xml from umbracoNode 
 inner join cmsContentXml on cmsContentXml.nodeId = umbracoNode.id and umbracoNode.nodeObjectType = @type
+inner join cmsDocument on cmsDocument.nodeId = umbracoNode.id
+where cmsDocument.published = 1 
 order by umbracoNode.level, umbracoNode.sortOrder";
 
                     lock (_dbReadSyncLock)

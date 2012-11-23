@@ -21,12 +21,6 @@ namespace Umbraco.Web.Models
 	/// </summary>
 	public class DynamicPublishedContent : DynamicObject, IPublishedContent
 	{
-		/// <summary>
-		/// This callback is used only so we can set it dynamically for use in unit tests
-		/// </summary>
-		internal static Func<string, string, Guid> GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
-			ContentType.GetDataType(docTypeAlias, propertyAlias);
-		
 		protected IPublishedContent PublishedContent { get; private set; }
 		private DynamicPublishedContentList _cachedChildren;
 		private readonly ConcurrentDictionary<string, object> _cachedMemberOutput = new ConcurrentDictionary<string, object>();
@@ -60,111 +54,48 @@ namespace Umbraco.Web.Models
 		/// <returns></returns>
 		public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
 		{
-			//TODO: We MUST cache the result here, it is very expensive to keep finding extension methods!
-
-			try
-			{
-				//Property?
-				result = typeof(DynamicPublishedContent).InvokeMember(binder.Name,
-												  System.Reflection.BindingFlags.Instance |
-												  System.Reflection.BindingFlags.Public |
-												  System.Reflection.BindingFlags.GetProperty,
-												  null,
-												  this,
-												  args);
-				return true;
-			}
-			catch (MissingMethodException)
-			{
-				try
-				{
-					//Static or Instance Method?
-					result = typeof(DynamicPublishedContent).InvokeMember(binder.Name,
-												  System.Reflection.BindingFlags.Instance |
-												  System.Reflection.BindingFlags.Public |
-												  System.Reflection.BindingFlags.Static |
-												  System.Reflection.BindingFlags.InvokeMethod,
-												  null,
-												  this,
-												  args);
-					return true;
-				}
-				catch (MissingMethodException)
-				{
-					try
-					{
-						result = ExecuteExtensionMethod(args, binder.Name);
-						return true;
-					}
-					catch (TargetInvocationException)
-					{
-						result = new DynamicNull();
-						return true;
-					}
-
-					catch
-					{
-						//TODO: LOg this!
-
-						result = null;
-						return false;
-					}
-
-				}
-
-
-			}
-			catch
-			{
-				result = null;
-				return false;
-			}
-
-		}
-
-		private object ExecuteExtensionMethod(object[] args, string name)
-		{
-			object result = null;
-			
-			var methodTypesToFind = new[]
+			var attempt = DynamicInstanceHelper.TryInvokeMember(this, binder, args, new[]
         		{
 					typeof(DynamicPublishedContent)
-        		};
+        		});
 
-			//find known extension methods that match the first type in the list
-			MethodInfo toExecute = null;
-			foreach (var t in methodTypesToFind)
+			if (attempt.Success)
 			{
-				toExecute = ExtensionMethodFinder.FindExtensionMethod(t, args, name, false);
-				if (toExecute != null)
-					break;
-			}
+				result = attempt.Result.ObjectResult;
 
-			if (toExecute != null)
-			{
-				var genericArgs = (new[] { this }).Concat(args);
-				result = toExecute.Invoke(null, genericArgs.ToArray());
-			}
-			else
-			{
-				throw new MissingMethodException();
-			}
-			if (result != null)
-			{
-				if (result is IPublishedContent)
-				{
-					result = new DynamicPublishedContent((IPublishedContent)result);
-				}				
-				if (result is IEnumerable<IPublishedContent>)
-				{
-					result = new DynamicPublishedContentList((IEnumerable<IPublishedContent>)result);
+				//need to check the return type and possibly cast if result is from an extension method found
+				if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod)
+				{					
+					//we don't need to cast if it is already DynamicPublishedContent
+					if (attempt.Result.ObjectResult != null && (!(attempt.Result.ObjectResult is DynamicPublishedContent)))
+					{
+						if (attempt.Result.ObjectResult is IPublishedContent)
+						{
+							result = new DynamicPublishedContent((IPublishedContent)attempt.Result.ObjectResult);
+						}
+						else if (attempt.Result.ObjectResult is IEnumerable<DynamicPublishedContent>)
+						{
+							result = new DynamicPublishedContentList((IEnumerable<DynamicPublishedContent>)attempt.Result.ObjectResult);
+						}	
+						else if (attempt.Result.ObjectResult is IEnumerable<IPublishedContent>)
+						{
+							result = new DynamicPublishedContentList((IEnumerable<IPublishedContent>)attempt.Result.ObjectResult);
+						}
+					}	
 				}
-				if (result is IEnumerable<DynamicPublishedContent>)
-				{
-					result = new DynamicPublishedContentList((IEnumerable<DynamicPublishedContent>)result);
-				}				
+				return true;
 			}
-			return result;
+			
+			//this is the result of an extension method execution gone wrong so we return dynamic null
+			if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod
+				&& attempt.Error != null && attempt.Error is TargetInvocationException) 				
+			{
+				result = new DynamicNull();
+				return true;	
+			}
+		
+			result = null;
+			return false;
 		}
 
 		/// <summary>
@@ -262,10 +193,10 @@ namespace Umbraco.Web.Models
 			}
 
 			//get the data type id for the current property
-			var dataType = GetDataType(userProperty.DocumentTypeAlias, userProperty.Alias);
+			var dataType = Umbraco.Core.PublishedContentHelper.GetDataType(userProperty.DocumentTypeAlias, userProperty.Alias);
 
 			//convert the string value to a known type
-			var converted = ConvertPropertyValue(result, dataType, userProperty.DocumentTypeAlias, userProperty.Alias);
+			var converted = Umbraco.Core.PublishedContentHelper.ConvertPropertyValue(result, dataType, userProperty.DocumentTypeAlias, userProperty.Alias);
 			if (converted.Success)
 			{
 				result = converted.Result;
@@ -823,87 +754,7 @@ namespace Umbraco.Web.Models
 		} 
 		#endregion
 
-		private static Guid GetDataType(string docTypeAlias, string propertyAlias)
-		{
-			return GetDataTypeCallback(docTypeAlias, propertyAlias);
-		}
-
-		/// <summary>
-		/// Converts the currentValue to a correctly typed value based on known registered converters, then based on known standards.
-		/// </summary>
-		/// <param name="currentValue"></param>
-		/// <param name="dataType"></param>
-		/// <param name="docTypeAlias"></param>
-		/// <param name="propertyTypeAlias"></param>
-		/// <returns></returns>
-		private Attempt<object> ConvertPropertyValue(object currentValue, Guid dataType, string docTypeAlias, string propertyTypeAlias)
-		{
-			if (currentValue == null) return Attempt<object>.False;
-
-			//First lets check all registered converters for this data type.			
-			var converters = PropertyEditorValueConvertersResolver.Current.Converters
-				.Where(x => x.IsConverterFor(dataType, docTypeAlias, propertyTypeAlias))
-				.ToArray();
-
-			//try to convert the value with any of the converters:
-			foreach (var converted in converters
-				.Select(p => p.ConvertPropertyValue(currentValue))
-				.Where(converted => converted.Success))
-			{
-				return new Attempt<object>(true, converted.Result);
-			}
-
-			//if none of the converters worked, then we'll process this from what we know
-
-			var sResult = Convert.ToString(currentValue).Trim();
-
-			//this will eat csv strings, so only do it if the decimal also includes a decimal seperator (according to the current culture)
-			if (sResult.Contains(System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator))
-			{
-				decimal dResult;
-				if (decimal.TryParse(sResult, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out dResult))
-				{
-					return new Attempt<object>(true, dResult);
-				}
-			}
-			//process string booleans as booleans
-			if (sResult.InvariantEquals("true"))
-			{
-				return new Attempt<object>(true, true);
-			}
-			if (sResult.InvariantEquals("false"))
-			{
-				return new Attempt<object>(true, false);
-			}
-
-			//a really rough check to see if this may be valid xml
-			//TODO: This is legacy code, I'm sure there's a better and nicer way
-			if (sResult.StartsWith("<") && sResult.EndsWith(">") && sResult.Contains("/"))
-			{
-				try
-				{
-					var e = XElement.Parse(DynamicXml.StripDashesInElementOrAttributeNames(sResult), LoadOptions.None);
-
-					//check that the document element is not one of the disallowed elements
-					//allows RTE to still return as html if it's valid xhtml
-					var documentElement = e.Name.LocalName;
-
-					//TODO: See note against this setting, pretty sure we don't need this
-					if (!UmbracoSettings.NotDynamicXmlDocumentElements.Any(
-						tag => string.Equals(tag, documentElement, StringComparison.CurrentCultureIgnoreCase)))
-					{
-						return new Attempt<object>(true, new DynamicXml(e));
-					}
-					return Attempt<object>.False;
-				}
-				catch (Exception)
-				{
-					return Attempt<object>.False;
-				}
-			}
-			return Attempt<object>.False;
-		}
-
+		
 		#region Index/Position
 		public int Position()
 		{

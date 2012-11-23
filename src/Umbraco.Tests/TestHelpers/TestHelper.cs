@@ -51,7 +51,7 @@ namespace Umbraco.Tests.TestHelpers
 		{
 			get
 			{
-				var codeBase = Assembly.GetCallingAssembly().CodeBase;
+				var codeBase = typeof(TestHelper).Assembly.CodeBase;
 				var uri = new Uri(codeBase);
 				var path = uri.LocalPath;
 				return Path.GetDirectoryName(path);

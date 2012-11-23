@@ -37,7 +37,10 @@ namespace Umbraco.Web
 		{
 			// do not process if client-side request
 			if (IsClientSideRequest(httpContext.Request.Url))
-				return;			
+				return;
+
+			//write the trace output for diagnostics at the end of the request
+			httpContext.Trace.Write("UmbracoModule", "Umbraco request begins");
 
 			// ok, process
 
@@ -93,6 +96,8 @@ namespace Umbraco.Web
 			// do not process if this request is not a front-end routable page
 			if (!EnsureUmbracoRoutablePage(umbracoContext, httpContext))
 				return;
+
+			httpContext.Trace.Write("UmbracoModule", "Umbraco request confirmed");
 
 			// ok, process
 
@@ -208,7 +213,7 @@ namespace Umbraco.Web
 			// at that point, either we have no extension, or it is .aspx
 
 			// if the path is reserved then it cannot be a document request
-			if (maybeDoc && GlobalSettings.IsReservedPathOrUrl(lpath))
+			if (maybeDoc && GlobalSettings.IsReservedPathOrUrl(lpath, httpContext, RouteTable.Routes))
 				maybeDoc = false;
 
 			//NOTE: No need to warn, plus if we do we should log the document, as this message doesn't really tell us anything :)
@@ -314,11 +319,8 @@ namespace Umbraco.Web
 			switch (engine)
 			{
 				case RenderingEngine.Mvc:
-					//the Path is normally ~/umbraco but we need to remove the start ~/ of it and if someone modifies this
-					//then we should be rendering the MVC stuff in that location.
-					rewritePath = "~/"
-						+ GlobalSettings.Path.TrimStart(new[] { '~', '/' }).TrimEnd(new[] { '/' })
-						+ "/RenderMvc";
+					// GlobalSettings.Path has already been through IOHelper.ResolveUrl() so it begins with / and vdir (if any)
+					rewritePath = GlobalSettings.Path.TrimEnd(new[] { '/' }) + "/RenderMvc";
 					// we rewrite the path to the path of the handler (i.e. default.aspx or /umbraco/RenderMvc )
 					context.RewritePath(rewritePath, "", currentQuery.TrimStart(new[] { '?' }), false);
 
@@ -400,7 +402,7 @@ namespace Umbraco.Web
 		{
 			app.BeginRequest += (sender, e) =>
 				{
-					var httpContext = ((HttpApplication)sender).Context;
+					var httpContext = ((HttpApplication)sender).Context;					
 					BeginRequest(new HttpContextWrapper(httpContext));
 				};
 
@@ -417,7 +419,16 @@ namespace Umbraco.Web
 					PersistXmlCache(new HttpContextWrapper(httpContext));
 				};
 
-			// todo: initialize request errors handler
+			app.EndRequest += (sender, args) =>
+				{
+					var httpContext = ((HttpApplication)sender).Context;
+					if (UmbracoContext.Current != null && UmbracoContext.Current.IsFrontEndUmbracoRequest)
+					{
+						//write the trace output for diagnostics at the end of the request
+						httpContext.Trace.Write("UmbracoModule", "Umbraco request completed");	
+						LogHelper.Debug<UmbracoModule>("Total milliseconds for umbraco request to process: " + DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
+					}					
+				};
 		}
 
 		public void Dispose()

@@ -1,14 +1,432 @@
-<?xml version="1.0" encoding="utf-8" ?> 
-<language alias="no" intName="Norwegian" localName="norsk" lcid="20" culture="nb-NO"><creator><name>The umbraco community</name><link>http://umbraco.org/documentation/language-files</link></creator><area alias="main"><key alias="sections"><![CDATA[Seksjoner]]></key><key alias="dashboard"><![CDATA[Skrivebord]]></key><key alias="tree"><![CDATA[Inndhold]]></key></area><area alias="defaultdialogs"><key alias="link"><![CDATA[Lenke]]></key><key alias="insertlink"><![CDATA[Sett inn lenke]]></key><key alias="insertgraphicheadline"><![CDATA[Sett inn grafisk overskrift]]></key><key alias="linknewwindow"><![CDATA[Åpne i nytt vindu?]]></key><key alias="linkinternal"><![CDATA[Intern link:]]></key><key alias="linklocaltip"><![CDATA[Ved lokal link, sett inn "#" foran link]]></key><key alias="insertimage"><![CDATA[Sett inn bilde]]></key><key alias="treepicker"><![CDATA[Velg punkt]]></key><key alias="confirmdelete"><![CDATA[Er du sikker på at du vil slette]]></key><key alias="confirmlogout"><![CDATA[Er du sikker på at du vil forlate umbraco?]]></key><key alias="insertAnchor"><![CDATA[Sett inn lokal link]]></key><key alias="anchorInsert"><![CDATA[Navn på lokalt link]]></key><key alias="insertMacro"><![CDATA[Sett inn makro]]></key><key alias="inserttable"><![CDATA[Sett inn tabell]]></key><key alias="tableColumns"><![CDATA[Antall kolonner]]></key><key alias="tableRows"><![CDATA[Antall rader]]></key><key alias="paste"><![CDATA[Lim inn]]></key><key alias="assignDomain"><![CDATA[Rediger domener]]></key><key alias="confirmSure"><![CDATA[Er du sikker?]]></key><key alias="requiredField"><![CDATA[Obligatorisk]]></key><key alias="lastEdited"><![CDATA[Sist redigeret]]></key><key alias="siterepublished"><![CDATA[Siten er nu republisert]]></key><key alias="editdictionary"><![CDATA[Rediger ordbok nøkkel]]></key><key alias="editlanguage"><![CDATA[Rediger språk]]></key><key alias="viewCacheItem"><![CDATA[Se Cache Item]]></key><key alias="confirmdisable"><![CDATA[Er du sikker på at du vil deaktivere]]></key><key alias="siterepublishHelp"><![CDATA[Hurtigbufferen for siden vil bli oppdatert. Alt publisert innhold vil bli oppdatert, mens upublisert innhold vil forbli upublisert.]]></key><key alias="sitereindexed"><![CDATA[Nettstedet er indeksert]]></key><key alias="permissionsEdit"><![CDATA[Endre rettigheter for]]></key><key alias="thumbnailimageclickfororiginal"><![CDATA[Klikk på bildet for å se det i naturlig størrelse]]></key><key alias="confirmEmptyTrashcan"><![CDATA[Vennligst kryss av i denne boksen for å bekrefte sletting av %0% element(er)]]></key><key alias="recycleBinIsEmpty"><![CDATA[Papirkurven er nå tom]]></key><key alias="recycleBinWarning"><![CDATA[Når elementer blir slettet fra papirkurven, vil de være slettet for godt]]></key><key alias="closeThisWindow"><![CDATA[Lukk dette vinduet]]></key><key alias="templateContentAreaHelp"><![CDATA[<strong>Sett en plassholder-ID</strong><br/>Ved å sette en ID på plassholderen kan du legge inn innhold i denne malen fra underliggende maler,
-		  ved å referere denne ID'en ved hjelp av et <code>&lt;asp:content /&gt;</code> element.]]></key><key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Velg en plassholder ID</strong> fra listen under. Du kan bare
-		  velge ID'er fra den gjeldende malens overmal.]]></key><key alias="regexSearchHelp"><![CDATA[Søk etter et regulært uttrykk for å legge inn validering til et felt. Eksempel: 'email, 'zip-code' 'url']]></key><key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a> webtjeneste opplever for tiden problemer, som vi ikke har kontroll over. Vi beklager denne uleiligheten.]]></key><key alias="macroDoesNotHaveProperties"><![CDATA[Denne makroen har ingen egenskaper du kan endre]]></key><key alias="recycleBinDeleting"><![CDATA[Innholdet i papirkurven blir nå slettet. Vennligst ikke lukk dette vinduet mens denne operasjonen foregår]]></key><key alias="insertCharacter"><![CDATA[Sett inn spesialtegn]]></key></area><area alias="general"><key alias="properties"><![CDATA[Egenskaper]]></key><key alias="elements"><![CDATA[Elementer]]></key><key alias="new"><![CDATA[Ny]]></key><key alias="add"><![CDATA[Legg til]]></key><key alias="rename"><![CDATA[Døp om]]></key><key alias="open"><![CDATA[Åpne]]></key><key alias="edit"><![CDATA[Rediger]]></key><key alias="close"><![CDATA[Lukk]]></key><key alias="create"><![CDATA[Opprett]]></key><key alias="delete"><![CDATA[Slett]]></key><key alias="sort"><![CDATA[Sorter]]></key><key alias="move"><![CDATA[Flytt]]></key><key alias="copy"><![CDATA[Kopier]]></key><key alias="logoff"><![CDATA[Logg av]]></key><key alias="rights"><![CDATA[Rettigheter]]></key><key alias="choose"><![CDATA[Velg]]></key><key alias="alias"><![CDATA[Alias]]></key><key alias="name"><![CDATA[Navn]]></key><key alias="icon"><![CDATA[Ikon]]></key><key alias="default"><![CDATA[Standard]]></key><key alias="type"><![CDATA[Type]]></key><key alias="yes"><![CDATA[Ja]]></key><key alias="no"><![CDATA[Nei]]></key><key alias="ok"><![CDATA[OK]]></key><key alias="update"><![CDATA[Oppdater]]></key><key alias="cancel"><![CDATA[Avbryt]]></key><key alias="macro"><![CDATA[Makro]]></key><key alias="insert"><![CDATA[Sett inn]]></key><key alias="size"><![CDATA[Størrelse]]></key><key alias="layout"><![CDATA[Layout]]></key><key alias="design"><![CDATA[Design]]></key><key alias="width"><![CDATA[Bredde]]></key><key alias="height"><![CDATA[Høyde]]></key><key alias="justify"><![CDATA[Justering]]></key><key alias="innerMargin"><![CDATA[Indre margin]]></key><key alias="cellMargin"><![CDATA[Celle margin]]></key><key alias="border"><![CDATA[Kant]]></key><key alias="pleasewait"><![CDATA[Ett øyeblikk...]]></key><key alias="areyousure"><![CDATA[Er du sikker?]]></key><key alias="error"><![CDATA[Feil]]></key><key alias="username"><![CDATA[Brukernavn]]></key><key alias="password"><![CDATA[Passord]]></key><key alias="login"><![CDATA[Login]]></key><key alias="welcome"><![CDATA[Velkommen...]]></key><key alias="language"><![CDATA[Språk]]></key><key alias="closewindow"><![CDATA[Lukk vindu]]></key><key alias="deleted"><![CDATA[Slettet]]></key><key alias="edited"><![CDATA[Redigeret]]></key><key alias="of"><![CDATA[av]]></key><key alias="about"><![CDATA[Om]]></key><key alias="help"><![CDATA[Hjelp]]></key><key alias="logout"><![CDATA[Logg ut]]></key><key alias="findDocument"><![CDATA[Finn]]></key><key alias="continue"><![CDATA[Fortsett]]></key><key alias="value"><![CDATA[Verdi]]></key><key alias="reciept"><![CDATA[E-post som innholdet i skjemaet skal sendes til]]></key><key alias="showPageOnSend"><![CDATA[Hvilken side skal vises etter at skjemaet er sendt]]></key><key alias="show"><![CDATA[Vis]]></key><key alias="view"><![CDATA[Visning]]></key><key alias="user"><![CDATA[Bruker]]></key><key alias="action"><![CDATA[Handling]]></key><key alias="date"><![CDATA[Dato]]></key><key alias="comment"><![CDATA[Kommentar]]></key><key alias="up"><![CDATA[Opp]]></key><key alias="down"><![CDATA[Ned]]></key><key alias="recycleBin"><![CDATA[Papirkurv]]></key><key alias="deleting"><![CDATA[Sletter...]]></key><key alias="remaining"><![CDATA[Gjenværende]]></key><key alias="import"><![CDATA[Importer]]></key><key alias="loading"><![CDATA[Laster]]></key><key alias="path"><![CDATA[Sti]]></key><key alias="or"><![CDATA[eller]]></key><key alias="by"><![CDATA[eller]]></key><key alias="placeHolderID"><![CDATA[Plassholder ID]]></key><key alias="typeToSearch"><![CDATA[Skriv for å søke...]]></key><key alias="confirm"><![CDATA[Bekreft]]></key><key alias="constrainProportions"><![CDATA[Behold proposjoner]]></key><key alias="database"><![CDATA[Database]]></key><key alias="dimensions"><![CDATA[Dimensjoner]]></key><key alias="download"><![CDATA[Last ned]]></key><key alias="install"><![CDATA[Installer]]></key><key alias="email"><![CDATA[E-post]]></key><key alias="next"><![CDATA[Neste]]></key><key alias="previous"><![CDATA[Forrige]]></key><key alias="retry"><![CDATA[Prøv igjen]]></key><key alias="upgrade"><![CDATA[Oppgrader]]></key><key alias="server"><![CDATA[Server]]></key><key alias="url"><![CDATA[Url]]></key><key alias="upload"><![CDATA[Last opp]]></key><key alias="search"><![CDATA[Søk]]></key></area><area alias="dashboard"><key alias="welcome"><![CDATA[Velkommen]]></key><key alias="openinnew"><![CDATA[er åpnet i nytt vindu]]></key><key alias="nothinghappens"><![CDATA[Hvis umbraco ikke starter, kan det skyldes at pop-up vinduer ikke er tillatt]]></key><key alias="restart"><![CDATA[Omstart]]></key><key alias="browser"><![CDATA[Til din webside]]></key><key alias="visit"><![CDATA[Besøk]]></key></area><area alias="sections"><key alias="content"><![CDATA[Inndhold]]></key><key alias="media"><![CDATA[Mediaarkiv]]></key><key alias="member"><![CDATA[Medlemmer]]></key><key alias="newsletters"><![CDATA[Nyhetsbrev]]></key><key alias="users"><![CDATA[Brukere]]></key><key alias="settings"><![CDATA[Innstillinger]]></key><key alias="developer"><![CDATA[Developer]]></key><key alias="statistics"><![CDATA[Statistikk]]></key><key alias="courier"><![CDATA[Courier]]></key><key alias="concierge"><![CDATA[Concierge]]></key><key alias="installer"><![CDATA[Umbraco konfigurasjonsveiviser]]></key><key alias="translation"><![CDATA[Oversettelse]]></key></area><area alias="buttons"><key alias="save"><![CDATA[Lagre]]></key><key alias="saveAndPublish"><![CDATA[Lagre og publiser]]></key><key alias="saveToPublish"><![CDATA[Lagre og send til publisering]]></key><key alias="htmlEdit"><![CDATA[Rediger HTML]]></key><key alias="relations"><![CDATA[Rediger relasjoner]]></key><key alias="showPage"><![CDATA[Se siden]]></key><key alias="styleChoose"><![CDATA[Velg formattering]]></key><key alias="styleShow"><![CDATA[Vis koder]]></key><key alias="bold"><![CDATA[Fet]]></key><key alias="italic"><![CDATA[Kursiv]]></key><key alias="graphicHeadline"><![CDATA[Sett inn grafisk overskrift]]></key><key alias="justifyLeft"><![CDATA[Venstrestill avsnitt]]></key><key alias="justifyCenter"><![CDATA[Sentrer]]></key><key alias="justifyRight"><![CDATA[Høyrestil avsnitt]]></key><key alias="listBullet"><![CDATA[Punktliste]]></key><key alias="listNumeric"><![CDATA[Numerert liste]]></key><key alias="indent"><![CDATA[Innrykk avsnitt]]></key><key alias="deindent"><![CDATA[Tilbakerykk avsnitt]]></key><key alias="linkInsert"><![CDATA[Sett inn lenke]]></key><key alias="linkLocal"><![CDATA[Sett inn lokal lenke]]></key><key alias="pictureInsert"><![CDATA[Sett inn bilde]]></key><key alias="macroInsert"><![CDATA[Sett inn makro]]></key><key alias="tableInsert"><![CDATA[Sett inn tabell]]></key><key alias="formFieldInsert"><![CDATA[Sett inn skjemafelt]]></key></area><area alias="content"><key alias="about"><![CDATA[Om siden]]></key><key alias="nodeName"><![CDATA[Sidetittel]]></key><key alias="alias"><![CDATA[Alternativ lenke]]></key><key alias="createDate"><![CDATA[Opprettet den]]></key><key alias="createBy"><![CDATA[Opprettet av]]></key><key alias="updateDate"><![CDATA[Sist redigeret]]></key><key alias="lastPublished"><![CDATA[Sist publisert]]></key><key alias="type"><![CDATA[Type]]></key><key alias="statistics"><![CDATA[Statistikk]]></key><key alias="releaseDate"><![CDATA[Utgivelsesdato]]></key><key alias="expireDate"><![CDATA[Utløpsdato]]></key><key alias="publish"><![CDATA[Publisert]]></key><key alias="otherElements"><![CDATA[Egenskaper]]></key><key alias="editing"><![CDATA[Redigerer]]></key><key alias="itemNotPublished"><![CDATA[Denne noden er ennå ikke publisert]]></key><key alias="itemChanged"><![CDATA[Denne noden er endret siden siste publisering]]></key><key alias="clickToEdit"><![CDATA[Klikk på musen for å redigere denne noden]]></key><key alias="documentType"><![CDATA[Dokumenttype]]></key><key alias="urls"><![CDATA[Lenke til dokument]]></key><key alias="alternativeUrls"><![CDATA[Alternative lenker]]></key><key alias="unPublish"><![CDATA[Avpubliser]]></key><key alias="publishStatus"><![CDATA[Publiseringsstatus]]></key><key alias="parentNotPublished"><![CDATA[Dette dokumentet er publisert, men ikke synlig da den overliggende siden '%0%' ikke er publisert!]]></key><key alias="uploadClear"><![CDATA[Fjern fil]]></key><key alias="noDate"><![CDATA[Ingen dato valgt]]></key><key alias="removeDate"><![CDATA[Fjern dato]]></key><key alias="alternativeTextHelp"><![CDATA[(hvordan du ville beskrevet bildet over telefon)]]></key><key alias="titleOptional"><![CDATA[Tittel (valgfri)]]></key><key alias="mediatype"><![CDATA[Mediatype]]></key><key alias="membertype"><![CDATA[Medlemstype]]></key><key alias="membergroup"><![CDATA[Medlemsgruppe]]></key><key alias="sortHelp"><![CDATA[For å sortere elementene, simpelthen dra elementene eller klikk på en av pverskriftene. Du kan velge flere elementer ved å holde "shift" eller "control" tasten mens du velger]]></key><key alias="sortDone"><![CDATA[Sorteringsrekkefølgen er oppdatert]]></key><key alias="memberrole"><![CDATA[Rolle]]></key></area><area alias="treeHeaders"><key alias="stylesheets"><![CDATA[Stiler]]></key><key alias="templates"><![CDATA[Maler]]></key><key alias="dictionary"><![CDATA[Ordbok]]></key><key alias="languages"><![CDATA[Språk]]></key><key alias="mediaTypes"><![CDATA[Mediatyper]]></key><key alias="nodeTypes"><![CDATA[Dokumenttyper]]></key><key alias="cacheBrowser"><![CDATA[Hurtigbuffer-leser]]></key><key alias="datatype"><![CDATA[Datatyper]]></key><key alias="macros"><![CDATA[Makroer]]></key><key alias="xslt"><![CDATA[XSLT Filer]]></key><key alias="member"><![CDATA[Medlemmer]]></key><key alias="memberType"><![CDATA[Medlemstyper]]></key><key alias="memberGroup"><![CDATA[Medlemsgrupper]]></key><key alias="contentRecycleBin"><![CDATA[Papirkurv]]></key><key alias="createdPackages"><![CDATA[Opprettede Pakker]]></key><key alias="runwayModules"><![CDATA[Runway moduler]]></key><key alias="runway"><![CDATA[Installer Runway]]></key><key alias="packager"><![CDATA[Pakker]]></key><key alias="packages"><![CDATA[Pakker]]></key><key alias="memberRoles"><![CDATA[Roller]]></key><key alias="installedPackages"><![CDATA[Installerte pakker]]></key><key alias="localPackage"><![CDATA[Installer lokal pakke]]></key><key alias="repositories"><![CDATA[Installer fra pakkebrønn]]></key><key alias="python"><![CDATA[Python Filer]]></key><key alias="scripts"><![CDATA[Scriptfiler]]></key></area><area alias="user"><key alias="username"><![CDATA[Brukernavn]]></key><key alias="loginname"><![CDATA[Login]]></key><key alias="password"><![CDATA[Passord]]></key><key alias="usertype"><![CDATA[Brukertype]]></key><key alias="language"><![CDATA[Språk]]></key><key alias="startnode"><![CDATA[Start node]]></key><key alias="modules"><![CDATA[Moduler]]></key><key alias="administrators"><![CDATA[Administrator]]></key><key alias="editors"><![CDATA[Redaktør]]></key><key alias="writer"><![CDATA[Forfatter]]></key><key alias="noConsole"><![CDATA[Deaktiver tilgang til umbraco]]></key><key alias="disabled"><![CDATA[Deaktiver User]]></key><key alias="mediastartnode"><![CDATA[Øverste nivå i Media]]></key><key alias="categoryField"><![CDATA[Kategorifelt]]></key><key alias="contentChannel"><![CDATA[Innholdskanal]]></key><key alias="defaultToLiveEditing"><![CDATA[Videresend til Canvas ved login]]></key><key alias="descriptionField"><![CDATA[Beskrivelsesfelt]]></key><key alias="documentType"><![CDATA[Dokumenttype]]></key><key alias="permissionReplaceChildren"><![CDATA[Overskriv tillatelser på undernoder]]></key><key alias="permissionSelectedPages"><![CDATA[Du redigerer for øyeblikket tillatelser for sidene:]]></key><key alias="searchAllChildren"><![CDATA[Søk i alle undersider]]></key><key alias="permissionSelectPages"><![CDATA[Velg sider for å redigere deres tillatelser]]></key><key alias="excerptField"><![CDATA[Utdragsfelt]]></key><key alias="userTypes"><![CDATA[Brukertyper]]></key><key alias="userPermissions"><![CDATA[Brukertillatelser]]></key></area><area alias="settings"><key alias="nodetype"><![CDATA[Nodetype]]></key><key alias="tab"><![CDATA[Arkfane]]></key><key alias="tabs"><![CDATA[Arkfaner]]></key><key alias="tabname"><![CDATA[Tittel på arkfane]]></key><key alias="objecttype"><![CDATA[Type]]></key><key alias="defaulttemplate"><![CDATA[Standard mal]]></key><key alias="newtabname"><![CDATA[Ny tittel på arkfane]]></key><key alias="stylesheet"><![CDATA[Stilark]]></key><key alias="stylesheet editor egenskab"><![CDATA[Stilark-egenskap]]></key><key alias="dictionary editor egenskab"><![CDATA[Ordbok-egenskap]]></key><key alias="importDocumentTypeHelp"><![CDATA[For å importere en dokumenttype, finn ".udt" filen på datamaskinen din ved å klikke "Utforsk" knappen og klikk "Importer" (du vil bli spurt om bekreftelse i det neste skjermbildet)]]></key></area><area alias="graphicheadline"><key alias="bold"><![CDATA[Fet]]></key><key alias="text"><![CDATA[Tekst]]></key><key alias="font"><![CDATA[Skrifttype]]></key><key alias="color"><![CDATA[Tekst farge]]></key><key alias="backgroundcolor"><![CDATA[Bakgrunnsfarge]]></key></area><area alias="update"><key alias="updateAvailable"><![CDATA[Ny oppdatering er klar]]></key><key alias="updateDownloadText"><![CDATA[%0% er klar, klikk her for å laste ned]]></key><key alias="updateNoServer"><![CDATA[Ingen forbindelse til server]]></key><key alias="updateNoServerError"><![CDATA[Kunne ikke sjekke etter ny oppdatering. Se trace for mere info.]]></key></area><area alias="actions"><key alias="create"><![CDATA[Opprett]]></key><key alias="move"><![CDATA[Flytt]]></key><key alias="copy"><![CDATA[Kopier]]></key><key alias="delete"><![CDATA[Slett]]></key><key alias="sort"><![CDATA[Sorter]]></key><key alias="publish"><![CDATA[Publiser]]></key><key alias="toPublish"><![CDATA[Send til publisering]]></key><key alias="rights"><![CDATA[Rettigheter]]></key><key alias="protect"><![CDATA[Offentlig tilgang]]></key><key alias="refreshNode"><![CDATA[Oppdater noder]]></key><key alias="update"><![CDATA[Oppdater]]></key><key alias="notify"><![CDATA[Varsling]]></key><key alias="logout"><![CDATA[Lukk umbraco]]></key><key alias="republish"><![CDATA[Republiser hele siten]]></key><key alias="assignDomain"><![CDATA[Angi domene]]></key><key alias="auditTrail"><![CDATA[Audit Trail]]></key><key alias="disable"><![CDATA[Deaktiver]]></key><key alias="createPackage"><![CDATA[Opprett pakke]]></key><key alias="importPackage"><![CDATA[Importer pakke]]></key><key alias="rollback"><![CDATA[Reverser]]></key><key alias="emptyTrashcan"><![CDATA[Tøm papirkurv]]></key><key alias="exportDocumentType"><![CDATA[Eksporter dokumenttype]]></key><key alias="importDocumentType"><![CDATA[Importer documenttype]]></key><key alias="sendToTranslate"><![CDATA[Send til oversetting]]></key><key alias="translate"><![CDATA[Oversett]]></key><key alias="browse"><![CDATA[Bla gjennom]]></key><key alias="sendtopublish"><![CDATA[Send til publisering]]></key><key alias="liveEdit"><![CDATA[Rediger i Canvas]]></key></area><area alias="errors"><key alias="startNodeDoesNotExists"><![CDATA[Startnode er slettet kontakt systemadministrator]]></key><key alias="stylesNoStylesOnPage"><![CDATA[Det er ingen aktive styles eller formatteringer på denne siden]]></key><key alias="stylesMustMarkBeforeSelect"><![CDATA[Du må markere innhold før du kan endre stil]]></key><key alias="pictureResizeBiggerThanOrg"><![CDATA[Du er i ferd med å gjøre bildet større enn originalen. Det vil forringe kvaliteten på bildet, ønsker du å fortsette?]]></key><key alias="tableColMergeLeft"><![CDATA[Du må stå til venstre for de 2 cellene du ønsker å slå sammen!]]></key><key alias="tableSplitNotSplittable"><![CDATA[Du kan ikke dele en celle som allerede er delt.]]></key><key alias="missingType"><![CDATA[Type mangler]]></key><key alias="missingTitle"><![CDATA[Tittel mangler]]></key><key alias="xsltErrorHeader"><![CDATA[Feil i XSLT kode]]></key><key alias="xsltErrorText"><![CDATA[Din XSLT er ikke oppdatert da den inneholder feil]]></key><key alias="contentTypeAliasAndNameNotNull"><![CDATA[Du må fylle ut både Alias & Navn på den nye egenskapstypen!]]></key><key alias="pythonErrorHeader"><![CDATA[Feil i python-skriptet]]></key><key alias="pythonErrorText"><![CDATA[Python-skriptet ditt ble ikke lagret fordi den inneholder en eller flere feil]]></key><key alias="filePermissionsError"><![CDATA[Det er et problem med lese/skrive rettighetene til en fil eller mappe]]></key></area><area alias="speechBubbles"><key alias="xsltSavedHeader"><![CDATA[XSLT lagret]]></key><key alias="xsltSavedText"><![CDATA[Det var ingen feil i den XSLT!]]></key><key alias="contentTypeSavedHeader"><![CDATA[Innholdstype lagret]]></key><key alias="contentTypeTabCreated"><![CDATA[Du har opprettet en arkfane]]></key><key alias="contentTypeTabDeleted"><![CDATA[Arkfane slettet]]></key><key alias="contentTypeTabDeletedText"><![CDATA[Arkfane med id: %0% slettet]]></key><key alias="contentTypePropertyTypeCreated"><![CDATA[Egenskapstype opprettet]]></key><key alias="contentTypePropertyTypeCreatedText"><![CDATA[Navn: %0% <br /> DataType: %1%]]></key><key alias="contentTypePropertyTypeDeleted"><![CDATA[Egenskapstype slettet]]></key><key alias="dataTypeSaved"><![CDATA[Datatype lagret]]></key><key alias="editContentSavedHeader"><![CDATA[Innhold lagret]]></key><key alias="editContentSavedText"><![CDATA[Husk å publisere for å gjøre det synlig for besøkende]]></key><key alias="editContentPublishedHeader"><![CDATA[Innhold publisert]]></key><key alias="editContentPublishedText"><![CDATA[og er nå synlig for besøkende]]></key><key alias="editMemberSaved"><![CDATA[Medlem lagret]]></key><key alias="editTemplateSaved"><![CDATA[Template lagret]]></key><key alias="editStylesheetSaved"><![CDATA[Stylesheet lagret]]></key><key alias="editStylesheetPropertySaved"><![CDATA[Stylesheetegenskap lagret]]></key><key alias="editUserSaved"><![CDATA[Bruker lagret]]></key><key alias="xsltErrorHeader"><![CDATA[XSLT-koden ble ikke lagret]]></key><key alias="xsltPermissionErrorText"><![CDATA[XSLT-koden ble ikke lagret, sjekk filrettigheter]]></key><key alias="xsltErrorText"><![CDATA[XSLT-koden inneholdt en feil]]></key><key alias="pythonSavedHeader"><![CDATA[Python-skriptet er lagret!]]></key><key alias="pythonSavedText"><![CDATA[Ingen feil i python-skriptet!]]></key><key alias="pythonErrorHeader"><![CDATA[Python-skriptet ble ikke lagret]]></key><key alias="pythonErrorText"><![CDATA[Python-skriptet kunne ikke lagres fordi det inneholder en eller flere feil]]></key><key alias="templateSavedHeader"><![CDATA[Malen ble lagret]]></key><key alias="templateSavedText"><![CDATA[Malen ble lagret uten feil!]]></key><key alias="templateErrorHeader"><![CDATA[Malen ble ikke lagret]]></key><key alias="templateErrorText"><![CDATA[Vennligst forviss deg om at du ikke har 2 maler med samme alias]]></key><key alias="cssSavedHeader"><![CDATA[Stilarket ble lagret]]></key><key alias="cssErrorHeader"><![CDATA[Stilarket ble ikke lagret]]></key><key alias="fileErrorHeader"><![CDATA[Filen ble ikke lagret]]></key><key alias="fileErrorText"><![CDATA[Filen kunne ikke lagres. Vennligst sjekk filrettigheter]]></key><key alias="fileSavedHeader"><![CDATA[Filen ble lagret]]></key><key alias="fileSavedText"><![CDATA[File ble lagret uten feil]]></key><key alias="editContentPublishedFailedByParent"><![CDATA[Publiseringen feilet fordi den overliggende siden ikke er publisert]]></key><key alias="editContentSendToPublish"><![CDATA[Sendt for godkjenning]]></key><key alias="editContentSendToPublishText"><![CDATA[Endringer har blitt sendt for godkjenning]]></key><key alias="dictionaryItemSaved"><![CDATA[Ordbok-element lagret]]></key><key alias="languageSaved"><![CDATA[Språk lagret]]></key><key alias="contentPublishedFailedByEvent"><![CDATA[Publisering ble avbrutt av en 3. parts plugin]]></key><key alias="cssSavedText"><![CDATA[Stilark lagret uten feil]]></key><key alias="editUserError"><![CDATA[Feil ved lagring av bruker (sjekk loggen)]]></key><key alias="contentTypeDublicatePropertyType"><![CDATA[Egenskaptypen finnes allerede]]></key></area><area alias="headers"><key alias="page"><![CDATA[Side]]></key></area><area alias="paste"><key alias="errorMessage"><![CDATA[Teksten du er i ferd med å lime inn, inneholder spesialtegn eller formattering. Dette kan skyldes at du kopierer fra f.eks. Microsoft Word. umbraco kan fjerne denne spesialformatteringen automatisk slik at innholdet er mer velegnet for visning på en webside.]]></key><key alias="removeAll"><![CDATA[Lim inn som ren tekst, dvs. fjern al formattering]]></key><key alias="doNothing"><![CDATA[Lim inn med full formattering (Anbefales ikke)]]></key><key alias="removeSpecialFormattering"><![CDATA[Lim inn og fjern uegnet formatering (anbefalt)]]></key></area><area alias="assignDomain"><key alias="domain"><![CDATA[Domene]]></key><key alias="addNew"><![CDATA[Legg til domene]]></key><key alias="orEdit"><![CDATA[eller rediger eksisterende domener]]></key><key alias="domainCreated"><![CDATA[Domene '%0%' er nå opprettet og tilknyttet siden]]></key><key alias="domainHelp"><![CDATA[f.eks.: dittdomene.com, www.dittdomene.com]]></key><key alias="domainExists"><![CDATA[Domenet '%0%' eksisterer allerede]]></key><key alias="domainUpdated"><![CDATA[Domenet '%0%' er nå oppdatert]]></key><key alias="domainDeleted"><![CDATA[Domenet '%0%' er nå slettet]]></key></area><area alias="rollback"><key alias="currentVersion"><![CDATA[Gjeldende versjon]]></key><key alias="rollbackTo"><![CDATA[Gjenopprett til]]></key><key alias="view"><![CDATA[Vis]]></key><key alias="diffHelp"><![CDATA[Dette viser forskjellene mellom den gjeldende og den valgte versjonen<br /><del>Rød</del> tekst vil ikke bli vist i den valgte versjonen. , <ins>grønn betyr lagt til</ins>]]></key><key alias="htmlHelp"><![CDATA[Dette viser den valgte versjonen som HTML, hvis du ønsker å se forksjellene mellom 2 versjoner samtidig, bruk avviksvisningen]]></key><key alias="selectVersion"><![CDATA[Velg versjon]]></key><key alias="documentRolledBack"><![CDATA[Dokumentet har blitt gjenopprettet til en tidligere versjon]]></key></area><area alias="sort"><key alias="sortPleaseWait"><![CDATA[ Vennligst vent. Sidene blir sortert, dette kan ta litt tid.<br/> <br/> Ikke lukk dette vinduet under sortering]]></key><key alias="sortHelp"><![CDATA[Dra de forskjellige sidene opp eller ned for å arrangere dem.]]></key><key alias="sortDone"><![CDATA[Sortering ferdig.]]></key></area><area alias="publish"><key alias="publishAll"><![CDATA[Publiser alle undersider]]></key><key alias="nodePublish"><![CDATA[%0% er nå publisert]]></key><key alias="nodePublishAll"><![CDATA[%0% og alle undersider er nå publisert]]></key><key alias="inProgress"><![CDATA[Publiserer - vennligst vent...]]></key><key alias="inProgressCounter"><![CDATA[%0% av %1% sider har blitt publisert...]]></key><key alias="includeUnpublished"><![CDATA[Inkluder upubliserte undersider]]></key><key alias="publishHelp"><![CDATA[Klikk <em>ok</em> for å publisere <strong>%0%</strong> og dermed gjøre innholdet synlig for alle.<br/><br />
-		  Du kan publisere denne siden og alle dens undersider ved å krysse av <em>Publiser alle undersider</em> nedenfor.
-		  ]]></key><key alias="contentPublishedFailedByEvent"><![CDATA[
-		  %0% kunne ikke bli publisert, fordi et tredje-parts tillegg avbrøt handlingen.
-		]]></key></area><area alias="moveOrCopy"><key alias="moveTo"><![CDATA[Flytt til]]></key><key alias="copyTo"><![CDATA[Kopier til]]></key><key alias="choose"><![CDATA[Velg siden ovenover...]]></key><key alias="notAllowedByContentType"><![CDATA[Gjeldende node kan ikke legges under denne pga. dens type]]></key><key alias="notAllowedByPath"><![CDATA[Gjeldende node kan ikke legges under en av dens undersider]]></key><key alias="moveDone"><![CDATA[%0% er nå flyttet til %1%]]></key><key alias="copyDone"><![CDATA[%0% er nå kopiert til %1%]]></key><key alias="noNodeSelected"><![CDATA[Intet element er valgt, vennligst velg et element i listen over før du klikker 'fortsett']]></key><key alias="nodeSelected"><![CDATA[har blitt valgt som rot til ditt nye innhold, klikk 'ok' nedenfor.]]></key></area><area alias="login"><key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key><key alias="topText"><![CDATA[Velkommen til umbraco, skriv inn ditt brukernavn og passord i feltene under:]]></key></area><area alias="stylesheet"><key alias="editstylesheet"><![CDATA[Rediger stylesheet]]></key><key alias="styles"><![CDATA[Stiler]]></key><key alias="aliasHelp"><![CDATA[Bruk CSS syntaks f.eks: h1, .redHeader, .blueText]]></key><key alias="editstylesheetproperty"><![CDATA[Rediger egenskap for stilark]]></key><key alias="preview"><![CDATA[Forhåndsvis]]></key><key alias="nameHelp"><![CDATA[Navn for å identifisere egenskapen for stilarket i rik-tekst editoren]]></key></area><area alias="scripts"><key alias="editscript"><![CDATA[Rediger script-filen]]></key></area><area alias="editcontenttype"><key alias="newtab"><![CDATA[Ny arkfane]]></key><key alias="create"><![CDATA[Opprett]]></key><key alias="allowedchildnodetypes"><![CDATA[Tillatte typer]]></key><key alias="tab"><![CDATA[Arkfane]]></key><key alias="deletetab"><![CDATA[Slett arkfane]]></key><key alias="thumbnail"><![CDATA[Miniatyrbilde]]></key><key alias="description"><![CDATA[Beskrivelse]]></key></area><area alias="editdatatype"><key alias="addPrevalue"><![CDATA[Legg til forhåndsverdi]]></key><key alias="dataBaseDatatype"><![CDATA[Database datatype]]></key><key alias="renderControl"><![CDATA[Renderkontroll]]></key>
-      <key alias="guid"><![CDATA[Datatype GUID]]></key><key alias="rteButtons"><![CDATA[Knapper]]></key><key alias="rteEnableAdvancedSettings"><![CDATA[Aktiver avanserte instillinger for]]></key><key alias="rteEnableContextMenu"><![CDATA[Aktiver kontektsmeny]]></key><key alias="rteMaximumDefaultImgSize"><![CDATA[Maksimum standard størrelse på innsatte bilder]]></key><key alias="rteRelatedStylesheets"><![CDATA[Beslektede stilark]]></key><key alias="rteShowLabel"><![CDATA[Vis etikett]]></key><key alias="rteWidthAndHeight"><![CDATA[Bredde og høyde]]></key></area><area alias="template"><key alias="template"><![CDATA[Mal]]></key><key alias="mastertemplate"><![CDATA[Master mal]]></key><key alias="edittemplate"><![CDATA[Rediger mal]]></key><key alias="insertMacro"><![CDATA[Sett inn makro]]></key><key alias="insertDictionaryItem"><![CDATA[Sett inn ordbok-element]]></key><key alias="insertContentArea"><![CDATA[Sett inn innholdsområde]]></key><key alias="insertContentAreaPlaceHolder"><![CDATA[Sett inn plassholder for innholdsområde]]></key><key alias="quickGuide"><![CDATA[Hurtigguide til umbraco sine mal-tagger]]></key><key alias="insertPageField"><![CDATA[Sett inn umbraco side-felt]]></key></area><area alias="dictionaryItem"><key alias="description"><![CDATA[
-			Rediger de forskjellige språkversjonene for ordbok-elementet ']]></key><key alias="displayName"><![CDATA[Kulturnavn]]></key></area><area alias="language"><key alias="cultureCode"><![CDATA[Culture Code]]></key><key alias="displayName"><![CDATA[Culture Name]]></key></area><area alias="templateEditor"><key alias="chooseField"><![CDATA[Felt som skal settes inn]]></key><key alias="alternativeField"><![CDATA[Alternativt felt]]></key><key alias="usedIfEmpty"><![CDATA[Dette feltet vil benyttes dersom feltet over er tomt]]></key><key alias="usedIfAllEmpty"><![CDATA[Denne teksten vil benyttes dersom feltene over er tomme]]></key><key alias="alternativeText"><![CDATA[Alternativ tekst]]></key><key alias="recursive"><![CDATA[Rekursivt]]></key><key alias="preContent"><![CDATA[Sett inn før felt]]></key><key alias="postContent"><![CDATA[Sett inn etter felt]]></key><key alias="insertedBefore"><![CDATA[Denne teksten vil settes inn like før verdien av feltet]]></key><key alias="insertedAfter"><![CDATA[Denne teksten vil settes inn like etter verdien av feltet]]></key><key alias="formatAsDate"><![CDATA[Formatter som dato]]></key><key alias="dateOnly"><![CDATA[Ja, kun dato]]></key><key alias="withTime"><![CDATA[Ja, med klokkeslett. Dato/tid separator: ]]></key><key alias="casing"><![CDATA[Casing]]></key><key alias="none"><![CDATA[Ingen]]></key><key alias="lowercase"><![CDATA[Lowercase]]></key><key alias="uppercase"><![CDATA[Uppercase]]></key><key alias="urlEncode"><![CDATA[URL encode]]></key><key alias="urlEncodeHelp"><![CDATA[Dersom innholdet av feltene skal sendes til en URL, skal spesialtegn formatteres]]></key><key alias="convertLineBreaks"><![CDATA[Konverter linjeskift]]></key><key alias="convertLineBreaksHelp"><![CDATA[Erstatter et linjeskift med html-tag'en &lt;br&gt;]]></key><key alias="removeParagraph"><![CDATA[Fjern paragraf-tags]]></key><key alias="removeParagraphHelp"><![CDATA[Fjerner eventuelle &lt;P&gt; rundt teksten]]></key><key alias="htmlEncode"><![CDATA[HTML koding]]></key><key alias="htmlEncodeHelp"><![CDATA[Formater spesialtegn med deres tilsvarende HTML-tegn.]]></key></area><area alias="create"><key alias="createUnder"><![CDATA[Oppret under]]></key><key alias="chooseNode"><![CDATA[Hvor ønsker du å oprette den nye %0%]]></key><key alias="updateData"><![CDATA[Velg en type og skriv en tittel]]></key></area><area alias="errorHandling"><key alias="errorHeader"><![CDATA[Det var feil i dokumentet:]]></key><key alias="errorHeaderWithoutTab"><![CDATA[Det var feil i skjemaet:]]></key><key alias="errorMandatory"><![CDATA[%0% under %1% er et obligatorisk felt og skal fylles ut]]></key><key alias="errorMandatoryWithoutTab"><![CDATA[%0% er et obligatorisk felt og skal fylles ut]]></key>
-                <key alias="errorExistsWithoutTab" version="2.1"><![CDATA[%0% allerede eksisterer]]></key><key alias="errorRegExp"><![CDATA[%0% under %1% er ikke i et korrekt format]]></key><key alias="errorRegExpWithoutTab"><![CDATA[%0% er ikke i et korrekt format]]></key><key alias="errorButDataWasSaved"><![CDATA[Dine data har blitt lagret, men før du kan publisere denne siden må du fikse noen feil:]]></key><key alias="errorChangingProviderPassword"><![CDATA[Den gjeldende Membership Provider støtter ikke endring av passord. (EnablePasswordRetrieval må være satt til sann)]]></key><key alias="errorInPasswordFormat"><![CDATA[Passordet bør være minst %0% tegn langt og inneholde minst %1% numeriske tegn]]></key><key alias="errorIntegerWithoutTab"><![CDATA[%0% må være en integer]]></key></area><area alias="publicAccess"><key alias="paHowWould"><![CDATA[Hvordan vil du beskytte siden din?]]></key><key alias="paSimple"><![CDATA[Enkelt: Beskytt ved hjelp av brukernavn og passord]]></key><key alias="paAdvanced"><![CDATA[Avansert: Beskytt ved å velge hvilke brukergrupper som har tilgang til siden]]></key><key alias="paLoginPage"><![CDATA[Innloggings-side]]></key><key alias="paErrorPage"><![CDATA[Feil-side]]></key><key alias="paLoginPageHelp"><![CDATA[Velg siden som har loginformularet]]></key><key alias="paErrorPageHelp"><![CDATA[Brukt når personer logger på, men ikke har tilgang]]></key><key alias="paIsProtected"><![CDATA[%0% er nå beskyttet]]></key><key alias="paIsRemoved"><![CDATA[Beskyttelse fjernet fra %0%]]></key><key alias="paRemoveProtection"><![CDATA[Fjern beskyttelse]]></key><key alias="paAdvancedHelp"><![CDATA[Om du ønsker å kontrollere tilgang til siden ved å bruke rolle-basert autentisering,<br /> ved å bruke Umbraco's medlems-grupper]]></key><key alias="paAdvancedNoGroups"><![CDATA[Du må opprette en medlemsgruppe før du kan bruke <br /> rollebasert autentikasjon.]]></key><key alias="paSelectPages"><![CDATA[Velg sidene som inneholder login-skjema og feilmelding ved feil innolgging.]]></key><key alias="paSelectRoles"><![CDATA[Velg rollene som har tilgang til denne siden]]></key><key alias="paSetLogin"><![CDATA[Sett brukernavn og passord for denne siden]]></key><key alias="paSimpleHelp"><![CDATA[Om du ønsker å bruke enkel autentisering via ett enkelt brukernavn og passord]]></key></area><area alias="auditTrails"><key alias="atViewingFor"><![CDATA[Viser for]]></key></area><area alias="notifications"><key alias="notifications"><![CDATA[Varsling]]></key><key alias="editNotifications"><![CDATA[Rediger dine varsler for %0%]]></key><key alias="mailSubject"><![CDATA[[%0%] Varsling om %1% utført på %2%]]></key><key alias="mailBody"><![CDATA[
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<language alias="no" intName="Norwegian" localName="norsk" lcid="20" culture="nb-NO">
+  <creator>
+    <name>The umbraco community</name>
+    <link>http://umbraco.org/documentation/language-files</link>
+  </creator>
+  <area alias="actions">
+    <key alias="assignDomain">Angi domene</key>
+    <key alias="auditTrail">Audit Trail</key>
+    <key alias="browse">Bla gjennom</key>
+    <key alias="copy">Kopier</key>
+    <key alias="create">Opprett</key>
+    <key alias="createPackage">Opprett pakke</key>
+    <key alias="delete">Slett</key>
+    <key alias="disable">Deaktiver</key>
+    <key alias="emptyTrashcan">Tøm papirkurv</key>
+    <key alias="exportDocumentType">Eksporter dokumenttype</key>
+    <key alias="exportDocumentTypeAsCode">TRANSLATE ME: 'Export to .NET'</key>
+    <key alias="exportDocumentTypeAsCode-Full">TRANSLATE ME: 'Export to .NET'</key>
+    <key alias="importDocumentType">Importer documenttype</key>
+    <key alias="importPackage">Importer pakke</key>
+    <key alias="liveEdit">Rediger i Canvas</key>
+    <key alias="logout">Lukk umbraco</key>
+    <key alias="move">Flytt</key>
+    <key alias="notify">Varsling</key>
+    <key alias="protect">Offentlig tilgang</key>
+    <key alias="publish">Publiser</key>
+    <key alias="refreshNode">Oppdater noder</key>
+    <key alias="republish">Republiser hele siten</key>
+    <key alias="rights">Rettigheter</key>
+    <key alias="rollback">Reverser</key>
+    <key alias="sendtopublish">Send til publisering</key>
+    <key alias="sendToTranslate">Send til oversetting</key>
+    <key alias="sort">Sorter</key>
+    <key alias="toPublish">Send til publisering</key>
+    <key alias="translate">Oversett</key>
+    <key alias="update">Oppdater</key>
+  </area>
+  <area alias="assignDomain">
+    <key alias="addNew">Legg til domene</key>
+    <key alias="domain">Domene</key>
+    <key alias="domainCreated">Domene '%0%' er nå opprettet og tilknyttet siden</key>
+    <key alias="domainDeleted">Domenet '%0%' er nå slettet</key>
+    <key alias="domainExists">Domenet '%0%' eksisterer allerede</key>
+    <key alias="domainHelp">f.eks.: dittdomene.com, www.dittdomene.com</key>
+    <key alias="domainUpdated">Domenet '%0%' er nå oppdatert</key>
+    <key alias="orEdit">eller rediger eksisterende domener</key>
+  </area>
+  <area alias="auditTrails">
+    <key alias="atViewingFor">Viser for</key>
+  </area>
+  <area alias="buttons">
+    <key alias="bold">Fet</key>
+    <key alias="deindent">Tilbakerykk avsnitt</key>
+    <key alias="formFieldInsert">Sett inn skjemafelt</key>
+    <key alias="graphicHeadline">Sett inn grafisk overskrift</key>
+    <key alias="htmlEdit">Rediger HTML</key>
+    <key alias="indent">Innrykk avsnitt</key>
+    <key alias="italic">Kursiv</key>
+    <key alias="justifyCenter">Sentrer</key>
+    <key alias="justifyLeft">Venstrestill avsnitt</key>
+    <key alias="justifyRight">Høyrestil avsnitt</key>
+    <key alias="linkInsert">Sett inn lenke</key>
+    <key alias="linkLocal">Sett inn lokal lenke</key>
+    <key alias="listBullet">Punktliste</key>
+    <key alias="listNumeric">Numerert liste</key>
+    <key alias="macroInsert">Sett inn makro</key>
+    <key alias="pictureInsert">Sett inn bilde</key>
+    <key alias="relations">Rediger relasjoner</key>
+    <key alias="save">Lagre</key>
+    <key alias="saveAndPublish">Lagre og publiser</key>
+    <key alias="saveToPublish">Lagre og send til publisering</key>
+    <key alias="showPage">Se siden</key>
+    <key alias="styleChoose">Velg formattering</key>
+    <key alias="styleShow">Vis koder</key>
+    <key alias="tableInsert">Sett inn tabell</key>
+  </area>
+  <area alias="content">
+    <key alias="about">Om siden</key>
+    <key alias="alias">Alternativ lenke</key>
+    <key alias="alternativeTextHelp">(hvordan du ville beskrevet bildet over telefon)</key>
+    <key alias="alternativeUrls">Alternative lenker</key>
+    <key alias="clickToEdit">Klikk på musen for å redigere denne noden</key>
+    <key alias="createBy">Opprettet av</key>
+    <key alias="createDate">Opprettet den</key>
+    <key alias="documentType">Dokumenttype</key>
+    <key alias="editing">Redigerer</key>
+    <key alias="expireDate">Utløpsdato</key>
+    <key alias="itemChanged">Denne noden er endret siden siste publisering</key>
+    <key alias="itemNotPublished">Denne noden er ennå ikke publisert</key>
+    <key alias="lastPublished">Sist publisert</key>
+    <key alias="mediatype">Mediatype</key>
+    <key alias="membergroup">Medlemsgruppe</key>
+    <key alias="memberrole">Rolle</key>
+    <key alias="membertype">Medlemstype</key>
+    <key alias="noDate">Ingen dato valgt</key>
+    <key alias="nodeName">Sidetittel</key>
+    <key alias="otherElements">Egenskaper</key>
+    <key alias="parentNotPublished">Dette dokumentet er publisert, men ikke synlig da den overliggende siden '%0%' ikke er publisert!</key>
+    <key alias="publish">Publisert</key>
+    <key alias="publishStatus">Publiseringsstatus</key>
+    <key alias="releaseDate">Utgivelsesdato</key>
+    <key alias="removeDate">Fjern dato</key>
+    <key alias="sortDone">Sorteringsrekkefølgen er oppdatert</key>
+    <key alias="sortHelp">For å sortere elementene, simpelthen dra elementene eller klikk på en av pverskriftene. Du kan velge flere elementer ved å holde "shift" eller "control" tasten mens du velger</key>
+    <key alias="statistics">Statistikk</key>
+    <key alias="titleOptional">Tittel (valgfri)</key>
+    <key alias="type">Type</key>
+    <key alias="unPublish">Avpubliser</key>
+    <key alias="updateDate">Sist redigeret</key>
+    <key alias="uploadClear">Fjern fil</key>
+    <key alias="urls">Lenke til dokument</key>
+  </area>
+  <area alias="create">
+    <key alias="chooseNode">Hvor ønsker du å oprette den nye %0%</key>
+    <key alias="createUnder">Oppret under</key>
+    <key alias="updateData">Velg en type og skriv en tittel</key>
+  </area>
+  <area alias="dashboard">
+    <key alias="browser">Til din webside</key>
+    <key alias="dontShowAgain">TRANSLATE ME: '- Hide'</key>
+    <key alias="nothinghappens">Hvis umbraco ikke starter, kan det skyldes at pop-up vinduer ikke er tillatt</key>
+    <key alias="openinnew">er åpnet i nytt vindu</key>
+    <key alias="restart">Omstart</key>
+    <key alias="visit">Besøk</key>
+    <key alias="welcome">Velkommen</key>
+  </area>
+  <area alias="defaultdialogs">
+    <key alias="anchorInsert">Navn på lokalt link</key>
+    <key alias="assignDomain">Rediger domener</key>
+    <key alias="closeThisWindow">Lukk dette vinduet</key>
+    <key alias="confirmdelete">Er du sikker på at du vil slette</key>
+    <key alias="confirmdisable">Er du sikker på at du vil deaktivere</key>
+    <key alias="confirmEmptyTrashcan">Vennligst kryss av i denne boksen for å bekrefte sletting av %0% element(er)</key>
+    <key alias="confirmlogout">Er du sikker på at du vil forlate umbraco?</key>
+    <key alias="confirmSure">Er du sikker?</key>
+    <key alias="cut">TRANSLATE ME: 'Cut'</key>
+    <key alias="editdictionary">Rediger ordbok nøkkel</key>
+    <key alias="editlanguage">Rediger språk</key>
+    <key alias="insertAnchor">Sett inn lokal link</key>
+    <key alias="insertCharacter">Sett inn spesialtegn</key>
+    <key alias="insertgraphicheadline">Sett inn grafisk overskrift</key>
+    <key alias="insertimage">Sett inn bilde</key>
+    <key alias="insertlink">Sett inn lenke</key>
+    <key alias="insertMacro">Sett inn makro</key>
+    <key alias="inserttable">Sett inn tabell</key>
+    <key alias="lastEdited">Sist redigeret</key>
+    <key alias="link">Lenke</key>
+    <key alias="linkinternal">Intern link:</key>
+    <key alias="linklocaltip">Ved lokal link, sett inn "#" foran link</key>
+    <key alias="linknewwindow">Åpne i nytt vindu?</key>
+    <key alias="macroContainerSettings">TRANSLATE ME: 'Macro Settings'</key>
+    <key alias="macroDoesNotHaveProperties">Denne makroen har ingen egenskaper du kan endre</key>
+    <key alias="paste">Lim inn</key>
+    <key alias="permissionsEdit">Endre rettigheter for</key>
+    <key alias="recycleBinDeleting">Innholdet i papirkurven blir nå slettet. Vennligst ikke lukk dette vinduet mens denne operasjonen foregår</key>
+    <key alias="recycleBinIsEmpty">Papirkurven er nå tom</key>
+    <key alias="recycleBinWarning">Når elementer blir slettet fra papirkurven, vil de være slettet for godt</key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a> webtjeneste opplever for tiden problemer, som vi ikke har kontroll over. Vi beklager denne uleiligheten.]]></key>
+    <key alias="regexSearchHelp">Søk etter et regulært uttrykk for å legge inn validering til et felt. Eksempel: 'email, 'zip-code' 'url'</key>
+    <key alias="removeMacro">TRANSLATE ME: 'Remove Macro'</key>
+    <key alias="requiredField">Obligatorisk</key>
+    <key alias="sitereindexed">Nettstedet er indeksert</key>
+    <key alias="siterepublished">Siten er nu republisert</key>
+    <key alias="siterepublishHelp">Hurtigbufferen for siden vil bli oppdatert. Alt publisert innhold vil bli oppdatert, mens upublisert innhold vil forbli upublisert.</key>
+    <key alias="tableColumns">Antall kolonner</key>
+    <key alias="tableRows">Antall rader</key>
+    <key alias="templateContentAreaHelp"><![CDATA[<strong>Sett en plassholder-ID</strong><br/>Ved å sette en ID på plassholderen kan du legge inn innhold i denne malen fra underliggende maler,
+		  ved å referere denne ID'en ved hjelp av et <code>&lt;asp:content /&gt;</code> element.]]></key>
+    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Velg en plassholder ID</strong> fra listen under. Du kan bare
+		  velge ID'er fra den gjeldende malens overmal.]]></key>
+    <key alias="thumbnailimageclickfororiginal">Klikk på bildet for å se det i naturlig størrelse</key>
+    <key alias="treepicker">Velg punkt</key>
+    <key alias="viewCacheItem">Se Cache Item</key>
+  </area>
+  <area alias="dictionaryItem">
+    <key alias="description"><![CDATA[
+			Rediger de forskjellige språkversjonene for ordbok-elementet ']]></key>
+    <key alias="displayName">Kulturnavn</key>
+  </area>
+  <area alias="editcontenttype">
+    <key alias="allowedchildnodetypes">Tillatte typer</key>
+    <key alias="create">Opprett</key>
+    <key alias="deletetab">Slett arkfane</key>
+    <key alias="description">Beskrivelse</key>
+    <key alias="newtab">Ny arkfane</key>
+    <key alias="tab">Arkfane</key>
+    <key alias="thumbnail">Miniatyrbilde</key>
+  </area>
+  <area alias="editdatatype">
+    <key alias="addPrevalue">Legg til forhåndsverdi</key>
+    <key alias="dataBaseDatatype">Database datatype</key>
+    <key alias="guid">Datatype GUID</key>
+    <key alias="renderControl">Renderkontroll</key>
+    <key alias="rteButtons">Knapper</key>
+    <key alias="rteEnableAdvancedSettings">Aktiver avanserte instillinger for</key>
+    <key alias="rteEnableContextMenu">Aktiver kontektsmeny</key>
+    <key alias="rteMaximumDefaultImgSize">Maksimum standard størrelse på innsatte bilder</key>
+    <key alias="rteRelatedStylesheets">Beslektede stilark</key>
+    <key alias="rteShowLabel">Vis etikett</key>
+    <key alias="rteWidthAndHeight">Bredde og høyde</key>
+  </area>
+  <area alias="errorHandling">
+    <key alias="errorButDataWasSaved">Dine data har blitt lagret, men før du kan publisere denne siden må du fikse noen feil:</key>
+    <key alias="errorChangingProviderPassword">Den gjeldende Membership Provider støtter ikke endring av passord. (EnablePasswordRetrieval må være satt til sann)</key>
+    <key alias="errorExistsWithoutTab">%0% allerede eksisterer</key>
+    <key alias="errorHeader">Det var feil i dokumentet:</key>
+    <key alias="errorHeaderWithoutTab">Det var feil i skjemaet:</key>
+    <key alias="errorInPasswordFormat">Passordet bør være minst %0% tegn langt og inneholde minst %1% numeriske tegn</key>
+    <key alias="errorIntegerWithoutTab">%0% må være en integer</key>
+    <key alias="errorMandatory">%0% under %1% er et obligatorisk felt og skal fylles ut</key>
+    <key alias="errorMandatoryWithoutTab">%0% er et obligatorisk felt og skal fylles ut</key>
+    <key alias="errorRegExp">%0% under %1% er ikke i et korrekt format</key>
+    <key alias="errorRegExpWithoutTab">%0% er ikke i et korrekt format</key>
+  </area>
+  <area alias="errors">
+    <key alias="codemirroriewarning">TRANSLATE ME: 'NOTE! Even though CodeMirror is enabled by configuration, it is disabled in Internet Explorer because it's not stable enough.'</key>
+    <key alias="contentTypeAliasAndNameNotNull">Du må fylle ut både Alias &amp; Navn på den nye egenskapstypen!</key>
+    <key alias="filePermissionsError">Det er et problem med lese/skrive rettighetene til en fil eller mappe</key>
+    <key alias="missingTitle">Tittel mangler</key>
+    <key alias="missingType">Type mangler</key>
+    <key alias="pictureResizeBiggerThanOrg">Du er i ferd med å gjøre bildet større enn originalen. Det vil forringe kvaliteten på bildet, ønsker du å fortsette?</key>
+    <key alias="pythonErrorHeader">Feil i python-skriptet</key>
+    <key alias="pythonErrorText">Python-skriptet ditt ble ikke lagret fordi den inneholder en eller flere feil</key>
+    <key alias="startNodeDoesNotExists">Startnode er slettet kontakt systemadministrator</key>
+    <key alias="stylesMustMarkBeforeSelect">Du må markere innhold før du kan endre stil</key>
+    <key alias="stylesNoStylesOnPage">Det er ingen aktive styles eller formatteringer på denne siden</key>
+    <key alias="tableColMergeLeft">Du må stå til venstre for de 2 cellene du ønsker å slå sammen!</key>
+    <key alias="tableSplitNotSplittable">Du kan ikke dele en celle som allerede er delt.</key>
+    <key alias="xsltErrorHeader">Feil i XSLT kode</key>
+    <key alias="xsltErrorText">Din XSLT er ikke oppdatert da den inneholder feil</key>
+  </area>
+  <area alias="general">
+    <key alias="about">Om</key>
+    <key alias="action">Handling</key>
+    <key alias="add">Legg til</key>
+    <key alias="alias">Alias</key>
+    <key alias="areyousure">Er du sikker?</key>
+    <key alias="border">Kant</key>
+    <key alias="by">eller</key>
+    <key alias="cancel">Avbryt</key>
+    <key alias="cellMargin">Celle margin</key>
+    <key alias="choose">Velg</key>
+    <key alias="close">Lukk</key>
+    <key alias="closewindow">Lukk vindu</key>
+    <key alias="comment">Kommentar</key>
+    <key alias="confirm">Bekreft</key>
+    <key alias="constrainProportions">Behold proposjoner</key>
+    <key alias="continue">Fortsett</key>
+    <key alias="copy">Kopier</key>
+    <key alias="create">Opprett</key>
+    <key alias="database">Database</key>
+    <key alias="date">Dato</key>
+    <key alias="default">Standard</key>
+    <key alias="delete">Slett</key>
+    <key alias="deleted">Slettet</key>
+    <key alias="deleting">Sletter...</key>
+    <key alias="design">Design</key>
+    <key alias="dimensions">Dimensjoner</key>
+    <key alias="down">Ned</key>
+    <key alias="download">Last ned</key>
+    <key alias="edit">Rediger</key>
+    <key alias="edited">Redigeret</key>
+    <key alias="elements">Elementer</key>
+    <key alias="email">E-post</key>
+    <key alias="error">Feil</key>
+    <key alias="findDocument">Finn</key>
+    <key alias="height">Høyde</key>
+    <key alias="help">Hjelp</key>
+    <key alias="icon">Ikon</key>
+    <key alias="import">Importer</key>
+    <key alias="innerMargin">Indre margin</key>
+    <key alias="insert">Sett inn</key>
+    <key alias="install">Installer</key>
+    <key alias="justify">Justering</key>
+    <key alias="language">Språk</key>
+    <key alias="layout">Layout</key>
+    <key alias="loading">Laster</key>
+    <key alias="locked">TRANSLATE ME: 'Locked'</key>
+    <key alias="login">Login</key>
+    <key alias="logoff">Logg av</key>
+    <key alias="logout">Logg ut</key>
+    <key alias="macro">Makro</key>
+    <key alias="move">Flytt</key>
+    <key alias="name">Navn</key>
+    <key alias="new">Ny</key>
+    <key alias="next">Neste</key>
+    <key alias="no">Nei</key>
+    <key alias="of">av</key>
+    <key alias="ok">OK</key>
+    <key alias="open">Åpne</key>
+    <key alias="or">eller</key>
+    <key alias="password">Passord</key>
+    <key alias="path">Sti</key>
+    <key alias="placeHolderID">Plassholder ID</key>
+    <key alias="pleasewait">Ett øyeblikk...</key>
+    <key alias="previous">Forrige</key>
+    <key alias="properties">Egenskaper</key>
+    <key alias="reciept">E-post som innholdet i skjemaet skal sendes til</key>
+    <key alias="recycleBin">Papirkurv</key>
+    <key alias="remaining">Gjenværende</key>
+    <key alias="rename">Døp om</key>
+    <key alias="renew">TRANSLATE ME: 'Renew'</key>
+    <key alias="retry">Prøv igjen</key>
+    <key alias="rights">Rettigheter</key>
+    <key alias="search">Søk</key>
+    <key alias="server">Server</key>
+    <key alias="show">Vis</key>
+    <key alias="showPageOnSend">Hvilken side skal vises etter at skjemaet er sendt</key>
+    <key alias="size">Størrelse</key>
+    <key alias="sort">Sorter</key>
+    <key alias="type">Type</key>
+    <key alias="typeToSearch">Skriv for å søke...</key>
+    <key alias="up">Opp</key>
+    <key alias="update">Oppdater</key>
+    <key alias="upgrade">Oppgrader</key>
+    <key alias="upload">Last opp</key>
+    <key alias="url">Url</key>
+    <key alias="user">Bruker</key>
+    <key alias="username">Brukernavn</key>
+    <key alias="value">Verdi</key>
+    <key alias="view">Visning</key>
+    <key alias="welcome">Velkommen...</key>
+    <key alias="width">Bredde</key>
+    <key alias="yes">Ja</key>
+  </area>
+  <area alias="graphicheadline">
+    <key alias="backgroundcolor">Bakgrunnsfarge</key>
+    <key alias="bold">Fet</key>
+    <key alias="color">Tekst farge</key>
+    <key alias="font">Skrifttype</key>
+    <key alias="text">Tekst</key>
+  </area>
+  <area alias="headers">
+    <key alias="page">Side</key>
+  </area>
+  <area alias="installer">
+    <key alias="databaseErrorCannotConnect">Installasjonsprogrammet kan ikke koble til databasen</key>
+    <key alias="databaseErrorWebConfig">Kunne ikke lagre Web.Config-filen. Vennligst endre databasens tilkoblingsstreng manuelt. </key>
+    <key alias="databaseFound">Din database er funnet og identifisert som</key>
+    <key alias="databaseHeader">Databasekonfigurasjon</key>
+    <key alias="databaseInstall"><![CDATA[Klikk <strong>installer</strong>-knappen for å installere Umbraco %0% databasen]]></key>
+    <key alias="databaseInstallDone"><![CDATA[Umbraco %0% har nå blitt kopiert til din database. Trykk <strong>Neste</strong> for å fortsette.]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>Databasen ble ikke funnet! Vennligst sjekk at informasjonen i "connection string" i "web.config"-filen er korrekt.</p><p>For å fortsette, vennligst rediger "web.config"-filen (bruk Visual Studio eller din favoritteditor), rull ned til bunnen, og legg til tilkoblingsstrengen for din database i nøkkelen "umbracoDbDSN" og lagre filen.</p><p>Klikk <strong>prøv på nytt</strong> når du er ferdig.<br /> <a href="http://umbraco.org/redir/installWebConfig" target="_blank">Mer informasjon om redigering av web.config her.</a></p>]]></key>
+    <key alias="databaseText"><![CDATA[For å fullføre dette steget, må du vite en del informasjon om din database server ("tilkoblingsstreng").<br/> Vennligst kontakt din ISP om nødvendig. Hvis du installerer på en lokal maskin eller server, må du kanskje skaffe informasjonen fra din systemadministrator.]]></key>
+    <key alias="databaseUpgrade"><![CDATA[<p> Trykk på knappen <strong>oppgrader</strong> for å oppgradere databasen din til Umbraco %0%</p> <p> Ikke vær urolig - intet innhold vil bli slettet og alt vil fortsette å virke etterpå! </p>]]></key>
+    <key alias="databaseUpgradeDone"><![CDATA[Databasen din har blitt oppgradert til den siste utgaven, %0%.<br/>Trykk <strong>Neste</strong> for å fortsette.]]></key>
+    <key alias="databaseUpToDate"><![CDATA[Databasen din er av nyeste versjon! Klikk <strong>neste</strong> for å fortsette konfigurasjonsveiviseren]]></key>
+    <key alias="defaultUserChangePass"><![CDATA[<strong>Passordet til standardbrukeren må endres!]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>Standardbrukeren har blitt deaktivert eller har ingen tilgang til umbraco!</strong></p><p>Ingen videre handling er nødvendig. Klikk <b>neste</b> for å fortsette.]]></key>
+    <key alias="defaultUserPassChanged"><![CDATA[<strong>Passordet til standardbrukeren har blitt forandret etter installasjonen!</strong></p><p>Ingen videre handling er nødvendig. Klikk <strong>Neste</strong> for å fortsette.]]></key>
+    <key alias="defaultUserPasswordChanged">Passordet er blitt endret!</key>
+    <key alias="defaultUserText"><![CDATA[<p> umbraco skaper en standard bruker med login <strong> ( "admin") </ strong> og passord <strong> ( "default") </ strong>. Det er <strong> viktig </ strong> at passordet er endret til noe unikt. </ p> <p> Dette trinnet vil sjekke standard brukerens passord og foreslår hvis det må skiftes </ p>]]></key>
+    <key alias="greatStart">Få en god start med våre introduksjonsvideoer</key>
+    <key alias="licenseText">Ved å klikke på Neste-knappen (eller endre umbracoConfigurationStatus i Web.config), godtar du lisensen for denne programvaren som angitt i boksen nedenfor. Legg merke til at denne umbraco distribusjon består av to ulike lisenser, åpen kilde MIT lisens for rammen og umbraco frivareverktøy lisens som dekker brukergrensesnittet.</key>
+    <key alias="None">Ikke installert.</key>
+    <key alias="permissionsAffectedFolders">Berørte filer og mapper</key>
+    <key alias="permissionsAffectedFoldersMoreInfo">Mer informasjon om å sette opp rettigheter for umbraco her</key>
+    <key alias="permissionsAffectedFoldersText">Du må gi ASP.NET brukeren rettigheter til å endre de følgende filer og mapper</key>
+    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Rettighetene er nesten perfekt satt opp!</strong><br/><br/> Du kan kjøre umbraco uten problemer, men du vil ikke være i stand til å installere de anbefalte pakkene for å utnytte umbraco fullt ut.]]></key>
+    <key alias="permissionsHowtoResolve">Hvordan løse problemet</key>
+    <key alias="permissionsHowtoResolveLink">Klikk her for å lese tekstversjonen</key>
+    <key alias="permissionsHowtoResolveText"><![CDATA[Se vår <strong>innføringsvideo</strong> om å sette opp rettigheter for umbraco eller les tekstversjonen.]]></key>
+    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Rettighetsinnstillingene kan være et problem!</strong><br/><br/> Du kan kjøre umbraco uten problemer, men du vil ikke være i stand til å installere de anbefalte pakkene for å utnytte umbraco fullt ut.]]></key>
+    <key alias="permissionsNotReady"><![CDATA[<strong>Rettighetsinstillingene er ikke klargjort for umbraco!</strong><br/><br/> For å kunne kjøre umbraco, må du oppdatere rettighetsinnstillingene dine.]]></key>
+    <key alias="permissionsPerfect"><![CDATA[<strong>Rettighetsinnstillingene er perfekt!</strong><br/><br/>Du er klar for å kjøre umbraco og installere pakker!]]></key>
+    <key alias="permissionsResolveFolderIssues">Løser mappeproblem</key>
+    <key alias="permissionsResolveFolderIssuesLink">Følg denne linken for mer informasjon om problemer med ASP.NET og oppretting av mapper</key>
+    <key alias="permissionsSettingUpPermissions">Konfigurerer mappetillatelser</key>
+    <key alias="permissionsText">umbraco trenger skrive/endre tilgang til enkelte mapper for å kunne lagre filer som bilder og PDF-dokumenter. Den lagrer også midlertidig data (aka: hurtiglager) for å øke ytelsen på websiden din.</key>
+    <key alias="runwayFromScratch">Jeg ønsker å starte fra bunnen.</key>
+    <key alias="runwayFromScratchText"><![CDATA[Din website er helt tom for øyeblikket. Dette er perfekt hvis du vil begynne helt forfra og lage dine egne dokumenttyper og maler. (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lær hvordan</a>) Du kan fortsatt velge å installere Runway senere. Vennligst gå til Utvikler-seksjonen og velg Pakker.]]></key>
+    <key alias="runwayHeader">Du har akkurat satt opp en ren Umbraco plattform. Hva vil du gjøre nå?</key>
+    <key alias="runwayInstalled">Runway er installert</key>
+    <key alias="runwayInstalledText"><![CDATA[Du har nå fundamentet på plass. Velg hvilke moduler du ønsker å installer på toppen av det.<br/> Dette er vår liste av anbefalte moduler- Kryss av de du ønsker å installere, eller se den<a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">fulle listen av moduler</a> ]]></key>
+    <key alias="runwayOnlyProUsers">Bare anbefalt for erfarne brukere</key>
+    <key alias="runwaySimpleSite">Jeg vil starte med en enkel webside</key>
+    <key alias="runwaySimpleSiteText"><![CDATA[<p> "Runway" er en enkel webside som utstyrer deg med noen grunnleggende dokumenttyper og maler. Veiviseren kan sette opp Runway for deg automatisk, men du kan enkelt endre, utvide eller slette den. Runway er ikke nødvendig, og du kan enkelt bruke Umbraco uten den. Imidlertidig tilbyr Runway et enkelt fundament basert på de beste metodene for å hjelpe deg i gang fortere enn noensinne. Hvis du velger å installere Runway, kan du også velge blant grunnleggende byggeklosser kalt Runway Moduler for å forøke dine Runway-sider. </p> <small> <em>Sider inkludert i Runway:</em> Hjemmeside, Komme-i-gang, Installere moduler.<br /> <em>Valgfrie Moduler:</em> Toppnavigasjon, Sidekart, Kontakt, Galleri. </small> ]]></key>
+    <key alias="runwayWhatIsRunway">Hva er Runway</key>
+    <key alias="step1">Steg 1/5 Godta lisens</key>
+    <key alias="step2">Steg 2/5 Database konfigurasjon</key>
+    <key alias="step3">Steg 3/5: Valider filrettigheter</key>
+    <key alias="step4">Steg 4/5: Skjekk Umbraco sikkerheten</key>
+    <key alias="step5">Steg 5/5: Umbraco er klar for deg til å starte!</key>
+    <key alias="thankYou">Tusen takk for at du valgte Umbraco!</key>
+    <key alias="theEndBrowseSite"><![CDATA[<h3>Se ditt nye nettsted</h3> Du har installert Runway, hvorfor ikke se hvordan ditt nettsted ser ut.]]></key>
+    <key alias="theEndFurtherHelp"><![CDATA[<h3>Mer hjelp og info</h3> Få hjelp fra vårt prisbelønte samfunn, bla gjennom dokumentasjonen eller se noen gratis videoer på hvordan man bygger et enkelt nettsted, hvordan bruke pakker og en rask guide til umbraco terminologi]]></key>
+    <key alias="theEndHeader">Umbraco %0% er installert og klar til bruk</key>
+    <key alias="theEndInstallFailed"><![CDATA[For å fullføre installasjonen, må du manuelt endre <strong>web.config</strong> filen, og oppdatere AppSetting-nøkkelen <strong>umbracoConfigurationStatus</strong> til verdien <strong>'%0%'</strong>]]></key>
+    <key alias="theEndInstallSuccess"><![CDATA[Du kan <strong>starte øyeblikkelig</strong> ved å klikke på "Start Umbraco" knappen nedenfor. <br/>Hvis du er <strong>ny på umbraco</strong>, kan du finne mange ressurser på våre komme-i-gang sider.]]></key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Start Umbraco</h3> For å administrere din webside, åpne umbraco og begynn å legge til innhold, oppdatere maler og stilark eller utvide funksjonaliteten]]></key>
+    <key alias="Unavailable">Tilkobling til databasen mislyktes.</key>
+    <key alias="Version3">Umbraco Versjon 3</key>
+    <key alias="Version4">Umbraco Versjon 4</key>
+    <key alias="watch">Pass på</key>
+    <key alias="welcomeIntro"><![CDATA[Denne veiviseren vil hjelpe deg gjennom prosessen med å konfigurere <strong>umbraco %0%</strong> for en ny installasjon eller oppgradering fra versjon 3.0. <br/><br/> Trykk <strong>"neste"</strong> for å starte veiviseren.]]></key>
+  </area>
+  <area alias="language">
+    <key alias="cultureCode">Culture Code</key>
+    <key alias="displayName">Culture Name</key>
+  </area>
+  <area alias="lockout">
+    <key alias="lockoutWillOccur">TRANSLATE ME: 'You've been idle and logout will automatically occur in'</key>
+    <key alias="renewSession">TRANSLATE ME: 'Renew now to save your work'</key>
+  </area>
+  <area alias="login">
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+    <key alias="topText">Velkommen til umbraco, skriv inn ditt brukernavn og passord i feltene under:</key>
+  </area>
+  <area alias="main">
+    <key alias="dashboard">Skrivebord</key>
+    <key alias="sections">Seksjoner</key>
+    <key alias="tree">Inndhold</key>
+  </area>
+  <area alias="moveOrCopy">
+    <key alias="choose">Velg siden ovenover...</key>
+    <key alias="copyDone">%0% er nå kopiert til %1%</key>
+    <key alias="copyTo">Kopier til</key>
+    <key alias="moveDone">%0% er nå flyttet til %1%</key>
+    <key alias="moveTo">Flytt til</key>
+    <key alias="nodeSelected">har blitt valgt som rot til ditt nye innhold, klikk 'ok' nedenfor.</key>
+    <key alias="noNodeSelected">Intet element er valgt, vennligst velg et element i listen over før du klikker 'fortsett'</key>
+    <key alias="notAllowedByContentType">Gjeldende node kan ikke legges under denne pga. dens type</key>
+    <key alias="notAllowedByPath">Gjeldende node kan ikke legges under en av dens undersider</key>
+    <key alias="notValid">TRANSLATE ME: 'The action isn't allowed since you have insufficient permissions on 1 or more child documents.'</key>
+  </area>
+  <area alias="notifications">
+    <key alias="editNotifications">Rediger dine varsler for %0%</key>
+    <key alias="mailBody"><![CDATA[
 Hei %0%
 
 Dette er en automatisk mail for å informere om at handlingen '%1%'
@@ -20,7 +438,8 @@ Gå til http://%4%/umbraco/default.aspx?section=content&id=%5% for å redigere.
 Ha en fin dag!
 		
 Vennlig hilsen umbraco roboten
-		]]></key><key alias="mailBodyHtml"><![CDATA[<p>Hei %0%</p>
+		]]></key>
+    <key alias="mailBodyHtml"><![CDATA[<p>Hei %0%</p>
 
 		  <p>Dette er en automatisk mail for å informere om at handlingen '%1%'
         er blitt utført på siden <a href="%7%"><strong>'%2%'</strong></a>
@@ -50,7 +469,233 @@ Vennlig hilsen umbraco roboten
 
 		  <p>Ha en fin dag!<br /><br />
 			  Vennlig hilsen umbraco roboten
-		  </p>]]></key></area><area alias="translation"><key alias="sendToTranslate"><![CDATA[Send til oversetting]]></key><key alias="mailSubject"><![CDATA[[%0%] Oversettingsoppgave for %1%]]></key><key alias="mailBody"><![CDATA[
+		  </p>]]></key>
+    <key alias="mailSubject">[%0%] Varsling om %1% utført på %2%</key>
+    <key alias="notifications">Varsling</key>
+  </area>
+  <area alias="packager">
+    <key alias="chooseLocalPackageText">Klikke browse og velg pakke fra lokal disk. umbraco-pakker har vanligvis endelsen ".umb" eller ".zip".</key>
+    <key alias="packageAuthor">Utvikler</key>
+    <key alias="packageDemonstration">Demonstrasjon</key>
+    <key alias="packageDocumentation">Dokumentasjon</key>
+    <key alias="packageMetaData">Metadata</key>
+    <key alias="packageName">Pakkenavn</key>
+    <key alias="packageNoItemsHeader">Pakken inneholder ingen elementer</key>
+    <key alias="packageNoItemsText"><![CDATA[Denne pakkefilen inneholder ingen elementer å avinstallere.<br/><br/>Du kan trygt fjerne pakken fra systemet ved å klikke "avinstaller pakke" nedenfor.]]></key>
+    <key alias="packageNoUpgrades">Ingen oppdateringer tilgjengelig</key>
+    <key alias="packageOptions">Alternativer for pakke</key>
+    <key alias="packageReadme">Lesmeg for pakke</key>
+    <key alias="packageRepository">Pakkebrønn</key>
+    <key alias="packageUninstallConfirm">Bekreft avinstallering</key>
+    <key alias="packageUninstalledHeader">Pakken ble avinstallert</key>
+    <key alias="packageUninstalledText">Pakken ble vellykket avinstallert</key>
+    <key alias="packageUninstallHeader">Avinstaller pakke</key>
+    <key alias="packageUninstallText"><![CDATA[Du kan velge bort elementer du ikke vil slette på dette tidspunkt, nedenfor. Når du klikker "bekreft avinstallering" vil alle elementer som er krysset av bli slettet.<br/> <span style="color:red;font-weight:bold;">Advarsel:</span> alle dokumenter, media, etc. som som er avhengig av elementene du sletter, vil slutte å virke, noe som kan føre til ustabilitet, så avinstaller med forsiktighet. Hvis du er i tvil, kontakt pakkeutvikleren.]]></key>
+    <key alias="packageUpgradeDownload">Last ned oppdatering fra pakkebrønnen</key>
+    <key alias="packageUpgradeHeader">Oppgrader pakke</key>
+    <key alias="packageUpgradeInstructions">Oppgraderingsinstrukser</key>
+    <key alias="packageUpgradeText">Det er en oppdatering tilgjengelig for denne pakken. Du kan laste den ned direkte fra pakkebrønnen.</key>
+    <key alias="packageVersion">Pakkeversjon</key>
+    <key alias="viewPackageWebsite">Se pakkens nettsted</key>
+  </area>
+  <area alias="paste">
+    <key alias="doNothing">Lim inn med full formattering (Anbefales ikke)</key>
+    <key alias="errorMessage">Teksten du er i ferd med å lime inn, inneholder spesialtegn eller formattering. Dette kan skyldes at du kopierer fra f.eks. Microsoft Word. umbraco kan fjerne denne spesialformatteringen automatisk slik at innholdet er mer velegnet for visning på en webside.</key>
+    <key alias="removeAll">Lim inn som ren tekst, dvs. fjern al formattering</key>
+    <key alias="removeSpecialFormattering">Lim inn og fjern uegnet formatering (anbefalt)</key>
+  </area>
+  <area alias="publicAccess">
+    <key alias="paAdvanced">Avansert: Beskytt ved å velge hvilke brukergrupper som har tilgang til siden</key>
+    <key alias="paAdvancedHelp"><![CDATA[Om du ønsker å kontrollere tilgang til siden ved å bruke rolle-basert autentisering,<br /> ved å bruke Umbraco's medlems-grupper]]></key>
+    <key alias="paAdvancedNoGroups"><![CDATA[Du må opprette en medlemsgruppe før du kan bruke <br /> rollebasert autentikasjon.]]></key>
+    <key alias="paErrorPage">Feil-side</key>
+    <key alias="paErrorPageHelp">Brukt når personer logger på, men ikke har tilgang</key>
+    <key alias="paHowWould">Hvordan vil du beskytte siden din?</key>
+    <key alias="paIsProtected">%0% er nå beskyttet</key>
+    <key alias="paIsRemoved">Beskyttelse fjernet fra %0%</key>
+    <key alias="paLoginPage">Innloggings-side</key>
+    <key alias="paLoginPageHelp">Velg siden som har loginformularet</key>
+    <key alias="paRemoveProtection">Fjern beskyttelse</key>
+    <key alias="paSelectPages">Velg sidene som inneholder login-skjema og feilmelding ved feil innolgging.</key>
+    <key alias="paSelectRoles">Velg rollene som har tilgang til denne siden</key>
+    <key alias="paSetLogin">Sett brukernavn og passord for denne siden</key>
+    <key alias="paSimple">Enkelt: Beskytt ved hjelp av brukernavn og passord</key>
+    <key alias="paSimpleHelp">Om du ønsker å bruke enkel autentisering via ett enkelt brukernavn og passord</key>
+  </area>
+  <area alias="publish">
+    <key alias="contentPublishedFailedByEvent"><![CDATA[
+		  %0% kunne ikke bli publisert, fordi et tredje-parts tillegg avbrøt handlingen.
+		]]></key>
+    <key alias="includeUnpublished">Inkluder upubliserte undersider</key>
+    <key alias="inProgress">Publiserer - vennligst vent...</key>
+    <key alias="inProgressCounter">%0% av %1% sider har blitt publisert...</key>
+    <key alias="nodePublish">%0% er nå publisert</key>
+    <key alias="nodePublishAll">%0% og alle undersider er nå publisert</key>
+    <key alias="publishAll">Publiser alle undersider</key>
+    <key alias="publishHelp"><![CDATA[Klikk <em>ok</em> for å publisere <strong>%0%</strong> og dermed gjøre innholdet synlig for alle.<br/><br />
+		  Du kan publisere denne siden og alle dens undersider ved å krysse av <em>Publiser alle undersider</em> nedenfor.
+		  ]]></key>
+  </area>
+  <area alias="relatedlinks">
+    <key alias="addExternal">TRANSLATE ME: 'Add external link'</key>
+    <key alias="addInternal">TRANSLATE ME: 'Add internal link'</key>
+    <key alias="addlink">TRANSLATE ME: 'Add'</key>
+    <key alias="caption">TRANSLATE ME: 'Caption'</key>
+    <key alias="internalPage">TRANSLATE ME: 'Internal page'</key>
+    <key alias="linkurl">TRANSLATE ME: 'URL'</key>
+    <key alias="modeDown">TRANSLATE ME: 'Move Down'</key>
+    <key alias="modeUp">TRANSLATE ME: 'Move Up'</key>
+    <key alias="newWindow">TRANSLATE ME: 'Open in new window'</key>
+    <key alias="removeLink">TRANSLATE ME: 'Remove link'</key>
+  </area>
+  <area alias="rollback">
+    <key alias="currentVersion">Gjeldende versjon</key>
+    <key alias="diffHelp"><![CDATA[Dette viser forskjellene mellom den gjeldende og den valgte versjonen<br /><del>Rød</del> tekst vil ikke bli vist i den valgte versjonen. , <ins>grønn betyr lagt til</ins>]]></key>
+    <key alias="documentRolledBack">Dokumentet har blitt gjenopprettet til en tidligere versjon</key>
+    <key alias="htmlHelp">Dette viser den valgte versjonen som HTML, hvis du ønsker å se forksjellene mellom 2 versjoner samtidig, bruk avviksvisningen</key>
+    <key alias="rollbackTo">Gjenopprett til</key>
+    <key alias="selectVersion">Velg versjon</key>
+    <key alias="view">Vis</key>
+  </area>
+  <area alias="scripts">
+    <key alias="editscript">Rediger script-filen</key>
+  </area>
+  <area alias="sections">
+    <key alias="concierge">Concierge</key>
+    <key alias="content">Inndhold</key>
+    <key alias="courier">Courier</key>
+    <key alias="developer">Developer</key>
+    <key alias="installer">Umbraco konfigurasjonsveiviser</key>
+    <key alias="media">Mediaarkiv</key>
+    <key alias="member">Medlemmer</key>
+    <key alias="newsletters">Nyhetsbrev</key>
+    <key alias="settings">Innstillinger</key>
+    <key alias="statistics">Statistikk</key>
+    <key alias="translation">Oversettelse</key>
+    <key alias="users">Brukere</key>
+  </area>
+  <area alias="settings">
+    <key alias="defaulttemplate">Standard mal</key>
+    <key alias="dictionary editor egenskab">Ordbok-egenskap</key>
+    <key alias="importDocumentTypeHelp">For å importere en dokumenttype, finn ".udt" filen på datamaskinen din ved å klikke "Utforsk" knappen og klikk "Importer" (du vil bli spurt om bekreftelse i det neste skjermbildet)</key>
+    <key alias="newtabname">Ny tittel på arkfane</key>
+    <key alias="nodetype">Nodetype</key>
+    <key alias="objecttype">Type</key>
+    <key alias="stylesheet">Stilark</key>
+    <key alias="stylesheet editor egenskab">Stilark-egenskap</key>
+    <key alias="tab">Arkfane</key>
+    <key alias="tabname">Tittel på arkfane</key>
+    <key alias="tabs">Arkfaner</key>
+  </area>
+  <area alias="sort">
+    <key alias="sortDone">Sortering ferdig.</key>
+    <key alias="sortHelp">Dra de forskjellige sidene opp eller ned for å arrangere dem.</key>
+    <key alias="sortPleaseWait"><![CDATA[ Vennligst vent. Sidene blir sortert, dette kan ta litt tid.<br/> <br/> Ikke lukk dette vinduet under sortering]]></key>
+  </area>
+  <area alias="speechBubbles">
+    <key alias="contentPublishedFailedByEvent">Publisering ble avbrutt av en 3. parts plugin</key>
+    <key alias="contentTypeDublicatePropertyType">Egenskaptypen finnes allerede</key>
+    <key alias="contentTypePropertyTypeCreated">Egenskapstype opprettet</key>
+    <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Navn: %0% <br /> DataType: %1%]]></key>
+    <key alias="contentTypePropertyTypeDeleted">Egenskapstype slettet</key>
+    <key alias="contentTypeSavedHeader">Innholdstype lagret</key>
+    <key alias="contentTypeTabCreated">Du har opprettet en arkfane</key>
+    <key alias="contentTypeTabDeleted">Arkfane slettet</key>
+    <key alias="contentTypeTabDeletedText">Arkfane med id: %0% slettet</key>
+    <key alias="cssErrorHeader">Stilarket ble ikke lagret</key>
+    <key alias="cssSavedHeader">Stilarket ble lagret</key>
+    <key alias="cssSavedText">Stilark lagret uten feil</key>
+    <key alias="dataTypeSaved">Datatype lagret</key>
+    <key alias="dictionaryItemSaved">Ordbok-element lagret</key>
+    <key alias="editContentPublishedFailedByParent">Publiseringen feilet fordi den overliggende siden ikke er publisert</key>
+    <key alias="editContentPublishedHeader">Innhold publisert</key>
+    <key alias="editContentPublishedText">og er nå synlig for besøkende</key>
+    <key alias="editContentSavedHeader">Innhold lagret</key>
+    <key alias="editContentSavedText">Husk å publisere for å gjøre det synlig for besøkende</key>
+    <key alias="editContentSendToPublish">Sendt for godkjenning</key>
+    <key alias="editContentSendToPublishText">Endringer har blitt sendt for godkjenning</key>
+    <key alias="editMemberSaved">Medlem lagret</key>
+    <key alias="editStylesheetPropertySaved">Stylesheetegenskap lagret</key>
+    <key alias="editStylesheetSaved">Stylesheet lagret</key>
+    <key alias="editTemplateSaved">Template lagret</key>
+    <key alias="editUserError">Feil ved lagring av bruker (sjekk loggen)</key>
+    <key alias="editUserSaved">Bruker lagret</key>
+    <key alias="fileErrorHeader">Filen ble ikke lagret</key>
+    <key alias="fileErrorText">Filen kunne ikke lagres. Vennligst sjekk filrettigheter</key>
+    <key alias="fileSavedHeader">Filen ble lagret</key>
+    <key alias="fileSavedText">File ble lagret uten feil</key>
+    <key alias="languageSaved">Språk lagret</key>
+    <key alias="pythonErrorHeader">Python-skriptet ble ikke lagret</key>
+    <key alias="pythonErrorText">Python-skriptet kunne ikke lagres fordi det inneholder en eller flere feil</key>
+    <key alias="pythonSavedHeader">Python-skriptet er lagret!</key>
+    <key alias="pythonSavedText">Ingen feil i python-skriptet!</key>
+    <key alias="templateErrorHeader">Malen ble ikke lagret</key>
+    <key alias="templateErrorText">Vennligst forviss deg om at du ikke har 2 maler med samme alias</key>
+    <key alias="templateSavedHeader">Malen ble lagret</key>
+    <key alias="templateSavedText">Malen ble lagret uten feil!</key>
+    <key alias="xsltErrorHeader">XSLT-koden ble ikke lagret</key>
+    <key alias="xsltErrorText">XSLT-koden inneholdt en feil</key>
+    <key alias="xsltPermissionErrorText">XSLT-koden ble ikke lagret, sjekk filrettigheter</key>
+    <key alias="xsltSavedHeader">XSLT lagret</key>
+    <key alias="xsltSavedText">Det var ingen feil i den XSLT!</key>
+  </area>
+  <area alias="stylesheet">
+    <key alias="aliasHelp">Bruk CSS syntaks f.eks: h1, .redHeader, .blueText</key>
+    <key alias="editstylesheet">Rediger stylesheet</key>
+    <key alias="editstylesheetproperty">Rediger egenskap for stilark</key>
+    <key alias="nameHelp">Navn for å identifisere egenskapen for stilarket i rik-tekst editoren</key>
+    <key alias="preview">Forhåndsvis</key>
+    <key alias="styles">Stiler</key>
+  </area>
+  <area alias="template">
+    <key alias="edittemplate">Rediger mal</key>
+    <key alias="insertContentArea">Sett inn innholdsområde</key>
+    <key alias="insertContentAreaPlaceHolder">Sett inn plassholder for innholdsområde</key>
+    <key alias="insertDictionaryItem">Sett inn ordbok-element</key>
+    <key alias="insertMacro">Sett inn makro</key>
+    <key alias="insertPageField">Sett inn umbraco side-felt</key>
+    <key alias="mastertemplate">Master mal</key>
+    <key alias="quickGuide">Hurtigguide til umbraco sine mal-tagger</key>
+    <key alias="template">Mal</key>
+  </area>
+  <area alias="templateEditor">
+    <key alias="alternativeField">Alternativt felt</key>
+    <key alias="alternativeText">Alternativ tekst</key>
+    <key alias="casing">Casing</key>
+    <key alias="chooseField">Felt som skal settes inn</key>
+    <key alias="convertLineBreaks">Konverter linjeskift</key>
+    <key alias="convertLineBreaksHelp">Erstatter et linjeskift med html-tag'en &amp;lt;br&amp;gt;</key>
+    <key alias="dateOnly">Ja, kun dato</key>
+    <key alias="formatAsDate">Formatter som dato</key>
+    <key alias="htmlEncode">HTML koding</key>
+    <key alias="htmlEncodeHelp">Formater spesialtegn med deres tilsvarende HTML-tegn.</key>
+    <key alias="insertedAfter">Denne teksten vil settes inn like etter verdien av feltet</key>
+    <key alias="insertedBefore">Denne teksten vil settes inn like før verdien av feltet</key>
+    <key alias="lowercase">Lowercase</key>
+    <key alias="none">Ingen</key>
+    <key alias="postContent">Sett inn etter felt</key>
+    <key alias="preContent">Sett inn før felt</key>
+    <key alias="recursive">Rekursivt</key>
+    <key alias="removeParagraph">Fjern paragraf-tags</key>
+    <key alias="removeParagraphHelp">Fjerner eventuelle &amp;lt;P&amp;gt; rundt teksten</key>
+    <key alias="uppercase">Uppercase</key>
+    <key alias="urlEncode">URL encode</key>
+    <key alias="urlEncodeHelp">Dersom innholdet av feltene skal sendes til en URL, skal spesialtegn formatteres</key>
+    <key alias="usedIfAllEmpty">Denne teksten vil benyttes dersom feltene over er tomme</key>
+    <key alias="usedIfEmpty">Dette feltet vil benyttes dersom feltet over er tomt</key>
+    <key alias="withTime">Ja, med klokkeslett. Dato/tid separator: </key>
+  </area>
+  <area alias="translation">
+    <key alias="assignedTasks">Oppgaver satt til deg</key>
+    <key alias="assignedTasksHelp"><![CDATA[Listen nedenfor viser oversettelsesoppgaver <strong>som du er tildelt</strong>. For å se en detaljert visning inkludert kommentarer, klikk på "Detaljer" eller navnet på siden. Du kan også laste ned siden som XML direkte ved å klikke på linken "Last ned XML". <br/> For å lukke en oversettelsesoppgave, vennligst gå til detaljvisningen og klikk på "Lukk" knappen.]]></key>
+    <key alias="closeTask">Lukk oppgave</key>
+    <key alias="details">Oversettelses detaljer</key>
+    <key alias="downloadAllAsXml">Last ned all oversettelsesoppgaver som XML</key>
+    <key alias="downloadTaskAsXml">Last ned XML</key>
+    <key alias="DownloadXmlDTD">Last ned XML DTD</key>
+    <key alias="fields">Felt</key>
+    <key alias="includeSubpages">Inkluder undersider</key>
+    <key alias="mailBody"><![CDATA[
 			Hei %0%
 
 			Dette er en automatisk mail for å informere deg om at dokumentet '%1%'
@@ -61,5 +706,93 @@ Vennlig hilsen umbraco roboten
 			Ha en fin dag!
 
 			Vennlig hilsen Umbraco Robot.
-		]]></key><key alias="assignedTasks"><![CDATA[Oppgaver satt til deg]]></key><key alias="closeTask"><![CDATA[Lukk oppgave]]></key><key alias="assignedTasksHelp"><![CDATA[Listen nedenfor viser oversettelsesoppgaver <strong>som du er tildelt</strong>. For å se en detaljert visning inkludert kommentarer, klikk på "Detaljer" eller navnet på siden. Du kan også laste ned siden som XML direkte ved å klikke på linken "Last ned XML". <br/> For å lukke en oversettelsesoppgave, vennligst gå til detaljvisningen og klikk på "Lukk" knappen.]]></key><key alias="details"><![CDATA[Oversettelses detaljer]]></key><key alias="downloadAllAsXml"><![CDATA[Last ned all oversettelsesoppgaver som XML]]></key><key alias="downloadTaskAsXml"><![CDATA[Last ned XML]]></key><key alias="DownloadXmlDTD"><![CDATA[Last ned XML DTD]]></key><key alias="fields"><![CDATA[Felt]]></key><key alias="includeSubpages"><![CDATA[Inkluder undersider]]></key><key alias="noTranslators"><![CDATA[Ingen oversettelses-bruker funnet. Vennligst opprett en oversettelses-bruker før du begynner å sende innhold til oversetting]]></key><key alias="ownedTasks"><![CDATA[Oppgaver opprettet av deg]]></key><key alias="ownedTasksHelp"><![CDATA[Listen under viser sider <strong>opprettet av deg</strong>. For å se en detaljert visning inkludert kommentarer, klikk på "Detaljer" eller navnet på siden. Du kan også laste ned siden som XML direkte ved å klikke på linken "Last ned XML". For å lukke en oversettelsesoppgave, vennligst gå til detaljvisningen og klikk på "Lukk" knappen.]]></key><key alias="pageHasBeenSendToTranslation"><![CDATA[Siden '%0%' har blitt sendt til oversetting]]></key><key alias="taskAssignedBy"><![CDATA[Tildelt av]]></key><key alias="taskOpened"><![CDATA[Oppgave åpnet]]></key><key alias="translateTo"><![CDATA[Oversett til]]></key><key alias="totalWords"><![CDATA[Antall ord]]></key><key alias="translationDone"><![CDATA[Oversetting fullført.]]></key><key alias="translationDoneHelp"><![CDATA[Du kan forhåndsvise sidene du nettopp har oversatt ved å klikke nedenfor. Hvis den originale siden finnes, vil du få en sammenligning av sidene.]]></key><key alias="translationFailed"><![CDATA[Oversetting mislykkes, XML filen kan være korrupt]]></key><key alias="translationOptions"><![CDATA[Alternativer for oversetting]]></key><key alias="translator"><![CDATA[Oversetter]]></key><key alias="uploadTranslationXml"><![CDATA[Last opp XML med oversettelse]]></key></area><area alias="packager"><key alias="packageAuthor"><![CDATA[Utvikler]]></key><key alias="packageDemonstration"><![CDATA[Demonstrasjon]]></key><key alias="packageDocumentation"><![CDATA[Dokumentasjon]]></key><key alias="packageMetaData"><![CDATA[Metadata]]></key><key alias="packageName"><![CDATA[Pakkenavn]]></key><key alias="packageNoItemsHeader"><![CDATA[Pakken inneholder ingen elementer]]></key><key alias="packageNoItemsText"><![CDATA[Denne pakkefilen inneholder ingen elementer å avinstallere.<br/><br/>Du kan trygt fjerne pakken fra systemet ved å klikke "avinstaller pakke" nedenfor.]]></key><key alias="packageNoUpgrades"><![CDATA[Ingen oppdateringer tilgjengelig]]></key><key alias="packageOptions"><![CDATA[Alternativer for pakke]]></key><key alias="packageReadme"><![CDATA[Lesmeg for pakke]]></key><key alias="packageRepository"><![CDATA[Pakkebrønn]]></key><key alias="packageUninstallConfirm"><![CDATA[Bekreft avinstallering]]></key><key alias="packageUninstalledHeader"><![CDATA[Pakken ble avinstallert]]></key><key alias="packageUninstalledText"><![CDATA[Pakken ble vellykket avinstallert]]></key><key alias="packageUninstallHeader"><![CDATA[Avinstaller pakke]]></key><key alias="packageUpgradeDownload"><![CDATA[Last ned oppdatering fra pakkebrønnen]]></key><key alias="packageUninstallText"><![CDATA[Du kan velge bort elementer du ikke vil slette på dette tidspunkt, nedenfor. Når du klikker "bekreft avinstallering" vil alle elementer som er krysset av bli slettet.<br/> <span style="color:red;font-weight:bold;">Advarsel:</span> alle dokumenter, media, etc. som som er avhengig av elementene du sletter, vil slutte å virke, noe som kan føre til ustabilitet, så avinstaller med forsiktighet. Hvis du er i tvil, kontakt pakkeutvikleren.]]></key><key alias="packageUpgradeHeader"><![CDATA[Oppgrader pakke]]></key><key alias="packageUpgradeInstructions"><![CDATA[Oppgraderingsinstrukser]]></key><key alias="packageUpgradeText"><![CDATA[Det er en oppdatering tilgjengelig for denne pakken. Du kan laste den ned direkte fra pakkebrønnen.]]></key><key alias="packageVersion"><![CDATA[Pakkeversjon]]></key><key alias="viewPackageWebsite"><![CDATA[Se pakkens nettsted]]></key><key alias="chooseLocalPackageText"><![CDATA[Klikke browse og velg pakke fra lokal disk. umbraco-pakker har vanligvis endelsen ".umb" eller ".zip".]]></key></area><area alias="installer"><key alias="databaseErrorCannotConnect"><![CDATA[Installasjonsprogrammet kan ikke koble til databasen]]></key><key alias="databaseFound"><![CDATA[Din database er funnet og identifisert som]]></key><key alias="databaseHeader"><![CDATA[Databasekonfigurasjon]]></key><key alias="databaseInstall"><![CDATA[Klikk <strong>installer</strong>-knappen for å installere Umbraco %0% databasen]]></key><key alias="None"><![CDATA[Ikke installert.]]></key><key alias="step1"><![CDATA[Steg 1/5 Godta lisens]]></key><key alias="step2"><![CDATA[Steg 2/5 Database konfigurasjon]]></key><key alias="step3"><![CDATA[Steg 3/5: Valider filrettigheter]]></key><key alias="step4"><![CDATA[Steg 4/5: Skjekk Umbraco sikkerheten]]></key><key alias="step5"><![CDATA[Steg 5/5: Umbraco er klar for deg til å starte!]]></key><key alias="thankYou"><![CDATA[Tusen takk for at du valgte Umbraco!]]></key><key alias="theEndBrowseSite"><![CDATA[<h3>Se ditt nye nettsted</h3> Du har installert Runway, hvorfor ikke se hvordan ditt nettsted ser ut.]]></key><key alias="theEndFurtherHelp"><![CDATA[<h3>Mer hjelp og info</h3> Få hjelp fra vårt prisbelønte samfunn, bla gjennom dokumentasjonen eller se noen gratis videoer på hvordan man bygger et enkelt nettsted, hvordan bruke pakker og en rask guide til umbraco terminologi]]></key><key alias="theEndHeader"><![CDATA[Umbraco %0% er installert og klar til bruk]]></key><key alias="licenseText"><![CDATA[Ved å klikke på Neste-knappen (eller endre umbracoConfigurationStatus i Web.config), godtar du lisensen for denne programvaren som angitt i boksen nedenfor. Legg merke til at denne umbraco distribusjon består av to ulike lisenser, åpen kilde MIT lisens for rammen og umbraco frivareverktøy lisens som dekker brukergrensesnittet.]]></key><key alias="runwayFromScratch"><![CDATA[Jeg ønsker å starte fra bunnen.]]></key><key alias="greatStart"><![CDATA[Få en god start med våre introduksjonsvideoer]]></key><key alias="defaultUserText"><![CDATA[<p> umbraco skaper en standard bruker med login <strong> ( "admin") </ strong> og passord <strong> ( "default") </ strong>. Det er <strong> viktig </ strong> at passordet er endret til noe unikt. </ p> <p> Dette trinnet vil sjekke standard brukerens passord og foreslår hvis det må skiftes </ p>]]></key><key alias="permissionsSettingUpPermissions"><![CDATA[Konfigurerer mappetillatelser]]></key><key alias="welcomeIntro"><![CDATA[Denne veiviseren vil hjelpe deg gjennom prosessen med å konfigurere <strong>umbraco %0%</strong> for en ny installasjon eller oppgradering fra versjon 3.0. <br/><br/> Trykk <strong>"neste"</strong> for å starte veiviseren.]]></key><key alias="Version4"><![CDATA[Umbraco Versjon 4]]></key><key alias="watch"><![CDATA[Pass på]]></key><key alias="Version3"><![CDATA[Umbraco Versjon 3]]></key><key alias="runwayWhatIsRunway"><![CDATA[Hva er Runway]]></key><key alias="databaseText"><![CDATA[For å fullføre dette steget, må du vite en del informasjon om din database server ("tilkoblingsstreng").<br/> Vennligst kontakt din ISP om nødvendig. Hvis du installerer på en lokal maskin eller server, må du kanskje skaffe informasjonen fra din systemadministrator.]]></key><key alias="databaseUpgrade"><![CDATA[<p> Trykk på knappen <strong>oppgrader</strong> for å oppgradere databasen din til Umbraco %0%</p> <p> Ikke vær urolig - intet innhold vil bli slettet og alt vil fortsette å virke etterpå! </p>]]></key><key alias="databaseUpgradeDone"><![CDATA[Databasen din har blitt oppgradert til den siste utgaven, %0%.<br/>Trykk <strong>Neste</strong> for å fortsette.]]></key><key alias="databaseUpToDate"><![CDATA[Databasen din er av nyeste versjon! Klikk <strong>neste</strong> for å fortsette konfigurasjonsveiviseren]]></key><key alias="defaultUserChangePass"><![CDATA[<strong>Passordet til standardbrukeren må endres!]]></key><key alias="defaultUserDisabled"><![CDATA[<strong>Standardbrukeren har blitt deaktivert eller har ingen tilgang til umbraco!</strong></p><p>Ingen videre handling er nødvendig. Klikk <b>neste</b> for å fortsette.]]></key><key alias="defaultUserPassChanged"><![CDATA[<strong>Passordet til standardbrukeren har blitt forandret etter installasjonen!</strong></p><p>Ingen videre handling er nødvendig. Klikk <strong>Neste</strong> for å fortsette.]]></key><key alias="defaultUserPasswordChanged"><![CDATA[Passordet er blitt endret!]]></key><key alias="permissionsAffectedFolders"><![CDATA[Berørte filer og mapper]]></key><key alias="permissionsAffectedFoldersMoreInfo"><![CDATA[Mer informasjon om å sette opp rettigheter for umbraco her]]></key><key alias="permissionsAffectedFoldersText"><![CDATA[Du må gi ASP.NET brukeren rettigheter til å endre de følgende filer og mapper]]></key><key alias="permissionsAlmostPerfect"><![CDATA[<strong>Rettighetene er nesten perfekt satt opp!</strong><br/><br/> Du kan kjøre umbraco uten problemer, men du vil ikke være i stand til å installere de anbefalte pakkene for å utnytte umbraco fullt ut.]]></key><key alias="permissionsHowtoResolve"><![CDATA[Hvordan løse problemet]]></key><key alias="permissionsHowtoResolveLink"><![CDATA[Klikk her for å lese tekstversjonen]]></key><key alias="permissionsHowtoResolveText"><![CDATA[Se vår <strong>innføringsvideo</strong> om å sette opp rettigheter for umbraco eller les tekstversjonen.]]></key><key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Rettighetsinnstillingene kan være et problem!</strong><br/><br/> Du kan kjøre umbraco uten problemer, men du vil ikke være i stand til å installere de anbefalte pakkene for å utnytte umbraco fullt ut.]]></key><key alias="permissionsNotReady"><![CDATA[<strong>Rettighetsinstillingene er ikke klargjort for umbraco!</strong><br/><br/> For å kunne kjøre umbraco, må du oppdatere rettighetsinnstillingene dine.]]></key><key alias="permissionsPerfect"><![CDATA[<strong>Rettighetsinnstillingene er perfekt!</strong><br/><br/>Du er klar for å kjøre umbraco og installere pakker!]]></key><key alias="permissionsResolveFolderIssues"><![CDATA[Løser mappeproblem]]></key><key alias="permissionsResolveFolderIssuesLink"><![CDATA[Følg denne linken for mer informasjon om problemer med ASP.NET og oppretting av mapper]]></key><key alias="permissionsText"><![CDATA[umbraco trenger skrive/endre tilgang til enkelte mapper for å kunne lagre filer som bilder og PDF-dokumenter. Den lagrer også midlertidig data (aka: hurtiglager) for å øke ytelsen på websiden din.]]></key><key alias="runwayFromScratchText"><![CDATA[Din website er helt tom for øyeblikket. Dette er perfekt hvis du vil begynne helt forfra og lage dine egne dokumenttyper og maler. (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lær hvordan</a>) Du kan fortsatt velge å installere Runway senere. Vennligst gå til Utvikler-seksjonen og velg Pakker.]]></key><key alias="runwayHeader"><![CDATA[Du har akkurat satt opp en ren Umbraco plattform. Hva vil du gjøre nå?]]></key><key alias="runwayInstalled"><![CDATA[Runway er installert]]></key><key alias="runwayInstalledText"><![CDATA[Du har nå fundamentet på plass. Velg hvilke moduler du ønsker å installer på toppen av det.<br/> Dette er vår liste av anbefalte moduler- Kryss av de du ønsker å installere, eller se den<a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">fulle listen av moduler</a> ]]></key><key alias="runwayOnlyProUsers"><![CDATA[Bare anbefalt for erfarne brukere]]></key><key alias="runwaySimpleSite"><![CDATA[Jeg vil starte med en enkel webside]]></key><key alias="runwaySimpleSiteText"><![CDATA[<p> "Runway" er en enkel webside som utstyrer deg med noen grunnleggende dokumenttyper og maler. Veiviseren kan sette opp Runway for deg automatisk, men du kan enkelt endre, utvide eller slette den. Runway er ikke nødvendig, og du kan enkelt bruke Umbraco uten den. Imidlertidig tilbyr Runway et enkelt fundament basert på de beste metodene for å hjelpe deg i gang fortere enn noensinne. Hvis du velger å installere Runway, kan du også velge blant grunnleggende byggeklosser kalt Runway Moduler for å forøke dine Runway-sider. </p> <small> <em>Sider inkludert i Runway:</em> Hjemmeside, Komme-i-gang, Installere moduler.<br /> <em>Valgfrie Moduler:</em> Toppnavigasjon, Sidekart, Kontakt, Galleri. </small> ]]></key><key alias="theEndInstallFailed"><![CDATA[For å fullføre installasjonen, må du manuelt endre <strong>web.config</strong> filen, og oppdatere AppSetting-nøkkelen <strong>umbracoConfigurationStatus</strong> til verdien <strong>'%0%'</strong>]]></key><key alias="theEndInstallSuccess"><![CDATA[Du kan <strong>starte øyeblikkelig</strong> ved å klikke på "Start Umbraco" knappen nedenfor. <br/>Hvis du er <strong>ny på umbraco</strong>, kan du finne mange ressurser på våre komme-i-gang sider.]]></key><key alias="theEndOpenUmbraco"><![CDATA[<h3>Start Umbraco</h3> For å administrere din webside, åpne umbraco og begynn å legge til innhold, oppdatere maler og stilark eller utvide funksjonaliteten]]></key><key alias="databaseErrorWebConfig"><![CDATA[Kunne ikke lagre Web.Config-filen. Vennligst endre databasens tilkoblingsstreng manuelt. ]]></key><key alias="Unavailable"><![CDATA[Tilkobling til databasen mislyktes.]]></key><key alias="databaseNotFound"><![CDATA[<p>Databasen ble ikke funnet! Vennligst sjekk at informasjonen i "connection string" i "web.config"-filen er korrekt.</p><p>For å fortsette, vennligst rediger "web.config"-filen (bruk Visual Studio eller din favoritteditor), rull ned til bunnen, og legg til tilkoblingsstrengen for din database i nøkkelen "umbracoDbDSN" og lagre filen.</p><p>Klikk <strong>prøv på nytt</strong> når du er ferdig.<br /> <a href="http://umbraco.org/redir/installWebConfig" target="_blank">Mer informasjon om redigering av web.config her.</a></p>]]></key><key alias="databaseInstallDone"><![CDATA[Umbraco %0% har nå blitt kopiert til din database. Trykk <strong>Neste</strong> for å fortsette.]]></key></area><area alias="relatedlinks" /></language> 
-
+		]]></key>
+    <key alias="mailSubject">[%0%] Oversettingsoppgave for %1%</key>
+    <key alias="noTranslators">Ingen oversettelses-bruker funnet. Vennligst opprett en oversettelses-bruker før du begynner å sende innhold til oversetting</key>
+    <key alias="ownedTasks">Oppgaver opprettet av deg</key>
+    <key alias="ownedTasksHelp"><![CDATA[Listen under viser sider <strong>opprettet av deg</strong>. For å se en detaljert visning inkludert kommentarer, klikk på "Detaljer" eller navnet på siden. Du kan også laste ned siden som XML direkte ved å klikke på linken "Last ned XML". For å lukke en oversettelsesoppgave, vennligst gå til detaljvisningen og klikk på "Lukk" knappen.]]></key>
+    <key alias="pageHasBeenSendToTranslation">Siden '%0%' har blitt sendt til oversetting</key>
+    <key alias="sendToTranslate">Send til oversetting</key>
+    <key alias="taskAssignedBy">Tildelt av</key>
+    <key alias="taskOpened">Oppgave åpnet</key>
+    <key alias="totalWords">Antall ord</key>
+    <key alias="translateTo">Oversett til</key>
+    <key alias="translationDone">Oversetting fullført.</key>
+    <key alias="translationDoneHelp">Du kan forhåndsvise sidene du nettopp har oversatt ved å klikke nedenfor. Hvis den originale siden finnes, vil du få en sammenligning av sidene.</key>
+    <key alias="translationFailed">Oversetting mislykkes, XML filen kan være korrupt</key>
+    <key alias="translationOptions">Alternativer for oversetting</key>
+    <key alias="translator">Oversetter</key>
+    <key alias="uploadTranslationXml">Last opp XML med oversettelse</key>
+  </area>
+  <area alias="treeHeaders">
+    <key alias="cacheBrowser">Hurtigbuffer-leser</key>
+    <key alias="contentRecycleBin">Papirkurv</key>
+    <key alias="createdPackages">Opprettede Pakker</key>
+    <key alias="datatype">Datatyper</key>
+    <key alias="dictionary">Ordbok</key>
+    <key alias="installedPackages">Installerte pakker</key>
+    <key alias="installSkin">TRANSLATE ME: 'Install skin'</key>
+    <key alias="installStarterKit">TRANSLATE ME: 'Install starter kit'</key>
+    <key alias="languages">Språk</key>
+    <key alias="localPackage">Installer lokal pakke</key>
+    <key alias="macros">Makroer</key>
+    <key alias="mediaTypes">Mediatyper</key>
+    <key alias="member">Medlemmer</key>
+    <key alias="memberGroup">Medlemsgrupper</key>
+    <key alias="memberRoles">Roller</key>
+    <key alias="memberType">Medlemstyper</key>
+    <key alias="nodeTypes">Dokumenttyper</key>
+    <key alias="packager">Pakker</key>
+    <key alias="packages">Pakker</key>
+    <key alias="python">Python Filer</key>
+    <key alias="repositories">Installer fra pakkebrønn</key>
+    <key alias="runway">Installer Runway</key>
+    <key alias="runwayModules">Runway moduler</key>
+    <key alias="scripting">TRANSLATE ME: 'Scripting Files'</key>
+    <key alias="scripts">Scriptfiler</key>
+    <key alias="stylesheets">Stiler</key>
+    <key alias="templates">Maler</key>
+    <key alias="xslt">XSLT Filer</key>
+  </area>
+  <area alias="update">
+    <key alias="updateAvailable">Ny oppdatering er klar</key>
+    <key alias="updateDownloadText">%0% er klar, klikk her for å laste ned</key>
+    <key alias="updateNoServer">Ingen forbindelse til server</key>
+    <key alias="updateNoServerError">Kunne ikke sjekke etter ny oppdatering. Se trace for mere info.</key>
+  </area>
+  <area alias="user">
+    <key alias="administrators">Administrator</key>
+    <key alias="categoryField">Kategorifelt</key>
+    <key alias="changePassword">TRANSLATE ME: 'Change Your Password'</key>
+    <key alias="changePasswordDescription">TRANSLATE ME: 'You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button'</key>
+    <key alias="contentChannel">Innholdskanal</key>
+    <key alias="defaultToLiveEditing">Videresend til Canvas ved login</key>
+    <key alias="descriptionField">Beskrivelsesfelt</key>
+    <key alias="disabled">Deaktiver User</key>
+    <key alias="documentType">Dokumenttype</key>
+    <key alias="editors">Redaktør</key>
+    <key alias="excerptField">Utdragsfelt</key>
+    <key alias="language">Språk</key>
+    <key alias="loginname">Login</key>
+    <key alias="mediastartnode">Øverste nivå i Media</key>
+    <key alias="modules">Moduler</key>
+    <key alias="noConsole">Deaktiver tilgang til umbraco</key>
+    <key alias="password">Passord</key>
+    <key alias="passwordChanged">TRANSLATE ME: 'Your password has been changed!'</key>
+    <key alias="passwordConfirm">TRANSLATE ME: 'Please confirm the new password'</key>
+    <key alias="passwordEnterNew">TRANSLATE ME: 'Enter your new password'</key>
+    <key alias="passwordIsBlank">TRANSLATE ME: 'Your new password cannot be blank!'</key>
+    <key alias="passwordIsDifferent">TRANSLATE ME: 'There was a difference between the new password and the confirmed password. Please try again!'</key>
+    <key alias="passwordMismatch">TRANSLATE ME: 'The confirmed password doesn't match the new password!'</key>
+    <key alias="permissionReplaceChildren">Overskriv tillatelser på undernoder</key>
+    <key alias="permissionSelectedPages">Du redigerer for øyeblikket tillatelser for sidene:</key>
+    <key alias="permissionSelectPages">Velg sider for å redigere deres tillatelser</key>
+    <key alias="searchAllChildren">Søk i alle undersider</key>
+    <key alias="startnode">Start node</key>
+    <key alias="username">Brukernavn</key>
+    <key alias="userPermissions">Brukertillatelser</key>
+    <key alias="usertype">Brukertype</key>
+    <key alias="userTypes">Brukertyper</key>
+    <key alias="writer">Forfatter</key>
+  </area>
+</language>

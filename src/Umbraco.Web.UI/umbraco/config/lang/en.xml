@@ -69,7 +69,6 @@
     <key alias="saveAndPublish">Save and publish</key>
     <key alias="saveToPublish">Save and send for approval</key>
     <key alias="showPage">Preview</key>
-    <key alias="showPageDisabled">Preview is disabled because there's no template assigned</key>
     <key alias="styleChoose">Choose style</key>
     <key alias="styleShow">Show styles</key>
     <key alias="tableInsert">Insert table</key>
@@ -324,6 +323,7 @@
     <key alias="welcome">Welcome...</key>
     <key alias="width">Width</key>
     <key alias="yes">Yes</key>
+    <key alias="folder">Folder</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Background color</key>
@@ -652,10 +652,6 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="tab">Tab</key>
     <key alias="tabname">Tab Title</key>
     <key alias="tabs">Tabs</key>
-    <key alias="contentTypeEnabled">Master Content Type enabled</key>
-    <key alias="contentTypeUses">This Content Type uses</key>
-    <key alias="asAContentMasterType">as a Master Content Type. Tabs from Master Content Types are not shown and can only be edited on the Master Content Type itself</key>
-    
   </area>
   <area alias="sort">
     <key alias="sortDone">Sorting complete.</key>
@@ -690,7 +686,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="editTemplateSaved">Template saved</key>
     <key alias="editUserError">Error saving user (check log)</key>
     <key alias="editUserSaved">User Saved</key>
-    <key alias="editUserTypeSaved">User type saved</key>
+	<key alias="editUserTypeSaved">User type saved</key>
     <key alias="fileErrorHeader">File not saved</key>
     <key alias="fileErrorText">file could not be saved. Please check file permissions</key>
     <key alias="fileSavedHeader">File saved</key>
@@ -846,8 +842,6 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Category field</key>
     <key alias="changePassword">Change Your Password</key>
-    <key alias="newPassword">Change Your Password</key>
-    <key alias="confirmNewPassword">Confirm new password</key>
     <key alias="changePasswordDescription">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
     <key alias="contentChannel">Content Channel</key>
     <key alias="defaultToLiveEditing">Redirect to canvas on login</key>

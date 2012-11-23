@@ -23,6 +23,7 @@ namespace Umbraco.Web.Routing
 
 		public PublishedContentRequestBuilder(PublishedContentRequest publishedContentRequest)
 		{
+			if (publishedContentRequest == null) throw new ArgumentNullException("publishedContentRequest");
 			_publishedContentRequest = publishedContentRequest;
 			_umbracoContext = publishedContentRequest.RoutingContext.UmbracoContext;
 			_routingContext = publishedContentRequest.RoutingContext;
@@ -146,20 +147,11 @@ namespace Umbraco.Web.Routing
 			const string tracePrefix = "LookupDocument: ";
 			LogHelper.Debug<PublishedContentRequest>("{0}Path=\"{1}\"", () => tracePrefix, () => _publishedContentRequest.Uri.AbsolutePath);
 
-			// look for the document
-			// the first successful resolver, if any, will set this.Node, and may also set this.Template
-			// some lookups may implement caching
+			// run the document lookups
+			LookupDocument1();
 
-			using (DisposableTimer.DebugDuration<PluginManager>(
-				string.Format("{0}Begin resolvers", tracePrefix),
-				string.Format("{0}End resolvers, {1}", tracePrefix, (_publishedContentRequest.HasNode ? "a document was found" : "no document was found"))))
-			{
-				_routingContext.DocumentLookups.Any(lookup => lookup.TrySetDocument(_publishedContentRequest));
-			}
-
-			// fixme - not handling umbracoRedirect
-			// should come after internal redirects
-			// so after ResolveDocument2() => docreq.IsRedirect => handled by the module!
+			// not handling umbracoRedirect here but after LookupDocument2
+			// so internal redirect, 404, etc has precedence over redirect
 
 			// handle not-found, redirects, access, template
 			LookupDocument2();
@@ -167,8 +159,31 @@ namespace Umbraco.Web.Routing
 			// handle umbracoRedirect (moved from umbraco.page)
 			FollowRedirect();
 
+			// handle wildcard domains
+			HandleWildcardDomains();
+
 			bool resolved = _publishedContentRequest.HasNode && _publishedContentRequest.HasTemplate;
 			return resolved;
+		}
+
+		/// <summary>
+		/// Performs the document resolution first pass.
+		/// </summary>
+		/// <remarks>The first past consists in running the document lookups.</remarks>
+		internal void LookupDocument1()
+		{
+			const string tracePrefix = "LookupDocument: ";
+
+			// look for the document
+			// the first successful resolver, if any, will set this.Node, and may also set this.Template
+			// some lookups may implement caching
+
+			using (DisposableTimer.DebugDuration<PluginManager>(
+				() => string.Format("{0}Begin resolvers", tracePrefix),
+				() => string.Format("{0}End resolvers, {1}", tracePrefix, (_publishedContentRequest.HasNode ? "a document was found" : "no document was found"))))
+			{
+				_routingContext.DocumentLookups.Any(lookup => lookup.TrySetDocument(_publishedContentRequest));
+			}
 		}
 
 		/// <summary>
@@ -181,6 +196,12 @@ namespace Umbraco.Web.Routing
 		internal void LookupDocument2()
 		{
 			const string tracePrefix = "LookupDocument2: ";
+
+			// at that point if we have a .PublishedContent then it is the "expected" document
+			// time to read the alternate template alias, from querystring, form, cookie or server vars.
+			// it will be cleared as soon as .PublishedContent change, because then it's not the
+			// expected content anymore and the alternate template does not apply.
+			_publishedContentRequest.AlternateTemplateAlias = _umbracoContext.HttpContext.Request["altTemplate"];
 
 			// handle "not found", follow internal redirects, validate access, template
 			// because these might loop, we have to have some sort of infinite loop detection 
@@ -217,10 +238,6 @@ namespace Umbraco.Web.Routing
 				if (_publishedContentRequest.HasNode)
 					EnsureNodeAccess();
 
-				// resolve template
-				if (_publishedContentRequest.HasNode)
-					LookupTemplate();
-
 				// loop while we don't have page, ie the redirect or access
 				// got us to nowhere and now we need to run the notFoundLookup again
 				// as long as it's not running out of control ie infinite loop of some sort
@@ -232,6 +249,13 @@ namespace Umbraco.Web.Routing
 				LogHelper.Debug<PublishedContentRequest>("{0}Looks like we're running into an infinite loop, abort", () => tracePrefix);
 				_publishedContentRequest.PublishedContent = null;
 			}
+
+			// resolve template - will do nothing if a template is already set
+			// moved out of the loop because LookupTemplate does set .PublishedContent to null anymore
+			// (see node in LookupTemplate)
+			if (_publishedContentRequest.HasNode)
+				LookupTemplate();
+			
 			LogHelper.Debug<PublishedContentRequest>("{0}End", () => tracePrefix);
 		}
 
@@ -312,7 +336,15 @@ namespace Umbraco.Web.Routing
 			{
 				LogHelper.Debug<PublishedContentRequest>("{0}Page is protected, check for access", () => tracePrefix);
 
-				var user = System.Web.Security.Membership.GetUser();
+                System.Web.Security.MembershipUser user = null;
+                try
+                {
+                    user = System.Web.Security.Membership.GetUser();
+                }
+                catch (ArgumentException)
+                {
+                    LogHelper.Debug<PublishedContentRequest>("{0}Membership.GetUser returned ArgumentException", () => tracePrefix);
+                }
 
 				if (user == null || !Member.IsLoggedOn())
 				{
@@ -348,46 +380,73 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		private void LookupTemplate()
 		{
-			//return if the request already has a template assigned, this can be possible if an ILookup assigns one
-			if (_publishedContentRequest.HasTemplate) return;
+			// HERE we should let people register their own way of finding a template, same as with documents!!!!
+			// do we?
 
 			const string tracePrefix = "LookupTemplate: ";
 
 			if (_publishedContentRequest.PublishedContent == null)
 				throw new InvalidOperationException("There is no node.");
 
-			//gets item from query string, form, cookie or server vars
-			var templateAlias = _umbracoContext.HttpContext.Request["altTemplate"];
-
-			if (templateAlias.IsNullOrWhiteSpace())
+			if (_publishedContentRequest.AlternateTemplateAlias.IsNullOrWhiteSpace())
 			{
-				//we don't have an alt template specified, so lookup the template id on the document and then lookup the template
-				// associated with it.
-				//TODO: When we remove the need for a database for templates, then this id should be irrelavent, not sure how were going to do this nicely.
+				// we don't have an alternate template specified. use the current one if there's one already,
+				// which can happen if a content lookup also set the template (LookupByNiceUrlAndTemplate...),
+				// else lookup the template id on the document then lookup the template with that id.
+
+				if (_publishedContentRequest.HasTemplate)
+				{
+					LogHelper.Debug<PublishedContentRequest>("{0}Has a template already, and no alternate template.", () => tracePrefix);
+					return;
+				}
+
+				// TODO: When we remove the need for a database for templates, then this id should be irrelavent,
+				// not sure how were going to do this nicely.
 
 				var templateId = _publishedContentRequest.PublishedContent.TemplateId;
-				LogHelper.Debug<PublishedContentRequest>("{0}Look for template id={1}", () => tracePrefix, () => templateId);
-				
+
 				if (templateId > 0)
-				{					
-					//NOTE: don't use the Template ctor as the result is not cached... instead use this static method
+				{
+					LogHelper.Debug<PublishedContentRequest>("{0}Look for template id={1}", () => tracePrefix, () => templateId);
+					// don't use the Template ctor as the result is not cached... instead use this static method
 					var template = Template.GetTemplate(templateId);
 					if (template == null)
 						throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render");
 					_publishedContentRequest.Template = template;
+					LogHelper.Debug<PublishedContentRequest>("{0}Got template id={1} alias=\"{2}\"", () => tracePrefix, () => template.Id, () => template.Alias);
+				}
+				else
+				{
+					LogHelper.Debug<PublishedContentRequest>("{0}No specified template.", () => tracePrefix);
 				}
 			}
 			else
 			{
-				LogHelper.Debug<PublishedContentRequest>("{0}Look for template alias=\"{1}\" (altTemplate)", () => tracePrefix, () => templateAlias);
+				// we have an alternate template specified. lookup the template with that alias
+				// this means the we override any template that a content lookup might have set
+				// so /path/to/page/template1?altTemplate=template2 will use template2
 
-				var template = Template.GetByAlias(templateAlias, true);
-				_publishedContentRequest.Template = template;
+				// ignore if the alias does not match - just trace
+
+				if (_publishedContentRequest.HasTemplate)
+					LogHelper.Debug<PublishedContentRequest>("{0}Has a template already, but also an alternate template.", () => tracePrefix);
+				LogHelper.Debug<PublishedContentRequest>("{0}Look for alternate template alias=\"{1}\"", () => tracePrefix, () => _publishedContentRequest.AlternateTemplateAlias);
+
+				var template = Template.GetByAlias(_publishedContentRequest.AlternateTemplateAlias, true);
+				if (template != null)
+				{
+					_publishedContentRequest.Template = template;
+					LogHelper.Debug<PublishedContentRequest>("{0}Got template id={1} alias=\"{2}\"", () => tracePrefix, () => template.Id, () => template.Alias);
+				}
+				else
+				{
+					LogHelper.Debug<PublishedContentRequest>("{0}The template with alias=\"{1}\" does not exist, ignoring.", () => tracePrefix, () => _publishedContentRequest.AlternateTemplateAlias);
+				}
 			}
 
 			if (!_publishedContentRequest.HasTemplate)
 			{
-				LogHelper.Debug<PublishedContentRequest>("{0}No template was found.");
+				LogHelper.Debug<PublishedContentRequest>("{0}No template was found.", () => tracePrefix);
 
 				// initial idea was: if we're not already 404 and UmbracoSettings.HandleMissingTemplateAs404 is true
 				// then reset _publishedContentRequest.Document to null to force a 404.
@@ -397,6 +456,10 @@ namespace Umbraco.Web.Routing
 				// care of everything.
 				//
 				// so, don't set _publishedContentRequest.Document to null here
+			}
+			else
+			{
+				LogHelper.Debug<PublishedContentRequest>("{0}Running with template id={1} alias=\"{2}\"", () => tracePrefix, () => _publishedContentRequest.Template.Id, () => _publishedContentRequest.Template.Alias);
 			}
 		}
 
@@ -415,6 +478,33 @@ namespace Umbraco.Web.Routing
 					redirectUrl = _routingContext.NiceUrlProvider.GetNiceUrl(redirectId);
 				if (redirectUrl != "#")
 					_publishedContentRequest.RedirectUrl = redirectUrl;
+			}
+		}
+
+		/// <summary>
+		/// Looks for wildcard domains in the path and updates <c>Culture</c> accordingly.
+		/// </summary>
+		private void HandleWildcardDomains()
+		{
+			const string tracePrefix = "HandleWildcardDomains: ";
+
+			if (!_publishedContentRequest.HasNode)
+				return;
+
+			var nodePath = _publishedContentRequest.PublishedContent.Path;
+			LogHelper.Debug<PublishedContentRequest>("{0}Path=\"{1}\"", () => tracePrefix, () => nodePath);
+			var rootNodeId = _publishedContentRequest.HasDomain ? _publishedContentRequest.Domain.RootNodeId : (int?)null;
+			var domain = DomainHelper.LookForWildcardDomain(Domain.GetDomains(), nodePath, rootNodeId);
+
+			if (domain != null)
+			{
+				_publishedContentRequest.Culture = new CultureInfo(domain.Language.CultureAlias);
+				LogHelper.Debug<PublishedContentRequest>("{0}Got domain on node {1}, set culture to \"{2}\".", () => tracePrefix,
+					() => domain.RootNodeId, () => _publishedContentRequest.Culture.Name);
+			}
+			else
+			{
+				LogHelper.Debug<PublishedContentRequest>("{0}No match.", () => tracePrefix);
 			}
 		}
 	}

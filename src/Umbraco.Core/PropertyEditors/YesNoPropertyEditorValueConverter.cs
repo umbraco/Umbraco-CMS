@@ -16,18 +16,7 @@ namespace Umbraco.Core.PropertyEditors
 		/// <returns></returns>
 		public Attempt<object> ConvertPropertyValue(object value)
 		{
-			if (value == null) return new Attempt<object>(false, null);
-			//if its already a bool
-			if (TypeHelper.IsTypeAssignableFrom<bool>(value))
-				return new Attempt<object>(true, value);
-			//convert to string
-			var asString = Convert.ToString(value);
-			bool asBool;
-			return bool.TryParse(asString, out asBool)
-			       	? new Attempt<object>(true, asBool)
-			       	: bool.TryParse(asString.Replace("1", "true").Replace("0", "false"), out asBool) //convert 0 or 1 to true or false
-			       	  	? new Attempt<object>(true, asBool)
-			       	  	: new Attempt<object>(false, null);
+			return value.TryConvertTo(typeof(bool));
 		}
 	}
 }

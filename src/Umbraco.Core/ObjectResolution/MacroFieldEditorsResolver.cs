@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Web;
 using System.Web.UI;
 using Umbraco.Core.Macros;
 using umbraco.interfaces;
@@ -47,7 +48,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// </remarks>
 		internal string GetValueFromMacroControl(Control macroControl)
 		{
-			return ((IMacroGuiRendering)macroControl).Value;
+            return HttpUtility.HtmlDecode(((IMacroGuiRendering)macroControl).Value);
 		}
 
 		/// <remarks>
@@ -74,7 +75,7 @@ namespace Umbraco.Core.ObjectResolution
 			{
 				if (!string.IsNullOrEmpty(prop.Value))
 				{
-					instance.Value = prop.Value;
+                    instance.Value = HttpUtility.HtmlDecode(prop.Value);
 				}
 				var macroControl = instance as Control;
 				if (macroControl != null)

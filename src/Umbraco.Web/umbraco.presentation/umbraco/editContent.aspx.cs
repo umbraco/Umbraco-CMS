@@ -307,11 +307,11 @@ namespace umbraco.cms.presentation
         {
             if (Page.IsValid)
             {
-                if (_document.Level == 1 || new cms.businesslogic.web.Document(_document.Parent.Id).Published)
+                if (_document.Level == 1 || new cms.businesslogic.web.Document(_document.Parent.Id).PathPublished)
                 {
                     Trace.Warn("before d.publish");
 
-                    if (_document.Id != 1061 && _document.PublishWithResult(base.getUser()))
+                    if (_document.PublishWithResult(base.getUser()))
                     {
 
                         ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));

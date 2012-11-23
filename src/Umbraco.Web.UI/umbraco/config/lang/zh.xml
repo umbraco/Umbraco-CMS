@@ -261,6 +261,7 @@
     <key alias="email">邮箱</key>
     <key alias="error">错误</key>
     <key alias="findDocument">查找文档</key>
+    <key alias="folder">文件夹</key>
     <key alias="height">高</key>
     <key alias="help">帮助</key>
     <key alias="icon">图标</key>

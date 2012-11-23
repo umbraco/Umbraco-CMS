@@ -1,17 +1,17 @@
 using System;
 using System.Linq;
+using System.Web;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
-using Umbraco.Web.Models;
 
-namespace Umbraco.Tests.DynamicDocument
+namespace Umbraco.Tests.PublishedContent
 {
 	/// <summary>
-	/// Tests the typed extension methods on IPublishedContent the same way we test the dynamic ones
+	/// Tests the methods on IPublishedContent using the DefaultPublishedContentStore
 	/// </summary>
 	[TestFixture]
 	public class PublishedContentTests : BaseWebTest
@@ -72,7 +72,7 @@ namespace Umbraco.Tests.DynamicDocument
 					});
 
 			//need to specify a custom callback for unit tests
-			DynamicPublishedContent.GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
+			PublishedContentHelper.GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
 				{
 					if (propertyAlias == "content")
 					{
@@ -106,6 +106,20 @@ namespace Umbraco.Tests.DynamicDocument
 		}
 
 		[Test]
+		public void Get_Property_Value_Uses_Converter()
+		{
+			var doc = GetNode(1173);
+
+			var propVal = doc.GetPropertyValue("content");
+			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<IHtmlString>(propVal.GetType()));
+			Assert.AreEqual("<div>This is some content</div>", propVal.ToString());
+
+			var propVal2 = doc.GetPropertyValue<IHtmlString>("content");
+			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<IHtmlString>(propVal2.GetType()));
+			Assert.AreEqual("<div>This is some content</div>", propVal2.ToString());
+		}
+
+		[Test]
 		public void Complex_Linq()
 		{
 			var doc = GetNode(1173);
@@ -113,7 +127,7 @@ namespace Umbraco.Tests.DynamicDocument
 			var result = doc.Ancestors().OrderBy(x => x.Level)
 				.Single()
 				.Descendants()
-				.FirstOrDefault(x => x.GetPropertyValue("selectedNodes", "").Split(',').Contains("1173"));
+				.FirstOrDefault(x => x.GetPropertyValue<string>("selectedNodes", "").Split(',').Contains("1173"));
 
 			Assert.IsNotNull(result);
 		}
@@ -255,17 +269,7 @@ namespace Umbraco.Tests.DynamicDocument
 			Assert.IsTrue(visible.IsVisible());
 		}
 
-		[Test]
-		public void Ensure_TinyMCE_Converted_Type_User_Property()
-		{
-			var doc = GetNode(1173);
-
-			throw new NotImplementedException("We currently don't have an extension method to return the formatted value using IPropertyValueConverter! This currently only works in the dynamic implementation");
-
-			//Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<IHtmlString>(doc.GetPropertyValue().Content.GetType()));
-			//Assert.AreEqual("<div>This is some content</div>", doc.Content.ToString());
-		}
-
+	
 		[Test]
 		public void Ancestor_Or_Self()
 		{
@@ -326,8 +330,8 @@ namespace Umbraco.Tests.DynamicDocument
 
 			Assert.IsNotNull(result);
 
-			Assert.AreEqual(6, result.Count());
-			Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1174, 1176, 1175 }));
+			Assert.AreEqual(7, result.Count());
+			Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1174, 1176, 1175, 4444 }));
 		}
 
 		[Test]

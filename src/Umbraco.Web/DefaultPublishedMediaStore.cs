@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Xml.XPath;
 using Examine;
+using Examine.Providers;
+using Lucene.Net.Documents;
 using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
@@ -21,6 +23,22 @@ namespace Umbraco.Web
 	/// </remarks>
 	internal class DefaultPublishedMediaStore : IPublishedMediaStore
 	{
+
+		public DefaultPublishedMediaStore()
+		{			
+		}
+
+		/// <summary>
+		/// Generally used for unit testing to use an explicit examine searcher
+		/// </summary>
+		/// <param name="searchProvider"></param>
+		internal DefaultPublishedMediaStore(BaseSearchProvider searchProvider)
+		{
+			_searchProvider = searchProvider;
+		}
+
+		private readonly BaseSearchProvider _searchProvider;
+
 		public virtual IPublishedContent GetDocumentById(UmbracoContext umbracoContext, int nodeId)
 		{
 			return GetUmbracoMedia(nodeId);
@@ -41,46 +59,87 @@ namespace Umbraco.Web
 			return result;
 		}
 
-		private IPublishedContent GetUmbracoMedia(int id)
+		private ExamineManager GetExamineManagerSafe()
 		{
-
 			try
 			{
-				//first check in Examine as this is WAY faster
-				var criteria = ExamineManager.Instance
-					.SearchProviderCollection["InternalSearcher"]
-					.CreateSearchCriteria("media");
-				var filter = criteria.Id(id);
-				var results = ExamineManager
-					.Instance.SearchProviderCollection["InternalSearcher"]
-					.Search(filter.Compile());
-				if (results.Any())
+				return ExamineManager.Instance;
+			}
+			catch (TypeInitializationException)
+			{
+				return null;
+			}
+		}
+
+		private BaseSearchProvider GetSearchProviderSafe()
+		{
+			if (_searchProvider != null)
+				return _searchProvider;
+
+			var eMgr = GetExamineManagerSafe();
+			if (eMgr != null)
+			{
+				try
 				{
-					return ConvertFromSearchResult(results.First());
+					//by default use the InternalSearcher
+					return eMgr.SearchProviderCollection["InternalSearcher"];
+				}
+				catch (FileNotFoundException)
+				{
+					//Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
+					//See this thread: http://examine.cdodeplex.com/discussions/264341
+					//Catch the exception here for the time being, and just fallback to GetMedia
+					//TODO: Need to fix examine in LB scenarios!
 				}
 			}
-			catch (FileNotFoundException)
+			return null;
+		}
+
+		private IPublishedContent GetUmbracoMedia(int id)
+		{
+			var searchProvider = GetSearchProviderSafe();
+
+			if (searchProvider != null)
 			{
-				//Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
-				//See this thread: http://examine.cdodeplex.com/discussions/264341
-				//Catch the exception here for the time being, and just fallback to GetMedia
-				//TODO: Need to fix examine in LB scenarios!
+				try
+				{
+					//first check in Examine as this is WAY faster
+					var criteria = searchProvider.CreateSearchCriteria("media");
+					var filter = criteria.Id(id);
+					var results = searchProvider.Search(filter.Compile());
+					if (results.Any())
+					{
+						return ConvertFromSearchResult(results.First());
+					}
+				}
+				catch (FileNotFoundException)
+				{
+					//Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
+					//See this thread: http://examine.cdodeplex.com/discussions/264341
+					//Catch the exception here for the time being, and just fallback to GetMedia
+					//TODO: Need to fix examine in LB scenarios!
+				}	
 			}
 
 			var media = global::umbraco.library.GetMedia(id, true);
 			if (media != null && media.Current != null)
 			{
-				if (media.MoveNext())
+				media.MoveNext();
+				var moved = media.Current.MoveToFirstChild();
+				//first check if we have an error
+				if (moved)
 				{
-					var current = media.Current;
-					//error check
-					if (media.Current.MoveToFirstChild() && media.Current.Name.InvariantEquals("error"))
+					if (media.Current.Name.InvariantEquals("error"))
 					{
 						return null;
-					}
-
-					return ConvertFromXPathNavigator(current);
-				}				
+					}	
+				}
+				if (moved)
+				{
+					//move back to the parent and return
+					media.Current.MoveToParent();	
+				}
+				return ConvertFromXPathNavigator(media.Current);
 			}
 
 			return null;
@@ -116,15 +175,13 @@ namespace Umbraco.Web
 
 
 			return new DictionaryPublishedContent(values,
-			                              d => d.ParentId != -1 //parent should be null if -1
-			                                   	? GetUmbracoMedia(d.ParentId)
-			                                   	: null,
-			                              //callback to return the children of the current node
-			                              d => GetChildrenMedia(d.ParentId),
-			                              GetProperty)
-				{
-					LoadedFromExamine = true
-				};
+			                                      d => d.ParentId != -1 //parent should be null if -1
+				                                           ? GetUmbracoMedia(d.ParentId)
+				                                           : null,
+			                                      //callback to return the children of the current node
+			                                      d => GetChildrenMedia(d.Id),
+			                                      GetProperty,
+			                                      true);
 		}
 
 		internal IPublishedContent ConvertFromXPathNavigator(XPathNavigator xpath)
@@ -180,8 +237,9 @@ namespace Umbraco.Web
 					? GetUmbracoMedia(d.ParentId) 
 					: null,
 				//callback to return the children of the current node based on the xml structure already found
-				d => GetChildrenMedia(d.ParentId, xpath),
-				GetProperty);
+				d => GetChildrenMedia(d.Id, xpath),
+				GetProperty,
+				false);
 		}
 
 		/// <summary>
@@ -240,57 +298,62 @@ namespace Umbraco.Web
 			//if there is no navigator, try examine first, then re-look it up
 			if (xpath == null)
 			{
-				try
+				var searchProvider = GetSearchProviderSafe();
+
+				if (searchProvider != null)
 				{
-					//first check in Examine as this is WAY faster
-					var criteria = ExamineManager.Instance
-						.SearchProviderCollection["InternalSearcher"]
-						.CreateSearchCriteria("media");
-					var filter = criteria.ParentId(parentId);
-					var results = ExamineManager
-						.Instance.SearchProviderCollection["InternalSearcher"]
-						.Search(filter.Compile());
-					if (results.Any())
+					try
 					{
-						return results.Select(ConvertFromSearchResult);
+						//first check in Examine as this is WAY faster
+						var criteria = searchProvider.CreateSearchCriteria("media");
+						var filter = criteria.ParentId(parentId);
+						var results = searchProvider.Search(filter.Compile());
+						if (results.Any())
+						{
+							return results.Select(ConvertFromSearchResult);
+						}
 					}
-				}
-				catch (FileNotFoundException)
-				{
-					//Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
-					//See this thread: http://examine.cdodeplex.com/discussions/264341
-					//Catch the exception here for the time being, and just fallback to GetMedia
-				}
+					catch (FileNotFoundException)
+					{
+						//Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
+						//See this thread: http://examine.cdodeplex.com/discussions/264341
+						//Catch the exception here for the time being, and just fallback to GetMedia
+					}	
+				}				
 
 				var media = library.GetMedia(parentId, true);
 				if (media != null && media.Current != null)
 				{
-					if (!media.MoveNext())
-						return null;
 					xpath = media.Current;
+				}
+				else
+				{
+					return null;
 				}
 			}
 
-			var children = xpath.SelectChildren(XPathNodeType.Element);
-			var mediaList = new List<IPublishedContent>();
-			while (children.Current != null)
+			//The xpath might be the whole xpath including the current ones ancestors so we need to select the current node
+			var item = xpath.Select("//*[@id='" + parentId + "']");
+			if (item.Current == null)
 			{
-				if (!children.MoveNext())
-				{
-					break;
-				}
+				return null;
+			}
+			var children = item.Current.SelectChildren(XPathNodeType.Element);
 
+			var mediaList = new List<IPublishedContent>();
+			foreach(XPathNavigator x in children)
+			{
 				//NOTE: I'm not sure why this is here, it is from legacy code of ExamineBackedMedia, but
 				// will leave it here as it must have done something!
-				if (children.Current.Name != "contents")
+				if (x.Name != "contents")
 				{
 					//make sure it's actually a node, not a property 
-					if (!string.IsNullOrEmpty(children.Current.GetAttribute("path", "")) &&
-						!string.IsNullOrEmpty(children.Current.GetAttribute("id", "")))
+					if (!string.IsNullOrEmpty(x.GetAttribute("path", "")) &&
+						!string.IsNullOrEmpty(x.GetAttribute("id", "")))
 					{
-						mediaList.Add(ConvertFromXPathNavigator(children.Current));
+						mediaList.Add(ConvertFromXPathNavigator(x));
 					}
-				}
+				}	
 			}
 			return mediaList;
 		}
@@ -309,7 +372,8 @@ namespace Umbraco.Web
 				IDictionary<string, string> valueDictionary, 
 				Func<DictionaryPublishedContent, IPublishedContent> getParent,
 				Func<DictionaryPublishedContent, IEnumerable<IPublishedContent>> getChildren,
-				Func<DictionaryPublishedContent, string, IPublishedContentProperty> getProperty)
+				Func<DictionaryPublishedContent, string, IPublishedContentProperty> getProperty,
+				bool fromExamine)
 			{
 				if (valueDictionary == null) throw new ArgumentNullException("valueDictionary");
 				if (getParent == null) throw new ArgumentNullException("getParent");
@@ -319,7 +383,7 @@ namespace Umbraco.Web
 				_getChildren = getChildren;
 				_getProperty = getProperty;
 
-				LoadedFromExamine = false; //default to false
+				LoadedFromExamine = fromExamine;
 
 				ValidateAndSetProperty(valueDictionary, val => Id = int.Parse(val), "id", "nodeId", "__NodeId"); //should validate the int!
 				ValidateAndSetProperty(valueDictionary, val => TemplateId = int.Parse(val), "template", "templateId");
@@ -329,12 +393,12 @@ namespace Umbraco.Web
 				ValidateAndSetProperty(valueDictionary, val => DocumentTypeAlias = val, "nodeTypeAlias", "__NodeTypeAlias");
 				ValidateAndSetProperty(valueDictionary, val => DocumentTypeId = int.Parse(val), "nodeType");
 				ValidateAndSetProperty(valueDictionary, val => WriterName = val, "writerName");
-				ValidateAndSetProperty(valueDictionary, val => CreatorName = val, "creatorName");
+				ValidateAndSetProperty(valueDictionary, val => CreatorName = val, "creatorName", "writerName"); //this is a bit of a hack fix for: U4-1132
 				ValidateAndSetProperty(valueDictionary, val => WriterId = int.Parse(val), "writerID");
-				ValidateAndSetProperty(valueDictionary, val => CreatorId = int.Parse(val), "creatorID");
+				ValidateAndSetProperty(valueDictionary, val => CreatorId = int.Parse(val), "creatorID", "writerID"); //this is a bit of a hack fix for: U4-1132
 				ValidateAndSetProperty(valueDictionary, val => Path = val, "path", "__Path");
-				ValidateAndSetProperty(valueDictionary, val => CreateDate = DateTime.Parse(val), "createDate");
-				ValidateAndSetProperty(valueDictionary, val => UpdateDate = DateTime.Parse(val), "updateDate");
+				ValidateAndSetProperty(valueDictionary, val => CreateDate = ParseDateTimeValue(val), "createDate");
+				ValidateAndSetProperty(valueDictionary, val => UpdateDate = ParseDateTimeValue(val), "updateDate");
 				ValidateAndSetProperty(valueDictionary, val => Level = int.Parse(val), "level");
 				ValidateAndSetProperty(valueDictionary, val =>
 					{
@@ -358,10 +422,28 @@ namespace Umbraco.Web
 				}
 			}
 
+			private DateTime ParseDateTimeValue(string val)
+			{
+				if (LoadedFromExamine)
+				{
+					try
+					{
+						//we might need to parse the date time using Lucene converters
+						return DateTools.StringToDate(val);
+					}
+					catch (FormatException)
+					{
+						//swallow exception, its not formatted correctly so revert to just trying to parse
+					}
+				}
+
+				return DateTime.Parse(val);
+			}
+
 			/// <summary>
 			/// Flag to get/set if this was laoded from examine cache
 			/// </summary>
-			internal bool LoadedFromExamine { get; set; }
+			internal bool LoadedFromExamine { get; private set; }
 
 			private readonly Func<DictionaryPublishedContent, IPublishedContent> _getParent;
 			private readonly Func<DictionaryPublishedContent, IEnumerable<IPublishedContent>> _getChildren;

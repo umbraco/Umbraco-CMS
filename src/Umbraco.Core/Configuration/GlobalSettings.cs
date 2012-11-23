@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Configuration;
+using System.Web.Routing;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.IO;
@@ -27,7 +28,7 @@ namespace Umbraco.Core.Configuration
         #region Private static fields
         
 		// CURRENT UMBRACO VERSION ID
-    	private const string CurrentUmbracoVersion = "4.10.0";
+    	private const string CurrentUmbracoVersion = "4.11.0";
 
     	private static string _reservedUrlsCache;
         private static string _reservedPathsCache;
@@ -57,9 +58,9 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-            	return ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths") 
-					? ConfigurationManager.AppSettings["umbracoReservedPaths"] 
-					: string.Empty;
+	            return ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths")
+		                   ? ConfigurationManager.AppSettings["umbracoReservedPaths"]
+		                   : string.Empty;
             }
         }
 
@@ -549,7 +550,29 @@ namespace Umbraco.Core.Configuration
             }
         }
 
-        /// <summary>
+	    /// <summary>
+	    /// Determines whether the current request is reserved based on the route table and 
+	    /// whether the specified URL is reserved or is inside a reserved path.
+	    /// </summary>
+	    /// <param name="url"></param>
+	    /// <param name="httpContext"></param>
+	    /// <param name="routes">The route collection to lookup the request in</param>
+	    /// <returns></returns>
+	    public static bool IsReservedPathOrUrl(string url, HttpContextBase httpContext, RouteCollection routes)
+		{
+			if (httpContext == null) throw new ArgumentNullException("httpContext");
+		    if (routes == null) throw new ArgumentNullException("routes");
+
+		    //check if the current request matches a route, if so then it is reserved.
+			var route = routes.GetRouteData(httpContext);
+			if (route != null)
+				return true;
+
+			//continue with the standard ignore routine
+		    return IsReservedPathOrUrl(url);
+		}
+
+	    /// <summary>
         /// Determines whether the specified URL is reserved or is inside a reserved path.
         /// </summary>
         /// <param name="url">The URL to check.</param>
@@ -557,7 +580,7 @@ namespace Umbraco.Core.Configuration
         /// 	<c>true</c> if the specified URL is reserved; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsReservedPathOrUrl(string url)
-        {
+        {			
             // check if GlobalSettings.ReservedPaths and GlobalSettings.ReservedUrls are unchanged
             if (!object.ReferenceEquals(_reservedPathsCache, GlobalSettings.ReservedPaths)
                 || !object.ReferenceEquals(_reservedUrlsCache, GlobalSettings.ReservedUrls))
