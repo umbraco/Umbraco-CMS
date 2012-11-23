@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Dynamic;
+using System.Reflection;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Collections;
@@ -10,7 +11,7 @@ using System.Web;
 
 namespace Umbraco.Core.Dynamics
 {
-    public class DynamicXml : DynamicObject, IEnumerable
+    public class DynamicXml : DynamicObject, IEnumerable<DynamicXml>, IEnumerable<XElement>
     {
         public XElement BaseElement { get; set; }
 
@@ -70,7 +71,53 @@ namespace Umbraco.Core.Dynamics
                 HandleIEnumerableXElement(elements, out result);
                 return true; //anyway
             }
-            return base.TryInvokeMember(binder, args, out result);
+
+			//ok, now lets try to match by member, property, extensino method
+			var attempt = DynamicInstanceHelper.TryInvokeMember(this, binder, args, new[]
+				{
+					typeof (IEnumerable<DynamicXml>),
+					typeof (IEnumerable<XElement>),
+					typeof (DynamicXml)
+				});
+
+			if (attempt.Success)
+			{
+				result = attempt.Result.ObjectResult;
+
+				//need to check the return type and possibly cast if result is from an extension method found
+				if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod)
+				{
+					//if the result is already a DynamicXml instance, then we do not need to cast
+					if (attempt.Result.ObjectResult != null && !(attempt.Result.ObjectResult is DynamicXml))
+					{
+						if (attempt.Result.ObjectResult is XElement)
+						{
+							result = new DynamicXml((XElement)attempt.Result.ObjectResult);
+						}
+						else if (attempt.Result.ObjectResult is IEnumerable<XElement>)
+						{
+							result = ((IEnumerable<XElement>)attempt.Result.ObjectResult).Select(x => new DynamicXml(x));
+						}
+						else if (attempt.Result.ObjectResult is IEnumerable<DynamicXml>)
+						{
+							result = ((IEnumerable<DynamicXml>)attempt.Result.ObjectResult).Select(x => new DynamicXml(x.BaseElement));
+						}
+					}
+				}
+				return true;
+			}
+
+			//this is the result of an extension method execution gone wrong so we return dynamic null
+			if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod
+				&& attempt.Error != null && attempt.Error is TargetInvocationException)
+			{
+				result = new DynamicNull();
+				return true;
+			}
+
+			result = null;
+			return false;
+
         }
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
@@ -181,19 +228,40 @@ namespace Umbraco.Core.Dynamics
             return new DynamicXml(this.BaseElement.XPathSelectElements(expression).FirstOrDefault());
         }
 
-        public IEnumerator GetEnumerator()
-        {
-            return this.BaseElement.Elements().Select(e => new DynamicXml(e)).GetEnumerator();
-        }
+	    IEnumerator<XElement> IEnumerable<XElement>.GetEnumerator()
+	    {
+			return this.BaseElement.Elements().GetEnumerator();
+	    }
+
+	    public IEnumerator<DynamicXml> GetEnumerator()
+	    {
+			return this.BaseElement.Elements().Select(e => new DynamicXml(e)).GetEnumerator();
+	    }
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+	    
         public int Count()
         {
-            return this.BaseElement.Elements().Count();
+			return ((IEnumerable<XElement>)this).Count();
         }
 
         public bool Any()
         {
-            return this.BaseElement.Elements().Any();
+			return ((IEnumerable<XElement>)this).Any();
         }
+
+		public IEnumerable<DynamicXml> Take(int count)
+		{
+			return ((IEnumerable<DynamicXml>)this).Take(count);
+		}
+
+		public IEnumerable<DynamicXml> Skip(int count)
+		{
+			return ((IEnumerable<DynamicXml>)this).Skip(count);
+		} 
 
         public bool IsNull()
         {
@@ -514,7 +582,7 @@ namespace Umbraco.Core.Dynamics
         }
 		public IEnumerable<DynamicXml> Ancestors(Func<XElement, bool> func)
         {
-            List<XElement> ancestorList = new List<XElement>();
+            var ancestorList = new List<XElement>();
             var node = this.BaseElement;
             while (node != null)
             {
@@ -661,5 +729,7 @@ namespace Umbraco.Core.Dynamics
                 }
             }
         }
+
+	    
     }
 }

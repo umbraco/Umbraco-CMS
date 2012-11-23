@@ -5,6 +5,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Collections;
 using umbraco.cms.businesslogic.macro;
+using System.Web;
 
 namespace umbraco.presentation.templateControls
 {
@@ -135,7 +136,7 @@ namespace umbraco.presentation.templateControls
             // collect all attributes set on the control
             var keys = Attributes.Keys;
             foreach (string key in keys)
-                MacroAttributes.Add(key.ToLower(), Attributes[key]);
+                MacroAttributes.Add(key.ToLower(), HttpUtility.HtmlDecode(Attributes[key]));
 
             if (!MacroAttributes.ContainsKey("macroalias") && !MacroAttributes.ContainsKey("macroAlias"))
                 MacroAttributes.Add("macroalias", Alias);

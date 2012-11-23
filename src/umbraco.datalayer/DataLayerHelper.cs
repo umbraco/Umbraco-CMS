@@ -119,7 +119,7 @@ namespace umbraco.DataLayer
 
         public static bool IsEmbeddedDatabase(string connectionString)
         {
-            return connectionString.ToLower().Contains("SQLCE4Umbraco.SqlCEHelper".ToLower());
+            return connectionString.ToLower().Contains(@"data source=|DataDirectory|\Umbraco.sdf".ToLower());
         }
 
         #endregion

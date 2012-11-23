@@ -88,6 +88,22 @@ namespace umbraco.webservices.documents
             return carrier;
         }
 
+        [WebMethod]
+        public documentCarrier ReadPublished(int id, string username, string password)
+        {
+            Authenticate(username, password);
+
+            var doc = new Document(id, true);
+
+            var publishedDoc = doc.GetPublishedVersion();
+
+            doc = publishedDoc == null ? new Document(id) : new Document(id, publishedDoc.Version);
+            
+            if (doc == null)
+                throw new Exception("Could not load Document with ID: " + id);
+
+            return createCarrier(doc);
+        }
 
         [WebMethod]
         public List<documentCarrier> readList(int parentid, string username, string password)

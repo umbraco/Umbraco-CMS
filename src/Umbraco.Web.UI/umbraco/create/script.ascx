@@ -2,13 +2,12 @@
 
 <input type="hidden" name="nodeType" value="-1"/>
 
-Name: <asp:RequiredFieldValidator id="RequiredFieldValidator1" ErrorMessage="*" ControlToValidate="rename" runat="server">*</asp:RequiredFieldValidator><br />
+<%=umbraco.ui.Text("name")%>: <asp:RequiredFieldValidator id="RequiredFieldValidator1" ErrorMessage="*" ControlToValidate="rename" runat="server">*</asp:RequiredFieldValidator><br />
 <asp:TextBox id="rename" Runat="server" Width="350" CssClass="bigInput"></asp:TextBox>
 
 <div style="MARGIN-TOP: 10px">
-Type:<br />
+<%=umbraco.ui.Text("type")%>:<br />
 <asp:ListBox id="scriptType" Runat="server" Width="350" CssClass="bigInput" Rows="1" SelectionMode="Single">
-	<asp:ListItem Selected="True" Value="">Folder</asp:ListItem>
 </asp:ListBox>
 </div>
 
@@ -17,6 +16,6 @@ Type:<br />
 
 <div style="MARGIN-TOP: 15px;">
 <asp:Button id="sbmt" Runat="server" style="MARGIN-TOP: 14px" Width="90"></asp:Button>
-<em> or </em>  
+<em> <%=umbraco.ui.Text("or")%> </em>  
 <a href="#" style="color: Blue; margin-left: 6px;" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
 </div>

@@ -3,6 +3,7 @@
 
 <%@ Register TagPrefix="ui" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Register TagPrefix="asp" Namespace="System.Web.UI" Assembly="System.Web" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
@@ -100,6 +101,7 @@
     <form id="Form1" runat="server">
     <asp:ScriptManager ID="ScriptManager1" runat="server">
     </asp:ScriptManager>
+
     <input type="hidden" name="macroMode" value="<%=Request["mode"]%>" />
     <%if (Request["umb_macroID"] != null || Request["umb_macroAlias"] != null)
       {%>

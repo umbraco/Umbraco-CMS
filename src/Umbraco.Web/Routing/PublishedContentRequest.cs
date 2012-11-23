@@ -58,11 +58,13 @@ namespace Umbraco.Web.Routing
 			// redirect if it has been flagged
 			if (this.IsRedirect)
 				httpContext.Response.Redirect(this.RedirectUrl, true);
-			//set the culture on the thread
+			//set the culture on the thread - once, so it's set when running document lookups
 			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = this.Culture;
 			//find the document, found will be true if the doc request has found BOTH a node and a template
 			// though currently we don't use this value.
 			var found = _builder.LookupDocument();
+			//set the culture on the thread -- again, 'cos it might have changed due to a wildcard domain
+			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = this.Culture;
 			//this could be called in the LookupDocument method, but I've just put it here for clarity.
 			_builder.DetermineRenderingEngine();
 
@@ -90,6 +92,9 @@ namespace Umbraco.Web.Routing
 			// just be safe - should never ever happen
 			if (!this.HasNode)
 				throw new Exception("No document to render.");
+
+			// trigger PublishedContentRequest.Rendering event?
+			// with complete access to the content request?
 
 			// render even though we might have no template
 			// to give MVC a chance to hijack routes
@@ -271,6 +276,7 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Gets or sets the requested content.
 		/// </summary>
+		/// <remarks>Setting the requested content clears both <c>Template</c> and <c>AlternateTemplateAlias</c>.</remarks>
 		public IPublishedContent PublishedContent
 		{			
 			get { return _publishedContent; }
@@ -278,6 +284,7 @@ namespace Umbraco.Web.Routing
 			{
 				_publishedContent = value;
 				this.Template = null;
+				this.AlternateTemplateAlias = null;
 				_nodeId = _publishedContent != null ? _publishedContent.Id : 0;
 			}
 		}
@@ -294,6 +301,16 @@ namespace Umbraco.Web.Routing
         {
             get { return this.Template != null ; }
         }
+
+		/// <summary>
+		/// Gets or sets the alternate template alias.
+		/// </summary>
+		/// <remarks>
+		/// <para>When <c>null</c> or empty, use the default template.</para>
+		/// <para>Alternate template works only when displaying the intended document and should be set
+		/// after <c>PublishedContent</c> since setting <c>PublishedContent</c> clears the alternate template.</para>
+		/// </remarks>
+		public string AlternateTemplateAlias { get; set; }
 
         /// <summary>
         /// Gets the identifier of the requested content.

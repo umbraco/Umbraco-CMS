@@ -756,8 +756,11 @@ namespace umbraco.cms.businesslogic.web
         }
 
         /// <summary>
-        /// Published flag is on if the document are published
+        /// Gets or sets a value indicating whether the document is published.
         /// </summary>
+		/// <remarks>A document can be published yet not visible, because of one or more of its
+		/// parents being unpublished. Use <c>PathPublished</c> to get a value indicating whether
+		/// the node and all its parents are published, and therefore whether the node is visible.</remarks>
         public bool Published
         {
             get { return _published; }
@@ -769,6 +772,21 @@ namespace umbraco.cms.businesslogic.web
                     string.Format("update cmsDocument set published = {0} where nodeId = {1}", Id, value ? 1 : 0));
             }
         }
+
+		/// <summary>
+		/// Gets a value indicating whether the document and all its parents are published.
+		/// </summary>
+		public bool PathPublished
+		{
+			get
+			{
+				int x = SqlHelper.ExecuteScalar<int>(@"select count(node.id) - count(doc.nodeid)
+from umbracoNode as node 
+left join cmsDocument as doc on (node.id=doc.nodeId and doc.published=1)
+where '" + Path + ",' like " + SqlHelper.Concat("node.path", "'%'"));
+				return (x == 1);
+			}
+		}
 
         public override string Text
         {
@@ -1251,6 +1269,28 @@ namespace umbraco.cms.businesslogic.web
                 i++;
             }
             return retVal;
+        }
+
+        /// <summary>
+        /// Returns the published version of this document
+        /// </summary>
+        /// <returns>The published version of this document</returns>
+        public DocumentVersionList GetPublishedVersion()
+        {
+            using (IRecordsReader dr =
+                SqlHelper.ExecuteReader("select top 1 documentUser, versionId, updateDate, text from cmsDocument where nodeId = @nodeId and published = 1 order by updateDate desc",
+                                        SqlHelper.CreateParameter("@nodeId", Id)))
+            {
+                if (dr.Read())
+                {
+                    return new DocumentVersionList(dr.GetGuid("versionId"),
+                                                dr.GetDateTime("updateDate"),
+                                                dr.GetString("text"),
+                                                User.GetUser(dr.GetInt("documentUser")));
+                }
+            }
+
+            return null;
         }
 
         /// <summary>

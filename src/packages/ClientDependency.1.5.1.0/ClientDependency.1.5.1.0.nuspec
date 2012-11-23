@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>ClientDependency</id>
+    <version>1.5.1.0</version>
+    <authors>Aaron Powell,  Shannon Deminick</authors>
+    <owners>Aaron Powell,  Shannon Deminick</owners>
+    <licenseUrl>http://www.opensource.org/licenses/ms-pl</licenseUrl>
+    <projectUrl>http://clientdependency.codeplex.com/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>ClientDependency is a framework for simplifying colaborative development of ASP.NET components, allowing components to state what CSS and JavaScript files they require, and ensuring that each file only is only added once to the response. ClientDependency also handles combination, minification and compression of CSS and JavaScript.</description>
+    <summary>A library for handling CSS and JavaScript dependencies in a file</summary>
+    <tags>webforms css html javascript</tags>
+  </metadata>
+</package>

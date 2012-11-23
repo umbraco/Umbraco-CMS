@@ -16,7 +16,7 @@ namespace Umbraco.Core
 	/// <remarks>
 	/// This class may be opened publicly at some point but needs a review of what is absoletely necessary.
 	/// </remarks>
-	internal class CacheHelper
+	public class CacheHelper
 	{
 		private readonly Cache _cache;
 

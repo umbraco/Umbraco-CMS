@@ -87,9 +87,8 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ClientDependency.Core, Version=1.5.0.0, Culture=neutral, PublicKeyToken=7a99a55a05d191a8, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\ClientDependency.Core.dll</HintPath>
+    <Reference Include="ClientDependency.Core">
+      <HintPath>..\packages\ClientDependency.1.5.1.0\lib\ClientDependency.Core.dll</HintPath>
     </Reference>
     <Reference Include="CookComputing.XmlRpcV2, Version=2.5.0.0, Culture=neutral, PublicKeyToken=a7d6e17aa302004d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -149,9 +148,7 @@
       <Name>System.Drawing</Name>
     </Reference>
     <Reference Include="System.EnterpriseServices" />
-    <Reference Include="System.Web">
-      <Name>System.Web</Name>
-    </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -253,6 +250,9 @@
     <Compile Include="Dynamics\Grouping.cs" />
     <Compile Include="Install\InstallPackageController.cs" />
     <Compile Include="Install\UmbracoInstallAuthorizeAttribute.cs" />
+    <Compile Include="Media\ImageUrl.cs" />
+    <Compile Include="Media\ImageUrlProviderResolver.cs" />
+    <Compile Include="Media\ImageUrlProviders\ImageUrlProvider.cs" />
     <Compile Include="Models\DynamicPublishedContent.cs" />
     <Compile Include="Models\DynamicPublishedContentList.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
@@ -361,6 +361,7 @@
     <Compile Include="umbraco.presentation\umbraco\settings\editTemplate.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\templateControls\Image.cs" />
     <Compile Include="umbraco.presentation\umbraco\uQuery\IGetProperty.cs" />
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="Mvc\ViewContextExtensions.cs" />
@@ -1900,7 +1901,9 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\republish.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\search.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx" />
-    <Content Include="umbraco.presentation\umbraco\create\script.ascx" />
+    <Content Include="umbraco.presentation\umbraco\create\script.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\InsertAnchor.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertChar.aspx" />
     <Content Include="umbraco.presentation\umbraco\webservices\TreeClientService.asmx" />
@@ -1956,9 +1959,12 @@
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertLink.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertMacro.aspx" />
+    <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertMacro.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx" />
     <None Include="Mvc\web.config.template" />
+    <None Include="packages.config" />
     <None Include="Web References\org.umbraco.update\UpgradeResult1.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>

@@ -58,20 +58,9 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-				//first we need to get the parsed base path VirtualPaths in the RouteTable.
-				//NOTE: for performance we would normally store this result in a variable, however since this class is static
-				// we cannot gaurantee that all of the routes will be added to the table before this  method is called so 
-				// unfortunately, we are stuck resolving these every single time. I don't think the performance will be bad
-				// but it could be better. Need to fix once we fix up all the configuration classes.
-	            var parser = new RouteParser(RouteTable.Routes);
-	            var reservedFromRouteTable = string.Join(",", parser.ParsedVirtualUrlsFromRouteTable());
-
-	            var config = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths")
-		                         ? ConfigurationManager.AppSettings["umbracoReservedPaths"]
-		                         : string.Empty;
-
-				//now add the reserved paths
-	            return config.IsNullOrWhiteSpace() ? reservedFromRouteTable : config + "," + reservedFromRouteTable;
+	            return ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths")
+		                   ? ConfigurationManager.AppSettings["umbracoReservedPaths"]
+		                   : string.Empty;
             }
         }
 
@@ -563,7 +552,29 @@ namespace Umbraco.Core.Configuration
             }
         }
 
-        /// <summary>
+	    /// <summary>
+	    /// Determines whether the current request is reserved based on the route table and 
+	    /// whether the specified URL is reserved or is inside a reserved path.
+	    /// </summary>
+	    /// <param name="url"></param>
+	    /// <param name="httpContext"></param>
+	    /// <param name="routes">The route collection to lookup the request in</param>
+	    /// <returns></returns>
+	    public static bool IsReservedPathOrUrl(string url, HttpContextBase httpContext, RouteCollection routes)
+		{
+			if (httpContext == null) throw new ArgumentNullException("httpContext");
+		    if (routes == null) throw new ArgumentNullException("routes");
+
+		    //check if the current request matches a route, if so then it is reserved.
+			var route = routes.GetRouteData(httpContext);
+			if (route != null)
+				return true;
+
+			//continue with the standard ignore routine
+		    return IsReservedPathOrUrl(url);
+		}
+
+	    /// <summary>
         /// Determines whether the specified URL is reserved or is inside a reserved path.
         /// </summary>
         /// <param name="url">The URL to check.</param>
@@ -571,7 +582,7 @@ namespace Umbraco.Core.Configuration
         /// 	<c>true</c> if the specified URL is reserved; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsReservedPathOrUrl(string url)
-        {
+        {			
             // check if GlobalSettings.ReservedPaths and GlobalSettings.ReservedUrls are unchanged
             if (!object.ReferenceEquals(_reservedPathsCache, GlobalSettings.ReservedPaths)
                 || !object.ReferenceEquals(_reservedUrlsCache, GlobalSettings.ReservedUrls))

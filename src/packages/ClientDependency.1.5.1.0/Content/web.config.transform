@@ -1,0 +1,111 @@
+<configuration>
+  <configSections>
+    <section name="clientDependency" type="ClientDependency.Core.Config.ClientDependencySection, ClientDependency.Core" requirePermission="false"/>
+  </configSections>
+
+  <clientDependency version="1">
+
+    <!-- Full config documentation is here: http://clientdependency.codeplex.com/wikipage?title=Configuration&referringTitle=Documentation -->
+
+    <!-- This section is used for Web Forms only, the enableCompositeFiles="true" is optional and by default is set to true -->
+    <fileRegistration defaultProvider="LoaderControlProvider">
+      <providers>
+        <add name="PageHeaderProvider" type="ClientDependency.Core.FileRegistration.Providers.PageHeaderProvider, ClientDependency.Core" enableCompositeFiles="true"/>
+        <add name="LazyLoadProvider" type="ClientDependency.Core.FileRegistration.Providers.LazyLoadProvider, ClientDependency.Core" enableCompositeFiles="true"/>
+        <add name="LoaderControlProvider" type="ClientDependency.Core.FileRegistration.Providers.LoaderControlProvider, ClientDependency.Core" enableCompositeFiles="true"/>
+        <add name="PlaceHolderProvider" type="ClientDependency.Core.FileRegistration.Providers.PlaceHolderProvider, ClientDependency.Core" enableCompositeFiles="true" javascriptPlaceHolderId="JavaScriptPlaceHolder" cssPlaceHolderId="CssPlaceHolder"/>
+      </providers>
+    </fileRegistration>
+
+    <!-- This section is used for MVC only -->
+    <mvc defaultRenderer="StandardRenderer">
+      <renderers>
+        <add name="StandardRenderer" type="ClientDependency.Core.FileRegistration.Providers.StandardRenderer, ClientDependency.Core" enableCompositeFiles="true"/>
+        <add name="LazyLoadRenderer" type="ClientDependency.Core.FileRegistration.Providers.LazyLoadRenderer, ClientDependency.Core" enableCompositeFiles="true"/>
+      </renderers>
+    </mvc>
+
+    <!--
+  The composite file section configures the compression/combination/minification of files.
+  You can enable/disable minification of either JS/CSS files and you can enable/disable the 
+  persistence of composite files. By default, minification and persistence is enabled. Persisting files
+  means that the system is going to save the output of the compressed/combined/minified files
+  to disk so that on any subsequent request (when output cache expires) that these files don't have
+  to be recreated again and will be based on the persisted file on disk. This saves on processing time.
+  -->
+    <compositeFiles defaultFileProcessingProvider="CompositeFileProcessor" compositeFileHandlerPath="~/DependencyHandler.axd">
+      <fileProcessingProviders>
+        <add name="CompositeFileProcessor" type="ClientDependency.Core.CompositeFiles.Providers.CompositeFileProcessingProvider, ClientDependency.Core"
+             enableCssMinify="true"
+             enableJsMinify="true"
+             persistFiles="true"
+             compositeFilePath="~/App_Data/ClientDependency"/>
+      </fileProcessingProviders>
+
+      <!-- 
+      A file map provider stores references to dependency files by an id to be used in the handler URL when using the MappedId Url type
+      -->
+      <fileMapProviders>
+        <add name="XmlFileMap"
+             type="ClientDependency.Core.CompositeFiles.Providers.XmlFileMapper, ClientDependency.Core"
+             mapPath="~/App_Data/ClientDependency"/>
+      </fileMapProviders>
+
+      <!-- 
+    Defines the mime types to compress when requested by the client.
+    Path is a regex selector, or a * can be used as in place of 'any'.
+    Generally mime types are only set by client browsers in the request for things
+    such as JSON or XML ajax requests.
+    
+      <mimeTypeCompression>
+        <add type="application/json" path="^.*?/Services/.*"/>
+      </mimeTypeCompression>
+	  -->
+
+      <!-- 
+    Defines the paths to match on to enable rogue file compression.
+    Path is a regex selector, or a * can be used as in place of 'any'.
+    jsExt and cssExt are comma seperated list of extensions to match to have the dependencies
+    replaced with the composite file handler. You can even include ASP.Net web service JS proxies.
+    
+      <rogueFileCompression>
+        <add path="*" compressJs="true" compressCss="true" jsExt=".js,asmx/js" cssExt=".css">
+          <exclusions>
+            <add path="^.*test.aspx.*" />
+          </exclusions>
+        </add>
+      </rogueFileCompression>
+	-->
+    </compositeFiles>
+
+  </clientDependency>
+
+  <system.web>
+    <pages>
+      <namespaces>
+        <add namespace="ClientDependency.Core"/>
+      </namespaces>
+    </pages>
+    <httpModules>
+      <!-- ** Need to add the dependency module -->
+      <add name="ClientDependencyModule" type="ClientDependency.Core.Module.ClientDependencyModule, ClientDependency.Core"/>
+    </httpModules>
+    <httpHandlers>
+      <!-- ** Need to add the dependency handler -->
+      <add verb="*" path="DependencyHandler.axd"  type="ClientDependency.Core.CompositeFiles.CompositeDependencyHandler, ClientDependency.Core "/>
+    </httpHandlers>
+  </system.web>
+  <system.webServer>
+    <validation validateIntegratedModeConfiguration="false" />
+    <modules>
+      <remove name="ClientDependencyModule" />
+      <!-- ** Need to add the dependency module -->
+      <add name="ClientDependencyModule" type="ClientDependency.Core.Module.ClientDependencyModule, ClientDependency.Core"/>
+    </modules>
+    <handlers>
+      <!-- ** Need to add the dependency handler -->
+      <remove name="DependencyHandler"/>
+      <add name="DependencyHandler" preCondition="integratedMode" verb="*" path="DependencyHandler.axd"  type="ClientDependency.Core.CompositeFiles.CompositeDependencyHandler, ClientDependency.Core "/>
+    </handlers>
+  </system.webServer>
+</configuration>

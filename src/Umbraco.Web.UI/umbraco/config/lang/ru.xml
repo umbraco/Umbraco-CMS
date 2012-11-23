@@ -75,7 +75,7 @@
   </area>
   <area alias="content">
     <key alias="about">Об этой странице</key>
-    <key alias="alias">Альтернативная ссылка</key>
+    <key alias="alias">Алиас</key>
     <key alias="alternativeTextHelp">(как бы Вы описали изображение по телефону)</key>
     <key alias="alternativeUrls">Альтернативные ссылки</key>
     <key alias="clickToEdit">Нажмите для правки этого элемента</key>

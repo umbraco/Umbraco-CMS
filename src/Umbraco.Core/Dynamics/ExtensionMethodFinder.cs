@@ -44,7 +44,7 @@ namespace Umbraco.Core.Dynamics
                 );
 
             //add the extension methods defined in IEnumerable
-            candidates = candidates.Concat(typeof(IEnumerable).GetMethods(BindingFlags.Static | BindingFlags.Public));            
+            candidates = candidates.Concat(typeof(Enumerable).GetMethods(BindingFlags.Static | BindingFlags.Public));            
 
             //filter by name	
             var methodsByName = candidates.Where(m => m.Name == name);

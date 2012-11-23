@@ -55,111 +55,48 @@ namespace Umbraco.Web.Models
 		/// <returns></returns>
 		public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
 		{
-			//TODO: We MUST cache the result here, it is very expensive to keep finding extension methods!
-
-			try
-			{
-				//Property?
-				result = typeof(DynamicPublishedContent).InvokeMember(binder.Name,
-												  System.Reflection.BindingFlags.Instance |
-												  System.Reflection.BindingFlags.Public |
-												  System.Reflection.BindingFlags.GetProperty,
-												  null,
-												  this,
-												  args);
-				return true;
-			}
-			catch (MissingMethodException)
-			{
-				try
-				{
-					//Static or Instance Method?
-					result = typeof(DynamicPublishedContent).InvokeMember(binder.Name,
-												  System.Reflection.BindingFlags.Instance |
-												  System.Reflection.BindingFlags.Public |
-												  System.Reflection.BindingFlags.Static |
-												  System.Reflection.BindingFlags.InvokeMethod,
-												  null,
-												  this,
-												  args);
-					return true;
-				}
-				catch (MissingMethodException)
-				{
-					try
-					{
-						result = ExecuteExtensionMethod(args, binder.Name);
-						return true;
-					}
-					catch (TargetInvocationException)
-					{
-						result = new DynamicNull();
-						return true;
-					}
-
-					catch
-					{
-						//TODO: LOg this!
-
-						result = null;
-						return false;
-					}
-
-				}
-
-
-			}
-			catch
-			{
-				result = null;
-				return false;
-			}
-
-		}
-
-		private object ExecuteExtensionMethod(object[] args, string name)
-		{
-			object result = null;
-			
-			var methodTypesToFind = new[]
+			var attempt = DynamicInstanceHelper.TryInvokeMember(this, binder, args, new[]
         		{
 					typeof(DynamicPublishedContent)
-        		};
+        		});
 
-			//find known extension methods that match the first type in the list
-			MethodInfo toExecute = null;
-			foreach (var t in methodTypesToFind)
+			if (attempt.Success)
 			{
-				toExecute = ExtensionMethodFinder.FindExtensionMethod(t, args, name, false);
-				if (toExecute != null)
-					break;
-			}
+				result = attempt.Result.ObjectResult;
 
-			if (toExecute != null)
-			{
-				var genericArgs = (new[] { this }).Concat(args);
-				result = toExecute.Invoke(null, genericArgs.ToArray());
-			}
-			else
-			{
-				throw new MissingMethodException();
-			}
-			if (result != null)
-			{
-				if (result is IPublishedContent)
-				{
-					result = new DynamicPublishedContent((IPublishedContent)result);
-				}				
-				if (result is IEnumerable<IPublishedContent>)
-				{
-					result = new DynamicPublishedContentList((IEnumerable<IPublishedContent>)result);
+				//need to check the return type and possibly cast if result is from an extension method found
+				if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod)
+				{					
+					//we don't need to cast if it is already DynamicPublishedContent
+					if (attempt.Result.ObjectResult != null && (!(attempt.Result.ObjectResult is DynamicPublishedContent)))
+					{
+						if (attempt.Result.ObjectResult is IPublishedContent)
+						{
+							result = new DynamicPublishedContent((IPublishedContent)attempt.Result.ObjectResult);
+						}
+						else if (attempt.Result.ObjectResult is IEnumerable<DynamicPublishedContent>)
+						{
+							result = new DynamicPublishedContentList((IEnumerable<DynamicPublishedContent>)attempt.Result.ObjectResult);
+						}	
+						else if (attempt.Result.ObjectResult is IEnumerable<IPublishedContent>)
+						{
+							result = new DynamicPublishedContentList((IEnumerable<IPublishedContent>)attempt.Result.ObjectResult);
+						}
+					}	
 				}
-				if (result is IEnumerable<DynamicPublishedContent>)
-				{
-					result = new DynamicPublishedContentList((IEnumerable<DynamicPublishedContent>)result);
-				}				
+				return true;
 			}
-			return result;
+			
+			//this is the result of an extension method execution gone wrong so we return dynamic null
+			if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod
+				&& attempt.Error != null && attempt.Error is TargetInvocationException) 				
+			{
+				result = new DynamicNull();
+				return true;	
+			}
+		
+			result = null;
+			return false;
 		}
 
 		/// <summary>

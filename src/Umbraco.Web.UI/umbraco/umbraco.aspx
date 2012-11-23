@@ -1,6 +1,8 @@
 <%@ Page Trace="false" Language="c#" CodeBehind="umbraco.aspx.cs" AutoEventWireup="True"
     Inherits="Umbraco.Web.UI.Umbraco.Umbraco" %>
 
+<%@ Import Namespace="System.Web.Script.Serialization" %>
+
 <%@ Register Src="controls/Tree/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="uc1" TagName="quickSearch" Src="Search/QuickSearch.ascx" %>
@@ -16,6 +18,8 @@
     <umb:CssInclude ID="CssInclude2" runat="server" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />
     <umb:JsInclude ID="JsInclude1" runat="server" FilePath="Application/NamespaceManager.js"
         PathNameAlias="UmbracoClient" Priority="0" />
+    <umb:JsInclude ID="JSON2" runat="server" FilePath="ui/json2.js" PathNameAlias="UmbracoClient"
+        Priority="0" />
     <umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient"
         Priority="0" />
     <umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/jqueryui.js" PathNameAlias="UmbracoClient"
@@ -289,14 +293,20 @@
         }
 
         function umbracoSessionRenewCheckPassword() {
+            var password = jQuery("#sessionrefreshpassword input").val();
 
+            if (password != "") {
 
+                var data = {
+                    username: <%= new JavaScriptSerializer().Serialize(this.getUser().LoginName) %>, 
+                    password: password
+                };
 
-            if (jQuery("#sessionrefreshpassword input").val() != "") {
                 jQuery.ajax({
                     type: "POST",
                     url: "<%=umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/webservices/legacyAjaxCalls.asmx/ValidateUser",
-                    data: "{'username': '<%=this.getUser().LoginName%>', 'password': '" + jQuery("#sessionrefreshpassword input").val() + "'}",
+                    data: JSON.stringify(data),
+                    processData: false, 
                     success: function (result) {
 
                         if (result.d == true) {

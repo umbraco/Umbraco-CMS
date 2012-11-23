@@ -12,12 +12,12 @@ namespace Umbraco.Core
 	/// </summary>
 	/// <remarks>
 	/// .Net has a class the same as this: System.Web.Util.HashCodeCombiner and of course it works for all sorts of things
-	/// and is probably more stable in general, however we just need a quick easy class for this in order to create a unique
-	/// hash of plugins to see if they've changed.
+	/// which we've not included here as we just need a quick easy class for this in order to create a unique
+	/// hash of directories/files to see if they have changed.
 	/// </remarks>
 	internal class HashCodeCombiner
 	{
-		private int _combinedHash;
+		private long _combinedHash = 5381L;
 
 		internal void AddInt(int i)
 		{
@@ -40,27 +40,45 @@ namespace Umbraco.Core
 				AddInt((StringComparer.InvariantCultureIgnoreCase).GetHashCode(s));
 		}
 
-		internal void AddFile(FileInfo f)
+		internal void AddFileSystemItem(FileSystemInfo f)
 		{
+			//if it doesn't exist, don't proceed.
+			if (!f.Exists)
+				return;
+
 			AddCaseInsensitiveString(f.FullName);
 			AddDateTime(f.CreationTimeUtc);
 			AddDateTime(f.LastWriteTimeUtc);
-			AddInt(f.Length.GetHashCode());
+			
+			//check if it is a file or folder 
+			var fileInfo = f as FileInfo;
+			if (fileInfo != null)
+			{
+				AddInt(fileInfo.Length.GetHashCode());
+			}
+			
+			var dirInfo = f as DirectoryInfo;
+			if (dirInfo != null)
+			{
+				foreach (var d in dirInfo.GetFiles())
+				{
+					AddFile(d);
+				}
+				foreach (var s in dirInfo.GetDirectories())
+				{
+					AddFolder(s);
+				}
+			}
+		}
+
+		internal void AddFile(FileInfo f)
+		{
+			AddFileSystemItem(f);			
 		}
 
 		internal void AddFolder(DirectoryInfo d)
 		{
-			AddCaseInsensitiveString(d.FullName);
-			AddDateTime(d.CreationTimeUtc);
-			AddDateTime(d.LastWriteTimeUtc);
-			foreach (var f in d.GetFiles())
-			{
-				AddFile(f);
-			}
-			foreach (var s in d.GetDirectories())
-			{
-				AddFolder(s);
-			}
+			AddFileSystemItem(d);			
 		}
 
 		/// <summary>

@@ -81,6 +81,18 @@ namespace Umbraco.Core
 		/// <summary>
 		/// Adds a start and end log entry as Debug and tracks how long it takes until disposed.
 		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="startMessage"></param>
+		/// <param name="completeMessage"></param>
+		/// <returns></returns>
+		public static DisposableTimer DebugDuration<T>(Func<string> startMessage, Func<string> completeMessage)
+		{
+			return DebugDuration(typeof(T), startMessage, completeMessage);
+		}
+
+		/// <summary>
+		/// Adds a start and end log entry as Debug and tracks how long it takes until disposed.
+		/// </summary>
 		/// <param name="loggerType"></param>
 		/// <param name="startMessage"></param>
 		/// <param name="completeMessage"></param>
@@ -89,6 +101,19 @@ namespace Umbraco.Core
 		{
 			LogHelper.Debug(loggerType, () => startMessage);
 			return new DisposableTimer(x => LogHelper.Debug(loggerType, () => completeMessage + " (took " + x + "ms)"));
+		}
+
+		/// <summary>
+		/// Adds a start and end log entry as Debug and tracks how long it takes until disposed.
+		/// </summary>
+		/// <param name="loggerType"></param>
+		/// <param name="startMessage"></param>
+		/// <param name="completeMessage"></param>
+		/// <returns></returns>
+		public static DisposableTimer DebugDuration(Type loggerType, Func<string> startMessage, Func<string> completeMessage)
+		{
+			LogHelper.Debug(loggerType, startMessage);
+			return new DisposableTimer(x => LogHelper.Debug(loggerType, () => completeMessage() + " (took " + x + "ms)"));
 		}
 
 		/// <summary>

@@ -261,6 +261,7 @@
     <key alias="email">Email</key>
     <key alias="error">Errore</key>
     <key alias="findDocument">Trova</key>
+    <key alias="folder">Cartella</key>
     <key alias="height">Altezza</key>
     <key alias="help">Aiuto</key>
     <key alias="icon">Icona</key>

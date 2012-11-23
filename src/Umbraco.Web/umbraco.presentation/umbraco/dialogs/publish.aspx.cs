@@ -32,6 +32,16 @@ namespace umbraco.dialogs
             cms.businesslogic.web.Document d = new cms.businesslogic.web.Document(nodeId);
             pageName = d.Text;
 
+			if (d.Level > 1 && !(new cms.businesslogic.web.Document(d.ParentId).PathPublished))
+			{
+				TheForm.Visible = false;
+				theEnd.Visible = true;
+				feedbackMsg.type = uicontrols.Feedback.feedbacktype.notice;
+				feedbackMsg.Text = ui.Text("publish", "contentPublishedFailedByParent", d.Text, base.getUser()) + "</p><p><a href='#' onClick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+	               
+				return;
+			}
+
             // add control prefix to variable for support with masterpages
             string prefix = PublishUnpublishedItems.ClientID.Replace(PublishUnpublishedItems.ID, "");
             masterPagePrefix.Text = prefix;
@@ -157,23 +167,5 @@ namespace umbraco.dialogs
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
         }
 
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
-		}
-		#endregion
 	}
 }

@@ -1,3 +1,5 @@
+using umbraco.BusinessLogic;
+
 namespace umbraco.presentation.install.steps
 {
     using System;
@@ -30,7 +32,7 @@ namespace umbraco.presentation.install.steps
             if (!cms.businesslogic.skinning.Skinning.IsStarterKitInstalled())
                 customizeSite.Visible = false;
 
-
+            var initTrees = new ApplicationTreeRegistrar();
         }
 
         #region Web Form Designer generated code
