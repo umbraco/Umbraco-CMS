@@ -15,6 +15,7 @@ using umbraco.interfaces;
 using umbraco.BusinessLogic.Utils;
 using umbraco.BusinessLogic;
 using umbraco.BasePages;
+using TypeFinder = umbraco.BusinessLogic.Utils.TypeFinder;
 
 namespace umbraco.cms.presentation.Trees
 {
@@ -151,11 +152,12 @@ namespace umbraco.cms.presentation.Trees
 
 				l.UpgradeToWriteLock();
 
-
-				var foundITrees = PluginManager.Current.ResolveTrees();
+                List<Type> foundITrees = TypeFinder.FindClassesOfType<ITree>();
+				//var foundITrees = PluginManager.Current.ResolveTrees();
 
 				var objTrees = ApplicationTree.getAll();
-				var appTrees = new List<ApplicationTree>();
+                List<ApplicationTree> appTrees = new List<ApplicationTree>();
+				//var appTrees = new List<ApplicationTree>();
 				appTrees.AddRange(objTrees);
 
 				var apps = Application.getAll();

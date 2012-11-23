@@ -31,8 +31,6 @@ namespace umbraco.presentation.install.steps
 
             if (!cms.businesslogic.skinning.Skinning.IsStarterKitInstalled())
                 customizeSite.Visible = false;
-
-            new ApplicationTreeRegistrar();
         }
 
         #region Web Form Designer generated code
