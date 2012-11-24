@@ -1,4 +1,4 @@
-syntax: regex
+syntax: regexp
 ^src/packages/(?!repositories.config$)
 
 syntax: glob
