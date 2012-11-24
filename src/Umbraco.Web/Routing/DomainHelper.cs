@@ -42,6 +42,11 @@ namespace Umbraco.Web.Routing
 			}
 		}
 
+		private static bool IsWildcardDomain(Domain d)
+		{
+			return string.IsNullOrWhiteSpace(d.Name) || d.Name.StartsWith("*");
+		}
+
 		/// <summary>
 		/// Finds the domain that best matches the current uri, into an enumeration of domains.
 		/// </summary>
@@ -56,7 +61,7 @@ namespace Umbraco.Web.Routing
 			// we need to order so example.com/foo matches before example.com/
 			var scheme = current == null ? Uri.UriSchemeHttp : current.Scheme;
 			var domainsAndUris = domains
-				.Where(d => !string.IsNullOrEmpty(d.Name) && d.Name != "*")
+				.Where(d => !IsWildcardDomain(d))
 				.Select(d => new { Domain = d, UriString = UriUtility.EndPathWithSlash(UriUtility.StartWithScheme(d.Name, scheme)) })
 				.OrderByDescending(t => t.UriString)
 				.Select(t => new DomainAndUri { Domain = t.Domain, Uri = new Uri(t.UriString) });
@@ -96,7 +101,7 @@ namespace Umbraco.Web.Routing
 		{
 			var scheme = current == null ? Uri.UriSchemeHttp : current.Scheme;
 			var domainsAndUris = domains
-				.Where(d => !string.IsNullOrEmpty(d.Name) && d.Name != "*")
+				.Where(d => !IsWildcardDomain(d))
 				.Select(d => new { Domain = d, UriString = UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(d.Name, scheme)) })
 				.OrderByDescending(t => t.UriString)
 				.Select(t => new DomainAndUri { Domain = t.Domain, Uri = new Uri(t.UriString) });
@@ -117,7 +122,7 @@ namespace Umbraco.Web.Routing
 				.Reverse()
 				.Select(id => int.Parse(id))
 				.TakeWhile(id => id != current.RootNodeId)
-				.Any(id => domains.Any(d => d.RootNodeId == id && !string.IsNullOrEmpty(d.Name) && d.Name != "*"));
+				.Any(id => domains.Any(d => d.RootNodeId == id && !IsWildcardDomain(d)));
 		}
 
 		/// <summary>
@@ -139,7 +144,7 @@ namespace Umbraco.Web.Routing
 
 				// supporting null or whitespace for backward compatibility, 
 				// although we should not allow ppl to create them anymore
-				var domain = domains.Where(d => d.RootNodeId == nodeId && (string.IsNullOrWhiteSpace(d.Name) || d.Name == "*")).FirstOrDefault();
+				var domain = domains.Where(d => d.RootNodeId == nodeId && IsWildcardDomain(d)).FirstOrDefault();
 				if (domain != null)
 					return domain;
 			}
