@@ -133,7 +133,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                          {
                                              DatabaseType = DataTypeDatabaseType.Integer,
                                              Name = "AgeDataType",
-                                             Creator = new Profile(0, "Administrator")
+                                             CreatorId = 0
                                          };
 
             // Act
@@ -158,7 +158,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                          {
                                              DatabaseType = DataTypeDatabaseType.Integer,
                                              Name = "AgeDataType",
-                                             Creator = new Profile(0, "Administrator")
+                                             CreatorId = 0
                                          };
             repository.AddOrUpdate(dataTypeDefinition);
             unitOfWork.Commit();
@@ -188,7 +188,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                          {
                                              DatabaseType = DataTypeDatabaseType.Integer,
                                              Name = "AgeDataType",
-                                             Creator = new Profile(0, "Administrator")
+                                             CreatorId = 0
                                          };
 
             // Act

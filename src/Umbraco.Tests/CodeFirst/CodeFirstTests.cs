@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -9,6 +10,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Serialization;
+using Umbraco.Tests.CodeFirst.Attributes;
 using Umbraco.Tests.CodeFirst.Definitions;
 using Umbraco.Tests.CodeFirst.TestModels;
 using Umbraco.Tests.TestHelpers;
@@ -43,6 +45,21 @@ namespace Umbraco.Tests.CodeFirst
 
             var serviceStackSerializer = new ServiceStackJsonSerializer();
             SerializationService = new SerializationService(serviceStackSerializer);
+        }
+
+        [Test]
+        public void Can_Create_Model_With_NonExisting_DataTypeDefinition()
+        {
+            ContentTypeDefinitionFactory.ClearContentTypeCache();
+
+            var modelType = typeof(ModelWithNewDataType);
+            var contentType = ContentTypeDefinitionFactory.GetContentTypeDefinition(modelType);
+
+            var mappedContentTypes = ContentTypeDefinitionFactory.RetrieveMappedContentTypes();
+            ServiceContext.ContentTypeService.Save(mappedContentTypes);
+
+            var model = ServiceContext.ContentTypeService.GetContentType(1046);
+            Assert.That(model, Is.Not.Null);
         }
 
         [Test]

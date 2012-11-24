@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
@@ -36,7 +35,7 @@ namespace Umbraco.Core.Persistence.Factories
                                              Path = dto.NodeDto.Path,
                                              SortOrder = dto.NodeDto.SortOrder,
                                              Trashed = dto.NodeDto.Trashed,
-                                             Creator = new Profile(dto.NodeDto.UserId.Value, "")
+                                             CreatorId = dto.NodeDto.UserId.Value
                                          };
 
             return dataTypeDefinition;
@@ -81,7 +80,7 @@ namespace Umbraco.Core.Persistence.Factories
                                   Text = entity.Name,
                                   Trashed = entity.Trashed,
                                   UniqueId = entity.Key,
-                                  UserId = entity.Creator.Id.SafeCast<int>()
+                                  UserId = entity.CreatorId
                               };
 
             return nodeDto;

@@ -36,7 +36,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to save</param>
         /// <param name="userId">Id of the user issueing the save</param>
-        void Save(IDataTypeDefinition dataTypeDefinition, int userId);
+        void Save(IDataTypeDefinition dataTypeDefinition, int userId = -1);
 
         /// <summary>
         /// Deletes an <see cref="IDataTypeDefinition"/>

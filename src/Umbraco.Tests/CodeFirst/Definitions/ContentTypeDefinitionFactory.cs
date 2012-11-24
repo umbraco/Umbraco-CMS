@@ -8,7 +8,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.CodeFirst.Attributes;
-using umbraco.interfaces;
 
 namespace Umbraco.Tests.CodeFirst.Definitions
 {
@@ -43,29 +42,44 @@ namespace Umbraco.Tests.CodeFirst.Definitions
             var objProperties = modelType.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
             foreach (var propertyInfo in objProperties)
             {
-                var definition = new PropertyDefinition();
+                var propertyTypeAttribute = propertyInfo.FirstAttribute<PropertyTypeConventionAttribute>();
+                var definition = propertyTypeAttribute == null
+                                     ? new PropertyDefinition()
+                                     : propertyTypeAttribute.GetPropertyConvention();
 
-                var aliasAttribute = propertyInfo.FirstAttribute<AliasAttribute>();
-                definition.Alias = PropertyTypeAliasConvention(aliasAttribute, propertyInfo.Name);
-                definition.Name = PropertyTypeNameConvention(aliasAttribute, propertyInfo.Name);
-
-                var descriptionAttribute = propertyInfo.FirstAttribute<DescriptionAttribute>();
-                definition.Description = descriptionAttribute != null ? descriptionAttribute.Description : string.Empty;
-
-                var sortOrderAttribute = propertyInfo.FirstAttribute<SortOrderAttribute>();
-                definition.Order = sortOrderAttribute != null ? sortOrderAttribute.Order : order;
-
-                var propertyTypeAttribute = propertyInfo.FirstAttribute<PropertyTypeAttribute>();
-                definition.Mandatory = propertyTypeAttribute != null && propertyTypeAttribute.Mandatory;
-                definition.ValidationRegExp = propertyTypeAttribute == null ? string.Empty : propertyTypeAttribute.ValidationRegExp;
-                definition.PropertyGroup = propertyTypeAttribute == null ? "Generic Properties" : propertyTypeAttribute.PropertyGroup;
-                definition.DataTypeDefinition = DataTypeConvention(propertyTypeAttribute, propertyInfo.PropertyType);
-
-                //RichtextAttribute convention
-                var richtextAttribute = propertyInfo.FirstAttribute<RichtextAttribute>();
-                if(richtextAttribute != null)
+                //DataTypeDefinition fallback
+                if(definition.DataTypeDefinition == null)
                 {
-                    definition.DataTypeDefinition = DataTypeConvention(richtextAttribute, propertyInfo.PropertyType);
+                    definition.DataTypeDefinition = Conventions.DataTypeConvention(null, propertyInfo.PropertyType);
+                }
+
+                if(string.IsNullOrEmpty(definition.PropertyGroup))
+                {
+                    definition.PropertyGroup = "Generic Properties";
+                }
+
+                //Alias fallback
+                if (string.IsNullOrEmpty(definition.Alias))
+                {
+                    var aliasAttribute = propertyInfo.FirstAttribute<AliasAttribute>();
+                    definition.Alias = Conventions.PropertyTypeAliasConvention(aliasAttribute, propertyInfo.Name);
+                    definition.Name = Conventions.PropertyTypeNameConvention(aliasAttribute, propertyInfo.Name);
+                }
+
+                //Description fallback
+                if (string.IsNullOrEmpty(definition.Description))
+                {
+                    var descriptionAttribute = propertyInfo.FirstAttribute<DescriptionAttribute>();
+                    definition.Description = descriptionAttribute != null
+                                                 ? descriptionAttribute.Description
+                                                 : string.Empty;
+                }
+
+                //SortOrder fallback
+                if (definition.Order == default(int))
+                {
+                    var sortOrderAttribute = propertyInfo.FirstAttribute<SortOrderAttribute>();
+                    definition.Order = sortOrderAttribute != null ? sortOrderAttribute.Order : order;
                 }
 
                 definitions.Add(definition);
@@ -178,84 +192,6 @@ namespace Umbraco.Tests.CodeFirst.Definitions
         }
 
         /// <summary>
-        /// Convention to get a DataTypeDefinition from the PropertyTypeAttribute or the type of the property itself
-        /// </summary>
-        /// <param name="attribute"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        private static IDataTypeDefinition DataTypeConvention(PropertyTypeAttribute attribute, Type type)
-        {
-            if(attribute != null)
-            {
-                var instance = Activator.CreateInstance(attribute.Type);
-                var dataType = instance as IDataType;
-                return GetDataTypeByControlId(dataType.Id);
-            }
-
-            return TypeToPredefinedDataTypeConvention(type);
-        }
-
-        /// <summary>
-        /// Convention to get predefined DataTypeDefinitions based on the Type of the property
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        private static IDataTypeDefinition TypeToPredefinedDataTypeConvention(Type type)
-        {
-            if(type == typeof(bool))
-            {
-                return GetDataTypeByControlId(new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a"));// Yes/No DataType
-            }
-            if(type == typeof(int))
-            {
-                return GetDataTypeByControlId(new Guid("1413afcb-d19a-4173-8e9a-68288d2a73b8"));// Number DataType
-            }
-            if(type == typeof(DateTime))
-            {
-                return GetDataTypeByControlId(new Guid("23e93522-3200-44e2-9f29-e61a6fcbb79a"));// Date Picker DataType
-            }
-
-            return GetDataTypeByControlId(new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea"));// Standard textfield
-        }
-
-        /// <summary>
-        /// Gets the <see cref="IDataTypeDefinition"/> from the DataTypeService by its control Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        private static IDataTypeDefinition GetDataTypeByControlId(Guid id)
-        {
-            //TODO Create Definition if none exists
-            var definition = ServiceFactory.DataTypeService.GetDataTypeDefinitionByControlId(id);
-            return definition.FirstOrDefault();
-        }
-
-        /// <summary>
-        /// Convention to get the Alias of the PropertyType from the AliasAttribute or the property itself
-        /// </summary>
-        /// <param name="attribute"></param>
-        /// <param name="propertyName"></param>
-        /// <returns></returns>
-        private static string PropertyTypeAliasConvention(AliasAttribute attribute, string propertyName)
-        {
-            return attribute == null ? propertyName.ToUmbracoAlias() : attribute.Alias;
-        }
-
-        /// <summary>
-        /// Convention to get the Name of the PropertyType from the AliasAttribute or the property itself
-        /// </summary>
-        /// <param name="attribute"></param>
-        /// <param name="propertyName"></param>
-        /// <returns></returns>
-        private static string PropertyTypeNameConvention(AliasAttribute attribute, string propertyName)
-        {
-            if (attribute == null)
-                return propertyName.SplitPascalCasing();
-
-            return string.IsNullOrEmpty(attribute.Name) ? propertyName.SplitPascalCasing() : attribute.Name;
-        }
-
-        /// <summary>
         /// Convention that converts a class decorated with the ContentTypeAttribute to an initial ContentType
         /// </summary>
         /// <param name="attribute"><see cref="ContentTypeAttribute"/> to use for mapping a <see cref="IContentType"/></param>
@@ -314,13 +250,14 @@ namespace Umbraco.Tests.CodeFirst.Definitions
                 var @alias = engine == RenderingEngine.Mvc
                                ? templateName.Replace(".cshtml", "").Replace(".vbhtml", "")
                                : templateName.Replace(".masterpage", "");
-                var name = engine == RenderingEngine.Mvc
-                               ? string.Concat(@alias, ".cshtml")
-                               : string.Concat(@alias, ".masterpage");
 
                 var template = ServiceFactory.FileService.GetTemplateByAlias(@alias);
                 if(template == null)
                 {
+                    var name = engine == RenderingEngine.Mvc
+                               ? string.Concat(@alias, ".cshtml")
+                               : string.Concat(@alias, ".masterpage");
+
                     template = new Template(string.Empty, name, @alias) { CreatorId = 0, Content = string.Empty};
                     ServiceFactory.FileService.SaveTemplate(template);
                 }

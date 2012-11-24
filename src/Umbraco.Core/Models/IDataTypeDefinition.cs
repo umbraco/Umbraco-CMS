@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Models
 {
@@ -42,7 +41,7 @@ namespace Umbraco.Core.Models
         /// Id of the user who created this entity
         /// </summary>
         [DataMember]
-        IProfile Creator { get; set; }
+        int CreatorId { get; set; }
 
         /// <summary>
         /// Boolean indicating whether this entity is Trashed or not.

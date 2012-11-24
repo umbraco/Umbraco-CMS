@@ -1,0 +1,101 @@
+﻿using System;
+using System.Linq;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
+using Umbraco.Tests.CodeFirst.Attributes;
+using umbraco.interfaces;
+
+namespace Umbraco.Tests.CodeFirst.Definitions
+{
+    public static class Conventions
+    {
+        /// <summary>
+        /// Convention to get a DataTypeDefinition from the PropertyTypeAttribute or the type of the property itself
+        /// </summary>
+        /// <param name="attribute"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static IDataTypeDefinition DataTypeConvention(PropertyTypeAttribute attribute, Type type)
+        {
+            if (attribute != null)
+            {
+                var instance = Activator.CreateInstance(attribute.Type);
+                var dataType = instance as IDataType;
+                var definition = GetDataTypeByControlId(dataType.Id);
+                //If the DataTypeDefinition doesn't exist we create a new one
+                if (definition == null)
+                {
+                    definition = new DataTypeDefinition(-1, dataType.Id)
+                    {
+                        DatabaseType = attribute.DatabaseType,
+                        Name = dataType.DataTypeName
+                    };
+                    ServiceFactory.DataTypeService.Save(definition, 0);
+                }
+                return definition;
+            }
+
+            return TypeToPredefinedDataTypeConvention(type);
+        }
+
+        /// <summary>
+        /// Convention to get predefined DataTypeDefinitions based on the Type of the property
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static IDataTypeDefinition TypeToPredefinedDataTypeConvention(Type type)
+        {
+            if (type == typeof(bool))
+            {
+                return GetDataTypeByControlId(new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a"));// Yes/No DataType
+            }
+            if (type == typeof(int))
+            {
+                return GetDataTypeByControlId(new Guid("1413afcb-d19a-4173-8e9a-68288d2a73b8"));// Number DataType
+            }
+            if (type == typeof(DateTime))
+            {
+                return GetDataTypeByControlId(new Guid("23e93522-3200-44e2-9f29-e61a6fcbb79a"));// Date Picker DataType
+            }
+
+            return GetDataTypeByControlId(new Guid("ec15c1e5-9d90-422a-aa52-4f7622c63bea"));// Standard textfield
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IDataTypeDefinition"/> from the DataTypeService by its control Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static IDataTypeDefinition GetDataTypeByControlId(Guid id)
+        {
+            var definitions = ServiceFactory.DataTypeService.GetDataTypeDefinitionByControlId(id);
+            return definitions.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Convention to get the Alias of the PropertyType from the AliasAttribute or the property itself
+        /// </summary>
+        /// <param name="attribute"></param>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        public static string PropertyTypeAliasConvention(AliasAttribute attribute, string propertyName)
+        {
+            return attribute == null ? propertyName.ToUmbracoAlias() : attribute.Alias;
+        }
+
+        /// <summary>
+        /// Convention to get the Name of the PropertyType from the AliasAttribute or the property itself
+        /// </summary>
+        /// <param name="attribute"></param>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        public static string PropertyTypeNameConvention(AliasAttribute attribute, string propertyName)
+        {
+            if (attribute == null)
+                return propertyName.SplitPascalCasing();
+
+            return string.IsNullOrEmpty(attribute.Name) ? propertyName.SplitPascalCasing() : attribute.Name;
+        }
+    }
+}
