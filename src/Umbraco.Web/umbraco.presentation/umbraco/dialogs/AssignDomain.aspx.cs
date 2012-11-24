@@ -50,7 +50,7 @@ namespace umbraco.dialogs
                 {
                     Domain d = new Domain(editDomain);
                     selectedLanguage = d.Language.id;
-                    DomainName.Text = d.Name;
+					DomainName.Text = d.Name.StartsWith("*") ? "*" : d.Name;
                     ok.Text = ui.Text("general", "update", base.getUser());
                 }
 
@@ -82,7 +82,8 @@ namespace umbraco.dialogs
                 allDomains.Text = "<table border=\"0\" cellspacing=\"10\">";
 
                 foreach (Domain d in domainList) {
-                    allDomains.Text += "<tr><td>" + d.Name + "</td><td>(" + d.Language.CultureAlias + ")</td><td><a href=\"?id=" + currentID + "&editDomain=" +
+					var name = d.Name.StartsWith("*") ? "*" : d.Name;
+                    allDomains.Text += "<tr><td>" + name + "</td><td>(" + d.Language.CultureAlias + ")</td><td><a href=\"?id=" + currentID + "&editDomain=" +
                                        d.Id.ToString() + "\">" + ui.Text("edit") + "</a></td><td><a href=\"?id=" + currentID +
                                        "&delDomain=" + d.Id.ToString() + "\" onClick=\"return confirm('" +
                                        ui.Text("defaultdialogs", "confirmdelete", base.getUser()) +
@@ -120,11 +121,14 @@ namespace umbraco.dialogs
                 }
                 else
                 {
-                    
-                  
-                    if( !Domain.Exists(DomainName.Text.ToLower())) {
-                        Domain.MakeNew(DomainName.Text, currentID, int.Parse(Languages.SelectedValue));
-                        FeedBackMessage.Text = ui.Text("assignDomain", "domainCreated", DomainName.Text, base.getUser());
+					// have to handle wildcard
+                    var domainName = DomainName.Text.Trim();
+					domainName = domainName == "*" ? ("*" + currentID.ToString()) : domainName;
+
+					if (!Domain.Exists(domainName.ToLower()))
+					{
+						Domain.MakeNew(domainName, currentID, int.Parse(Languages.SelectedValue));
+                        FeedBackMessage.Text = ui.Text("assignDomain", "domainCreated", domainName, base.getUser());
                         FeedBackMessage.type = umbraco.uicontrols.Feedback.feedbacktype.success;
 
                         DomainName.Text = "";
@@ -134,7 +138,7 @@ namespace umbraco.dialogs
                         //this is probably the worst webform I've ever seen... 
                         Response.Redirect("AssignDomain.aspx?id=" + currentID.ToString());
                     } else {
-                        FeedBackMessage.Text = ui.Text("assignDomain", "domainExists", DomainName.Text, base.getUser());
+						FeedBackMessage.Text = ui.Text("assignDomain", "domainExists", DomainName.Text.Trim(), base.getUser());
                         FeedBackMessage.type = umbraco.uicontrols.Feedback.feedbacktype.error;
                     }
                 }
