@@ -52,7 +52,7 @@ namespace Umbraco.Tests.CodeFirst.Attributes
             definition.Mandatory = Mandatory;
             definition.ValidationRegExp = string.IsNullOrEmpty(ValidationRegExp) ? ValidationRegExp : string.Empty;
             definition.PropertyGroup = string.IsNullOrEmpty(PropertyGroup) ? "Generic Properties" : PropertyGroup;
-            definition.DataTypeDefinition = Conventions.DataTypeConvention(this, Type);
+            definition.DataTypeDefinition = Conventions.GetDataTypeDefinitionByAttributeOrType(this, Type);
 
             return definition;
         }

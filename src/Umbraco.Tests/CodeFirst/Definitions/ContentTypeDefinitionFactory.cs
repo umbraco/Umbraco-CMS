@@ -50,7 +50,7 @@ namespace Umbraco.Tests.CodeFirst.Definitions
                 //DataTypeDefinition fallback
                 if(definition.DataTypeDefinition == null)
                 {
-                    definition.DataTypeDefinition = Conventions.DataTypeConvention(null, propertyInfo.PropertyType);
+                    definition.DataTypeDefinition = Conventions.GetDataTypeDefinitionByAttributeOrType(null, propertyInfo.PropertyType);
                 }
 
                 if(string.IsNullOrEmpty(definition.PropertyGroup))
@@ -62,8 +62,8 @@ namespace Umbraco.Tests.CodeFirst.Definitions
                 if (string.IsNullOrEmpty(definition.Alias))
                 {
                     var aliasAttribute = propertyInfo.FirstAttribute<AliasAttribute>();
-                    definition.Alias = Conventions.PropertyTypeAliasConvention(aliasAttribute, propertyInfo.Name);
-                    definition.Name = Conventions.PropertyTypeNameConvention(aliasAttribute, propertyInfo.Name);
+                    definition.Alias = Conventions.GetPropertyTypeAlias(aliasAttribute, propertyInfo.Name);
+                    definition.Name = Conventions.GetPropertyTypeName(aliasAttribute, propertyInfo.Name);
                 }
 
                 //Description fallback

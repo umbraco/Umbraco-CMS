@@ -2,6 +2,8 @@
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Tests.CodeFirst.Attributes;
 using umbraco.interfaces;
@@ -16,7 +18,7 @@ namespace Umbraco.Tests.CodeFirst.Definitions
         /// <param name="attribute"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static IDataTypeDefinition DataTypeConvention(PropertyTypeAttribute attribute, Type type)
+        public static IDataTypeDefinition GetDataTypeDefinitionByAttributeOrType(PropertyTypeAttribute attribute, Type type)
         {
             if (attribute != null)
             {
@@ -27,16 +29,16 @@ namespace Umbraco.Tests.CodeFirst.Definitions
                 if (definition == null)
                 {
                     definition = new DataTypeDefinition(-1, dataType.Id)
-                    {
-                        DatabaseType = attribute.DatabaseType,
-                        Name = dataType.DataTypeName
-                    };
+                                     {
+                                         DatabaseType = attribute.DatabaseType,
+                                         Name = dataType.DataTypeName
+                                     };
                     ServiceFactory.DataTypeService.Save(definition, 0);
                 }
                 return definition;
             }
 
-            return TypeToPredefinedDataTypeConvention(type);
+            return GetPredefinedDataTypeDefinitionByType(type);
         }
 
         /// <summary>
@@ -44,7 +46,7 @@ namespace Umbraco.Tests.CodeFirst.Definitions
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static IDataTypeDefinition TypeToPredefinedDataTypeConvention(Type type)
+        public static IDataTypeDefinition GetPredefinedDataTypeDefinitionByType(Type type)
         {
             if (type == typeof(bool))
             {
@@ -74,12 +76,52 @@ namespace Umbraco.Tests.CodeFirst.Definitions
         }
 
         /// <summary>
+        /// Creates a new DataTypeDefinition based on the Type in the PropertyTypeAttribute
+        /// </summary>
+        /// <param name="attribute"></param>
+        /// <param name="dataTypeDefinitionName"></param>
+        /// <returns></returns>
+        public static IDataTypeDefinition CreateDataTypeDefinitionFromAttribute(PropertyTypeAttribute attribute, string dataTypeDefinitionName)
+        {
+            var instance = Activator.CreateInstance(attribute.Type);
+            var dataType = instance as IDataType;
+
+            var definition = new DataTypeDefinition(-1, dataType.Id)
+                                 {
+                                     DatabaseType = attribute.DatabaseType,
+                                     Name = dataTypeDefinitionName
+                                 };
+            ServiceFactory.DataTypeService.Save(definition, 0);
+            return definition;
+        }
+
+        /// <summary>
+        /// Creates a PreValue for a <see cref="IDataTypeDefinition"/>
+        /// </summary>
+        /// <param name="dataTypeDefinitionId"></param>
+        /// <param name="value"></param>
+        /// <param name="sortOrder"></param>
+        /// <param name="alias"></param>
+        public static void CreatePrevalueForDataTypeDefinition(int dataTypeDefinitionId, string value, int sortOrder, string alias)
+        {
+            var poco = new DataTypePreValueDto
+                           {
+                               Alias = alias, 
+                               DataTypeNodeId = dataTypeDefinitionId, 
+                               SortOrder = sortOrder, 
+                               Value = value
+                           };
+
+            DatabaseFactory.Current.Database.Insert(poco);
+        }
+
+        /// <summary>
         /// Convention to get the Alias of the PropertyType from the AliasAttribute or the property itself
         /// </summary>
         /// <param name="attribute"></param>
         /// <param name="propertyName"></param>
         /// <returns></returns>
-        public static string PropertyTypeAliasConvention(AliasAttribute attribute, string propertyName)
+        public static string GetPropertyTypeAlias(AliasAttribute attribute, string propertyName)
         {
             return attribute == null ? propertyName.ToUmbracoAlias() : attribute.Alias;
         }
@@ -90,7 +132,7 @@ namespace Umbraco.Tests.CodeFirst.Definitions
         /// <param name="attribute"></param>
         /// <param name="propertyName"></param>
         /// <returns></returns>
-        public static string PropertyTypeNameConvention(AliasAttribute attribute, string propertyName)
+        public static string GetPropertyTypeName(AliasAttribute attribute, string propertyName)
         {
             if (attribute == null)
                 return propertyName.SplitPascalCasing();

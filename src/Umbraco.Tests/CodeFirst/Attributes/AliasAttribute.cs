@@ -2,7 +2,7 @@
 
 namespace Umbraco.Tests.CodeFirst.Attributes
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Interface, AllowMultiple = false, Inherited = true)]
     public class AliasAttribute : Attribute
     {
         public AliasAttribute(string @alias)
