@@ -1,5 +1,6 @@
 syntax: regexp
 ^src/packages/(?!repositories.config$)
+web.Template.[a-zA-Z0-9]*.Debug.config
 
 syntax: glob
 *.obj
