@@ -103,6 +103,10 @@
     <Compile Include="CodeFirst\Definitions\DependencyField.cs" />
     <Compile Include="CodeFirst\Definitions\PropertyDefinition.cs" />
     <Compile Include="CodeFirst\TestModels\AdvancedContentPage.cs" />
+    <Compile Include="CodeFirst\TestModels\Composition\Base.cs" />
+    <Compile Include="CodeFirst\TestModels\Composition\Meta.cs" />
+    <Compile Include="CodeFirst\TestModels\Composition\News.cs" />
+    <Compile Include="CodeFirst\TestModels\Composition\Seo.cs" />
     <Compile Include="CodeFirst\TestModels\ContentPage.cs" />
     <Compile Include="CodeFirst\TestModels\DecoratedModelPage.cs" />
     <Compile Include="CodeFirst\TestModels\Home.cs" />
