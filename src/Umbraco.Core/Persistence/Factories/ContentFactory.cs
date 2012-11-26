@@ -36,7 +36,9 @@ namespace Umbraco.Core.Persistence.Factories
                                dto.ContentVersionDto.ContentDto.NodeDto.UniqueId.HasValue
                                    ? dto.ContentVersionDto.ContentDto.NodeDto.UniqueId.Value
                                    : _id.ToGuid(),
-                           Name = dto.ContentVersionDto.ContentDto.NodeDto.Text,
+                           Name = dto.Text,
+                           NodeName = dto.ContentVersionDto.ContentDto.NodeDto.Text,
+                           Language = dto.ContentVersionDto.Language,
                            Path = dto.ContentVersionDto.ContentDto.NodeDto.Path,
                            CreatorId = dto.ContentVersionDto.ContentDto.NodeDto.UserId.Value,
                            WriterId = dto.WriterUserId,
@@ -81,11 +83,16 @@ namespace Umbraco.Core.Persistence.Factories
 
         private ContentVersionDto BuildContentVersionDto(IContent entity)
         {
+            //TODO: Change this once the Language property is public on IContent
+            var content = entity as Content;
+            var lang = content == null ? string.Empty : content.Language;
+
             var contentVersionDto = new ContentVersionDto
                                         {
                                             NodeId = entity.Id,
                                             VersionDate = entity.UpdateDate,
                                             VersionId = entity.Version,
+                                            Language = lang,
                                             ContentDto = BuildContentDto(entity)
                                         };
             return contentVersionDto;
@@ -110,6 +117,10 @@ namespace Umbraco.Core.Persistence.Factories
 
         private NodeDto BuildNodeDto(IContent entity)
         {
+            //TODO: Change this once the Language property is public on IContent
+            var content = entity as Content;
+            var nodeName = content == null ? entity.Name : content.NodeName;
+
             var nodeDto = new NodeDto
                               {
                                   CreateDate = entity.CreateDate,
@@ -119,7 +130,7 @@ namespace Umbraco.Core.Persistence.Factories
                                   ParentId = entity.ParentId,
                                   Path = entity.Path,
                                   SortOrder = entity.SortOrder,
-                                  Text = entity.Name,
+                                  Text = nodeName,
                                   Trashed = entity.Trashed,
                                   UniqueId = entity.Key,
                                   UserId = entity.CreatorId

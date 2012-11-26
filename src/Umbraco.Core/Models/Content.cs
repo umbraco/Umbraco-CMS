@@ -19,6 +19,7 @@ namespace Umbraco.Core.Models
         private DateTime? _releaseDate;
         private DateTime? _expireDate;
         private int _writer;
+        private string _nodeName;
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -48,6 +49,7 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo ReleaseDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ReleaseDate);
         private static readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
         private static readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.WriterId);
+        private static readonly PropertyInfo NodeNameSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.NodeName);
 
         /// <summary>
         /// Gets or sets the template used by the Content.
@@ -120,7 +122,7 @@ namespace Umbraco.Core.Models
         /// Left internal until multilingual support is implemented.
         /// </remarks>
         [DataMember]
-        internal string Language
+        public string Language
         {
             get { return _language; }
             set
@@ -178,6 +180,16 @@ namespace Umbraco.Core.Models
             {
                 _writer = value;
                 OnPropertyChanged(WriterSelector);
+            }
+        }
+
+        internal string NodeName
+        {
+            get { return _nodeName; }
+            set
+            {
+                _nodeName = value;
+                OnPropertyChanged(NodeNameSelector);
             }
         }
 

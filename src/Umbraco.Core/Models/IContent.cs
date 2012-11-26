@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Models
 {
@@ -19,9 +20,12 @@ namespace Umbraco.Core.Models
         bool Published { get; }
 
         /// <summary>
-        /// Language of the data contained within the Content object
+        /// Language of the data contained within this Content object.
         /// </summary>
-        //string Language { get; set; }
+        /// <remarks>
+        /// Left internal until multilingual support is implemented.
+        /// </remarks>
+        string Language { get; set; }
 
         /// <summary>
         /// Gets or Sets the date the Content should be released and thus be published
