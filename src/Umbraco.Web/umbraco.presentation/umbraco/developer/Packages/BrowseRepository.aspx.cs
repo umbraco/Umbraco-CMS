@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Xml;
 using System.Xml.XPath;
+using Umbraco.Core.Configuration;
 using umbraco.IO;
 
 namespace umbraco.presentation.developer.packages {
@@ -47,9 +48,9 @@ namespace umbraco.presentation.developer.packages {
                     url, repoGuid, category, Request.ServerVariables["SERVER_NAME"],
                     Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                     IOHelper.ResolveUrl(SystemDirectories.Umbraco).Trim('/'), repoGuid,
-                    Umbraco.Core.Configuration.GlobalSettings.Version.Major,
-                    Umbraco.Core.Configuration.GlobalSettings.Version.Minor,
-                    Umbraco.Core.Configuration.GlobalSettings.Version.Build,
+                    UmbracoVersion.Current.Major,
+                    UmbracoVersion.Current.Minor,
+                    UmbracoVersion.Current.Build,
                     UmbracoSettings.UseLegacyXmlSchema.ToString(), Environment.Version,
                     Umbraco.Core.SystemUtilities.GetCurrentTrustLevel());
         }

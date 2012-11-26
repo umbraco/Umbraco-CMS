@@ -254,7 +254,7 @@ namespace Umbraco.Core.Configuration
                 try
                 {
                     string configStatus = ConfigurationStatus;
-                    string currentVersion = Version.ToString(3);
+                    string currentVersion = UmbracoVersion.Current.ToString(3);
 
 
                     if (currentVersion != configStatus)
@@ -407,27 +407,15 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// Gets the current version of Umbraco.
-        /// Version class with the specified major, minor, build (Patch), and revision numbers.
-        /// </summary>
-        /// <remarks>
-        /// CURRENT UMBRACO VERSION ID.
-        /// </remarks>
-        public static Version Version
-        {
-            get { return _version ?? (_version = typeof (GlobalSettings).Assembly.GetName().Version); }
-        }
-
-        /// <summary>
         /// Gets the current version.
         /// </summary>
         /// <value>The current version.</value>
-        [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static string CurrentVersion
         {
             get
             {
-                return Version.ToString(3);
+                return UmbracoVersion.Current.ToString(3);
             }
         }
 
@@ -435,12 +423,12 @@ namespace Umbraco.Core.Configuration
         /// Gets the major version number.
         /// </summary>
         /// <value>The major version number.</value>
-        [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static int VersionMajor
         {
             get
             {
-                return Version.Major;
+                return UmbracoVersion.Current.Major;
             }
         }
 
@@ -448,12 +436,12 @@ namespace Umbraco.Core.Configuration
         /// Gets the minor version number.
         /// </summary>
         /// <value>The minor version number.</value>
-        [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static int VersionMinor
         {
             get
             {
-                return Version.Minor;
+                return UmbracoVersion.Current.Minor;
             }
         }
 
@@ -461,12 +449,12 @@ namespace Umbraco.Core.Configuration
         /// Gets the patch version number.
         /// </summary>
         /// <value>The patch version number.</value>
-        [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static int VersionPatch
         {
             get
             {
-                return Version.Build;
+                return UmbracoVersion.Current.Build;
             }
         }
 
@@ -474,12 +462,12 @@ namespace Umbraco.Core.Configuration
         /// Gets the version comment (like beta or RC).
         /// </summary>
         /// <value>The version comment.</value>
-        [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static string VersionComment
         {
             get
             {
-                return "";
+                return Umbraco.Core.Configuration.UmbracoVersion.CurrentComment;
             }
         }
 

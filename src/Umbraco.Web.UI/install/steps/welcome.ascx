@@ -1,5 +1,6 @@
 <%@ Control Language="c#" AutoEventWireup="True" CodeBehind="welcome.ascx.cs" Inherits="umbraco.presentation.install.welcome"
 	TargetSchema="http://schemas.microsoft.com/intellisense/ie5" %>
+<%@ Import Namespace="Umbraco.Core.Configuration" %>
 <!-- welcome box -->
 <div class="tab main-tabinfo">
 	<div class="container">
@@ -30,7 +31,7 @@
 		 <asp:PlaceHolder ID="ph_upgrade" runat="server" Visible="false">
             <h1>Upgrading Umbraco</h1>
             <p>
-                Welcome to the umbraco upgrade wizard. This will make sure that you upgrade safely from your old version to <strong>Umbraco version <%=Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3) %></strong> 
+                Welcome to the umbraco upgrade wizard. This will make sure that you upgrade safely from your old version to <strong>Umbraco version <%=UmbracoVersion.Current.ToString(3) %></strong> 
             </p>
             <p>
                 As this is an upgrade, <strong>the wizard might skip steps</strong> that are only needed for new umbraco installations. It might also ask you questions you've already answered once. But do not worry, 

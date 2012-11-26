@@ -1,6 +1,7 @@
 using System.Configuration;
 using System.Web.Routing;
 using NUnit.Framework;
+using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using System.Web.Mvc;
 
@@ -32,7 +33,7 @@ namespace Umbraco.Tests
         [Test]
         public void Is_Version_From_Assembly_Correct()
         {
-            Assert.That(Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3), Is.EqualTo("6.0.0"));
+            Assert.That(UmbracoVersion.Current.ToString(3), Is.EqualTo("6.0.0"));
         }
 
 		[TestCase("/umbraco/umbraco.aspx")]

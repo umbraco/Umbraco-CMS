@@ -1,5 +1,6 @@
 <%@ Control Language="c#" AutoEventWireup="True" CodeBehind="database.ascx.cs" Inherits="umbraco.presentation.install.steps.detect"
     TargetSchema="http://schemas.microsoft.com/intellisense/ie5" %>
+<%@ Import Namespace="Umbraco.Core.Configuration" %>
 <asp:PlaceHolder ID="settings" runat="server" Visible="true">
     <!-- database box -->
     <div class="tab main-tabinfo">
@@ -209,7 +210,7 @@
     </div>
     <script type="text/javascript">
         var hasEmbeddedDlls = <%= HasEmbeddedDatabaseFiles.ToString().ToLower() %>;
-        var currentVersion = '<%=Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3)%>';
+        var currentVersion = '<%=UmbracoVersion.Current.ToString(3)%>';
         var configured = <%= IsConfigured.ToString().ToLower() %>;
 
         jQuery(document).ready(function(){
@@ -336,7 +337,7 @@
         <div class="success">
             <p>
                 Umbraco
-				<%=Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3)%>
+				<%=UmbracoVersion.Current.ToString(3)%>
 				has now been copied to your database. Press <b>Continue</b> to proceed.
             </p>
         </div>
@@ -346,7 +347,7 @@
         <div class="success">
             <p>
                 Your database has been upgraded to version: 
-					<%=Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3)%>.<br />
+					<%=UmbracoVersion.Current.ToString(3)%>.<br />
                 Press <b>Continue</b> to proceed.
             </p>
         </div>

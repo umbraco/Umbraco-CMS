@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
 using System.Web;
-
+using Umbraco.Core.Configuration;
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
 using umbraco.BusinessLogic.Utils;
@@ -371,7 +371,7 @@ namespace umbraco.presentation
 
 			    // Check for configured key, checking for currentversion to ensure that a request with
 				// no httpcontext don't set the whole app in configure mode
-                if (Umbraco.Core.Configuration.GlobalSettings.Version != null && !GlobalSettings.Configured)
+                if (UmbracoVersion.Current != null && !GlobalSettings.Configured)
 				{
 					HttpApp.Application["umbracoNeedConfiguration"] = true;
 				}

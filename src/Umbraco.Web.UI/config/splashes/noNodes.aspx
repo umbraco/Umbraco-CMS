@@ -1,4 +1,5 @@
 <%@ Page Language="C#" AutoEventWireup="true" Inherits="System.Web.UI.Page" %>
+<%@ Import Namespace="Umbraco.Core.Configuration" %>
 
 <!DOCTYPE html>
 <html>
@@ -7,7 +8,7 @@
 	<meta charset="utf-8">
 
     <title>Umbraco
-        <%=Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3)%>
+        <%=UmbracoVersion.Current.ToString(3)%>
         - no pages found</title>
 
 

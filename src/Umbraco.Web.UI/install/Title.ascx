@@ -1,2 +1,3 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="Title.ascx.cs" Inherits="umbraco.presentation.install.Title" %>
-<title>Umbraco <%=Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3)%> Configuration Wizard</title>
+<%@ Import Namespace="Umbraco.Core.Configuration" %>
+<title>Umbraco <%=UmbracoVersion.Current.ToString(3)%> Configuration Wizard</title>

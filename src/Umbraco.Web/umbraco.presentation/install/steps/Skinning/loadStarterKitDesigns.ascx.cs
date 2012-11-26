@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core.Configuration;
 using umbraco.BusinessLogic;
 
 namespace umbraco.presentation.install.steps.Skinning
@@ -130,7 +131,7 @@ namespace umbraco.presentation.install.steps.Skinning
 
 						if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus))
 						{
-                            GlobalSettings.ConfigurationStatus = Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3);
+                            GlobalSettings.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
 							Application["umbracoNeedConfiguration"] = false;
 						}
 					}

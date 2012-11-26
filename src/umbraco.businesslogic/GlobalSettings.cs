@@ -6,6 +6,7 @@ using System.Web.Hosting;
 using System.Web.Configuration;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using umbraco.BusinessLogic;
 using umbraco.IO;
 
@@ -293,50 +294,50 @@ namespace umbraco
         /// Gets the current version.
         /// </summary>
         /// <value>The current version.</value>
-        [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static string CurrentVersion
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3); }
+			get { return UmbracoVersion.Current.ToString(3); }
         }
 
         /// <summary>
         /// Gets the major version number.
         /// </summary>
         /// <value>The major version number.</value>
-        [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static int VersionMajor
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.Version.Major; }
+			get { return UmbracoVersion.Current.Major; }
         }
 
         /// <summary>
         /// Gets the minor version number.
         /// </summary>
         /// <value>The minor version number.</value>
-        [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static int VersionMinor
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.Version.Minor; }
+			get { return UmbracoVersion.Current.Minor; }
         }
 
         /// <summary>
         /// Gets the patch version number.
         /// </summary>
         /// <value>The patch version number.</value>
-        [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static int VersionPatch
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.Version.Build; }
+			get { return UmbracoVersion.Current.Build; }
         }
 
         /// <summary>
         /// Gets the version comment (like beta or RC).
         /// </summary>
         /// <value>The version comment.</value>
-        [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static string VersionComment
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.VersionComment; }
+			get { return Umbraco.Core.Configuration.UmbracoVersion.CurrentComment; }
         }
 
 

@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Reflection;
 using System.Diagnostics;
+using Umbraco.Core.Configuration;
 using umbraco.IO;
 
 namespace umbraco.dialogs
@@ -23,7 +24,7 @@ namespace umbraco.dialogs
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 			// Put user code to initialize the page here
-            version.Text = Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3);
+            version.Text = UmbracoVersion.Current.ToString(3);
 			thisYear.Text = DateTime.Now.Year.ToString();
 
 
