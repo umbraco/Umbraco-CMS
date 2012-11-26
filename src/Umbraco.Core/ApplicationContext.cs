@@ -90,7 +90,7 @@ namespace Umbraco.Core
 				try
 				{
 					string configStatus = ConfigurationStatus;
-					string currentVersion = GlobalSettings.CurrentVersion;
+					string currentVersion = GlobalSettings.Version.ToString(3);
 
 
 					if (currentVersion != configStatus)

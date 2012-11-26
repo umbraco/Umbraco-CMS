@@ -27,6 +27,7 @@ namespace Umbraco.Core.Configuration
 
         #region Private static fields
 
+        private static Version _version;
     	private static string _reservedUrlsCache;
         private static string _reservedPathsCache;
         private static StartsWithContainer _reservedList = new StartsWithContainer();
@@ -253,7 +254,7 @@ namespace Umbraco.Core.Configuration
                 try
                 {
                     string configStatus = ConfigurationStatus;
-                    string currentVersion = CurrentVersion;
+                    string currentVersion = Version.ToString(3);
 
 
                     if (currentVersion != configStatus)
@@ -407,16 +408,14 @@ namespace Umbraco.Core.Configuration
 
         /// <summary>
         /// Gets the current version of Umbraco.
+        /// Version class with the specified major, minor, build (Patch), and revision numbers.
         /// </summary>
         /// <remarks>
-        /// CURRENT UMBRACO VERSION ID
+        /// CURRENT UMBRACO VERSION ID.
         /// </remarks>
         public static Version Version
         {
-            get
-            {
-                return typeof(GlobalSettings).Assembly.GetName().Version;
-            }
+            get { return _version ?? (_version = typeof (GlobalSettings).Assembly.GetName().Version); }
         }
 
         /// <summary>
