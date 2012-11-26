@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("umbraco.providers")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Core assembly containing umbraco specific membership providers")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("umbraco.providers")]
+[assembly: AssemblyProduct("Umbraco CMS")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 

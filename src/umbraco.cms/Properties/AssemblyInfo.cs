@@ -7,10 +7,9 @@ using System.Runtime.CompilerServices;
 // associated with an assembly.
 //
 [assembly: AssemblyTitle("umbraco.cms")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Core assembly containing CMS functionality")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("")]
-
+[assembly: AssemblyProduct("Umbraco CMS")]
 
 [assembly: InternalsVisibleTo("umbraco", AllInternalsVisible=true)]
 [assembly: InternalsVisibleTo("Umbraco.LegacyTests")]

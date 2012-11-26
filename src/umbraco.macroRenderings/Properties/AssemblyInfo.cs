@@ -7,6 +7,6 @@ using System.Runtime.CompilerServices;
 // associated with an assembly.
 //
 [assembly: AssemblyTitle("umbraco.macroRenderings")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Core assembly containing legacy macro renderings")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("")]
+[assembly: AssemblyProduct("Umbraco CMS")]

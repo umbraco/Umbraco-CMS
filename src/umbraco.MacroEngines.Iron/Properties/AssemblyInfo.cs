@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("umbraco.MacroEngines.Iron")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Core assembly containing the Iron Python macro engine")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("umbraco.MacroEngines.Iron")]
+[assembly: AssemblyProduct("Umbraco CMS")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
