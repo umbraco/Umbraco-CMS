@@ -173,6 +173,16 @@ namespace umbraco.presentation.install.steps
                                                                         DatabaseUsername.Text, DatabasePassword.Text,
                                                                         DatabaseType.SelectedValue);
                 }
+
+                Helper.setProgress(20, "Connection opened", "");
+
+                DatabaseContext.Current.Database.Initialize();
+
+                Helper.setProgress(90, "Refreshing content cache", "");
+
+                library.RefreshContent();
+
+                Helper.setProgress(100, "Database is up-to-date", "");
             }
             catch (Exception ex)
             {

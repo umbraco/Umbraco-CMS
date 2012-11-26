@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Data.SqlServerCe;
 using System.Linq;
 using System.Web.Configuration;
 using System.Xml.Linq;
@@ -21,6 +22,7 @@ namespace Umbraco.Core
 
         #region Singleton
         private static readonly Lazy<DatabaseContext> lazy = new Lazy<DatabaseContext>(() => new DatabaseContext());
+        private string _connectionString;
 
         /// <summary>
         /// Gets the current Database Context.
@@ -54,6 +56,55 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Gets the configured umbraco db connection string.
+        /// </summary>
+        public string ConnectionString
+        {
+            get { return _connectionString; }
+        }
+
+        /// <summary>
+        /// Returns the name of the dataprovider from the connectionstring setting in config
+        /// </summary>
+        public string ProviderName
+        {
+            get
+            {
+                var providerName = "System.Data.SqlClient";
+                if (ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName] != null)
+                {
+                    if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName))
+                        providerName = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName;
+                }
+                else
+                {
+                    throw new InvalidOperationException("Can't find a connection string with the name '" + GlobalSettings.UmbracoConnectionName + "'");
+                }
+                return providerName;
+            }
+        }
+
+        /// <summary>
+        /// Returns the Type of DatabaseProvider used
+        /// </summary>
+        public DatabaseProviders DatabaseProvider
+        {
+            get
+            {
+                string dbtype = Database.Connection == null ? ProviderName : Database.Connection.GetType().Name;
+
+                if (dbtype.StartsWith("MySql")) return DatabaseProviders.MySql;
+                if (dbtype.StartsWith("SqlCe") || dbtype.Contains("SqlServerCe")) return DatabaseProviders.SqlServerCE;
+                if (dbtype.StartsWith("Npgsql")) return DatabaseProviders.PostgreSQL;
+                if (dbtype.StartsWith("Oracle") || dbtype.Contains("OracleClient")) return DatabaseProviders.Oracle;
+                if (dbtype.StartsWith("SQLite")) return DatabaseProviders.SQLite;
+                if (dbtype.Contains("Azure")) return DatabaseProviders.SqlAzure;
+
+                return DatabaseProviders.SqlServer;
+            }
+        }
+
+        /// <summary>
         /// Configure a ConnectionString for the embedded database.
         /// </summary>
         public void ConfigureDatabaseConnection()
@@ -63,6 +114,10 @@ namespace Umbraco.Core
             var appSettingsConnection = @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf";
 
             SaveConnectionString(connectionString, appSettingsConnection, providerName);
+
+            var engine = new SqlCeEngine(connectionString);
+            engine.CreateDatabase();
+
             Initialize();
         }
 
@@ -116,6 +171,9 @@ namespace Umbraco.Core
         /// <summary>
         /// Saves the connection string as a proper .net ConnectionString and the legacy AppSettings key/value.
         /// </summary>
+        /// <remarks>
+        /// Saves the ConnectionString in the very nasty 'medium trust'-supportive way.
+        /// </remarks>
         /// <param name="connectionString"></param>
         /// <param name="appSettingsConnection"></param>
         /// <param name="providerName"></param>
@@ -177,7 +235,13 @@ namespace Umbraco.Core
             {
                 var providerName = "System.Data.SqlClient";
                 if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName))
-                        providerName = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName;
+                {
+                    providerName = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName;
+
+                    _connectionString =
+                        ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ConnectionString;
+                    
+                }
 
                 if (providerName.StartsWith("MySql"))
                 {
