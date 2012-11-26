@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Macros.PropertyTypes
 {
-    public class MediaCurrent : IMacroPropertyType
+    internal class MediaCurrent : IMacroPropertyType
     {
         public string Alias
         {

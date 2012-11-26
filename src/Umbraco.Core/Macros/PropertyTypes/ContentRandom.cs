@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Macros.PropertyTypes
 {
-    public class ContentRandom : IMacroPropertyType
+    internal class ContentRandom : IMacroPropertyType
     {
         public string Alias
         {

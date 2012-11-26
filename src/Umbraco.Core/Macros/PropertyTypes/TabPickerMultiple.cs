@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Macros.PropertyTypes
 {
-    public class TabPickerMultiple : IMacroPropertyType
+    internal class TabPickerMultiple : IMacroPropertyType
     {
         public string Alias
         {

@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Macros.PropertyTypes
 {
-    public class YesNoBool : IMacroPropertyType
+    internal class YesNoBool : IMacroPropertyType
     {
         public string Alias
         {

@@ -8,7 +8,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class MacroProperty : IMacroProperty
+    internal class MacroProperty : IMacroProperty
     {
         /// <summary>
         /// Gets or sets the Alias of the Property

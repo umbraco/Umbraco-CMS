@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Macro : Entity, IMacro
+    internal class Macro : Entity, IMacro
     {
         /// <summary>
         /// Gets or sets the alias of the Macro

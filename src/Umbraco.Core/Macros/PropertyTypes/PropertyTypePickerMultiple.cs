@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Macros.PropertyTypes
 {
-    public class PropertyTypePickerMultiple : IMacroPropertyType
+    internal class PropertyTypePickerMultiple : IMacroPropertyType
     {
         public string Alias
         {

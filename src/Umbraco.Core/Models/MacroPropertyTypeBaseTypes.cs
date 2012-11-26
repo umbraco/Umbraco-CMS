@@ -8,10 +8,13 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public enum MacroPropertyTypeBaseTypes
+    internal enum MacroPropertyTypeBaseTypes
     {
+        [EnumMember]
         Int32,
+        [EnumMember]
         Boolean,
+        [EnumMember]
         String
     }
 }

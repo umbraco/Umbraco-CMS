@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Macros.PropertyTypes
 {
-    public class ContentAll : IMacroPropertyType
+    internal class ContentAll : IMacroPropertyType
     {
         public string Alias
         {

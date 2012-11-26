@@ -3,7 +3,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Defines a PropertyType (plugin) for a Macro
     /// </summary>
-    public interface IMacroPropertyType
+    internal interface IMacroPropertyType
     {
         /// <summary>
         /// Gets the unique Alias of the Property Type

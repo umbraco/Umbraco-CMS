@@ -22,7 +22,14 @@ namespace Umbraco.Core.Services
         public MacroService(IUnitOfWorkProvider provider)
         {
             _unitOfWork = provider.GetUnitOfWork();
-            EnsureMacroCache();
+        }
+
+        public MacroService(IUnitOfWorkProvider provider, bool ensureCachedMacros)
+        {
+            _unitOfWork = provider.GetUnitOfWork();
+
+            if(ensureCachedMacros)
+                EnsureMacroCache();
         }
 
         /// <summary>
