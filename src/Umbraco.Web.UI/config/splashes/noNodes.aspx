@@ -7,7 +7,7 @@
 	<meta charset="utf-8">
 
     <title>Umbraco
-        <%=umbraco.GlobalSettings.CurrentVersion%>
+        <%=Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3)%>
         - no pages found</title>
 
 

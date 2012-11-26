@@ -22,8 +22,8 @@ namespace umbraco.presentation.install.steps
             // Update configurationStatus
             try
             {
-                
-                GlobalSettings.ConfigurationStatus = GlobalSettings.CurrentVersion;
+
+                GlobalSettings.ConfigurationStatus = Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3);
                 Application["umbracoNeedConfiguration"] = false;
             }
             catch (Exception)

@@ -130,7 +130,7 @@ namespace umbraco.presentation.install.steps.Skinning
 
 						if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus))
 						{
-							GlobalSettings.ConfigurationStatus = GlobalSettings.CurrentVersion;
+                            GlobalSettings.ConfigurationStatus = Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3);
 							Application["umbracoNeedConfiguration"] = false;
 						}
 					}

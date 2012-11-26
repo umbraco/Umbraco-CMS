@@ -371,7 +371,7 @@ namespace umbraco.presentation
 
 			    // Check for configured key, checking for currentversion to ensure that a request with
 				// no httpcontext don't set the whole app in configure mode
-				if (GlobalSettings.CurrentVersion != null && !GlobalSettings.Configured)
+                if (Umbraco.Core.Configuration.GlobalSettings.Version != null && !GlobalSettings.Configured)
 				{
 					HttpApp.Application["umbracoNeedConfiguration"] = true;
 				}

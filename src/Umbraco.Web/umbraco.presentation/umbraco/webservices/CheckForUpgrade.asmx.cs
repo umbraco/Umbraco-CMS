@@ -40,7 +40,7 @@ namespace umbraco.presentation.webservices
         {
             UpgradeType = upgradeType;
             UpgradeComment = upgradeComment;
-            UpgradeUrl = upgradeUrl + "?version=" + HttpContext.Current.Server.UrlEncode(GlobalSettings.CurrentVersion);
+            UpgradeUrl = upgradeUrl + "?version=" + HttpContext.Current.Server.UrlEncode(Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3));
         }
     }
 }

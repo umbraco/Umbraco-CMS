@@ -29,6 +29,12 @@ namespace Umbraco.Tests
 			ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "");
 		}
 
+        [Test]
+        public void Is_Version_From_Assembly_Correct()
+        {
+            Assert.That(Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3), Is.EqualTo("6.0.0"));
+        }
+
 		[TestCase("/umbraco/umbraco.aspx")]
 		[TestCase("/umbraco/editContent.aspx")]
 		[TestCase("/install/default.aspx")]

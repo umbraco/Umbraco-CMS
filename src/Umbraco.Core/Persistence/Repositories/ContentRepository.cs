@@ -94,6 +94,8 @@ namespace Umbraco.Core.Persistence.Repositories
             //NOTE: This doesn't allow properties to be part of the query
             var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
 
+            //NOTE: Won't work with language related queries because the language version isn't passed to the Get() method.
+            //A solution could be to look at the sql for the LanguageLocale column and choose the foreach-loop based on that.
             foreach (var dto in dtos.DistinctBy(x => x.NodeId))
             {
                 yield return Get(dto.NodeId);

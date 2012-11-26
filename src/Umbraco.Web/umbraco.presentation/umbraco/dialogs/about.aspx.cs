@@ -23,7 +23,7 @@ namespace umbraco.dialogs
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 			// Put user code to initialize the page here
-			version.Text = GlobalSettings.CurrentVersion;
+            version.Text = Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3);
 			thisYear.Text = DateTime.Now.Year.ToString();
 
 

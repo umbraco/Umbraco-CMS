@@ -209,7 +209,7 @@
     </div>
     <script type="text/javascript">
         var hasEmbeddedDlls = <%= HasEmbeddedDatabaseFiles.ToString().ToLower() %>;
-        var currentVersion = '<%=umbraco.GlobalSettings.CurrentVersion%>';
+        var currentVersion = '<%=Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3)%>';
         var configured = <%= IsConfigured.ToString().ToLower() %>;
 
         jQuery(document).ready(function(){
@@ -336,7 +336,7 @@
         <div class="success">
             <p>
                 Umbraco
-				<%=umbraco.GlobalSettings.CurrentVersion%>
+				<%=Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3)%>
 				has now been copied to your database. Press <b>Continue</b> to proceed.
             </p>
         </div>
@@ -346,7 +346,7 @@
         <div class="success">
             <p>
                 Your database has been upgraded to version: 
-					<%=umbraco.GlobalSettings.CurrentVersion%>.<br />
+					<%=Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3)%>.<br />
                 Press <b>Continue</b> to proceed.
             </p>
         </div>

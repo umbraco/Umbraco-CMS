@@ -293,6 +293,7 @@ namespace umbraco
         /// Gets the current version.
         /// </summary>
         /// <value>The current version.</value>
+        [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
         public static string CurrentVersion
         {
 			get { return Umbraco.Core.Configuration.GlobalSettings.CurrentVersion; }
@@ -302,6 +303,7 @@ namespace umbraco
         /// Gets the major version number.
         /// </summary>
         /// <value>The major version number.</value>
+        [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
         public static int VersionMajor
         {
 			get { return Umbraco.Core.Configuration.GlobalSettings.VersionMajor; }
@@ -311,6 +313,7 @@ namespace umbraco
         /// Gets the minor version number.
         /// </summary>
         /// <value>The minor version number.</value>
+        [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
         public static int VersionMinor
         {
 			get { return Umbraco.Core.Configuration.GlobalSettings.VersionMinor; }
@@ -320,6 +323,7 @@ namespace umbraco
         /// Gets the patch version number.
         /// </summary>
         /// <value>The patch version number.</value>
+        [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
         public static int VersionPatch
         {
 			get { return Umbraco.Core.Configuration.GlobalSettings.VersionPatch; }
@@ -329,6 +333,7 @@ namespace umbraco
         /// Gets the version comment (like beta or RC).
         /// </summary>
         /// <value>The version comment.</value>
+        [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
         public static string VersionComment
         {
 			get { return Umbraco.Core.Configuration.GlobalSettings.VersionComment; }

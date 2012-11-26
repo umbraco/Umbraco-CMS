@@ -1843,7 +1843,9 @@
     </Content>
     <Content Include="umbraco.presentation\install\steps\renaming.ascx" />
     <Content Include="umbraco.presentation\install\steps\skinning.ascx" />
-    <Content Include="umbraco.presentation\install\Title.ascx" />
+    <Content Include="umbraco.presentation\install\Title.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\install\utills\p.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1950,7 +1952,7 @@
       <SubType>UserControl</SubType>
     </Content>
     <Content Include="umbraco.presentation\install\steps\welcome.ascx">
-      <SubType>UserControl</SubType>
+      <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\cacheBrowser.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx">
