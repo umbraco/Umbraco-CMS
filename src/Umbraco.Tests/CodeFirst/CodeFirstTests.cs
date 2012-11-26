@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Serialization;
-using Umbraco.Tests.CodeFirst.Attributes;
 using Umbraco.Tests.CodeFirst.Definitions;
 using Umbraco.Tests.CodeFirst.TestModels;
 using Umbraco.Tests.TestHelpers;

@@ -77,6 +77,7 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -104,6 +105,7 @@
     <Compile Include="CodeFirst\Definitions\Conventions.cs" />
     <Compile Include="CodeFirst\Definitions\DependencyField.cs" />
     <Compile Include="CodeFirst\Definitions\PropertyDefinition.cs" />
+    <Compile Include="CodeFirst\Mvc\UmbracoTemplatePage`T.cs" />
     <Compile Include="CodeFirst\TestModels\AdvancedContentPage.cs" />
     <Compile Include="CodeFirst\TestModels\Composition\Base.cs" />
     <Compile Include="CodeFirst\TestModels\Composition\Meta.cs" />

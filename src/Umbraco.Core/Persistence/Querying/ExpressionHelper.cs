@@ -502,10 +502,7 @@ namespace Umbraco.Core.Persistence.Querying
         protected virtual string GetFieldName(Database.PocoData pocoData, string name)
         {
             var column = pocoData.Columns.FirstOrDefault(x => x.Value.PropertyInfo.Name == name);
-            var fieldName = string.Format("{0}.{1}",
-                SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(pocoData.TableInfo.TableName),
-                SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(column.Value.ColumnName));
-            return fieldName;
+            return column.Value.ColumnName;
         }
 
         protected virtual string GetFieldName(string name)
@@ -513,9 +510,6 @@ namespace Umbraco.Core.Persistence.Querying
 
             if (useFieldName)
             {
-                //FieldDefinition fd = modelDef.FieldDefinitions.FirstOrDefault(x => x.Name == name);
-                //string fn = fd != default(FieldDefinition) ? fd.FieldName : name;
-                //return OrmLiteConfig.DialectProvider.GetQuotedColumnName(fn);
                 return SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(name);
             }
             else

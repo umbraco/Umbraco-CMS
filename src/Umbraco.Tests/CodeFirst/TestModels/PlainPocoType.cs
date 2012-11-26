@@ -2,6 +2,7 @@
 
 namespace Umbraco.Tests.CodeFirst.TestModels
 {
+    //Plain Poco Type - plainPocoType
     public class PlainPocoType
     {
         public string Title { get; set; }

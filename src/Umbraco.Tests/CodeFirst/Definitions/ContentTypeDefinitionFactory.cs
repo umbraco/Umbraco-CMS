@@ -32,7 +32,7 @@ namespace Umbraco.Tests.CodeFirst.Definitions
             var contentTypeAlias = contentTypeAttribute == null ? modelType.Name.ToUmbracoAlias() : contentTypeAttribute.Alias;
             //Check if ContentType already exists by looking it up by Alias.
             var existing = ServiceFactory.ContentTypeService.GetContentType(contentTypeAlias);
-
+            
             Lazy<IContentType> contentType = contentTypeAttribute == null
                                                  ? PlainPocoConvention(modelType, existing)
                                                  : ContentTypeConvention(contentTypeAttribute, modelType, existing);
