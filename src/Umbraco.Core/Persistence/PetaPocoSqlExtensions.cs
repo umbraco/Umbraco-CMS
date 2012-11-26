@@ -33,7 +33,31 @@ namespace Umbraco.Core.Persistence
             var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
             var columnName = column.FirstAttribute<ColumnAttribute>().Name;
 
-            return sql.OrderBy(SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(columnName));
+            var type = typeof(TColumn);
+            var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
+            string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
+
+            var syntax = string.Format("{0}.{1}",
+                SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName),
+                SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(columnName));
+
+            return sql.OrderBy(syntax);
+        }
+
+        public static Sql OrderByDescending<TColumn>(this Sql sql, Expression<Func<TColumn, object>> columnMember)
+        {
+            var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
+            var columnName = column.FirstAttribute<ColumnAttribute>().Name;
+
+            var type = typeof(TColumn);
+            var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
+            string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
+
+            var syntax = string.Format("{0}.{1} DESC",
+                SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName),
+                SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(columnName));
+
+            return sql.OrderBy(syntax);
         }
 
         public static Sql GroupBy<TColumn>(this Sql sql, Expression<Func<TColumn, object>> columnMember)

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Querying
 {
@@ -65,7 +66,7 @@ namespace Umbraco.Core.Persistence.Querying
                 case ExpressionType.RightShift:
                 case ExpressionType.LeftShift:
                 case ExpressionType.ExclusiveOr:
-                    return "(" + VisitBinary(exp as BinaryExpression) + ")";
+                    return VisitBinary(exp as BinaryExpression);
                 case ExpressionType.Negate:
                 case ExpressionType.NegateChecked:
                 case ExpressionType.Not:
@@ -501,7 +502,10 @@ namespace Umbraco.Core.Persistence.Querying
         protected virtual string GetFieldName(Database.PocoData pocoData, string name)
         {
             var column = pocoData.Columns.FirstOrDefault(x => x.Value.PropertyInfo.Name == name);
-            return column.Value.ColumnName;
+            var fieldName = string.Format("{0}.{1}",
+                SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(pocoData.TableInfo.TableName),
+                SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(column.Value.ColumnName));
+            return fieldName;
         }
 
         protected virtual string GetFieldName(string name)
@@ -512,7 +516,7 @@ namespace Umbraco.Core.Persistence.Querying
                 //FieldDefinition fd = modelDef.FieldDefinitions.FirstOrDefault(x => x.Name == name);
                 //string fn = fd != default(FieldDefinition) ? fd.FieldName : name;
                 //return OrmLiteConfig.DialectProvider.GetQuotedColumnName(fn);
-                return "[" + name + "]";
+                return SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(name);
             }
             else
             {

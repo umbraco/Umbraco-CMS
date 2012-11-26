@@ -115,11 +115,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-            //NOTE: If IsDefault=true we won't get ContentTypes like File, Folder etc. but only DocumentTypes.
-            //Which is why "AND cmsDocumentType.IsDefault = @IsDefault" has been removed from sql below.
-            //But might need to add it if we create a MediaTypeRepository
-            //NOTE: Think the above is incorrect as ContentType and MediaType have different NodeObjectTypes.
-            //UPDATE The above is no longer relevant as the ContentType/DocumentType and MediaType repos are not the same.
+            //TODO Investigate the proper usage of IsDefault on cmsDocumentType
             sql.Select(isCount ? "COUNT(*)" : "*");
             sql.From("cmsDocumentType");
             sql.RightJoin("cmsContentType ON ([cmsContentType].[nodeId] = [cmsDocumentType].[contentTypeNodeId])");
