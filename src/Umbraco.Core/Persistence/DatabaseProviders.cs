@@ -3,6 +3,7 @@
     public enum DatabaseProviders
     {
         SqlServer,
+        SqlAzure,
         SqlServerCE,
         MySql,
         PostgreSQL,

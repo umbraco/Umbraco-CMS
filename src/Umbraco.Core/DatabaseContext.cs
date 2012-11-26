@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Configuration;
-using System.Data.Common;
+using System.Linq;
+using System.Web.Configuration;
+using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -49,6 +51,115 @@ namespace Umbraco.Core
         public bool IsDatabaseConfigured
         {
             get { return _configured; }
+        }
+
+        /// <summary>
+        /// Configure a ConnectionString for the embedded database.
+        /// </summary>
+        public void ConfigureDatabaseConnection()
+        {
+            var providerName = "System.Data.SqlServerCe.4.0";
+            var connectionString = "Datasource=|DataDirectory|Umbraco.sdf";
+            var appSettingsConnection = @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf";
+
+            SaveConnectionString(connectionString, appSettingsConnection, providerName);
+            Initialize();
+        }
+
+        /// <summary>
+        /// Configure a ConnectionString that has been entered manually.
+        /// </summary>
+        /// <remarks>
+        /// Please note that we currently assume that the 'System.Data.SqlClient' provider can be used.
+        /// </remarks>
+        /// <param name="connectionString"></param>
+        public void ConfigureDatabaseConnection(string connectionString)
+        {
+            SaveConnectionString(connectionString, connectionString, string.Empty);
+            Initialize();
+        }
+
+        /// <summary>
+        /// Configures a ConnectionString for the Umbraco database based on the passed in properties from the installer.
+        /// </summary>
+        /// <param name="server">Name or address of the database server</param>
+        /// <param name="databaseName">Name of the database</param>
+        /// <param name="user">Database Username</param>
+        /// <param name="password">Database Password</param>
+        /// <param name="databaseProvider">Type of the provider to be used (Sql, Sql Azure, Sql Ce, MySql)</param>
+        public void ConfigureDatabaseConnection(string server, string databaseName, string user, string password, string databaseProvider)
+        {
+            string connectionString;
+            string appSettingsConnection;
+            string providerName = "System.Data.SqlClient";
+            if(databaseProvider.ToLower().Contains("mysql"))
+            {
+                providerName = "MySql.Data.MySqlClient";
+                connectionString = string.Format("Server={0}; Database={1};Uid={2};Pwd={3}", server, databaseName, user, password);
+                appSettingsConnection = connectionString;
+            }
+            else if(databaseProvider.ToLower().Contains("azure"))
+            {
+                connectionString = string.Format("Server=tcp:{0}.database.windows.net;Database={1};User ID={2}@{0};Password={3}", server, databaseName, user, password);
+                appSettingsConnection = connectionString;
+            }
+            else
+            {
+                connectionString = string.Format("server={0};database={1};user id={2};password={3}", server, databaseName, user, password);
+                appSettingsConnection = connectionString;
+            }
+
+            SaveConnectionString(connectionString, appSettingsConnection, providerName);
+            Initialize();
+        }
+
+        /// <summary>
+        /// Saves the connection string as a proper .net ConnectionString and the legacy AppSettings key/value.
+        /// </summary>
+        /// <param name="connectionString"></param>
+        /// <param name="appSettingsConnection"></param>
+        /// <param name="providerName"></param>
+        private void SaveConnectionString(string connectionString, string appSettingsConnection, string providerName)
+        {
+            //Set the connection string for the new datalayer
+            var connectionStringSettings = string.IsNullOrEmpty(providerName)
+                                      ? new ConnectionStringSettings(GlobalSettings.UmbracoConnectionName,
+                                                                     connectionString)
+                                      : new ConnectionStringSettings(GlobalSettings.UmbracoConnectionName,
+                                                                     connectionString, providerName);
+
+            //Set the connection string in appsettings used in the legacy datalayer
+            GlobalSettings.DbDsn = appSettingsConnection;
+            //ConfigurationManager.ConnectionStrings.Add(conectionString);
+
+            var webConfig = new WebConfigurationFileMap();
+            var vDir = GlobalSettings.FullpathToRoot;
+            foreach (VirtualDirectoryMapping v in webConfig.VirtualDirectories)
+            {
+                if (v.IsAppRoot)
+                {
+                    vDir = v.PhysicalDirectory;
+                }
+            }
+
+            string fileName = String.Concat(vDir, "web.config");
+            var xml = XDocument.Load(fileName);
+            var connectionstrings = xml.Root.Descendants("connectionStrings").Single();
+
+            // Update connectionString if it exists, or else create a new appSetting for the given key and value
+            var setting = connectionstrings.Descendants("add").FirstOrDefault(s => s.Attribute("name").Value == GlobalSettings.UmbracoConnectionName);
+            if (setting == null)
+                connectionstrings.Add(new XElement("add", 
+                    new XAttribute("name", GlobalSettings.UmbracoConnectionName),
+                    new XAttribute("connectionString", connectionStringSettings),
+                    new XAttribute("providerName", providerName)));
+            else
+            {
+                setting.Attribute("connectionString").Value = connectionString;
+            }
+
+            xml.Save(fileName);
+            ConfigurationManager.RefreshSection("connectionStrings");
         }
 
         /// <summary>

@@ -2,6 +2,8 @@ using System;
 using System.Data.Common;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core;
+using Umbraco.Core.Persistence;
 using umbraco.DataLayer;
 using umbraco.DataLayer.Utility.Installer;
 using System.IO;
@@ -154,8 +156,23 @@ namespace umbraco.presentation.install.steps
 
             try
             {
-                DbConnectionStringBuilder connectionStringBuilder = CreateConnectionString();
-                GlobalSettings.DbDSN = connectionStringBuilder.ConnectionString;
+                /*DbConnectionStringBuilder connectionStringBuilder = CreateConnectionString();
+                GlobalSettings.DbDSN = connectionStringBuilder.ConnectionString;*/
+
+                if (string.IsNullOrEmpty(ConnectionString.Text) == false)
+                {
+                    DatabaseContext.Current.ConfigureDatabaseConnection(ConnectionString.Text);
+                }
+                else if (IsEmbeddedDatabase)
+                {
+                    DatabaseContext.Current.ConfigureDatabaseConnection();
+                }
+                else
+                {
+                    DatabaseContext.Current.ConfigureDatabaseConnection(DatabaseServer.Text, DatabaseName.Text,
+                                                                        DatabaseUsername.Text, DatabasePassword.Text,
+                                                                        DatabaseType.SelectedValue);
+                }
             }
             catch (Exception ex)
             {

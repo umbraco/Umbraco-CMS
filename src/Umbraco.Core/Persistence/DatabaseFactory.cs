@@ -66,6 +66,7 @@ namespace Umbraco.Core.Persistence
                 if (dbtype.StartsWith("Npgsql")) return DatabaseProviders.PostgreSQL;
                 if (dbtype.StartsWith("Oracle") || dbtype.Contains("OracleClient")) return DatabaseProviders.Oracle;
                 if (dbtype.StartsWith("SQLite")) return DatabaseProviders.SQLite;
+                if(dbtype.Contains("Azure")) return DatabaseProviders.SqlAzure;
 
                 return DatabaseProviders.SqlServer;
             }
