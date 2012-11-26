@@ -10,7 +10,7 @@
  
 IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
  
-    Database version: 4.8.0.5
+    Database version: 4.8.0.6
     
     Please increment this version number if ANY change is made to this script,
     so compatibility with scripts for other database systems can be verified easily.
@@ -497,7 +497,7 @@ INSERT INTO umbracoNode (id, trashed, parentID, nodeUser, level, path, sortOrder
 	(-51, 0, -1, 0, 11, '-1,-51', 4, '2e6d3631-066e-44b8-aec4-96f09099b2b5', 'Numeric', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/09/30 14:01:49.920'),
 	(-49, 0, -1, 0, 11, '-1,-49', 2, '92897bc6-a5f3-4ffe-ae27-f2e7e33dda49', 'True/false', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/09/30 14:01:49.920'),
 	(-43, 0, -1, 0, 1, '-1,-43', 2, 'fbaf13a8-4036-41f2-93a3-974f678c312a', 'Checkbox list', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/10/15 14:11:04.367'),
-	(-42, 0, -1, 0, 1, '-1,-42', 2, '0b6a45e7-44ba-430d-9da5-4e46060b9e03', 'Dropdow', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/10/15 14:10:59.000'),
+	(-42, 0, -1, 0, 1, '-1,-42', 2, '0b6a45e7-44ba-430d-9da5-4e46060b9e03', 'Dropdown', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/10/15 14:10:59.000'),
 	(-41, 0, -1, 0, 1, '-1,-41', 2, '5046194e-4237-453c-a547-15db3a07c4e1', 'Date Picker', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/10/15 14:10:54.303'),
 	(-40, 0, -1, 0, 1, '-1,-40', 2, 'bb5f57c9-ce2b-4bb9-b697-4caca783a805', 'Radiobox', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/10/15 14:10:49.253'),
 	(-39, 0, -1, 0, 1, '-1,-39', 2, 'f38f0ac7-1d27-439c-9f3f-089cd8825a53', 'Dropdown multiple', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/10/15 14:10:44.480'),
