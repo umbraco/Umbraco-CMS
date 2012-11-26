@@ -48,14 +48,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Examine, Version=0.1.42.2941, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="Examine, Version=0.1.42.2941, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Examine.0.1.42.2941\lib\Examine.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\log4net-mediumtrust.2.0.0\lib\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Lucene.Net, Version=2.9.4.1, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Umbraco.Web.UI\bin\Lucene.Net.dll</HintPath>
+      <HintPath>..\packages\Lucene.Net.2.9.4.1\lib\net40\Lucene.Net.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.0.12054\lib\nunit.framework.dll</HintPath>
@@ -67,12 +74,12 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\SQLCE4\System.Data.SqlServerCe.dll</HintPath>
+      <Private>True</Private>
+      <HintPath>..\packages\SqlServerCE.4.0.0.0\lib\System.Data.SqlServerCe.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.SqlServerCe.Entity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\SQLCE4\System.Data.SqlServerCe.Entity.dll</HintPath>
+      <Private>True</Private>
+      <HintPath>..\packages\SqlServerCE.4.0.0.0\lib\System.Data.SqlServerCe.Entity.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
@@ -84,7 +91,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="UmbracoExamine, Version=0.1.42.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Umbraco.Web.UI\bin\UmbracoExamine.dll</HintPath>
+      <HintPath>..\packages\UmbracoExamine.0.1.42.2941\lib\UmbracoExamine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -285,10 +292,6 @@
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Name>umbraco.interfaces</Name>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.MacroEngines.Iron\umbraco.MacroEngines.Iron.csproj">
-      <Project>{98CBA7E2-1B62-497C-8AA3-B868704068D7}</Project>
-      <Name>umbraco.MacroEngines.Iron</Name>
-    </ProjectReference>
     <ProjectReference Include="..\umbraco.MacroEngines\umbraco.MacroEngines.csproj">
       <Project>{89C09045-1064-466B-B94A-DB3AFE2A5853}</Project>
       <Name>umbraco.MacroEngines</Name>
@@ -340,8 +343,8 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)"..\..\lib\SQLCE4\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /D
-xcopy "$(ProjectDir)"..\..\lib\SQLCE4\x86\*.* "$(TargetDir)x86\" /Y /F /E /D</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /D
+xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" /Y /F /E /D</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
