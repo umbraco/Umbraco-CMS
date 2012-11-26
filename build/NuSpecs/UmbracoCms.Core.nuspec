@@ -16,6 +16,7 @@
         <tags>umbraco</tags>
 		<dependencies>
             <dependency id="Microsoft.AspNet.Mvc" version="[3.0.20105.1]" />
+			<dependency id="ServiceStack.Text" version="3.9.21" />
         </dependencies>
     </metadata>
 	<files>
@@ -36,7 +37,6 @@
 		<file src="..\_BuildOutput\WebApp\bin\Our.Umbraco.uGoLive.47x.dll" target="lib\Our.Umbraco.uGoLive.47x.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\Our.Umbraco.uGoLive.Checks.dll" target="lib\Our.Umbraco.uGoLive.Checks.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\Our.Umbraco.uGoLive.dll" target="lib\Our.Umbraco.uGoLive.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\ServiceStack.Text.dll" target="lib\ServiceStack.Text.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\SQLCE4Umbraco.dll" target="lib\SQLCE4Umbraco.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.dll" target="lib\System.Data.SqlServerCe.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.Entity.dll" target="lib\System.Data.SqlServerCe.Entity.dll" />
