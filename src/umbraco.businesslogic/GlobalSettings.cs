@@ -296,7 +296,7 @@ namespace umbraco
         [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
         public static string CurrentVersion
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.CurrentVersion; }
+			get { return Umbraco.Core.Configuration.GlobalSettings.Version.ToString(3); }
         }
 
         /// <summary>
@@ -306,7 +306,7 @@ namespace umbraco
         [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
         public static int VersionMajor
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.VersionMajor; }
+			get { return Umbraco.Core.Configuration.GlobalSettings.Version.Major; }
         }
 
         /// <summary>
@@ -316,7 +316,7 @@ namespace umbraco
         [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
         public static int VersionMinor
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.VersionMinor; }
+			get { return Umbraco.Core.Configuration.GlobalSettings.Version.Minor; }
         }
 
         /// <summary>
@@ -326,7 +326,7 @@ namespace umbraco
         [Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.Version instead", false)]
         public static int VersionPatch
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.VersionPatch; }
+			get { return Umbraco.Core.Configuration.GlobalSettings.Version.Build; }
         }
 
         /// <summary>

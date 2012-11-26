@@ -24,7 +24,10 @@ namespace umbraco.presentation.webservices
             legacyAjaxCalls.Authorize();
 
             org.umbraco.update.CheckForUpgrade check = new global::umbraco.presentation.org.umbraco.update.CheckForUpgrade();
-            org.umbraco.update.UpgradeResult result = check.CheckUpgrade(GlobalSettings.VersionMajor, GlobalSettings.VersionMinor, GlobalSettings.VersionPatch, GlobalSettings.VersionComment);
+            org.umbraco.update.UpgradeResult result = check.CheckUpgrade(Umbraco.Core.Configuration.GlobalSettings.Version.Major,
+                                                                         Umbraco.Core.Configuration.GlobalSettings.Version.Minor,
+                                                                         Umbraco.Core.Configuration.GlobalSettings.Version.Build,
+                                                                         Umbraco.Core.Configuration.GlobalSettings.VersionComment);
             return new UpgradeResult(result.UpgradeType.ToString(), result.Comment, result.UpgradeUrl);
         }
 
