@@ -22,6 +22,8 @@
             <PackageSource Include="https://nuget.org/api/v2/" />
             <PackageSource Include="https://my-nuget-source/nuget/" />
         -->
+      <PackageSource Include="https://nuget.org/api/v2/" />
+      <PackageSource Include="http://www.myget.org/F/umbracocore/" />
     </ItemGroup>
 
     <PropertyGroup Condition=" '$(OS)' == 'Windows_NT'">
