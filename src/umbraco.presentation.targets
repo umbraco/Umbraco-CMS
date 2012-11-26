@@ -87,7 +87,7 @@
     <Message Text="$(OutputFileName)" Importance="high" />
     
     <TransformXml Condition="$(BuildingInsideVisualStudio) == ''" Source="$(OriginalFileName)" Transform="$(WebConfigSource)" Destination="$(OutputFileName)" />
-    <TransformXml Condition="$(BuildingInsideVisualStudio) == 'true'" Source="$(OutputFileName)" Transform="$(WebConfigSource)" Destination="$(OutputFileName)" />
+    <TransformXml Condition="$(BuildingInsideVisualStudio) == 'true'" Source="$(OriginalFileName)" Transform="$(WebConfigSource)" Destination="$(OutputFileName)" />
   </Target>
 
   <Target Name="ResetConfigFiles" Condition="$(ProjDir) != $(ProjOutputDir)" BeforeTargets="Build;Rebuild" Inputs="@(ConfigFiles)" Outputs="%(Identity).Dummy">
