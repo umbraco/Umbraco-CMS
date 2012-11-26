@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected Database Database
         {
-            get { return DatabaseFactory.Current.Database; }
+            get { return DatabaseContext.Current.Database; }
         }
 
         #region Abstract Methods

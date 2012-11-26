@@ -16,7 +16,7 @@ namespace Umbraco.Core.Auditing
         /// <param name="comment">Audit comment</param>
         public void WriteEntry(int objectId, int userId, DateTime date, string header, string comment)
         {
-            DatabaseFactory.Current.Database.Insert(new LogDto
+            DatabaseContext.Current.Database.Insert(new LogDto
                                                         {
                                                             Comment = comment,
                                                             Datestamp = date,

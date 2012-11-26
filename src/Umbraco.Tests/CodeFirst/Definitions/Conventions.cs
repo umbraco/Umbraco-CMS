@@ -112,7 +112,7 @@ namespace Umbraco.Tests.CodeFirst.Definitions
                                Value = value
                            };
 
-            DatabaseFactory.Current.Database.Insert(poco);
+            DatabaseContext.Current.Database.Insert(poco);
         }
 
         /// <summary>

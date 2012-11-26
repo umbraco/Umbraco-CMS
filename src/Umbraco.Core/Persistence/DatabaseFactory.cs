@@ -6,8 +6,12 @@ namespace Umbraco.Core.Persistence
 {
     /// <summary>
     /// Provides access to the PetaPoco database as Singleton, so the database is created once in app lifetime.
-    /// This is necessary for transactions to work properly
+    /// This is necessary for transactions to work properly.
     /// </summary>
+    /// <remarks>
+    /// Because the Database is created static, the configuration has to be checked and set in 
+    /// another class, which is where the DatabaseContext comes in.
+    /// </remarks>
     public sealed class DatabaseFactory
     {
         #region Singleton
