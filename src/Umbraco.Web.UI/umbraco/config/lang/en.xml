@@ -40,7 +40,11 @@
     <key alias="domainCreated">New domain '%0%' has been created</key>
     <key alias="domainDeleted">Domain '%0%' is deleted</key>
     <key alias="domainExists">Domain '%0%' has already been assigned</key>
-    <key alias="domainHelp">ei: yourdomain.com, www.yourdomain.com</key>
+    <key alias="domainHelp">
+      <![CDATA[eg: example.com, www.example.com, example.com:8080,<br/>
+        https://www.example.com/, example.com/en, etc. Use * to match<br/>
+	any domain and just set the culture.]]>
+    </key>
     <key alias="domainUpdated">Domain '%0%' has been updated</key>
     <key alias="orEdit">Edit Current Domains</key>
   </area>
@@ -69,6 +73,7 @@
     <key alias="saveAndPublish">Save and publish</key>
     <key alias="saveToPublish">Save and send for approval</key>
     <key alias="showPage">Preview</key>
+    <key alias="showPageDisabled">Preview is disabled because there's no template assigned</key>    
     <key alias="styleChoose">Choose style</key>
     <key alias="styleShow">Show styles</key>
     <key alias="tableInsert">Insert table</key>
@@ -592,6 +597,11 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="contentPublishedFailedByEvent"><![CDATA[
       %0% could not be published, due to a 3rd party extension cancelling the action.
     ]]></key>
+    <key alias="contentPublishedFailedByParent">
+      <![CDATA[
+      %0% can not be published, because a parent page is not published.
+    ]]>
+    </key>    
     <key alias="includeUnpublished">Include unpublished child pages</key>
     <key alias="inProgress">Publishing in progress - please wait...</key>
     <key alias="inProgressCounter">%0% out of %1% pages have been published...</key>
@@ -652,6 +662,9 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="tab">Tab</key>
     <key alias="tabname">Tab Title</key>
     <key alias="tabs">Tabs</key>
+    <key alias="contentTypeEnabled">Master Content Type enabled</key>
+    <key alias="contentTypeUses">This Content Type uses</key>
+    <key alias="asAContentMasterType">as a Master Content Type. Tabs from Master Content Types are not shown and can only be edited on the Master Content Type itself</key>
   </area>
   <area alias="sort">
     <key alias="sortDone">Sorting complete.</key>
@@ -842,6 +855,8 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Category field</key>
     <key alias="changePassword">Change Your Password</key>
+    <key alias="newPassword">Change Your Password</key>
+    <key alias="confirmNewPassword">Confirm new password</key>    
     <key alias="changePasswordDescription">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
     <key alias="contentChannel">Content Channel</key>
     <key alias="defaultToLiveEditing">Redirect to canvas on login</key>
