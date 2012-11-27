@@ -314,7 +314,7 @@ namespace umbraco.cms.businesslogic
         /// <returns>The Id of the Tab on which the PropertyType is placed</returns>
         public static int getTabIdFromPropertyType(PropertyType pt)
         {
-            object tmp = SqlHelper.ExecuteScalar<object>("Select tabId from cmsPropertyType where id = " + pt.Id.ToString());
+            object tmp = SqlHelper.ExecuteScalar<object>("Select propertyTypeGroupId from cmsPropertyType where id = " + pt.Id.ToString());
             if (tmp == DBNull.Value)
                 return 0;
             else return int.Parse(tmp.ToString());
@@ -760,11 +760,11 @@ namespace umbraco.cms.businesslogic
         {
 
             // Get tab count
-            int tabCount = SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsTab WHERE contenttypeNodeId = @nodeId",
+            int tabCount = SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @nodeId",
                 SqlHelper.CreateParameter("@nodeId", Id));
 
             // The method is synchronized
-            SqlHelper.ExecuteNonQuery("INSERT INTO cmsTab (contenttypeNodeId,text,sortorder) VALUES (@nodeId,@text,@sortorder)",
+            SqlHelper.ExecuteNonQuery("INSERT INTO cmsPropertyTypeGroup (contenttypeNodeId,text,sortorder) VALUES (@nodeId,@text,@sortorder)",
                     SqlHelper.CreateParameter("@nodeId", Id),
                     SqlHelper.CreateParameter("@text", Caption),
                     SqlHelper.CreateParameter("@sortorder", tabCount + 1));
@@ -772,7 +772,7 @@ namespace umbraco.cms.businesslogic
             // Remove from cache
             FlushFromCache(Id);
 
-            return SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsTab");
+            return SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsPropertyTypeGroup");
         }
 
         /// <summary>
@@ -792,7 +792,7 @@ namespace umbraco.cms.businesslogic
                     x.TabId = 0;
                 });
 
-            SqlHelper.ExecuteNonQuery("delete from cmsTab where id =" + id);
+            SqlHelper.ExecuteNonQuery("delete from cmsPropertyTypeGroup where id =" + id);
 
             InitializeVirtualTabs();
             // Remove from cache
@@ -806,7 +806,7 @@ namespace umbraco.cms.businesslogic
         /// <param name="Caption">The new Caption</param>
         public void SetTabName(int tabId, string Caption)
         {
-            SqlHelper.ExecuteNonQuery("Update cmsTab set text = @text where id = @id",
+            SqlHelper.ExecuteNonQuery("Update cmsPropertyTypeGroup set text = @text where id = @id",
             SqlHelper.CreateParameter("@text", Caption),
             SqlHelper.CreateParameter("@id", tabId));
 
@@ -822,7 +822,7 @@ namespace umbraco.cms.businesslogic
         public void SetTabSortOrder(int tabId, int sortOrder)
         {
             SqlHelper.ExecuteNonQuery(
-                                      "Update  cmsTab set sortOrder = " + sortOrder + " where id = " + tabId);
+                                      "Update  cmsPropertyTypeGroup set sortOrder = " + sortOrder + " where id = " + tabId);
 
             // Remove from cache
             FlushFromCache(Id);
@@ -1028,7 +1028,7 @@ namespace umbraco.cms.businesslogic
             var temporaryList = new List<TabI>();
             using (IRecordsReader dr = SqlHelper.ExecuteReader(
                                                               string.Format(
-                                                                  "Select Id,text,sortOrder from cmsTab where contenttypeNodeId = {0} order by sortOrder",
+                                                                  "Select Id,text,sortOrder from cmsPropertyTypeGroup where contenttypeNodeId = {0} order by sortOrder",
                                                                   Id)))
             {
                 while (dr.Read())
@@ -1174,7 +1174,7 @@ namespace umbraco.cms.businesslogic
                 Tab tab = null;
                 using (IRecordsReader dr = SqlHelper.ExecuteReader(
                                                   string.Format(
-                                                      "Select Id, text, contenttypeNodeId, sortOrder from cmsTab where Id = {0} order by sortOrder",
+                                                      "Select Id, text, contenttypeNodeId, sortOrder from cmsPropertyTypeGroup where Id = {0} order by sortOrder",
                                                       id)))
                 {
                     if (dr.Read())
@@ -1233,7 +1233,7 @@ namespace umbraco.cms.businesslogic
                             var tmp1 = new List<PropertyType>();
 
                             using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(
-                                @"select id from cmsPropertyType where tabId = {0} and contentTypeId = {1}
+                                @"select id from cmsPropertyType where propertyTypeGroupId = {0} and contentTypeId = {1}
 									order by sortOrder", _id, ctype)))
                             {
                                 while (dr.Read())
@@ -1254,7 +1254,7 @@ namespace umbraco.cms.businesslogic
                 var tmp = new List<PropertyType>();
 
                 using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(
-                    @"select id from cmsPropertyType where tabId = {0}", _id)))
+                    @"select id from cmsPropertyType where propertyTypeGroupId = {0}", _id)))
                 {
                     while (dr.Read())
                         tmp.Add(PropertyType.GetPropertyType(dr.GetInt("id")));
@@ -1294,9 +1294,9 @@ namespace umbraco.cms.businesslogic
             /// </summary>
             public void Delete()
             {
-                SqlHelper.ExecuteNonQuery("update cmsPropertyType set tabId = NULL where tabid = @id",
+                SqlHelper.ExecuteNonQuery("update cmsPropertyType set propertyTypeGroupId = NULL where propertyTypeGroupId = @id",
                                           SqlHelper.CreateParameter("@id", Id));
-                SqlHelper.ExecuteNonQuery("delete from cmsTab where id = @id",
+                SqlHelper.ExecuteNonQuery("delete from cmsPropertyTypeGroup where id = @id",
                                           SqlHelper.CreateParameter("@id", Id));
             }
 
@@ -1309,7 +1309,7 @@ namespace umbraco.cms.businesslogic
             {
                 try
                 {
-                    string tempCaption = SqlHelper.ExecuteScalar<string>("Select text from cmsTab where id = " + id.ToString());
+                    string tempCaption = SqlHelper.ExecuteScalar<string>("Select text from cmsPropertyTypeGroup where id = " + id.ToString());
                     if (!tempCaption.StartsWith("#"))
                         return tempCaption;
                     else
@@ -1344,13 +1344,13 @@ namespace umbraco.cms.businesslogic
                 {
                     if (!_sortOrder.HasValue)
                     {
-                        _sortOrder = SqlHelper.ExecuteScalar<int>("select sortOrder from cmsTab where id = " + _id);
+                        _sortOrder = SqlHelper.ExecuteScalar<int>("select sortOrder from cmsPropertyTypeGroup where id = " + _id);
                     }
                     return _sortOrder.Value;
                 }
                 set
                 {
-                    SqlHelper.ExecuteNonQuery("update cmsTab set sortOrder = " + value + " where id =" + _id);
+                    SqlHelper.ExecuteNonQuery("update cmsPropertyTypeGroup set sortOrder = " + value + " where id =" + _id);
                 }
             }
 

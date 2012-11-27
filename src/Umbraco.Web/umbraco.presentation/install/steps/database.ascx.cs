@@ -1,8 +1,10 @@
 using System;
 using System.Data.Common;
+using System.Threading;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using umbraco.DataLayer;
 using umbraco.DataLayer.Utility.Installer;
@@ -174,26 +176,20 @@ namespace umbraco.presentation.install.steps
                                                                         DatabaseType.SelectedValue);
                 }
 
-                if(DatabaseContext.Current.IsDatabaseConfigured == false)
-                    throw new Exception("ConnectionString could not be found");
-
-                Helper.setProgress(20, "Connection opened", "");
-
                 var database = new Database(DatabaseContext.Current.ConnectionString,
-                                            DatabaseContext.Current.ProviderName);
+                                        DatabaseContext.Current.ProviderName);
+
                 database.Initialize();
-
-                Helper.setProgress(90, "Refreshing content cache", "");
-
-                library.RefreshContent();
-
-                Helper.setProgress(100, "Database is up-to-date", "");
             }
             catch (Exception ex)
             {
+                LogHelper.Error<detect>("Exception was thrown during the setup of the database in 'saveDBConfig'.", ex);
+
                 Exception error = new Exception("Could not save the web.config file. Please modify the connection string manually.", ex);
                 Helper.setProgress(-1, "Could not save the web.config file. Please modify the connection string manually.", error.InnerException.Message);
             }
+
+            Thread.Sleep(5000);
 
             settings.Visible = false;
             installing.Visible = true;

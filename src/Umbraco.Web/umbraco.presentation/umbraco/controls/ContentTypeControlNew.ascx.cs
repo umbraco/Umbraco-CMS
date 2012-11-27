@@ -311,7 +311,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
             {
                 ((DropDownList)e.Item.FindControl("dllTab")).SelectedValue =
-                    ((DataRowView)e.Item.DataItem).Row["tabid"].ToString();
+                    ((DataRowView)e.Item.DataItem).Row["propertyTypeGroupId"].ToString();
                 ((DropDownList)e.Item.FindControl("ddlType")).SelectedValue =
                     ((DataRowView)e.Item.DataItem).Row["type"].ToString();
             }
@@ -540,13 +540,13 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             ds.Tables.Add(dtT);
 
             dtP.Columns.Add("id");
-            dtP.Columns.Add("tabid");
+            dtP.Columns.Add("propertyTypeGroupId");
             dtP.Columns.Add("alias");
             dtP.Columns.Add("name");
             dtP.Columns.Add("type");
             dtP.Columns.Add("tab");
 
-            dtT.Columns.Add("tabid");
+            dtT.Columns.Add("propertyTypeGroupId");
             dtT.Columns.Add("TabName");
             dtT.Columns.Add("genericProperties");
 
@@ -555,7 +555,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             {
                 DataRow dr = dtT.NewRow();
                 dr["TabName"] = tb.GetRawCaption();
-                dr["tabid"] = tb.Id;
+                dr["propertyTypeGroupId"] = tb.Id;
                 dtT.Rows.Add(dr);
 
                 // zb-00036 #29889 : fix property types getter
@@ -563,7 +563,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 {
                     DataRow dr1 = dtP.NewRow();
                     dr1["alias"] = pt.Alias;
-                    dr1["tabid"] = tb.Id;
+                    dr1["propertyTypeGroupId"] = tb.Id;
                     dr1["name"] = pt.GetRawName();
                     dr1["type"] = pt.DataTypeDefinition.Id;
                     dr1["tab"] = tb.GetRawCaption();
@@ -575,7 +575,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
             DataRow dr2 = dtT.NewRow();
             dr2["TabName"] = "General properties";
-            dr2["tabid"] = 0;
+            dr2["propertyTypeGroupId"] = 0;
             dtT.Rows.Add(dr2);
 
             foreach (cms.businesslogic.propertytype.PropertyType pt in cType.PropertyTypes)
@@ -584,7 +584,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 {
                     DataRow dr1 = dtP.NewRow();
                     dr1["alias"] = pt.Alias;
-                    dr1["tabid"] = 0;
+                    dr1["propertyTypeGroupId"] = 0;
                     dr1["name"] = pt.GetRawName();
                     dr1["type"] = pt.DataTypeDefinition.Id;
                     dr1["tab"] = "General properties";
@@ -594,7 +594,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             }
 
 
-            ds.Relations.Add(new DataRelation("tabidrelation", dtT.Columns["tabid"], dtP.Columns["tabid"], false));
+            ds.Relations.Add(new DataRelation("tabidrelation", dtT.Columns["propertyTypeGroupId"], dtP.Columns["propertyTypeGroupId"], false));
         }
 
 
@@ -733,7 +733,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
         protected void dlTab_itemdatabound(object sender, DataListItemEventArgs e)
         {
-            if (int.Parse(((DataRowView)e.Item.DataItem).Row["tabid"].ToString()) == 0)
+            if (int.Parse(((DataRowView)e.Item.DataItem).Row["propertyTypeGroupId"].ToString()) == 0)
             {
                 ((Button)e.Item.FindControl("btnTabDelete")).Visible = false;
                 ((Button)e.Item.FindControl("btnTabUp")).Visible = false;

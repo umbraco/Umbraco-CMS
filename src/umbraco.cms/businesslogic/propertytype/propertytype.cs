@@ -49,15 +49,15 @@ namespace umbraco.cms.businesslogic.propertytype
         public PropertyType(int id)
         {
             using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                "Select mandatory, DataTypeId, tabId, ContentTypeId, sortOrder, alias, name, validationRegExp, description from cmsPropertyType where id=@id",
+                "Select mandatory, DataTypeId, propertyTypeGroupId, ContentTypeId, sortOrder, alias, name, validationRegExp, description from cmsPropertyType where id=@id",
                 SqlHelper.CreateParameter("@id", id)))
             {
                 if (!dr.Read())
                     throw new ArgumentException("Propertytype with id: " + id + " doesnt exist!");
                 _mandatory = dr.GetBoolean("mandatory");
                 _id = id;
-                if (!dr.IsNull("tabId"))
-                    _tabId = dr.GetInt("tabId");
+                if (!dr.IsNull("propertyTypeGroupId"))
+                    _tabId = dr.GetInt("propertyTypeGroupId");
                 _sortOrder = dr.GetInt("sortOrder");
                 _alias = dr.GetString("alias");
                 _name = dr.GetString("Name");
@@ -109,7 +109,7 @@ namespace umbraco.cms.businesslogic.propertytype
                     tabId = DBNull.Value;
                 }
 
-                SqlHelper.ExecuteNonQuery("Update cmsPropertyType set tabId = @tabId where id = @id",
+                SqlHelper.ExecuteNonQuery("Update cmsPropertyType set propertyTypeGroupId = @tabId where id = @id",
                                           SqlHelper.CreateParameter("@tabId", tabId),
                                           SqlHelper.CreateParameter("@id", Id));
             }

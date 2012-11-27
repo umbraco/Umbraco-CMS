@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using umbraco.DataLayer.Utility.Installer;
 using umbraco.DataLayer;
 
@@ -13,6 +17,7 @@ namespace umbraco.presentation.install.utills
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            LogHelper.Info<p>(string.Format("Hitting Page_Load on p.aspx for the requested '{0}' feed", Request.QueryString["feed"]));
 
             // Stop Caching in IE
             Response.Cache.SetCacheability(System.Web.HttpCacheability.NoCache);
@@ -57,16 +62,31 @@ namespace umbraco.presentation.install.utills
         [System.Web.Script.Services.ScriptMethod]
         public static string installOrUpgrade()
         {
-            Helper.setProgress(5, "Opening database connection...", "");
+            LogHelper.Info<p>("Running 'installOrUpgrade' service");
 
-            IInstallerUtility installer;
+            //Helper.setProgress(5, "Opening database connection...", "");
+            //IInstallerUtility installer;
 
-            // Build the new connection string
-            //DbConnectionStringBuilder connectionStringBuilder = CreateConnectionString();
-            Helper.setProgress(5, "Connecting...", "");
+            if (DatabaseContext.Current.IsDatabaseConfigured == false)
+                return "ConnectionString could not be found";
 
-            // Try to connect to the database
-            try
+            //Helper.setProgress(20, "Connection opened", "");
+
+            //var database = new Database(DatabaseContext.Current.ConnectionString, DatabaseContext.Current.ProviderName);
+            
+            //Helper.setProgress(35, "Installing tables...", "");
+
+            //database.Initialize();
+
+            //Helper.setProgress(90, "Refreshing content cache", "");
+
+            //library.RefreshContent();
+
+            Helper.setProgress(100, "Installation completed!", "");
+
+            return "installed";
+
+            /*try
             {
                 var sqlHelper = DataLayerHelper.CreateSqlHelper(GlobalSettings.DbDSN);
                 installer = sqlHelper.Utility.CreateInstaller();
@@ -83,17 +103,17 @@ namespace umbraco.presentation.install.utills
                     string.Format("{0}<br />Connection string: {1}", error.InnerException.Message, GlobalSettings.DbDSN));
 
                 return error.Message;
-            }
+            }*/
 
 
-            if (installer.CanConnect)
+            /*if (installer.CanConnect)
             {
                 if (installer.IsLatestVersion)
                 {
 
                     Helper.setProgress(90, "Refreshing content cache", "");
 
-                    //library.RefreshContent();
+                    library.RefreshContent();
 
                     Helper.setProgress(100, "Database is up-to-date", "");
 
@@ -103,10 +123,9 @@ namespace umbraco.presentation.install.utills
                     if (installer.IsEmpty)
                     {
                         Helper.setProgress(35, "Installing tables...", "");
-                        //do install
                         try
                         {
-                            //installer.Install();
+                            installer.Install();
                             Helper.setProgress(100, "Installation completed!", "");
                             installer = null;
 
@@ -119,17 +138,11 @@ namespace umbraco.presentation.install.utills
                             return "error";
                         }
  
-                    } //else if (m_Installer.CurrentVersion == DatabaseVersion.None || m_Installer.CanUpgrade) {
-                    //Helper.setProgress(35, "Updating database tables...", "");
-                    //m_Installer.Install();
-
-                      //      library.RefreshContent();
-                    //      return "installed";
-                    //  }
+                    }
                     else if (installer.CurrentVersion == DatabaseVersion.None || installer.CanUpgrade)
                     {
                         Helper.setProgress(35, "Updating database tables...", "");
-                        //installer.Install();
+                        installer.Install();
 
                         Helper.setProgress(100, "Upgrade completed!", "");
 
@@ -139,10 +152,7 @@ namespace umbraco.presentation.install.utills
                         return "upgraded";
                     }
                 }
-
-
-
-            }
+            }*/
 
             return "no connection;";
         }

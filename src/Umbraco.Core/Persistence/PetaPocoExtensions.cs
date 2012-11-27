@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions;
@@ -84,7 +85,7 @@ namespace Umbraco.Core.Persistence
                 }
 
                 //Specific to Sql Ce - look for changes to Identity Seed
-                if(DatabaseContext.Current.DatabaseProvider == DatabaseProviders.SqlServerCE)
+                if (DatabaseContext.Current.ProviderName.Contains("SqlServerCe"))
                 {
                     var seedSql = SyntaxConfig.SqlSyntaxProvider.ToAlterIdentitySeedStatements(tableDefinition);
                     foreach (var sql in seedSql)
@@ -93,6 +94,8 @@ namespace Umbraco.Core.Persistence
                     }
                 }
             }
+
+            LogHelper.Info<Database>(string.Format("New table '{0}' was created", tableName));
         }
 
         public static void DropTable<T>(this Database db)
@@ -124,6 +127,8 @@ namespace Umbraco.Core.Persistence
         public static void Initialize(this Database db)
         {
             NewTable += PetaPocoExtensions_NewTable;
+
+            LogHelper.Info<Database>("Initializing database schema creation");
 
             var creation = new DatabaseCreation(db);
             creation.InitializeDatabaseSchema();

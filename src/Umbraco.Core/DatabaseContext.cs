@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Configuration;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -43,7 +44,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <remarks>
         /// This should not be used for CRUD operations or queries against the
-        /// standard Umbraco tables!
+        /// standard Umbraco tables! Use the Public services for that.
         /// </remarks>
         public Database Database
         {
@@ -122,7 +123,7 @@ namespace Umbraco.Core
             SaveConnectionString(connectionString, appSettingsConnection, providerName);
 
             string appData = VirtualPathUtility.ToAbsolute(GlobalSettings.StorageDirectory);
-            var path = Path.Combine(appData, "Umbraco.sdf");
+            var path = Path.Combine(GlobalSettings.FullpathToRoot, "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
             {
                 var engine = new SqlCeEngine(connectionString);
@@ -231,6 +232,8 @@ namespace Umbraco.Core
             }
 
             xml.Save(fileName);
+
+            LogHelper.Info<DatabaseContext>("Configured new ConnectionString: " + connectionString);
         }
 
         /// <summary>
