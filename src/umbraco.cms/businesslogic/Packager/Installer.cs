@@ -13,7 +13,8 @@ using ICSharpCode.SharpZipLib;
 using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Zip.Compression;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-
+using Umbraco.Core;
+using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.BusinessLogic;
@@ -154,29 +155,34 @@ namespace umbraco.cms.businesslogic.packager
         /// <returns></returns>
         public string Import(string InputFile)
         {
-            string tempDir = "";
-            if (File.Exists(IOHelper.MapPath(SystemDirectories.Data + Path.DirectorySeparatorChar + InputFile)))
-            {
-                FileInfo fi = new FileInfo(IOHelper.MapPath(SystemDirectories.Data + Path.DirectorySeparatorChar + InputFile));
-                // Check if the file is a valid package
-                if (fi.Extension.ToLower() == ".umb")
-                {
-                    try
-                    {
-                        tempDir = unPack(fi.FullName);
-                        LoadConfig(tempDir);
-                    }
-                    catch (Exception unpackE)
-                    {
-                        throw new Exception("Error unpacking extension...", unpackE);
-                    }
-                }
-                else
-                    throw new Exception("Error - file isn't a package (doesn't have a .umb extension). Check if the file automatically got named '.zip' upon download.");
-            }
-            else
-                throw new Exception("Error - file not found. Could find file named '" + IOHelper.MapPath(SystemDirectories.Data + Path.DirectorySeparatorChar + InputFile) + "'");
-            return tempDir;
+			using (DisposableTimer.DebugDuration<Installer>(
+				() => "Importing package file " + InputFile, 
+				() => "Package file " + InputFile + "imported"))
+			{
+				string tempDir = "";
+				if (File.Exists(IOHelper.MapPath(SystemDirectories.Data + Path.DirectorySeparatorChar + InputFile)))
+				{
+					FileInfo fi = new FileInfo(IOHelper.MapPath(SystemDirectories.Data + Path.DirectorySeparatorChar + InputFile));
+					// Check if the file is a valid package
+					if (fi.Extension.ToLower() == ".umb")
+					{
+						try
+						{
+							tempDir = unPack(fi.FullName);
+							LoadConfig(tempDir);
+						}
+						catch (Exception unpackE)
+						{
+							throw new Exception("Error unpacking extension...", unpackE);
+						}
+					}
+					else
+						throw new Exception("Error - file isn't a package (doesn't have a .umb extension). Check if the file automatically got named '.zip' upon download.");
+				}
+				else
+					throw new Exception("Error - file not found. Could find file named '" + IOHelper.MapPath(SystemDirectories.Data + Path.DirectorySeparatorChar + InputFile) + "'");
+				return tempDir;	
+			}
         }
 
 
@@ -220,218 +226,259 @@ namespace umbraco.cms.businesslogic.packager
             return insPack.Data.Id;
         }
 
-        public void InstallFiles(int packageId, string tempDir) {
+        public void InstallFiles(int packageId, string tempDir) 
+		{
+			using (DisposableTimer.DebugDuration<Installer>(
+				() => "Installing package files for package id " + packageId + " into temp folder " + tempDir,
+				() => "Package file installation complete for package id " + packageId))
+			{
+				//retrieve the manifest to continue installation
+				packager.InstalledPackage insPack = packager.InstalledPackage.GetById(packageId);
 
-            //retrieve the manifest to continue installation
-            packager.InstalledPackage insPack = packager.InstalledPackage.GetById(packageId);
+				// Move files
+				//string virtualBasePath = System.Web.HttpContext.Current.Request.ApplicationPath;
+				string basePath = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
 
-            // Move files
-            //string virtualBasePath = System.Web.HttpContext.Current.Request.ApplicationPath;
-            string basePath = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
+				foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("//file"))
+				{
+					//we enclose the whole file-moving to ensure that the entire installer doesn't crash
+					try
+					{
+						String destPath = getFileName(basePath, xmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")));
+						String sourceFile = getFileName(tempDir, xmlHelper.GetNodeValue(n.SelectSingleNode("guid")));
+						String destFile = getFileName(destPath, xmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
 
-            foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("//file")) {
-                //we enclose the whole file-moving to ensure that the entire installer doesn't crash
-                try {
-                    String destPath = getFileName(basePath, xmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")));
-                    String sourceFile = getFileName(tempDir, xmlHelper.GetNodeValue(n.SelectSingleNode("guid")));
-                    String destFile = getFileName(destPath, xmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
+						// Create the destination directory if it doesn't exist
+						if (!Directory.Exists(destPath))
+							Directory.CreateDirectory(destPath);
+						//If a file with this name exists, delete it
+						else if (File.Exists(destFile))
+							File.Delete(destFile);
 
-                    // Create the destination directory if it doesn't exist
-                    if (!Directory.Exists(destPath))
-                        Directory.CreateDirectory(destPath);
-                    //If a file with this name exists, delete it
-                    else if (File.Exists(destFile))
-                        File.Delete(destFile);
+						// Move the file
+						File.Move(sourceFile, destFile);
 
-                    // Move the file
-                    File.Move(sourceFile, destFile);
+						//PPH log file install
+						insPack.Data.Files.Add(xmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")) + "/" + xmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
+					}
+					catch (Exception ex)
+					{
+						Log.Add(LogTypes.Error, -1, "Package install error: " + ex.ToString());
+					}
+				}
 
-                    //PPH log file install
-                    insPack.Data.Files.Add(xmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")) + "/" + xmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
-                } catch (Exception ex) {
-                    Log.Add(LogTypes.Error, -1, "Package install error: " + ex.ToString());
-                }
-            }
-
-            insPack.Save();
+				insPack.Save();	
+			}		            
         }
 
 
         public void InstallBusinessLogic(int packageId, string tempDir) {
-            
-            //retrieve the manifest to continue installation
-            packager.InstalledPackage insPack = packager.InstalledPackage.GetById(packageId);
-            bool saveNeeded = false;
 
-            //Install DataTypes
-            foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("//DataType")) {
-                cms.businesslogic.datatype.DataTypeDefinition newDtd = cms.businesslogic.datatype.DataTypeDefinition.Import(n);
+			using (DisposableTimer.DebugDuration<Installer>(
+				() => "Installing business logic for package id " + packageId + " into temp folder " + tempDir,
+				() => "Package business logic installation complete for package id " + packageId))
+			{
+				//retrieve the manifest to continue installation
+				packager.InstalledPackage insPack = packager.InstalledPackage.GetById(packageId);
+				bool saveNeeded = false;
 
-                if (newDtd != null) {
-                    insPack.Data.DataTypes.Add(newDtd.Id.ToString());
-                    saveNeeded = true;
-                }
-            }
+				//Install DataTypes
+				foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("//DataType"))
+				{
+					cms.businesslogic.datatype.DataTypeDefinition newDtd = cms.businesslogic.datatype.DataTypeDefinition.Import(n);
 
-            if (saveNeeded) {insPack.Save(); saveNeeded = false;}
+					if (newDtd != null)
+					{
+						insPack.Data.DataTypes.Add(newDtd.Id.ToString());
+						saveNeeded = true;
+					}
+				}
 
-            //Install languages
-            foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("//Language")) {
-                language.Language newLang = language.Language.Import(n);
+				if (saveNeeded) { insPack.Save(); saveNeeded = false; }
 
-                if (newLang != null) {
-                    insPack.Data.Languages.Add(newLang.id.ToString());
-                    saveNeeded = true;
-                }
-            }
+				//Install languages
+				foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("//Language"))
+				{
+					language.Language newLang = language.Language.Import(n);
 
-            if (saveNeeded) { insPack.Save(); saveNeeded = false; }
+					if (newLang != null)
+					{
+						insPack.Data.Languages.Add(newLang.id.ToString());
+						saveNeeded = true;
+					}
+				}
 
-            //Install dictionary items
-            foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("./DictionaryItems/DictionaryItem")) {
-                Dictionary.DictionaryItem newDi = Dictionary.DictionaryItem.Import(n);
+				if (saveNeeded) { insPack.Save(); saveNeeded = false; }
 
-                if (newDi != null) {
-                    insPack.Data.DictionaryItems.Add(newDi.id.ToString());
-                    saveNeeded = true;
-                }
-            }
+				//Install dictionary items
+				foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("./DictionaryItems/DictionaryItem"))
+				{
+					Dictionary.DictionaryItem newDi = Dictionary.DictionaryItem.Import(n);
 
-            if (saveNeeded) { insPack.Save(); saveNeeded = false; }
+					if (newDi != null)
+					{
+						insPack.Data.DictionaryItems.Add(newDi.id.ToString());
+						saveNeeded = true;
+					}
+				}
 
-            // Install macros
-            foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("//macro")) {
-                cms.businesslogic.macro.Macro m = cms.businesslogic.macro.Macro.Import(n);
+				if (saveNeeded) { insPack.Save(); saveNeeded = false; }
 
-                if (m != null) {
-                    insPack.Data.Macros.Add(m.Id.ToString());
-                    saveNeeded = true;
-                }
-            }
+				// Install macros
+				foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("//macro"))
+				{
+					cms.businesslogic.macro.Macro m = cms.businesslogic.macro.Macro.Import(n);
 
-            if (saveNeeded) { insPack.Save(); saveNeeded = false; }
+					if (m != null)
+					{
+						insPack.Data.Macros.Add(m.Id.ToString());
+						saveNeeded = true;
+					}
+				}
 
-            // Get current user, with a fallback
-            User u = new User(0);
-            if (!string.IsNullOrEmpty(BasePages.UmbracoEnsuredPage.umbracoUserContextID)) {
-                if (BasePages.UmbracoEnsuredPage.ValidateUserContextID(BasePages.UmbracoEnsuredPage.umbracoUserContextID)) {
-                    u = User.GetCurrent();
-                }
-            } 
+				if (saveNeeded) { insPack.Save(); saveNeeded = false; }
 
-
-            // Add Templates
-            foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Templates/Template")) {
-                var t = Template.Import(n, u);
-                
-                insPack.Data.Templates.Add(t.Id.ToString());
-
-                saveNeeded = true;
-            }
-
-            if (saveNeeded) { insPack.Save(); saveNeeded = false; }
-
-
-			//NOTE: SD: I'm pretty sure the only thing the below script does is ensure that the Master template Id is set
-			// in the database, but this is also duplicating the saving of the design content since the above Template.Import
-			// already does this. I've left this for now because I'm not sure the reprocussions of removing it but seems there
-			// is a lot of excess database calls happening here.
-            foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Templates/Template")) {
-                string master = xmlHelper.GetNodeValue(n.SelectSingleNode("Master"));
-                template.Template t = template.Template.GetByAlias(xmlHelper.GetNodeValue(n.SelectSingleNode("Alias")));
-                if (master.Trim() != "") {
-                    template.Template masterTemplate = template.Template.GetByAlias(master);
-                    if (masterTemplate != null) {
-                        t.MasterTemplate = template.Template.GetByAlias(master).Id;
-						//SD: This appears to always just save an empty template because the design isn't set yet
-						// this fixes an issue now that we have MVC because if there is an empty template and MVC is 
-						// the default, it will create a View not a master page and then the system will try to route via
-						// MVC which means that the package will not work anymore.
-						// The code below that imports the templates should suffice because it's actually importing 
-						// template data not just blank data.
-
-						//if (UmbracoSettings.UseAspNetMasterPages)
-						//	t.SaveMasterPageFile(t.Design);
-                    }
-                }
-                // Master templates can only be generated when their master is known
-                if (UmbracoSettings.UseAspNetMasterPages) {
-                    t.ImportDesign(xmlHelper.GetNodeValue(n.SelectSingleNode("Design")));
-                    t.SaveMasterPageFile(t.Design);
-                }
-            }
-
-            // Add documenttypes
-            foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("DocumentTypes/DocumentType")) {
-                ImportDocumentType(n, u, false);
-                saveNeeded = true;
-            }
-
-            if (saveNeeded) { insPack.Save(); saveNeeded = false; }
+				// Get current user, with a fallback
+				User u = new User(0);
+				if (!string.IsNullOrEmpty(BasePages.UmbracoEnsuredPage.umbracoUserContextID))
+				{
+					if (BasePages.UmbracoEnsuredPage.ValidateUserContextID(BasePages.UmbracoEnsuredPage.umbracoUserContextID))
+					{
+						u = User.GetCurrent();
+					}
+				}
 
 
-            // Add documenttype structure
-            foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("DocumentTypes/DocumentType")) {
-                DocumentType dt = DocumentType.GetByAlias(xmlHelper.GetNodeValue(n.SelectSingleNode("Info/Alias")));
-                if (dt != null) {
-                    ArrayList allowed = new ArrayList();
-                    foreach (XmlNode structure in n.SelectNodes("Structure/DocumentType")) {
-                        DocumentType dtt = DocumentType.GetByAlias(xmlHelper.GetNodeValue(structure));
-                        if(dtt != null)
-                            allowed.Add(dtt.Id);
-                    }
+				// Add Templates
+				foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Templates/Template"))
+				{
+					var t = Template.Import(n, u);
 
-                    int[] adt = new int[allowed.Count];
-                    for (int i = 0; i < allowed.Count; i++)
-                        adt[i] = (int)allowed[i];
-                    dt.AllowedChildContentTypeIDs = adt;
+					insPack.Data.Templates.Add(t.Id.ToString());
 
-                    //PPH we log the document type install here.
-                    insPack.Data.Documenttypes.Add(dt.Id.ToString());
-                    saveNeeded = true;
-                }
-            }
+					saveNeeded = true;
+				}
 
-            if (saveNeeded) { insPack.Save(); saveNeeded = false; }
+				if (saveNeeded) { insPack.Save(); saveNeeded = false; }
 
-            // Stylesheets
-            foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Stylesheets/Stylesheet")) {
-                StyleSheet s = StyleSheet.Import(n, u);
 
-                insPack.Data.Stylesheets.Add(s.Id.ToString());
-                saveNeeded = true;
-            }
+				//NOTE: SD: I'm pretty sure the only thing the below script does is ensure that the Master template Id is set
+				// in the database, but this is also duplicating the saving of the design content since the above Template.Import
+				// already does this. I've left this for now because I'm not sure the reprocussions of removing it but seems there
+				// is a lot of excess database calls happening here.
+				foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Templates/Template"))
+				{
+					string master = xmlHelper.GetNodeValue(n.SelectSingleNode("Master"));
+					template.Template t = template.Template.GetByAlias(xmlHelper.GetNodeValue(n.SelectSingleNode("Alias")));
+					if (master.Trim() != "")
+					{
+						template.Template masterTemplate = template.Template.GetByAlias(master);
+						if (masterTemplate != null)
+						{
+							t.MasterTemplate = template.Template.GetByAlias(master).Id;
+							//SD: This appears to always just save an empty template because the design isn't set yet
+							// this fixes an issue now that we have MVC because if there is an empty template and MVC is 
+							// the default, it will create a View not a master page and then the system will try to route via
+							// MVC which means that the package will not work anymore.
+							// The code below that imports the templates should suffice because it's actually importing 
+							// template data not just blank data.
 
-            if (saveNeeded) { insPack.Save(); saveNeeded = false; }
+							//if (UmbracoSettings.UseAspNetMasterPages)
+							//	t.SaveMasterPageFile(t.Design);
+						}
+					}
+					// Master templates can only be generated when their master is known
+					if (UmbracoSettings.UseAspNetMasterPages)
+					{
+						t.ImportDesign(xmlHelper.GetNodeValue(n.SelectSingleNode("Design")));
+						t.SaveMasterPageFile(t.Design);
+					}
+				}
 
-            // Documents
-            foreach (XmlElement n in _packageConfig.DocumentElement.SelectNodes("Documents/DocumentSet [@importMode = 'root']/*")) {
-                insPack.Data.ContentNodeId = cms.businesslogic.web.Document.Import(-1, u, n).ToString();
-            }
+				// Add documenttypes
+				foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("DocumentTypes/DocumentType"))
+				{
+					ImportDocumentType(n, u, false);
+					saveNeeded = true;
+				}
 
-            //Package Actions
-            foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Actions/Action")) {
+				if (saveNeeded) { insPack.Save(); saveNeeded = false; }
 
-                if (n.Attributes["undo"] == null || n.Attributes["undo"].Value == "true") {
-                    insPack.Data.Actions += n.OuterXml;
-                    Log.Add(LogTypes.Debug, -1, HttpUtility.HtmlEncode(n.OuterXml));
-                }
 
-                if (n.Attributes["runat"] != null && n.Attributes["runat"].Value == "install") {
-                    try {
-                        packager.PackageAction.RunPackageAction(insPack.Data.Name, n.Attributes["alias"].Value, n);
-                    } catch {
+				// Add documenttype structure
+				foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("DocumentTypes/DocumentType"))
+				{
+					DocumentType dt = DocumentType.GetByAlias(xmlHelper.GetNodeValue(n.SelectSingleNode("Info/Alias")));
+					if (dt != null)
+					{
+						ArrayList allowed = new ArrayList();
+						foreach (XmlNode structure in n.SelectNodes("Structure/DocumentType"))
+						{
+							DocumentType dtt = DocumentType.GetByAlias(xmlHelper.GetNodeValue(structure));
+							if (dtt != null)
+								allowed.Add(dtt.Id);
+						}
 
-                    }
-                }
-            }
+						int[] adt = new int[allowed.Count];
+						for (int i = 0; i < allowed.Count; i++)
+							adt[i] = (int)allowed[i];
+						dt.AllowedChildContentTypeIDs = adt;
 
-            // Trigger update of Apps / Trees config.
-            // (These are ApplicationStartupHandlers so just instantiating them will trigger them)
-            new ApplicationRegistrar();
-            new ApplicationTreeRegistrar();
+						//PPH we log the document type install here.
+						insPack.Data.Documenttypes.Add(dt.Id.ToString());
+						saveNeeded = true;
+					}
+				}
 
-            insPack.Save();
+				if (saveNeeded) { insPack.Save(); saveNeeded = false; }
+
+				// Stylesheets
+				foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Stylesheets/Stylesheet"))
+				{
+					StyleSheet s = StyleSheet.Import(n, u);
+
+					insPack.Data.Stylesheets.Add(s.Id.ToString());
+					saveNeeded = true;
+				}
+
+				if (saveNeeded) { insPack.Save(); saveNeeded = false; }
+
+				// Documents
+				foreach (XmlElement n in _packageConfig.DocumentElement.SelectNodes("Documents/DocumentSet [@importMode = 'root']/*"))
+				{
+					insPack.Data.ContentNodeId = cms.businesslogic.web.Document.Import(-1, u, n).ToString();
+				}
+
+				//Package Actions
+				foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Actions/Action"))
+				{
+
+					if (n.Attributes["undo"] == null || n.Attributes["undo"].Value == "true")
+					{
+						insPack.Data.Actions += n.OuterXml;
+						Log.Add(LogTypes.Debug, -1, HttpUtility.HtmlEncode(n.OuterXml));
+					}
+
+					if (n.Attributes["runat"] != null && n.Attributes["runat"].Value == "install")
+					{
+						try
+						{
+							packager.PackageAction.RunPackageAction(insPack.Data.Name, n.Attributes["alias"].Value, n);
+						}
+						catch
+						{
+
+						}
+					}
+				}
+
+				// Trigger update of Apps / Trees config.
+				// (These are ApplicationStartupHandlers so just instantiating them will trigger them)
+				new ApplicationRegistrar();
+				new ApplicationTreeRegistrar();
+
+				insPack.Save();
+			}	        
         }
 
         public void InstallCleanUp(int packageId, string tempDir) {
