@@ -68,6 +68,14 @@ namespace Umbraco.Core
 				Directory.CreateDirectory(_tempFolder);
 			}
 
+			//this is a check for legacy changes, before we didn't store the TypeResolutionKind in the file which was a mistake,
+			//so we need to detect if the old file is there without this attribute, if it is then we delete it
+			if (DetectLegacyPluginListFile())
+			{
+				var filePath = GetPluginListFilePath();
+				File.Delete(filePath);
+			}			
+
 			if (detectCodeChanges)
 			{
 				//first check if the cached hash is 0, if it is then we ne
@@ -119,6 +127,7 @@ namespace Umbraco.Core
 		}
 
 		#region Hash checking methods
+
 
 		/// <summary>
 		/// Returns a bool if the assemblies in the /bin have changed since they were last hashed.
@@ -228,9 +237,9 @@ namespace Umbraco.Core
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		internal Attempt<IEnumerable<string>> TryGetCachedPluginsFromFile<T>()
+		internal Attempt<IEnumerable<string>> TryGetCachedPluginsFromFile<T>(TypeResolutionKind resolutionType)
 		{
-			var filePath = Path.Combine(_tempFolder, "umbraco-plugins.list");
+			var filePath = GetPluginListFilePath();
 			if (!File.Exists(filePath))
 				return Attempt<IEnumerable<string>>.False;
 
@@ -257,9 +266,12 @@ namespace Umbraco.Core
 				var typeElement = xml.Root.Elements()
 					.SingleOrDefault(x =>
 					                 x.Name.LocalName == "baseType"
-					                 && ((string) x.Attribute("type")) == typeof (T).FullName);
+					                 && ((string) x.Attribute("type")) == typeof (T).FullName
+									 && ((string) x.Attribute("resolutionType")) == resolutionType.ToString());
+
+				//return false but specify this exception type so we can detect it
 				if (typeElement == null)
-					return Attempt<IEnumerable<string>>.False;
+					return new Attempt<IEnumerable<string>>(new CachedPluginNotFoundInFile());
 
 				//return success
 				return new Attempt<IEnumerable<string>>(
@@ -267,10 +279,52 @@ namespace Umbraco.Core
 					typeElement.Elements("add")
 						.Select(x => (string) x.Attribute("type")));
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
 				//if the file is corrupted, etc... return false
-				return Attempt<IEnumerable<string>>.False;
+				return new Attempt<IEnumerable<string>>(ex);
+			}
+		}
+
+		private string GetPluginListFilePath()
+		{
+			return Path.Combine(_tempFolder, "umbraco-plugins.list");			
+		}
+
+		/// <summary>
+		/// This will return true if the plugin list file is a legacy one
+		/// </summary>
+		/// <returns></returns>
+		/// <remarks>
+		/// This method exists purely due to an error in 4.11. We were writing the plugin list file without the 
+		/// type resolution kind which will have caused some problems. Now we detect this legacy file and if it is detected
+		/// we remove it so it can be recreated properly.
+		/// </remarks>
+		internal bool DetectLegacyPluginListFile()
+		{
+			var filePath = GetPluginListFilePath();
+			if (!File.Exists(filePath))
+				return false;
+
+			try
+			{
+				 var xml = XDocument.Load(filePath);
+				 if (xml.Root == null)
+					 return false;
+
+				var typeElement = xml.Root.Elements()
+					.FirstOrDefault(x => x.Name.LocalName == "baseType");
+
+				if (typeElement == null)
+					return false;
+
+				//now check if the typeElement is missing the resolutionType attribute
+				return typeElement.Attributes().All(x => x.Name.LocalName != "resolutionType");
+			}
+			catch (Exception)
+			{
+				//if the file is corrupted, etc... return true so it is removed
+				return true;
 			}
 		}
 
@@ -279,7 +333,8 @@ namespace Umbraco.Core
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="typesFound"></param>
-		/// <remarks>
+		///<param name="resolutionType"> </param>
+		///<remarks>
 		/// THIS METHOD IS NOT THREAD SAFE
 		/// </remarks>
 		/// <example>
@@ -292,9 +347,9 @@ namespace Umbraco.Core
 		/// </plugins>
 		/// ]]>
 		/// </example>
-		internal void UpdateCachedPluginsFile<T>(IEnumerable<Type> typesFound)
+		internal void UpdateCachedPluginsFile<T>(IEnumerable<Type> typesFound, TypeResolutionKind resolutionType)
 		{
-			var filePath = Path.Combine(_tempFolder, "umbraco-plugins.list");
+			var filePath = GetPluginListFilePath();
 			XDocument xml;
 			try
 			{
@@ -316,11 +371,15 @@ namespace Umbraco.Core
 			var typeElement = xml.Root.Elements()
 				.SingleOrDefault(x =>
 								 x.Name.LocalName == "baseType"
-								 && ((string)x.Attribute("type")) == typeof(T).FullName);
+								 && ((string)x.Attribute("type")) == typeof(T).FullName
+								 && ((string)x.Attribute("resolutionType")) == resolutionType.ToString());
+
 			if (typeElement == null)
 			{
 				//create the type element
-				typeElement = new XElement("baseType", new XAttribute("type", typeof(T).FullName));
+				typeElement = new XElement("baseType", 
+					new XAttribute("type", typeof(T).FullName),
+					new XAttribute("resolutionType", resolutionType.ToString()));
 				//then add it to the root
 				xml.Root.Add(typeElement);
 			}
@@ -486,9 +545,11 @@ namespace Umbraco.Core
 		{
 			using (var readLock = new UpgradeableReadLock(_lock))
 			{
+				var typesFound = new List<Type>();
+
 				using (DisposableTimer.TraceDuration<PluginManager>(
-					String.Format("Starting resolution types of {0}", typeof(T).FullName),
-					String.Format("Completed resolution of types of {0}", typeof(T).FullName)))
+					() => String.Format("Starting resolution types of {0}", typeof(T).FullName),
+					() => String.Format("Completed resolution of types of {0}, found {1}", typeof(T).FullName, typesFound.Count)))
 				{					
 					//check if the TypeList already exists, if so return it, if not we'll create it
 					var typeList = _types.SingleOrDefault(x => x.IsTypeList<T>(resolutionType));
@@ -501,46 +562,59 @@ namespace Umbraco.Core
 						typeList = new TypeList<T>(resolutionType);
 
 						//we first need to look into our cache file (this has nothing to do with the 'cacheResult' parameter which caches in memory).
-						if (!HaveAssembliesChanged)
+						//if assemblies have not changed and the cache file actually exists, then proceed to try to lookup by the cache file.
+						if (!HaveAssembliesChanged && File.Exists(GetPluginListFilePath()))
 						{
-							var fileCacheResult = TryGetCachedPluginsFromFile<T>();
-							if (fileCacheResult.Success)
+							var fileCacheResult = TryGetCachedPluginsFromFile<T>(resolutionType);
+
+							//here we need to identify if the CachedPluginNotFoundInFile was the exception, if it was then we need to re-scan
+							//in some cases the plugin will not have been scanned for on application startup, but the assemblies haven't changed
+							//so in this instance there will never be a result.
+							if (fileCacheResult.Error != null && fileCacheResult.Error is CachedPluginNotFoundInFile)
 							{
-								var successfullyLoadedFromCache = true;
-								//we have a previous cache for this so we don't need to scan we just load what has been found in the file
-								foreach(var t in fileCacheResult.Result)
-								{
-									try
-									{
-										//we use the build manager to ensure we get all types loaded, this is slightly slower than
-										//Type.GetType but if the types in the assembly aren't loaded yet then we have problems with that.
-										var type = BuildManager.GetType(t, true);
-										typeList.AddType(type);										
-									}
-									catch (Exception ex)
-									{
-										//if there are any exceptions loading types, we have to exist, this should never happen so 
-										//we will need to revert to scanning for types.
-										successfullyLoadedFromCache = false;
-										LogHelper.Error<PluginManager>("Could not load a cached plugin type: " + t + " now reverting to re-scanning assemblies for the base type: " + typeof (T).FullName, ex);
-										break;
-									}									
-								}
-								if (!successfullyLoadedFromCache )
-								{
-									//we need to manually load by scanning if loading from the file was not successful.
-									LoadViaScanningAndUpdateCacheFile<T>(typeList, finder);	
-								}
-								else
-								{
-									LogHelper.Debug<PluginManager>("Loaded plugin types " + typeof(T).FullName + " from persisted cache");
-								}
+								//we don't have a cache for this so proceed to look them up by scanning
+								LoadViaScanningAndUpdateCacheFile<T>(typeList, resolutionType, finder);	
 							}
+							else
+							{
+								if (fileCacheResult.Success)
+								{
+									var successfullyLoadedFromCache = true;
+									//we have a previous cache for this so we don't need to scan we just load what has been found in the file
+									foreach (var t in fileCacheResult.Result)
+									{
+										try
+										{
+											//we use the build manager to ensure we get all types loaded, this is slightly slower than
+											//Type.GetType but if the types in the assembly aren't loaded yet then we have problems with that.
+											var type = BuildManager.GetType(t, true);
+											typeList.AddType(type);
+										}
+										catch (Exception ex)
+										{
+											//if there are any exceptions loading types, we have to exist, this should never happen so 
+											//we will need to revert to scanning for types.
+											successfullyLoadedFromCache = false;
+											LogHelper.Error<PluginManager>("Could not load a cached plugin type: " + t + " now reverting to re-scanning assemblies for the base type: " + typeof(T).FullName, ex);
+											break;
+										}
+									}
+									if (!successfullyLoadedFromCache)
+									{
+										//we need to manually load by scanning if loading from the file was not successful.
+										LoadViaScanningAndUpdateCacheFile<T>(typeList, resolutionType, finder);
+									}
+									else
+									{
+										LogHelper.Debug<PluginManager>("Loaded plugin types " + typeof(T).FullName + " from persisted cache");
+									}
+								}	
+							}													
 						}
 						else
 						{
 							//we don't have a cache for this so proceed to look them up by scanning
-							LoadViaScanningAndUpdateCacheFile<T>(typeList, finder);	
+							LoadViaScanningAndUpdateCacheFile<T>(typeList, resolutionType, finder);	
 						}
 
 						//only add the cache if we are to cache the results
@@ -550,8 +624,10 @@ namespace Umbraco.Core
 							_types.Add(typeList);	
 						}						
 					}
-					return typeList.GetTypes();
+					typesFound = typeList.GetTypes().ToList();									
 				}
+
+				return typesFound;
 			}
 		}
 
@@ -560,18 +636,19 @@ namespace Umbraco.Core
 		/// Once the results are loaded, we update the cached type xml file
 		/// </summary>
 		/// <param name="typeList"></param>
+		/// <param name="resolutionKind"> </param>
 		/// <param name="finder"></param>
 		/// <remarks>
 		/// THIS METHODS IS NOT THREAD SAFE
 		/// </remarks>
-		private void LoadViaScanningAndUpdateCacheFile<T>(TypeList typeList, Func<IEnumerable<Type>> finder)
+		private void LoadViaScanningAndUpdateCacheFile<T>(TypeList typeList, TypeResolutionKind resolutionKind, Func<IEnumerable<Type>> finder)
 		{
 			//we don't have a cache for this so proceed to look them up by scanning
 			foreach (var t in finder())
 			{
 				typeList.AddType(t);
-			}	
-			UpdateCachedPluginsFile<T>(typeList.GetTypes());
+			}
+			UpdateCachedPluginsFile<T>(typeList.GetTypes(), resolutionKind);
 		}
 
 		/// <summary>
@@ -683,6 +760,16 @@ namespace Umbraco.Core
 				return _types;
 			}
 		}
+		
+		/// <summary>
+		/// This class is used simply to determine that a plugin was not found in the cache plugin list with the specified
+		/// TypeResolutionKind.
+		/// </summary>
+		internal class CachedPluginNotFoundInFile : Exception
+		{
+			
+		}
+		
 		#endregion
 	}
 }

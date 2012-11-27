@@ -2,15 +2,16 @@ using System.IO;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.BusinessLogic;
+using System;
+using System.Data;
+using System.Drawing;
+using System.Web;
+using System.Web.UI.WebControls;
+using System.Web.UI.HtmlControls;
 
 namespace umbraco.presentation.install.steps
 {
-    using System;
-    using System.Data;
-    using System.Drawing;
-    using System.Web;
-    using System.Web.UI.WebControls;
-    using System.Web.UI.HtmlControls;
+    
 
     /// <summary>
     ///		Summary description for theend.
@@ -35,9 +36,6 @@ namespace umbraco.presentation.install.steps
             if (!cms.businesslogic.skinning.Skinning.IsStarterKitInstalled())
                 customizeSite.Visible = false;
 
-            var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
-            if(Directory.Exists(tempFolder))
-                Directory.Delete(tempFolder, true);
         }
 
         #region Web Form Designer generated code

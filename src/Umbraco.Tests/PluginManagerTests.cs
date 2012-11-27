@@ -8,12 +8,12 @@ using System.Web.Compilation;
 using NUnit.Framework;
 using SqlCE4Umbraco;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using umbraco;
 using umbraco.DataLayer;
 using umbraco.MacroEngines;
-using umbraco.MacroEngines.Iron;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.editorControls;
@@ -54,7 +54,6 @@ namespace Umbraco.Tests
 			        typeof(System.Web.Mvc.ActionResult).Assembly,
 			        typeof(TypeFinder).Assembly,
 			        typeof(ISqlHelper).Assembly,
-			        typeof(DLRScriptingEngine).Assembly,
 			        typeof(ICultureDictionary).Assembly,
 					typeof(UmbracoContext).Assembly,
 					typeof(BaseDataType).Assembly
@@ -151,16 +150,49 @@ namespace Umbraco.Tests
 		//}
 
 		[Test]
+		public void Detect_Legacy_Plugin_File_List()
+		{
+			var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
+			var manager = new PluginManager(false);
+			var filePath = Path.Combine(tempFolder, "umbraco-plugins.list");
+			File.WriteAllText(filePath, @"<?xml version=""1.0"" encoding=""utf-8""?>
+<plugins>
+<baseType type=""umbraco.interfaces.ICacheRefresher"">
+<add type=""umbraco.macroCacheRefresh, umbraco, Version=6.0.0.0, Culture=neutral, PublicKeyToken=null"" />
+</baseType>
+</plugins>");
+
+			Assert.IsTrue(manager.DetectLegacyPluginListFile());
+
+			File.Delete(filePath);
+
+			//now create a valid one
+			File.WriteAllText(filePath, @"<?xml version=""1.0"" encoding=""utf-8""?>
+<plugins>
+<baseType type=""umbraco.interfaces.ICacheRefresher"" resolutionType=""FindAllTypes"">
+<add type=""umbraco.macroCacheRefresh, umbraco, Version=6.0.0.0, Culture=neutral, PublicKeyToken=null"" />
+</baseType>
+</plugins>");
+
+			Assert.IsFalse(manager.DetectLegacyPluginListFile());
+		}
+
+		[Test]
 		public void Create_Cached_Plugin_File()
 		{
 			var types = new[] {typeof (PluginManager), typeof (PluginManagerTests), typeof (UmbracoContext)};
 
 			var manager = new PluginManager(false);
 			//yes this is silly, none of these types inherit from string, but this is just to test the xml file format
-			manager.UpdateCachedPluginsFile<string>(types);
+			manager.UpdateCachedPluginsFile<string>(types, PluginManager.TypeResolutionKind.FindAllTypes);
 
-			var plugins = manager.TryGetCachedPluginsFromFile<string>();
+			var plugins = manager.TryGetCachedPluginsFromFile<string>(PluginManager.TypeResolutionKind.FindAllTypes);
+			var diffType = manager.TryGetCachedPluginsFromFile<string>(PluginManager.TypeResolutionKind.FindAttributedTypes);
+
 			Assert.IsTrue(plugins.Success);
+			//this will be false since there is no cache of that type resolution kind
+			Assert.IsFalse(diffType.Success);
+
 			Assert.AreEqual(3, plugins.Result.Count());
 			var shouldContain = types.Select(x => x.AssemblyQualifiedName);
 			//ensure they are all found
@@ -208,11 +240,11 @@ namespace Umbraco.Tests
 			var hash3 = PluginManager.GetAssembliesHash(list3);
 
 			//Assert
-
-			//both should be the same since we only create the hash based on the unique folder of the list passed in, yet
-			//all files will exist in those folders still
-			Assert.AreEqual(hash1, hash2);
+			Assert.AreNotEqual(hash1, hash2);
 			Assert.AreNotEqual(hash1, hash3);
+			Assert.AreNotEqual(hash2, hash3);
+
+			Assert.AreEqual(hash1, PluginManager.GetAssembliesHash(list1));
 		}
 
 		[Test]

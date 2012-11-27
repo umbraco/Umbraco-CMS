@@ -32,7 +32,7 @@ namespace umbraco.cms.businesslogic.template
             if (!File.Exists(GetFilePath(t)) || overWrite)
             {
                 masterpageContent = CreateDefaultMasterPageContent(t, t.Alias);
-                saveDesignToFile(t, null, masterpageContent);
+                SaveDesignToFile(t, null, masterpageContent);
             }
             else
             {
@@ -59,9 +59,9 @@ namespace umbraco.cms.businesslogic.template
 
         internal static string UpdateMasterPageFile(Template t, string currentAlias)
         {
-            var template = updateMasterPageContent(t, currentAlias);
-            updateChildTemplates(t, currentAlias);
-            saveDesignToFile(t, currentAlias, template);
+            var template = UpdateMasterPageContent(t, currentAlias);
+            UpdateChildTemplates(t, currentAlias);
+            SaveDesignToFile(t, currentAlias, template);
 
             return template;
         }
@@ -137,7 +137,7 @@ namespace umbraco.cms.businesslogic.template
              * */
         }
 
-        internal static string updateMasterPageContent(Template template, string currentAlias)
+        internal static string UpdateMasterPageContent(Template template, string currentAlias)
         {
             var masterPageContent = template.Design;
 
@@ -174,7 +174,7 @@ namespace umbraco.cms.businesslogic.template
             return masterPageContent;
         }
 
-        private static void updateChildTemplates(Template t, string currentAlias)
+        private static void UpdateChildTemplates(Template t, string currentAlias)
         {
             //if we have a Old Alias if the alias and therefor the masterpage file name has changed...
             //so before we save the new masterfile, we'll clear the old one, so we don't up with 
@@ -192,7 +192,7 @@ namespace umbraco.cms.businesslogic.template
         }
 
 
-        private static void saveDesignToFile(Template t, string currentAlias, string design)
+        private static void SaveDesignToFile(Template t, string currentAlias, string design)
         {
             //kill the old file..
             if (!string.IsNullOrEmpty(currentAlias) && currentAlias != t.Alias)

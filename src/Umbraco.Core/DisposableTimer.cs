@@ -41,6 +41,17 @@ namespace Umbraco.Core
 			return new DisposableTimer(callback);
 		}
 
+		public static DisposableTimer TraceDuration<T>(Func<string> startMessage, Func<string> completeMessage)
+		{
+			return TraceDuration(typeof(T), startMessage, completeMessage);
+		}
+
+		public static DisposableTimer TraceDuration(Type loggerType, Func<string> startMessage, Func<string> completeMessage)
+		{
+			LogHelper.Debug(loggerType, startMessage);
+			return new DisposableTimer(x => LogHelper.Info(loggerType, () => completeMessage() + " (took " + x + "ms)"));
+		}
+
 		/// <summary>
 		/// Adds a start and end log entry as Info and tracks how long it takes until disposed.
 		/// </summary>
