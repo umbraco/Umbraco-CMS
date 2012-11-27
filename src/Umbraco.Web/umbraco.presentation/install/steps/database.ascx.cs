@@ -179,7 +179,9 @@ namespace umbraco.presentation.install.steps
 
                 Helper.setProgress(20, "Connection opened", "");
 
-                DatabaseContext.Current.Database.Initialize();
+                var database = new Database(DatabaseContext.Current.ConnectionString,
+                                            DatabaseContext.Current.ProviderName);
+                database.Initialize();
 
                 Helper.setProgress(90, "Refreshing content cache", "");
 

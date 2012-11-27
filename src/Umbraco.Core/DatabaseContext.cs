@@ -25,6 +25,7 @@ namespace Umbraco.Core
         #region Singleton
         private static readonly Lazy<DatabaseContext> lazy = new Lazy<DatabaseContext>(() => new DatabaseContext());
         private string _connectionString;
+        private string _providerName;
 
         /// <summary>
         /// Gets the current Database Context.
@@ -72,17 +73,20 @@ namespace Umbraco.Core
         {
             get
             {
-                var providerName = "System.Data.SqlClient";
+                if (string.IsNullOrEmpty(_providerName) == false)
+                    return _providerName;
+
+                _providerName = "System.Data.SqlClient";
                 if (ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName] != null)
                 {
                     if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName))
-                        providerName = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName;
+                        _providerName = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName;
                 }
                 else
                 {
                     throw new InvalidOperationException("Can't find a connection string with the name '" + GlobalSettings.UmbracoConnectionName + "'");
                 }
-                return providerName;
+                return _providerName;
             }
         }
 
@@ -125,7 +129,8 @@ namespace Umbraco.Core
                 engine.CreateDatabase();
             }
 
-            Initialize();
+            
+            Initialize(providerName);
         }
 
         /// <summary>
@@ -138,7 +143,7 @@ namespace Umbraco.Core
         public void ConfigureDatabaseConnection(string connectionString)
         {
             SaveConnectionString(connectionString, connectionString, string.Empty);
-            Initialize();
+            Initialize(string.Empty);
         }
 
         /// <summary>
@@ -172,7 +177,7 @@ namespace Umbraco.Core
             }
 
             SaveConnectionString(connectionString, appSettingsConnection, providerName);
-            Initialize();
+            Initialize(providerName);
         }
 
         /// <summary>
@@ -193,9 +198,11 @@ namespace Umbraco.Core
                                       : new ConnectionStringSettings(GlobalSettings.UmbracoConnectionName,
                                                                      connectionString, providerName);
 
+            _connectionString = connectionString;
+            _providerName = providerName;
+
             //Set the connection string in appsettings used in the legacy datalayer
             GlobalSettings.DbDsn = appSettingsConnection;
-            //ConfigurationManager.ConnectionStrings.Add(conectionString);
 
             var webConfig = new WebConfigurationFileMap();
             var vDir = GlobalSettings.FullpathToRoot;
@@ -224,7 +231,6 @@ namespace Umbraco.Core
             }
 
             xml.Save(fileName);
-            ConfigurationManager.RefreshSection("connectionStrings");
         }
 
         /// <summary>
@@ -269,6 +275,24 @@ namespace Umbraco.Core
             {
                 _configured = false;
             }
+        }
+
+        internal void Initialize(string providerName)
+        {
+            if (providerName.StartsWith("MySql"))
+            {
+                SyntaxConfig.SqlSyntaxProvider = MySqlSyntax.Provider;
+            }
+            else if (providerName.Contains("SqlServerCe"))
+            {
+                SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            }
+            else
+            {
+                SyntaxConfig.SqlSyntaxProvider = SqlServerSyntax.Provider;
+            }
+
+            _configured = true;
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlServerCe;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions;
