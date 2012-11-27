@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Configuration;
 using System.Data.SqlServerCe;
+using System.IO;
 using System.Linq;
+using System.Web;
 using System.Web.Configuration;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
@@ -115,8 +117,13 @@ namespace Umbraco.Core
 
             SaveConnectionString(connectionString, appSettingsConnection, providerName);
 
-            var engine = new SqlCeEngine(connectionString);
-            engine.CreateDatabase();
+            string appData = VirtualPathUtility.ToAbsolute(GlobalSettings.StorageDirectory);
+            var path = Path.Combine(appData, "Umbraco.sdf");
+            if (File.Exists(path) == false)
+            {
+                var engine = new SqlCeEngine(connectionString);
+                engine.CreateDatabase();
+            }
 
             Initialize();
         }

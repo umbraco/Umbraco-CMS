@@ -4,7 +4,7 @@ namespace Umbraco.Core.Configuration
 {
     public class UmbracoVersion
     {
-        private static Version _version;
+        private static readonly Version Version = new Version(6,0,0);
 
         /// <summary>
         /// Gets the current version of Umbraco.
@@ -15,7 +15,7 @@ namespace Umbraco.Core.Configuration
         /// </remarks>
         public static Version Current
         {
-            get { return _version ?? (_version = typeof(UmbracoVersion).Assembly.GetName().Version); }
+            get { return Version; }
         }
 
         /// <summary>

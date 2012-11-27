@@ -93,7 +93,7 @@ namespace umbraco.presentation.install.utills
 
                     Helper.setProgress(90, "Refreshing content cache", "");
 
-                    library.RefreshContent();
+                    //library.RefreshContent();
 
                     Helper.setProgress(100, "Database is up-to-date", "");
 
@@ -106,7 +106,7 @@ namespace umbraco.presentation.install.utills
                         //do install
                         try
                         {
-                            installer.Install();
+                            //installer.Install();
                             Helper.setProgress(100, "Installation completed!", "");
                             installer = null;
 
@@ -129,7 +129,7 @@ namespace umbraco.presentation.install.utills
                     else if (installer.CurrentVersion == DatabaseVersion.None || installer.CanUpgrade)
                     {
                         Helper.setProgress(35, "Updating database tables...", "");
-                        installer.Install();
+                        //installer.Install();
 
                         Helper.setProgress(100, "Upgrade completed!", "");
 

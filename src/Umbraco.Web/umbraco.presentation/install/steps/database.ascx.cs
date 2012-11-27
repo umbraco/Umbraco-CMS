@@ -174,6 +174,9 @@ namespace umbraco.presentation.install.steps
                                                                         DatabaseType.SelectedValue);
                 }
 
+                if(DatabaseContext.Current.IsDatabaseConfigured == false)
+                    throw new Exception("ConnectionString could not be found");
+
                 Helper.setProgress(20, "Connection opened", "");
 
                 DatabaseContext.Current.Database.Initialize();

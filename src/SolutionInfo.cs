@@ -1,12 +1,12 @@
-﻿using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Security;
+using System.Reflection;
+using System.Resources;
 
-//This is the core assembly information for the whole project
-[assembly: AssemblyVersion("6.0.0.0")]
-[assembly: AssemblyFileVersion("6.0.0.0")]
-[assembly: AssemblyInformationalVersion("Umbraco 6.0")]
-[assembly: AssemblyCompany("Umbraco")]
-[assembly: AssemblyCopyright("Copyright © 2012")]
-[assembly: AssemblyTrademark("Umbraco")]
+[assembly: AssemblyCompany("umbraco")]
+[assembly: AssemblyCopyright("Copyright � Umbraco 2012")]
+[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+
+[assembly: NeutralResourcesLanguageAttribute("en-US")]
+
+
+[assembly: AssemblyVersion("1.0.*")]
