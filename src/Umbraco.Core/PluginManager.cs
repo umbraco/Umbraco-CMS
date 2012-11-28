@@ -175,7 +175,9 @@ namespace Umbraco.Core
 							//add the app code folder and everything in it
 							new DirectoryInfo(IOHelper.MapPath("~/App_Code")),
 							//add the global.asax (the app domain also monitors this, if it changes will do a full restart)
-							new FileInfo(IOHelper.MapPath("~/global.asax"))
+							new FileInfo(IOHelper.MapPath("~/global.asax")),
+                            //add the trees.config
+                            new FileInfo(IOHelper.MapPath(SystemDirectories.Config + "/trees.config"))
 						}
                     );
                 return _currentAssembliesHash;
