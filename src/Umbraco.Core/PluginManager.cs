@@ -10,6 +10,7 @@ using System.Web.Compilation;
 using System.Xml.Linq;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using umbraco.interfaces;
 using File = System.IO.File;
@@ -446,6 +447,15 @@ namespace Umbraco.Core
         internal IEnumerable<Type> ResolveActions()
         {
             return ResolveTypes<IAction>();
+        }
+
+        /// <summary>
+        /// Returns all available IMacroPropertyTypes in application
+        /// </summary>
+        /// <returns></returns>
+        internal IEnumerable<Type> ResolveMacroPropertyTypes()
+        {
+            return ResolveTypes<IMacroPropertyType>();
         }
 
         /// <summary>
