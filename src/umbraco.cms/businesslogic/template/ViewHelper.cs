@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.IO;
@@ -27,7 +25,7 @@ namespace umbraco.cms.businesslogic.template
 
             if (File.Exists(path))
             {
-                System.IO.TextReader tr = new StreamReader(path);
+                TextReader tr = new StreamReader(path);
                 viewContent = tr.ReadToEnd();
                 tr.Close();
             }
@@ -37,14 +35,14 @@ namespace umbraco.cms.businesslogic.template
 
         internal static string CreateViewFile(Template t, bool overWrite = false)
         {
-            string viewContent = "";
+            string viewContent;
 			string path = IOHelper.MapPath(ViewPath(t.Alias));
 
-            if (!File.Exists(path) || overWrite)
+            if (File.Exists(path) == false || overWrite)
                 viewContent = SaveTemplateToFile(t, t.Alias);
             else
             {
-                System.IO.TextReader tr = new StreamReader(path);
+                TextReader tr = new StreamReader(path);
                 viewContent = tr.ReadToEnd();
                 tr.Close();
             }
@@ -55,7 +53,7 @@ namespace umbraco.cms.businesslogic.template
         internal static string SaveTemplateToFile(Template template, string currentAlias)
         {
             var design = EnsureInheritedLayout(template);
-            System.IO.File.WriteAllText(IOHelper.MapPath(ViewPath(template.Alias)), design, Encoding.UTF8);
+            File.WriteAllText(IOHelper.MapPath(ViewPath(template.Alias)), design, Encoding.UTF8);
             
             return template.Design;
         }
@@ -64,7 +62,7 @@ namespace umbraco.cms.businesslogic.template
         {
             var path = IOHelper.MapPath(ViewPath(t.Alias));
 
-			if (!string.IsNullOrEmpty(currentAlias) && currentAlias != t.Alias)
+			if (string.IsNullOrEmpty(currentAlias) == false && currentAlias != t.Alias)
 			{
 				//NOTE: I don't think this is needed for MVC, this was ported over from the
 				// masterpages helper but I think only relates to when templates are stored in the db.
@@ -78,30 +76,28 @@ namespace umbraco.cms.businesslogic.template
 
 				//then kill the old file.. 
 				var oldFile = IOHelper.MapPath(ViewPath(currentAlias));
-				if (System.IO.File.Exists(oldFile))
-					System.IO.File.Delete(oldFile);
+				if (File.Exists(oldFile))
+					File.Delete(oldFile);
 			}
 
-            System.IO.File.WriteAllText(path, t.Design, Encoding.UTF8);
+            File.WriteAllText(path, t.Design, Encoding.UTF8);
             return t.Design;
         }
 
 		internal static void RemoveViewFile(string alias)
 		{
-			if (!string.IsNullOrWhiteSpace(alias))
+			if (string.IsNullOrWhiteSpace(alias) == false)
 			{
 				var file = IOHelper.MapPath(ViewPath(alias));
-				if (System.IO.File.Exists(file))
-					System.IO.File.Delete(file);
+				if (File.Exists(file))
+                    File.Delete(file);
 			}
 		}
 
         public static string ViewPath(string alias)
         {
-			return Umbraco.Core.IO.SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
+			return SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
         }
-
-
 
         private static string EnsureInheritedLayout(Template template)
         {
@@ -115,8 +111,7 @@ namespace umbraco.cms.businesslogic.template
 }";
 
                 if (template.MasterTemplate > 0)
-                    design = design.Replace("null", "\"" + new Template(template.MasterTemplate).Alias.Replace(" ", "") + "\"");
-
+                    design = design.Replace("null", string.Format("\"{0}.cshtml\"", new Template(template.MasterTemplate).Alias.Replace(" ", "")));
             }
 
             return design;

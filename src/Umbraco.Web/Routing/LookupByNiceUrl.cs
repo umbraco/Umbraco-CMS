@@ -82,13 +82,9 @@ namespace Umbraco.Web.Routing
                     docreq.PublishedContent = node;
 					LogHelper.Debug<LookupByNiceUrl>("Query matches, id={0}", () => docreq.DocumentId);
 
-					var iscanon = true;
-					if (docreq.HasDomain)
-					{
-						iscanon = !DomainHelper.ExistsDomainInPath(docreq.Domain, node.Path);
-						if (!iscanon)
-							LogHelper.Debug<LookupByNiceUrl>("Non canonical url");
-					}
+					var iscanon = !DomainHelper.ExistsDomainInPath(docreq.Domain, node.Path);
+					if (!iscanon)
+						LogHelper.Debug<LookupByNiceUrl>("Non canonical url");
 
 					// do not store if previewing or if non-canonical
 					if (!docreq.RoutingContext.UmbracoContext.InPreviewMode && iscanon)
