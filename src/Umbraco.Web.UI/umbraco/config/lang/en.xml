@@ -47,6 +47,7 @@
     </key>
     <key alias="domainUpdated">Domain '%0%' has been updated</key>
     <key alias="orEdit">Edit Current Domains</key>
+    <key alias="invalidDomain">Invalid domain</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
