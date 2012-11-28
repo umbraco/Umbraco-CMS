@@ -106,9 +106,9 @@ namespace umbraco.cms.businesslogic.template
             if (string.IsNullOrEmpty(design))
             {
                 design = @"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
-                         @{
-                             Layout = null;
-                         }";
+@{
+    Layout = null;
+}";
 
                 if (template.MasterTemplate > 0)
                     design = design.Replace("null", string.Format("\"{0}.cshtml\"", new Template(template.MasterTemplate).Alias.Replace(" ", "")));
