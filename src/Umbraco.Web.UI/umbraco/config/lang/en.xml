@@ -36,7 +36,7 @@
   </area>
   <area alias="assignDomain">
     <key alias="addNew">Add new Domain</key>
-    <key alias="invalidDomain">This is not a valid hostname</key>   
+    <key alias="invalidDomain">Invalid hostname</key>   
     <key alias="domain">Domain</key>
     <key alias="domainCreated">New domain '%0%' has been created</key>
     <key alias="domainDeleted">Domain '%0%' is deleted</key>

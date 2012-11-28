@@ -49,6 +49,24 @@ namespace Umbraco.Web.Routing
 			return string.IsNullOrWhiteSpace(d.Name) || d.Name.StartsWith("*");
 		}
 
+		private static Domain SanitizeForBackwardCompatibility(Domain d)
+		{
+			// this is a _really_ nasty one that should be removed in 6.x
+			// some people were using hostnames such as "/en" which happened to work pre-4.10
+			// but make _no_ sense at all... and 4.10 throws on them, so here we just try
+			// to find a way so 4.11 does not throw.
+			// but, really.
+			// no.
+			var context = System.Web.HttpContext.Current;
+			if (context != null && d.Name.StartsWith("/"))
+			{
+				// turn /en into http://whatever.com/en so it becomes a parseable uri
+				var authority = context.Request.Url.GetLeftPart(UriPartial.Authority);
+				d.Name = authority + d.Name;
+			}
+			return d;
+		}
+
 		/// <summary>
 		/// Finds the domain that best matches the current uri, into an enumeration of domains.
 		/// </summary>
@@ -64,6 +82,7 @@ namespace Umbraco.Web.Routing
 			var scheme = current == null ? Uri.UriSchemeHttp : current.Scheme;
 			var domainsAndUris = domains
 				.Where(d => !IsWildcardDomain(d))
+				.Select(d => SanitizeForBackwardCompatibility(d))
 				.Select(d => new { Domain = d, UriString = UriUtility.EndPathWithSlash(UriUtility.StartWithScheme(d.Name, scheme)) })
 				.OrderByDescending(t => t.UriString)
 				.Select(t => new DomainAndUri { Domain = t.Domain, Uri = new Uri(t.UriString) });
@@ -104,6 +123,7 @@ namespace Umbraco.Web.Routing
 			var scheme = current == null ? Uri.UriSchemeHttp : current.Scheme;
 			var domainsAndUris = domains
 				.Where(d => !IsWildcardDomain(d))
+				.Select(d => SanitizeForBackwardCompatibility(d))
 				.Select(d => new { Domain = d, UriString = UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(d.Name, scheme)) })
 				.OrderByDescending(t => t.UriString)
 				.Select(t => new DomainAndUri { Domain = t.Domain, Uri = new Uri(t.UriString) });
