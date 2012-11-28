@@ -44,7 +44,27 @@ namespace Umbraco.Web.Routing
 
 		private static bool IsWildcardDomain(Domain d)
 		{
+			// supporting null or whitespace for backward compatibility, 
+			// although we should not allow ppl to create them anymore
 			return string.IsNullOrWhiteSpace(d.Name) || d.Name.StartsWith("*");
+		}
+
+		private static Domain SanitizeForBackwardCompatibility(Domain d)
+		{
+			// this is a _really_ nasty one that should be removed in 6.x
+			// some people were using hostnames such as "/en" which happened to work pre-4.10
+			// but make _no_ sense at all... and 4.10 throws on them, so here we just try
+			// to find a way so 4.11 does not throw.
+			// but, really.
+			// no.
+			var context = System.Web.HttpContext.Current;
+			if (context != null && d.Name.StartsWith("/"))
+			{
+				// turn /en into http://whatever.com/en so it becomes a parseable uri
+				var authority = context.Request.Url.GetLeftPart(UriPartial.Authority);
+				d.Name = authority + d.Name;
+			}
+			return d;
 		}
 
 		/// <summary>
@@ -62,6 +82,7 @@ namespace Umbraco.Web.Routing
 			var scheme = current == null ? Uri.UriSchemeHttp : current.Scheme;
 			var domainsAndUris = domains
 				.Where(d => !IsWildcardDomain(d))
+				.Select(d => SanitizeForBackwardCompatibility(d))
 				.Select(d => new { Domain = d, UriString = UriUtility.EndPathWithSlash(UriUtility.StartWithScheme(d.Name, scheme)) })
 				.OrderByDescending(t => t.UriString)
 				.Select(t => new DomainAndUri { Domain = t.Domain, Uri = new Uri(t.UriString) });
@@ -102,6 +123,7 @@ namespace Umbraco.Web.Routing
 			var scheme = current == null ? Uri.UriSchemeHttp : current.Scheme;
 			var domainsAndUris = domains
 				.Where(d => !IsWildcardDomain(d))
+				.Select(d => SanitizeForBackwardCompatibility(d))
 				.Select(d => new { Domain = d, UriString = UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(d.Name, scheme)) })
 				.OrderByDescending(t => t.UriString)
 				.Select(t => new DomainAndUri { Domain = t.Domain, Uri = new Uri(t.UriString) });
@@ -117,11 +139,12 @@ namespace Umbraco.Web.Routing
 		public static bool ExistsDomainInPath(Domain current, string path)
 		{
 			var domains = Domain.GetDomains();
+			var stopNodeId = current == null ? -1 : current.RootNodeId;
 
 			return path.Split(',')
 				.Reverse()
 				.Select(id => int.Parse(id))
-				.TakeWhile(id => id != current.RootNodeId)
+				.TakeWhile(id => id != stopNodeId)
 				.Any(id => domains.Any(d => d.RootNodeId == id && !IsWildcardDomain(d)));
 		}
 
@@ -134,20 +157,21 @@ namespace Umbraco.Web.Routing
 		/// <returns>The deepest wildcard <see cref="Domain"/> in the path, or null.</returns>
 		public static Domain LookForWildcardDomain(IEnumerable<Domain> domains, string path, int? rootNodeId)
 		{
-			var nodeIds = path.Split(',').Select(p => int.Parse(p)).Reverse();
-			rootNodeId = rootNodeId ?? -1; // every paths begin with -1
+			var nodeIds = path.Split(',').Select(p => int.Parse(p)).Skip(1).Reverse();
 
 			foreach (var nodeId in nodeIds)
 			{
-				if (nodeId == rootNodeId) // stop at current domain or root
-					break;
-
-				// supporting null or whitespace for backward compatibility, 
-				// although we should not allow ppl to create them anymore
 				var domain = domains.Where(d => d.RootNodeId == nodeId && IsWildcardDomain(d)).FirstOrDefault();
 				if (domain != null)
 					return domain;
+
+				// stop at current domain root if any
+				// "When you perform comparisons with nullable types, if the value of one of the nullable
+				// types is null and the other is not, all comparisons evaluate to false."
+				if (nodeId == rootNodeId)
+					break;
 			}
+
 			return null;
 		}
 

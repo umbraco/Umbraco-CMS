@@ -58,6 +58,10 @@ namespace umbraco.dialogs
                 LanguageValidator.ErrorMessage = ui.Text("defaultdialogs", "requiredField", base.getUser()) + "<br/>";
                 DomainValidator.ErrorMessage = ui.Text("defaultdialogs", "requiredField", base.getUser());
 
+				DomainValidator2.ErrorMessage = ui.Text("assignDomain", "invalidDomain", base.getUser());
+				//DomainValidator2.ValidationExpression = @"^(?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/[-\w]*)?$";
+				DomainValidator2.ValidationExpression = @"^(\*|((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/[-\w]*)?))$";
+
                 Languages.Items.Add(new ListItem(ui.Text("general", "choose", base.getUser()), ""));
                 foreach (Language l in Language.getAll)
                 {
