@@ -12,7 +12,6 @@ using Umbraco.Web;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -58,15 +57,6 @@ namespace Umbraco.Tests.TestHelpers
             UmbracoSettings.ResetSetters();
         }
 
-        protected virtual void CleanDirectories(string[] directories)
-        {
-            foreach (var directory in directories)
-            {
-                var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
-                directoryInfo.Delete(true);
-            }
-        }
-
         protected virtual void CreateDirectories(string[] directories)
         {
             foreach (var directory in directories)
@@ -74,6 +64,16 @@ namespace Umbraco.Tests.TestHelpers
                 var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
                 if (directoryInfo.Exists == false)
                     Directory.CreateDirectory(IOHelper.MapPath(directory));
+            }
+        }
+        
+        protected virtual void CleanDirectories(string[] directories)
+        {
+            foreach (var directory in directories)
+            {
+                var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
+                if (directoryInfo.Exists)
+                    directoryInfo.GetFiles().ForEach(x => x.Delete());
             }
         }
 
