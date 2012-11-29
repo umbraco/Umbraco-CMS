@@ -339,11 +339,6 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Masterpages\leave-this-dummy-file-here.txt" />
-    <Content Include="Media\leave-this-dummy-file-here.txt" />
-    <Content Include="Views\leave-this-dummy-file-here.txt" />
-  </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

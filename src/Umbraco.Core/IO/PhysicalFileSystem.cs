@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Publishing;
 
 namespace Umbraco.Core.IO
 {
@@ -131,7 +133,9 @@ namespace Umbraco.Core.IO
                 File.Delete(GetFullPath(path));
             }
             catch (FileNotFoundException ex)
-            { }
+            {
+                LogHelper.Info<PublishingStrategy>(string.Format("DeleteFile failed with FileNotFoundException: {0}", ex.InnerException));
+            }
         }
 
         public bool FileExists(string path)
