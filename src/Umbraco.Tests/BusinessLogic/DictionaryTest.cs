@@ -19,11 +19,6 @@ namespace Umbraco.Tests.BusinessLogic
     [TestFixture]
     public class DictionaryTest : BaseWebTest
     {
-        protected override bool RequiresDbSetup
-        {
-            get { return false; }
-        }
-
 		public override void Initialize()
 		{
 			base.Initialize();
