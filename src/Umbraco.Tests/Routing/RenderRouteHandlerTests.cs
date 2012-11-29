@@ -19,12 +19,16 @@ namespace Umbraco.Tests.Routing
 
 		public override void Initialize()
 		{
+            //this ensures its reset
+            PluginManager.Current = new PluginManager();
+
+            SurfaceControllerResolver.Current = new SurfaceControllerResolver(
+                PluginManager.Current.ResolveSurfaceControllers());
+
 			base.Initialize();
+
 			System.Configuration.ConfigurationManager.AppSettings.Set("umbracoPath", "~/umbraco");
-
-			SurfaceControllerResolver.Current = new SurfaceControllerResolver(
-				PluginManager.Current.ResolveSurfaceControllers());
-
+            
 			var webBoot = new WebBootManager(new UmbracoApplication(), true);
 			//webBoot.Initialize();
 			//webBoot.Startup(null); -> don't call startup, we don't want any other application event handlers to bind for this test.

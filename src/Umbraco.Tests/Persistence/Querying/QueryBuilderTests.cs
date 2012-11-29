@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var result = translator.Translate();
             var strResult = result.SQL;
 
-            string expectedResult = "SELECT *\nFROM umbracoNode\nWHERE (([umbracoNode].[parentID]=-1))";
+            string expectedResult = "SELECT *\nFROM umbracoNode\nWHERE ([umbracoNode].[parentID]=-1)";
 
             // Assert
             Assert.That(strResult, Is.Not.Empty);
@@ -71,7 +71,7 @@ namespace Umbraco.Tests.Persistence.Querying
             var result = translator.Translate();
             var strResult = result.SQL;
 
-            string expectedResult = "SELECT *\nFROM umbracoNode\nWHERE (([cmsContentType].[alias]='umbTextpage'))";
+            string expectedResult = "SELECT *\nFROM umbracoNode\nWHERE ([cmsContentType].[alias]='umbTextpage')";
 
             // Assert
             Assert.That(strResult, Is.Not.Empty);

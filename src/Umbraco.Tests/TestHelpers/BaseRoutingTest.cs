@@ -16,7 +16,6 @@ namespace Umbraco.Tests.TestHelpers
 		public override void Initialize()
 		{					
 			base.Initialize();
-            UmbracoSettings.ResetSetters();
 		}
 
 		public override void TearDown()

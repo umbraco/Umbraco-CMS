@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Can_OrderBy_With_Type()
         {
             var expected = new Sql();
-            expected.Select("*").From("[cmsContent]").OrderBy("[contentType]");
+            expected.Select("*").From("[cmsContent]").OrderBy("[cmsContent].[contentType]");
 
             var sql = new Sql();
             sql.Select("*").From<ContentDto>().OrderBy<ContentDto>(x => x.ContentTypeId);
@@ -74,7 +74,7 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Can_Use_Where_Predicate()
         {
             var expected = new Sql();
-            expected.Select("*").From("[cmsContent]").Where("(nodeId=1045)");
+            expected.Select("*").From("[cmsContent]").Where("nodeId=1045");
 
             var sql = new Sql();
             sql.Select("*").From<ContentDto>().Where<ContentDto>(x => x.NodeId == 1045);
@@ -90,8 +90,8 @@ namespace Umbraco.Tests.Persistence.Querying
             var expected = new Sql();
             expected.Select("*")
                 .From("[cmsContent]")
-                .Where("(nodeId=1045)")
-                .Where("(contentType=1050)");
+                .Where("nodeId=1045")
+                .Where("contentType=1050");
 
             var sql = new Sql();
             sql.Select("*")

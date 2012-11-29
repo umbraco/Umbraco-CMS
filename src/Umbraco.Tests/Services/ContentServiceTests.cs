@@ -650,6 +650,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var subpage2 = contentService.GetById(1048);
             var version = subpage2.Version;
+            var nameBeforeRollback = subpage2.Name;
             subpage2.Name = "Text Page 2 Updated";
             subpage2.SetValue("author", "Jane Doe");
             contentService.Save(subpage2, 0);
@@ -661,7 +662,7 @@ namespace Umbraco.Tests.Services
             Assert.That(rollback, Is.Not.Null);
             Assert.AreNotEqual(rollback.Version, version);
             Assert.That(rollback.GetValue<string>("author"), Is.Not.EqualTo("Jane Doe"));
-            Assert.AreEqual(subpage2.Name, rollback.Name);
+            Assert.AreEqual(nameBeforeRollback, rollback.Name);
         }
 
         [Test]

@@ -318,45 +318,6 @@
                 }
             });
         });
-        
-        /*var intervalId = 0;
-
-        jQuery(document).ready(function () {
-            
-            jQuery(".btn-box").hide();
-            jQuery.ajax({
-                type: 'POST',
-                contentType: 'application/json; charset=utf-8',
-                data: '{}',
-                dataType: 'json',
-                url: 'utills/p.aspx/installOrUpgrade'
-            });
-            
-            intervalId = setInterval("progressBarCallback()", 1000);
-        });
-
-        function progressBarCallback() {
-            jQuery.getJSON('utills/p.aspx?feed=progress', function (data) {
-
-                updateProgressBar(data.Percentage);
-                updateStatusMessage(data.Description);
-
-                if (data.Error != "") {
-                    clearInterval(intervalId);
-                    updateStatusMessage(jQuery(".loader > strong").text(), data.Error);
-
-                    jQuery(".btn-continue").hide();
-                    jQuery(".btn-back").show();
-                    jQuery(".btn-box").show();
-                }
-
-                if (data.Percentage == 100) {
-                    clearInterval(intervalId);
-                    jQuery(".btn-box").show();
-                    jQuery('.ui-progressbar-value').css("background-image", "url(../umbraco_client/installer/images/pbar.gif)");
-                }
-            });
-        }*/
     </script>
 
 </asp:PlaceHolder>
