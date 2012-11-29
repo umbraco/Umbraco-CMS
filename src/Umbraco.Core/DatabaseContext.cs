@@ -22,12 +22,12 @@ namespace Umbraco.Core
     public class DatabaseContext
     {
         private bool _configured;
-
-        #region Singleton
-        private static readonly Lazy<DatabaseContext> lazy = new Lazy<DatabaseContext>(() => new DatabaseContext());
         private string _connectionString;
         private string _providerName;
 
+        #region Singleton
+        private static readonly Lazy<DatabaseContext> lazy = new Lazy<DatabaseContext>(() => new DatabaseContext());
+        
         /// <summary>
         /// Gets the current Database Context.
         /// </summary>
@@ -122,7 +122,6 @@ namespace Umbraco.Core
 
             SaveConnectionString(connectionString, appSettingsConnection, providerName);
 
-            string appData = VirtualPathUtility.ToAbsolute(GlobalSettings.StorageDirectory);
             var path = Path.Combine(GlobalSettings.FullpathToRoot, "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
             {
@@ -130,7 +129,6 @@ namespace Umbraco.Core
                 engine.CreateDatabase();
             }
 
-            
             Initialize(providerName);
         }
 
@@ -296,6 +294,33 @@ namespace Umbraco.Core
             }
 
             _configured = true;
+        }
+
+        internal Result CreateDatabaseSchemaAndData()
+        {
+            var providerName = string.IsNullOrEmpty(_providerName) ? ProviderName : _providerName;
+            if (_configured == false || (string.IsNullOrEmpty(_connectionString) || string.IsNullOrEmpty(providerName)))
+            {
+                return new Result{Message = "Database configuration is invalid", Success = false, Percentage = "10"};
+            }
+
+            try
+            {
+                var database = new Database(_connectionString, providerName);
+                database.CreateDatabaseSchema();
+                return new Result { Message = "Installation completed!", Success = true, Percentage = "100" };
+            }
+            catch (Exception ex)
+            {
+                return new Result { Message = ex.Message, Success = false, Percentage = "90" };
+            }
+        }
+
+        internal class Result
+        {
+            public string Message { get; set; }
+            public bool Success { get; set; }
+            public string Percentage { get; set; }
         }
     }
 }

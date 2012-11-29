@@ -1,13 +1,9 @@
 using System;
 using System.Data.Common;
-using System.Threading;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
-using umbraco.DataLayer;
-using umbraco.DataLayer.Utility.Installer;
 using System.IO;
 using umbraco.IO;
 
@@ -18,29 +14,6 @@ namespace umbraco.presentation.install.steps
     /// </summary>
     public partial class detect : System.Web.UI.UserControl
     {
-        /// <summary>The installer associated with the chosen connection string.</summary>
-        private IInstallerUtility m_Installer;
-       
-        /// <summary>
-        /// The installer associated with the chosen connection string.
-        /// Will be initialized if <c>m_Installer</c> is <c>null</c>.
-        /// </summary>
-        protected IInstallerUtility Installer
-        {
-            get
-            {
-                if (m_Installer == null)
-                    m_Installer = SqlHelper.Utility.CreateInstaller();
-                return m_Installer;
-            }
-        }
-
-        /// <summary>Returns the current SQLHelper.</summary>
-        protected static ISqlHelper SqlHelper
-        {
-            get { return BusinessLogic.Application.SqlHelper; }
-        }
-
         /// <summary>
         /// Returns whether the selected database is an embedded database.
         /// </summary>
@@ -154,13 +127,8 @@ namespace umbraco.presentation.install.steps
         /// </summary>
         protected void saveDBConfig(object sender, EventArgs e)
         {
-            Helper.setProgress(5, "Saving database connection...", "");
-
             try
             {
-                /*DbConnectionStringBuilder connectionStringBuilder = CreateConnectionString();
-                GlobalSettings.DbDSN = connectionStringBuilder.ConnectionString;*/
-
                 if (string.IsNullOrEmpty(ConnectionString.Text) == false)
                 {
                     DatabaseContext.Current.ConfigureDatabaseConnection(ConnectionString.Text);
@@ -175,68 +143,14 @@ namespace umbraco.presentation.install.steps
                                                                         DatabaseUsername.Text, DatabasePassword.Text,
                                                                         DatabaseType.SelectedValue);
                 }
-
-                var database = new Database(DatabaseContext.Current.ConnectionString,
-                                        DatabaseContext.Current.ProviderName);
-
-                database.Initialize();
             }
             catch (Exception ex)
             {
                 LogHelper.Error<detect>("Exception was thrown during the setup of the database in 'saveDBConfig'.", ex);
-
-                Exception error = new Exception("Could not save the web.config file. Please modify the connection string manually.", ex);
-                Helper.setProgress(-1, "Could not save the web.config file. Please modify the connection string manually.", error.InnerException.Message);
             }
-
-            Thread.Sleep(5000);
-
+            
             settings.Visible = false;
             installing.Visible = true;
-        }
-
-        /// <summary>
-        /// Creates the connection string with the values the user has supplied.
-        /// </summary>
-        /// <returns></returns>
-        protected DbConnectionStringBuilder CreateConnectionString()
-        {
-            DbConnectionStringBuilder connectionStringBuilder = new DbConnectionStringBuilder();
-
-            if (ManualConnectionString)
-            {
-                connectionStringBuilder.ConnectionString = ConnectionString.Text;
-            }
-            else if (!IsEmbeddedDatabase && !DatabaseType.SelectedValue.Contains("SqlAzure"))//If database is not embedded or of type Sql Azure
-            {
-                connectionStringBuilder["server"] = DatabaseServer.Text;
-                connectionStringBuilder["database"] = DatabaseName.Text;
-                connectionStringBuilder["user id"] = DatabaseUsername.Text;
-                connectionStringBuilder["password"] = DatabasePassword.Text;
-            }
-            else if (!IsEmbeddedDatabase && DatabaseType.SelectedValue.Contains("SqlAzure"))//If database is not embedded and of type Sql Azure
-            {
-                connectionStringBuilder.ConnectionString =
-                    string.Format("Server=tcp:{0}.database.windows.net;Database={1};User ID={2}@{0};Password={3}",
-                                  DatabaseServer.Text, DatabaseName.Text, DatabaseUsername.Text, DatabasePassword.Text);
-            }
-            else if (Request["database"] == "embedded")
-            {
-                connectionStringBuilder.ConnectionString = @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf";
-            }
-
-            if (!String.IsNullOrEmpty(Request["database"]) && !String.IsNullOrEmpty(DatabaseType.SelectedValue) 
-                && !DatabaseType.SelectedValue.Contains("SqlServer")
-                && !DatabaseType.SelectedValue.Contains("SqlAzure")
-                && Request["database"] != "advanced")
-            {
-                connectionStringBuilder["datalayer"] = DatabaseType.SelectedValue;
-            }
-
-            //if (!String.IsNullOrEmpty(DatabaseType.SelectedValue) && !DatabaseType.SelectedValue.Contains("SqlServer") && !DatabaseType.SelectedValue.Contains("Custom"))
-            //    connectionStringBuilder["datalayer"] = DatabaseType.SelectedValue;
-
-            return connectionStringBuilder;
         }
 
         /// <summary>

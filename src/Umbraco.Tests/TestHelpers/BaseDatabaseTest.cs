@@ -43,7 +43,7 @@ namespace Umbraco.Tests.TestHelpers
 
             //Create the umbraco database
             _database = new Database(ConnectionString, ProviderName);
-            _database.Initialize();
+            _database.CreateDatabaseSchema();
         }
 
         public abstract string ConnectionString { get; }

@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
+using System.Web.Script.Serialization;
+using System.Web.Script.Services;
+using System.Web.Services;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
-using umbraco.DataLayer.Utility.Installer;
-using umbraco.DataLayer;
 
 namespace umbraco.presentation.install.utills
 {
@@ -58,103 +52,17 @@ namespace umbraco.presentation.install.utills
         }
 
 
-        [System.Web.Services.WebMethod]
-        [System.Web.Script.Services.ScriptMethod]
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public static string installOrUpgrade()
         {
             LogHelper.Info<p>("Running 'installOrUpgrade' service");
 
-            //Helper.setProgress(5, "Opening database connection...", "");
-            //IInstallerUtility installer;
+            var result = DatabaseContext.Current.CreateDatabaseSchemaAndData();
 
-            if (DatabaseContext.Current.IsDatabaseConfigured == false)
-                return "ConnectionString could not be found";
-
-            //Helper.setProgress(20, "Connection opened", "");
-
-            //var database = new Database(DatabaseContext.Current.ConnectionString, DatabaseContext.Current.ProviderName);
-            
-            //Helper.setProgress(35, "Installing tables...", "");
-
-            //database.Initialize();
-
-            //Helper.setProgress(90, "Refreshing content cache", "");
-
-            //library.RefreshContent();
-
-            Helper.setProgress(100, "Installation completed!", "");
-
-            return "installed";
-
-            /*try
-            {
-                var sqlHelper = DataLayerHelper.CreateSqlHelper(GlobalSettings.DbDSN);
-                installer = sqlHelper.Utility.CreateInstaller();
-
-                if (!installer.CanConnect)
-                    throw new Exception("The installer cannot connect to the database.");
-                else
-                    Helper.setProgress(20, "Connection opened", "");
-            }
-            catch (Exception ex)
-            {
-                var error = new Exception("Database connection initialisation failed.", ex);
-                Helper.setProgress(-5, "Database connection initialisation failed.", 
-                    string.Format("{0}<br />Connection string: {1}", error.InnerException.Message, GlobalSettings.DbDSN));
-
-                return error.Message;
-            }*/
-
-
-            /*if (installer.CanConnect)
-            {
-                if (installer.IsLatestVersion)
-                {
-
-                    Helper.setProgress(90, "Refreshing content cache", "");
-
-                    library.RefreshContent();
-
-                    Helper.setProgress(100, "Database is up-to-date", "");
-
-                }
-                else
-                {
-                    if (installer.IsEmpty)
-                    {
-                        Helper.setProgress(35, "Installing tables...", "");
-                        try
-                        {
-                            installer.Install();
-                            Helper.setProgress(100, "Installation completed!", "");
-                            installer = null;
-
-                            library.RefreshContent();
-                            return "installed";
-                        }
-                        catch (Exception SqlExp)
-                        {
-                            Helper.setProgress(35, "Error installing tables", SqlExp.InnerException.ToString());
-                            return "error";
-                        }
- 
-                    }
-                    else if (installer.CurrentVersion == DatabaseVersion.None || installer.CanUpgrade)
-                    {
-                        Helper.setProgress(35, "Updating database tables...", "");
-                        installer.Install();
-
-                        Helper.setProgress(100, "Upgrade completed!", "");
-
-                        installer = null;
-
-                        library.RefreshContent();
-                        return "upgraded";
-                    }
-                }
-            }*/
-
-            return "no connection;";
+            var js = new JavaScriptSerializer();
+            var jsonResult = js.Serialize(result);
+            return jsonResult;
         }
     }
 }

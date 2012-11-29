@@ -124,7 +124,7 @@ namespace Umbraco.Core.Persistence
             return SyntaxConfig.SqlSyntaxProvider.DoesTableExist(db, tableName);
         }
 
-        public static void Initialize(this Database db)
+        public static void CreateDatabaseSchema(this Database db)
         {
             NewTable += PetaPocoExtensions_NewTable;
 
