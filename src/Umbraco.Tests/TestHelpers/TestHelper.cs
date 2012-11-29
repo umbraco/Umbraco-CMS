@@ -3,6 +3,8 @@ using System.Configuration;
 using System.IO;
 using System.Reflection;
 using SqlCE4Umbraco;
+using Umbraco.Core;
+using Umbraco.Core.IO;
 using log4net.Config;
 using umbraco.DataLayer;
 using GlobalSettings = umbraco.GlobalSettings;
@@ -75,5 +77,35 @@ namespace Umbraco.Tests.TestHelpers
 		{
 			XmlConfigurator.Configure(new FileInfo(MapPathForTest("~/unit-test-log4net.config")));
 		}
+
+        public static void InitializeContentDirectories()
+        {
+            CreateDirectories(new[] { SystemDirectories.Masterpages, SystemDirectories.MvcViews, SystemDirectories.Media });
+        }
+
+	    public static void CleanContentDirectories()
+	    {
+	        CleanDirectories(new[] { SystemDirectories.Masterpages, SystemDirectories.MvcViews, SystemDirectories.Media });
+	    }
+
+	    public static void CreateDirectories(string[] directories)
+        {
+            foreach (var directory in directories)
+            {
+                var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
+                if (directoryInfo.Exists == false)
+                    Directory.CreateDirectory(IOHelper.MapPath(directory));
+            }
+        }
+
+	    public static void CleanDirectories(string[] directories)
+        {
+            foreach (var directory in directories)
+            {
+                var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
+                if (directoryInfo.Exists)
+                    directoryInfo.GetFiles().ForEach(x => x.Delete());
+            }
+        }
 	}
 }

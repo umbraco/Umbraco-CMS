@@ -23,13 +23,12 @@ namespace Umbraco.Tests.TestHelpers
         public virtual void Initialize()
         {
             TestHelper.SetupLog4NetForTests();
+            TestHelper.InitializeContentDirectories();
 
             AppDomain.CurrentDomain.SetData("DataDirectory", TestHelper.CurrentAssemblyDirectory);
 
             if (RequiresDbSetup)
                 TestHelper.InitializeDatabase();
-
-            CreateDirectories(new[] { SystemDirectories.Masterpages, SystemDirectories.MvcViews, SystemDirectories.Media });
 
             Resolution.Freeze();
 
@@ -40,19 +39,20 @@ namespace Umbraco.Tests.TestHelpers
         [TearDown]
         public virtual void TearDown()
         {
+            TestHelper.CleanContentDirectories();
+
             //reset the app context
             ApplicationContext.ApplicationCache.ClearAllCache();
             ApplicationContext.Current = null;
             DatabaseContext = null;
             Resolution.IsFrozen = false;
+
             if (RequiresDbSetup)
                 TestHelper.ClearDatabase();
 
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
             Cache.ClearAllCache();
-            
-            CleanDirectories(new[] { SystemDirectories.Masterpages, SystemDirectories.MvcViews, SystemDirectories.Media });
 
             UmbracoSettings.ResetSetters();
         }

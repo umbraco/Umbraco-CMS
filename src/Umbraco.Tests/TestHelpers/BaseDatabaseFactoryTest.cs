@@ -29,18 +29,13 @@ namespace Umbraco.Tests.TestHelpers
         public virtual void Initialize()
         {
             TestHelper.SetupLog4NetForTests();
+            TestHelper.InitializeContentDirectories();
 
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
             UmbracoSettings.UseLegacyXmlSchema = false;
-
-            //we need to clear out all currently created template files
-            var masterPages = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Masterpages));
-            masterPages.GetFiles().ForEach(x => x.Delete());
-            var mvcViews = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.MvcViews));
-            mvcViews.GetFiles().ForEach(x => x.Delete());
-
+            
             //Delete database file before continueing
             string filePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
             if (File.Exists(filePath))
@@ -51,7 +46,7 @@ namespace Umbraco.Tests.TestHelpers
             //Get the connectionstring settings from config
             var settings = ConfigurationManager.ConnectionStrings["umbracoDbDsn"];
             ConfigurationManager.AppSettings.Set("umbracoDbDSN", @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf");
-
+            
             //Create the Sql CE database
             var engine = new SqlCeEngine(settings.ConnectionString);
             engine.CreateDatabase();
@@ -67,9 +62,12 @@ namespace Umbraco.Tests.TestHelpers
             DatabaseContext.Database.Initialize();
         }
 
+
         [TearDown]
         public virtual void TearDown()
         {
+            TestHelper.CleanContentDirectories();
+
             //reset the app context
             DatabaseContext = null;
             ApplicationContext.Current = null;
