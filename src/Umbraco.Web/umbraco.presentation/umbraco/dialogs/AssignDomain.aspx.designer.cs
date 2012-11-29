@@ -58,6 +58,15 @@ namespace umbraco.dialogs {
         protected global::System.Web.UI.WebControls.RequiredFieldValidator DomainValidator;
         
         /// <summary>
+        /// DomainValidator2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator DomainValidator2;
+        
+        /// <summary>
         /// prop_lang control.
         /// </summary>
         /// <remarks>

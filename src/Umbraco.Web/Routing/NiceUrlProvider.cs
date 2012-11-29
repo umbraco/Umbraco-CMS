@@ -278,7 +278,7 @@ namespace Umbraco.Web.Routing
 			{
 				// domains were found : return absolute urls
 				// ignore vdir at that point
-				uris.AddRange(domainUris.Select(domainUri => new Uri(domainUri.GetLeftPart(UriPartial.Path).TrimEnd('/') + path)));
+				uris.AddRange(domainUris.Select(domainUri => new Uri(CombinePaths(domainUri.GetLeftPart(UriPartial.Path), path))));
 			}
 
 			// UriFromUmbraco will handle vdir
