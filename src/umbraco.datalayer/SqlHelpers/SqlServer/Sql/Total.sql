@@ -153,6 +153,7 @@ CREATE TABLE [cmsContentType]
 [nodeId] [int] NOT NULL, 
 [alias] [nvarchar] (255) NULL, 
 [icon] [nvarchar] (255) NULL,
+[thumbnail] nvarchar(255) NOT NULL CONSTRAINT [DF_cmsContentType_thumbnail] DEFAULT ('folder.png'),
 [isContainer] [bit] NOT NULL CONSTRAINT [df_cmsContentType_isContainer] DEFAULT 0,
 [allowAtRoot] [bit] NOT NULL CONSTRAINT [df_cmsContentType_allowAtRoot] DEFAULT 0
 ) 
@@ -668,9 +669,9 @@ INSERT INTO [umbracoNode] ([id], [trashed], [parentID], [nodeUser], [level], [pa
 SET IDENTITY_INSERT [umbracoNode] OFF 
 ;
 SET IDENTITY_INSERT [cmsContentType] ON 
-INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon], [isContainer], [allowAtRoot]) VALUES (532, 1031, N'Folder', N'folder.gif', 1, 1) 
-INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon]) VALUES (533, 1032, N'Image', N'mediaPhoto.gif') 
-INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon]) VALUES (534, 1033, N'File', N'mediaFile.gif') 
+INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail], [isContainer], [allowAtRoot]) VALUES (532, 1031, N'Folder', N'folder.gif', N'folder.png', 1, 1) 
+INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail]) VALUES (533, 1032, N'Image', N'mediaPhoto.gif', N'mediaPhoto.png') 
+INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail]) VALUES (534, 1033, N'File', N'mediaFile.gif', N'mediaFile.png')
 SET IDENTITY_INSERT [cmsContentType] OFF 
 ;
 SET IDENTITY_INSERT [umbracoUser] ON 
@@ -831,10 +832,10 @@ insert into umbracoRelationType (dual, parentObjectType, childObjectType, name, 
 ;
 ALTER TABLE cmsMacro ADD macroPython nvarchar(255)
 ;
-alter TABLE [cmsContentType]
-add [thumbnail] nvarchar(255) NOT NULL CONSTRAINT
-[DF_cmsContentType_thumbnail] DEFAULT ('folder.png')
-;
+--alter TABLE [cmsContentType]
+--add [thumbnail] nvarchar(255) NOT NULL CONSTRAINT
+--[DF_cmsContentType_thumbnail] DEFAULT ('folder.png')
+--;
 alter TABLE [cmsContentType]
 add [description] nvarchar(1500) NULL
 ;

@@ -138,7 +138,8 @@ nodeId int NOT NULL,
 alias nvarchar (255) NULL, 
 icon nvarchar (255) NULL,
 isContainer bit NOT NULL DEFAULT 0,
-allowAtRoot bit NOT NULL DEFAULT 0
+allowAtRoot bit NOT NULL DEFAULT 0,
+thumbnail nvarchar(255) NOT NULL DEFAULT 'folder.png'
 ) 
  
 ; 
@@ -511,7 +512,7 @@ INSERT INTO umbracoNode (id, trashed, parentID, nodeUser, level, path, sortOrder
 	(-51, 0, -1, 0, 11, '-1,-51', 4, '2e6d3631-066e-44b8-aec4-96f09099b2b5', 'Numeric', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/09/30 14:01:49.920'),
 	(-49, 0, -1, 0, 11, '-1,-49', 2, '92897bc6-a5f3-4ffe-ae27-f2e7e33dda49', 'True/false', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/09/30 14:01:49.920'),
 	(-43, 0, -1, 0, 1, '-1,-43', 2, 'fbaf13a8-4036-41f2-93a3-974f678c312a', 'Checkbox list', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/10/15 14:11:04.367'),
-	(-42, 0, -1, 0, 1, '-1,-42', 2, '0b6a45e7-44ba-430d-9da5-4e46060b9e03', 'Dropdow', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/10/15 14:10:59.000'),
+	(-42, 0, -1, 0, 1, '-1,-42', 2, '0b6a45e7-44ba-430d-9da5-4e46060b9e03', 'Dropdown', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/10/15 14:10:59.000'),
 	(-41, 0, -1, 0, 1, '-1,-41', 2, '5046194e-4237-453c-a547-15db3a07c4e1', 'Date Picker', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/10/15 14:10:54.303'),
 	(-40, 0, -1, 0, 1, '-1,-40', 2, 'bb5f57c9-ce2b-4bb9-b697-4caca783a805', 'Radiobox', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/10/15 14:10:49.253'),
 	(-39, 0, -1, 0, 1, '-1,-39', 2, 'f38f0ac7-1d27-439c-9f3f-089cd8825a53', 'Dropdown multiple', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/10/15 14:10:44.480'),
@@ -534,10 +535,10 @@ INSERT INTO umbracoNode (id, trashed, parentID, nodeUser, level, path, sortOrder
 	(1043, 0, -1, 0, 1, '-1,1042', 2, '1df9f033-e6d4-451f-b8d2-e0cbc50a836f', 'Image Cropper', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2006/01/03 13:07:55.250')
 ;
 
-INSERT INTO cmsContentType (pk, nodeId, alias, icon, isContainer, allowAtRoot) VALUES
-	(532, 1031, 'Folder', 'folder.gif', 1, 1),
-	(533, 1032, 'Image', 'mediaPhoto.gif', 0, 0),
-	(534, 1033, 'File', 'mediaFile.gif', 0, 0)
+INSERT INTO cmsContentType (pk, nodeId, alias, icon, thumbnail, isContainer, allowAtRoot) VALUES
+	(532, 1031, 'Folder', 'folder.gif', 'folder.png', 1, 1),
+	(533, 1032, 'Image', 'mediaPhoto.gif', 'mediaPhoto.png', 0, 0),
+	(534, 1033, 'File', 'mediaFile.gif', 'mediaFile.png', 0, 0)
 ;
 INSERT INTO umbracoUserType (id, userTypeAlias, userTypeName, userTypeDefaultPermissions) VALUES
 	(1, 'admin', 'Administrators', 'CADMOSKTPIURZ5:'),
@@ -744,9 +745,10 @@ INSERT INTO umbracoAppTree(treeSilent, treeInitialize, treeSortOrder, appAlias, 
 ;
 INSERT INTO umbracoAppTree(treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType) VALUES(0, 1, 2, 'settings', 'scripts', 'Scripts', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadScripts') 
 ;
-*/
 alter TABLE cmsContentType add thumbnail nvarchar(255) NOT NULL DEFAULT 'folder.png'
 ;
+*/
+
 alter TABLE cmsContentType add description nvarchar(1500) NULL
 ;
 insert into cmsDataTypePreValues (id, dataTypeNodeId, value, sortorder, alias) values 
