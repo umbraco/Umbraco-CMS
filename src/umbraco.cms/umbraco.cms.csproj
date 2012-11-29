@@ -239,6 +239,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>PackageFiles.resx</DependentUpon>
     </Compile>
+    <Compile Include="businesslogic\propertytype\PropertyTypeGroup.cs" />
     <Compile Include="businesslogic\Property\Properties.cs" />
     <Compile Include="businesslogic\skinning\controls\ColorPicker.cs" />
     <Compile Include="businesslogic\skinning\controls\ImageUploader.cs" />

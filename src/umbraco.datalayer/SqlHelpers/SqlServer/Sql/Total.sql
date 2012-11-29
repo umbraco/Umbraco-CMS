@@ -10,7 +10,7 @@
  
 IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
  
-    Database version: 4.8.0.3
+    Database version: 6.0.0.0
     
     Please increment this version number if ANY change is made to this script,
     so compatibility with scripts for other database systems can be verified easily.
@@ -152,13 +152,23 @@ CREATE TABLE [cmsContentType]
 [pk] [int] NOT NULL IDENTITY(1, 1), 
 [nodeId] [int] NOT NULL, 
 [alias] [nvarchar] (255) NULL, 
-[icon] [nvarchar] (255) NULL, 
-[thumbnail] nvarchar(255) NOT NULL CONSTRAINT [DF_cmsContentType_thumbnail] DEFAULT ('folder.png') 
+[icon] [nvarchar] (255) NULL,
+[isContainer] [bit] NOT NULL CONSTRAINT [df_cmsContentType_isContainer] DEFAULT 0,
+[allowAtRoot] [bit] NOT NULL CONSTRAINT [df_cmsContentType_allowAtRoot] DEFAULT 0
 ) 
  
 ; 
 ALTER TABLE [cmsContentType] ADD CONSTRAINT [PK_cmsContentType] PRIMARY KEY CLUSTERED  ([pk]) 
 ; 
+CREATE TABLE [cmsContentType2ContentType](
+	[parentContentTypeId] [int] NOT NULL,
+	[childContentTypeId] [int] NOT NULL,
+ CONSTRAINT [PK_cmsContentType2ContentType] PRIMARY KEY CLUSTERED 
+(
+	[parentContentTypeId] ASC,
+	[childContentTypeId] ASC
+))
+;
 CREATE TABLE [cmsMacroPropertyType] 
 ( 
 [id] [smallint] NOT NULL IDENTITY(1, 1), 
@@ -190,16 +200,17 @@ ALTER TABLE [umbracoStylesheetProperty] ADD CONSTRAINT [PK_stylesheetProperty] P
 
 */
  
-CREATE TABLE [cmsTab] 
+CREATE TABLE [cmsPropertyTypeGroup] 
 ( 
 [id] [int] NOT NULL IDENTITY(1, 1), 
+[parentGroupId] [int] NULL CONSTRAINT [df_cmsPropertyTypeGroup_parentGroupId] DEFAULT NULL, 
 [contenttypeNodeId] [int] NOT NULL, 
 [text] [nvarchar] (255) NOT NULL, 
 [sortorder] [int] NOT NULL 
 ) 
  
 ; 
-ALTER TABLE [cmsTab] ADD CONSTRAINT [PK_cmsTab] PRIMARY KEY CLUSTERED  ([id]) 
+ALTER TABLE [cmsPropertyTypeGroup] ADD CONSTRAINT [PK_cmsPropertyTypeGroup] PRIMARY KEY CLUSTERED  ([id]) 
 ; 
 CREATE TABLE [cmsTemplate] 
 ( 
@@ -310,7 +321,7 @@ CREATE TABLE [cmsPropertyType]
 [id] [int] NOT NULL IDENTITY(1, 1), 
 [dataTypeId] [int] NOT NULL, 
 [contentTypeId] [int] NOT NULL, 
-[tabId] [int] NULL, 
+[propertyTypeGroupId] [int] NULL, 
 [Alias] [nvarchar] (255) NOT NULL, 
 [Name] [nvarchar] (255) NULL, 
 [helpText] [nvarchar] (1000) NULL, 
@@ -387,7 +398,8 @@ ALTER TABLE [umbracoAppTree] ADD CONSTRAINT [PK_umbracoAppTree] PRIMARY KEY CLUS
 CREATE TABLE [cmsContentTypeAllowedContentType] 
 ( 
 [Id] [int] NOT NULL, 
-[AllowedId] [int] NOT NULL 
+[AllowedId] [int] NOT NULL,
+[SortOrder] [int] NOT NULL CONSTRAINT [df_cmsContentTypeAllowedContentType_sortOrder] DEFAULT 1
 ) 
  
 ; 
@@ -584,7 +596,7 @@ ALTER TABLE [cmsContentType] ADD
 CONSTRAINT [FK_cmsContentType_umbracoNode] FOREIGN KEY ([nodeId]) REFERENCES [umbracoNode] ([id]) 
 ; 
 ALTER TABLE [cmsPropertyType] ADD 
-CONSTRAINT [FK_cmsPropertyType_cmsTab] FOREIGN KEY ([tabId]) REFERENCES [cmsTab] ([id]) 
+CONSTRAINT [FK_cmsPropertyType_cmsPropertyTypeGroup] FOREIGN KEY ([propertyTypeGroupId]) REFERENCES [cmsPropertyTypeGroup] ([id]) 
 ; 
 ALTER TABLE [cmsContent] ADD 
 CONSTRAINT [FK_cmsContent_umbracoNode] FOREIGN KEY ([nodeId]) REFERENCES [umbracoNode] ([id]) 
@@ -595,7 +607,7 @@ CONSTRAINT [FK_umbracoUser2app_umbracoUser] FOREIGN KEY ([user]) REFERENCES [umb
  
 ALTER TABLE [cmsTemplate] DROP CONSTRAINT [FK_cmsTemplate_umbracoNode] 
 ; 
-ALTER TABLE [cmsPropertyType] DROP CONSTRAINT [FK_cmsPropertyType_cmsTab] 
+ALTER TABLE [cmsPropertyType] DROP CONSTRAINT [FK_cmsPropertyType_cmsPropertyTypeGroup] 
 ; 
 ALTER TABLE [cmsContent] DROP CONSTRAINT [FK_cmsContent_umbracoNode] 
 ; 
@@ -656,9 +668,9 @@ INSERT INTO [umbracoNode] ([id], [trashed], [parentID], [nodeUser], [level], [pa
 SET IDENTITY_INSERT [umbracoNode] OFF 
 ;
 SET IDENTITY_INSERT [cmsContentType] ON 
-INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail]) VALUES (532, 1031, N'Folder', N'folder.gif', N'folder.png') 
-INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail]) VALUES (533, 1032, N'Image', N'mediaPhoto.gif', N'mediaPhoto.png') 
-INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon], [thumbnail]) VALUES (534, 1033, N'File', N'mediaFile.gif', N'mediaFile.png') 
+INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon], [isContainer], [allowAtRoot]) VALUES (532, 1031, N'Folder', N'folder.gif', 1, 1) 
+INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon]) VALUES (533, 1032, N'Image', N'mediaPhoto.gif') 
+INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon]) VALUES (534, 1033, N'File', N'mediaFile.gif') 
 SET IDENTITY_INSERT [cmsContentType] OFF 
 ;
 SET IDENTITY_INSERT [umbracoUser] ON 
@@ -697,22 +709,22 @@ INSERT INTO [cmsMacroPropertyType] ([id], [macroPropertyTypeAlias], [macroProper
 INSERT INTO [cmsMacroPropertyType] ([id], [macroPropertyTypeAlias], [macroPropertyTypeRenderAssembly], [macroPropertyTypeRenderType], [macroPropertyTypeBaseType]) VALUES (25, N'textMultiLine', N'umbraco.macroRenderings', N'textMultiple', N'String') 
 SET IDENTITY_INSERT [cmsMacroPropertyType] OFF 
 ;
-SET IDENTITY_INSERT [cmsTab] ON 
-INSERT INTO [cmsTab] ([id], [contenttypeNodeId], [text], [sortorder]) VALUES (3, 1032, N'Image', 1) 
-INSERT INTO [cmsTab] ([id], [contenttypeNodeId], [text], [sortorder]) VALUES (4, 1033, N'File', 1) 
-INSERT INTO [cmsTab] ([id], [contenttypeNodeId], [text], [sortorder]) VALUES (5, 1031, N'Contents', 1) 
-SET IDENTITY_INSERT [cmsTab] OFF 
+SET IDENTITY_INSERT [cmsPropertyTypeGroup] ON 
+INSERT INTO [cmsPropertyTypeGroup] ([id], [contenttypeNodeId], [text], [sortorder]) VALUES (3, 1032, N'Image', 1) 
+INSERT INTO [cmsPropertyTypeGroup] ([id], [contenttypeNodeId], [text], [sortorder]) VALUES (4, 1033, N'File', 1) 
+INSERT INTO [cmsPropertyTypeGroup] ([id], [contenttypeNodeId], [text], [sortorder]) VALUES (5, 1031, N'Contents', 1) 
+SET IDENTITY_INSERT [cmsPropertyTypeGroup] OFF 
 ;
 SET IDENTITY_INSERT [cmsPropertyType] ON 
-INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [tabId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (6, -90, 1032, 3, N'umbracoFile', N'Upload image', NULL, 0, 0, NULL, NULL) 
-INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [tabId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (7, -92, 1032, 3, N'umbracoWidth', N'Width', NULL, 0, 0, NULL, NULL) 
-INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [tabId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (8, -92, 1032, 3, N'umbracoHeight', N'Height', NULL, 0, 0, NULL, NULL) 
-INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [tabId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (9, -92, 1032, 3, N'umbracoBytes', N'Size', NULL, 0, 0, NULL, NULL) 
-INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [tabId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (10, -92, 1032, 3, N'umbracoExtension', N'Type', NULL, 0, 0, NULL, NULL) 
-INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [tabId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (24, -90, 1033, 4, N'umbracoFile', N'Upload file', NULL, 0, 0, NULL, NULL) 
-INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [tabId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (25, -92, 1033, 4, N'umbracoExtension', N'Type', NULL, 0, 0, NULL, NULL) 
-INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [tabId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (26, -92, 1033, 4, N'umbracoBytes', N'Size', NULL, 0, 0, NULL, NULL) 
-INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [tabId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (27, -38, 1031, 5, N'contents', N'Contents:', NULL, 0, 0, NULL, NULL) 
+INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [propertyTypeGroupId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (6, -90, 1032, 3, N'umbracoFile', N'Upload image', NULL, 0, 0, NULL, NULL) 
+INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [propertyTypeGroupId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (7, -92, 1032, 3, N'umbracoWidth', N'Width', NULL, 0, 0, NULL, NULL) 
+INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [propertyTypeGroupId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (8, -92, 1032, 3, N'umbracoHeight', N'Height', NULL, 0, 0, NULL, NULL) 
+INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [propertyTypeGroupId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (9, -92, 1032, 3, N'umbracoBytes', N'Size', NULL, 0, 0, NULL, NULL) 
+INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [propertyTypeGroupId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (10, -92, 1032, 3, N'umbracoExtension', N'Type', NULL, 0, 0, NULL, NULL) 
+INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [propertyTypeGroupId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (24, -90, 1033, 4, N'umbracoFile', N'Upload file', NULL, 0, 0, NULL, NULL) 
+INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [propertyTypeGroupId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (25, -92, 1033, 4, N'umbracoExtension', N'Type', NULL, 0, 0, NULL, NULL) 
+INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [propertyTypeGroupId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (26, -92, 1033, 4, N'umbracoBytes', N'Size', NULL, 0, 0, NULL, NULL) 
+INSERT INTO [cmsPropertyType] ([id], [dataTypeId], [contentTypeId], [propertyTypeGroupId], [Alias], [Name], [helpText], [sortOrder], [mandatory], [validationRegExp], [Description]) VALUES (27, -38, 1031, 5, N'contents', N'Contents:', NULL, 0, 0, NULL, NULL) 
 SET IDENTITY_INSERT [cmsPropertyType] OFF 
 ;
 SET IDENTITY_INSERT [umbracoLanguage] ON 
@@ -761,7 +773,7 @@ INSERT INTO [cmsDataType] ([pk], [nodeId], [controlId], [dbType]) VALUES (40, 10
 SET IDENTITY_INSERT [cmsDataType] OFF 
 ;
 ALTER TABLE [cmsTemplate] ADD CONSTRAINT [FK_cmsTemplate_umbracoNode] FOREIGN KEY ([nodeId]) REFERENCES [umbracoNode] ([id]) 
-ALTER TABLE [cmsPropertyType] ADD CONSTRAINT [FK_cmsPropertyType_cmsTab] FOREIGN KEY ([tabId]) REFERENCES [cmsTab] ([id]) 
+ALTER TABLE [cmsPropertyType] ADD CONSTRAINT [FK_cmsPropertyType_cmsPropertyTypeGroup] FOREIGN KEY ([propertyTypeGroupId]) REFERENCES [cmsPropertyTypeGroup] ([id]) 
 ALTER TABLE [cmsContent] ADD CONSTRAINT [FK_cmsContent_umbracoNode] FOREIGN KEY ([nodeId]) REFERENCES [umbracoNode] ([id]) 
 ALTER TABLE [cmsMacroProperty] ADD CONSTRAINT [FK_umbracoMacroProperty_umbracoMacroPropertyType] FOREIGN KEY ([macroPropertyType]) REFERENCES [cmsMacroPropertyType] ([id]) 
 ALTER TABLE [umbracoUser2app] ADD CONSTRAINT [FK_umbracoUser2app_umbracoUser] FOREIGN KEY ([user]) REFERENCES [umbracoUser] ([id]) 
@@ -819,10 +831,10 @@ insert into umbracoRelationType (dual, parentObjectType, childObjectType, name, 
 ;
 ALTER TABLE cmsMacro ADD macroPython nvarchar(255)
 ;
---alter TABLE [cmsContentType]
---add [thumbnail] nvarchar(255) NOT NULL CONSTRAINT
---[DF_cmsContentType_thumbnail] DEFAULT ('folder.png')
---;
+alter TABLE [cmsContentType]
+add [thumbnail] nvarchar(255) NOT NULL CONSTRAINT
+[DF_cmsContentType_thumbnail] DEFAULT ('folder.png')
+;
 alter TABLE [cmsContentType]
 add [description] nvarchar(1500) NULL
 ;
@@ -856,11 +868,6 @@ IF NOT EXISTS (SELECT permission FROM umbracoUser2NodePermission WHERE permissio
 INSERT INTO umbracoUser2NodePermission (userID, nodeId, permission) 
 SELECT DISTINCT userID, nodeId, 'H' FROM umbracoUser2NodePermission WHERE userId IN
 (SELECT umbracoUser.id FROM umbracoUserType INNER JOIN umbracoUser ON umbracoUserType.id = umbracoUser.userType WHERE (umbracoUserType.userTypeAlias = 'writer'))
-;
-
-alter TABLE [cmsContentType]
-add [masterContentType] int NULL CONSTRAINT
-[DF_cmsContentType_masterContentType] DEFAULT (0)
 ;
 
 CREATE TABLE [cmsTagRelationship](
@@ -1305,8 +1312,8 @@ ALTER TABLE cmsPropertyType ADD CONSTRAINT
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE cmsTab ADD CONSTRAINT
-	FK_cmsTab_cmsContentType FOREIGN KEY
+ALTER TABLE cmsPropertyTypeGroup ADD CONSTRAINT
+	FK_cmsPropertyTypeGroup_cmsContentType FOREIGN KEY
 	(
 	contenttypeNodeId
 	) REFERENCES cmsContentType
@@ -1589,7 +1596,10 @@ ALTER TABLE cmsMember2MemberGroup ADD CONSTRAINT
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
-
+ALTER TABLE [cmsPropertyTypeGroup] 
+WITH CHECK ADD CONSTRAINT [FK_cmsPropertyTypeGroup_cmsPropertyTypeGroup] FOREIGN KEY([parentGroupId])
+REFERENCES [cmsPropertyTypeGroup] ([id])
+;
 
 /***********************************************************************************************************************
 
