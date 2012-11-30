@@ -9,6 +9,7 @@ using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core
@@ -296,7 +297,7 @@ namespace Umbraco.Core
             _configured = true;
         }
 
-        internal Result CreateDatabaseSchemaAndData()
+        internal Result CreateDatabaseSchemaAndDataOrUpgrade()
         {
             if (_configured == false || (string.IsNullOrEmpty(_connectionString) || string.IsNullOrEmpty(ProviderName)))
             {
@@ -306,7 +307,19 @@ namespace Umbraco.Core
             try
             {
                 var database = new Database(_connectionString, ProviderName);
-                database.CreateDatabaseSchema();
+                //If Configuration Status is empty its a new install - otherwise upgrade the existing
+                if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus))
+                {
+                    database.CreateDatabaseSchema();
+                }
+                else
+                {
+                    var configuredVersion = new Version(GlobalSettings.ConfigurationStatus);
+                    var targetVersion = UmbracoVersion.Current;
+                    var runner = new MigrationRunner(configuredVersion, targetVersion);
+                    var upgraded = runner.Execute(database, true);
+                }
+                
                 return new Result { Message = "Installation completed!", Success = true, Percentage = "100" };
             }
             catch (Exception ex)

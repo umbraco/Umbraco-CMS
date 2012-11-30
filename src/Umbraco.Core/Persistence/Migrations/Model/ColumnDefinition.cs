@@ -18,12 +18,6 @@ namespace Umbraco.Core.Persistence.Migrations.Model
         public virtual bool IsNullable { get; set; }
         public virtual bool IsUnique { get; set; }
         public virtual string TableName { get; set; }
-        public virtual ColumnModificationType ModificationType { get; set; }
-    }
-
-    public enum ColumnModificationType
-    {
-        Create,
-        Alter
+        public virtual ModificationType ModificationType { get; set; }
     }
 }

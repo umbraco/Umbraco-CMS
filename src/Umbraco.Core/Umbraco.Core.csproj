@@ -196,12 +196,15 @@
     <Compile Include="Persistence\Migrations\MigrationAttribute.cs" />
     <Compile Include="Persistence\Migrations\MigrationBase.cs" />
     <Compile Include="Persistence\Migrations\MigrationContext.cs" />
+    <Compile Include="Persistence\Migrations\MigrationRunner.cs" />
     <Compile Include="Persistence\Migrations\Model\ColumnDefinition.cs" />
+    <Compile Include="Persistence\Migrations\Model\ModificationType.cs" />
     <Compile Include="Persistence\Migrations\Model\ForeignKeyDefinition.cs" />
     <Compile Include="Persistence\Migrations\Model\IndexColumnDefinition.cs" />
     <Compile Include="Persistence\Migrations\Model\IndexDefinition.cs" />
     <Compile Include="Persistence\Migrations\Model\SystemMethods.cs" />
     <Compile Include="Persistence\Migrations\Model\TableDefinition.cs" />
+    <Compile Include="Persistence\Migrations\PluginManagerExtension.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Alter\AlterSyntaxBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Alter\Column\AlterColumnSyntaxBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Alter\Column\IAlterColumnOptionForeignKeyCascadeSyntax.cs" />

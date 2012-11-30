@@ -6,7 +6,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
     {
         public AlterColumnExpression()
         {
-            Column = new ColumnDefinition() { ModificationType = ColumnModificationType.Alter };
+            Column = new ColumnDefinition() { ModificationType = ModificationType.Alter };
         }
 
         public virtual string SchemaName { get; set; }

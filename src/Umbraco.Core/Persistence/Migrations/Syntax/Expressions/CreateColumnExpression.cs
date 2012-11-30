@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
     {
         public CreateColumnExpression()
         {
-            Column = new ColumnDefinition { ModificationType = ColumnModificationType.Create };
+            Column = new ColumnDefinition { ModificationType = ModificationType.Create };
         }
 
         public virtual string SchemaName { get; set; }

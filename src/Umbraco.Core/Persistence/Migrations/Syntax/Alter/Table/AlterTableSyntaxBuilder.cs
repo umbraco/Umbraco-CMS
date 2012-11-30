@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table
 
         public IAlterTableColumnOptionSyntax WithDefaultValue(object value)
         {
-            if (CurrentColumn.ModificationType == ColumnModificationType.Alter)
+            if (CurrentColumn.ModificationType == ModificationType.Alter)
             {
                 var dc = new AlterDefaultConstraintExpression
                              {
@@ -213,7 +213,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table
 
         public IAlterTableColumnSyntax AddColumn(string name)
         {
-            var column = new ColumnDefinition { Name = name, ModificationType = ColumnModificationType.Create };
+            var column = new ColumnDefinition { Name = name, ModificationType = ModificationType.Create };
             var createColumn = new CreateColumnExpression
                                    {
                                        Column = column,
@@ -229,7 +229,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table
 
         public IAlterTableColumnSyntax AlterColumn(string name)
         {
-            var column = new ColumnDefinition { Name = name, ModificationType = ColumnModificationType.Alter };
+            var column = new ColumnDefinition { Name = name, ModificationType = ModificationType.Alter };
             var alterColumn = new AlterColumnExpression
                                   {
                                       Column = column,

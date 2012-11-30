@@ -371,7 +371,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         protected virtual string FormatNullable(Migrations.Model.ColumnDefinition column)
         {
-            return !column.IsNullable ? "NOT NULL" : string.Empty;
+            return column.IsNullable ? string.Empty : "NOT NULL";
         }
 
         protected virtual string FormatDefaultValue(Migrations.Model.ColumnDefinition column)
