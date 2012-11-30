@@ -55,6 +55,7 @@ namespace Umbraco.Tests.Persistence
             
             using (Transaction transaction = Database.GetTransaction())
             {
+                Database.CreateTable<NodeDto>();
                 Database.CreateTable<ContentType2ContentTypeDto>();
 
                 //transaction.Complete();

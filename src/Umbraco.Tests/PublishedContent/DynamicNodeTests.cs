@@ -59,6 +59,8 @@ namespace Umbraco.Tests.PublishedContent
 			base.TearDown();
 
 			PluginManager.Current.AssembliesToScan = null;
+
+            UmbracoSettings.ResetSetters();
 		}
 
 		protected override dynamic GetDynamicNode(int id)

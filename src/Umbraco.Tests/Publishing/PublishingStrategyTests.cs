@@ -56,6 +56,8 @@ namespace Umbraco.Tests.Publishing
 
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
+
+            UmbracoSettings.ResetSetters();
         }
 
         [Test]

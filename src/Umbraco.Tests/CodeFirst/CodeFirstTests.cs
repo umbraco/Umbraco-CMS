@@ -240,6 +240,8 @@ namespace Umbraco.Tests.CodeFirst
 
             ServiceContext = null;
             SerializationService = null;
+
+            UmbracoSettings.ResetSetters();
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Routing
 		/// </summary>
 		protected override bool RequiresDbSetup
 		{
-			get { return false; }
+			get { return true; }
 		}
 
 		[TestCase("/", 1046)]
@@ -35,7 +35,6 @@ namespace Umbraco.Tests.Routing
 		// we've made it return "/test-page" => we have to support that url back in the lookup...
 		[TestCase("/home", 1046)]
 		[TestCase("/test-page", 1172)]
-
 		public void Match_Document_By_Url_Hide_Top_Level(string urlString, int expectedId)
 		{
 			var routingContext = GetRoutingContext(urlString);
