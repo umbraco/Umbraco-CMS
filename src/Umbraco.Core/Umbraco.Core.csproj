@@ -190,8 +190,53 @@
     <Compile Include="Persistence\Mappers\RelationTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\UserMapper.cs" />
     <Compile Include="Persistence\Mappers\UserTypeMapper.cs" />
+    <Compile Include="Persistence\Migrations\IMigration.cs" />
     <Compile Include="Persistence\Migrations\Initial\BaseDataCreation.cs" />
     <Compile Include="Persistence\Migrations\Initial\DatabaseCreation.cs" />
+    <Compile Include="Persistence\Migrations\MigrationAttribute.cs" />
+    <Compile Include="Persistence\Migrations\MigrationBase.cs" />
+    <Compile Include="Persistence\Migrations\MigrationContext.cs" />
+    <Compile Include="Persistence\Migrations\Model\ColumnDefinition.cs" />
+    <Compile Include="Persistence\Migrations\Model\ForeignKeyDefinition.cs" />
+    <Compile Include="Persistence\Migrations\Model\IndexColumnDefinition.cs" />
+    <Compile Include="Persistence\Migrations\Model\IndexDefinition.cs" />
+    <Compile Include="Persistence\Migrations\Model\SystemMethods.cs" />
+    <Compile Include="Persistence\Migrations\Model\TableDefinition.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Alter\AlterSyntaxBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Alter\Column\AlterColumnSyntaxBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Alter\Column\IAlterColumnOptionForeignKeyCascadeSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Alter\Column\IAlterColumnOptionSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Alter\Column\IAlterColumnSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Alter\Expressions\AlterColumnExpression.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Alter\Expressions\AlterTableExpression.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Alter\IAlterSyntaxBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Alter\Table\AlterTableSyntaxBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Alter\Table\IAlterTableColumnOptionForeignKeyCascadeSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Alter\Table\IAlterTableColumnOptionSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Alter\Table\IAlterTableColumnSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Alter\Table\IAlterTableSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Create\CreateBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Create\ICreateBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\DeleteBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\IDeleteBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\ExpressionBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\ExpressionBuilderBase.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Expressions\AlterDefaultConstraintExpression.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Expressions\CreateColumnExpression.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Expressions\CreateForeignKeyExpression.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Expressions\CreateIndexExpression.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\IColumnOptionSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\IColumnTypeSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\IFluentSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\IForeignKeyCascadeSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Insert\IInsertBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Insert\InsertBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Rename\IRenameBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Rename\RenameBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Schema\ISchemaBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Schema\SchemaBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Update\IUpdateBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Update\UpdateBuilder.cs" />
     <Compile Include="Persistence\PetaPocoExtensions.cs" />
     <Compile Include="Persistence\PetaPocoSqlExtensions.cs" />
     <Compile Include="Persistence\Querying\ExpressionHelper.cs" />
@@ -488,7 +533,9 @@
       <Name>umbraco.interfaces</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Persistence\Migrations\Syntax\Schema\Index\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Persistence.SqlSyntax
+﻿using Umbraco.Core.Persistence.Migrations.Model;
+
+namespace Umbraco.Core.Persistence.SqlSyntax
 {
     /// <summary>
     /// Static class that provides simple access to the Sql Server SqlSyntax Providers singleton
@@ -40,5 +42,34 @@
 
             return result > 0;
         }
+
+        protected override string FormatIdentity(Migrations.Model.ColumnDefinition column)
+        {
+            return column.IsIdentity ? GetIdentityString(column) : string.Empty;
+        }
+
+        private static string GetIdentityString(Migrations.Model.ColumnDefinition column)
+        {
+            return "IDENTITY(1,1)";
+        }
+
+        protected override string FormatSystemMethods(SystemMethods systemMethod)
+        {
+            switch (systemMethod)
+            {
+                case SystemMethods.NewGuid:
+                    return "NEWID()";
+                case SystemMethods.NewSequentialId:
+                    return "NEWSEQUENTIALID()";
+                case SystemMethods.CurrentDateTime:
+                    return "GETDATE()";
+                case SystemMethods.CurrentUTCDateTime:
+                    return "GETUTCDATE()";
+            }
+
+            return null;
+        }
+
+        public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
     }
 }

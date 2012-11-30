@@ -133,6 +133,11 @@
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="Configurations\RepositorySettingsTests.cs" />
     <Compile Include="ContentStores\PublishMediaStoreTests.cs" />
+    <Compile Include="Migrations\AlterMigrationTests.cs" />
+    <Compile Include="Migrations\FindingMigrationsTest.cs" />
+    <Compile Include="Migrations\Stubs\AlterUserTableMigrationStub.cs" />
+    <Compile Include="Migrations\PluginManagerExtensions.cs" />
+    <Compile Include="Migrations\Stubs\FourNineMigration.cs" />
     <Compile Include="Persistence\Querying\ContentRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\Querying\ContentTypeRepositorySqlClausesTest.cs" />
     <Compile Include="PublishedContent\DynamicXmlTests.cs" />

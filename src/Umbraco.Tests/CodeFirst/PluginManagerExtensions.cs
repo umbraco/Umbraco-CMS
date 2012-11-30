@@ -5,7 +5,7 @@ using Umbraco.Core;
 namespace Umbraco.Tests.CodeFirst
 {
     /// <summary>
-    /// Used for PluginTypeResolverTests
+    /// Used for TypeInheritanceTest and CodeFirstTests
     /// </summary>
     internal static class PluginManagerExtensions
     {

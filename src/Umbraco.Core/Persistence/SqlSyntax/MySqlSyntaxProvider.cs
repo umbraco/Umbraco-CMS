@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions;
+using Umbraco.Core.Persistence.Migrations.Model;
+using ColumnDefinition = Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions.ColumnDefinition;
+using TableDefinition = Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions.TableDefinition;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
@@ -166,5 +168,33 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
             return result > 0;
         }
+
+        protected override string FormatIdentity(Migrations.Model.ColumnDefinition column)
+        {
+            return column.IsIdentity ? AutoIncrementDefinition : string.Empty;
+        }
+
+        protected override string FormatSystemMethods(SystemMethods systemMethod)
+        {
+            switch (systemMethod)
+            {
+                case SystemMethods.NewGuid:
+                    return "NEWID()";
+                case SystemMethods.NewSequentialId:
+                    return "NEWSEQUENTIALID()";
+                case SystemMethods.CurrentDateTime:
+                    return "GETDATE()";
+                case SystemMethods.CurrentUTCDateTime:
+                    return "GETUTCDATE()";
+            }
+
+            return null;
+        }
+
+        public override string AlterColumn { get { return "ALTER TABLE {0} MODIFY COLUMN {1}"; } }
+
+        public override string DeleteConstraint { get { return "ALTER TABLE {0} DROP {1}{2}"; } }
+
+        public override string CreateTable { get { return "CREATE TABLE {0} ({1}) ENGINE = INNODB"; } }
     }
 }

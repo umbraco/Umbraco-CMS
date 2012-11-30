@@ -26,5 +26,24 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string GetSpecialDbType(SpecialDbTypes dbTypes);
         string GetConstraintDefinition(ColumnDefinition column, string tableName);
         List<string> ToAlterIdentitySeedStatements(TableDefinition table);
+        string CreateTable { get; }
+        string DropTable { get; }
+        string AddColumn { get; }
+        string DropColumn { get; }
+        string AlterColumn { get; }
+        string RenameColumn { get; }
+        string RenameTable { get; }
+        string CreateSchema { get; }
+        string AlterSchema { get; }
+        string DropSchema { get; }
+        string CreateIndex { get; }
+        string DropIndex { get; }
+        string InsertData { get; }
+        string UpdateData { get; }
+        string DeleteData { get; }
+        string CreateConstraint { get; }
+        string DeleteConstraint { get; }
+        string CreateForeignKeyConstraint { get; }
+        string Format(Migrations.Model.ColumnDefinition column);
     }
 }

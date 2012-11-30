@@ -4,7 +4,9 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions;
+using Umbraco.Core.Persistence.Migrations.Model;
+using ColumnDefinition = Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions.ColumnDefinition;
+using TableDefinition = Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions.TableDefinition;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
@@ -18,6 +20,19 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     internal abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         where TSyntax : ISqlSyntaxProvider
     {
+        protected SqlSyntaxProviderBase()
+        {
+            ClauseOrder = new List<Func<Migrations.Model.ColumnDefinition, string>>
+                              {
+                                  FormatString,
+                                  FormatType,
+                                  FormatNullable,
+                                  FormatDefaultValue,
+                                  FormatPrimaryKey,
+                                  FormatIdentity
+                              };
+        }
+
         public string StringLengthNonUnicodeColumnDefinitionFormat = "VARCHAR({0})";
         public string StringLengthUnicodeColumnDefinitionFormat = "NVARCHAR({0})";
 
@@ -38,6 +53,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public string BlobColumnDefinition = "BLOB";
         public string DateTimeColumnDefinition = "DATETIME";
         public string TimeColumnDefinition = "DATETIME";
+
+        protected IList<Func<Migrations.Model.ColumnDefinition, string>> ClauseOrder { get; set; }
 
         protected DbTypes<TSyntax> DbTypeMap = new DbTypes<TSyntax>();
         protected void InitColumnTypeMap()
@@ -317,5 +334,96 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
             return DbTypeMap.ColumnDbTypeMap[valueType];
         }
+
+        public virtual string Format(Migrations.Model.ColumnDefinition column)
+        {
+            var clauses = new List<string>();
+
+            foreach (var action in ClauseOrder)
+            {
+                string clause = action(column);
+                if (!string.IsNullOrEmpty(clause))
+                    clauses.Add(clause);
+            }
+
+            return string.Join(" ", clauses.ToArray());
+        }
+
+        public virtual string FormatString(Migrations.Model.ColumnDefinition column)
+        {
+            return GetQuotedColumnName(column.Name);
+        }
+
+        protected virtual string FormatType(Migrations.Model.ColumnDefinition column)
+        {
+            if (!column.Type.HasValue)
+                return column.CustomType;
+
+            var dbType = DbTypeMap.ColumnDbTypeMap.First(x => x.Value == column.Type.Value).Key;
+            var definition = DbTypeMap.ColumnDbTypeMap.First(x => x.Key == dbType).Value;
+
+            string dbTypeDefinition = column.Size != default(int)
+                                          ? string.Format("{0}({1})", definition, column.Size)
+                                          : definition.ToString();
+            //NOTE Percision is left out
+            return dbTypeDefinition;
+        }
+
+        protected virtual string FormatNullable(Migrations.Model.ColumnDefinition column)
+        {
+            return !column.IsNullable ? "NOT NULL" : string.Empty;
+        }
+
+        protected virtual string FormatDefaultValue(Migrations.Model.ColumnDefinition column)
+        {
+            if (column.DefaultValue == null)
+                return string.Empty;
+
+            // see if this is for a system method
+            if (column.DefaultValue is SystemMethods)
+            {
+                string method = FormatSystemMethods((SystemMethods)column.DefaultValue);
+                if (string.IsNullOrEmpty(method))
+                    return string.Empty;
+
+                return "DEFAULT " + method;
+            }
+
+            return "DEFAULT " + GetQuotedValue(column.DefaultValue.ToString());
+        }
+
+        protected virtual string FormatPrimaryKey(Migrations.Model.ColumnDefinition column)
+        {
+            return string.Empty;
+        }
+
+        protected abstract string FormatSystemMethods(SystemMethods systemMethod);
+
+        protected abstract string FormatIdentity(Migrations.Model.ColumnDefinition column);
+
+        public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
+        public virtual string DropTable { get { return "DROP TABLE {0}"; } }
+
+        public virtual string AddColumn { get { return "ALTER TABLE {0} ADD COLUMN {1}"; } }
+        public virtual string DropColumn { get { return "ALTER TABLE {0} DROP COLUMN {1}"; } }
+        public virtual string AlterColumn { get { return "ALTER TABLE {0} ALTER COLUMN {1}"; } }
+        public virtual string RenameColumn { get { return "ALTER TABLE {0} RENAME COLUMN {1} TO {2}"; } }
+
+        public virtual string RenameTable { get { return "RENAME TABLE {0} TO {1}"; } }
+
+        public virtual string CreateSchema { get { return "CREATE SCHEMA {0}"; } }
+        public virtual string AlterSchema { get { return "ALTER SCHEMA {0} TRANSFER {1}.{2}"; } }
+        public virtual string DropSchema { get { return "DROP SCHEMA {0}"; } }
+
+        public virtual string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4})"; } }
+        public virtual string DropIndex { get { return "DROP INDEX {0}"; } }
+
+        public virtual string InsertData { get { return "INSERT INTO {0} ({1}) VALUES ({2})"; } }
+        public virtual string UpdateData { get { return "UPDATE {0} SET {1} WHERE {2}"; } }
+        public virtual string DeleteData { get { return "DELETE FROM {0} WHERE {1}"; } }
+
+        public virtual string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})"; } }
+        public virtual string DeleteConstraint { get { return "ALTER TABLE {0} DROP CONSTRAINT {1}"; } }
+        public virtual string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}"; } }
     }
 }
