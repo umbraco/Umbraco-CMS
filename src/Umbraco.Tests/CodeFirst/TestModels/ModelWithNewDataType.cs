@@ -4,7 +4,7 @@ using umbraco.editorControls.tinymce;
 
 namespace Umbraco.Tests.CodeFirst.TestModels
 {
-    public class ModelWithNewDataType
+    public class ModelWithNewDataType : ContentTypeBase
     {
         [PropertyType(typeof(TextFieldDataType), PropertyGroup = "Content")]
         public string Title { get; set; }

@@ -5,7 +5,7 @@ using umbraco.editorControls.textfieldmultiple;
 namespace Umbraco.Tests.CodeFirst.TestModels
 {
     [ContentType("home", AllowedChildContentTypes = new[] { typeof(ContentPage) })]
-    public class Home
+    public class Home : ContentTypeBase
     {
         [PropertyType(typeof(TextFieldDataType))]
         public string SiteName { get; set; }

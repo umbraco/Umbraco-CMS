@@ -3,7 +3,7 @@ using umbraco.editorControls.textfield;
 
 namespace Umbraco.Tests.CodeFirst.TestModels
 {
-    public class SimpleContentPage
+    public class SimpleContentPage : ContentTypeBase
     {
         [PropertyType(typeof(TextFieldDataType), PropertyGroup = "Content")]
         public string Title { get; set; }

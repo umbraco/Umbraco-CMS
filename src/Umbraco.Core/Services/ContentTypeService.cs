@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
@@ -126,6 +127,8 @@ namespace Umbraco.Core.Services
                 content.Value.CreatorId = 0;
                 repository.AddOrUpdate(content.Value);
                 _unitOfWork.Commit();
+
+                LogHelper.Info<ContentTypeService>(string.Format("Saved ContentType with Alias '{0}' and Id '{1}'", content.Value.Alias, content.Value.Id));
             }
         }
 

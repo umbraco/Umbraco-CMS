@@ -37,6 +37,9 @@ namespace Umbraco.Tests.CodeFirst.Definitions
                                                  ? PlainPocoConvention(modelType, existing)
                                                  : ContentTypeConvention(contentTypeAttribute, modelType, existing);
 
+            //Check for interfaces that'll be used for ContentTypeComposition
+            var mixins = GetAliasesFromTypeInterfaces(modelType);
+
             var definitions = new List<PropertyDefinition>();
             int order = 0;
             var objProperties = modelType.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly).ToList();
@@ -126,16 +129,47 @@ namespace Umbraco.Tests.CodeFirst.Definitions
             //Add the resolved ContentType to the internal cache
             var field = new DependencyField {ContentType = contentType, Alias = contentType.Value.Alias};
             var dependencies = new List<string>();
+            //If current type has a parent (inherited model) we add the alias of that type as a dependency
             if(hasParent)
+            {
                 dependencies.Add(parent.Value.Alias);
+            }
+            //Check ContentType for existing 'Allowed ContentTypes'
             if(contentType.Value.AllowedContentTypes.Any())
             {
                 dependencies.AddRange(contentType.Value.AllowedContentTypes.Select(allowed => allowed.Alias));
+            }
+            //Check for interfaces with AliasAttribute and add those as dependencies 
+            //NOTE: might also be an idea to check if ContentType has already been created/added to cache that implements the interface.
+            if(mixins.Any())
+            {
+                foreach (var mixin in mixins)
+                {
+                    if(dependencies.Contains(mixin.Item1)) continue;
+
+                    dependencies.Add(mixin.Item1);
+                    var isMixinResolved = _contentTypeCache.ContainsKey(mixin.Item2);
+
+                    Lazy<IContentType> compositionType = null;
+
+                    if (isMixinResolved)
+                    {
+                        compositionType = _contentTypeCache[mixin.Item2].ContentType;
+                    }
+                    else
+                    {
+                        GetContentTypeDefinition(mixin.Item3);
+                        compositionType = _contentTypeCache[mixin.Item2].ContentType;
+                    }
+
+                    contentType.Value.AddContentType(compositionType.Value);
+                }
             }
             field.DependsOn = dependencies.ToArray();
             _contentTypeCache.AddOrUpdate(modelType.FullName, field, (x, y) => field);
             return contentType;
         }
+
 
         private static int[] GetTopologicalSortOrder(IList<DependencyField> fields)
         {
@@ -189,6 +223,37 @@ namespace Umbraco.Tests.CodeFirst.Definitions
         public static void ClearContentTypeCache()
         {
             _contentTypeCache.Clear();
+        }
+
+        /// <summary>
+        /// Retrieves a list of aliases that correspond to the interfaces on the passed in type,
+        /// which are attributed with the AliasAttribute.
+        /// </summary>
+        /// <remarks>
+        /// The modelType is also used to ensure that the implementing class doesn't reference 
+        /// itself via its interface.
+        /// </remarks>
+        /// <param name="modelType">Type of the model to retrieve interface aliases from</param>
+        /// <returns>An enumerable list of strings with aliases</returns>
+        private static IEnumerable<Tuple<string, string, Type>> GetAliasesFromTypeInterfaces(Type modelType)
+        {
+            var interfaces = modelType.GetInterfaces().ToList().Distinct();
+            var list = new List<Tuple<string, string, Type>>();
+
+            foreach (var interfaceType in interfaces)
+            {
+                var mixinAttribute = interfaceType.FirstAttribute<MixinAttribute>();
+                if (mixinAttribute != null)
+                {
+                    if(mixinAttribute.Type == modelType) continue;
+                    var contentTypeAttribute = mixinAttribute.Type.FirstAttribute<ContentTypeAttribute>();
+                    var contentTypeAlias = contentTypeAttribute == null ? mixinAttribute.Type.Name.ToUmbracoAlias() : contentTypeAttribute.Alias;
+                    var tuple = new Tuple<string, string, Type>(contentTypeAlias, mixinAttribute.Type.FullName, mixinAttribute.Type);
+                    list.Add(tuple);
+                }
+            }
+
+            return list;
         }
 
         /// <summary>

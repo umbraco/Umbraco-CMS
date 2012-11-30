@@ -30,8 +30,8 @@ namespace Umbraco.Tests.CodeFirst.Attributes
 
             if(string.IsNullOrEmpty(PreValue) == false)
             {
-                Conventions.CreatePrevalueForDataTypeDefinition(definition.DataTypeDefinition.Id, PreValue, 0,
-                                                                string.Empty);
+                //TODO - test inserting a prevalue when a DataTypeDefinition has been created, as its currently throwing a foreignkey constraint error.
+                Conventions.CreatePrevalueForDataTypeDefinition(definition.DataTypeDefinition.Id, PreValue, 0, string.Empty);
             }
 
             return definition;

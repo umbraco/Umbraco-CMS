@@ -101,6 +101,7 @@
     <Compile Include="CodeFirst\Attributes\AliasAttribute.cs" />
     <Compile Include="CodeFirst\Attributes\ContentTypeAttribute.cs" />
     <Compile Include="CodeFirst\Attributes\DescriptionAttribute.cs" />
+    <Compile Include="CodeFirst\Attributes\MixinAttribute.cs" />
     <Compile Include="CodeFirst\Attributes\Numeric.cs" />
     <Compile Include="CodeFirst\Attributes\PropertyTypeAttribute.cs" />
     <Compile Include="CodeFirst\Attributes\PropertyTypeConventionAttribute.cs" />
@@ -113,11 +114,12 @@
     <Compile Include="CodeFirst\Definitions\DependencyField.cs" />
     <Compile Include="CodeFirst\Definitions\PropertyDefinition.cs" />
     <Compile Include="CodeFirst\Mvc\UmbracoTemplatePage`T.cs" />
+    <Compile Include="CodeFirst\PluginManagerExtensions.cs" />
     <Compile Include="CodeFirst\TestModels\AdvancedContentPage.cs" />
     <Compile Include="CodeFirst\TestModels\Composition\Base.cs" />
     <Compile Include="CodeFirst\TestModels\Composition\Meta.cs" />
     <Compile Include="CodeFirst\TestModels\Composition\News.cs" />
-    <Compile Include="CodeFirst\TestModels\Composition\Seo.cs" />
+    <Compile Include="CodeFirst\TestModels\Composition\MetaSeo.cs" />
     <Compile Include="CodeFirst\TestModels\ContentPage.cs" />
     <Compile Include="CodeFirst\TestModels\DecoratedModelPage.cs" />
     <Compile Include="CodeFirst\TestModels\Home.cs" />

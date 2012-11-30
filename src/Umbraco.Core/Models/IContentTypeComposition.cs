@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets a list of ContentTypes that make up a composition of PropertyGroups and PropertyTypes for the current ContentType
         /// </summary>
-        List<IContentTypeComposition> ContentTypeComposition { get; }
+        IEnumerable<IContentTypeComposition> ContentTypeComposition { get; }
 
         /// <summary>
         /// Gets a list of <see cref="PropertyGroup"/> objects from the composition

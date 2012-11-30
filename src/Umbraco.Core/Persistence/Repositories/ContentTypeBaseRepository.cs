@@ -84,7 +84,19 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 if (composition.Id == entity.Id) continue;//Just to ensure that we aren't creating a reference to ourself.
 
-                Database.Insert(new ContentType2ContentTypeDto { ParentId = composition.Id, ChildId = entity.Id });
+                if (composition.HasIdentity)
+                {
+                    Database.Insert(new ContentType2ContentTypeDto { ParentId = composition.Id, ChildId = entity.Id });
+                }
+                else
+                {
+                    //Fallback for ContentTypes with no identity
+                    var contentTypeDto = Database.FirstOrDefault<ContentTypeDto>("WHERE alias = @Alias", new {Alias = composition.Alias});
+                    if (contentTypeDto != null)
+                    {
+                        Database.Insert(new ContentType2ContentTypeDto { ParentId = contentTypeDto.NodeId, ChildId = entity.Id });
+                    }
+                }
             }
 
             //Insert collection of allowed content types

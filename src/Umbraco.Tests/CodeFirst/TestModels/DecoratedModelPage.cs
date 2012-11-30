@@ -7,7 +7,7 @@ namespace Umbraco.Tests.CodeFirst.TestModels
     [ContentType("modelPage", 
         AllowedChildContentTypes = new[] { typeof(ContentPage) }, 
         AllowedTemplates = new[]{"umbMaster"})]
-    public class DecoratedModelPage
+    public class DecoratedModelPage : ContentTypeBase
     {
         [PropertyType(typeof(TextFieldDataType), PropertyGroup = "Content")]
         public string Author { get; set; }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -10,6 +9,7 @@ using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Serialization;
 using Umbraco.Tests.CodeFirst.Definitions;
 using Umbraco.Tests.CodeFirst.TestModels;
+using Umbraco.Tests.CodeFirst.TestModels.Composition;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.editorControls.tinyMCE3;
@@ -32,7 +32,8 @@ namespace Umbraco.Tests.CodeFirst
             PluginManager.Current.AssembliesToScan = new[]
 				{
                     typeof(IDataType).Assembly,
-                    typeof(tinyMCE3dataType).Assembly
+                    typeof(tinyMCE3dataType).Assembly,
+                    typeof (ContentTypeBase).Assembly
 				};
 
             DataTypesResolver.Current = new DataTypesResolver(
@@ -187,36 +188,42 @@ namespace Umbraco.Tests.CodeFirst
 
         }
 
-        private SerializationService SerializationService { get; set; }
-
-        private static int[] GetTopologicalSortOrder(IList<DependencyField> fields)
+        [Test]
+        public void Can_Resolve_ContentType_Composition_And_Save_To_Database()
         {
-            var g = new TopologicalSorter(fields.Count());
-            var _indexes = new Dictionary<string, int>();
+            ContentTypeDefinitionFactory.ClearContentTypeCache();
 
-            //add vertices
-            for (int i = 0; i < fields.Count(); i++)
-            {
-                _indexes[fields[i].Alias.ToLower()] = g.AddVertex(i);
-            }
+            var metaSeoModel = typeof(MetaSeo);
+            var seoContentType = ContentTypeDefinitionFactory.GetContentTypeDefinition(metaSeoModel);
+            var metaModel = typeof(Meta);
+            var metaContentType = ContentTypeDefinitionFactory.GetContentTypeDefinition(metaModel);
+            var baseModel = typeof(Base);
+            var baseContentType = ContentTypeDefinitionFactory.GetContentTypeDefinition(baseModel);
+            var newsModel = typeof(News);
+            var newsContentType = ContentTypeDefinitionFactory.GetContentTypeDefinition(newsModel);
 
-            //add edges
-            for (int i = 0; i < fields.Count; i++)
-            {
-                if (fields[i].DependsOn != null)
-                {
-                    for (int j = 0; j < fields[i].DependsOn.Length; j++)
-                    {
-                        g.AddEdge(i,
-                            _indexes[fields[i].DependsOn[j].ToLower()]);
-                    }
-                }
-            }
+            var mappedContentTypes = ContentTypeDefinitionFactory.RetrieveMappedContentTypes().ToList();
+            ServiceContext.ContentTypeService.Save(mappedContentTypes);
 
-            int[] result = g.Sort();
-            return result;
-
+            Assert.That(mappedContentTypes.Count(), Is.EqualTo(4));
         }
+
+        [Test]
+        public void Can_Resolve_Full_List_Of_Models_Implementing_ContentTypeBase()
+        {
+            ContentTypeDefinitionFactory.ClearContentTypeCache();
+
+            var foundTypes = PluginManager.Current.ResolveContentTypeBaseTypes();
+            var contentTypeList = foundTypes.Select(ContentTypeDefinitionFactory.GetContentTypeDefinition).ToList();
+
+            var mappedContentTypes = ContentTypeDefinitionFactory.RetrieveMappedContentTypes();
+
+            Assert.That(contentTypeList.Count(), Is.EqualTo(mappedContentTypes.Count()));
+
+            ServiceContext.ContentTypeService.Save(mappedContentTypes);//Save to db
+        }
+
+        private SerializationService SerializationService { get; set; }
 
         [TearDown]
         public override void TearDown()
