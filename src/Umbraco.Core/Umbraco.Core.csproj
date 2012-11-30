@@ -534,6 +534,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Persistence\DatabaseModelDefinitions\" />
     <Folder Include="Persistence\Migrations\Syntax\Schema\Index\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -360,11 +360,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 return column.CustomType;
 
             var dbType = DbTypeMap.ColumnDbTypeMap.First(x => x.Value == column.Type.Value).Key;
-            var definition = DbTypeMap.ColumnDbTypeMap.First(x => x.Key == dbType).Value;
+            var definition = DbTypeMap.ColumnTypeMap.First(x => x.Key == dbType).Value;
 
             string dbTypeDefinition = column.Size != default(int)
                                           ? string.Format("{0}({1})", definition, column.Size)
-                                          : definition.ToString();
+                                          : definition;
             //NOTE Percision is left out
             return dbTypeDefinition;
         }

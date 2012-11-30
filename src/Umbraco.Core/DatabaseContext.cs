@@ -70,7 +70,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Returns the name of the dataprovider from the connectionstring setting in config
         /// </summary>
-        public string ProviderName
+        internal string ProviderName
         {
             get
             {
@@ -298,15 +298,14 @@ namespace Umbraco.Core
 
         internal Result CreateDatabaseSchemaAndData()
         {
-            var providerName = string.IsNullOrEmpty(_providerName) ? ProviderName : _providerName;
-            if (_configured == false || (string.IsNullOrEmpty(_connectionString) || string.IsNullOrEmpty(providerName)))
+            if (_configured == false || (string.IsNullOrEmpty(_connectionString) || string.IsNullOrEmpty(ProviderName)))
             {
                 return new Result{Message = "Database configuration is invalid", Success = false, Percentage = "10"};
             }
 
             try
             {
-                var database = new Database(_connectionString, providerName);
+                var database = new Database(_connectionString, ProviderName);
                 database.CreateDatabaseSchema();
                 return new Result { Message = "Installation completed!", Success = true, Percentage = "100" };
             }
