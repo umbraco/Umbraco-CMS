@@ -23,6 +23,14 @@ namespace Umbraco.Tests.Routing
 			get { return false; }
 		}
 
+		/// <summary>
+		/// We don't need a db for this test, will run faster without one
+		/// </summary>
+		protected override bool RequiresDbSetup
+		{
+			get { return false; }
+		}
+
 		[TestCase("/this/is/my/alias", 1046)]
 		[TestCase("/anotheralias", 1046)]
 		[TestCase("/page2/alias", 1173)]
