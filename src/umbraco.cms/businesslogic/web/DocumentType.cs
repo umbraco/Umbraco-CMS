@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Data;
 using System.Text;
 using System.Xml;
 using System.Linq;
@@ -8,8 +7,7 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.DataLayer;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-
+using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -34,7 +32,7 @@ namespace umbraco.cms.businesslogic.web
 
         new internal const string m_SQLOptimizedGetAll = @"
             SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text,
-                masterContentType,Alias,icon,thumbnail,description,
+                allowAtRoot, isContainer, Alias,icon,thumbnail,description,
                 templateNodeId, IsDefault
             FROM umbracoNode 
             INNER JOIN cmsContentType ON umbracoNode.id = cmsContentType.nodeId
@@ -201,7 +199,7 @@ namespace umbraco.cms.businesslogic.web
             {
                 if (!_hasChildrenInitialized)
                 {
-                    HasChildren = SqlHelper.ExecuteScalar<int>("select count(NodeId) as tmp from cmsContentType where masterContentType = " + Id) > 0;
+                    HasChildren = SqlHelper.ExecuteScalar<int>("select count(childContentTypeId) as tmp from cmsContentType2ContentType where parentContentTypeId = @id", SqlHelper.CreateParameter("@id", Id)) > 0;
                 }
                 return _hasChildren;
             }
@@ -321,16 +319,12 @@ namespace umbraco.cms.businesslogic.web
             DeleteEventArgs e = new DeleteEventArgs();
             FireBeforeDelete(e);
 
-            if (!e.Cancel)
+            if (e.Cancel == false)
             {
                 // check that no document types uses me as a master
-                foreach (DocumentType dt in DocumentType.GetAllAsList())
+                if (GetAllAsList().Any(dt => dt.MasterContentTypes.Contains(this.Id)))
                 {
-                    if (dt.MasterContentType == this.Id)
-                    {
-                        //this should be InvalidOperationException (or something other than ArgumentException)!
-                        throw new ArgumentException("Can't delete a Document Type used as a Master Content Type. Please remove all references first!");
-                    }
+                    throw new ArgumentException("Can't delete a Document Type used as a Master Content Type. Please remove all references first!");
                 }
 
                 // delete all documents of this type
@@ -358,38 +352,39 @@ namespace umbraco.cms.businesslogic.web
             // info section
             XmlElement info = xd.CreateElement("Info");
             doc.AppendChild(info);
-            info.AppendChild(xmlHelper.addTextNode(xd, "Name", Text));
-            info.AppendChild(xmlHelper.addTextNode(xd, "Alias", Alias));
-            info.AppendChild(xmlHelper.addTextNode(xd, "Icon", IconUrl));
-            info.AppendChild(xmlHelper.addTextNode(xd, "Thumbnail", Thumbnail));
-            info.AppendChild(xmlHelper.addTextNode(xd, "Description", Description));
+            info.AppendChild(XmlHelper.AddTextNode(xd, "Name", Text));
+            info.AppendChild(XmlHelper.AddTextNode(xd, "Alias", Alias));
+            info.AppendChild(XmlHelper.AddTextNode(xd, "Icon", IconUrl));
+            info.AppendChild(XmlHelper.AddTextNode(xd, "Thumbnail", Thumbnail));
+            info.AppendChild(XmlHelper.AddTextNode(xd, "Description", Description));
 
+            //TODO: Add support for mixins!
             if (this.MasterContentType > 0)
             {
                 DocumentType dt = new DocumentType(this.MasterContentType);
 
                 if (dt != null)
-                    info.AppendChild(xmlHelper.addTextNode(xd, "Master", dt.Alias));
+                    info.AppendChild(XmlHelper.AddTextNode(xd, "Master", dt.Alias));
             }
 
 
             // templates
             XmlElement allowed = xd.CreateElement("AllowedTemplates");
             foreach (template.Template t in allowedTemplates)
-                allowed.AppendChild(xmlHelper.addTextNode(xd, "Template", t.Alias));
+                allowed.AppendChild(XmlHelper.AddTextNode(xd, "Template", t.Alias));
             info.AppendChild(allowed);
             if (DefaultTemplate != 0)
                 info.AppendChild(
-                    xmlHelper.addTextNode(xd, "DefaultTemplate", new template.Template(DefaultTemplate).Alias));
+                    XmlHelper.AddTextNode(xd, "DefaultTemplate", new template.Template(DefaultTemplate).Alias));
             else
-                info.AppendChild(xmlHelper.addTextNode(xd, "DefaultTemplate", ""));
+                info.AppendChild(XmlHelper.AddTextNode(xd, "DefaultTemplate", ""));
 
             // structure
             XmlElement structure = xd.CreateElement("Structure");
             doc.AppendChild(structure);
 
             foreach (int cc in AllowedChildContentTypeIDs.ToList())
-                structure.AppendChild(xmlHelper.addTextNode(xd, "DocumentType", new DocumentType(cc).Alias));
+                structure.AppendChild(XmlHelper.AddTextNode(xd, "DocumentType", new DocumentType(cc).Alias));
 
             // generic properties
             XmlElement pts = xd.CreateElement("GenericProperties");
@@ -399,35 +394,37 @@ namespace umbraco.cms.businesslogic.web
                 if (pt.ContentTypeId == this.Id)
                 {
                     XmlElement ptx = xd.CreateElement("GenericProperty");
-                    ptx.AppendChild(xmlHelper.addTextNode(xd, "Name", pt.Name));
-                    ptx.AppendChild(xmlHelper.addTextNode(xd, "Alias", pt.Alias));
-                    ptx.AppendChild(xmlHelper.addTextNode(xd, "Type", pt.DataTypeDefinition.DataType.Id.ToString()));
+                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Name", pt.Name));
+                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Alias", pt.Alias));
+                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Type", pt.DataTypeDefinition.DataType.Id.ToString()));
 
                     //Datatype definition guid was added in v4 to enable datatype imports
-                    ptx.AppendChild(xmlHelper.addTextNode(xd, "Definition", pt.DataTypeDefinition.UniqueId.ToString()));
+                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Definition", pt.DataTypeDefinition.UniqueId.ToString()));
 
-                    ptx.AppendChild(xmlHelper.addTextNode(xd, "Tab", Tab.GetCaptionById(pt.TabId)));
-                    ptx.AppendChild(xmlHelper.addTextNode(xd, "Mandatory", pt.Mandatory.ToString()));
-                    ptx.AppendChild(xmlHelper.addTextNode(xd, "Validation", pt.ValidationRegExp));
-                    ptx.AppendChild(xmlHelper.addCDataNode(xd, "Description", pt.Description));
+                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Tab", Tab.GetCaptionById(pt.TabId)));
+                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Mandatory", pt.Mandatory.ToString()));
+                    ptx.AppendChild(XmlHelper.AddTextNode(xd, "Validation", pt.ValidationRegExp));
+                    ptx.AppendChild(XmlHelper.AddCDataNode(xd, "Description", pt.Description));
                     pts.AppendChild(ptx);
                 }
             }
             doc.AppendChild(pts);
 
             // tabs
-            XmlElement tabs = xd.CreateElement("Tabs");
-            foreach (TabI t in getVirtualTabs.ToList())
+            var tabs = xd.CreateElement("Tabs");
+
+            foreach (var propertyTypeGroup in PropertyTypeGroups)
             {
                 //only add tabs that aren't from a master doctype
-                if (t.ContentType == this.Id)
+                if (propertyTypeGroup.ContentTypeId == this.Id)
                 {
-                    XmlElement tabx = xd.CreateElement("Tab");
-                    tabx.AppendChild(xmlHelper.addTextNode(xd, "Id", t.Id.ToString()));
-                    tabx.AppendChild(xmlHelper.addTextNode(xd, "Caption", t.Caption));
+                    var tabx = xd.CreateElement("Tab");
+                    tabx.AppendChild(XmlHelper.AddTextNode(xd, "Id", propertyTypeGroup.Id.ToString()));
+                    tabx.AppendChild(XmlHelper.AddTextNode(xd, "Caption", propertyTypeGroup.Name));
                     tabs.AppendChild(tabx);
                 }
             }
+
             doc.AppendChild(tabs);
             return doc;
         }
@@ -435,8 +432,7 @@ namespace umbraco.cms.businesslogic.web
         public void RemoveDefaultTemplate()
         {
             _defaultTemplate = 0;
-            SqlHelper.ExecuteNonQuery("update cmsDocumentType set IsDefault = 0 where contentTypeNodeId = " +
-                                      Id.ToString());
+            SqlHelper.ExecuteNonQuery("update cmsDocumentType set IsDefault = 0 where contentTypeNodeId = " + Id.ToString());
         }
 
         public bool HasTemplate()

@@ -75,10 +75,10 @@ function openNodeType(id) {
         public override void Render(ref XmlTree tree)
         {
             List<DocumentType> docTypes;
-            if (base.m_id == -1)
-                docTypes = DocumentType.GetAllAsList().FindAll(delegate(DocumentType dt) { return dt.MasterContentType == 0; });
-            else
-                docTypes = DocumentType.GetAllAsList().FindAll(delegate(DocumentType dt) { return dt.MasterContentType == base.m_id; });
+            docTypes = base.m_id == -1 
+                ? DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == 0) 
+                : DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentTypes.Contains(base.m_id));
+
 
             foreach (DocumentType dt in docTypes)
             {

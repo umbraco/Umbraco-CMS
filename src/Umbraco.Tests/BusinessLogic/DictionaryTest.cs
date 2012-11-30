@@ -16,7 +16,7 @@ namespace Umbraco.Tests.BusinessLogic
     ///This is a test class for Dictionary_DictionaryItemTest and is intended
     ///to contain all Dictionary_DictionaryItemTest Unit Tests
     ///</summary>
-    [TestFixture]
+    [TestFixture, NUnit.Framework.Ignore]
     public class DictionaryTest : BaseWebTest
     {
 		public override void Initialize()
