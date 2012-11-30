@@ -240,7 +240,13 @@ namespace Umbraco.Core
 					"umbraco.webservices",
                     "Lucene.",
                     "Examine,",
-                    "Examine."
+                    "Examine.",
+                    "ServiceStack.",
+                    "MySql.",
+                    "HtmlAgilityPack.",
+                    "TidyNet.",
+                    "ICSharpCode.",
+                    "CookComputing."
                 };
 
 		public static IEnumerable<Type> FindClassesOfTypeWithAttribute<T, TAttribute>()

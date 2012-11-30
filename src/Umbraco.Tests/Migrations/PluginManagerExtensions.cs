@@ -12,12 +12,13 @@ namespace Umbraco.Tests.Migrations
     {
         public static IEnumerable<Type> ResolveMigrationTypes(this PluginManager resolver)
         {
-            return resolver.ResolveTypes<IMigration>();
+            return resolver.ResolveTypesWithAttribute<IMigration, MigrationAttribute>();
         }
 
         public static IEnumerable<IMigration> FindMigrations(this PluginManager resolver)
         {
-            return resolver.FindAndCreateInstances<IMigration>();
+            var types = resolver.ResolveTypesWithAttribute<IMigration, MigrationAttribute>();
+            return resolver.CreateInstances<IMigration>(types);
         }
     }
 }
