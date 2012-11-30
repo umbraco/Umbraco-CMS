@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.Migrations.Stubs;

@@ -234,6 +234,7 @@ namespace Umbraco.Tests.CodeFirst
             DataTypesResolver.Reset();
             ApplicationContext.Current = null;
             Resolution.IsFrozen = false;
+            PluginManager.Current = null;
 
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", null);

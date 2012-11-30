@@ -79,5 +79,11 @@ namespace Umbraco.Tests.CodeFirst
                             PluginManager.Current.GetTypeLists()
                                 .Count(x => x.IsTypeList<ContentTypeBase>(PluginManager.TypeResolutionKind.FindAllTypes)));
         }
+
+        [TearDown]
+        public void TearDown()
+        {
+            PluginManager.Current = null;
+        }
     }
 }

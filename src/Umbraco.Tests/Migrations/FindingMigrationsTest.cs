@@ -74,5 +74,11 @@ namespace Umbraco.Tests.Migrations
                 Console.WriteLine(expression.ToString());
             }
         }
+
+        [TearDown]
+        public void TearDown()
+        {
+            PluginManager.Current = null;
+        }
     }
 }
