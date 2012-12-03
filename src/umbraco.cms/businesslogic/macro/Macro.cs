@@ -161,7 +161,7 @@ namespace umbraco.cms.businesslogic.macro
 		}
 
         /// <summary>
-        /// The python file used to be executed
+        /// The razor macro file to be executed
         /// 
         /// Umbraco assumes that the python file is present in the "/python" folder
         /// </summary>

@@ -25,7 +25,6 @@ namespace umbraco.cms.presentation.developer
 		public editMacro()
 		{
 			CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
-
 		}
 
 		protected PlaceHolder buttons;
@@ -86,17 +85,14 @@ namespace umbraco.cms.presentation.developer
 				macroPropertyBind();
 
 				// Load xslt files from default dir
-				populateXsltFiles();
+				PopulateXsltFiles();
 
 				// Load python files from default dir
-				populatePythonFiles();
+				PopulatePythonFiles();
 
 				// Load usercontrols
-				populateUserControls(IOHelper.MapPath(SystemDirectories.Usercontrols));
+				PopulateUserControls(IOHelper.MapPath(SystemDirectories.Usercontrols));
 				userControlList.Items.Insert(0, new ListItem("Browse usercontrols on server...", string.Empty));
-				userControlList.Attributes.Add("onChange",
-					"document.getElementById('" + macroUserControl.ClientID + "').value = this[this.selectedIndex].value;");
-
 
 			}
 			else
@@ -167,14 +163,14 @@ namespace umbraco.cms.presentation.developer
 			}
 		}
 
-		private void getXsltFilesFromDir(string orgPath, string path, ArrayList files)
+		private void GetXsltFilesFromDir(string orgPath, string path, ArrayList files)
 		{
 			DirectoryInfo dirInfo = new DirectoryInfo(path);
 
 			// Populate subdirectories
 			DirectoryInfo[] dirInfos = dirInfo.GetDirectories();
 			foreach (DirectoryInfo dir in dirInfos)
-				getXsltFilesFromDir(orgPath, path + "/" + dir.Name, files);
+				GetXsltFilesFromDir(orgPath, path + "/" + dir.Name, files);
 
 			FileInfo[] fileInfo = dirInfo.GetFiles("*.xsl*");
 
@@ -182,19 +178,17 @@ namespace umbraco.cms.presentation.developer
 				files.Add((path.Replace(orgPath, string.Empty).Trim('/') + "/" + file.Name).Trim('/'));
 		}
 
-		private void populateXsltFiles()
+		private void PopulateXsltFiles()
 		{
 			ArrayList xslts = new ArrayList();
 			string xsltDir = IOHelper.MapPath(SystemDirectories.Xslt + "/");
-			getXsltFilesFromDir(xsltDir, xsltDir, xslts);
+			GetXsltFilesFromDir(xsltDir, xsltDir, xslts);
 			xsltFiles.DataSource = xslts;
 			xsltFiles.DataBind();
 			xsltFiles.Items.Insert(0, new ListItem("Browse xslt files on server...", string.Empty));
-			xsltFiles.Attributes.Add("onChange",
-				"document.getElementById('" + macroXslt.ClientID + "').value = this[this.selectedIndex].value; document.getElementById('" + macroPython.ClientID + "').value =''");
 		}
 
-		private void getPythonFilesFromDir(string orgPath, string path, ArrayList files)
+		private void GetPythonFilesFromDir(string orgPath, string path, ArrayList files)
 		{
 			var dirInfo = new DirectoryInfo(path);
 			if (!dirInfo.Exists)
@@ -207,19 +201,17 @@ namespace umbraco.cms.presentation.developer
 			// Populate subdirectories
 			var dirInfos = dirInfo.GetDirectories();
 			foreach (var dir in dirInfos)
-				getPythonFilesFromDir(orgPath, path + "/" + dir.Name + "/", files);
+				GetPythonFilesFromDir(orgPath, path + "/" + dir.Name + "/", files);
 		}
 
-		private void populatePythonFiles()
+		private void PopulatePythonFiles()
 		{
 			ArrayList pythons = new ArrayList();
 			string pythonDir = IOHelper.MapPath(SystemDirectories.MacroScripts + "/");
-			getPythonFilesFromDir(pythonDir, pythonDir, pythons);
+			GetPythonFilesFromDir(pythonDir, pythonDir, pythons);
 			pythonFiles.DataSource = pythons;
 			pythonFiles.DataBind();
 			pythonFiles.Items.Insert(0, new ListItem("Browse scripting files on server...", string.Empty));
-			pythonFiles.Attributes.Add("onChange",
-				"document.getElementById('" + macroPython.ClientID + "').value = this[this.selectedIndex].value; document.getElementById('" + macroXslt.ClientID + "').value = ''");
 		}
 
 		public void deleteMacroProperty(object sender, EventArgs e)
@@ -304,7 +296,7 @@ namespace umbraco.cms.presentation.developer
 			}
 		}
 
-		private void populateUserControls(string path)
+		private void PopulateUserControls(string path)
 		{
 			DirectoryInfo di = new DirectoryInfo(path);
 
@@ -313,7 +305,7 @@ namespace umbraco.cms.presentation.developer
 			foreach (FileInfo uc in di.GetFiles("*.ascx"))
 			{
 				userControlList.Items.Add(
-					new ListItem(SystemDirectories.Usercontrols + 
+					new ListItem(SystemDirectories.Usercontrols +
 							uc.FullName.Substring(rootDir.Length).Replace(IOHelper.DirSepChar, '/')));
 				/*
 										uc.FullName.IndexOf(usercontrolsDir), 
@@ -322,7 +314,7 @@ namespace umbraco.cms.presentation.developer
 
 			}
 			foreach (DirectoryInfo dir in di.GetDirectories())
-				populateUserControls(dir.FullName);
+				PopulateUserControls(dir.FullName);
 		}
 
 		#region Web Form Designer generated code
@@ -417,15 +409,6 @@ namespace umbraco.cms.presentation.developer
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
 		protected global::umbraco.uicontrols.Pane Pane1_2;
-
-		/// <summary>
-		/// Table2 control.
-		/// </summary>
-		/// <remarks>
-		/// Auto-generated field.
-		/// To modify move field declaration from designer file to code-behind file.
-		/// </remarks>
-		protected global::System.Web.UI.HtmlControls.HtmlTable Table2;
 
 		/// <summary>
 		/// macroXslt control.

@@ -288,6 +288,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Umbraco\developer\Macros\EditMacro.aspx.cs">
+      <DependentUpon>editMacro.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Umbraco\developer\Macros\EditMacro.aspx.designer.cs">
