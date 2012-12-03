@@ -33,7 +33,7 @@ namespace umbraco.editorControls.userControlGrapper
         public usercontrolDataEditor(umbraco.interfaces.IData Data, string UsercontrolPath)
         {
 			_data = Data;
-            _usercontrolPath = UsercontrolPath;
+            _usercontrolPath = VirtualPathUtility.ToAppRelative(UsercontrolPath);
 		}
 
 		public virtual bool TreatAsRichTextEditor 
@@ -60,13 +60,6 @@ namespace umbraco.editorControls.userControlGrapper
 		{
 			base.OnInit (e);
 
-            if (!_usercontrolPath.StartsWith("~"))
-            {
-                if (_usercontrolPath.StartsWith("/"))
-                    _usercontrolPath = "~" + _usercontrolPath;
-                else
-                    _usercontrolPath = "~/" + _usercontrolPath;
-            }
             Control oControl = new System.Web.UI.UserControl().LoadControl(_usercontrolPath);
 
             if (HasSettings(oControl.GetType()))
