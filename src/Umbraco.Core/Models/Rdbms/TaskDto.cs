@@ -18,19 +18,16 @@ namespace Umbraco.Core.Models.Rdbms
         public int Id { get; set; }
 
         [Column("taskTypeId")]
-        //[ForeignKey(typeof(TaskTypeDto))]
+        [ForeignKey(typeof(TaskTypeDto))]
         public byte TaskTypeId { get; set; }
 
         [Column("nodeId")]
-        [ForeignKey(typeof(NodeDto))]
         public int NodeId { get; set; }
 
         [Column("parentUserId")]
-        [ForeignKey(typeof(UserDto), Name = "FK_cmsTask_umbracoUser")]
         public int ParentUserId { get; set; }
 
         [Column("userId")]
-        [ForeignKey(typeof(UserDto), Name = "FK_cmsTask_umbracoUser1")]
         public int UserId { get; set; }
 
         [Column("DateTime")]

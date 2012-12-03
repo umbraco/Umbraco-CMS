@@ -305,8 +305,9 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                      Alias = "",
                                      SortOrder = 0,
                                      DataTypeNodeId = -87,
-                                     Value = ",code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,' + char(124) + '1' + char(124) + '1,2,3,' + char(124) + '0' + char(124) + '500,400' + char(124) + '1049,' + char(124) + 'true' + char(124) + '"
+                                     Value = ",code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,|1|1,2,3,|0|500,400|1049,|true|',0,N''"
                                  });
+
                 _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto
                                  {
                                      Id = 4,
@@ -344,17 +345,19 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         private void CreateCmsTaskTypeData()
         {
-            //TODO: It tries to do an identity insert it seems, why? Error: The column cannot be modified. [ Column name = id ]
-            //using (var transaction = _database.GetTransaction())
-            //{
-            //    _database.Insert("cmsTaskType", "id", false,
-            //                     new TaskTypeDto
-            //                     {
-            //                         Alias = "toTranslate"
-            //                     });
+            using (var transaction = _database.GetTransaction())
+            {
+                _database.Execute(new Sql("SET IDENTITY_INSERT [cmsTaskType] ON "));
+                _database.Insert("cmsTaskType", "id", false,
+                                 new TaskTypeDto
+                                 {
+                                     Id = 1,
+                                     Alias = "toTranslate"
+                                 });
+                _database.Execute(new Sql("SET IDENTITY_INSERT [cmsTaskType] OFF;"));
 
-            //    transaction.Complete();
-            //}            
+                transaction.Complete();
+            }            
         }
     }
 }

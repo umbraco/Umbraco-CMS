@@ -21,7 +21,6 @@ namespace Umbraco.Core.Models.Rdbms
         public short Type { get; set; }
 
         [Column("macro")]
-        [ForeignKey(typeof(MacroDto))]
         public int Macro { get; set; }
 
         [Column("macroPropertySortOrder")]

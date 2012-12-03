@@ -25,7 +25,7 @@ namespace Umbraco.Core.Models.Rdbms
         public Guid? VersionId { get; set; }
 
         [Column("propertytypeid")]
-        [ForeignKey(typeof(PropertyTypeDto))]
+        //[ForeignKey(typeof(PropertyTypeDto))]
         [Index(IndexTypes.NonClustered, Name = "IX_cmsPropertyData_3")]
         public int PropertyTypeId { get; set; }
 

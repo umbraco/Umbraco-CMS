@@ -14,7 +14,6 @@ namespace Umbraco.Core.Models.Rdbms
         public int PrimaryKey { get; set; }
 
         [Column("nodeId")]
-        [ForeignKey(typeof(NodeDto))]
         [Index(IndexTypes.UniqueNonClustered)]
         public int DataTypeId { get; set; }
 
