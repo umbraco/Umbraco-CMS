@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence;
+﻿using System.Data;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
@@ -10,10 +11,11 @@ namespace Umbraco.Core.Models.Rdbms
     {
         [Column("nodeId")]
         [PrimaryKeyColumn(AutoIncrement = false)]
-        [ForeignKey(typeof(ContentDto))]
+        //[ForeignKey(typeof(ContentDto))]
         public int NodeId { get; set; }
 
         [Column("xml")]
+        [SpecialDbType(SpecialDbTypes.NTEXT)]
         public string Xml { get; set; }
     }
 }
