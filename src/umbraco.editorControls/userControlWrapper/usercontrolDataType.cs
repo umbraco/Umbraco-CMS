@@ -42,7 +42,7 @@ namespace umbraco.editorControls.userControlGrapper
 
         public override string DataTypeName
         {
-            get { return "umbraco usercontrol wrapper"; }
+            get { return "Umbraco Usercontrol Wrapper"; }
         }
 
         public override umbraco.interfaces.IDataPrevalue PrevalueEditor

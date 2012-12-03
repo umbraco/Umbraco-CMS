@@ -308,12 +308,12 @@ namespace umbraco.cms.presentation.developer
 		{
 			DirectoryInfo di = new DirectoryInfo(path);
 
-			string rootDir = IOHelper.MapPath(SystemDirectories.Root);
+			string rootDir = IOHelper.MapPath(SystemDirectories.Usercontrols);
 
 			foreach (FileInfo uc in di.GetFiles("*.ascx"))
 			{
 				userControlList.Items.Add(
-					new ListItem(
+					new ListItem(SystemDirectories.Usercontrols + 
 							uc.FullName.Substring(rootDir.Length).Replace(IOHelper.DirSepChar, '/')));
 				/*
 										uc.FullName.IndexOf(usercontrolsDir), 

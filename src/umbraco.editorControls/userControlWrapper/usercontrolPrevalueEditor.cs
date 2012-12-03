@@ -76,14 +76,15 @@ namespace umbraco.editorControls.userControlGrapper
 		private void populateUserControls(string path)
 		{
 			DirectoryInfo di = new DirectoryInfo(path);
+
 			foreach (FileInfo uc in di.GetFiles("*.ascx"))
 			{
-				string root = IOHelper.MapPath(SystemDirectories.Root);
+                string ucRoot = IOHelper.MapPath(SystemDirectories.Usercontrols);
 
 				_dropdownlistUserControl.Items.Add(
 					
-					new ListItem( 
-							uc.FullName.Substring(root.Length).Replace(IOHelper.DirSepChar, '/'))
+					new ListItem( SystemDirectories.Usercontrols +
+                            uc.FullName.Substring(ucRoot.Length).Replace(IOHelper.DirSepChar, '/'))
 
 					/*
 					new ListItem( 
