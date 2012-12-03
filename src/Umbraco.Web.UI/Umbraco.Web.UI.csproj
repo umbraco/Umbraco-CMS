@@ -2245,7 +2245,28 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
   <Import Project="$(MSBuildStartupDirectory)\..\src\umbraco.presentation.targets" Condition="$(BuildingInsideVisualStudio) != true" />
   <Import Project="$(SolutionDir)umbraco.presentation.targets" Condition="$(BuildingInsideVisualStudio) == true" />
   <PropertyGroup>
-    <!--<PostBuildEvent>xcopy "$(ProjectDir)..\..\lib\*.dll" "$(TargetDir)*.dll" /Y</PostBuildEvent>-->
+    <PostBuildEvent></PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <Target Name="BeforeBuild">
+	<Copy
+        SourceFiles="$(ProjectDir)web.Template.config"
+        DestinationFiles="$(ProjectDir)Web.config"
+        OverwriteReadOnlyFiles="true"
+        SkipUnchangedFiles="false"
+        Condition="!Exists('$(ProjectDir)Web.config')"
+     />
+    <TransformXml Source="$(ProjectDir)Web.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="$(ProjectDir)Web.$(Configuration).config.transformed" />
+	
+	<Message Text="BeforeBuild was performed" Importance="high" />	
+  </Target>
+  <Target Name="AfterBuild">
+	<Copy
+        SourceFiles="$(ProjectDir)Web.$(Configuration).config.transformed"
+        DestinationFiles="$(ProjectDir)Web.config"
+        OverwriteReadOnlyFiles="true"
+        SkipUnchangedFiles="false"
+		Condition="$(BuildingInsideVisualStudio) == true"
+     />  
+  </Target>
 </Project>

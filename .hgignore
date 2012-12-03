@@ -65,3 +65,4 @@ src/Umbraco.Web.UI/App_Plugins/*
 src/Umbraco.Web.UI/Views/*
 
 src\Umbraco.Web.UI\[W]eb.config
+*.transformed
