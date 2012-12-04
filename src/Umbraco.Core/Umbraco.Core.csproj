@@ -157,6 +157,7 @@
     <Compile Include="Persistence\DatabaseAnnotations\PrimaryKeyColumnAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ReferencesAttribute.cs" />
     <Compile Include="Persistence\DatabaseFactory.cs" />
+    <Compile Include="Persistence\DatabaseModelDefinitions\DefinitionFactory.cs" />
     <Compile Include="Persistence\DatabaseProviders.cs" />
     <Compile Include="Persistence\Factories\ContentFactory.cs" />
     <Compile Include="Persistence\Factories\ContentTypeFactory.cs" />
@@ -537,7 +538,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Persistence\DatabaseModelDefinitions\" />
     <Folder Include="Persistence\Migrations\Syntax\Schema\Index\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
