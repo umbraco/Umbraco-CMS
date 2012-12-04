@@ -5,38 +5,44 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 using System.Web.WebPages;
 using Umbraco.Core.IO;
 using Umbraco.Web.Models;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
+using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Macros
 {
-	///// <summary>
-	///// Controller to render macro content
-	///// </summary>
-	//public class MacroController : Controller
-	//{
-	//	private readonly UmbracoContext _umbracoContext;
+	/// <summary>
+	/// Controller to render macro content
+	/// </summary>
+	internal class PartialViewMacroController : Controller
+	{
+		private readonly UmbracoContext _umbracoContext;
+		private readonly MacroModel _macro;
+		private readonly INode _currentPage;
+		
+		public PartialViewMacroController(UmbracoContext umbracoContext, MacroModel macro, INode currentPage)
+		{
+			_umbracoContext = umbracoContext;
+			_macro = macro;
+			_currentPage = currentPage;
+		}
 
-	//	public MacroController(UmbracoContext umbracoContext)
-	//	{
-	//		_umbracoContext = umbracoContext;
-	//	}
+		/// <summary>
+		/// Child action to render a macro
+		/// </summary>
+		/// <returns></returns>
+		[ChildActionOnly]
+		public PartialViewResult Index()
+		{
+			var model = new PartialViewMacroModel(_currentPage.ConvertFromNode(), new Dictionary<string, object>());
+			return PartialView(_macro.ScriptName, model);
+		}
 
-	//	/// <summary>
-	//	/// Child action to render a macro
-	//	/// </summary>
-	//	/// <param name="macroAlias">The macro alias to render</param>
-	//	/// <returns></returns>
-	//	[ChildActionOnly]
-	//	public ActionResult Index(string macroAlias)
-	//	{
-			
-	//	}
-
-	//}
+	}
 
 	public abstract class PartialViewMacroPage : WebViewPage<PartialViewMacroModel>
 	{
@@ -49,6 +55,7 @@ namespace Umbraco.Web.Macros
 	public class PartialViewMacroEngine : IMacroEngine
 	{
 		private readonly Func<HttpContextBase> _getHttpContext;
+		private readonly Func<UmbracoContext> _getUmbracoContext;
 
 		public const string EngineName = "Partial View Macro Engine";
 
@@ -60,15 +67,24 @@ namespace Umbraco.Web.Macros
 						throw new InvalidOperationException("The " + this.GetType() + " cannot execute with a null HttpContext.Current reference");
 					return new HttpContextWrapper(HttpContext.Current);
 				};
+
+			_getUmbracoContext = () =>
+			{
+				if (UmbracoContext.Current == null)
+					throw new InvalidOperationException("The " + this.GetType() + " cannot execute with a null UmbracoContext.Current reference");
+				return UmbracoContext.Current;
+			};
 		}
 
 		/// <summary>
 		/// Constructor generally used for unit testing
 		/// </summary>
 		/// <param name="httpContext"></param>
-		internal PartialViewMacroEngine(HttpContextBase httpContext)
+		/// <param name="umbracoContext"> </param>
+		internal PartialViewMacroEngine(HttpContextBase httpContext, UmbracoContext umbracoContext)
 		{
 			_getHttpContext = () => httpContext;
+			_getUmbracoContext = () => umbracoContext;
 		}
 
 		public string Name
@@ -114,15 +130,21 @@ namespace Umbraco.Web.Macros
 				throw new InvalidOperationException("Cannot render the Partial View Macro with file: " + macro.ScriptName + ". All Partial View Macros must exist in the " + SystemDirectories.MvcViews + "/MacroPartials/ folder");
 			}
 
-			var fileLocation = macro.ScriptName;
-			
-			//var controller = new MacroController(UmbracoContext.Current);
-			//controller.ControllerContext = new ControllerContext();
-			var model = new PartialViewMacroModel(currentPage.ConvertFromNode(), new Dictionary<string, object>());
-			var view = CompileAndInstantiate(fileLocation);
-			var output = new StringWriter();
-			view.ExecutePageHierarchy(new WebPageContext(_getHttpContext(), view, model), output);
-			return output.ToString();
+			var http = _getHttpContext();
+			var umbCtx = _getUmbracoContext();
+			var routeVals = new RouteData();
+			routeVals.Values.Add("controller", "PartialViewMacro");
+			routeVals.Values.Add("action", "Index");
+			var request = new RequestContext(http, routeVals);
+			string output;
+			using (var controller = new PartialViewMacroController(umbCtx, macro, currentPage))
+			{
+				controller.ControllerContext = new ControllerContext(request, controller);
+				var result = controller.Index();				
+				output = controller.RenderViewResultAsString(result);	
+			}
+
+			return output;
 		}
 
 		private string GetVirtualPathFromPhysicalPath(string physicalPath)
