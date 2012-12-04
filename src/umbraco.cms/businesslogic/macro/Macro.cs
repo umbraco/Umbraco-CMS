@@ -131,10 +131,11 @@ namespace umbraco.cms.businesslogic.macro
 		}
 
 		/// <summary>
-		/// The relative path to the usercontrol
-		/// 
-		/// Specified like: /usercontrols/myusercontrol.ascx (with the .ascx postfix)
+		/// The relative path to the usercontrol or the assembly type of the macro when using .Net custom controls
 		/// </summary>
+		/// <remarks>
+		/// When using a user control the value is specified like: /usercontrols/myusercontrol.ascx (with the .ascx postfix)
+		/// </remarks>
 		public string Type
 		{
 			get {return _type;}
@@ -161,10 +162,13 @@ namespace umbraco.cms.businesslogic.macro
 		}
 
         /// <summary>
-        /// The razor macro file to be executed
-        /// 
-        /// Umbraco assumes that the python file is present in the "/python" folder
+        /// This field is used to store the file value for any scripting macro such as python, ruby, razor macros or Partial View Macros        
         /// </summary>
+        /// <remarks>
+        /// Depending on how the file is stored depends on what type of macro it is. For example if the file path is a full virtual path
+        /// starting with the ~/Views/MacroPartials then it is deemed to be a Partial View Macro, otherwise the file extension of the file
+        /// saved will determine which macro engine will be used to execute the file.
+        /// </remarks>
         public string ScriptingFile {
             get { return _scriptingFile; }
             set {

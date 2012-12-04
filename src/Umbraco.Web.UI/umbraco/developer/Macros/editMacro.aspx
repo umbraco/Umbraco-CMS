@@ -11,9 +11,16 @@
         //handles the change selection of the drop downs to populate the text box
         (function($) {
             $(document).ready(function () {
+                //on drop down change, update the text box and clear other text boxes
                 $("#Table2 td.propertyContent select").change(function() {
-                    $(this).prev("input[type='text']").val($(this).val());
-                });
+                    //update the txt box
+                    var txt = $(this).prev("input[type='text']");
+                    txt.val($(this).val());
+                    //clear other text boxes
+                    $("#Table2 td.propertyContent input[type='text']").not(txt).val("");
+                    //reset other drop downs
+                    $("#Table2 td.propertyContent select").not($(this)).val("");
+                });                
             });
         })(jQuery);
         
