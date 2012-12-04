@@ -6,8 +6,8 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.WebPages;
+using Umbraco.Core.IO;
 using Umbraco.Web.Models;
-using umbraco.IO;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
 
@@ -106,18 +106,16 @@ namespace Umbraco.Web.Macros
 
 		public string Execute(MacroModel macro, INode currentPage)
 		{
-			string fileLocation = null;
-			if (!string.IsNullOrEmpty(macro.ScriptName))
-			{
-				//Razor Is Already Contained In A File
-				if (macro.ScriptName.StartsWith("~"))
-					fileLocation = macro.ScriptName;
-				else
-					fileLocation = SystemDirectories.MacroScripts + "/" + macro.ScriptName;
-			}
-			if (string.IsNullOrEmpty(fileLocation))
-				return String.Empty; //No File Location
+			if (macro == null) throw new ArgumentNullException("macro");
+			if (currentPage == null) throw new ArgumentNullException("currentPage");
 
+			if (!macro.ScriptName.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/"))
+			{
+				throw new InvalidOperationException("Cannot render the Partial View Macro with file: " + macro.ScriptName + ". All Partial View Macros must exist in the " + SystemDirectories.MvcViews + "/MacroPartials/ folder");
+			}
+
+			var fileLocation = macro.ScriptName;
+			
 			//var controller = new MacroController(UmbracoContext.Current);
 			//controller.ControllerContext = new ControllerContext();
 			var model = new PartialViewMacroModel(currentPage.ConvertFromNode(), new Dictionary<string, object>());

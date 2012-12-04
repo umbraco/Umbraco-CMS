@@ -1183,11 +1183,7 @@ namespace umbraco
 			var retVal = new ScriptingMacroResult();
 			TraceInfo("umbracoMacro", "Rendering Partial View Macro");
 			IMacroEngine engine = null;
-			if (macro.ScriptName.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/"))
-			{
-				retVal.ResultException = new InvalidOperationException("Cannot render the Partial View Macro with file: " + macro.ScriptName + ". All Partial View Macros must exist in the " + SystemDirectories.MvcViews + "/MacroPartials/ folder");
-				return retVal;
-			}
+			
 			engine = MacroEngineFactory.GetEngine(PartialViewMacroEngine.EngineName);
 			var ret = engine.Execute(macro, Node.GetCurrent());
 
