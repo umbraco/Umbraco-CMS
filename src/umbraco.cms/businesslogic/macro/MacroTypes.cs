@@ -7,6 +7,7 @@ namespace umbraco.cms.businesslogic.macro
 		UserControl = 3,
 		Unknown = 4,
 		Python = 5,
-		Script = 6
+		Script = 6,
+		PartialView = 7
 	}
 }

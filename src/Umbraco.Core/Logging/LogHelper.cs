@@ -80,6 +80,35 @@ namespace Umbraco.Core.Logging
 
 		}
 
+		public static void Warn(Type callingType, string message, TraceContext trace, Exception e, params object[] items)
+		{
+			if (trace != null)
+			{
+				if (e != null)
+				{
+					trace.Warn(callingType.FullName, string.Format(message, items), e);
+				}
+				else
+				{
+					trace.Warn(callingType.FullName, string.Format(message, items));
+				}
+			}
+
+			var logger = LogManager.GetLogger(callingType);
+			if (logger != null)
+			{
+				if (e != null)
+				{
+					logger.WarnFormat(PrefixThreadId(message) + ". Exception: " + e, items);	
+				}
+				else
+				{
+					logger.WarnFormat(PrefixThreadId(message), items);	
+				}
+			}
+				
+		} 
+
 		/// <summary>
 		/// Adds a warn log
 		/// </summary>
@@ -88,21 +117,17 @@ namespace Umbraco.Core.Logging
 		/// <param name="items"></param>
 		public static void Warn<T>(string message, params object[] items)
 		{
-			var logger = LoggerFor<T>();
-			if (logger != null)
-				logger.WarnFormat(PrefixThreadId(message), items);
+			Warn(typeof (T), message, items);
 		}
 
 		public static void Warn<T>(string message, TraceContext trace, params object[] items)
 		{
-			if (trace != null)
-			{
-				trace.Warn(string.Format(message, items));
-			}	
+			Warn(typeof(T), message, trace, items);
+		}
 
-			var logger = LoggerFor<T>();
-			if (logger != null)
-				logger.WarnFormat(PrefixThreadId(message), items);
+		public static void Warn<T>(string message, TraceContext trace, Exception e, params object[] items)
+		{
+			Warn(typeof(T), message, trace, e, items);
 		} 
 
 		#endregion

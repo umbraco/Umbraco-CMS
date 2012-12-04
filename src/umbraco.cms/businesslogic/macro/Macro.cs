@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Runtime.CompilerServices;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.cache;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
@@ -530,22 +531,23 @@ namespace umbraco.cms.businesslogic.macro
         {
             if (!string.IsNullOrEmpty(xslt))
                 return MacroTypes.XSLT;
-            else
-            {
-                if (!string.IsNullOrEmpty(scriptFile))
-                    return MacroTypes.Script;
-                else
-                {
-                    if (!string.IsNullOrEmpty(scriptType) && scriptType.ToLower().IndexOf(".ascx") > -1)
-                    {
-                        return MacroTypes.UserControl;
-                    }
-                    else if (!string.IsNullOrEmpty(scriptType) && !string.IsNullOrEmpty(scriptAssembly))
-                        return MacroTypes.CustomControl;
-                }
-            }
+	        
+			if (!string.IsNullOrEmpty(scriptFile))
+			{
+				//we need to check if the file path saved is a virtual path starting with ~/Views/MacroPartials, if so then this is 
+				//a partial view macro, not a script macro
+				return scriptFile.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/") 
+					? MacroTypes.PartialView 
+					: MacroTypes.Script;
+			}
 
-            return MacroTypes.Unknown;
+	        if (!string.IsNullOrEmpty(scriptType) && scriptType.ToLower().IndexOf(".ascx") > -1)
+		        return MacroTypes.UserControl;
+	        
+			if (!string.IsNullOrEmpty(scriptType) && !string.IsNullOrEmpty(scriptAssembly))
+		        return MacroTypes.CustomControl;
+
+	        return MacroTypes.Unknown;
         }
 
         public static string GenerateCacheKeyFromCode(string input)

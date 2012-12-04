@@ -17,6 +17,7 @@ using System.Web.UI.WebControls;
 using System.Xml;
 using System.Xml.Xsl;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Utils;
@@ -369,6 +370,12 @@ namespace umbraco
                 int macroType = Model.MacroType != MacroTypes.Unknown ? (int)Model.MacroType : MacroType;
                 switch (macroType)
                 {
+					case (int)MacroTypes.PartialView:
+						UmbracoContext.Current.Trace.Write("umbracoMacro", "Partial View added (" + Model.TypeName + ")");
+
+						//TODO: IMPLEMENT THIS!!!!
+
+		                break;
                     case (int)MacroTypes.UserControl:
                         try
                         {
@@ -400,10 +407,11 @@ namespace umbraco
                         {
                             renderFailed = true;
                             Exceptions.Add(e);
-                            UmbracoContext.Current.Trace.Warn("umbracoMacro",
-                                                              "Error loading customControl (Assembly: " +
-                                                              Model.TypeAssembly +
-                                                              ", Type: '" + Model.TypeName + "'", e);
+							
+							LogHelper.Warn<macro>("Error loading customControl (Assembly: " +
+															  Model.TypeAssembly +
+															  ", Type: '" + Model.TypeName + "'", UmbracoContext.Current.Trace, e);
+                            
                             macroControl =
                                 new LiteralControl("Error loading customControl (Assembly: " + Model.TypeAssembly +
                                                    ", Type: '" +
@@ -433,9 +441,10 @@ namespace umbraco
                         {
                             renderFailed = true;
                             Exceptions.Add(e);
-                            UmbracoContext.Current.Trace.Warn("umbracoMacro",
-                                                              "Error loading MacroEngine script (file: " + ScriptFile +
-                                                              ", Type: '" + Model.TypeName + "'", e);
+
+							LogHelper.Warn<macro>("umbracoMacro",
+															  "Error loading MacroEngine script (file: " + ScriptFile +
+															  ", Type: '" + Model.TypeName + "'", UmbracoContext.Current.Trace, e);
 
                             var result =
                                 new LiteralControl("Error loading MacroEngine script (file: " + ScriptFile + ")");
@@ -1405,18 +1414,19 @@ namespace umbraco
             }
         }
 
-        /// <summary>
-        /// Loads an usercontrol using reflection into the macro object
-        /// </summary>
-        /// <param name="fileName">Filename of the usercontrol - ie. ~wulff.ascx</param>
-        /// <param name="attributes">The attributes.</param>
-        /// <param name="pageElements">The page elements.</param>
-        /// <returns></returns>
-        public Control loadUserControl(string fileName, MacroModel model, Hashtable pageElements)
+	    /// <summary>
+	    /// Loads an usercontrol using reflection into the macro object
+	    /// </summary>
+	    /// <param name="fileName">Filename of the usercontrol - ie. ~wulff.ascx</param>
+	    /// <param name="model"> </param>
+	    /// <param name="pageElements">The page elements.</param>
+	    /// <returns></returns>
+	    public Control loadUserControl(string fileName, MacroModel model, Hashtable pageElements)
         {
-            Debug.Assert(!string.IsNullOrEmpty(fileName), "fileName cannot be empty");
-            Debug.Assert(model.Properties != null, "attributes cannot be null");
-            Debug.Assert(pageElements != null, "pageElements cannot be null");
+			Mandate.ParameterNotNullOrEmpty(fileName, "fileName");
+	        Mandate.ParameterNotNull(model, "model");
+			Mandate.ParameterNotNull(pageElements, "pageElements");
+
             try
             {
                 string userControlPath = fileName;
