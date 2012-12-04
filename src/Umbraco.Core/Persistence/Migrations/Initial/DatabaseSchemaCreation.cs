@@ -5,11 +5,11 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
     /// <summary>
     /// Represents the initial database schema creation by running CreateTable for all DTOs against the db.
     /// </summary>
-    internal class DatabaseCreation
+    internal class DatabaseSchemaCreation
     {
         private readonly Database _database;
 
-        public DatabaseCreation(Database database)
+        public DatabaseSchemaCreation(Database database)
         {
             _database = database;
         }

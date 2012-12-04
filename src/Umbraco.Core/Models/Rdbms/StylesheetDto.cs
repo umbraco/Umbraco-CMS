@@ -10,6 +10,7 @@ namespace Umbraco.Core.Models.Rdbms
     {
         [Column("nodeId")]
         [PrimaryKeyColumn(AutoIncrement = false)]
+        [ForeignKey(typeof(NodeDto))]
         public int NodeId { get; set; }
 
         [Column("filename")]

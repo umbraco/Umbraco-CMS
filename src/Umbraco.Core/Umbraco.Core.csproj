@@ -193,7 +193,7 @@
     <Compile Include="Persistence\Mappers\UserTypeMapper.cs" />
     <Compile Include="Persistence\Migrations\IMigration.cs" />
     <Compile Include="Persistence\Migrations\Initial\BaseDataCreation.cs" />
-    <Compile Include="Persistence\Migrations\Initial\DatabaseCreation.cs" />
+    <Compile Include="Persistence\Migrations\Initial\DatabaseSchemaCreation.cs" />
     <Compile Include="Persistence\Migrations\MigrationAttribute.cs" />
     <Compile Include="Persistence\Migrations\MigrationBase.cs" />
     <Compile Include="Persistence\Migrations\MigrationContext.cs" />

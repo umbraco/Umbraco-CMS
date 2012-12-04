@@ -15,6 +15,8 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("parentGroupId")]
         [NullSetting(NullSetting = NullSettings.Null)]
+        //[Constraint(Default = "NULL")]
+        [ForeignKey(typeof(PropertyTypeGroupDto))]
         public int? ParentGroupId { get; set; }
 
         [Column("contenttypeNodeId")]

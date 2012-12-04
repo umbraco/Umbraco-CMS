@@ -17,7 +17,7 @@ namespace Umbraco.Core.Models.Rdbms
         public bool Initialize { get; set; }
 
         [Column("treeSortOrder")]
-        public int SortOrder { get; set; }
+        public byte SortOrder { get; set; }
 
         [Column("appAlias")]
         [PrimaryKeyColumn(AutoIncrement = false, Clustered = true, Name = "PK_umbracoAppTree", OnColumns = "[appAlias], [treeAlias]")]

@@ -10,9 +10,12 @@ namespace Umbraco.Core.Models.Rdbms
     {
         [Column("contentTypeNodeId")]
         [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsDocumentType", OnColumns = "contentTypeNodeId, templateNodeId")]
+        [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
+        [ForeignKey(typeof(NodeDto))]
         public int ContentTypeNodeId { get; set; }
 
         [Column("templateNodeId")]
+        /*[ForeignKey(typeof(TemplateDto))]*/
         public int TemplateNodeId { get; set; }
 
         [Column("IsDefault")]

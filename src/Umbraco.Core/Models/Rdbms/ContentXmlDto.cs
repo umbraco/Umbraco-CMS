@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models.Rdbms
     {
         [Column("nodeId")]
         [PrimaryKeyColumn(AutoIncrement = false)]
-        //[ForeignKey(typeof(ContentDto))]
+        [ForeignKey(typeof(ContentDto))]
         public int NodeId { get; set; }
 
         [Column("xml")]

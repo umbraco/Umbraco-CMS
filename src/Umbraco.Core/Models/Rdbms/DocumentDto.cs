@@ -42,7 +42,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("templateId")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        //[ForeignKey(typeof(TemplateDto))]
+        [ForeignKey(typeof(TemplateDto))]
         public int? TemplateId { get; set; }
 
         [Column("alias")]

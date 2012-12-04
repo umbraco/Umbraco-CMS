@@ -72,11 +72,14 @@ namespace Umbraco.Core.Persistence
                 //If any statements exists for the primary key execute them here
                 if(!string.IsNullOrEmpty(createPrimaryKeySql))
                     db.Execute(new Sql(createPrimaryKeySql));
-                
-                //Loop through foreignkey statements and execute sql
-                foreach (var sql in foreignSql)
+
+                if (DatabaseContext.Current.ProviderName.Contains("SqlServerCe") == false)
                 {
-                    int createdFk = db.Execute(new Sql(sql));
+                    //Loop through foreignkey statements and execute sql
+                    foreach (var sql in foreignSql)
+                    {
+                        int createdFk = db.Execute(new Sql(sql));
+                    }
                 }
                 //Loop through index statements and execute sql
                 foreach (var sql in indexSql)
@@ -130,7 +133,7 @@ namespace Umbraco.Core.Persistence
 
             LogHelper.Info<Database>("Initializing database schema creation");
 
-            var creation = new DatabaseCreation(db);
+            var creation = new DatabaseSchemaCreation(db);
             creation.InitializeDatabaseSchema();
 
             NewTable -= PetaPocoExtensions_NewTable;
