@@ -77,9 +77,18 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 CreateCmsDataTypeData();
             }
 
+            if (tableName.Equals("cmsDataTypePreValues"))
+            {
+                CreateCmsDataTypePreValuesData();
+            }
+
             if (tableName.Equals("umbracoRelationType"))
             {
                 CreateUmbracoRelationTypeData();
+            }
+            if (tableName.Equals("cmsTaskType"))
+            {
+                CreateCmsTaskTypeData();
             }
         }
 
@@ -127,8 +136,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         private void CreateCmsContentTypeData()
         {
             _database.Insert(new ContentTypeDto { PrimaryKey = 532, NodeId = 1031, Alias = "Folder", Icon = "folder.gif", Thumbnail = "folder.png", IsContainer = true, AllowAtRoot = true });
-            _database.Insert(new ContentTypeDto { PrimaryKey = 533, NodeId = 1032, Alias = "Image", Icon = "mediaPhoto.gif", Thumbnail = "folder.png" });
-            _database.Insert(new ContentTypeDto { PrimaryKey = 534, NodeId = 1033, Alias = "File", Icon = "mediaFile.gif", Thumbnail = "folder.png" });
+            _database.Insert(new ContentTypeDto { PrimaryKey = 533, NodeId = 1032, Alias = "Image", Icon = "mediaPhoto.gif", Thumbnail = "mediaPhoto.png" });
+            _database.Insert(new ContentTypeDto { PrimaryKey = 534, NodeId = 1033, Alias = "File", Icon = "mediaFile.gif", Thumbnail = "mediaFile.png" });
         }
 
         private void CreateUmbracoUserData()
@@ -285,7 +294,33 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         }
 
         private void CreateCmsDataTypePreValuesData()
-        {}
+        {
+            using (var transaction = _database.GetTransaction())
+            {
+                _database.Execute(new Sql("SET IDENTITY_INSERT [cmsDataTypePreValues] ON "));
+                _database.Insert("cmsDataTypePreValues", "id", false,
+                                 new DataTypePreValueDto
+                                 {
+                                     Id = 3,
+                                     Alias = "",
+                                     SortOrder = 0,
+                                     DataTypeNodeId = -87,
+                                     Value = ",code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,|1|1,2,3,|0|500,400|1049,|true|',0,N''"
+                                 });
+
+                _database.Insert("cmsDataTypePreValues", "id", false, new DataTypePreValueDto
+                                 {
+                                     Id = 4,
+                                     Alias = "group",
+                                     SortOrder = 0,
+                                     DataTypeNodeId = 1041,
+                                     Value = "default"
+                                 });
+                _database.Execute(new Sql("SET IDENTITY_INSERT [cmsDataTypePreValues] OFF;"));
+
+                transaction.Complete();
+            }
+        }
 
         private void CreateUmbracoRelationTypeData()
         {
@@ -309,24 +344,20 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         }
 
         private void CreateCmsTaskTypeData()
-        { }
+        {
+            using (var transaction = _database.GetTransaction())
+            {
+                _database.Execute(new Sql("SET IDENTITY_INSERT [cmsTaskType] ON "));
+                _database.Insert("cmsTaskType", "id", false,
+                                 new TaskTypeDto
+                                 {
+                                     Id = 1,
+                                     Alias = "toTranslate"
+                                 });
+                _database.Execute(new Sql("SET IDENTITY_INSERT [cmsTaskType] OFF;"));
 
-        /*
-         
-         * SET IDENTITY_INSERT [cmsDataTypePreValues] ON 
-insert into cmsDataTypePreValues (id, dataTypeNodeId, [value], sortorder, alias)
-values (3,-87,',code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,' + char(124) + '1' + char(124) + '1,2,3,' + char(124) + '0' + char(124) + '500,400' + char(124) + '1049,' + char(124) + 'true' + char(124) + '', 0, '')
-
-insert into cmsDataTypePreValues (id, dataTypeNodeId, [value], sortorder, alias)
-values (4,1041,'default', 0, 'group')
-
-SET IDENTITY_INSERT [cmsDataTypePreValues] OFF
-;
-
-         * 
-         * 
-         
-         insert into cmsTaskType (alias) values ('toTranslate');
-         */
+                transaction.Complete();
+            }            
+        }
     }
 }

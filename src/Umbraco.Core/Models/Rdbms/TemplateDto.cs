@@ -19,7 +19,6 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("master")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        /*[ForeignKey(typeof(TemplateDto), Column = "nodeId")]*/
         [ForeignKey(typeof(NodeDto), Name = "FK_cmsTemplate_cmsTemplate")]
         public int? Master { get; set; }
 

@@ -33,7 +33,7 @@ namespace umbraco.editorControls.userControlGrapper
         public usercontrolDataEditor(umbraco.interfaces.IData Data, string UsercontrolPath)
         {
 			_data = Data;
-            _usercontrolPath = UsercontrolPath;
+            _usercontrolPath = VirtualPathUtility.ToAppRelative(UsercontrolPath);
 		}
 
 		public virtual bool TreatAsRichTextEditor 

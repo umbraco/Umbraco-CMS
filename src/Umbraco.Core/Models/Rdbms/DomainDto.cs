@@ -18,7 +18,6 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("domainRootStructureID")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [ForeignKey(typeof(NodeDto))]
         public int? RootStructureId { get; set; }
 
         [Column("domainName")]

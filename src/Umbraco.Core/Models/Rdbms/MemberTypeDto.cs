@@ -13,8 +13,6 @@ namespace Umbraco.Core.Models.Rdbms
         public int PrimaryKey { get; set; }
 
         [Column("NodeId")]
-        [ForeignKey(typeof(NodeDto))]
-        [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
         public int NodeId { get; set; }
 
         [Column("propertytypeId")]

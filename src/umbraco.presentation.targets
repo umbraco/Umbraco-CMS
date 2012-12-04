@@ -57,39 +57,6 @@
   *****************************************************
   -->
 
-  <!-- Make sure web.config will be there even for package/publish -->
-  <Target Name="CopyWebConfig" BeforeTargets="Build;Rebuild">
-
-    <PropertyGroup>
-      <OriginalFileName>$(ProjDir)Web.Template.config</OriginalFileName>
-      <OutputFileName>$(ProjOutputDir)Web.config</OutputFileName>
-    </PropertyGroup>
-
-    <Copy
-        SourceFiles="$(OriginalFileName)"
-        DestinationFiles="$(OutputFileName)"
-        OverwriteReadOnlyFiles="true"
-        SkipUnchangedFiles="false"
-        Condition="!Exists('$(OutputFileName)')"
-    />
-  </Target>
-
-  <Target Name="CustomTarget" AfterTargets="CopyWebConfig">
-    <Message Text="Building in VS? $(BuildingInsideVisualStudio)" Importance="high" />
-    <Message Text="Transforming: $(WebConfigSource), running MSBuild on project $(MSBuildProjectDirectory)" Importance="high" />
-
-    <PropertyGroup>
-      <OriginalFileName>$(ProjDir)Web.Template.config</OriginalFileName>
-      <OutputFileName>$(ProjOutputDir)Web.config</OutputFileName>
-    </PropertyGroup>
-    
-    <Message Text="$(OriginalFileName)" Importance="high" />
-    <Message Text="$(OutputFileName)" Importance="high" />
-    
-    <TransformXml Condition="$(BuildingInsideVisualStudio) == ''" Source="$(OriginalFileName)" Transform="$(WebConfigSource)" Destination="$(OutputFileName)" />
-    <TransformXml Condition="$(BuildingInsideVisualStudio) == 'true'" Source="$(OriginalFileName)" Transform="$(WebConfigSource)" Destination="$(OutputFileName)" />
-  </Target>
-
   <Target Name="ResetConfigFiles" Condition="$(ProjDir) != $(ProjOutputDir)" BeforeTargets="Build;Rebuild" Inputs="@(ConfigFiles)" Outputs="%(Identity).Dummy">
     
     <PropertyGroup>

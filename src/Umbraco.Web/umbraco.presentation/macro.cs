@@ -1419,7 +1419,7 @@ namespace umbraco
             Debug.Assert(pageElements != null, "pageElements cannot be null");
             try
             {
-                string userControlPath = @"~/" + fileName;
+                string userControlPath = VirtualPathUtility.ToAppRelative(fileName);
 
                 if (!File.Exists(IOHelper.MapPath(userControlPath)))
                     return new LiteralControl(string.Format("UserControl {0} does not exist.", fileName));
