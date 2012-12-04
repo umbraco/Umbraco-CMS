@@ -213,13 +213,12 @@ namespace umbraco
                     if (isInitializing)
                     {
 						LogHelper.Debug<content>("Initializing content on thread '{0}' (Threadpool? {1})", 
-							HttpContext.Current == null ? null : HttpContext.Current.Trace,
+							true,
 							() => Thread.CurrentThread.Name,
 							() => Thread.CurrentThread.IsThreadPoolThread);
                         
                         _xmlContent = LoadContent();
-						LogHelper.Debug<content>("Content initialized (loaded)", 
-							HttpContext.Current == null ? null : HttpContext.Current.Trace);
+						LogHelper.Debug<content>("Content initialized (loaded)", true);
 
                         FireAfterRefreshContent(new RefreshContentEventArgs());
 

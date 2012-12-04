@@ -100,7 +100,7 @@ namespace Umbraco.Web.Routing
 				{
 					LogHelper.Warn<NiceUrlProvider>(
 						"Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
-						nodeId);
+						() => nodeId);
 
 					return NullUrl; 
 				}
@@ -184,7 +184,7 @@ namespace Umbraco.Web.Routing
 				{
 					LogHelper.Warn<NiceUrlProvider>(
 						"Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
-						nodeId);
+						() => nodeId);
 
 					return new string[] { NullUrl };
 				}

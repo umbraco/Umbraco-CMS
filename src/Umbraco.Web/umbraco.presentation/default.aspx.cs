@@ -134,7 +134,7 @@ namespace umbraco
 			// filter / add preview banner
 			if (UmbracoContext.Current.InPreviewMode)
 			{
-				LogHelper.Debug<UmbracoDefault>("Umbraco is running in preview mode.", Context.Trace);
+				LogHelper.Debug<UmbracoDefault>("Umbraco is running in preview mode.", true);
 
 				if (Response.ContentType.InvariantEquals("text/html")) // ASP.NET default value
 				{

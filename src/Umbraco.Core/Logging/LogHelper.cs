@@ -60,53 +60,52 @@ namespace Umbraco.Core.Logging
 
 		#region Warn		
 
-		public static void Warn(Type callingType, string message, params object[] format)
+		public static void Warn(Type callingType, string message, params Func<object>[] formatItems)
 		{
 			var logger = LogManager.GetLogger(callingType);
-			if (logger != null)
-				logger.WarnFormat(PrefixThreadId(message), format);
+			if (logger == null || !logger.IsWarnEnabled) return;
+			logger.WarnFormat(PrefixThreadId(message), formatItems.Select(x => x.Invoke()).ToArray());
 		}
 
-		public static void Warn(Type callingType, TraceContext trace, string message, params object[] format)
+		public static void Warn(Type callingType, string message, bool showHttpTrace, params Func<object>[] formatItems)
 		{
-			if (trace != null)
+			Mandate.ParameterNotNull(callingType, "callingType");
+			Mandate.ParameterNotNullOrEmpty(message, "message");
+
+			if (showHttpTrace && HttpContext.Current != null)
 			{
-				trace.Warn(string.Format(message, format));
+				HttpContext.Current.Trace.Warn(callingType.Name, string.Format(message, formatItems.Select(x => x.Invoke()).ToArray()));
 			}	
 
 			var logger = LogManager.GetLogger(callingType);
-			if (logger != null)
-				logger.WarnFormat(PrefixThreadId(message), format);
+			if (logger == null || !logger.IsWarnEnabled) return;
+			logger.WarnFormat(PrefixThreadId(message), formatItems.Select(x => x.Invoke()).ToArray());
 
 		}
 
-		public static void Warn(Type callingType, string message, TraceContext trace, Exception e, params object[] items)
+		public static void WarnWithException(Type callingType, string message, Exception e, params Func<object>[] formatItems)
 		{
-			if (trace != null)
+			WarnWithException(callingType, message, false, e, formatItems);
+		}
+
+		public static void WarnWithException(Type callingType, string message, bool showHttpTrace, Exception e, params Func<object>[] formatItems)
+		{
+			Mandate.ParameterNotNull(e, "e");
+			Mandate.ParameterNotNull(callingType, "callingType");
+			Mandate.ParameterNotNullOrEmpty(message, "message");
+
+			if (showHttpTrace && HttpContext.Current != null)
 			{
-				if (e != null)
-				{
-					trace.Warn(callingType.FullName, string.Format(message, items), e);
-				}
-				else
-				{
-					trace.Warn(callingType.FullName, string.Format(message, items));
-				}
+				HttpContext.Current.Trace.Warn(
+					callingType.Name,
+					string.Format(message, formatItems.Select(x => x.Invoke()).ToArray()), 
+					e);
 			}
 
 			var logger = LogManager.GetLogger(callingType);
-			if (logger != null)
-			{
-				if (e != null)
-				{
-					logger.WarnFormat(PrefixThreadId(message) + ". Exception: " + e, items);	
-				}
-				else
-				{
-					logger.WarnFormat(PrefixThreadId(message), items);	
-				}
-			}
-				
+			if (logger == null || !logger.IsWarnEnabled) return;
+			var executedParams = formatItems.Select(x => x.Invoke()).ToArray();
+			logger.WarnFormat(PrefixThreadId(message) + ". Exception: " + e, executedParams);				
 		} 
 
 		/// <summary>
@@ -114,20 +113,24 @@ namespace Umbraco.Core.Logging
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="message"></param>
-		/// <param name="items"></param>
-		public static void Warn<T>(string message, params object[] items)
+		/// <param name="formatItems"></param>
+		public static void Warn<T>(string message, params Func<object>[] formatItems)
 		{
-			Warn(typeof (T), message, items);
+			Warn(typeof(T), message, formatItems);
 		}
 
-		public static void Warn<T>(string message, TraceContext trace, params object[] items)
+		public static void Warn<T>(string message, bool showHttpTrace, params Func<object>[] formatItems)
 		{
-			Warn(typeof(T), message, trace, items);
+			Warn(typeof(T), message, showHttpTrace, formatItems);
 		}
 
-		public static void Warn<T>(string message, TraceContext trace, Exception e, params object[] items)
+		public static void WarnWithException<T>(string message, Exception e, params Func<object>[] formatItems)
 		{
-			Warn(typeof(T), message, trace, e, items);
+			WarnWithException(typeof(T), message, e, formatItems);
+		}
+		public static void WarnWithException<T>(string message, bool showHttpTrace, Exception e, params Func<object>[] formatItems)
+		{
+			WarnWithException(typeof(T), message, showHttpTrace, e, formatItems);
 		} 
 
 		#endregion
@@ -239,14 +242,15 @@ namespace Umbraco.Core.Logging
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="generateMessageFormat"></param>
-		/// <param name="trace"></param>
+		/// <param name="showHttpTrace"></param>
 		/// <param name="formatItems"></param>
-		public static void Debug<T>(string generateMessageFormat, TraceContext trace, params Func<object>[] formatItems)
+		public static void Debug<T>(string generateMessageFormat, bool showHttpTrace, params Func<object>[] formatItems)
 		{
-			if (trace != null)
+			if (showHttpTrace && HttpContext.Current != null)
 			{
-				// must .ToArray() here else string.Format sees only one parameter
-				trace.Write(string.Format(generateMessageFormat, formatItems.Select(x => x()).ToArray()));	
+				HttpContext.Current.Trace.Write(
+					typeof(T).Name,
+					string.Format(generateMessageFormat, formatItems.Select(x => x()).ToArray()));	
 			}			
 			Debug(typeof(T), generateMessageFormat, formatItems);
 		}

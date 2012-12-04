@@ -48,7 +48,9 @@ namespace Umbraco.Web.Macros
 	/// </summary>
 	public class PartialViewMacroEngine : IMacroEngine
 	{
-		private readonly Func<HttpContextBase> _getHttpContext; 
+		private readonly Func<HttpContextBase> _getHttpContext;
+
+		public const string EngineName = "Partial View Macro Engine";
 
 		public PartialViewMacroEngine()
 		{						
@@ -71,7 +73,7 @@ namespace Umbraco.Web.Macros
 
 		public string Name
 		{
-			get { return "Partial View Macro Engine"; }
+			get { return EngineName; }
 		}
 		public IEnumerable<string> SupportedExtensions
 		{
