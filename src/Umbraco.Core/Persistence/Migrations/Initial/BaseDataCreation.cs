@@ -94,8 +94,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         private void CreateUmbracNodeData()
         {
-            using (var transaction = _database.GetTransaction())
-            {
+            //using (var transaction = _database.GetTransaction())
+            //{
                 _database.Execute(new Sql("SET IDENTITY_INSERT [umbracoNode] ON "));
                 _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = -1, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1", SortOrder = 0, UniqueId = new Guid("916724a5-173d-4619-b97e-b9de133dd6f5"), Text = "SYSTEM DATA: umbraco master root", NodeObjectType = new Guid("ea7d8624-4cfe-4578-a871-24aa946bf34d"), CreateDate = DateTime.UtcNow });
                 _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = -20, Trashed = false, ParentId = -1, UserId = 0, Level = 0, Path = "-1,-20", SortOrder = 0, UniqueId = new Guid("0F582A79-1E41-4CF0-BFA0-76340651891A"), Text = "Recycle Bin", NodeObjectType = new Guid("01BB7FF2-24DC-4C0C-95A2-C24EF72BBAC8"), CreateDate = DateTime.UtcNow });
@@ -129,8 +129,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1043, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1043", SortOrder = 2, UniqueId = new Guid("1df9f033-e6d4-451f-b8d2-e0cbc50a836f"), Text = "Image Cropper", NodeObjectType = new Guid("30a2a501-1978-4ddb-a57b-f7efed43ba3c"), CreateDate = DateTime.UtcNow });
                 _database.Execute(new Sql("SET IDENTITY_INSERT [umbracoNode] OFF;"));
 
-                transaction.Complete();
-            }
+                //transaction.Complete();
+            //}
         }
 
         private void CreateCmsContentTypeData()
@@ -142,14 +142,14 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         private void CreateUmbracoUserData()
         {
-            using (var transaction = _database.GetTransaction())
-            {
+            //using (var transaction = _database.GetTransaction())
+            //{
                 _database.Execute(new Sql("SET IDENTITY_INSERT [umbracoUser] ON "));
                 _database.Insert("umbracoUser", "id", false, new UserDto { Id = 0, Disabled = false, NoConsole = false, Type = 1, ContentStartId = -1, MediaStartId = -1, UserName = "Administrator", Login = "admin", Password = "default", Email = "", UserLanguage = "en", DefaultPermissions = null, DefaultToLiveEditing = false });
                 _database.Execute(new Sql("SET IDENTITY_INSERT [umbracoUser] OFF;"));
 
-                transaction.Complete();
-            }
+                //transaction.Complete();
+            //}
         }
         
         private void CreateUmbracoUserTypeData()
@@ -193,22 +193,22 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         private void CreateCmsPropertyTypeGroupData()
         {
-            using (var transaction = _database.GetTransaction())
-            {
+            //using (var transaction = _database.GetTransaction())
+            //{
                 _database.Execute(new Sql("SET IDENTITY_INSERT [cmsPropertyTypeGroup] ON "));
                 _database.Insert("cmsPropertyTypeGroup", "id", false, new PropertyTypeGroupDto { Id = 3, ContentTypeNodeId = 1032, Text = "Image", SortOrder = 1 });
                 _database.Insert("cmsPropertyTypeGroup", "id", false, new PropertyTypeGroupDto { Id = 4, ContentTypeNodeId = 1033, Text = "File", SortOrder = 1 });
                 _database.Insert("cmsPropertyTypeGroup", "id", false, new PropertyTypeGroupDto { Id = 5, ContentTypeNodeId = 1031, Text = "Contents", SortOrder = 1 });
                 _database.Execute(new Sql("SET IDENTITY_INSERT [cmsPropertyTypeGroup] OFF;"));
 
-                transaction.Complete();
-            }
+                //transaction.Complete();
+            //}
         }
 
         private void CreateCmsPropertyTypeData()
         {
-            using (var transaction = _database.GetTransaction())
-            {
+            //using (var transaction = _database.GetTransaction())
+            //{
                 _database.Execute(new Sql("SET IDENTITY_INSERT [cmsPropertyType] ON "));
                 _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 6, DataTypeId = -90, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = "umbracoFile", Name = "Upload image", HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
                 _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 7, DataTypeId = -92, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = "umbracoWidth", Name = "Width", HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
@@ -221,8 +221,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 27, DataTypeId = -38, ContentTypeId = 1031, PropertyTypeGroupId = 5, Alias = "contents", Name = "Contents:", HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
                 _database.Execute(new Sql("SET IDENTITY_INSERT [cmsPropertyType] OFF;"));
 
-                transaction.Complete();
-            }
+                //transaction.Complete();
+            //}
         }
 
         private void CreateUmbracoLanguageData()
@@ -239,8 +239,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         private void CreateCmsDataTypeData()
         {
-            using (var transaction = _database.GetTransaction())
-            {
+            //using (var transaction = _database.GetTransaction())
+            //{
                 //TODO Check which of the DataTypeIds below doesn't exist in umbracoNode, which results in a foreign key constraint errors.
                 _database.Execute(new Sql("SET IDENTITY_INSERT [cmsDataType] ON "));
                 _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 1, DataTypeId = -49, ControlId = new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a"), DbType = "Integer" });
@@ -289,14 +289,14 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 24, DataTypeId = 1043, ControlId = new Guid("7A2D436C-34C2-410F-898F-4A23B3D79F54"), DbType = "Ntext" });
                 _database.Execute(new Sql("SET IDENTITY_INSERT [cmsDataType] OFF;"));
 
-                transaction.Complete();
-            }
+                //transaction.Complete();
+            //}
         }
 
         private void CreateCmsDataTypePreValuesData()
         {
-            using (var transaction = _database.GetTransaction())
-            {
+            //using (var transaction = _database.GetTransaction())
+            //{
                 _database.Execute(new Sql("SET IDENTITY_INSERT [cmsDataTypePreValues] ON "));
                 _database.Insert("cmsDataTypePreValues", "id", false,
                                  new DataTypePreValueDto
@@ -318,14 +318,14 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                  });
                 _database.Execute(new Sql("SET IDENTITY_INSERT [cmsDataTypePreValues] OFF;"));
 
-                transaction.Complete();
-            }
+                //transaction.Complete();
+            //}
         }
 
         private void CreateUmbracoRelationTypeData()
         {
-            using (var transaction = _database.GetTransaction())
-            {
+            //using (var transaction = _database.GetTransaction())
+            //{
                 _database.Execute(new Sql("SET IDENTITY_INSERT [umbracoRelationType] ON "));
                 _database.Insert("umbracoRelationType", "id", false,
                                  new RelationTypeDto
@@ -339,14 +339,14 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                      });
                 _database.Execute(new Sql("SET IDENTITY_INSERT [umbracoRelationType] OFF;"));
 
-                transaction.Complete();
-            }
+                //transaction.Complete();
+            //}
         }
 
         private void CreateCmsTaskTypeData()
         {
-            using (var transaction = _database.GetTransaction())
-            {
+            //using (var transaction = _database.GetTransaction())
+            //{
                 _database.Execute(new Sql("SET IDENTITY_INSERT [cmsTaskType] ON "));
                 _database.Insert("cmsTaskType", "id", false,
                                  new TaskTypeDto
@@ -356,8 +356,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                  });
                 _database.Execute(new Sql("SET IDENTITY_INSERT [cmsTaskType] OFF;"));
 
-                transaction.Complete();
-            }            
+                //transaction.Complete();
+            //}            
         }
     }
 }

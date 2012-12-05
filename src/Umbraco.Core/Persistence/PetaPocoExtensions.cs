@@ -36,21 +36,6 @@ namespace Umbraco.Core.Persistence
             var foreignSql = SyntaxConfig.SqlSyntaxProvider.ToCreateForeignKeyStatements(tableDefinition);
             var indexSql = SyntaxConfig.SqlSyntaxProvider.ToCreateIndexStatements(tableDefinition);
 
-            /*
-#if DEBUG
-            Console.WriteLine(createSql);
-            Console.WriteLine(createPrimaryKeySql);
-            foreach (var sql in foreignSql)
-            {
-                Console.WriteLine(sql);
-            }
-            foreach (var sql in indexSql)
-            {
-                Console.WriteLine(sql);
-            }
-#endif
-             */
-
             var tableExist = db.TableExist(tableName);
             if (overwrite && tableExist)
             {
@@ -59,40 +44,45 @@ namespace Umbraco.Core.Persistence
 
             if (!tableExist)
             {
-                //Execute the Create Table sql
-                int created = db.Execute(new Sql(createSql));
-
-                //Fires the NewTable event, which is used internally to insert base data before adding constrants to the schema
-                if (NewTable != null)
+                using (var transaction = db.GetTransaction())
                 {
-                    var e = new TableCreationEventArgs();
-                    NewTable(tableName, db, e);
-                }
-                
-                //If any statements exists for the primary key execute them here
-                if(!string.IsNullOrEmpty(createPrimaryKeySql))
-                    db.Execute(new Sql(createPrimaryKeySql));
+                    //Execute the Create Table sql
+                    int created = db.Execute(new Sql(createSql));
 
-                //Loop through foreignkey statements and execute sql
-                foreach (var sql in foreignSql)
-                {
-                    int createdFk = db.Execute(new Sql(sql));
-                }
+                    //If any statements exists for the primary key execute them here
+                    if (!string.IsNullOrEmpty(createPrimaryKeySql))
+                        db.Execute(new Sql(createPrimaryKeySql));
 
-                //Loop through index statements and execute sql
-                foreach (var sql in indexSql)
-                {
-                    int createdIndex = db.Execute(new Sql(sql));
-                }
-
-                //Specific to Sql Ce - look for changes to Identity Seed
-                if (DatabaseContext.Current.ProviderName.Contains("SqlServerCe"))
-                {
-                    var seedSql = SyntaxConfig.SqlSyntaxProvider.ToAlterIdentitySeedStatements(tableDefinition);
-                    foreach (var sql in seedSql)
+                    //Fires the NewTable event, which is used internally to insert base data before adding constrants to the schema
+                    if (NewTable != null)
                     {
-                        int createdSeed = db.Execute(new Sql(sql));
+                        var e = new TableCreationEventArgs();
+                        NewTable(tableName, db, e);
                     }
+
+                    //Loop through foreignkey statements and execute sql
+                    foreach (var sql in foreignSql)
+                    {
+                        int createdFk = db.Execute(new Sql(sql));
+                    }
+
+                    //Loop through index statements and execute sql
+                    foreach (var sql in indexSql)
+                    {
+                        int createdIndex = db.Execute(new Sql(sql));
+                    }
+
+                    //Specific to Sql Ce - look for changes to Identity Seed
+                    if (DatabaseContext.Current.ProviderName.Contains("SqlServerCe"))
+                    {
+                        var seedSql = SyntaxConfig.SqlSyntaxProvider.ToAlterIdentitySeedStatements(tableDefinition);
+                        foreach (var sql in seedSql)
+                        {
+                            int createdSeed = db.Execute(new Sql(sql));
+                        }
+                    }
+
+                    transaction.Complete();
                 }
             }
 
