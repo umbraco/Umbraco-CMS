@@ -57,7 +57,17 @@ namespace Umbraco.Core.Persistence
                     if (NewTable != null)
                     {
                         var e = new TableCreationEventArgs();
+
+                        //Turn on identity insert if db provider is not mysql
+                        if (DatabaseContext.Current.ProviderName.Contains("MySql") == false && tableDefinition.IsIdentity)
+                            db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName))));
+                        
+                        //Call the NewTable-event to trigger the insert of base/default data
                         NewTable(tableName, db, e);
+
+                        //Turn off identity insert if db provider is not mysql
+                        if (DatabaseContext.Current.ProviderName.Contains("MySql") == false && tableDefinition.IsIdentity)
+                            db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName))));
                     }
 
                     //Loop through foreignkey statements and execute sql

@@ -28,6 +28,10 @@ namespace Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions
                  var columnAttribute = propertyInfo.FirstAttribute<ColumnAttribute>();
                  string columnName = columnAttribute != null ? columnAttribute.Name : propertyInfo.Name;
 
+                 //Use PetaPoco's PrimaryKeyAttribute to set Identity property on TableDefinition
+                 var primaryKeyAttribute = modelType.FirstAttribute<PrimaryKeyAttribute>();
+                 tableDefinition.IsIdentity = primaryKeyAttribute != null && primaryKeyAttribute.autoIncrement;
+
                  //Creates a column definition and adds it to the collection on the table definition
                  var columnDefinition = new ColumnDefinition
                  {

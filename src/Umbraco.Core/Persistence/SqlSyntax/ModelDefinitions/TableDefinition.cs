@@ -13,6 +13,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions
         }
 
         public string TableName { get; set; }
+        public bool IsIdentity { get; set; }
         public bool IsPrimaryKeyClustered
         {
             get { return ColumnDefinitions.Any(x => x.IsPrimaryKeyClustered); }
