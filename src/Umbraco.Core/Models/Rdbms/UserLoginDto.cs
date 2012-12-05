@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
@@ -8,6 +9,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class UserLoginDto
     {
         [Column("contextID")]
+        [Index(IndexTypes.Clustered, Name = "umbracoUserLogins_Index")]
         public Guid ContextId { get; set; }
 
         [Column("userID")]
