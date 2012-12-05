@@ -34,16 +34,16 @@ umbraco\presentation\scripts\*
 umbraco\presentation\fonts\*
 umbraco\presentation\css\*
 
-src\Umbraco.Web.UI\css\*
+src\Umbraco.Web.UI\[Cc]ss\*
 src\Umbraco.Web.UI\App_Code\*
 src\Umbraco.Web.UI\App_Data\*
 src\Umbraco.Tests\App_Data\*
-src\Umbraco.Web.UI\media\*
-src\Umbraco.Web.UI\masterpages\*
-src\Umbraco.Web.UI\macroScripts\*
-src\Umbraco.Web.UI\xslt\*
-src\Umbraco.Web.UI\images\*
-src\Umbraco.Web.UI\scripts\*
+src\Umbraco.Web.UI\[Mm]edia\*
+src\Umbraco.Web.UI\[Mm]aster[Pp]ages\*
+src\Umbraco.Web.UI\[Mm]acro[Ss]cripts\*
+src\Umbraco.Web.UI\[Xx]slt\*
+src\Umbraco.Web.UI\[Ii]mages\*
+src\Umbraco.Web.UI\[Ss]cripts\*
 
 umbraco\presentation\umbraco\plugins\uComponents\uComponentsInstaller.ascx
 umbraco\presentation\packages\uComponents\MultiNodePicker\CustomTreeService.asmx
@@ -64,5 +64,5 @@ src/Umbraco.Tests/config/umbracoSettings.config
 src/Umbraco.Web.UI/App_Plugins/*
 src/Umbraco.Web.UI/Views/*
 
-src\Umbraco.Web.UI\[W]eb.config
+src\Umbraco.Web.UI\[Ww]eb.config
 *.transformed
