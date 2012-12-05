@@ -161,6 +161,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public override bool DoesTableExist(Database db, string tableName)
         {
+            db.OpenSharedConnection();
             var result =
                 db.ExecuteScalar<long>("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES " +
                 "WHERE TABLE_NAME = @TableName AND " +
