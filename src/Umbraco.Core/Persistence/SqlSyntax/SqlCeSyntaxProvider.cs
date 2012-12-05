@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence.Migrations.Model;
+﻿using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Core.Persistence.Migrations.Model;
 using ColumnDefinition = Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions.ColumnDefinition;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
@@ -33,6 +34,23 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             BlobColumnDefinition = "VARBINARY(MAX)";
 
             InitColumnTypeMap();
+        }
+
+        public override string GetIndexType(IndexTypes indexTypes)
+        {
+            string indexType;
+            //NOTE Sql Ce doesn't support clustered indexes
+            if (indexTypes == IndexTypes.Clustered)
+            {
+                indexType = "NONCLUSTERED";
+            }
+            else
+            {
+                indexType = indexTypes == IndexTypes.NonClustered
+                    ? "NONCLUSTERED"
+                    : "UNIQUE NONCLUSTERED";
+            }
+            return indexType;
         }
 
         public override string GetQuotedTableName(string tableName)

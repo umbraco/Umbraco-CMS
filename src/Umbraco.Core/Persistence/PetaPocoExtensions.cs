@@ -73,14 +73,12 @@ namespace Umbraco.Core.Persistence
                 if(!string.IsNullOrEmpty(createPrimaryKeySql))
                     db.Execute(new Sql(createPrimaryKeySql));
 
-                if (DatabaseContext.Current.ProviderName.Contains("SqlServerCe") == false)
+                //Loop through foreignkey statements and execute sql
+                foreach (var sql in foreignSql)
                 {
-                    //Loop through foreignkey statements and execute sql
-                    foreach (var sql in foreignSql)
-                    {
-                        int createdFk = db.Execute(new Sql(sql));
-                    }
+                    int createdFk = db.Execute(new Sql(sql));
                 }
+
                 //Loop through index statements and execute sql
                 foreach (var sql in indexSql)
                 {
