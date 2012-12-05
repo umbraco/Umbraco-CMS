@@ -49,9 +49,9 @@ umbraco\presentation\umbraco\plugins\uComponents\uComponentsInstaller.ascx
 umbraco\presentation\packages\uComponents\MultiNodePicker\CustomTreeService.asmx
 _BuildOutput/*
 *.ncrunchsolution
-build/UmbracoCms.AllBinaries.zip
-build/UmbracoCms.WebPI.zip
-build/UmbracoCms.zip
+build/UmbracoCms.AllBinaries*zip
+build/UmbracoCms.WebPI*zip
+build/UmbracoCms*zip
 build/*.nupkg
 src/Umbraco.Tests/config/applications.config
 src/Umbraco.Tests/config/trees.config
