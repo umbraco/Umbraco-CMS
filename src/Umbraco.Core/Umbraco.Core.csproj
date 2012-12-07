@@ -229,6 +229,7 @@
     <Compile Include="Persistence\Migrations\Model\ConstraintDefinition.cs" />
     <Compile Include="Persistence\Migrations\Model\ConstraintType.cs" />
     <Compile Include="Persistence\Migrations\Model\Direction.cs" />
+    <Compile Include="Persistence\Migrations\Model\InsertionDataDefinition.cs" />
     <Compile Include="Persistence\Migrations\Model\ModificationType.cs" />
     <Compile Include="Persistence\Migrations\Model\ForeignKeyDefinition.cs" />
     <Compile Include="Persistence\Migrations\Model\IndexColumnDefinition.cs" />
@@ -290,8 +291,11 @@
     <Compile Include="Persistence\Migrations\Syntax\IColumnTypeSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\IFluentSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\IForeignKeyCascadeSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Insert\Expressions\InsertDataExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Insert\IInsertBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Insert\IInsertDataSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Insert\InsertBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Insert\InsertDataBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Rename\IRenameBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Rename\RenameBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Schema\ISchemaBuilder.cs" />
@@ -595,6 +599,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Persistence\Migrations\Syntax\Delete\Column\" />
+    <Folder Include="Persistence\Migrations\Syntax\Delete\Constraint\" />
+    <Folder Include="Persistence\Migrations\Syntax\Delete\DefaultConstraint\" />
+    <Folder Include="Persistence\Migrations\Syntax\Delete\ForeignKey\" />
+    <Folder Include="Persistence\Migrations\Syntax\Delete\Index\" />
+    <Folder Include="Persistence\Migrations\Syntax\Delete\Table\" />
     <Folder Include="Persistence\Migrations\Syntax\Schema\Index\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
