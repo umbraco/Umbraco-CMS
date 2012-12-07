@@ -1,5 +1,4 @@
 ﻿using System;
-using Umbraco.Core.Persistence.Migrations.Model;
 
 namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
 {

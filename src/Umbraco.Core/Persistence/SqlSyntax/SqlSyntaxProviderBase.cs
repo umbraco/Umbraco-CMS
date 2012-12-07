@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.Migrations.Model;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using ColumnDefinition = Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions.ColumnDefinition;
 using TableDefinition = Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions.TableDefinition;
 
@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     {
         protected SqlSyntaxProviderBase()
         {
-            ClauseOrder = new List<Func<Migrations.Model.ColumnDefinition, string>>
+            ClauseOrder = new List<Func<DatabaseModelDefinitions.ColumnDefinition, string>>
                               {
                                   FormatString,
                                   FormatType,
@@ -54,7 +54,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public string DateTimeColumnDefinition = "DATETIME";
         public string TimeColumnDefinition = "DATETIME";
 
-        protected IList<Func<Migrations.Model.ColumnDefinition, string>> ClauseOrder { get; set; }
+        protected IList<Func<DatabaseModelDefinitions.ColumnDefinition, string>> ClauseOrder { get; set; }
 
         protected DbTypes<TSyntax> DbTypeMap = new DbTypes<TSyntax>();
         protected void InitColumnTypeMap()
@@ -335,7 +335,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return DbTypeMap.ColumnDbTypeMap[valueType];
         }
 
-        public virtual string Format(Migrations.Model.ColumnDefinition column)
+        public virtual string Format(DatabaseModelDefinitions.ColumnDefinition column)
         {
             var clauses = new List<string>();
 
@@ -349,12 +349,12 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return string.Join(" ", clauses.ToArray());
         }
 
-        public virtual string FormatString(Migrations.Model.ColumnDefinition column)
+        public virtual string FormatString(DatabaseModelDefinitions.ColumnDefinition column)
         {
             return GetQuotedColumnName(column.Name);
         }
 
-        protected virtual string FormatType(Migrations.Model.ColumnDefinition column)
+        protected virtual string FormatType(DatabaseModelDefinitions.ColumnDefinition column)
         {
             if (!column.Type.HasValue)
                 return column.CustomType;
@@ -369,12 +369,12 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return dbTypeDefinition;
         }
 
-        protected virtual string FormatNullable(Migrations.Model.ColumnDefinition column)
+        protected virtual string FormatNullable(DatabaseModelDefinitions.ColumnDefinition column)
         {
             return column.IsNullable ? string.Empty : "NOT NULL";
         }
 
-        protected virtual string FormatDefaultValue(Migrations.Model.ColumnDefinition column)
+        protected virtual string FormatDefaultValue(DatabaseModelDefinitions.ColumnDefinition column)
         {
             if (column.DefaultValue == null)
                 return string.Empty;
@@ -392,14 +392,14 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return "DEFAULT " + GetQuotedValue(column.DefaultValue.ToString());
         }
 
-        protected virtual string FormatPrimaryKey(Migrations.Model.ColumnDefinition column)
+        protected virtual string FormatPrimaryKey(DatabaseModelDefinitions.ColumnDefinition column)
         {
             return string.Empty;
         }
 
         protected abstract string FormatSystemMethods(SystemMethods systemMethod);
 
-        protected abstract string FormatIdentity(Migrations.Model.ColumnDefinition column);
+        protected abstract string FormatIdentity(DatabaseModelDefinitions.ColumnDefinition column);
 
         public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
         public virtual string DropTable { get { return "DROP TABLE {0}"; } }

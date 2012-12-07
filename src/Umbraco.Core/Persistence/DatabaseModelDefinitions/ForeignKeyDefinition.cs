@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Data;
 
-namespace Umbraco.Core.Persistence.Migrations.Model
+namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
 {
     public class ForeignKeyDefinition
     {

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Persistence.Migrations.Model
+namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
 {
     public enum ModificationType
     {

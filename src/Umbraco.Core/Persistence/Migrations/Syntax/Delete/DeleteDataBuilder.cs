@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using Umbraco.Core.Persistence.Migrations.Model;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete

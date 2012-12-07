@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.Migrations.Model;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using ColumnDefinition = Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions.ColumnDefinition;
 using TableDefinition = Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions.TableDefinition;
 
@@ -170,7 +170,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return result > 0;
         }
 
-        protected override string FormatIdentity(Migrations.Model.ColumnDefinition column)
+        protected override string FormatIdentity(DatabaseModelDefinitions.ColumnDefinition column)
         {
             return column.IsIdentity ? AutoIncrementDefinition : string.Empty;
         }

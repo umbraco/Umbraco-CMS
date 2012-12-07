@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Persistence.Migrations.Model;
+﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Expressions;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Index
