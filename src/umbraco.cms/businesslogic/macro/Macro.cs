@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Runtime.CompilerServices;
 using Umbraco.Core.IO;
@@ -536,9 +537,11 @@ namespace umbraco.cms.businesslogic.macro
 			{
 				//we need to check if the file path saved is a virtual path starting with ~/Views/MacroPartials, if so then this is 
 				//a partial view macro, not a script macro
-				return scriptFile.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/") 
-					? MacroTypes.PartialView 
-					: MacroTypes.Script;
+				//we also check if the file exists in ~/App_Plugins/[Packagename]/Views/MacroPartials, if so then it is also a partial view.
+				return (scriptFile.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
+				        || (Regex.IsMatch(scriptFile, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled)))
+					       ? MacroTypes.PartialView
+					       : MacroTypes.Script;
 			}
 
 	        if (!string.IsNullOrEmpty(scriptType) && scriptType.ToLower().IndexOf(".ascx") > -1)

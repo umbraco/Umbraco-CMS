@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -90,7 +91,8 @@ namespace Umbraco.Web.Macros
 			if (macro == null) throw new ArgumentNullException("macro");
 			if (currentPage == null) throw new ArgumentNullException("currentPage");
 
-			if (!macro.ScriptName.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/"))
+			if (!macro.ScriptName.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
+				&& (!Regex.IsMatch(macro.ScriptName, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled)))
 			{
 				throw new InvalidOperationException("Cannot render the Partial View Macro with file: " + macro.ScriptName + ". All Partial View Macros must exist in the " + SystemDirectories.MvcViews + "/MacroPartials/ folder");
 			}

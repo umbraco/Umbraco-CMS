@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI.WebControls;
 using Umbraco.Core.IO;
@@ -32,10 +33,11 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
 		{
 			base.PopulateFieldsOnLoad(macro, macroAssemblyValue, macroTypeValue);
 			//check if the ScriptingFile property contains the MacroPartials path
-			if (macro.ScriptingFile.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/"))
+			if (macro.ScriptingFile.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
+				|| (Regex.IsMatch(macro.ScriptingFile, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled)))
 			{
 				macroPython.Text = "";
-				SelectedPartialView.Text = Path.GetFileName(macro.ScriptingFile);
+				SelectedPartialView.Text = macro.ScriptingFile;
 			}
 		}
 
@@ -52,7 +54,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
 			base.SetMacroValuesFromPostBack(macro, macroCachePeriod, macroAssemblyValue, macroTypeValue);
 			if (!SelectedPartialView.Text.IsNullOrWhiteSpace())
 			{
-				macro.ScriptingFile = SystemDirectories.MvcViews + "/MacroPartials/" + SelectedPartialView.Text;
+				macro.ScriptingFile = SelectedPartialView.Text;
 			}
 		}
 
@@ -62,19 +64,40 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
 		private void PopulatePartialViewFiles()
 		{
 			var partialsDir = IOHelper.MapPath(SystemDirectories.MvcViews + "/MacroPartials");
-			var views = GetPartialViewFiles(partialsDir, partialsDir);
-			PartialViewList.DataSource = views;
+			//get all the partials in the normal /MacroPartials folder
+			var foundMacroPartials = GetPartialViewFiles(partialsDir, partialsDir, SystemDirectories.MvcViews + "/MacroPartials");
+			//now try to find all of them int he App_Plugins/[PackageName]/Views/MacroPartials folder
+			var partialPluginsDir = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins));
+			foreach(var d in partialPluginsDir.GetDirectories())
+			{
+				var viewsFolder = d.GetDirectories("Views");
+				if (viewsFolder.Any())
+				{
+					var macroPartials = viewsFolder.First().GetDirectories("MacroPartials");
+					if (macroPartials.Any())
+					{
+						foundMacroPartials = foundMacroPartials.Concat(
+							GetPartialViewFiles(macroPartials.First().FullName, macroPartials.First().FullName, SystemDirectories.AppPlugins + "/" + d.Name + "/Views/MacroPartials"));
+					}
+				}
+			}
+			
+			
+			
+			PartialViewList.DataSource = foundMacroPartials;
 			PartialViewList.DataBind();
 			PartialViewList.Items.Insert(0, new ListItem("Browse partial view files on server...", string.Empty));			
 		}
 
 		/// <summary>
-		/// Get the list of partial view files in the ~/Views/MacroPartials folder
+		/// Get the list of partial view files in the ~/Views/MacroPartials folder and in all 
+		/// folders of ~/App_Plugins/[PackageName]/Views/MacroPartials
 		/// </summary>
 		/// <param name="orgPath"></param>
 		/// <param name="path"></param>
+		/// <param name="prefixVirtualPath"> </param>
 		/// <returns></returns>
-		private IEnumerable<string> GetPartialViewFiles(string orgPath, string path)
+		private IEnumerable<string> GetPartialViewFiles(string orgPath, string path, string prefixVirtualPath)
 		{
 			var files = new List<string>();
 			var dirInfo = new DirectoryInfo(path);
@@ -83,12 +106,14 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
 			var dirInfos = dirInfo.GetDirectories();
 			foreach (var dir in dirInfos)
 			{
-				files.AddRange(GetPartialViewFiles(orgPath, path + "/" + dir.Name));
+				files.AddRange(GetPartialViewFiles(orgPath, path + "/" + dir.Name, prefixVirtualPath));
 			}
 
 			var fileInfo = dirInfo.GetFiles("*.*");
 
-			files.AddRange(fileInfo.Select(file => (path.Replace(orgPath, string.Empty).Trim('/') + "/" + file.Name).Trim('/')));
+			files.AddRange(
+				fileInfo.Select(file => 
+					prefixVirtualPath.TrimEnd('/') + "/" + (path.Replace(orgPath, string.Empty).Trim('/') + "/" + file.Name).Trim('/')));
 			return files;
 		}
 
