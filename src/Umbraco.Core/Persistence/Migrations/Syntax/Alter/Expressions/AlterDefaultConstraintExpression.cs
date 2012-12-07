@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
+namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 {
     public class AlterDefaultConstraintExpression : IMigrationExpression
     {

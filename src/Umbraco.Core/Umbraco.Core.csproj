@@ -228,6 +228,7 @@
     <Compile Include="Persistence\Migrations\Model\ColumnDefinition.cs" />
     <Compile Include="Persistence\Migrations\Model\ConstraintDefinition.cs" />
     <Compile Include="Persistence\Migrations\Model\ConstraintType.cs" />
+    <Compile Include="Persistence\Migrations\Model\DeletionDataDefinition.cs" />
     <Compile Include="Persistence\Migrations\Model\Direction.cs" />
     <Compile Include="Persistence\Migrations\Model\InsertionDataDefinition.cs" />
     <Compile Include="Persistence\Migrations\Model\ModificationType.cs" />
@@ -244,6 +245,7 @@
     <Compile Include="Persistence\Migrations\Syntax\Alter\Column\IAlterColumnSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Alter\Column\IAlterColumnTypeSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Alter\Expressions\AlterColumnExpression.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Alter\Expressions\AlterDefaultConstraintExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Alter\Expressions\AlterTableExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Alter\IAlterSyntaxBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Alter\Table\AlterTableBuilder.cs" />
@@ -279,11 +281,36 @@
     <Compile Include="Persistence\Migrations\Syntax\Create\Table\ICreateTableColumnOptionForeignKeyCascadeSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Create\Table\ICreateTableColumnOptionSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Create\Table\ICreateTableWithColumnSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\Column\DeleteColumnBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\Column\IDeleteColumnFromTableSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\Constraint\DeleteConstraintBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\Constraint\IDeleteConstraintOnTableSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\DefaultConstraint\DeleteDefaultConstraintBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\DefaultConstraint\IDeleteDefaultConstraintOnColumnSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\DefaultConstraint\IDeleteDefaultConstraintOnTableSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Delete\DeleteBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\DeleteDataBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\Expressions\DeleteColumnExpression.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\Expressions\DeleteConstraintExpression.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\Expressions\DeleteDataExpression.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\Expressions\DeleteDefaultConstraintExpression.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\Expressions\DeleteForeignKeyExpression.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\Expressions\DeleteIndexExpression.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\Expressions\DeleteTableExpression.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\ForeignKey\DeleteForeignKeyBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\ForeignKey\IDeleteForeignKeyForeignColumnSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\ForeignKey\IDeleteForeignKeyFromTableSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\ForeignKey\IDeleteForeignKeyOnTableSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\ForeignKey\IDeleteForeignKeyPrimaryColumnSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\ForeignKey\IDeleteForeignKeyToTableSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Delete\IDeleteBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\IDeleteDataSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\Index\DeleteIndexBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\Index\IDeleteIndexForTableSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\Index\IDeleteIndexOnColumnSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Delete\Table\DeleteTableBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\ExpressionBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\ExpressionBuilderBase.cs" />
-    <Compile Include="Persistence\Migrations\Syntax\Expressions\AlterDefaultConstraintExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Expressions\CreateColumnExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Expressions\CreateForeignKeyExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Expressions\CreateIndexExpression.cs" />
@@ -296,12 +323,21 @@
     <Compile Include="Persistence\Migrations\Syntax\Insert\IInsertDataSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Insert\InsertBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Insert\InsertDataBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Rename\Column\IRenameColumnTableSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Rename\Column\IRenameColumnToSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Rename\Column\RenameColumnBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Rename\Expressions\RenameColumnExpression.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Rename\Expressions\RenameTableExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Rename\IRenameBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Rename\RenameBuilder.cs" />
-    <Compile Include="Persistence\Migrations\Syntax\Schema\ISchemaBuilder.cs" />
-    <Compile Include="Persistence\Migrations\Syntax\Schema\SchemaBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Rename\Table\IRenameTableSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Rename\Table\RenameTableBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Update\Expressions\UpdateDataExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Update\IUpdateBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Update\IUpdateSetSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Update\IUpdateWhereSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Update\UpdateBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Update\UpdateDataBuilder.cs" />
     <Compile Include="Persistence\PetaPocoExtensions.cs" />
     <Compile Include="Persistence\PetaPocoSqlExtensions.cs" />
     <Compile Include="Persistence\Querying\ExpressionHelper.cs" />
@@ -598,15 +634,7 @@
       <Name>umbraco.interfaces</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Persistence\Migrations\Syntax\Delete\Column\" />
-    <Folder Include="Persistence\Migrations\Syntax\Delete\Constraint\" />
-    <Folder Include="Persistence\Migrations\Syntax\Delete\DefaultConstraint\" />
-    <Folder Include="Persistence\Migrations\Syntax\Delete\ForeignKey\" />
-    <Folder Include="Persistence\Migrations\Syntax\Delete\Index\" />
-    <Folder Include="Persistence\Migrations\Syntax\Delete\Table\" />
-    <Folder Include="Persistence\Migrations\Syntax\Schema\Index\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
