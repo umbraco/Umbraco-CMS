@@ -150,6 +150,18 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets a specific version of an <see cref="IContent"/> item.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/> to retrieve version from</param>
+        /// <param name="versionId">Id of the version to retrieve</param>
+        /// <returns>An <see cref="IContent"/> item</returns>
+        public IContent GetByIdVersion(int id, Guid versionId)
+        {
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
+            return repository.GetByVersion(id, versionId);
+        }
+
+        /// <summary>
         /// Gets a collection of an <see cref="IContent"/> objects versions by Id
         /// </summary>
         /// <param name="id"></param>
@@ -215,6 +227,19 @@ namespace Umbraco.Core.Services
             var contents = repository.GetByQuery(query);
 
             return contents;
+        }
+
+        /// <summary>
+        /// Checks whether an <see cref="IContent"/> item has any published versions
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/></param>
+        /// <returns>True if the content has any published versiom otherwise False</returns>
+        public bool HasPublishedVersion(int id)
+        {
+            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(_unitOfWork);
+            var query = Query<IContent>.Builder.Where(x => x.Published == true && x.Id == id);
+            int count = repository.Count(query);
+            return count > 0;
         }
 
         /// <summary>

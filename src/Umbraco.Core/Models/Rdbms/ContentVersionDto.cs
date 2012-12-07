@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models.Rdbms
     [TableName("cmsContentVersion")]
     [PrimaryKey("id")]
     [ExplicitColumns]
-    internal class ContentVersionDto
+    public class ContentVersionDto
     {
         [Column("id")]
         [PrimaryKeyColumn]

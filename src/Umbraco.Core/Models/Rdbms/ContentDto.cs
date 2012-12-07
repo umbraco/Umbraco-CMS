@@ -6,7 +6,7 @@ namespace Umbraco.Core.Models.Rdbms
     [TableName("cmsContent")]
     [PrimaryKey("pk")]
     [ExplicitColumns]
-    internal class ContentDto
+    public class ContentDto
     {
         [Column("pk")]
         [PrimaryKeyColumn]

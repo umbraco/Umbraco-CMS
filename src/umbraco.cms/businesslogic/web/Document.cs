@@ -5,10 +5,10 @@ using System.Linq;
 using System.Web;
 using System.Xml;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
-using umbraco.cms.businesslogic.property;
-using umbraco.cms.businesslogic.relation;
 using umbraco.cms.helpers;
 using umbraco.DataLayer;
 using umbraco.IO;
@@ -17,6 +17,9 @@ using umbraco.cms.businesslogic.datatype.controls;
 using System.IO;
 using System.Diagnostics;
 using Umbraco.Core;
+using Property = umbraco.cms.businesslogic.property.Property;
+using Relation = umbraco.cms.businesslogic.relation.Relation;
+using RelationType = umbraco.cms.businesslogic.relation.RelationType;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -229,6 +232,7 @@ namespace umbraco.cms.businesslogic.web
         private User _writer;
         private int? _writerId;
         private bool _optimizedMode;
+        private IContent _content;
 
         /// <summary>
         /// This is used to cache the child documents of Document when the children property
@@ -1663,8 +1667,38 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "'%'"));
         #region Protected Methods
         protected override void setupNode()
         {
-            base.setupNode();
+            _content = Version == Guid.Empty
+                           ? ServiceContext.Current.ContentService.GetById(Id)
+                           : ServiceContext.Current.ContentService.GetByIdVersion(Id, Version);
 
+            if(_content == null)
+                throw new ArgumentException(string.Format("No Document exists with id '{0}'", Id));
+
+            //Setting private properties from IContent replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
+            var objectType = new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972");
+            base.PopulateCMSNodeFromContent(_content, objectType);
+
+            //If the version is empty we update with the latest version from the current IContent.
+            if (Version == Guid.Empty)
+                Version = _content.Version;
+
+            //Setting private properties from IContent replacing Document.setupNode()
+            _creator = User.GetUser(_content.CreatorId);
+            _writer = User.GetUser(_content.WriterId);
+            _updated = _content.UpdateDate;
+
+            if(_content.Template != null)
+                _template = _content.Template.Id;
+
+            if (_content.ExpireDate.HasValue)
+                _expire = _content.ExpireDate.Value;
+
+            if (_content.ReleaseDate.HasValue)
+                _release = _content.ReleaseDate.Value;
+
+            _published = _content.HasPublishedVersion();
+
+            /*base.setupNode();
             using (var dr =
                 SqlHelper.ExecuteReader("select published, documentUser, coalesce(templateId, cmsDocumentType.templateNodeId) as templateId, text, releaseDate, expireDate, updateDate from cmsDocument inner join cmsContent on cmsDocument.nodeId = cmsContent.Nodeid left join cmsDocumentType on cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1 where versionId = @versionId",
                                         SqlHelper.CreateParameter("@versionId", Version)))
@@ -1688,8 +1722,8 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "'%'"));
                     throw new ArgumentException(string.Format("No Document exists with Version '{0}'", Version));
                 }
             }
-
-            _published = HasPublishedVersion();
+            
+             _published = HasPublishedVersion();*/
         }
 
         protected void InitializeDocument(User InitUser, User InitWriter, string InitText, int InitTemplate,

@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models.Rdbms
     [TableName("umbracoNode")]
     [PrimaryKey("id")]
     [ExplicitColumns]
-    internal class NodeDto
+    public class NodeDto
     {
         [Column("id")]
         [PrimaryKeyColumn(Name = "PK_structure", IdentitySeed = 1045)]
