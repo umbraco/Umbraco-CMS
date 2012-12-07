@@ -28,6 +28,8 @@ namespace Umbraco.Core.Persistence
 
         public static void CreateTable(this Database db, bool overwrite, Type modelType)
         {
+            //TODO The line below should be refactored to use 'Umbraco.Core.Persistence.DatabaseModelDefinitions.DefinitionFactory.GetTableDefinition(modelType)'
+            //But first the sql syntax provider should be updated/refactored to format sql statements using the 'new' definitions from the DatabaseModelDefinitions-namespace.
             var tableDefinition = DefinitionFactory.GetTableDefinition(modelType);
             var tableName = tableDefinition.TableName;
 
