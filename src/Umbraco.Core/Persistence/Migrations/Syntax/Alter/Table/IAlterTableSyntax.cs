@@ -2,7 +2,7 @@
 {
     public interface IAlterTableSyntax : IFluentSyntax
     {
-        IAlterTableColumnSyntax AddColumn(string name);
-        IAlterTableColumnSyntax AlterColumn(string name);
+        IAlterTableColumnTypeSyntax AddColumn(string name);
+        IAlterTableColumnTypeSyntax AlterColumn(string name);
     }
 }

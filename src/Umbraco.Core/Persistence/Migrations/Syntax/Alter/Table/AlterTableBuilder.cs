@@ -5,13 +5,13 @@ using Umbraco.Core.Persistence.Migrations.Syntax.Expressions;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table
 {
-    public class AlterTableSyntaxBuilder : ExpressionBuilder<AlterTableExpression, IAlterTableColumnOptionSyntax>,
-                                               IAlterTableColumnSyntax,
+    public class AlterTableBuilder : ExpressionBuilder<AlterTableExpression, IAlterTableColumnOptionSyntax>,
+                                               IAlterTableColumnTypeSyntax,
                                                IAlterTableColumnOptionForeignKeyCascadeSyntax
     {
         private readonly IMigrationContext _context;
 
-        public AlterTableSyntaxBuilder(AlterTableExpression expression, IMigrationContext context)
+        public AlterTableBuilder(AlterTableExpression expression, IMigrationContext context)
             : base(expression)
         {
             _context = context;
@@ -24,6 +24,12 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table
         public override ColumnDefinition GetColumnForType()
         {
             return CurrentColumn;
+        }
+
+        public IAlterTableColumnOptionSyntax WithDefault(SystemMethods method)
+        {
+            CurrentColumn.DefaultValue = method;
+            return this;
         }
 
         public IAlterTableColumnOptionSyntax WithDefaultValue(object value)
@@ -211,7 +217,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table
             return this;
         }
 
-        public IAlterTableColumnSyntax AddColumn(string name)
+        public IAlterTableColumnTypeSyntax AddColumn(string name)
         {
             var column = new ColumnDefinition { Name = name, ModificationType = ModificationType.Create };
             var createColumn = new CreateColumnExpression
@@ -227,7 +233,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table
             return this;
         }
 
-        public IAlterTableColumnSyntax AlterColumn(string name)
+        public IAlterTableColumnTypeSyntax AlterColumn(string name)
         {
             var column = new ColumnDefinition { Name = name, ModificationType = ModificationType.Alter };
             var alterColumn = new AlterColumnExpression

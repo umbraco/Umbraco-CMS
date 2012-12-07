@@ -5,13 +5,14 @@ using Umbraco.Core.Persistence.Migrations.Syntax.Expressions;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Column
 {
-    public class AlterColumnSyntaxBuilder : ExpressionBuilder<AlterColumnExpression, IAlterColumnOptionSyntax>,
+    public class AlterColumnBuilder : ExpressionBuilder<AlterColumnExpression, IAlterColumnOptionSyntax>,
                                             IAlterColumnSyntax,
+                                            IAlterColumnTypeSyntax,
                                             IAlterColumnOptionForeignKeyCascadeSyntax
     {
         private readonly IMigrationContext _context;
 
-        public AlterColumnSyntaxBuilder(AlterColumnExpression expression, IMigrationContext context)
+        public AlterColumnBuilder(AlterColumnExpression expression, IMigrationContext context)
             : base(expression)
         {
             _context = context;
@@ -23,6 +24,30 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Column
         {
             return Expression.Column;
         }
+
+        public IAlterColumnTypeSyntax OnTable(string name)
+        {
+            Expression.TableName = name;
+            return this;
+        }
+
+        public IAlterColumnOptionSyntax WithDefault(SystemMethods method)
+        {
+            var dc = new AlterDefaultConstraintExpression
+                         {
+                             TableName = Expression.TableName,
+                             SchemaName = Expression.SchemaName,
+                             ColumnName = Expression.Column.Name,
+                             DefaultValue = method
+                         };
+
+            _context.Expressions.Add(dc);
+
+            Expression.Column.DefaultValue = method;
+
+            return this;
+        }
+        
 
         public IAlterColumnOptionSyntax WithDefaultValue(object value)
         {

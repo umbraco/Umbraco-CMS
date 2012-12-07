@@ -1,9 +1,12 @@
-﻿namespace Umbraco.Core.Persistence.Migrations.Syntax
+﻿using Umbraco.Core.Persistence.Migrations.Model;
+
+namespace Umbraco.Core.Persistence.Migrations.Syntax
 {
     public interface IColumnOptionSyntax<TNext, TNextFk> : IFluentSyntax
         where TNext : IFluentSyntax
         where TNextFk : IFluentSyntax
     {
+        TNext WithDefault(SystemMethods method);
         TNext WithDefaultValue(object value);
         TNext Identity();
         TNext Indexed();
