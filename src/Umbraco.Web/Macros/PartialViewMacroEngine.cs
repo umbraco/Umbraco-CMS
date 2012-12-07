@@ -8,47 +8,12 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.WebPages;
 using Umbraco.Core.IO;
-using Umbraco.Web.Models;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
 using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Macros
 {
-	/// <summary>
-	/// Controller to render macro content
-	/// </summary>
-	internal class PartialViewMacroController : Controller
-	{
-		private readonly UmbracoContext _umbracoContext;
-		private readonly MacroModel _macro;
-		private readonly INode _currentPage;
-		
-		public PartialViewMacroController(UmbracoContext umbracoContext, MacroModel macro, INode currentPage)
-		{
-			_umbracoContext = umbracoContext;
-			_macro = macro;
-			_currentPage = currentPage;
-		}
-
-		/// <summary>
-		/// Child action to render a macro
-		/// </summary>
-		/// <returns></returns>
-		[ChildActionOnly]
-		public PartialViewResult Index()
-		{
-			var model = new PartialViewMacroModel(_currentPage.ConvertFromNode(), new Dictionary<string, object>());
-			return PartialView(_macro.ScriptName, model);
-		}
-
-	}
-
-	public abstract class PartialViewMacroPage : WebViewPage<PartialViewMacroModel>
-	{
-		
-	}
-
 	/// <summary>
 	/// A macro engine using MVC Partial Views to execute
 	/// </summary>
@@ -135,11 +100,26 @@ namespace Umbraco.Web.Macros
 			var routeVals = new RouteData();
 			routeVals.Values.Add("controller", "PartialViewMacro");
 			routeVals.Values.Add("action", "Index");
+			routeVals.DataTokens.Add("umbraco-context", umbCtx); //required for UmbracoViewPage
+
+			////lets render this controller as a child action if we are currently executing using MVC 
+			////(otherwise don't do this since we're using webforms)
+			//var mvcHandler = http.CurrentHandler as MvcHandler;
+			//if (mvcHandler != null)
+			//{
+			//	routeVals.DataTokens.Add("ParentActionViewContext", 
+			//		//If we could get access to the currently executing controller we could do this but this is nearly 
+			//		//impossible. The only way to do that would be to store the controller instance in the route values 
+			//		//in the base class of the UmbracoController.... but not sure the reprocussions of that, i think it could 
+			//		//work but is a bit nasty.
+			//		new ViewContext());
+			//}
+
 			var request = new RequestContext(http, routeVals);
 			string output;
 			using (var controller = new PartialViewMacroController(umbCtx, macro, currentPage))
 			{
-				controller.ControllerContext = new ControllerContext(request, controller);
+				controller.ControllerContext = new ControllerContext(request, controller);						
 				var result = controller.Index();				
 				output = controller.RenderViewResultAsString(result);	
 			}

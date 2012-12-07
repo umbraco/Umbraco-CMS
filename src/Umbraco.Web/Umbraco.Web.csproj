@@ -249,7 +249,9 @@
     <Compile Include="Dynamics\Grouping.cs" />
     <Compile Include="Install\InstallPackageController.cs" />
     <Compile Include="Install\UmbracoInstallAuthorizeAttribute.cs" />
+    <Compile Include="Macros\PartialViewMacroController.cs" />
     <Compile Include="Macros\PartialViewMacroEngine.cs" />
+    <Compile Include="Macros\PartialViewMacroPage.cs" />
     <Compile Include="Media\ImageUrl.cs" />
     <Compile Include="Media\ImageUrlProviderResolver.cs" />
     <Compile Include="Media\ImageUrlProviders\ImageUrlProvider.cs" />
