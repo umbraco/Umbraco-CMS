@@ -3,10 +3,27 @@
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
-    <script language="javascript">
+    <script type="text/javascript">
         function doSubmit() {
             document.forms.aspnetForm.submit();
         }
+
+        //handles the change selection of the drop downs to populate the text box
+        (function($) {
+            $(document).ready(function () {
+                //on drop down change, update the text box and clear other text boxes
+                $("#Table2 td.propertyContent select").change(function() {
+                    //update the txt box
+                    var txt = $(this).prev("input[type='text']");
+                    txt.val($(this).val());
+                    //clear other text boxes
+                    $("#Table2 td.propertyContent input[type='text']").not(txt).val("");
+                    //reset other drop downs
+                    $("#Table2 td.propertyContent select").not($(this)).val("");
+                });                
+            });
+        })(jQuery);
+        
     </script>
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server">
@@ -32,11 +49,22 @@
         </table>
     </cc1:Pane>
     <cc1:Pane ID="Pane1_2" BackColor="mediumaquamarine" runat="server">
-        <table id="Table2" cellspacing="0" cellpadding="4" width="98%" border="0" runat="server">
+        <table id="Table2" cellspacing="0" cellpadding="4" width="98%" border="0">
             <tr>
                 <td class="propertyHeader" width="30%">
-                    <img alt="Xslt Icon" src="../../images/umbraco/developerXslt.gif" align="absMiddle">
-                    Use XSLT file
+                    <img alt="python Icon" src="../../images/umbraco/developerScript.gif" align="absMiddle" />
+                    Use MVC Partial View
+                </td>
+                <td class="propertyContent">
+                    <asp:TextBox ID="SelectedPartialView" runat="server" Width="230px" CssClass="guiInputText"></asp:TextBox>
+                    <asp:DropDownList ID="PartialViewList" runat="server" >
+                    </asp:DropDownList>
+                </td>
+            </tr>
+            <tr>
+                <td class="propertyHeader" width="30%">
+                    <img alt="Xslt Icon" src="../../images/umbraco/developerXslt.gif" align="absMiddle"/>
+                    or XSLT file
                 </td>
                 <td class="propertyContent">
                     <asp:TextBox ID="macroXslt" runat="server" Width="230px" CssClass="guiInputText"></asp:TextBox>
@@ -46,7 +74,7 @@
             </tr>
             <tr>
                 <td class="propertyHeader" width="30%">
-                    <img alt="User control Icon" src="../../images/developer/userControlIcon.png" align="absMiddle">
+                    <img alt="User control Icon" src="../../images/developer/userControlIcon.png" align="absMiddle"/>
                     or .NET User Control
                 </td>
                 <td class="propertyContent">
@@ -58,8 +86,7 @@
             </tr>
             <tr>
                 <td class="propertyHeader" valign="top" width="30%">
-                    <img alt="Custom Control Icon" src="../../images/developer/customControlIcon.png"
-                        align="absMiddle">
+                    <img alt="Custom Control Icon" src="../../images/developer/customControlIcon.png" align="absMiddle"/>
                     or .NET Custom Control
                 </td>
                 <td class="propertyContent">
@@ -72,7 +99,7 @@
             </tr>
             <tr>
                 <td class="propertyHeader" width="30%">
-                    <img alt="python Icon" src="../../images/umbraco/developerScript.gif" align="absMiddle">
+                    <img alt="python Icon" src="../../images/umbraco/developerScript.gif" align="absMiddle"/>
                     or script file
                 </td>
                 <td class="propertyContent">

@@ -11,5 +11,23 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros {
     
     
     public partial class EditMacro {
+        
+        /// <summary>
+        /// SelectedPartialView control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox SelectedPartialView;
+        
+        /// <summary>
+        /// PartialViewList control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList PartialViewList;
     }
 }

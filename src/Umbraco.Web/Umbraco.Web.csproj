@@ -255,11 +255,15 @@
     <Compile Include="Dynamics\Grouping.cs" />
     <Compile Include="Install\InstallPackageController.cs" />
     <Compile Include="Install\UmbracoInstallAuthorizeAttribute.cs" />
+    <Compile Include="Macros\PartialViewMacroController.cs" />
+    <Compile Include="Macros\PartialViewMacroEngine.cs" />
+    <Compile Include="Macros\PartialViewMacroPage.cs" />
     <Compile Include="Media\ImageUrl.cs" />
     <Compile Include="Media\ImageUrlProviderResolver.cs" />
     <Compile Include="Media\ImageUrlProviders\ImageUrlProvider.cs" />
     <Compile Include="Models\DynamicPublishedContent.cs" />
     <Compile Include="Models\DynamicPublishedContentList.cs" />
+    <Compile Include="Models\PartialViewMacroModel.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
     <Compile Include="BaseRest\Configuration\BaseRestSection.cs" />
     <Compile Include="BaseRest\BaseRestHandler.cs" />
@@ -328,6 +332,7 @@
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\DLRMacroResult.cs" />
     <Compile Include="umbraco.presentation\install\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -338,6 +343,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\LibraryCacheRefresher.cs" />
+    <Compile Include="umbraco.presentation\MacroCacheContent.cs" />
+    <Compile Include="umbraco.presentation\macroCacheRefresh.cs" />
+    <Compile Include="umbraco.presentation\ScriptingMacroResult.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -368,6 +376,7 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\templateControls\Image.cs" />
     <Compile Include="umbraco.presentation\umbraco\uQuery\IGetProperty.cs" />
+    <Compile Include="umbraco.presentation\XsltExtensionAttribute.cs" />
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="Mvc\ViewContextExtensions.cs" />
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />

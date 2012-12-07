@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Web;
@@ -12,8 +13,7 @@ using umbraco;
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
 using umbraco.cms.businesslogic.template;
-using ContentType = umbraco.cms.businesslogic.ContentType;
-using Template = umbraco.cms.businesslogic.template.Template;
+using umbraco.interfaces;
 
 namespace Umbraco.Web
 {
@@ -26,6 +26,18 @@ namespace Umbraco.Web
 	/// </remarks>
 	public static class PublishedContentExtensions
 	{
+
+		/// <summary>
+		/// Converts an INode to an IPublishedContent item
+		/// </summary>
+		/// <param name="node"></param>
+		/// <returns></returns>
+		internal static IPublishedContent ConvertFromNode(this INode node)
+		{
+			var umbHelper = new UmbracoHelper(UmbracoContext.Current);
+			return umbHelper.TypedContent(node.Id);
+		}
+
 		/// <summary>
 		/// Gets the NiceUrl for the content item
 		/// </summary>

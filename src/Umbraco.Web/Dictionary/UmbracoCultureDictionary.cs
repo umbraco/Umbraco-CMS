@@ -26,8 +26,7 @@ namespace Umbraco.Web.Dictionary
 				}
 				catch (Exception e)
 				{
-					var trace = UmbracoContext.Current != null ? UmbracoContext.Current.HttpContext.Trace : null;
-					LogHelper.Warn<DefaultCultureDictionary>("Error returning dictionary item '" + key + "'", trace, e);					
+					LogHelper.WarnWithException<DefaultCultureDictionary>("Error returning dictionary item '" + key + "'", true, e);		
 					return string.Empty;
 				}
 			}

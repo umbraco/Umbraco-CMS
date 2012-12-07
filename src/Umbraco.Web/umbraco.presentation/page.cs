@@ -41,23 +41,7 @@ namespace umbraco
 
 		readonly Hashtable _elements = new Hashtable();
 		readonly StringBuilder _pageContent = new StringBuilder();
-		Control _pageContentControl = new Control();
-
-		/// <summary>
-		/// Returns the trace context to use for debugging, this is for backwards compatibility as people may be execting some of this
-		/// information in the TraceContext.
-		/// </summary>
-		private TraceContext TraceContext
-		{
-			get
-			{
-				if (HttpContext.Current == null)
-				{
-					return null;
-				}
-				return HttpContext.Current.Trace;
-			}
-		}
+		Control _pageContentControl = new Control();	
 
 		#endregion
 
@@ -293,14 +277,14 @@ namespace umbraco
 				{
 					LogHelper.Debug<page>(
 						string.Format("Aliases must be unique, an element with alias \"{0}\" has already been loaded!", alias), 
-						TraceContext);					
+						true);					
 				}
 				else
 				{
 					_elements[alias] = value;
 					LogHelper.Debug<page>(
 						string.Format("Load element \"{0}\"", alias),
-						TraceContext);					
+						true);					
 				}
 			}
 		}
