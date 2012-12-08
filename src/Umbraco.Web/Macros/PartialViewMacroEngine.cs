@@ -12,6 +12,7 @@ using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
 using Umbraco.Web.Mvc;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Macros
 {
@@ -90,7 +91,8 @@ namespace Umbraco.Web.Macros
 		{
 			if (macro == null) throw new ArgumentNullException("macro");
 			if (currentPage == null) throw new ArgumentNullException("currentPage");
-
+			if (macro.ScriptName.IsNullOrWhiteSpace()) throw new ArgumentException("The ScriptName property of the macro object cannot be null or empty");
+		
 			if (!macro.ScriptName.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
 				&& (!Regex.IsMatch(macro.ScriptName, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled)))
 			{
