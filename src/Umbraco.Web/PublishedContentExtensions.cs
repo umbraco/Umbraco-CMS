@@ -9,6 +9,7 @@ using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Templates;
 using umbraco;
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
@@ -72,6 +73,114 @@ namespace Umbraco.Web
 			var template = Template.GetTemplate(doc.TemplateId);
 			return template.Alias;			
 		}
+
+		#region GetPropertyValue
+
+		/// <summary>
+		/// if the val is a string, ensures all internal local links are parsed
+		/// </summary>
+		/// <param name="val"></param>
+		/// <returns></returns>
+		internal static object GetValueWithParsedLinks(object val)
+		{
+			//if it is a string send it through the url parser
+			var text = val as string;
+			if (text != null)
+			{
+				return TemplateUtilities.ResolveUrlsFromTextString(
+					TemplateUtilities.ParseInternalLinks(text));
+			}
+			//its not a string
+			return val;
+		}
+
+		public static object GetPropertyValue(this IPublishedContent doc, string alias)
+		{
+			return doc.GetPropertyValue(alias, false);
+		}
+		public static object GetPropertyValue(this IPublishedContent doc, string alias, string fallback)
+		{
+			var prop = doc.GetPropertyValue(alias);
+			return (prop != null && !Convert.ToString(prop).IsNullOrWhiteSpace()) ? prop : fallback;
+		}
+		public static object GetPropertyValue(this IPublishedContent doc, string alias, bool recursive)
+		{
+			var p = doc.GetProperty(alias, recursive);
+			if (p == null) return null;
+
+			//Here we need to put the value through the IPropertyEditorValueConverter's
+			//get the data type id for the current property
+			var dataType = PublishedContentHelper.GetDataType(doc.DocumentTypeAlias, alias);
+			//convert the string value to a known type
+			var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, dataType, doc.DocumentTypeAlias, alias);
+			return converted.Success
+				       ? GetValueWithParsedLinks(converted.Result)
+				       : GetValueWithParsedLinks(p.Value);
+		}
+		public static object GetPropertyValue(this IPublishedContent doc, string alias, bool recursive, string fallback)
+		{
+			var prop = doc.GetPropertyValue(alias, recursive);
+			return (prop != null && !Convert.ToString(prop).IsNullOrWhiteSpace()) ? prop : fallback;
+		}
+
+		/// <summary>
+		/// Returns the property as the specified type, if the property is not found or does not convert
+		/// then the default value of type T is returned.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="doc"></param>
+		/// <param name="alias"></param>
+		/// <returns></returns>
+		public static T GetPropertyValue<T>(this IPublishedContent doc, string alias)
+		{
+			return doc.GetPropertyValue<T>(alias, default(T));
+		}
+
+		public static T GetPropertyValue<T>(this IPublishedContent prop, string alias, bool recursive, T ifCannotConvert)
+		{
+			var p = prop.GetProperty(alias, recursive);
+			if (p == null)
+				return ifCannotConvert;
+
+			//before we try to convert it manually, lets see if the PropertyEditorValueConverter does this for us
+			//Here we need to put the value through the IPropertyEditorValueConverter's
+			//get the data type id for the current property
+			var dataType = PublishedContentHelper.GetDataType(prop.DocumentTypeAlias, alias);
+			//convert the value to a known type
+			var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, dataType, prop.DocumentTypeAlias, alias);
+			object parsedLinksVal;
+			if (converted.Success)
+			{
+				parsedLinksVal = GetValueWithParsedLinks(converted.Result);
+
+				//if its successful, check if its the correct type and return it
+				if (parsedLinksVal is T)
+				{
+					return (T)parsedLinksVal;
+				}
+				//if that's not correct, try converting the converted type
+				var reConverted = converted.Result.TryConvertTo<T>();
+				if (reConverted.Success)
+				{
+					return reConverted.Result;
+				}
+			}
+
+			//first, parse links if possible
+			parsedLinksVal = GetValueWithParsedLinks(p.Value);
+			//last, if all the above has failed, we'll just try converting the raw value straight to 'T'
+			var manualConverted = parsedLinksVal.TryConvertTo<T>();
+			if (manualConverted.Success)
+				return manualConverted.Result;
+			return ifCannotConvert;
+		}
+
+		public static T GetPropertyValue<T>(this IPublishedContent prop, string alias, T ifCannotConvert)
+		{
+			return prop.GetPropertyValue<T>(alias, false, ifCannotConvert);
+		}
+
+		#endregion
 
 		#region Search
 		public static IEnumerable<IPublishedContent> Search(this IPublishedContent d, string term, bool useWildCards = true, string searchProvider = null)
