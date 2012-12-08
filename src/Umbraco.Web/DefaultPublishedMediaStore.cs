@@ -472,7 +472,11 @@ namespace Umbraco.Web
 
 			public override int TemplateId
 			{
-				get { return _templateId; }
+				get
+				{
+					//TODO: should probably throw a not supported exception since media doesn't actually support this.
+					return _templateId;
+				}
 			}
 
 			public override int SortOrder
