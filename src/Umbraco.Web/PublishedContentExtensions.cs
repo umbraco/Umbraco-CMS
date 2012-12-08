@@ -48,8 +48,19 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public static string NiceUrl(this IPublishedContent doc)
 		{
-			var umbHelper = new UmbracoHelper(UmbracoContext.Current);
-			return umbHelper.NiceUrl(doc.Id);
+			switch (doc.ItemType)
+			{
+				case PublishedItemType.Content:
+					var umbHelper = new UmbracoHelper(UmbracoContext.Current);
+					return umbHelper.NiceUrl(doc.Id);
+				case PublishedItemType.Media:
+					var prop = doc.GetProperty("umbracoFile");
+					if (prop == null)
+						throw new NotSupportedException("Cannot retreive a Url for a media item if there is no 'umbracoFile' property defined");
+					return prop.Value.ToString();
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
 		}
 
 		/// <summary>
@@ -59,8 +70,16 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public static string NiceUrlWithDomain(this IPublishedContent doc)
 		{
-			var umbHelper = new UmbracoHelper(UmbracoContext.Current);
-			return umbHelper.NiceUrlWithDomain(doc.Id);
+			switch (doc.ItemType)
+			{
+				case PublishedItemType.Content:
+					var umbHelper = new UmbracoHelper(UmbracoContext.Current);
+					return umbHelper.NiceUrlWithDomain(doc.Id);
+				case PublishedItemType.Media:
+					throw new NotSupportedException("NiceUrlWithDomain is not supported for media types");
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
 		}
 
 		/// <summary>
@@ -71,7 +90,7 @@ namespace Umbraco.Web
 		public static string GetTemplateAlias(this IPublishedContent doc)
 		{
 			var template = Template.GetTemplate(doc.TemplateId);
-			return template.Alias;			
+			return template.Alias;
 		}
 
 		#region GetPropertyValue
@@ -114,8 +133,8 @@ namespace Umbraco.Web
 			//convert the string value to a known type
 			var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, dataType, doc.DocumentTypeAlias, alias);
 			return converted.Success
-				       ? GetValueWithParsedLinks(converted.Result)
-				       : GetValueWithParsedLinks(p.Value);
+					   ? GetValueWithParsedLinks(converted.Result)
+					   : GetValueWithParsedLinks(p.Value);
 		}
 		public static object GetPropertyValue(this IPublishedContent doc, string alias, bool recursive, string fallback)
 		{
@@ -228,7 +247,7 @@ namespace Umbraco.Web
 
 			var results = s.Search(criteria);
 			return results.ConvertSearchResultToPublishedContent(PublishedContentStoreResolver.Current.PublishedContentStore);
-		} 
+		}
 		#endregion
 
 		#region List Extensions
@@ -334,7 +353,7 @@ namespace Umbraco.Web
 			{
 				throw new IndexOutOfRangeException(string.Format("Node {0} belongs to a DynamicDocumentList but could not retrieve the index for it's position in the list", content.Id));
 			}
-		} 
+		}
 		#endregion
 
 		#region Is Helpers
@@ -832,8 +851,8 @@ namespace Umbraco.Web
 		{
 			//get the root docs if parent is null
 			var ownersList = content.Parent == null
-				                 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-				                 : content.Parent.Children;
+								 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
+								 : content.Parent.Children;
 
 			var container = ownersList.ToList();
 			var currentIndex = container.FindIndex(n => n.Id == content.Id);
@@ -848,16 +867,16 @@ namespace Umbraco.Web
 		{
 			//get the root docs if parent is null
 			var ownersList = content.Parent == null
-				                 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-				                 : content.Parent.Children;
+								 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
+								 : content.Parent.Children;
 
 			var container = ownersList.ToList();
 			var currentIndex = container.FindIndex(n => n.Id == content.Id);
 			if (currentIndex != -1)
 			{
 				var newIndex = container.FindIndex(currentIndex, n => n.DocumentTypeAlias == nodeTypeAlias);
-				return newIndex != -1 
-					? container.ElementAt(newIndex) 
+				return newIndex != -1
+					? container.ElementAt(newIndex)
 					: null;
 			}
 			throw new IndexOutOfRangeException(string.Format("Node {0} belongs to a DynamicNodeList but could not retrieve the index for it's position in the list", content.Id));
@@ -885,8 +904,8 @@ namespace Umbraco.Web
 		{
 			//get the root docs if parent is null
 			var ownersList = content.Parent == null
-				                 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-				                 : content.Parent.Children;
+								 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
+								 : content.Parent.Children;
 
 			var container = ownersList.ToList();
 			int currentIndex = container.FindIndex(n => n.Id == content.Id);
@@ -921,8 +940,8 @@ namespace Umbraco.Web
 		{
 			//get the root docs if parent is null
 			var ownersList = content.Parent == null
-				                 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-				                 : content.Parent.Children;
+								 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
+								 : content.Parent.Children;
 
 			var container = ownersList.ToList();
 			var currentIndex = container.FindIndex(n => n.Id == content.Id);
@@ -959,7 +978,7 @@ namespace Umbraco.Web
 		public static IEnumerable<IPublishedContent> Children(this IPublishedContent p)
 		{
 			return p.Children;
-		} 
+		}
 
 		/// <summary>
 		/// Returns a DataTable object for the IPublishedContent
@@ -981,10 +1000,10 @@ namespace Umbraco.Web
 		private static DataTable GenerateDataTable(IPublishedContent node, string nodeTypeAliasFilter = "")
 		{
 			var firstNode = nodeTypeAliasFilter.IsNullOrWhiteSpace()
-			                	? node.Children.Any()
-			                	  	? node.Children.ElementAt(0)
-			                	  	: null
-			                	: node.Children.FirstOrDefault(x => x.DocumentTypeAlias == nodeTypeAliasFilter);
+								? node.Children.Any()
+									? node.Children.ElementAt(0)
+									: null
+								: node.Children.FirstOrDefault(x => x.DocumentTypeAlias == nodeTypeAliasFilter);
 			if (firstNode == null)
 				return new DataTable(); //no children found 
 
@@ -998,19 +1017,19 @@ namespace Umbraco.Web
 				alias => GetPropertyAliasesAndNames(alias),
 				//pass in a callback to populate the datatable, yup its a bit ugly but it's already legacy and we just want to maintain code in one place.
 				() =>
+				{
+					//create all row data
+					var tableData = Umbraco.Core.DataTableExtensions.CreateTableData();
+					//loop through each child and create row data for it
+					foreach (var n in node.Children)
 					{
-						//create all row data
-						var tableData = Umbraco.Core.DataTableExtensions.CreateTableData();
-						//loop through each child and create row data for it
-						foreach (var n in node.Children)
+						if (!nodeTypeAliasFilter.IsNullOrWhiteSpace())
 						{
-							if (!nodeTypeAliasFilter.IsNullOrWhiteSpace())
-							{
-								if (n.DocumentTypeAlias != nodeTypeAliasFilter)
-									continue; //skip this one, it doesn't match the filter
-							}
+							if (n.DocumentTypeAlias != nodeTypeAliasFilter)
+								continue; //skip this one, it doesn't match the filter
+						}
 
-							var standardVals = new Dictionary<string, object>()
+						var standardVals = new Dictionary<string, object>()
 								{
 									{"Id", n.Id},
 									{"NodeName", n.Name},
@@ -1021,22 +1040,22 @@ namespace Umbraco.Web
 									{"WriterName", n.WriterName},
 									{"Url", urlProvider.GetNiceUrl(n.Id)}
 								};
-							var userVals = new Dictionary<string, object>();
-							foreach (var p in from IPublishedContentProperty p in n.Properties where p.Value != null select p)
-							{
-								userVals[p.Alias] = p.Value;
-							}
-							//add the row data
-							Umbraco.Core.DataTableExtensions.AddRowData(tableData, standardVals, userVals);
+						var userVals = new Dictionary<string, object>();
+						foreach (var p in from IPublishedContentProperty p in n.Properties where p.Value != null select p)
+						{
+							userVals[p.Alias] = p.Value;
 						}
-						return tableData;
+						//add the row data
+						Umbraco.Core.DataTableExtensions.AddRowData(tableData, standardVals, userVals);
 					}
+					return tableData;
+				}
 				);
 			return dt;
 		}
 
 		private static Func<string, Dictionary<string, string>> _getPropertyAliasesAndNames;
-		
+
 		/// <summary>
 		/// This is used only for unit tests to set the delegate to look up aliases/names dictionary of a content type
 		/// </summary>
