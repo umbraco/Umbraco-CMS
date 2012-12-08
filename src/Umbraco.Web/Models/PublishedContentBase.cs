@@ -19,15 +19,30 @@ namespace Umbraco.Web.Models
 		/// <summary>
 		/// Returns the Url for this content item
 		/// </summary>
+		/// <remarks>
+		/// If this item type is media, the Url that is returned is the Url computed by the NiceUrlProvider, otherwise if it is media
+		/// the Url returned is the value found in the 'umbracoFile' property.
+		/// </remarks>
 		public virtual string Url
 		{
 			get
 			{
-				if (UmbracoContext.Current == null)
-					throw new InvalidOperationException("Cannot resolve a Url for a content item with a null UmbracoContext.Current reference");
-				if (UmbracoContext.Current.NiceUrlProvider == null)
-					throw new InvalidOperationException("Cannot resolve a Url for a content item with a null UmbracoContext.Current.NiceUrlProvider reference");
-				return UmbracoContext.Current.NiceUrlProvider.GetNiceUrl(this.Id);
+				switch (ItemType)
+				{
+					case PublishedItemType.Content:
+						if (UmbracoContext.Current == null)
+							throw new InvalidOperationException("Cannot resolve a Url for a content item with a null UmbracoContext.Current reference");
+						if (UmbracoContext.Current.NiceUrlProvider == null)
+							throw new InvalidOperationException("Cannot resolve a Url for a content item with a null UmbracoContext.Current.NiceUrlProvider reference");
+						return UmbracoContext.Current.NiceUrlProvider.GetNiceUrl(this.Id);
+					case PublishedItemType.Media:
+						var prop = GetProperty("umbracoFile");
+						if (prop == null)
+							throw new NotSupportedException("Cannot retreive a Url for a media item if there is no 'umbracoFile' property defined");
+						return prop.Value.ToString();
+					default:
+						throw new ArgumentOutOfRangeException();
+				}
 			}
 		}
 
@@ -47,7 +62,7 @@ namespace Umbraco.Web.Models
 		public abstract DateTime CreateDate { get; }
 		public abstract DateTime UpdateDate { get; }
 		public abstract Guid Version { get; }
-		public abstract int Level { get; }	
+		public abstract int Level { get; }
 		public abstract ICollection<IPublishedContentProperty> Properties { get; }
 
 		/// <summary>
