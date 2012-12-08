@@ -46,7 +46,18 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="doc"></param>
 		/// <returns></returns>
+		[Obsolete("NiceUrl() is obsolete, use the Url() method instead")]
 		public static string NiceUrl(this IPublishedContent doc)
+		{
+			return doc.Url();
+		}
+
+		/// <summary>
+		/// Gets the Url for the content item
+		/// </summary>
+		/// <param name="doc"></param>
+		/// <returns></returns>
+		public static string Url(this IPublishedContent doc)
 		{
 			switch (doc.ItemType)
 			{
@@ -68,7 +79,18 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="doc"></param>
 		/// <returns></returns>
+		[Obsolete("NiceUrlWithDomain() is obsolete, use the UrlWithDomain() method instead")]
 		public static string NiceUrlWithDomain(this IPublishedContent doc)
+		{
+			return doc.UrlWithDomain();
+		}
+
+		/// <summary>
+		/// Gets the UrlWithDomain for the content item
+		/// </summary>
+		/// <param name="doc"></param>
+		/// <returns></returns>
+		public static string UrlWithDomain(this IPublishedContent doc)
 		{
 			switch (doc.ItemType)
 			{
