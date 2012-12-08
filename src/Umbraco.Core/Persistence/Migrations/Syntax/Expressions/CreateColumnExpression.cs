@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Core.Persistence.Migrations.Model;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions

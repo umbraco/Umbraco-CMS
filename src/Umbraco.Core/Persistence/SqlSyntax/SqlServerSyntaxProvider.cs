@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Persistence.Migrations.Model;
+﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
@@ -43,12 +43,12 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return result > 0;
         }
 
-        protected override string FormatIdentity(Migrations.Model.ColumnDefinition column)
+        protected override string FormatIdentity(ColumnDefinition column)
         {
             return column.IsIdentity ? GetIdentityString(column) : string.Empty;
         }
 
-        private static string GetIdentityString(Migrations.Model.ColumnDefinition column)
+        private static string GetIdentityString(ColumnDefinition column)
         {
             return "IDENTITY(1,1)";
         }
