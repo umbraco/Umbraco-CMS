@@ -7,9 +7,23 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Tests.Persistence
 {
-    [TestFixture]
+	[TestFixture]
     public class RepositoryResolverTests
     {
+
+		[SetUp]
+		public void Setup()
+		{
+			RepositoryInstanceResolver.Current = new RepositoryInstanceResolver(
+				new RepositoryInstanceFactory());
+		}
+
+		[TearDown]
+		public void Teardown()
+		{
+			RepositoryInstanceResolver.Reset();
+		}
+
         [Test]
         public void Can_Resolve_All_Repositories()
         {

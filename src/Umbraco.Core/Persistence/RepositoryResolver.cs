@@ -10,7 +10,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence
 {
-    internal class RepositoryResolver
+	internal class RepositoryResolver
     {
         private static readonly ConcurrentDictionary<string, object> Repositories = new ConcurrentDictionary<string, object>();
 
@@ -32,47 +32,52 @@ namespace Umbraco.Core.Persistence
             string interfaceShortName = typeof(TRepository).Name;
             string entityTypeName = typeof(TEntity).Name;
 
-            //Check if the repository has already been created and is in the cache
-            if (Repositories.ContainsKey(interfaceShortName))
-            {
-                repository = (TRepository)Repositories[interfaceShortName];
-                if (unitOfWork != null && (typeof(IRepository<TId, TEntity>).IsInstanceOfType(repository)))
-                {
-                    repository.SetUnitOfWork(unitOfWork);
-                }
-                return repository;
-            }
-            
-            var settings = Infrastructure.Instance.Repositories;
+			//Check if the repository has already been created and is in the cache
+			//SD: Changed to TryGetValue as this will be a bit quicker since if we do a ContainsKey and then resolve,
+			// the underlying ConcurrentDictionary does this twice and thus does two locks.
+	        object repositoryObject;
+			if (Repositories.TryGetValue(interfaceShortName, out repositoryObject))
+			{
+				repository = (TRepository)repositoryObject;
+				if (unitOfWork != null && (typeof(IRepository<TId, TEntity>).IsInstanceOfType(repository)))
+				{
+					repository.SetUnitOfWork(unitOfWork);
+				}
+				return repository;
+			}
 
-            Type repositoryType = null;
+	        repository = RepositoryInstanceResolver.Current.ResolveByType<TRepository>(unitOfWork);
 
-            //Check if a valid interfaceShortName was passed in
-            if (settings.Repository.ContainsKey(interfaceShortName))
-            {
-                repositoryType = Type.GetType(settings.Repository[interfaceShortName].RepositoryFullTypeName);
-            }
-            else
-            {
-                foreach (Repository element in settings.Repository)
-                {
-                    if (element.InterfaceShortTypeName.Contains(entityTypeName))
-                    {
-                        repositoryType = Type.GetType(settings.Repository[element.InterfaceShortTypeName].RepositoryFullTypeName);
-                        break;
-                    }
-                }
-            }
+			//var settings = Infrastructure.Instance.Repositories;
 
-            //If the repository type is null we should stop and throw an exception
-            if (repositoryType == null)
-            {
-                throw new Exception(string.Format("No repository matching the Repository interface '{0}' or Entity type '{1}' could be resolved",
-                interfaceShortName, entityTypeName));
-            }
+			//Type repositoryType = null;
 
-            //Resolve the repository with its constructor dependencies
-            repository = Resolve(repositoryType, unitOfWork, interfaceShortName) as TRepository;
+			////Check if a valid interfaceShortName was passed in
+			//if (settings.Repository.ContainsKey(interfaceShortName))
+			//{
+			//	repositoryType = Type.GetType(settings.Repository[interfaceShortName].RepositoryFullTypeName);
+			//}
+			//else
+			//{
+			//	foreach (Repository element in settings.Repository)
+			//	{
+			//		if (element.InterfaceShortTypeName.Contains(entityTypeName))
+			//		{
+			//			repositoryType = Type.GetType(settings.Repository[element.InterfaceShortTypeName].RepositoryFullTypeName);
+			//			break;
+			//		}
+			//	}
+			//}
+
+			////If the repository type is null we should stop and throw an exception
+			//if (repositoryType == null)
+			//{
+			//	throw new Exception(string.Format("No repository matching the Repository interface '{0}' or Entity type '{1}' could be resolved",
+			//	interfaceShortName, entityTypeName));
+			//}
+
+			////Resolve the repository with its constructor dependencies
+			//repository = Resolve(repositoryType, unitOfWork, interfaceShortName) as TRepository;
 
             //Add the new repository instance to the cache
             Repositories.AddOrUpdate(interfaceShortName, repository, (x, y) => repository);
