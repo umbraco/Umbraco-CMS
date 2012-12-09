@@ -383,9 +383,7 @@
     <Compile Include="Persistence\Repositories\TemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\UserRepository.cs" />
     <Compile Include="Persistence\Repositories\UserTypeRepository.cs" />
-    <Compile Include="Persistence\RepositoryInstanceFactory.cs" />
-    <Compile Include="Persistence\RepositoryInstanceResolver.cs" />
-    <Compile Include="Persistence\RepositoryInstanceTypeAttribute.cs" />
+    <Compile Include="Persistence\RepositoryFactory.cs" />
     <Compile Include="Persistence\RepositoryResolver.cs" />
     <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />
     <Compile Include="Persistence\SqlSyntax\ISqlSyntaxProvider.cs" />

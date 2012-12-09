@@ -167,7 +167,6 @@
     <Compile Include="Migrations\Stubs\FourNineMigration.cs" />
     <Compile Include="Persistence\Querying\ContentRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\Querying\ContentTypeRepositorySqlClausesTest.cs" />
-    <Compile Include="Persistence\RepositoryInstanceResolverTests.cs" />
     <Compile Include="PublishedContent\DynamicXmlTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
     <Compile Include="PublishedContent\PublishedContentTests.cs" />

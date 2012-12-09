@@ -36,8 +36,8 @@ namespace Umbraco.Tests.TestHelpers
 
             UmbracoSettings.UseLegacyXmlSchema = false;
 
-			RepositoryInstanceResolver.Current = new RepositoryInstanceResolver(
-				new RepositoryInstanceFactory());
+			RepositoryResolver.Current = new RepositoryResolver(
+				new RepositoryFactory());
 
             //Delete database file before continueing
             string filePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
@@ -77,7 +77,7 @@ namespace Umbraco.Tests.TestHelpers
             ServiceContext = null;
             Resolution.IsFrozen = false;
 
-			RepositoryInstanceResolver.Reset();
+			RepositoryResolver.Reset();
 
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", null);

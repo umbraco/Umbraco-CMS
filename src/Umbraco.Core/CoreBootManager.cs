@@ -97,8 +97,8 @@ namespace Umbraco.Core
 		/// </summary>
 		protected virtual void InitializeResolvers()
 		{
-			RepositoryInstanceResolver.Current = new RepositoryInstanceResolver(
-				new RepositoryInstanceFactory());
+			RepositoryResolver.Current = new RepositoryResolver(
+				new RepositoryFactory());
 
 			CacheRefreshersResolver.Current = new CacheRefreshersResolver(
 				PluginManager.Current.ResolveCacheRefreshers());

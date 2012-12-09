@@ -13,6 +13,9 @@ namespace Umbraco.Core.Services
     {
         private readonly IUnitOfWork _fileUnitOfWork;
         private readonly IUnitOfWork _dataUnitOfWork;
+	    private readonly IStylesheetRepository _stylesheetRepository;
+	    private readonly IScriptRepository _scriptRepository;
+	    private readonly ITemplateRepository _templateRepository;
 
         public FileService() : this(new FileUnitOfWorkProvider(), new PetaPocoUnitOfWorkProvider())
         {
@@ -22,6 +25,9 @@ namespace Umbraco.Core.Services
         {
             _fileUnitOfWork = fileProvider.GetUnitOfWork();
             _dataUnitOfWork = dataProvider.GetUnitOfWork();
+	        _templateRepository = RepositoryResolver.Current.Factory.CreateTemplateRepository(_dataUnitOfWork);
+	        _stylesheetRepository = RepositoryResolver.Current.Factory.CreateStylesheetRepository(_fileUnitOfWork);
+	        _scriptRepository = RepositoryResolver.Current.Factory.CreateScriptRepository(_fileUnitOfWork);
         }
 
         /// <summary>
@@ -30,7 +36,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Stylesheet"/> objects</returns>
         public IEnumerable<Stylesheet> GetStylesheets(params string[] names)
         {
-            var repository = RepositoryResolver.ResolveByType<IStylesheetRepository>(_fileUnitOfWork);
+            var repository = _stylesheetRepository;
             return repository.GetAll(names);
         }
 
@@ -41,7 +47,7 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="Stylesheet"/> object</returns>
         public Stylesheet GetStylesheetByName(string name)
         {
-            var repository = RepositoryResolver.ResolveByType<IStylesheetRepository>(_fileUnitOfWork);
+            var repository = _stylesheetRepository;
             return repository.Get(name);
         }
 
@@ -51,7 +57,7 @@ namespace Umbraco.Core.Services
         /// <param name="stylesheet"><see cref="Stylesheet"/> to save</param>
         public void SaveStylesheet(Stylesheet stylesheet)
         {
-            var repository = RepositoryResolver.ResolveByType<IStylesheetRepository>(_fileUnitOfWork);
+            var repository = _stylesheetRepository;
             repository.AddOrUpdate(stylesheet);
             _fileUnitOfWork.Commit();
         }
@@ -62,7 +68,7 @@ namespace Umbraco.Core.Services
         /// <param name="name">Name incl. extension of the Stylesheet to delete</param>
         public void DeleteStylesheet(string name)
         {
-            var repository = RepositoryResolver.ResolveByType<IStylesheetRepository>(_fileUnitOfWork);
+            var repository = _stylesheetRepository;
             var stylesheet = repository.Get(name);
             repository.Delete(stylesheet);
             _fileUnitOfWork.Commit();
@@ -84,7 +90,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Script"/> objects</returns>
         public IEnumerable<Script> GetScripts(params string[] names)
         {
-            var repository = RepositoryResolver.ResolveByType<IScriptRepository>(_fileUnitOfWork);
+            var repository = _scriptRepository;
             return repository.GetAll(names);
         }
 
@@ -95,7 +101,7 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="Script"/> object</returns>
         public Script GetScriptByName(string name)
         {
-            var repository = RepositoryResolver.ResolveByType<IScriptRepository>(_fileUnitOfWork);
+            var repository = _scriptRepository;
             return repository.Get(name);
         }
 
@@ -105,7 +111,7 @@ namespace Umbraco.Core.Services
         /// <param name="script"><see cref="Script"/> to save</param>
         public void SaveScript(Script script)
         {
-            var repository = RepositoryResolver.ResolveByType<IScriptRepository>(_fileUnitOfWork);
+            var repository = _scriptRepository;
             repository.AddOrUpdate(script);
             _fileUnitOfWork.Commit();
         }
@@ -116,7 +122,7 @@ namespace Umbraco.Core.Services
         /// <param name="name">Name incl. extension of the Script to delete</param>
         public void DeleteScript(string name)
         {
-            var repository = RepositoryResolver.ResolveByType<IScriptRepository>(_fileUnitOfWork);
+            var repository = _scriptRepository;
             var script = repository.Get(name);
             repository.Delete(script);
             _fileUnitOfWork.Commit();
@@ -138,7 +144,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
         public IEnumerable<ITemplate> GetTemplates(params string[] aliases)
         {
-            var repository = RepositoryResolver.ResolveByType<ITemplateRepository>(_dataUnitOfWork);
+            var repository = _templateRepository;
             return repository.GetAll(aliases);
         }
 
@@ -149,7 +155,7 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="Template"/> object</returns>
         public ITemplate GetTemplateByAlias(string alias)
         {
-            var repository = RepositoryResolver.ResolveByType<ITemplateRepository>(_dataUnitOfWork);
+            var repository = _templateRepository;
             return repository.Get(alias);
         }
 
@@ -159,7 +165,7 @@ namespace Umbraco.Core.Services
         /// <param name="template"><see cref="Template"/> to save</param>
         public void SaveTemplate(ITemplate template)
         {
-            var repository = RepositoryResolver.ResolveByType<ITemplateRepository>(_dataUnitOfWork);
+            var repository = _templateRepository;
             repository.AddOrUpdate(template);
             _dataUnitOfWork.Commit();
         }
@@ -170,7 +176,7 @@ namespace Umbraco.Core.Services
         /// <param name="alias">Alias of the <see cref="ITemplate"/> to delete</param>
         public void DeleteTemplate(string alias)
         {
-            var repository = RepositoryResolver.ResolveByType<ITemplateRepository>(_dataUnitOfWork);
+            var repository = _templateRepository;
             var template = repository.Get(alias);
             repository.Delete(template);
             _dataUnitOfWork.Commit();

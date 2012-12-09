@@ -13,6 +13,7 @@ namespace Umbraco.Core.Services
     internal class MacroService : IMacroService
     {
         private readonly IUnitOfWork _unitOfWork;
+	    private readonly IMacroRepository _macroRepository;
 
         public MacroService()
             : this(new FileUnitOfWorkProvider())
@@ -22,6 +23,7 @@ namespace Umbraco.Core.Services
         public MacroService(IUnitOfWorkProvider provider)
         {
             _unitOfWork = provider.GetUnitOfWork();
+	        _macroRepository = RepositoryResolver.Current.Factory.CreateMacroRepository(_unitOfWork);
         }
 
         public MacroService(IUnitOfWorkProvider provider, bool ensureCachedMacros)
@@ -48,7 +50,7 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IMacro"/> object</returns>
         public IMacro GetByAlias(string alias)
         {
-            var repository = RepositoryResolver.ResolveByType<IMacroRepository>(_unitOfWork);
+            var repository = _macroRepository;
             return repository.Get(alias);
         }
 
@@ -59,7 +61,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IMacro"/> objects</returns>
         public IEnumerable<IMacro> GetAll(params string[] aliases)
         {
-            var repository = RepositoryResolver.ResolveByType<IMacroRepository>(_unitOfWork);
+            var repository = _macroRepository;
             return repository.GetAll(aliases);
         }
 
@@ -69,7 +71,7 @@ namespace Umbraco.Core.Services
         /// <param name="macro"><see cref="IMacro"/> to delete</param>
         public void Delete(IMacro macro)
         {
-            var repository = RepositoryResolver.ResolveByType<IMacroRepository>(_unitOfWork);
+            var repository = _macroRepository;
             repository.Delete(macro);
             _unitOfWork.Commit();
         }
@@ -80,7 +82,7 @@ namespace Umbraco.Core.Services
         /// <param name="macro"><see cref="IMacro"/> to save</param>
         public void Save(IMacro macro)
         {
-            var repository = RepositoryResolver.ResolveByType<IMacroRepository>(_unitOfWork);
+            var repository = _macroRepository;
             repository.AddOrUpdate(macro);
             _unitOfWork.Commit();
         }
