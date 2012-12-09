@@ -44,7 +44,6 @@ namespace umbraco
         public bool Save()
         {
             int masterId = ParentID;
-            BusinessLogic.Log.Add(LogTypes.Debug, -1, "tp id:" + masterId.ToString());
 
             var editor = "settings/editTemplate.aspx";
             if(Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)

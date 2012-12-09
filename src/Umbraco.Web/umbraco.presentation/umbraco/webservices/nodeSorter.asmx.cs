@@ -3,6 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Web.Script.Services;
 using System.Web.Services;
+using Umbraco.Core.Logging;
 using umbraco.BasePages;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
@@ -150,7 +151,7 @@ namespace umbraco.presentation.webservices
             }
             catch (Exception ex)
             {
-                BusinessLogic.Log.Add(global::umbraco.BusinessLogic.LogTypes.Debug, ParentId, ex.ToString());
+				LogHelper.Error<nodeSorter>("An error occurred", ex);
             }
 
         }

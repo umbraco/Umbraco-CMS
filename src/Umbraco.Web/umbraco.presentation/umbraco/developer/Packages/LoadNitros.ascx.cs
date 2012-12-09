@@ -9,6 +9,7 @@ using System.Collections;
 using System.Web.UI;
 using System.Web.UI.WebControls.WebParts;
 using System.Collections.Generic;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 
 namespace umbraco.presentation.developer.packages {
@@ -159,28 +160,33 @@ namespace umbraco.presentation.developer.packages {
             fb.Text = "<strong>No connection to repository.</strong> Modules could not be fetched from the repository as there was no connection to: '" + repo.RepositoryUrl + "'";
 
 
-            if (repo.HasConnection()) {
-                try {
+			if (repo.HasConnection())
+			{
+				try
+				{
 
-                    if(UmbracoSettings.UseLegacyXmlSchema)
-                        rep_nitros.DataSource = repo.Webservice.NitrosCategorizedByVersion(cms.businesslogic.packager.repositories.Version.Version4);
-                    else
-                        rep_nitros.DataSource = repo.Webservice.NitrosCategorizedByVersion(cms.businesslogic.packager.repositories.Version.Version41);
-                    
-                    rep_nitros.DataBind();
-                } catch (Exception ex) {
+					if (UmbracoSettings.UseLegacyXmlSchema)
+						rep_nitros.DataSource = repo.Webservice.NitrosCategorizedByVersion(cms.businesslogic.packager.repositories.Version.Version4);
+					else
+						rep_nitros.DataSource = repo.Webservice.NitrosCategorizedByVersion(cms.businesslogic.packager.repositories.Version.Version41);
 
-                    Log.Add(LogTypes.Debug, -1, ex.ToString());
+					rep_nitros.DataBind();
+				}
+				catch (Exception ex)
+				{
+					LogHelper.Error<LoadNitros>("An error occurred", ex);
 
-                    loadNitros.Controls.Clear();
-                    loadNitros.Controls.Add(fb);
-                    //nitroList.Visible = false;
-                    //lt_status.Text = "<div class='error'><p>Nitros could not be fetched from the repository. Please check your internet connection</p><p>You can always install Nitros later in the packages section</p><p>" + ex.ToString() + "</p></div>";
-                }
-            } else {
-                loadNitros.Controls.Clear();
-                loadNitros.Controls.Add(fb);
-            }
+					loadNitros.Controls.Clear();
+					loadNitros.Controls.Add(fb);
+					//nitroList.Visible = false;
+					//lt_status.Text = "<div class='error'><p>Nitros could not be fetched from the repository. Please check your internet connection</p><p>You can always install Nitros later in the packages section</p><p>" + ex.ToString() + "</p></div>";
+				}
+			}
+			else
+			{
+				loadNitros.Controls.Clear();
+				loadNitros.Controls.Add(fb);
+			}
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Xml;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.property;
@@ -1161,7 +1162,7 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "'%'"));
                 SqlHelper.ExecuteNonQuery("update cmsDocument set published = 0 where nodeId = " + Id);
                 SqlHelper.ExecuteNonQuery("update cmsDocument set published = 1 where versionId = @versionId", SqlHelper.CreateParameter("@versionId", tempVersion));
 
-                BusinessLogic.Log.Add(LogTypes.Debug, -1, newVersion.ToString() + " - " + Id.ToString());
+				LogHelper.Debug<Document>("PublishWithSubs: " + newVersion.ToString() + " - " + Id.ToString());
 
                 // Update xml in db
                 XmlGenerate(new XmlDocument());

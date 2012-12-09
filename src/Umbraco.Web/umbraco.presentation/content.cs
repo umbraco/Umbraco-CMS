@@ -1085,7 +1085,7 @@ namespace umbraco
 
                 try
                 {
-                    Log.Add(LogTypes.Debug, staticUser, -1, "Republishing starting");
+					LogHelper.Debug<content>("Republishing starting");
 
                     // Lets cache the DTD to save on the DB hit on the subsequent use
                     string dtd = DocumentType.GenerateDtd();
@@ -1155,7 +1155,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                         }
                     }
 
-                    Log.Add(LogTypes.Debug, staticUser, -1, "Xml Pages loaded");
+					LogHelper.Debug<content>("Xml Pages loaded");
 
                     try
                     {
@@ -1170,7 +1170,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                         // Start building the content tree recursively from the root (-1) node
                         GenerateXmlDocument(hierarchy, nodeIndex, -1, xmlDoc.DocumentElement);
 
-                        Log.Add(LogTypes.Debug, staticUser, -1, "Done republishing Xml Index");
+						LogHelper.Debug<content>("Done republishing Xml Index");
 
                         return xmlDoc;
                     }
@@ -1294,7 +1294,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                                                   Thread.CurrentThread.Name, stopWatch.Elapsed,
                                                   Thread.CurrentThread.IsThreadPoolThread));
 
-                        Log.Add(LogTypes.Debug, staticUser, -1, string.Format("Xml saved in {0}", stopWatch.Elapsed));
+						LogHelper.Debug<content>(string.Format("Xml saved in {0}", stopWatch.Elapsed));
                     }
                     catch (Exception ee)
                     {
@@ -1364,10 +1364,8 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         {
             if (xmlDoc == null) return null;
 
-            Log.Add(LogTypes.Debug, -1, "Cloning...");
             // Save copy of content
             var xmlCopy = (XmlDocument)xmlDoc.CloneNode(true);
-            Log.Add(LogTypes.Debug, -1, "Cloning ended...");
             return xmlCopy;
         }
 

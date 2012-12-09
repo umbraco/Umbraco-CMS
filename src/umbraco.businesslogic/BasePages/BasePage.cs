@@ -174,8 +174,8 @@ namespace umbraco.BasePages
                 {
                     return true;
                 }
-
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.Logout, BusinessLogic.User.GetUser(uid), -1, "");
+	            var user = BusinessLogic.User.GetUser(uid);
+				LogHelper.Info<BasePage>("User {0} (Id:{1}) logged out", () => user.Name, () => user.Id);
             }
             return false;
         }
@@ -334,7 +334,9 @@ namespace umbraco.BasePages
                                       "') ",
                                       SqlHelper.CreateParameter("@contextId", retVal));
             umbracoUserContextID = retVal.ToString();
-            BusinessLogic.Log.Add(BusinessLogic.LogTypes.Login, u, -1, "");
+
+			LogHelper.Info<BasePage>("User {0} (Id: {1}) logged in", () => u.Name, () => u.Id);
+
         }
 
 

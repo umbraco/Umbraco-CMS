@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.skinning;
 using System.Xml;
 using System.Text;
@@ -184,7 +185,7 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
                 }
                 catch (Exception exception)
                 {
-                    Log.Add(LogTypes.Debug, -1, exception.ToString());
+                    LogHelper.Error<SkinCustomizer>("An error occurred", exception);
                 }
             }
             else

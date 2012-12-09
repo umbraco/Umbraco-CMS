@@ -458,7 +458,6 @@ namespace umbraco.cms.businesslogic.packager
                     if (n.Attributes["undo"] == null || n.Attributes["undo"].Value == "true")
                     {
                         insPack.Data.Actions += n.OuterXml;
-                        Log.Add(LogTypes.Debug, -1, HttpUtility.HtmlEncode(n.OuterXml));
                     }
 
                     if (n.Attributes["runat"] != null && n.Attributes["runat"].Value == "install")

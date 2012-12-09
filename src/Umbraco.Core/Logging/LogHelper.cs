@@ -52,10 +52,16 @@ namespace Umbraco.Core.Logging
 		/// <param name="exception"></param>
 		public static void Error<T>(string message, Exception exception)
 		{
-			var logger = LoggerFor<T>();
+			Error(typeof (T), message, exception);
+		}
+
+		public static void Error(Type callingType, string message, Exception exception)
+		{
+			var logger = LogManager.GetLogger(callingType);
 			if (logger != null)
 				logger.Error(PrefixThreadId(message), exception);
 		}
+
 		#endregion
 
 		#region Warn		

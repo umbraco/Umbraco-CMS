@@ -55,7 +55,6 @@ namespace umbraco.cms.presentation.create.controls
 					nodeId,
 					rename.Text);
 
-                Log.Add(LogTypes.Debug, -1, "return:" + returnUrl);
 
 				BasePage.Current.ClientTools
 					.ChangeContentFrameUrl(returnUrl)

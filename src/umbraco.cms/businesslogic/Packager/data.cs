@@ -4,6 +4,7 @@ using System.Xml.XPath;
 using System.Collections.Generic;
 using System.IO;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 
 namespace umbraco.cms.businesslogic.packager
 {
@@ -178,15 +179,19 @@ namespace umbraco.cms.businesslogic.packager
 
             List<PackageInstance> retVal = new List<PackageInstance>();
 
-            for (int i = 0; i < nList.Count; i++) {
-                try {
-                    retVal.Add(ConvertXmlToPackage(nList[i]));
-                } catch (Exception ex) {
-                    BusinessLogic.Log.Add(BusinessLogic.LogTypes.Debug, new BusinessLogic.User(0), -1, ex.ToString());
-                }
-            }
+			for (int i = 0; i < nList.Count; i++)
+			{
+				try
+				{
+					retVal.Add(ConvertXmlToPackage(nList[i]));
+				}
+				catch (Exception ex)
+				{
+					LogHelper.Error<data>("An error occurred in GetAllPackages", ex);
+				}
+			}
 
-            return retVal;
+	        return retVal;
         }
 
         private static PackageInstance ConvertXmlToPackage(XmlNode n) {
