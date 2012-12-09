@@ -16,6 +16,9 @@ namespace Umbraco.Web.Models
 	/// </summary>
 	public abstract class PublishedContentBase : IPublishedContent
 	{
+		private string _url;
+		private readonly Dictionary<string, object> _resolvePropertyValues = new Dictionary<string, object>();
+
 		/// <summary>
 		/// Returns the Url for this content item
 		/// </summary>
@@ -27,6 +30,9 @@ namespace Umbraco.Web.Models
 		{
 			get
 			{
+				if (_url != null)
+					return _url;
+
 				switch (ItemType)
 				{
 					case PublishedItemType.Content:
@@ -34,15 +40,18 @@ namespace Umbraco.Web.Models
 							throw new InvalidOperationException("Cannot resolve a Url for a content item with a null UmbracoContext.Current reference");
 						if (UmbracoContext.Current.NiceUrlProvider == null)
 							throw new InvalidOperationException("Cannot resolve a Url for a content item with a null UmbracoContext.Current.NiceUrlProvider reference");
-						return UmbracoContext.Current.NiceUrlProvider.GetNiceUrl(this.Id);
+						_url= UmbracoContext.Current.NiceUrlProvider.GetNiceUrl(this.Id);
+						break;
 					case PublishedItemType.Media:
 						var prop = GetProperty("umbracoFile");
 						if (prop == null)
 							throw new NotSupportedException("Cannot retreive a Url for a media item if there is no 'umbracoFile' property defined");
-						return prop.Value.ToString();
+						_url = prop.Value.ToString();
+						break;
 					default:
 						throw new ArgumentOutOfRangeException();
 				}
+				return _url;
 			}
 		}
 
@@ -75,7 +84,15 @@ namespace Umbraco.Web.Models
 		/// </remarks>
 		public virtual object this[string propertyAlias]
 		{
-			get { return this.GetPropertyValue(propertyAlias); }
+			get
+			{
+				//check this instance's cache, this is better for performance because resolving a value can 
+				//have performance impacts since it has to resolve Urls and IPropertyEditorValueConverter's as well.
+				if (_resolvePropertyValues.ContainsKey(propertyAlias))
+					return _resolvePropertyValues[propertyAlias];
+				_resolvePropertyValues.Add(propertyAlias, this.GetPropertyValue(propertyAlias));
+				return _resolvePropertyValues[propertyAlias];
+			}
 		}
 
 		public abstract IPublishedContentProperty GetProperty(string alias);
