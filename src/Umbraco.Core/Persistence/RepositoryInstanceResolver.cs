@@ -14,7 +14,16 @@ namespace Umbraco.Core.Persistence
 		internal RepositoryInstanceResolver(RepositoryInstanceFactory registrar)
 			: base(registrar)
 		{
-		} 
+		}
+
+		/// <summary>
+		/// Can be used by developers at runtime to set their own RepositoryInstanceFactory at app startup
+		/// </summary>
+		/// <param name="factory"></param>
+		public void SetRepositoryInstanceFactory(RepositoryInstanceFactory factory)
+		{
+			Value = factory;
+		}
 
 		/// <summary>
 		/// Return the repository based on the type
