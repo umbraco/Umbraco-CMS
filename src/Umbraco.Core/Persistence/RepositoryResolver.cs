@@ -22,15 +22,14 @@ namespace Umbraco.Core.Persistence
         //Otherwise look for an entity type in the config
         //- If type exists check dependencies, create new object, add it to dictionary and return it
         //If we have come this far the correct types wasn't found and we throw an exception
-        internal static TRepository ResolveByType<TRepository, TEntity, TId>(IUnitOfWork unitOfWork)
-            where TRepository : class, IRepository<TId, TEntity>
-            where TEntity : class
+        internal static TRepository ResolveByType<TRepository>(IUnitOfWork unitOfWork)
+            where TRepository : class, IRepository
         {
             //Initialize the provider's default value
-            TRepository repository = default(TRepository);
+            var repository = default(TRepository);
 
-            string interfaceShortName = typeof(TRepository).Name;
-            string entityTypeName = typeof(TEntity).Name;
+            var interfaceShortName = typeof(TRepository).Name;
+			//string entityTypeName = typeof(TEntity).Name;
 
 			//Check if the repository has already been created and is in the cache
 			//SD: Changed to TryGetValue as this will be a bit quicker since if we do a ContainsKey and then resolve,
@@ -39,7 +38,7 @@ namespace Umbraco.Core.Persistence
 			if (Repositories.TryGetValue(interfaceShortName, out repositoryObject))
 			{
 				repository = (TRepository)repositoryObject;
-				if (unitOfWork != null && (typeof(IRepository<TId, TEntity>).IsInstanceOfType(repository)))
+				if (unitOfWork != null)
 				{
 					repository.SetUnitOfWork(unitOfWork);
 				}

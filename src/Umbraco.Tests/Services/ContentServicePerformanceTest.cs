@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Services
 
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository>(unitOfWork);
 
             // Act
             Stopwatch watch = Stopwatch.StartNew();
@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Services
 
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository>(unitOfWork);
 
             // Act
             Stopwatch watch = Stopwatch.StartNew();
@@ -120,7 +120,7 @@ namespace Umbraco.Tests.Services
 
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository>(unitOfWork);
 
             // Act
             var contents = repository.GetAll();
@@ -148,7 +148,7 @@ namespace Umbraco.Tests.Services
 
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository>(unitOfWork);
 
             // Act
             var contents = repository.GetAll();

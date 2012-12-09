@@ -49,7 +49,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public static IProfile GetCreatorProfile(this IContent content)
         {
-            var repository = RepositoryResolver.ResolveByType<IUserRepository, IUser, int>(null);
+            var repository = RepositoryResolver.ResolveByType<IUserRepository>(null);
             return repository.GetProfileById(content.CreatorId);
         }
 
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public static IProfile GetWriterProfile(this IContent content)
         {
-            var repository = RepositoryResolver.ResolveByType<IUserRepository, IUser, int>(null);
+            var repository = RepositoryResolver.ResolveByType<IUserRepository>(null);
             return repository.GetProfileById(content.WriterId);
         }
     }

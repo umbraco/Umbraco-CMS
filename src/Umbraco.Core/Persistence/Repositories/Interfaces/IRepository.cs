@@ -3,11 +3,20 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    /// <summary>
+	public interface IRepository
+	{
+		/// <summary>
+		/// Sets the Unit Of Work for the Repository
+		/// </summary>
+		/// <param name="work"></param>
+		void SetUnitOfWork(IUnitOfWork work);
+	}
+
+	/// <summary>
     /// Defines the implementation of a Repository
     /// </summary>
-    public interface IRepository<TId, TEntity>
-    {
+    public interface IRepository<in TId, TEntity> : IRepository
+	{
         /// <summary>
         /// Adds or Updates an Entity
         /// </summary>
@@ -40,11 +49,5 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="id"></param>
         /// <returns></returns>
         bool Exists(TId id);
-
-        /// <summary>
-        /// Sets the Unit Of Work for the Repository
-        /// </summary>
-        /// <param name="work"></param>
-        void SetUnitOfWork(IUnitOfWork work);
-    }
+	}
 }

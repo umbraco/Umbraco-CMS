@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(uow);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -57,7 +57,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(uow);
+            var repository = RepositoryResolver.ResolveByType<IContentTypeRepository>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(uow);
+            var repository = RepositoryResolver.ResolveByType<IMediaRepository>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -83,7 +83,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(uow);
+            var repository = RepositoryResolver.ResolveByType<IMediaTypeRepository>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -96,7 +96,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<IDataTypeDefinitionRepository, IDataTypeDefinition, int>(uow);
+            var repository = RepositoryResolver.ResolveByType<IDataTypeDefinitionRepository>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -109,7 +109,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository, IDictionaryItem, int>(uow);
+            var repository = RepositoryResolver.ResolveByType<IDictionaryRepository>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -122,7 +122,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<ILanguageRepository, ILanguage, int>(uow);
+            var repository = RepositoryResolver.ResolveByType<ILanguageRepository>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -135,7 +135,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<IMacroRepository, IMacro, string>(uow);
+            var repository = RepositoryResolver.ResolveByType<IMacroRepository>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -148,7 +148,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<IRelationRepository, Relation, int>(uow);
+            var repository = RepositoryResolver.ResolveByType<IRelationRepository>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -161,7 +161,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<IRelationTypeRepository, RelationType, int>(uow);
+            var repository = RepositoryResolver.ResolveByType<IRelationTypeRepository>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -174,7 +174,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<IScriptRepository, Script, string>(uow);
+            var repository = RepositoryResolver.ResolveByType<IScriptRepository>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -187,7 +187,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<IStylesheetRepository, Stylesheet, string>(uow);
+            var repository = RepositoryResolver.ResolveByType<IStylesheetRepository>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -200,7 +200,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<ITemplateRepository, ITemplate, int>(uow);
+            var repository = RepositoryResolver.ResolveByType<ITemplateRepository>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -213,7 +213,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<IUserRepository, IUser, int>(uow);
+            var repository = RepositoryResolver.ResolveByType<IUserRepository>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -226,7 +226,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<IUserTypeRepository, IUserType, int>(uow);
+            var repository = RepositoryResolver.ResolveByType<IUserTypeRepository>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -239,7 +239,7 @@ namespace Umbraco.Tests.Persistence
             var uow = new PetaPocoUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(uow);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository>(uow);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -257,7 +257,7 @@ namespace Umbraco.Tests.Persistence
             Assert.That(isAssignableFrom, Is.True);
             
             var uow = new PetaPocoUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(uow);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository>(uow);
             bool subclassOf = repository.GetType().IsSubclassOf(typeof (IRepository<int, IContent>));
 
             Assert.That(subclassOf, Is.False);

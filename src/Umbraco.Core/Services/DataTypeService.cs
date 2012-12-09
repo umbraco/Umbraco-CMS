@@ -33,7 +33,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDataTypeDefinition"/></returns>
         public IDataTypeDefinition GetDataTypeDefinitionById(int id)
         {
-            var repository = RepositoryResolver.ResolveByType<IDataTypeDefinitionRepository, IDataTypeDefinition, int>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IDataTypeDefinitionRepository>(_unitOfWork);
             return repository.Get(id);
         }
 
@@ -44,7 +44,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDataTypeDefinition"/></returns>
         public IDataTypeDefinition GetDataTypeDefinitionById(Guid id)
         {
-            var repository = RepositoryResolver.ResolveByType<IDataTypeDefinitionRepository, IDataTypeDefinition, int>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IDataTypeDefinitionRepository>(_unitOfWork);
 
             var query = Query<IDataTypeDefinition>.Builder.Where(x => x.Key == id);
             var definitions = repository.GetByQuery(query);
@@ -59,7 +59,7 @@ namespace Umbraco.Core.Services
         /// <returns>Collection of <see cref="IDataTypeDefinition"/> objects with a matching contorl id</returns>
         public IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByControlId(Guid id)
         {
-            var repository = RepositoryResolver.ResolveByType<IDataTypeDefinitionRepository, IDataTypeDefinition, int>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IDataTypeDefinitionRepository>(_unitOfWork);
 
             var query = Query<IDataTypeDefinition>.Builder.Where(x => x.ControlId == id);
             var definitions = repository.GetByQuery(query);
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IDataTypeDefinition"/> objects</returns>
         public IEnumerable<IDataTypeDefinition> GetAllDataTypeDefinitions(params int[] ids)
         {
-            var repository = RepositoryResolver.ResolveByType<IDataTypeDefinitionRepository, IDataTypeDefinition, int>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IDataTypeDefinitionRepository>(_unitOfWork);
             return repository.GetAll(ids);
         }
 
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Id of the user issueing the save</param>
         public void Save(IDataTypeDefinition dataTypeDefinition, int userId)
         {
-            var repository = RepositoryResolver.ResolveByType<IDataTypeDefinitionRepository, IDataTypeDefinition, int>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IDataTypeDefinitionRepository>(_unitOfWork);
             repository.AddOrUpdate(dataTypeDefinition);
             _unitOfWork.Commit();
         }
@@ -102,7 +102,7 @@ namespace Umbraco.Core.Services
         public void Delete(IDataTypeDefinition dataTypeDefinition, int userId)
         {           
             //Find ContentTypes using this IDataTypeDefinition on a PropertyType
-            var contentTypeRepository = RepositoryResolver.ResolveByType<IContentTypeRepository, IContentType, int>(_unitOfWork);
+            var contentTypeRepository = RepositoryResolver.ResolveByType<IContentTypeRepository>(_unitOfWork);
             var query = Query<PropertyType>.Builder.Where(x => x.DataTypeId == dataTypeDefinition.Id);
             var contentTypes = contentTypeRepository.GetByQuery(query);
 
@@ -123,7 +123,7 @@ namespace Umbraco.Core.Services
                 contentTypeRepository.AddOrUpdate(contentType);
             }
 
-            var repository = RepositoryResolver.ResolveByType<IDataTypeDefinitionRepository, IDataTypeDefinition, int>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IDataTypeDefinitionRepository>(_unitOfWork);
             repository.Delete(dataTypeDefinition);
             _unitOfWork.Commit();
         }

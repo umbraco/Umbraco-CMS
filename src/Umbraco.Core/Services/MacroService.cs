@@ -48,7 +48,7 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IMacro"/> object</returns>
         public IMacro GetByAlias(string alias)
         {
-            var repository = RepositoryResolver.ResolveByType<IMacroRepository, IMacro, string>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMacroRepository>(_unitOfWork);
             return repository.Get(alias);
         }
 
@@ -59,7 +59,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IMacro"/> objects</returns>
         public IEnumerable<IMacro> GetAll(params string[] aliases)
         {
-            var repository = RepositoryResolver.ResolveByType<IMacroRepository, IMacro, string>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMacroRepository>(_unitOfWork);
             return repository.GetAll(aliases);
         }
 
@@ -69,7 +69,7 @@ namespace Umbraco.Core.Services
         /// <param name="macro"><see cref="IMacro"/> to delete</param>
         public void Delete(IMacro macro)
         {
-            var repository = RepositoryResolver.ResolveByType<IMacroRepository, IMacro, string>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMacroRepository>(_unitOfWork);
             repository.Delete(macro);
             _unitOfWork.Commit();
         }
@@ -80,7 +80,7 @@ namespace Umbraco.Core.Services
         /// <param name="macro"><see cref="IMacro"/> to save</param>
         public void Save(IMacro macro)
         {
-            var repository = RepositoryResolver.ResolveByType<IMacroRepository, IMacro, string>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IMacroRepository>(_unitOfWork);
             repository.AddOrUpdate(macro);
             _unitOfWork.Commit();
         }

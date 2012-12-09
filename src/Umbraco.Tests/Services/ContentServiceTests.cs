@@ -676,7 +676,7 @@ namespace Umbraco.Tests.Services
             var c2 = new Lazy<IContent>(() => MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage", c.Value.Id));
             var list = new List<Lazy<IContent>> {c, c2};
 
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IContentRepository>(unitOfWork);
             foreach (var content in list)
             {
                 repository.AddOrUpdate(content.Value);

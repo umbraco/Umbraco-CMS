@@ -88,7 +88,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IProfile"/></returns>
         public IProfile GetProfileById(int id)
         {
-            var repository = RepositoryResolver.ResolveByType<IUserRepository, IUser, int>(_unitOfWork);
+            var repository = RepositoryResolver.ResolveByType<IUserRepository>(_unitOfWork);
             return repository.GetProfileById(id);
         }
 
