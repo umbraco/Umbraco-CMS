@@ -43,8 +43,6 @@ namespace Umbraco.Core.Persistence
 		internal TRepository ResolveByType<TRepository>(IUnitOfWork unitOfWork)
 			where TRepository : class, IRepository
 		{
-			//TODO: REMOVE all of these binding flags once the IDictionaryRepository, IMacroRepository are public! As this probably
-			// wont work in medium trust!
 			var createMethod = this.Value.GetType().GetMethods()
 				.First(x => x.Name == "Create" + typeof (TRepository).Name.Substring(1));
 
