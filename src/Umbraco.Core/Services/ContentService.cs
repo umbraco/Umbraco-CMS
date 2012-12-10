@@ -20,11 +20,11 @@ namespace Umbraco.Core.Services
     public class ContentService : IContentService
     {
         private readonly IPublishingStrategy _publishingStrategy;
-        private readonly IUserService _userService;
         private readonly IUnitOfWork _unitOfWork;
-        private HttpContextBase _httpContext;
+        private readonly IUserService _userService;
 	    private readonly IContentRepository _contentRepository;
 		private readonly IContentTypeRepository _contentTypeRepository;
+        private HttpContextBase _httpContext;
 
         public ContentService(IUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy)
         {
