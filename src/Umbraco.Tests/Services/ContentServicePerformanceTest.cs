@@ -4,7 +4,6 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
@@ -12,7 +11,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
-    [TestFixture]
+    [TestFixture, NUnit.Framework.Ignore]
     public class ContentServicePerformanceTest : BaseDatabaseFactoryTest
     {
         [SetUp]

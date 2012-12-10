@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {

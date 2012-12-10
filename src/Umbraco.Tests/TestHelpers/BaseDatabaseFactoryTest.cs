@@ -77,7 +77,7 @@ namespace Umbraco.Tests.TestHelpers
             ServiceContext = null;
             Resolution.IsFrozen = false;
 
-			RepositoryResolver.Reset();
+            RepositoryResolver.Reset();
 
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
