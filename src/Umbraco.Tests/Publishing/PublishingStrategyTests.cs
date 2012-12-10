@@ -8,6 +8,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Persistence;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Strategies;
@@ -53,6 +54,8 @@ namespace Umbraco.Tests.Publishing
             DataTypesResolver.Reset();
             ApplicationContext.Current = null;
             Resolution.IsFrozen = false;
+
+            RepositoryResolver.Reset();
 
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", null);

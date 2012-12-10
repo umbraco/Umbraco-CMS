@@ -4,7 +4,6 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
@@ -12,7 +11,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
-    [TestFixture]
+    [TestFixture, NUnit.Framework.Ignore]
     public class ContentServicePerformanceTest : BaseDatabaseFactoryTest
     {
         [SetUp]
@@ -70,7 +69,7 @@ namespace Umbraco.Tests.Services
 
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
 
             // Act
             Stopwatch watch = Stopwatch.StartNew();
@@ -95,7 +94,7 @@ namespace Umbraco.Tests.Services
 
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
 
             // Act
             Stopwatch watch = Stopwatch.StartNew();
@@ -120,7 +119,7 @@ namespace Umbraco.Tests.Services
 
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
 
             // Act
             var contents = repository.GetAll();
@@ -148,7 +147,7 @@ namespace Umbraco.Tests.Services
 
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IContentRepository, IContent, int>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
 
             // Act
             var contents = repository.GetAll();
