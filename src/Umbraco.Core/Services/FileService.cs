@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Umbraco.Core.Auditing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
@@ -55,23 +57,48 @@ namespace Umbraco.Core.Services
         /// Saves a <see cref="Stylesheet"/>
         /// </summary>
         /// <param name="stylesheet"><see cref="Stylesheet"/> to save</param>
-        public void SaveStylesheet(Stylesheet stylesheet)
+        /// <param name="userId"></param>
+        public void SaveStylesheet(Stylesheet stylesheet, int userId = -1)
         {
-            var repository = _stylesheetRepository;
-            repository.AddOrUpdate(stylesheet);
-            _fileUnitOfWork.Commit();
+            var e = new SaveEventArgs();
+            if (Saving != null)
+                Saving(stylesheet, e);
+
+            if (!e.Cancel)
+            {
+                _stylesheetRepository.AddOrUpdate(stylesheet);
+                _fileUnitOfWork.Commit();
+
+                if (Saved != null)
+                    Saved(stylesheet, e);
+
+                Audit.Add(AuditTypes.Save, string.Format("Save Stylesheet issued by user"), userId == -1 ? 0 : userId, -1);
+            }
         }
 
         /// <summary>
         /// Deletes a stylesheet by its name
         /// </summary>
         /// <param name="name">Name incl. extension of the Stylesheet to delete</param>
-        public void DeleteStylesheet(string name)
+        /// <param name="userId"></param>
+        public void DeleteStylesheet(string name, int userId = -1)
         {
-            var repository = _stylesheetRepository;
-            var stylesheet = repository.Get(name);
-            repository.Delete(stylesheet);
-            _fileUnitOfWork.Commit();
+            var stylesheet = _stylesheetRepository.Get(name);
+
+            var e = new DeleteEventArgs();
+            if (Deleting != null)
+                Deleting(stylesheet, e);
+
+            if (!e.Cancel)
+            {
+                _stylesheetRepository.Delete(stylesheet);
+                _fileUnitOfWork.Commit();
+
+                if (Deleted != null)
+                    Deleted(stylesheet, e);
+
+                Audit.Add(AuditTypes.Delete, string.Format("Delete Stylesheet issued by user"), userId == -1 ? 0 : userId, -1);
+            }
         }
 
         /// <summary>
@@ -109,23 +136,48 @@ namespace Umbraco.Core.Services
         /// Saves a <see cref="Script"/>
         /// </summary>
         /// <param name="script"><see cref="Script"/> to save</param>
-        public void SaveScript(Script script)
+        /// <param name="userId"></param>
+        public void SaveScript(Script script, int userId = -1)
         {
-            var repository = _scriptRepository;
-            repository.AddOrUpdate(script);
-            _fileUnitOfWork.Commit();
+            var e = new SaveEventArgs();
+            if (Saving != null)
+                Saving(script, e);
+
+            if (!e.Cancel)
+            {
+                _scriptRepository.AddOrUpdate(script);
+                _fileUnitOfWork.Commit();
+
+                if (Saved != null)
+                    Saved(script, e);
+
+                Audit.Add(AuditTypes.Save, string.Format("Save Script issued by user"), userId == -1 ? 0 : userId, -1);
+            }
         }
 
         /// <summary>
         /// Deletes a script by its name
         /// </summary>
         /// <param name="name">Name incl. extension of the Script to delete</param>
-        public void DeleteScript(string name)
+        /// <param name="userId"></param>
+        public void DeleteScript(string name, int userId = -1)
         {
-            var repository = _scriptRepository;
-            var script = repository.Get(name);
-            repository.Delete(script);
-            _fileUnitOfWork.Commit();
+            var script = _scriptRepository.Get(name);
+
+            var e = new DeleteEventArgs();
+            if (Deleting != null)
+                Deleting(script, e);
+
+            if (!e.Cancel)
+            {
+                _scriptRepository.Delete(script);
+                _fileUnitOfWork.Commit();
+
+                if (Deleted != null)
+                    Deleted(script, e);
+
+                Audit.Add(AuditTypes.Delete, string.Format("Delete Script issued by user"), userId == -1 ? 0 : userId, -1);
+            }
         }
 
         /// <summary>
@@ -163,23 +215,48 @@ namespace Umbraco.Core.Services
         /// Saves a <see cref="Template"/>
         /// </summary>
         /// <param name="template"><see cref="Template"/> to save</param>
-        public void SaveTemplate(ITemplate template)
+        /// <param name="userId"></param>
+        public void SaveTemplate(ITemplate template, int userId = -1)
         {
-            var repository = _templateRepository;
-            repository.AddOrUpdate(template);
-            _dataUnitOfWork.Commit();
+            var e = new SaveEventArgs();
+            if (Saving != null)
+                Saving(template, e);
+
+            if (!e.Cancel)
+            {
+                _templateRepository.AddOrUpdate(template);
+                _dataUnitOfWork.Commit();
+
+                if (Saved != null)
+                    Saved(template, e);
+
+                Audit.Add(AuditTypes.Save, string.Format("Save Template issued by user"), userId == -1 ? 0 : userId, template.Id);
+            }
         }
 
         /// <summary>
         /// Deletes a template by its alias
         /// </summary>
         /// <param name="alias">Alias of the <see cref="ITemplate"/> to delete</param>
-        public void DeleteTemplate(string alias)
+        /// <param name="userId"></param>
+        public void DeleteTemplate(string alias, int userId = -1)
         {
-            var repository = _templateRepository;
-            var template = repository.Get(alias);
-            repository.Delete(template);
-            _dataUnitOfWork.Commit();
+            var template = _templateRepository.Get(alias);
+
+            var e = new DeleteEventArgs();
+            if (Deleting != null)
+                Deleting(template, e);
+
+            if (!e.Cancel)
+            {
+                _templateRepository.Delete(template);
+                _dataUnitOfWork.Commit();
+
+                if (Deleted != null)
+                    Deleted(template, e);
+
+                Audit.Add(AuditTypes.Delete, string.Format("Delete Template issued by user"), userId == -1 ? 0 : userId, template.Id);
+            }
         }
 
         /// <summary>
@@ -193,5 +270,27 @@ namespace Umbraco.Core.Services
         }
 
         //TODO Method to change name and/or alias of view/masterpage template
+
+        #region Event Handlers
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>
+        public static event EventHandler<DeleteEventArgs> Deleting;
+
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event EventHandler<DeleteEventArgs> Deleted;
+
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        public static event EventHandler<SaveEventArgs> Saving;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        public static event EventHandler<SaveEventArgs> Saved;
+        #endregion
     }
 }
