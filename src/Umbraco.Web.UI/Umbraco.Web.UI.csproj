@@ -2275,9 +2275,15 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <Target Name="BeforeBuild">
+    <!-- Create web.config file from Template if it doesn't exist -->
     <Copy SourceFiles="$(ProjectDir)web.Template.config" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Web.config')" />
-    <TransformXml Source="$(ProjectDir)Web.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="$(ProjectDir)Web.$(Configuration).config.transformed" />
-    <Message Text="BeforeBuild was performed" Importance="high" />
+    
+    <!-- Transform the local Web.config file in Visual Studio -->
+    <TransformXml Source="$(ProjectDir)Web.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="$(ProjectDir)Web.$(Configuration).config.transformed" Condition="$(BuildingInsideVisualStudio) == true" />
+    
+    <!-- Always transform the Template file when not in VS (ie: build.bat) -->
+    <TransformXml Source="$(ProjectDir)Web.Template.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="$(ProjectDir)Web.$(Configuration).config.transformed" Condition="$(BuildingInsideVisualStudio) != true" />
+    
   </Target>
   <Target Name="AfterBuild">
     <Copy SourceFiles="$(ProjectDir)Web.$(Configuration).config.transformed" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="$(BuildingInsideVisualStudio) == true" />
