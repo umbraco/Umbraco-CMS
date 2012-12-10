@@ -23,18 +23,20 @@ namespace Umbraco.Core.Services
         /// <param name="aliases">Optional array of aliases to limit the results</param>
         /// <returns>An enumerable list of <see cref="IMacro"/> objects</returns>
         IEnumerable<IMacro> GetAll(params string[] aliases);
-        
+
         /// <summary>
         /// Deletes an <see cref="IMacro"/>
         /// </summary>
         /// <param name="macro"><see cref="IMacro"/> to delete</param>
-        void Delete(IMacro macro);
+        /// <param name="userId">Optional id of the user deleting the macro</param>
+        void Delete(IMacro macro, int userId = -1);
 
         /// <summary>
         /// Saves an <see cref="IMacro"/>
         /// </summary>
         /// <param name="macro"><see cref="IMacro"/> to save</param>
-        void Save(IMacro macro);
+        /// <param name="userId">Optional id of the user saving the macro</param>
+        void Save(IMacro macro, int userId = -1);
 
         /// <summary>
         /// Gets a list all available <see cref="IMacroPropertyType"/> plugins

@@ -49,7 +49,7 @@ namespace Umbraco.Core.Services
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
         /// that this Content is based on.
         /// </summary>
-        /// <param name="parentId">Id of Parent for content</param>
+        /// <param name="parentId">Id of Parent for the new Content</param>
         /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional id of the user creating the content</param>
         /// <returns><see cref="IContent"/></returns>
@@ -494,7 +494,7 @@ namespace Umbraco.Core.Services
                 if (Saved != null)
                     Saved(content, e);
 
-                Audit.Add(AuditTypes.Save, "Save content issued by user", userId == -1 ? 0 : userId, content.Id);
+                Audit.Add(AuditTypes.Save, "Save Content issued by user", userId == -1 ? 0 : userId, content.Id);
             }
         }
 

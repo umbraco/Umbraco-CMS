@@ -69,7 +69,8 @@ namespace Umbraco.Core.Services
         /// Deletes an <see cref="IMacro"/>
         /// </summary>
         /// <param name="macro"><see cref="IMacro"/> to delete</param>
-        public void Delete(IMacro macro)
+        /// <param name="userId">Optional id of the user deleting the macro</param>
+        public void Delete(IMacro macro, int userId = -1)
         {
             var repository = _macroRepository;
             repository.Delete(macro);
@@ -80,7 +81,8 @@ namespace Umbraco.Core.Services
         /// Saves an <see cref="IMacro"/>
         /// </summary>
         /// <param name="macro"><see cref="IMacro"/> to save</param>
-        public void Save(IMacro macro)
+        /// <param name="userId">Optional Id of the user deleting the macro</param>
+        public void Save(IMacro macro, int userId = -1)
         {
             var repository = _macroRepository;
             repository.AddOrUpdate(macro);
