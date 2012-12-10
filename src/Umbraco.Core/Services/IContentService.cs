@@ -163,7 +163,8 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
         /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
-        void DeleteContentOfType(int contentTypeId);
+        /// <param name="userId">Optional Id of the user issueing the delete operation</param>
+        void DeleteContentOfType(int contentTypeId, int userId = -1);
 
         /// <summary>
         /// Permanently deletes an <see cref="IContent"/> object
