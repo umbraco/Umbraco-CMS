@@ -13,10 +13,12 @@ namespace Umbraco.Core.Services
     internal class UserService : IUserService
     {
         private readonly IUnitOfWork _unitOfWork;
+	    private readonly IUserRepository _userRepository;
 
         public UserService(IUnitOfWorkProvider provider)
         {
             _unitOfWork = provider.GetUnitOfWork();
+	        _userRepository = RepositoryResolver.Current.Factory.CreateUserRepository(_unitOfWork);
         }
 
         #region Implementation of IUserService
@@ -88,7 +90,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IProfile"/></returns>
         public IProfile GetProfileById(int id)
         {
-            var repository = RepositoryResolver.ResolveByType<IUserRepository, IUser, int>(_unitOfWork);
+			var repository = _userRepository;
             return repository.GetProfileById(id);
         }
 

@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -43,8 +43,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var mediaTypeRepository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var mediaTypeRepository = RepositoryResolver.Current.ResolveByType<IMediaTypeRepository>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
 
             var mediaType = mediaTypeRepository.Get(1032);
             var image = MockedMedia.CreateMediaImage(mediaType, -1);
@@ -65,8 +65,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var mediaTypeRepository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var mediaTypeRepository = RepositoryResolver.Current.ResolveByType<IMediaTypeRepository>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
 
             var mediaType = mediaTypeRepository.Get(1032);
             var file = MockedMedia.CreateMediaFile(mediaType, -1);
@@ -94,8 +94,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var mediaTypeRepository = RepositoryResolver.ResolveByType<IMediaTypeRepository, IMediaType, int>(unitOfWork);
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var mediaTypeRepository = RepositoryResolver.Current.ResolveByType<IMediaTypeRepository>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
 
             var mediaType = mediaTypeRepository.Get(1032);
             var file = MockedMedia.CreateMediaFile(mediaType, -1);
@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
 
             // Act
             var media = repository.Get(1046);
@@ -139,7 +139,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
 
             // Act
             var content = repository.Get(1047);
@@ -160,7 +160,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
 
             // Act
             var media = repository.Get(1047);
@@ -181,7 +181,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
 
             // Act
             var media = repository.Get(1046);
@@ -205,7 +205,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
 
             // Act
             var query = Query<IMedia>.Builder.Where(x => x.Level == 2);
@@ -221,7 +221,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
 
             // Act
             var medias = repository.GetAll(1046, 1047);
@@ -238,7 +238,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
 
             // Act
             var medias = repository.GetAll();
@@ -255,7 +255,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
 
             // Act
             var exists = repository.Exists(1046);
@@ -274,7 +274,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.ResolveByType<IMediaRepository, IMedia, int>(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IMediaRepository>(unitOfWork);
 
             // Act
             int level = 2;

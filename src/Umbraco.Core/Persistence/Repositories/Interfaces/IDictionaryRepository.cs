@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal interface IDictionaryRepository : IRepositoryQueryable<int, IDictionaryItem>
+    public interface IDictionaryRepository : IRepositoryQueryable<int, IDictionaryItem>
     {
          
     }
