@@ -119,7 +119,7 @@ namespace Umbraco.Core.Services
                 if (Saved != null)
                     Saved(contentType, e);
 
-                Audit.Add(AuditTypes.Save, string.Format("Save ContentType issued by user"), userId == -1 ? 0 : userId, contentType.Id);
+                Audit.Add(AuditTypes.Save, string.Format("Save ContentType performed by user"), userId == -1 ? 0 : userId, contentType.Id);
             }
         }
 
@@ -146,7 +146,7 @@ namespace Umbraco.Core.Services
                 if (Saved != null)
                     Saved(contentTypes, e);
 
-                Audit.Add(AuditTypes.Save, string.Format("Save ContentTypes issued by user"), userId == -1 ? 0 : userId, -1);
+                Audit.Add(AuditTypes.Save, string.Format("Save ContentTypes performed by user"), userId == -1 ? 0 : userId, -1);
             }
         }
 
@@ -177,7 +177,7 @@ namespace Umbraco.Core.Services
                 if (Saved != null)
                     Saved(contentTypes, e);
 
-                Audit.Add(AuditTypes.Save, string.Format("Save (lazy) ContentTypes issued by user"), userId == -1 ? 0 : userId, -1);
+                Audit.Add(AuditTypes.Save, string.Format("Save (lazy) ContentTypes performed by user"), userId == -1 ? 0 : userId, -1);
             }
         }
 
@@ -205,7 +205,7 @@ namespace Umbraco.Core.Services
                 if (Deleted != null)
                     Deleted(contentType, e);
 
-                Audit.Add(AuditTypes.Delete, string.Format("Delete ContentType issued by user"), userId == -1 ? 0 : userId, contentType.Id);
+                Audit.Add(AuditTypes.Delete, string.Format("Delete ContentType performed by user"), userId == -1 ? 0 : userId, contentType.Id);
             }
         }
 
@@ -242,7 +242,7 @@ namespace Umbraco.Core.Services
                 if (Deleted != null)
                     Deleted(contentTypes, e);
 
-                Audit.Add(AuditTypes.Delete, string.Format("Delete ContentTypes issued by user"), userId == -1 ? 0 : userId, -1);
+                Audit.Add(AuditTypes.Delete, string.Format("Delete ContentTypes performed by user"), userId == -1 ? 0 : userId, -1);
             }
         }
 
@@ -317,7 +317,7 @@ namespace Umbraco.Core.Services
                 if (Saved != null)
                     Saved(mediaType, e);
 
-                Audit.Add(AuditTypes.Save, string.Format("Save MediaType issued by user"), userId == -1 ? 0 : userId, mediaType.Id);
+                Audit.Add(AuditTypes.Save, string.Format("Save MediaType performed by user"), userId == -1 ? 0 : userId, mediaType.Id);
             }
         }
 
@@ -344,7 +344,7 @@ namespace Umbraco.Core.Services
                 if (Saved != null)
                     Saved(mediaTypes, e);
 
-                Audit.Add(AuditTypes.Save, string.Format("Save MediaTypes issued by user"), userId == -1 ? 0 : userId, -1);
+                Audit.Add(AuditTypes.Save, string.Format("Save MediaTypes performed by user"), userId == -1 ? 0 : userId, -1);
             }
         }
 
@@ -372,7 +372,7 @@ namespace Umbraco.Core.Services
                 if (Deleted != null)
                     Deleted(mediaType, e);
 
-                Audit.Add(AuditTypes.Delete, string.Format("Delete MediaType issued by user"), userId == -1 ? 0 : userId, mediaType.Id);
+                Audit.Add(AuditTypes.Delete, string.Format("Delete MediaType performed by user"), userId == -1 ? 0 : userId, mediaType.Id);
             }
         }
 
@@ -407,7 +407,7 @@ namespace Umbraco.Core.Services
                 if (Deleted != null)
                     Deleted(mediaTypes, e);
 
-                Audit.Add(AuditTypes.Delete, string.Format("Delete MediaTypes issued by user"), userId == -1 ? 0 : userId, -1);
+                Audit.Add(AuditTypes.Delete, string.Format("Delete MediaTypes performed by user"), userId == -1 ? 0 : userId, -1);
             }
         }
 

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Auditing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
@@ -75,6 +76,8 @@ namespace Umbraco.Core.Services
             var repository = _macroRepository;
             repository.Delete(macro);
             _unitOfWork.Commit();
+
+            Audit.Add(AuditTypes.Delete, "Delete Macro performed by user", userId > -1 ? userId : 0, -1);
         }
 
         /// <summary>
@@ -84,9 +87,10 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user deleting the macro</param>
         public void Save(IMacro macro, int userId = -1)
         {
-            var repository = _macroRepository;
-            repository.AddOrUpdate(macro);
+            _macroRepository.AddOrUpdate(macro);
             _unitOfWork.Commit();
+
+            Audit.Add(AuditTypes.Save, "Save Macro performed by user", userId > -1 ? userId : 0, -1);
         }
 
         /// <summary>

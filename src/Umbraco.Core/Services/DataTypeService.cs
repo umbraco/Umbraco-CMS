@@ -103,7 +103,7 @@ namespace Umbraco.Core.Services
                 if (Saved != null)
                     Saved(dataTypeDefinition, e);
 
-                Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition issued by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
+                Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition performed by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
             }
         }
 
@@ -153,7 +153,7 @@ namespace Umbraco.Core.Services
                 if (Deleted != null)
                     Deleted(dataTypeDefinition, e);
 
-                Audit.Add(AuditTypes.Delete, string.Format("Delete DataTypeDefinition issued by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
+                Audit.Add(AuditTypes.Delete, string.Format("Delete DataTypeDefinition performed by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
             }
         }
 

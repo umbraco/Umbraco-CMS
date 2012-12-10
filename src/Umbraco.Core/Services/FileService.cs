@@ -72,7 +72,7 @@ namespace Umbraco.Core.Services
                 if (Saved != null)
                     Saved(stylesheet, e);
 
-                Audit.Add(AuditTypes.Save, string.Format("Save Stylesheet issued by user"), userId == -1 ? 0 : userId, -1);
+                Audit.Add(AuditTypes.Save, string.Format("Save Stylesheet performed by user"), userId == -1 ? 0 : userId, -1);
             }
         }
 
@@ -97,7 +97,7 @@ namespace Umbraco.Core.Services
                 if (Deleted != null)
                     Deleted(stylesheet, e);
 
-                Audit.Add(AuditTypes.Delete, string.Format("Delete Stylesheet issued by user"), userId == -1 ? 0 : userId, -1);
+                Audit.Add(AuditTypes.Delete, string.Format("Delete Stylesheet performed by user"), userId == -1 ? 0 : userId, -1);
             }
         }
 
@@ -151,7 +151,7 @@ namespace Umbraco.Core.Services
                 if (Saved != null)
                     Saved(script, e);
 
-                Audit.Add(AuditTypes.Save, string.Format("Save Script issued by user"), userId == -1 ? 0 : userId, -1);
+                Audit.Add(AuditTypes.Save, string.Format("Save Script performed by user"), userId == -1 ? 0 : userId, -1);
             }
         }
 
@@ -176,7 +176,7 @@ namespace Umbraco.Core.Services
                 if (Deleted != null)
                     Deleted(script, e);
 
-                Audit.Add(AuditTypes.Delete, string.Format("Delete Script issued by user"), userId == -1 ? 0 : userId, -1);
+                Audit.Add(AuditTypes.Delete, string.Format("Delete Script performed by user"), userId == -1 ? 0 : userId, -1);
             }
         }
 
@@ -230,7 +230,7 @@ namespace Umbraco.Core.Services
                 if (Saved != null)
                     Saved(template, e);
 
-                Audit.Add(AuditTypes.Save, string.Format("Save Template issued by user"), userId == -1 ? 0 : userId, template.Id);
+                Audit.Add(AuditTypes.Save, string.Format("Save Template performed by user"), userId == -1 ? 0 : userId, template.Id);
             }
         }
 
@@ -255,7 +255,7 @@ namespace Umbraco.Core.Services
                 if (Deleted != null)
                     Deleted(template, e);
 
-                Audit.Add(AuditTypes.Delete, string.Format("Delete Template issued by user"), userId == -1 ? 0 : userId, template.Id);
+                Audit.Add(AuditTypes.Delete, string.Format("Delete Template performed by user"), userId == -1 ? 0 : userId, template.Id);
             }
         }
 

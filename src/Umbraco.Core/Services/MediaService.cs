@@ -189,7 +189,7 @@ namespace Umbraco.Core.Services
                 if (Moved != null)
                     Moved(media, e);
 
-                Audit.Add(AuditTypes.Move, "Move Media issued by user", userId == -1 ? 0 : userId, media.Id);
+                Audit.Add(AuditTypes.Move, "Move Media performed by user", userId == -1 ? 0 : userId, media.Id);
             }
         }
 
@@ -216,7 +216,7 @@ namespace Umbraco.Core.Services
                 if (Trashed != null)
                     Trashed(media, e);
 
-                Audit.Add(AuditTypes.Move, "Move Media to Recycle Bin issued by user", userId == -1 ? 0 : userId, media.Id);
+                Audit.Add(AuditTypes.Move, "Move Media to Recycle Bin performed by user", userId == -1 ? 0 : userId, media.Id);
             }
         }
 
@@ -236,7 +236,7 @@ namespace Umbraco.Core.Services
             }
             _unitOfWork.Commit();
 
-            Audit.Add(AuditTypes.Delete, "Empty Recycle Bin issued by user", 0, -20);
+            Audit.Add(AuditTypes.Delete, "Empty Recycle Bin performed by user", 0, -20);
         }
 
         /// <summary>
@@ -272,7 +272,7 @@ namespace Umbraco.Core.Services
                 if (Deleted != null)
                     Deleted(contents, e);
 
-                Audit.Add(AuditTypes.Delete, "Delete Media items by Type issued by user", userId == -1 ? 0 : userId, -1);
+                Audit.Add(AuditTypes.Delete, "Delete Media items by Type performed by user", userId == -1 ? 0 : userId, -1);
             }
         }
 
@@ -299,7 +299,7 @@ namespace Umbraco.Core.Services
                 if (Deleted != null)
                     Deleted(media, e);
 
-                Audit.Add(AuditTypes.Delete, "Delete Media issued by user", userId == -1 ? 0 : userId, media.Id);
+                Audit.Add(AuditTypes.Delete, "Delete Media performed by user", userId == -1 ? 0 : userId, media.Id);
             }
         }
 
@@ -323,7 +323,7 @@ namespace Umbraco.Core.Services
                 if (Saved != null)
                     Saved(media, e);
 
-                Audit.Add(AuditTypes.Save, "Save Media issued by user", media.CreatorId, media.Id);
+                Audit.Add(AuditTypes.Save, "Save Media performed by user", media.CreatorId, media.Id);
             }
         }
 
@@ -350,7 +350,7 @@ namespace Umbraco.Core.Services
                 if (Saved != null)
                     Saved(medias, e);
 
-                Audit.Add(AuditTypes.Save, "Save Media items issued by user", userId == -1 ? 0 : userId, -1);
+                Audit.Add(AuditTypes.Save, "Save Media items performed by user", userId == -1 ? 0 : userId, -1);
             }
         }
 
