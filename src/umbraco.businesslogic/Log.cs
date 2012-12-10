@@ -2,7 +2,7 @@ using System;
 using System.Data;
 using System.Diagnostics;
 using System.Threading;
-
+using Umbraco.Core.Logging;
 using umbraco.DataLayer;
 using System.Collections.Generic;
 using System.Reflection;
@@ -36,8 +36,7 @@ namespace umbraco.BusinessLogic
                         }
                         catch (Exception ee)
                         {
-                            Log.AddLocally(LogTypes.Error, User.GetUser(0), -1,
-                                "Error loading external logger: " + ee.ToString());
+							LogHelper.Error<Log>("Error loading external logger: " + ee.ToString(), ee);
                         }
                     }
                 }
@@ -103,6 +102,7 @@ namespace umbraco.BusinessLogic
             }
         }
 
+		[Obsolete("Use LogHelper to log exceptions/errors")]
         public void AddException(Exception ee)
         {
             if (ExternalLogger != null)
@@ -119,7 +119,7 @@ namespace umbraco.BusinessLogic
                     error += ex2.ToString();
                     ex2 = ex2.InnerException;
                 }
-                Add(LogTypes.Error, -1, error);
+				LogHelper.Error<Log>("An error occurred", ee);
             }
         }
 

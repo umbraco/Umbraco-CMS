@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Xml;
+using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.cache;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
@@ -297,9 +298,10 @@ namespace umbraco.cms.businesslogic.language
                 }
             }
             else
-            {
-                Log.Add(LogTypes.Error, umbraco.BasePages.UmbracoEnsuredPage.CurrentUser, -1, "Could not remove Language " + _friendlyName + " because it's attached to a node");
-                throw new DataException("Cannot remove language " + _friendlyName + " because it's attached to a domain on a node");                
+            {   
+                var e = new DataException("Cannot remove language " + _friendlyName + " because it's attached to a domain on a node");
+	            LogHelper.Error<Language>("Cannot remove language " + _friendlyName + " because it's attached to a domain on a node", e);
+	            throw e;
             }
         }
 

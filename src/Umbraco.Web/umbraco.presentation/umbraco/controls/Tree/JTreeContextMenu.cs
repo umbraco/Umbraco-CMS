@@ -4,6 +4,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.Script.Serialization;
+using Umbraco.Core.Logging;
 using umbraco.interfaces;
 using System.Text.RegularExpressions;
 using umbraco.BusinessLogic.Actions;
@@ -53,7 +54,7 @@ namespace umbraco.controls.Tree
                 }
                 catch (Exception ee)
                 {
-                    Log.Add(LogTypes.Error, -1, "Error initializing tree action: " + ee.ToString());
+	                LogHelper.Error<JTreeContextMenu>("Error initializing tree action", ee);
                 }
 
 			}

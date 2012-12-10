@@ -28,7 +28,6 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
 		public bool Execute(string packageName, XmlNode xmlData)
 		{
 
-			BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, BusinessLogic.User.GetUser(0), -1, "executing addStringToHtmlElement");
 
 			string templateAlias = xmlData.Attributes["templateAlias"].Value;
 			string htmlElementId = xmlData.Attributes["htmlElementId"].Value;

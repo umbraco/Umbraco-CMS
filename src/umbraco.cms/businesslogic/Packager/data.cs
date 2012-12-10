@@ -150,7 +150,7 @@ namespace umbraco.cms.businesslogic.packager
             }
             catch (Exception ex)
             {
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, 0, ex.ToString());
+				LogHelper.Error<data>("An error occurred", ex);
             }
 
             return retVal;
@@ -161,16 +161,19 @@ namespace umbraco.cms.businesslogic.packager
         }
 
         public static PackageInstance Package(string guid, string datasource) {
-            try {
-                XmlNode node = GetFromGuid(guid, datasource, true);
-                if(node != null)
-                return ConvertXmlToPackage(node);
-                else
-                return new PackageInstance();
-            } catch(Exception ex) {
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, 0, ex.ToString());
-                return new PackageInstance();
-            }
+			try
+			{
+				XmlNode node = GetFromGuid(guid, datasource, true);
+				if (node != null)
+					return ConvertXmlToPackage(node);
+				else
+					return new PackageInstance();
+			}
+			catch (Exception ex)
+			{
+				LogHelper.Error<data>("An error occurred", ex);
+				return new PackageInstance();
+			}
         }
 
         public static List<PackageInstance> GetAllPackages(string dataSource) {
@@ -332,8 +335,7 @@ namespace umbraco.cms.businesslogic.packager
             }
 			catch(Exception F)
 			{
-				BusinessLogic.User myUser = new BusinessLogic.User(0);
-				BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, myUser, 0, F.ToString()); 
+				LogHelper.Error<data>("An error occurred", F);
 			}   
 			
 		}

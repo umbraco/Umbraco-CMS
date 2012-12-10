@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using umbraco.BasePages;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.businesslogic.web;
@@ -41,8 +42,7 @@ namespace umbraco.cms.businesslogic.packager
 				}
 				catch (Exception ipaExp)
 				{
-					BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, BusinessLogic.User.GetUser(0), -1, string.Format("Error loading package action '{0}' for package {1}: {2}",
-						ipa.Alias(), packageName, ipaExp));
+					LogHelper.Error<PackageAction>(string.Format("Error loading package action '{0}' for package {1}", ipa.Alias(), packageName), ipaExp);
 				}
 			}
 		}
@@ -68,8 +68,7 @@ namespace umbraco.cms.businesslogic.packager
 				}
 				catch (Exception ipaExp)
 				{
-					BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, BusinessLogic.User.GetUser(0), -1, string.Format("Error undoing package action '{0}' for package {1}: {2}",
-						ipa.Alias(), packageName, ipaExp));
+					LogHelper.Error<PackageAction>(string.Format("Error undoing package action '{0}' for package {1}", ipa.Alias(), packageName), ipaExp);
 				}
 			}
 		}

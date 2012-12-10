@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.cache;
@@ -161,8 +162,10 @@ namespace umbraco.cms.businesslogic.web
 							if (result.Find(delegate(Domain d) { return d.Name == domainName; }) == null)
 								result.Add(new Domain(domainId));
 							else
-        						Log.Add(LogTypes.Error, User.GetUser(0), -1,
-        							string.Format("Domain already exists in list ({0})", domainName));
+							{
+								LogHelper.Warn<Domain>(string.Format("Domain already exists in list ({0})", domainName));
+							}
+        						
         				}
         			}
         			return result;

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Web;
+using Umbraco.Core.Logging;
 using umbraco.IO;
 
 namespace umbraco.cms.businesslogic.packager {
@@ -60,15 +61,18 @@ namespace umbraco.cms.businesslogic.packager {
         }
 
         public static bool isPackageInstalled(string packageGuid) {
-            try {
-                if (data.GetFromGuid(packageGuid, IOHelper.MapPath(Settings.InstalledPackagesSettings), true) == null)
-                    return false;
-                else
-                    return true;
-            } catch (Exception ex) {
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, 0, ex.ToString());
-                return false;
-            }
+			try
+			{
+				if (data.GetFromGuid(packageGuid, IOHelper.MapPath(Settings.InstalledPackagesSettings), true) == null)
+					return false;
+				else
+					return true;
+			}
+			catch (Exception ex)
+			{
+				LogHelper.Error<InstalledPackage>("An error occured in isPackagedInstalled", ex);
+				return false;
+			}
         }
 
         //EVENTS

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.Script.Serialization;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.datatype;
 
@@ -67,7 +68,7 @@ namespace umbraco.editorControls
                     }
                     catch (Exception ex)
                     {
-                        Log.Add(LogTypes.Error, this.m_DataType.DataTypeDefinitionId, string.Concat("umbraco.editorControls: Execption thrown: ", ex));
+						LogHelper.Error<AbstractJsonPrevalueEditor>("umbraco.editorControls: Execption thrown", ex);
                     }
                 }
             }

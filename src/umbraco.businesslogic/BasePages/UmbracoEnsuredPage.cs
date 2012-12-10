@@ -96,9 +96,9 @@ namespace umbraco.BasePages
                         throw new UserAuthorizationException(String.Format("The current user doesn't have access to the section/app '{0}'", CurrentApp));
                 }
             }
-            catch (UserAuthorizationException)
+            catch (UserAuthorizationException ex)
             {
-                Log.Add(LogTypes.Error, CurrentUser, -1, String.Format("Tried to access '{0}'", CurrentApp));
+				LogHelper.Error<UmbracoEnsuredPage>(String.Format("Tried to access '{0}'", CurrentApp), ex);
                 throw;
             }
             catch

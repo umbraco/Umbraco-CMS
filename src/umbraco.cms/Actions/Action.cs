@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.Reflection;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using umbraco.BasePages;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms;
@@ -103,8 +104,7 @@ namespace umbraco.BusinessLogic.Actions
                 }
                 catch (Exception iaExp)
                 {
-                    Log.Add(LogTypes.Error, User.GetUser(0), -1, string.Format("Error loading actionhandler '{0}': {1}",
-                        ia.HandlerName(), iaExp));
+	                LogHelper.Error<Action>(string.Format("Error loading actionhandler '{0}'", ia.HandlerName()), iaExp);
                 }
             }
 
@@ -185,7 +185,7 @@ namespace umbraco.BusinessLogic.Actions
                     }
                     catch (Exception ee)
                     {
-                        Log.Add(LogTypes.Error, -1, "Error registrering action to javascript: " + ee.ToString());
+	                    LogHelper.Error<Action>("Error registrering action to javascript", ee);
                     }
                 }
 

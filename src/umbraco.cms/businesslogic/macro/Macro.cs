@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Runtime.CompilerServices;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.cache;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
@@ -341,7 +342,7 @@ namespace umbraco.cms.businesslogic.macro
                 }
                 catch (Exception macroExp)
                 {
-                    BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, BusinessLogic.User.GetUser(0), -1, "Error creating macro property: " + macroExp.ToString());
+					LogHelper.Error<Macro>("Error creating macro property", macroExp);
                 }
 
                 // macro properties
@@ -372,7 +373,7 @@ namespace umbraco.cms.businesslogic.macro
                     }
                     catch (Exception macroPropertyExp)
                     {
-                        BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, BusinessLogic.User.GetUser(0), -1, "Error creating macro property: " + macroPropertyExp.ToString());
+						LogHelper.Error<Macro>("Error creating macro property", macroPropertyExp);
                     }
                 }
 
