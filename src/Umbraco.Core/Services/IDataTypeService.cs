@@ -47,7 +47,7 @@ namespace Umbraco.Core.Services
         /// </remarks>
         /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to delete</param>
         /// <param name="userId">Id of the user issueing the deletion</param>
-        void Delete(IDataTypeDefinition dataTypeDefinition, int userId);
+        void Delete(IDataTypeDefinition dataTypeDefinition, int userId = -1);
 
         /// <summary>
         /// Gets the <see cref="IDataType"/> specified by it's unique ID

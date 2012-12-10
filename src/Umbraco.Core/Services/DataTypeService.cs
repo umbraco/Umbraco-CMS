@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Auditing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
@@ -27,6 +28,7 @@ namespace Umbraco.Core.Services
         {
             _unitOfWork = provider.GetUnitOfWork();
 	        _dataTypeService = RepositoryResolver.Current.Factory.CreateDataTypeDefinitionRepository(_unitOfWork);
+            _contentTypeRepository = RepositoryResolver.Current.Factory.CreateContentTypeRepository(_unitOfWork);
         }
 
         /// <summary>
@@ -86,11 +88,23 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to save</param>
         /// <param name="userId">Id of the user issueing the save</param>
-        public void Save(IDataTypeDefinition dataTypeDefinition, int userId)
+        public void Save(IDataTypeDefinition dataTypeDefinition, int userId = -1)
         {
-            var repository = _dataTypeService;
-            repository.AddOrUpdate(dataTypeDefinition);
-            _unitOfWork.Commit();
+            var e = new SaveEventArgs();
+            if (Saving != null)
+                Saving(dataTypeDefinition, e);
+
+            if (!e.Cancel)
+            {
+                dataTypeDefinition.CreatorId = userId > -1 ? userId : 0;
+                _dataTypeService.AddOrUpdate(dataTypeDefinition);
+                _unitOfWork.Commit();
+
+                if (Saved != null)
+                    Saved(dataTypeDefinition, e);
+
+                Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition issued by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
+            }
         }
 
         /// <summary>
@@ -101,34 +115,46 @@ namespace Umbraco.Core.Services
         /// all the <see cref="PropertyType"/> data that references this <see cref="IDataTypeDefinition"/>.
         /// </remarks>
         /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to delete</param>
-        /// <param name="userId">Id of the user issueing the deletion</param>
-        public void Delete(IDataTypeDefinition dataTypeDefinition, int userId)
-        {           
-            //Find ContentTypes using this IDataTypeDefinition on a PropertyType
-	        var contentTypeRepository = _contentTypeRepository;
-            var query = Query<PropertyType>.Builder.Where(x => x.DataTypeId == dataTypeDefinition.Id);
-            var contentTypes = contentTypeRepository.GetByQuery(query);
+        /// <param name="userId">Optional Id of the user issueing the deletion</param>
+        public void Delete(IDataTypeDefinition dataTypeDefinition, int userId = -1)
+        {
+            var e = new DeleteEventArgs { Id = dataTypeDefinition.Id };
+            if (Deleting != null)
+                Deleting(dataTypeDefinition, e);
 
-            //Loop through the list of results and remove the PropertyTypes that references the DataTypeDefinition that is being deleted
-            foreach (var contentType in contentTypes)
+            if (!e.Cancel)
             {
-                if(contentType == null) continue;
+                //Find ContentTypes using this IDataTypeDefinition on a PropertyType
+                var contentTypeRepository = _contentTypeRepository;
+                var query = Query<PropertyType>.Builder.Where(x => x.DataTypeId == dataTypeDefinition.Id);
+                var contentTypes = contentTypeRepository.GetByQuery(query);
 
-                foreach (var group in contentType.PropertyGroups)
+                //Loop through the list of results and remove the PropertyTypes that references the DataTypeDefinition that is being deleted
+                foreach (var contentType in contentTypes)
                 {
-                    var types = group.PropertyTypes.Where(x => x.DataTypeId == dataTypeDefinition.Id);
-                    foreach (var propertyType in types)
+                    if (contentType == null) continue;
+
+                    foreach (var group in contentType.PropertyGroups)
                     {
-                        group.PropertyTypes.Remove(propertyType);
+                        var types = group.PropertyTypes.Where(x => x.DataTypeId == dataTypeDefinition.Id);
+                        foreach (var propertyType in types)
+                        {
+                            group.PropertyTypes.Remove(propertyType);
+                        }
                     }
+
+                    contentTypeRepository.AddOrUpdate(contentType);
                 }
 
-                contentTypeRepository.AddOrUpdate(contentType);
-            }
+                var repository = _dataTypeService;
+                repository.Delete(dataTypeDefinition);
+                _unitOfWork.Commit();
 
-            var repository = _dataTypeService;
-            repository.Delete(dataTypeDefinition);
-            _unitOfWork.Commit();
+                if (Deleted != null)
+                    Deleted(dataTypeDefinition, e);
+
+                Audit.Add(AuditTypes.Delete, string.Format("Delete DataTypeDefinition issued by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
+            }
         }
 
         /// <summary>
@@ -149,5 +175,27 @@ namespace Umbraco.Core.Services
         {
             return DataTypesResolver.Current.DataTypes;
         }
+
+        #region Event Handlers
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>
+        public static event EventHandler<DeleteEventArgs> Deleting;
+
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event EventHandler<DeleteEventArgs> Deleted;
+
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        public static event EventHandler<SaveEventArgs> Saving;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        public static event EventHandler<SaveEventArgs> Saved;
+        #endregion
     }
 }

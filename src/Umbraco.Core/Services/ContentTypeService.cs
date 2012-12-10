@@ -527,16 +527,6 @@ namespace Umbraco.Core.Services
         /// Occurs after Save
         /// </summary>
         public static event EventHandler<SaveEventArgs> Saved;
-
-        /// <summary>
-        /// Occurs before Create
-        /// </summary>
-        public static event EventHandler<NewEventArgs> Creating;
-
-        /// <summary>
-        /// Occurs after Create
-        /// </summary>
-        public static event EventHandler<NewEventArgs> Created;
         #endregion
     }
 }
