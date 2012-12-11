@@ -68,7 +68,7 @@ namespace Umbraco.Core.Services
                 _macroService = new MacroService(fileProvider);
 
             if(_contentTypeService == null)
-                _contentTypeService = new ContentTypeService(_contentService, _mediaService, provider);
+				_contentTypeService = new ContentTypeService(provider, _contentService, _mediaService);
 
             if(_dataTypeService == null)
                 _dataTypeService = new DataTypeService(provider);

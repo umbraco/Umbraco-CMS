@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Auditing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
@@ -69,22 +71,47 @@ namespace Umbraco.Core.Services
         /// Deletes an <see cref="IMacro"/>
         /// </summary>
         /// <param name="macro"><see cref="IMacro"/> to delete</param>
-        public void Delete(IMacro macro)
+        /// <param name="userId">Optional id of the user deleting the macro</param>
+        public void Delete(IMacro macro, int userId = -1)
         {
-            var repository = _macroRepository;
-            repository.Delete(macro);
-            _unitOfWork.Commit();
+            var e = new DeleteEventArgs();
+            if (Deleting != null)
+                Deleting(macro, e);
+
+            if (!e.Cancel)
+            {
+                var repository = _macroRepository;
+                repository.Delete(macro);
+                _unitOfWork.Commit();
+
+                if (Deleted != null)
+                    Deleted(macro, e);
+
+                Audit.Add(AuditTypes.Delete, "Delete Macro performed by user", userId > -1 ? userId : 0, -1);
+            }
         }
 
         /// <summary>
         /// Saves an <see cref="IMacro"/>
         /// </summary>
         /// <param name="macro"><see cref="IMacro"/> to save</param>
-        public void Save(IMacro macro)
+        /// <param name="userId">Optional Id of the user deleting the macro</param>
+        public void Save(IMacro macro, int userId = -1)
         {
-            var repository = _macroRepository;
-            repository.AddOrUpdate(macro);
-            _unitOfWork.Commit();
+            var e = new SaveEventArgs();
+            if (Saving != null)
+                Saving(macro, e);
+
+            if (!e.Cancel)
+            {
+                _macroRepository.AddOrUpdate(macro);
+                _unitOfWork.Commit();
+
+                if (Saved != null)
+                    Saved(macro, e);
+
+                Audit.Add(AuditTypes.Save, "Save Macro performed by user", userId > -1 ? userId : 0, -1);
+            }
         }
 
         /// <summary>
@@ -105,5 +132,27 @@ namespace Umbraco.Core.Services
         {
             return MacroPropertyTypeResolver.Current.MacroPropertyTypes.FirstOrDefault(x => x.Alias == alias);
         }
+
+        #region Event Handlers
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>
+        public static event EventHandler<DeleteEventArgs> Deleting;
+
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event EventHandler<DeleteEventArgs> Deleted;
+
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        public static event EventHandler<SaveEventArgs> Saving;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        public static event EventHandler<SaveEventArgs> Saved;
+        #endregion
     }
 }

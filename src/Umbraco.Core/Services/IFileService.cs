@@ -25,13 +25,15 @@ namespace Umbraco.Core.Services
         /// Saves a <see cref="Stylesheet"/>
         /// </summary>
         /// <param name="stylesheet"><see cref="Stylesheet"/> to save</param>
-        void SaveStylesheet(Stylesheet stylesheet);
+        /// <param name="userId">Optional id of the user saving the stylesheet</param>
+        void SaveStylesheet(Stylesheet stylesheet, int userId = -1);
 
         /// <summary>
         /// Deletes a stylesheet by its name
         /// </summary>
         /// <param name="name">Name incl. extension of the Stylesheet to delete</param>
-        void DeleteStylesheet(string name);
+        /// <param name="userId">Optional id of the user deleting the stylesheet</param>
+        void DeleteStylesheet(string name, int userId = -1);
 
         /// <summary>
         /// Validates a <see cref="Stylesheet"/>
@@ -57,13 +59,15 @@ namespace Umbraco.Core.Services
         /// Saves a <see cref="Script"/>
         /// </summary>
         /// <param name="script"><see cref="Script"/> to save</param>
-        void SaveScript(Script script);
+        /// <param name="userId">Optional id of the user saving the script</param>
+        void SaveScript(Script script, int userId = -1);
 
         /// <summary>
         /// Deletes a script by its name
         /// </summary>
         /// <param name="name">Name incl. extension of the Script to delete</param>
-        void DeleteScript(string name);
+        /// <param name="userId">Optional id of the user deleting the script</param>
+        void DeleteScript(string name, int userId = -1);
 
         /// <summary>
         /// Validates a <see cref="Script"/>
@@ -89,13 +93,15 @@ namespace Umbraco.Core.Services
         /// Saves a <see cref="ITemplate"/>
         /// </summary>
         /// <param name="template"><see cref="ITemplate"/> to save</param>
-        void SaveTemplate(ITemplate template);
+        /// <param name="userId">Optional id of the user saving the template</param>
+        void SaveTemplate(ITemplate template, int userId = -1);
 
         /// <summary>
         /// Deletes a template by its alias
         /// </summary>
         /// <param name="alias">Alias of the <see cref="ITemplate"/> to delete</param>
-        void DeleteTemplate(string alias);
+        /// <param name="userId">Optional id of the user deleting the template</param>
+        void DeleteTemplate(string alias, int userId = -1);
 
         /// <summary>
         /// Validates a <see cref="ITemplate"/>

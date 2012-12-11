@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web;
+using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -19,21 +21,33 @@ namespace Umbraco.Core.Services
     {
         private readonly IContentService _contentService;
         private readonly IMediaService _mediaService;
+        private readonly IUserService _userService;
         private readonly IDatabaseUnitOfWork _unitOfWork;
 	    private readonly IContentTypeRepository _contentTypeRepository;
 	    private readonly IMediaTypeRepository _mediaTypeRepository;
+        private HttpContextBase _httpContext;
 
         public ContentTypeService(IContentService contentService, IMediaService mediaService)
-            : this(contentService, mediaService, new PetaPocoUnitOfWorkProvider())
+            : this(new PetaPocoUnitOfWorkProvider(), contentService, mediaService)
         {}
 
-        public ContentTypeService(IContentService contentService, IMediaService mediaService, IDatabaseUnitOfWorkProvider provider)
+        public ContentTypeService(IDatabaseUnitOfWorkProvider provider, IContentService contentService, IMediaService mediaService)
         {
             _contentService = contentService;
             _mediaService = mediaService;
             _unitOfWork = provider.GetUnitOfWork();
 	        _contentTypeRepository = RepositoryResolver.Current.Factory.CreateContentTypeRepository(_unitOfWork);
 	        _mediaTypeRepository = RepositoryResolver.Current.Factory.CreateMediaTypeRepository(_unitOfWork);
+        }
+
+		internal ContentTypeService(IDatabaseUnitOfWorkProvider provider, IContentService contentService, IMediaService mediaService, IUserService userService)
+        {
+            _contentService = contentService;
+            _mediaService = mediaService;
+            _userService = userService;
+            _unitOfWork = provider.GetUnitOfWork();
+            _contentTypeRepository = RepositoryResolver.Current.Factory.CreateContentTypeRepository(_unitOfWork);
+            _mediaTypeRepository = RepositoryResolver.Current.Factory.CreateMediaTypeRepository(_unitOfWork);
         }
 
         /// <summary>
@@ -80,10 +94,8 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContentType"/> objects</returns>
         public IEnumerable<IContentType> GetContentTypeChildren(int id)
         {
-            var repository = _contentTypeRepository;
-
             var query = Query<IContentType>.Builder.Where(x => x.ParentId == id);
-            var contentTypes = repository.GetByQuery(query);
+            var contentTypes = _contentTypeRepository.GetByQuery(query);
             return contentTypes;
         }
 
@@ -91,27 +103,51 @@ namespace Umbraco.Core.Services
         /// Saves a single <see cref="IContentType"/> object
         /// </summary>
         /// <param name="contentType"><see cref="IContentType"/> to save</param>
-        public void Save(IContentType contentType)
+        /// <param name="userId">Optional id of the user saving the ContentType</param>
+        public void Save(IContentType contentType, int userId = -1)
         {
-            var repository = _contentTypeRepository;
+            var e = new SaveEventArgs();
+            if (Saving != null)
+                Saving(contentType, e);
 
-            repository.AddOrUpdate(contentType);
-            _unitOfWork.Commit();
+            if (!e.Cancel)
+            {
+                SetUser(contentType, userId);
+                _contentTypeRepository.AddOrUpdate(contentType);
+                _unitOfWork.Commit();
+
+                if (Saved != null)
+                    Saved(contentType, e);
+
+                Audit.Add(AuditTypes.Save, string.Format("Save ContentType performed by user"), userId == -1 ? 0 : userId, contentType.Id);
+            }
         }
 
         /// <summary>
         /// Saves a collection of <see cref="IContentType"/> objects
         /// </summary>
         /// <param name="contentTypes">Collection of <see cref="IContentType"/> to save</param>
-        public void Save(IEnumerable<IContentType> contentTypes)
+        /// <param name="userId">Optional id of the user saving the ContentType</param>
+        public void Save(IEnumerable<IContentType> contentTypes, int userId = -1)
         {
-            var repository = _contentTypeRepository;
+            var e = new SaveEventArgs();
+            if (Saving != null)
+                Saving(contentTypes, e);
 
-            foreach (var contentType in contentTypes)
+            if (!e.Cancel)
             {
-                repository.AddOrUpdate(contentType);
+                foreach (var contentType in contentTypes)
+                {
+                    SetUser(contentType, userId);
+                    _contentTypeRepository.AddOrUpdate(contentType);
+                }
+                _unitOfWork.Commit();
+
+                if (Saved != null)
+                    Saved(contentTypes, e);
+
+                Audit.Add(AuditTypes.Save, string.Format("Save ContentTypes performed by user"), userId == -1 ? 0 : userId, -1);
             }
-            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -125,14 +161,23 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User saving the ContentTypes</param>
         public void Save(IEnumerable<Lazy<IContentType>> contentTypes, int userId = -1)
         {
-            var repository = _contentTypeRepository;
-            foreach (var content in contentTypes)
-            {
-                content.Value.CreatorId = 0;
-                repository.AddOrUpdate(content.Value);
-                _unitOfWork.Commit();
+            var e = new SaveEventArgs();
+            if (Saving != null)
+                Saving(contentTypes, e);
 
-                LogHelper.Info<ContentTypeService>(string.Format("Saved ContentType with Alias '{0}' and Id '{1}'", content.Value.Alias, content.Value.Id));
+            if (!e.Cancel)
+            {
+                foreach (var content in contentTypes)
+                {
+                    content.Value.CreatorId = 0;
+                    _contentTypeRepository.AddOrUpdate(content.Value);
+                    _unitOfWork.Commit();
+                }
+
+                if (Saved != null)
+                    Saved(contentTypes, e);
+
+                Audit.Add(AuditTypes.Save, string.Format("Save (lazy) ContentTypes performed by user"), userId == -1 ? 0 : userId, -1);
             }
         }
 
@@ -140,39 +185,65 @@ namespace Umbraco.Core.Services
         /// Deletes a single <see cref="IContentType"/> object
         /// </summary>
         /// <param name="contentType"><see cref="IContentType"/> to delete</param>
+        /// <param name="userId">Optional id of the user issueing the delete</param>
         /// <remarks>Deleting a <see cref="IContentType"/> will delete all the <see cref="IContent"/> objects based on this <see cref="IContentType"/></remarks>
-        public void Delete(IContentType contentType)
+        public void Delete(IContentType contentType, int userId = -1)
         {
-            _contentService.DeleteContentOfType(contentType.Id);
+            var e = new DeleteEventArgs { Id = contentType.Id };
+            if (Deleting != null)
+                Deleting(contentType, e);
 
-            var repository = _contentTypeRepository;
+            if (!e.Cancel)
+            {
+                _contentService.DeleteContentOfType(contentType.Id);
 
-            repository.Delete(contentType);
-            _unitOfWork.Commit();
+                var repository = _contentTypeRepository;
+
+                repository.Delete(contentType);
+                _unitOfWork.Commit();
+
+                if (Deleted != null)
+                    Deleted(contentType, e);
+
+                Audit.Add(AuditTypes.Delete, string.Format("Delete ContentType performed by user"), userId == -1 ? 0 : userId, contentType.Id);
+            }
         }
 
         /// <summary>
         /// Deletes a collection of <see cref="IContentType"/> objects.
         /// </summary>
         /// <param name="contentTypes">Collection of <see cref="IContentType"/> to delete</param>
+        /// <param name="userId">Optional id of the user issueing the delete</param>
         /// <remarks>
         /// Deleting a <see cref="IContentType"/> will delete all the <see cref="IContent"/> objects based on this <see cref="IContentType"/>
         /// </remarks>
-        public void Delete(IEnumerable<IContentType> contentTypes)
+        public void Delete(IEnumerable<IContentType> contentTypes, int userId = -1)
         {
-            var contentTypeList = contentTypes.ToList();
-            foreach (var contentType in contentTypeList)
-            {
-                _contentService.DeleteContentOfType(contentType.Id);
-            }
+            var e = new DeleteEventArgs();
+            if (Deleting != null)
+                Deleting(contentTypes, e);
 
-            var repository = _contentTypeRepository;
-
-            foreach (var contentType in contentTypeList)
+            if (!e.Cancel)
             {
-                repository.Delete(contentType);
+                var contentTypeList = contentTypes.ToList();
+                foreach (var contentType in contentTypeList)
+                {
+                    _contentService.DeleteContentOfType(contentType.Id);
+                }
+
+                var repository = _contentTypeRepository;
+
+                foreach (var contentType in contentTypeList)
+                {
+                    repository.Delete(contentType);
+                }
+                _unitOfWork.Commit();
+
+                if (Deleted != null)
+                    Deleted(contentTypes, e);
+
+                Audit.Add(AuditTypes.Delete, string.Format("Delete ContentTypes performed by user"), userId == -1 ? 0 : userId, -1);
             }
-            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -230,64 +301,114 @@ namespace Umbraco.Core.Services
         /// Saves a single <see cref="IMediaType"/> object
         /// </summary>
         /// <param name="mediaType"><see cref="IMediaType"/> to save</param>
-        public void Save(IMediaType mediaType)
+        /// <param name="userId">Optional Id of the user saving the MediaType</param>
+        public void Save(IMediaType mediaType, int userId = -1)
         {
-            var repository = _mediaTypeRepository;
+            var e = new SaveEventArgs();
+            if (Saving != null)
+                Saving(mediaType, e);
 
-            repository.AddOrUpdate(mediaType);
-            _unitOfWork.Commit();
+            if (!e.Cancel)
+            {
+                SetUser(mediaType, userId);
+                _mediaTypeRepository.AddOrUpdate(mediaType);
+                _unitOfWork.Commit();
+
+                if (Saved != null)
+                    Saved(mediaType, e);
+
+                Audit.Add(AuditTypes.Save, string.Format("Save MediaType performed by user"), userId == -1 ? 0 : userId, mediaType.Id);
+            }
         }
 
         /// <summary>
         /// Saves a collection of <see cref="IMediaType"/> objects
         /// </summary>
         /// <param name="mediaTypes">Collection of <see cref="IMediaType"/> to save</param>
-        public void Save(IEnumerable<IMediaType> mediaTypes)
+        /// <param name="userId">Optional Id of the user savging the MediaTypes</param>
+        public void Save(IEnumerable<IMediaType> mediaTypes, int userId = -1)
         {
-            var repository = _mediaTypeRepository;
+            var e = new SaveEventArgs();
+            if (Saving != null)
+                Saving(mediaTypes, e);
 
-            foreach (var mediaType in mediaTypes)
+            if (!e.Cancel)
             {
-                repository.AddOrUpdate(mediaType);
+                foreach (var mediaType in mediaTypes)
+                {
+                    SetUser(mediaType, userId);
+                    _mediaTypeRepository.AddOrUpdate(mediaType);
+                }
+                _unitOfWork.Commit();
+
+                if (Saved != null)
+                    Saved(mediaTypes, e);
+
+                Audit.Add(AuditTypes.Save, string.Format("Save MediaTypes performed by user"), userId == -1 ? 0 : userId, -1);
             }
-            _unitOfWork.Commit();
         }
 
         /// <summary>
         /// Deletes a single <see cref="IMediaType"/> object
         /// </summary>
         /// <param name="mediaType"><see cref="IMediaType"/> to delete</param>
+        /// <param name="userId">Optional Id of the user deleting the MediaType</param>
         /// <remarks>Deleting a <see cref="IMediaType"/> will delete all the <see cref="IMedia"/> objects based on this <see cref="IMediaType"/></remarks>
-        public void Delete(IMediaType mediaType)
+        public void Delete(IMediaType mediaType, int userId = -1)
         {
-            _mediaService.DeleteMediaOfType(mediaType.Id);
-            
-            var repository = _mediaTypeRepository;
+            var e = new DeleteEventArgs { Id = mediaType.Id };
+            if (Deleting != null)
+                Deleting(mediaType, e);
 
-            repository.Delete(mediaType);
-            _unitOfWork.Commit();
+            if (!e.Cancel)
+            {
+                _mediaService.DeleteMediaOfType(mediaType.Id);
+
+                var repository = _mediaTypeRepository;
+
+                repository.Delete(mediaType);
+                _unitOfWork.Commit();
+
+                if (Deleted != null)
+                    Deleted(mediaType, e);
+
+                Audit.Add(AuditTypes.Delete, string.Format("Delete MediaType performed by user"), userId == -1 ? 0 : userId, mediaType.Id);
+            }
         }
 
         /// <summary>
         /// Deletes a collection of <see cref="IMediaType"/> objects
         /// </summary>
         /// <param name="mediaTypes">Collection of <see cref="IMediaType"/> to delete</param>
+        /// <param name="userId"></param>
         /// <remarks>Deleting a <see cref="IMediaType"/> will delete all the <see cref="IMedia"/> objects based on this <see cref="IMediaType"/></remarks>
-        public void Delete(IEnumerable<IMediaType> mediaTypes)
+        public void Delete(IEnumerable<IMediaType> mediaTypes, int userId = -1)
         {
-            var mediaTypeList = mediaTypes.ToList();
-            foreach (var mediaType in mediaTypeList)
-            {
-                _mediaService.DeleteMediaOfType(mediaType.Id);
-            }
+            var e = new DeleteEventArgs();
+            if (Deleting != null)
+                Deleting(mediaTypes, e);
 
-            var repository = _mediaTypeRepository;
-
-            foreach (var mediaType in mediaTypeList)
+            if (!e.Cancel)
             {
-                repository.Delete(mediaType);
+                var mediaTypeList = mediaTypes.ToList();
+                foreach (var mediaType in mediaTypeList)
+                {
+                    _mediaService.DeleteMediaOfType(mediaType.Id);
+                }
+
+                var repository = _mediaTypeRepository;
+
+                foreach (var mediaType in mediaTypeList)
+                {
+                    repository.Delete(mediaType);
+                }
+                _unitOfWork.Commit();
+
+                if (Deleted != null)
+                    Deleted(mediaTypes, e);
+
+                Audit.Add(AuditTypes.Delete, string.Format("Delete MediaTypes performed by user"), userId == -1 ? 0 : userId, -1);
             }
-            _unitOfWork.Commit();
         }
 
         /// <summary>
@@ -345,5 +466,67 @@ namespace Umbraco.Core.Services
             }
             return dtd.ToString();
         }
+
+        /// <summary>
+        /// Internal method to set the HttpContextBase for testing.
+        /// </summary>
+        /// <param name="httpContext"><see cref="HttpContextBase"/></param>
+        internal void SetHttpContext(HttpContextBase httpContext)
+        {
+            _httpContext = httpContext;
+        }
+
+        /// <summary>
+        /// Updates a content object with the User (id), who created the content.
+        /// </summary>
+        /// <param name="contentType">ContentType object to update</param>
+        /// <param name="userId">Optional Id of the User</param>
+        private void SetUser(IContentTypeBase contentType, int userId)
+        {
+            if (userId > -1)
+            {
+                //If a user id was passed in we use that
+                contentType.CreatorId = userId;
+            }
+            else if (UserServiceOrContext())
+            {
+                var profile = _httpContext == null
+                                  ? _userService.GetCurrentBackOfficeUser()
+                                  : _userService.GetCurrentBackOfficeUser(_httpContext);
+                contentType.CreatorId = profile.Id.SafeCast<int>();
+            }
+            else
+            {
+                //Otherwise we default to Admin user, which should always exist (almost always)
+                contentType.CreatorId = 0;
+            }
+        }
+
+        private bool UserServiceOrContext()
+        {
+            return _userService != null && (HttpContext.Current != null || _httpContext != null);
+        }
+
+        #region Event Handlers
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>
+        public static event EventHandler<DeleteEventArgs> Deleting;
+
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event EventHandler<DeleteEventArgs> Deleted;
+
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        public static event EventHandler<SaveEventArgs> Saving;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        public static event EventHandler<SaveEventArgs> Saved;
+        #endregion
     }
 }

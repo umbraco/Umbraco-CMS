@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Auditing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
@@ -119,12 +120,24 @@ namespace Umbraco.Core.Services
         /// Saves a <see cref="IDictionaryItem"/> object
         /// </summary>
         /// <param name="dictionaryItem"><see cref="IDictionaryItem"/> to save</param>
-        public void Save(IDictionaryItem dictionaryItem)
+        /// <param name="userId">Optional id of the user saving the dictionary item</param>
+        public void Save(IDictionaryItem dictionaryItem, int userId = -1)
         {
-            var repository = _dictionaryRepository;
+            var e = new SaveEventArgs();
+            if (Saving != null)
+                Saving(dictionaryItem, e);
 
-            repository.AddOrUpdate(dictionaryItem);
-            _unitOfWork.Commit();
+            if (!e.Cancel)
+            {
+                _dictionaryRepository.AddOrUpdate(dictionaryItem);
+                _unitOfWork.Commit();
+
+                if (Saved != null)
+                    Saved(dictionaryItem, e);
+
+                Audit.Add(AuditTypes.Save, "Save DictionaryItem performed by user", userId == -1 ? 0 : userId,
+                          dictionaryItem.Id);
+            }
         }
 
         /// <summary>
@@ -132,13 +145,24 @@ namespace Umbraco.Core.Services
         /// as well as its children.
         /// </summary>
         /// <param name="dictionaryItem"><see cref="IDictionaryItem"/> to delete</param>
-        public void Delete(IDictionaryItem dictionaryItem)
+        /// <param name="userId">Optional id of the user deleting the dictionary item</param>
+        public void Delete(IDictionaryItem dictionaryItem, int userId = -1)
         {
-            var repository = _dictionaryRepository;
+            var e = new DeleteEventArgs { Id = dictionaryItem.Id };
+            if (Deleting != null)
+                Deleting(dictionaryItem, e);
 
-            //NOTE: The recursive delete is done in the repository
-            repository.Delete(dictionaryItem);
-            _unitOfWork.Commit();
+            if (!e.Cancel)
+            {
+                //NOTE: The recursive delete is done in the repository
+                _dictionaryRepository.Delete(dictionaryItem);
+                _unitOfWork.Commit();
+
+                if (Deleted != null)
+                    Deleted(dictionaryItem, e);
+
+                Audit.Add(AuditTypes.Delete, "Delete DictionaryItem performed by user", userId == -1 ? 0 : userId, dictionaryItem.Id);
+            }
         }
 
         /// <summary>
@@ -182,25 +206,69 @@ namespace Umbraco.Core.Services
         /// Saves a <see cref="ILanguage"/> object
         /// </summary>
         /// <param name="language"><see cref="ILanguage"/> to save</param>
-        public void Save(ILanguage language)
+        /// <param name="userId">Optional id of the user saving the language</param>
+        public void Save(ILanguage language, int userId = -1)
         {
-            var repository = _languageRepository;
+            var e = new SaveEventArgs();
+            if (Saving != null)
+                Saving(language, e);
 
-            repository.AddOrUpdate(language);
-            _unitOfWork.Commit();
+            if (!e.Cancel)
+            {
+                _languageRepository.AddOrUpdate(language);
+                _unitOfWork.Commit();
+
+                if (Saved != null)
+                    Saved(language, e);
+
+                Audit.Add(AuditTypes.Save, "Save Language performed by user", userId == -1 ? 0 : userId, language.Id);
+            }
         }
 
         /// <summary>
         /// Deletes a <see cref="ILanguage"/> by removing it (but not its usages) from the db
         /// </summary>
         /// <param name="language"><see cref="ILanguage"/> to delete</param>
-        public void Delete(ILanguage language)
+        /// <param name="userId">Optional id of the user deleting the language</param>
+        public void Delete(ILanguage language, int userId = -1)
         {
-            var repository = _languageRepository;
+            var e = new DeleteEventArgs { Id = language.Id };
+            if (Deleting != null)
+                Deleting(language, e);
 
-            //NOTE: There isn't any constraints in the db, so possible references aren't deleted
-            repository.Delete(language);
-            _unitOfWork.Commit();
+            if (!e.Cancel)
+            {
+                //NOTE: There isn't any constraints in the db, so possible references aren't deleted
+                _languageRepository.Delete(language);
+                _unitOfWork.Commit();
+
+                if (Deleted != null)
+                    Deleted(language, e);
+
+                Audit.Add(AuditTypes.Delete, "Delete Language performed by user", userId == -1 ? 0 : userId, language.Id);
+            }
         }
+
+        #region Event Handlers
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>
+        public static event EventHandler<DeleteEventArgs> Deleting;
+
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event EventHandler<DeleteEventArgs> Deleted;
+
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        public static event EventHandler<SaveEventArgs> Saving;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        public static event EventHandler<SaveEventArgs> Saved;
+        #endregion
     }
 }

@@ -108,7 +108,6 @@
     <Compile Include="Configuration\FileSystemProviderElement.cs" />
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
-    <Compile Include="Configuration\InfrastructureSettings\Infrastructure.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
     <Compile Include="CoreBootManager.cs" />
     <Compile Include="DatabaseContext.cs" />

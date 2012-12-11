@@ -14,6 +14,7 @@ using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.language;
 using umbraco.cms.helpers;
 using umbraco.IO;
+using umbraco.uicontrols;
 using umbraco.uicontrols.DatePicker;
 using umbraco.BusinessLogic;
 using umbraco.presentation.preview;
@@ -460,8 +461,24 @@ namespace umbraco.cms.presentation
 
         private void addPreviewButton(uicontrols.ScrollingMenu menu, int id)
         {
+            uicontrols.MenuIconI menuItem;
+
+            // Find the first splitter in the Menu - Should be the rte toolbar's splitter
+            var startIndex = menu.FindSplitter(1);
+            
+            if (startIndex == -1)
+            {
+                // No Splitter found - rte toolbar isn't loaded
             menu.InsertSplitter();
-            uicontrols.MenuIconI menuItem = menu.NewIcon();
+                menuItem = menu.NewIcon();
+            } 
+            else
+            {
+                // Rte toolbar is loaded, inject after it's Splitter
+                menuItem = menu.NewIcon(startIndex + 1);
+                menu.InsertSplitter(startIndex + 2);
+            }
+            
             menuItem.ImageURL = SystemDirectories.Umbraco + "/images/editor/vis.gif";
             // Fix for U4-682, if there's no template, disable the preview button
             if (_document.Template != -1)

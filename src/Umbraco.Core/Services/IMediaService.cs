@@ -9,6 +9,16 @@ namespace Umbraco.Core.Services
     public interface IMediaService : IService
     {
         /// <summary>
+        /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
+        /// that this Media is based on.
+        /// </summary>
+        /// <param name="parentId">Id of Parent for the new Media item</param>
+        /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
+        /// <param name="userId">Optional id of the user creating the media item</param>
+        /// <returns><see cref="IMedia"/></returns>
+        IMedia CreateContent(int parentId, string mediaTypeAlias, int userId = -1);
+
+        /// <summary>
         /// Gets an <see cref="IMedia"/> object by Id
         /// </summary>
         /// <param name="id">Id of the Content to retrieve</param>
@@ -54,14 +64,14 @@ namespace Umbraco.Core.Services
         /// <param name="media">The <see cref="IMedia"/> to move</param>
         /// <param name="parentId">Id of the Media's new Parent</param>
         /// <param name="userId">Id of the User moving the Media</param>
-        void Move(IMedia media, int parentId, int userId);
+        void Move(IMedia media, int parentId, int userId = -1);
 
         /// <summary>
         /// Deletes an <see cref="IMedia"/> object by moving it to the Recycle Bin
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        void MoveToRecycleBin(IMedia media, int userId);
+        void MoveToRecycleBin(IMedia media, int userId = -1);
 
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
@@ -73,7 +83,8 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
         /// <param name="mediaTypeId">Id of the <see cref="IMediaType"/></param>
-        void DeleteMediaOfType(int mediaTypeId);
+        /// <param name="userId">Optional Id of the user deleting Media</param>
+        void DeleteMediaOfType(int mediaTypeId, int userId = -1);
 
         /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object
@@ -84,20 +95,20 @@ namespace Umbraco.Core.Services
         /// </remarks>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        void Delete(IMedia media, int userId);
+        void Delete(IMedia media, int userId = -1);
 
         /// <summary>
         /// Saves a single <see cref="IMedia"/> object
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to save</param>
-        /// <param name="userId">Id of the User saving the Content</param>
-        void Save(IMedia media, int userId);
+        /// <param name="userId">Id of the User saving the Media</param>
+        void Save(IMedia media, int userId = -1);
 
         /// <summary>
         /// Saves a collection of <see cref="IMedia"/> objects
         /// </summary>
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
-        /// <param name="userId">Id of the User saving the Content</param>
-        void Save(IEnumerable<IMedia> medias, int userId);
+        /// <param name="userId">Id of the User saving the Media</param>
+        void Save(IEnumerable<IMedia> medias, int userId = -1);
     }
 }

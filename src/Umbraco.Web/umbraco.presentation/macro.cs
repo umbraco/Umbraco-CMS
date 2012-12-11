@@ -1494,7 +1494,7 @@ namespace umbraco
 
             try
             {
-                string userControlPath = VirtualPathUtility.ToAppRelative(fileName);
+                string userControlPath = IOHelper.FindFile(fileName);
 
                 if (!File.Exists(IOHelper.MapPath(userControlPath)))
                     return new LiteralControl(string.Format("UserControl {0} does not exist.", fileName));
