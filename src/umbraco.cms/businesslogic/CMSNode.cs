@@ -1080,6 +1080,20 @@ order by level,sortOrder";
             _isTrashed = content.Trashed;
         }
 
+        internal protected void PopulateCMSNodeFromContentType(IContentType contentType, Guid objectType)
+        {
+            _uniqueID = contentType.Key;
+            _nodeObjectType = objectType;
+            _level = contentType.Level;
+            _path = contentType.Path;
+            _parentid = contentType.ParentId;
+            _text = contentType.Name;
+            _sortOrder = contentType.SortOrder;
+            _userId = contentType.CreatorId;
+            _createDate = contentType.CreateDate;
+            _isTrashed = false;
+        }
+
         #endregion
 
         #region Private Methods

@@ -3,11 +3,13 @@ using System.Collections;
 using System.Text;
 using System.Xml;
 using System.Linq;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.propertytype;
 using umbraco.DataLayer;
 using System.Collections.Generic;
 using Umbraco.Core;
+using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -47,6 +49,7 @@ namespace umbraco.cms.businesslogic.web
         private int _defaultTemplate;
         private bool _hasChildrenInitialized = false;
         private bool _hasChildren;
+        private IContentType _contentType;
 
         #endregion
 
@@ -115,11 +118,14 @@ namespace umbraco.cms.businesslogic.web
         {
             try
             {
-                return
+                var contentType = ServiceContext.Current.ContentTypeService.GetContentType(Alias);
+                return new DocumentType(contentType.Id);
+
+                /*return
                     new DocumentType(
                             SqlHelper.ExecuteScalar<int>(@"SELECT nodeid from cmsContentType INNER JOIN umbracoNode on cmsContentType.nodeId = umbracoNode.id WHERE nodeObjectType=@nodeObjectType AND alias=@alias",
                                 SqlHelper.CreateParameter("@nodeObjectType", DocumentType._objectType),
-                                SqlHelper.CreateParameter("@alias", Alias)));
+                                SqlHelper.CreateParameter("@alias", Alias)));*/
             }
             catch
             {
@@ -129,13 +135,17 @@ namespace umbraco.cms.businesslogic.web
 
         public static DocumentType MakeNew(User u, string Text)
         {
-            int ParentId = -1;
+            /*int ParentId = -1;
             int level = 1;
             Guid uniqueId = Guid.NewGuid();
             CMSNode n = MakeNew(ParentId, _objectType, u.Id, level, Text, uniqueId);
 
             Create(n.Id, Text, "");
-            DocumentType newDt = new DocumentType(n.Id);
+            DocumentType newDt = new DocumentType(n.Id);*/
+
+            var contentType = new Umbraco.Core.Models.ContentType(-1) { Name = Text, Alias = Text};
+            ServiceContext.Current.ContentTypeService.Save(contentType);
+            var newDt = new DocumentType(contentType.Id);
 
             //event
             NewEventArgs e = new NewEventArgs();
@@ -155,10 +165,10 @@ namespace umbraco.cms.businesslogic.web
 
         public static List<DocumentType> GetAllAsList()
         {
+            var contentTypes = ServiceContext.Current.ContentTypeService.GetAllContentTypes();
+            var documentTypes = contentTypes.Select(x => new DocumentType(x.Id));
 
-            var documentTypes = new List<DocumentType>();
-
-            using (IRecordsReader dr =
+            /*using (IRecordsReader dr =
                 SqlHelper.ExecuteReader(m_SQLOptimizedGetAll.Trim(), SqlHelper.CreateParameter("@nodeObjectType", DocumentType._objectType)))
             {
                 while (dr.Read())
@@ -184,7 +194,7 @@ namespace umbraco.cms.businesslogic.web
                         dt.PopulateDocumentTypeNodeFromReader(dr);
                     }
                 }
-            }
+            }*/
 
             return documentTypes.OrderBy(x => x.Text).ToList();
 
@@ -476,7 +486,15 @@ namespace umbraco.cms.businesslogic.web
 
         protected override void setupNode()
         {
-            base.setupNode();
+            _contentType = ServiceContext.Current.ContentTypeService.GetContentType(Id);
+            _templateIds = new ArrayList { _contentType.AllowedTemplates.Select(x => x.Id) };
+            if(_contentType.DefaultTemplate != null)
+                _defaultTemplate = _contentType.DefaultTemplate.Id;
+
+            base.PopulateContentTypeFromContentType(_contentType, _objectType);
+            base.PopulateCMSNodeFromContentType(_contentType, _objectType);
+
+            /*base.setupNode();
 
             using (IRecordsReader dr = SqlHelper.ExecuteReader("Select templateNodeId, IsDefault from cmsDocumentType where contentTypeNodeId = @id",
                 SqlHelper.CreateParameter("@id", Id)))
@@ -485,7 +503,7 @@ namespace umbraco.cms.businesslogic.web
                 {
                     PopulateDocumentTypeNodeFromReader(dr);
                 }
-            }
+            }*/
 
         }
 

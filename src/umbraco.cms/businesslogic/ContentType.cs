@@ -5,13 +5,15 @@ using System.Diagnostics;
 using System.Threading;
 using System.Runtime.CompilerServices;
 using System.Linq;
+using Umbraco.Core.Models;
 using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.datatype;
-using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
+using DataTypeDefinition = umbraco.cms.businesslogic.datatype.DataTypeDefinition;
+using Language = umbraco.cms.businesslogic.language.Language;
+using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 
 namespace umbraco.cms.businesslogic
 {
@@ -954,6 +956,16 @@ namespace umbraco.cms.businesslogic
         #endregion
 
         #region Protected Methods
+
+        internal protected void PopulateContentTypeFromContentType(IContentType contentType, Guid objectType)
+        {
+            _alias = contentType.Alias;
+            _iconurl = contentType.Icon;
+            _isContainerContentType = contentType.IsContainer;
+            _allowAtRoot = contentType.AllowedAsRoot;
+            _thumbnail = contentType.Thumbnail;
+            _description = contentType.Description;
+        }
 
         protected void PopulateContentTypeNodeFromReader(IRecordsReader dr)
         {
