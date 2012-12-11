@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Services
 		private Tuple<int, Guid> _lastUowIdWithThread = null;
 
 		[Test]
-		public void Ensure_All_Threads_Reference_Different_Units_Of_Work_Content_Service()
+		public void Ensure_All_Threads_Execute_Successfully_Content_Service()
 		{
 			//we will mimick the ServiceContext in that each repository in a service (i.e. ContentService) is a singleton
 			var contentService = (ContentService)ServiceContext.ContentService;
@@ -67,9 +67,6 @@ namespace Umbraco.Tests.Services
 			var threads = new List<Thread>();
 			
 			Debug.WriteLine("Starting test...");
-
-			//bind to event to determine what is going on during the saving process
-			ContentService.Saving += HandleSaving;
 
 			for (var i = 0; i < _maxThreadCount; i++)
 			{
@@ -124,7 +121,7 @@ namespace Umbraco.Tests.Services
 		}
 
 		[Test]
-		public void Ensure_All_Threads_Reference_Different_Units_Of_Work_Media_Service()
+		public void Ensure_All_Threads_Execute_Successfully_Media_Service()
 		{
 			//we will mimick the ServiceContext in that each repository in a service (i.e. ContentService) is a singleton
 			var mediaService = (MediaService)ServiceContext.MediaService;
@@ -132,9 +129,6 @@ namespace Umbraco.Tests.Services
 			var threads = new List<Thread>();
 
 			Debug.WriteLine("Starting test...");
-
-			//bind to event to determine what is going on during the saving process
-			ContentService.Saving += HandleSaving;
 
 			for (var i = 0; i < _maxThreadCount; i++)
 			{
@@ -189,40 +183,7 @@ namespace Umbraco.Tests.Services
 			}
 
 		}
-
-		private void HandleSaving(object sender, SaveEventArgs args)
-		{
-			if (_error == null)
-			{
-				lock (_locker)
-				{
-					//get the instance id of the unit of work
-					var uowId = ((PetaPocoUnitOfWork)args.UnitOfWork).InstanceId;
-					if (_lastUowIdWithThread == null)
-					{
-						Debug.WriteLine("Initial UOW found = " + uowId + " with thread id " + Thread.CurrentThread.ManagedThreadId);
-
-						_lastUowIdWithThread = new Tuple<int, Guid>(
-							Thread.CurrentThread.ManagedThreadId, uowId);
-					}
-					else
-					{
-						Debug.WriteLine("Next thread running. UOW found = " + uowId + " with thread id " + Thread.CurrentThread.ManagedThreadId);
-
-						var newTuple = new Tuple<int, Guid>(
-							Thread.CurrentThread.ManagedThreadId, uowId);
-
-						//check if the uowId is the same as the last and if the thread Id's are different then we have a problem
-						if (newTuple.Item2 == _lastUowIdWithThread.Item2
-							&& newTuple.Item1 != _lastUowIdWithThread.Item1)
-						{
-							_error = new Exception("The threads: " + newTuple.Item1 + " and " + _lastUowIdWithThread.Item1 + " are both referencing the Unit of work: " + _lastUowIdWithThread.Item2);
-						}
-					}
-				}
-			}
-		}
-
+		
 		public void CreateTestData()
 		{
 			//Create and Save ContentType "umbTextpage" -> 1045

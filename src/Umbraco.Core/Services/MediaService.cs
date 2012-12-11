@@ -204,7 +204,7 @@ namespace Umbraco.Core.Services
         {
             var repository = _mediaRepository;
 
-			var e = new SaveEventArgs(_unitOfWork);
+			var e = new SaveEventArgs();
 			if (Saving != null)
 				Saving(media, e);
 

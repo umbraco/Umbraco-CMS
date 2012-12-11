@@ -42,30 +42,7 @@ namespace Umbraco.Core
         /// </summary>
         public int Id { get; set; }
     }
-	public class SaveEventArgs : System.ComponentModel.CancelEventArgs
-    {
-		/// <summary>
-		/// public constructor
-		/// </summary>
-		public SaveEventArgs()
-		{
-
-		}
-
-		/// <summary>
-		/// internal constructor used for unit testing
-		/// </summary>
-		/// <param name="unitOfWork"></param>
-		internal SaveEventArgs(IUnitOfWork unitOfWork)
-		{
-			UnitOfWork = unitOfWork;
-		}
-
-		/// <summary>
-		/// Used for unit testing
-		/// </summary>
-		internal IUnitOfWork UnitOfWork { get; private set; }
-    }
+	public class SaveEventArgs : System.ComponentModel.CancelEventArgs { }
     public class NewEventArgs : System.ComponentModel.CancelEventArgs
     {
         /// <summary>

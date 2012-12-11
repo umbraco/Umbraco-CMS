@@ -430,7 +430,7 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(uow))
 			{
-				var e = new SaveEventArgs(uow);
+				var e = new SaveEventArgs();
 				if (Saving != null)
 					Saving(content, e);
 
@@ -490,7 +490,7 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(uow))
 			{
-				var e = new SaveEventArgs(uow);
+				var e = new SaveEventArgs();
 				if (Saving != null)
 					Saving(content, e);
 
@@ -524,7 +524,7 @@ namespace Umbraco.Core.Services
             {
 				var containsNew = contents.Any(x => x.HasIdentity == false);
 
-				var e = new SaveEventArgs(uow);
+				var e = new SaveEventArgs();
 				if (Saving != null)
 					Saving(contents, e);
 
@@ -573,7 +573,7 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(uow))
 			{
-				var e = new SaveEventArgs(uow);
+				var e = new SaveEventArgs();
 				if (Saving != null)
 					Saving(contents, e);
 
