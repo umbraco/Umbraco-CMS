@@ -781,7 +781,7 @@ namespace umbraco.cms.businesslogic.web
 				int x = SqlHelper.ExecuteScalar<int>(@"select count(node.id) - count(doc.nodeid)
 from umbracoNode as node 
 left join cmsDocument as doc on (node.id=doc.nodeId and doc.published=1)
-where '" + Path + ",' like " + SqlHelper.Concat("node.path", "'%'"));
+where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'"));
 				return (x == 1);
 			}
 		}
