@@ -281,10 +281,23 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Checks whether an <see cref="IContent"/> item has any children
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/></param>
+        /// <returns>True if the content has any children otherwise False</returns>
+        public bool HasChildren(int id)
+        {
+            var repository = _contentRepository;
+            var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
+            int count = repository.Count(query);
+            return count > 0;
+        }
+
+        /// <summary>
         /// Checks whether an <see cref="IContent"/> item has any published versions
         /// </summary>
         /// <param name="id">Id of the <see cref="IContent"/></param>
-        /// <returns>True if the content has any published versiom otherwise False</returns>
+        /// <returns>True if the content has any published version otherwise False</returns>
         public bool HasPublishedVersion(int id)
         {
             var repository = _contentRepository;

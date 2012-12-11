@@ -261,7 +261,7 @@ namespace Umbraco.Core.Services
         /// Cheacks whether an <see cref="IContent"/> item has any published versions
         /// </summary>
         /// <param name="id">Id of the <see cref="IContent"/></param>
-        /// <returns>True if the content has any published versiom otherwise False</returns>
+        /// <returns>True if the content has any published version otherwise False</returns>
         bool HasPublishedVersion(int id);
 
         /// <summary>
@@ -292,5 +292,12 @@ namespace Umbraco.Core.Services
         /// <param name="content"><see cref="IContent"/> item to retrieve Descendants from</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetDescendants(IContent content);
+
+        /// <summary>
+        /// Checks whether an <see cref="IContent"/> item has any children
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/></param>
+        /// <returns>True if the content has any children otherwise False</returns>
+        bool HasChildren(int id);
     }
 }

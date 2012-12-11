@@ -147,5 +147,19 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <returns>The DTD as a string</returns>
         string GetContentTypesDtd();
+
+        /// <summary>
+        /// Checks whether an <see cref="IContentType"/> item has any children
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContentType"/></param>
+        /// <returns>True if the content type has any children otherwise False</returns>
+        bool HasChildren(int id);
+
+        /// <summary>
+        /// Checks whether an <see cref="IMediaType"/> item has any children
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMediaType"/></param>
+        /// <returns>True if the media type has any children otherwise False</returns>
+        bool MediaTypeHasChildren(int id);
     }
 }

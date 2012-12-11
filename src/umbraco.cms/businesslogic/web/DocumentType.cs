@@ -209,7 +209,8 @@ namespace umbraco.cms.businesslogic.web
             {
                 if (!_hasChildrenInitialized)
                 {
-                    HasChildren = SqlHelper.ExecuteScalar<int>("select count(childContentTypeId) as tmp from cmsContentType2ContentType where parentContentTypeId = @id", SqlHelper.CreateParameter("@id", Id)) > 0;
+                    HasChildren = ServiceContext.Current.ContentTypeService.HasChildren(Id);
+                    //HasChildren = SqlHelper.ExecuteScalar<int>("select count(childContentTypeId) as tmp from cmsContentType2ContentType where parentContentTypeId = @id", SqlHelper.CreateParameter("@id", Id)) > 0;
                 }
                 return _hasChildren;
             }
@@ -487,7 +488,12 @@ namespace umbraco.cms.businesslogic.web
         protected override void setupNode()
         {
             _contentType = ServiceContext.Current.ContentTypeService.GetContentType(Id);
-            _templateIds = new ArrayList { _contentType.AllowedTemplates.Select(x => x.Id) };
+
+            foreach (var template in _contentType.AllowedTemplates)
+            {
+                _templateIds.Add(template.Id);
+            }
+
             if(_contentType.DefaultTemplate != null)
                 _defaultTemplate = _contentType.DefaultTemplate.Id;
 

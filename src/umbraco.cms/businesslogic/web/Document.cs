@@ -495,7 +495,10 @@ namespace umbraco.cms.businesslogic.web
         /// <returns></returns>
         public static Document[] GetChildrenForTree(int NodeId)
         {
-            var tmp = new List<Document>();
+            var children = ServiceContext.Current.ContentService.GetChildren(NodeId);
+            var list = children.Select(x => new Document(x.Id));
+            return list.ToArray();
+            /*var tmp = new List<Document>();
             using (IRecordsReader dr =
                 SqlHelper.ExecuteReader(
                                         string.Format(m_SQLOptimizedMany.Trim(), "umbracoNode.parentID = @parentId", "umbracoNode.sortOrder"),
@@ -510,7 +513,7 @@ namespace umbraco.cms.businesslogic.web
                 }
             }
 
-            return tmp.ToArray();
+            return tmp.ToArray();*/
         }
 
         public static List<Document> GetChildrenBySearch(int NodeId, string searchString)
