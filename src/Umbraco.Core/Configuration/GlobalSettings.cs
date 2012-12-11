@@ -201,7 +201,8 @@ namespace Umbraco.Core.Configuration
             }
 
             string fileName = String.Concat(vDir, "web.config");
-            var xml = XDocument.Load(fileName);
+            var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
+            
             var appSettings = xml.Root.Descendants("appSettings").Single();
 
             // Update appSetting if it exists, or else create a new appSetting for the given key and value
@@ -211,7 +212,7 @@ namespace Umbraco.Core.Configuration
             else
                 setting.Attribute("value").Value = value;
 
-            xml.Save(fileName);
+            xml.Save(fileName, SaveOptions.DisableFormatting);
             ConfigurationManager.RefreshSection("appSettings");
         }
 
