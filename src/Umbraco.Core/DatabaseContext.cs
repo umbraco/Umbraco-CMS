@@ -22,25 +22,34 @@ namespace Umbraco.Core
     /// </remarks>
     public class DatabaseContext
     {
-        private bool _configured;
+	    private readonly IDatabaseFactory _factory;
+	    private bool _configured;
         private string _connectionString;
         private string _providerName;
-		private static volatile Database _globalInstance = null;
-		private static readonly object Locker = new object();
-
 
         #region Singleton
-        private static readonly Lazy<DatabaseContext> lazy = new Lazy<DatabaseContext>(() => new DatabaseContext());
-        
-        /// <summary>
-        /// Gets the current Database Context.
-        /// </summary>
-        public static DatabaseContext Current { get { return lazy.Value; } }
 
-        private DatabaseContext()
+	    private static DatabaseContext _customContext = null;
+        private static readonly Lazy<DatabaseContext> lazy = new Lazy<DatabaseContext>(() => new DatabaseContext(new DefaultDatabaseFactory()));
+        
+	    /// <summary>
+	    /// Gets the current Database Context.
+	    /// </summary>
+	    public static DatabaseContext Current
+	    {
+			//return the _custom context if it is set, otherwise the automatic lazy instance
+		    get { return _customContext ?? lazy.Value; }
+			//Allows setting a custom database context for the 'Current', normally used for unit tests or if the
+			//default IDatabaseFactory is not sufficient.
+			internal set { _customContext = value; }
+	    }
+
+        internal DatabaseContext(IDatabaseFactory factory)
         {
+	        _factory = factory;
         }
-        #endregion
+
+	    #endregion
 
         /// <summary>
         /// Gets the <see cref="Database"/> object for doing CRUD operations
@@ -49,38 +58,10 @@ namespace Umbraco.Core
         /// <remarks>
         /// This should not be used for CRUD operations or queries against the
         /// standard Umbraco tables! Use the Public services for that.
-        /// 
-		/// If we are running in an http context
-		/// it will create on per context, otherwise it will a global singleton object
         /// </remarks>
         public Database Database
         {
-            get
-            {
-				//no http context, create the singleton global object
-				if (HttpContext.Current == null)
-				{
-					if (_globalInstance == null)
-					{
-						lock (Locker)
-						{
-							//double check
-							if (_globalInstance == null)
-							{
-								_globalInstance = new Database(GlobalSettings.UmbracoConnectionName);
-							}
-						}
-					}
-					return _globalInstance;
-				}
-
-				//we have an http context, so only create one per request
-				if (!HttpContext.Current.Items.Contains(typeof(DatabaseContext)))
-				{
-					HttpContext.Current.Items.Add(typeof(DatabaseContext), new Database(GlobalSettings.UmbracoConnectionName));
-				}
-				return (Database)HttpContext.Current.Items[typeof(DatabaseContext)];
-            }
+            get { return _factory.CreateDatabase(); }
         }
 
         /// <summary>

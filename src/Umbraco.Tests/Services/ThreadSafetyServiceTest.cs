@@ -20,16 +20,27 @@ namespace Umbraco.Tests.Services
 	public class ThreadSafetyServiceTest : BaseDatabaseFactoryTest
 	{
 		private PerThreadPetaPocoUnitOfWorkProvider _uowProvider;
+		private PerThreadDatabaseFactory _dbFactory;
 
 		[SetUp]
 		public override void Initialize()
 		{
 			base.Initialize();
 			
+			//we need to use our own custom IDatabaseFactory for the DatabaseContext because we MUST ensure that 
+			//a Database instance is created per thread, whereas the default implementation which will work in an HttpContext
+			//threading environment, or a single apartment threading environment will not work for this test because 
+			//it is multi-threaded.
+			_dbFactory = new PerThreadDatabaseFactory();
+			//assign the custom factory to the new context and assign that to 'Current'
+			DatabaseContext.Current = new DatabaseContext(_dbFactory);
+			//overwrite the local object
+			DatabaseContext = DatabaseContext.Current;
+
 			//here we are going to override the ServiceContext because normally with our test cases we use a 
 			//global Database object but this is NOT how it should work in the web world or in any multi threaded scenario.
 			//we need a new Database object for each thread.
-			_uowProvider = new PerThreadPetaPocoUnitOfWorkProvider();			
+			_uowProvider = new PerThreadPetaPocoUnitOfWorkProvider(_dbFactory);			
 			ServiceContext = new ServiceContext(_uowProvider, new FileUnitOfWorkProvider(), new PublishingStrategy());
 
 			CreateTestData();
@@ -39,9 +50,9 @@ namespace Umbraco.Tests.Services
 		public override void TearDown()
 		{
 			_error = null;
-			_lastUowIdWithThread = null;
 
 			//dispose!
+			_dbFactory.Dispose();
 			_uowProvider.Dispose();
 
 			base.TearDown();
@@ -54,9 +65,7 @@ namespace Umbraco.Tests.Services
 		/// </summary>
 		private volatile Exception _error = null;
 
-		private int _maxThreadCount = 1;
-		private object _locker = new object();
-		private Tuple<int, Guid> _lastUowIdWithThread = null;
+		private const int MaxThreadCount = 20;
 
 		[Test]
 		public void Ensure_All_Threads_Execute_Successfully_Content_Service()
@@ -68,7 +77,7 @@ namespace Umbraco.Tests.Services
 			
 			Debug.WriteLine("Starting test...");
 
-			for (var i = 0; i < _maxThreadCount; i++)
+			for (var i = 0; i < MaxThreadCount; i++)
 			{
 				var t = new Thread(() =>
 					{
@@ -81,14 +90,14 @@ namespace Umbraco.Tests.Services
 							var content1 = contentService.CreateContent(-1, "umbTextpage", 0);
 							content1.Name = "test" + Guid.NewGuid();
 							Debug.WriteLine("Saving content1 on thread: " + Thread.CurrentThread.ManagedThreadId);
-							contentService.Save(content1);	
+							contentService.Save(content1);
 
-							//Thread.Sleep(100); //quick pause for maximum overlap!
+							Thread.Sleep(100); //quick pause for maximum overlap!
 
-							//var content2 = contentService.CreateContent(-1, "umbTextpage", 0);
-							//content2.Name = "test" + Guid.NewGuid();
-							//Debug.WriteLine("Saving content2 on thread: " + Thread.CurrentThread.ManagedThreadId);
-							//contentService.Save(content2);	
+							var content2 = contentService.CreateContent(-1, "umbTextpage", 0);
+							content2.Name = "test" + Guid.NewGuid();
+							Debug.WriteLine("Saving content2 on thread: " + Thread.CurrentThread.ManagedThreadId);
+							contentService.Save(content2);	
 						}
 						catch(Exception e)
 						{														
@@ -130,7 +139,7 @@ namespace Umbraco.Tests.Services
 
 			Debug.WriteLine("Starting test...");
 
-			for (var i = 0; i < _maxThreadCount; i++)
+			for (var i = 0; i < MaxThreadCount; i++)
 			{
 				var t = new Thread(() =>
 				{
@@ -193,24 +202,48 @@ namespace Umbraco.Tests.Services
 		}
 
 		/// <summary>
-		/// Creates a Database object per thread, this mimics the web context which is per HttpContext
+		/// Creates a Database object per thread, this mimics the web context which is per HttpContext and is required for the multi-threaded test
 		/// </summary>
-		internal class PerThreadPetaPocoUnitOfWorkProvider : DisposableObject, IDatabaseUnitOfWorkProvider
-		{			
-			private readonly ConcurrentDictionary<int, Database> _databases = new ConcurrentDictionary<int, Database>(); 
+		internal class PerThreadDatabaseFactory : DisposableObject, IDatabaseFactory
+		{
+			private readonly ConcurrentDictionary<int, UmbracoDatabase> _databases = new ConcurrentDictionary<int, UmbracoDatabase>(); 
 
-			public IDatabaseUnitOfWork GetUnitOfWork()
+			public UmbracoDatabase CreateDatabase()
 			{
-				//Create or get a database instance for this thread.
-				//var db = _databases.GetOrAdd(Thread.CurrentThread.ManagedThreadId, i => new Database(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName));
-
-				return new PetaPocoUnitOfWork(new Database(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName));
+				var db = _databases.GetOrAdd(Thread.CurrentThread.ManagedThreadId, i => new UmbracoDatabase(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName));
+				return db;
 			}
 
 			protected override void DisposeResources()
 			{
 				//dispose the databases
 				_databases.ForEach(x => x.Value.Dispose());
+			}
+		}
+
+		/// <summary>
+		/// Creates a UOW with a Database object per thread
+		/// </summary>
+		internal class PerThreadPetaPocoUnitOfWorkProvider : DisposableObject, IDatabaseUnitOfWorkProvider
+		{
+			private readonly PerThreadDatabaseFactory _dbFactory;
+
+			public PerThreadPetaPocoUnitOfWorkProvider(PerThreadDatabaseFactory dbFactory)
+			{
+				_dbFactory = dbFactory;
+			}
+
+			public IDatabaseUnitOfWork GetUnitOfWork()
+			{
+				//Create or get a database instance for this thread.
+				var db = _dbFactory.CreateDatabase();
+				return new PetaPocoUnitOfWork(db);
+			}
+
+			protected override void DisposeResources()
+			{
+				//dispose the databases
+				_dbFactory.Dispose();
 			}
 		}
 
