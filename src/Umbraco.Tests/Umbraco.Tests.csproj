@@ -157,7 +157,6 @@
     <Compile Include="CodeFirst\TopologicalSorter.cs" />
     <Compile Include="CodeFirst\TypeInheritanceTest.cs" />
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
-    <Compile Include="Configurations\RepositorySettingsTests.cs" />
     <Compile Include="ContentStores\PublishMediaStoreTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
     <Compile Include="Migrations\FindingMigrationsTest.cs" />
