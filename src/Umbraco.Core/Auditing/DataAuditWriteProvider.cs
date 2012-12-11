@@ -4,7 +4,7 @@ using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Auditing
 {
-    public class DataAuditWriteProvider : IAuditWriteProvider
+    internal class DataAuditWriteProvider : IAuditWriteProvider
     {
         /// <summary>
         /// Writes an audit entry to the underlaying datastore.

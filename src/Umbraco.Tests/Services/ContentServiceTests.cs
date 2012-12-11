@@ -668,7 +668,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Save_Lazy_Content()
         {
-			var unitOfWork = new PetaPocoUnitOfWork(DatabaseFactory.Current.Database);
+			var unitOfWork = new PetaPocoUnitOfWork(Umbraco.Core.DatabaseContext.Current.Database);
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
             var root = ServiceContext.ContentService.GetById(1046);
 

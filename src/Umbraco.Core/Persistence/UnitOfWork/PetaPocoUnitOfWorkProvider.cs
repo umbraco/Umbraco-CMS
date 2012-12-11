@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 
 	    public IDatabaseUnitOfWork GetUnitOfWork()
         {
-			return new PetaPocoUnitOfWork(DatabaseFactory.Current.Database);
+			return new PetaPocoUnitOfWork(DatabaseContext.Current.Database);
         }
 
         #endregion

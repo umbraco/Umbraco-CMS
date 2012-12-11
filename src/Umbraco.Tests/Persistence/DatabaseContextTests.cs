@@ -11,13 +11,13 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Persistence
 {
     [TestFixture]
-    public class DatabaseFactoryTests
+    public class DatabaseContextTests
     {
         [Test]
         public void Can_Verify_Single_Database_Instance()
         {
-            var db1 = DatabaseFactory.Current.Database;
-            var db2 = DatabaseFactory.Current.Database;
+			var db1 = DatabaseContext.Current.Database;
+			var db2 = DatabaseContext.Current.Database;
 
             Assert.AreSame(db1, db2);
         }
@@ -53,11 +53,11 @@ namespace Umbraco.Tests.Persistence
             SyntaxConfig.SqlSyntaxProvider = SqlCeSyntaxProvider.Instance;
 
             //Create the umbraco database
-            DatabaseFactory.Current.Database.CreateDatabaseSchema();
+			DatabaseContext.Current.Database.CreateDatabaseSchema();
 
-            bool umbracoNodeTable = DatabaseFactory.Current.Database.TableExist("umbracoNode");
-            bool umbracoUserTable = DatabaseFactory.Current.Database.TableExist("umbracoUser");
-            bool cmsTagsTable = DatabaseFactory.Current.Database.TableExist("cmsTags");
+			bool umbracoNodeTable = DatabaseContext.Current.Database.TableExist("umbracoNode");
+			bool umbracoUserTable = DatabaseContext.Current.Database.TableExist("umbracoUser");
+			bool cmsTagsTable = DatabaseContext.Current.Database.TableExist("cmsTags");
 
             Assert.That(umbracoNodeTable, Is.True);
             Assert.That(umbracoUserTable, Is.True);

@@ -183,7 +183,6 @@
     <Compile Include="Persistence\DatabaseAnnotations\NullSettings.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\PrimaryKeyColumnAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ReferencesAttribute.cs" />
-    <Compile Include="Persistence\DatabaseFactory.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\ColumnDefinition.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\ConstraintDefinition.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\ConstraintType.cs" />

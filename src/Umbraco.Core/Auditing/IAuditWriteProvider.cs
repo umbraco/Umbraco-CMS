@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Auditing
 {
-    public interface IAuditWriteProvider
+    internal interface IAuditWriteProvider
     {
         /// <summary>
         /// Writes an audit entry to the underlaying datastore.

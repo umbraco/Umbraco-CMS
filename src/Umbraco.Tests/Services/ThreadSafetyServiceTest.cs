@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Services
 		/// </summary>
 		private volatile Exception _error = null;
 
-		private int _maxThreadCount = 20;
+		private int _maxThreadCount = 1;
 		private object _locker = new object();
 		private Tuple<int, Guid> _lastUowIdWithThread = null;
 
@@ -83,12 +83,12 @@ namespace Umbraco.Tests.Services
 							Debug.WriteLine("Saving content1 on thread: " + Thread.CurrentThread.ManagedThreadId);
 							contentService.Save(content1);	
 
-							Thread.Sleep(100); //quick pause for maximum overlap!
+							//Thread.Sleep(100); //quick pause for maximum overlap!
 
-							var content2 = contentService.CreateContent(-1, "umbTextpage", 0);
-							content2.Name = "test" + Guid.NewGuid();
-							Debug.WriteLine("Saving content2 on thread: " + Thread.CurrentThread.ManagedThreadId);
-							contentService.Save(content2);	
+							//var content2 = contentService.CreateContent(-1, "umbTextpage", 0);
+							//content2.Name = "test" + Guid.NewGuid();
+							//Debug.WriteLine("Saving content2 on thread: " + Thread.CurrentThread.ManagedThreadId);
+							//contentService.Save(content2);	
 						}
 						catch(Exception e)
 						{														
@@ -202,9 +202,9 @@ namespace Umbraco.Tests.Services
 			public IDatabaseUnitOfWork GetUnitOfWork()
 			{
 				//Create or get a database instance for this thread.
-				var db = _databases.GetOrAdd(Thread.CurrentThread.ManagedThreadId, i => new Database(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName));
-				
-				return new PetaPocoUnitOfWork(db);
+				//var db = _databases.GetOrAdd(Thread.CurrentThread.ManagedThreadId, i => new Database(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName));
+
+				return new PetaPocoUnitOfWork(new Database(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName));
 			}
 
 			protected override void DisposeResources()

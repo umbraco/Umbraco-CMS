@@ -516,7 +516,7 @@ namespace Umbraco.Core.Services
 					if (Saved != null)
 						Saved(content, e);
 
-					Audit.Add(AuditTypes.Save, "Save Content performed by user", userId == -1 ? 0 : userId, content.Id);
+					//Audit.Add(AuditTypes.Save, "Save Content performed by user", userId == -1 ? 0 : userId, content.Id);
 				}
 			}
 		}
