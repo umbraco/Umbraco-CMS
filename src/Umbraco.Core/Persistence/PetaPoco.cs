@@ -2304,6 +2304,7 @@ namespace Umbraco.Core.Persistence
 
 		public SqlJoinClause InnerJoin(string table) { return Join("INNER JOIN ", table); }
 		public SqlJoinClause LeftJoin(string table) { return Join("LEFT JOIN ", table); }
+        public SqlJoinClause LeftOuterJoin(string table) { return Join("LEFT OUTER JOIN ", table); }
         public SqlJoinClause RightJoin(string table) { return Join("RIGHT JOIN ", table); }
 
 		public class SqlJoinClause

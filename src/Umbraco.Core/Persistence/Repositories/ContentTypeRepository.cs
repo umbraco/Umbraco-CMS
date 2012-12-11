@@ -91,11 +91,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IContentType>(sqlClause, query);
             var sql = translator.Translate();
 
-            var documentTypeDtos = Database.Fetch<DocumentTypeDto, ContentTypeDto, NodeDto>(sql);
+            var dtos = Database.Fetch<DocumentTypeDto, ContentTypeDto, NodeDto>(sql);
 
-            foreach (var dto in documentTypeDtos)
+            foreach (var dto in dtos.DistinctBy(x => x.ContentTypeDto.NodeId))
             {
-                yield return Get(dto.ContentTypeNodeId);
+                yield return Get(dto.ContentTypeDto.NodeId);
             }
         }
 
@@ -114,14 +114,20 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql GetBaseQuery(bool isCount)
         {
-            var sql = new Sql();
             //TODO Investigate the proper usage of IsDefault on cmsDocumentType
-            sql.Select(isCount ? "COUNT(*)" : "*");
-            sql.From("cmsDocumentType");
+            /*sql.From("cmsDocumentType");
             sql.RightJoin("cmsContentType ON ([cmsContentType].[nodeId] = [cmsDocumentType].[contentTypeNodeId])");
             sql.InnerJoin("umbracoNode ON ([cmsContentType].[nodeId] = [umbracoNode].[id])");
             sql.Where("[umbracoNode].[nodeObjectType] = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
-            sql.Where("[cmsDocumentType].[IsDefault] = @IsDefault", new { IsDefault = true });
+            sql.Where("[cmsDocumentType].[IsDefault] = @IsDefault", new { IsDefault = true });*/
+
+            var sql = new Sql();
+            sql.Select(isCount ? "COUNT(*)" : "*");
+            sql.From<DocumentTypeDto>();
+            sql.RightJoin<ContentTypeDto>().On<ContentTypeDto, DocumentTypeDto>(x => x.NodeId, y => y.ContentTypeNodeId);
+            sql.InnerJoin<NodeDto>().On<ContentTypeDto, NodeDto>(x => x.NodeId, y => y.NodeId);
+            sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+
             return sql;
         }
 

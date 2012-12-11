@@ -36,6 +36,9 @@ namespace Umbraco.Tests.TestHelpers
 
             UmbracoSettings.UseLegacyXmlSchema = false;
 
+            DataTypesResolver.Current = new DataTypesResolver(
+                PluginManager.Current.ResolveDataTypes());
+
 			RepositoryResolver.Current = new RepositoryResolver(
 				new RepositoryFactory());
 
@@ -71,13 +74,15 @@ namespace Umbraco.Tests.TestHelpers
         {
             TestHelper.CleanContentDirectories();
 
+            DataTypesResolver.Reset();
+            RepositoryResolver.Reset();
+
             //reset the app context
             DatabaseContext = null;
             ApplicationContext.Current = null;
             ServiceContext = null;
-            Resolution.IsFrozen = false;
 
-            RepositoryResolver.Reset();
+            Resolution.IsFrozen = false;
 
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
