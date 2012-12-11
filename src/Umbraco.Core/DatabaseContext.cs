@@ -49,7 +49,10 @@ namespace Umbraco.Core
         /// </remarks>
         public Database Database
         {
-            get { return DatabaseFactory.Current.Database; }
+            get
+            {
+	            return DatabaseFactory.Current.Database;
+            }
         }
 
         /// <summary>

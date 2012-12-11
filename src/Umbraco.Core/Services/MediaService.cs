@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
@@ -12,14 +13,14 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class MediaService : IMediaService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IDatabaseUnitOfWork _unitOfWork;
 	    private readonly IMediaRepository _mediaRepository;
 
         public MediaService() : this(new PetaPocoUnitOfWorkProvider())
         {
         }
 
-        public MediaService(IUnitOfWorkProvider provider)
+        public MediaService(IDatabaseUnitOfWorkProvider provider)
         {
             _unitOfWork = provider.GetUnitOfWork();
 	        _mediaRepository = RepositoryResolver.Current.Factory.CreateMediaRepository(_unitOfWork);
@@ -202,8 +203,19 @@ namespace Umbraco.Core.Services
         public void Save(IMedia media, int userId)
         {
             var repository = _mediaRepository;
-            repository.AddOrUpdate(media);
-            _unitOfWork.Commit();
+
+			var e = new SaveEventArgs(_unitOfWork);
+			if (Saving != null)
+				Saving(media, e);
+
+			if (!e.Cancel)
+			{
+				repository.AddOrUpdate(media);
+				_unitOfWork.Commit();
+
+				if (Saved != null)
+					Saved(media, e);
+			}
         }
 
         /// <summary>
@@ -220,5 +232,15 @@ namespace Umbraco.Core.Services
             }
             _unitOfWork.Commit();
         }
+
+		/// <summary>
+		/// Occurs before Save
+		/// </summary>
+		public static event EventHandler<SaveEventArgs> Saving;
+
+		/// <summary>
+		/// Occurs after Save
+		/// </summary>
+		public static event EventHandler<SaveEventArgs> Saved;
     }
 }

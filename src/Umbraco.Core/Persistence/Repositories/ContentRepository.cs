@@ -20,14 +20,14 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;
 
-        public ContentRepository(IUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
+		public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
             : base(work)
         {
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
         }
 
-        public ContentRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
+		public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
             : base(work, cache)
         {
             _contentTypeRepository = contentTypeRepository;

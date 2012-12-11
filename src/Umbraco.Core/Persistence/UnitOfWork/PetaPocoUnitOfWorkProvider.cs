@@ -1,15 +1,21 @@
-﻿namespace Umbraco.Core.Persistence.UnitOfWork
+﻿using System;
+using System.Threading;
+using System.Web;
+using Umbraco.Core.Configuration;
+
+namespace Umbraco.Core.Persistence.UnitOfWork
 {
     /// <summary>
     /// Represents a Unit of Work Provider for creating a <see cref="PetaPocoUnitOfWork"/>
     /// </summary>
-    internal class PetaPocoUnitOfWorkProvider : IUnitOfWorkProvider
+    internal class PetaPocoUnitOfWorkProvider : IDatabaseUnitOfWorkProvider
     {
-        #region Implementation of IUnitOfWorkProvider
+	    
+	    #region Implementation of IUnitOfWorkProvider
 
-        public IUnitOfWork GetUnitOfWork()
+	    public IDatabaseUnitOfWork GetUnitOfWork()
         {
-            return new PetaPocoUnitOfWork();
+			return new PetaPocoUnitOfWork(DatabaseFactory.Current.Database);
         }
 
         #endregion

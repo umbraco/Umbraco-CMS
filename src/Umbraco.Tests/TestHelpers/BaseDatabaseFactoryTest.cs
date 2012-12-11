@@ -10,6 +10,8 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
@@ -18,6 +20,7 @@ using umbraco.BusinessLogic;
 
 namespace Umbraco.Tests.TestHelpers
 {
+	
     /// <summary>
     /// Use this abstract class for tests that requires a Sql Ce database populated with the umbraco db schema.
     /// The PetaPoco Database class should be used through the <see cref="DatabaseFactory"/> singleton.
@@ -57,7 +60,7 @@ namespace Umbraco.Tests.TestHelpers
             Resolution.Freeze();
             ApplicationContext = new ApplicationContext() { IsReady = true };
             DatabaseContext = DatabaseContext.Current;
-            ServiceContext = ServiceContext.Current;
+            ServiceContext = new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy());
 
             //Configure the Database and Sql Syntax based on connection string set in config
             DatabaseContext.Initialize();
@@ -69,6 +72,8 @@ namespace Umbraco.Tests.TestHelpers
         [TearDown]
         public virtual void TearDown()
         {
+			DatabaseContext.Database.Dispose();
+
             TestHelper.CleanContentDirectories();
 
             //reset the app context

@@ -29,14 +29,14 @@ namespace Umbraco.Tests.Persistence
 
 		//[TestCase(typeof(IUserTypeRepository))]
 		//[TestCase(typeof(IUserRepository))]
+		//[TestCase(typeof(IMacroRepository))]
 		[TestCase(typeof(IContentRepository))]
 		[TestCase(typeof(IMediaRepository))]
 		[TestCase(typeof(IMediaTypeRepository))]
 		[TestCase(typeof(IContentTypeRepository))]
 		[TestCase(typeof(IDataTypeDefinitionRepository))]
 		[TestCase(typeof(IDictionaryRepository))]
-		[TestCase(typeof(ILanguageRepository))]
-		//[TestCase(typeof(IMacroRepository))]
+		[TestCase(typeof(ILanguageRepository))]		
 		[TestCase(typeof(IRelationRepository))]
 		[TestCase(typeof(IRelationTypeRepository))]
 		[TestCase(typeof(IScriptRepository))]
@@ -46,29 +46,16 @@ namespace Umbraco.Tests.Persistence
 		{
 			var method = typeof(RepositoryResolver).GetMethod("ResolveByType", BindingFlags.NonPublic | BindingFlags.Instance);
 			var gMethod = method.MakeGenericMethod(repoType);
-			var repo = gMethod.Invoke(RepositoryResolver.Current, new object[] { new PetaPocoUnitOfWork() });
+			var repo = gMethod.Invoke(RepositoryResolver.Current, new object[] { new PetaPocoUnitOfWork(DatabaseFactory.Current.Database) });
 			Assert.IsNotNull(repo);
 			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom(repoType, repo.GetType()));
 		}
 
-		//[Test]
-		//public void Can_Resolve_All_Repositories()
-		//{
-		//	// Arrange
-		//	var uow = new PetaPocoUnitOfWork();
-
-		//	// Act
-		//	RepositoryResolver.RegisterRepositories();
-            
-		//	// Assert
-		//	Assert.That(RepositoryResolver.RegisteredRepositories(), Is.EqualTo(15));
-		//}
-		
-        [Test]
+		[Test]
         public void Can_Verify_UOW_In_Repository()
         {
             // Arrange
-            var uow = new PetaPocoUnitOfWork();
+			var uow = new PetaPocoUnitOfWork(DatabaseFactory.Current.Database);
 
             // Act
             var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(uow);
@@ -87,8 +74,8 @@ namespace Umbraco.Tests.Persistence
 
             Assert.That(isSubclassOf, Is.False);
             Assert.That(isAssignableFrom, Is.True);
-            
-            var uow = new PetaPocoUnitOfWork();
+
+			var uow = new PetaPocoUnitOfWork(DatabaseFactory.Current.Database);
             var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(uow);
             bool subclassOf = repository.GetType().IsSubclassOf(typeof (IRepository<int, IContent>));
 

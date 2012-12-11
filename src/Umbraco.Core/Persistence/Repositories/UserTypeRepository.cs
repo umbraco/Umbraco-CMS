@@ -15,11 +15,13 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class UserTypeRepository : PetaPocoRepositoryBase<int, IUserType>, IUserTypeRepository
     {
-        public UserTypeRepository(IUnitOfWork work) : base(work)
+		public UserTypeRepository(IDatabaseUnitOfWork work)
+			: base(work)
         {
         }
 
-        public UserTypeRepository(IUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
+		public UserTypeRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
+			: base(work, cache)
         {
         }
 

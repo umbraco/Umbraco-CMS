@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services
     {
         private readonly IContentService _contentService;
         private readonly IMediaService _mediaService;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IDatabaseUnitOfWork _unitOfWork;
 	    private readonly IContentTypeRepository _contentTypeRepository;
 	    private readonly IMediaTypeRepository _mediaTypeRepository;
 
@@ -27,7 +27,7 @@ namespace Umbraco.Core.Services
             : this(contentService, mediaService, new PetaPocoUnitOfWorkProvider())
         {}
 
-        public ContentTypeService(IContentService contentService, IMediaService mediaService, IUnitOfWorkProvider provider)
+        public ContentTypeService(IContentService contentService, IMediaService mediaService, IDatabaseUnitOfWorkProvider provider)
         {
             _contentService = contentService;
             _mediaService = mediaService;

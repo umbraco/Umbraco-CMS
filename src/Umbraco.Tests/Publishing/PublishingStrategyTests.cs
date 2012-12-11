@@ -46,8 +46,8 @@ namespace Umbraco.Tests.Publishing
         [TearDown]
         public override void TearDown()
         {
-            DatabaseContext.Database.Dispose();
-
+			base.TearDown();
+            
             //TestHelper.ClearDatabase();
 
             //reset the app context

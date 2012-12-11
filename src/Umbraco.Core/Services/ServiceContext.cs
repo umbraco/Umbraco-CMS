@@ -31,18 +31,29 @@ namespace Umbraco.Core.Services
 
         private ServiceContext()
         {
-            BuildServiceCache();
+			BuildServiceCache(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy());
         }
+
+		/// <summary>
+		/// Internal constructor used for unit tests
+		/// </summary>
+		/// <param name="dbUnitOfWorkProvider"></param>
+		/// <param name="fileUnitOfWorkProvider"></param>
+		/// <param name="publishingStrategy"></param>
+		internal ServiceContext(IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, IUnitOfWorkProvider fileUnitOfWorkProvider, IPublishingStrategy publishingStrategy)
+		{
+			BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy);
+		}
+
         #endregion
 
         /// <summary>
         /// Builds the various services
         /// </summary>
-        private void BuildServiceCache()
+		private void BuildServiceCache(IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, IUnitOfWorkProvider fileUnitOfWorkProvider, IPublishingStrategy publishingStrategy)
         {
-            var provider = new PetaPocoUnitOfWorkProvider();
-            var fileProvider = new FileUnitOfWorkProvider();
-            var publishingStrategy = new PublishingStrategy();
+            var provider = dbUnitOfWorkProvider;
+            var fileProvider = fileUnitOfWorkProvider;	        
 
             if(_userService == null)
                 _userService = new UserService(provider);

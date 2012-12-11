@@ -15,7 +15,7 @@ namespace Umbraco.Core.Services
     public class LocalizationService : ILocalizationService
     {
         private static readonly Guid RootParentId = new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde");
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IDatabaseUnitOfWork _unitOfWork;
 	    private readonly IDictionaryRepository _dictionaryRepository;
 	    private readonly ILanguageRepository _languageRepository;
 
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Services
         {
         }
 
-        public LocalizationService(IUnitOfWorkProvider provider)
+        public LocalizationService(IDatabaseUnitOfWorkProvider provider)
         {
             _unitOfWork = provider.GetUnitOfWork();
 	        _dictionaryRepository = RepositoryResolver.Current.Factory.CreateDictionaryRepository(_unitOfWork);

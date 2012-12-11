@@ -22,11 +22,13 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class ContentTypeBaseRepository<TId, TEntity> : PetaPocoRepositoryBase<TId, TEntity>
         where TEntity : IContentTypeComposition
     {
-        protected ContentTypeBaseRepository(IUnitOfWork work) : base(work)
+		protected ContentTypeBaseRepository(IDatabaseUnitOfWork work)
+			: base(work)
         {
         }
 
-        protected ContentTypeBaseRepository(IUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
+		protected ContentTypeBaseRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
+			: base(work, cache)
         {
         }
 

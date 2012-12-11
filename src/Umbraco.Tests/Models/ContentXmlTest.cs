@@ -38,8 +38,6 @@ namespace Umbraco.Tests.Models
         [TearDown]
         public override void TearDown()
         {
-            DatabaseContext.Database.Dispose();
-
             //reset the app context
             DataTypesResolver.Reset();
             

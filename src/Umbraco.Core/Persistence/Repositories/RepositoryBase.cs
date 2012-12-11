@@ -13,18 +13,18 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     /// <typeparam name="TEntity">Type of <see cref="IAggregateRoot"/> entity for which the repository is used</typeparam>
     /// <typeparam name="TId">Type of the Id used for this entity</typeparam>
-    internal abstract class RepositoryBase<TId, TEntity> : IRepositoryQueryable<TId, TEntity>, 
-        IUnitOfWorkRepository where TEntity : IAggregateRoot
+    internal abstract class RepositoryBase<TId, TEntity> : DisposableObject, IRepositoryQueryable<TId, TEntity>, IUnitOfWorkRepository 
+		where TEntity : IAggregateRoot
     {
-        private IUnitOfWork _work;
+		private readonly IUnitOfWork _work;
         private readonly IRepositoryCacheProvider _cache;
 
-        protected RepositoryBase(IUnitOfWork work)
+		protected RepositoryBase(IUnitOfWork work)
             : this(work, RuntimeCacheProvider.Current)
         {
         }
 
-        internal RepositoryBase(IUnitOfWork work, IRepositoryCacheProvider cache)
+		internal RepositoryBase(IUnitOfWork work, IRepositoryCacheProvider cache)
         {
             _work = work;
             _cache = cache;
@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Returns the Unit of Work added to the repository
         /// </summary>
-        protected IUnitOfWork UnitOfWork
+		protected internal IUnitOfWork UnitOfWork
         {
             get { return _work; }
         }
@@ -181,16 +181,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public int Count(IQuery<TEntity> query)
         {
             return PerformCount(query);
-        }
-
-        /// <summary>
-        /// Sets the repository's Unit Of Work with the passed in <see cref="IUnitOfWork"/>
-        /// </summary>
-        /// <param name="work"></param>
-        public void SetUnitOfWork(IUnitOfWork work)
-        {
-            _work = work;
-        }
+        }       
 
         #endregion
 
@@ -259,5 +250,16 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             return id.EncodeAsGuid();
         }
+
+		/// <summary>
+		/// Dispose disposable properties
+		/// </summary>
+		/// <remarks>
+		/// Ensure the unit of work is disposed
+		/// </remarks>
+		protected override void DisposeResources()
+		{
+			UnitOfWork.DisposeIfDisposable();
+		}
     }
 }

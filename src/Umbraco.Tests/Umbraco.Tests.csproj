@@ -235,6 +235,7 @@
     <Compile Include="Routing\UrlsWithNestedDomains.cs" />
     <Compile Include="Services\ContentServicePerformanceTest.cs" />
     <Compile Include="Services\ContentServiceTests.cs" />
+    <Compile Include="Services\ThreadSafetyServiceTest.cs" />
     <Compile Include="Surface\PluginControllerAreaTests.cs" />
     <Compile Include="Templates\MasterPageHelperTests.cs" />
     <Compile Include="TestHelpers\BaseDatabaseFactoryTest.cs" />

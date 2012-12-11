@@ -228,9 +228,6 @@ namespace Umbraco.Tests.CodeFirst
         [TearDown]
         public override void TearDown()
         {
-			
-            DatabaseContext.Database.Dispose();
-
 			base.TearDown();
 
             //reset the app context

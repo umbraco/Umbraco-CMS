@@ -400,6 +400,8 @@
     <Compile Include="Persistence\TransactionType.cs" />
     <Compile Include="Persistence\UnitOfWork\FileUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\FileUnitOfWorkProvider.cs" />
+    <Compile Include="Persistence\UnitOfWork\IDatabaseUnitOfWork.cs" />
+    <Compile Include="Persistence\UnitOfWork\IDatabaseUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkRepository.cs" />

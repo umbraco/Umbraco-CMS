@@ -8,17 +8,26 @@ namespace Umbraco.Core.Persistence.UnitOfWork
     /// <summary>
     /// Represents the Unit of Work implementation for PetaPoco
     /// </summary>
-    internal class PetaPocoUnitOfWork : IUnitOfWork
+	internal class PetaPocoUnitOfWork : DisposableObject, IDatabaseUnitOfWork
     {
+
+	    /// <summary>
+	    /// Used for testing
+	    /// </summary>
+		internal Guid InstanceId { get; private set; }
+
         private Guid _key;
         private readonly List<Operation> _operations = new List<Operation>();
 
-        public PetaPocoUnitOfWork()
-        {
-            _key = Guid.NewGuid();
-        }
 
-        /// <summary>
+        public PetaPocoUnitOfWork(Database database)
+        {
+	        Database = database;
+	        _key = Guid.NewGuid();
+	        InstanceId = Guid.NewGuid();
+        }	    
+
+	    /// <summary>
         /// Registers an <see cref="IEntity" /> instance to be added through this <see cref="UnitOfWork" />
         /// </summary>
         /// <param name="entity">The <see cref="IEntity" /></param>
@@ -74,7 +83,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// </summary>
         public void Commit()
         {
-            using(Transaction transaction = DatabaseFactory.Current.Database.GetTransaction())
+			using(Transaction transaction = Database.GetTransaction())			
             {
                 foreach (var operation in _operations.OrderBy(o => o.ProcessDate))
                 {
@@ -103,6 +112,8 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         {
             get { return _key; }
         }
+
+		public Database Database { get; private set; }
 
         #region Operation
 
@@ -137,5 +148,19 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         }
 
         #endregion
+
+		/// <summary>
+		/// Ensures disposable objects are disposed
+		/// </summary>
+		/// <remarks>
+		/// We will not dispose the database because this will get disposed of automatically when 
+		/// in the HttpContext by the UmbracoModule because the DatabaseFactory stores the instance in HttpContext.Items 
+		/// when in a web context.
+		/// When not in a web context, we may possibly be re-using the database context.
+		/// </remarks>
+	    protected override void DisposeResources()
+	    {
+			_operations.Clear();			
+	    }
     }
 }

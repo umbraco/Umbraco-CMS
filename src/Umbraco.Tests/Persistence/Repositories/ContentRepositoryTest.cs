@@ -13,7 +13,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [TestFixture]
+	[TestFixture]
     public class ContentRepositoryTest : BaseDatabaseFactoryTest
     {
         [SetUp]

@@ -12,7 +12,7 @@ namespace Umbraco.Core.Services
     public class FileService : IFileService
     {
         private readonly IUnitOfWork _fileUnitOfWork;
-        private readonly IUnitOfWork _dataUnitOfWork;
+        private readonly IDatabaseUnitOfWork _dataUnitOfWork;
 	    private readonly IStylesheetRepository _stylesheetRepository;
 	    private readonly IScriptRepository _scriptRepository;
 	    private readonly ITemplateRepository _templateRepository;
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Services
         {
         }
 
-        public FileService(IUnitOfWorkProvider fileProvider, IUnitOfWorkProvider dataProvider)
+        public FileService(IUnitOfWorkProvider fileProvider, IDatabaseUnitOfWorkProvider dataProvider)
         {
             _fileUnitOfWork = fileProvider.GetUnitOfWork();
             _dataUnitOfWork = dataProvider.GetUnitOfWork();

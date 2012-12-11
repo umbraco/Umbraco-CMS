@@ -12,10 +12,10 @@ namespace Umbraco.Core.Services
     /// </summary>
     internal class UserService : IUserService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IDatabaseUnitOfWork _unitOfWork;
 	    private readonly IUserRepository _userRepository;
 
-        public UserService(IUnitOfWorkProvider provider)
+		public UserService(IDatabaseUnitOfWorkProvider provider)
         {
             _unitOfWork = provider.GetUnitOfWork();
 	        _userRepository = RepositoryResolver.Current.Factory.CreateUserRepository(_unitOfWork);

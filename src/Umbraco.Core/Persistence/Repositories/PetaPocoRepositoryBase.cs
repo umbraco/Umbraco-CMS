@@ -15,17 +15,27 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class PetaPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
         where TEntity : IAggregateRoot
     {
-        protected PetaPocoRepositoryBase(IUnitOfWork work) : base(work)
+		protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work)
+			: base(work)
         {
         }
 
-        protected PetaPocoRepositoryBase(IUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
+		protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
+			: base(work, cache)
         {
         }
+
+		/// <summary>
+		/// Returns the database Unit of Work added to the repository
+		/// </summary>
+		protected internal new IDatabaseUnitOfWork UnitOfWork
+		{
+			get { return (IDatabaseUnitOfWork)base.UnitOfWork; }
+		}
 
         protected Database Database
         {
-            get { return DatabaseContext.Current.Database; }
+            get { return UnitOfWork.Database; }			
         }
 
         #region Abstract Methods

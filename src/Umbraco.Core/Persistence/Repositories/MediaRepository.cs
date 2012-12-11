@@ -19,13 +19,13 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IMediaTypeRepository _mediaTypeRepository;
 
-        public MediaRepository(IUnitOfWork work, IMediaTypeRepository mediaTypeRepository)
+		public MediaRepository(IDatabaseUnitOfWork work, IMediaTypeRepository mediaTypeRepository)
             : base(work)
         {
             _mediaTypeRepository = mediaTypeRepository;
         }
 
-        public MediaRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IMediaTypeRepository mediaTypeRepository)
+		public MediaRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMediaTypeRepository mediaTypeRepository)
             : base(work, cache)
         {
             _mediaTypeRepository = mediaTypeRepository;
