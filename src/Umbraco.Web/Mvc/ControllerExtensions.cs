@@ -92,7 +92,7 @@ namespace Umbraco.Web.Mvc
 					: ViewEngines.Engines.FindPartialView(controller.ControllerContext, viewName);
 				var viewContext = new ViewContext(controller.ControllerContext, viewResult.View, controller.ViewData, controller.TempData, sw);
 				viewResult.View.Render(viewContext, sw);
-
+				viewResult.ViewEngine.ReleaseView(controller.ControllerContext, viewResult.View);				
 				return sw.GetStringBuilder().ToString();
 			}
 		}

@@ -2,6 +2,6 @@
 {
     public interface IAlterColumnSyntax : IFluentSyntax
     {
-         
+        IAlterColumnTypeSyntax OnTable(string name);
     }
 }

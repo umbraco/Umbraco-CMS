@@ -4,6 +4,7 @@ using System.Net.Mail;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Web;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.web;
@@ -63,7 +64,7 @@ namespace umbraco.cms.businesslogic.workflow
                 }
                 catch (Exception notifyExp)
                 {
-                    Log.Add(LogTypes.Error, u, Node.Id, "Error in notification: " + notifyExp);
+					LogHelper.Error<Notification>("Error in notification", notifyExp);
                 }
             }
         }

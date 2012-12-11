@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using System.Web;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.Files;
 using umbraco.IO;
@@ -66,8 +67,7 @@ namespace umbraco.editorControls.tinymce
                                     cleanTag += " width=\"" + helper.FindAttribute(ht, "width") + "\"";
                                     cleanTag += " height=\"" + helper.FindAttribute(ht, "height") + "\"";
                                 }
-                                Log.Add(LogTypes.Error, User.GetUser(0), -1,
-                                        "Error resizing image in editor: " + err.ToString());
+								LogHelper.Error<tinyMCEImageHelper>("Error resizing image in editor", err);
                             }
                         }
                         else

@@ -2,7 +2,7 @@ using System;
 using System.Data;
 using System.Diagnostics;
 using System.Threading;
-
+using Umbraco.Core.Logging;
 using umbraco.DataLayer;
 using System.Collections.Generic;
 using System.Reflection;
@@ -36,8 +36,7 @@ namespace umbraco.BusinessLogic
                         }
                         catch (Exception ee)
                         {
-                            Log.AddLocally(LogTypes.Error, User.GetUser(0), -1,
-                                "Error loading external logger: " + ee.ToString());
+							LogHelper.Error<Log>("Error loading external logger: " + ee.ToString(), ee);
                         }
                     }
                 }
@@ -103,6 +102,7 @@ namespace umbraco.BusinessLogic
             }
         }
 
+		[Obsolete("Use LogHelper to log exceptions/errors")]
         public void AddException(Exception ee)
         {
             if (ExternalLogger != null)
@@ -119,7 +119,7 @@ namespace umbraco.BusinessLogic
                     error += ex2.ToString();
                     ex2 = ex2.InnerException;
                 }
-                Add(LogTypes.Error, -1, error);
+				LogHelper.Error<Log>("An error occurred", ee);
             }
         }
 
@@ -337,141 +337,7 @@ namespace umbraco.BusinessLogic
         #endregion
     }
 
-    /// <summary>
-    /// The collection of available log types.
-    /// </summary>
-    public enum LogTypes
-    {
-        /// <summary>
-        /// Used when new nodes are added
-        /// </summary>
-        [AuditTrailLogItem]
-        New,
-        /// <summary>
-        /// Used when nodes are saved
-        /// </summary>
-        [AuditTrailLogItem]
-        Save,
-        /// <summary>
-        /// Used when nodes are opened
-        /// </summary>
-        [AuditTrailLogItem]
-        Open,
-        /// <summary>
-        /// Used when nodes are deleted
-        /// </summary>
-        [AuditTrailLogItem]
-        Delete,
-        /// <summary>
-        /// Used when nodes are published
-        /// </summary>
-        [AuditTrailLogItem]
-        Publish,
-        /// <summary>
-        /// Used when nodes are send to publishing
-        /// </summary>
-        [AuditTrailLogItem]
-        SendToPublish,
-        /// <summary>
-        /// Used when nodes are unpublished
-        /// </summary>
-        [AuditTrailLogItem]
-        UnPublish,
-        /// <summary>
-        /// Used when nodes are moved
-        /// </summary>
-        [AuditTrailLogItem]
-        Move,
-        /// <summary>
-        /// Used when nodes are copied
-        /// </summary>
-        [AuditTrailLogItem]
-        Copy,
-        /// <summary>
-        /// Used when nodes are assígned a domain
-        /// </summary>
-        [AuditTrailLogItem]
-        AssignDomain,
-        /// <summary>
-        /// Used when public access are changed for a node
-        /// </summary>
-        [AuditTrailLogItem]
-        PublicAccess,
-        /// <summary>
-        /// Used when nodes are sorted
-        /// </summary>
-        [AuditTrailLogItem]
-        Sort,
-        /// <summary>
-        /// Used when a notification are send to a user
-        /// </summary>
-        [AuditTrailLogItem]
-        Notify,
-        /// <summary>
-        /// Used when a user logs into the umbraco back-end
-        /// </summary>
-        Login,
-        /// <summary>
-        /// Used when a user logs out of the umbraco back-end
-        /// </summary>
-        Logout,
-        /// <summary>
-        /// Used when a user login fails
-        /// </summary>
-        LoginFailure,
-        /// <summary>
-        /// General system notification
-        /// </summary>
-        [AuditTrailLogItem]
-        System,
-        /// <summary>
-        /// System debugging notification
-        /// </summary>
-        Debug,
-        /// <summary>
-        /// System error notification
-        /// </summary>
-        Error,
-        /// <summary>
-        /// Notfound error notification
-        /// </summary>
-        NotFound,
-        /// <summary>
-        /// Used when a node's content is rolled back to a previous version
-        /// </summary>
-        [AuditTrailLogItem]
-        RollBack,
-        /// <summary>
-        /// Used when a package is installed
-        /// </summary>
-        [AuditTrailLogItem]
-        PackagerInstall,
-        /// <summary>
-        /// Used when a package is uninstalled
-        /// </summary>
-        [AuditTrailLogItem]
-        PackagerUninstall,
-        /// <summary>
-        /// Used when a ping is send to/from the system
-        /// </summary>
-        Ping,
-        /// <summary>
-        /// Used when a node is send to translation
-        /// </summary>
-        [AuditTrailLogItem]
-        SendToTranslate,
-        /// <summary>
-        /// Notification from a Scheduled task.
-        /// </summary>
-        ScheduledTask,
-        /// <summary>
-        /// Use this log action for custom log messages that should be shown in the audit trail
-        /// </summary>
-        [AuditTrailLogItem]
-        Custom
-    }
-
-    public class LogItem
+	public class LogItem
     {
         public int UserId { get; set; }
         public int NodeId { get; set; }

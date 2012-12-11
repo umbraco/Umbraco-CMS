@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.Services;
+using Umbraco.Core.Logging;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using umbraco.presentation.webservices;
@@ -81,7 +82,7 @@ namespace umbraco.presentation.umbraco.webservices
             }
             catch (Exception ex)
             {
-                Log.Add(LogTypes.Debug, -1, ex.ToString());
+				LogHelper.Error<TagsAutoCompleteHandler>("An error occurred", ex);
             }
 
         }

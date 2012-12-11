@@ -169,6 +169,17 @@ namespace Umbraco.Tests.PublishedContent
 
 		private class TestPublishedContent : IPublishedContent
 		{
+			public string Url { get; set; }
+			public PublishedItemType ItemType { get; set; }
+
+			IPublishedContent IPublishedContent.Parent
+			{
+				get { return Parent; }
+			}
+			IEnumerable<IPublishedContent> IPublishedContent.Children
+			{
+				get { return Children; }
+			}
 			public IPublishedContent Parent { get; set; }
 			public int Id { get; set; }
 			public int TemplateId { get; set; }
@@ -186,7 +197,13 @@ namespace Umbraco.Tests.PublishedContent
 			public DateTime UpdateDate { get; set; }
 			public Guid Version { get; set; }
 			public int Level { get; set; }
-			public Collection<IPublishedContentProperty> Properties { get; set; }
+			public ICollection<IPublishedContentProperty> Properties { get; set; }
+
+			public object this[string propertyAlias]
+			{
+				get { return GetProperty(propertyAlias).Value; }
+			}
+
 			public IEnumerable<IPublishedContent> Children { get; set; }
 			public IPublishedContentProperty GetProperty(string alias)
 			{

@@ -5,17 +5,35 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.PublishedContent
 {
 	[TestFixture]
-	public class StronglyTypedQueryTests : BaseWebTest
+	public class StronglyTypedQueryTests : BaseRoutingTest
 	{
 		protected override bool RequiresDbSetup
 		{
 			get { return false; }
+		}
+
+		public override void Initialize()
+		{
+			base.Initialize();
+
+			var routingCtx = GetRoutingContext("/test", 1234);
+			UmbracoContext.Current = routingCtx.UmbracoContext;
+			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(Enumerable.Empty<Type>());
+		}
+
+		public override void TearDown()
+		{
+			base.TearDown();
+			UmbracoContext.Current = null;
+			PropertyEditorValueConvertersResolver.Reset();
 		}
 
 		protected override string GetXmlContent(int templateId)
@@ -62,7 +80,7 @@ namespace Umbraco.Tests.PublishedContent
 
 		internal IPublishedContent GetNode(int id)
 		{
-			var ctx = GetUmbracoContext("/test", 1234);
+			var ctx = UmbracoContext.Current;
 			var contentStore = new DefaultPublishedContentStore();
 			var doc = contentStore.GetDocumentById(ctx, id);
 			Assert.IsNotNull(doc);
@@ -160,7 +178,7 @@ namespace Umbraco.Tests.PublishedContent
 			if (content.DocumentTypeAlias == alias) return creator(content);
 			throw new InvalidOperationException("The content type cannot be cast to " + typeof(T).FullName + " since it is type: " + content.DocumentTypeAlias);
 		}
-	
+
 		public static HomeContentItem AsHome(this IPublishedContent content)
 		{
 			return content.AsDocumentType("Home", x => new HomeContentItem(x));
@@ -209,6 +227,16 @@ namespace Umbraco.Tests.PublishedContent
 		public PublishedContentWrapper(IPublishedContent content)
 		{
 			WrappedContent = content;
+		}
+
+		public string Url
+		{
+			get { return WrappedContent.Url; }
+		}
+
+		public PublishedItemType ItemType
+		{
+			get { return WrappedContent.ItemType; }
 		}
 
 		public IPublishedContent Parent
@@ -280,10 +308,16 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			get { return WrappedContent.Level; }
 		}
-		public Collection<IPublishedContentProperty> Properties
+		public ICollection<IPublishedContentProperty> Properties
 		{
 			get { return WrappedContent.Properties; }
 		}
+
+		public object this[string propertyAlias]
+		{
+			get { return GetProperty(propertyAlias).Value; }
+		}
+
 		public IEnumerable<IPublishedContent> Children
 		{
 			get { return WrappedContent.Children; }
@@ -295,8 +329,9 @@ namespace Umbraco.Tests.PublishedContent
 	}
 
 	public partial class HomeContentItem : ContentPageContentItem
-	{	
-		public HomeContentItem(IPublishedContent content) : base(content)
+	{
+		public HomeContentItem(IPublishedContent content)
+			: base(content)
 		{
 		}
 

@@ -264,7 +264,7 @@ namespace umbraco.cms.businesslogic.packager
                     }
                     catch (Exception ex)
                     {
-                        Log.Add(LogTypes.Error, -1, "Package install error: " + ex.ToString());
+						LogHelper.Error<Installer>("Package install error", ex);
                     }
                 }
 
@@ -458,7 +458,6 @@ namespace umbraco.cms.businesslogic.packager
                     if (n.Attributes["undo"] == null || n.Attributes["undo"].Value == "true")
                     {
                         insPack.Data.Actions += n.OuterXml;
-                        Log.Add(LogTypes.Debug, -1, HttpUtility.HtmlEncode(n.OuterXml));
                     }
 
                     if (n.Attributes["runat"] != null && n.Attributes["runat"].Value == "install")
@@ -727,7 +726,7 @@ namespace umbraco.cms.businesslogic.packager
             }
             catch (Exception ee)
             {
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, u, dt.Id, "Packager: Error handling allowed templates: " + ee.ToString());
+	            LogHelper.Error<Installer>("Packager: Error handling allowed templates", ee);
             }
 
             // Default template
@@ -738,7 +737,7 @@ namespace umbraco.cms.businesslogic.packager
             }
             catch (Exception ee)
             {
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, u, dt.Id, "Packager: Error assigning default template: " + ee.ToString());
+				LogHelper.Error<Installer>("Packager: Error assigning default template", ee);
             }
 
             // Tabs
@@ -830,7 +829,7 @@ namespace umbraco.cms.businesslogic.packager
                     }
                     catch (Exception ee)
                     {
-                        BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, u, dt.Id, "Packager: Error assigning property to tab: " + ee.ToString());
+						LogHelper.Error<Installer>("Packager: Error assigning property to tab", ee);
                     }
                 }
             }

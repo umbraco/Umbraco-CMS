@@ -12,7 +12,14 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ServiceContext
     {
-        private readonly ConcurrentDictionary<string, IService> _cache = new ConcurrentDictionary<string, IService>();
+        private ContentService _contentService;
+        private UserService _userService;
+        private MediaService _mediaService;
+        private MacroService _macroService;
+        private ContentTypeService _contentTypeService;
+        private DataTypeService _dataTypeService;
+        private FileService _fileService;
+        private LocalizationService _localizationService;
 
         #region Singleton
         private static readonly Lazy<ServiceContext> lazy = new Lazy<ServiceContext>(() => new ServiceContext());
@@ -29,39 +36,37 @@ namespace Umbraco.Core.Services
         #endregion
 
         /// <summary>
-        /// Builds the various services and adds them to the internal cache
+        /// Builds the various services
         /// </summary>
         private void BuildServiceCache()
         {
-            if (_cache.IsEmpty == false) return;//Only proceed to build cache if cache is empty
-
             var provider = new PetaPocoUnitOfWorkProvider();
             var fileProvider = new FileUnitOfWorkProvider();
             var publishingStrategy = new PublishingStrategy();
 
-            var userService = new UserService(provider);
-            _cache.AddOrUpdate(typeof(UserService).Name, userService, (x, y) => userService);
+            if(_userService == null)
+                _userService = new UserService(provider);
 
-            var contentService = new ContentService(provider, publishingStrategy, userService);
-            _cache.AddOrUpdate(typeof (IContentService).Name, contentService, (x, y) => contentService);
+            if (_contentService == null)
+                _contentService = new ContentService(provider, publishingStrategy, _userService);
 
-            var mediaService = new MediaService(provider);
-            _cache.AddOrUpdate(typeof(IMediaService).Name, mediaService, (x, y) => mediaService);
+            if(_mediaService == null)
+                _mediaService = new MediaService(provider);
 
-            var macroService = new MacroService(fileProvider);
-            _cache.AddOrUpdate(typeof (IMacroService).Name, macroService, (x, y) => macroService);
+            if(_macroService == null)
+                _macroService = new MacroService(fileProvider);
 
-            var contentTypeService = new ContentTypeService(contentService, mediaService, provider);
-            _cache.AddOrUpdate(typeof(IContentTypeService).Name, contentTypeService, (x, y) => contentTypeService);
+            if(_contentTypeService == null)
+                _contentTypeService = new ContentTypeService(_contentService, _mediaService, provider);
 
-            var dataTypeService = new DataTypeService(provider);
-            _cache.AddOrUpdate(typeof(IDataTypeService).Name, dataTypeService, (x, y) => dataTypeService);
+            if(_dataTypeService == null)
+                _dataTypeService = new DataTypeService(provider);
 
-            var fileService = new FileService(fileProvider, provider);
-            _cache.AddOrUpdate(typeof(IFileService).Name, fileService, (x, y) => fileService);
-            
-            var localizationService = new LocalizationService(provider);
-            _cache.AddOrUpdate(typeof(ILocalizationService).Name, localizationService, (x, y) => localizationService);
+            if(_fileService == null)
+                _fileService = new FileService(fileProvider, provider);
+
+            if(_localizationService == null)
+                _localizationService = new LocalizationService(provider);
         }
 
         /// <summary>
@@ -69,7 +74,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         public IContentService ContentService
         {
-            get { return _cache[typeof (IContentService).Name] as IContentService; }
+            get { return _contentService; }
         }
 
         /// <summary>
@@ -77,7 +82,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         public IContentTypeService ContentTypeService
         {
-            get { return _cache[typeof(IContentTypeService).Name] as IContentTypeService; }
+            get { return _contentTypeService; }
         }
 
         /// <summary>
@@ -85,7 +90,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         public IDataTypeService DataTypeService
         {
-            get { return _cache[typeof(IDataTypeService).Name] as IDataTypeService; }
+            get { return _dataTypeService; }
         }
 
         /// <summary>
@@ -93,7 +98,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         public IFileService FileService
         {
-            get { return _cache[typeof (IFileService).Name] as IFileService; }
+            get { return _fileService; }
         }
 
         /// <summary>
@@ -101,7 +106,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         public ILocalizationService LocalizationService
         {
-            get { return _cache[typeof(ILocalizationService).Name] as ILocalizationService; }
+            get { return _localizationService; }
         }
 
         /// <summary>
@@ -109,7 +114,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         public IMediaService MediaService
         {
-            get { return _cache[typeof(IMediaService).Name] as IMediaService; }
+            get { return _mediaService; }
         }
 
         /// <summary>
@@ -117,7 +122,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         internal IMacroService MacroService
         {
-            get { return _cache[typeof(IMacroService).Name] as IMacroService; }
+            get { return _macroService; }
         }
 
         /// <summary>
@@ -125,7 +130,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         internal IUserService UserService
         {
-            get { return _cache[typeof(IUserService).Name] as IUserService; }
+            get { return _userService; }
         }
     }
 }

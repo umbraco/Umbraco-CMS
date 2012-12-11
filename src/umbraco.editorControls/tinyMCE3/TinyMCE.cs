@@ -3,6 +3,7 @@ using System.Collections;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI;
+using Umbraco.Core.Logging;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
@@ -176,10 +177,7 @@ namespace umbraco.editorControls.tinyMCE3
                             }
                             catch (Exception ee)
                             {
-                                Log.Add(LogTypes.Error, -1,
-                                        string.Format(
-                                            string.Format("Error adding stylesheet to tinymce (id: {{0}}). {0}", ee),
-                                            styleSheetId));
+								LogHelper.Error<TinyMCE>("Error adding stylesheet to tinymce Id:" + styleSheetId, ee);
                             }
                     }
                     // remove any ending comma (,)
@@ -613,8 +611,7 @@ namespace umbraco.editorControls.tinyMCE3
                         }
                         catch (Exception ee)
                         {
-                            Log.Add(LogTypes.Error, User.GetUser(0), -1,
-                                    string.Format("TinyMCE: Error initializing button '{0}': {1}", button, ee));
+							LogHelper.Error<TinyMCE>(string.Format("TinyMCE: Error initializing button '{0}'", button), ee);
                         }
                     }
                 }

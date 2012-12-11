@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Configuration;
 using System.Collections;
+using Umbraco.Core.Logging;
 using umbraco.DataLayer;
 using System.Collections.Generic;
 using System.Linq;
@@ -336,7 +337,10 @@ namespace umbraco.BusinessLogic
 
             // Logging
             if (tmp == null)
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.LoginFailure, BusinessLogic.User.GetUser(0), -1, "Login: '" + lname + "' failed, from IP: " + System.Web.HttpContext.Current.Request.UserHostAddress);
+            {
+				LogHelper.Info<User>("Login: '" + lname + "' failed, from IP: " + System.Web.HttpContext.Current.Request.UserHostAddress);
+            }
+                
             return (tmp != null);
         }
 

@@ -69,6 +69,15 @@ namespace Umbraco.Core.IO
             }
         }
 
+		public static string AppPlugins
+		{
+			get
+			{
+				//NOTE: this is not configurable and shouldn't need to be
+				return "~/App_Plugins";
+			}
+		}
+
 		public static string MvcViews
 		{
 			get

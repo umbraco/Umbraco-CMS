@@ -9,6 +9,8 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using System.Web.Services;
 using System.Web.Services.Protocols;
+using Umbraco.Core.Logging;
+using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using System.IO;
 
@@ -50,13 +52,16 @@ namespace umbraco.webservices
            
             User u = new User(username);
             if(!HttpContext.Current.Request.Url.Scheme.Equals("https"))
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.Debug, u, -1, "Webservices login attempted without https");
+            {
+				LogHelper.Debug<BaseWebService>("Webservices login attempted without https");
+            }
+                
 
             try
             {
                 if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].ValidateUser(username, password))
                 {
-                    BusinessLogic.Log.Add(BusinessLogic.LogTypes.Login, u, -1,"Webservices");
+					LogHelper.Info<BaseWebService>("User {0} (Id: {1}) logged in", () => u.Name, () => u.Id);
                     return u;
                 }
             }

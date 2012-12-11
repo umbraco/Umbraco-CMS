@@ -108,28 +108,26 @@
  <Target Name="CreateSystemFolders" DependsOnTargets="CopyLibraries" Inputs="@(SystemFolders)" Outputs="%(Identity).Dummy">
    <MakeDir Directories="@(SystemFolders)" />
  </Target>
-
+ 
  <Target Name="CopyLibraries" DependsOnTargets="OffsetTimestamps" >
    <!-- Copy SQL CE -->
    <ItemGroup>
-     <SQLCE4Files Include="..\src\packages\SqlServerCE.4.0.0.0\**\*.*" />
+     <SQLCE4Files 
+		Include="..\src\packages\SqlServerCE.4.0.0.0\**\*.*" 
+		Exclude="..\src\packages\SqlServerCE.4.0.0.0\lib\**\*;..\src\packages\SqlServerCE.4.0.0.0\**\*.nu*"
+		/>
    </ItemGroup>
 
    <Copy SourceFiles="@(SQLCE4Files)"
        DestinationFiles="@(SQLCE4Files->'$(SolutionBinFolder)%(RecursiveDir)%(Filename)%(Extension)')"
        OverwriteReadOnlyFiles="true"
        SkipUnchangedFiles="false" />
+
    <Copy SourceFiles="@(SQLCE4Files)"
        DestinationFiles="@(SQLCE4Files->'$(WebAppFolder)bin\%(RecursiveDir)%(Filename)%(Extension)')"
        OverwriteReadOnlyFiles="true"
        SkipUnchangedFiles="false" />
  
-	<RemoveDir Directories="$(WebAppFolder)bin\lib\" />
-	<RemoveDir Directories="$(SolutionBinFolder)\lib\" />
-	<Delete Files="$(WebAppFolder)\bin\SqlServerCE.4.0.0.0.nupkg" />
-	<Delete Files="$(WebAppFolder)\bin\SqlServerCE.4.0.0.0.nuspec" />
-	<Delete Files="$(SolutionBinFolder)\SqlServerCE.4.0.0.0.nupkg" />
-	<Delete Files="$(SolutionBinFolder)\SqlServerCE.4.0.0.0.nuspec" />
  </Target>
 
  <!-- Offset the modified timestamps on all umbraco dlls, as WebResources break if date is in the future, which, due to timezone offsets can happen. -->

@@ -41,13 +41,15 @@ namespace Umbraco.Core.Services
         /// Saves a single <see cref="IContentType"/> object
         /// </summary>
         /// <param name="contentType"><see cref="IContentType"/> to save</param>
-        void Save(IContentType contentType);
+        /// <param name="userId">Optional Id of the User saving the ContentType</param>
+        void Save(IContentType contentType, int userId = -1);
 
         /// <summary>
         /// Saves a collection of <see cref="IContentType"/> objects
         /// </summary>
         /// <param name="contentTypes">Collection of <see cref="IContentType"/> to save</param>
-        void Save(IEnumerable<IContentType> contentTypes);
+        /// <param name="userId">Optional Id of the User saving the ContentTypes</param>
+        void Save(IEnumerable<IContentType> contentTypes, int userId = -1);
 
         /// <summary>
         /// Saves a collection of lazy loaded <see cref="IContentType"/> objects.
@@ -65,14 +67,16 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="contentType"><see cref="IContentType"/> to delete</param>
         /// <remarks>Deleting a <see cref="IContentType"/> will delete all the <see cref="IContent"/> objects based on this <see cref="IContentType"/></remarks>
-        void Delete(IContentType contentType);
+        /// <param name="userId">Optional Id of the User deleting the ContentType</param>
+        void Delete(IContentType contentType, int userId = -1);
 
         /// <summary>
         /// Deletes a collection of <see cref="IContentType"/> objects
         /// </summary>
         /// <param name="contentTypes">Collection of <see cref="IContentType"/> to delete</param>
         /// <remarks>Deleting a <see cref="IContentType"/> will delete all the <see cref="IContent"/> objects based on this <see cref="IContentType"/></remarks>
-        void Delete(IEnumerable<IContentType> contentTypes);
+        /// <param name="userId">Optional Id of the User deleting the ContentTypes</param>
+        void Delete(IEnumerable<IContentType> contentTypes, int userId = -1);
 
         /// <summary>
         /// Gets an <see cref="IMediaType"/> object by its Id
@@ -106,27 +110,31 @@ namespace Umbraco.Core.Services
         /// Saves a single <see cref="IMediaType"/> object
         /// </summary>
         /// <param name="mediaType"><see cref="IMediaType"/> to save</param>
-        void Save(IMediaType mediaType);
+        /// <param name="userId">Optional Id of the User saving the MediaType</param>
+        void Save(IMediaType mediaType, int userId = -1);
 
         /// <summary>
         /// Saves a collection of <see cref="IMediaType"/> objects
         /// </summary>
         /// <param name="mediaTypes">Collection of <see cref="IMediaType"/> to save</param>
-        void Save(IEnumerable<IMediaType> mediaTypes);
+        /// <param name="userId">Optional Id of the User saving the MediaTypes</param>
+        void Save(IEnumerable<IMediaType> mediaTypes, int userId = -1);
 
         /// <summary>
         /// Deletes a single <see cref="IMediaType"/> object
         /// </summary>
         /// <param name="mediaType"><see cref="IMediaType"/> to delete</param>
         /// <remarks>Deleting a <see cref="IMediaType"/> will delete all the <see cref="IMedia"/> objects based on this <see cref="IMediaType"/></remarks>
-        void Delete(IMediaType mediaType);
+        /// <param name="userId">Optional Id of the User deleting the MediaType</param>
+        void Delete(IMediaType mediaType, int userId = -1);
 
         /// <summary>
         /// Deletes a collection of <see cref="IMediaType"/> objects
         /// </summary>
         /// <param name="mediaTypes">Collection of <see cref="IMediaType"/> to delete</param>
         /// <remarks>Deleting a <see cref="IMediaType"/> will delete all the <see cref="IMedia"/> objects based on this <see cref="IMediaType"/></remarks>
-        void Delete(IEnumerable<IMediaType> mediaTypes);
+        /// <param name="userId">Optional Id of the User deleting the MediaTypes</param>
+        void Delete(IEnumerable<IMediaType> mediaTypes, int userId = -1);
 
         /// <summary>
         /// Generates the complete (simplified) XML DTD.

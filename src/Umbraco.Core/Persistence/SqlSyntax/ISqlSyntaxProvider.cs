@@ -44,6 +44,6 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string CreateConstraint { get; }
         string DeleteConstraint { get; }
         string CreateForeignKeyConstraint { get; }
-        string Format(Migrations.Model.ColumnDefinition column);
+        string Format(DatabaseModelDefinitions.ColumnDefinition column);
     }
 }

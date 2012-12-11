@@ -2,8 +2,11 @@ using System;
 using System.Data;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Runtime.CompilerServices;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.cache;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
@@ -131,10 +134,11 @@ namespace umbraco.cms.businesslogic.macro
 		}
 
 		/// <summary>
-		/// The relative path to the usercontrol
-		/// 
-		/// Specified like: /usercontrols/myusercontrol.ascx (with the .ascx postfix)
+		/// The relative path to the usercontrol or the assembly type of the macro when using .Net custom controls
 		/// </summary>
+		/// <remarks>
+		/// When using a user control the value is specified like: /usercontrols/myusercontrol.ascx (with the .ascx postfix)
+		/// </remarks>
 		public string Type
 		{
 			get {return _type;}
@@ -161,10 +165,13 @@ namespace umbraco.cms.businesslogic.macro
 		}
 
         /// <summary>
-        /// The python file used to be executed
-        /// 
-        /// Umbraco assumes that the python file is present in the "/python" folder
+        /// This field is used to store the file value for any scripting macro such as python, ruby, razor macros or Partial View Macros        
         /// </summary>
+        /// <remarks>
+        /// Depending on how the file is stored depends on what type of macro it is. For example if the file path is a full virtual path
+        /// starting with the ~/Views/MacroPartials then it is deemed to be a Partial View Macro, otherwise the file extension of the file
+        /// saved will determine which macro engine will be used to execute the file.
+        /// </remarks>
         public string ScriptingFile {
             get { return _scriptingFile; }
             set {
@@ -335,7 +342,7 @@ namespace umbraco.cms.businesslogic.macro
                 }
                 catch (Exception macroExp)
                 {
-                    BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, BusinessLogic.User.GetUser(0), -1, "Error creating macro property: " + macroExp.ToString());
+					LogHelper.Error<Macro>("Error creating macro property", macroExp);
                 }
 
                 // macro properties
@@ -366,7 +373,7 @@ namespace umbraco.cms.businesslogic.macro
                     }
                     catch (Exception macroPropertyExp)
                     {
-                        BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, BusinessLogic.User.GetUser(0), -1, "Error creating macro property: " + macroPropertyExp.ToString());
+						LogHelper.Error<Macro>("Error creating macro property", macroPropertyExp);
                     }
                 }
 
@@ -526,22 +533,25 @@ namespace umbraco.cms.businesslogic.macro
         {
             if (!string.IsNullOrEmpty(xslt))
                 return MacroTypes.XSLT;
-            else
-            {
-                if (!string.IsNullOrEmpty(scriptFile))
-                    return MacroTypes.Script;
-                else
-                {
-                    if (!string.IsNullOrEmpty(scriptType) && scriptType.ToLower().IndexOf(".ascx") > -1)
-                    {
-                        return MacroTypes.UserControl;
-                    }
-                    else if (!string.IsNullOrEmpty(scriptType) && !string.IsNullOrEmpty(scriptAssembly))
-                        return MacroTypes.CustomControl;
-                }
-            }
+	        
+			if (!string.IsNullOrEmpty(scriptFile))
+			{
+				//we need to check if the file path saved is a virtual path starting with ~/Views/MacroPartials, if so then this is 
+				//a partial view macro, not a script macro
+				//we also check if the file exists in ~/App_Plugins/[Packagename]/Views/MacroPartials, if so then it is also a partial view.
+				return (scriptFile.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
+				        || (Regex.IsMatch(scriptFile, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled)))
+					       ? MacroTypes.PartialView
+					       : MacroTypes.Script;
+			}
 
-            return MacroTypes.Unknown;
+	        if (!string.IsNullOrEmpty(scriptType) && scriptType.ToLower().IndexOf(".ascx") > -1)
+		        return MacroTypes.UserControl;
+	        
+			if (!string.IsNullOrEmpty(scriptType) && !string.IsNullOrEmpty(scriptAssembly))
+		        return MacroTypes.CustomControl;
+
+	        return MacroTypes.Unknown;
         }
 
         public static string GenerateCacheKeyFromCode(string input)

@@ -8,6 +8,7 @@ using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Models
 {
@@ -17,7 +18,7 @@ namespace Umbraco.Web.Models
 	/// </summary>
 	[Serializable]
 	[XmlType(Namespace = "http://umbraco.org/webservices/")]
-	internal class XmlPublishedContent : IPublishedContent
+	internal class XmlPublishedContent : PublishedContentBase
 	{
 		/// <summary>
 		/// Constructor
@@ -65,7 +66,7 @@ namespace Umbraco.Web.Models
 		private int _sortOrder;
 		private int _level;
 
-		public IEnumerable<IPublishedContent> Children
+		public override IEnumerable<IPublishedContent> Children
 		{
 			get
 			{
@@ -75,12 +76,20 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public IPublishedContentProperty GetProperty(string alias)
+		public override IPublishedContentProperty GetProperty(string alias)
 		{
 			return Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 		}
 
-		public IPublishedContent Parent
+		/// <summary>
+		/// returns 'Content' as the ItemType
+		/// </summary>
+		public override PublishedItemType ItemType
+		{
+			get { return PublishedItemType.Content; }
+		}
+
+		public override IPublishedContent Parent
 		{
 			get
 			{
@@ -90,7 +99,7 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public int Id
+		public override int Id
 		{
 			get
 			{
@@ -100,7 +109,7 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public int TemplateId
+		public override int TemplateId
 		{
 			get
 			{
@@ -110,7 +119,7 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public int SortOrder
+		public override int SortOrder
 		{
 			get
 			{
@@ -120,7 +129,7 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public string Name
+		public override string Name
 		{
 			get
 			{
@@ -129,8 +138,8 @@ namespace Umbraco.Web.Models
 				return _name;
 			}
 		}
-		
-		public string DocumentTypeAlias
+
+		public override string DocumentTypeAlias
 		{
 			get
 			{
@@ -140,7 +149,7 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public int DocumentTypeId
+		public override int DocumentTypeId
 		{
 			get
 			{
@@ -150,7 +159,7 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public string WriterName
+		public override string WriterName
 		{
 			get
 			{
@@ -160,7 +169,7 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public string CreatorName
+		public override string CreatorName
 		{
 			get
 			{
@@ -170,7 +179,7 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public int WriterId
+		public override int WriterId
 		{
 			get
 			{
@@ -180,7 +189,7 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public int CreatorId
+		public override int CreatorId
 		{
 			get
 			{
@@ -191,7 +200,7 @@ namespace Umbraco.Web.Models
 		}
 
 
-		public string Path
+		public override string Path
 		{
 			get
 			{
@@ -201,7 +210,7 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public DateTime CreateDate
+		public override DateTime CreateDate
 		{
 			get
 			{
@@ -211,7 +220,7 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public DateTime UpdateDate
+		public override DateTime UpdateDate
 		{
 			get
 			{
@@ -221,7 +230,7 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public Guid Version
+		public override Guid Version
 		{
 			get
 			{
@@ -231,7 +240,7 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public string UrlName
+		public override string UrlName
 		{
 			get
 			{
@@ -241,7 +250,7 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public int Level
+		public override int Level
 		{
 			get
 			{
@@ -251,7 +260,7 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		public Collection<IPublishedContentProperty> Properties
+		public override ICollection<IPublishedContentProperty> Properties
 		{
 			get
 			{

@@ -60,14 +60,16 @@ namespace Umbraco.Core.Services
         /// Saves a <see cref="IDictionaryItem"/> object
         /// </summary>
         /// <param name="dictionaryItem"><see cref="IDictionaryItem"/> to save</param>
-        void Save(IDictionaryItem dictionaryItem);
+        /// <param name="userId">Optional id of the user saving the dictionary item</param>
+        void Save(IDictionaryItem dictionaryItem, int userId = -1);
 
         /// <summary>
         /// Deletes a <see cref="IDictionaryItem"/> object and its related translations
         /// as well as its children.
         /// </summary>
         /// <param name="dictionaryItem"><see cref="IDictionaryItem"/> to delete</param>
-        void Delete(IDictionaryItem dictionaryItem);
+        /// <param name="userId">Optional id of the user deleting the dictionary item</param>
+        void Delete(IDictionaryItem dictionaryItem, int userId = -1);
 
         /// <summary>
         /// Gets a <see cref="ILanguage"/> by its id
@@ -93,12 +95,14 @@ namespace Umbraco.Core.Services
         /// Saves a <see cref="ILanguage"/> object
         /// </summary>
         /// <param name="language"><see cref="ILanguage"/> to save</param>
-        void Save(ILanguage language);
+        /// <param name="userId">Optional id of the user saving the language</param>
+        void Save(ILanguage language, int userId = -1);
 
         /// <summary>
         /// Deletes a <see cref="ILanguage"/> by removing it and its usages from the db
         /// </summary>
         /// <param name="language"><see cref="ILanguage"/> to delete</param>
-        void Delete(ILanguage language);
+        /// <param name="userId">Optional id of the user deleting the language</param>
+        void Delete(ILanguage language, int userId = -1);
     }
 }

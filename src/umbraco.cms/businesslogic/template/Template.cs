@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using umbraco.DataLayer;
 using System.Text.RegularExpressions;
 using System.IO;
@@ -535,9 +536,10 @@ namespace umbraco.cms.businesslogic.template
         {
             // don't allow template deletion if it has child templates
             if (this.HasChildren)
-            {
-                Log.Add(LogTypes.Error, this.Id, "Can't delete a master template. Remove any bindings from child templates first.");
-                throw new InvalidOperationException("Can't delete a master template. Remove any bindings from child templates first.");
+            {                
+                var ex = new InvalidOperationException("Can't delete a master template. Remove any bindings from child templates first.");
+				LogHelper.Error<Template>("Can't delete a master template. Remove any bindings from child templates first.", ex);
+	            throw ex;
             }
 
             // NH: Changed this; if you delete a template we'll remove all references instead of 

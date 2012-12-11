@@ -86,7 +86,19 @@ namespace umbraco.cms.presentation
 
             // Check publishing permissions
             if (!base.getUser().GetPermissions(_document.Path).Contains(ActionPublish.Instance.Letter.ToString()))
-                _canPublish = controls.ContentControl.publishModes.SendToPublish;
+            {
+                // Check to see if the user has send to publish permissions
+                if (!base.getUser().GetPermissions(_document.Path).Contains(ActionToPublish.Instance.Letter.ToString()))
+                {
+					//If no send to publish permission then revert to NoPublish mode
+                    _canPublish = controls.ContentControl.publishModes.NoPublish;
+                }
+                else
+                {
+                    _canPublish = controls.ContentControl.publishModes.SendToPublish;
+                }
+            }
+
             cControl = new controls.ContentControl(_document, _canPublish, "TabView1");
 
             cControl.ID = "TabView1";
@@ -448,8 +460,8 @@ namespace umbraco.cms.presentation
 
         private void addPreviewButton(uicontrols.ScrollingMenu menu, int id)
         {
-            menu.InsertSplitter(2);
-            uicontrols.MenuIconI menuItem = menu.NewIcon(3);
+            menu.InsertSplitter();
+            uicontrols.MenuIconI menuItem = menu.NewIcon();
             menuItem.ImageURL = SystemDirectories.Umbraco + "/images/editor/vis.gif";
             // Fix for U4-682, if there's no template, disable the preview button
             if (_document.Template != -1)

@@ -3,7 +3,6 @@ using Umbraco.Core.Persistence.Migrations.Syntax.Create;
 using Umbraco.Core.Persistence.Migrations.Syntax.Delete;
 using Umbraco.Core.Persistence.Migrations.Syntax.Insert;
 using Umbraco.Core.Persistence.Migrations.Syntax.Rename;
-using Umbraco.Core.Persistence.Migrations.Syntax.Schema;
 using Umbraco.Core.Persistence.Migrations.Syntax.Update;
 
 namespace Umbraco.Core.Persistence.Migrations
@@ -50,11 +49,6 @@ namespace Umbraco.Core.Persistence.Migrations
         public IRenameBuilder Rename
         {
             get { return new RenameBuilder(_context); }
-        }
-
-        public ISchemaBuilder Schema
-        {
-            get { return new SchemaBuilder(_context); }
         }
 
         public IUpdateBuilder Update

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core
@@ -96,6 +97,9 @@ namespace Umbraco.Core
 		/// </summary>
 		protected virtual void InitializeResolvers()
 		{
+			RepositoryResolver.Current = new RepositoryResolver(
+				new RepositoryFactory());
+
 			CacheRefreshersResolver.Current = new CacheRefreshersResolver(
 				PluginManager.Current.ResolveCacheRefreshers());
 

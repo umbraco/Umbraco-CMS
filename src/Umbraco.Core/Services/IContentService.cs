@@ -13,7 +13,7 @@ namespace Umbraco.Core.Services
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
         /// that this Content is based on.
         /// </summary>
-        /// <param name="parentId">Id of Parent for content</param>
+        /// <param name="parentId">Id of Parent for the new Content</param>
         /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional id of the user creating the content</param>
         /// <returns><see cref="IContent"/></returns>
@@ -22,7 +22,7 @@ namespace Umbraco.Core.Services
         //TODO Add GetLatestUnpublishedVersions(int id){}
         //TODO Add CreateNewVersion method? Its currently used in the Document API when Publishing - latest version is published, 
         //but then a new version is created so latest version is not published.
-        //IContent CreateNewVersion(int id);
+        //IContent CreateNewVersion(int id); -> should not be necessary as Version number is changed when updating
 
         /// <summary>
         /// Gets an <see cref="IContent"/> object by Id
@@ -163,7 +163,8 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
         /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
-        void DeleteContentOfType(int contentTypeId);
+        /// <param name="userId">Optional Id of the user issueing the delete operation</param>
+        void DeleteContentOfType(int contentTypeId, int userId = -1);
 
         /// <summary>
         /// Permanently deletes an <see cref="IContent"/> object

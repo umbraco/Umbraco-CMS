@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -70,7 +71,7 @@ namespace umbraco
 
         public bool Delete()
         {
-            BusinessLogic.Log.Add(LogTypes.Debug, ParentID, _typeID.ToString() + " " + _parentID.ToString() + " deleting " + Alias);
+			LogHelper.Debug<dictionaryTasks>(_typeID.ToString() + " " + _parentID.ToString() + " deleting " + Alias);
 
             new cms.businesslogic.Dictionary.DictionaryItem(ParentID).delete();
             return true;
