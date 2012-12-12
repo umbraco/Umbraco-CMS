@@ -30,5 +30,15 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         }
 
         #endregion
+
+		/// <summary>
+		/// Static helper method to return a new unit of work
+		/// </summary>
+		/// <returns></returns>
+		internal static IDatabaseUnitOfWork CreateUnitOfWork()
+		{
+			var provider = new PetaPocoUnitOfWorkProvider();
+			return provider.GetUnitOfWork();
+		}
     }
 }

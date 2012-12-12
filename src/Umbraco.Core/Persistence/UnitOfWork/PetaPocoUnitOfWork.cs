@@ -25,10 +25,12 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		/// </summary>
 		/// <param name="database"></param>
 		/// <remarks>
+		/// This should normally not be used directly and should be created with the UnitOfWorkProvider
+		/// 
 		/// The Database instance used for this unit of work should not be shared with other unit's of work, other repositories, etc...
 		/// as it will get disposed of when this unit of work is disposed.
 		/// </remarks>
-		public PetaPocoUnitOfWork(UmbracoDatabase database)
+		internal PetaPocoUnitOfWork(UmbracoDatabase database)
         {
 	        Database = database;
 	        _key = Guid.NewGuid();
