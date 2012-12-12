@@ -21,22 +21,26 @@ namespace Umbraco.Core.Services
 		private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 		private readonly IPublishingStrategy _publishingStrategy;
 		private readonly IUserService _userService;
+        private readonly RepositoryFactory _repositoryFactory;
 		private HttpContextBase _httpContext;
 
-        public ContentService(IDatabaseUnitOfWorkProvider provider) : this(provider, new PublishingStrategy())
+        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
+            : this(provider, new PublishingStrategy(), repositoryFactory)
         {}
 
-	    internal ContentService(IDatabaseUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy)
+	    internal ContentService(IDatabaseUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy, RepositoryFactory repositoryFactory)
 		{
 			_uowProvider = provider;
 			_publishingStrategy = publishingStrategy;
+            _repositoryFactory = repositoryFactory;
 		}
 
-		internal ContentService(IDatabaseUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy, IUserService userService)
+        internal ContentService(IDatabaseUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy, IUserService userService, RepositoryFactory repositoryFactory)
 		{
+            _uowProvider = provider;
 			_publishingStrategy = publishingStrategy;
 			_userService = userService;
-			_uowProvider = provider;
+            _repositoryFactory = repositoryFactory;
 		}
 
 		/// <summary>
@@ -50,7 +54,7 @@ namespace Umbraco.Core.Services
 		public IContent CreateContent(int parentId, string contentTypeAlias, int userId = -1)
 		{
 			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentTypeRepository(uow))
+            using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
 			{
 				var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
 				var contentTypes = repository.GetByQuery(query);
@@ -92,7 +96,7 @@ namespace Umbraco.Core.Services
 		/// <returns><see cref="IContent"/></returns>
 		public IContent GetById(int id)
 		{
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 			{
 				return repository.Get(id);
 			}
@@ -106,7 +110,7 @@ namespace Umbraco.Core.Services
 		/// <returns><see cref="IContent"/></returns>
 		public IContent GetById(Guid key)
 		{
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 			{
 				var query = Query<IContent>.Builder.Where(x => x.Key == key);
 				var contents = repository.GetByQuery(query);
@@ -122,7 +126,7 @@ namespace Umbraco.Core.Services
 		/// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
 		public IEnumerable<IContent> GetContentOfContentType(int id)
 		{
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 			{
 				var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == id);
 				var contents = repository.GetByQuery(query);
@@ -138,7 +142,7 @@ namespace Umbraco.Core.Services
 		/// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
 		public IEnumerable<IContent> GetByLevel(int level)
 		{
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 			{
 				var query = Query<IContent>.Builder.Where(x => x.Level == level);
 				var contents = repository.GetByQuery(query);
@@ -154,7 +158,7 @@ namespace Umbraco.Core.Services
 		/// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
 		public IEnumerable<IContent> GetChildren(int id)
 		{
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 			{
 				var query = Query<IContent>.Builder.Where(x => x.ParentId == id);
 				var contents = repository.GetByQuery(query);
@@ -170,7 +174,7 @@ namespace Umbraco.Core.Services
 		/// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
 		public IEnumerable<IContent> GetVersions(int id)
 		{
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 			{
 				var versions = repository.GetAllVersions(id);
 				return versions;
@@ -184,7 +188,7 @@ namespace Umbraco.Core.Services
 		/// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
 		public IEnumerable<IContent> GetRootContent()
 		{
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 			{
 				var query = Query<IContent>.Builder.Where(x => x.ParentId == -1);
 				var contents = repository.GetByQuery(query);
@@ -199,7 +203,7 @@ namespace Umbraco.Core.Services
 		/// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
 		public IEnumerable<IContent> GetContentForExpiration()
 		{
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 			{
 				var query = Query<IContent>.Builder.Where(x => x.Published == true && x.ExpireDate <= DateTime.UtcNow);
 				var contents = repository.GetByQuery(query);
@@ -214,7 +218,7 @@ namespace Umbraco.Core.Services
 		/// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
 		public IEnumerable<IContent> GetContentForRelease()
 		{
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 			{
 				var query = Query<IContent>.Builder.Where(x => x.Published == false && x.ReleaseDate <= DateTime.UtcNow);
 				var contents = repository.GetByQuery(query);
@@ -229,7 +233,7 @@ namespace Umbraco.Core.Services
 		/// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
 		public IEnumerable<IContent> GetContentInRecycleBin()
 		{
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 			{
 				var query = Query<IContent>.Builder.Where(x => x.ParentId == -20);
 				var contents = repository.GetByQuery(query);
@@ -246,7 +250,7 @@ namespace Umbraco.Core.Services
 		public bool RePublishAll(int userId = -1)
 		{
 			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(uow))
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
 				var list = new List<IContent>();
 
@@ -306,7 +310,7 @@ namespace Umbraco.Core.Services
 		public bool PublishWithChildren(IContent content, int userId = -1)
 		{
 			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(uow))
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
 				//Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
 				if (content.ParentId != -1 && content.ParentId != -20 && !GetById(content.ParentId).Published)
@@ -366,7 +370,7 @@ namespace Umbraco.Core.Services
 		public bool UnPublish(IContent content, int userId = -1)
 		{
 			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(uow))
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
 				//Look for children and unpublish them if any exists, otherwise just unpublish the passed in Content.
 				var children = GetChildrenDeep(content.Id);
@@ -439,7 +443,7 @@ namespace Umbraco.Core.Services
 		public bool SaveAndPublish(IContent content, int userId = -1)
 		{
 			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(uow))
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
 				var e = new SaveEventArgs();
 				if (Saving != null)
@@ -501,7 +505,7 @@ namespace Umbraco.Core.Services
 		public void Save(IContent content, int userId = -1)
 		{
 			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(uow))
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
 				var e = new SaveEventArgs();
 				if (Saving != null)
@@ -535,7 +539,7 @@ namespace Umbraco.Core.Services
 		public void Save(IEnumerable<IContent> contents, int userId = -1)
 		{
 			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(uow))
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
 				var containsNew = contents.Any(x => x.HasIdentity == false);
 
@@ -588,7 +592,7 @@ namespace Umbraco.Core.Services
 		public void Save(IEnumerable<Lazy<IContent>> contents, int userId = -1)
 		{
 			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(uow))
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
 				var e = new SaveEventArgs();
 				if (Saving != null)
@@ -621,7 +625,7 @@ namespace Umbraco.Core.Services
 		public void DeleteContentOfType(int contentTypeId, int userId = -1)
 		{
 			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(uow))
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
 				//NOTE What about content that has the contenttype as part of its composition?
 				var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == contentTypeId);
@@ -668,7 +672,7 @@ namespace Umbraco.Core.Services
 			if (!e.Cancel)
 			{
 				var uow = _uowProvider.GetUnitOfWork();
-				using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(uow))
+				using (var repository = _repositoryFactory.CreateContentRepository(uow))
 				{
 					SetWriter(content, userId);
 					repository.Delete(content);
@@ -720,7 +724,7 @@ namespace Umbraco.Core.Services
 
 			if (!e.Cancel)
 			{
-				using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+				using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 				{
 					repository.Delete(id, versionDate);
 
@@ -742,7 +746,7 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
 		public void Delete(int id, Guid versionId, bool deletePriorVersions, int userId = -1)
 		{
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 			{
 				if (deletePriorVersions)
 				{
@@ -777,7 +781,7 @@ namespace Umbraco.Core.Services
 			//TODO If content item has children those should also be moved to the recycle bin
 			//TODO Unpublish deleted content + children
 			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(uow))
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
 
 				var e = new MoveEventArgs { ParentId = -20 };
@@ -853,7 +857,7 @@ namespace Umbraco.Core.Services
 		public void EmptyRecycleBin()
 		{
 			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(uow))
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
 				var query = Query<IContent>.Builder.Where(x => x.ParentId == -20);
 				var contents = repository.GetByQuery(query);
@@ -890,7 +894,7 @@ namespace Umbraco.Core.Services
 				copy.Name = copy.Name + " (1)";
 
 				var uow = _uowProvider.GetUnitOfWork();
-				using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(uow))
+				using (var repository = _repositoryFactory.CreateContentRepository(uow))
 				{
 					SetWriter(content, userId);
 
@@ -962,7 +966,7 @@ namespace Umbraco.Core.Services
 			var e = new RollbackEventArgs();
 
 			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = RepositoryResolver.Current.Factory.CreateContentRepository(uow))
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
 				var content = repository.GetByVersion(id, versionId);
 

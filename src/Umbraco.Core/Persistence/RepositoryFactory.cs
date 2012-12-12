@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence
                 CreateUserTypeRepository(uow));
         }
 
-		public virtual IContentRepository CreateContentRepository(IDatabaseUnitOfWork uow)
+        internal virtual IContentRepository CreateContentRepository(IDatabaseUnitOfWork uow)
         {
             return new ContentRepository(
                 uow,
@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence
                 CreateTemplateRepository(uow));
         }
 
-		public virtual IContentTypeRepository CreateContentTypeRepository(IDatabaseUnitOfWork uow)
+        internal virtual IContentTypeRepository CreateContentTypeRepository(IDatabaseUnitOfWork uow)
         {
             return new ContentTypeRepository(
                 uow,
@@ -41,14 +41,14 @@ namespace Umbraco.Core.Persistence
                 new TemplateRepository(uow, NullCacheProvider.Current));
         }
 
-		public virtual IDataTypeDefinitionRepository CreateDataTypeDefinitionRepository(IDatabaseUnitOfWork uow)
+        internal virtual IDataTypeDefinitionRepository CreateDataTypeDefinitionRepository(IDatabaseUnitOfWork uow)
         {
             return new DataTypeDefinitionRepository(
                 uow,
                 NullCacheProvider.Current);
         }
 
-		public virtual IDictionaryRepository CreateDictionaryRepository(IDatabaseUnitOfWork uow)
+        internal virtual IDictionaryRepository CreateDictionaryRepository(IDatabaseUnitOfWork uow)
         {
             return new DictionaryRepository(
                 uow,
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Persistence
                 CreateLanguageRepository(uow));
         }
 
-		public virtual ILanguageRepository CreateLanguageRepository(IDatabaseUnitOfWork uow)
+        internal virtual ILanguageRepository CreateLanguageRepository(IDatabaseUnitOfWork uow)
         {
             return new LanguageRepository(
                 uow,
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Persistence
                 InMemoryCacheProvider.Current);
         }
 
-		public virtual IMediaRepository CreateMediaRepository(IDatabaseUnitOfWork uow)
+        internal virtual IMediaRepository CreateMediaRepository(IDatabaseUnitOfWork uow)
         {
             return new MediaRepository(
                 uow,
@@ -78,14 +78,14 @@ namespace Umbraco.Core.Persistence
                 CreateMediaTypeRepository(uow));
         }
 
-		public virtual IMediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork uow)
+        internal virtual IMediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork uow)
         {
             return new MediaTypeRepository(
                 uow,
                 InMemoryCacheProvider.Current);
         }
 
-		public virtual IRelationRepository CreateRelationRepository(IDatabaseUnitOfWork uow)
+        internal virtual IRelationRepository CreateRelationRepository(IDatabaseUnitOfWork uow)
         {
             return new RelationRepository(
                 uow,
@@ -93,24 +93,24 @@ namespace Umbraco.Core.Persistence
                 CreateRelationTypeRepository(uow));
         }
 
-		public virtual IRelationTypeRepository CreateRelationTypeRepository(IDatabaseUnitOfWork uow)
+        internal virtual IRelationTypeRepository CreateRelationTypeRepository(IDatabaseUnitOfWork uow)
         {
             return new RelationTypeRepository(
                 uow,
                 NullCacheProvider.Current);
         }
 
-        public virtual IScriptRepository CreateScriptRepository(IUnitOfWork uow)
+        internal virtual IScriptRepository CreateScriptRepository(IUnitOfWork uow)
         {
             return new ScriptRepository(uow);
         }
 
-        public virtual IStylesheetRepository CreateStylesheetRepository(IUnitOfWork uow)
+        internal virtual IStylesheetRepository CreateStylesheetRepository(IUnitOfWork uow)
         {
             return new StylesheetRepository(uow);
         }
 
-		public virtual ITemplateRepository CreateTemplateRepository(IDatabaseUnitOfWork uow)
+        internal virtual ITemplateRepository CreateTemplateRepository(IDatabaseUnitOfWork uow)
         {
             return new TemplateRepository(uow, NullCacheProvider.Current);
         }
