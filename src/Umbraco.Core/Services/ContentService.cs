@@ -362,7 +362,7 @@ namespace Umbraco.Core.Services
                 _unitOfWork.Commit();
 
                 //Updating content to published state is finished, so we fire event through PublishingStrategy to have cache updated
-                _publishingStrategy.PublishingFinalized(updated);
+                _publishingStrategy.PublishingFinalized(updated, true);
 
                 Audit.Add(AuditTypes.Publish, "RePublish All performed by user", userId == -1 ? 0 : userId, -1);
             }
@@ -433,7 +433,7 @@ namespace Umbraco.Core.Services
                 _unitOfWork.Commit();
 
                 //Save xml to db and call following method to fire event:
-                _publishingStrategy.PublishingFinalized(updated);
+                _publishingStrategy.PublishingFinalized(updated, false);
 
                 Audit.Add(AuditTypes.Publish, "Publish with Children performed by user", userId == -1 ? 0 : userId, content.Id);
             }

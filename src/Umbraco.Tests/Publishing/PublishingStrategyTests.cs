@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Web;
-using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -11,7 +9,6 @@ using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Web.Strategies;
 using umbraco.editorControls.tinyMCE3;
 using umbraco.interfaces;
 
@@ -66,25 +63,7 @@ namespace Umbraco.Tests.Publishing
         [Test]
         public void Can_Publish_And_Update_Xml_Cache()
         {
-            // Arrange
-            var httpContext = base.GetUmbracoContext("/test", 1234).HttpContext;
-            var updateContentCache = new UpdateContentCache(httpContext);
-            var contentService = ServiceContext.ContentService;
-            var content = contentService.GetById(1046);
-
-            // Act
-            bool published = contentService.Publish(content, 0);
-
-            // Assert
-            Assert.That(published, Is.True);
-            Assert.That(content.Published, Is.True);
-            Assert.IsTrue(httpContext.Items.Contains("UmbracoXmlContextContent"));
-
-            var document = httpContext.Items["UmbracoXmlContextContent"] as XmlDocument;
-            Console.Write(document.OuterXml);
-            document.Save("umbraco.config");
-
-            updateContentCache.Unsubscribe();
+            //TODO Make new test
         }
 
         public void CreateTestData()

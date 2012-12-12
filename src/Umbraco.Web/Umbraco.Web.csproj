@@ -327,9 +327,9 @@
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Routing\LookupByPageIdQuery.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
+    <Compile Include="Strategies\UpdateCacheAfterPublish.cs" />
+    <Compile Include="Strategies\UpdateCacheAfterUnPublish.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
-    <Compile Include="Strategies\UpdateContentCache.cs" />
-    <Compile Include="Strategies\UpdateMultipleContentCache.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>

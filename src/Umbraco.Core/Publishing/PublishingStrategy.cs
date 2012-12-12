@@ -252,9 +252,10 @@ namespace Umbraco.Core.Publishing
         /// Call to fire event that updating the published content has finalized.
         /// </summary>
         /// <param name="content">An enumerable list of <see cref="IContent"/> thats being published</param>
-        public override void PublishingFinalized(IEnumerable<IContent> content)
+        /// <param name="isAllRepublished">Boolean indicating whether its all content that is republished</param>
+        public override void PublishingFinalized(IEnumerable<IContent> content, bool isAllRepublished)
         {
-            OnPublished(content, new PublishingEventArgs());
+            OnPublished(content, new PublishingEventArgs{ IsAllRepublished = isAllRepublished});
         }
 
         /// <summary>
