@@ -65,7 +65,7 @@ namespace Umbraco.Tests.Services
 		/// </summary>
 		private volatile Exception _error = null;
 
-		private const int MaxThreadCount = 1;
+		private const int MaxThreadCount = 20;
 
 		[Test]
 		public void Ensure_All_Threads_Execute_Successfully_Content_Service()
@@ -145,20 +145,18 @@ namespace Umbraco.Tests.Services
 				{
 					try
 					{
-						var folderMediaType = ServiceContext.ContentTypeService.GetMediaType(1031);
-
 						Debug.WriteLine("Created content on thread: " + Thread.CurrentThread.ManagedThreadId);
 
 						//create 2 content items
-						
-						var folder1 = MockedMedia.CreateMediaFolder(folderMediaType, -1);
+
+					    var folder1 = mediaService.CreateMedia(-1, "Folder", 0);
 						folder1.Name = "test" + Guid.NewGuid();
 						Debug.WriteLine("Saving folder1 on thread: " + Thread.CurrentThread.ManagedThreadId);
 						mediaService.Save(folder1, 0);
 
 						Thread.Sleep(100); //quick pause for maximum overlap!
 
-						var folder2 = MockedMedia.CreateMediaFolder(folderMediaType, -1);
+                        var folder2 = mediaService.CreateMedia(-1, "Folder", 0);
 						folder2.Name = "test" + Guid.NewGuid();
 						Debug.WriteLine("Saving folder2 on thread: " + Thread.CurrentThread.ManagedThreadId);
 						mediaService.Save(folder2, 0);

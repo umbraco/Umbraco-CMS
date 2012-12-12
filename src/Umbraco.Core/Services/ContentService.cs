@@ -8,7 +8,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 
@@ -24,7 +23,10 @@ namespace Umbraco.Core.Services
 		private readonly IUserService _userService;
 		private HttpContextBase _httpContext;
 
-		public ContentService(IDatabaseUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy)
+        public ContentService(IDatabaseUnitOfWorkProvider provider) : this(provider, new PublishingStrategy())
+        {}
+
+	    internal ContentService(IDatabaseUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy)
 		{
 			_uowProvider = provider;
 			_publishingStrategy = publishingStrategy;
@@ -36,8 +38,6 @@ namespace Umbraco.Core.Services
 			_userService = userService;
 			_uowProvider = provider;
 		}
-
-		//TODO Add GetLatestUnpublishedVersions(int id){}
 
 		/// <summary>
 		/// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>

@@ -263,7 +263,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Insert(dto);
 
             //Create the PropertyData for this version - cmsPropertyData
-            var propertyFactory = new PropertyFactory(((Content)entity).ContentType, entity.Version, entity.Id);
+            var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
             var propertyDataDtos = propertyFactory.BuildDto(entity.Properties);
             //Add Properties
             foreach (var propertyDataDto in propertyDataDtos)

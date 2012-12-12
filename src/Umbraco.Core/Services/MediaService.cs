@@ -6,7 +6,6 @@ using Umbraco.Core.Auditing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -44,7 +43,7 @@ namespace Umbraco.Core.Services
 		/// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
 		/// <param name="userId">Optional id of the user creating the media item</param>
 		/// <returns><see cref="IMedia"/></returns>
-		public IMedia CreateContent(int parentId, string mediaTypeAlias, int userId = -1)
+		public IMedia CreateMedia(int parentId, string mediaTypeAlias, int userId = -1)
 		{
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = RepositoryResolver.Current.Factory.CreateMediaTypeRepository(uow))
@@ -55,12 +54,12 @@ namespace Umbraco.Core.Services
 				if (!mediaTypes.Any())
 					throw new Exception(string.Format("No ContentType matching the passed in Alias: '{0}' was found", mediaTypeAlias));
 
-				var contentType = mediaTypes.First();
+				var mediaType = mediaTypes.First();
 
-				if (contentType == null)
+				if (mediaType == null)
 					throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null", mediaTypeAlias));
 
-				var media = new Models.Media(parentId, contentType);
+				var media = new Models.Media(parentId, mediaType);
 
 				var e = new NewEventArgs { Alias = mediaTypeAlias, ParentId = parentId };
 				
@@ -307,7 +306,6 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Id of the User deleting the Media</param>
 		public void Delete(IMedia media, int userId = -1)
 		{
-
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = RepositoryResolver.Current.Factory.CreateMediaRepository(uow))
 			{
@@ -345,7 +343,6 @@ namespace Umbraco.Core.Services
 				if (!e.Cancel)
 				{
 					SetUser(media, userId);
-					repository.AddOrUpdate(media);
 					repository.AddOrUpdate(media);
 					uow.Commit();
 
