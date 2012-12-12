@@ -156,6 +156,11 @@ namespace umbraco.cms.businesslogic.web
             }*/
         }
 
+        internal Document(IContent content) : base(content)
+        {
+            setupNode(content);
+        }
+
         #endregion
 
         #region Constants and Static members
@@ -398,7 +403,7 @@ namespace umbraco.cms.businesslogic.web
             ServiceContext.Current.ContentService.Save(content);
 
             //read the whole object from the db
-            Document d = new Document(content.Id);
+            Document d = new Document(content);
 
             //event
             NewEventArgs e = new NewEventArgs();
@@ -443,7 +448,7 @@ namespace umbraco.cms.businesslogic.web
         public static Document[] GetRootDocuments()
         {
             var content = ServiceContext.Current.ContentService.GetRootContent();
-            return content.Select(c => new Document(c.Id)).ToArray();
+            return content.Select(c => new Document(c)).ToArray();
         }
 
         public static int CountSubs(int parentId, bool publishedOnly)
@@ -474,7 +479,7 @@ namespace umbraco.cms.businesslogic.web
         public static IEnumerable<Document> GetDocumentsOfDocumentType(int docTypeId)
         {
             var contents = ServiceContext.Current.ContentService.GetContentOfContentType(docTypeId);
-            return contents.Select(x => new Document(x.Id)).ToArray();
+            return contents.Select(x => new Document(x)).ToArray();
         }
 
         public static void RemoveTemplateFromDocument(int templateId)
@@ -492,7 +497,7 @@ namespace umbraco.cms.businesslogic.web
         public static Document[] GetChildrenForTree(int NodeId)
         {
             var children = ServiceContext.Current.ContentService.GetChildren(NodeId);
-            var list = children.Select(x => new Document(x.Id));
+            var list = children.Select(x => new Document(x));
             return list.ToArray();
         }
 
@@ -500,7 +505,7 @@ namespace umbraco.cms.businesslogic.web
         public static List<Document> GetChildrenBySearch(int NodeId, string searchString)
         {
             var children = ServiceContext.Current.ContentService.GetChildrenByName(NodeId, searchString);
-            return children.Select(x => new Document(x.Id)).ToList();
+            return children.Select(x => new Document(x)).ToList();
         }
 
 
@@ -559,7 +564,7 @@ namespace umbraco.cms.businesslogic.web
         public static Document[] GetDocumentsForExpiration()
         {
             var contents = ServiceContext.Current.ContentService.GetContentForExpiration();
-            return contents.Select(x => new Document(x.Id)).ToArray();
+            return contents.Select(x => new Document(x)).ToArray();
         }
 
         /// <summary>
@@ -570,7 +575,7 @@ namespace umbraco.cms.businesslogic.web
         public static Document[] GetDocumentsForRelease()
         {
             var contents = ServiceContext.Current.ContentService.GetContentForRelease();
-            return contents.Select(x => new Document(x.Id)).ToArray();
+            return contents.Select(x => new Document(x)).ToArray();
         }
 
         #endregion
@@ -1151,7 +1156,7 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'"));
             {
                 // Make the new document
                 var content = ServiceContext.Current.ContentService.Copy(_content, CopyTo, RelateToOrignal, u.Id);
-                newDoc = new Document(content.Id);
+                newDoc = new Document(content);
 
                 e.NewDocument = newDoc;
                 FireAfterCopy(e);
@@ -1394,13 +1399,19 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'"));
         [Obsolete("Deprecated", false)]
         protected override void setupNode()
         {
-            _content = Version == Guid.Empty
+            var content = Version == Guid.Empty
                            ? ServiceContext.Current.ContentService.GetById(Id)
                            : ServiceContext.Current.ContentService.GetByIdVersion(Id, Version);
 
-            if(_content == null)
+            if(content == null)
                 throw new ArgumentException(string.Format("No Document exists with id '{0}'", Id));
 
+            setupNode(content);
+        }
+
+        private void setupNode(IContent content)
+        {
+            _content = content;
             //Setting private properties from IContent replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
             base.PopulateCMSNodeFromContent(_content, _objectType);
 
@@ -1413,7 +1424,7 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'"));
             _writer = User.GetUser(_content.WriterId);
             _updated = _content.UpdateDate;
 
-            if(_content.Template != null)
+            if (_content.Template != null)
                 _template = _content.Template.Id;
 
             if (_content.ExpireDate.HasValue)

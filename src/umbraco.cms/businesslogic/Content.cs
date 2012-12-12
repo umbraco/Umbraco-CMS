@@ -1,21 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using System.Data;
 using System.Xml;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
 using umbraco.cms.businesslogic.property;
-using umbraco.cms.businesslogic.propertytype;
 using umbraco.DataLayer;
 using System.Runtime.CompilerServices;
 using umbraco.cms.helpers;
-using umbraco.BusinessLogic;
-using umbraco.interfaces;
-using System.IO;
-using umbraco.IO;
 using umbraco.cms.businesslogic.datatype.controls;
-using Umbraco.Core;
+using File = System.IO.File;
+using Property = umbraco.cms.businesslogic.property.Property;
+using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 
 namespace umbraco.cms.businesslogic
 {
@@ -40,6 +36,7 @@ namespace umbraco.cms.businesslogic
         private string _contentTypeIcon;
         private ContentType _contentType;
         private Properties m_LoadedProperties = null;
+        private IContentBase _contentBase;
 
         #endregion
 
@@ -52,6 +49,16 @@ namespace umbraco.cms.businesslogic
         protected Content(Guid id) : base(id) { }
 
         protected Content(Guid id, bool noSetup) : base(id, noSetup) { }
+
+        protected internal Content(IContentBase contentBase)
+            : base(contentBase)
+        {
+            _contentBase = contentBase;
+            _version = _contentBase.Version;
+            _versionDate = _contentBase.UpdateDate;
+            _versionDateInitialized = true;
+
+        }
 
         #endregion
 

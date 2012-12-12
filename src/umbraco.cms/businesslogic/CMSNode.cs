@@ -4,6 +4,7 @@ using System.Data;
 
 using System.Xml;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
@@ -397,6 +398,11 @@ namespace umbraco.cms.businesslogic
         {
             _id = reader.GetInt("id");
             PopulateCMSNodeFromReader(reader);
+        }
+
+        protected internal CMSNode(IEntity entity)
+        {
+            _id = entity.Id;
         }
 
         #endregion
