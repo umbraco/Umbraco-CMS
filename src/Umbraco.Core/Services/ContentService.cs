@@ -50,37 +50,39 @@ namespace Umbraco.Core.Services
 		public IContent CreateContent(int parentId, string contentTypeAlias, int userId = -1)
 		{
 			var uow = _uowProvider.GetUnitOfWork();
-			var repository = RepositoryResolver.Current.Factory.CreateContentTypeRepository(uow);
-			var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
-			var contentTypes = repository.GetByQuery(query);
-
-			if (!contentTypes.Any())
-				throw new Exception(string.Format("No ContentType matching the passed in Alias: '{0}' was found", contentTypeAlias));
-
-			var contentType = contentTypes.First();
-
-			if (contentType == null)
-				throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null", contentTypeAlias));
-
-			IContent content = null;
-
-			var e = new NewEventArgs { Alias = contentTypeAlias, ParentId = parentId };
-			if (Creating != null)
-				Creating(content, e);
-
-			if (!e.Cancel)
+			using (var repository = RepositoryResolver.Current.Factory.CreateContentTypeRepository(uow))
 			{
-				content = new Content(parentId, contentType);
-				SetUser(content, userId);
-				SetWriter(content, userId);
+				var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
+				var contentTypes = repository.GetByQuery(query);
 
-				if (Created != null)
-					Created(content, e);
+				if (!contentTypes.Any())
+					throw new Exception(string.Format("No ContentType matching the passed in Alias: '{0}' was found", contentTypeAlias));
 
-				Audit.Add(AuditTypes.New, "", content.CreatorId, content.Id);
+				var contentType = contentTypes.First();
+
+				if (contentType == null)
+					throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null", contentTypeAlias));
+
+				IContent content = null;
+
+				var e = new NewEventArgs { Alias = contentTypeAlias, ParentId = parentId };
+				if (Creating != null)
+					Creating(content, e);
+
+				if (!e.Cancel)
+				{
+					content = new Content(parentId, contentType);
+					SetUser(content, userId);
+					SetWriter(content, userId);
+
+					if (Created != null)
+						Created(content, e);
+
+					Audit.Add(AuditTypes.New, "", content.CreatorId, content.Id);
+				}
+
+				return content;	
 			}
-
-			return content;
 		}
 
 		/// <summary>

@@ -16,7 +16,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
-	[TestFixture]
+	[TestFixture, RequiresSTA]
 	public class ThreadSafetyServiceTest : BaseDatabaseFactoryTest
 	{
 		private PerThreadPetaPocoUnitOfWorkProvider _uowProvider;
@@ -65,7 +65,7 @@ namespace Umbraco.Tests.Services
 		/// </summary>
 		private volatile Exception _error = null;
 
-		private const int MaxThreadCount = 20;
+		private const int MaxThreadCount = 1;
 
 		[Test]
 		public void Ensure_All_Threads_Execute_Successfully_Content_Service()
