@@ -23,7 +23,7 @@ namespace Umbraco.Core.Models
                                 : xd.CreateTextNode(property.Value.ToString());
 
             xmlNode.AppendChild(child);
-
+            //TODO Revisit this by correcting test setup or refactoring DefaultData class to use PetaPoco instead of SqlHelper.
             //This seems to fail during testing 
             //xmlNode.AppendChild(property.PropertyType.DataType(property.Id).Data.ToXMl(xd));
             
