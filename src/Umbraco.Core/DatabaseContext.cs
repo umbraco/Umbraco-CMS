@@ -215,7 +215,7 @@ namespace Umbraco.Core
             }
 
             string fileName = String.Concat(vDir, "web.config");
-            var xml = XDocument.Load(fileName);
+            var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
             var connectionstrings = xml.Root.Descendants("connectionStrings").Single();
 
             // Update connectionString if it exists, or else create a new appSetting for the given key and value
@@ -230,7 +230,7 @@ namespace Umbraco.Core
                 setting.Attribute("connectionString").Value = connectionString;
             }
 
-            xml.Save(fileName);
+            xml.Save(fileName, SaveOptions.DisableFormatting);
 
             LogHelper.Info<DatabaseContext>("Configured new ConnectionString: " + connectionString);
         }

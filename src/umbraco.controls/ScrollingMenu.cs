@@ -66,6 +66,27 @@ namespace umbraco.uicontrols {
             Icons.Insert(Index, icon);
         }
 
+        /// <summary>
+        /// Finds the index of the n-th Splitter in this Menu
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns>The index of the n-th Splitter, or -1 if the number of Splitters is smaller than n</returns>
+        public int FindSplitter(int n)
+        {
+            var count = 0;
+            for(var i=0; i<Icons.Count; i++)
+            {
+               if (Icons[i].GetType() == typeof(Splitter))
+               {
+                   count++;
+
+                   if (count == n)
+                       return i;
+               }
+            }
+
+            return -1;
+        }
 
         protected override void OnLoad(System.EventArgs EventArguments) {
             if (base.Visible)
