@@ -630,7 +630,7 @@ namespace Umbraco.Tests.Services
             var content = contentService.GetById(1048);
 
             // Act
-            var copy = contentService.Copy(content, content.ParentId, 0);
+            var copy = contentService.Copy(content, content.ParentId, false, 0);
 
             // Assert
             Assert.That(copy, Is.Not.Null);

@@ -219,22 +219,6 @@ namespace umbraco.cms.businesslogic
             {
                 EnsureProperties();
                 return m_LoadedProperties.ToArray();
-
-                //if (this.ContentType == null)
-                //    return new Property[0];
-
-                //List<Property> result = new List<Property>();
-                //foreach (PropertyType prop in this.ContentType.PropertyTypes)
-                //{
-                //    if (prop == null)
-                //        continue;
-                //    Property p = getProperty(prop);
-                //    if (p == null)
-                //        continue;
-                //    result.Add(p);
-                //}
-
-                //return result.ToArray();
             }
         }
 
@@ -300,26 +284,6 @@ namespace umbraco.cms.businesslogic
         /// <returns>The property with the given propertytype</returns>
         public Property getProperty(PropertyType pt)
         {
-
-            //object o = SqlHelper.ExecuteScalar<object>(
-            //    "select id from cmsPropertyData where versionId=@version and propertyTypeId=@propertyTypeId",
-            //    SqlHelper.CreateParameter("@version", this.Version),
-            //    SqlHelper.CreateParameter("@propertyTypeId", pt.Id));
-            //if (o == null)
-            //    return null;
-            //int propertyId;
-            //if (!int.TryParse(o.ToString(), out propertyId))
-            //    return null;
-            //try
-            //{
-            //    return new Property(propertyId, pt);
-            //}
-            //catch (Exception ex)
-            //{
-            //    Log.Add(LogTypes.Error, this.Id, "An error occurred retreiving property. EXCEPTION: " + ex.Message);
-            //    return null;
-            //}
-
             EnsureProperties();
 
             var prop = m_LoadedProperties

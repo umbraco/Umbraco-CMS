@@ -235,9 +235,10 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to copy</param>
         /// <param name="parentId">Id of the Content's new Parent</param>
+        /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
         /// <param name="userId">Optional Id of the User copying the Content</param>
         /// <returns>The newly created <see cref="IContent"/> object</returns>
-        IContent Copy(IContent content, int parentId, int userId = -1);
+        IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = -1);
 
         /// <summary>
         /// Sends an <see cref="IContent"/> to Publication, which executes handlers and events for the 'Send to Publication' action.

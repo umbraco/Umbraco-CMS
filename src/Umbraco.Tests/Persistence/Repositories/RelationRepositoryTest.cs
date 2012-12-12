@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             // Act
             var relationType = repositoryType.Get(1);
-            var relation = new Relation(1047, 1048) { RelationType = relationType };
+            var relation = new Relation(1047, 1048, relationType);
             repository.AddOrUpdate(relation);
             unitOfWork.Commit();
 
@@ -270,8 +270,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
             ServiceContext.ContentService.Save(subpage2, 0);
 
-            var relation = new Relation(textpage.Id, subpage.Id) {RelationType = relateContent, Comment = string.Empty};
-            var relation2 = new Relation(textpage.Id, subpage2.Id) { RelationType = relateContent, Comment = string.Empty};
+            var relation = new Relation(textpage.Id, subpage.Id, relateContent) { Comment = string.Empty };
+            var relation2 = new Relation(textpage.Id, subpage2.Id, relateContent) { Comment = string.Empty };
             relationRepository.AddOrUpdate(relation);
             relationRepository.AddOrUpdate(relation2);
             unitOfWork.Commit();

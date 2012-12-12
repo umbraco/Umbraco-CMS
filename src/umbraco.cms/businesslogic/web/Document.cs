@@ -237,14 +237,9 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         private IEnumerable<Document> _children = null;
 
-        // special for passing httpcontext object
-        //private HttpContext _httpContext;
-
         // special for tree performance
         private int _userId = -1;
 
-        //private Dictionary<Property, object> _knownProperties = new Dictionary<Property, object>();
-        //private Func<KeyValuePair<Property, object>, string, bool> propertyTypeByAlias = (pt, alias) => pt.Key.PropertyType.Alias == alias; 
         #endregion
 
         #region Static Methods
@@ -1156,31 +1151,6 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'"));
             return
                 versions.Select(x => new DocumentVersionList(x.Version, x.UpdateDate, x.Name, User.GetUser(x.CreatorId)))
                         .ToArray();
-
-            /*ArrayList versions = new ArrayList();
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader("select documentUser, versionId, updateDate, text from cmsDocument where nodeId = @nodeId order by updateDate",
-                                        SqlHelper.CreateParameter("@nodeId", Id)))
-            {
-                while (dr.Read())
-                {
-                    DocumentVersionList dv =
-                        new DocumentVersionList(dr.GetGuid("versionId"),
-                                                dr.GetDateTime("updateDate"),
-                                                dr.GetString("text"),
-                                                User.GetUser(dr.GetInt("documentUser")));
-                    versions.Add(dv);
-                }
-            }
-
-            DocumentVersionList[] retVal = new DocumentVersionList[versions.Count];
-            int i = 0;
-            foreach (DocumentVersionList dv in versions)
-            {
-                retVal[i] = dv;
-                i++;
-            }
-            return retVal;*/
         }
 
         /// <summary>
@@ -1194,21 +1164,6 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'"));
                 return null;
 
             return new DocumentVersionList(version.Version, version.UpdateDate, version.Name, User.GetUser(version.CreatorId));
-
-            /*using (IRecordsReader dr =
-                SqlHelper.ExecuteReader("select top 1 documentUser, versionId, updateDate, text from cmsDocument where nodeId = @nodeId and published = 1 order by updateDate desc",
-                                        SqlHelper.CreateParameter("@nodeId", Id)))
-            {
-                if (dr.Read())
-                {
-                    return new DocumentVersionList(dr.GetGuid("versionId"),
-                                                dr.GetDateTime("updateDate"),
-                                                dr.GetString("text"),
-                                                User.GetUser(dr.GetInt("documentUser")));
-                }
-            }
-
-            return null;*/
         }
 
         /// <summary>
@@ -1248,9 +1203,7 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'"));
         /// <param name="RelateToOrignal"></param>
         public Document Copy(int CopyTo, User u, bool RelateToOrignal)
         {
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-
-            CopyEventArgs e = new CopyEventArgs();
+            var e = new CopyEventArgs();
             e.CopyTo = CopyTo;
             FireBeforeCopy(e);
             Document newDoc = null;
@@ -1258,74 +1211,11 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'"));
             if (!e.Cancel)
             {
                 // Make the new document
-                newDoc = MakeNew(Text, new DocumentType(ContentType.Id), u, CopyTo);
+                var content = ServiceContext.Current.ContentService.Copy(_content, CopyTo, RelateToOrignal, u.Id);
+                newDoc = new Document(content.Id);
 
-                if (newDoc != null)
-                {
-                    // update template if a template is set
-                    if (this.Template > 0)
-                        newDoc.Template = Template;
-
-                    //update the trashed property as it could be copied inside the recycle bin
-                    newDoc.IsTrashed = this.IsTrashed;
-
-                    // Copy the properties of the current document
-                    var props = GenericProperties;
-                    foreach (Property p in props)
-                    {
-                        //copy file if it's an upload property (so it doesn't get removed when original doc get's deleted)
-
-                        IDataType uploadField = new Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
-
-                        if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id
-                        && p.Value.ToString() != ""
-                        && fs.FileExists(fs.GetRelativePath(p.Value.ToString())))
-                        {
-                            var currentPath = fs.GetRelativePath(p.Value.ToString());
-
-                            var propId = newDoc.getProperty(p.PropertyType.Alias).Id;
-                            var newPath = fs.GetRelativePath(propId, System.IO.Path.GetFileName(currentPath));
-
-                            fs.CopyFile(currentPath, newPath);
-
-                            newDoc.getProperty(p.PropertyType.Alias).Value = fs.GetUrl(newPath);
-
-                            //copy thumbs
-                            foreach (var thumbPath in fs.GetThumbnails(currentPath))
-                            {
-                                var newThumbPath = fs.GetRelativePath(propId, System.IO.Path.GetFileName(thumbPath));
-                                fs.CopyFile(thumbPath, newThumbPath);
-                            }
-
-                        }
-                        else
-                        {
-                            newDoc.getProperty(p.PropertyType.Alias).Value = p.Value;
-                        }
-
-                    }
-
-                    // Relate?
-                    if (RelateToOrignal)
-                    {
-                        Relation.MakeNew(Id, newDoc.Id, RelationType.GetByAlias("relateDocumentOnCopy"), "");
-
-                        // Add to audit trail
-                        Log.Add(LogTypes.Copy, u, newDoc.Id, "Copied and related from " + Text + " (id: " + Id.ToString() + ")");
-                    }
-
-
-                    // Copy the children
-                    //store children array here because iterating over an Array object is very inneficient.
-                    var c = Children;
-                    foreach (Document d in c)
-                        d.Copy(newDoc.Id, u, RelateToOrignal);
-
-                    e.NewDocument = newDoc;
-                }
-
+                e.NewDocument = newDoc;
                 FireAfterCopy(e);
-
             }
 
             return newDoc;

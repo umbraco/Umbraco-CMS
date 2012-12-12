@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Umbraco.Core.Auditing;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -42,8 +43,6 @@ namespace Umbraco.Core.Services
 			_contentRepository = RepositoryResolver.Current.Factory.CreateContentRepository(_unitOfWork);
 			_contentTypeRepository = RepositoryResolver.Current.Factory.CreateContentTypeRepository(_unitOfWork);
         }
-
-        //TODO Add GetLatestUnpublishedVersions(int id){}
 
         /// <summary>
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
@@ -922,13 +921,11 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to copy</param>
         /// <param name="parentId">Id of the Content's new Parent</param>
+        /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
         /// <param name="userId">Optional Id of the User copying the Content</param>
         /// <returns>The newly created <see cref="IContent"/> object</returns>
-        public IContent Copy(IContent content, int parentId, int userId = -1)
+        public IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = -1)
         {
-            //TODO Current implementation doesn't account for files, so should be updated to check properties for files that should be copied/re-created.
-            //TODO Add overload for creating a relation between New vs. Old copy
-            //TODO Children should also be copied (?)
             var e = new CopyEventArgs{ParentId = parentId};
             if (Copying != null)
                 Copying(content, e);
@@ -943,16 +940,75 @@ namespace Umbraco.Core.Services
 
                 var repository = _contentRepository;
 
-                SetWriter(content, userId);
+                SetWriter(copy, userId);
 
                 repository.AddOrUpdate(copy);
                 _unitOfWork.Commit();
+                
+                //NOTE This 'Relation' part should eventually be delegated to a RelationService
+                if (relateToOriginal)
+                {
+                    var relationTypeRepository = RepositoryResolver.Current.Factory.CreateRelationTypeRepository(_unitOfWork);
+                    var relationRepository = RepositoryResolver.Current.Factory.CreateRelationRepository(_unitOfWork);
+
+                    var relationType = relationTypeRepository.Get(1);
+
+                    var relation = new Relation(content.Id, copy.Id, relationType);
+                    relationRepository.AddOrUpdate(relation);
+                    _unitOfWork.Commit();
+
+                    Audit.Add(AuditTypes.Copy,
+                              string.Format("Copied content with Id: '{0}' related to original content with Id: '{1}'",
+                                            copy.Id, content.Id), copy.WriterId, copy.Id);
+                }
+
+                var uploadFieldId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
+                if (content.Properties.Any(x => x.PropertyType.DataTypeControlId == uploadFieldId))
+                {
+                    bool isUpdated = false;
+                    var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+
+                    //Loop through properties to check if the content contains media that should be deleted
+                    foreach (var property in content.Properties.Where(x => x.PropertyType.DataTypeControlId == uploadFieldId 
+                        && string.IsNullOrEmpty(x.Value.ToString()) == false))
+                    {
+                        if (fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
+                        {
+                            var currentPath = fs.GetRelativePath(property.Value.ToString());
+                            var propertyId = copy.Properties.First(x => x.Alias == property.Alias).Id;
+                            var newPath = fs.GetRelativePath(propertyId, System.IO.Path.GetFileName(currentPath));
+
+                            fs.CopyFile(currentPath, newPath);
+                            copy.SetValue(property.Alias, fs.GetUrl(newPath));
+
+                            //Copy thumbnails
+                            foreach (var thumbPath in fs.GetThumbnails(currentPath))
+                            {
+                                var newThumbPath = fs.GetRelativePath(propertyId, System.IO.Path.GetFileName(thumbPath));
+                                fs.CopyFile(thumbPath, newThumbPath);
+                            }
+                            isUpdated = true;
+                        }
+                    }
+
+                    if (isUpdated)
+                    {
+                        repository.AddOrUpdate(copy);
+                        _unitOfWork.Commit();
+                    }
+                }
+
+                var children = GetChildren(content.Id);
+                foreach (var child in children)
+                {
+                    Copy(child, copy.Id, relateToOriginal, userId);
+                }
             }
 
             if(Copied != null)
                 Copied(copy, e);
 
-            Audit.Add(AuditTypes.Delete, "Copy Content performed by user", content.WriterId, content.Id);
+            Audit.Add(AuditTypes.Copy, "Copy Content performed by user", content.WriterId, content.Id);
 
             return copy;
         }
