@@ -1658,8 +1658,6 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\ContentRecycleBin.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\FileSystemTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackager.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadCache.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadCacheItem.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadContent.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadcontentItemType.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadDataTypes.cs" />
