@@ -15,7 +15,7 @@ namespace Umbraco.Core
 	/// <remarks>
 	/// This does not provide any startup functionality relating to web objects
 	/// </remarks>
-	internal class CoreBootManager : IBootManager
+	public class CoreBootManager : IBootManager
 	{
 
 		private DisposableTimer _timer;
