@@ -20,6 +20,14 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         private readonly List<Operation> _operations = new List<Operation>();
 
 
+		/// <summary>
+		/// Creates a new unit of work instance
+		/// </summary>
+		/// <param name="database"></param>
+		/// <remarks>
+		/// The Database instance used for this unit of work should not be shared with other unit's of work, other repositories, etc...
+		/// as it will get disposed of when this unit of work is disposed.
+		/// </remarks>
 		public PetaPocoUnitOfWork(UmbracoDatabase database)
         {
 	        Database = database;
@@ -151,16 +159,15 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 
 		/// <summary>
 		/// Ensures disposable objects are disposed
-		/// </summary>
+		/// </summary>		
 		/// <remarks>
-		/// We will not dispose the database because this will get disposed of automatically when 
-		/// in the HttpContext by the UmbracoModule because the DatabaseFactory stores the instance in HttpContext.Items 
-		/// when in a web context.
-		/// When not in a web context, we may possibly be re-using the database context.
+		/// Ensures that the Database instance is disposed of. As per the constructor documentation, the database instance
+		/// used to construct this object should not be shared as it will get disposed of when this object is disposed.
 		/// </remarks>
 	    protected override void DisposeResources()
 	    {
 			_operations.Clear();			
+			Database.Dispose();
 	    }
     }
 }
