@@ -63,9 +63,16 @@ namespace Umbraco.Core.Publishing
                                   content.Name, content.Id));
 
                 //Fire Published event
-                OnPublished(content, e);
+                //OnPublished(content, e);
 
                 //NOTE: Ideally the xml cache should be refreshed here - as part of the publishing
+                //but the updated content hasn't been saved yet
+                //Consider creating a method in the PublishingStrategy that is called when updating a content-being-publishing item is final
+                //and thus more legit to fire the OnPublished event
+                //PublishingFinalized(IContent content) { OnPublished(content, new PublishingEventArgs()); }
+                //PublishingFinalized(IEnumerable<IContent> content) { OnPublished(content, new PublishingEventArgs()); }
+                //UnPublishingFinalized(IContent content) { OnUnPublished(content, new PublishingEventArgs()); }
+                //UnPublishingFinalized(IEnumerable<IContent> content) { OnUnPublished(content, new PublishingEventArgs()); }
 
                 return true;
             }
@@ -127,10 +134,10 @@ namespace Umbraco.Core.Publishing
                                   item.Name, item.Id));
 
                 //Fire Published event
-                OnPublished(item, e);
+                //OnPublished(item, e);
             }
 
-            OnPublished(content, e);
+            //OnPublished(content, e);
 
             //NOTE: Ideally the xml cache should be refreshed here - as part of the publishing
             //OnCacheContentAfterPublish(content, e)
@@ -171,7 +178,7 @@ namespace Umbraco.Core.Publishing
                                   content.Name, content.Id));
 
                 //Fire UnPublishing event
-                OnUnPublished(content, e);
+                //OnUnPublished(content, e);
 
                 //NOTE: Ideally the xml cache should be refreshed here - as part of the unpublishing
                 //OnRemoveCacheContentAfterPublish(content, e)
@@ -218,14 +225,54 @@ namespace Umbraco.Core.Publishing
                                   item.Name, item.Id));
 
                 //Fire AfterUnPublish event
-                OnUnPublished(item, e);
+                //OnUnPublished(item, e);
             }
 
-            OnUnPublished(content, e);
+            //OnUnPublished(content, e);
 
             //NOTE: Ideally the xml cache should be refreshed here - as part of the publishing
 
             return true;
+        }
+
+        /// <summary>
+        /// Call to fire event that updating the published content has finalized.
+        /// </summary>
+        /// <remarks>
+        /// This seperation of the OnPublished event is done to ensure that the Content
+        /// has been properly updated (committed unit of work) and xml saved in the db.
+        /// </remarks>
+        /// <param name="content"><see cref="IContent"/> thats being published</param>
+        public override void PublishingFinalized(IContent content)
+        {
+            OnPublished(content, new PublishingEventArgs());
+        }
+
+        /// <summary>
+        /// Call to fire event that updating the published content has finalized.
+        /// </summary>
+        /// <param name="content">An enumerable list of <see cref="IContent"/> thats being published</param>
+        public override void PublishingFinalized(IEnumerable<IContent> content)
+        {
+            OnPublished(content, new PublishingEventArgs());
+        }
+
+        /// <summary>
+        /// Call to fire event that updating the unpublished content has finalized.
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> thats being unpublished</param>
+        public override void UnPublishingFinalized(IContent content)
+        {
+            OnUnPublished(content, new PublishingEventArgs());
+        }
+
+        /// <summary>
+        /// Call to fire event that updating the unpublished content has finalized.
+        /// </summary>
+        /// <param name="content">An enumerable list of <see cref="IContent"/> thats being unpublished</param>
+        public override void UnPublishingFinalized(IEnumerable<IContent> content)
+        {
+            OnUnPublished(content, new PublishingEventArgs());
         }
     }
 }

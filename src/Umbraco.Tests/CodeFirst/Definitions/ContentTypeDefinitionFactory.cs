@@ -316,7 +316,7 @@ namespace Umbraco.Tests.CodeFirst.Definitions
                                ? templateName.Replace(".cshtml", "").Replace(".vbhtml", "")
                                : templateName.Replace(".masterpage", "");
 
-                var template = ServiceFactory.FileService.GetTemplateByAlias(@alias);
+                var template = ServiceFactory.FileService.GetTemplate(@alias);
                 if(template == null)
                 {
                     var name = engine == RenderingEngine.Mvc

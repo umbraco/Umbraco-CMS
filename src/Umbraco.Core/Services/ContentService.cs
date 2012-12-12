@@ -158,6 +158,22 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by its name or partial name
+        /// </summary>
+        /// <param name="parentId">Id of the Parent to retrieve Children from</param>
+        /// <param name="name">Full or partial name of the children</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetChildrenByName(int parentId, string name)
+        {
+            var repository = _contentRepository;
+
+            var query = Query<IContent>.Builder.Where(x => x.ParentId == parentId && x.Name.Contains(name));
+            var contents = repository.GetByQuery(query);
+
+            return contents;
+        }
+
+        /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by Parent Id
         /// </summary>
         /// <param name="id">Id of the Parent to retrieve Descendants from</param>
@@ -312,9 +328,11 @@ namespace Umbraco.Core.Services
         /// <returns>True if publishing succeeded, otherwise False</returns>
         public bool RePublishAll(int userId = -1)
         {
+            //TODO delete from cmsContentXml or truncate table cmsContentXml before generating and saving xml to db
             var repository = _contentRepository;
 
             var list = new List<IContent>();
+            var updated = new List<IContent>();
 
             //Consider creating a Path query instead of recursive method:
             //var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith("-1"));
@@ -338,12 +356,13 @@ namespace Umbraco.Core.Services
                 {
                     SetWriter(item, userId);
                     repository.AddOrUpdate(item);
+                    updated.Add(item);
                 }
 
                 _unitOfWork.Commit();
 
-                //TODO Change this so we can avoid a depencency to the horrible library method / umbraco.content (singleton) class.
-                //global::umbraco.library.RefreshContent();
+                //Updating content to published state is finished, so we fire event through PublishingStrategy to have cache updated
+                _publishingStrategy.PublishingFinalized(updated);
 
                 Audit.Add(AuditTypes.Publish, "RePublish All performed by user", userId == -1 ? 0 : userId, -1);
             }
@@ -370,6 +389,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if publishing succeeded, otherwise False</returns>
         public bool PublishWithChildren(IContent content, int userId = -1)
         {
+            //TODO Should Publish generate xml of content and save it in the db?
             var repository = _contentRepository;
 
             //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
@@ -393,6 +413,7 @@ namespace Umbraco.Core.Services
             //Consider creating a Path query instead of recursive method:
             //var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(content.Path));
 
+            var updated = new List<IContent>();
             var list = new List<IContent>();
             list.Add(content);
             list.AddRange(GetChildrenDeep(content.Id));
@@ -406,13 +427,13 @@ namespace Umbraco.Core.Services
                 {
                     SetWriter(item, userId);
                     repository.AddOrUpdate(item);
+                    updated.Add(item);
                 }
 
                 _unitOfWork.Commit();
 
-                //TODO Change this so we can avoid a depencency to the horrible library method / umbraco.content (singleton) class.
-                //TODO Need to investigate if it will also update the cache for children of the Content object
-                //global::umbraco.library.UpdateDocumentCache(content.Id);
+                //Save xml to db and call following method to fire event:
+                _publishingStrategy.PublishingFinalized(updated);
 
                 Audit.Add(AuditTypes.Publish, "Publish with Children performed by user", userId == -1 ? 0 : userId, content.Id);
             }
@@ -456,8 +477,8 @@ namespace Umbraco.Core.Services
 
                 _unitOfWork.Commit();
 
-                //TODO Change this so we can avoid a depencency to the horrible library method / umbraco.content class.
-                //global::umbraco.library.UnPublishSingleNode(content.Id);
+                //Delete xml from db? and call following method to fire event through PublishingStrategy to update cache
+                _publishingStrategy.UnPublishingFinalized(content);
 
                 Audit.Add(AuditTypes.Publish, "UnPublish performed by user", userId == -1 ? 0 : userId, content.Id);
             }
@@ -499,6 +520,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if publishing succeeded, otherwise False</returns>
         public bool SaveAndPublish(IContent content, int userId = -1)
         {
+            //TODO Should Publish generate xml of content and save it in the db?
             var e = new SaveEventArgs();
             if (Saving != null)
                 Saving(content, e);
@@ -535,14 +557,14 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(content);
                     _unitOfWork.Commit();
 
-                    //TODO Change this so we can avoid a depencency to the horrible library method / umbraco.content (singleton) class.
-                    //global::umbraco.library.UpdateDocumentCache(content.Id);
+                    //Save xml to db and call following method to fire event through PublishingStrategy to update cache
+                    _publishingStrategy.PublishingFinalized(content);
                 }
 
                 if (Saved != null)
                     Saved(content, e);
 
-                Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId == -1 ? 0 : userId, content.Id);
+                Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", content.WriterId, content.Id);
 
                 return published;
             }
@@ -690,15 +712,13 @@ namespace Umbraco.Core.Services
 
                     foreach (var child in children)
                     {
-                        ((Content)child).ChangeTrashedState(true);
-                        repository.AddOrUpdate(child);
+                        if(child.ContentType.Id != contentTypeId)
+                            MoveToRecycleBin(child, userId);
                     }
 
                     //Permantly delete the content
-                    repository.Delete(content);
+                    Delete(content, userId);
                 }
-
-                _unitOfWork.Commit();
 
                 if (Deleted != null)
                     Deleted(contents, e);
@@ -708,23 +728,35 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Permanently deletes an <see cref="IContent"/> object
+        /// Permanently deletes an <see cref="IContent"/> object.
         /// </summary>
+        /// <remarks>
+        /// This method will also delete associated media files, child content and possibly associated domains.
+        /// </remarks>
         /// <remarks>Please note that this method will completely remove the Content from the database</remarks>
         /// <param name="content">The <see cref="IContent"/> to delete</param>
         /// <param name="userId">Optional Id of the User deleting the Content</param>
         public void Delete(IContent content, int userId = -1)
         {
-            //TODO Ensure that content is unpublished when deleted
-            //TODO This method should handle/react to errors when there is a constraint issue with the content being deleted
-            //TODO Children should either be deleted or moved to the recycle bin
-
             var e = new DeleteEventArgs { Id = content.Id };
             if (Deleting != null)
                 Deleting(content, e);
 
             if (!e.Cancel)
             {
+                //Make sure that published content is unpublished before being deleted
+                if (content.HasPublishedVersion())
+                {
+                    UnPublish(content, userId);
+                }
+
+                //Delete children before deleting the 'possible parent'
+                var children = GetChildren(content.Id);
+                foreach (var child in children)
+                {
+                    Delete(child, userId);
+                }
+
                 var repository = _contentRepository;
                 SetWriter(content, userId);
                 repository.Delete(content);
@@ -733,7 +765,7 @@ namespace Umbraco.Core.Services
                 if (Deleted != null)
                     Deleted(content, e);
 
-                Audit.Add(AuditTypes.Delete, "Delete Content performed by user", userId == -1 ? 0 : userId, content.Id);
+                Audit.Add(AuditTypes.Delete, "Delete Content performed by user", userId == -1 ? 0 : content.WriterId, content.Id);
             }
         }
 
@@ -824,15 +856,25 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting the Content</param>
         public void MoveToRecycleBin(IContent content, int userId = -1)
         {
-            //TODO If content item has children those should also be moved to the recycle bin
-            //TODO Unpublish deleted content + children
-
             var e = new MoveEventArgs { ParentId = -20 };
             if (Trashing != null)
                 Trashing(content, e);
 
             if (!e.Cancel)
             {
+                //Make sure that published content is unpublished before being moved to the Recycle Bin
+                if (content.HasPublishedVersion())
+                {
+                    UnPublish(content, userId);
+                }
+
+                //Move children to Recycle Bin before the 'possible parent' is moved there
+                var children = GetChildren(content.Id);
+                foreach (var child in children)
+                {
+                    MoveToRecycleBin(child, userId);
+                }
+
                 var repository = _contentRepository;
                 SetWriter(content, userId);
                 content.ChangeTrashedState(true);
@@ -1019,7 +1061,7 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to send to publication</param>
         /// <param name="userId">Optional Id of the User issueing the send to publication</param>
         /// <returns>True if sending publication was succesfull otherwise false</returns>
-        public bool SendToPublication(IContent content, int userId = -1)
+        internal bool SendToPublication(IContent content, int userId = -1)
         {
             //TODO Implement something similar to this
             var e = new SendToPublishEventArgs();

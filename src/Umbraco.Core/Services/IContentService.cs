@@ -246,7 +246,7 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to send to publication</param>
         /// <param name="userId">Optional Id of the User issueing the send to publication</param>
         /// <returns>True if sending publication was succesfull otherwise false</returns>
-        bool SendToPublication(IContent content, int userId = -1);
+        //bool SendToPublication(IContent content, int userId = -1);
 
         /// <summary>
         /// Rollback an <see cref="IContent"/> object to a previous version.
@@ -300,5 +300,13 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the <see cref="IContent"/></param>
         /// <returns>True if the content has any children otherwise False</returns>
         bool HasChildren(int id);
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by its name or partial name
+        /// </summary>
+        /// <param name="parentId">Id of the Parent to retrieve Children from</param>
+        /// <param name="name">Full or partial name of the children</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetChildrenByName(int parentId, string name);
     }
 }

@@ -129,18 +129,19 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                            {
-                               string.Format("DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id"),
-                               string.Format("DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id"),
-                               string.Format("DELETE FROM umbracoRelation WHERE parentId = @Id"),
-                               string.Format("DELETE FROM umbracoRelation WHERE childId = @Id"),
-                               string.Format("DELETE FROM cmsTagRelationship WHERE nodeId = @Id"),
-                               string.Format("DELETE FROM cmsDocument WHERE NodeId = @Id"),
-                               string.Format("DELETE FROM cmsPropertyData WHERE contentNodeId = @Id"),
-                               string.Format("DELETE FROM cmsPreviewXml WHERE nodeId = @Id"),
-                               string.Format("DELETE FROM cmsContentVersion WHERE ContentId = @Id"),
-                               string.Format("DELETE FROM cmsContentXml WHERE nodeID = @Id"),
-                               string.Format("DELETE FROM cmsContent WHERE NodeId = @Id"),
-                               string.Format("DELETE FROM umbracoNode WHERE id = @Id")
+                               "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
+                               "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                               "DELETE FROM umbracoRelation WHERE parentId = @Id",
+                               "DELETE FROM umbracoRelation WHERE childId = @Id",
+                               "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
+                               "DELETE FROM umbracoDomains WHERE domainRootStructureID = @Id",
+                               "DELETE FROM cmsDocument WHERE NodeId = @Id",
+                               "DELETE FROM cmsPropertyData WHERE contentNodeId = @Id",
+                               "DELETE FROM cmsPreviewXml WHERE nodeId = @Id",
+                               "DELETE FROM cmsContentVersion WHERE ContentId = @Id",
+                               "DELETE FROM cmsContentXml WHERE nodeID = @Id",
+                               "DELETE FROM cmsContent WHERE NodeId = @Id",
+                               "DELETE FROM umbracoNode WHERE id = @Id"
                            };
             return list;
         }
@@ -228,9 +229,12 @@ namespace Umbraco.Core.Persistence.Repositories
             //Updates Modified date and Version Guid
             ((Content)entity).UpdatingEntity();
 
-            //Look up parent to get and set the correct Path
-            var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
-            entity.Path = string.Concat(parent.Path, ",", entity.Id);
+            //Look up parent to get and set the correct Path if ParentId has changed
+            if (((ICanBeDirty) entity).IsPropertyDirty("ParentId"))
+            {
+                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new {ParentId = entity.ParentId});
+                entity.Path = string.Concat(parent.Path, ",", entity.Id);
+            }
 
             var factory = new ContentFactory(NodeObjectTypeId, entity.Id);
             //Look up Content entry to get Primary for updating the DTO

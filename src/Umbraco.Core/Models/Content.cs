@@ -296,10 +296,10 @@ namespace Umbraco.Core.Models
         public override bool IsPropertyDirty(string propertyName)
         {
             bool existsInEntity = base.IsPropertyDirty(propertyName);
+            if (existsInEntity)
+                return true;
 
-            bool anyDirtyProperties = Properties.Any(x => x.IsPropertyDirty(propertyName));
-
-            return existsInEntity || anyDirtyProperties;
+            return Properties.Any(x => x.IsPropertyDirty(propertyName));
         }
 
         /// <summary>

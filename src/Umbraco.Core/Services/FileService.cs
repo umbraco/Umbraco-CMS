@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
@@ -205,10 +206,21 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="alias">Alias of the template</param>
         /// <returns>A <see cref="Template"/> object</returns>
-        public ITemplate GetTemplateByAlias(string alias)
+        public ITemplate GetTemplate(string alias)
         {
             var repository = _templateRepository;
             return repository.Get(alias);
+        }
+
+        /// <summary>
+        /// Gets a <see cref="ITemplate"/> object by its alias
+        /// </summary>
+        /// <param name="id">Id of the template</param>
+        /// <returns>A <see cref="ITemplate"/> object</returns>
+        public ITemplate GetTemplate(int id)
+        {
+            var repository = _templateRepository;
+            return repository.Get(id);
         }
 
         /// <summary>
