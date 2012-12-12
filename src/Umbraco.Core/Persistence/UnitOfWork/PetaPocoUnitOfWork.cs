@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         private readonly List<Operation> _operations = new List<Operation>();
 
 
-        public PetaPocoUnitOfWork(Database database)
+		public PetaPocoUnitOfWork(UmbracoDatabase database)
         {
 	        Database = database;
 	        _key = Guid.NewGuid();
@@ -113,7 +113,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
             get { return _key; }
         }
 
-		public Database Database { get; private set; }
+		public UmbracoDatabase Database { get; private set; }
 
         #region Operation
 

@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories
 			get { return (IDatabaseUnitOfWork)base.UnitOfWork; }
 		}
 
-        protected Database Database
+		protected UmbracoDatabase Database
         {
             get { return UnitOfWork.Database; }			
         }

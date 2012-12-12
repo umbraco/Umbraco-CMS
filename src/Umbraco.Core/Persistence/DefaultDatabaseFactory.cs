@@ -38,7 +38,7 @@ namespace Umbraco.Core.Persistence
 			//we have an http context, so only create one per request
 			if (!HttpContext.Current.Items.Contains(typeof(DefaultDatabaseFactory)))
 			{
-				HttpContext.Current.Items.Add(typeof(DefaultDatabaseFactory), new Database(GlobalSettings.UmbracoConnectionName));
+				HttpContext.Current.Items.Add(typeof(DefaultDatabaseFactory), new UmbracoDatabase(GlobalSettings.UmbracoConnectionName));
 			}
 			return (UmbracoDatabase)HttpContext.Current.Items[typeof(DefaultDatabaseFactory)];
 		}

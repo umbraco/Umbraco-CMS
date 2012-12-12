@@ -7,6 +7,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 	/// </summary>
 	public interface IDatabaseUnitOfWork : IUnitOfWork, IDisposable
 	{
-		Database Database { get; }
+		UmbracoDatabase Database { get; }
 	}
 }

@@ -59,7 +59,7 @@ namespace Umbraco.Core
         /// This should not be used for CRUD operations or queries against the
         /// standard Umbraco tables! Use the Public services for that.
         /// </remarks>
-        public Database Database
+        public UmbracoDatabase Database
         {
             get { return _factory.CreateDatabase(); }
         }
@@ -318,7 +318,7 @@ namespace Umbraco.Core
 
             try
             {
-                var database = new Database(_connectionString, ProviderName);
+                var database = new UmbracoDatabase(_connectionString, ProviderName);
                 //If Configuration Status is empty its a new install - otherwise upgrade the existing
                 if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus))
                 {
