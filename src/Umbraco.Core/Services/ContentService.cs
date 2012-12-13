@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Xml.Linq;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
@@ -325,10 +327,10 @@ namespace Umbraco.Core.Services
         /// Re-Publishes all Content
         /// </summary>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this RePublish method. By default this method will update the cache.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        public bool RePublishAll(int userId = -1)
+        public bool RePublishAll(int userId = -1, bool omitCacheRefresh = false)
         {
-            //TODO delete from cmsContentXml or truncate table cmsContentXml before generating and saving xml to db
             var repository = _contentRepository;
 
             var list = new List<IContent>();
@@ -361,8 +363,19 @@ namespace Umbraco.Core.Services
 
                 _unitOfWork.Commit();
 
+                foreach (var c in updated)
+                {
+                    var xml = c.ToXml();
+                    var poco = new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) };
+                    var exists = DatabaseContext.Current.Database.IsNew(poco);
+                    int result = exists
+                                     ? DatabaseContext.Current.Database.Update(poco)
+                                     : Convert.ToInt32(DatabaseContext.Current.Database.Insert(poco));
+                }
+
                 //Updating content to published state is finished, so we fire event through PublishingStrategy to have cache updated
-                _publishingStrategy.PublishingFinalized(updated, true);
+                if(omitCacheRefresh == false)
+                    _publishingStrategy.PublishingFinalized(updated, true);
 
                 Audit.Add(AuditTypes.Publish, "RePublish All performed by user", userId == -1 ? 0 : userId, -1);
             }
@@ -375,10 +388,11 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to publish</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        public bool Publish(IContent content, int userId = -1)
+        public bool Publish(IContent content, int userId = -1, bool omitCacheRefresh = false)
         {
-            return SaveAndPublish(content, userId);
+            return SaveAndPublish(content, userId, omitCacheRefresh);
         }
 
         /// <summary>
@@ -386,10 +400,10 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        public bool PublishWithChildren(IContent content, int userId = -1)
+        public bool PublishWithChildren(IContent content, int userId = -1, bool omitCacheRefresh = false)
         {
-            //TODO Should Publish generate xml of content and save it in the db?
             var repository = _contentRepository;
 
             //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
@@ -432,8 +446,19 @@ namespace Umbraco.Core.Services
 
                 _unitOfWork.Commit();
 
+                foreach (var c in updated)
+                {
+                    var xml = c.ToXml();
+                    var poco = new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) };
+                    var exists = DatabaseContext.Current.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id }) != null;
+                    int result = exists
+                                     ? DatabaseContext.Current.Database.Update(poco)
+                                     : Convert.ToInt32(DatabaseContext.Current.Database.Insert(poco));
+                }
+
                 //Save xml to db and call following method to fire event:
-                _publishingStrategy.PublishingFinalized(updated, false);
+                if(omitCacheRefresh == false)
+                    _publishingStrategy.PublishingFinalized(updated, false);
 
                 Audit.Add(AuditTypes.Publish, "Publish with Children performed by user", userId == -1 ? 0 : userId, content.Id);
             }
@@ -446,8 +471,9 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to publish</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Unpublish method. By default this method will update the cache.</param>
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
-        public bool UnPublish(IContent content, int userId = -1)
+        public bool UnPublish(IContent content, int userId = -1, bool omitCacheRefresh = false)
         {
             var repository = _contentRepository;
 
@@ -477,8 +503,19 @@ namespace Umbraco.Core.Services
 
                 _unitOfWork.Commit();
 
+                //Remove 'published' xml from the cmsContentXml table for the unpublished content and its (possible) children
+                DatabaseContext.Current.Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new {Id = content.Id});
+                if (hasChildren)
+                {
+                    foreach (var child in children)
+                    {
+                        DatabaseContext.Current.Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new { Id = child.Id });
+                    }
+                }
+
                 //Delete xml from db? and call following method to fire event through PublishingStrategy to update cache
-                _publishingStrategy.UnPublishingFinalized(content);
+                if(omitCacheRefresh == false)
+                    _publishingStrategy.UnPublishingFinalized(content);
 
                 Audit.Add(AuditTypes.Publish, "UnPublish performed by user", userId == -1 ? 0 : userId, content.Id);
             }
@@ -517,10 +554,10 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to save and publish</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        public bool SaveAndPublish(IContent content, int userId = -1)
+        public bool SaveAndPublish(IContent content, int userId = -1, bool omitCacheRefresh = false)
         {
-            //TODO Should Publish generate xml of content and save it in the db?
             var e = new SaveEventArgs();
             if (Saving != null)
                 Saving(content, e);
@@ -530,7 +567,7 @@ namespace Umbraco.Core.Services
                 var repository = _contentRepository;
 
                 //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
-                if (content.ParentId != -1 && content.ParentId != -20 && GetById(content.ParentId).Published == false)
+                if (content.ParentId != -1 && content.ParentId != -20 && HasPublishedVersion(content.ParentId) == false)
                 {
                     LogHelper.Info<ContentService>(
                         string.Format(
@@ -557,8 +594,16 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(content);
                     _unitOfWork.Commit();
 
+                    var xml = content.ToXml();
+                    var poco = new ContentXmlDto{NodeId = content.Id, Xml = xml.ToString(SaveOptions.None)};
+                    var exists = DatabaseContext.Current.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new {Id = content.Id}) != null;
+                    int result = exists
+                                     ? DatabaseContext.Current.Database.Update(poco)
+                                     : Convert.ToInt32(DatabaseContext.Current.Database.Insert(poco));
+
                     //Save xml to db and call following method to fire event through PublishingStrategy to update cache
-                    _publishingStrategy.PublishingFinalized(content);
+                    if(omitCacheRefresh == false)
+                        _publishingStrategy.PublishingFinalized(content);
                 }
 
                 if (Saved != null)

@@ -155,6 +155,19 @@ namespace Umbraco.Core.Persistence.Mappers
 
         public Func<object, object> GetToDbConverter(Type sourceType)
         {
+            //We need this check to ensure that PetaPoco doesn't try to insert an invalid date from a nullable DateTime property
+            if (sourceType == typeof (DateTime))
+            {
+                return datetimeVal =>
+                           {
+                               var datetime = datetimeVal as DateTime?;
+                               if(datetime.HasValue && datetime.Value > DateTime.MinValue)
+                                   return datetime.Value;
+
+                               return null;
+                           };
+            }
+
             return null;
         }
     }

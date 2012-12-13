@@ -18,14 +18,8 @@ namespace Umbraco.Core.Models
             var xd = new XmlDocument();
             XmlNode xmlNode = xd.CreateNode(XmlNodeType.Element, nodeName, "");
 
-            XmlNode child = property.PropertyType.DataTypeDatabaseType == DataTypeDatabaseType.Ntext
-                                ? xd.CreateCDataSection(property.Value.ToString()) as XmlNode
-                                : xd.CreateTextNode(property.Value.ToString());
-
-            xmlNode.AppendChild(child);
-            //TODO Revisit this by correcting test setup or refactoring DefaultData class to use PetaPoco instead of SqlHelper.
-            //This seems to fail during testing 
-            //xmlNode.AppendChild(property.PropertyType.DataType(property.Id).Data.ToXMl(xd));
+            //NOTE Possibly revisit this by correcting test setup or refactoring DefaultData class to use PetaPoco instead of SqlHelper.
+            xmlNode.AppendChild(property.PropertyType.DataType(property.Id).Data.ToXMl(xd));
             
             var element = xmlNode.GetXElement();
             return element;

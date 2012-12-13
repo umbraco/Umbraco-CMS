@@ -247,7 +247,6 @@
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="ApplicationEventsResolver.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
-    <Compile Include="ContentExtensions.cs" />
     <Compile Include="Dynamics\DynamicExpression.cs" />
     <Compile Include="Dynamics\DynamicGrouping.cs" />
     <Compile Include="Dynamics\DynamicPublishedContentIdEqualityComparer.cs" />

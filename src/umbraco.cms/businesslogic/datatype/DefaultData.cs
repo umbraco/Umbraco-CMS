@@ -1,6 +1,8 @@
 using System;
 using System.Data;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using umbraco.interfaces;
@@ -22,6 +24,13 @@ namespace umbraco.cms.businesslogic.datatype
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
+        }
+
+        //TODO Refactor this class to use the Database object instead of the SqlHelper
+        //NOTE DatabaseContext.Current.Database should eventually be replaced with that from the Repository-Resolver refactor branch. 
+        internal static Database Database
+        {
+            get { return DatabaseContext.Current.Database; }
         }
 
         /// <summary>

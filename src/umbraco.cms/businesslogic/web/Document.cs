@@ -75,24 +75,30 @@ namespace umbraco.cms.businesslogic.web
             : base(id, optimizedMode)
         {
             this._optimizedMode = optimizedMode;
-            _content = ServiceContext.Current.ContentService.GetById(id);
-            bool hasChildren = ServiceContext.Current.ContentService.HasChildren(id);
-            
-            SetupDocumentForTree(_content.Key, _content.Level, _content.ParentId, _content.CreatorId, _content.WriterId,
-                                 _content.Published, _content.Path, _content.Name, _content.CreateDate,
-                                 _content.UpdateDate, _content.UpdateDate, _content.ContentType.Icon, hasChildren,
-                                 _content.ContentType.Alias, _content.ContentType.Thumbnail,
-                                 _content.ContentType.Description, null, _content.ContentType.Id, _content.Template.Id,
-                                 _content.ContentType.IsContainer);
+            if (optimizedMode)
+            {
+                _content = ServiceContext.Current.ContentService.GetById(id);
+                bool hasChildren = ServiceContext.Current.ContentService.HasChildren(id);
+                int templateId = _content.Template == null ? 0 : _content.Template.Id;
 
-            var tmpReleaseDate = _content.ReleaseDate.HasValue ? _content.ReleaseDate.Value : new DateTime();
-            var tmpExpireDate = _content.ExpireDate.HasValue ? _content.ExpireDate.Value : new DateTime();
-            var creator = new User(_content.CreatorId, true);
-            var writer = new User(_content.WriterId, true);
+                SetupDocumentForTree(_content.Key, _content.Level, _content.ParentId, _content.CreatorId,
+                                     _content.WriterId,
+                                     _content.Published, _content.Path, _content.Name, _content.CreateDate,
+                                     _content.UpdateDate, _content.UpdateDate, _content.ContentType.Icon, hasChildren,
+                                     _content.ContentType.Alias, _content.ContentType.Thumbnail,
+                                     _content.ContentType.Description, null, _content.ContentType.Id,
+                                     templateId, _content.ContentType.IsContainer);
 
-            InitializeContent(_content.ContentType.Id, _content.Version, _content.UpdateDate, _content.ContentType.Icon);
-            InitializeDocument(creator, writer, _content.Name, _content.Template.Id, tmpReleaseDate, tmpExpireDate, _content.UpdateDate, _content.Published);
+                var tmpReleaseDate = _content.ReleaseDate.HasValue ? _content.ReleaseDate.Value : new DateTime();
+                var tmpExpireDate = _content.ExpireDate.HasValue ? _content.ExpireDate.Value : new DateTime();
+                var creator = new User(_content.CreatorId, true);
+                var writer = new User(_content.WriterId, true);
 
+                InitializeContent(_content.ContentType.Id, _content.Version, _content.UpdateDate,
+                                  _content.ContentType.Icon);
+                InitializeDocument(creator, writer, _content.Name, templateId, tmpReleaseDate, tmpExpireDate,
+                                   _content.UpdateDate, _content.Published);
+            }
             /*if (optimizedMode)
             {
 
@@ -868,7 +874,7 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'"));
         [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.Publish()", false)]
         public void Publish(User u)
         {
-            ServiceContext.Current.ContentService.Publish(_content, u.Id);
+            ServiceContext.Current.ContentService.Publish(_content, u.Id, true);
             //PublishWithResult(u);
         }
 
@@ -884,12 +890,13 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'"));
         [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.Publish()", false)]
         public bool PublishWithResult(User u)
         {
-            PublishEventArgs e = new PublishEventArgs();
+            var e = new PublishEventArgs();
             FireBeforePublish(e);
 
             if (!e.Cancel)
             {
-                var result = ServiceContext.Current.ContentService.Publish(_content, u.Id);
+                var result = ServiceContext.Current.ContentService.Publish(_content, u.Id, true);
+                _published = result;
 
                 // make a lookup to see if template is 0 as the template is not initialized in the optimized
                 // Document.Children method which is used in PublishWithChildrenWithResult methhod
@@ -943,7 +950,7 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'"));
         [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
         public bool PublishWithChildrenWithResult(User u)
         {
-            return ServiceContext.Current.ContentService.PublishWithChildren(_content, u.Id);
+            return ServiceContext.Current.ContentService.PublishWithChildren(_content, u.Id, true);
 
             /*if (PublishWithResult(u))
             {
@@ -986,6 +993,7 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'"));
         /// Envoking this method will publish the documents and all children recursive.
         /// </summary>
         /// <param name="u">The usercontext under which the action are performed</param>
+        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
         public void PublishWithSubs(User u)
         {
             PublishEventArgs e = new PublishEventArgs();
@@ -993,7 +1001,9 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'"));
 
             if (!e.Cancel)
             {
-                _published = true;
+                var published = ServiceContext.Current.ContentService.PublishWithChildren(_content, u.Id, true);
+
+                /*_published = true;
                 string tempVersion = Version.ToString();
                 DateTime versionDate = DateTime.Now;
                 Guid newVersion = createNewVersion(versionDate);
@@ -1014,7 +1024,7 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'"));
                 XmlGenerate(new XmlDocument());
 
                 foreach (Document dc in Children.ToList())
-                    dc.PublishWithSubs(u);
+                    dc.PublishWithSubs(u);*/
 
                 FireAfterPublish(e);
             }
@@ -1032,7 +1042,7 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'"));
                 //SqlHelper.ExecuteNonQuery(string.Format("update cmsDocument set published = 0 where nodeId = {0}", Id));
                 //_published = false;
 
-                ServiceContext.Current.ContentService.UnPublish(_content);
+                ServiceContext.Current.ContentService.UnPublish(_content, 0, true);
 
                 FireAfterUnPublish(e);
             }
@@ -1062,10 +1072,8 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'"));
         [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.HasPublishedVersion()", false)]
         public bool HasPublishedVersion()
         {
-            if (_content != null)
-                return _content.HasPublishedVersion();
-
-            return (SqlHelper.ExecuteScalar<int>("select Count(published) as tmp from cmsDocument where published = 1 And nodeId =" + Id) > 0);
+            return _content.HasPublishedVersion();
+            //return (SqlHelper.ExecuteScalar<int>("select Count(published) as tmp from cmsDocument where published = 1 And nodeId =" + Id) > 0);
         }
 
         /// <summary>
@@ -1076,8 +1084,9 @@ where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'"));
         /// <returns></returns>
         public bool HasPendingChanges()
         {
-            double timeDiff = new TimeSpan(UpdateDate.Ticks - VersionDate.Ticks).TotalMilliseconds;
-            return timeDiff > 2000;
+            return _content.Published == false;
+            //double timeDiff = new TimeSpan(UpdateDate.Ticks - VersionDate.Ticks).TotalMilliseconds;
+            //return timeDiff > 2000;
         }
 
         /// <summary>

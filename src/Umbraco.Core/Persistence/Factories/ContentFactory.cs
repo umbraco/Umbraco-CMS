@@ -49,8 +49,8 @@ namespace Umbraco.Core.Persistence.Factories
                            Published = dto.Published,
                            CreateDate = dto.ContentVersionDto.ContentDto.NodeDto.CreateDate,
                            UpdateDate = dto.ContentVersionDto.VersionDate,
-                           ExpireDate = dto.ExpiresDate,
-                           ReleaseDate = dto.ReleaseDate,
+                           ExpireDate = dto.ExpiresDate.HasValue ? dto.ExpiresDate.Value : (DateTime?) null,
+                           ReleaseDate = dto.ReleaseDate.HasValue ? dto.ReleaseDate.Value : (DateTime?) null,
                            Version = dto.ContentVersionDto.VersionId
                        };
         }
@@ -60,17 +60,24 @@ namespace Umbraco.Core.Persistence.Factories
             //NOTE Currently doesn't add Alias and templateId (legacy stuff that eventually will go away)
             var documentDto = new DocumentDto
                                   {
-                                      ExpiresDate = entity.ExpireDate,
                                       Newest = true,
                                       NodeId = entity.Id,
                                       Published = entity.Published,
-                                      ReleaseDate = entity.ReleaseDate,
                                       Text = entity.Name,
                                       UpdateDate = entity.UpdateDate,
                                       WriterUserId = entity.WriterId,
                                       VersionId = entity.Version,
+                                      ExpiresDate = null,
+                                      ReleaseDate = null,
                                       ContentVersionDto = BuildContentVersionDto(entity)
                                   };
+
+            if (entity.ExpireDate.HasValue)
+                documentDto.ExpiresDate = entity.ExpireDate.Value;
+            
+            if (entity.ReleaseDate.HasValue)
+                documentDto.ReleaseDate = entity.ReleaseDate.Value;
+
             return documentDto;
         }
 

@@ -263,6 +263,18 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Update(docDto);
             }
 
+            //If Published state has changed previous versions should have their publish state reset
+            if (((ICanBeDirty) entity).IsPropertyDirty("Published") && entity.Published)
+            {
+                var publishedDocs = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND published = @IsPublished", new { Id = entity.Id, IsPublished = true });
+                foreach (var doc in publishedDocs)
+                {
+                    var docDto = doc;
+                    docDto.Published = false;
+                    Database.Update(docDto);
+                }
+            }
+
             //Create a new version - cmsContentVersion
             //Assumes a new Version guid and Version date (modified date) has been set
             var contentVersionDto = dto.ContentVersionDto;
