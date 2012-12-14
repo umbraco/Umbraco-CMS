@@ -406,44 +406,6 @@ namespace umbraco.MacroEngines
             }
             return result;
         }
-        private List<string> GetAncestorOrSelfNodeTypeAlias(DynamicBackingItem node)
-        {
-            List<string> list = new List<string>();
-            if (node != null)
-            {
-                if (node.Type == DynamicBackingItemType.Content)
-                {
-                    //find the doctype node, so we can walk it's parent's tree- not the working.parent content tree
-                    CMSNode working = ContentType.GetByAlias(node.NodeTypeAlias);
-                    while (working != null)
-                    {
-						//NOTE: I'm not sure if anyone has ever tested this but if you get working.Parent it will return a CMSNode and
-						// it will never be castable to a 'ContentType' object
-						// pretty sure the only reason why this method works for the one place that it is used is that it returns
-						// the current node's alias which is all that is actually requried, this is just added overhead for no 
-						// reason
-
-                        if ((working as ContentType) != null)
-                        {
-                            list.Add((working as ContentType).Alias);
-                        }
-                        try
-                        {
-                            working = working.Parent;
-                        }
-                        catch (ArgumentException)
-                        {
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            return list;
-        }
 
     	private static Dictionary<System.Tuple<Guid, int>, Type> _razorDataTypeModelTypes = null;
     	private static readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
@@ -484,14 +446,6 @@ namespace umbraco.MacroEngines
 										foundTypes.Add(key, item.Value);
 									}
 								});
-
-							//NOTE: We really dont need to log this?
-							//var i = 1;
-							//foreach (var item in foundTypes)
-							//{
-							//    HttpContext.Current.Trace.Write(string.Format("{0}/{1}: {2}@{4} => {3}", i, foundTypes.Count, item.Key.Item1, item.Value.FullName, item.Key.Item2));
-							//    i++;
-							//}
 
 							//there is no error, so set the collection
 							_razorDataTypeModelTypes = foundTypes;
@@ -605,21 +559,8 @@ namespace umbraco.MacroEngines
 							LogHelper.Warn<DynamicNode>(string.Format("Could not get the dataTypeType for the RazorDataTypeModel"));                            
                         }
                     }
-                    else
-                    {
-						//NOTE: Do we really want to log this? I'm not sure.
-						//if (RazorDataTypeModelTypes == null)
-						//{
-						//    HttpContext.Current.Trace.Write(string.Format("RazorDataTypeModelTypes is null, probably an exception while building the cache, falling back to ConvertPropertyValueByDataType", dataType));
-						//}
-						//else
-						//{
-						//    HttpContext.Current.Trace.Write(string.Format("GUID {0} does not have a DataTypeModel, falling back to ConvertPropertyValueByDataType", dataType));
-						//}
-
-                    }
-
-                    //convert the string value to a known type
+                    
+					//convert the string value to a known type
                     return ConvertPropertyValueByDataType(ref result, name, dataType);
 
                 }
@@ -629,15 +570,10 @@ namespace umbraco.MacroEngines
                 var typeChildren = n.ChildrenAsList;
                 if (typeChildren != null)
                 {
-                    var filteredTypeChildren = typeChildren.Where(x =>
-                    {
-                        List<string> ancestorAliases = GetAncestorOrSelfNodeTypeAlias(x);
-                        if (ancestorAliases == null)
-                        {
-                            return false;
-                        }
-                        return ancestorAliases.Any(alias => alias == name || MakePluralName(alias) == name);
-                    });
+
+	                var filteredTypeChildren = typeChildren
+		                .Where(x => x.NodeTypeAlias.InvariantEquals(name) || x.NodeTypeAlias.MakePluralName().InvariantEquals(binder.Name))
+		                .ToArray();
                     if (filteredTypeChildren.Any())
                     {
                         result = new DynamicNodeList(filteredTypeChildren);
