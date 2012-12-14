@@ -2,7 +2,6 @@ using System;
 using System.Web;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -13,14 +12,12 @@ namespace Umbraco.Core.Services
     internal class UserService : IUserService
     {
 	    private readonly RepositoryFactory _repositoryFactory;
-	    private readonly IDatabaseUnitOfWork _unitOfWork;
-	    private readonly IUserRepository _userRepository;
+        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 
-		public UserService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
+        public UserService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
         {
 			_repositoryFactory = repositoryFactory;
-			_unitOfWork = provider.GetUnitOfWork();
-			_userRepository = _repositoryFactory.CreateUserRepository(_unitOfWork);
+			_uowProvider = provider;
         }
 
         #region Implementation of IUserService
@@ -50,8 +47,9 @@ namespace Umbraco.Core.Services
 
             if(HttpRuntime.Cache[cacheKey] == null)
             {
+                var uow = _uowProvider.GetUnitOfWork();
                 userId =
-					_unitOfWork.Database.ExecuteScalar<int>(
+					uow.Database.ExecuteScalar<int>(
                         "select userID from umbracoUserLogins where contextID = @ContextId",
                         new {ContextId = new Guid(contextId)});
 
@@ -92,8 +90,10 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IProfile"/></returns>
         public IProfile GetProfileById(int id)
         {
-			var repository = _userRepository;
-            return repository.GetProfileById(id);
+            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetProfileById(id);
+            }
         }
 
         #endregion
