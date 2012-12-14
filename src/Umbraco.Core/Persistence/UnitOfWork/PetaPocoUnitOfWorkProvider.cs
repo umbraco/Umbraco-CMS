@@ -47,7 +47,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		/// <returns></returns>
 		/// <remarks>
 		/// Each PetaPoco UOW uses it's own Database object, not the shared Database object that comes from
-		/// the DatabaseContext.Current.Database. This is because each transaction should use it's own Database
+		/// the ApplicationContext.Current.DatabaseContext.Database. This is because each transaction should use it's own Database
 		/// and we Dispose of this Database object when the UOW is disposed.
 		/// </remarks>
 	    public IDatabaseUnitOfWork GetUnitOfWork()

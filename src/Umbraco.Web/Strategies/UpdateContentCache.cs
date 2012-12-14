@@ -26,17 +26,17 @@ namespace Umbraco.Web.Strategies
         public UpdateContentCache()
         {
             _httpContext = new HttpContextWrapper(HttpContext.Current);
-            _serviceContext = ServiceContext.Current;
+			_serviceContext = ApplicationContext.Current.Services;
 
-            PublishingStrategy.Published += PublishingStrategy_Published;
+            BasePublishingStrategy.Published += PublishingStrategy_Published;
         }
 
         public UpdateContentCache(HttpContextBase httpContext)
         {
             _httpContext = httpContext;
-            _serviceContext = ServiceContext.Current;
+			_serviceContext = ApplicationContext.Current.Services;
 
-            PublishingStrategy.Published += PublishingStrategy_Published;
+            BasePublishingStrategy.Published += PublishingStrategy_Published;
         }
 
         void PublishingStrategy_Published(object sender, PublishingEventArgs e)
@@ -232,7 +232,7 @@ namespace Umbraco.Web.Strategies
 
         internal void Unsubscribe()
         {
-            PublishingStrategy.Published -= PublishingStrategy_Published;
+            BasePublishingStrategy.Published -= PublishingStrategy_Published;
         }
     }
 }

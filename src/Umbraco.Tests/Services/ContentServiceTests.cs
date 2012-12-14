@@ -30,6 +30,12 @@ namespace Umbraco.Tests.Services
             CreateTestData();
         }
 
+		[TearDown]
+		public override void TearDown()
+		{
+			base.TearDown();
+		}
+
         //TODO Add test to verify there is only ONE newest document/content in cmsDocument table after updating.
         //TODO Add test to delete specific version (with and without deleting prior versions) and versions by date.
 
@@ -691,14 +697,6 @@ namespace Umbraco.Tests.Services
 
             Assert.That(c.Value.ParentId > 0, Is.True);
             Assert.That(c2.Value.ParentId > 0, Is.True);
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-
-            ServiceContext = null;
         }
 
         public void CreateTestData()

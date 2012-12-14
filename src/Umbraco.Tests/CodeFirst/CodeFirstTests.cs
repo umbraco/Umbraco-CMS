@@ -238,8 +238,7 @@ namespace Umbraco.Tests.CodeFirst
 
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
-
-            ServiceContext = null;
+            
             SerializationService = null;
 
             UmbracoSettings.ResetSetters();

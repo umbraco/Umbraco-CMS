@@ -58,10 +58,12 @@ namespace Umbraco.Tests.TestHelpers
             engine.CreateDatabase();
 
             Resolution.Freeze();
-            ApplicationContext = new ApplicationContext() { IsReady = true };
-            DatabaseContext = DatabaseContext.Current;
-            ServiceContext = new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy());
-
+            ApplicationContext.Current = new ApplicationContext(
+				//assign the db context
+				new DatabaseContext(new DefaultDatabaseFactory()),
+				//assign the service context
+				new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
+            
             //Configure the Database and Sql Syntax based on connection string set in config
             DatabaseContext.Initialize();
             //Create the umbraco database and its base data
@@ -76,10 +78,9 @@ namespace Umbraco.Tests.TestHelpers
 
             TestHelper.CleanContentDirectories();
 
-            //reset the app context
-            DatabaseContext = null;
+            //reset the app context            
+			ApplicationContext.ApplicationCache.ClearAllCache();
             ApplicationContext.Current = null;
-            ServiceContext = null;
             Resolution.IsFrozen = false;
 
             RepositoryResolver.Reset();
@@ -94,11 +95,20 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected ApplicationContext ApplicationContext { get; set; }
+	    protected ApplicationContext ApplicationContext
+	    {
+		    get { return ApplicationContext.Current; }
+	    }
 
-        protected ServiceContext ServiceContext { get; set; }
+	    protected ServiceContext ServiceContext
+	    {
+		    get { return ApplicationContext.Services; }
+	    }
 
-        protected DatabaseContext DatabaseContext { get; set; }
+	    protected DatabaseContext DatabaseContext
+	    {
+		    get { return ApplicationContext.DatabaseContext; }
+	    }
 
         protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null)
         {

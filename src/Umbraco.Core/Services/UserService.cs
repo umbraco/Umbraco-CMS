@@ -49,7 +49,7 @@ namespace Umbraco.Core.Services
             if(HttpRuntime.Cache[cacheKey] == null)
             {
                 userId =
-                    DatabaseContext.Current.Database.ExecuteScalar<int>(
+					_unitOfWork.Database.ExecuteScalar<int>(
                         "select userID from umbracoUserLogins where contextID = @ContextId",
                         new {ContextId = new Guid(contextId)});
 

@@ -22,19 +22,6 @@ namespace Umbraco.Core.Services
         private FileService _fileService;
         private LocalizationService _localizationService;
 
-        #region Singleton
-        private static readonly Lazy<ServiceContext> lazy = new Lazy<ServiceContext>(() => new ServiceContext());
-
-        /// <summary>
-        /// Gets the current Database Context.
-        /// </summary>
-        public static ServiceContext Current { get { return lazy.Value; } }
-
-        private ServiceContext()
-        {
-			BuildServiceCache(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy());
-        }
-
 		/// <summary>
 		/// Internal constructor used for unit tests
 		/// </summary>
@@ -45,8 +32,6 @@ namespace Umbraco.Core.Services
 		{
 			BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy);
 		}
-
-        #endregion
 
         /// <summary>
         /// Builds the various services

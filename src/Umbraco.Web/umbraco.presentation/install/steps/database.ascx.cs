@@ -131,15 +131,15 @@ namespace umbraco.presentation.install.steps
             {
                 if (string.IsNullOrEmpty(ConnectionString.Text) == false)
                 {
-                    DatabaseContext.Current.ConfigureDatabaseConnection(ConnectionString.Text);
+					ApplicationContext.Current.DatabaseContext.ConfigureDatabaseConnection(ConnectionString.Text);
                 }
                 else if (IsEmbeddedDatabase)
                 {
-                    DatabaseContext.Current.ConfigureDatabaseConnection();
+                    ApplicationContext.Current.DatabaseContext.ConfigureDatabaseConnection();
                 }
                 else
                 {
-                    DatabaseContext.Current.ConfigureDatabaseConnection(DatabaseServer.Text, DatabaseName.Text,
+                    ApplicationContext.Current.DatabaseContext.ConfigureDatabaseConnection(DatabaseServer.Text, DatabaseName.Text,
                                                                         DatabaseUsername.Text, DatabasePassword.Text,
                                                                         DatabaseType.SelectedValue);
                 }
