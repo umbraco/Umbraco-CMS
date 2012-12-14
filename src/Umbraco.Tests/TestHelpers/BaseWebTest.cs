@@ -7,6 +7,10 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Publishing;
+using Umbraco.Core.Services;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -32,8 +36,15 @@ namespace Umbraco.Tests.TestHelpers
 
             Resolution.Freeze();
 
-            ApplicationContext = new ApplicationContext { IsReady = true };
-            DatabaseContext = DatabaseContext.Current;
+			//NOTE: We are not constructing with the service context here because it is not required for these tests (currently)
+			// if we do, this means that we have to initialized the RepositoryResolver too.
+			ApplicationContext.Current = new ApplicationContext
+				{
+					IsReady = true,
+					//assign the db context
+					DatabaseContext = new DatabaseContext(new DefaultDatabaseFactory())
+				};
+			
         }
 
         [TearDown]
@@ -44,7 +55,6 @@ namespace Umbraco.Tests.TestHelpers
             //reset the app context
             ApplicationContext.ApplicationCache.ClearAllCache();
             ApplicationContext.Current = null;
-            DatabaseContext = null;
             Resolution.IsFrozen = false;
 
             if (RequiresDbSetup)
@@ -98,9 +108,15 @@ namespace Umbraco.Tests.TestHelpers
             return factory;
         }
 
-        protected ApplicationContext ApplicationContext { get; private set; }
+	    protected ApplicationContext ApplicationContext
+	    {
+		    get { return ApplicationContext.Current; }
+	    }
 
-        protected DatabaseContext DatabaseContext { get; private set; }
+	    protected DatabaseContext DatabaseContext
+	    {
+		    get { return ApplicationContext.DatabaseContext; }
+	    }
 
         internal virtual IRoutesCache GetRoutesCache()
         {

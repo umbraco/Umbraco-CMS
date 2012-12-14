@@ -20,12 +20,13 @@ namespace Umbraco.Core.Persistence.Repositories
         private IFileSystem _fileSystem;
         private SerializationService _serializationService;
 
-        public MacroRepository(IUnitOfWork work) : base(work)
+		public MacroRepository(IUnitOfWork work)
+			: base(work)
         {
             EnsureDependencies();
         }
 
-        public MacroRepository(IUnitOfWork work, IRepositoryCacheProvider cache)
+		public MacroRepository(IUnitOfWork work, IRepositoryCacheProvider cache)
             : base(work, cache)
         {
             EnsureDependencies();

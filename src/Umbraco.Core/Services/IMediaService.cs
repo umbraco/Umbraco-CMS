@@ -16,7 +16,7 @@ namespace Umbraco.Core.Services
         /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
         /// <param name="userId">Optional id of the user creating the media item</param>
         /// <returns><see cref="IMedia"/></returns>
-        IMedia CreateContent(int parentId, string mediaTypeAlias, int userId = -1);
+        IMedia CreateMedia(int parentId, string mediaTypeAlias, int userId = -1);
 
         /// <summary>
         /// Gets an <see cref="IMedia"/> object by Id

@@ -6,18 +6,43 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Publishing;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence
 {
     [TestFixture]
-    public class DatabaseFactoryTests
+    public class DatabaseContextTests
     {
+	    private DatabaseContext _dbContext;
+
+		[SetUp]
+		public void Setup()
+		{
+			_dbContext = new DatabaseContext(new DefaultDatabaseFactory());
+
+			//unfortunately we have to set this up because the PetaPocoExtensions require singleton access
+			ApplicationContext.Current = new ApplicationContext
+				{
+					DatabaseContext = _dbContext,
+					IsReady = true
+				};			
+		}
+
+		[TearDown]
+		public void TearDown()
+		{
+			_dbContext = null;
+			ApplicationContext.Current = null;
+		}
+
         [Test]
         public void Can_Verify_Single_Database_Instance()
         {
-            var db1 = DatabaseFactory.Current.Database;
-            var db2 = DatabaseFactory.Current.Database;
+			var db1 = _dbContext.Database;
+			var db2 = _dbContext.Database;
 
             Assert.AreSame(db1, db2);
         }
@@ -25,7 +50,7 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void Can_Assert_DatabaseProvider()
         {
-            var provider = DatabaseContext.Current.DatabaseProvider;
+			var provider = _dbContext.DatabaseProvider;
 
             Assert.AreEqual(DatabaseProviders.SqlServerCE, provider);
         }
@@ -53,11 +78,11 @@ namespace Umbraco.Tests.Persistence
             SyntaxConfig.SqlSyntaxProvider = SqlCeSyntaxProvider.Instance;
 
             //Create the umbraco database
-            DatabaseFactory.Current.Database.CreateDatabaseSchema();
+			_dbContext.Database.CreateDatabaseSchema();
 
-            bool umbracoNodeTable = DatabaseFactory.Current.Database.TableExist("umbracoNode");
-            bool umbracoUserTable = DatabaseFactory.Current.Database.TableExist("umbracoUser");
-            bool cmsTagsTable = DatabaseFactory.Current.Database.TableExist("cmsTags");
+			bool umbracoNodeTable = _dbContext.Database.TableExist("umbracoNode");
+			bool umbracoUserTable = _dbContext.Database.TableExist("umbracoUser");
+			bool cmsTagsTable = _dbContext.Database.TableExist("cmsTags");
 
             Assert.That(umbracoNodeTable, Is.True);
             Assert.That(umbracoUserTable, Is.True);

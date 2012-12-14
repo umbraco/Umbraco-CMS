@@ -17,11 +17,12 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class DataTypeDefinitionRepository : PetaPocoRepositoryBase<int, IDataTypeDefinition>, IDataTypeDefinitionRepository
     {
-        public DataTypeDefinitionRepository(IUnitOfWork work) : base(work)
+		public DataTypeDefinitionRepository(IDatabaseUnitOfWork work)
+			: base(work)
         {
         }
 
-        public DataTypeDefinitionRepository(IUnitOfWork work, IRepositoryCacheProvider cache)
+		public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
             : base(work, cache)
         {
         }

@@ -7,9 +7,10 @@ using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
@@ -18,6 +19,7 @@ using umbraco.BusinessLogic;
 
 namespace Umbraco.Tests.TestHelpers
 {
+	
     /// <summary>
     /// Use this abstract class for tests that requires a Sql Ce database populated with the umbraco db schema.
     /// The PetaPoco Database class should be used through the <see cref="DatabaseFactory"/> singleton.
@@ -55,10 +57,12 @@ namespace Umbraco.Tests.TestHelpers
             engine.CreateDatabase();
 
             Resolution.Freeze();
-            ApplicationContext = new ApplicationContext() { IsReady = true };
-            DatabaseContext = DatabaseContext.Current;
-            ServiceContext = ServiceContext.Current;
-
+            ApplicationContext.Current = new ApplicationContext(
+				//assign the db context
+				new DatabaseContext(new DefaultDatabaseFactory()),
+				//assign the service context
+				new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
+            
             //Configure the Database and Sql Syntax based on connection string set in config
             DatabaseContext.Initialize();
             //Create the umbraco database and its base data
@@ -69,12 +73,13 @@ namespace Umbraco.Tests.TestHelpers
         [TearDown]
         public virtual void TearDown()
         {
+			DatabaseContext.Database.Dispose();
+
             TestHelper.CleanContentDirectories();
 
-            //reset the app context
-            DatabaseContext = null;
+            //reset the app context            
+			ApplicationContext.ApplicationCache.ClearAllCache();
             ApplicationContext.Current = null;
-            ServiceContext = null;
             Resolution.IsFrozen = false;
 
             RepositoryResolver.Reset();
@@ -89,11 +94,20 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected ApplicationContext ApplicationContext { get; set; }
+	    protected ApplicationContext ApplicationContext
+	    {
+		    get { return ApplicationContext.Current; }
+	    }
 
-        protected ServiceContext ServiceContext { get; set; }
+	    protected ServiceContext ServiceContext
+	    {
+		    get { return ApplicationContext.Services; }
+	    }
 
-        protected DatabaseContext DatabaseContext { get; set; }
+	    protected DatabaseContext DatabaseContext
+	    {
+		    get { return ApplicationContext.DatabaseContext; }
+	    }
 
         protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null)
         {

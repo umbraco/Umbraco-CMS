@@ -24,7 +24,7 @@ namespace Umbraco.Web
 	/// <summary>
 	/// A bootstrapper for the Umbraco application which initializes all objects including the Web portion of the application 
 	/// </summary>
-	internal class WebBootManager : CoreBootManager
+	public class WebBootManager : CoreBootManager
 	{
 		private readonly bool _isForTesting;
 		private readonly UmbracoApplication _umbracoApplication;

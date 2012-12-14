@@ -58,7 +58,7 @@ namespace umbraco.presentation.install.utills
         {
             LogHelper.Info<p>("Running 'installOrUpgrade' service");
 
-            var result = DatabaseContext.Current.CreateDatabaseSchemaAndDataOrUpgrade();
+            var result = ApplicationContext.Current.DatabaseContext.CreateDatabaseSchemaAndDataOrUpgrade();
 
             var js = new JavaScriptSerializer();
             var jsonResult = js.Serialize(result);

@@ -5,7 +5,7 @@ namespace Umbraco.Core.Auditing
     /// <summary>
     /// Represents the Audit implementation
     /// </summary>
-    public class AuditTrail
+    internal class AuditTrail
     {
         #region Singleton
 

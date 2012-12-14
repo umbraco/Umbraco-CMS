@@ -61,14 +61,14 @@ namespace Umbraco.Core.Persistence
                         var e = new TableCreationEventArgs();
 
                         //Turn on identity insert if db provider is not mysql
-                        if (DatabaseContext.Current.ProviderName.Contains("MySql") == false && tableDefinition.IsIdentity)
+						if (ApplicationContext.Current.DatabaseContext.ProviderName.Contains("MySql") == false && tableDefinition.IsIdentity)
                             db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName))));
                         
                         //Call the NewTable-event to trigger the insert of base/default data
                         NewTable(tableName, db, e);
 
                         //Turn off identity insert if db provider is not mysql
-                        if (DatabaseContext.Current.ProviderName.Contains("MySql") == false && tableDefinition.IsIdentity)
+						if (ApplicationContext.Current.DatabaseContext.ProviderName.Contains("MySql") == false && tableDefinition.IsIdentity)
                             db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName))));
                     }
 
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Persistence
                     }
 
                     //Specific to Sql Ce - look for changes to Identity Seed
-                    if (DatabaseContext.Current.ProviderName.Contains("SqlServerCe"))
+					if (ApplicationContext.Current.DatabaseContext.ProviderName.Contains("SqlServerCe"))
                     {
                         var seedSql = SyntaxConfig.SqlSyntaxProvider.ToAlterIdentitySeedStatements(tableDefinition);
                         foreach (var sql in seedSql)

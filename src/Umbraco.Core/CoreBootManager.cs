@@ -5,7 +5,10 @@ using System.Text;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Publishing;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core
 {
@@ -15,7 +18,7 @@ namespace Umbraco.Core
 	/// <remarks>
 	/// This does not provide any startup functionality relating to web objects
 	/// </remarks>
-	internal class CoreBootManager : IBootManager
+	public class CoreBootManager : IBootManager
 	{
 
 		private DisposableTimer _timer;
@@ -33,11 +36,15 @@ namespace Umbraco.Core
 			LogHelper.Info<CoreBootManager>("Umbraco application starting");
 			_timer = DisposableTimer.Start(x => LogHelper.Info<CoreBootManager>("Umbraco application startup complete" + " (took " + x + "ms)"));
 
+			//create database and service contexts for the app context
+			var dbContext = new DatabaseContext(new DefaultDatabaseFactory());
+			var serviceContext = new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy());
+			
 			//create the ApplicationContext
-			ApplicationContext = ApplicationContext.Current = new ApplicationContext();
+			ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext);
 
             //initialize the DatabaseContext
-            DatabaseContext.Current.Initialize();
+			dbContext.Initialize();
 
 			InitializeResolvers();
 

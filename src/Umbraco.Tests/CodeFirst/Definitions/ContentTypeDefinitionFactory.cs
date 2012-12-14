@@ -31,7 +31,7 @@ namespace Umbraco.Tests.CodeFirst.Definitions
             var contentTypeAttribute = modelType.FirstAttribute<ContentTypeAttribute>();
             var contentTypeAlias = contentTypeAttribute == null ? modelType.Name.ToUmbracoAlias() : contentTypeAttribute.Alias;
             //Check if ContentType already exists by looking it up by Alias.
-            var existing = ServiceFactory.ContentTypeService.GetContentType(contentTypeAlias);
+            var existing = ApplicationContext.Current.Services.ContentTypeService.GetContentType(contentTypeAlias);
             
             Lazy<IContentType> contentType = contentTypeAttribute == null
                                                  ? PlainPocoConvention(modelType, existing)
@@ -316,7 +316,7 @@ namespace Umbraco.Tests.CodeFirst.Definitions
                                ? templateName.Replace(".cshtml", "").Replace(".vbhtml", "")
                                : templateName.Replace(".masterpage", "");
 
-                var template = ServiceFactory.FileService.GetTemplateByAlias(@alias);
+				var template = ApplicationContext.Current.Services.FileService.GetTemplateByAlias(@alias);
                 if(template == null)
                 {
                     var name = engine == RenderingEngine.Mvc
@@ -324,7 +324,7 @@ namespace Umbraco.Tests.CodeFirst.Definitions
                                : string.Concat(@alias, ".masterpage");
 
                     template = new Template(string.Empty, name, @alias) { CreatorId = 0, Content = string.Empty};
-                    ServiceFactory.FileService.SaveTemplate(template);
+					ApplicationContext.Current.Services.FileService.SaveTemplate(template);
                 }
                 templates.Add(template);
             }

@@ -16,11 +16,12 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class LanguageRepository : PetaPocoRepositoryBase<int, ILanguage>, ILanguageRepository
     {
-        public LanguageRepository(IUnitOfWork work) : base(work)
+		public LanguageRepository(IDatabaseUnitOfWork work)
+			: base(work)
         {
         }
 
-        public LanguageRepository(IUnitOfWork work, IRepositoryCacheProvider cache)
+		public LanguageRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
             : base(work, cache)
         {
         }

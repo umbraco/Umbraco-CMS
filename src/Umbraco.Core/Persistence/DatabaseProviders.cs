@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Persistence
 {
-    public enum DatabaseProviders
+	public enum DatabaseProviders
     {
         SqlServer,
         SqlAzure,

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
@@ -50,9 +51,11 @@ namespace Umbraco.Core.Models
         /// </summary>
         public static IProfile GetCreatorProfile(this IContent content)
         {
-	        var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
-		        new PetaPocoUnitOfWork());
-            return repository.GetProfileById(content.CreatorId);
+			using (var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
+				PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
+			{
+				return repository.GetProfileById(content.CreatorId);
+			}
         }
 
         /// <summary>
@@ -60,9 +63,11 @@ namespace Umbraco.Core.Models
         /// </summary>
         public static IProfile GetWriterProfile(this IContent content)
         {
-			var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
-				new PetaPocoUnitOfWork());
-            return repository.GetProfileById(content.WriterId);
+			using(var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
+				PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
+			{
+				return repository.GetProfileById(content.WriterId);	
+			}
         }
     }
 }

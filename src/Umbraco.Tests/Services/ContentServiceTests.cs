@@ -14,7 +14,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
-    /// <summary>
+	/// <summary>
     /// Tests covering all methods in the ContentService class.
     /// This is more of an integration test as it involves multiple layers
     /// as well as configuration.
@@ -29,6 +29,12 @@ namespace Umbraco.Tests.Services
 
             CreateTestData();
         }
+
+		[TearDown]
+		public override void TearDown()
+		{
+			base.TearDown();
+		}
 
         //TODO Add test to verify there is only ONE newest document/content in cmsDocument table after updating.
         //TODO Add test to delete specific version (with and without deleting prior versions) and versions by date.
@@ -667,8 +673,8 @@ namespace Umbraco.Tests.Services
 
         [Test]
         public void Can_Save_Lazy_Content()
-        {
-            var unitOfWork = new PetaPocoUnitOfWork();
+        {	        
+	        var unitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
             var root = ServiceContext.ContentService.GetById(1046);
 
@@ -691,14 +697,6 @@ namespace Umbraco.Tests.Services
 
             Assert.That(c.Value.ParentId > 0, Is.True);
             Assert.That(c2.Value.ParentId > 0, Is.True);
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-
-            ServiceContext = null;
         }
 
         public void CreateTestData()

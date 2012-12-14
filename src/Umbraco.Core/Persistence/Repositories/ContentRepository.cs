@@ -20,14 +20,14 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;
 
-        public ContentRepository(IUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
+		public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
             : base(work)
         {
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
         }
 
-        public ContentRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
+		public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
             : base(work, cache)
         {
             _contentTypeRepository = contentTypeRepository;
@@ -263,7 +263,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Insert(dto);
 
             //Create the PropertyData for this version - cmsPropertyData
-            var propertyFactory = new PropertyFactory(((Content)entity).ContentType, entity.Version, entity.Id);
+            var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
             var propertyDataDtos = propertyFactory.BuildDto(entity.Properties);
             //Add Properties
             foreach (var propertyDataDto in propertyDataDtos)

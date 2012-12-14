@@ -1,8 +1,11 @@
 ﻿using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core
 {
-    //Publishing Events
+	
+	//Publishing Events
     public class PublishingEventArgs : System.ComponentModel.CancelEventArgs { }
     public class SendToPublishEventArgs : System.ComponentModel.CancelEventArgs { }
 
@@ -39,7 +42,7 @@ namespace Umbraco.Core
         /// </summary>
         public int Id { get; set; }
     }
-    public class SaveEventArgs : System.ComponentModel.CancelEventArgs { }
+	public class SaveEventArgs : System.ComponentModel.CancelEventArgs { }
     public class NewEventArgs : System.ComponentModel.CancelEventArgs
     {
         /// <summary>

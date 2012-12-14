@@ -17,13 +17,13 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IUserTypeRepository _userTypeRepository;
 
-        public UserRepository(IUnitOfWork work, IUserTypeRepository userTypeRepository)
+		public UserRepository(IDatabaseUnitOfWork work, IUserTypeRepository userTypeRepository)
             : base(work)
         {
             _userTypeRepository = userTypeRepository;
         }
 
-        public UserRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IUserTypeRepository userTypeRepository)
+		public UserRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IUserTypeRepository userTypeRepository)
             : base(work, cache)
         {
             _userTypeRepository = userTypeRepository;

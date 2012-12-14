@@ -23,17 +23,20 @@ namespace Umbraco.Core.Persistence.Repositories
         private IFileSystem _masterpagesFileSystem;
         private IFileSystem _viewsFileSystem;
 
-        public TemplateRepository(IUnitOfWork work) : base(work)
+		public TemplateRepository(IDatabaseUnitOfWork work)
+			: base(work)
         {
             EnsureDepedencies();
         }
 
-        public TemplateRepository(IUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
+		public TemplateRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
+			: base(work, cache)
         {
             EnsureDepedencies();
         }
 
-        internal TemplateRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem) : base(work, cache)
+		internal TemplateRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem)
+			: base(work, cache)
         {
             _masterpagesFileSystem = masterpageFileSystem;
             _viewsFileSystem = viewFileSystem;

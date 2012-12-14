@@ -8,17 +8,36 @@ namespace Umbraco.Core.Persistence.UnitOfWork
     /// <summary>
     /// Represents the Unit of Work implementation for PetaPoco
     /// </summary>
-    internal class PetaPocoUnitOfWork : IUnitOfWork
+	internal class PetaPocoUnitOfWork : DisposableObject, IDatabaseUnitOfWork
     {
+
+	    /// <summary>
+	    /// Used for testing
+	    /// </summary>
+		internal Guid InstanceId { get; private set; }
+
         private Guid _key;
         private readonly List<Operation> _operations = new List<Operation>();
 
-        public PetaPocoUnitOfWork()
-        {
-            _key = Guid.NewGuid();
-        }
 
-        /// <summary>
+		/// <summary>
+		/// Creates a new unit of work instance
+		/// </summary>
+		/// <param name="database"></param>
+		/// <remarks>
+		/// This should normally not be used directly and should be created with the UnitOfWorkProvider
+		/// 
+		/// The Database instance used for this unit of work should not be shared with other unit's of work, other repositories, etc...
+		/// as it will get disposed of when this unit of work is disposed.
+		/// </remarks>
+		internal PetaPocoUnitOfWork(UmbracoDatabase database)
+        {
+	        Database = database;
+	        _key = Guid.NewGuid();
+	        InstanceId = Guid.NewGuid();
+        }	    
+
+	    /// <summary>
         /// Registers an <see cref="IEntity" /> instance to be added through this <see cref="UnitOfWork" />
         /// </summary>
         /// <param name="entity">The <see cref="IEntity" /></param>
@@ -74,7 +93,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// </summary>
         public void Commit()
         {
-            using(Transaction transaction = DatabaseFactory.Current.Database.GetTransaction())
+			using(Transaction transaction = Database.GetTransaction())			
             {
                 foreach (var operation in _operations.OrderBy(o => o.ProcessDate))
                 {
@@ -103,6 +122,8 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         {
             get { return _key; }
         }
+
+		public UmbracoDatabase Database { get; private set; }
 
         #region Operation
 
@@ -137,5 +158,18 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         }
 
         #endregion
+
+		/// <summary>
+		/// Ensures disposable objects are disposed
+		/// </summary>		
+		/// <remarks>
+		/// Ensures that the Database instance is disposed of. As per the constructor documentation, the database instance
+		/// used to construct this object should not be shared as it will get disposed of when this object is disposed.
+		/// </remarks>
+	    protected override void DisposeResources()
+	    {
+			_operations.Clear();			
+			Database.Dispose();
+	    }
     }
 }

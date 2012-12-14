@@ -22,22 +22,15 @@ namespace Umbraco.Core
     /// </remarks>
     public class DatabaseContext
     {
-        private bool _configured;
+	    private readonly IDatabaseFactory _factory;
+	    private bool _configured;
         private string _connectionString;
         private string _providerName;
 
-        #region Singleton
-        private static readonly Lazy<DatabaseContext> lazy = new Lazy<DatabaseContext>(() => new DatabaseContext());
-        
-        /// <summary>
-        /// Gets the current Database Context.
-        /// </summary>
-        public static DatabaseContext Current { get { return lazy.Value; } }
-
-        private DatabaseContext()
+		internal DatabaseContext(IDatabaseFactory factory)
         {
+	        _factory = factory;
         }
-        #endregion
 
         /// <summary>
         /// Gets the <see cref="Database"/> object for doing CRUD operations
@@ -47,9 +40,9 @@ namespace Umbraco.Core
         /// This should not be used for CRUD operations or queries against the
         /// standard Umbraco tables! Use the Public services for that.
         /// </remarks>
-        public Database Database
+        public UmbracoDatabase Database
         {
-            get { return DatabaseFactory.Current.Database; }
+            get { return _factory.CreateDatabase(); }
         }
 
         /// <summary>
@@ -306,7 +299,7 @@ namespace Umbraco.Core
 
             try
             {
-                var database = new Database(_connectionString, ProviderName);
+                var database = new UmbracoDatabase(_connectionString, ProviderName);
                 //If Configuration Status is empty its a new install - otherwise upgrade the existing
                 if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus))
                 {

@@ -1,5 +1,4 @@
-using System;
-using System.Collections.Concurrent;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 
@@ -21,52 +20,52 @@ namespace Umbraco.Core.Services
         private FileService _fileService;
         private LocalizationService _localizationService;
 
-        #region Singleton
-        private static readonly Lazy<ServiceContext> lazy = new Lazy<ServiceContext>(() => new ServiceContext());
-
-        /// <summary>
-        /// Gets the current Database Context.
-        /// </summary>
-        public static ServiceContext Current { get { return lazy.Value; } }
-
-        private ServiceContext()
-        {
-            BuildServiceCache();
-        }
-        #endregion
+		/// <summary>
+		/// Internal constructor used for unit tests
+		/// </summary>
+		/// <param name="dbUnitOfWorkProvider"></param>
+		/// <param name="fileUnitOfWorkProvider"></param>
+		/// <param name="publishingStrategy"></param>
+		internal ServiceContext(IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, IUnitOfWorkProvider fileUnitOfWorkProvider, IPublishingStrategy publishingStrategy)
+		{
+			BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy, RepositoryResolver.Current.Factory);
+		}
 
         /// <summary>
         /// Builds the various services
         /// </summary>
-        private void BuildServiceCache()
+		private void BuildServiceCache(
+			IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, 
+			IUnitOfWorkProvider fileUnitOfWorkProvider, 
+			IPublishingStrategy publishingStrategy, 
+			RepositoryFactory repositoryFactory)
         {
-            var provider = new PetaPocoUnitOfWorkProvider();
-            var fileProvider = new FileUnitOfWorkProvider();
-            var publishingStrategy = new PublishingStrategy();
+            var provider = dbUnitOfWorkProvider;
+            var fileProvider = fileUnitOfWorkProvider;	        
 
             if(_userService == null)
-                _userService = new UserService(provider);
+                _userService = new UserService(provider, repositoryFactory);
 
             if (_contentService == null)
-                _contentService = new ContentService(provider, publishingStrategy, _userService);
+				_contentService = new ContentService(provider, repositoryFactory, publishingStrategy, _userService);
 
             if(_mediaService == null)
-                _mediaService = new MediaService(provider);
+                _mediaService = new MediaService(provider, repositoryFactory);
 
             if(_macroService == null)
-                _macroService = new MacroService(fileProvider);
+				_macroService = new MacroService(fileProvider, repositoryFactory);
 
             if(_contentTypeService == null)
-                _contentTypeService = new ContentTypeService(_contentService, _mediaService, provider);
+				_contentTypeService = new ContentTypeService(provider, repositoryFactory, _contentService, _mediaService);
 
             if(_dataTypeService == null)
-                _dataTypeService = new DataTypeService(provider);
+				_dataTypeService = new DataTypeService(provider, repositoryFactory);
 
             if(_fileService == null)
-                _fileService = new FileService(fileProvider, provider);
+				_fileService = new FileService(fileProvider, provider, repositoryFactory);
 
             if(_localizationService == null)
-                _localizationService = new LocalizationService(provider);
+				_localizationService = new LocalizationService(provider, repositoryFactory);
         }
 
         /// <summary>
