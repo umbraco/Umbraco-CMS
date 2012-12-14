@@ -24,9 +24,13 @@ namespace Umbraco.Core.Services
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private HttpContextBase _httpContext;
 
-        public ContentTypeService(RepositoryFactory repositoryFactory, IContentService contentService, IMediaService mediaService)
-			: this(new PetaPocoUnitOfWorkProvider(), repositoryFactory, contentService, mediaService)
+        public ContentTypeService(IContentService contentService, IMediaService mediaService)
+			: this(new PetaPocoUnitOfWorkProvider(), new RepositoryFactory(), contentService, mediaService)
         {}
+
+        public ContentTypeService(RepositoryFactory repositoryFactory, IContentService contentService, IMediaService mediaService)
+            : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory, contentService, mediaService)
+        { }
 
         public ContentTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IContentService contentService, IMediaService mediaService)
         {

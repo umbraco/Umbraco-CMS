@@ -18,9 +18,17 @@ namespace Umbraco.Core.Services
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 	    private static readonly Guid RootParentId = new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde");
 
+        public LocalizationService()
+            : this(new RepositoryFactory())
+        {}
 
         public LocalizationService(RepositoryFactory repositoryFactory)
 			: this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
+        {
+        }
+
+        public LocalizationService(IDatabaseUnitOfWorkProvider provider)
+            : this(provider, new RepositoryFactory())
         {
         }
 

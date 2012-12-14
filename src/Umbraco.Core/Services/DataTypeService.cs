@@ -18,8 +18,17 @@ namespace Umbraco.Core.Services
 	    private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 
+        public DataTypeService()
+            : this(new RepositoryFactory())
+        {}
+
         public DataTypeService(RepositoryFactory repositoryFactory)
 			: this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
+        {
+        }
+
+        public DataTypeService(IDatabaseUnitOfWorkProvider provider)
+            : this(provider, new RepositoryFactory())
         {
         }
 

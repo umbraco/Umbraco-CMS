@@ -16,6 +16,10 @@ namespace Umbraco.Core.Services
         private readonly IUnitOfWorkProvider _fileUowProvider;
         private readonly IDatabaseUnitOfWorkProvider _dataUowProvider;
 
+        public FileService()
+            : this(new RepositoryFactory())
+        {}
+
         public FileService(RepositoryFactory repositoryFactory)
 			: this(new FileUnitOfWorkProvider(), new PetaPocoUnitOfWorkProvider(), repositoryFactory)
         {

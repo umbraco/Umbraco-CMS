@@ -24,9 +24,17 @@ namespace Umbraco.Core.Services
         private readonly RepositoryFactory _repositoryFactory;
 		private HttpContextBase _httpContext;
 
+        public ContentService()
+            : this(new RepositoryFactory())
+        {}
+
         public ContentService(RepositoryFactory repositoryFactory)
             : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory, new PublishingStrategy())
         {}
+
+        public ContentService(IDatabaseUnitOfWorkProvider provider)
+            : this(provider, new RepositoryFactory(), new PublishingStrategy())
+        { }
 
         public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
             : this(provider, repositoryFactory, new PublishingStrategy())

@@ -16,8 +16,18 @@ namespace Umbraco.Core.Services
 	    private readonly RepositoryFactory _repositoryFactory;
         private readonly IUnitOfWorkProvider _uowProvider;
 
+        public MacroService()
+            : this(new RepositoryFactory())
+        {
+        }
+
         public MacroService(RepositoryFactory repositoryFactory)
-			: this(new FileUnitOfWorkProvider(), repositoryFactory)
+            : this(new FileUnitOfWorkProvider(), repositoryFactory)
+        {
+        }
+
+        public MacroService(IUnitOfWorkProvider provider)
+            : this(provider, new RepositoryFactory())
         {
         }
 
