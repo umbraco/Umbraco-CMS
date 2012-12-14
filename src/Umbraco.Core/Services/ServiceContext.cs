@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Concurrent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
@@ -49,7 +47,7 @@ namespace Umbraco.Core.Services
                 _userService = new UserService(provider, repositoryFactory);
 
             if (_contentService == null)
-				_contentService = new ContentService(provider, publishingStrategy, repositoryFactory, _userService);
+				_contentService = new ContentService(provider, repositoryFactory, publishingStrategy, _userService);
 
             if(_mediaService == null)
                 _mediaService = new MediaService(provider, repositoryFactory);

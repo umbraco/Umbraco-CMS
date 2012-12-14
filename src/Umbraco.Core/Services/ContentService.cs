@@ -24,18 +24,22 @@ namespace Umbraco.Core.Services
         private readonly RepositoryFactory _repositoryFactory;
 		private HttpContextBase _httpContext;
 
-        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
-            : this(provider, new PublishingStrategy(), repositoryFactory)
+        public ContentService(RepositoryFactory repositoryFactory)
+            : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory, new PublishingStrategy())
         {}
 
-	    internal ContentService(IDatabaseUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy, RepositoryFactory repositoryFactory)
+        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
+            : this(provider, repositoryFactory, new PublishingStrategy())
+        { }
+
+        internal ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy)
 		{
 			_uowProvider = provider;
 			_publishingStrategy = publishingStrategy;
             _repositoryFactory = repositoryFactory;
 		}
 
-        internal ContentService(IDatabaseUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy, RepositoryFactory repositoryFactory, IUserService userService)
+        internal ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy, IUserService userService)
 		{
             _uowProvider = provider;
 			_publishingStrategy = publishingStrategy;
@@ -100,7 +104,6 @@ namespace Umbraco.Core.Services
 			{
 				return repository.Get(id);
 			}
-
 		}
 
 		/// <summary>
