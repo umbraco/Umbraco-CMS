@@ -75,6 +75,36 @@ namespace Umbraco.Core
 		}
 		#endregion
 
+		/// <summary>
+		/// Returns the recursive value of a field by iterating up the parent chain but starting at the publishedContent passed in
+		/// </summary>
+		/// <param name="publishedContent"></param>
+		/// <param name="fieldname"></param>
+		/// <returns></returns>
+		public static string GetRecursiveValue(this IPublishedContent publishedContent, string fieldname)
+		{
+			var contentValue = "";
+			var currentContent = publishedContent;
+
+			while (contentValue.IsNullOrWhiteSpace())
+			{
+				var val = currentContent[fieldname];
+				if (val == null || val.ToString().IsNullOrWhiteSpace())
+				{
+					if (currentContent.Parent == null)
+					{
+						break; //we've reached the top
+					}
+					currentContent = currentContent.Parent;
+				}
+				else
+				{
+					contentValue = val.ToString(); //we've found a recursive val
+				}
+			}
+			return contentValue;
+		}
+
 		public static bool IsVisible(this IPublishedContent doc)
 		{
 			var umbracoNaviHide = doc.GetProperty("umbracoNaviHide");

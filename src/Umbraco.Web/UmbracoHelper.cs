@@ -300,8 +300,7 @@ namespace Umbraco.Web
 
 
 		    var item = new Item()
-		                   {
-		                       //NodeId = currentPage.Id.ToString();
+		                   {		        
 		                       Field = fieldAlias,
 		                       TextIfEmpty = altText,
 		                       LegacyAttributes = attributesForItem
