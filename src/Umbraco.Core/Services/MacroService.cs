@@ -14,18 +14,20 @@ namespace Umbraco.Core.Services
     /// </summary>
     internal class MacroService : IMacroService
     {
-        private readonly IUnitOfWork _unitOfWork;
+	    private readonly RepositoryFactory _repositoryFactory;
+	    private readonly IUnitOfWork _unitOfWork;
 	    private readonly IMacroRepository _macroRepository;
 
-        public MacroService()
-            : this(new FileUnitOfWorkProvider())
+        public MacroService(RepositoryFactory repositoryFactory)
+			: this(new FileUnitOfWorkProvider(), repositoryFactory)
         {
         }
 
-        public MacroService(IUnitOfWorkProvider provider)
+		public MacroService(IUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
         {
-            _unitOfWork = provider.GetUnitOfWork();
-	        _macroRepository = RepositoryResolver.Current.Factory.CreateMacroRepository(_unitOfWork);
+			_repositoryFactory = repositoryFactory;
+			_unitOfWork = provider.GetUnitOfWork();
+	        _macroRepository = _repositoryFactory.CreateMacroRepository(_unitOfWork);
         }
 
         public MacroService(IUnitOfWorkProvider provider, bool ensureCachedMacros)

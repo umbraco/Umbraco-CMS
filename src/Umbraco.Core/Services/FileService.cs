@@ -13,23 +13,26 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class FileService : IFileService
     {
-        private readonly IUnitOfWork _fileUnitOfWork;
+	    private readonly RepositoryFactory _repositoryFactory;
+	    private readonly IUnitOfWork _fileUnitOfWork;
         private readonly IDatabaseUnitOfWork _dataUnitOfWork;
 	    private readonly IStylesheetRepository _stylesheetRepository;
 	    private readonly IScriptRepository _scriptRepository;
 	    private readonly ITemplateRepository _templateRepository;
 
-        public FileService() : this(new FileUnitOfWorkProvider(), new PetaPocoUnitOfWorkProvider())
+        public FileService(RepositoryFactory repositoryFactory)
+			: this(new FileUnitOfWorkProvider(), new PetaPocoUnitOfWorkProvider(), repositoryFactory)
         {
         }
 
-        public FileService(IUnitOfWorkProvider fileProvider, IDatabaseUnitOfWorkProvider dataProvider)
+		public FileService(IUnitOfWorkProvider fileProvider, IDatabaseUnitOfWorkProvider dataProvider, RepositoryFactory repositoryFactory)
         {
-            _fileUnitOfWork = fileProvider.GetUnitOfWork();
+			_repositoryFactory = repositoryFactory;
+			_fileUnitOfWork = fileProvider.GetUnitOfWork();
             _dataUnitOfWork = dataProvider.GetUnitOfWork();
-	        _templateRepository = RepositoryResolver.Current.Factory.CreateTemplateRepository(_dataUnitOfWork);
-	        _stylesheetRepository = RepositoryResolver.Current.Factory.CreateStylesheetRepository(_fileUnitOfWork);
-	        _scriptRepository = RepositoryResolver.Current.Factory.CreateScriptRepository(_fileUnitOfWork);
+	        _templateRepository = _repositoryFactory.CreateTemplateRepository(_dataUnitOfWork);
+	        _stylesheetRepository = _repositoryFactory.CreateStylesheetRepository(_fileUnitOfWork);
+	        _scriptRepository = _repositoryFactory.CreateScriptRepository(_fileUnitOfWork);
         }
 
         /// <summary>

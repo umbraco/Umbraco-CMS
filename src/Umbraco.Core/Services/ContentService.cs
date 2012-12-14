@@ -35,7 +35,7 @@ namespace Umbraco.Core.Services
             _repositoryFactory = repositoryFactory;
 		}
 
-        internal ContentService(IDatabaseUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy, IUserService userService, RepositoryFactory repositoryFactory)
+        internal ContentService(IDatabaseUnitOfWorkProvider provider, IPublishingStrategy publishingStrategy, RepositoryFactory repositoryFactory, IUserService userService)
 		{
             _uowProvider = provider;
 			_publishingStrategy = publishingStrategy;

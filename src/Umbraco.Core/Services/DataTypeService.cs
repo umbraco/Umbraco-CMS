@@ -16,19 +16,22 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class DataTypeService : IDataTypeService
     {
-        private readonly IDatabaseUnitOfWork _unitOfWork;
+	    private readonly RepositoryFactory _repositoryFactory;
+	    private readonly IDatabaseUnitOfWork _unitOfWork;
 		private readonly IDataTypeDefinitionRepository _dataTypeService;
 	    private readonly IContentTypeRepository _contentTypeRepository;
 
-        public DataTypeService() : this(new PetaPocoUnitOfWorkProvider())
+        public DataTypeService(RepositoryFactory repositoryFactory)
+			: this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
         {
         }
 
-        public DataTypeService(IDatabaseUnitOfWorkProvider provider)
+		public DataTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
         {
-            _unitOfWork = provider.GetUnitOfWork();
-	        _dataTypeService = RepositoryResolver.Current.Factory.CreateDataTypeDefinitionRepository(_unitOfWork);
-            _contentTypeRepository = RepositoryResolver.Current.Factory.CreateContentTypeRepository(_unitOfWork);
+			_repositoryFactory = repositoryFactory;
+			_unitOfWork = provider.GetUnitOfWork();
+	        _dataTypeService = _repositoryFactory.CreateDataTypeDefinitionRepository(_unitOfWork);
+            _contentTypeRepository = _repositoryFactory.CreateContentTypeRepository(_unitOfWork);
         }
 
         /// <summary>

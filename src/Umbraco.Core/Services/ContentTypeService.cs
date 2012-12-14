@@ -19,7 +19,8 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ContentTypeService : IContentTypeService
     {
-        private readonly IContentService _contentService;
+	    private readonly RepositoryFactory _repositoryFactory;
+	    private readonly IContentService _contentService;
         private readonly IMediaService _mediaService;
         private readonly IUserService _userService;
         private readonly IDatabaseUnitOfWork _unitOfWork;
@@ -27,27 +28,29 @@ namespace Umbraco.Core.Services
 	    private readonly IMediaTypeRepository _mediaTypeRepository;
         private HttpContextBase _httpContext;
 
-        public ContentTypeService(IContentService contentService, IMediaService mediaService)
-            : this(new PetaPocoUnitOfWorkProvider(), contentService, mediaService)
+        public ContentTypeService(RepositoryFactory repositoryFactory, IContentService contentService, IMediaService mediaService)
+			: this(new PetaPocoUnitOfWorkProvider(), repositoryFactory, contentService, mediaService)
         {}
 
-        public ContentTypeService(IDatabaseUnitOfWorkProvider provider, IContentService contentService, IMediaService mediaService)
+        public ContentTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IContentService contentService, IMediaService mediaService)
         {
-            _contentService = contentService;
+	        _repositoryFactory = repositoryFactory;
+	        _contentService = contentService;
             _mediaService = mediaService;
             _unitOfWork = provider.GetUnitOfWork();
-	        _contentTypeRepository = RepositoryResolver.Current.Factory.CreateContentTypeRepository(_unitOfWork);
-	        _mediaTypeRepository = RepositoryResolver.Current.Factory.CreateMediaTypeRepository(_unitOfWork);
+	        _contentTypeRepository = _repositoryFactory.CreateContentTypeRepository(_unitOfWork);
+	        _mediaTypeRepository = _repositoryFactory.CreateMediaTypeRepository(_unitOfWork);
         }
 
-		internal ContentTypeService(IDatabaseUnitOfWorkProvider provider, IContentService contentService, IMediaService mediaService, IUserService userService)
+		internal ContentTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IContentService contentService, IMediaService mediaService, IUserService userService)
         {
-            _contentService = contentService;
+			_repositoryFactory = repositoryFactory;
+			_contentService = contentService;
             _mediaService = mediaService;
             _userService = userService;
             _unitOfWork = provider.GetUnitOfWork();
-            _contentTypeRepository = RepositoryResolver.Current.Factory.CreateContentTypeRepository(_unitOfWork);
-            _mediaTypeRepository = RepositoryResolver.Current.Factory.CreateMediaTypeRepository(_unitOfWork);
+            _contentTypeRepository = _repositoryFactory.CreateContentTypeRepository(_unitOfWork);
+            _mediaTypeRepository = _repositoryFactory.CreateMediaTypeRepository(_unitOfWork);
         }
 
         /// <summary>

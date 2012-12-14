@@ -30,40 +30,44 @@ namespace Umbraco.Core.Services
 		/// <param name="publishingStrategy"></param>
 		internal ServiceContext(IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, IUnitOfWorkProvider fileUnitOfWorkProvider, IPublishingStrategy publishingStrategy)
 		{
-			BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy);
+			BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy, RepositoryResolver.Current.Factory);
 		}
 
         /// <summary>
         /// Builds the various services
         /// </summary>
-		private void BuildServiceCache(IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, IUnitOfWorkProvider fileUnitOfWorkProvider, IPublishingStrategy publishingStrategy)
+		private void BuildServiceCache(
+			IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, 
+			IUnitOfWorkProvider fileUnitOfWorkProvider, 
+			IPublishingStrategy publishingStrategy, 
+			RepositoryFactory repositoryFactory)
         {
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;	        
 
             if(_userService == null)
-                _userService = new UserService(provider);
+                _userService = new UserService(provider, repositoryFactory);
 
             if (_contentService == null)
-                _contentService = new ContentService(provider, publishingStrategy, _userService, RepositoryResolver.Current.Factory);
+				_contentService = new ContentService(provider, publishingStrategy, repositoryFactory, _userService);
 
             if(_mediaService == null)
-                _mediaService = new MediaService(provider);
+                _mediaService = new MediaService(provider, repositoryFactory);
 
             if(_macroService == null)
-                _macroService = new MacroService(fileProvider);
+				_macroService = new MacroService(fileProvider, repositoryFactory);
 
             if(_contentTypeService == null)
-				_contentTypeService = new ContentTypeService(provider, _contentService, _mediaService);
+				_contentTypeService = new ContentTypeService(provider, repositoryFactory, _contentService, _mediaService);
 
             if(_dataTypeService == null)
-                _dataTypeService = new DataTypeService(provider);
+				_dataTypeService = new DataTypeService(provider, repositoryFactory);
 
             if(_fileService == null)
-                _fileService = new FileService(fileProvider, provider);
+				_fileService = new FileService(fileProvider, provider, repositoryFactory);
 
             if(_localizationService == null)
-                _localizationService = new LocalizationService(provider);
+				_localizationService = new LocalizationService(provider, repositoryFactory);
         }
 
         /// <summary>
