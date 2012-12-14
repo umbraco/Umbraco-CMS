@@ -5,7 +5,6 @@ using Umbraco.Core.Auditing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using umbraco.interfaces;
 
@@ -17,9 +16,7 @@ namespace Umbraco.Core.Services
     public class DataTypeService : IDataTypeService
     {
 	    private readonly RepositoryFactory _repositoryFactory;
-	    private readonly IDatabaseUnitOfWork _unitOfWork;
-		private readonly IDataTypeDefinitionRepository _dataTypeService;
-	    private readonly IContentTypeRepository _contentTypeRepository;
+        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 
         public DataTypeService(RepositoryFactory repositoryFactory)
 			: this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
@@ -29,9 +26,7 @@ namespace Umbraco.Core.Services
 		public DataTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
         {
 			_repositoryFactory = repositoryFactory;
-			_unitOfWork = provider.GetUnitOfWork();
-	        _dataTypeService = _repositoryFactory.CreateDataTypeDefinitionRepository(_unitOfWork);
-            _contentTypeRepository = _repositoryFactory.CreateContentTypeRepository(_unitOfWork);
+            _uowProvider = provider;
         }
 
         /// <summary>
@@ -41,8 +36,10 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDataTypeDefinition"/></returns>
         public IDataTypeDefinition GetDataTypeDefinitionById(int id)
         {
-            var repository = _dataTypeService;
-            return repository.Get(id);
+            using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(id);
+            }
         }
 
         /// <summary>
@@ -52,12 +49,13 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IDataTypeDefinition"/></returns>
         public IDataTypeDefinition GetDataTypeDefinitionById(Guid id)
         {
-            var repository = _dataTypeService;
+            using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IDataTypeDefinition>.Builder.Where(x => x.Key == id);
+                var definitions = repository.GetByQuery(query);
 
-            var query = Query<IDataTypeDefinition>.Builder.Where(x => x.Key == id);
-            var definitions = repository.GetByQuery(query);
-
-            return definitions.FirstOrDefault();
+                return definitions.FirstOrDefault();
+            }
         }
 
         /// <summary>
@@ -67,12 +65,13 @@ namespace Umbraco.Core.Services
         /// <returns>Collection of <see cref="IDataTypeDefinition"/> objects with a matching contorl id</returns>
         public IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByControlId(Guid id)
         {
-            var repository = _dataTypeService;
+            using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IDataTypeDefinition>.Builder.Where(x => x.ControlId == id);
+                var definitions = repository.GetByQuery(query);
 
-            var query = Query<IDataTypeDefinition>.Builder.Where(x => x.ControlId == id);
-            var definitions = repository.GetByQuery(query);
-
-            return definitions;
+                return definitions;
+            }
         }
 
         /// <summary>
@@ -82,8 +81,10 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IDataTypeDefinition"/> objects</returns>
         public IEnumerable<IDataTypeDefinition> GetAllDataTypeDefinitions(params int[] ids)
         {
-            var repository = _dataTypeService;
-            return repository.GetAll(ids);
+            using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(ids);
+            }
         }
 
         /// <summary>
@@ -99,12 +100,16 @@ namespace Umbraco.Core.Services
 
             if (!e.Cancel)
             {
-                dataTypeDefinition.CreatorId = userId > -1 ? userId : 0;
-                _dataTypeService.AddOrUpdate(dataTypeDefinition);
-                _unitOfWork.Commit();
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow))
+                {
+                    dataTypeDefinition.CreatorId = userId > -1 ? userId : 0;
+                    repository.AddOrUpdate(dataTypeDefinition);
+                    uow.Commit();
 
-                if (Saved != null)
-                    Saved(dataTypeDefinition, e);
+                    if (Saved != null)
+                        Saved(dataTypeDefinition, e);
+                }
 
                 Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition performed by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
             }
@@ -127,34 +132,38 @@ namespace Umbraco.Core.Services
 
             if (!e.Cancel)
             {
-                //Find ContentTypes using this IDataTypeDefinition on a PropertyType
-                var contentTypeRepository = _contentTypeRepository;
-                var query = Query<PropertyType>.Builder.Where(x => x.DataTypeId == dataTypeDefinition.Id);
-                var contentTypes = contentTypeRepository.GetByQuery(query);
-
-                //Loop through the list of results and remove the PropertyTypes that references the DataTypeDefinition that is being deleted
-                foreach (var contentType in contentTypes)
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
                 {
-                    if (contentType == null) continue;
+                    //Find ContentTypes using this IDataTypeDefinition on a PropertyType
+                    var query = Query<PropertyType>.Builder.Where(x => x.DataTypeId == dataTypeDefinition.Id);
+                    var contentTypes = repository.GetByQuery(query);
 
-                    foreach (var group in contentType.PropertyGroups)
+                    //Loop through the list of results and remove the PropertyTypes that references the DataTypeDefinition that is being deleted
+                    foreach (var contentType in contentTypes)
                     {
-                        var types = group.PropertyTypes.Where(x => x.DataTypeId == dataTypeDefinition.Id);
-                        foreach (var propertyType in types)
+                        if (contentType == null) continue;
+
+                        foreach (var group in contentType.PropertyGroups)
                         {
-                            group.PropertyTypes.Remove(propertyType);
+                            var types = group.PropertyTypes.Where(x => x.DataTypeId == dataTypeDefinition.Id);
+                            foreach (var propertyType in types)
+                            {
+                                group.PropertyTypes.Remove(propertyType);
+                            }
                         }
+
+                        repository.AddOrUpdate(contentType);
                     }
 
-                    contentTypeRepository.AddOrUpdate(contentType);
+                    var dataTypeRepository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow);
+                    dataTypeRepository.Delete(dataTypeDefinition);
+
+                    uow.Commit();
+
+                    if (Deleted != null)
+                        Deleted(dataTypeDefinition, e);
                 }
-
-                var repository = _dataTypeService;
-                repository.Delete(dataTypeDefinition);
-                _unitOfWork.Commit();
-
-                if (Deleted != null)
-                    Deleted(dataTypeDefinition, e);
 
                 Audit.Add(AuditTypes.Delete, string.Format("Delete DataTypeDefinition performed by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
             }
