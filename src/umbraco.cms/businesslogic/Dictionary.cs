@@ -359,7 +359,7 @@ namespace umbraco.cms.businesslogic
                 Item.removeText(UniqueId);
 
                 // remove key from database
-                SqlHelper.ExecuteNonQuery("delete from cmsDictionary where [key] ='" + key + "'");
+                SqlHelper.ExecuteNonQuery("delete from cmsDictionary where [key] = @key", SqlHelper.CreateParameter("@key", key));
 
                 // Remove key from cache
                 DictionaryItems.Remove(key);

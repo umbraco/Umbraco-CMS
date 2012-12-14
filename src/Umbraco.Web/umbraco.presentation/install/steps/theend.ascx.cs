@@ -33,6 +33,10 @@ namespace umbraco.presentation.install.steps
                 //errorLiteral.Text = ex.ToString();
             }
 
+            // Update ClientDependency version
+            var clientDependencyConfig = new ClientDependencyConfiguration();
+            var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
+
             if (!cms.businesslogic.skinning.Skinning.IsStarterKitInstalled())
                 customizeSite.Visible = false;
 

@@ -399,6 +399,7 @@
       <DependentUpon>UI.xml</DependentUpon>
     </None>
     <Content Include="Global.asax" />
+    <Content Include="Umbraco\Config\Lang\en_us.xml" />
     <Content Include="Umbraco\Config\Lang\he.xml" />
     <Content Include="Umbraco\Config\Lang\ja.xml" />
     <Content Include="Umbraco\Config\Lang\pl.xml" />
@@ -639,6 +640,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Langs\da.js" />
     <Content Include="Umbraco_Client\Tinymce3\Langs\de.js" />
     <Content Include="Umbraco_Client\Tinymce3\Langs\en.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Langs\en_us.js" />
     <Content Include="Umbraco_Client\Tinymce3\Langs\fi.js" />
     <Content Include="Umbraco_Client\Tinymce3\Langs\fr.js" />
     <Content Include="Umbraco_Client\Tinymce3\Langs\he.js" />
@@ -658,6 +660,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advhr\Langs\da_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advhr\Langs\de_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advhr\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Advhr\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advhr\Langs\fi_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advhr\Langs\fr_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advhr\Langs\he_dlg.js" />
@@ -679,6 +682,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advimage\Langs\da_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advimage\Langs\de_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advimage\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Advimage\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advimage\Langs\fi_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advimage\Langs\fr_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advimage\Langs\he_dlg.js" />
@@ -697,6 +701,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advlink\Langs\da_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advlink\Langs\de_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advlink\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Advlink\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advlink\Langs\fi_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advlink\Langs\fr_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advlink\Langs\he_dlg.js" />
@@ -718,6 +723,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Autosave\editor_plugin.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Autosave\editor_plugin_src.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Autosave\Langs\en.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Autosave\Langs\en_us.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Bbcode\editor_plugin.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Bbcode\editor_plugin_src.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Contextmenu\editor_plugin.js" />
@@ -747,6 +753,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Emotions\Langs\da_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Emotions\Langs\de_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Emotions\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Emotions\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Emotions\Langs\fi_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Emotions\Langs\fr_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Emotions\Langs\he_dlg.js" />
@@ -775,6 +782,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Fullpage\Langs\da_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Fullpage\Langs\de_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Fullpage\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Fullpage\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Fullpage\Langs\fi_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Fullpage\Langs\fr_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Fullpage\Langs\he_dlg.js" />
@@ -827,13 +835,20 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\da_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\de_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\es_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\fi_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\fr_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\he_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\it_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\ja_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\ko_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\nl_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\no_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\pl_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\pt_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\sv_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\media.htm" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\moxieplayer.swf" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Nonbreaking\editor_plugin.js" />
@@ -849,6 +864,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Paste\Langs\da_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Paste\Langs\de_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Paste\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Paste\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Paste\Langs\fi_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Paste\Langs\fr_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Paste\Langs\he_dlg.js" />
@@ -878,6 +894,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Searchreplace\Langs\da_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Searchreplace\Langs\de_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Searchreplace\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Searchreplace\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Searchreplace\Langs\fi_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Searchreplace\Langs\fr_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Searchreplace\Langs\he_dlg.js" />
@@ -901,6 +918,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Style\Langs\da_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Style\Langs\de_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Style\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Style\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Style\Langs\fi_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Style\Langs\fr_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Style\Langs\he_dlg.js" />
@@ -929,6 +947,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Table\Langs\da_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Table\Langs\de_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Table\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Table\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Table\Langs\fi_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Table\Langs\fr_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Table\Langs\he_dlg.js" />
@@ -951,6 +970,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Template\Langs\da_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Template\Langs\de_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Template\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Template\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Template\Langs\fi_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Template\Langs\fr_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Template\Langs\he_dlg.js" />
@@ -970,6 +990,8 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Js\dialog.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\en.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\en_us.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\ru.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\ru_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\zh.js" />
@@ -982,6 +1004,8 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Js\dialog.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\en.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\en_us.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\ru.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\ru_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\zh.js" />
@@ -989,6 +1013,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoimg\editor_plugin_src.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoimg\Js\image.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoimg\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoimg\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoimg\Langs\he_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoimg\Langs\ja_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoimg\Langs\ru_dlg.js" />
@@ -996,6 +1021,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\editor_plugin_src.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Js\umbracolink.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\he_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\ja_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\ru_dlg.js" />
@@ -1006,6 +1032,8 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracomacro\Js\dialog.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracomacro\Langs\en.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracomacro\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracomacro\Langs\en_us.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracomacro\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracomacro\Langs\he.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracomacro\Langs\he_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracomacro\Langs\ja.js" />
@@ -1043,6 +1071,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Xhtmlxtras\Langs\da_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Xhtmlxtras\Langs\de_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Xhtmlxtras\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Xhtmlxtras\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Xhtmlxtras\Langs\fi_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Xhtmlxtras\Langs\fr_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Xhtmlxtras\Langs\he_dlg.js" />
@@ -1173,6 +1202,8 @@
     <Content Include="Umbraco_Client\Tinymce3\Themes\Umbraco\Langs\de_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Themes\Umbraco\Langs\en.js" />
     <Content Include="Umbraco_Client\Tinymce3\Themes\Umbraco\Langs\en_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Themes\Umbraco\Langs\en_us.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Themes\Umbraco\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Themes\Umbraco\Langs\es.js" />
     <Content Include="Umbraco_Client\Tinymce3\Themes\Umbraco\Langs\es_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Themes\Umbraco\Langs\fr.js" />
