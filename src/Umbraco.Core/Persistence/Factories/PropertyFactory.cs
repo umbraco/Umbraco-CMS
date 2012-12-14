@@ -45,18 +45,15 @@ namespace Umbraco.Core.Persistence.Factories
         public IEnumerable<PropertyDataDto> BuildDto(IEnumerable<Property> properties)
         {
             var propertyDataDtos = new List<PropertyDataDto>();
-            /*var serviceStackSerializer = new ServiceStackXmlSerializer();
-            var service = new SerializationService(serviceStackSerializer);*/
 
             foreach (var property in properties)
             {
                 var dto = new PropertyDataDto { NodeId = _id, PropertyTypeId = property.PropertyTypeId, VersionId = _version };
-                //TODO Add complex (PropertyEditor) ValueModels to the Ntext/Nvarchar column as a serialized 'Object' (DataTypeDatabaseType.Object)
-                /*if (property.Value is IEditorModel)
-                {
-                    var result = service.ToStream(property.Value);
-                    dto.Text = result.ResultStream.ToJsonString();
-                }*/
+
+                //Check if property has an Id and set it, so that it can be updated if it already exists
+                if (property.HasIdentity)
+                    dto.Id = property.Id;
+
                 if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer && property.Value != null)
                 {
                     dto.Integer = int.Parse(property.Value.ToString());

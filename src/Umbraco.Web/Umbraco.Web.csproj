@@ -247,7 +247,6 @@
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="ApplicationEventsResolver.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
-    <Compile Include="ContentExtensions.cs" />
     <Compile Include="Dynamics\DynamicExpression.cs" />
     <Compile Include="Dynamics\DynamicGrouping.cs" />
     <Compile Include="Dynamics\DynamicPublishedContentIdEqualityComparer.cs" />
@@ -328,10 +327,6 @@
     <Compile Include="Routing\LookupByPageIdQuery.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
-    <Compile Include="Strategies\DeletedTemplate.cs" />
-    <Compile Include="Strategies\TrashedContent.cs" />
-    <Compile Include="Strategies\UpdateContentCache.cs" />
-    <Compile Include="Strategies\UpdateMultipleContentCache.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -2186,7 +2181,9 @@
       <CachedSettingsPropName>umbraco_org_umbraco_update_CheckForUpgrade</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Strategies\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

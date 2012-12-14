@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -101,7 +103,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 yield return Get(dto.NodeId);
             }
         }
-        
+
         #endregion
 
         #region Overrides of PetaPocoRepositoryBase<IContent>
@@ -127,18 +129,19 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                            {
-                               string.Format("DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id"),
-                               string.Format("DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id"),
-                               string.Format("DELETE FROM umbracoRelation WHERE parentId = @Id"),
-                               string.Format("DELETE FROM umbracoRelation WHERE childId = @Id"),
-                               string.Format("DELETE FROM cmsTagRelationship WHERE nodeId = @Id"),
-                               string.Format("DELETE FROM cmsDocument WHERE NodeId = @Id"),
-                               string.Format("DELETE FROM cmsPropertyData WHERE contentNodeId = @Id"),
-                               string.Format("DELETE FROM cmsPreviewXml WHERE nodeId = @Id"),
-                               string.Format("DELETE FROM cmsContentVersion WHERE ContentId = @Id"),
-                               string.Format("DELETE FROM cmsContentXml WHERE nodeID = @Id"),
-                               string.Format("DELETE FROM cmsContent WHERE NodeId = @Id"),
-                               string.Format("DELETE FROM umbracoNode WHERE id = @Id")
+                               "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
+                               "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                               "DELETE FROM umbracoRelation WHERE parentId = @Id",
+                               "DELETE FROM umbracoRelation WHERE childId = @Id",
+                               "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
+                               "DELETE FROM umbracoDomains WHERE domainRootStructureID = @Id",
+                               "DELETE FROM cmsDocument WHERE NodeId = @Id",
+                               "DELETE FROM cmsPropertyData WHERE contentNodeId = @Id",
+                               "DELETE FROM cmsPreviewXml WHERE nodeId = @Id",
+                               "DELETE FROM cmsContentVersion WHERE ContentId = @Id",
+                               "DELETE FROM cmsContentXml WHERE nodeID = @Id",
+                               "DELETE FROM cmsContent WHERE NodeId = @Id",
+                               "DELETE FROM umbracoNode WHERE id = @Id"
                            };
             return list;
         }
@@ -223,8 +226,24 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(IContent entity)
         {
-            //Updates Modified date and Version Guid
-            ((Content)entity).UpdatingEntity();
+            //A new version should only be created if published state has changed
+            bool shouldCreateNewVersion = ((ICanBeDirty)entity).IsPropertyDirty("Published") || ((ICanBeDirty)entity).IsPropertyDirty("Language");
+            if (shouldCreateNewVersion)
+            {
+                //Updates Modified date and Version Guid
+                ((Content)entity).UpdatingEntity();
+            }
+            else
+            {
+                entity.UpdateDate = DateTime.UtcNow;
+            }
+
+            //Look up parent to get and set the correct Path if ParentId has changed
+            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            {
+                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
+                entity.Path = string.Concat(parent.Path, ",", entity.Id);
+            }
 
             var factory = new ContentFactory(NodeObjectTypeId, entity.Id);
             //Look up Content entry to get Primary for updating the DTO
@@ -235,7 +254,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Updates the (base) node data - umbracoNode
             var nodeDto = dto.ContentVersionDto.ContentDto.NodeDto;
             var o = Database.Update(nodeDto);
-            
+
             //Only update this DTO if the contentType has actually changed
             if (contentDto.ContentTypeId != entity.ContentTypeId)
             {
@@ -244,36 +263,97 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Update(newContentDto);
             }
 
-            //Look up (newest) entries by id in cmsDocument table to set newest = false
-            var documentDtos = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND newest = @IsNewest", new { Id = entity.Id, IsNewest = true });
-            foreach (var documentDto in documentDtos)
+            //If Published state has changed then previous versions should have their publish state reset
+            if (shouldCreateNewVersion && entity.Published)
             {
-                var docDto = documentDto;
-                docDto.Newest = false;
-                Database.Update(docDto);
+                var publishedDocs = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND published = @IsPublished", new { Id = entity.Id, IsPublished = true });
+                foreach (var doc in publishedDocs)
+                {
+                    var docDto = doc;
+                    docDto.Published = false;
+                    Database.Update(docDto);
+                }
             }
 
-            //Create a new version - cmsContentVersion
-            //Assumes a new Version guid and Version date (modified date) has been set
             var contentVersionDto = dto.ContentVersionDto;
-            Database.Insert(contentVersionDto);
+            if (shouldCreateNewVersion)
+            {
+                //Look up (newest) entries by id in cmsDocument table to set newest = false
+                //NOTE: This is only relevant when a new version is created, which is why its done inside this if-statement.
+                var documentDtos = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND newest = @IsNewest", new { Id = entity.Id, IsNewest = true });
+                foreach (var documentDto in documentDtos)
+                {
+                    var docDto = documentDto;
+                    docDto.Newest = false;
+                    Database.Update(docDto);
+                }
 
-            //Create the Document specific data for this version - cmsDocument
-            //Assumes a new Version guid has been generated
-            Database.Insert(dto);
+                //Create a new version - cmsContentVersion
+                //Assumes a new Version guid and Version date (modified date) has been set
+                Database.Insert(contentVersionDto);
+                //Create the Document specific data for this version - cmsDocument
+                //Assumes a new Version guid has been generated
+                Database.Insert(dto);
+            }
+            else
+            {
+                //In order to update the ContentVersion we need to retreive its primary key id
+                var contentVerDto = Database.SingleOrDefault<ContentVersionDto>("WHERE VersionId = @Version", new { Version = entity.Version });
+                contentVersionDto.Id = contentVerDto.Id;
+
+                Database.Update(contentVersionDto);
+                Database.Update(dto);
+            }
 
             //Create the PropertyData for this version - cmsPropertyData
-            var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
+            var propertyFactory = new PropertyFactory(((Content)entity).ContentType, entity.Version, entity.Id);
             var propertyDataDtos = propertyFactory.BuildDto(entity.Properties);
             //Add Properties
             foreach (var propertyDataDto in propertyDataDtos)
             {
-                Database.Insert(propertyDataDto);
+                if (shouldCreateNewVersion == false && propertyDataDto.Id > 0)
+                {
+                    Database.Update(propertyDataDto);
+                }
+                else
+                {
+                    Database.Insert(propertyDataDto);
+                }
             }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }
-        
+
+        protected override void PersistDeletedItem(IContent entity)
+        {
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+            var uploadFieldId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
+            //Loop through properties to check if the content contains media that should be deleted
+            foreach (var property in entity.Properties)
+            {
+                if (property.PropertyType.DataTypeControlId == uploadFieldId &&
+                    string.IsNullOrEmpty(property.Value.ToString()) == false
+                    && fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
+                {
+                    var relativeFilePath = fs.GetRelativePath(property.Value.ToString());
+                    var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);
+
+                    // don't want to delete the media folder if not using directories.
+                    if (UmbracoSettings.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
+                    {
+                        //issue U4-771: if there is a parent directory the recursive parameter should be true
+                        fs.DeleteDirectory(parentDirectory, String.IsNullOrEmpty(parentDirectory) == false);
+                    }
+                    else
+                    {
+                        fs.DeleteFile(relativeFilePath, true);
+                    }
+                }
+            }
+
+            base.PersistDeletedItem(entity);
+        }
+
         #endregion
 
         #region Implementation of IContentRepository
@@ -334,7 +414,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var documentDto = Database.FirstOrDefault<DocumentDto>("WHERE nodeId = @Id AND versionId = @VersionId AND newest = @Newest", new { Id = id, VersionId = versionId, Newest = false });
             Mandate.That<Exception>(documentDto != null);
 
-            using(var transaction = Database.GetTransaction())
+            using (var transaction = Database.GetTransaction())
             {
                 DeleteVersion(id, versionId);
 
@@ -344,7 +424,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void Delete(int id, DateTime versionDate)
         {
-            var list = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND VersionDate < @VersionDate", new {Id = id, VersionDate = versionDate});
+            var list = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND VersionDate < @VersionDate", new { Id = id, VersionDate = versionDate });
             Mandate.That<Exception>(list.Any());
 
             using (var transaction = Database.GetTransaction())
@@ -357,7 +437,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 transaction.Complete();
             }
         }
-        
+
         /// <summary>
         /// Private method to execute the delete statements for removing a single version for a Content item.
         /// </summary>

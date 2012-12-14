@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models
         internal static IDataType DataType(this PropertyType propertyType, int propertyId)
         {
             Mandate.ParameterNotNull(propertyType, "propertyType");
-            var dataType = DataTypesResolver.Current.GetById(propertyType.DataTypeControlId);
+            var dataType = ApplicationContext.Current.Services.DataTypeService.GetDataTypeById(propertyType.DataTypeControlId);
             dataType.DataTypeDefinitionId = propertyType.DataTypeId;
             dataType.Data.PropertyId = propertyId;
             return dataType;

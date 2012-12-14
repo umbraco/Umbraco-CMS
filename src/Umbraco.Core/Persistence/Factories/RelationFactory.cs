@@ -16,13 +16,12 @@ namespace Umbraco.Core.Persistence.Factories
 
         public Relation BuildEntity(RelationDto dto)
         {
-            var entity = new Relation(dto.ParentId, dto.ChildId)
+            var entity = new Relation(dto.ParentId, dto.ChildId, _relationType)
                              {
                                  Comment = dto.Comment,
                                  CreateDate = dto.Datetime,
                                  Id = dto.Id,
-                                 UpdateDate = dto.Datetime,
-                                 RelationType = _relationType
+                                 UpdateDate = dto.Datetime
                              };
             return entity;
         }

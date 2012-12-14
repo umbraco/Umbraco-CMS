@@ -1,12 +1,10 @@
-﻿using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Services;
-
-namespace Umbraco.Core
+﻿namespace Umbraco.Core
 {
 	
 	//Publishing Events
-    public class PublishingEventArgs : System.ComponentModel.CancelEventArgs { }
+    public class PublishingEventArgs : System.ComponentModel.CancelEventArgs {
+        public bool IsAllRepublished { get; set; }
+    }
     public class SendToPublishEventArgs : System.ComponentModel.CancelEventArgs { }
 
     //Moving object Events

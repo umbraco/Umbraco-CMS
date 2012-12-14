@@ -18,10 +18,11 @@ namespace Umbraco.Core.Models
         private RelationType _relationType;
         private string _comment;
 
-        public Relation(int parentId, int childId)
+        public Relation(int parentId, int childId, RelationType relationType)
         {
             _parentId = parentId;
             _childId = childId;
+            _relationType = relationType;
         }
 
         private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<Relation, int>(x => x.ParentId);

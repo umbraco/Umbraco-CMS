@@ -25,6 +25,19 @@ namespace Umbraco.Tests.Services
         [SetUp]
         public override void Initialize()
         {
+            //this ensures its reset
+            //PluginManager.Current = new PluginManager();
+
+            //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
+            /*PluginManager.Current.AssembliesToScan = new[]
+				{
+                    typeof(IDataType).Assembly,
+                    typeof(tinyMCE3dataType).Assembly
+				};
+
+            DataTypesResolver.Current = new DataTypesResolver(
+                PluginManager.Current.ResolveDataTypes());*/
+
             base.Initialize();
 
             CreateTestData();
@@ -33,6 +46,10 @@ namespace Umbraco.Tests.Services
 		[TearDown]
 		public override void TearDown()
 		{
+            //reset the app context
+            //DataTypesResolver.Reset();
+            //PluginManager.Current = null;
+
 			base.TearDown();
 		}
 
@@ -207,10 +224,12 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
+            var parent = ServiceContext.ContentService.GetById(1046);
+            ServiceContext.ContentService.Publish(parent);//Publishing root, so Text Page 2 can be updated.
             var subpage2 = contentService.GetById(1048);
             subpage2.Name = "Text Page 2 Updated";
             subpage2.SetValue("author", "Jane Doe");
-            contentService.Save(subpage2, 0);
+            contentService.SaveAndPublish(subpage2, 0);//NOTE New versions are only added between publish-state-changed, so publishing to ensure addition version.
 
             // Act
             var versions = contentService.GetVersions(1048);
@@ -636,7 +655,7 @@ namespace Umbraco.Tests.Services
             var content = contentService.GetById(1048);
 
             // Act
-            var copy = contentService.Copy(content, content.ParentId, 0);
+            var copy = contentService.Copy(content, content.ParentId, false, 0);
 
             // Assert
             Assert.That(copy, Is.Not.Null);
@@ -654,19 +673,21 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
+            var parent = ServiceContext.ContentService.GetById(1046);
+            ServiceContext.ContentService.Publish(parent);//Publishing root, so Text Page 2 can be updated.
             var subpage2 = contentService.GetById(1048);
             var version = subpage2.Version;
             var nameBeforeRollback = subpage2.Name;
             subpage2.Name = "Text Page 2 Updated";
             subpage2.SetValue("author", "Jane Doe");
-            contentService.Save(subpage2, 0);
+            contentService.SaveAndPublish(subpage2, 0);//Saving and publishing, so a new version is created
 
             // Act
             var rollback = contentService.Rollback(1048, version, 0);
 
             // Assert
             Assert.That(rollback, Is.Not.Null);
-            Assert.AreNotEqual(rollback.Version, version);
+            Assert.AreNotEqual(rollback.Version, subpage2.Version);
             Assert.That(rollback.GetValue<string>("author"), Is.Not.EqualTo("Jane Doe"));
             Assert.AreEqual(nameBeforeRollback, rollback.Name);
         }
