@@ -2,21 +2,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.datatype.controls;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using umbraco.uicontrols;
-using Umbraco.Core.IO;
 using Content = umbraco.cms.businesslogic.Content;
 using SystemDirectories = umbraco.IO.SystemDirectories;
 
@@ -30,7 +27,7 @@ namespace umbraco.controls
     public class ContentControl : TabView
     {
         private Content _content;
-        private ArrayList _dataFields = new ArrayList();
+        internal Dictionary<string, IDataType> DataTypes = new Dictionary<string, IDataType>();
         private UmbracoEnsuredPage prntpage;
         public event EventHandler SaveAndPublish;
         public event EventHandler SaveToPublish;
@@ -248,9 +245,10 @@ namespace umbraco.controls
                     return;
                 }
             }
-            foreach (IDataEditor df in _dataFields)
+
+            foreach (var type in DataTypes)
             {
-                df.Save();
+                type.Value.DataEditor.Save();
             }
 
             if (!string.IsNullOrEmpty(NameTxt.Text))
@@ -308,15 +306,14 @@ namespace umbraco.controls
             dt.DataEditor.Editor.ID = string.Format("prop_{0}", p.PropertyType.Alias);
             dt.Data.PropertyId = p.Id;
 
+            //Add the DataType to an internal dictionary, which will be used to call the save method on the IDataEditor
+            //and to retrieve the value from IData in editContent.aspx.cs, so that it can be set on the legacy Document class.
+            DataTypes.Add(p.PropertyType.Alias, dt);
+
             // check for buttons
             IDataFieldWithButtons df1 = dt.DataEditor.Editor as IDataFieldWithButtons;
             if (df1 != null)
             {
-                // df1.Alias = p.PropertyType.Alias;
-                /*
-				// df1.Version = _content.Version;
-				editDataType.Data.PropertyId = p.Id;
-				*/
                 ((Control)df1).ID = p.PropertyType.Alias;
 
 
@@ -388,14 +385,6 @@ namespace umbraco.controls
                 tp.Menu.NewElement(menuElement.ElementName, menuElement.ElementIdPreFix + p.Id.ToString(),
                                    menuElement.ElementClass, menuElement.ExtraMenuWidth);
             }
-
-
-            // fieldData.Alias = p.PropertyType.Alias;
-            // ((Control) fieldData).ID = p.PropertyType.Alias;
-            // fieldData.Text = p.Value.ToString();
-
-            _dataFields.Add(dt.DataEditor.Editor);
-
 
             Pane pp = new Pane();
             Control holder = new Control();

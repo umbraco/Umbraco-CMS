@@ -77,27 +77,27 @@ namespace umbraco.cms.businesslogic.web
             this._optimizedMode = optimizedMode;
             if (optimizedMode)
             {
-                _content = ServiceContext.Current.ContentService.GetById(id);
+                Content = ServiceContext.Current.ContentService.GetById(id);
                 bool hasChildren = ServiceContext.Current.ContentService.HasChildren(id);
-                int templateId = _content.Template == null ? 0 : _content.Template.Id;
+                int templateId = Content.Template == null ? 0 : Content.Template.Id;
 
-                SetupDocumentForTree(_content.Key, _content.Level, _content.ParentId, _content.CreatorId,
-                                     _content.WriterId,
-                                     _content.Published, _content.Path, _content.Name, _content.CreateDate,
-                                     _content.UpdateDate, _content.UpdateDate, _content.ContentType.Icon, hasChildren,
-                                     _content.ContentType.Alias, _content.ContentType.Thumbnail,
-                                     _content.ContentType.Description, null, _content.ContentType.Id,
-                                     templateId, _content.ContentType.IsContainer);
+                SetupDocumentForTree(Content.Key, Content.Level, Content.ParentId, Content.CreatorId,
+                                     Content.WriterId,
+                                     Content.Published, Content.Path, Content.Name, Content.CreateDate,
+                                     Content.UpdateDate, Content.UpdateDate, Content.ContentType.Icon, hasChildren,
+                                     Content.ContentType.Alias, Content.ContentType.Thumbnail,
+                                     Content.ContentType.Description, null, Content.ContentType.Id,
+                                     templateId, Content.ContentType.IsContainer);
 
-                var tmpReleaseDate = _content.ReleaseDate.HasValue ? _content.ReleaseDate.Value : new DateTime();
-                var tmpExpireDate = _content.ExpireDate.HasValue ? _content.ExpireDate.Value : new DateTime();
-                var creator = new User(_content.CreatorId, true);
-                var writer = new User(_content.WriterId, true);
+                var tmpReleaseDate = Content.ReleaseDate.HasValue ? Content.ReleaseDate.Value : new DateTime();
+                var tmpExpireDate = Content.ExpireDate.HasValue ? Content.ExpireDate.Value : new DateTime();
+                var creator = new User(Content.CreatorId, true);
+                var writer = new User(Content.WriterId, true);
 
-                InitializeContent(_content.ContentType.Id, _content.Version, _content.UpdateDate,
-                                  _content.ContentType.Icon);
-                InitializeDocument(creator, writer, _content.Name, templateId, tmpReleaseDate, tmpExpireDate,
-                                   _content.UpdateDate, _content.Published);
+                InitializeContent(Content.ContentType.Id, Content.Version, Content.UpdateDate,
+                                  Content.ContentType.Icon);
+                InitializeDocument(creator, writer, Content.Name, templateId, tmpReleaseDate, tmpExpireDate,
+                                   Content.UpdateDate, Content.Published);
             }
             /*if (optimizedMode)
             {
@@ -253,7 +253,7 @@ namespace umbraco.cms.businesslogic.web
         private User _writer;
         private int? _writerId;
         private bool _optimizedMode;
-        private IContent _content;
+        protected internal IContent Content;
 
         /// <summary>
         /// This is used to cache the child documents of Document when the children property
@@ -680,7 +680,7 @@ namespace umbraco.cms.businesslogic.web
             set
             {
                 _published = value;
-                _content.ChangePublishedState(value);
+                Content.ChangePublishedState(value);
                 /*SqlHelper.ExecuteNonQuery(
                     string.Format("update cmsDocument set published = {0} where nodeId = {1}", Id, value ? 1 : 0));*/
             }
@@ -710,14 +710,14 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         {
             get
             {
-                return _content.Name;
+                return Content.Name;
                 //return base.Text;
             }
             set
             {
                 value = value.Trim();
                 base.Text = value;
-                _content.Name = value;
+                Content.Name = value;
 
                 /*SqlHelper.ExecuteNonQuery("update cmsDocument set text = @text where versionId = @versionId",
                                           SqlHelper.CreateParameter("@text", value),
@@ -735,7 +735,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
             set
             {
                 _updated = value;
-                _content.UpdateDate = value;
+                Content.UpdateDate = value;
                 /*SqlHelper.ExecuteNonQuery("update cmsDocument set updateDate = @value where versionId = @versionId",
                                           SqlHelper.CreateParameter("@value", value),
                                           SqlHelper.CreateParameter("@versionId", Version));*/
@@ -752,7 +752,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
             set
             {
                 _release = value;
-                _content.ReleaseDate = value;
+                Content.ReleaseDate = value;
                 /*if (_release.Year != 1 || _release.Month != 1 || _release.Day != 1)
                     SqlHelper.ExecuteNonQuery("update cmsDocument set releaseDate = @value where versionId = @versionId",
                                               SqlHelper.CreateParameter("@value", value),
@@ -773,7 +773,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
             set
             {
                 _expire = value;
-                _content.ExpireDate = value;
+                Content.ExpireDate = value;
                 /*if (_expire.Year != 1 || _expire.Month != 1 || _expire.Day != 1)
                     SqlHelper.ExecuteNonQuery("update cmsDocument set expireDate = @value where versionId=@versionId",
                                               SqlHelper.CreateParameter("@value", value),
@@ -803,12 +803,12 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
                 _template = value;
                 if (value == 0)
                 {
-                    _content.Template = null;
+                    Content.Template = null;
                 }
                 else
                 {
                     var template = ServiceContext.Current.FileService.GetTemplate(value);
-                    _content.Template = template;
+                    Content.Template = template;
                 }
                 /*if (value == 0)
                 {
@@ -878,7 +878,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.Publish()", false)]
         public void Publish(User u)
         {
-            ServiceContext.Current.ContentService.Publish(_content, u.Id, true);
+            ServiceContext.Current.ContentService.Publish(Content, u.Id, true);
             //PublishWithResult(u);
         }
 
@@ -899,7 +899,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
 
             if (!e.Cancel)
             {
-                var result = ServiceContext.Current.ContentService.Publish(_content, u.Id, true);
+                var result = ServiceContext.Current.ContentService.Publish(Content, u.Id, true);
                 _published = result;
 
                 // make a lookup to see if template is 0 as the template is not initialized in the optimized
@@ -954,7 +954,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
         public bool PublishWithChildrenWithResult(User u)
         {
-            return ServiceContext.Current.ContentService.PublishWithChildren(_content, u.Id, true);
+            return ServiceContext.Current.ContentService.PublishWithChildren(Content, u.Id, true);
 
             /*if (PublishWithResult(u))
             {
@@ -985,7 +985,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
 
             if (!e.Cancel)
             {
-                _content = ServiceContext.Current.ContentService.Rollback(Id, VersionId, u.Id);
+                Content = ServiceContext.Current.ContentService.Rollback(Id, VersionId, u.Id);
 
                 FireAfterRollBack(e);
             }
@@ -1005,7 +1005,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
 
             if (!e.Cancel)
             {
-                var published = ServiceContext.Current.ContentService.PublishWithChildren(_content, u.Id, true);
+                var published = ServiceContext.Current.ContentService.PublishWithChildren(Content, u.Id, true);
 
                 /*_published = true;
                 string tempVersion = Version.ToString();
@@ -1046,7 +1046,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
                 //SqlHelper.ExecuteNonQuery(string.Format("update cmsDocument set published = 0 where nodeId = {0}", Id));
                 //_published = false;
 
-                ServiceContext.Current.ContentService.UnPublish(_content, 0, true);
+                ServiceContext.Current.ContentService.UnPublish(Content, 0, true);
 
                 FireAfterUnPublish(e);
             }
@@ -1063,7 +1063,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
 
             if (!e.Cancel)
             {
-                ServiceContext.Current.ContentService.Save(_content);
+                ServiceContext.Current.ContentService.Save(Content);
 
                 base.Save();
                 // update preview xml
@@ -1076,7 +1076,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.HasPublishedVersion()", false)]
         public bool HasPublishedVersion()
         {
-            return _content.HasPublishedVersion();
+            return Content.HasPublishedVersion();
             //return (SqlHelper.ExecuteScalar<int>("select Count(published) as tmp from cmsDocument where published = 1 And nodeId =" + Id) > 0);
         }
 
@@ -1088,7 +1088,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// <returns></returns>
         public bool HasPendingChanges()
         {
-            return _content.Published == false;
+            return Content.Published == false;
             //double timeDiff = new TimeSpan(UpdateDate.Ticks - VersionDate.Ticks).TotalMilliseconds;
             //return timeDiff > 2000;
         }
@@ -1168,7 +1168,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
             if (!e.Cancel)
             {
                 // Make the new document
-                var content = ServiceContext.Current.ContentService.Copy(_content, CopyTo, RelateToOrignal, u.Id);
+                var content = ServiceContext.Current.ContentService.Copy(Content, CopyTo, RelateToOrignal, u.Id);
                 newDoc = new Document(content);
 
                 e.NewDocument = newDoc;
@@ -1209,9 +1209,9 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// <returns></returns>
         public override IEnumerable GetDescendants()
         {
-            var descendants = _content == null
+            var descendants = Content == null
                                   ? ServiceContext.Current.ContentService.GetDescendants(Id)
-                                  : ServiceContext.Current.ContentService.GetDescendants(_content);
+                                  : ServiceContext.Current.ContentService.GetDescendants(Content);
 
             return descendants.Select(x => new Document(x.Id, true));
         }
@@ -1424,29 +1424,29 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
 
         private void setupNode(IContent content)
         {
-            _content = content;
+            Content = content;
             //Setting private properties from IContent replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
-            base.PopulateCMSNodeFromContent(_content, _objectType);
+            base.PopulateCMSNodeFromContent(Content, _objectType);
 
             //If the version is empty we update with the latest version from the current IContent.
             if (Version == Guid.Empty)
-                Version = _content.Version;
+                Version = Content.Version;
 
             //Setting private properties from IContent replacing Document.setupNode()
-            _creator = User.GetUser(_content.CreatorId);
-            _writer = User.GetUser(_content.WriterId);
-            _updated = _content.UpdateDate;
+            _creator = User.GetUser(Content.CreatorId);
+            _writer = User.GetUser(Content.WriterId);
+            _updated = Content.UpdateDate;
 
-            if (_content.Template != null)
-                _template = _content.Template.Id;
+            if (Content.Template != null)
+                _template = Content.Template.Id;
 
-            if (_content.ExpireDate.HasValue)
-                _expire = _content.ExpireDate.Value;
+            if (Content.ExpireDate.HasValue)
+                _expire = Content.ExpireDate.Value;
 
-            if (_content.ReleaseDate.HasValue)
-                _release = _content.ReleaseDate.Value;
+            if (Content.ReleaseDate.HasValue)
+                _release = Content.ReleaseDate.Value;
 
-            _published = _content.HasPublishedVersion();
+            _published = Content.HasPublishedVersion();
         }
 
         [Obsolete("Deprecated", false)]
@@ -1574,14 +1574,14 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
             if (!e.Cancel)
             {
                 umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
-                if (_content != null)
+                if (Content != null)
                 {
-                    ServiceContext.Current.ContentService.Delete(_content);
+                    ServiceContext.Current.ContentService.Delete(Content);
                 }
                 else
                 {
-                    _content = ServiceContext.Current.ContentService.GetById(Id);
-                    ServiceContext.Current.ContentService.Delete(_content);
+                    Content = ServiceContext.Current.ContentService.GetById(Id);
+                    ServiceContext.Current.ContentService.Delete(Content);
                 }
 
                 //Keeping the base.delete() as it looks to be clear 'private/internal cache'
@@ -1606,14 +1606,14 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
             {
                 umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
                 UnPublish();
-                if (_content != null)
+                if (Content != null)
                 {
-                    ServiceContext.Current.ContentService.MoveToRecycleBin(_content);
+                    ServiceContext.Current.ContentService.MoveToRecycleBin(Content);
                 }
                 else
                 {
-                    _content = ServiceContext.Current.ContentService.GetById(Id);
-                    ServiceContext.Current.ContentService.MoveToRecycleBin(_content);
+                    Content = ServiceContext.Current.ContentService.GetById(Id);
+                    ServiceContext.Current.ContentService.MoveToRecycleBin(Content);
                 }
                 FireAfterMoveToTrash(e);
             }

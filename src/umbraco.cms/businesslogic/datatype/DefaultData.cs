@@ -138,7 +138,7 @@ namespace umbraco.cms.businesslogic.datatype
 			}
 			set 
 			{
-                if (!PreviewMode)
+                /*if (!PreviewMode)
                 {
                     // Try to set null values if possible
                     try
@@ -168,8 +168,9 @@ namespace umbraco.cms.businesslogic.datatype
                         if (value == null) value = "";
                         SqlHelper.ExecuteNonQuery("update cmsPropertyData set " + _dataType.DataFieldName + " = @value where id = " + m_PropertyId, SqlHelper.CreateParameter("@value", value));
                     }
-                }
+                }*/
                 m_Value = value;
+                m_ValueLoaded = true;
 			}
 		}
 

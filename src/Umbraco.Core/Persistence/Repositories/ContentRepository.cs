@@ -226,8 +226,17 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(IContent entity)
         {
-            //Updates Modified date and Version Guid
-            ((Content)entity).UpdatingEntity();
+            //A new version should only be created if published state has changed
+            bool hasPublishedStateChanged = ((ICanBeDirty) entity).IsPropertyDirty("Published");
+            if (hasPublishedStateChanged)
+            {
+                //Updates Modified date and Version Guid
+                ((Content)entity).UpdatingEntity();
+            }
+            else
+            {
+                entity.UpdateDate = DateTime.UtcNow;
+            }
 
             //Look up parent to get and set the correct Path if ParentId has changed
             if (((ICanBeDirty) entity).IsPropertyDirty("ParentId"))
@@ -254,17 +263,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Update(newContentDto);
             }
 
-            //Look up (newest) entries by id in cmsDocument table to set newest = false
-            var documentDtos = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND newest = @IsNewest", new { Id = entity.Id, IsNewest = true });
-            foreach (var documentDto in documentDtos)
-            {
-                var docDto = documentDto;
-                docDto.Newest = false;
-                Database.Update(docDto);
-            }
-
-            //If Published state has changed previous versions should have their publish state reset
-            if (((ICanBeDirty) entity).IsPropertyDirty("Published") && entity.Published)
+            //If Published state has changed then previous versions should have their publish state reset
+            if (hasPublishedStateChanged && entity.Published)
             {
                 var publishedDocs = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND published = @IsPublished", new { Id = entity.Id, IsPublished = true });
                 foreach (var doc in publishedDocs)
@@ -275,14 +275,35 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            //Create a new version - cmsContentVersion
-            //Assumes a new Version guid and Version date (modified date) has been set
             var contentVersionDto = dto.ContentVersionDto;
-            Database.Insert(contentVersionDto);
+            if (hasPublishedStateChanged)
+            {
+                //Look up (newest) entries by id in cmsDocument table to set newest = false
+                //NOTE: This is only relevant when a new version is created, which is why its done inside this if-statement.
+                var documentDtos = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND newest = @IsNewest", new { Id = entity.Id, IsNewest = true });
+                foreach (var documentDto in documentDtos)
+                {
+                    var docDto = documentDto;
+                    docDto.Newest = false;
+                    Database.Update(docDto);
+                }
 
-            //Create the Document specific data for this version - cmsDocument
-            //Assumes a new Version guid has been generated
-            Database.Insert(dto);
+                //Create a new version - cmsContentVersion
+                //Assumes a new Version guid and Version date (modified date) has been set
+                Database.Insert(contentVersionDto);
+                //Create the Document specific data for this version - cmsDocument
+                //Assumes a new Version guid has been generated
+                Database.Insert(dto);
+            }
+            else
+            {
+                //In order to update the ContentVersion we need to retreive its primary key id
+                var contentVerDto = Database.SingleOrDefault<ContentVersionDto>("WHERE VersionId = @Version", new { Version = entity.Version });
+                contentVersionDto.Id = contentVerDto.Id;
+
+                Database.Update(contentVersionDto);
+                Database.Update(dto);
+            }
 
             //Create the PropertyData for this version - cmsPropertyData
             var propertyFactory = new PropertyFactory(((Content)entity).ContentType, entity.Version, entity.Id);
@@ -290,7 +311,14 @@ namespace Umbraco.Core.Persistence.Repositories
             //Add Properties
             foreach (var propertyDataDto in propertyDataDtos)
             {
-                Database.Insert(propertyDataDto);
+                if (hasPublishedStateChanged == false && propertyDataDto.Id > 0)
+                {
+                    Database.Update(propertyDataDto);
+                }
+                else
+                {
+                    Database.Insert(propertyDataDto);
+                }
             }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();

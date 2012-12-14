@@ -291,8 +291,14 @@ namespace umbraco.cms.presentation
                 }
             }
 
-
-
+            //The value of the properties has been set on IData through IDataEditor in the ContentControl
+            //so we need to 'retrieve' that value and set it on the property of the new IContent object.
+            //NOTE This is a workaround for the legacy approach to saving values through the DataType instead of the Property 
+            //- (The DataType shouldn't be responsible for saving the value - especically directly to the db).
+            foreach (var item in cControl.DataTypes)
+            {
+                _document.Content.SetValue(item.Key, item.Value.Data.Value);
+            }
 
             // Run Handler				
             BusinessLogic.Actions.Action.RunActionHandlers(_document, ActionUpdate.Instance);

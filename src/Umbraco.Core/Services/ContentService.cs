@@ -517,7 +517,7 @@ namespace Umbraco.Core.Services
                 if(omitCacheRefresh == false)
                     _publishingStrategy.UnPublishingFinalized(content);
 
-                Audit.Add(AuditTypes.Publish, "UnPublish performed by user", userId == -1 ? 0 : userId, content.Id);
+                Audit.Add(AuditTypes.UnPublish, "UnPublish performed by user", userId == -1 ? 0 : userId, content.Id);
             }
 
             return unpublished;
@@ -588,12 +588,14 @@ namespace Umbraco.Core.Services
 
                 //Publish and then update the database with new status
                 bool published = _publishingStrategy.Publish(content, userId);
+
+                //Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
+                SetWriter(content, userId);
+                repository.AddOrUpdate(content);
+                _unitOfWork.Commit();
+
                 if (published)
                 {
-                    SetWriter(content, userId);
-                    repository.AddOrUpdate(content);
-                    _unitOfWork.Commit();
-
                     var xml = content.ToXml();
                     var poco = new ContentXmlDto{NodeId = content.Id, Xml = xml.ToString(SaveOptions.None)};
                     var exists = DatabaseContext.Current.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new {Id = content.Id}) != null;
@@ -633,7 +635,11 @@ namespace Umbraco.Core.Services
                 var repository = _contentRepository;
 
                 SetWriter(content, userId);
-				content.ChangePublishedState(false);
+
+                //Only change the publish state if the "previous" version was actually published
+                if(content.Published)
+				    content.ChangePublishedState(false);
+
                 repository.AddOrUpdate(content);
                 _unitOfWork.Commit();
 
@@ -669,7 +675,11 @@ namespace Umbraco.Core.Services
                     foreach (var content in contents)
                     {
                         SetWriter(content, userId);
-						content.ChangePublishedState(false);
+                        
+                        //Only change the publish state if the "previous" version was actually published
+                        if (content.Published)
+                            content.ChangePublishedState(false);
+
                         repository.AddOrUpdate(content);
                         _unitOfWork.Commit();
                     }
@@ -716,7 +726,11 @@ namespace Umbraco.Core.Services
                 foreach (var content in contents)
                 {
                     SetWriter(content.Value, userId);
-					content.Value.ChangePublishedState(false);
+                    
+                    //Only change the publish state if the "previous" version was actually published
+                    if (content.Value.Published)
+                        content.Value.ChangePublishedState(false);
+
                     repository.AddOrUpdate(content.Value);
                     _unitOfWork.Commit();
                 }

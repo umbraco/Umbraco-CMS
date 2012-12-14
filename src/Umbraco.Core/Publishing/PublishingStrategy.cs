@@ -62,18 +62,6 @@ namespace Umbraco.Core.Publishing
                     string.Format("Content '{0}' with Id '{1}' has been published.",
                                   content.Name, content.Id));
 
-                //Fire Published event
-                //OnPublished(content, e);
-
-                //NOTE: Ideally the xml cache should be refreshed here - as part of the publishing
-                //but the updated content hasn't been saved yet
-                //Consider creating a method in the PublishingStrategy that is called when updating a content-being-publishing item is final
-                //and thus more legit to fire the OnPublished event
-                //PublishingFinalized(IContent content) { OnPublished(content, new PublishingEventArgs()); }
-                //PublishingFinalized(IEnumerable<IContent> content) { OnPublished(content, new PublishingEventArgs()); }
-                //UnPublishingFinalized(IContent content) { OnUnPublished(content, new PublishingEventArgs()); }
-                //UnPublishingFinalized(IEnumerable<IContent> content) { OnUnPublished(content, new PublishingEventArgs()); }
-
                 return true;
             }
 
@@ -132,15 +120,7 @@ namespace Umbraco.Core.Publishing
                 LogHelper.Info<PublishingStrategy>(
                     string.Format("Content '{0}' with Id '{1}' has been published.",
                                   item.Name, item.Id));
-
-                //Fire Published event
-                //OnPublished(item, e);
             }
-
-            //OnPublished(content, e);
-
-            //NOTE: Ideally the xml cache should be refreshed here - as part of the publishing
-            //OnCacheContentAfterPublish(content, e)
 
             return true;
         }
@@ -176,13 +156,6 @@ namespace Umbraco.Core.Publishing
                 LogHelper.Info<PublishingStrategy>(
                     string.Format("Content '{0}' with Id '{1}' has been unpublished.",
                                   content.Name, content.Id));
-
-                //Fire UnPublishing event
-                //OnUnPublished(content, e);
-
-                //NOTE: Ideally the xml cache should be refreshed here - as part of the unpublishing
-                //OnRemoveCacheContentAfterPublish(content, e)
-
                 return true;
             }
 
@@ -223,14 +196,7 @@ namespace Umbraco.Core.Publishing
                 LogHelper.Info<PublishingStrategy>(
                     string.Format("Content '{0}' with Id '{1}' has been unpublished.",
                                   item.Name, item.Id));
-
-                //Fire AfterUnPublish event
-                //OnUnPublished(item, e);
             }
-
-            //OnUnPublished(content, e);
-
-            //NOTE: Ideally the xml cache should be refreshed here - as part of the publishing
 
             return true;
         }

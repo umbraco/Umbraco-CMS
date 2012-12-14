@@ -126,7 +126,7 @@ namespace Umbraco.Core.Persistence.Factories
         {
             //TODO: Change this once the Language property is public on IContent
             var content = entity as Content;
-            var nodeName = content == null ? entity.Name : content.NodeName;
+            var nodeName = content != null && string.IsNullOrEmpty(content.NodeName) == false ? content.NodeName : entity.Name;
 
             var nodeDto = new NodeDto
                               {

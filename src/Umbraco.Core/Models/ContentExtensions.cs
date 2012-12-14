@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Xml.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
@@ -116,7 +117,8 @@ namespace Umbraco.Core.Models
                                    new XAttribute("urlName", niceUrl),//Format Url ?
                                    new XAttribute("writerName", content.GetWriterProfile().Name),
                                    new XAttribute("creatorName", content.GetCreatorProfile().Name),
-                                   new XAttribute("path", content.Path));
+                                   new XAttribute("path", content.Path),
+                                   new XAttribute("isDoc", ""));
 
             foreach (var property in content.Properties)
             {
