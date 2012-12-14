@@ -26,39 +26,11 @@ namespace Umbraco.Core
 	    private bool _configured;
         private string _connectionString;
         private string _providerName;
-		//private static readonly object Locker = new object();
-		//private static DatabaseContext _databaseContext;
-
-		//#region Singleton
-
-		///// <summary>
-		///// Gets the current Database Context.
-		///// </summary>
-		//public static DatabaseContext Current
-		//{
-		//	get
-		//	{
-		//		if (_databaseContext == null)
-		//			throw new InvalidOperationException("The DatabaseContext hasn't been initialized. Ensure that the CoreBootManager has been used to boot the application");
-		//		return _databaseContext;
-		//	}
-		//	internal set
-		//	{
-		//		lock(Locker)
-		//		{
-		//			_databaseContext = value;
-		//		}
-		//	}
-		//}
-
-		//#endregion
 
 		internal DatabaseContext(IDatabaseFactory factory)
         {
 	        _factory = factory;
         }
-
-	    
 
         /// <summary>
         /// Gets the <see cref="Database"/> object for doing CRUD operations

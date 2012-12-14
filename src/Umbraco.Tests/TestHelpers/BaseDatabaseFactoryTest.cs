@@ -7,7 +7,6 @@ using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
