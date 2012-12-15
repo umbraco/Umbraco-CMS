@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence
 	/// </summary>
 	/// <remarks>
 	/// If we are running in an http context
-	/// it will create on per context, otherwise it will a global singleton object which is NOT thread safe
+	/// it will create one per context, otherwise it will be a global singleton object which is NOT thread safe
 	/// since we need (at least) a new instance of the database object per thread.
 	/// </remarks>
 	internal class DefaultDatabaseFactory : DisposableObject, IDatabaseFactory
