@@ -23,38 +23,18 @@ namespace Umbraco.Tests.Services
     /// as well as configuration.
     /// </summary>
     [TestFixture, RequiresSTA]
-    public class ContentServiceTests : BaseDatabaseFactoryTest
+    public class ContentServiceTests : BaseServiceTest
     {
         [SetUp]
         public override void Initialize()
         {
-
-            //this ensures its reset
-            PluginManager.Current = new PluginManager();
-
-            //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-            PluginManager.Current.AssembliesToScan = new[]
-				{
-                    typeof(IDataType).Assembly,
-                    typeof(tinyMCE3dataType).Assembly
-				};
-
-            DataTypesResolver.Current = new DataTypesResolver(
-                PluginManager.Current.ResolveDataTypes());
-
-            base.Initialize();
-
-            CreateTestData();
+	        base.Initialize();
         }
 		
 		[TearDown]
 		public override void TearDown()
-		{
-            //reset the app context
-            DataTypesResolver.Reset();
-            PluginManager.Current = null;
-
-			base.TearDown();
+		{   
+      		base.TearDown();
 		}
 
         //TODO Add test to verify there is only ONE newest document/content in cmsDocument table after updating.
@@ -570,7 +550,10 @@ namespace Umbraco.Tests.Services
             contentService.Save(hierarchy, 0);
 
             Assert.That(hierarchy.Any(), Is.True);
-            Assert.That(hierarchy.Any(x => x.Value.HasIdentity == false), Is.False);
+			Assert.That(hierarchy.Any(x => x.HasIdentity == false), Is.False);
+			//all parent id's should be ok, they are lazy and if they equal zero an exception will be thrown
+			Assert.DoesNotThrow(() => hierarchy.Any(x => x.ParentId != 0));
+
         }
 
         [Test]
@@ -724,47 +707,17 @@ namespace Umbraco.Tests.Services
             Assert.That(c2.Value.ParentId > 0, Is.True);
         }
 
-        public void CreateTestData()
-        {
-            //NOTE Maybe not the best way to create/save test data as we are using the services, which are being tested.
-
-            //Create and Save ContentType "umbTextpage" -> 1045
-            ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
-            contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
-            ServiceContext.ContentTypeService.Save(contentType);
-
-            //Create and Save Content "Homepage" based on "umbTextpage" -> 1046
-            Content textpage = MockedContent.CreateSimpleContent(contentType);
-            textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
-            ServiceContext.ContentService.Save(textpage, 0);
-
-            //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1047
-            Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
-            subpage.ReleaseDate = DateTime.UtcNow.AddMinutes(-5);
-            subpage.ChangePublishedState(false);
-            ServiceContext.ContentService.Save(subpage, 0);
-
-            //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1048
-            Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
-            ServiceContext.ContentService.Save(subpage2, 0);
-
-            //Create and Save Content "Text Page Deleted" based on "umbTextpage" -> 1049
-            Content trashed = MockedContent.CreateSimpleContent(contentType, "Text Page Deleted", -20);
-            trashed.Trashed = true;
-            ServiceContext.ContentService.Save(trashed, 0);
-        }
-
-        private IEnumerable<Lazy<IContent>> CreateContentHierarchy()
+		private IEnumerable<IContent> CreateContentHierarchy()
         {
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
             var root = ServiceContext.ContentService.GetById(1046);
 
-            var list = new List<Lazy<IContent>>();
+			var list = new List<IContent>();
 
             for (int i = 0; i < 10; i++)
             {
-                var content = new Lazy<IContent>(
-                    () => MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Page " + i, root.Id));
+				var content = MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Page " + i, root);
+
                 list.Add(content);
                 list.AddRange(CreateChildrenOf(contentType, content, 4));
 
@@ -774,12 +727,12 @@ namespace Umbraco.Tests.Services
             return list;
         }
 
-        private IEnumerable<Lazy<IContent>> CreateChildrenOf(IContentType contentType, Lazy<IContent> content, int depth)
+		private IEnumerable<IContent> CreateChildrenOf(IContentType contentType, IContent content, int depth)
         {
-            var list = new List<Lazy<IContent>>();
+            var list = new List<IContent>();
             for (int i = 0; i < depth; i++)
             {
-                var c = new Lazy<IContent>(() => MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage " + i, content.Value.Id));
+				var c = MockedContent.CreateSimpleContent(contentType, "Hierarchy Simple Text Subpage " + i, content);
                 list.Add(c);
 
                 Console.WriteLine("Created: 'Hierarchy Simple Text Subpage {0}' - Depth: {1}", i, depth);

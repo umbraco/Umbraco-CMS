@@ -736,46 +736,6 @@ namespace Umbraco.Core.Services
 			}
 		}
 
-		/// <summary>
-		/// Saves a collection of lazy loaded <see cref="IContent"/> objects.
-		/// </summary>
-		/// <remarks>
-		/// This method ensures that Content is saved lazily, so a new graph of <see cref="IContent"/>
-		/// objects can be saved in bulk. But note that objects are saved one at a time to ensure Ids.
-		/// </remarks>
-		/// <param name="contents">Collection of Lazy <see cref="IContent"/> to save</param>
-		/// <param name="userId">Optional Id of the User saving the Content</param>
-		public void Save(IEnumerable<Lazy<IContent>> contents, int userId = -1)
-		{
-			if (CollectionSaving.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable>(contents), this))
-				return;
-
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateContentRepository(uow))
-			{				
-				foreach (var content in contents)
-				{
-					if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content.Value), this)) 
-						continue;
-
-					SetWriter(content.Value, userId);
-                        
-					//Only change the publish state if the "previous" version was actually published
-					if (content.Value.Published)
-						content.Value.ChangePublishedState(false);
-
-					repository.AddOrUpdate(content.Value);
-					uow.Commit();
-
-					Saved.RaiseEvent(new SaveEventArgs<IContent>(content.Value, false), this);
-				}
-
-				CollectionSaved.RaiseEvent(new SaveEventArgs<IEnumerable>(contents, false), this);
-					
-				Audit.Add(AuditTypes.Save, "Bulk Save (lazy) content performed by user", userId == -1 ? 0 : userId, -1);
-			}
-		}
-
 	    /// <summary>
 	    /// Deletes all content of specified type. All children of deleted content is moved to Recycle Bin.
 	    /// </summary>

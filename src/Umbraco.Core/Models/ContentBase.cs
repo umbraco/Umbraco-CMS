@@ -41,7 +41,22 @@ namespace Umbraco.Core.Models
             Version = Guid.NewGuid();
         }
 
-        private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Name);
+		protected ContentBase(IContentBase parent, IContentTypeComposition contentType, PropertyCollection properties)
+		{
+			Mandate.ParameterNotNull(parent, "parent");
+			Mandate.ParameterNotNull(contentType, "contentType");
+			Mandate.ParameterNotNull(properties, "properties");
+
+			_parentId = new Lazy<int>(() => parent.Id);
+
+			_contentTypeId = int.Parse(contentType.Id.ToString(CultureInfo.InvariantCulture));
+			ContentTypeBase = contentType;
+			_properties = properties;
+			_properties.EnsurePropertyTypes(PropertyTypes);
+			Version = Guid.NewGuid();
+		}
+
+	    private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Name);
         private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ParentId);
         private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.SortOrder);
         private static readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.Level);
@@ -63,7 +78,15 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual int ParentId
         {
-            get { return _parentId.Value; }
+            get
+            {
+	            var val = _parentId.Value;
+				if (val == 0)
+				{
+					throw new InvalidOperationException("The ParentId cannot be a value of 0. Perhaps the parent object used to instantiate this object has not been persisted to the data store.");
+				}
+				return val;
+            }
             set
             {
                 _parentId = new Lazy<int>(() => value);
