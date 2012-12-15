@@ -139,7 +139,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the ContentType</param>
         public void Save(IEnumerable<IContentType> contentTypes, int userId = -1)
         {
-	        if (CollectionSaving.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable>(contentTypes), this)) 
+	        if (SavingContentTypeCollection.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable<IContentType>>(contentTypes), this)) 
 				return;
 	        
 			var uow = _uowProvider.GetUnitOfWork();
@@ -154,7 +154,7 @@ namespace Umbraco.Core.Services
 				//save it all in one go
 				uow.Commit();
 
-		        CollectionSaved.RaiseEvent(new SaveEventArgs<IEnumerable>(contentTypes, false), this);
+		        SavedContentTypeCollection.RaiseEvent(new SaveEventArgs<IEnumerable<IContentType>>(contentTypes, false), this);
 	        }
 
 	        Audit.Add(AuditTypes.Save, string.Format("Save ContentTypes performed by user"), userId == -1 ? 0 : userId, -1);
@@ -317,7 +317,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user savging the MediaTypes</param>
         public void Save(IEnumerable<IMediaType> mediaTypes, int userId = -1)
         {
-			if (CollectionSaving.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable>(mediaTypes), this))
+			if (SavingMediaTypeCollection.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable<IMediaType>>(mediaTypes), this))
 				return;
 
 			var uow = _uowProvider.GetUnitOfWork();
@@ -333,7 +333,7 @@ namespace Umbraco.Core.Services
 				//save it all in one go
 				uow.Commit();
 
-				CollectionSaved.RaiseEvent(new SaveEventArgs<IEnumerable>(mediaTypes, false), this);
+				SavedMediaTypeCollection.RaiseEvent(new SaveEventArgs<IEnumerable<IMediaType>>(mediaTypes, false), this);
 			}
 
 			Audit.Add(AuditTypes.Save, string.Format("Save MediaTypes performed by user"), userId == -1 ? 0 : userId, -1);
@@ -538,12 +538,22 @@ namespace Umbraco.Core.Services
 		/// <summary>
 		/// Occurs before saving a collection
 		/// </summary>
-		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IEnumerable>> CollectionSaving;
+		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IEnumerable<IContentType>>> SavingContentTypeCollection;
 
 		/// <summary>
 		/// Occurs after saving a collection
 		/// </summary>
-		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IEnumerable>> CollectionSaved;
+		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IEnumerable<IContentType>>> SavedContentTypeCollection;
+
+		/// <summary>
+		/// Occurs before saving a collection
+		/// </summary>
+		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IEnumerable<IMediaType>>> SavingMediaTypeCollection;
+
+		/// <summary>
+		/// Occurs after saving a collection
+		/// </summary>
+		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IEnumerable<IMediaType>>> SavedMediaTypeCollection;
 
         #endregion
     }

@@ -365,7 +365,7 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 			{
-				if (CollectionSaving.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable>(medias), this))
+				if (SavingCollection.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable<IMedia>>(medias), this))
 					return;
 
 				foreach (var media in medias)
@@ -377,7 +377,7 @@ namespace Umbraco.Core.Services
 				//commit the whole lot in one go
 				uow.Commit();
 				
-				CollectionSaved.RaiseEvent(new SaveEventArgs<IEnumerable>(medias, false), this);
+				SavedCollection.RaiseEvent(new SaveEventArgs<IEnumerable<IMedia>>(medias, false), this);
 
 				Audit.Add(AuditTypes.Save, "Save Media items performed by user", userId == -1 ? 0 : userId, -1);
 			}			
@@ -447,12 +447,12 @@ namespace Umbraco.Core.Services
 		/// <summary>
 		/// Occurs before saving a collection
 		/// </summary>
-		public static event TypedEventHandler<IMediaService, SaveEventArgs<IEnumerable>> CollectionSaving;
+		public static event TypedEventHandler<IMediaService, SaveEventArgs<IEnumerable<IMedia>>> SavingCollection;
 
 		/// <summary>
 		/// Occurs after saving a collection
 		/// </summary>
-		public static event TypedEventHandler<IMediaService, SaveEventArgs<IEnumerable>> CollectionSaved;
+		public static event TypedEventHandler<IMediaService, SaveEventArgs<IEnumerable<IMedia>>> SavedCollection;
 
 		/// <summary>
 		/// Occurs before Create

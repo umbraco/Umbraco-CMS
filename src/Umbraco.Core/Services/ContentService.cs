@@ -696,7 +696,7 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Optional Id of the User saving the Content</param>
 		public void Save(IEnumerable<IContent> contents, int userId = -1)
 		{
-			if (CollectionSaving.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable>(contents), this))
+			if (SavingCollection.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable<IContent>>(contents), this))
 				return;
 
 			var uow = _uowProvider.GetUnitOfWork();
@@ -730,7 +730,7 @@ namespace Umbraco.Core.Services
 				//Commit everything in one go
 				uow.Commit();
 
-				CollectionSaved.RaiseEvent(new SaveEventArgs<IEnumerable>(contents, false), this);
+				SavedCollection.RaiseEvent(new SaveEventArgs<IEnumerable<IContent>>(contents, false), this);
 
 				Audit.Add(AuditTypes.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, -1);
 			}
@@ -1300,12 +1300,12 @@ namespace Umbraco.Core.Services
 		/// <summary>
 		/// Occurs before saving a collection
 		/// </summary>
-		public static event TypedEventHandler<IContentService, SaveEventArgs<IEnumerable>> CollectionSaving;
+		public static event TypedEventHandler<IContentService, SaveEventArgs<IEnumerable<IContent>>> SavingCollection;
 
 		/// <summary>
 		/// Occurs after saving a collection
 		/// </summary>
-		public static event TypedEventHandler<IContentService, SaveEventArgs<IEnumerable>> CollectionSaved;
+		public static event TypedEventHandler<IContentService, SaveEventArgs<IEnumerable<IContent>>> SavedCollection;
 
 		/// <summary>
 		/// Occurs before Create
