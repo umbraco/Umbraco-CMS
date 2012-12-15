@@ -18,9 +18,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 
 		private Guid _key;
 		private readonly List<Operation> _operations = new List<Operation>();
-		private readonly Transaction _transaction;
-		private bool _committed = false;
-
 
 		/// <summary>
 		/// Creates a new unit of work instance
@@ -34,7 +31,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 			Database = database;
 			_key = Guid.NewGuid();
 			InstanceId = Guid.NewGuid();
-			_transaction = Database.GetTransaction();
 		}
 
 		/// <summary>
@@ -91,34 +87,37 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		/// <summary>
 		/// Commits all batched changes within the scope of a PetaPoco transaction <see cref="Transaction"/>
 		/// </summary>
+		/// <remarks>
+		/// Unlike a typical unit of work, this UOW will let you commit more than once since a new transaction is creaed per
+		/// Commit() call instead of having one Transaction per UOW. 
+		/// </remarks>
 		public void Commit()
 		{
-			if (_committed)
+			
+			using (var transaction = Database.GetTransaction())
 			{
-				throw new InvalidOperationException("Cannot has already been called for this unit of work");
-			}
-
-			foreach (var operation in _operations.OrderBy(o => o.ProcessDate))
-			{
-				switch (operation.Type)
+				foreach (var operation in _operations.OrderBy(o => o.ProcessDate))
 				{
-					case TransactionType.Insert:
-						operation.Repository.PersistNewItem(operation.Entity);
-						break;
-					case TransactionType.Delete:
-						operation.Repository.PersistDeletedItem(operation.Entity);
-						break;
-					case TransactionType.Update:
-						operation.Repository.PersistUpdatedItem(operation.Entity);
-						break;
+					switch (operation.Type)
+					{
+						case TransactionType.Insert:
+							operation.Repository.PersistNewItem(operation.Entity);
+							break;
+						case TransactionType.Delete:
+							operation.Repository.PersistDeletedItem(operation.Entity);
+							break;
+						case TransactionType.Update:
+							operation.Repository.PersistUpdatedItem(operation.Entity);
+							break;
+					}
 				}
+				transaction.Complete();	
 			}
-			_transaction.Complete();
+			
 
 			// Clear everything
 			_operations.Clear();
 			_key = Guid.NewGuid();
-			_committed = true;
 		}
 
 		public object Key
@@ -171,9 +170,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		protected override void DisposeResources()
 		{
 			_operations.Clear();
-			_transaction.Dispose();
-			//ensure the local object will be gargabe collected
-			Database = null;
 		}
 	}
 }

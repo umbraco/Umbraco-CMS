@@ -5,6 +5,7 @@ using System.IO;
 using System.Web.Routing;
 using System.Xml;
 using NUnit.Framework;
+using SQLCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.ObjectResolution;
@@ -74,23 +75,25 @@ namespace Umbraco.Tests.TestHelpers
         public virtual void TearDown()
         {
 			DatabaseContext.Database.Dispose();
+			//reset the app context            
+			ApplicationContext.ApplicationCache.ClearAllCache();           
+			
+			//legacy API database connection close
+			SqlCeContextGuardian.CloseBackgroundConnection();
+			
+			ApplicationContext.Current = null;
+			Resolution.IsFrozen = false;
+			RepositoryResolver.Reset();
 
             TestHelper.CleanContentDirectories();
-
-            //reset the app context            
-			ApplicationContext.ApplicationCache.ClearAllCache();
-            ApplicationContext.Current = null;
-            Resolution.IsFrozen = false;
-
-            RepositoryResolver.Reset();
-
+			
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
             string filePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
             if (File.Exists(filePath))
             {
-                //File.Delete(filePath);
+                File.Delete(filePath);
             }
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -11,6 +12,8 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using umbraco.editorControls.tinyMCE3;
+using umbraco.interfaces;
 
 namespace Umbraco.Tests.Services
 {
@@ -26,17 +29,17 @@ namespace Umbraco.Tests.Services
         public override void Initialize()
         {
             //this ensures its reset
-            //PluginManager.Current = new PluginManager();
+            PluginManager.Current = new PluginManager();
 
             //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-            /*PluginManager.Current.AssembliesToScan = new[]
+            PluginManager.Current.AssembliesToScan = new[]
 				{
                     typeof(IDataType).Assembly,
                     typeof(tinyMCE3dataType).Assembly
 				};
 
             DataTypesResolver.Current = new DataTypesResolver(
-                PluginManager.Current.ResolveDataTypes());*/
+                PluginManager.Current.ResolveDataTypes());
 
             base.Initialize();
 
@@ -47,8 +50,8 @@ namespace Umbraco.Tests.Services
 		public override void TearDown()
 		{
             //reset the app context
-            //DataTypesResolver.Reset();
-            //PluginManager.Current = null;
+            DataTypesResolver.Reset();
+            PluginManager.Current = null;
 
 			base.TearDown();
 		}
