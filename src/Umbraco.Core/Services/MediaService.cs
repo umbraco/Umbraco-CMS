@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -340,19 +341,16 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 			{
-				var e = new SaveEventArgs();
-				if (Saving != null)
-					Saving(media, e);
 
-				if (!e.Cancel)
-				{
-					SetUser(media, userId);
-					repository.AddOrUpdate(media);
-					uow.Commit();
+				if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(media), this))
+					return;
 
-					if (Saved != null)
-						Saved(media, e);
-				}
+				SetUser(media, userId);
+				repository.AddOrUpdate(media);
+				uow.Commit();
+
+				Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this);
+
 				Audit.Add(AuditTypes.Save, "Save Media performed by user", media.CreatorId, media.Id);
 			}			
 		}
@@ -367,24 +365,24 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 			{
-				var e = new SaveEventArgs();
-				if (Saving != null)
-					Saving(medias, e);
+				if (CollectionSaving.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable>(medias), this))
+					return;
 
-				if (!e.Cancel)
+				foreach (var media in medias)
 				{
-					foreach (var media in medias)
-					{
-						SetUser(media, userId);
-						repository.AddOrUpdate(media);
-					}
+					if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(media), this))
+						continue;
+
+					SetUser(media, userId);
+					repository.AddOrUpdate(media);
 					uow.Commit();
 
-					if (Saved != null)
-						Saved(medias, e);
-
-					Audit.Add(AuditTypes.Save, "Save Media items performed by user", userId == -1 ? 0 : userId, -1);
+					Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this);
 				}
+				
+				CollectionSaved.RaiseEvent(new SaveEventArgs<IEnumerable>(medias, false), this);
+
+				Audit.Add(AuditTypes.Save, "Save Media items performed by user", userId == -1 ? 0 : userId, -1);
 			}			
 		}
 
@@ -442,12 +440,22 @@ namespace Umbraco.Core.Services
 		/// <summary>
 		/// Occurs before Save
 		/// </summary>
-		public static event EventHandler<SaveEventArgs> Saving;
+		public static event TypedEventHandler<IMediaService, SaveEventArgs<IMedia>> Saving;
 
 		/// <summary>
 		/// Occurs after Save
 		/// </summary>
-		public static event EventHandler<SaveEventArgs> Saved;
+		public static event TypedEventHandler<IMediaService, SaveEventArgs<IMedia>> Saved;
+
+		/// <summary>
+		/// Occurs before saving a collection
+		/// </summary>
+		public static event TypedEventHandler<IMediaService, SaveEventArgs<IEnumerable>> CollectionSaving;
+
+		/// <summary>
+		/// Occurs after saving a collection
+		/// </summary>
+		public static event TypedEventHandler<IMediaService, SaveEventArgs<IEnumerable>> CollectionSaved;
 
 		/// <summary>
 		/// Occurs before Create

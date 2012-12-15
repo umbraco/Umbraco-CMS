@@ -104,25 +104,20 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Id of the user issueing the save</param>
         public void Save(IDataTypeDefinition dataTypeDefinition, int userId = -1)
         {
-            var e = new SaveEventArgs();
-            if (Saving != null)
-                Saving(dataTypeDefinition, e);
+	        if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this)) 
+				return;
+	        
+			var uow = _uowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow))
+	        {
+		        dataTypeDefinition.CreatorId = userId > -1 ? userId : 0;
+		        repository.AddOrUpdate(dataTypeDefinition);
+		        uow.Commit();
 
-            if (!e.Cancel)
-            {
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow))
-                {
-                    dataTypeDefinition.CreatorId = userId > -1 ? userId : 0;
-                    repository.AddOrUpdate(dataTypeDefinition);
-                    uow.Commit();
+		        Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this);
+	        }
 
-                    if (Saved != null)
-                        Saved(dataTypeDefinition, e);
-                }
-
-                Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition performed by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
-            }
+	        Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition performed by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
         }
 
         /// <summary>
@@ -212,12 +207,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        public static event EventHandler<SaveEventArgs> Saving;
+		public static event TypedEventHandler<IDataTypeService, SaveEventArgs<IDataTypeDefinition>> Saving;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        public static event EventHandler<SaveEventArgs> Saved;
+		public static event TypedEventHandler<IDataTypeService, SaveEventArgs<IDataTypeDefinition>> Saved;
         #endregion
     }
 }

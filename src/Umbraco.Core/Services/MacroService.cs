@@ -114,24 +114,19 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user deleting the macro</param>
         public void Save(IMacro macro, int userId = -1)
         {
-            var e = new SaveEventArgs();
-            if (Saving != null)
-                Saving(macro, e);
+	        if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMacro>(macro), this)) 
+				return;
+	        
+			var uow = _uowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateMacroRepository(uow))
+	        {
+		        repository.AddOrUpdate(macro);
+		        uow.Commit();
 
-            if (!e.Cancel)
-            {
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateMacroRepository(uow))
-                {
-                    repository.AddOrUpdate(macro);
-                    uow.Commit();
+		        Saved.RaiseEvent(new SaveEventArgs<IMacro>(macro, false), this);
+	        }
 
-                    if (Saved != null)
-                        Saved(macro, e);
-                }
-
-                Audit.Add(AuditTypes.Save, "Save Macro performed by user", userId > -1 ? userId : 0, -1);
-            }
+	        Audit.Add(AuditTypes.Save, "Save Macro performed by user", userId > -1 ? userId : 0, -1);
         }
 
         /// <summary>
@@ -167,12 +162,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        public static event EventHandler<SaveEventArgs> Saving;
+		public static event TypedEventHandler<IMacroService, SaveEventArgs<IMacro>> Saving;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        public static event EventHandler<SaveEventArgs> Saved;
+		public static event TypedEventHandler<IMacroService, SaveEventArgs<IMacro>> Saved;
         #endregion
     }
 }

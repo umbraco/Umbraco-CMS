@@ -120,6 +120,10 @@
     <Compile Include="Events\ContentCacheEventArgs.cs" />
     <Compile Include="Events\CopyEventArgs.cs" />
     <Compile Include="Events\DeleteEventArgs.cs" />
+    <Compile Include="Events\CancellableObjectEventArgs.cs" />
+    <Compile Include="Events\EventExtensions.cs" />
+    <Compile Include="Events\ICancellableObjectEventArgs.cs" />
+    <Compile Include="Events\TypedEventHandler.cs" />
     <Compile Include="Events\PublishingEventArgs.cs" />
     <Compile Include="Events\MoveEventArgs.cs" />
     <Compile Include="Events\NewEventArgs.cs" />

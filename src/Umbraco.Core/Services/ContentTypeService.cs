@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -114,26 +115,21 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the ContentType</param>
         public void Save(IContentType contentType, int userId = -1)
         {
-            var e = new SaveEventArgs();
-            if (Saving != null)
-                Saving(contentType, e);
+	        if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(contentType), this)) 
+				return;
+	        
+			var uow = _uowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
+	        {
+		        SetUser(contentType, userId);
+		        repository.AddOrUpdate(contentType);
 
-            if (!e.Cancel)
-            {
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
-                {
-                    SetUser(contentType, userId);
-                    repository.AddOrUpdate(contentType);
+		        uow.Commit();
 
-                    uow.Commit();
+				SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(contentType, false), this);
+	        }
 
-                    if (Saved != null)
-                        Saved(contentType, e);
-                }
-
-                Audit.Add(AuditTypes.Save, string.Format("Save ContentType performed by user"), userId == -1 ? 0 : userId, contentType.Id);
-            }
+	        Audit.Add(AuditTypes.Save, string.Format("Save ContentType performed by user"), userId == -1 ? 0 : userId, contentType.Id);
         }
 
         /// <summary>
@@ -143,29 +139,28 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the ContentType</param>
         public void Save(IEnumerable<IContentType> contentTypes, int userId = -1)
         {
-            var e = new SaveEventArgs();
-            if (Saving != null)
-                Saving(contentTypes, e);
+	        if (CollectionSaving.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable>(contentTypes), this)) 
+				return;
+	        
+			var uow = _uowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
+	        {
+		        foreach (var contentType in contentTypes)
+		        {
+					if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(contentType), this))
+						continue;
 
-            if (!e.Cancel)
-            {
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
-                {
-                    foreach (var contentType in contentTypes)
-                    {
-                        SetUser(contentType, userId);
-                        repository.AddOrUpdate(contentType);
-                    }
+			        SetUser(contentType, userId);
+			        repository.AddOrUpdate(contentType);
+					uow.Commit();
 
-                    uow.Commit();
+					SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(contentType, false), this);
+		        }
 
-                    if (Saved != null)
-                        Saved(contentTypes, e);
-                }
+		        CollectionSaved.RaiseEvent(new SaveEventArgs<IEnumerable>(contentTypes, false), this);
+	        }
 
-                Audit.Add(AuditTypes.Save, string.Format("Save ContentTypes performed by user"), userId == -1 ? 0 : userId, -1);
-            }
+	        Audit.Add(AuditTypes.Save, string.Format("Save ContentTypes performed by user"), userId == -1 ? 0 : userId, -1);
         }
 
         /// <summary>
@@ -179,28 +174,28 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User saving the ContentTypes</param>
         public void Save(IEnumerable<Lazy<IContentType>> contentTypes, int userId = -1)
         {
-            var e = new SaveEventArgs();
-            if (Saving != null)
-                Saving(contentTypes, e);
+	        if (CollectionSaving.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable>(contentTypes), this)) 
+				return;
+	        
+			var uow = _uowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
+	        {
+		        foreach (var content in contentTypes)
+		        {
+					if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(content.Value), this))
+						continue;
 
-            if (!e.Cancel)
-            {
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
-                {
-                    foreach (var content in contentTypes)
-                    {
-                        content.Value.CreatorId = 0;
-                        repository.AddOrUpdate(content.Value);
-                        uow.Commit();
-                    }
+			        content.Value.CreatorId = 0;
+			        repository.AddOrUpdate(content.Value);
+			        uow.Commit();
 
-                    if (Saved != null)
-                        Saved(contentTypes, e);
-                }
+					SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(content.Value, false), this);
+		        }
 
-                Audit.Add(AuditTypes.Save, string.Format("Save (lazy) ContentTypes performed by user"), userId == -1 ? 0 : userId, -1);
-            }
+		        CollectionSaved.RaiseEvent(new SaveEventArgs<IEnumerable>(contentTypes, false), this);
+	        }
+
+	        Audit.Add(AuditTypes.Save, string.Format("Save (lazy) ContentTypes performed by user"), userId == -1 ? 0 : userId, -1);
         }
 
         /// <summary>
@@ -337,26 +332,20 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user saving the MediaType</param>
         public void Save(IMediaType mediaType, int userId = -1)
         {
-            var e = new SaveEventArgs();
-            if (Saving != null)
-                Saving(mediaType, e);
+	        if (SavingMediaType.IsRaisedEventCancelled(new SaveEventArgs<IMediaType>(mediaType), this)) 
+				return;
+	        
+			var uow = _uowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
+	        {
+		        SetUser(mediaType, userId);
+		        repository.AddOrUpdate(mediaType);
+		        uow.Commit();
 
-            if (!e.Cancel)
-            {
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
-                {
-                    SetUser(mediaType, userId);
-                    repository.AddOrUpdate(mediaType);
-                    uow.Commit();
+				SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(mediaType, false), this);
+	        }
 
-
-                    if (Saved != null)
-                        Saved(mediaType, e);
-                }
-
-                Audit.Add(AuditTypes.Save, string.Format("Save MediaType performed by user"), userId == -1 ? 0 : userId, mediaType.Id);
-            }
+	        Audit.Add(AuditTypes.Save, string.Format("Save MediaType performed by user"), userId == -1 ? 0 : userId, mediaType.Id);
         }
 
         /// <summary>
@@ -366,29 +355,29 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user savging the MediaTypes</param>
         public void Save(IEnumerable<IMediaType> mediaTypes, int userId = -1)
         {
-            var e = new SaveEventArgs();
-            if (Saving != null)
-                Saving(mediaTypes, e);
+			if (CollectionSaving.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable>(mediaTypes), this))
+				return;
 
-            if (!e.Cancel)
-            {
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
-                {
+			var uow = _uowProvider.GetUnitOfWork();
+			using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
+			{
 
-                    foreach (var mediaType in mediaTypes)
-                    {
-                        SetUser(mediaType, userId);
-                        repository.AddOrUpdate(mediaType);
-                    }
-                    uow.Commit();
+				foreach (var mediaType in mediaTypes)
+				{
+					if (SavingMediaType.IsRaisedEventCancelled(new SaveEventArgs<IMediaType>(mediaType), this))
+						return;
+					
+					SetUser(mediaType, userId);
+					repository.AddOrUpdate(mediaType);
+					uow.Commit();
 
-                    if (Saved != null)
-                        Saved(mediaTypes, e);
-                }
+					SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(mediaType, false), this);
+				}
 
-                Audit.Add(AuditTypes.Save, string.Format("Save MediaTypes performed by user"), userId == -1 ? 0 : userId, -1);
-            }
+				CollectionSaved.RaiseEvent(new SaveEventArgs<IEnumerable>(mediaTypes, false), this);
+			}
+
+			Audit.Add(AuditTypes.Save, string.Format("Save MediaTypes performed by user"), userId == -1 ? 0 : userId, -1);
         }
 
         /// <summary>
@@ -569,12 +558,34 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        public static event EventHandler<SaveEventArgs> Saving;
+		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IContentType>> SavingContentType;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        public static event EventHandler<SaveEventArgs> Saved;
+		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IContentType>> SavedContentType;
+
+		/// <summary>
+		/// Occurs before Save
+		/// </summary>
+		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IMediaType>> SavingMediaType;
+
+		/// <summary>
+		/// Occurs after Save
+		/// </summary>
+		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IMediaType>> SavedMediaType;
+
+
+		/// <summary>
+		/// Occurs before saving a collection
+		/// </summary>
+		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IEnumerable>> CollectionSaving;
+
+		/// <summary>
+		/// Occurs after saving a collection
+		/// </summary>
+		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IEnumerable>> CollectionSaved;
+
         #endregion
     }
 }

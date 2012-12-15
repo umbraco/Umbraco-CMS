@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -603,64 +604,56 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
-				var e = new SaveEventArgs();
-				if (Saving != null)
-					Saving(content, e);
+				if (!Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
+					return false;
 
-				if (!e.Cancel)
+				//Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
+				if (content.ParentId != -1 && content.ParentId != -20 && HasPublishedVersion(content.ParentId) == false)
 				{
-					//Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
-                    if (content.ParentId != -1 && content.ParentId != -20 && HasPublishedVersion(content.ParentId) == false)
-					{
-						LogHelper.Info<ContentService>(
-							string.Format(
-								"Content '{0}' with Id '{1}' could not be published because its parent is not published.",
-								content.Name, content.Id));
-						return false;
-					}
-
-					//Content contains invalid property values and can therefore not be published - fire event?
-					if (!content.IsValid())
-					{
-						LogHelper.Info<ContentService>(
-							string.Format(
-								"Content '{0}' with Id '{1}' could not be published because of invalid properties.",
-								content.Name, content.Id));
-						return false;
-					}
-
-					//Publish and then update the database with new status
-					bool published = _publishingStrategy.Publish(content, userId);
-
-                    //Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
-                    SetWriter(content, userId);
-                    repository.AddOrUpdate(content);
-                    uow.Commit();
-
-                    if (published)
-                    {
-                        var xml = content.ToXml();
-                        var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
-                        var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = content.Id }) != null;
-                        int result = exists
-                                         ? uow.Database.Update(poco)
-                                         : Convert.ToInt32(uow.Database.Insert(poco));
-
-                        //Save xml to db and call following method to fire event through PublishingStrategy to update cache
-                        if (omitCacheRefresh == false)
-                            _publishingStrategy.PublishingFinalized(content);
-                    }
-
-					if (Saved != null)
-						Saved(content, e);
-
-					Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId == -1 ? 0 : userId, content.Id);
-
-					return published;
+					LogHelper.Info<ContentService>(
+						string.Format(
+							"Content '{0}' with Id '{1}' could not be published because its parent is not published.",
+							content.Name, content.Id));
+					return false;
 				}
 
+				//Content contains invalid property values and can therefore not be published - fire event?
+				if (!content.IsValid())
+				{
+					LogHelper.Info<ContentService>(
+						string.Format(
+							"Content '{0}' with Id '{1}' could not be published because of invalid properties.",
+							content.Name, content.Id));
+					return false;
+				}
 
-				return false;
+				//Publish and then update the database with new status
+				bool published = _publishingStrategy.Publish(content, userId);
+
+				//Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
+				SetWriter(content, userId);
+				repository.AddOrUpdate(content);
+				uow.Commit();
+
+				if (published)
+				{
+					var xml = content.ToXml();
+					var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
+					var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = content.Id }) != null;
+					int result = exists
+									 ? uow.Database.Update(poco)
+									 : Convert.ToInt32(uow.Database.Insert(poco));
+
+					//Save xml to db and call following method to fire event through PublishingStrategy to update cache
+					if (omitCacheRefresh == false)
+						_publishingStrategy.PublishingFinalized(content);
+				}
+
+				Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
+
+				Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId == -1 ? 0 : userId, content.Id);
+
+				return published;
 			}
 		}
 
@@ -674,26 +667,21 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
-				var e = new SaveEventArgs();
-				if (Saving != null)
-					Saving(content, e);
+				if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this)) 
+					return;
+				
+				SetWriter(content, userId);
 
-				if (!e.Cancel)
-				{
-					SetWriter(content, userId);
+				//Only change the publish state if the "previous" version was actually published
+				if (content.Published)
+					content.ChangePublishedState(false);
 
-                    //Only change the publish state if the "previous" version was actually published
-                    if (content.Published)
-                        content.ChangePublishedState(false);
+				repository.AddOrUpdate(content);
+				uow.Commit();
 
-					repository.AddOrUpdate(content);
-					uow.Commit();
-
-					if (Saved != null)
-						Saved(content, e);
-
-                    Audit.Add(AuditTypes.Save, "Save Content performed by user", userId == -1 ? 0 : userId, content.Id);
-				}
+				Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
+					
+				Audit.Add(AuditTypes.Save, "Save Content performed by user", userId == -1 ? 0 : userId, content.Id);
 			}
 		}
 
@@ -713,44 +701,46 @@ namespace Umbraco.Core.Services
 			{
 				var containsNew = contents.Any(x => x.HasIdentity == false);
 
-				var e = new SaveEventArgs();
-				if (Saving != null)
-					Saving(contents, e);
-
-				if (!e.Cancel)
+				if (CollectionSaving.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable>(contents), this)) 
+					return;
+				
+				if (containsNew)
 				{
-					if (containsNew)
+					foreach (var content in contents)
 					{
-						foreach (var content in contents)
-						{
-							SetWriter(content, userId);
-                            
-                            //Only change the publish state if the "previous" version was actually published
-                            if (content.Published)
-                                content.ChangePublishedState(false);
+						if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
+							continue;
+							
+						SetWriter(content, userId);
 
-							repository.AddOrUpdate(content);
-							uow.Commit();
-						}
-					}
-					else
-					{
-						foreach (var content in contents)
-						{
-							if (Saving != null)
-								Saving(content, e);
+						//Only change the publish state if the "previous" version was actually published
+						if (content.Published)
+							content.ChangePublishedState(false);
 
-							SetWriter(content, userId);
-							repository.AddOrUpdate(content);
-						}
+						repository.AddOrUpdate(content);
 						uow.Commit();
+
+						Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
 					}
-
-					if (Saved != null)
-						Saved(contents, e);
-
-					Audit.Add(AuditTypes.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, -1);
 				}
+				else
+				{
+					foreach (var content in contents)
+					{
+						if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
+							continue;
+
+						SetWriter(content, userId);
+						repository.AddOrUpdate(content);
+						uow.Commit();
+
+						Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
+					}
+				}
+
+				CollectionSaved.RaiseEvent(new SaveEventArgs<IEnumerable>(contents, false), this);
+
+				Audit.Add(AuditTypes.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, -1);
 			}
 		}
 
@@ -767,15 +757,14 @@ namespace Umbraco.Core.Services
 		{
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
-			{
-				var e = new SaveEventArgs();
-				if (Saving != null)
-					Saving(contents, e);
-
-				if (!e.Cancel)
+			{				
+				if (!CollectionSaving.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable>(contents), this))
 				{
 					foreach (var content in contents)
 					{
+						if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content.Value), this)) 
+							continue;
+
 						SetWriter(content.Value, userId);
                         
                         //Only change the publish state if the "previous" version was actually published
@@ -784,11 +773,12 @@ namespace Umbraco.Core.Services
 
 						repository.AddOrUpdate(content.Value);
 						uow.Commit();
+
+						Saved.RaiseEvent(new SaveEventArgs<IContent>(content.Value, false), this);
 					}
 
-					if (Saved != null)
-						Saved(contents, e);
-
+					CollectionSaved.RaiseEvent(new SaveEventArgs<IEnumerable>(contents, false), this);
+					
 					Audit.Add(AuditTypes.Save, "Bulk Save (lazy) content performed by user", userId == -1 ? 0 : userId, -1);
 				}
 			}
@@ -1348,12 +1338,22 @@ namespace Umbraco.Core.Services
 		/// <summary>
 		/// Occurs before Save
 		/// </summary>
-		public static event EventHandler<SaveEventArgs> Saving;
-
+		public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Saving;
+		
 		/// <summary>
 		/// Occurs after Save
 		/// </summary>
-		public static event EventHandler<SaveEventArgs> Saved;
+		public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Saved;
+
+		/// <summary>
+		/// Occurs before saving a collection
+		/// </summary>
+		public static event TypedEventHandler<IContentService, SaveEventArgs<IEnumerable>> CollectionSaving;
+
+		/// <summary>
+		/// Occurs after saving a collection
+		/// </summary>
+		public static event TypedEventHandler<IContentService, SaveEventArgs<IEnumerable>> CollectionSaved;
 
 		/// <summary>
 		/// Occurs before Create

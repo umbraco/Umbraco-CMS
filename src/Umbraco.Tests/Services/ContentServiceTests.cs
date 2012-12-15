@@ -28,6 +28,7 @@ namespace Umbraco.Tests.Services
         [SetUp]
         public override void Initialize()
         {
+
             //this ensures its reset
             PluginManager.Current = new PluginManager();
 
@@ -45,7 +46,7 @@ namespace Umbraco.Tests.Services
 
             CreateTestData();
         }
-
+		
 		[TearDown]
 		public override void TearDown()
 		{

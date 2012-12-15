@@ -138,25 +138,20 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the dictionary item</param>
         public void Save(IDictionaryItem dictionaryItem, int userId = -1)
         {
-            var e = new SaveEventArgs();
-            if (Saving != null)
-                Saving(dictionaryItem, e);
+	        if (SavingDictionaryItem.IsRaisedEventCancelled(new SaveEventArgs<IDictionaryItem>(dictionaryItem), this)) 
+				return;
+	        
+			var uow = _uowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateDictionaryRepository(uow))
+	        {
+		        repository.AddOrUpdate(dictionaryItem);
+		        uow.Commit();
 
-            if (!e.Cancel)
-            {
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateDictionaryRepository(uow))
-                {
-                    repository.AddOrUpdate(dictionaryItem);
-                    uow.Commit();
+		        SavedDictionaryItem.RaiseEvent(new SaveEventArgs<IDictionaryItem>(dictionaryItem, false), this);
+	        }
 
-                    if (Saved != null)
-                        Saved(dictionaryItem, e);
-                }
-
-                Audit.Add(AuditTypes.Save, "Save DictionaryItem performed by user", userId == -1 ? 0 : userId,
-                          dictionaryItem.Id);
-            }
+	        Audit.Add(AuditTypes.Save, "Save DictionaryItem performed by user", userId == -1 ? 0 : userId,
+	                  dictionaryItem.Id);
         }
 
         /// <summary>
@@ -237,24 +232,19 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the language</param>
         public void Save(ILanguage language, int userId = -1)
         {
-            var e = new SaveEventArgs();
-            if (Saving != null)
-                Saving(language, e);
+	        if (SavingLanguage.IsRaisedEventCancelled(new SaveEventArgs<ILanguage>(language), this)) 
+				return;
+	        
+			var uow = _uowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateLanguageRepository(uow))
+	        {
+		        repository.AddOrUpdate(language);
+		        uow.Commit();
 
-            if (!e.Cancel)
-            {
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateLanguageRepository(uow))
-                {
-                    repository.AddOrUpdate(language);
-                    uow.Commit();
+		        SavedLanguage.RaiseEvent(new SaveEventArgs<ILanguage>(language, false), this);
+	        }
 
-                    if (Saved != null)
-                        Saved(language, e);
-                }
-
-                Audit.Add(AuditTypes.Save, "Save Language performed by user", userId == -1 ? 0 : userId, language.Id);
-            }
+	        Audit.Add(AuditTypes.Save, "Save Language performed by user", userId == -1 ? 0 : userId, language.Id);
         }
 
         /// <summary>
@@ -299,12 +289,22 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        public static event EventHandler<SaveEventArgs> Saving;
+		public static event TypedEventHandler<ILocalizationService, SaveEventArgs<IDictionaryItem>> SavingDictionaryItem;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        public static event EventHandler<SaveEventArgs> Saved;
+		public static event TypedEventHandler<ILocalizationService, SaveEventArgs<IDictionaryItem>> SavedDictionaryItem;
+
+		/// <summary>
+		/// Occurs before Save
+		/// </summary>
+		public static event TypedEventHandler<ILocalizationService, SaveEventArgs<ILanguage>> SavingLanguage;
+
+		/// <summary>
+		/// Occurs after Save
+		/// </summary>
+		public static event TypedEventHandler<ILocalizationService, SaveEventArgs<ILanguage>> SavedLanguage;
         #endregion
     }
 }

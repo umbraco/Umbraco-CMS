@@ -65,24 +65,19 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void SaveStylesheet(Stylesheet stylesheet, int userId = -1)
         {
-            var e = new SaveEventArgs();
-            if (Saving != null)
-                Saving(stylesheet, e);
+	        if (SavingStylesheet.IsRaisedEventCancelled(new SaveEventArgs<Stylesheet>(stylesheet), this)) 
+				return;
+	        
+			var uow = _fileUowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateStylesheetRepository(uow))
+	        {
+		        repository.AddOrUpdate(stylesheet);
+		        uow.Commit();
 
-            if (!e.Cancel)
-            {
-                var uow = _fileUowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateStylesheetRepository(uow))
-                {
-                    repository.AddOrUpdate(stylesheet);
-                    uow.Commit();
+		        SavedStylesheet.RaiseEvent(new SaveEventArgs<Stylesheet>(stylesheet, false), this);
+	        }
 
-                    if (Saved != null)
-                        Saved(stylesheet, e);
-                }
-
-                Audit.Add(AuditTypes.Save, string.Format("Save Stylesheet performed by user"), userId == -1 ? 0 : userId, -1);
-            }
+	        Audit.Add(AuditTypes.Save, string.Format("Save Stylesheet performed by user"), userId == -1 ? 0 : userId, -1);
         }
 
         /// <summary>
@@ -156,24 +151,19 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void SaveScript(Script script, int userId = -1)
         {
-            var e = new SaveEventArgs();
-            if (Saving != null)
-                Saving(script, e);
+	        if (SavingScript.IsRaisedEventCancelled(new SaveEventArgs<Script>(script), this)) 
+				return;
+	        
+			var uow = _fileUowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateScriptRepository(uow))
+	        {
+		        repository.AddOrUpdate(script);
+		        uow.Commit();
 
-            if (!e.Cancel)
-            {
-                var uow = _fileUowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateScriptRepository(uow))
-                {
-                    repository.AddOrUpdate(script);
-                    uow.Commit();
+		        SavedScript.RaiseEvent(new SaveEventArgs<Script>(script, false), this);
+	        }
 
-                    if (Saved != null)
-                        Saved(script, e);
-                }
-
-                Audit.Add(AuditTypes.Save, string.Format("Save Script performed by user"), userId == -1 ? 0 : userId, -1);
-            }
+	        Audit.Add(AuditTypes.Save, string.Format("Save Script performed by user"), userId == -1 ? 0 : userId, -1);
         }
 
         /// <summary>
@@ -248,24 +238,19 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void SaveTemplate(ITemplate template, int userId = -1)
         {
-            var e = new SaveEventArgs();
-            if (Saving != null)
-                Saving(template, e);
+	        if (SavingTemplate.IsRaisedEventCancelled(new SaveEventArgs<ITemplate>(template), this)) 
+				return;
+	        
+			var uow = _dataUowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateTemplateRepository(uow))
+	        {
+		        repository.AddOrUpdate(template);
+		        uow.Commit();
 
-            if (!e.Cancel)
-            {
-                var uow = _dataUowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateTemplateRepository(uow))
-                {
-                    repository.AddOrUpdate(template);
-                    uow.Commit();
+		        SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(template, false), this);
+	        }
 
-                    if (Saved != null)
-                        Saved(template, e);
-                }
-
-                Audit.Add(AuditTypes.Save, string.Format("Save Template performed by user"), userId == -1 ? 0 : userId, template.Id);
-            }
+	        Audit.Add(AuditTypes.Save, string.Format("Save Template performed by user"), userId == -1 ? 0 : userId, template.Id);
         }
 
         /// <summary>
@@ -324,12 +309,33 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        public static event EventHandler<SaveEventArgs> Saving;
+		public static event TypedEventHandler<IFileService, SaveEventArgs<ITemplate>> SavingTemplate;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        public static event EventHandler<SaveEventArgs> Saved;
+		public static event TypedEventHandler<IFileService, SaveEventArgs<ITemplate>> SavedTemplate;
+
+		/// <summary>
+		/// Occurs before Save
+		/// </summary>
+		public static event TypedEventHandler<IFileService, SaveEventArgs<Script>> SavingScript;
+
+		/// <summary>
+		/// Occurs after Save
+		/// </summary>
+		public static event TypedEventHandler<IFileService, SaveEventArgs<Script>> SavedScript;
+
+		/// <summary>
+		/// Occurs before Save
+		/// </summary>
+		public static event TypedEventHandler<IFileService, SaveEventArgs<Stylesheet>> SavingStylesheet;
+
+		/// <summary>
+		/// Occurs after Save
+		/// </summary>
+		public static event TypedEventHandler<IFileService, SaveEventArgs<Stylesheet>> SavedStylesheet;
+
         #endregion
     }
 }
