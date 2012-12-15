@@ -55,7 +55,7 @@ namespace Umbraco.Core.Persistence.Caching
 
         public void Save(Type type, IEntity entity)
         {
-            var key = GetCompositeId(type, entity.Key);
+            var key = GetCompositeId(type, entity.Id);
             var exists = _memoryCache.GetCacheItem(key) != null;
 
             _keyTracker.TryAdd(key, key);
@@ -71,7 +71,7 @@ namespace Umbraco.Core.Persistence.Caching
         public void Delete(Type type, IEntity entity)
         {
             string throwaway = null;
-            var key = GetCompositeId(type, entity.Key);
+            var key = GetCompositeId(type, entity.Id);
             var keyBeSure = _keyTracker.TryGetValue(key, out throwaway);
             object itemRemoved = _memoryCache.Remove(key);
             _keyTracker.TryRemove(key, out throwaway);
@@ -80,6 +80,11 @@ namespace Umbraco.Core.Persistence.Caching
         private string GetCompositeId(Type type, Guid id)
         {
             return string.Format("{0}-{1}", type.Name, id.ToString());
+        }
+
+        private string GetCompositeId(Type type, int id)
+        {
+            return string.Format("{0}-{1}", type.Name, id.ToGuid());
         }
     }
 }

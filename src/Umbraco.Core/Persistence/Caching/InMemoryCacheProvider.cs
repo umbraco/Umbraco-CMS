@@ -78,7 +78,7 @@ namespace Umbraco.Core.Persistence.Caching
         /// <param name="entity"></param>
         public void Save(Type type, IEntity entity)
         {
-            _cache.AddOrUpdate(GetCompositeId(type, entity.Key), entity, (x, y) => entity);
+            _cache.AddOrUpdate(GetCompositeId(type, entity.Id), entity, (x, y) => entity);
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace Umbraco.Core.Persistence.Caching
         public void Delete(Type type, IEntity entity)
         {
             IEntity entity1;
-            bool result = _cache.TryRemove(GetCompositeId(type, entity.Key), out entity1);
+            bool result = _cache.TryRemove(GetCompositeId(type, entity.Id), out entity1);
         }
 
         public void Clear()
@@ -100,6 +100,11 @@ namespace Umbraco.Core.Persistence.Caching
         private string GetCompositeId(Type type, Guid id)
         {
             return string.Format("{0}-{1}", type.Name, id.ToString());
+        }
+
+        private string GetCompositeId(Type type, int id)
+        {
+            return string.Format("{0}-{1}", type.Name, id.ToGuid());
         }
     }
 }
