@@ -1,4 +1,3 @@
-using System;
 using System.Security.Permissions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -10,14 +9,13 @@ namespace Umbraco.Core.Events
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	[HostProtection(SecurityAction.LinkDemand, SharedState = true)]
-	public class CancellableObjectEventArgs<T> : EventArgs, ICancellableObjectEventArgs
+	public class CancellableObjectEventArgs<T> : CancellableEventArgs
 	{
-		private bool _cancel;
 
 		public CancellableObjectEventArgs(T entity, bool canCancel)
+			: base(canCancel)
 		{
 			Entity = entity;
-			CanCancel = canCancel;
 		}
 
 		public CancellableObjectEventArgs(T entity)
@@ -25,33 +23,6 @@ namespace Umbraco.Core.Events
 		{
 		}
 
-		/// <summary>
-		/// Flag to determine if this instance will support being cancellable
-		/// </summary>
-		public bool CanCancel { get; set; }
-
-		/// <summary>
-		/// If this instance supports cancellation, this gets/sets the cancel value
-		/// </summary>
-		public bool Cancel
-		{
-			get
-			{
-				if (!CanCancel)
-				{
-					throw new InvalidOperationException("This event argument class does not support cancelling.");
-				}
-				return _cancel;
-			}
-			set
-			{
-				if (!CanCancel)
-				{
-					throw new InvalidOperationException("This event argument class does not support cancelling.");
-				}
-				_cancel = value;
-			}
-		}
 
 		public T Entity { get; private set; }
 

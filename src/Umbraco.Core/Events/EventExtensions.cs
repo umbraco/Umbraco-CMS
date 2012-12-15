@@ -20,7 +20,7 @@ namespace Umbraco.Core.Events
 			this TypedEventHandler<TSender, TArgs> eventHandler,
 			TArgs args,
 			TSender sender)
-			where TArgs : ICancellableObjectEventArgs
+			where TArgs : CancellableEventArgs
 		{
 			if (eventHandler != null)
 				eventHandler(sender, args);
