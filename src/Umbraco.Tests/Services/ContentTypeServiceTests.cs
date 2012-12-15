@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Services
 		}
 
 		[Test]
-		public void Can_Bulk_Save_New_Hierarchy_Content()
+		public void Can_Bulk_Save_New_Hierarchy_Content_Types()
 		{
 			// Arrange
 			var contentTypeService = ServiceContext.ContentTypeService;
