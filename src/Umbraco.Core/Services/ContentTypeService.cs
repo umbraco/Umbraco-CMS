@@ -5,6 +5,7 @@ using System.Text;
 using System.Web;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;

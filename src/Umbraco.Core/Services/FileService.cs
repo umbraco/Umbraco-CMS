@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core.Auditing;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;

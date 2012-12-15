@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Xml.Linq;
 using Umbraco.Core.Auditing;
+using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;

@@ -1,6 +1,6 @@
-﻿namespace Umbraco.Core
+﻿namespace Umbraco.Core.Events
 {
-	
+
 	//Publishing Events
     public class PublishingEventArgs : System.ComponentModel.CancelEventArgs 
 	{
