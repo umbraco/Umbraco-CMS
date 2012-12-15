@@ -88,14 +88,14 @@ namespace Umbraco.Core.Services
 		            throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null",
 		                                              contentTypeAlias));
 		    }
-            
+
+            content = new Content(parentId, contentType);
             var e = new NewEventArgs { Alias = contentTypeAlias, ParentId = parentId };
 		    if (Creating != null)
 		        Creating(content, e);
 
 		    if (!e.Cancel)
 		    {
-		        content = new Content(parentId, contentType);
 		        SetUser(content, userId);
 		        SetWriter(content, userId);
 
@@ -136,7 +136,6 @@ namespace Umbraco.Core.Services
 				return contents.SingleOrDefault();
 			}
 		}
-
 
 		/// <summary>
 		/// Gets a collection of <see cref="IContent"/> objects by the Id of the <see cref="IContentType"/>
@@ -1369,7 +1368,11 @@ namespace Umbraco.Core.Services
 		/// <summary>
 		/// Occurs after Create
 		/// </summary>
-		public static event EventHandler<NewEventArgs> Created;
+        /// <remarks>
+        /// Please note that the Content object has been created, but not saved
+        /// so it does not have an identity yet (meaning no Id has been set).
+        /// </remarks>
+        public static event EventHandler<NewEventArgs> Created;
 
 		/// <summary>
 		/// Occurs before Copy
