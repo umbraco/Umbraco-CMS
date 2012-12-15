@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
@@ -37,8 +38,12 @@ namespace Umbraco.Core
 			_timer = DisposableTimer.Start(x => LogHelper.Info<CoreBootManager>("Umbraco application startup complete" + " (took " + x + "ms)"));
 
 			//create database and service contexts for the app context
-			var dbContext = new DatabaseContext(new DefaultDatabaseFactory());
-			var serviceContext = new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy());
+			var dbFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName);
+			var dbContext = new DatabaseContext(dbFactory);
+			var serviceContext = new ServiceContext(
+				new PetaPocoUnitOfWorkProvider(dbFactory), 
+				new FileUnitOfWorkProvider(), 
+				new PublishingStrategy());
 			
 			//create the ApplicationContext
 			ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext);

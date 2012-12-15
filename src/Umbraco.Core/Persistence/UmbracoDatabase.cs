@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using System.Data.Common;
 
@@ -13,6 +14,18 @@ namespace Umbraco.Core.Persistence
 	/// </remarks>
 	public class UmbracoDatabase : Database
 	{
+
+
+
+		private readonly Guid _instanceId = Guid.NewGuid();
+		/// <summary>
+		/// Used for testing
+		/// </summary>
+		internal Guid InstanceId
+		{
+			get { return _instanceId; }
+		}
+
 		public UmbracoDatabase(IDbConnection connection) : base(connection)
 		{
 		}

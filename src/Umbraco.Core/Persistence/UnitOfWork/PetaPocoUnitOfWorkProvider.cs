@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Configuration;
+﻿using System;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
@@ -7,37 +8,26 @@ namespace Umbraco.Core.Persistence.UnitOfWork
     /// </summary>
     public class PetaPocoUnitOfWorkProvider : IDatabaseUnitOfWorkProvider
     {
-        private readonly string _connectionString;
-        private readonly string _providerName;
+	    private readonly IDatabaseFactory _dbFactory;
 
         /// <summary>
-        /// Parameterless constructor
+        /// Parameterless constructor uses defaults
         /// </summary>
         public PetaPocoUnitOfWorkProvider()
+			: this(new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName))
         {
-            _connectionString = GlobalSettings.UmbracoConnectionName;
+            
         }
 
-        /// <summary>
-        /// Constructor to explicitly set the connectionstring to use
-        /// </summary>
-        /// <param name="connectionString">Connection String to use</param>
-        public PetaPocoUnitOfWorkProvider(string connectionString)
-        {
-            _connectionString = connectionString;
-        }
-
-        /// <summary>
-        /// Constructor to explicitly set the connectionstring and provider name to use,
-        /// which will avoid the lookup of any additional config settings.
-        /// </summary>
-        /// <param name="connectionString">Connection String to use</param>
-        /// <param name="providerName">Database Provider</param>
-        public PetaPocoUnitOfWorkProvider(string connectionString, string providerName)
-        {
-            _connectionString = connectionString;
-            _providerName = providerName;
-        }
+		/// <summary>
+		/// Constructor accepting an IDatabaseFactory instance
+		/// </summary>
+		/// <param name="dbFactory"></param>
+	    internal PetaPocoUnitOfWorkProvider(IDatabaseFactory dbFactory)
+	    {
+		    Mandate.ParameterNotNull(dbFactory, "dbFactory");
+		    _dbFactory = dbFactory;
+	    }
 
 	    #region Implementation of IUnitOfWorkProvider
 
@@ -52,10 +42,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		/// </remarks>
 	    public IDatabaseUnitOfWork GetUnitOfWork()
         {
-            var database = string.IsNullOrEmpty(_providerName)
-                               ? new UmbracoDatabase(_connectionString)
-                               : new UmbracoDatabase(_connectionString, _providerName);
-            return new PetaPocoUnitOfWork(database);
+            return new PetaPocoUnitOfWork(_dbFactory.CreateDatabase());
         }
 
         #endregion
@@ -66,7 +53,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		/// <returns></returns>
 		internal static IDatabaseUnitOfWork CreateUnitOfWork()
 		{
-            var provider = new PetaPocoUnitOfWorkProvider(GlobalSettings.UmbracoConnectionName);
+            var provider = new PetaPocoUnitOfWorkProvider();
 			return provider.GetUnitOfWork();
 		}
     }

@@ -53,16 +53,18 @@ namespace Umbraco.Core.Services
 
             if(HttpRuntime.Cache[cacheKey] == null)
             {
-                var uow = _uowProvider.GetUnitOfWork();
-                userId =
-					uow.Database.ExecuteScalar<int>(
-                        "select userID from umbracoUserLogins where contextID = @ContextId",
-                        new {ContextId = new Guid(contextId)});
+                using (var uow = _uowProvider.GetUnitOfWork())
+                {
+					userId =
+						uow.Database.ExecuteScalar<int>(
+							"select userID from umbracoUserLogins where contextID = @ContextId",
+							new { ContextId = new Guid(contextId) });
 
-                HttpRuntime.Cache.Insert(cacheKey, userId,
-                                         null,
-                                         System.Web.Caching.Cache.NoAbsoluteExpiration,
-                                         new TimeSpan(0, (int)(Umbraco.Core.Configuration.GlobalSettings.TimeOutInMinutes / 10), 0));
+					HttpRuntime.Cache.Insert(cacheKey, userId,
+											 null,
+											 System.Web.Caching.Cache.NoAbsoluteExpiration,
+											 new TimeSpan(0, (int)(Umbraco.Core.Configuration.GlobalSettings.TimeOutInMinutes / 10), 0));    
+                }                
             }
             else
             {

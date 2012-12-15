@@ -21,7 +21,7 @@ namespace Umbraco.Core.Services
         private LocalizationService _localizationService;
 
 		/// <summary>
-		/// Internal constructor used for unit tests
+		/// Constructor
 		/// </summary>
 		/// <param name="dbUnitOfWorkProvider"></param>
 		/// <param name="fileUnitOfWorkProvider"></param>

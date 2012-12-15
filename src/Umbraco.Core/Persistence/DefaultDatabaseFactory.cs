@@ -13,8 +13,41 @@ namespace Umbraco.Core.Persistence
 	/// </remarks>
 	internal class DefaultDatabaseFactory : DisposableObject, IDatabaseFactory
 	{
+		private readonly string _connectionString;
+		private readonly string _providerName;
 		private static volatile UmbracoDatabase _globalInstance = null;
 		private static readonly object Locker = new object();
+
+		/// <summary>
+		/// Default constructor initialized with the GlobalSettings.UmbracoConnectionName
+		/// </summary>
+		public DefaultDatabaseFactory() : this(GlobalSettings.UmbracoConnectionName)
+		{
+			
+		}
+
+		/// <summary>
+		/// Constructor accepting custom connection string
+		/// </summary>
+		/// <param name="connectionString"></param>
+		public DefaultDatabaseFactory(string connectionString)
+		{
+			Mandate.ParameterNotNullOrEmpty(connectionString, "connectionString");
+			_connectionString = connectionString;
+		}
+
+		/// <summary>
+		/// Constructor accepting custom connectino string and provider name
+		/// </summary>
+		/// <param name="connectionString"></param>
+		/// <param name="providerName"></param>
+		public DefaultDatabaseFactory(string connectionString, string providerName)
+		{
+			Mandate.ParameterNotNullOrEmpty(connectionString, "connectionString");
+			Mandate.ParameterNotNullOrEmpty(providerName, "providerName");
+			_connectionString = connectionString;
+			_providerName = providerName;
+		}
 
 		public UmbracoDatabase CreateDatabase()
 		{
@@ -28,7 +61,9 @@ namespace Umbraco.Core.Persistence
 						//double check
 						if (_globalInstance == null)
 						{
-							_globalInstance = new UmbracoDatabase(GlobalSettings.UmbracoConnectionName);
+							_globalInstance = string.IsNullOrEmpty(_providerName)
+								                  ? new UmbracoDatabase(_connectionString)
+								                  : new UmbracoDatabase(_connectionString, _providerName);
 						}
 					}
 				}
@@ -38,7 +73,10 @@ namespace Umbraco.Core.Persistence
 			//we have an http context, so only create one per request
 			if (!HttpContext.Current.Items.Contains(typeof(DefaultDatabaseFactory)))
 			{
-				HttpContext.Current.Items.Add(typeof(DefaultDatabaseFactory), new UmbracoDatabase(GlobalSettings.UmbracoConnectionName));
+				HttpContext.Current.Items.Add(typeof (DefaultDatabaseFactory),
+				                              string.IsNullOrEmpty(_providerName)
+					                              ? new UmbracoDatabase(_connectionString)
+					                              : new UmbracoDatabase(_connectionString, _providerName));
 			}
 			return (UmbracoDatabase)HttpContext.Current.Items[typeof(DefaultDatabaseFactory)];
 		}
