@@ -25,7 +25,7 @@ namespace Umbraco.Core.Events
 			if (eventHandler != null)
 				eventHandler(sender, args);
 
-			return !args.Cancel;
+			return args.Cancel;
 		}
 
 		/// <summary>

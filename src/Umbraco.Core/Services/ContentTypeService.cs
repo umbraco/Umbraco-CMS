@@ -147,15 +147,12 @@ namespace Umbraco.Core.Services
 	        {
 		        foreach (var contentType in contentTypes)
 		        {
-					if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(contentType), this))
-						continue;
-
 			        SetUser(contentType, userId);
-			        repository.AddOrUpdate(contentType);
-					uow.Commit();
-
-					SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(contentType, false), this);
+			        repository.AddOrUpdate(contentType);					
 		        }
+
+				//save it all in one go
+				uow.Commit();
 
 		        CollectionSaved.RaiseEvent(new SaveEventArgs<IEnumerable>(contentTypes, false), this);
 	        }
@@ -364,15 +361,12 @@ namespace Umbraco.Core.Services
 
 				foreach (var mediaType in mediaTypes)
 				{
-					if (SavingMediaType.IsRaisedEventCancelled(new SaveEventArgs<IMediaType>(mediaType), this))
-						return;
-					
 					SetUser(mediaType, userId);
-					repository.AddOrUpdate(mediaType);
-					uow.Commit();
-
-					SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(mediaType, false), this);
+					repository.AddOrUpdate(mediaType);					
 				}
+
+				//save it all in one go
+				uow.Commit();
 
 				CollectionSaved.RaiseEvent(new SaveEventArgs<IEnumerable>(mediaTypes, false), this);
 			}

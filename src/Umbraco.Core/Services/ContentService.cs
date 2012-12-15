@@ -604,7 +604,7 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
-				if (!Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
+				if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
 					return false;
 
 				//Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
@@ -696,20 +696,18 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Optional Id of the User saving the Content</param>
 		public void Save(IEnumerable<IContent> contents, int userId = -1)
 		{
+			if (CollectionSaving.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable>(contents), this))
+				return;
+
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
 				var containsNew = contents.Any(x => x.HasIdentity == false);
 
-				if (CollectionSaving.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable>(contents), this)) 
-					return;
-				
 				if (containsNew)
 				{
 					foreach (var content in contents)
 					{
-						if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
-							continue;
 							
 						SetWriter(content, userId);
 
@@ -717,26 +715,20 @@ namespace Umbraco.Core.Services
 						if (content.Published)
 							content.ChangePublishedState(false);
 
-						repository.AddOrUpdate(content);
-						uow.Commit();
-
-						Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
+						repository.AddOrUpdate(content);						
 					}
 				}
 				else
 				{
 					foreach (var content in contents)
 					{
-						if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
-							continue;
-
 						SetWriter(content, userId);
 						repository.AddOrUpdate(content);
-						uow.Commit();
-
-						Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
 					}
 				}
+
+				//Commit everything in one go
+				uow.Commit();
 
 				CollectionSaved.RaiseEvent(new SaveEventArgs<IEnumerable>(contents, false), this);
 
@@ -755,32 +747,32 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Optional Id of the User saving the Content</param>
 		public void Save(IEnumerable<Lazy<IContent>> contents, int userId = -1)
 		{
+			if (CollectionSaving.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable>(contents), this))
+				return;
+
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{				
-				if (!CollectionSaving.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable>(contents), this))
+				foreach (var content in contents)
 				{
-					foreach (var content in contents)
-					{
-						if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content.Value), this)) 
-							continue;
+					if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content.Value), this)) 
+						continue;
 
-						SetWriter(content.Value, userId);
+					SetWriter(content.Value, userId);
                         
-                        //Only change the publish state if the "previous" version was actually published
-                        if (content.Value.Published)
-                            content.Value.ChangePublishedState(false);
+					//Only change the publish state if the "previous" version was actually published
+					if (content.Value.Published)
+						content.Value.ChangePublishedState(false);
 
-						repository.AddOrUpdate(content.Value);
-						uow.Commit();
+					repository.AddOrUpdate(content.Value);
+					uow.Commit();
 
-						Saved.RaiseEvent(new SaveEventArgs<IContent>(content.Value, false), this);
-					}
-
-					CollectionSaved.RaiseEvent(new SaveEventArgs<IEnumerable>(contents, false), this);
-					
-					Audit.Add(AuditTypes.Save, "Bulk Save (lazy) content performed by user", userId == -1 ? 0 : userId, -1);
+					Saved.RaiseEvent(new SaveEventArgs<IContent>(content.Value, false), this);
 				}
+
+				CollectionSaved.RaiseEvent(new SaveEventArgs<IEnumerable>(contents, false), this);
+					
+				Audit.Add(AuditTypes.Save, "Bulk Save (lazy) content performed by user", userId == -1 ? 0 : userId, -1);
 			}
 		}
 

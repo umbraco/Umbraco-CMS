@@ -370,15 +370,12 @@ namespace Umbraco.Core.Services
 
 				foreach (var media in medias)
 				{
-					if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(media), this))
-						continue;
-
 					SetUser(media, userId);
-					repository.AddOrUpdate(media);
-					uow.Commit();
-
-					Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this);
+					repository.AddOrUpdate(media);					
 				}
+
+				//commit the whole lot in one go
+				uow.Commit();
 				
 				CollectionSaved.RaiseEvent(new SaveEventArgs<IEnumerable>(medias, false), this);
 
