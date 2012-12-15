@@ -221,7 +221,7 @@ namespace Umbraco.Core.Publishing
         /// <param name="isAllRepublished">Boolean indicating whether its all content that is republished</param>
         public override void PublishingFinalized(IEnumerable<IContent> content, bool isAllRepublished)
         {
-            OnPublished(content, new PublishingEventArgs { IsAllRepublished = isAllRepublished });
+			OnPublished(content, new PublishingEventArgs(isAllRepublished));
         }
 
         /// <summary>

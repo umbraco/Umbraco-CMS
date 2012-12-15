@@ -2,9 +2,21 @@
 {
 	
 	//Publishing Events
-    public class PublishingEventArgs : System.ComponentModel.CancelEventArgs {
-        public bool IsAllRepublished { get; set; }
+    public class PublishingEventArgs : System.ComponentModel.CancelEventArgs 
+	{
+	    public PublishingEventArgs()
+	    {
+		    IsAllRepublished = false;
+	    }
+
+	    public PublishingEventArgs(bool isAllPublished)
+	    {
+		    IsAllRepublished = isAllPublished;
+	    }
+
+        public bool IsAllRepublished { get; private set; }
     }
+
     public class SendToPublishEventArgs : System.ComponentModel.CancelEventArgs { }
 
     //Moving object Events
