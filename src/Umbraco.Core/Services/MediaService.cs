@@ -172,7 +172,7 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 			{
-				var query = Query<IMedia>.Builder.Where(x => x.ParentId == -20);
+				var query = Query<IMedia>.Builder.Where(x => x.ParentId == -21);
 				var medias = repository.GetByQuery(query);
 
 				return medias;
@@ -187,20 +187,15 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Id of the User moving the Media</param>
 		public void Move(IMedia media, int parentId, int userId = -1)
 		{
-			var e = new MoveEventArgs { ParentId = parentId };
-			if (Moving != null)
-				Moving(media, e);
+			if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, parentId), this))
+				return;
 
-			if (!e.Cancel)
-			{
-				media.ParentId = parentId;
-				Save(media, userId);
+			media.ParentId = parentId;
+			Save(media, userId);
 
-				if (Moved != null)
-					Moved(media, e);
+			Moved.RaiseEvent(new MoveEventArgs<IMedia>(media, false, parentId), this);
 
-				Audit.Add(AuditTypes.Move, "Move Media performed by user", userId == -1 ? 0 : userId, media.Id);
-			}
+			Audit.Add(AuditTypes.Move, "Move Media performed by user", userId == -1 ? 0 : userId, media.Id);
 		}
 
 		/// <summary>
@@ -212,24 +207,19 @@ namespace Umbraco.Core.Services
 		{
 			//TODO If media item has children those should also be moved to the recycle bin as well
 
+			if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, -21), this))
+				return;
+
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 			{
-				var e = new MoveEventArgs { ParentId = -20 };
-				if (Trashing != null)
-					Trashing(media, e);
+				((Core.Models.Media)media).ChangeTrashedState(true);
+				repository.AddOrUpdate(media);
+				uow.Commit();
 
-				if (!e.Cancel)
-				{				
-					((Core.Models.Media)media).ChangeTrashedState(true);
-					repository.AddOrUpdate(media);
-					uow.Commit();
+				Trashed.RaiseEvent(new MoveEventArgs<IMedia>(media, false, -21), this);
 
-					if (Trashed != null)
-						Trashed(media, e);
-
-					Audit.Add(AuditTypes.Move, "Move Media to Recycle Bin performed by user", userId == -1 ? 0 : userId, media.Id);
-				}
+				Audit.Add(AuditTypes.Move, "Move Media to Recycle Bin performed by user", userId == -1 ? 0 : userId, media.Id);
 			}			
 		}
 
@@ -241,7 +231,7 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 			{
-				var query = Query<IMedia>.Builder.Where(x => x.ParentId == -20);
+				var query = Query<IMedia>.Builder.Where(x => x.ParentId == -21);
 				var contents = repository.GetByQuery(query);
 
 				foreach (var content in contents)
@@ -250,7 +240,7 @@ namespace Umbraco.Core.Services
 				}
 				uow.Commit();
 
-				Audit.Add(AuditTypes.Delete, "Empty Recycle Bin performed by user", 0, -20);
+				Audit.Add(AuditTypes.Delete, "Empty Recycle Bin performed by user", 0, -21);
 			}
 		}
 
@@ -460,22 +450,22 @@ namespace Umbraco.Core.Services
 		/// <summary>
 		/// Occurs before Content is moved to Recycle Bin
 		/// </summary>
-		public static event EventHandler<MoveEventArgs> Trashing;
+		public static event TypedEventHandler<IMediaService, MoveEventArgs<IMedia>> Trashing;		
 
 		/// <summary>
 		/// Occurs after Content is moved to Recycle Bin
 		/// </summary>
-		public static event EventHandler<MoveEventArgs> Trashed;
+		public static event TypedEventHandler<IMediaService, MoveEventArgs<IMedia>> Trashed;
 
 		/// <summary>
 		/// Occurs before Move
 		/// </summary>
-		public static event EventHandler<MoveEventArgs> Moving;
+		public static event TypedEventHandler<IMediaService, MoveEventArgs<IMedia>> Moving;
 
 		/// <summary>
 		/// Occurs after Move
 		/// </summary>
-		public static event EventHandler<MoveEventArgs> Moved;
+		public static event TypedEventHandler<IMediaService, MoveEventArgs<IMedia>> Moved;
 		#endregion
 	}
 }

@@ -914,38 +914,33 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Optional Id of the User deleting the Content</param>
 		public void MoveToRecycleBin(IContent content, int userId = -1)
 		{
+			if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, -20), this))
+				return;
+
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
-				var e = new MoveEventArgs { ParentId = -20 };
-				if (Trashing != null)
-					Trashing(content, e);
-
-				if (!e.Cancel)
+				//Make sure that published content is unpublished before being moved to the Recycle Bin
+				if (HasPublishedVersion(content.Id))
 				{
-                    //Make sure that published content is unpublished before being moved to the Recycle Bin
-                    if (HasPublishedVersion(content.Id))
-                    {
-                        UnPublish(content, userId);
-                    }
-
-                    //Move children to Recycle Bin before the 'possible parent' is moved there
-                    var children = GetChildren(content.Id);
-                    foreach (var child in children)
-                    {
-                        MoveToRecycleBin(child, userId);
-                    }
-
-                    SetWriter(content, userId);
-                    content.ChangeTrashedState(true);
-                    repository.AddOrUpdate(content);
-                    uow.Commit();
-
-					if (Trashed != null)
-						Trashed(content, e);
-
-					Audit.Add(AuditTypes.Move, "Move Content to Recycle Bin performed by user", userId == -1 ? 0 : userId, content.Id);
+					UnPublish(content, userId);
 				}
+
+				//Move children to Recycle Bin before the 'possible parent' is moved there
+				var children = GetChildren(content.Id);
+				foreach (var child in children)
+				{
+					MoveToRecycleBin(child, userId);
+				}
+
+				SetWriter(content, userId);
+				content.ChangeTrashedState(true);
+				repository.AddOrUpdate(content);
+				uow.Commit();
+
+				Trashed.RaiseEvent(new MoveEventArgs<IContent>(content, false, -20), this);
+
+				Audit.Add(AuditTypes.Move, "Move Content to Recycle Bin performed by user", userId == -1 ? 0 : userId, content.Id);
 			}
 		}
 
@@ -964,39 +959,35 @@ namespace Umbraco.Core.Services
 		{
             //TODO Verify that SortOrder + Path is updated correctly
             //TODO Add a check to see if parentId = -20 because then we should change the TrashState
-			var e = new MoveEventArgs { ParentId = parentId };
-			if (Moving != null)
-				Moving(content, e);
+			
+			if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, parentId), this)) 
+				return;
+			
+			SetWriter(content, userId);
 
-			if (!e.Cancel)
+			//If Content is being moved away from Recycle Bin, its state should be un-trashed
+			if (content.Trashed && parentId != -20)
 			{
-				SetWriter(content, userId);
-
-				//If Content is being moved away from Recycle Bin, its state should be un-trashed
-				if (content.Trashed && parentId != -20)
-				{
-					content.ChangeTrashedState(false, parentId);
-				}
-				else
-				{
-					content.ParentId = parentId;
-				}
-
-				//If Content is published, it should be (re)published from its new location
-				if (content.Published)
-				{
-					SaveAndPublish(content, userId);
-				}
-				else
-				{
-					Save(content, userId);
-				}
-
-				if (Moved != null)
-					Moved(content, e);
-
-				Audit.Add(AuditTypes.Move, "Move Content performed by user", userId == -1 ? 0 : userId, content.Id);
+				content.ChangeTrashedState(false, parentId);
 			}
+			else
+			{
+				content.ParentId = parentId;
+			}
+
+			//If Content is published, it should be (re)published from its new location
+			if (content.Published)
+			{
+				SaveAndPublish(content, userId);
+			}
+			else
+			{
+				Save(content, userId);
+			}
+
+			Moved.RaiseEvent(new MoveEventArgs<IContent>(content, false, parentId), this);
+
+			Audit.Add(AuditTypes.Move, "Move Content performed by user", userId == -1 ? 0 : userId, content.Id);
 		}
 
 		/// <summary>
@@ -1324,22 +1315,22 @@ namespace Umbraco.Core.Services
 		/// <summary>
 		/// Occurs before Content is moved to Recycle Bin
 		/// </summary>
-		public static event EventHandler<MoveEventArgs> Trashing;
+		public static event TypedEventHandler<IContentService, MoveEventArgs<IContent>> Trashing;
 
 		/// <summary>
 		/// Occurs after Content is moved to Recycle Bin
 		/// </summary>
-		public static event EventHandler<MoveEventArgs> Trashed;
+		public static event TypedEventHandler<IContentService, MoveEventArgs<IContent>> Trashed;
 
 		/// <summary>
 		/// Occurs before Move
 		/// </summary>
-		public static event EventHandler<MoveEventArgs> Moving;
+		public static event TypedEventHandler<IContentService, MoveEventArgs<IContent>> Moving;
 
 		/// <summary>
 		/// Occurs after Move
 		/// </summary>
-		public static event EventHandler<MoveEventArgs> Moved;
+		public static event TypedEventHandler<IContentService, MoveEventArgs<IContent>> Moved;
 
 		/// <summary>
 		/// Occurs before Rollback
