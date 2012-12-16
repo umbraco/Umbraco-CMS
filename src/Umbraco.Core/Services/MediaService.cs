@@ -252,6 +252,8 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Optional id of the user deleting the media</param>
 		public void DeleteMediaOfType(int mediaTypeId, int userId = -1)
 		{
+			//TODO: Do we need another event DeletingMediaOfType ?
+
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 			{
@@ -261,25 +263,22 @@ namespace Umbraco.Core.Services
 				var query = Query<IMedia>.Builder.Where(x => x.ContentTypeId == mediaTypeId);
 				var contents = repository.GetByQuery(query);
 
-				var e = new DeleteEventArgs { Id = mediaTypeId };
-				if (Deleting != null)
-					Deleting(contents, e);
+				//TODO: We shouldn't raise events here, I think we should be doing the same thing as the ContentService and
+				// performing the move to the recycle bin before deleting the parent content
 
-				if (!e.Cancel)
+				//var e = new DeleteEventArgs { Id = mediaTypeId };
+				//if (Deleting != null)
+				//	Deleting(contents, e);
+
+				foreach (var content in contents)
 				{
-					foreach (var content in contents)
-					{
-						((Core.Models.Media)content).ChangeTrashedState(true);
-						repository.AddOrUpdate(content);
-					}
-
-					uow.Commit();
-
-					if (Deleted != null)
-						Deleted(contents, e);
-
-					Audit.Add(AuditTypes.Delete, "Delete Media items by Type performed by user", userId == -1 ? 0 : userId, -1);
+					((Core.Models.Media)content).ChangeTrashedState(true);
+					repository.AddOrUpdate(content);
 				}
+
+				uow.Commit();
+
+				Audit.Add(AuditTypes.Delete, "Delete Media items by Type performed by user", userId == -1 ? 0 : userId, -1);
 			}			
 		}
 
@@ -294,23 +293,18 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Id of the User deleting the Media</param>
 		public void Delete(IMedia media, int userId = -1)
 		{
+			if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMedia>(media), this))
+				return;
+
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 			{
-				var e = new DeleteEventArgs { Id = media.Id };
-				if (Deleting != null)
-					Deleting(media, e);
+				repository.Delete(media);
+				uow.Commit();
 
-				if (!e.Cancel)
-				{
-					repository.Delete(media);
-					uow.Commit();
+				Deleted.RaiseEvent(new DeleteEventArgs<IMedia>(media, false), this);
 
-					if (Deleted != null)
-						Deleted(media, e);
-
-					Audit.Add(AuditTypes.Delete, "Delete Media performed by user", userId == -1 ? 0 : userId, media.Id);
-				}
+				Audit.Add(AuditTypes.Delete, "Delete Media performed by user", userId == -1 ? 0 : userId, media.Id);
 			}			
 		}
 
@@ -410,12 +404,12 @@ namespace Umbraco.Core.Services
 		/// <summary>
 		/// Occurs before Delete
 		/// </summary>
-		public static event EventHandler<DeleteEventArgs> Deleting;
+		public static event TypedEventHandler<IMediaService, DeleteEventArgs<IMedia>> Deleting;
 
 		/// <summary>
 		/// Occurs after Delete
 		/// </summary>
-		public static event EventHandler<DeleteEventArgs> Deleted;
+		public static event TypedEventHandler<IMediaService, DeleteEventArgs<IMedia>> Deleted;
 
 		/// <summary>
 		/// Occurs before Save

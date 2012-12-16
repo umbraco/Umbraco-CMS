@@ -87,24 +87,19 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user deleting the macro</param>
         public void Delete(IMacro macro, int userId = -1)
         {
-            var e = new DeleteEventArgs();
-            if (Deleting != null)
-                Deleting(macro, e);
+			if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMacro>(macro), this))
+				return;
 
-            if (!e.Cancel)
-            {
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateMacroRepository(uow))
-                {
-                    repository.Delete(macro);
-                    uow.Commit();
+			var uow = _uowProvider.GetUnitOfWork();
+			using (var repository = _repositoryFactory.CreateMacroRepository(uow))
+			{
+				repository.Delete(macro);
+				uow.Commit();
 
-                    if (Deleted != null)
-                        Deleted(macro, e);
-                }
+				Deleted.RaiseEvent(new DeleteEventArgs<IMacro>(macro, false), this);
+			}
 
-                Audit.Add(AuditTypes.Delete, "Delete Macro performed by user", userId > -1 ? userId : 0, -1);
-            }
+			Audit.Add(AuditTypes.Delete, "Delete Macro performed by user", userId > -1 ? userId : 0, -1);
         }
 
         /// <summary>
@@ -152,12 +147,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Delete
         /// </summary>
-        public static event EventHandler<DeleteEventArgs> Deleting;
+		public static event TypedEventHandler<IMacroService, DeleteEventArgs<IMacro>> Deleting;
 
         /// <summary>
         /// Occurs after Delete
         /// </summary>
-        public static event EventHandler<DeleteEventArgs> Deleted;
+		public static event TypedEventHandler<IMacroService, DeleteEventArgs<IMacro>> Deleted;
 
         /// <summary>
         /// Occurs before Save

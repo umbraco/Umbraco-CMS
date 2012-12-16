@@ -130,48 +130,43 @@ namespace Umbraco.Core.Services
         /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to delete</param>
         /// <param name="userId">Optional Id of the user issueing the deletion</param>
         public void Delete(IDataTypeDefinition dataTypeDefinition, int userId = -1)
-        {
-            var e = new DeleteEventArgs { Id = dataTypeDefinition.Id };
-            if (Deleting != null)
-                Deleting(dataTypeDefinition, e);
+        {            
+	        if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition), this)) 
+				return;
+	        
+			var uow = _uowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
+	        {
+		        //Find ContentTypes using this IDataTypeDefinition on a PropertyType
+		        var query = Query<PropertyType>.Builder.Where(x => x.DataTypeId == dataTypeDefinition.Id);
+		        var contentTypes = repository.GetByQuery(query);
 
-            if (!e.Cancel)
-            {
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
-                {
-                    //Find ContentTypes using this IDataTypeDefinition on a PropertyType
-                    var query = Query<PropertyType>.Builder.Where(x => x.DataTypeId == dataTypeDefinition.Id);
-                    var contentTypes = repository.GetByQuery(query);
+		        //Loop through the list of results and remove the PropertyTypes that references the DataTypeDefinition that is being deleted
+		        foreach (var contentType in contentTypes)
+		        {
+			        if (contentType == null) continue;
 
-                    //Loop through the list of results and remove the PropertyTypes that references the DataTypeDefinition that is being deleted
-                    foreach (var contentType in contentTypes)
-                    {
-                        if (contentType == null) continue;
+			        foreach (var group in contentType.PropertyGroups)
+			        {
+				        var types = @group.PropertyTypes.Where(x => x.DataTypeId == dataTypeDefinition.Id);
+				        foreach (var propertyType in types)
+				        {
+					        @group.PropertyTypes.Remove(propertyType);
+				        }
+			        }
 
-                        foreach (var group in contentType.PropertyGroups)
-                        {
-                            var types = group.PropertyTypes.Where(x => x.DataTypeId == dataTypeDefinition.Id);
-                            foreach (var propertyType in types)
-                            {
-                                group.PropertyTypes.Remove(propertyType);
-                            }
-                        }
+			        repository.AddOrUpdate(contentType);
+		        }
 
-                        repository.AddOrUpdate(contentType);
-                    }
+		        var dataTypeRepository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow);
+		        dataTypeRepository.Delete(dataTypeDefinition);
 
-                    var dataTypeRepository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow);
-                    dataTypeRepository.Delete(dataTypeDefinition);
+		        uow.Commit();
 
-                    uow.Commit();
+		        Deleted.RaiseEvent(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this); 		        
+	        }
 
-                    if (Deleted != null)
-                        Deleted(dataTypeDefinition, e);
-                }
-
-                Audit.Add(AuditTypes.Delete, string.Format("Delete DataTypeDefinition performed by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
-            }
+	        Audit.Add(AuditTypes.Delete, string.Format("Delete DataTypeDefinition performed by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
         }
 
         /// <summary>
@@ -197,12 +192,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Delete
         /// </summary>
-        public static event EventHandler<DeleteEventArgs> Deleting;
+		public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<IDataTypeDefinition>> Deleting;
 
         /// <summary>
         /// Occurs after Delete
         /// </summary>
-        public static event EventHandler<DeleteEventArgs> Deleted;
+		public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<IDataTypeDefinition>> Deleted;
 
         /// <summary>
         /// Occurs before Save

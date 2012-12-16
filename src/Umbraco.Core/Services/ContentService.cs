@@ -738,42 +738,34 @@ namespace Umbraco.Core.Services
 	    /// <param name="userId">Optional Id of the user issueing the delete operation</param>
 	    public void DeleteContentOfType(int contentTypeId, int userId = -1)
 	    {
+			//TODO: Do we need another event DeletingContentOfType ?
+
 	        using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 	        {
 	            //NOTE What about content that has the contenttype as part of its composition?
 	            var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == contentTypeId);
 	            var contents = repository.GetByQuery(query);
 
-	            var e = new DeleteEventArgs {Id = contentTypeId};
-	            if (Deleting != null)
-	                Deleting(contents, e);
+				foreach (var content in contents.OrderByDescending(x => x.ParentId))
+				{
+					//Look for children of current content and move that to trash before the current content is deleted
+					var c = content;
+					var childQuery = Query<IContent>.Builder.Where(x => x.Path.StartsWith(c.Path));
+					var children = repository.GetByQuery(childQuery);
 
-	            if (!e.Cancel)
-	            {
-	                foreach (var content in contents.OrderByDescending(x => x.ParentId))
-	                {
-	                    //Look for children of current content and move that to trash before the current content is deleted
-	                    var c = content;
-	                    var childQuery = Query<IContent>.Builder.Where(x => x.Path.StartsWith(c.Path));
-	                    var children = repository.GetByQuery(childQuery);
+					foreach (var child in children)
+					{
+						if (child.ContentType.Id != contentTypeId)
+							MoveToRecycleBin(child, userId);
+					}
 
-	                    foreach (var child in children)
-	                    {
-	                        if (child.ContentType.Id != contentTypeId)
-	                            MoveToRecycleBin(child, userId);
-	                    }
+					//Permantly delete the content, this will raise appropriate events
+					Delete(content, userId);
+				}
 
-	                    //Permantly delete the content
-	                    Delete(content, userId);
-	                }
-
-	                if (Deleted != null)
-	                    Deleted(contents, e);
-
-	                Audit.Add(AuditTypes.Delete,
-	                          string.Format("Delete Content of Type {0} performed by user", contentTypeId),
-	                          userId == -1 ? 0 : userId, -1);
-	            }
+				Audit.Add(AuditTypes.Delete,
+						  string.Format("Delete Content of Type {0} performed by user", contentTypeId),
+						  userId == -1 ? 0 : userId, -1);
 	        }
 	    }
 
@@ -788,39 +780,33 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting the Content</param>
 		public void Delete(IContent content, int userId = -1)
 		{
-			var e = new DeleteEventArgs { Id = content.Id };
-			if (Deleting != null)
-				Deleting(content, e);
+	        if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(content), this)) 
+				return;
+	        
+			var uow = _uowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateContentRepository(uow))
+	        {
+		        //Make sure that published content is unpublished before being deleted
+		        if (HasPublishedVersion(content.Id))
+		        {
+			        UnPublish(content, userId);
+		        }
 
-			if (!e.Cancel)
-			{
-				var uow = _uowProvider.GetUnitOfWork();
-				using (var repository = _repositoryFactory.CreateContentRepository(uow))
-				{
-                    //Make sure that published content is unpublished before being deleted
-                    if (HasPublishedVersion(content.Id))
-                    {
-                        UnPublish(content, userId);
-                    }
+		        //Delete children before deleting the 'possible parent'
+		        var children = GetChildren(content.Id);
+		        foreach (var child in children)
+		        {
+			        Delete(child, userId);
+		        }
 
-                    //Delete children before deleting the 'possible parent'
-                    var children = GetChildren(content.Id);
-                    foreach (var child in children)
-                    {
-                        Delete(child, userId);
-                    }
+		        SetWriter(content, userId);
+		        repository.Delete(content);
+		        uow.Commit();
 
-                    SetWriter(content, userId);
-                    repository.Delete(content);
-					uow.Commit();
+		        Deleted.RaiseEvent(new DeleteEventArgs<IContent>(content, false), this);
 
-					if (Deleted != null)
-						Deleted(content, e);
-
-					Audit.Add(AuditTypes.Delete, "Delete Content performed by user", userId == -1 ? 0 : userId, content.Id);
-				}
-
-			}
+		        Audit.Add(AuditTypes.Delete, "Delete Content performed by user", userId == -1 ? 0 : userId, content.Id);
+	        }
 		}
 
 		/// <summary>
@@ -854,22 +840,16 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
 		public void Delete(int id, DateTime versionDate, int userId = -1)
 		{
-			var e = new DeleteEventArgs { Id = id };
-			if (Deleting != null)
-				Deleting(versionDate, e);
-
-			if (!e.Cancel)
+			if (DeletingRevisions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, dateToRetain: versionDate), this))
+				return;
+			
+			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 			{
-				using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
-				{
-					repository.Delete(id, versionDate);
+				repository.Delete(id, versionDate);
 
-					if (Deleted != null)
-						Deleted(versionDate, e);
+				DeletedRevisions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, dateToRetain:versionDate), this);
 
-					Audit.Add(AuditTypes.Delete, "Delete Content by version date performed by user", userId == -1 ? 0 : userId, -1);
-				}
-
+				Audit.Add(AuditTypes.Delete, "Delete Content by version date performed by user", userId == -1 ? 0 : userId, -1);
 			}
 		}
 
@@ -890,19 +870,14 @@ namespace Umbraco.Core.Services
 					Delete(id, content.UpdateDate, userId);
 				}
 
-				var e = new DeleteEventArgs { Id = id };
-				if (Deleting != null)
-					Deleting(versionId, e);
+				if (DeletingRevisions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion: versionId), this)) 
+					return;
+				
+				repository.Delete(id, versionId);
 
-				if (!e.Cancel)
-				{
-					repository.Delete(id, versionId);
+				DeletedRevisions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, specificVersion:versionId), this);
 
-					if (Deleted != null)
-						Deleted(versionId, e);
-
-					Audit.Add(AuditTypes.Delete, "Delete Content by version performed by user", userId == -1 ? 0 : userId, -1);
-				}
+				Audit.Add(AuditTypes.Delete, "Delete Content by version performed by user", userId == -1 ? 0 : userId, -1);
 			}
 		}
 
@@ -1257,13 +1232,23 @@ namespace Umbraco.Core.Services
 		#region Event Handlers
 		/// <summary>
 		/// Occurs before Delete
-		/// </summary>
-		public static event EventHandler<DeleteEventArgs> Deleting;
+		/// </summary>		
+		public static event TypedEventHandler<IContentService, DeleteEventArgs<IContent>> Deleting;
 
 		/// <summary>
 		/// Occurs after Delete
 		/// </summary>
-		public static event EventHandler<DeleteEventArgs> Deleted;
+		public static event TypedEventHandler<IContentService, DeleteEventArgs<IContent>> Deleted;
+
+		/// <summary>
+		/// Occurs before Delete
+		/// </summary>		
+		public static event TypedEventHandler<IContentService, DeleteRevisionsEventArgs> DeletingRevisions;
+
+		/// <summary>
+		/// Occurs after Delete
+		/// </summary>
+		public static event TypedEventHandler<IContentService, DeleteRevisionsEventArgs> DeletedRevisions;
 
 		/// <summary>
 		/// Occurs before Save

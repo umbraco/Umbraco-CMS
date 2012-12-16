@@ -167,27 +167,22 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user issueing the delete</param>
         /// <remarks>Deleting a <see cref="IContentType"/> will delete all the <see cref="IContent"/> objects based on this <see cref="IContentType"/></remarks>
         public void Delete(IContentType contentType, int userId = -1)
-        {
-            var e = new DeleteEventArgs { Id = contentType.Id };
-            if (Deleting != null)
-                Deleting(contentType, e);
+        {            
+	        if (DeletingContentType.IsRaisedEventCancelled(new DeleteEventArgs<IContentType>(contentType), this)) 
+				return;
+	        
+			_contentService.DeleteContentOfType(contentType.Id);
 
-            if (!e.Cancel)
-            {
-                _contentService.DeleteContentOfType(contentType.Id);
+	        var uow = _uowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
+	        {
+		        repository.Delete(contentType);
+		        uow.Commit();
 
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
-                {
-                    repository.Delete(contentType);
-                    uow.Commit();
+		        DeletedContentType.RaiseEvent(new DeleteEventArgs<IContentType>(contentType, false), this);
+	        }
 
-                    if (Deleted != null)
-                        Deleted(contentType, e);
-                }
-
-                Audit.Add(AuditTypes.Delete, string.Format("Delete ContentType performed by user"), userId == -1 ? 0 : userId, contentType.Id);
-            }
+	        Audit.Add(AuditTypes.Delete, string.Format("Delete ContentType performed by user"), userId == -1 ? 0 : userId, contentType.Id);
         }
 
         /// <summary>
@@ -200,34 +195,29 @@ namespace Umbraco.Core.Services
         /// </remarks>
         public void Delete(IEnumerable<IContentType> contentTypes, int userId = -1)
         {
-            var e = new DeleteEventArgs();
-            if (Deleting != null)
-                Deleting(contentTypes, e);
+	        if (DeletingContentTypeCollection.IsRaisedEventCancelled(new DeleteEventArgs<IEnumerable<IContentType>>(contentTypes), this)) 
+				return;
+	        
+			var contentTypeList = contentTypes.ToList();
+	        foreach (var contentType in contentTypeList)
+	        {
+		        _contentService.DeleteContentOfType(contentType.Id);
+	        }
 
-            if (!e.Cancel)
-            {
-                var contentTypeList = contentTypes.ToList();
-                foreach (var contentType in contentTypeList)
-                {
-                    _contentService.DeleteContentOfType(contentType.Id);
-                }
+	        var uow = _uowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
+	        {
+		        foreach (var contentType in contentTypeList)
+		        {
+			        repository.Delete(contentType);
+		        }
 
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
-                {
-                    foreach (var contentType in contentTypeList)
-                    {
-                        repository.Delete(contentType);
-                    }
+		        uow.Commit();
 
-                    uow.Commit();
+		        DeletedContentTypeCollection.RaiseEvent(new DeleteEventArgs<IEnumerable<IContentType>>(contentTypes, false), this);
+	        }
 
-                    if (Deleted != null)
-                        Deleted(contentTypes, e);
-                }
-
-                Audit.Add(AuditTypes.Delete, string.Format("Delete ContentTypes performed by user"), userId == -1 ? 0 : userId, -1);
-            }
+	        Audit.Add(AuditTypes.Delete, string.Format("Delete ContentTypes performed by user"), userId == -1 ? 0 : userId, -1);
         }
 
         /// <summary>
@@ -347,27 +337,22 @@ namespace Umbraco.Core.Services
         /// <remarks>Deleting a <see cref="IMediaType"/> will delete all the <see cref="IMedia"/> objects based on this <see cref="IMediaType"/></remarks>
         public void Delete(IMediaType mediaType, int userId = -1)
         {
-            var e = new DeleteEventArgs { Id = mediaType.Id };
-            if (Deleting != null)
-                Deleting(mediaType, e);
+	        if (DeletingMediaType.IsRaisedEventCancelled(new DeleteEventArgs<IMediaType>(mediaType), this)) 
+				return;
+	        
+			_mediaService.DeleteMediaOfType(mediaType.Id);
 
-            if (!e.Cancel)
-            {
-                _mediaService.DeleteMediaOfType(mediaType.Id);
+	        var uow = _uowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
+	        {
 
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
-                {
+		        repository.Delete(mediaType);
+		        uow.Commit();
 
-                    repository.Delete(mediaType);
-                    uow.Commit();
+		        DeletedMediaType.RaiseEvent(new DeleteEventArgs<IMediaType>(mediaType, false), this);
+	        }
 
-                    if (Deleted != null)
-                        Deleted(mediaType, e);
-                }
-
-                Audit.Add(AuditTypes.Delete, string.Format("Delete MediaType performed by user"), userId == -1 ? 0 : userId, mediaType.Id);
-            }
+	        Audit.Add(AuditTypes.Delete, string.Format("Delete MediaType performed by user"), userId == -1 ? 0 : userId, mediaType.Id);
         }
 
         /// <summary>
@@ -377,34 +362,29 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         /// <remarks>Deleting a <see cref="IMediaType"/> will delete all the <see cref="IMedia"/> objects based on this <see cref="IMediaType"/></remarks>
         public void Delete(IEnumerable<IMediaType> mediaTypes, int userId = -1)
-        {
-            var e = new DeleteEventArgs();
-            if (Deleting != null)
-                Deleting(mediaTypes, e);
+        {            
+	        if (DeletingMediaTypeCollection.IsRaisedEventCancelled(new DeleteEventArgs<IEnumerable<IMediaType>>(mediaTypes), this)) 
+				return;
+	        
+			var mediaTypeList = mediaTypes.ToList();
+	        foreach (var mediaType in mediaTypeList)
+	        {
+		        _mediaService.DeleteMediaOfType(mediaType.Id);
+	        }
 
-            if (!e.Cancel)
-            {
-                var mediaTypeList = mediaTypes.ToList();
-                foreach (var mediaType in mediaTypeList)
-                {
-                    _mediaService.DeleteMediaOfType(mediaType.Id);
-                }
+	        var uow = _uowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
+	        {
+		        foreach (var mediaType in mediaTypeList)
+		        {
+			        repository.Delete(mediaType);
+		        }
+		        uow.Commit();
 
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
-                {
-                    foreach (var mediaType in mediaTypeList)
-                    {
-                        repository.Delete(mediaType);
-                    }
-                    uow.Commit();
+				DeletedMediaTypeCollection.RaiseEvent(new DeleteEventArgs<IEnumerable<IMediaType>>(mediaTypes, false), this);		        
+	        }
 
-                    if (Deleted != null)
-                        Deleted(mediaTypes, e);
-                }
-
-                Audit.Add(AuditTypes.Delete, string.Format("Delete MediaTypes performed by user"), userId == -1 ? 0 : userId, -1);
-            }
+	        Audit.Add(AuditTypes.Delete, string.Format("Delete MediaTypes performed by user"), userId == -1 ? 0 : userId, -1);
         }
 
         /// <summary>
@@ -504,15 +484,46 @@ namespace Umbraco.Core.Services
         }
 
         #region Event Handlers
-        /// <summary>
+
+		/// <summary>
+		/// Occurs before Delete
+		/// </summary>
+		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IContentType>> DeletingContentType;
+
+		/// <summary>
+		/// Occurs after Delete
+		/// </summary>
+		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IContentType>> DeletedContentType;
+
+		/// <summary>
+		/// Occurs before Delete
+		/// </summary>
+		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IEnumerable<IContentType>>> DeletingContentTypeCollection;
+
+		/// <summary>
+		/// Occurs after Delete
+		/// </summary>
+		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IEnumerable<IContentType>>> DeletedContentTypeCollection;
+
+		/// <summary>
+		/// Occurs before Delete
+		/// </summary>
+		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IMediaType>> DeletingMediaType;
+
+		/// <summary>
+		/// Occurs after Delete
+		/// </summary>
+		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IMediaType>> DeletedMediaType;
+
+		/// <summary>
         /// Occurs before Delete
         /// </summary>
-        public static event EventHandler<DeleteEventArgs> Deleting;
-
+		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IEnumerable<IMediaType>>> DeletingMediaTypeCollection;
+		
         /// <summary>
         /// Occurs after Delete
         /// </summary>
-        public static event EventHandler<DeleteEventArgs> Deleted;
+		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IEnumerable<IMediaType>>> DeletedMediaTypeCollection;
 
         /// <summary>
         /// Occurs before Save

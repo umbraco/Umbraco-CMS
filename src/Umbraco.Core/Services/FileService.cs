@@ -92,20 +92,15 @@ namespace Umbraco.Core.Services
             {
                 var stylesheet = repository.Get(name);
 
-                var e = new DeleteEventArgs();
-                if (Deleting != null)
-                    Deleting(stylesheet, e);
+				if (DeletingStylesheet.IsRaisedEventCancelled(new DeleteEventArgs<Stylesheet>(stylesheet), this))
+					return;
 
-                if (!e.Cancel)
-                {
-                    repository.Delete(stylesheet);
-                    uow.Commit();
+				repository.Delete(stylesheet);
+				uow.Commit();
 
-                    if (Deleted != null)
-                        Deleted(stylesheet, e);
+				DeletedStylesheet.RaiseEvent(new DeleteEventArgs<Stylesheet>(stylesheet, false), this);
 
-                    Audit.Add(AuditTypes.Delete, string.Format("Delete Stylesheet performed by user"), userId == -1 ? 0 : userId, -1);
-                }
+				Audit.Add(AuditTypes.Delete, string.Format("Delete Stylesheet performed by user"), userId == -1 ? 0 : userId, -1);
             }
         }
 
@@ -178,21 +173,16 @@ namespace Umbraco.Core.Services
             {
                 var script = repository.Get(name);
 
-                var e = new DeleteEventArgs();
-                if (Deleting != null)
-                    Deleting(script, e);
+				if (DeletingScript.IsRaisedEventCancelled(new DeleteEventArgs<Script>(script), this))
+					return; ;
+				
+				repository.Delete(script);
+				uow.Commit();
 
-                if (!e.Cancel)
-                {
-                    repository.Delete(script);
-                    uow.Commit();
+				DeletedScript.RaiseEvent(new DeleteEventArgs<Script>(script, false), this);
 
-                    if (Deleted != null)
-                        Deleted(script, e);
-
-                    Audit.Add(AuditTypes.Delete, string.Format("Delete Script performed by user"),
-                              userId == -1 ? 0 : userId, -1);
-                }
+				Audit.Add(AuditTypes.Delete, string.Format("Delete Script performed by user"),
+						  userId == -1 ? 0 : userId, -1);
             }
         }
 
@@ -265,21 +255,16 @@ namespace Umbraco.Core.Services
             {
                 var template = repository.Get(alias);
 
-                var e = new DeleteEventArgs();
-                if (Deleting != null)
-                    Deleting(template, e);
+				if (DeletingTemplate.IsRaisedEventCancelled(new DeleteEventArgs<ITemplate>(template), this))
+					return;
 
-                if (!e.Cancel)
-                {
-                    repository.Delete(template);
-                    uow.Commit();
+				repository.Delete(template);
+				uow.Commit();
 
-                    if (Deleted != null)
-                        Deleted(template, e);
+				DeletedTemplate.RaiseEvent(new DeleteEventArgs<ITemplate>(template, false), this);
 
-                    Audit.Add(AuditTypes.Delete, string.Format("Delete Template performed by user"),
-                              userId == -1 ? 0 : userId, template.Id);
-                }
+				Audit.Add(AuditTypes.Delete, string.Format("Delete Template performed by user"),
+						  userId == -1 ? 0 : userId, template.Id);
             }
         }
 
@@ -298,13 +283,33 @@ namespace Umbraco.Core.Services
         #region Event Handlers
         /// <summary>
         /// Occurs before Delete
-        /// </summary>
-        public static event EventHandler<DeleteEventArgs> Deleting;
+        /// </summary>        
+		public static event TypedEventHandler<IFileService, DeleteEventArgs<ITemplate>> DeletingTemplate;
 
         /// <summary>
         /// Occurs after Delete
         /// </summary>
-        public static event EventHandler<DeleteEventArgs> Deleted;
+		public static event TypedEventHandler<IFileService, DeleteEventArgs<ITemplate>> DeletedTemplate;
+
+		/// <summary>
+		/// Occurs before Delete
+		/// </summary>        
+		public static event TypedEventHandler<IFileService, DeleteEventArgs<Script>> DeletingScript;
+
+		/// <summary>
+		/// Occurs after Delete
+		/// </summary>
+		public static event TypedEventHandler<IFileService, DeleteEventArgs<Script>> DeletedScript;
+
+		/// <summary>
+		/// Occurs before Delete
+		/// </summary>        
+		public static event TypedEventHandler<IFileService, DeleteEventArgs<Stylesheet>> DeletingStylesheet;
+
+		/// <summary>
+		/// Occurs after Delete
+		/// </summary>
+		public static event TypedEventHandler<IFileService, DeleteEventArgs<Stylesheet>> DeletedStylesheet;
 
         /// <summary>
         /// Occurs before Save

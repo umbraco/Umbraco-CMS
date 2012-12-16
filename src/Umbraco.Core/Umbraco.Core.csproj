@@ -122,6 +122,7 @@
     <Compile Include="Events\CopyEventArgs.cs" />
     <Compile Include="Events\DeleteEventArgs.cs" />
     <Compile Include="Events\CancellableObjectEventArgs.cs" />
+    <Compile Include="Events\DeleteRevisionsEventArgs.cs" />
     <Compile Include="Events\EventExtensions.cs" />
     <Compile Include="Events\TypedEventHandler.cs" />
     <Compile Include="Events\PublishingEventArgs.cs" />
