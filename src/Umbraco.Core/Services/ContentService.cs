@@ -1135,29 +1135,23 @@ namespace Umbraco.Core.Services
 		/// <returns>The newly created <see cref="IContent"/> object</returns>
 		public IContent Rollback(int id, Guid versionId, int userId = -1)
 		{
-			var e = new RollbackEventArgs();
-
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
 				var content = repository.GetByVersion(id, versionId);
 
-				if (Rollingback != null)
-					Rollingback(content, e);
+				if (RollingBack.IsRaisedEventCancelled(new RollbackEventArgs<IContent>(content), this)) 
+					return content;
+				
+				SetUser(content, userId);
+				SetWriter(content, userId);
 
-				if (!e.Cancel)
-				{
-					SetUser(content, userId);
-					SetWriter(content, userId);
+				repository.AddOrUpdate(content);
+				uow.Commit();
 
-					repository.AddOrUpdate(content);
-					uow.Commit();
+				RolledBack.RaiseEvent(new RollbackEventArgs<IContent>(content, false), this);
 
-					if (Rolledback != null)
-						Rolledback(content, e);
-
-					Audit.Add(AuditTypes.RollBack, "Content rollback performed by user", content.WriterId, content.Id);
-				}
+				Audit.Add(AuditTypes.RollBack, "Content rollback performed by user", content.WriterId, content.Id);
 
 				return content;
 			}
@@ -1313,12 +1307,12 @@ namespace Umbraco.Core.Services
 		/// <summary>
 		/// Occurs before Rollback
 		/// </summary>
-		public static event EventHandler<RollbackEventArgs> Rollingback;
+		public static event TypedEventHandler<IContentService, RollbackEventArgs<IContent>> RollingBack;
 
 		/// <summary>
 		/// Occurs after Rollback
 		/// </summary>
-		public static event EventHandler<RollbackEventArgs> Rolledback;
+		public static event TypedEventHandler<IContentService, RollbackEventArgs<IContent>> RolledBack;
 
 		/// <summary>
 		/// Occurs before Send to Publish
