@@ -1021,94 +1021,87 @@ namespace Umbraco.Core.Services
         /// <returns>The newly created <see cref="IContent"/> object</returns>
         public IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = -1)
 		{
-			var e = new CopyEventArgs { ParentId = parentId };
-			if (Copying != null)
-				Copying(content, e);
+			var copy = ((Content)content).Clone();
+			copy.ParentId = parentId;
+			copy.Name = copy.Name + " (1)";
 
-			IContent copy = null;
+			if (Copying.IsRaisedEventCancelled(new CopyEventArgs<IContent>(content, copy, parentId), this))
+				return null;
 
-			if (!e.Cancel)
+			var uow = _uowProvider.GetUnitOfWork();
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
-				copy = ((Content)content).Clone();
-				copy.ParentId = parentId;
-				copy.Name = copy.Name + " (1)";
+				SetWriter(content, userId);
 
-				var uow = _uowProvider.GetUnitOfWork();
-				using (var repository = _repositoryFactory.CreateContentRepository(uow))
+				repository.AddOrUpdate(copy);
+				uow.Commit();
+
+				var uploadFieldId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
+				if (content.Properties.Any(x => x.PropertyType.DataTypeControlId == uploadFieldId))
 				{
-					SetWriter(content, userId);
+					bool isUpdated = false;
+					var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
-					repository.AddOrUpdate(copy);
-					uow.Commit();
-                    
-                    var uploadFieldId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
-                    if (content.Properties.Any(x => x.PropertyType.DataTypeControlId == uploadFieldId))
-                    {
-                        bool isUpdated = false;
-                        var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+					//Loop through properties to check if the content contains media that should be deleted
+					foreach (var property in content.Properties.Where(x => x.PropertyType.DataTypeControlId == uploadFieldId
+						&& string.IsNullOrEmpty(x.Value.ToString()) == false))
+					{
+						if (fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
+						{
+							var currentPath = fs.GetRelativePath(property.Value.ToString());
+							var propertyId = copy.Properties.First(x => x.Alias == property.Alias).Id;
+							var newPath = fs.GetRelativePath(propertyId, System.IO.Path.GetFileName(currentPath));
 
-                        //Loop through properties to check if the content contains media that should be deleted
-                        foreach (var property in content.Properties.Where(x => x.PropertyType.DataTypeControlId == uploadFieldId
-                            && string.IsNullOrEmpty(x.Value.ToString()) == false))
-                        {
-                            if (fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
-                            {
-                                var currentPath = fs.GetRelativePath(property.Value.ToString());
-                                var propertyId = copy.Properties.First(x => x.Alias == property.Alias).Id;
-                                var newPath = fs.GetRelativePath(propertyId, System.IO.Path.GetFileName(currentPath));
+							fs.CopyFile(currentPath, newPath);
+							copy.SetValue(property.Alias, fs.GetUrl(newPath));
 
-                                fs.CopyFile(currentPath, newPath);
-                                copy.SetValue(property.Alias, fs.GetUrl(newPath));
+							//Copy thumbnails
+							foreach (var thumbPath in fs.GetThumbnails(currentPath))
+							{
+								var newThumbPath = fs.GetRelativePath(propertyId, System.IO.Path.GetFileName(thumbPath));
+								fs.CopyFile(thumbPath, newThumbPath);
+							}
+							isUpdated = true;
+						}
+					}
 
-                                //Copy thumbnails
-                                foreach (var thumbPath in fs.GetThumbnails(currentPath))
-                                {
-                                    var newThumbPath = fs.GetRelativePath(propertyId, System.IO.Path.GetFileName(thumbPath));
-                                    fs.CopyFile(thumbPath, newThumbPath);
-                                }
-                                isUpdated = true;
-                            }
-                        }
-
-                        if (isUpdated)
-                        {
-                            repository.AddOrUpdate(copy);
-                            uow.Commit();
-                        }
-                    }
+					if (isUpdated)
+					{
+						repository.AddOrUpdate(copy);
+						uow.Commit();
+					}
 				}
-
-                //NOTE This 'Relation' part should eventually be delegated to a RelationService
-                if (relateToOriginal)
-                {
-                    RelationType relationType = null;
-                    using (var relationTypeRepository = _repositoryFactory.CreateRelationTypeRepository(uow))
-                    {
-                        relationType = relationTypeRepository.Get(1);
-                    }
-
-                    using (var relationRepository = _repositoryFactory.CreateRelationRepository(uow))
-                    {
-                        var relation = new Relation(content.Id, copy.Id, relationType);
-                        relationRepository.AddOrUpdate(relation);
-                        uow.Commit();
-                    }
-
-                    Audit.Add(AuditTypes.Copy,
-                              string.Format("Copied content with Id: '{0}' related to original content with Id: '{1}'",
-                                            copy.Id, content.Id), copy.WriterId, copy.Id);
-                }
-
-                //Look for children and copy those as well
-                var children = GetChildren(content.Id);
-                foreach (var child in children)
-                {
-                    Copy(child, copy.Id, relateToOriginal, userId);
-                }
 			}
 
-			if (Copied != null)
-				Copied(copy, e);
+			//NOTE This 'Relation' part should eventually be delegated to a RelationService
+			if (relateToOriginal)
+			{
+				RelationType relationType = null;
+				using (var relationTypeRepository = _repositoryFactory.CreateRelationTypeRepository(uow))
+				{
+					relationType = relationTypeRepository.Get(1);
+				}
+
+				using (var relationRepository = _repositoryFactory.CreateRelationRepository(uow))
+				{
+					var relation = new Relation(content.Id, copy.Id, relationType);
+					relationRepository.AddOrUpdate(relation);
+					uow.Commit();
+				}
+
+				Audit.Add(AuditTypes.Copy,
+						  string.Format("Copied content with Id: '{0}' related to original content with Id: '{1}'",
+										copy.Id, content.Id), copy.WriterId, copy.Id);
+			}
+
+			//Look for children and copy those as well
+			var children = GetChildren(content.Id);
+			foreach (var child in children)
+			{
+				Copy(child, copy.Id, relateToOriginal, userId);
+			}
+
+			Copied.RaiseEvent(new CopyEventArgs<IContent>(content, copy, false, parentId), this);
 
 			Audit.Add(AuditTypes.Copy, "Copy Content performed by user", content.WriterId, content.Id);
 
@@ -1305,12 +1298,12 @@ namespace Umbraco.Core.Services
 		/// <summary>
 		/// Occurs before Copy
 		/// </summary>
-		public static event EventHandler<CopyEventArgs> Copying;
+		public static event TypedEventHandler<IContentService, CopyEventArgs<IContent>> Copying;
 
 		/// <summary>
 		/// Occurs after Copy
 		/// </summary>
-		public static event EventHandler<CopyEventArgs> Copied;
+		public static event TypedEventHandler<IContentService, CopyEventArgs<IContent>> Copied;
 
 		/// <summary>
 		/// Occurs before Content is moved to Recycle Bin
