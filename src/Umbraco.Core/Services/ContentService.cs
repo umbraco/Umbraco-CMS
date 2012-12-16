@@ -84,23 +84,17 @@ namespace Umbraco.Core.Services
 				if (contentType == null)
 					throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null", contentTypeAlias));
 
-				IContent content = null;
+				var content = new Content(parentId, contentType);
 
-				var e = new NewEventArgs { Alias = contentTypeAlias, ParentId = parentId };
-				if (Creating != null)
-					Creating(content, e);
+				if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this)) 
+					return content;
+				
+				SetUser(content, userId);
+				SetWriter(content, userId);
 
-				if (!e.Cancel)
-				{
-					content = new Content(parentId, contentType);
-					SetUser(content, userId);
-					SetWriter(content, userId);
+				Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this);
 
-					if (Created != null)
-						Created(content, e);
-
-					Audit.Add(AuditTypes.New, "", content.CreatorId, content.Id);
-				}
+				Audit.Add(AuditTypes.New, "", content.CreatorId, content.Id);
 
 				return content;	
 			}
@@ -1310,12 +1304,12 @@ namespace Umbraco.Core.Services
 		/// <summary>
 		/// Occurs before Create
 		/// </summary>
-		public static event EventHandler<NewEventArgs> Creating;
+		public static event TypedEventHandler<IContentService, NewEventArgs<IContent>> Creating;
 
 		/// <summary>
 		/// Occurs after Create
 		/// </summary>
-		public static event EventHandler<NewEventArgs> Created;
+		public static event TypedEventHandler<IContentService, NewEventArgs<IContent>> Created;
 
 		/// <summary>
 		/// Occurs before Copy

@@ -66,21 +66,14 @@ namespace Umbraco.Core.Services
 
 				var media = new Models.Media(parentId, mediaType);
 
-				var e = new NewEventArgs { Alias = mediaTypeAlias, ParentId = parentId };
+				if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this)) 
+					return media;
 				
-				if (Creating != null)
-					Creating(media, e);
+				SetUser(media, userId);
 
-				if (!e.Cancel)
-				{
-					
-					SetUser(media, userId);
+				Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId), this);
 
-					if (Created != null)
-						Created(media, e);
-
-					Audit.Add(AuditTypes.New, "", media.CreatorId, media.Id);
-				}
+				Audit.Add(AuditTypes.New, "", media.CreatorId, media.Id);
 
 				return media;	
 			}
@@ -457,12 +450,12 @@ namespace Umbraco.Core.Services
 		/// <summary>
 		/// Occurs before Create
 		/// </summary>
-		public static event EventHandler<NewEventArgs> Creating;
+		public static event TypedEventHandler<IMediaService, NewEventArgs<IMedia>> Creating;
 
 		/// <summary>
 		/// Occurs after Create
 		/// </summary>
-		public static event EventHandler<NewEventArgs> Created;
+		public static event TypedEventHandler<IMediaService, NewEventArgs<IMedia>> Created;
 
 		/// <summary>
 		/// Occurs before Content is moved to Recycle Bin

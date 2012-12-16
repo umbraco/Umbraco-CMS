@@ -33,6 +33,8 @@ namespace Umbraco.Core.Models
 
         protected ContentTypeBase(int parentId)
         {
+			Mandate.ParameterCondition(parentId != 0, "parentId");
+
             _parentId = new Lazy<int>(() => parentId);
             _allowedContentTypes = new List<ContentTypeSort>();
             _propertyGroups = new PropertyGroupCollection();
@@ -40,6 +42,8 @@ namespace Umbraco.Core.Models
 
 		protected ContentTypeBase(IContentTypeBase parent)
 		{
+			Mandate.ParameterNotNull(parent, "parent");
+
 			_parentId = new Lazy<int>(() => parent.Id);
 			_allowedContentTypes = new List<ContentTypeSort>();
 			_propertyGroups = new PropertyGroupCollection();

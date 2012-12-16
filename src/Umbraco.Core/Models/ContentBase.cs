@@ -27,7 +27,7 @@ namespace Umbraco.Core.Models
 
         protected ContentBase(int parentId, IContentTypeComposition contentType, PropertyCollection properties)
         {
-            //Mandate.ParameterCondition(parentId != 0, "parentId");
+            Mandate.ParameterCondition(parentId != 0, "parentId");
             Mandate.ParameterNotNull(contentType, "contentType");
             Mandate.ParameterNotNull(properties, "properties");
 
