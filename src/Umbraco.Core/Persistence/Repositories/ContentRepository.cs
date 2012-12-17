@@ -342,6 +342,8 @@ namespace Umbraco.Core.Persistence.Repositories
             //Create the PropertyData for this version - cmsPropertyData
             var propertyFactory = new PropertyFactory(((Content)entity).ContentType, entity.Version, entity.Id);
             var propertyDataDtos = propertyFactory.BuildDto(entity.Properties);
+            var keyDictionary = new Dictionary<int, int>();
+
             //Add Properties
             foreach (var propertyDataDto in propertyDataDtos)
             {
@@ -351,7 +353,17 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
                 else
                 {
-                    Database.Insert(propertyDataDto);
+                    int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
+                    keyDictionary.Add(propertyDataDto.PropertyTypeId, primaryKey);
+                }
+            }
+
+            //Update Properties with its newly set Id
+            if (keyDictionary.Any())
+            {
+                foreach (var property in entity.Properties)
+                {
+                    property.Id = keyDictionary[property.PropertyTypeId];
                 }
             }
 

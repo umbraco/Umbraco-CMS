@@ -231,7 +231,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(IMedia entity)
         {
-            //Updates Modified date and Version Guid
+            //Updates Modified date
             ((Models.Media)entity).UpdatingEntity();
 
             var factory = new MediaFactory(NodeObjectTypeId, entity.Id);
@@ -252,17 +252,36 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Update(newContentDto);
             }
 
-            //Create a new version - cmsContentVersion
-            //Assumes a new Version guid and Version date (modified date) has been set
-            Database.Insert(dto);
+            //Updates the current version - cmsContentVersion
+            //Assumes a Version guid exists and Version date (modified date) has been set/updated
+            Database.Update(dto);
 
             //Create the PropertyData for this version - cmsPropertyData
             var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
             var propertyDataDtos = propertyFactory.BuildDto(entity.Properties);
+            var keyDictionary = new Dictionary<int, int>();
+
             //Add Properties
             foreach (var propertyDataDto in propertyDataDtos)
             {
-                Database.Insert(propertyDataDto);
+                if (propertyDataDto.Id > 0)
+                {
+                    Database.Update(propertyDataDto);
+                }
+                else
+                {
+                    int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
+                    keyDictionary.Add(propertyDataDto.PropertyTypeId, primaryKey);
+                }
+            }
+
+            //Update Properties with its newly set Id
+            if (keyDictionary.Any())
+            {
+                foreach (var property in entity.Properties)
+                {
+                    property.Id = keyDictionary[property.PropertyTypeId];
+                }
             }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
