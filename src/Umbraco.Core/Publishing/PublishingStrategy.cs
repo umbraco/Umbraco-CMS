@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 
@@ -30,7 +31,7 @@ namespace Umbraco.Core.Publishing
             if (!e.Cancel)
             {
                 //Check if the Content is Expired to verify that it can in fact be published
-                if(content.Status == ContentStatus.Expired)
+                if (content.Status == ContentStatus.Expired)
                 {
                     LogHelper.Info<PublishingStrategy>(
                         string.Format("Content '{0}' with Id '{1}' has expired and could not be published.",
@@ -116,7 +117,7 @@ namespace Umbraco.Core.Publishing
                 }
 
                 item.ChangePublishedState(true);
-                
+
                 LogHelper.Info<PublishingStrategy>(
                     string.Format("Content '{0}' with Id '{1}' has been published.",
                                   item.Name, item.Id));
@@ -221,7 +222,7 @@ namespace Umbraco.Core.Publishing
         /// <param name="isAllRepublished">Boolean indicating whether its all content that is republished</param>
         public override void PublishingFinalized(IEnumerable<IContent> content, bool isAllRepublished)
         {
-            OnPublished(content, new PublishingEventArgs{ IsAllRepublished = isAllRepublished});
+			OnPublished(content, new PublishingEventArgs(isAllRepublished));
         }
 
         /// <summary>

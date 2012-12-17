@@ -228,9 +228,6 @@ namespace Umbraco.Tests.CodeFirst
         [TearDown]
         public override void TearDown()
         {
-			
-            DatabaseContext.Database.Dispose();
-
 			base.TearDown();
 
             //reset the app context
@@ -241,8 +238,7 @@ namespace Umbraco.Tests.CodeFirst
 
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
-
-            ServiceContext = null;
+            
             SerializationService = null;
 
             UmbracoSettings.ResetSetters();

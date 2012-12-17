@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a Unit of Work Provider for creating a <see cref="FileUnitOfWork"/>
     /// </summary>
-    internal class FileUnitOfWorkProvider : IUnitOfWorkProvider
+    public class FileUnitOfWorkProvider : IUnitOfWorkProvider
     {
         #region Implementation of IUnitOfWorkProvider
 

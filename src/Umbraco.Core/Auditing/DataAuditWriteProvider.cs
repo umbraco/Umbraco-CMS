@@ -4,7 +4,7 @@ using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Auditing
 {
-    public class DataAuditWriteProvider : IAuditWriteProvider
+    internal class DataAuditWriteProvider : IAuditWriteProvider
     {
         /// <summary>
         /// Writes an audit entry to the underlaying datastore.
@@ -16,7 +16,7 @@ namespace Umbraco.Core.Auditing
         /// <param name="comment">Audit comment</param>
         public void WriteEntry(int objectId, int userId, DateTime date, string header, string comment)
         {
-            DatabaseContext.Current.Database.Insert(new LogDto
+            ApplicationContext.Current.DatabaseContext.Database.Insert(new LogDto
                                                         {
                                                             Comment = comment,
                                                             Datestamp = date,

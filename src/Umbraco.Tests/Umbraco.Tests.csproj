@@ -183,7 +183,7 @@
     <Compile Include="Persistence\BaseTableByTableTest.cs" />
     <Compile Include="Persistence\Caching\InMemoryCacheProviderTest.cs" />
     <Compile Include="Persistence\Caching\RuntimeCacheProviderTest.cs" />
-    <Compile Include="Persistence\DatabaseFactoryTests.cs" />
+    <Compile Include="Persistence\DatabaseContextTests.cs" />
     <Compile Include="Persistence\Mappers\ContentMapperTest.cs" />
     <Compile Include="Persistence\Mappers\ContentTypeMapperTest.cs" />
     <Compile Include="Persistence\Mappers\DataTypeDefinitionMapperTest.cs" />
@@ -234,6 +234,7 @@
     <Compile Include="Routing\UrlsWithNestedDomains.cs" />
     <Compile Include="Services\ContentServicePerformanceTest.cs" />
     <Compile Include="Services\ContentServiceTests.cs" />
+    <Compile Include="Services\ThreadSafetyServiceTest.cs" />
     <Compile Include="Surface\PluginControllerAreaTests.cs" />
     <Compile Include="Templates\MasterPageHelperTests.cs" />
     <Compile Include="TestHelpers\BaseDatabaseFactoryTest.cs" />

@@ -8,7 +8,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal abstract class FileRepository<TId, TEntity> : IUnitOfWorkRepository, IRepository<TId, TEntity> 
+    internal abstract class FileRepository<TId, TEntity> : DisposableObject, IUnitOfWorkRepository, IRepository<TId, TEntity> 
         where TEntity : IFile
     {
         private IUnitOfWork _work;
@@ -110,5 +110,16 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
+
+		/// <summary>
+		/// Dispose any disposable properties
+		/// </summary>
+		/// <remarks>
+		/// Dispose the unit of work
+		/// </remarks>
+		protected override void DisposeResources()
+		{
+			_work.DisposeIfDisposable();
+		}
     }
 }

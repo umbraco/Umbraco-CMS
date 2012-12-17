@@ -9,14 +9,14 @@ namespace Umbraco.Core.Persistence
     /// </summary>
     public class RepositoryFactory
     {
-        internal virtual IUserTypeRepository CreateUserTypeRepository(IUnitOfWork uow)
+		internal virtual IUserTypeRepository CreateUserTypeRepository(IDatabaseUnitOfWork uow)
         {
             return new UserTypeRepository(
                 uow,
                 NullCacheProvider.Current);
         }
 
-        internal virtual IUserRepository CreateUserRepository(IUnitOfWork uow)
+		internal virtual IUserRepository CreateUserRepository(IDatabaseUnitOfWork uow)
         {
             return new UserRepository(
                 uow,
@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence
                 CreateUserTypeRepository(uow));
         }
 
-        public virtual IContentRepository CreateContentRepository(IUnitOfWork uow)
+        public virtual IContentRepository CreateContentRepository(IDatabaseUnitOfWork uow)
         {
             return new ContentRepository(
                 uow,
@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence
                 CreateTemplateRepository(uow));
         }
 
-        public virtual IContentTypeRepository CreateContentTypeRepository(IUnitOfWork uow)
+        public virtual IContentTypeRepository CreateContentTypeRepository(IDatabaseUnitOfWork uow)
         {
             return new ContentTypeRepository(
                 uow,
@@ -41,14 +41,14 @@ namespace Umbraco.Core.Persistence
                 new TemplateRepository(uow, NullCacheProvider.Current));
         }
 
-        public virtual IDataTypeDefinitionRepository CreateDataTypeDefinitionRepository(IUnitOfWork uow)
+        public virtual IDataTypeDefinitionRepository CreateDataTypeDefinitionRepository(IDatabaseUnitOfWork uow)
         {
             return new DataTypeDefinitionRepository(
                 uow,
                 NullCacheProvider.Current);
         }
 
-        public virtual IDictionaryRepository CreateDictionaryRepository(IUnitOfWork uow)
+        public virtual IDictionaryRepository CreateDictionaryRepository(IDatabaseUnitOfWork uow)
         {
             return new DictionaryRepository(
                 uow,
@@ -56,21 +56,21 @@ namespace Umbraco.Core.Persistence
                 CreateLanguageRepository(uow));
         }
 
-        public virtual ILanguageRepository CreateLanguageRepository(IUnitOfWork uow)
+        public virtual ILanguageRepository CreateLanguageRepository(IDatabaseUnitOfWork uow)
         {
             return new LanguageRepository(
                 uow,
                 InMemoryCacheProvider.Current);
         }
 
-        internal virtual IMacroRepository CreateMacroRepository(IUnitOfWork uow)
+		internal virtual IMacroRepository CreateMacroRepository(IUnitOfWork uow)
         {
             return new MacroRepository(
                 uow,
                 InMemoryCacheProvider.Current);
         }
 
-        public virtual IMediaRepository CreateMediaRepository(IUnitOfWork uow)
+        public virtual IMediaRepository CreateMediaRepository(IDatabaseUnitOfWork uow)
         {
             return new MediaRepository(
                 uow,
@@ -78,14 +78,14 @@ namespace Umbraco.Core.Persistence
                 CreateMediaTypeRepository(uow));
         }
 
-        public virtual IMediaTypeRepository CreateMediaTypeRepository(IUnitOfWork uow)
+        public virtual IMediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork uow)
         {
             return new MediaTypeRepository(
                 uow,
                 InMemoryCacheProvider.Current);
         }
 
-        public virtual IRelationRepository CreateRelationRepository(IUnitOfWork uow)
+        public virtual IRelationRepository CreateRelationRepository(IDatabaseUnitOfWork uow)
         {
             return new RelationRepository(
                 uow,
@@ -93,7 +93,7 @@ namespace Umbraco.Core.Persistence
                 CreateRelationTypeRepository(uow));
         }
 
-        public virtual IRelationTypeRepository CreateRelationTypeRepository(IUnitOfWork uow)
+        public virtual IRelationTypeRepository CreateRelationTypeRepository(IDatabaseUnitOfWork uow)
         {
             return new RelationTypeRepository(
                 uow,
@@ -110,7 +110,7 @@ namespace Umbraco.Core.Persistence
             return new StylesheetRepository(uow);
         }
 
-        public virtual ITemplateRepository CreateTemplateRepository(IUnitOfWork uow)
+        public virtual ITemplateRepository CreateTemplateRepository(IDatabaseUnitOfWork uow)
         {
             return new TemplateRepository(uow, NullCacheProvider.Current);
         }

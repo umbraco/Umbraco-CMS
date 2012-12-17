@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Net.Mime;
 using System.Web;
+using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using umbraco.interfaces;
 
@@ -83,6 +84,13 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		public static string GetRecursiveValue(this IPublishedContent publishedContent, string fieldname)
 		{
+			//check for the cached value in the objects properties first
+			var cachedVal = publishedContent["__recursive__" + fieldname];
+			if (cachedVal != null)
+			{
+				return cachedVal.ToString();
+			}
+
 			var contentValue = "";
 			var currentContent = publishedContent;
 
@@ -102,6 +110,10 @@ namespace Umbraco.Core
 					contentValue = val.ToString(); //we've found a recursive val
 				}
 			}
+
+			//cache this lookup in a new custom (hidden) property
+			publishedContent.Properties.Add(new PropertyResult("__recursive__" + fieldname, contentValue, Guid.Empty, PropertyResultType.CustomProperty));
+
 			return contentValue;
 		}
 

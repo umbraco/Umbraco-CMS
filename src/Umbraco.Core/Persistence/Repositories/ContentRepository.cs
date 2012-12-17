@@ -22,14 +22,14 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;
 
-        public ContentRepository(IUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
+		public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
             : base(work)
         {
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
         }
 
-        public ContentRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
+		public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
             : base(work, cache)
         {
             _contentTypeRepository = contentTypeRepository;
@@ -103,7 +103,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 yield return Get(dto.NodeId);
             }
         }
-        
+
         #endregion
 
         #region Overrides of PetaPocoRepositoryBase<IContent>
@@ -227,8 +227,8 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override void PersistUpdatedItem(IContent entity)
         {
             //A new version should only be created if published state has changed
-            bool hasPublishedStateChanged = ((ICanBeDirty) entity).IsPropertyDirty("Published");
-            if (hasPublishedStateChanged)
+            bool shouldCreateNewVersion = ((ICanBeDirty)entity).IsPropertyDirty("Published") || ((ICanBeDirty)entity).IsPropertyDirty("Language");
+            if (shouldCreateNewVersion)
             {
                 //Updates Modified date and Version Guid
                 ((Content)entity).UpdatingEntity();
@@ -239,9 +239,9 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //Look up parent to get and set the correct Path if ParentId has changed
-            if (((ICanBeDirty) entity).IsPropertyDirty("ParentId"))
+            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
             {
-                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new {ParentId = entity.ParentId});
+                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
             }
 
@@ -254,7 +254,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Updates the (base) node data - umbracoNode
             var nodeDto = dto.ContentVersionDto.ContentDto.NodeDto;
             var o = Database.Update(nodeDto);
-            
+
             //Only update this DTO if the contentType has actually changed
             if (contentDto.ContentTypeId != entity.ContentTypeId)
             {
@@ -264,7 +264,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //If Published state has changed then previous versions should have their publish state reset
-            if (hasPublishedStateChanged && entity.Published)
+            if (shouldCreateNewVersion && entity.Published)
             {
                 var publishedDocs = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND published = @IsPublished", new { Id = entity.Id, IsPublished = true });
                 foreach (var doc in publishedDocs)
@@ -276,7 +276,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             var contentVersionDto = dto.ContentVersionDto;
-            if (hasPublishedStateChanged)
+            if (shouldCreateNewVersion)
             {
                 //Look up (newest) entries by id in cmsDocument table to set newest = false
                 //NOTE: This is only relevant when a new version is created, which is why its done inside this if-statement.
@@ -311,7 +311,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Add Properties
             foreach (var propertyDataDto in propertyDataDtos)
             {
-                if (hasPublishedStateChanged == false && propertyDataDto.Id > 0)
+                if (shouldCreateNewVersion == false && propertyDataDto.Id > 0)
                 {
                     Database.Update(propertyDataDto);
                 }
@@ -414,7 +414,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var documentDto = Database.FirstOrDefault<DocumentDto>("WHERE nodeId = @Id AND versionId = @VersionId AND newest = @Newest", new { Id = id, VersionId = versionId, Newest = false });
             Mandate.That<Exception>(documentDto != null);
 
-            using(var transaction = Database.GetTransaction())
+            using (var transaction = Database.GetTransaction())
             {
                 DeleteVersion(id, versionId);
 
@@ -424,7 +424,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void Delete(int id, DateTime versionDate)
         {
-            var list = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND VersionDate < @VersionDate", new {Id = id, VersionDate = versionDate});
+            var list = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND VersionDate < @VersionDate", new { Id = id, VersionDate = versionDate });
             Mandate.That<Exception>(list.Any());
 
             using (var transaction = Database.GetTransaction())
@@ -437,7 +437,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 transaction.Complete();
             }
         }
-        
+
         /// <summary>
         /// Private method to execute the delete statements for removing a single version for a Content item.
         /// </summary>

@@ -33,7 +33,7 @@ namespace Umbraco.Tests.CodeFirst.Definitions
                                          DatabaseType = attribute.DatabaseType,
                                          Name = dataType.DataTypeName
                                      };
-                    ServiceFactory.DataTypeService.Save(definition, 0);
+					ApplicationContext.Current.Services.DataTypeService.Save(definition, 0);
                 }
                 return definition;
             }
@@ -71,7 +71,7 @@ namespace Umbraco.Tests.CodeFirst.Definitions
         /// <returns></returns>
         public static IDataTypeDefinition GetDataTypeByControlId(Guid id)
         {
-            var definitions = ServiceFactory.DataTypeService.GetDataTypeDefinitionByControlId(id);
+			var definitions = ApplicationContext.Current.Services.DataTypeService.GetDataTypeDefinitionByControlId(id);
             return definitions.FirstOrDefault();
         }
 
@@ -91,7 +91,7 @@ namespace Umbraco.Tests.CodeFirst.Definitions
                                      DatabaseType = attribute.DatabaseType,
                                      Name = dataTypeDefinitionName
                                  };
-            ServiceFactory.DataTypeService.Save(definition, 0);
+			ApplicationContext.Current.Services.DataTypeService.Save(definition, 0);
             return definition;
         }
 
@@ -112,7 +112,7 @@ namespace Umbraco.Tests.CodeFirst.Definitions
                                Value = value
                            };
 
-            DatabaseContext.Current.Database.Insert(poco);
+            ApplicationContext.Current.DatabaseContext.Database.Insert(poco);
         }
 
         /// <summary>

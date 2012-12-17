@@ -79,7 +79,7 @@ namespace Umbraco.Web
                 return _umbracoContext;
             }
 
-            set
+            internal set
             {
                 lock (Locker)
                 {

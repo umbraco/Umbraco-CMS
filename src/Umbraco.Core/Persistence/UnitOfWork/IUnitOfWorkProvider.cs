@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Persistence.UnitOfWork
 {
-    /// <summary>
+	/// <summary>
     /// Defines a Unit of Work Provider
     /// </summary>
     public interface IUnitOfWorkProvider

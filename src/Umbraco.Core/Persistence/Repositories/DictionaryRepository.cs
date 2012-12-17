@@ -19,12 +19,13 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly ILanguageRepository _languageRepository;
 
-        public DictionaryRepository(IUnitOfWork work, ILanguageRepository languageRepository) : base(work)
+		public DictionaryRepository(IDatabaseUnitOfWork work, ILanguageRepository languageRepository)
+			: base(work)
         {
             _languageRepository = languageRepository;
         }
 
-        public DictionaryRepository(IUnitOfWork work, IRepositoryCacheProvider cache, ILanguageRepository languageRepository)
+		public DictionaryRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ILanguageRepository languageRepository)
             : base(work, cache)
         {
             _languageRepository = languageRepository;

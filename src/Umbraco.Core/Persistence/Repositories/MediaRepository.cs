@@ -19,13 +19,13 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IMediaTypeRepository _mediaTypeRepository;
 
-        public MediaRepository(IUnitOfWork work, IMediaTypeRepository mediaTypeRepository)
+		public MediaRepository(IDatabaseUnitOfWork work, IMediaTypeRepository mediaTypeRepository)
             : base(work)
         {
             _mediaTypeRepository = mediaTypeRepository;
         }
 
-        public MediaRepository(IUnitOfWork work, IRepositoryCacheProvider cache, IMediaTypeRepository mediaTypeRepository)
+		public MediaRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMediaTypeRepository mediaTypeRepository)
             : base(work, cache)
         {
             _mediaTypeRepository = mediaTypeRepository;
@@ -176,12 +176,21 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Insert(dto);
 
             //Create the PropertyData for this version - cmsPropertyData
-            var propertyFactory = new PropertyFactory(((Models.Media)entity).ContentType, entity.Version, entity.Id);
+            var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
             var propertyDataDtos = propertyFactory.BuildDto(entity.Properties);
+            var keyDictionary = new Dictionary<int, int>();
+
             //Add Properties
             foreach (var propertyDataDto in propertyDataDtos)
             {
-                Database.Insert(propertyDataDto);
+                var primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
+                keyDictionary.Add(propertyDataDto.PropertyTypeId, primaryKey);
+            }
+
+            //Update Properties with its newly set Id
+            foreach (var property in entity.Properties)
+            {
+                property.Id = keyDictionary[property.PropertyTypeId];
             }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
@@ -215,7 +224,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Insert(dto);
 
             //Create the PropertyData for this version - cmsPropertyData
-            var propertyFactory = new PropertyFactory(((Models.Media)entity).ContentType, entity.Version, entity.Id);
+            var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
             var propertyDataDtos = propertyFactory.BuildDto(entity.Properties);
             //Add Properties
             foreach (var propertyDataDto in propertyDataDtos)

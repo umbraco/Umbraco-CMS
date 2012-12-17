@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -11,10 +12,12 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using umbraco.editorControls.tinyMCE3;
+using umbraco.interfaces;
 
 namespace Umbraco.Tests.Services
 {
-    /// <summary>
+	/// <summary>
     /// Tests covering all methods in the ContentService class.
     /// This is more of an integration test as it involves multiple layers
     /// as well as configuration.
@@ -25,10 +28,33 @@ namespace Umbraco.Tests.Services
         [SetUp]
         public override void Initialize()
         {
+            //this ensures its reset
+            PluginManager.Current = new PluginManager();
+
+            //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
+            PluginManager.Current.AssembliesToScan = new[]
+				{
+                    typeof(IDataType).Assembly,
+                    typeof(tinyMCE3dataType).Assembly
+				};
+
+            DataTypesResolver.Current = new DataTypesResolver(
+                PluginManager.Current.ResolveDataTypes());
+
             base.Initialize();
 
             CreateTestData();
         }
+
+		[TearDown]
+		public override void TearDown()
+		{
+            //reset the app context
+            DataTypesResolver.Reset();
+            PluginManager.Current = null;
+
+			base.TearDown();
+		}
 
         //TODO Add test to verify there is only ONE newest document/content in cmsDocument table after updating.
         //TODO Add test to delete specific version (with and without deleting prior versions) and versions by date.
@@ -201,10 +227,12 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
+            var parent = ServiceContext.ContentService.GetById(1046);
+            ServiceContext.ContentService.Publish(parent);//Publishing root, so Text Page 2 can be updated.
             var subpage2 = contentService.GetById(1048);
             subpage2.Name = "Text Page 2 Updated";
             subpage2.SetValue("author", "Jane Doe");
-            contentService.Save(subpage2, 0);
+            contentService.SaveAndPublish(subpage2, 0);//NOTE New versions are only added between publish-state-changed, so publishing to ensure addition version.
 
             // Act
             var versions = contentService.GetVersions(1048);
@@ -648,27 +676,29 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
+            var parent = ServiceContext.ContentService.GetById(1046);
+            ServiceContext.ContentService.Publish(parent);//Publishing root, so Text Page 2 can be updated.
             var subpage2 = contentService.GetById(1048);
             var version = subpage2.Version;
             var nameBeforeRollback = subpage2.Name;
             subpage2.Name = "Text Page 2 Updated";
             subpage2.SetValue("author", "Jane Doe");
-            contentService.Save(subpage2, 0);
+            contentService.SaveAndPublish(subpage2, 0);//Saving and publishing, so a new version is created
 
             // Act
             var rollback = contentService.Rollback(1048, version, 0);
 
             // Assert
             Assert.That(rollback, Is.Not.Null);
-            Assert.AreNotEqual(rollback.Version, version);
+            Assert.AreNotEqual(rollback.Version, subpage2.Version);
             Assert.That(rollback.GetValue<string>("author"), Is.Not.EqualTo("Jane Doe"));
             Assert.AreEqual(nameBeforeRollback, rollback.Name);
         }
 
         [Test]
         public void Can_Save_Lazy_Content()
-        {
-            var unitOfWork = new PetaPocoUnitOfWork();
+        {	        
+	        var unitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
             var root = ServiceContext.ContentService.GetById(1046);
 
@@ -711,14 +741,6 @@ namespace Umbraco.Tests.Services
             Assert.That(published, Is.True);
             Assert.That(homepage.Published, Is.False);
             Assert.That(hasPublishedVersion, Is.True);
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-
-            ServiceContext = null;
         }
 
         public void CreateTestData()

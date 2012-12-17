@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence
 		internal TRepository ResolveByType<TRepository>(IUnitOfWork unitOfWork)
 			where TRepository : class, IRepository
 		{
-			var createMethod = this.Value.GetType().GetMethods()
+            var createMethod = this.Value.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public)
 				.First(x => x.Name == "Create" + typeof (TRepository).Name.Substring(1));
 
 			if (createMethod.GetParameters().Count() != 1

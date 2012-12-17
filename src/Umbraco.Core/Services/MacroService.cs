@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Auditing;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -14,23 +14,32 @@ namespace Umbraco.Core.Services
     /// </summary>
     internal class MacroService : IMacroService
     {
-        private readonly IUnitOfWork _unitOfWork;
-	    private readonly IMacroRepository _macroRepository;
+	    private readonly RepositoryFactory _repositoryFactory;
+        private readonly IUnitOfWorkProvider _uowProvider;
 
         public MacroService()
-            : this(new FileUnitOfWorkProvider())
+            : this(new RepositoryFactory())
+        {
+        }
+
+        public MacroService(RepositoryFactory repositoryFactory)
+            : this(new FileUnitOfWorkProvider(), repositoryFactory)
         {
         }
 
         public MacroService(IUnitOfWorkProvider provider)
+            : this(provider, new RepositoryFactory())
         {
-            _unitOfWork = provider.GetUnitOfWork();
-	        _macroRepository = RepositoryResolver.Current.Factory.CreateMacroRepository(_unitOfWork);
         }
 
-        public MacroService(IUnitOfWorkProvider provider, bool ensureCachedMacros)
+		public MacroService(IUnitOfWorkProvider provider, RepositoryFactory repositoryFactory) : this(provider, repositoryFactory, false)
         {
-            _unitOfWork = provider.GetUnitOfWork();
+        }
+
+        public MacroService(IUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, bool ensureCachedMacros)
+        {
+            _uowProvider = provider;
+            _repositoryFactory = repositoryFactory;
 
             if(ensureCachedMacros)
                 EnsureMacroCache();
@@ -52,8 +61,10 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IMacro"/> object</returns>
         public IMacro GetByAlias(string alias)
         {
-            var repository = _macroRepository;
-            return repository.Get(alias);
+            using (var repository = _repositoryFactory.CreateMacroRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(alias);
+            }
         }
 
         /// <summary>
@@ -63,8 +74,10 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IMacro"/> objects</returns>
         public IEnumerable<IMacro> GetAll(params string[] aliases)
         {
-            var repository = _macroRepository;
-            return repository.GetAll(aliases);
+            using (var repository = _repositoryFactory.CreateMacroRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(aliases);
+            }
         }
 
         /// <summary>
@@ -80,12 +93,15 @@ namespace Umbraco.Core.Services
 
             if (!e.Cancel)
             {
-                var repository = _macroRepository;
-                repository.Delete(macro);
-                _unitOfWork.Commit();
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateMacroRepository(uow))
+                {
+                    repository.Delete(macro);
+                    uow.Commit();
 
-                if (Deleted != null)
-                    Deleted(macro, e);
+                    if (Deleted != null)
+                        Deleted(macro, e);
+                }
 
                 Audit.Add(AuditTypes.Delete, "Delete Macro performed by user", userId > -1 ? userId : 0, -1);
             }
@@ -104,11 +120,15 @@ namespace Umbraco.Core.Services
 
             if (!e.Cancel)
             {
-                _macroRepository.AddOrUpdate(macro);
-                _unitOfWork.Commit();
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateMacroRepository(uow))
+                {
+                    repository.AddOrUpdate(macro);
+                    uow.Commit();
 
-                if (Saved != null)
-                    Saved(macro, e);
+                    if (Saved != null)
+                        Saved(macro, e);
+                }
 
                 Audit.Add(AuditTypes.Save, "Save Macro performed by user", userId > -1 ? userId : 0, -1);
             }

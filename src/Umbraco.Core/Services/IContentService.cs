@@ -86,50 +86,6 @@ namespace Umbraco.Core.Services
         IEnumerable<IContent> GetContentInRecycleBin();
 
         /// <summary>
-        /// Re-Publishes all Content
-        /// </summary>
-        /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this RePublish method. By default this method will update the cache.</param>
-        /// <returns>True if publishing succeeded, otherwise False</returns>
-        bool RePublishAll(int userId = -1, bool omitCacheRefresh = false);
-
-        /// <summary>
-        /// Publishes a single <see cref="IContent"/> object
-        /// </summary>
-        /// <param name="content">The <see cref="IContent"/> to publish</param>
-        /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
-        /// <returns>True if publishing succeeded, otherwise False</returns>
-        bool Publish(IContent content, int userId = -1, bool omitCacheRefresh = false);
-
-        /// <summary>
-        /// Publishes a <see cref="IContent"/> object and all its children
-        /// </summary>
-        /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
-        /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
-        /// <returns>True if publishing succeeded, otherwise False</returns>
-        bool PublishWithChildren(IContent content, int userId = -1, bool omitCacheRefresh = false);
-
-        /// <summary>
-        /// UnPublishes a single <see cref="IContent"/> object
-        /// </summary>
-        /// <param name="content">The <see cref="IContent"/> to publish</param>
-        /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Unpublish method. By default this method will update the cache.</param>
-        /// <returns>True if unpublishing succeeded, otherwise False</returns>
-        bool UnPublish(IContent content, int userId = -1, bool omitCacheRefresh = false);
-
-        /// <summary>
-        /// Saves and Publishes a single <see cref="IContent"/> object
-        /// </summary>
-        /// <param name="content">The <see cref="IContent"/> to save and publish</param>
-        /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
-        /// <returns>True if publishing succeeded, otherwise False</returns>
-        bool SaveAndPublish(IContent content, int userId = -1, bool omitCacheRefresh = false);
-
-        /// <summary>
         /// Saves a single <see cref="IContent"/> object
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to save</param>
@@ -165,14 +121,6 @@ namespace Umbraco.Core.Services
         /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional Id of the user issueing the delete operation</param>
         void DeleteContentOfType(int contentTypeId, int userId = -1);
-
-        /// <summary>
-        /// Permanently deletes an <see cref="IContent"/> object
-        /// </summary>
-        /// <remarks>Please note that this method will completely remove the Content from the database</remarks>
-        /// <param name="content">The <see cref="IContent"/> to delete</param>
-        /// <param name="userId">Optional Id of the User deleting the Content</param>
-        void Delete(IContent content, int userId = -1);
 
         /// <summary>
         /// Permanently deletes versions from an <see cref="IContent"/> object prior to a specific date.
@@ -230,25 +178,6 @@ namespace Umbraco.Core.Services
         void EmptyRecycleBin();
 
         /// <summary>
-        /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current 
-        /// to the new copy which is returned.
-        /// </summary>
-        /// <param name="content">The <see cref="IContent"/> to copy</param>
-        /// <param name="parentId">Id of the Content's new Parent</param>
-        /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
-        /// <param name="userId">Optional Id of the User copying the Content</param>
-        /// <returns>The newly created <see cref="IContent"/> object</returns>
-        IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = -1);
-
-        /// <summary>
-        /// Sends an <see cref="IContent"/> to Publication, which executes handlers and events for the 'Send to Publication' action.
-        /// </summary>
-        /// <param name="content">The <see cref="IContent"/> to send to publication</param>
-        /// <param name="userId">Optional Id of the User issueing the send to publication</param>
-        /// <returns>True if sending publication was succesfull otherwise false</returns>
-        //bool SendToPublication(IContent content, int userId = -1);
-
-        /// <summary>
         /// Rollback an <see cref="IContent"/> object to a previous version.
         /// This will create a new version, which is a copy of all the old data.
         /// </summary>
@@ -259,11 +188,26 @@ namespace Umbraco.Core.Services
         IContent Rollback(int id, Guid versionId, int userId = -1);
 
         /// <summary>
-        /// Cheacks whether an <see cref="IContent"/> item has any published versions
+        /// Gets a collection of <see cref="IContent"/> objects by its name or partial name
         /// </summary>
-        /// <param name="id">Id of the <see cref="IContent"/></param>
-        /// <returns>True if the content has any published version otherwise False</returns>
-        bool HasPublishedVersion(int id);
+        /// <param name="parentId">Id of the Parent to retrieve Children from</param>
+        /// <param name="name">Full or partial name of the children</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetChildrenByName(int parentId, string name);
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetDescendants(int id);
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> item to retrieve Descendants from</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetDescendants(IContent content);
 
         /// <summary>
         /// Gets a specific version of an <see cref="IContent"/> item.
@@ -281,20 +225,6 @@ namespace Umbraco.Core.Services
         IContent GetPublishedVersion(int id);
 
         /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
-        /// </summary>
-        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        IEnumerable<IContent> GetDescendants(int id);
-
-        /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
-        /// </summary>
-        /// <param name="content"><see cref="IContent"/> item to retrieve Descendants from</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        IEnumerable<IContent> GetDescendants(IContent content);
-
-        /// <summary>
         /// Checks whether an <see cref="IContent"/> item has any children
         /// </summary>
         /// <param name="id">Id of the <see cref="IContent"/></param>
@@ -302,11 +232,76 @@ namespace Umbraco.Core.Services
         bool HasChildren(int id);
 
         /// <summary>
-        /// Gets a collection of <see cref="IContent"/> objects by its name or partial name
+        /// Checks whether an <see cref="IContent"/> item has any published versions
         /// </summary>
-        /// <param name="parentId">Id of the Parent to retrieve Children from</param>
-        /// <param name="name">Full or partial name of the children</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        IEnumerable<IContent> GetChildrenByName(int parentId, string name);
+        /// <param name="id">Id of the <see cref="IContent"/></param>
+        /// <returns>True if the content has any published version otherwise False</returns>
+        bool HasPublishedVersion(int id);
+
+        /// <summary>
+        /// Re-Publishes all Content
+        /// </summary>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this RePublish method. By default this method will update the cache.</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        bool RePublishAll(int userId = -1, bool omitCacheRefresh = false);
+
+        /// <summary>
+        /// Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        bool Publish(IContent content, int userId = -1, bool omitCacheRefresh = false);
+
+        /// <summary>
+        /// Publishes a <see cref="IContent"/> object and all its children
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        bool PublishWithChildren(IContent content, int userId = -1, bool omitCacheRefresh = false);
+
+        /// <summary>
+        /// UnPublishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Unpublish method. By default this method will update the cache.</param>
+        /// <returns>True if unpublishing succeeded, otherwise False</returns>
+        bool UnPublish(IContent content, int userId = -1, bool omitCacheRefresh = false);
+
+        /// <summary>
+        /// Saves and Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save and publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        bool SaveAndPublish(IContent content, int userId = -1, bool omitCacheRefresh = false);
+
+        /// <summary>
+        /// Permanently deletes an <see cref="IContent"/> object.
+        /// </summary>
+        /// <remarks>
+        /// This method will also delete associated media files, child content and possibly associated domains.
+        /// </remarks>
+        /// <remarks>Please note that this method will completely remove the Content from the database</remarks>
+        /// <param name="content">The <see cref="IContent"/> to delete</param>
+        /// <param name="userId">Optional Id of the User deleting the Content</param>
+        void Delete(IContent content, int userId = -1);
+
+        /// <summary>
+        /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current 
+        /// to the new copy which is returned.
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to copy</param>
+        /// <param name="parentId">Id of the Content's new Parent</param>
+        /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
+        /// <param name="userId">Optional Id of the User copying the Content</param>
+        /// <returns>The newly created <see cref="IContent"/> object</returns>
+        IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = -1);
     }
 }

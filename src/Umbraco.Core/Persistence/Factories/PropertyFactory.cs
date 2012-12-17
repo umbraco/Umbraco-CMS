@@ -49,7 +49,7 @@ namespace Umbraco.Core.Persistence.Factories
             foreach (var property in properties)
             {
                 var dto = new PropertyDataDto { NodeId = _id, PropertyTypeId = property.PropertyTypeId, VersionId = _version };
-                
+
                 //Check if property has an Id and set it, so that it can be updated if it already exists
                 if (property.HasIdentity)
                     dto.Id = property.Id;

@@ -43,8 +43,8 @@ namespace Umbraco.Tests.Publishing
         [TearDown]
         public override void TearDown()
         {
-            DatabaseContext.Database.Dispose();
-
+			base.TearDown();
+            
             //TestHelper.ClearDatabase();
 
             //reset the app context
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Publishing
         [Test]
         public void Can_Publish_And_Update_Xml_Cache()
         {
-            //TODO Make new test
+            //TODO Create new test
         }
 
         public void CreateTestData()

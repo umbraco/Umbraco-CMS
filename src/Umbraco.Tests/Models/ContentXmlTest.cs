@@ -29,13 +29,17 @@ namespace Umbraco.Tests.Models
                     typeof(tinyMCE3dataType).Assembly
 				};
 
+            DataTypesResolver.Current = new DataTypesResolver(
+                PluginManager.Current.ResolveDataTypes());
+
             base.Initialize();
         }
 
         [TearDown]
         public override void TearDown()
         {
-            DatabaseContext.Database.Dispose();
+            //reset the app context
+            DataTypesResolver.Reset();
             
             base.TearDown();
         }
@@ -57,8 +61,6 @@ namespace Umbraco.Tests.Models
             // Assert
             Assert.That(element, Is.Not.Null);
             Assert.That(element.Name.LocalName, Is.EqualTo(nodeName));
-
-            Console.WriteLine(element.ToString(SaveOptions.DisableFormatting));
         } 
     }
 }

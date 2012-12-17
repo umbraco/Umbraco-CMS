@@ -117,7 +117,16 @@
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
     <Compile Include="Dynamics\DynamicInstanceHelper.cs" />
-    <Compile Include="EventArgs.cs" />
+    <Compile Include="Events\ContentCacheEventArgs.cs" />
+    <Compile Include="Events\CopyEventArgs.cs" />
+    <Compile Include="Events\DeleteEventArgs.cs" />
+    <Compile Include="Events\PublishingEventArgs.cs" />
+    <Compile Include="Events\MoveEventArgs.cs" />
+    <Compile Include="Events\NewEventArgs.cs" />
+    <Compile Include="Events\RefreshContentEventArgs.cs" />
+    <Compile Include="Events\RollbackEventArgs.cs" />
+    <Compile Include="Events\SaveEventArgs.cs" />
+    <Compile Include="Events\SendToPublishEventArgs.cs" />
     <Compile Include="MacroPropertyTypeResolver.cs" />
     <Compile Include="Models\ContentBase.cs" />
     <Compile Include="Models\ContentExtensions.cs" />
@@ -184,7 +193,6 @@
     <Compile Include="Persistence\DatabaseAnnotations\NullSettings.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\PrimaryKeyColumnAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ReferencesAttribute.cs" />
-    <Compile Include="Persistence\DatabaseFactory.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\ColumnDefinition.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\ConstraintDefinition.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\ConstraintType.cs" />
@@ -199,6 +207,7 @@
     <Compile Include="Persistence\DatabaseModelDefinitions\SystemMethods.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\TableDefinition.cs" />
     <Compile Include="Persistence\DatabaseProviders.cs" />
+    <Compile Include="Persistence\DefaultDatabaseFactory.cs" />
     <Compile Include="Persistence\Factories\ContentFactory.cs" />
     <Compile Include="Persistence\Factories\ContentTypeFactory.cs" />
     <Compile Include="Persistence\Factories\DataTypeDefinitionFactory.cs" />
@@ -215,6 +224,7 @@
     <Compile Include="Persistence\Factories\TemplateFactory.cs" />
     <Compile Include="Persistence\Factories\UserFactory.cs" />
     <Compile Include="Persistence\Factories\UserTypeFactory.cs" />
+    <Compile Include="Persistence\IDatabaseFactory.cs" />
     <Compile Include="Persistence\Mappers\BaseMapper.cs" />
     <Compile Include="Persistence\Mappers\ContentMapper.cs" />
     <Compile Include="Persistence\Mappers\ContentTypeMapper.cs" />
@@ -398,8 +408,11 @@
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderBase.cs" />
     <Compile Include="Persistence\SqlSyntax\SyntaxConfig.cs" />
     <Compile Include="Persistence\TransactionType.cs" />
+    <Compile Include="Persistence\UmbracoDatabase.cs" />
     <Compile Include="Persistence\UnitOfWork\FileUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\FileUnitOfWorkProvider.cs" />
+    <Compile Include="Persistence\UnitOfWork\IDatabaseUnitOfWork.cs" />
+    <Compile Include="Persistence\UnitOfWork\IDatabaseUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkRepository.cs" />
@@ -592,7 +605,6 @@
     <Compile Include="Services\MacroService.cs" />
     <Compile Include="Services\MediaService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
-    <Compile Include="Services\ServiceFactory.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="ReadLock.cs" />

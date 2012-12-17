@@ -2,7 +2,6 @@ using System;
 using System.Web;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -12,13 +11,19 @@ namespace Umbraco.Core.Services
     /// </summary>
     internal class UserService : IUserService
     {
-        private readonly IUnitOfWork _unitOfWork;
-	    private readonly IUserRepository _userRepository;
+	    private readonly RepositoryFactory _repositoryFactory;
+        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 
-        public UserService(IUnitOfWorkProvider provider)
+        public UserService(RepositoryFactory repositoryFactory) : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
+        {}
+
+        public UserService(IDatabaseUnitOfWorkProvider provider) : this(provider, new RepositoryFactory())
+        {}
+
+        public UserService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
         {
-            _unitOfWork = provider.GetUnitOfWork();
-	        _userRepository = RepositoryResolver.Current.Factory.CreateUserRepository(_unitOfWork);
+			_repositoryFactory = repositoryFactory;
+			_uowProvider = provider;
         }
 
         #region Implementation of IUserService
@@ -48,15 +53,18 @@ namespace Umbraco.Core.Services
 
             if(HttpRuntime.Cache[cacheKey] == null)
             {
-                userId =
-                    DatabaseContext.Current.Database.ExecuteScalar<int>(
-                        "select userID from umbracoUserLogins where contextID = @ContextId",
-                        new {ContextId = new Guid(contextId)});
+                using (var uow = _uowProvider.GetUnitOfWork())
+                {
+					userId =
+						uow.Database.ExecuteScalar<int>(
+							"select userID from umbracoUserLogins where contextID = @ContextId",
+							new { ContextId = new Guid(contextId) });
 
-                HttpRuntime.Cache.Insert(cacheKey, userId,
-                                         null,
-                                         System.Web.Caching.Cache.NoAbsoluteExpiration,
-                                         new TimeSpan(0, (int)(Umbraco.Core.Configuration.GlobalSettings.TimeOutInMinutes / 10), 0));
+					HttpRuntime.Cache.Insert(cacheKey, userId,
+											 null,
+											 System.Web.Caching.Cache.NoAbsoluteExpiration,
+											 new TimeSpan(0, (int)(Umbraco.Core.Configuration.GlobalSettings.TimeOutInMinutes / 10), 0));    
+                }                
             }
             else
             {
@@ -90,8 +98,10 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IProfile"/></returns>
         public IProfile GetProfileById(int id)
         {
-			var repository = _userRepository;
-            return repository.GetProfileById(id);
+            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetProfileById(id);
+            }
         }
 
         #endregion

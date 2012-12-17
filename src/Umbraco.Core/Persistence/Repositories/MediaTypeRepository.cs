@@ -16,12 +16,12 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class MediaTypeRepository : ContentTypeBaseRepository<int, IMediaType>, IMediaTypeRepository
     {
-        public MediaTypeRepository(IUnitOfWork work)
+		public MediaTypeRepository(IDatabaseUnitOfWork work)
             : base(work)
         {
         }
 
-        public MediaTypeRepository(IUnitOfWork work, IRepositoryCacheProvider cache)
+		public MediaTypeRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
             : base(work, cache)
         {
         }
