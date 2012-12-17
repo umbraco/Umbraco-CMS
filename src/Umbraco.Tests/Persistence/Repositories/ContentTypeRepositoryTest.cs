@@ -192,7 +192,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Assert
             Assert.That(contentType3.PropertyTypes.Any(x => x.Alias == "metaDescription"), Is.False);
             Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(contentType3.PropertyGroups.Count));
-            Assert.That(contentType.PropertyTypes.Count(), Is.GreaterThan(contentType3.PropertyTypes.Count()));
+            Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(contentType3.PropertyTypes.Count()));
         }
 
         [Test]

@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IContent"/>
     /// </summary>
-    internal class ContentRepository : PetaPocoRepositoryBase<int, IContent>, IContentRepository
+    internal class ContentRepository : VersionableRepositoryBase<int, IContent>, IContentRepository
     {
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;
@@ -40,11 +40,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IContent PerformGet(int id)
         {
-            var contentSql = GetBaseQuery(false);
-            contentSql.Where(GetBaseWhereClause(), new { Id = id });
-            contentSql.OrderBy("[cmsContentVersion].[VersionDate] DESC");
+            var sql = GetBaseQuery(false);
+            sql.Where(GetBaseWhereClause(), new { Id = id });
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dto = Database.Query<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(contentSql).FirstOrDefault();
+            var dto = Database.Query<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -149,6 +149,40 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Guid NodeObjectTypeId
         {
             get { return new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"); }
+        }
+
+        #endregion
+
+        #region Overrides of VersionableRepositoryBase<IContent>
+        
+        public override IContent GetByVersion(Guid versionId)
+        {
+            var sql = GetBaseQuery(false);
+            sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+
+            var dto = Database.Query<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
+
+            if (dto == null)
+                return null;
+
+            var contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
+
+            var factory = new ContentFactory(contentType, NodeObjectTypeId, dto.NodeId);
+            var content = factory.BuildEntity(dto);
+
+            content.Properties = GetPropertyCollection(dto.NodeId, versionId, contentType);
+
+            ((ICanBeDirty)content).ResetDirtyProperties();
+            return content;
+        }
+
+        protected override void PerformDeleteVersion(int id, Guid versionId)
+        {
+            Database.Delete<PreviewXmlDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<PropertyDataDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<ContentVersionDto>("WHERE nodeId = @Id AND VersionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<DocumentDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
         }
 
         #endregion
@@ -358,97 +392,19 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Implementation of IContentRepository
 
-        public IEnumerable<IContent> GetAllVersions(int id)
-        {
-            var contentSql = GetBaseQuery(false);
-            contentSql.Where(GetBaseWhereClause(), new { Id = id });
-            contentSql.OrderBy("[cmsContentVersion].[VersionDate] DESC");
-
-            var documentDtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(contentSql);
-            foreach (var dto in documentDtos)
-            {
-                yield return GetByVersion(id, dto.ContentVersionDto.VersionId);
-            }
-        }
-
-        public IContent GetByVersion(int id, Guid versionId)
-        {
-            var contentSql = GetBaseQuery(false);
-            contentSql.Where(GetBaseWhereClause(), new { Id = id });
-            contentSql.Where("[cmsContentVersion].[VersionId] = @VersionId", new { VersionId = versionId });
-            contentSql.OrderBy("[cmsContentVersion].[VersionDate] DESC");
-
-            var dto = Database.Query<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(contentSql).FirstOrDefault();
-
-            if (dto == null)
-                return null;
-
-            var contentType = _contentTypeRepository.Get(dto.ContentVersionDto.ContentDto.ContentTypeId);
-
-            var factory = new ContentFactory(contentType, NodeObjectTypeId, id);
-            var content = factory.BuildEntity(dto);
-
-            content.Properties = GetPropertyCollection(id, versionId, contentType);
-
-            ((ICanBeDirty)content).ResetDirtyProperties();
-            return content;
-        }
-
         public IContent GetByLanguage(int id, string language)
         {
-            var contentSql = GetBaseQuery(false);
-            contentSql.Where(GetBaseWhereClause(), new { Id = id });
-            contentSql.Where("[cmsContentVersion].[LanguageLocale] = @Language", new { Language = language });
-            contentSql.OrderBy("[cmsContentVersion].[VersionDate] DESC");
+            var sql = GetBaseQuery(false);
+            sql.Where(GetBaseWhereClause(), new { Id = id });
+            sql.Where("[cmsContentVersion].[LanguageLocale] = @Language", new { Language = language });
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dto = Database.Query<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(contentSql).FirstOrDefault();
+            var dto = Database.Query<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
 
-            return GetByVersion(dto.NodeId, dto.ContentVersionDto.VersionId);
-        }
-
-        public void Delete(int id, Guid versionId)
-        {
-            var documentDto = Database.FirstOrDefault<DocumentDto>("WHERE nodeId = @Id AND versionId = @VersionId AND newest = @Newest", new { Id = id, VersionId = versionId, Newest = false });
-            Mandate.That<Exception>(documentDto != null);
-
-            using (var transaction = Database.GetTransaction())
-            {
-                DeleteVersion(id, versionId);
-
-                transaction.Complete();
-            }
-        }
-
-        public void Delete(int id, DateTime versionDate)
-        {
-            var list = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND VersionDate < @VersionDate", new { Id = id, VersionDate = versionDate });
-            Mandate.That<Exception>(list.Any());
-
-            using (var transaction = Database.GetTransaction())
-            {
-                foreach (var dto in list)
-                {
-                    DeleteVersion(id, dto.VersionId);
-                }
-
-                transaction.Complete();
-            }
-        }
-
-        /// <summary>
-        /// Private method to execute the delete statements for removing a single version for a Content item.
-        /// </summary>
-        /// <param name="id">Id of the <see cref="IContent"/> to delete a version from</param>
-        /// <param name="versionId">Guid id of the version to delete</param>
-        private void DeleteVersion(int id, Guid versionId)
-        {
-            Database.Delete<PreviewXmlDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
-            Database.Delete<PropertyDataDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
-            Database.Delete<ContentVersionDto>("WHERE nodeId = @Id AND VersionId = @VersionId", new { Id = id, VersionId = versionId });
-            Database.Delete<DocumentDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
+            return GetByVersion(dto.ContentVersionDto.VersionId);
         }
 
         #endregion

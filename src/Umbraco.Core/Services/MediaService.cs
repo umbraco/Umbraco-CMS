@@ -115,6 +115,49 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Gets a collection of <see cref="IMedia"/> objects by Level
+        /// </summary>
+        /// <param name="level">The level to retrieve Media from</param>
+        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
+        public IEnumerable<IMedia> GetByLevel(int level)
+        {
+            using (var repository = _repositoryFactory.CreateMediaRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IMedia>.Builder.Where(x => x.Level == level);
+                var contents = repository.GetByQuery(query);
+
+                return contents;
+            }
+        }
+
+        /// <summary>
+        /// Gets a specific version of an <see cref="IMedia"/> item.
+        /// </summary>
+        /// <param name="versionId">Id of the version to retrieve</param>
+        /// <returns>An <see cref="IMedia"/> item</returns>
+        public IMedia GetByVersion(Guid versionId)
+        {
+            using (var repository = _repositoryFactory.CreateMediaRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetByVersion(versionId);
+            }
+        }
+
+        /// <summary>
+        /// Gets a collection of an <see cref="IMedia"/> objects versions by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
+        public IEnumerable<IMedia> GetVersions(int id)
+        {
+            using (var repository = _repositoryFactory.CreateMediaRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var versions = repository.GetAllVersions(id);
+                return versions;
+            }
+        }
+
 		/// <summary>
 		/// Gets a collection of <see cref="IMedia"/> objects by Parent Id
 		/// </summary>
@@ -199,6 +242,21 @@ namespace Umbraco.Core.Services
 				return medias;
 			}			
 		}
+
+        /// <summary>
+        /// Checks whether an <see cref="IMedia"/> item has any children
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMedia"/></param>
+        /// <returns>True if the media has any children otherwise False</returns>
+        public bool HasChildren(int id)
+        {
+            using (var repository = _repositoryFactory.CreateMediaRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IMedia>.Builder.Where(x => x.ParentId == id);
+                int count = repository.Count(query);
+                return count > 0;
+            }
+        }
 
 		/// <summary>
 		/// Moves an <see cref="IMedia"/> object to a new location
@@ -343,6 +401,69 @@ namespace Umbraco.Core.Services
 	            Audit.Add(AuditTypes.Delete, "Delete Media performed by user", userId == -1 ? 0 : userId, media.Id);
 	        }
 	    }
+
+        /// <summary>
+        /// Permanently deletes versions from an <see cref="IMedia"/> object prior to a specific date.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMedia"/> object to delete versions from</param>
+        /// <param name="versionDate">Latest version date</param>
+        /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
+        public void DeleteVersions(int id, DateTime versionDate, int userId = -1)
+        {
+            var e = new DeleteEventArgs { Id = id };
+            if (Deleting != null)
+                Deleting(versionDate, e);
+
+            if (!e.Cancel)
+            {
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+                {
+                    repository.DeleteVersions(id, versionDate);
+                    uow.Commit();
+                }
+
+                if (Deleted != null)
+                    Deleted(versionDate, e);
+
+                Audit.Add(AuditTypes.Delete, "Delete Media by version date performed by user", userId == -1 ? 0 : userId, -1);
+            }
+        }
+
+        /// <summary>
+        /// Permanently deletes specific version(s) from an <see cref="IMedia"/> object.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMedia"/> object to delete a version from</param>
+        /// <param name="versionId">Id of the version to delete</param>
+        /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
+        /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
+        public void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = -1)
+        {
+            if (deletePriorVersions)
+            {
+                var content = GetByVersion(versionId);
+                DeleteVersions(id, content.UpdateDate, userId);
+            }
+
+            var e = new DeleteEventArgs { Id = id };
+            if (Deleting != null)
+                Deleting(versionId, e);
+
+            if (!e.Cancel)
+            {
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+                {
+                    repository.DeleteVersion(versionId);
+                    uow.Commit();
+                }
+
+                if (Deleted != null)
+                    Deleted(versionId, e);
+
+                Audit.Add(AuditTypes.Delete, "Delete Media by version performed by user", userId == -1 ? 0 : userId, -1);
+            }
+        }
 
 	    /// <summary>
 	    /// Saves a single <see cref="IMedia"/> object

@@ -125,27 +125,10 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Permanently deletes versions from an <see cref="IContent"/> object prior to a specific date.
         /// </summary>
-        /// <param name="content">Id of the <see cref="IContent"/> object to delete versions from</param>
-        /// <param name="versionDate">Latest version date</param>
-        /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        void Delete(IContent content, DateTime versionDate, int userId = -1);
-
-        /// <summary>
-        /// Permanently deletes a specific version from an <see cref="IContent"/> object.
-        /// </summary>
-        /// <param name="content">Id of the <see cref="IContent"/> object to delete a version from</param>
-        /// <param name="versionId">Id of the version to delete</param>
-        /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
-        /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        void Delete(IContent content, Guid versionId, bool deletePriorVersions, int userId = -1);
-
-        /// <summary>
-        /// Permanently deletes versions from an <see cref="IContent"/> object prior to a specific date.
-        /// </summary>
         /// <param name="id">Id of the <see cref="IContent"/> object to delete versions from</param>
         /// <param name="versionDate">Latest version date</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        void Delete(int id, DateTime versionDate, int userId = -1);
+        void DeleteVersions(int id, DateTime versionDate, int userId = -1);
 
         /// <summary>
         /// Permanently deletes a specific version from an <see cref="IContent"/> object.
@@ -154,7 +137,7 @@ namespace Umbraco.Core.Services
         /// <param name="versionId">Id of the version to delete</param>
         /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        void Delete(int id, Guid versionId, bool deletePriorVersions, int userId = -1);
+        void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = -1);
 
         /// <summary>
         /// Deletes an <see cref="IContent"/> object by moving it to the Recycle Bin
@@ -212,10 +195,9 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets a specific version of an <see cref="IContent"/> item.
         /// </summary>
-        /// <param name="id">Id of the <see cref="IContent"/> to retrieve version from</param>
         /// <param name="versionId">Id of the version to retrieve</param>
         /// <returns>An <see cref="IContent"/> item</returns>
-        IContent GetByIdVersion(int id, Guid versionId);
+        IContent GetByVersion(Guid versionId);
 
         /// <summary>
         /// Gets the published version of an <see cref="IContent"/> item
