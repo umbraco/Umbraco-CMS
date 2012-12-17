@@ -108,15 +108,5 @@ namespace Umbraco.Core.Models
             if (Key == Guid.Empty)
                 Key = Guid.NewGuid();
         }
-
-        /// <summary>
-        /// Method to call when Entity is being updated
-        /// </summary>
-        /// <remarks>Modified Date is set and a new Version guid is set</remarks>
-        internal override void UpdatingEntity()
-        {
-            base.UpdatingEntity();
-            Version = Guid.NewGuid();
-        }
     }
 }

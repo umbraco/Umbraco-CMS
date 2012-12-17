@@ -189,7 +189,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Assert
             Assert.That(mediaTypeV3.PropertyTypes.Any(x => x.Alias == "title"), Is.False);
             Assert.That(mediaType.PropertyGroups.Count, Is.EqualTo(mediaTypeV3.PropertyGroups.Count));
-            Assert.That(mediaType.PropertyTypes.Count(), Is.GreaterThan(mediaTypeV3.PropertyTypes.Count()));
+            Assert.That(mediaType.PropertyTypes.Count(), Is.EqualTo(mediaTypeV3.PropertyTypes.Count()));
         }
 
         [Test]

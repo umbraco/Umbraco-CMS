@@ -169,6 +169,33 @@ namespace Umbraco.Core.Services
 			}
 		}
 
+        /// <summary>
+        /// Gets a specific version of an <see cref="IContent"/> item.
+        /// </summary>
+        /// <param name="versionId">Id of the version to retrieve</param>
+        /// <returns>An <see cref="IContent"/> item</returns>
+        public IContent GetByVersion(Guid versionId)
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetByVersion(versionId);
+            }
+        }
+
+        /// <summary>
+        /// Gets a collection of an <see cref="IContent"/> objects versions by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetVersions(int id)
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var versions = repository.GetAllVersions(id);
+                return versions;
+            }
+        }
+
 		/// <summary>
 		/// Gets a collection of <see cref="IContent"/> objects by Parent Id
 		/// </summary>
@@ -228,35 +255,6 @@ namespace Umbraco.Core.Services
                 return contents;
             }
         }
-
-
-        /// <summary>
-        /// Gets a specific version of an <see cref="IContent"/> item.
-        /// </summary>
-        /// <param name="id">Id of the <see cref="IContent"/> to retrieve version from</param>
-        /// <param name="versionId">Id of the version to retrieve</param>
-        /// <returns>An <see cref="IContent"/> item</returns>
-        public IContent GetByIdVersion(int id, Guid versionId)
-        {
-            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
-            {
-                return repository.GetByVersion(id, versionId);
-            }
-        }
-
-		/// <summary>
-		/// Gets a collection of an <see cref="IContent"/> objects versions by Id
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-		public IEnumerable<IContent> GetVersions(int id)
-		{
-			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
-			{
-				var versions = repository.GetAllVersions(id);
-				return versions;
-			}
-		}
 
         /// <summary>
         /// Gets the published version of an <see cref="IContent"/> item
@@ -869,33 +867,10 @@ namespace Umbraco.Core.Services
 		/// <summary>
 		/// Permanently deletes versions from an <see cref="IContent"/> object prior to a specific date.
 		/// </summary>
-		/// <param name="content">Id of the <see cref="IContent"/> object to delete versions from</param>
-		/// <param name="versionDate">Latest version date</param>
-		/// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-		public void Delete(IContent content, DateTime versionDate, int userId = -1)
-		{
-			Delete(content.Id, versionDate, userId);
-		}
-
-		/// <summary>
-		/// Permanently deletes specific version(s) from an <see cref="IContent"/> object.
-		/// </summary>
-		/// <param name="content">Id of the <see cref="IContent"/> object to delete a version from</param>
-		/// <param name="versionId">Id of the version to delete</param>
-		/// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
-		/// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-		public void Delete(IContent content, Guid versionId, bool deletePriorVersions, int userId = -1)
-		{
-			Delete(content.Id, versionId, deletePriorVersions, userId);
-		}
-
-		/// <summary>
-		/// Permanently deletes versions from an <see cref="IContent"/> object prior to a specific date.
-		/// </summary>
 		/// <param name="id">Id of the <see cref="IContent"/> object to delete versions from</param>
 		/// <param name="versionDate">Latest version date</param>
 		/// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-		public void Delete(int id, DateTime versionDate, int userId = -1)
+		public void DeleteVersions(int id, DateTime versionDate, int userId = -1)
 		{
 			var e = new DeleteEventArgs { Id = id };
 			if (Deleting != null)
@@ -906,7 +881,7 @@ namespace Umbraco.Core.Services
 			    var uow = _uowProvider.GetUnitOfWork();
 				using (var repository = _repositoryFactory.CreateContentRepository(uow))
 				{
-					repository.Delete(id, versionDate);
+					repository.DeleteVersions(id, versionDate);
                     uow.Commit();
 				}
 
@@ -924,13 +899,13 @@ namespace Umbraco.Core.Services
 	    /// <param name="versionId">Id of the version to delete</param>
 	    /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
 	    /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-	    public void Delete(int id, Guid versionId, bool deletePriorVersions, int userId = -1)
+	    public void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = -1)
 	    {
-	        if (deletePriorVersions)
-	        {
-	            var content = GetByIdVersion(id, versionId);
-	            Delete(id, content.UpdateDate, userId);
-	        }
+            if (deletePriorVersions)
+            {
+                var content = GetByVersion(versionId);
+                DeleteVersions(id, content.UpdateDate, userId);
+            }
 
 	        var e = new DeleteEventArgs {Id = id};
 	        if (Deleting != null)
@@ -941,7 +916,7 @@ namespace Umbraco.Core.Services
 	            var uow = _uowProvider.GetUnitOfWork();
 	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
 	            {
-	                repository.Delete(id, versionId);
+	                repository.DeleteVersion(versionId);
 	                uow.Commit();
 	            }
 
@@ -1215,7 +1190,7 @@ namespace Umbraco.Core.Services
 	    public IContent Rollback(int id, Guid versionId, int userId = -1)
 	    {
 	        var e = new RollbackEventArgs();
-	        var content = GetByIdVersion(id, versionId);
+	        var content = GetByVersion(versionId);
 
 	        if (Rollingback != null)
 	            Rollingback(content, e);

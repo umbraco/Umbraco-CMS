@@ -162,8 +162,13 @@
     <Compile Include="Models\Membership\IProfile.cs" />
     <Compile Include="Models\Membership\IUser.cs" />
     <Compile Include="Models\Membership\IUserType.cs" />
+    <Compile Include="Models\Membership\Member.cs" />
+    <Compile Include="Models\Membership\MemberGroup.cs" />
+    <Compile Include="Models\Membership\MemberProfile.cs" />
+    <Compile Include="Models\Membership\MemberType.cs" />
     <Compile Include="Models\Membership\Profile.cs" />
     <Compile Include="Models\Membership\User.cs" />
+    <Compile Include="Models\Membership\UserGroup.cs" />
     <Compile Include="Models\Membership\UserProfile.cs" />
     <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\PropertyExtensions.cs" />
@@ -375,6 +380,7 @@
     <Compile Include="Persistence\Repositories\Interfaces\IRelationTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRepositoryQueryable.cs" />
     <Compile Include="Persistence\Relators\GroupPropertyTypeRelator.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IRepositoryVersionable.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IScriptRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IStylesheetRepository.cs" />
@@ -394,6 +400,7 @@
     <Compile Include="Persistence\Repositories\TemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\UserRepository.cs" />
     <Compile Include="Persistence\Repositories\UserTypeRepository.cs" />
+    <Compile Include="Persistence\Repositories\VersionableRepositoryBase.cs" />
     <Compile Include="Persistence\RepositoryFactory.cs" />
     <Compile Include="Persistence\RepositoryResolver.cs" />
     <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />
