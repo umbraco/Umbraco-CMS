@@ -873,6 +873,12 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
 
             if (!e.Cancel)
             {
+                //NOTE This seems to currently override the data set in the content control
+                foreach (var property in GenericProperties)
+                {
+                    //Content.SetValue(property.PropertyType.Alias, property.Value);
+                }
+
                 ApplicationContext.Current.Services.ContentService.Save(Content);
 
                 base.Save();
@@ -1219,13 +1225,27 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
 
         #endregion
 
+        #region Public Methods - Overides Content for legacy api refactor
+        public override Property getProperty(string alias)
+        {
+            var prop = Content.Properties.FirstOrDefault(x => x.Alias == alias);
+            return new Property(prop);
+        }
+
+        public override Property getProperty(propertytype.PropertyType pt)
+        {
+            var prop = Content.Properties.FirstOrDefault(x => x.Alias == pt.Alias);
+            return new Property(prop);
+        }
+        #endregion
+
         #region Protected Methods
         [Obsolete("Deprecated", false)]
         protected override void setupNode()
         {
             var content = Version == Guid.Empty
                            ? ApplicationContext.Current.Services.ContentService.GetById(Id)
-                           : ApplicationContext.Current.Services.ContentService.GetByIdVersion(Id, Version);
+                           : ApplicationContext.Current.Services.ContentService.GetByVersion(Version);
 
             if(content == null)
                 throw new ArgumentException(string.Format("No Document exists with id '{0}'", Id));

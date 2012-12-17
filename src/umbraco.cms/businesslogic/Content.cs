@@ -91,18 +91,13 @@ namespace umbraco.cms.businesslogic
         [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.GetByIdVersion() or Umbraco.Core.Services.MediaService.GetByIdVersion()", false)]
         public static Content GetContentFromVersion(Guid version)
         {
-            int id =
-                ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
-                    "Select ContentId from cmsContentVersion where versionId = @VersionId", new {VersionId = version});
-
-            var content = ApplicationContext.Current.Services.ContentService.GetByIdVersion(id, version);
+            var content = ApplicationContext.Current.Services.ContentService.GetByVersion(version);
             if (content != null)
             {
                 return new Content(content);
             }
 
-            //TODO Change to use GetByIdVersion once that method has been implemented in the MediaService
-            var media = ApplicationContext.Current.Services.MediaService.GetById(id);
+            var media = ApplicationContext.Current.Services.MediaService.GetByVersion(version);
             return new Content(media);
         }
 
@@ -285,7 +280,7 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         /// <param name="alias">Propertyalias (defined in the documenttype)</param>
         /// <returns>The property with the given alias</returns>
-        public Property getProperty(string alias)
+        public virtual Property getProperty(string alias)
         {
             ContentType ct = this.ContentType;
             if (ct == null)
@@ -301,7 +296,7 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         /// <param name="pt">PropertyType</param>
         /// <returns>The property with the given propertytype</returns>
-        public Property getProperty(PropertyType pt)
+        public virtual Property getProperty(PropertyType pt)
         {
             EnsureProperties();
 
@@ -318,7 +313,7 @@ namespace umbraco.cms.businesslogic
         /// <param name="pt">The PropertyType of the Property</param>
         /// <param name="versionId">The version of the document on which the property should be add'ed</param>
         /// <returns>The new Property</returns>
-        public Property addProperty(PropertyType pt, Guid versionId)
+        public virtual Property addProperty(PropertyType pt, Guid versionId)
         {
             ClearLoadedProperties();
             
@@ -486,6 +481,7 @@ namespace umbraco.cms.businesslogic
 
             if (_contentType == null)
                 _contentType = ContentType.GetContentType(InitContentType);
+
             _version = InitVersion;
             _versionDate = InitVersionDate;
             _contentTypeIcon = InitContentTypeIcon;
@@ -500,12 +496,9 @@ namespace umbraco.cms.businesslogic
             SqlHelper.ExecuteNonQuery("insert into cmsContent (nodeId,ContentType) values (" + this.Id + "," + ct.Id + ")");
             createNewVersion(DateTime.Now);
         }
-
-
-
+        
         /// <summary>
-        /// Method for creating a new version of the data associated to the Content.
-        /// 
+        /// Method for creating a new version of the data associated to the Content. 
         /// </summary>
         /// <returns>The new version Id</returns>
 		protected Guid createNewVersion(DateTime versionDate = default(DateTime))
@@ -656,6 +649,12 @@ namespace umbraco.cms.businesslogic
         private void InitializeProperties()
         {
             m_LoadedProperties = new Properties();
+
+            if (_contentBase != null)
+            {
+                m_LoadedProperties.AddRange(_contentBase.Properties.Select(x => new Property(x)));
+                return;
+            }
 
             if (this.ContentType == null)
                 return;

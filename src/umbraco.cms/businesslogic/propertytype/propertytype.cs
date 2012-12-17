@@ -22,8 +22,6 @@ namespace umbraco.cms.businesslogic.propertytype
     {
         #region Declarations
 
-        private static string _connstring = GlobalSettings.DbDSN;
-
         private static readonly object propertyTypeCacheSyncLock = new object();
         private static readonly string UmbracoPropertyTypeCacheKey = "UmbracoPropertyTypeCache";
         private readonly int _contenttypeid;
@@ -37,6 +35,8 @@ namespace umbraco.cms.businesslogic.propertytype
         private int _tabId;
         private int _propertyTypeGroup;
         private string _validationRegExp = "";
+
+        private Umbraco.Core.Models.PropertyType _propertyType;
 
         #endregion
 
@@ -71,6 +71,24 @@ namespace umbraco.cms.businesslogic.propertytype
                 _contenttypeid = dr.GetInt("contentTypeId");
                 _description = dr.GetString("description");
             }
+        }
+
+        internal PropertyType(Umbraco.Core.Models.PropertyType propertyType)
+        {
+            _propertyType = propertyType;
+
+            //_contenttypeid
+            //_propertyTypeGroup
+            //_tabId
+
+            _mandatory = propertyType.Mandatory;
+            _sortOrder = propertyType.SortOrder;
+            _alias = propertyType.Alias;
+            _name = propertyType.Name;
+            _validationRegExp = propertyType.ValidationRegExp;
+            _DataTypeId = propertyType.DataTypeId;
+            _description = propertyType.Description;
+
         }
 
         #endregion
@@ -112,6 +130,7 @@ namespace umbraco.cms.businesslogic.propertytype
                 InvalidateCache();
             }
         }
+
         public int PropertyTypeGroup
         {
             get { return _propertyTypeGroup; }
