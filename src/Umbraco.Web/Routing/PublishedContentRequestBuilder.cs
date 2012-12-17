@@ -201,7 +201,12 @@ namespace Umbraco.Web.Routing
 			// time to read the alternate template alias, from querystring, form, cookie or server vars.
 			// it will be cleared as soon as .PublishedContent change, because then it's not the
 			// expected content anymore and the alternate template does not apply.
+            if (_umbracoContext.HttpContext.Items["altTemplate"] != null)
+                _publishedContentRequest.AlternateTemplateAlias = _umbracoContext.HttpContext.Items["altTemplate"].ToString();
+
 			_publishedContentRequest.AlternateTemplateAlias = _umbracoContext.HttpContext.Request["altTemplate"];
+
+            _umbracoContext.HttpContext.Trace.Write(string.Format("test {0}", _publishedContentRequest.AlternateTemplateAlias));
 
 			// handle "not found", follow internal redirects, validate access, template
 			// because these might loop, we have to have some sort of infinite loop detection 
