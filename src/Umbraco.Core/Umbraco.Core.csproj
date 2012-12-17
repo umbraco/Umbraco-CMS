@@ -162,8 +162,13 @@
     <Compile Include="Models\Membership\IProfile.cs" />
     <Compile Include="Models\Membership\IUser.cs" />
     <Compile Include="Models\Membership\IUserType.cs" />
+    <Compile Include="Models\Membership\Member.cs" />
+    <Compile Include="Models\Membership\MemberGroup.cs" />
+    <Compile Include="Models\Membership\MemberProfile.cs" />
+    <Compile Include="Models\Membership\MemberType.cs" />
     <Compile Include="Models\Membership\Profile.cs" />
     <Compile Include="Models\Membership\User.cs" />
+    <Compile Include="Models\Membership\UserGroup.cs" />
     <Compile Include="Models\Membership\UserProfile.cs" />
     <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\PropertyExtensions.cs" />
