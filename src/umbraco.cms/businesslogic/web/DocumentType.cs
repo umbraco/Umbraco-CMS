@@ -118,7 +118,7 @@ namespace umbraco.cms.businesslogic.web
         {
             try
             {
-                var contentType = ServiceContext.Current.ContentTypeService.GetContentType(Alias);
+                var contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(Alias);
                 return new DocumentType(contentType.Id);
 
                 /*return
@@ -144,7 +144,7 @@ namespace umbraco.cms.businesslogic.web
             DocumentType newDt = new DocumentType(n.Id);*/
 
             var contentType = new Umbraco.Core.Models.ContentType(-1) { Name = Text, Alias = Text};
-            ServiceContext.Current.ContentTypeService.Save(contentType);
+            ApplicationContext.Current.Services.ContentTypeService.Save(contentType);
             var newDt = new DocumentType(contentType.Id);
 
             //event
@@ -165,7 +165,7 @@ namespace umbraco.cms.businesslogic.web
 
         public static List<DocumentType> GetAllAsList()
         {
-            var contentTypes = ServiceContext.Current.ContentTypeService.GetAllContentTypes();
+            var contentTypes = ApplicationContext.Current.Services.ContentTypeService.GetAllContentTypes();
             var documentTypes = contentTypes.Select(x => new DocumentType(x.Id));
 
             /*using (IRecordsReader dr =
@@ -209,7 +209,7 @@ namespace umbraco.cms.businesslogic.web
             {
                 if (!_hasChildrenInitialized)
                 {
-                    HasChildren = ServiceContext.Current.ContentTypeService.HasChildren(Id);
+                    HasChildren = ApplicationContext.Current.Services.ContentTypeService.HasChildren(Id);
                     //HasChildren = SqlHelper.ExecuteScalar<int>("select count(childContentTypeId) as tmp from cmsContentType2ContentType where parentContentTypeId = @id", SqlHelper.CreateParameter("@id", Id)) > 0;
                 }
                 return _hasChildren;
@@ -487,7 +487,7 @@ namespace umbraco.cms.businesslogic.web
 
         protected override void setupNode()
         {
-            _contentType = ServiceContext.Current.ContentTypeService.GetContentType(Id);
+            _contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(Id);
 
             foreach (var template in _contentType.AllowedTemplates)
             {

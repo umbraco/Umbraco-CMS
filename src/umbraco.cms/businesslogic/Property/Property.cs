@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Runtime.CompilerServices;
 using System.Xml;
-
+using Umbraco.Core;
+using Umbraco.Core.Persistence;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 
@@ -15,14 +16,18 @@ namespace umbraco.cms.businesslogic.property
     /// </summary>
     public class Property
     {
-        private static string _connstring = GlobalSettings.DbDSN;
-        propertytype.PropertyType _pt;
-        interfaces.IData _data;
+        private propertytype.PropertyType _pt;
+        private interfaces.IData _data;
         private int _id;
 
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
+        }
+
+        internal static Database Database
+        {
+            get { return ApplicationContext.Current.DatabaseContext.Database; }
         }
 
         public Property(int Id, propertytype.PropertyType pt)

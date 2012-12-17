@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using umbraco.cms.businesslogic.property;
@@ -25,6 +26,7 @@ namespace umbraco.cms.businesslogic
     /// Note that Content data in umbraco is *not* tablular but in a treestructure.
     /// 
     /// </summary>
+    [Obsolete("Deprecated, Use Umbraco.Core.Models.Content or Umbraco.Core.Models.Media", false)]
     public class Content : CMSNode
     {
         #region Private Members
@@ -40,7 +42,7 @@ namespace umbraco.cms.businesslogic
 
         #endregion
 
-        #region Constructors        
+        #region Constructors
       
         public Content(int id) : base(id) { }
 
@@ -57,7 +59,6 @@ namespace umbraco.cms.businesslogic
             _version = _contentBase.Version;
             _versionDate = _contentBase.UpdateDate;
             _versionDateInitialized = true;
-
         }
 
         #endregion
@@ -69,18 +70,17 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         /// <param name="ct">The ContentType</param>
         /// <returns>A list of Content objects sharing the ContentType defined.</returns>
+        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.GetContentOfContentType() or Umbraco.Core.Services.MediaService.GetMediaOfMediaType()", false)]
         public static Content[] getContentOfContentType(ContentType ct)
         {
-            IRecordsReader dr = SqlHelper.ExecuteReader("Select nodeId from  cmsContent INNER JOIN umbracoNode ON cmsContent.nodeId = umbracoNode.id where ContentType = " + ct.Id + " ORDER BY umbracoNode.text ");
-            System.Collections.ArrayList tmp = new System.Collections.ArrayList();
+            var list = new List<Content>();
+            var content = ApplicationContext.Current.Services.ContentService.GetContentOfContentType(ct.Id);
+            list.AddRange(content.OrderBy(x => x.Name).Select(x => new Content(x)));
 
-            while (dr.Read()) tmp.Add(dr.GetInt("nodeId"));
-            dr.Close();
+            var media = ApplicationContext.Current.Services.MediaService.GetMediaOfMediaType(ct.Id);
+            list.AddRange(media.OrderBy(x => x.Name).Select(x => new Content(x)));
 
-            Content[] retval = new Content[tmp.Count];
-            for (int i = 0; i < tmp.Count; i++) retval[i] = new Content((int)tmp[i]);
-
-            return retval;
+            return list.ToArray();
         }
 
         /// <summary>
@@ -88,10 +88,22 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         /// <param name="version">The version identifier</param>
         /// <returns>The Content object from the given version</returns>
+        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.GetByIdVersion() or Umbraco.Core.Services.MediaService.GetByIdVersion()", false)]
         public static Content GetContentFromVersion(Guid version)
         {
-            int tmpContentId = SqlHelper.ExecuteScalar<int>("Select ContentId from cmsContentVersion where versionId = '" + version.ToString() + "'");
-            return new Content(tmpContentId);
+            int id =
+                ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
+                    "Select ContentId from cmsContentVersion where versionId = @VersionId", new {VersionId = version});
+
+            var content = ApplicationContext.Current.Services.ContentService.GetByIdVersion(id, version);
+            if (content != null)
+            {
+                return new Content(content);
+            }
+
+            //TODO Change to use GetByIdVersion once that method has been implemented in the MediaService
+            var media = ApplicationContext.Current.Services.MediaService.GetById(id);
+            return new Content(media);
         }
 
         #endregion
@@ -393,7 +405,7 @@ namespace umbraco.cms.businesslogic
 
         public virtual void XmlPopulate(XmlDocument xd, ref XmlNode x, bool Deep)
         {
-            var props = this.getProperties;
+            var props = this.GenericProperties;
             foreach (property.Property p in props)
                 if (p != null)
                     x.AppendChild(p.ToXml(xd));
@@ -483,7 +495,7 @@ namespace umbraco.cms.businesslogic
         /// Creates a new Content object from the ContentType.
         /// </summary>
         /// <param name="ct"></param>
-        protected void CreateContent(ContentType ct)
+        protected virtual void CreateContent(ContentType ct)
         {
             SqlHelper.ExecuteNonQuery("insert into cmsContent (nodeId,ContentType) values (" + this.Id + "," + ct.Id + ")");
             createNewVersion(DateTime.Now);

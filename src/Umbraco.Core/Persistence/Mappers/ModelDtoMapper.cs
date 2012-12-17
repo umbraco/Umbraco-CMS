@@ -2,6 +2,8 @@
 using System.Reflection;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -15,6 +17,21 @@ namespace Umbraco.Core.Persistence.Mappers
 
         public bool MapPropertyToColumn(Type t, PropertyInfo pi, ref string columnName, ref bool resultColumn)
         {
+            if (t == typeof (PropertyDataDto))
+            {
+                var tableNameAttribute = t.FirstAttribute<TableNameAttribute>();
+                var columnAttribute = pi.FirstAttribute<ColumnAttribute>();
+
+                if (tableNameAttribute != null && columnAttribute != null && string.IsNullOrEmpty(columnAttribute.Name) == false)
+                {
+                    columnName = string.Format("{0}.{1}",
+                                               SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(
+                                                   tableNameAttribute.Value),
+                                               SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(columnAttribute.Name));
+                }
+                return true;
+            }
+
             if (t == typeof(Content) || t == typeof(IContent))
             {
                 var mappedName = ContentMapper.Instance.Map(pi.Name);
@@ -118,6 +135,16 @@ namespace Umbraco.Core.Persistence.Mappers
             if (t == typeof(UserType) || t == typeof(IUserType))
             {
                 var mappedName = UserTypeMapper.Instance.Map(pi.Name);
+                if (!string.IsNullOrEmpty(mappedName))
+                {
+                    columnName = mappedName;
+                }
+                return true;
+            }
+
+            if (t == typeof(Property))
+            {
+                var mappedName = PropertyMapper.Instance.Map(pi.Name);
                 if (!string.IsNullOrEmpty(mappedName))
                 {
                     columnName = mappedName;

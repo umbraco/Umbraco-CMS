@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Publishing;
 using umbraco;
@@ -24,7 +25,7 @@ namespace Umbraco.Web.Strategies
             PublishingStrategy.UnPublished += PublishingStrategy_UnPublished;
         }
 
-        void PublishingStrategy_UnPublished(object sender, Core.PublishingEventArgs e)
+        void PublishingStrategy_UnPublished(object sender, PublishingEventArgs e)
         {
             if (sender is IContent)
             {

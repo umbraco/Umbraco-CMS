@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -239,6 +238,7 @@ namespace Umbraco.Core.Services
             using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
             {
                 return repository.Get(alias);
+            }
         }
 
         /// <summary>
@@ -248,8 +248,9 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="ITemplate"/> object</returns>
         public ITemplate GetTemplate(int id)
         {
-            var repository = _templateRepository;
-            return repository.Get(id);
+            using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(id);
             }
         }
 
