@@ -1,7 +1,7 @@
 using System;
-using System.Data;
-using System.Runtime.CompilerServices;
 using System.Collections.Generic;
+using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Caching;
 using umbraco.DataLayer;
 using System.Linq;
@@ -14,9 +14,9 @@ namespace umbraco.cms.businesslogic.media
     /// 
     /// Due to the inheritance of the ContentType class,it enables definition of generic datafields on a Media.
     /// </summary>
+    [Obsolete("Deprecated, Use Umbraco.Core.Models.MediaType", false)]
     public class MediaType : ContentType
     {
-
         #region Constructors
 
         /// <summary>
@@ -33,11 +33,23 @@ namespace umbraco.cms.businesslogic.media
 
         public MediaType(int id, bool noSetup) : base(id, noSetup) { }
 
+        internal MediaType(IMediaType mediaType)
+            : base(mediaType)
+        {
+            SetupNode(mediaType);
+        }
+
         #endregion
 
         #region Constants and static members
 
         public static Guid _objectType = new Guid("4ea4382b-2f5a-4c2b-9587-ae9b3cf3602e");
+
+        #endregion
+
+        #region Private Members
+
+        private IMediaType _mediaType;
 
         #endregion
 
@@ -167,6 +179,26 @@ namespace umbraco.cms.businesslogic.media
 
                 FireAfterDelete(e);
             }
+        }
+        #endregion
+
+        #region Protected Methods
+
+        protected override void setupNode()
+        {
+            var mediaType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(Id);
+            SetupNode(mediaType);
+        }
+
+        #endregion
+
+        #region Private Methods
+        private void SetupNode(IMediaType mediaType)
+        {
+            _mediaType = mediaType;
+
+            base.PopulateContentTypeFromContentTypeBase(_mediaType, _objectType);
+            base.PopulateCMSNodeFromContentTypeBase(_mediaType, _objectType);
         }
         #endregion
 

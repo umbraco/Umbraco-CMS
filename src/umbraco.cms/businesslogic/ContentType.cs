@@ -26,6 +26,7 @@ namespace umbraco.cms.businesslogic
     /// Besides data definition, the ContentType also defines the sorting and grouping (in tabs) of Properties/Datafields
     /// on the Content and which Content (by ContentType) can be created as child to the Content of the ContentType.
     /// </summary>
+    [Obsolete("Deprecated, Use Umbraco.Core.Models.ContentType or Umbraco.Core.Models.MediaType", false)]
     public class ContentType : CMSNode
     {
 
@@ -70,6 +71,10 @@ namespace umbraco.cms.businesslogic
                 MasterContentType = masterContentType.Value;
             if (isContainer.HasValue)
                 _isContainerContentType = isContainer.Value;
+        }
+
+        internal ContentType(IContentTypeComposition contentType) : base(contentType)
+        {
         }
 
         #endregion
@@ -1001,15 +1006,6 @@ namespace umbraco.cms.businesslogic
                     throw new ArgumentException("No Contenttype with id: " + Id);
                 }
             }
-        }
-
-        /// <summary>
-        /// Set up the internal data of the ContentType
-        /// </summary>
-        [Obsolete("Use the overriden setupNode method instead. This method now calls that method")]
-        protected void setupContentType()
-        {
-            setupNode();
         }
 
         /// <summary>

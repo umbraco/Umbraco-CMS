@@ -30,6 +30,7 @@ namespace umbraco.cms.businesslogic
     /// The child classes are required to implement an identifier (Guid) which is used as the objecttype identifier, for 
     /// distinguishing the different types of CMSNodes (ex. Documents/Medias/Stylesheets/documenttypes and so forth).
     /// </summary>
+    [Obsolete("Deprecated, This class will eventually be phased out", false)]
     public class CMSNode : BusinessLogic.console.IconI
     {
         #region Private Members
@@ -1086,7 +1087,7 @@ order by level,sortOrder";
             _isTrashed = content.Trashed;
         }
 
-        internal protected void PopulateCMSNodeFromContentType(IContentType contentType, Guid objectType)
+        internal protected void PopulateCMSNodeFromContentTypeBase(IContentTypeBase contentType, Guid objectType)
         {
             _uniqueID = contentType.Key;
             _nodeObjectType = objectType;

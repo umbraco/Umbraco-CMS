@@ -102,7 +102,7 @@ namespace umbraco.cms.businesslogic.web
 
         internal Document(IContent content) : base(content)
         {
-            setupNode(content);
+            SetupNode(content);
         }
 
         #endregion
@@ -1228,10 +1228,10 @@ namespace umbraco.cms.businesslogic.web
             if(content == null)
                 throw new ArgumentException(string.Format("No Document exists with id '{0}'", Id));
 
-            setupNode(content);
+            SetupNode(content);
         }
 
-        private void setupNode(IContent content)
+        private void SetupNode(IContent content)
         {
             Content = content;
             //Setting private properties from IContentBase replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
