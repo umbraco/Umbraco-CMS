@@ -1072,7 +1072,7 @@ order by level,sortOrder";
             _isTrashed = dr.GetBoolean("trashed");
         }
 
-        internal protected void PopulateCMSNodeFromContent(IContent content, Guid objectType)
+        internal protected void PopulateCMSNodeFromContentBase(IContentBase content, Guid objectType)
         {
             _uniqueID = content.Key;
             _nodeObjectType = objectType;

@@ -501,7 +501,7 @@ namespace umbraco.cms.businesslogic.web
             if(_contentType.DefaultTemplate != null)
                 _defaultTemplate = _contentType.DefaultTemplate.Id;
 
-            base.PopulateContentTypeFromContentType(_contentType, _objectType);
+            base.PopulateContentTypeFromContentTypeBase(_contentType, _objectType);
             base.PopulateCMSNodeFromContentType(_contentType, _objectType);
 
             /*base.setupNode();

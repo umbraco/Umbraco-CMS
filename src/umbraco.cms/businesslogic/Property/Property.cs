@@ -57,11 +57,10 @@ namespace umbraco.cms.businesslogic.property
             _property = property;
             _propertyType = property.PropertyType;
 
-            var dataTypeDefinition = DataTypeDefinition.GetDataTypeDefinition(property.PropertyType.DataTypeId);
-            _data = dataTypeDefinition.DataType.Data;
-
             //Just to ensure that there is a PropertyType available
             _pt = PropertyType.GetPropertyType(property.PropertyTypeId);
+            _data = _pt.DataTypeDefinition.DataType.Data;
+            _data.PropertyId = Id;
         }
 
         public Guid VersionId

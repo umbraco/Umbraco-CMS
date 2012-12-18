@@ -1234,8 +1234,8 @@ namespace umbraco.cms.businesslogic.web
         private void setupNode(IContent content)
         {
             Content = content;
-            //Setting private properties from IContent replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
-            base.PopulateCMSNodeFromContent(Content, _objectType);
+            //Setting private properties from IContentBase replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
+            base.PopulateCMSNodeFromContentBase(Content, _objectType);
 
             //If the version is empty we update with the latest version from the current IContent.
             if (Version == Guid.Empty)

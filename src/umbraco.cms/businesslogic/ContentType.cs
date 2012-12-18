@@ -957,7 +957,7 @@ namespace umbraco.cms.businesslogic
 
         #region Protected Methods
 
-        internal protected void PopulateContentTypeFromContentType(IContentType contentType, Guid objectType)
+        internal protected void PopulateContentTypeFromContentTypeBase(IContentTypeBase contentType, Guid objectType)
         {
             _alias = contentType.Alias;
             _iconurl = contentType.Icon;
