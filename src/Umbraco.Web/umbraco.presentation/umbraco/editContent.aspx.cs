@@ -1,27 +1,12 @@
 using System;
-using System.Collections;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using System.Reflection;
 using umbraco.BusinessLogic.Actions;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.helpers;
 using umbraco.IO;
-using umbraco.uicontrols;
 using umbraco.uicontrols.DatePicker;
 using umbraco.BusinessLogic;
-using umbraco.presentation.preview;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation;
-using umbraco.cms.businesslogic.skinning;
-using System.Collections.Generic;
 using System.Linq;
 using Image = System.Web.UI.WebControls.Image;
 
@@ -297,7 +282,7 @@ namespace umbraco.cms.presentation
             //- (The DataType shouldn't be responsible for saving the value - especically directly to the db).
             foreach (var item in cControl.DataTypes)
             {
-                _document.Content.SetValue(item.Key, item.Value.Data.Value);
+                _document.getProperty(item.Key).Value = item.Value.Data.Value;
             }
 
             // Run Handler				
@@ -326,7 +311,7 @@ namespace umbraco.cms.presentation
         {
             if (Page.IsValid)
             {
-                if (_document.Level == 1 || new cms.businesslogic.web.Document(_document.Parent.Id).PathPublished)
+                if (_document.Level == 1 || _document.PathPublished)
                 {
                     Trace.Warn("before d.publish");
 

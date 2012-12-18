@@ -141,11 +141,12 @@ namespace Umbraco.Core.Models
             get { return _releaseDate; }
             set
             {
-                if(value.HasValue && value.Value > DateTime.UtcNow && Published)
+                //Thought this type of check would be clever, but it only seems to cause problems
+                /*if(value.HasValue && value.Value > DateTime.UtcNow && Published)
                     _published = false;
 
                 if (value.HasValue && value.Value < DateTime.UtcNow && !Published)
-                    _published = true;
+                    _published = true;*/
 
                 _releaseDate = value;
                 OnPropertyChanged(ReleaseDateSelector);
@@ -161,8 +162,9 @@ namespace Umbraco.Core.Models
             get { return _expireDate; }
             set
             {
-                if(value.HasValue && DateTime.UtcNow > value.Value && Published)
-                    _published = false;
+                //Thought this type of check would be clever, but it only seems to cause problems
+                /*if(value.HasValue && DateTime.UtcNow > value.Value && Published)
+                    _published = false;*/
 
                 _expireDate = value;
                 OnPropertyChanged(ExpireDateSelector);

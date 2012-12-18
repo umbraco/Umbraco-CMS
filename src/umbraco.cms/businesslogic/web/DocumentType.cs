@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml;
 using System.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -461,6 +462,9 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
+                //Ensure that MediaTypes are reloaded from db by clearing cache
+                InMemoryCacheProvider.Current.Clear();
+
                 base.Save();
                 FireAfterSave(e);
             }

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using umbraco.DataLayer;
@@ -100,7 +101,6 @@ namespace umbraco.cms.businesslogic.datatype
                 return _dataType.DataTypeDefinitionId;
             }
         }
-
 
 		#region IData Members
 

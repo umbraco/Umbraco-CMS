@@ -132,7 +132,6 @@ namespace umbraco.controls
                 // ge : had a bit of a corrupt db and got weird NRE errors so rewrote this to catch the error and rethrow with detail
                 foreach (PropertyType propertyType in tab.GetPropertyTypes(_content.ContentType.Id))
                 {
-                    // table.Rows.Add(addControl(_content.getProperty(editPropertyType.Alias), tp));
                     var property = _content.getProperty(propertyType);
                     if (property != null && tabPage != null)
                     {
@@ -246,9 +245,9 @@ namespace umbraco.controls
                 }
             }
 
-            foreach (var type in DataTypes)
+            foreach (var property in DataTypes)
             {
-                type.Value.DataEditor.Save();
+                property.Value.DataEditor.Save();
             }
 
             if (!string.IsNullOrEmpty(NameTxt.Text))

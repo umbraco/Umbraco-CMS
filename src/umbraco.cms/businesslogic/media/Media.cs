@@ -1,14 +1,11 @@
 using System;
-using System.IO;
-using umbraco.BusinessLogic.Actions;
+using Umbraco.Core;
+using Umbraco.Core.Models.Rdbms;
 using umbraco.DataLayer;
 using System.Collections;
 using System.Collections.Generic;
-using umbraco.IO;
 using System.Xml;
 using System.Linq;
-using umbraco.interfaces;
-using umbraco.cms.businesslogic.datatype.controls;
 
 namespace umbraco.cms.businesslogic.media
 {
@@ -202,6 +199,55 @@ namespace umbraco.cms.businesslogic.media
 
             if (!e.Cancel)
             {
+                var db = ApplicationContext.Current.DatabaseContext.Database;
+                using (var transaction = db.GetTransaction())
+                {
+                    foreach (var property in GenericProperties)
+                    {
+                        var poco = new PropertyDataDto
+                        {
+                            Id = property.Id,
+                            PropertyTypeId = property.PropertyType.Id,
+                            NodeId = Id,
+                            VersionId = property.VersionId
+                        };
+                        if (property.Value != null)
+                        {
+                            string dbType = property.PropertyType.DataTypeDefinition.DbType;
+                            if (dbType.Equals("dataInt"))
+                            {
+                                int value = 0;
+                                if (int.TryParse(property.Value.ToString(), out value))
+                                {
+                                    poco.Integer = value;
+                                }
+                            }
+                            else if (dbType.Equals("dataDate"))
+                            {
+                                poco.Date = DateTime.Parse(property.Value.ToString());
+                            }
+                            else if (dbType.Equals("dataNvarchar"))
+                            {
+                                poco.VarChar = property.Value.ToString();
+                            }
+                            else
+                            {
+                                poco.Text = property.Value.ToString();
+                            }
+                        }
+                        bool isNew = db.IsNew(poco);
+                        if (isNew)
+                        {
+                            db.Insert(poco);
+                        }
+                        else
+                        {
+                            db.Update(poco);
+                        }
+                    }
+                    transaction.Complete();
+                }
+
                 this.VersionDate = DateTime.Now;
 
                 base.Save();

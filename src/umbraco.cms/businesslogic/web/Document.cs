@@ -605,19 +605,12 @@ namespace umbraco.cms.businesslogic.web
 		/// <summary>
 		/// Gets a value indicating whether the document and all its parents are published.
 		/// </summary>
-		public bool PathPublished
+        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.IsPublishable()", false)]
+        public bool PathPublished
 		{
 			get
 			{
-				// get all nodes in the path to the document, and get all matching published documents
-				// the difference should be zero if everything is published
-				// test nodeObjectType to make sure we only count _content_ nodes
-				int x = SqlHelper.ExecuteScalar<int>(@"select count(node.id) - count(doc.nodeid)
-from umbracoNode as node 
-left join cmsDocument as doc on (node.id=doc.nodeId and doc.published=1)
-where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'") + @"
-and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
-				return (x == 0);
+				return ApplicationContext.Current.Services.ContentService.IsPublishable(Content);
 			}
 		}
 
@@ -873,10 +866,9 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
 
             if (!e.Cancel)
             {
-                //NOTE This seems to currently override the data set in the content control
                 foreach (var property in GenericProperties)
                 {
-                    //Content.SetValue(property.PropertyType.Alias, property.Value);
+                    Content.SetValue(property.PropertyType.Alias, property.Value);
                 }
 
                 ApplicationContext.Current.Services.ContentService.Save(Content);
@@ -1223,20 +1215,6 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
             Template = 0;
         }
 
-        #endregion
-
-        #region Public Methods - Overides Content for legacy api refactor
-        public override Property getProperty(string alias)
-        {
-            var prop = Content.Properties.FirstOrDefault(x => x.Alias == alias);
-            return new Property(prop);
-        }
-
-        public override Property getProperty(propertytype.PropertyType pt)
-        {
-            var prop = Content.Properties.FirstOrDefault(x => x.Alias == pt.Alias);
-            return new Property(prop);
-        }
         #endregion
 
         #region Protected Methods

@@ -282,13 +282,10 @@ namespace umbraco.cms.businesslogic
         /// <returns>The property with the given alias</returns>
         public virtual Property getProperty(string alias)
         {
-            ContentType ct = this.ContentType;
-            if (ct == null)
-                return null;
-            propertytype.PropertyType pt = ct.getPropertyType(alias);
-            if (pt == null)
-                return null;
-            return getProperty(pt);
+            EnsureProperties();
+
+            var prop = m_LoadedProperties.SingleOrDefault(x => x.PropertyType.Alias == alias);
+            return prop;
         }
 
         /// <summary>
@@ -300,11 +297,8 @@ namespace umbraco.cms.businesslogic
         {
             EnsureProperties();
 
-            var prop = m_LoadedProperties
-                .Where(x => x.PropertyType.Id == pt.Id)
-                .SingleOrDefault();
+            var prop = m_LoadedProperties.SingleOrDefault(x => x.PropertyType.Id == pt.Id);
             return prop;
-
         }
 
         /// <summary>

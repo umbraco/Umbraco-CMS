@@ -36,8 +36,6 @@ namespace umbraco.cms.businesslogic.propertytype
         private int _propertyTypeGroup;
         private string _validationRegExp = "";
 
-        private Umbraco.Core.Models.PropertyType _propertyType;
-
         #endregion
 
         protected static ISqlHelper SqlHelper
@@ -71,24 +69,6 @@ namespace umbraco.cms.businesslogic.propertytype
                 _contenttypeid = dr.GetInt("contentTypeId");
                 _description = dr.GetString("description");
             }
-        }
-
-        internal PropertyType(Umbraco.Core.Models.PropertyType propertyType)
-        {
-            _propertyType = propertyType;
-
-            //_contenttypeid
-            //_propertyTypeGroup
-            //_tabId
-
-            _mandatory = propertyType.Mandatory;
-            _sortOrder = propertyType.SortOrder;
-            _alias = propertyType.Alias;
-            _name = propertyType.Name;
-            _validationRegExp = propertyType.ValidationRegExp;
-            _DataTypeId = propertyType.DataTypeId;
-            _description = propertyType.Description;
-
         }
 
         #endregion

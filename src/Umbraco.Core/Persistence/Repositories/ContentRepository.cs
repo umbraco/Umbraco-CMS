@@ -260,7 +260,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(IContent entity)
         {
-            //A new version should only be created if published state has changed
+            //A new version should only be created if published state (or language) has changed
             bool shouldCreateNewVersion = ((ICanBeDirty)entity).IsPropertyDirty("Published") || ((ICanBeDirty)entity).IsPropertyDirty("Language");
             if (shouldCreateNewVersion)
             {
