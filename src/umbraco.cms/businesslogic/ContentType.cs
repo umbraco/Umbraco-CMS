@@ -29,7 +29,6 @@ namespace umbraco.cms.businesslogic
     [Obsolete("Deprecated, Use Umbraco.Core.Models.ContentType or Umbraco.Core.Models.MediaType", false)]
     public class ContentType : CMSNode
     {
-
         #region Constructors
 
         /// <summary>
@@ -67,8 +66,10 @@ namespace umbraco.cms.businesslogic
             _alias = alias;
             _iconurl = icon;
             _thumbnail = thumbnail;
+            
             if (masterContentType.HasValue)
                 MasterContentType = masterContentType.Value;
+
             if (isContainer.HasValue)
                 _isContainerContentType = isContainer.Value;
         }
@@ -299,6 +300,9 @@ namespace umbraco.cms.businesslogic
             }
         }
 
+        /// <summary>
+        /// Gets or sets the 'allow at root' boolean
+        /// </summary>
         public bool AllowAtRoot
         {
             get { return _allowAtRoot; }
@@ -311,6 +315,7 @@ namespace umbraco.cms.businesslogic
                                           SqlHelper.CreateParameter("@id", Id));
             }
         }
+        
         /// <summary>
         /// Gets or sets the description.
         /// </summary>
@@ -372,16 +377,6 @@ namespace umbraco.cms.businesslogic
                 FlushFromCache(Id);
             }
         }
-
-        ///// <summary>
-        ///// Gets or sets a value indicating whether [optimized mode].
-        ///// </summary>
-        ///// <value><c>true</c> if [optimized mode]; otherwise, <c>false</c>.</value>
-        //public bool OptimizedMode
-        //{
-        //    get { return _optimizedMode; }
-        //    set { _optimizedMode = value; }
-        //}
 
         /// <summary>
         /// Human readable name/label
@@ -962,7 +957,7 @@ namespace umbraco.cms.businesslogic
 
         #region Protected Methods
 
-        internal protected void PopulateContentTypeFromContentTypeBase(IContentTypeBase contentType, Guid objectType)
+        internal protected void PopulateContentTypeFromContentTypeBase(IContentTypeBase contentType)
         {
             _alias = contentType.Alias;
             _iconurl = contentType.Icon;
@@ -1047,7 +1042,6 @@ namespace umbraco.cms.businesslogic
         #endregion
 
         #region Private Methods
-
         /// <summary>
         /// The cache key used to cache the properties for the content type
         /// </summary>

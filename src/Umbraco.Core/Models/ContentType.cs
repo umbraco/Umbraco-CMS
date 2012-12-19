@@ -77,6 +77,24 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Removes a template from the list of allowed templates
+        /// </summary>
+        /// <param name="template"><see cref="ITemplate"/> to remove</param>
+        /// <returns>True if template was removed, otherwise False</returns>
+        public bool RemoveTemplate(ITemplate template)
+        {
+            if (DefaultTemplateId == template.Id)
+                DefaultTemplateId = default(int);
+
+            var templates = AllowedTemplates.ToList();
+            var remove = templates.FirstOrDefault(x => x.Id == template.Id);
+            var result = templates.Remove(remove);
+            AllowedTemplates = templates;
+
+            return result;
+        }
+
+        /// <summary>
         /// Indicates whether a specific property on the current <see cref="IContent"/> entity is dirty.
         /// </summary>
         /// <param name="propertyName">Name of the property to check</param>

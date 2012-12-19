@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
-
 using System.Xml;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;

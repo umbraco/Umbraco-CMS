@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models.Rdbms
     [TableName("cmsDocument")]
     [PrimaryKey("versionId", autoIncrement = false)]
     [ExplicitColumns]
-    public class DocumentDto
+    internal class DocumentDto
     {
         [Column("nodeId")]
         [ForeignKey(typeof(ContentDto), Column = "nodeId")]

@@ -19,6 +19,8 @@ namespace umbraco.cms.businesslogic.web
     [Obsolete("Deprecated, Use Umbraco.Core.Models.ContentType", false)]
     public class DocumentType : ContentType
     {
+        //MCH: Templates is still on the refactoring todo-list, so its currenly using db to get/set/remove templates.
+
         #region Constructors
 
         public DocumentType(int id) : base(id) { }
@@ -139,8 +141,8 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Deprecated, Use Umbraco.Core.Models.ContentType and Umbraco.Core.Services.ContentTypeService.Save()", false)]
         public static DocumentType MakeNew(User u, string Text)
         {
-            var contentType = new Umbraco.Core.Models.ContentType(-1) { Name = Text, Alias = Text};
-            ApplicationContext.Current.Services.ContentTypeService.Save(contentType);
+            var contentType = new Umbraco.Core.Models.ContentType(-1) { Name = Text, Alias = Text, CreatorId = u.Id};
+            ApplicationContext.Current.Services.ContentTypeService.Save(contentType, u.Id);
             var newDt = new DocumentType(contentType.Id);
 
             //event
@@ -506,7 +508,7 @@ namespace umbraco.cms.businesslogic.web
             if (_contentType.DefaultTemplate != null)
                 _defaultTemplate = _contentType.DefaultTemplate.Id;
 
-            base.PopulateContentTypeFromContentTypeBase(_contentType, _objectType);
+            base.PopulateContentTypeFromContentTypeBase(_contentType);
             base.PopulateCMSNodeFromContentTypeBase(_contentType, _objectType);
         }
         #endregion
