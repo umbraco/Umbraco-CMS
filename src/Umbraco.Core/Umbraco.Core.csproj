@@ -404,11 +404,6 @@
     <Compile Include="Persistence\RepositoryResolver.cs" />
     <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />
     <Compile Include="Persistence\SqlSyntax\ISqlSyntaxProvider.cs" />
-    <Compile Include="Persistence\SqlSyntax\ModelDefinitions\ColumnDefinition.cs" />
-    <Compile Include="Persistence\SqlSyntax\ModelDefinitions\DefinitionFactory.cs" />
-    <Compile Include="Persistence\SqlSyntax\ModelDefinitions\ForeignKeyDefinition.cs" />
-    <Compile Include="Persistence\SqlSyntax\ModelDefinitions\IndexDefinition.cs" />
-    <Compile Include="Persistence\SqlSyntax\ModelDefinitions\TableDefinition.cs" />
     <Compile Include="Persistence\SqlSyntax\MySqlSyntaxProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlCeSyntaxProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlServerSyntaxProvider.cs" />
