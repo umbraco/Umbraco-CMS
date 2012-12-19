@@ -421,7 +421,7 @@ namespace umbraco.cms.presentation
         private void ShowUserValidationError(string message)
         {
             this.Controls.Clear();
-            this.Controls.Add(new LiteralControl(String.Format("<h1>{0}</h1>", message)));
+            this.Controls.Add(new LiteralControl(String.Format("<link rel='stylesheet' type='text/css' href='../../umbraco_client/ui/default.css'><link rel='stylesheet' type='text/css' href='../../umbraco_client/tabview/style.css'><link rel='stylesheet' type='text/css' href='../../umbraco_client/propertypane/style.css'><div id='body_dashboardTabs' style='height: auto; width: auto;'><div class='header'><ul><li id='body_dashboardTabs_tab01' class='tabOn'><a id='body_dashboardTabs_tab01a' href='#' onclick='setActiveTab('body_dashboardTabs','body_dashboardTabs_tab01',body_dashboardTabs_tabs); return false;'><span><nobr>Access denied</nobr></span></a></li></ul></div><div id='' class='tabpagecontainer'><div id='body_dashboardTabs_tab01layer' class='tabpage' style='display: block;'><div class='menubar'></div><div class='tabpagescrollinglayer' id='body_dashboardTabs_tab01layer_contentlayer' style='width: auto; height: auto;'><div class='tabpageContent' style='padding:0 10px;'><div class='propertypane' style=''><div><div class='propertyItem' style=''><div class='dashboardWrapper'><h2>Access denied</h2><img src='./dashboard/images/access-denied.png' alt='Access denied' class='dashboardIcon'>{0}</div></div></div></div></div></div></div></div><div class='footer'><div class='status'><h2></h2></div></div></div>", message)));
         }
 
         /// <summary>
@@ -433,18 +433,19 @@ namespace umbraco.cms.presentation
             // Validate permissions
             if (!base.ValidateUserApp("content"))
             {
-                ShowUserValidationError("The current user doesn't have access to this application. Please contact the system administrator.");
+                ShowUserValidationError("<h3>The current user doesn't have access to this application</h3><p>Please contact the system administrator if you think that you should have access.</p>");
                 return false;
             }
             if (!base.ValidateUserNodeTreePermissions(_document.Path, ActionBrowse.Instance.Letter.ToString()))
             {
-                ShowUserValidationError("The current user doesn't have permissions to browse this document. Please contact the system administrator.");
+                ShowUserValidationError(
+                    "<h3>The current user doesn't have permissions to browse this document</h3><p>Please contact the system administrator if you think that you should have access.</p>");
                 return false;
             }
             //TODO: Change this, when we add view capabilities, the user will be able to view but not edit!
             if (!base.ValidateUserNodeTreePermissions(_document.Path, ActionUpdate.Instance.Letter.ToString()))
             {
-                ShowUserValidationError("The current user doesn't have permissions to edit this document. Please contact the system administrator.");
+                ShowUserValidationError("<h3>The current user doesn't have permissions to edit this document</h3><p>Please contact the system administrator if you think that you should have access.</p>");
                 return false;
             }
             return true;

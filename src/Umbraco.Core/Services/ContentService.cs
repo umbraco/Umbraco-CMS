@@ -633,7 +633,9 @@ namespace Umbraco.Core.Services
 	                //Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
 	                SetWriter(content, userId);
 	                repository.AddOrUpdate(content);
-	                
+
+                    uow.Commit();
+
 	                if (published)
 	                {
 	                    var xml = content.ToXml();
@@ -645,8 +647,6 @@ namespace Umbraco.Core.Services
 	                                     ? uow.Database.Update(poco)
 	                                     : Convert.ToInt32(uow.Database.Insert(poco));
 	                }
-
-                    uow.Commit();
 	            }
 
 	            //Save xml to db and call following method to fire event through PublishingStrategy to update cache
