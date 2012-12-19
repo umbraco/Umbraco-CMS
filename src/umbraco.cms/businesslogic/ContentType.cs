@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Runtime.CompilerServices;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
-using umbraco.BusinessLogic;
 using DataTypeDefinition = umbraco.cms.businesslogic.datatype.DataTypeDefinition;
 using Language = umbraco.cms.businesslogic.language.Language;
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
@@ -76,6 +75,7 @@ namespace umbraco.cms.businesslogic
 
         internal ContentType(IContentTypeComposition contentType) : base(contentType)
         {
+            _contentType = contentType;
         }
 
         #endregion
@@ -279,9 +279,73 @@ namespace umbraco.cms.businesslogic
 
         private static readonly object propertyTypesCacheSyncLock = new object();
 
+        private IContentTypeComposition _contentType;
+
         #endregion
 
         #region Public Properties
+
+        /// <summary>
+        /// The Alias of the ContentType, is used for import/export and more human readable initialization see: GetByAlias 
+        /// method.
+        /// </summary>
+        public string Alias
+        {
+            get { return _alias; }
+            set
+            {
+                _alias = helpers.Casing.SafeAliasWithForcingCheck(value);
+
+                // validate if alias is empty
+                if (String.IsNullOrEmpty(_alias))
+                {
+                    throw new ArgumentOutOfRangeException("An Alias cannot be empty");
+                }
+
+                //This switches between using new vs. legacy api.
+                //Note that this is currently only done to support both DocumentType and MediaType, which use the new api and MemberType that doesn't.
+                if (_contentType == null)
+                {
+                    SqlHelper.ExecuteNonQuery("update cmsContentType set alias = @alias where nodeId = @id",
+                                              SqlHelper.CreateParameter("@alias", _alias),
+                                              SqlHelper.CreateParameter("@id", Id));
+                }
+                else
+                {
+                    _contentType.Alias = _alias;
+                }
+
+                // Remove from cache
+                FlushFromCache(Id);
+            }
+        }
+
+        /// <summary>
+        /// A Content object is often (always) represented in the treeview in the Umbraco console, the ContentType defines
+        /// which Icon the Content of this type is representated with.
+        /// </summary>
+        public string IconUrl
+        {
+            get { return _iconurl; }
+            set
+            {
+                _iconurl = value;
+
+                //This switches between using new vs. legacy api.
+                //Note that this is currently only done to support both DocumentType and MediaType, which use the new api and MemberType that doesn't.
+                if (_contentType == null)
+                {
+                    SqlHelper.ExecuteNonQuery("update cmsContentType set icon='" + value + "' where nodeid = " + Id);
+                }
+                else
+                {
+                    _contentType.Icon = _iconurl;
+                }
+
+                // Remove from cache
+                FlushFromCache(Id);
+            }
+        }
 
         /// <summary>
         /// Get or Sets the Container status of the Content Type. A Container Content Type doesn't show its children in the tree,
@@ -293,10 +357,20 @@ namespace umbraco.cms.businesslogic
             set
             {
                 _isContainerContentType = value;
-                SqlHelper.ExecuteNonQuery(
+
+                //This switches between using new vs. legacy api.
+                //Note that this is currently only done to support both DocumentType and MediaType, which use the new api and MemberType that doesn't.
+                if (_contentType == null)
+                {
+                    SqlHelper.ExecuteNonQuery(
                                           "update cmsContentType set isContainer = @isContainer where nodeId = @id",
                                           SqlHelper.CreateParameter("@isContainer", value),
                                           SqlHelper.CreateParameter("@id", Id));
+                }
+                else
+                {
+                    _contentType.IsContainer = _isContainerContentType;
+                }
             }
         }
 
@@ -309,10 +383,20 @@ namespace umbraco.cms.businesslogic
             set
             {
                 _allowAtRoot = value;
-                SqlHelper.ExecuteNonQuery(
+
+                //This switches between using new vs. legacy api. 
+                //Note that this is currently only done to support both DocumentType and MediaType, which use the new api and MemberType that doesn't.
+                if (_contentType == null)
+                {
+                    SqlHelper.ExecuteNonQuery(
                                           "update cmsContentType set allowAtRoot = @allowAtRoot where nodeId = @id",
                                           SqlHelper.CreateParameter("@allowAtRoot", value),
                                           SqlHelper.CreateParameter("@id", Id));
+                }
+                else
+                {
+                    _contentType.AllowedAsRoot = _allowAtRoot;
+                }
             }
         }
         
@@ -350,10 +434,20 @@ namespace umbraco.cms.businesslogic
             set
             {
                 _description = value;
-                SqlHelper.ExecuteNonQuery(
+
+                //This switches between using new vs. legacy api. 
+                //Note that this is currently only done to support both DocumentType and MediaType, which use the new api and MemberType that doesn't.
+                if (_contentType == null)
+                {
+                    SqlHelper.ExecuteNonQuery(
                                           "update cmsContentType set description = @description where nodeId = @id",
                                           SqlHelper.CreateParameter("@description", value),
                                           SqlHelper.CreateParameter("@id", Id));
+                }
+                else
+                {
+                    _contentType.Description = _description;
+                }
 
                 FlushFromCache(Id);
             }
@@ -369,10 +463,20 @@ namespace umbraco.cms.businesslogic
             set
             {
                 _thumbnail = value;
-                SqlHelper.ExecuteNonQuery(
+
+                //This switches between using new vs. legacy api. 
+                //Note that this is currently only done to support both DocumentType and MediaType, which use the new api and MemberType that doesn't.
+                if (_contentType == null)
+                {
+                    SqlHelper.ExecuteNonQuery(
                                           "update cmsContentType set thumbnail = @thumbnail where nodeId = @id",
                                           SqlHelper.CreateParameter("@thumbnail", value),
                                           SqlHelper.CreateParameter("@id", Id));
+                }
+                else
+                {
+                    _contentType.Thumbnail = _thumbnail;
+                }
 
                 FlushFromCache(Id);
             }
@@ -409,6 +513,11 @@ namespace umbraco.cms.businesslogic
             set
             {
                 base.Text = value;
+
+                if (_contentType != null)
+                {
+                    _contentType.Name = value;
+                }
 
                 // Remove from cache
                 FlushFromCache(Id);
@@ -465,50 +574,6 @@ namespace umbraco.cms.businesslogic
                     });
             }
         }
-
-        /// <summary>
-        /// The Alias of the ContentType, is used for import/export and more human readable initialization see: GetByAlias 
-        /// method.
-        /// </summary>
-        public string Alias
-        {
-            get { return _alias; }
-            set
-            {
-                _alias = helpers.Casing.SafeAliasWithForcingCheck(value);
-
-                // validate if alias is empty
-                if (String.IsNullOrEmpty(_alias))
-                {
-                    throw new ArgumentOutOfRangeException("An Alias cannot be empty");
-                }
-
-                SqlHelper.ExecuteNonQuery(
-                                          "update cmsContentType set alias = @alias where nodeId = @id",
-                                          SqlHelper.CreateParameter("@alias", _alias),
-                                          SqlHelper.CreateParameter("@id", Id));
-
-                // Remove from cache
-                FlushFromCache(Id);
-            }
-        }
-
-        /// <summary>
-        /// A Content object is often (always) represented in the treeview in the Umbraco console, the ContentType defines
-        /// which Icon the Content of this type is representated with.
-        /// </summary>
-        public string IconUrl
-        {
-            get { return _iconurl; }
-            set
-            {
-                _iconurl = value;
-                SqlHelper.ExecuteNonQuery("update cmsContentType set icon='" + value + "' where nodeid = " + Id);
-                // Remove from cache
-                FlushFromCache(Id);
-            }
-        }
-
 
         public List<int> MasterContentTypes
         {
@@ -703,13 +768,31 @@ namespace umbraco.cms.businesslogic
             {
                 m_AllowedChildContentTypeIDs = value.ToList();
 
-                SqlHelper.ExecuteNonQuery(
-                                          "delete from cmsContentTypeAllowedContentType where id=" + Id);
-                foreach (int i in value)
+                //This switches between using new vs. legacy api.
+                //Note that this is currently only done to support both DocumentType and MediaType, which use the new api and MemberType that doesn't.
+                if (_contentType == null)
                 {
                     SqlHelper.ExecuteNonQuery(
-                                              "insert into cmsContentTypeAllowedContentType (id,AllowedId) values (" +
-                                              Id + "," + i + ")");
+                        "delete from cmsContentTypeAllowedContentType where id=" + Id);
+                    foreach (int i in value)
+                    {
+                        SqlHelper.ExecuteNonQuery(
+                            "insert into cmsContentTypeAllowedContentType (id,AllowedId) values (" +
+                            Id + "," + i + ")");
+                    }
+                }
+                else
+                {
+                    var list = new List<ContentTypeSort>();
+                    int sort = 0;
+                    foreach (var i in value)
+                    {
+                        int id = i;
+                        list.Add(new ContentTypeSort{Id = new Lazy<int>(() => id), SortOrder = sort});
+                        sort++;
+                    }
+
+                    _contentType.AllowedContentTypes = list;
                 }
             }
         }
@@ -894,11 +977,6 @@ namespace umbraco.cms.businesslogic
             // NH 22-08-08, Get from the property type stack to ensure support of master document types
             object o = this.PropertyTypes.Find(pt => pt.Alias == alias);
 
-            //object o = SqlHelper.ExecuteScalar<object>(
-            //    "Select id from cmsPropertyType where contentTypeId=@contentTypeId And Alias=@alias",
-            //    SqlHelper.CreateParameter("@contentTypeId", this.Id),
-            //    SqlHelper.CreateParameter("@alias", alias));
-
             if (o == null)
             {
                 return null;
@@ -907,12 +985,6 @@ namespace umbraco.cms.businesslogic
             {
                 return (PropertyType)o;
             }
-
-            //int propertyTypeId;
-            //if (!int.TryParse(o.ToString(), out propertyTypeId))
-            //    return null;
-
-            //return PropertyType.GetPropertyType(propertyTypeId);
         }
 
         /// <summary>
@@ -957,7 +1029,7 @@ namespace umbraco.cms.businesslogic
 
         #region Protected Methods
 
-        internal protected void PopulateContentTypeFromContentTypeBase(IContentTypeBase contentType)
+        internal protected void PopulateContentTypeFromContentTypeBase(IContentTypeComposition contentType)
         {
             _alias = contentType.Alias;
             _iconurl = contentType.Icon;
@@ -965,6 +1037,9 @@ namespace umbraco.cms.businesslogic
             _allowAtRoot = contentType.AllowedAsRoot;
             _thumbnail = contentType.Thumbnail;
             _description = contentType.Description;
+
+            if (_contentType == null)
+                _contentType = contentType;
         }
 
         protected void PopulateContentTypeNodeFromReader(IRecordsReader dr)
@@ -986,6 +1061,26 @@ namespace umbraco.cms.businesslogic
         protected override void setupNode()
         {
             base.setupNode();
+
+            //Try to load the ContentType/MediaType through the new public api
+            if (nodeObjectType == new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"))
+            {
+                var contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(Id);
+                if (contentType != null)
+                {
+                    PopulateContentTypeFromContentTypeBase(contentType);
+                    return;
+                }
+            }
+            else if (nodeObjectType == new Guid("4EA4382B-2F5A-4C2B-9587-AE9B3CF3602E"))
+            {
+                var mediaType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(Id);
+                if (mediaType != null)
+                {
+                    PopulateContentTypeFromContentTypeBase(mediaType);
+                    return;
+                }
+            }
 
             // TODO: Load master content types
             using (IRecordsReader dr =

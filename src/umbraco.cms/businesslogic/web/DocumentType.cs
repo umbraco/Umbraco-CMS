@@ -141,7 +141,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Deprecated, Use Umbraco.Core.Models.ContentType and Umbraco.Core.Services.ContentTypeService.Save()", false)]
         public static DocumentType MakeNew(User u, string Text)
         {
-            var contentType = new Umbraco.Core.Models.ContentType(-1) { Name = Text, Alias = Text, CreatorId = u.Id};
+            var contentType = new Umbraco.Core.Models.ContentType(-1) { Name = Text, Alias = Text, CreatorId = u.Id, Thumbnail = "folder.png", Icon = "folder.gif" };
             ApplicationContext.Current.Services.ContentTypeService.Save(contentType, u.Id);
             var newDt = new DocumentType(contentType.Id);
 
@@ -462,6 +462,8 @@ namespace umbraco.cms.businesslogic.web
             {
                 //Ensure that MediaTypes are reloaded from db by clearing cache
                 InMemoryCacheProvider.Current.Clear();
+
+                ApplicationContext.Current.Services.ContentTypeService.Save(_contentType);
 
                 base.Save();
                 FireAfterSave(e);

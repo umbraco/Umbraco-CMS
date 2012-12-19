@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Caching;
-using umbraco.DataLayer;
 using System.Linq;
-
 
 namespace umbraco.cms.businesslogic.media
 {
@@ -94,7 +92,7 @@ namespace umbraco.cms.businesslogic.media
         [Obsolete("Deprecated, Use Umbraco.Core.Models.MediaType and Umbraco.Core.Services.ContentTypeService.Save()", false)]
         public static MediaType MakeNew(BusinessLogic.User u, string Text)
         {
-            var mediaType = new Umbraco.Core.Models.MediaType(-1) { Name = Text, Alias = Text, CreatorId = u.Id};
+            var mediaType = new Umbraco.Core.Models.MediaType(-1) { Name = Text, Alias = Text, CreatorId = u.Id, Thumbnail = "folder.png", Icon = "folder.gif" };
             ApplicationContext.Current.Services.ContentTypeService.Save(mediaType, u.Id);
             var mt = new MediaType(mediaType.Id);
 
@@ -118,6 +116,8 @@ namespace umbraco.cms.businesslogic.media
             {
                 //Ensure that MediaTypes are reloaded from db by clearing cache
                 InMemoryCacheProvider.Current.Clear();
+
+                ApplicationContext.Current.Services.ContentTypeService.Save(_mediaType);
 
                 base.Save();
 
