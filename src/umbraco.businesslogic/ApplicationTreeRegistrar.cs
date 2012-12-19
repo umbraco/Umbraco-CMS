@@ -90,8 +90,6 @@ namespace umbraco.BusinessLogic
                 }
 
             }, true);
-
-            //SqlHelper.ExecuteNonQuery("DELETE FROM umbracoAppTree");
         }
     }
 }
