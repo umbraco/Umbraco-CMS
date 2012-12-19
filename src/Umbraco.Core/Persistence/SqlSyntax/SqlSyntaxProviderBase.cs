@@ -5,8 +5,6 @@ using System.Linq;
 using System.Text;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using ColumnDefinition = Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions.ColumnDefinition;
-using TableDefinition = Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions.TableDefinition;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
@@ -22,11 +20,12 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     {
         protected SqlSyntaxProviderBase()
         {
-            ClauseOrder = new List<Func<DatabaseModelDefinitions.ColumnDefinition, string>>
+            ClauseOrder = new List<Func<ColumnDefinition, string>>
                               {
                                   FormatString,
                                   FormatType,
                                   FormatNullable,
+                                  FormatConstraint,
                                   FormatDefaultValue,
                                   FormatPrimaryKey,
                                   FormatIdentity
@@ -36,7 +35,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public string StringLengthNonUnicodeColumnDefinitionFormat = "VARCHAR({0})";
         public string StringLengthUnicodeColumnDefinitionFormat = "NVARCHAR({0})";
 
-        public string DefaultValueFormat = " DEFAULT ({0})";
+        public string DefaultValueFormat = "DEFAULT ({0})";
         public int DefaultStringLength = 255;
 
         //Set by Constructor
@@ -54,7 +53,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public string DateTimeColumnDefinition = "DATETIME";
         public string TimeColumnDefinition = "DATETIME";
 
-        protected IList<Func<DatabaseModelDefinitions.ColumnDefinition, string>> ClauseOrder { get; set; }
+        protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; set; }
 
         protected DbTypes<TSyntax> DbTypeMap = new DbTypes<TSyntax>();
         protected void InitColumnTypeMap()
@@ -152,190 +151,91 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return "NVARCHAR";
         }
 
-        public virtual string GetColumnDefinition(ColumnDefinition column, string tableName)
-        {
-            string dbTypeDefinition;
-            if (column.HasSpecialDbType)
-            {
-                if (column.DbTypeLength.HasValue)
-                {
-                    dbTypeDefinition = string.Format("{0}({1})",
-                                                     GetSpecialDbType(column.DbType),
-                                                     column.DbTypeLength.Value);
-                }
-                else
-                {
-                    dbTypeDefinition = GetSpecialDbType(column.DbType);
-                }
-            }
-            else if (column.PropertyType == typeof(string))
-            {
-                dbTypeDefinition = string.Format(StringLengthColumnDefinitionFormat, column.DbTypeLength.GetValueOrDefault(DefaultStringLength));
-            }
-            else
-            {
-                if (!DbTypeMap.ColumnTypeMap.TryGetValue(column.PropertyType, out dbTypeDefinition))
-                {
-                    dbTypeDefinition = "";
-                }
-            }
-
-            var sql = new StringBuilder();
-            sql.AppendFormat("{0} {1}", GetQuotedColumnName(column.ColumnName), dbTypeDefinition);
-
-            if (column.IsPrimaryKeyIdentityColumn)
-            {
-                sql.Append(" NOT NULL ").Append(AutoIncrementDefinition);
-            }
-            else
-            {
-                sql.Append(column.IsNullable ? " NULL" : " NOT NULL");
-            }
-
-            if(column.HasConstraint)
-            {
-                sql.Append(GetConstraintDefinition(column, tableName));
-            }
-
-            return sql.ToString();
-        }
-
-        public virtual string GetConstraintDefinition(ColumnDefinition column, string tableName)
-        {
-            var sql = new StringBuilder();
-            sql.AppendFormat(" CONSTRAINT {0}",
-                                 string.IsNullOrEmpty(column.ConstraintName)
-                                     ? GetQuotedName(string.Format("DF_{0}_{1}", tableName, column.ColumnName))
-                                     : column.ConstraintName);
-
-            string value = column.PropertyType == typeof (string)
-                               ? GetQuotedValue(column.ConstraintDefaultValue)
-                               : column.ConstraintDefaultValue;
-
-            sql.AppendFormat(DefaultValueFormat, value);
-            return sql.ToString();
-        }
-
-        public virtual string GetPrimaryKeyStatement(ColumnDefinition column, string tableName)
-        {
-            string constraintName = string.IsNullOrEmpty(column.PrimaryKeyName)
-                                        ? string.Format("PK_{0}", tableName)
-                                        : column.PrimaryKeyName;
-
-            string columns = string.IsNullOrEmpty(column.PrimaryKeyColumns)
-                                 ? GetQuotedColumnName(column.ColumnName)
-                                 : column.PrimaryKeyColumns;
-
-            string sql = string.Format("ALTER TABLE {0} ADD CONSTRAINT {1} PRIMARY KEY {2} ({3}); \n",
-                                       GetQuotedTableName(tableName),
-                                       GetQuotedName(constraintName),
-                                       column.IsPrimaryKeyClustered ? "CLUSTERED" : "NONCLUSTERED",
-                                       columns);
-            return sql;
-        }
-
-        public virtual string ToCreateTableStatement(TableDefinition table)
-        {
-            var columns = new StringBuilder();
-
-            foreach (var column in table.ColumnDefinitions)
-            {
-                columns.Append(GetColumnDefinition(column, table.TableName) + ", \n");
-            }
-
-            string sql = string.Format("CREATE TABLE {0} \n(\n {1} \n); \n",
-                                       table.TableName,
-                                       columns.ToString().TrimEnd(", \n".ToCharArray()));
-
-            return sql;
-        }
-
-        public virtual string ToCreatePrimaryKeyStatement(TableDefinition table)
-        {
-            var columnDefinition = table.ColumnDefinitions.FirstOrDefault(x => x.IsPrimaryKey);
-            if (columnDefinition == null)
-                return string.Empty;
-
-            var sql = GetPrimaryKeyStatement(columnDefinition, table.TableName);
-            return sql;
-        }
-
-        public virtual List<string> ToCreateForeignKeyStatements(TableDefinition table)
-        {
-            var foreignKeys = new List<string>();
-
-            foreach (var key in table.ForeignKeyDefinitions)
-            {
-                string constraintName = string.IsNullOrEmpty(key.ConstraintName)
-                                        ? string.Format("FK_{0}_{1}_{2}", table.TableName, key.ReferencedTableName, key.ReferencedColumnName)
-                                        : key.ConstraintName;
-
-                foreignKeys.Add(string.Format("ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}); \n",
-                                         GetQuotedTableName(table.TableName),
-                                         GetQuotedName(constraintName),
-                                         GetQuotedColumnName(key.ColumnName),
-                                         GetQuotedTableName(key.ReferencedTableName),
-                                         GetQuotedColumnName(key.ReferencedColumnName)));
-            }
-
-            return foreignKeys;
-        }
-
-        public virtual List<string> ToCreateIndexStatements(TableDefinition table)
-        {
-            var indexes = new List<string>();
-
-            foreach (var index in table.IndexDefinitions)
-            {
-                string name = string.IsNullOrEmpty(index.IndexName)
-                                  ? string.Format("IX_{0}_{1}", table.TableName, index.IndexForColumn)
-                                  : index.IndexName;
-
-                string columns = string.IsNullOrEmpty(index.ColumnNames)
-                                     ? GetQuotedColumnName(index.IndexForColumn)
-                                     : index.ColumnNames;
-
-                indexes.Add(string.Format("CREATE {0} INDEX {1} ON {2} ({3}); \n",
-                                     GetIndexType(index.IndexType),
-                                     GetQuotedName(name),
-                                     GetQuotedTableName(table.TableName),
-                                     columns));
-            }
-            return indexes;
-        }
-
-        public virtual List<string> ToAlterIdentitySeedStatements(TableDefinition table)
-        {
-            var seeds = new List<string>();
-
-            foreach (var definition in table.ColumnDefinitions)
-            {
-                if (definition.PrimaryKeySeeding > 0)
-                {
-                    seeds.Add(string.Format("ALTER TABLE {0} ALTER COLUMN {1} IDENTITY({2},1); \n",
-                                            GetQuotedTableName(table.TableName),
-                                            GetQuotedColumnName(definition.ColumnName),
-                                            definition.PrimaryKeySeeding));
-                }
-            }
-
-            return seeds;
-        }
-
         public virtual bool DoesTableExist(Database db, string tableName)
         {
             return false;
         }
 
-        public virtual DbType GetColumnDbType(Type valueType)
+        public virtual string Format(TableDefinition table)
         {
-            if (valueType.IsEnum)
-                return DbTypeMap.ColumnDbTypeMap[typeof(string)];
+            var statement = string.Format(CreateTable, table.Name, Format(table.Columns));
 
-            return DbTypeMap.ColumnDbTypeMap[valueType];
+            return statement;
         }
 
-        public virtual string Format(DatabaseModelDefinitions.ColumnDefinition column)
+        public virtual string FormatPrimaryKey(TableDefinition table)
+        {
+            var columnDefinition = table.Columns.FirstOrDefault(x => x.IsPrimaryKey);
+            if (columnDefinition == null)
+                return string.Empty;
+
+            string constraintName = string.IsNullOrEmpty(columnDefinition.PrimaryKeyName)
+                                        ? string.Format("PK_{0}", table.Name)
+                                        : columnDefinition.PrimaryKeyName;
+
+            string columns = string.IsNullOrEmpty(columnDefinition.PrimaryKeyColumns)
+                                 ? GetQuotedColumnName(columnDefinition.Name)
+                                 : columnDefinition.PrimaryKeyColumns;
+
+            string primaryKeyPart = string.Concat("PRIMARY KEY", columnDefinition.IsIndexed ? " CLUSTERED" : " NONCLUSTERED");
+
+            return string.Format(CreateConstraint,
+                                 GetQuotedTableName(table.Name), 
+                                 GetQuotedName(constraintName),
+                                 primaryKeyPart,
+                                 columns);
+        }
+
+        public virtual List<string> Format(IEnumerable<IndexDefinition> indexes)
+        {
+            return indexes.Select(Format).ToList();
+        }
+
+        public virtual string Format(IndexDefinition index)
+        {
+            string name = string.IsNullOrEmpty(index.Name)
+                                  ? string.Format("IX_{0}_{1}", index.TableName, index.ColumnName)
+                                  : index.Name;
+
+            string columns = index.Columns.Any()
+                                 ? string.Join(",", index.Columns.Select(x => GetQuotedColumnName(x.Name)))
+                                 : GetQuotedColumnName(index.ColumnName);
+
+            return string.Format(CreateIndex, GetIndexType(index.IndexType), " ", GetQuotedName(name),
+                                 GetQuotedTableName(index.TableName), columns);
+        }
+
+        public virtual List<string> Format(IEnumerable<ForeignKeyDefinition> foreignKeys)
+        {
+            return foreignKeys.Select(Format).ToList();
+        }
+
+        public virtual string Format(ForeignKeyDefinition foreignKey)
+        {
+            string constraintName = string.IsNullOrEmpty(foreignKey.Name)
+                                        ? string.Format("FK_{0}_{1}_{2}", foreignKey.ForeignTable, foreignKey.PrimaryTable, foreignKey.PrimaryColumns.First())
+                                        : foreignKey.Name;
+
+            return string.Format(CreateForeignKeyConstraint,
+                                 GetQuotedTableName(foreignKey.ForeignTable),
+                                 GetQuotedName(constraintName),
+                                 GetQuotedColumnName(foreignKey.ForeignColumns.First()),
+                                 GetQuotedTableName(foreignKey.PrimaryTable),
+                                 GetQuotedColumnName(foreignKey.PrimaryColumns.First()),
+                                 "", "");
+        }
+
+        public virtual string Format(IEnumerable<ColumnDefinition> columns)
+        {
+            var sb = new StringBuilder();
+            foreach (var column in columns)
+            {
+                sb.Append(Format(column) +",\n");
+            }
+            return sb.ToString().TrimEnd(",\n");
+        }
+
+        public virtual string Format(ColumnDefinition column)
         {
             var clauses = new List<string>();
 
@@ -349,19 +249,39 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return string.Join(" ", clauses.ToArray());
         }
 
-        public virtual string FormatString(DatabaseModelDefinitions.ColumnDefinition column)
+        public virtual string FormatString(ColumnDefinition column)
         {
             return GetQuotedColumnName(column.Name);
         }
 
-        protected virtual string FormatType(DatabaseModelDefinitions.ColumnDefinition column)
+        protected virtual string FormatType(ColumnDefinition column)
         {
-            if (!column.Type.HasValue)
+            if (column.Type.HasValue == false && string.IsNullOrEmpty(column.CustomType) == false)
                 return column.CustomType;
 
-            var dbType = DbTypeMap.ColumnDbTypeMap.First(x => x.Value == column.Type.Value).Key;
-            var definition = DbTypeMap.ColumnTypeMap.First(x => x.Key == dbType).Value;
+            if (column.HasSpecialDbType)
+            {
+                if (column.Size != default(int))
+                {
+                    return string.Format("{0}({1})",
+                                         GetSpecialDbType(column.DbType),
+                                         column.Size);
+                }
 
+                return GetSpecialDbType(column.DbType);
+            }
+
+            Type type = column.Type.HasValue 
+                ? DbTypeMap.ColumnDbTypeMap.First(x => x.Value == column.Type.Value).Key
+                : column.PropertyType;
+
+            if (type == typeof (string))
+            {
+                var valueOrDefault = column.Size != default(int) ? column.Size : DefaultStringLength;
+                return string.Format(StringLengthColumnDefinitionFormat, valueOrDefault);
+            }
+
+            string definition = DbTypeMap.ColumnTypeMap.First(x => x.Key == type).Value;
             string dbTypeDefinition = column.Size != default(int)
                                           ? string.Format("{0}({1})", definition, column.Size)
                                           : definition;
@@ -369,12 +289,23 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return dbTypeDefinition;
         }
 
-        protected virtual string FormatNullable(DatabaseModelDefinitions.ColumnDefinition column)
+        protected virtual string FormatNullable(ColumnDefinition column)
         {
-            return column.IsNullable ? string.Empty : "NOT NULL";
+            return column.IsNullable ? "NULL" : "NOT NULL";
         }
 
-        protected virtual string FormatDefaultValue(DatabaseModelDefinitions.ColumnDefinition column)
+        protected virtual string FormatConstraint(ColumnDefinition column)
+        {
+            if (string.IsNullOrEmpty(column.ConstraintName) && column.DefaultValue == null)
+                return string.Empty;
+
+            return string.Format("CONSTRAINT {0}",
+                                 string.IsNullOrEmpty(column.ConstraintName)
+                                     ? GetQuotedName(string.Format("DF_{0}_{1}", column.TableName, column.Name))
+                                     : column.ConstraintName);
+        }
+
+        protected virtual string FormatDefaultValue(ColumnDefinition column)
         {
             if (column.DefaultValue == null)
                 return string.Empty;
@@ -386,20 +317,20 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 if (string.IsNullOrEmpty(method))
                     return string.Empty;
 
-                return "DEFAULT " + method;
+                return string.Format(DefaultValueFormat, method);
             }
 
-            return "DEFAULT " + GetQuotedValue(column.DefaultValue.ToString());
+            return string.Format(DefaultValueFormat, GetQuotedValue(column.DefaultValue.ToString()));
         }
 
-        protected virtual string FormatPrimaryKey(DatabaseModelDefinitions.ColumnDefinition column)
+        protected virtual string FormatPrimaryKey(ColumnDefinition column)
         {
             return string.Empty;
         }
 
         protected abstract string FormatSystemMethods(SystemMethods systemMethod);
 
-        protected abstract string FormatIdentity(DatabaseModelDefinitions.ColumnDefinition column);
+        protected abstract string FormatIdentity(ColumnDefinition column);
 
         public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
         public virtual string DropTable { get { return "DROP TABLE {0}"; } }

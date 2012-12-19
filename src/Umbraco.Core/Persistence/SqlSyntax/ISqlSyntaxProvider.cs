@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
@@ -15,17 +13,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string GetQuotedColumnName(string columnName);
         string GetQuotedName(string name);
         bool DoesTableExist(Database db, string tableName);
-        string ToCreateTableStatement(TableDefinition tableDefinition);
-        List<string> ToCreateForeignKeyStatements(TableDefinition tableDefinition);
-        List<string> ToCreateIndexStatements(TableDefinition tableDefinition);
-        DbType GetColumnDbType(Type valueType);
         string GetIndexType(IndexTypes indexTypes);
-        string GetColumnDefinition(ColumnDefinition column, string tableName);
-        string GetPrimaryKeyStatement(ColumnDefinition column, string tableName);
-        string ToCreatePrimaryKeyStatement(TableDefinition table);
         string GetSpecialDbType(SpecialDbTypes dbTypes);
-        string GetConstraintDefinition(ColumnDefinition column, string tableName);
-        List<string> ToAlterIdentitySeedStatements(TableDefinition table);
         string CreateTable { get; }
         string DropTable { get; }
         string AddColumn { get; }
@@ -44,6 +33,12 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string CreateConstraint { get; }
         string DeleteConstraint { get; }
         string CreateForeignKeyConstraint { get; }
-        string Format(DatabaseModelDefinitions.ColumnDefinition column);
+        string Format(TableDefinition table);
+        string Format(IEnumerable<ColumnDefinition> columns);
+        List<string> Format(IEnumerable<IndexDefinition> indexes);
+        List<string> Format(IEnumerable<ForeignKeyDefinition> foreignKeys);
+        string FormatPrimaryKey(TableDefinition table);
+        string GetQuotedValue(string value);
+        string Format(ColumnDefinition column);
     }
 }

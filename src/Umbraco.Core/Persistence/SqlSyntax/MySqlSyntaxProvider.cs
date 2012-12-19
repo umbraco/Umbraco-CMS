@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Linq;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using ColumnDefinition = Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions.ColumnDefinition;
-using TableDefinition = Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions.TableDefinition;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
@@ -67,96 +64,20 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return "NVARCHAR";
         }
 
-        public override string GetConstraintDefinition(ColumnDefinition column, string tableName)
+        public override string Format(IndexDefinition index)
         {
-            var sql = new StringBuilder();
+            string name = string.IsNullOrEmpty(index.Name)
+                                  ? string.Format("IX_{0}_{1}", index.TableName, index.ColumnName)
+                                  : index.Name;
 
-            if (column.ConstraintDefaultValue.Equals("getdate()"))
-            {
-                sql.Append(" DEFAULT CURRENT_TIMESTAMP");
-            }
-            else
-            {
-                sql.AppendFormat(DefaultValueFormat, column.ConstraintDefaultValue);
-            }
+            string columns = index.Columns.Any()
+                                 ? string.Join(",", index.Columns.Select(x => GetQuotedColumnName(x.Name)))
+                                 : GetQuotedColumnName(index.ColumnName);
 
-            return sql.ToString();
-        }
-
-        public override string GetColumnDefinition(ColumnDefinition column, string tableName)
-        {
-            string dbTypeDefinition;
-            if (column.HasSpecialDbType)
-            {
-                if (column.DbTypeLength.HasValue)
-                {
-                    dbTypeDefinition = string.Format("{0}({1})",
-                                                     GetSpecialDbType(column.DbType),
-                                                     column.DbTypeLength.Value);
-                }
-                else
-                {
-                    dbTypeDefinition = GetSpecialDbType(column.DbType);
-                }
-            }
-            else if (column.PropertyType == typeof(string))
-            {
-                dbTypeDefinition = string.Format(StringLengthColumnDefinitionFormat, column.DbTypeLength.GetValueOrDefault(DefaultStringLength));
-            }
-            else
-            {
-                if (!DbTypeMap.ColumnTypeMap.TryGetValue(column.PropertyType, out dbTypeDefinition))
-                {
-                    dbTypeDefinition = "";
-                }
-            }
-
-            var sql = new StringBuilder();
-            sql.AppendFormat("{0} {1}", GetQuotedColumnName(column.ColumnName), dbTypeDefinition);
-
-            if (column.IsPrimaryKeyIdentityColumn)
-            {
-                sql.Append(" NOT NULL PRIMARY KEY ").Append(AutoIncrementDefinition);
-            }
-            else
-            {
-                sql.Append(column.IsNullable ? " NULL" : " NOT NULL");
-            }
-
-            if (column.HasConstraint)
-            {
-                sql.Append(GetConstraintDefinition(column, tableName));
-                sql = sql.Replace("DATETIME", "TIMESTAMP");
-            }
-
-            return sql.ToString();
-        }
-
-        public override string GetPrimaryKeyStatement(ColumnDefinition column, string tableName)
-        {
-            return string.Empty;
-        }
-
-        public override List<string> ToCreateIndexStatements(TableDefinition table)
-        {
-            var indexes = new List<string>();
-
-            foreach (var index in table.IndexDefinitions)
-            {
-                string name = string.IsNullOrEmpty(index.IndexName)
-                                  ? string.Format("IX_{0}_{1}", table.TableName, index.IndexForColumn)
-                                  : index.IndexName;
-
-                string columns = string.IsNullOrEmpty(index.ColumnNames)
-                                     ? GetQuotedColumnName(index.IndexForColumn)
-                                     : index.ColumnNames;
-
-                indexes.Add(string.Format("CREATE INDEX {0} ON {1} ({2}); \n",
-                                     GetQuotedName(name),
-                                     GetQuotedTableName(table.TableName),
-                                     columns));
-            }
-            return indexes;
+            return string.Format(CreateIndex,
+                                 GetQuotedName(name),
+                                 GetQuotedTableName(index.TableName), 
+                                 columns);
         }
 
         public override bool DoesTableExist(Database db, string tableName)
@@ -170,9 +91,38 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return result > 0;
         }
 
-        protected override string FormatIdentity(DatabaseModelDefinitions.ColumnDefinition column)
+        protected override string FormatIdentity(ColumnDefinition column)
         {
             return column.IsIdentity ? AutoIncrementDefinition : string.Empty;
+        }
+
+        protected override string FormatDefaultValue(ColumnDefinition column)
+        {
+            if (column.DefaultValue == null)
+                return string.Empty;
+
+            // see if this is for a system method
+            if (column.DefaultValue is SystemMethods)
+            {
+                string method = FormatSystemMethods((SystemMethods)column.DefaultValue);
+                if (string.IsNullOrEmpty(method))
+                    return string.Empty;
+
+                return string.Format(DefaultValueFormat, method);
+            }
+
+            if (column.DefaultValue.ToString().Equals("getdate()"))
+                return "DEFAULT CURRENT_TIMESTAMP";
+
+            return string.Format(DefaultValueFormat, column.DefaultValue);
+        }
+
+        protected override string FormatPrimaryKey(ColumnDefinition column)
+        {
+            if(column.IsPrimaryKey)
+                return "PRIMARY KEY";
+
+            return string.Empty;
         }
 
         protected override string FormatSystemMethods(SystemMethods systemMethod)
@@ -197,5 +147,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public override string DeleteConstraint { get { return "ALTER TABLE {0} DROP {1}{2}"; } }
 
         public override string CreateTable { get { return "CREATE TABLE {0} ({1}) ENGINE = INNODB"; } }
+
+        public override string CreateIndex { get { return "CREATE INDEX {0} ON {1} ({2})"; } }
     }
 }

@@ -34,6 +34,21 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             InitColumnTypeMap();
         }
 
+        public override string GetQuotedTableName(string tableName)
+        {
+            return string.Format("[{0}]", tableName);
+        }
+
+        public override string GetQuotedColumnName(string columnName)
+        {
+            return string.Format("[{0}]", columnName);
+        }
+
+        public override string GetQuotedName(string name)
+        {
+            return string.Format("[{0}]", name);
+        }
+
         public override bool DoesTableExist(Database db, string tableName)
         {
             var result =
