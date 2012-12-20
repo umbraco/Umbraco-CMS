@@ -58,6 +58,16 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return result > 0;
         }
 
+        public override string FormatColumnRename(string tableName, string oldName, string newName)
+        {
+            return string.Format(RenameColumn, tableName, oldName, newName);
+        }
+
+        public override string FormatTableRename(string oldName, string newName)
+        {
+            return string.Format(RenameTable, oldName, newName);
+        }
+
         protected override string FormatIdentity(ColumnDefinition column)
         {
             return column.IsIdentity ? GetIdentityString(column) : string.Empty;
@@ -85,6 +95,34 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return null;
         }
 
+        public override string DeleteDefaultConstraint
+        {
+            get
+            {
+                return "DECLARE @default sysname, @sql nvarchar(max);\r\n\r\n" +
+                    "-- get name of default constraint\r\n" +
+                    "SELECT @default = name\r\n" +
+                    "FROM sys.default_constraints\r\n" +
+                    "WHERE parent_object_id = object_id('{0}')\r\n" + "" +
+                    "AND type = 'D'\r\n" + "" +
+                    "AND parent_column_id = (\r\n" + "" +
+                    "SELECT column_id\r\n" +
+                    "FROM sys.columns\r\n" +
+                    "WHERE object_id = object_id('{0}')\r\n" +
+                    "AND name = '{1}'\r\n" +
+                    ");\r\n\r\n" +
+                    "-- create alter table command to drop contraint as string and run it\r\n" +
+                    "SET @sql = N'ALTER TABLE {0} DROP CONSTRAINT ' + @default;\r\n" +
+                    "EXEC sp_executesql @sql;";
+            }
+        }
+
         public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
+
+        public override string DropIndex { get { return "DROP INDEX {0} ON {1}"; } }
+
+        public override string RenameColumn { get { return "sp_rename '{0}.{1}', '{2}', 'COLUMN'"; } }
+
+        public override string RenameTable { get { return "sp_rename '{0}', '{1}'"; } }
     }
 }

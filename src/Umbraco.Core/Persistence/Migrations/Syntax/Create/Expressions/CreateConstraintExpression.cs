@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+﻿using System.Linq;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions
 {
@@ -13,8 +15,20 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions
 
         public override string ToString()
         {
-            //TODO replace with sql syntax provider
-            return base.ToString() + Constraint.ConstraintName;
+            var constraintType = (Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
+
+            string[] columns = new string[Constraint.Columns.Count];
+
+            for (int i = 0; i < Constraint.Columns.Count; i++)
+            {
+                columns[i] = SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(Constraint.Columns.ElementAt(i));
+            }
+
+            return string.Format(SyntaxConfig.SqlSyntaxProvider.CreateConstraint,
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(Constraint.TableName),
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedName(Constraint.ConstraintName),
+                                 constraintType,
+                                 string.Join(", ", columns));
         }
     }
 }

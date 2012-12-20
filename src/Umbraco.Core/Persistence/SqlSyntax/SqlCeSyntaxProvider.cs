@@ -129,5 +129,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         }
 
         public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
+
+        public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
     }
 }

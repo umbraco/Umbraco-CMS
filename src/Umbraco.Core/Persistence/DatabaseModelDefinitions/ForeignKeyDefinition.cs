@@ -9,6 +9,9 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
         {
             ForeignColumns = new List<string>();
             PrimaryColumns = new List<string>();
+            //Set to None by Default
+            OnDelete = Rule.None;
+            OnUpdate = Rule.None;
         }
 
         public virtual string Name { get; set; }

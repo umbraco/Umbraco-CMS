@@ -1,5 +1,6 @@
-﻿using System.Linq;
+﻿using System;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
@@ -14,10 +15,12 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 
         public override string ToString()
         {
-            //TODO Change to use sql syntax provider
-            return base.ToString() + ForeignKey.Name + " "
-                + ForeignKey.ForeignTable + " (" + string.Join(", ", ForeignKey.ForeignColumns.ToArray()) + ") "
-                + ForeignKey.PrimaryTable + " (" + string.Join(", ", ForeignKey.PrimaryColumns.ToArray()) + ")";
+            if (ForeignKey.ForeignTable == null)
+                throw new ArgumentNullException("Table name not specified, ensure you have appended the OnTable extension. Format should be Delete.ForeignKey(KeyName).OnTable(TableName)");
+
+            return string.Format(SyntaxConfig.SqlSyntaxProvider.DeleteConstraint,
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(ForeignKey.ForeignTable),
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(ForeignKey.Name));
         }
     }
 }

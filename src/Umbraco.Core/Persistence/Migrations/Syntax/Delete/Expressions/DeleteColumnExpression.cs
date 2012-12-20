@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
@@ -16,8 +18,16 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 
         public override string ToString()
         {
-            //TODO Change to use sql syntax provider
-            return base.ToString() + TableName + " " + ColumnNames.Aggregate((a, b) => a + ", " + b);
+            var sb = new StringBuilder();
+            foreach (string columnName in ColumnNames)
+            {
+                if (ColumnNames.First() != columnName) sb.AppendLine(";");
+                sb.AppendFormat(SyntaxConfig.SqlSyntaxProvider.DropColumn,
+                                SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(TableName),
+                                SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(columnName));
+            }
+
+            return sb.ToString();
         }
     }
 }

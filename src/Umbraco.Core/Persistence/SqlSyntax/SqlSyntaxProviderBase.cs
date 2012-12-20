@@ -158,32 +158,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public virtual string Format(TableDefinition table)
         {
-            var statement = string.Format(CreateTable, table.Name, Format(table.Columns));
+            var statement = string.Format(CreateTable, GetQuotedTableName(table.Name), Format(table.Columns));
 
             return statement;
-        }
-
-        public virtual string FormatPrimaryKey(TableDefinition table)
-        {
-            var columnDefinition = table.Columns.FirstOrDefault(x => x.IsPrimaryKey);
-            if (columnDefinition == null)
-                return string.Empty;
-
-            string constraintName = string.IsNullOrEmpty(columnDefinition.PrimaryKeyName)
-                                        ? string.Format("PK_{0}", table.Name)
-                                        : columnDefinition.PrimaryKeyName;
-
-            string columns = string.IsNullOrEmpty(columnDefinition.PrimaryKeyColumns)
-                                 ? GetQuotedColumnName(columnDefinition.Name)
-                                 : columnDefinition.PrimaryKeyColumns;
-
-            string primaryKeyPart = string.Concat("PRIMARY KEY", columnDefinition.IsIndexed ? " CLUSTERED" : " NONCLUSTERED");
-
-            return string.Format(CreateConstraint,
-                                 GetQuotedTableName(table.Name), 
-                                 GetQuotedName(constraintName),
-                                 primaryKeyPart,
-                                 columns);
         }
 
         public virtual List<string> Format(IEnumerable<IndexDefinition> indexes)
@@ -222,7 +199,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                                  GetQuotedColumnName(foreignKey.ForeignColumns.First()),
                                  GetQuotedTableName(foreignKey.PrimaryTable),
                                  GetQuotedColumnName(foreignKey.PrimaryColumns.First()),
-                                 "", "");
+                                 FormatCascade("DELETE", foreignKey.OnDelete), 
+                                 FormatCascade("UPDATE", foreignKey.OnUpdate));
         }
 
         public virtual string Format(IEnumerable<ColumnDefinition> columns)
@@ -249,7 +227,64 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return string.Join(" ", clauses.ToArray());
         }
 
-        public virtual string FormatString(ColumnDefinition column)
+        public virtual string FormatPrimaryKey(TableDefinition table)
+        {
+            var columnDefinition = table.Columns.FirstOrDefault(x => x.IsPrimaryKey);
+            if (columnDefinition == null)
+                return string.Empty;
+
+            string constraintName = string.IsNullOrEmpty(columnDefinition.PrimaryKeyName)
+                                        ? string.Format("PK_{0}", table.Name)
+                                        : columnDefinition.PrimaryKeyName;
+
+            string columns = string.IsNullOrEmpty(columnDefinition.PrimaryKeyColumns)
+                                 ? GetQuotedColumnName(columnDefinition.Name)
+                                 : columnDefinition.PrimaryKeyColumns;
+
+            string primaryKeyPart = string.Concat("PRIMARY KEY", columnDefinition.IsIndexed ? " CLUSTERED" : " NONCLUSTERED");
+
+            return string.Format(CreateConstraint,
+                                 GetQuotedTableName(table.Name),
+                                 GetQuotedName(constraintName),
+                                 primaryKeyPart,
+                                 columns);
+        }
+
+        public virtual string FormatColumnRename(string tableName, string oldName, string newName)
+        {
+            return string.Format(RenameColumn,
+                                 GetQuotedTableName(tableName),
+                                 GetQuotedColumnName(oldName),
+                                 GetQuotedColumnName(newName));
+        }
+
+        public virtual string FormatTableRename(string oldName, string newName)
+        {
+            return string.Format(RenameTable, GetQuotedTableName(oldName), GetQuotedTableName(newName));
+        }
+
+        protected virtual string FormatCascade(string onWhat, Rule rule)
+        {
+            string action = "NO ACTION";
+            switch (rule)
+            {
+                case Rule.None:
+                    return "";
+                case Rule.Cascade:
+                    action = "CASCADE";
+                    break;
+                case Rule.SetNull:
+                    action = "SET NULL";
+                    break;
+                case Rule.SetDefault:
+                    action = "SET DEFAULT";
+                    break;
+            }
+
+            return string.Format(" ON {0} {1}", onWhat, action);
+        }
+
+        protected virtual string FormatString(ColumnDefinition column)
         {
             return GetQuotedColumnName(column.Name);
         }
@@ -331,6 +366,14 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         protected abstract string FormatSystemMethods(SystemMethods systemMethod);
 
         protected abstract string FormatIdentity(ColumnDefinition column);
+
+        public virtual string DeleteDefaultConstraint
+        {
+            get
+            {
+                throw new NotSupportedException("Default constraints are not supported");
+            }
+        }
 
         public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
         public virtual string DropTable { get { return "DROP TABLE {0}"; } }

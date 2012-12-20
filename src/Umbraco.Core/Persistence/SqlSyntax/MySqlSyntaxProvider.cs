@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
@@ -142,9 +143,19 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return null;
         }
 
+        public override string DeleteDefaultConstraint
+        {
+            get
+            {
+                throw new NotSupportedException("Default constraints are not supported in MySql");
+            }
+        }
+
         public override string AlterColumn { get { return "ALTER TABLE {0} MODIFY COLUMN {1}"; } }
 
         public override string DeleteConstraint { get { return "ALTER TABLE {0} DROP {1}{2}"; } }
+
+        public override string DropIndex { get { return "DROP INDEX {0} ON {1}"; } }
 
         public override string CreateTable { get { return "CREATE TABLE {0} ({1}) ENGINE = INNODB"; } }
 

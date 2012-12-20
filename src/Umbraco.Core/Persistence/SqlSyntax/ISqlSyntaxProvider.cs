@@ -33,6 +33,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string CreateConstraint { get; }
         string DeleteConstraint { get; }
         string CreateForeignKeyConstraint { get; }
+        string DeleteDefaultConstraint { get; }
         string Format(TableDefinition table);
         string Format(IEnumerable<ColumnDefinition> columns);
         List<string> Format(IEnumerable<IndexDefinition> indexes);
@@ -40,5 +41,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string FormatPrimaryKey(TableDefinition table);
         string GetQuotedValue(string value);
         string Format(ColumnDefinition column);
+        string Format(IndexDefinition index);
+        string Format(ForeignKeyDefinition foreignKey);
+        string FormatColumnRename(string tableName, string oldName, string newName);
+        string FormatTableRename(string oldName, string newName);
     }
 }
