@@ -8,7 +8,7 @@ namespace Umbraco.Core.Models.Membership
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Profile : IProfile
+    internal class Profile : IProfile
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Profile"/> class.

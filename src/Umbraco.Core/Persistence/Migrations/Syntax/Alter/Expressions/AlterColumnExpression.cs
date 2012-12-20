@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 {
@@ -15,8 +16,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 
         public override string ToString()
         {
-            //TODO Implement usage of the SqlSyntax provider here to generate the sql statement for this expression.
-            return TableName + " " + Column.Name + " " + Column.Type ?? Column.CustomType;
+            return string.Format(SyntaxConfig.SqlSyntaxProvider.AlterColumn,
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(TableName),
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(Column.Name));
         }
     }
 }

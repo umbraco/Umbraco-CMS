@@ -1,5 +1,4 @@
-﻿using System;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
@@ -18,10 +17,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
         public override string ToString()
         {
 
-            var output = String.Format(SyntaxConfig.SqlSyntaxProvider.AddColumn,
-                                       SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(TableName),
-                                       SyntaxConfig.SqlSyntaxProvider.Format(Column));
-            return output;
+            return string.Format(SyntaxConfig.SqlSyntaxProvider.AddColumn,
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(TableName),
+                                 SyntaxConfig.SqlSyntaxProvider.Format(Column));
         }
     }
 }

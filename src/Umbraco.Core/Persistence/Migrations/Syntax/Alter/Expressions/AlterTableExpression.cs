@@ -11,7 +11,7 @@
 
         public override string ToString()
         {
-            return base.ToString() + TableName;
+            return string.Format("ALTER TABLE {0}", TableName);
         }
     }
 }

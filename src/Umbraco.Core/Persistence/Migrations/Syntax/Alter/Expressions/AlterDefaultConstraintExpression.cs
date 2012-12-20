@@ -1,3 +1,5 @@
+using Umbraco.Core.Persistence.SqlSyntax;
+
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 {
     public class AlterDefaultConstraintExpression : IMigrationExpression
@@ -5,16 +7,16 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
         public virtual string ColumnName { get; set; }
+        public virtual string ConstraintName { get; set; }
         public virtual object DefaultValue { get; set; }
 
         public override string ToString()
         {
-            return base.ToString() +
-                    string.Format("{0}.{1} {2} {3}",
-                                SchemaName,
-                                TableName,
-                                ColumnName,
-                                DefaultValue);
+            //NOTE Should probably investigate if Deleting a Default Constraint is different from deleting a 'regular' constraint
+
+            return string.Format(SyntaxConfig.SqlSyntaxProvider.DeleteConstraint,
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(TableName),
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedName(ConstraintName));
         }
     }
 }

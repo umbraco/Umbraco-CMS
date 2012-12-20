@@ -70,7 +70,7 @@ namespace umbraco.cms.presentation.user
             userType.DefaultPermissions = actions;
             userType.Save();
 
-            speechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editUserTypeSaved", base.getUser()), "");
+            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editUserTypeSaved", base.getUser()), "");
         }
 
         protected List<IAction> CurrentUserTypeActions

@@ -407,6 +407,7 @@
     <Content Include="Umbraco\Config\Lang\ru.xml" />
     <Content Include="Umbraco\Config\Lang\zh.xml" />
     <Content Include="Umbraco\Controls\Tree\CustomTreeService.asmx" />
+    <Content Include="Umbraco\Dashboard\Images\access-denied.png" />
     <Content Include="Umbraco\Dashboard\Scripts\swfobject.js" />
     <Content Include="Umbraco\Dashboard\MediaDashboardFolderBrowser.ascx" />
     <Content Include="Umbraco\Developer\RelationTypes\EditRelationType.aspx" />

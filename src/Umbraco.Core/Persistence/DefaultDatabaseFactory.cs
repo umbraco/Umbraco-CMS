@@ -8,12 +8,13 @@ namespace Umbraco.Core.Persistence
 	/// </summary>
 	/// <remarks>
 	/// If we are running in an http context
-	/// it will create on per context, otherwise it will a global singleton object which is NOT thread safe
+	/// it will create one per context, otherwise it will be a global singleton object which is NOT thread safe
 	/// since we need (at least) a new instance of the database object per thread.
 	/// </remarks>
 	internal class DefaultDatabaseFactory : DisposableObject, IDatabaseFactory
 	{
-		private readonly string _connectionString;
+		private readonly string _connectionStringName;
+        private readonly string _connectionString;
 		private readonly string _providerName;
 		private static volatile UmbracoDatabase _globalInstance = null;
 		private static readonly object Locker = new object();
@@ -29,18 +30,18 @@ namespace Umbraco.Core.Persistence
 		/// <summary>
 		/// Constructor accepting custom connection string
 		/// </summary>
-		/// <param name="connectionString"></param>
-		public DefaultDatabaseFactory(string connectionString)
+		/// <param name="connectionStringName">Name of the connection string in web.config</param>
+		public DefaultDatabaseFactory(string connectionStringName)
 		{
-			Mandate.ParameterNotNullOrEmpty(connectionString, "connectionString");
-			_connectionString = connectionString;
+			Mandate.ParameterNotNullOrEmpty(connectionStringName, "connectionStringName");
+			_connectionStringName = connectionStringName;
 		}
 
 		/// <summary>
 		/// Constructor accepting custom connectino string and provider name
 		/// </summary>
-		/// <param name="connectionString"></param>
-		/// <param name="providerName"></param>
+		/// <param name="connectionString">Connection String to use with Database</param>
+		/// <param name="providerName">Database Provider for the Connection String</param>
 		public DefaultDatabaseFactory(string connectionString, string providerName)
 		{
 			Mandate.ParameterNotNullOrEmpty(connectionString, "connectionString");
@@ -61,9 +62,9 @@ namespace Umbraco.Core.Persistence
 						//double check
 						if (_globalInstance == null)
 						{
-							_globalInstance = string.IsNullOrEmpty(_providerName)
-								                  ? new UmbracoDatabase(_connectionString)
-								                  : new UmbracoDatabase(_connectionString, _providerName);
+						    _globalInstance = string.IsNullOrEmpty(_providerName) == false && string.IsNullOrEmpty(_providerName) == false
+						                          ? new UmbracoDatabase(_connectionString, _providerName)
+						                          : new UmbracoDatabase(_connectionStringName);
 						}
 					}
 				}
@@ -74,9 +75,9 @@ namespace Umbraco.Core.Persistence
 			if (!HttpContext.Current.Items.Contains(typeof(DefaultDatabaseFactory)))
 			{
 				HttpContext.Current.Items.Add(typeof (DefaultDatabaseFactory),
-				                              string.IsNullOrEmpty(_providerName)
-					                              ? new UmbracoDatabase(_connectionString)
-					                              : new UmbracoDatabase(_connectionString, _providerName));
+                                              string.IsNullOrEmpty(_providerName) == false && string.IsNullOrEmpty(_providerName) == false
+					                              ? new UmbracoDatabase(_connectionString, _providerName)
+					                              : new UmbracoDatabase(_connectionStringName));
 			}
 			return (UmbracoDatabase)HttpContext.Current.Items[typeof(DefaultDatabaseFactory)];
 		}

@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IMedia"/>
     /// </summary>
-    internal class MediaRepository : PetaPocoRepositoryBase<int, IMedia>, IMediaRepository
+    internal class MediaRepository : VersionableRepositoryBase<int, IMedia>, IMediaRepository
     {
         private readonly IMediaTypeRepository _mediaTypeRepository;
 
@@ -35,24 +35,24 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IMedia PerformGet(int id)
         {
-            var contentSql = GetBaseQuery(false);
-            contentSql.Where(GetBaseWhereClause(), new { Id = id });
-            contentSql.OrderBy("[cmsContentVersion].[VersionDate] DESC");
+            var sql = GetBaseQuery(false);
+            sql.Where(GetBaseWhereClause(), new { Id = id });
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dto = Database.Query<ContentVersionDto, ContentDto, NodeDto>(contentSql).FirstOrDefault();
+            var dto = Database.Query<ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
 
-            var contentType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
+            var mediaType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
 
-            var factory = new MediaFactory(contentType, NodeObjectTypeId, id);
-            var content = factory.BuildEntity(dto);
+            var factory = new MediaFactory(mediaType, NodeObjectTypeId, id);
+            var media = factory.BuildEntity(dto);
 
-            content.Properties = GetPropertyCollection(id, dto.VersionId, contentType);
+            media.Properties = GetPropertyCollection(id, dto.VersionId, mediaType);
 
-            ((ICanBeDirty)content).ResetDirtyProperties();
-            return content;
+            ((ICanBeDirty)media).ResetDirtyProperties();
+            return media;
         }
 
         protected override IEnumerable<IMedia> PerformGetAll(params int[] ids)
@@ -131,8 +131,41 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
+        #region Overrides of VersionableRepositoryBase<IContent>
+
+        public override IMedia GetByVersion(Guid versionId)
+        {
+            var sql = GetBaseQuery(false);
+            sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+
+            var dto = Database.Query<ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
+
+            if (dto == null)
+                return null;
+
+            var mediaType = _mediaTypeRepository.Get(dto.ContentDto.ContentTypeId);
+
+            var factory = new MediaFactory(mediaType, NodeObjectTypeId, dto.NodeId);
+            var media = factory.BuildEntity(dto);
+
+            media.Properties = GetPropertyCollection(dto.NodeId, dto.VersionId, mediaType);
+
+            ((ICanBeDirty)media).ResetDirtyProperties();
+            return media;
+        }
+
+        protected override void PerformDeleteVersion(int id, Guid versionId)
+        {
+            Database.Delete<PreviewXmlDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<PropertyDataDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<ContentVersionDto>("WHERE nodeId = @Id AND VersionId = @VersionId", new { Id = id, VersionId = versionId });
+        }
+
+        #endregion
+
         #region Unit of Work Implementation
-        
+
         protected override void PersistNewItem(IMedia entity)
         {
             ((Models.Media)entity).AddingEntity();
@@ -198,7 +231,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(IMedia entity)
         {
-            //Updates Modified date and Version Guid
+            //Updates Modified date
             ((Models.Media)entity).UpdatingEntity();
 
             var factory = new MediaFactory(NodeObjectTypeId, entity.Id);
@@ -219,17 +252,36 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Update(newContentDto);
             }
 
-            //Create a new version - cmsContentVersion
-            //Assumes a new Version guid and Version date (modified date) has been set
-            Database.Insert(dto);
+            //Updates the current version - cmsContentVersion
+            //Assumes a Version guid exists and Version date (modified date) has been set/updated
+            Database.Update(dto);
 
             //Create the PropertyData for this version - cmsPropertyData
             var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
             var propertyDataDtos = propertyFactory.BuildDto(entity.Properties);
+            var keyDictionary = new Dictionary<int, int>();
+
             //Add Properties
             foreach (var propertyDataDto in propertyDataDtos)
             {
-                Database.Insert(propertyDataDto);
+                if (propertyDataDto.Id > 0)
+                {
+                    Database.Update(propertyDataDto);
+                }
+                else
+                {
+                    int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
+                    keyDictionary.Add(propertyDataDto.PropertyTypeId, primaryKey);
+                }
+            }
+
+            //Update Properties with its newly set Id
+            if (keyDictionary.Any())
+            {
+                foreach (var property in entity.Properties)
+                {
+                    property.Id = keyDictionary[property.PropertyTypeId];
+                }
             }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();

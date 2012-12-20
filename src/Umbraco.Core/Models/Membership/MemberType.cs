@@ -5,7 +5,7 @@ using Umbraco.Core.Models.EntityBase;
 namespace Umbraco.Core.Models.Membership
 {
     /// <summary>
-    /// Represents the Type for a Backoffice User
+    /// Represents the Type for an Umbraco Member
     /// </summary>
     /// <remarks>
     /// Should be internal until a proper user/membership implementation
@@ -13,15 +13,8 @@ namespace Umbraco.Core.Models.Membership
     /// </remarks>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class UserType : Entity, IUserType
+    internal class MemberType : Entity
     {
-        [DataMember]
-        public string Alias { get; set; }
-
-        [DataMember]
-        public string Name { get; set; }
-
-        [DataMember]
-        public string Permissions { get; set; }
+         
     }
 }

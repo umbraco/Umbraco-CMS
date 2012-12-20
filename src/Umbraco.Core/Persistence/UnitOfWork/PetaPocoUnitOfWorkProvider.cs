@@ -1,5 +1,4 @@
-﻿using System;
-using Umbraco.Core.Configuration;
+﻿using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Persistence.UnitOfWork
 {
@@ -18,6 +17,14 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         {
             
         }
+
+        /// <summary>
+        /// Constructor accepting custom connectino string and provider name
+        /// </summary>
+        /// <param name="connectionString">Connection String to use with Database</param>
+        /// <param name="providerName">Database Provider for the Connection String</param>
+        public PetaPocoUnitOfWorkProvider(string connectionString, string providerName) : this(new DefaultDatabaseFactory(connectionString, providerName))
+        {}
 
 		/// <summary>
 		/// Constructor accepting an IDatabaseFactory instance

@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
+﻿using Umbraco.Core.Persistence.SqlSyntax;
+
+namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
     public class DeleteTableExpression : IMigrationExpression
     {
@@ -7,9 +9,8 @@
 
         public override string ToString()
         {
-            //TODO implement the use of sql syntax provider
-
-            return base.ToString() + TableName;
+            return string.Format(SyntaxConfig.SqlSyntaxProvider.DropTable,
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(TableName));
         }
     }
 }

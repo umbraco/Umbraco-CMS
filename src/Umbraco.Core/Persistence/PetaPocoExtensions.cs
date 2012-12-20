@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Linq;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions;
 
 namespace Umbraco.Core.Persistence
 {
@@ -28,15 +29,13 @@ namespace Umbraco.Core.Persistence
 
         public static void CreateTable(this Database db, bool overwrite, Type modelType)
         {
-            //TODO The line below should be refactored to use 'Umbraco.Core.Persistence.DatabaseModelDefinitions.DefinitionFactory.GetTableDefinition(modelType)'
-            //But first the sql syntax provider should be updated/refactored to format sql statements using the 'new' definitions from the DatabaseModelDefinitions-namespace.
             var tableDefinition = DefinitionFactory.GetTableDefinition(modelType);
-            var tableName = tableDefinition.TableName;
+            var tableName = tableDefinition.Name;
 
-            string createSql = SyntaxConfig.SqlSyntaxProvider.ToCreateTableStatement(tableDefinition);
-            string createPrimaryKeySql = SyntaxConfig.SqlSyntaxProvider.ToCreatePrimaryKeyStatement(tableDefinition);
-            var foreignSql = SyntaxConfig.SqlSyntaxProvider.ToCreateForeignKeyStatements(tableDefinition);
-            var indexSql = SyntaxConfig.SqlSyntaxProvider.ToCreateIndexStatements(tableDefinition);
+            string createSql = SyntaxConfig.SqlSyntaxProvider.Format(tableDefinition);
+            string createPrimaryKeySql = SyntaxConfig.SqlSyntaxProvider.FormatPrimaryKey(tableDefinition);
+            var foreignSql = SyntaxConfig.SqlSyntaxProvider.Format(tableDefinition.ForeignKeys);
+            var indexSql = SyntaxConfig.SqlSyntaxProvider.Format(tableDefinition.Indexes);
 
             var tableExist = db.TableExist(tableName);
             if (overwrite && tableExist)
@@ -50,10 +49,14 @@ namespace Umbraco.Core.Persistence
                 {
                     //Execute the Create Table sql
                     int created = db.Execute(new Sql(createSql));
+                    LogHelper.Info<Database>(string.Format("Create Table sql {0}:\n {1}", created, createSql));
 
                     //If any statements exists for the primary key execute them here
                     if (!string.IsNullOrEmpty(createPrimaryKeySql))
-                        db.Execute(new Sql(createPrimaryKeySql));
+                    {
+                        int createdPk = db.Execute(new Sql(createPrimaryKeySql));
+                        LogHelper.Info<Database>(string.Format("Primary Key sql {0}:\n {1}", createdPk, createPrimaryKeySql));
+                    }
 
                     //Fires the NewTable event, which is used internally to insert base data before adding constrants to the schema
                     if (NewTable != null)
@@ -61,14 +64,14 @@ namespace Umbraco.Core.Persistence
                         var e = new TableCreationEventArgs();
 
                         //Turn on identity insert if db provider is not mysql
-						if (ApplicationContext.Current.DatabaseContext.ProviderName.Contains("MySql") == false && tableDefinition.IsIdentity)
+						if (ApplicationContext.Current.DatabaseContext.ProviderName.Contains("MySql") == false && tableDefinition.Columns.Any(x => x.IsIdentity))
                             db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName))));
                         
                         //Call the NewTable-event to trigger the insert of base/default data
                         NewTable(tableName, db, e);
 
                         //Turn off identity insert if db provider is not mysql
-						if (ApplicationContext.Current.DatabaseContext.ProviderName.Contains("MySql") == false && tableDefinition.IsIdentity)
+                        if (ApplicationContext.Current.DatabaseContext.ProviderName.Contains("MySql") == false && tableDefinition.Columns.Any(x => x.IsIdentity))
                             db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName))));
                     }
 
@@ -76,23 +79,25 @@ namespace Umbraco.Core.Persistence
                     foreach (var sql in foreignSql)
                     {
                         int createdFk = db.Execute(new Sql(sql));
+                        LogHelper.Info<Database>(string.Format("Create Foreign Key sql {0}:\n {1}", createdFk, sql));
                     }
 
                     //Loop through index statements and execute sql
                     foreach (var sql in indexSql)
                     {
                         int createdIndex = db.Execute(new Sql(sql));
+                        LogHelper.Info<Database>(string.Format("Create Index sql {0}:\n {1}", createdIndex, sql));
                     }
 
                     //Specific to Sql Ce - look for changes to Identity Seed
-					if (ApplicationContext.Current.DatabaseContext.ProviderName.Contains("SqlServerCe"))
-                    {
-                        var seedSql = SyntaxConfig.SqlSyntaxProvider.ToAlterIdentitySeedStatements(tableDefinition);
-                        foreach (var sql in seedSql)
-                        {
-                            int createdSeed = db.Execute(new Sql(sql));
-                        }
-                    }
+                    //if (ApplicationContext.Current.DatabaseContext.ProviderName.Contains("SqlServerCe"))
+                    //{
+                    //    var seedSql = SyntaxConfig.SqlSyntaxProvider.ToAlterIdentitySeedStatements(tableDefinition);
+                    //    foreach (var sql in seedSql)
+                    //    {
+                    //        int createdSeed = db.Execute(new Sql(sql));
+                    //    }
+                    //}
 
                     transaction.Complete();
                 }

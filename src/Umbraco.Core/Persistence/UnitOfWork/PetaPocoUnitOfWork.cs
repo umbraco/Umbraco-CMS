@@ -93,7 +93,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 		/// </remarks>
 		public void Commit()
 		{
-			
 			using (var transaction = Database.GetTransaction())
 			{
 				foreach (var operation in _operations.OrderBy(o => o.ProcessDate))
@@ -113,7 +112,6 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 				}
 				transaction.Complete();	
 			}
-			
 
 			// Clear everything
 			_operations.Clear();

@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
@@ -14,8 +14,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 
         public override string ToString()
         {
-            //TODO Change to use sql syntax provider
-            return base.ToString() + Index.TableName + " (" + string.Join(", ", Index.Columns.Select(x => x.Name).ToArray()) + ")";
+            return string.Format(SyntaxConfig.SqlSyntaxProvider.DropIndex,
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedName(Index.Name),
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(Index.TableName));
         }
     }
 }

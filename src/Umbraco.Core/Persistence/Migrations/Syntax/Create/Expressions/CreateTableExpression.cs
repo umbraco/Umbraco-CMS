@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions
 {
@@ -16,8 +17,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions
 
         public override string ToString()
         {
-            //TODO replace with sql syntax provider
-            return base.ToString() + TableName;
+            return string.Format(SyntaxConfig.SqlSyntaxProvider.CreateTable,
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(TableName),
+                                 SyntaxConfig.SqlSyntaxProvider.Format(Columns));
         }
     }
 }

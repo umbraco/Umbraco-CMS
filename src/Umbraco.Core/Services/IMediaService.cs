@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 
@@ -110,5 +111,57 @@ namespace Umbraco.Core.Services
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
         void Save(IEnumerable<IMedia> medias, int userId = -1);
+
+        /// <summary>
+        /// Gets an <see cref="IMedia"/> object by its 'UniqueId'
+        /// </summary>
+        /// <param name="key">Guid key of the Media to retrieve</param>
+        /// <returns><see cref="IMedia"/></returns>
+        IMedia GetById(Guid key);
+
+        /// <summary>
+        /// Gets a collection of <see cref="IMedia"/> objects by Level
+        /// </summary>
+        /// <param name="level">The level to retrieve Media from</param>
+        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
+        IEnumerable<IMedia> GetByLevel(int level);
+
+        /// <summary>
+        /// Gets a specific version of an <see cref="IMedia"/> item.
+        /// </summary>
+        /// <param name="versionId">Id of the version to retrieve</param>
+        /// <returns>An <see cref="IMedia"/> item</returns>
+        IMedia GetByVersion(Guid versionId);
+
+        /// <summary>
+        /// Gets a collection of an <see cref="IMedia"/> objects versions by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
+        IEnumerable<IMedia> GetVersions(int id);
+
+        /// <summary>
+        /// Checks whether an <see cref="IMedia"/> item has any children
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMedia"/></param>
+        /// <returns>True if the media has any children otherwise False</returns>
+        bool HasChildren(int id);
+
+        /// <summary>
+        /// Permanently deletes versions from an <see cref="IMedia"/> object prior to a specific date.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMedia"/> object to delete versions from</param>
+        /// <param name="versionDate">Latest version date</param>
+        /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
+        void DeleteVersions(int id, DateTime versionDate, int userId = -1);
+
+        /// <summary>
+        /// Permanently deletes specific version(s) from an <see cref="IMedia"/> object.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMedia"/> object to delete a version from</param>
+        /// <param name="versionId">Id of the version to delete</param>
+        /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
+        /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
+        void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = -1);
     }
 }

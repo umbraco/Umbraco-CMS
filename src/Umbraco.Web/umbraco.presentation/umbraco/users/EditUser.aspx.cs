@@ -501,17 +501,17 @@ namespace umbraco.cms.presentation.user
 
                     }
 
-                    speechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editUserSaved", base.getUser()), "");
+                    ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editUserSaved", base.getUser()), "");
                 }
                 catch (Exception ex)
                 {
-                    speechBubble(speechBubbleIcon.error, ui.Text("speechBubbles", "editUserError", base.getUser()), "");
+                    ClientTools.ShowSpeechBubble(speechBubbleIcon.error, ui.Text("speechBubbles", "editUserError", base.getUser()), "");
                     Log.Add(LogTypes.Error, 0, ex.Message);
                 }
             }
             else
             {
-                speechBubble(speechBubbleIcon.error, ui.Text("speechBubbles", "editUserError", base.getUser()), "");
+                ClientTools.ShowSpeechBubble(speechBubbleIcon.error, ui.Text("speechBubbles", "editUserError", base.getUser()), "");
             }
         }
     }

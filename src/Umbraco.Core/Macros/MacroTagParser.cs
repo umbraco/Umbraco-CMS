@@ -66,8 +66,7 @@ namespace Umbraco.Core.Macros
 						}
 					}
 
-
-					var macroAlias = attributes["macroalias"] ?? attributes["alias"];
+				    var macroAlias = attributes.ContainsKey("macroalias") ? attributes["macroalias"] : attributes["alias"];
 
 					//call the callback now that we have the macro parsed
 					macroFoundCallback(macroAlias, attributes);

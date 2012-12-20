@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Persistence.Migrations.Syntax.Rename.Expressions
+﻿using Umbraco.Core.Persistence.SqlSyntax;
+
+namespace Umbraco.Core.Persistence.Migrations.Syntax.Rename.Expressions
 {
     public class RenameColumnExpression : IMigrationExpression
     {
@@ -9,8 +11,7 @@
 
         public override string ToString()
         {
-            //TODO Implement usage of sql syntax provider
-            return base.ToString() + TableName + " " + OldName + " to " + NewName;
+            return SyntaxConfig.SqlSyntaxProvider.FormatColumnRename(TableName, OldName, NewName);
         }
     }
 }
