@@ -4,6 +4,7 @@ using System.Linq;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -95,6 +96,20 @@ namespace Umbraco.Core.Services
             {
                 return repository.GetAll(ids);
             }
+        }
+
+        /// <summary>
+        /// Gets all values for an <see cref="IDataTypeDefinition"/>
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IDataTypeDefinition"/> to retrieve prevalues from</param>
+        /// <returns>An enumerable list of string values</returns>
+        public IEnumerable<string> GetPreValuesByDataTypeId(int id)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            var dtos = uow.Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new {Id = id});
+            var list = dtos.Select(x => x.Value).ToList();
+            uow.Dispose();
+            return list;
         }
 
         /// <summary>

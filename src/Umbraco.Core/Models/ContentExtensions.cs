@@ -177,7 +177,22 @@ namespace Umbraco.Core.Models
                 if (property.PropertyType.DataTypeControlId == uploadFieldId)
                 {
                     //Get Prevalues by the DataType's Id: property.PropertyType.DataTypeId
-                    //var definition = ApplicationContext.Current.Services.DataTypeService.GetDataTypeDefinitionById(property.PropertyType.DataTypeId);
+                    var values = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(property.PropertyType.DataTypeId);
+                    var thumbnailSizes = values.FirstOrDefault();
+                    //Additional thumbnails configured as prevalues on the DataType
+                    if (thumbnailSizes != null)
+                    {
+                        char sep = (!thumbnailSizes.Contains("") && thumbnailSizes.Contains(",")) ? ',' : ';';
+
+                        foreach (string thumb in thumbnailSizes.Split(sep))
+                        {
+                            int thumbSize;
+                            if (thumb != "" && int.TryParse(thumb, out thumbSize))
+                            {
+                                Resize(fs, fileName, extension, thumbSize, string.Format("thumb_{0}", thumbSize));
+                            }
+                        }
+                    }
                 }
             }
 
@@ -190,7 +205,7 @@ namespace Umbraco.Core.Models
                 
                 if (uploadFieldConfigNode != null)
                 {
-                    // Only add dimensions to web images
+                    //Only add dimensions to web images
                     if (supportsResizing)
                     {
                         SetPropertyValue(content, uploadFieldConfigNode, "widthFieldAlias", GetDimensions(fs, fileName).Item1);
