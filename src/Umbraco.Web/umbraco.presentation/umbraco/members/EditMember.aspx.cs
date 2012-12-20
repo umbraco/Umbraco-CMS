@@ -206,7 +206,7 @@ namespace umbraco.cms.presentation.members
 
                 }
 
-                this.speechBubble(BasePages.BasePage.speechBubbleIcon.save,
+                ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.save,
                                   ui.Text("speechBubbles", "editMemberSaved", base.getUser()), "");
             }
 		}

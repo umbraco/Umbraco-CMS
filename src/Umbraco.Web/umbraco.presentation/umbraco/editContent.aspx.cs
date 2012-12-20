@@ -353,6 +353,9 @@ namespace umbraco.cms.presentation
 
             library.UnPublishSingleNode(_document.Id);
 
+            Current.ClientTools.SyncTree(_document.Path, true);
+            ClientTools.ShowSpeechBubble(speechBubbleIcon.success, ui.Text("unpublish"), ui.Text("speechBubbles", "contentUnpublished"));
+
             //newPublishStatus.Text = "0";
         }
 

@@ -241,6 +241,10 @@ namespace umbraco.BusinessLogic
         {
             LoadXml(doc =>
             {
+                var el = doc.Root.Elements("add").SingleOrDefault(x => x.Attribute("alias").Value == alias && x.Attribute("application").Value == applicationAlias);
+
+                if (el == null)
+                {
                 doc.Root.Add(new XElement("add",
                     new XAttribute("silent", silent),
                     new XAttribute("initialize", initialize),
@@ -253,6 +257,7 @@ namespace umbraco.BusinessLogic
                     new XAttribute("assembly", assemblyName),
                     new XAttribute("type", type),
                     new XAttribute("action", string.IsNullOrEmpty(action) ? "" : action)));
+                }
             }, true);
         }
 

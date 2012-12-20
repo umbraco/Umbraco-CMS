@@ -203,6 +203,8 @@ namespace Umbraco.Web.Routing
 			// expected content anymore and the alternate template does not apply.
 			_publishedContentRequest.AlternateTemplateAlias = _umbracoContext.HttpContext.Request["altTemplate"];
 
+            _umbracoContext.HttpContext.Trace.Write(string.Format("test {0}", _publishedContentRequest.AlternateTemplateAlias));
+
 			// handle "not found", follow internal redirects, validate access, template
 			// because these might loop, we have to have some sort of infinite loop detection 
 			int i = 0, j = 0;

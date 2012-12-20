@@ -86,8 +86,7 @@ namespace umbraco.BusinessLogic
                 if (UmbracoSettings.DisabledLogTypes != null &&
                     UmbracoSettings.DisabledLogTypes.SelectSingleNode(String.Format("//logTypeAlias [. = '{0}']", type.ToString().ToLower())) == null)
                 {
-
-                    if (comment.Length > 3999)
+                    if (comment != null && comment.Length > 3999)
                         comment = comment.Substring(0, 3955) + "...";
 
                     if (UmbracoSettings.EnableAsyncLogging)
