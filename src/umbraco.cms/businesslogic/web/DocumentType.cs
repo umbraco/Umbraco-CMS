@@ -19,8 +19,6 @@ namespace umbraco.cms.businesslogic.web
     [Obsolete("Deprecated, Use Umbraco.Core.Models.ContentType", false)]
     public class DocumentType : ContentType
     {
-        //MCH: Templates is still on the refactoring todo-list, so its currenly using db to get/set/remove templates.
-
         #region Constructors
 
         public DocumentType(int id) : base(id) { }
@@ -167,36 +165,7 @@ namespace umbraco.cms.businesslogic.web
             var contentTypes = ApplicationContext.Current.Services.ContentTypeService.GetAllContentTypes();
             var documentTypes = contentTypes.Select(x => new DocumentType(x.Id));
 
-            /*using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(m_SQLOptimizedGetAll.Trim(), SqlHelper.CreateParameter("@nodeObjectType", DocumentType._objectType)))
-            {
-                while (dr.Read())
-                {
-                    //check if the document id has already been added
-                    if (documentTypes.Where(x => x.Id == dr.Get<int>("id")).Count() == 0)
-                    {
-                        //create the DocumentType object without setting up
-                        DocumentType dt = new DocumentType(dr.Get<int>("id"), true);
-                        //populate it's CMSNode properties
-                        dt.PopulateCMSNodeFromReader(dr);
-                        //populate it's ContentType properties
-                        dt.PopulateContentTypeNodeFromReader(dr);
-                        //populate from it's DocumentType properties
-                        dt.PopulateDocumentTypeNodeFromReader(dr);
-
-                        documentTypes.Add(dt);
-                    }
-                    else
-                    {
-                        //we've already created the document type with this id, so we'll add the rest of it's templates to itself
-                        var dt = documentTypes.Where(x => x.Id == dr.Get<int>("id")).Single();
-                        dt.PopulateDocumentTypeNodeFromReader(dr);
-                    }
-                }
-            }*/
-
             return documentTypes.OrderBy(x => x.Text).ToList();
-
         }
 
         #endregion
@@ -231,7 +200,6 @@ namespace umbraco.cms.businesslogic.web
 
                 if (_defaultTemplate != 0)
                 {
-                    //SqlHelper.ExecuteNonQuery("update cmsDocumentType set IsDefault = 1 where contentTypeNodeId = " + Id.ToString() + " and TemplateNodeId = " + value.ToString());
                     var template = ApplicationContext.Current.Services.FileService.GetTemplate(_defaultTemplate);
                     _contentType.SetDefaultTemplate(template);
                 }
@@ -263,7 +231,6 @@ namespace umbraco.cms.businesslogic.web
                 var templates = new List<ITemplate>();
                 foreach (template.Template t in value)
                 {
-                    //SqlHelper.ExecuteNonQuery("Insert into cmsDocumentType (contentTypeNodeId, templateNodeId) values (" + Id + "," + t.Id + ")");
                     var template = ApplicationContext.Current.Services.FileService.GetTemplate(t.Id);
                     templates.Add(template);
 
@@ -324,8 +291,6 @@ namespace umbraco.cms.businesslogic.web
             // remove from list of document type templates
             if (_templateIds.Contains(templateId))
             {
-                /*SqlHelper.ExecuteNonQuery("delete from cmsDocumentType where contentTypeNodeId = @id and templateNodeId = @templateId",
-                    SqlHelper.CreateParameter("@id", this.Id), SqlHelper.CreateParameter("@templateId", templateId));*/
                 var template = _contentType.AllowedTemplates.FirstOrDefault(x => x.Id == templateId);
                 if (template != null)
                     _contentType.RemoveTemplate(template);
@@ -338,6 +303,7 @@ namespace umbraco.cms.businesslogic.web
         /// 
         /// </summary>
         /// <exception cref="ArgumentException">Throws an exception if trying to delete a document type that is assigned as a master document type</exception>
+        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentTypeService.Delete()", false)]
         public override void delete()
         {
             DeleteEventArgs e = new DeleteEventArgs();
@@ -364,7 +330,6 @@ namespace umbraco.cms.businesslogic.web
 
         public void clearTemplates()
         {
-            //SqlHelper.ExecuteNonQuery("Delete from cmsDocumentType where contentTypeNodeId =" + Id);
             _contentType.AllowedTemplates = new List<ITemplate>();
             _templateIds.Clear();
         }
@@ -461,8 +426,6 @@ namespace umbraco.cms.businesslogic.web
             var template = _contentType.DefaultTemplate;
             if(template != null)
                 _contentType.RemoveTemplate(template);
-
-            //SqlHelper.ExecuteNonQuery("update cmsDocumentType set IsDefault = 0 where contentTypeNodeId = " + Id.ToString());
         }
 
         public bool HasTemplate()
@@ -473,6 +436,7 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
         /// </summary>
+        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentTypeService.Save()", false)]
         public override void Save()
         {
             SaveEventArgs e = new SaveEventArgs();
