@@ -856,6 +856,7 @@ namespace umbraco.cms.businesslogic.packager
             foreach (DocumentType.TabI t in dt.getVirtualTabs.ToList())
                 DocumentType.FlushTabCache(t.Id, dt.Id);
 
+            dt.Save();
         }
 
         /// <summary>
