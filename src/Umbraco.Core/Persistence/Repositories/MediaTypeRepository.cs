@@ -124,6 +124,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                string.Format("DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id"),
                                string.Format("DELETE FROM cmsTagRelationship WHERE nodeId = @Id"),
                                string.Format("DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @Id"),
+                               string.Format("DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @Id"),
                                string.Format("DELETE FROM cmsContentType2ContentType WHERE parentContentTypeId = @Id"),
                                string.Format("DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @Id"),
                                string.Format("DELETE FROM cmsPropertyType WHERE contentTypeId = @Id"),

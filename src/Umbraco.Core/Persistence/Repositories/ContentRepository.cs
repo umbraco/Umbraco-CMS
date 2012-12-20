@@ -374,7 +374,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
             var uploadFieldId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
-            //Loop through properties to check if the content contains media that should be deleted
+            //Loop through properties to check if the content contains images/files that should be deleted
             foreach (var property in entity.Properties)
             {
                 if (property.PropertyType.DataTypeControlId == uploadFieldId &&
