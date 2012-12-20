@@ -71,7 +71,7 @@ namespace umbraco.settings
 		    currentLanguage.Save();
 			updateCultureList();
 
-            speechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "languageSaved"), "");	
+            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "languageSaved"), "");	
 		}
 
 		#region Web Form Designer generated code
