@@ -91,20 +91,16 @@ namespace Umbraco.Core.Services
 		    }
 
             content = new Content(parentId, contentType);
-            var e = new NewEventArgs { Alias = contentTypeAlias, ParentId = parentId };
-		    if (Creating != null)
-		        Creating(content, e);
-				
-		    if (!e.Cancel)
-		    {
-		        SetUser(content, userId);
-		        SetWriter(content, userId);
 
-		        if (Created != null)
-		            Created(content, e);
+			if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
+				return content;
 
-		        Audit.Add(AuditTypes.New, "", content.CreatorId, content.Id);
-		    }
+			SetUser(content, userId);
+			SetWriter(content, userId);
+
+			Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this);
+
+			Audit.Add(AuditTypes.New, "", content.CreatorId, content.Id);
 
 		    return content;	
 			
@@ -581,69 +577,63 @@ namespace Umbraco.Core.Services
 	    public bool SaveAndPublish(IContent content, int userId = -1, bool omitCacheRefresh = false)
 	    {
             //TODO Refactor this so omitCacheRefresh isn't exposed in the public method, but only in an internal one as its purely there for legacy reasons.
-	        var e = new SaveEventArgs();
-	        if (Saving != null)
-	            Saving(content, e);
+			if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
+				return false;
 
-	        if (!e.Cancel)
-	        {
-	            //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
-	            if (content.ParentId != -1 && content.ParentId != -20 && HasPublishedVersion(content.ParentId) == false)
-	            {
-	                LogHelper.Info<ContentService>(
-	                    string.Format(
-	                        "Content '{0}' with Id '{1}' could not be published because its parent is not published.",
-	                        content.Name, content.Id));
-	                return false;
-	            }
+			//Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
+			if (content.ParentId != -1 && content.ParentId != -20 && HasPublishedVersion(content.ParentId) == false)
+			{
+				LogHelper.Info<ContentService>(
+					string.Format(
+						"Content '{0}' with Id '{1}' could not be published because its parent is not published.",
+						content.Name, content.Id));
+				return false;
+			}
 
-	            //Content contains invalid property values and can therefore not be published - fire event?
-	            if (!content.IsValid())
-	            {
-	                LogHelper.Info<ContentService>(
-	                    string.Format(
-	                        "Content '{0}' with Id '{1}' could not be published because of invalid properties.",
-	                        content.Name, content.Id));
-	                return false;
-	            }
+			//Content contains invalid property values and can therefore not be published - fire event?
+			if (!content.IsValid())
+			{
+				LogHelper.Info<ContentService>(
+					string.Format(
+						"Content '{0}' with Id '{1}' could not be published because of invalid properties.",
+						content.Name, content.Id));
+				return false;
+			}
 
-	            //Publish and then update the database with new status
-	            bool published = _publishingStrategy.Publish(content, userId);
+			//Publish and then update the database with new status
+			bool published = _publishingStrategy.Publish(content, userId);
 
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
-	            {
-	                //Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
-	                SetWriter(content, userId);
-	                repository.AddOrUpdate(content);
+			var uow = _uowProvider.GetUnitOfWork();
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
+			{
+				//Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
+				SetWriter(content, userId);
+				repository.AddOrUpdate(content);
 
 				uow.Commit();
 
-	                if (published)
-	                {
-	                    var xml = content.ToXml();
-	                    var poco = new ContentXmlDto {NodeId = content.Id, Xml = xml.ToString(SaveOptions.None)};
-	                    var exists =
-	                        uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new {Id = content.Id}) !=
-	                        null;
-	                    int result = exists
-	                                     ? uow.Database.Update(poco)
-	                                     : Convert.ToInt32(uow.Database.Insert(poco));
-	                }
-	            }
+				if (published)
+				{
+					var xml = content.ToXml();
+					var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
+					var exists =
+						uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = content.Id }) !=
+						null;
+					int result = exists
+									 ? uow.Database.Update(poco)
+									 : Convert.ToInt32(uow.Database.Insert(poco));
+				}
+			}
 
-	            //Save xml to db and call following method to fire event through PublishingStrategy to update cache
-	            if (omitCacheRefresh == false)
-	                _publishingStrategy.PublishingFinalized(content);
+			//Save xml to db and call following method to fire event through PublishingStrategy to update cache
+			if (omitCacheRefresh == false)
+				_publishingStrategy.PublishingFinalized(content);
 
-	            if (Saved != null)
-	                Saved(content, e);
+			Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
 
-	            Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId == -1 ? 0 : userId, content.Id);
+			Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId == -1 ? 0 : userId, content.Id);
 
-	            return published;
-	        }
-	        return false;
+			return published;
 	    }
 
 	    /// <summary>
@@ -653,29 +643,25 @@ namespace Umbraco.Core.Services
 	    /// <param name="userId">Optional Id of the User saving the Content</param>
 	    public void Save(IContent content, int userId = -1)
 	    {
-	        var e = new SaveEventArgs();
-	        if (Saving != null)
-	            Saving(content, e);
-				
-	        if (!e.Cancel)
-	        {
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
-	            {
-	                SetWriter(content, userId);
+			if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
+				return;
 
-	                //Only change the publish state if the "previous" version was actually published
-	                if (content.Published)
-	                    content.ChangePublishedState(false);
+			var uow = _uowProvider.GetUnitOfWork();
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
+			{
+				SetWriter(content, userId);
 
-	                repository.AddOrUpdate(content);
-	                uow.Commit();
-	            }
-	            if (Saved != null)
-	                Saved(content, e);
-					
-	            Audit.Add(AuditTypes.Save, "Save Content performed by user", userId == -1 ? 0 : userId, content.Id);
-	        }
+				//Only change the publish state if the "previous" version was actually published
+				if (content.Published)
+					content.ChangePublishedState(false);
+
+				repository.AddOrUpdate(content);
+				uow.Commit();
+			}
+			
+			Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
+
+			Audit.Add(AuditTypes.Save, "Save Content performed by user", userId == -1 ? 0 : userId, content.Id);
 	    }
 
 	    /// <summary>
@@ -694,83 +680,43 @@ namespace Umbraco.Core.Services
 
 	        var containsNew = contents.Any(x => x.HasIdentity == false);
 
-	        var e = new SaveEventArgs();
-	        if (Saving != null)
-	            Saving(contents, e);
-	        if (!e.Cancel)
-	        {
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
-	            {
-	                if (containsNew)
-	                {
-	                    foreach (var content in contents)
-	                    {
-							
-	                        SetWriter(content, userId);
+			if (SavingCollection.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable<IContent>>(contents), this))
+				return;
 
-	                        //Only change the publish state if the "previous" version was actually published
-	                        if (content.Published)
-	                            content.ChangePublishedState(false);
+			var uow = _uowProvider.GetUnitOfWork();
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
+			{
+				if (containsNew)
+				{
+					foreach (var content in contents)
+					{
 
-	                        repository.AddOrUpdate(content);
-	                        uow.Commit();
-	                    }
-	                }
-	                else
-	                {
-	                    foreach (var content in contents)
-	                    {
-	                        SetWriter(content, userId);
-	                        repository.AddOrUpdate(content);
-	                    }
-	                    uow.Commit();
-	                }
-	            }
-	            if (Saved != null)
-	                Saved(contents, e);
-	            Audit.Add(AuditTypes.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, -1);
-	        }
+						SetWriter(content, userId);
+
+						//Only change the publish state if the "previous" version was actually published
+						if (content.Published)
+							content.ChangePublishedState(false);
+
+						repository.AddOrUpdate(content);
+						uow.Commit();
+					}
+				}
+				else
+				{
+					foreach (var content in contents)
+					{
+						SetWriter(content, userId);
+						repository.AddOrUpdate(content);
+					}
+					uow.Commit();
+				}
+			}
+			
+			SavedCollection.RaiseEvent(new SaveEventArgs<IEnumerable<IContent>>(contents, false), this);
+
+			Audit.Add(AuditTypes.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, -1);
 	    }
-
-	    /// <summary>
-	    /// Saves a collection of lazy loaded <see cref="IContent"/> objects.
-	    /// </summary>
-	    /// <remarks>
-	    /// This method ensures that Content is saved lazily, so a new graph of <see cref="IContent"/>
-	    /// objects can be saved in bulk. But note that objects are saved one at a time to ensure Ids.
-	    /// </remarks>
-	    /// <param name="contents">Collection of Lazy <see cref="IContent"/> to save</param>
-	    /// <param name="userId">Optional Id of the User saving the Content</param>
-	    public void Save(IEnumerable<Lazy<IContent>> contents, int userId = -1)
-	    {
-	        var e = new SaveEventArgs();
-	        if (Saving != null)
-	            Saving(contents, e);
-	        if (!e.Cancel)
-	        {
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
-	            {
-	                foreach (var content in contents)
-	                {
-	                    SetWriter(content.Value, userId);
-
-	                    //Only change the publish state if the "previous" version was actually published
-	                    if (content.Value.Published)
-	                        content.Value.ChangePublishedState(false);
-	                    repository.AddOrUpdate(content.Value);
-	                    uow.Commit();
-	                }
-	            }
-
-	            if (Saved != null)
-	                Saved(contents, e);
-
-	            Audit.Add(AuditTypes.Save, "Bulk Save (lazy) content performed by user", userId == -1 ? 0 : userId, -1);
-	        }
-	    }
-
+		
 	    /// <summary>
 	    /// Deletes all content of specified type. All children of deleted content is moved to Recycle Bin.
 	    /// </summary>
@@ -778,43 +724,35 @@ namespace Umbraco.Core.Services
 	    /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
 	    /// <param name="userId">Optional Id of the user issueing the delete operation</param>
 	    public void DeleteContentOfType(int contentTypeId, int userId = -1)
-	    {
-	        var uow = _uowProvider.GetUnitOfWork();
-	        var repository = _repositoryFactory.CreateContentRepository(uow);
-	        //NOTE What about content that has the contenttype as part of its composition?
-	        var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == contentTypeId);
-	        var contents = repository.GetByQuery(query);
+	    {	        
+			using (var uow = _uowProvider.GetUnitOfWork())
+			{
+				var repository = _repositoryFactory.CreateContentRepository(uow);
+				//NOTE What about content that has the contenttype as part of its composition?
+				var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == contentTypeId);
+				var contents = repository.GetByQuery(query);
 
-	        var e = new DeleteEventArgs {Id = contentTypeId};
-	        if (Deleting != null)
-	            Deleting(contents, e);
-	        if (!e.Cancel)
-	        {
-	            foreach (var content in contents.OrderByDescending(x => x.ParentId))
-	            {
-	                //Look for children of current content and move that to trash before the current content is deleted
-	                var c = content;
-	                var childQuery = Query<IContent>.Builder.Where(x => x.Path.StartsWith(c.Path));
-	                var children = repository.GetByQuery(childQuery);
+				foreach (var content in contents.OrderByDescending(x => x.ParentId))
+				{
+					//Look for children of current content and move that to trash before the current content is deleted
+					var c = content;
+					var childQuery = Query<IContent>.Builder.Where(x => x.Path.StartsWith(c.Path));
+					var children = repository.GetByQuery(childQuery);
 
-	                foreach (var child in children)
-	                {
-	                    if (child.ContentType.Id != contentTypeId)
-	                        MoveToRecycleBin(child, userId);
-	                }
+					foreach (var child in children)
+					{
+						if (child.ContentType.Id != contentTypeId)
+							MoveToRecycleBin(child, userId);
+					}
 
-	                //Permantly delete the content
-	                Delete(content, userId);
-	            }
+					//Permantly delete the content
+					Delete(content, userId);
+				}	
+			}
 
-                uow.Dispose();
-
-	            if (Deleted != null)
-	                Deleted(contents, e);
-	            Audit.Add(AuditTypes.Delete,
-	                      string.Format("Delete Content of Type {0} performed by user", contentTypeId),
-	                      userId == -1 ? 0 : userId, -1);
-	        }
+			Audit.Add(AuditTypes.Delete,
+					  string.Format("Delete Content of Type {0} performed by user", contentTypeId),
+					  userId == -1 ? 0 : userId, -1);
 	    }
 
 	    /// <summary>
@@ -830,35 +768,31 @@ namespace Umbraco.Core.Services
 		{
 	        if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(content), this)) 
 				return;
-	        
-	        if (!e.Cancel)
-	        {
-	            //Make sure that published content is unpublished before being deleted
-	            if (HasPublishedVersion(content.Id))
-	            {
-	                UnPublish(content, userId);
-	            }
 
-	            //Delete children before deleting the 'possible parent'
-	            var children = GetChildren(content.Id);
-	            foreach (var child in children)
-	            {
-	                Delete(child, userId);
-	            }
+			//Make sure that published content is unpublished before being deleted
+			if (HasPublishedVersion(content.Id))
+			{
+				UnPublish(content, userId);
+			}
 
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
-	            {
-	                SetWriter(content, userId);
-	                repository.Delete(content);
-	                uow.Commit();
-	            }
+			//Delete children before deleting the 'possible parent'
+			var children = GetChildren(content.Id);
+			foreach (var child in children)
+			{
+				Delete(child, userId);
+			}
 
-	            if (Deleted != null)
-	                Deleted(content, e);
+			var uow = _uowProvider.GetUnitOfWork();
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
+			{
+				SetWriter(content, userId);
+				repository.Delete(content);
+				uow.Commit();
+			}
 
-	            Audit.Add(AuditTypes.Delete, "Delete Content performed by user", userId == -1 ? 0 : userId, content.Id);
-	        }
+			Deleted.RaiseEvent(new DeleteEventArgs<IContent>(content, false), this);
+
+			Audit.Add(AuditTypes.Delete, "Delete Content performed by user", userId == -1 ? 0 : userId, content.Id);
 		}
 
 		/// <summary>
@@ -869,24 +803,22 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
 		public void DeleteVersions(int id, DateTime versionDate, int userId = -1)
 		{
-			if (DeletingRevisions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, dateToRetain: versionDate), this))
+			if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, dateToRetain: versionDate), this))
 				return;
-			
-			    var uow = _uowProvider.GetUnitOfWork();
-				using (var repository = _repositoryFactory.CreateContentRepository(uow))
+
+			var uow = _uowProvider.GetUnitOfWork();
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
-					repository.DeleteVersions(id, versionDate);
-                    uow.Commit();
-				}
-
-                if (Deleted != null)
-                    Deleted(versionDate, e);
-
-                Audit.Add(AuditTypes.Delete, "Delete Content by version date performed by user", userId == -1 ? 0 : userId, -1);
+				repository.DeleteVersions(id, versionDate);
+				uow.Commit();
 			}
+
+			DeletedRevisions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate), this);
+			
+			Audit.Add(AuditTypes.Delete, "Delete Content by version date performed by user", userId == -1 ? 0 : userId, -1);
 		}
 
-	    /// <summary>
+		/// <summary>
 	    /// Permanently deletes specific version(s) from an <see cref="IContent"/> object.
 	    /// </summary>
 	    /// <param name="id">Id of the <see cref="IContent"/> object to delete a version from</param>
@@ -901,24 +833,19 @@ namespace Umbraco.Core.Services
                 DeleteVersions(id, content.UpdateDate, userId);
             }
 
-	        var e = new DeleteEventArgs {Id = id};
-	        if (Deleting != null)
-	            Deleting(versionId, e);
-				
-	        if (!e.Cancel)
-	        {
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
-	            {
-	                repository.DeleteVersion(versionId);
-	                uow.Commit();
-	            }
+			if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion: versionId), this))
+				return;
 
-	            if (Deleted != null)
-	                Deleted(versionId, e);
+			var uow = _uowProvider.GetUnitOfWork();
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
+			{
+				repository.DeleteVersion(versionId);
+				uow.Commit();
+			}
 
-	            Audit.Add(AuditTypes.Delete, "Delete Content by version performed by user", userId == -1 ? 0 : userId, -1);
-	        }
+			DeletedRevisions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, specificVersion:versionId), this);
+
+			Audit.Add(AuditTypes.Delete, "Delete Content by version performed by user", userId == -1 ? 0 : userId, -1);
 	    }
 
 	    /// <summary>
@@ -932,39 +859,32 @@ namespace Umbraco.Core.Services
 			if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, -20), this))
 				return;
 
-	        var e = new MoveEventArgs {ParentId = -20};
-	        if (Trashing != null)
-	            Trashing(content, e);
-	        if (!e.Cancel)
-	        {
-	            //Make sure that published content is unpublished before being moved to the Recycle Bin
-	            if (HasPublishedVersion(content.Id))
-	            {
-	                UnPublish(content, userId);
-	            }
+			//Make sure that published content is unpublished before being moved to the Recycle Bin
+			if (HasPublishedVersion(content.Id))
+			{
+				UnPublish(content, userId);
+			}
 
-	            //Move children to Recycle Bin before the 'possible parent' is moved there
-	            var children = GetChildren(content.Id);
-	            foreach (var child in children)
-	            {
-	                MoveToRecycleBin(child, userId);
-	            }
+			//Move children to Recycle Bin before the 'possible parent' is moved there
+			var children = GetChildren(content.Id);
+			foreach (var child in children)
+			{
+				MoveToRecycleBin(child, userId);
+			}
 
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
-	            {
-	                SetWriter(content, userId);
-	                content.ChangeTrashedState(true);
-	                repository.AddOrUpdate(content);
-	                uow.Commit();
-	            }
+			var uow = _uowProvider.GetUnitOfWork();
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
+			{
+				SetWriter(content, userId);
+				content.ChangeTrashedState(true);
+				repository.AddOrUpdate(content);
+				uow.Commit();
+			}
 
-	            if (Trashed != null)
-	                Trashed(content, e);
+			Trashed.RaiseEvent(new MoveEventArgs<IContent>(content, false, -20), this);
 
-	            Audit.Add(AuditTypes.Move, "Move Content to Recycle Bin performed by user", userId == -1 ? 0 : userId,
-	                      content.Id);
-	        }
+			Audit.Add(AuditTypes.Move, "Move Content to Recycle Bin performed by user", userId == -1 ? 0 : userId,
+					  content.Id);
 	    }
 
 	    /// <summary>
@@ -1174,31 +1094,27 @@ namespace Umbraco.Core.Services
 	    /// <returns>The newly created <see cref="IContent"/> object</returns>
 	    public IContent Rollback(int id, Guid versionId, int userId = -1)
 	    {
-	        var e = new RollbackEventArgs();
+	        
 	        var content = GetByVersion(versionId);
 
-	        if (Rollingback != null)
-	            Rollingback(content, e);
-				
-	        if (!e.Cancel)
-	        {
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
-	            {
-	                SetUser(content, userId);
-	                SetWriter(content, userId);
+			if (RollingBack.IsRaisedEventCancelled(new RollbackEventArgs<IContent>(content), this))
+				return content;
 
-	                repository.AddOrUpdate(content);
-	                uow.Commit();
-	            }
+			var uow = _uowProvider.GetUnitOfWork();
+			using (var repository = _repositoryFactory.CreateContentRepository(uow))
+			{
+				SetUser(content, userId);
+				SetWriter(content, userId);
 
-	            if (Rolledback != null)
-	                Rolledback(content, e);
+				repository.AddOrUpdate(content);
+				uow.Commit();
+			}
 
-	            Audit.Add(AuditTypes.RollBack, "Content rollback performed by user", content.WriterId, content.Id);
-	        }
+			RolledBack.RaiseEvent(new RollbackEventArgs<IContent>(content, false), this);
 
-	        return content;
+			Audit.Add(AuditTypes.RollBack, "Content rollback performed by user", content.WriterId, content.Id);
+
+		    return content;
 	    }
 
         #region Internal Methods
@@ -1313,7 +1229,7 @@ namespace Umbraco.Core.Services
 		/// <summary>
 		/// Occurs before Delete
 		/// </summary>		
-		public static event TypedEventHandler<IContentService, DeleteRevisionsEventArgs> DeletingRevisions;
+		public static event TypedEventHandler<IContentService, DeleteRevisionsEventArgs> DeletingVersions;
 
 		/// <summary>
 		/// Occurs after Delete
@@ -1352,7 +1268,7 @@ namespace Umbraco.Core.Services
         /// Please note that the Content object has been created, but not saved
         /// so it does not have an identity yet (meaning no Id has been set).
         /// </remarks>
-        public static event EventHandler<NewEventArgs> Created;
+		public static event TypedEventHandler<IContentService, NewEventArgs<IContent>> Created;
 
 		/// <summary>
 		/// Occurs before Copy
