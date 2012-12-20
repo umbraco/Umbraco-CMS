@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Querying
         IList<string> updateFields = new List<string>();
         IList<string> insertFields = new List<string>();
 
-        private string sep = string.Empty;
+        private string sep = " ";
         private bool useFieldName = false;
         private Database.PocoData pd;
 

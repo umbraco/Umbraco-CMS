@@ -29,7 +29,8 @@ namespace umbraco.cms.businesslogic.web
 
         public DocumentType(int id, bool noSetup) : base(id, noSetup) { }
 
-        internal DocumentType(IContentType contentType) : base(contentType)
+        internal DocumentType(IContentType contentType)
+            : base(contentType)
         {
             SetupNode(contentType);
         }
@@ -123,7 +124,7 @@ namespace umbraco.cms.businesslogic.web
             return dtd.ToString();
 
         }
-        
+
         [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentTypeService.GetContentType()", false)]
         public new static DocumentType GetByAlias(string Alias)
         {
@@ -143,7 +144,7 @@ namespace umbraco.cms.businesslogic.web
         {
             var contentType = new Umbraco.Core.Models.ContentType(-1) { Name = Text, Alias = Text, CreatorId = u.Id, Thumbnail = "folder.png", Icon = "folder.gif" };
             ApplicationContext.Current.Services.ContentTypeService.Save(contentType, u.Id);
-            var newDt = new DocumentType(contentType.Id);
+            var newDt = new DocumentType(contentType);
 
             //event
             NewEventArgs e = new NewEventArgs();
@@ -459,7 +460,7 @@ namespace umbraco.cms.businesslogic.web
             _defaultTemplate = 0;
 
             var template = _contentType.DefaultTemplate;
-            if(template != null)
+            if (template != null)
                 _contentType.RemoveTemplate(template);
 
             //SqlHelper.ExecuteNonQuery("update cmsDocumentType set IsDefault = 0 where contentTypeNodeId = " + Id.ToString());
@@ -531,7 +532,7 @@ namespace umbraco.cms.businesslogic.web
         private void SetupNode(IContentType contentType)
         {
             _contentType = contentType;
-            foreach (var template in _contentType.AllowedTemplates)
+            foreach (var template in _contentType.AllowedTemplates.Where(t => t != null))
             {
                 _templateIds.Add(template.Id);
             }
