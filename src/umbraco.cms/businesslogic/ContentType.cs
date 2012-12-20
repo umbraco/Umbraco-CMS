@@ -636,6 +636,8 @@ namespace umbraco.cms.businesslogic
                     SqlHelper.CreateParameter("@parentContentTypeId", parentContentTypeId),
                     SqlHelper.CreateParameter("@childContentTypeId", Id));
                 MasterContentTypes.Add(parentContentTypeId);
+
+
             }
         }
 

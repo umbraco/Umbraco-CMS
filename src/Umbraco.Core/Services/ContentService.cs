@@ -539,17 +539,7 @@ namespace Umbraco.Core.Services
 	    {
             //TODO Refactor this so omitCacheRefresh isn't exposed in the public method, but only in an internal one as its purely there for legacy reasons.
 
-	        //Look for children and unpublish them if any exists, otherwise just unpublish the passed in Content.
-	        var children = GetChildrenDeep(content.Id);
-	        var hasChildren = children.Any();
-
-	        if (hasChildren)
-	            children.Add(content);
-
-	        var unpublished = hasChildren
-	                              ? _publishingStrategy.UnPublish(children, userId)
-	                              : _publishingStrategy.UnPublish(content, userId);
-
+	        var unpublished = _publishingStrategy.UnPublish(content, userId);
 	        if (unpublished)
 	        {
 	            var uow = _uowProvider.GetUnitOfWork();
@@ -557,24 +547,8 @@ namespace Umbraco.Core.Services
 	            {
 	                repository.AddOrUpdate(content);
 
-	                if (hasChildren)
-	                {
-	                    foreach (var child in children)
-	                    {
-	                        SetWriter(child, userId);
-	                        repository.AddOrUpdate(child);
-	                    }
-	                }
-
-	                //Remove 'published' xml from the cmsContentXml table for the unpublished content and its (possible) children
+	                //Remove 'published' xml from the cmsContentXml table for the unpublished content
 	                uow.Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new {Id = content.Id});
-	                if (hasChildren)
-	                {
-	                    foreach (var child in children)
-	                    {
-	                        uow.Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new {Id = child.Id});
-	                    }
-	                }
 
                     uow.Commit();
 	            }
@@ -652,6 +626,15 @@ namespace Umbraco.Core.Services
 	            //Save xml to db and call following method to fire event through PublishingStrategy to update cache
 	            if (omitCacheRefresh == false)
 	                _publishingStrategy.PublishingFinalized(content);
+
+                if (HasChildren(content.Id))
+                {
+                    var children = GetChildrenDeep(content.Id);
+                    var shouldBeRepublished = children.Where(child => HasPublishedVersion(child.Id));
+
+                    if (omitCacheRefresh == false)
+                        _publishingStrategy.PublishingFinalized(shouldBeRepublished, false);
+                }
 
 	            if (Saved != null)
 	                Saved(content, e);

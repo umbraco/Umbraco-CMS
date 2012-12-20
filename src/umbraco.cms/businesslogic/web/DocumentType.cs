@@ -220,6 +220,7 @@ namespace umbraco.cms.businesslogic.web
             }
         }
 
+        [Obsolete("Deprecated, Use SetDefaultTemplate() on Umbraco.Core.Models.ContentType", false)]
         public int DefaultTemplate
         {
             get { return _defaultTemplate; }
@@ -227,15 +228,20 @@ namespace umbraco.cms.businesslogic.web
             {
                 RemoveDefaultTemplate();
                 _defaultTemplate = value;
+
                 if (_defaultTemplate != 0)
-                    SqlHelper.ExecuteNonQuery("update cmsDocumentType set IsDefault = 1 where contentTypeNodeId = " +
-                                              Id.ToString() + " and TemplateNodeId = " + value.ToString());
+                {
+                    //SqlHelper.ExecuteNonQuery("update cmsDocumentType set IsDefault = 1 where contentTypeNodeId = " + Id.ToString() + " and TemplateNodeId = " + value.ToString());
+                    var template = ApplicationContext.Current.Services.FileService.GetTemplate(_defaultTemplate);
+                    _contentType.SetDefaultTemplate(template);
+                }
             }
         }
 
         /// <summary>
         /// Gets/sets the allowed templates for this document type.
         /// </summary>
+        [Obsolete("Deprecated, Use AllowedTemplates property on Umbraco.Core.Models.ContentType", false)]
         public template.Template[] allowedTemplates
         {
             get
@@ -254,12 +260,16 @@ namespace umbraco.cms.businesslogic.web
             set
             {
                 clearTemplates();
+                var templates = new List<ITemplate>();
                 foreach (template.Template t in value)
                 {
-                    SqlHelper.ExecuteNonQuery("Insert into cmsDocumentType (contentTypeNodeId, templateNodeId) values (" +
-                                              Id + "," + t.Id + ")");
+                    //SqlHelper.ExecuteNonQuery("Insert into cmsDocumentType (contentTypeNodeId, templateNodeId) values (" + Id + "," + t.Id + ")");
+                    var template = ApplicationContext.Current.Services.FileService.GetTemplate(t.Id);
+                    templates.Add(template);
+
                     _templateIds.Add(t.Id);
                 }
+                _contentType.AllowedTemplates = templates;
             }
         }
 
@@ -302,6 +312,7 @@ namespace umbraco.cms.businesslogic.web
 
         #region Public Methods
 
+        [Obsolete("Deprecated, Use RemoveTemplate() on Umbraco.Core.Models.ContentType", false)]
         public void RemoveTemplate(int templateId)
         {
             // remove if default template
@@ -313,9 +324,12 @@ namespace umbraco.cms.businesslogic.web
             // remove from list of document type templates
             if (_templateIds.Contains(templateId))
             {
-                SqlHelper.ExecuteNonQuery("delete from cmsDocumentType where contentTypeNodeId = @id and templateNodeId = @templateId",
-                    SqlHelper.CreateParameter("@id", this.Id), SqlHelper.CreateParameter("@templateId", templateId)
-                    );
+                /*SqlHelper.ExecuteNonQuery("delete from cmsDocumentType where contentTypeNodeId = @id and templateNodeId = @templateId",
+                    SqlHelper.CreateParameter("@id", this.Id), SqlHelper.CreateParameter("@templateId", templateId));*/
+                var template = _contentType.AllowedTemplates.FirstOrDefault(x => x.Id == templateId);
+                if (template != null)
+                    _contentType.RemoveTemplate(template);
+
                 _templateIds.Remove(templateId);
             }
         }
@@ -337,13 +351,12 @@ namespace umbraco.cms.businesslogic.web
                     throw new ArgumentException("Can't delete a Document Type used as a Master Content Type. Please remove all references first!");
                 }
 
-                // delete all documents of this type
-                Document.DeleteFromType(this);
+                // Remove from cache
+                FlushFromCache(Id);
+
+                ApplicationContext.Current.Services.ContentTypeService.Delete(_contentType);
 
                 clearTemplates();
-
-                // Delete contentType
-                base.delete();
 
                 FireAfterDelete(e);
             }
@@ -351,7 +364,8 @@ namespace umbraco.cms.businesslogic.web
 
         public void clearTemplates()
         {
-            SqlHelper.ExecuteNonQuery("Delete from cmsDocumentType where contentTypeNodeId =" + Id);
+            //SqlHelper.ExecuteNonQuery("Delete from cmsDocumentType where contentTypeNodeId =" + Id);
+            _contentType.AllowedTemplates = new List<ITemplate>();
             _templateIds.Clear();
         }
 
@@ -439,10 +453,16 @@ namespace umbraco.cms.businesslogic.web
             return doc;
         }
 
+        [Obsolete("Deprecated, Use RemoveTemplate() on Umbraco.Core.Models.ContentType", false)]
         public void RemoveDefaultTemplate()
         {
             _defaultTemplate = 0;
-            SqlHelper.ExecuteNonQuery("update cmsDocumentType set IsDefault = 0 where contentTypeNodeId = " + Id.ToString());
+
+            var template = _contentType.DefaultTemplate;
+            if(template != null)
+                _contentType.RemoveTemplate(template);
+
+            //SqlHelper.ExecuteNonQuery("update cmsDocumentType set IsDefault = 0 where contentTypeNodeId = " + Id.ToString());
         }
 
         public bool HasTemplate()
@@ -460,10 +480,19 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                //Ensure that MediaTypes are reloaded from db by clearing cache
-                InMemoryCacheProvider.Current.Clear();
+                if (MasterContentType != 0)
+                    _contentType.ParentId = MasterContentType;
+
+                foreach (var masterContentType in MasterContentTypes)
+                {
+                    var contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(masterContentType);
+                    _contentType.AddContentType(contentType);
+                }
 
                 ApplicationContext.Current.Services.ContentTypeService.Save(_contentType);
+
+                //Ensure that DocumentTypes are reloaded from db by clearing cache
+                InMemoryCacheProvider.Current.Clear();
 
                 base.Save();
                 FireAfterSave(e);

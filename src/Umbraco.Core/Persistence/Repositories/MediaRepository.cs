@@ -234,6 +234,13 @@ namespace Umbraco.Core.Persistence.Repositories
             //Updates Modified date
             ((Models.Media)entity).UpdatingEntity();
 
+            //Look up parent to get and set the correct Path if ParentId has changed
+            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            {
+                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
+                entity.Path = string.Concat(parent.Path, ",", entity.Id);
+            }
+
             var factory = new MediaFactory(NodeObjectTypeId, entity.Id);
             //Look up Content entry to get Primary for updating the DTO
             var contentDto = Database.SingleOrDefault<ContentDto>("WHERE nodeId = @Id", new { Id = entity.Id });

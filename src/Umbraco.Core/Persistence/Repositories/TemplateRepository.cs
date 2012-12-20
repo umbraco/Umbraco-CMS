@@ -226,6 +226,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
+            //Look up parent to get and set the correct Path if ParentId has changed
+            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            {
+                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = ((Template)entity).ParentId });
+                entity.Path = string.Concat(parent.Path, ",", entity.Id);
+            }
+
             //Get TemplateDto from db to get the Primary key of the entity
             var templateDto = Database.SingleOrDefault<TemplateDto>("WHERE nodeId = @Id", new { Id = entity.Id });
             //Save updated entity to db

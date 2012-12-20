@@ -153,6 +153,13 @@ namespace Umbraco.Core.Persistence.Repositories
             //Updates Modified date and Version Guid
             ((DataTypeDefinition)entity).UpdatingEntity();
 
+            //Look up parent to get and set the correct Path if ParentId has changed
+            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            {
+                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
+                entity.Path = string.Concat(parent.Path, ",", entity.Id);
+            }
+
             var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
             //Look up DataTypeDefinition entry to get Primary for updating the DTO
             var dataTypeDto = Database.SingleOrDefault<DataTypeDto>("WHERE nodeId = @Id", new { Id = entity.Id });
