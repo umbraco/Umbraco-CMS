@@ -2,14 +2,22 @@ namespace Umbraco.Core.Events
 {
 	public class MoveEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>
 	{
-		public MoveEventArgs(TEntity entity, bool canCancel, int parentId) : base(entity, canCancel)
+		public MoveEventArgs(TEntity eventObject, bool canCancel, int parentId) : base(eventObject, canCancel)
 		{
 			ParentId = parentId;
 		}
 
-		public MoveEventArgs(TEntity entity, int parentId) : base(entity)
+		public MoveEventArgs(TEntity eventObject, int parentId) : base(eventObject)
 		{
 			ParentId = parentId;
+		}
+
+		/// <summary>
+		/// The entity being moved
+		/// </summary>
+		public TEntity Entity
+		{
+			get { return EventObject; }
 		}
 
 		/// <summary>

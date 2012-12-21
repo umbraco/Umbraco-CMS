@@ -329,35 +329,29 @@ namespace Umbraco.Core.Services
 	    /// <param name="mediaTypeId">Id of the <see cref="IMediaType"/></param>
 	    /// <param name="userId">Optional id of the user deleting the media</param>
 	    public void DeleteMediaOfType(int mediaTypeId, int userId = -1)
-	    {
-			//TODO: Do we need another event DeletingMediaOfType, If we just change delete args to be ienumerable this would fix this ?
-
+	    {			
 	        var uow = _uowProvider.GetUnitOfWork();
-	        var repository = _repositoryFactory.CreateMediaRepository(uow);
-	        //NOTE What about media that has the contenttype as part of its composition?
-	        //The ContentType has to be removed from the composition somehow as it would otherwise break
-	        //Dbl.check+test that the ContentType's Id is removed from the ContentType2ContentType table
-	        var query = Query<IMedia>.Builder.Where(x => x.ContentTypeId == mediaTypeId);
-	        var contents = repository.GetByQuery(query);
+	        using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+	        {
+				//NOTE What about media that has the contenttype as part of its composition?
+				//The ContentType has to be removed from the composition somehow as it would otherwise break
+				//Dbl.check+test that the ContentType's Id is removed from the ContentType2ContentType table
+				var query = Query<IMedia>.Builder.Where(x => x.ContentTypeId == mediaTypeId);
+				var contents = repository.GetByQuery(query);
 
-			//var e = new DeleteEventArgs {Id = mediaTypeId};
-			//if (Deleting != null)
-			//	Deleting(contents, e);
-			//	//var e = new DeleteEventArgs { Id = mediaTypeId };
-			//	//if (Deleting != null)
-			//	//	Deleting(contents, e);
+				if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMedia>(contents), this))
+					return;
 
-			foreach (var content in contents)
-			{
-				((Core.Models.Media)content).ChangeTrashedState(true);
-				repository.AddOrUpdate(content);
-			}
+				foreach (var content in contents)
+				{
+					((Core.Models.Media)content).ChangeTrashedState(true);
+					repository.AddOrUpdate(content);
+				}
 
-			uow.Commit();
-			uow.Dispose();
+				uow.Commit();
 
-			//if (Deleted != null)
-			//	Deleted(contents, e);
+				Deleted.RaiseEvent(new DeleteEventArgs<IMedia>(contents, false), this);
+	        }			
 
 			Audit.Add(AuditTypes.Delete, "Delete Media items by Type performed by user", userId == -1 ? 0 : userId, -1);
 	    }

@@ -675,13 +675,10 @@ namespace Umbraco.Core.Services
 	    /// <param name="userId">Optional Id of the User saving the Content</param>
 	    public void Save(IEnumerable<IContent> contents, int userId = -1)
 	    {
-			if (SavingCollection.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable<IContent>>(contents), this))
+			if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(contents), this))
 				return;
 
-	        var containsNew = contents.Any(x => x.HasIdentity == false);
-
-			if (SavingCollection.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable<IContent>>(contents), this))
-				return;
+			var containsNew = contents.Any(x => x.HasIdentity == false);
 
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
@@ -712,7 +709,7 @@ namespace Umbraco.Core.Services
 				}
 			}
 			
-			SavedCollection.RaiseEvent(new SaveEventArgs<IEnumerable<IContent>>(contents, false), this);
+			Saved.RaiseEvent(new SaveEventArgs<IContent>(contents, false), this);
 
 			Audit.Add(AuditTypes.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, -1);
 	    }
@@ -731,6 +728,9 @@ namespace Umbraco.Core.Services
 				//NOTE What about content that has the contenttype as part of its composition?
 				var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == contentTypeId);
 				var contents = repository.GetByQuery(query);
+
+				if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(contents), this))
+					return;
 
 				foreach (var content in contents.OrderByDescending(x => x.ParentId))
 				{
@@ -803,6 +803,9 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
 		public void DeleteVersions(int id, DateTime versionDate, int userId = -1)
 		{
+			//TODO: We should check if we are going to delete the most recent version because if that happens it means the 
+			// entity is completely deleted and we should raise the normal Deleting/Deleted event
+
 			if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, dateToRetain: versionDate), this))
 				return;
 
@@ -827,6 +830,9 @@ namespace Umbraco.Core.Services
 	    /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
 	    public void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = -1)
 	    {
+			//TODO: We should check if we are going to delete the most recent version because if that happens it means the 
+			// entity is completely deleted and we should raise the normal Deleting/Deleted event
+
             if (deletePriorVersions)
             {
                 var content = GetByVersion(versionId);
@@ -1245,17 +1251,7 @@ namespace Umbraco.Core.Services
 		/// Occurs after Save
 		/// </summary>
 		public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Saved;
-
-		/// <summary>
-		/// Occurs before saving a collection
-		/// </summary>
-		public static event TypedEventHandler<IContentService, SaveEventArgs<IEnumerable<IContent>>> SavingCollection;
-
-		/// <summary>
-		/// Occurs after saving a collection
-		/// </summary>
-		public static event TypedEventHandler<IContentService, SaveEventArgs<IEnumerable<IContent>>> SavedCollection;
-
+		
 		/// <summary>
 		/// Occurs before Create
 		/// </summary>

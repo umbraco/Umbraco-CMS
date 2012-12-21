@@ -2,12 +2,20 @@ namespace Umbraco.Core.Events
 {
 	public class RollbackEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>
 	{
-		public RollbackEventArgs(TEntity entity, bool canCancel) : base(entity, canCancel)
+		public RollbackEventArgs(TEntity eventObject, bool canCancel) : base(eventObject, canCancel)
 		{
 		}
 
-		public RollbackEventArgs(TEntity entity) : base(entity)
+		public RollbackEventArgs(TEntity eventObject) : base(eventObject)
 		{
+		}
+
+		/// <summary>
+		/// The entity being rolledback
+		/// </summary>
+		public TEntity Entity
+		{
+			get { return EventObject; }
 		}
 	}
 }

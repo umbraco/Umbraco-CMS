@@ -2,16 +2,24 @@ namespace Umbraco.Core.Events
 {
 	public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>
 	{
-		public NewEventArgs(TEntity entity, bool canCancel, string @alias, int parentId) : base(entity, canCancel)
+		public NewEventArgs(TEntity eventObject, bool canCancel, string @alias, int parentId) : base(eventObject, canCancel)
 		{
 			Alias = alias;
 			ParentId = parentId;
 		}
 
-		public NewEventArgs(TEntity entity, string @alias, int parentId) : base(entity)
+		public NewEventArgs(TEntity eventObject, string @alias, int parentId) : base(eventObject)
 		{
 			Alias = alias;
 			ParentId = parentId;
+		}
+
+		/// <summary>
+		/// The entity being created
+		/// </summary>
+		public TEntity Entity
+		{
+			get { return EventObject; }
 		}
 
 		/// <summary>

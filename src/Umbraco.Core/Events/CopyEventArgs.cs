@@ -8,7 +8,7 @@ namespace Umbraco.Core.Events
 			ParentId = parentId;
 		}
 
-		public CopyEventArgs(TEntity entity, TEntity copy, int parentId) : base(entity)
+		public CopyEventArgs(TEntity eventObject, TEntity copy, int parentId) : base(eventObject)
 		{
 			Copy = copy;
 			ParentId = parentId;
@@ -18,6 +18,14 @@ namespace Umbraco.Core.Events
 		/// The copied entity
 		/// </summary>
 		public TEntity Copy { get; set; }
+
+		/// <summary>
+		/// The original entity
+		/// </summary>
+		public TEntity Original
+		{
+			get { return EventObject; }
+		}
 
 		/// <summary>
 		/// Gets or Sets the Id of the objects new parent.
