@@ -26,9 +26,23 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
-        public Content(int parentId, IContentType contentType) : this(parentId, contentType, new PropertyCollection())
+        public Content(int parentId, IContentType contentType) 
+			: this(parentId, contentType, new PropertyCollection())
         {
         }
+
+		public Content(IContent parent, IContentType contentType)
+			: this(parent, contentType, new PropertyCollection())
+		{			
+		}
+
+		public Content(IContent parent, IContentType contentType, PropertyCollection properties)
+			: base(parent, contentType, properties)
+		{
+			Mandate.ParameterNotNull(contentType, "contentType");
+
+			_contentType = contentType;
+		}
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -36,7 +50,8 @@ namespace Umbraco.Core.Models
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
-        public Content(int parentId, IContentType contentType, PropertyCollection properties) : base(parentId, contentType, properties)
+        public Content(int parentId, IContentType contentType, PropertyCollection properties) 
+			: base(parentId, contentType, properties)
         {
             Mandate.ParameterNotNull(contentType, "contentType");
 

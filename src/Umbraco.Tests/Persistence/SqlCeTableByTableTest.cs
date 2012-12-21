@@ -64,6 +64,8 @@ namespace Umbraco.Tests.Persistence
         {
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
+            SyntaxConfig.SqlSyntaxProvider = null;
+
             //reset the app context
             ApplicationContext.Current = null;
             Resolution.IsFrozen = false;

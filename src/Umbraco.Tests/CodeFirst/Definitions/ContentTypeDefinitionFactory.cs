@@ -200,15 +200,17 @@ namespace Umbraco.Tests.CodeFirst.Definitions
 
         }
 
-        public static IEnumerable<Lazy<IContentType>> RetrieveMappedContentTypes()
+        //public static IEnumerable<Lazy<IContentType>> RetrieveMappedContentTypes()
+		public static IEnumerable<IContentType> RetrieveMappedContentTypes()
         {
             var fields = _contentTypeCache.Select(x => x.Value).ToList();
             int[] sortOrder = GetTopologicalSortOrder(fields);
-            var list = new List<Lazy<IContentType>>();
+			//var list = new List<Lazy<IContentType>>();
+			var list = new List<IContentType>();
             for (int i = 0; i < sortOrder.Length; i++)
             {
                 var field = fields[sortOrder[i]];
-                list.Add(field.ContentType);
+                list.Add(field.ContentType.Value);
                 Console.WriteLine(field.Alias);
                 if (field.DependsOn != null)
                     foreach (var item in field.DependsOn)

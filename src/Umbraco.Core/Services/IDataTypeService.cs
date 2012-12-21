@@ -68,5 +68,12 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the DataType control</param>
         /// <returns><see cref="IDataTypeDefinition"/></returns>
         IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByControlId(Guid id);
+
+        /// <summary>
+        /// Gets all values for an <see cref="IDataTypeDefinition"/>
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IDataTypeDefinition"/> to retrieve prevalues from</param>
+        /// <returns>An enumerable list of string values</returns>
+        IEnumerable<string> GetPreValuesByDataTypeId(int id);
     }
 }

@@ -166,6 +166,7 @@
     <Compile Include="Migrations\Stubs\FourNineMigration.cs" />
     <Compile Include="Persistence\Querying\ContentRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\Querying\ContentTypeRepositorySqlClausesTest.cs" />
+    <Compile Include="Persistence\SyntaxProvider\SqlSyntaxProviderTests.cs" />
     <Compile Include="PublishedContent\DynamicXmlTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
@@ -232,8 +233,10 @@
     <Compile Include="Routing\NiceUrlsProviderWithDomainsTests.cs" />
     <Compile Include="Routing\uQueryGetNodeIdByUrlTests.cs" />
     <Compile Include="Routing\UrlsWithNestedDomains.cs" />
+    <Compile Include="Services\BaseServiceTest.cs" />
     <Compile Include="Services\ContentServicePerformanceTest.cs" />
     <Compile Include="Services\ContentServiceTests.cs" />
+    <Compile Include="Services\ContentTypeServiceTests.cs" />
     <Compile Include="Services\ThreadSafetyServiceTest.cs" />
     <Compile Include="Surface\PluginControllerAreaTests.cs" />
     <Compile Include="Templates\MasterPageHelperTests.cs" />

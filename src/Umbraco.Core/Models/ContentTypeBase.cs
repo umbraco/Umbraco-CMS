@@ -33,10 +33,21 @@ namespace Umbraco.Core.Models
 
         protected ContentTypeBase(int parentId)
         {
+			Mandate.ParameterCondition(parentId != 0, "parentId");
+
             _parentId = new Lazy<int>(() => parentId);
             _allowedContentTypes = new List<ContentTypeSort>();
             _propertyGroups = new PropertyGroupCollection();
         }
+
+		protected ContentTypeBase(IContentTypeBase parent)
+		{
+			Mandate.ParameterNotNull(parent, "parent");
+
+			_parentId = new Lazy<int>(() => parent.Id);
+			_allowedContentTypes = new List<ContentTypeSort>();
+			_propertyGroups = new PropertyGroupCollection();
+		}
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Name);
         private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, int>(x => x.ParentId);
@@ -66,7 +77,15 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual int ParentId
         {
-            get { return _parentId.Value; }
+            get
+            {
+				var val = _parentId.Value;
+				if (val == 0)
+				{
+					throw new InvalidOperationException("The ParentId cannot be a value of 0. Perhaps the parent object used to instantiate this object has not been persisted to the data store.");
+				}
+				return val;				
+            }
             set
             {
                 _parentId = new Lazy<int>(() => value);

@@ -54,6 +54,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\SQLCE4\System.Data.SqlServerCe.Entity.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Transactions" />
@@ -117,9 +118,14 @@
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
     <Compile Include="Dynamics\DynamicInstanceHelper.cs" />
+    <Compile Include="Events\CancellableEventArgs.cs" />
     <Compile Include="Events\ContentCacheEventArgs.cs" />
     <Compile Include="Events\CopyEventArgs.cs" />
     <Compile Include="Events\DeleteEventArgs.cs" />
+    <Compile Include="Events\CancellableObjectEventArgs.cs" />
+    <Compile Include="Events\DeleteRevisionsEventArgs.cs" />
+    <Compile Include="Events\EventExtensions.cs" />
+    <Compile Include="Events\TypedEventHandler.cs" />
     <Compile Include="Events\PublishingEventArgs.cs" />
     <Compile Include="Events\MoveEventArgs.cs" />
     <Compile Include="Events\NewEventArgs.cs" />
@@ -405,11 +411,6 @@
     <Compile Include="Persistence\RepositoryResolver.cs" />
     <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />
     <Compile Include="Persistence\SqlSyntax\ISqlSyntaxProvider.cs" />
-    <Compile Include="Persistence\SqlSyntax\ModelDefinitions\ColumnDefinition.cs" />
-    <Compile Include="Persistence\SqlSyntax\ModelDefinitions\DefinitionFactory.cs" />
-    <Compile Include="Persistence\SqlSyntax\ModelDefinitions\ForeignKeyDefinition.cs" />
-    <Compile Include="Persistence\SqlSyntax\ModelDefinitions\IndexDefinition.cs" />
-    <Compile Include="Persistence\SqlSyntax\ModelDefinitions\TableDefinition.cs" />
     <Compile Include="Persistence\SqlSyntax\MySqlSyntaxProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlCeSyntaxProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlServerSyntaxProvider.cs" />

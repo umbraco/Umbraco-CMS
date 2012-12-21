@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Persistence.DatabaseAnnotations;
+﻿using System.Linq;
+using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using ColumnDefinition = Umbraco.Core.Persistence.SqlSyntax.ModelDefinitions.ColumnDefinition;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
@@ -68,22 +68,25 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return string.Format("[{0}]", name);
         }
 
-        public override string GetPrimaryKeyStatement(ColumnDefinition column, string tableName)
+        public override string FormatPrimaryKey(TableDefinition table)
         {
-            string constraintName = string.IsNullOrEmpty(column.PrimaryKeyName)
-                                        ? string.Format("PK_{0}", tableName)
-                                        : column.PrimaryKeyName;
+            var columnDefinition = table.Columns.FirstOrDefault(x => x.IsPrimaryKey);
+            if (columnDefinition == null)
+                return string.Empty;
 
-            string columns = string.IsNullOrEmpty(column.PrimaryKeyColumns)
-                                 ? GetQuotedColumnName(column.ColumnName)
-                                 : column.PrimaryKeyColumns;
+            string constraintName = string.IsNullOrEmpty(columnDefinition.PrimaryKeyName)
+                                        ? string.Format("PK_{0}", table.Name)
+                                        : columnDefinition.PrimaryKeyName;
 
-            string sql = string.Format("ALTER TABLE {0} ADD CONSTRAINT {1} PRIMARY KEY ({2}); \n",
-                                       GetQuotedTableName(tableName),
-                                       GetQuotedName(constraintName),
-                                       columns);
+            string columns = string.IsNullOrEmpty(columnDefinition.PrimaryKeyColumns)
+                                 ? GetQuotedColumnName(columnDefinition.Name)
+                                 : columnDefinition.PrimaryKeyColumns;
 
-            return sql;
+            return string.Format(CreateConstraint,
+                                 GetQuotedTableName(table.Name),
+                                 GetQuotedName(constraintName),
+                                 "PRIMARY KEY",
+                                 columns);
         }
 
         public override bool DoesTableExist(Database db, string tableName)
@@ -95,13 +98,16 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return result > 0;
         }
 
-        protected override string FormatIdentity(DatabaseModelDefinitions.ColumnDefinition column)
+        protected override string FormatIdentity(ColumnDefinition column)
         {
             return column.IsIdentity ? GetIdentityString(column) : string.Empty;
         }
 
-        private static string GetIdentityString(DatabaseModelDefinitions.ColumnDefinition column)
+        private static string GetIdentityString(ColumnDefinition column)
         {
+            if (column.Seeding != default(int))
+                return string.Format("IDENTITY({0},1)", column.Seeding);
+
             return "IDENTITY(1,1)";
         }
 
@@ -123,5 +129,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         }
 
         public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
+
+        public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
@@ -13,8 +14,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 
         public override string ToString()
         {
-            //TODO change to use sql syntax provider
-            return base.ToString() + Constraint.ConstraintName;
+            return string.Format(SyntaxConfig.SqlSyntaxProvider.DeleteConstraint,
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(Constraint.TableName),
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedName(Constraint.ConstraintName));
         }
     }
 }

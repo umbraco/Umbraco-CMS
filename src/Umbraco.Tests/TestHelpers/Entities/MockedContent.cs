@@ -38,6 +38,22 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return content;
         }
 
+		public static Content CreateSimpleContent(IContentType contentType, string name, IContent parent)
+		{
+			var content = new Content(parent, contentType) { Name = name, Language = "en-US", CreatorId = 0, WriterId = 0 };
+			object obj =
+				new
+				{
+					title = name + " Subpage",
+					bodyText = "This is a subpage",
+					author = "John Doe"
+				};
+
+			content.PropertyValues(obj);
+
+			return content;
+		}
+
         public static Content CreateTextpageContent(IContentType contentType, string name, int parentId)
         {
             var content = new Content(parentId, contentType) { Name = name, Language = "en-US", CreatorId = 0, WriterId = 0};

@@ -142,10 +142,13 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
                                      IsUnique = attribute.IndexType == IndexTypes.UniqueNonClustered
                                  };
 
-            var columns = attribute.ForColumns.Split(',').Select(p => p.Trim());
-            foreach (var column in columns)
+            if (string.IsNullOrEmpty(attribute.ForColumns) == false)
             {
-                definition.Columns.Add(new IndexColumnDefinition{Name = column, Direction = Direction.Ascending});
+                var columns = attribute.ForColumns.Split(',').Select(p => p.Trim());
+                foreach (var column in columns)
+                {
+                    definition.Columns.Add(new IndexColumnDefinition {Name = column, Direction = Direction.Ascending});
+                }
             }
             return definition;
         }

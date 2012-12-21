@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
 {
@@ -14,13 +14,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
 
         public override string ToString()
         {
-            return base.ToString() +
-                    string.Format("{0} {1}({2}) {3}({4})",
-                                ForeignKey.Name,
-                                ForeignKey.ForeignTable,
-                                string.Join(", ", ForeignKey.ForeignColumns.ToArray()),
-                                ForeignKey.PrimaryTable,
-                                string.Join(", ", ForeignKey.PrimaryColumns.ToArray()));
+            return SyntaxConfig.SqlSyntaxProvider.Format(ForeignKey);
         }
     }
 }

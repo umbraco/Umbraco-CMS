@@ -13,11 +13,15 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentTypeComposition
     {
-        private List<IContentTypeComposition> _contentTypeComposition = new List<IContentTypeComposition>();
+        private readonly List<IContentTypeComposition> _contentTypeComposition = new List<IContentTypeComposition>();
 
         protected ContentTypeCompositionBase(int parentId) : base(parentId)
         {
         }
+
+		protected ContentTypeCompositionBase(IContentTypeBase parent) : base(parent)
+		{
+		}
 
         private static readonly PropertyInfo ContentTypeCompositionSelector =
             ExpressionHelper.GetPropertyInfo<ContentTypeCompositionBase, IEnumerable<IContentTypeComposition>>(

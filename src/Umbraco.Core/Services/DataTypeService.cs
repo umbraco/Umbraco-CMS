@@ -4,6 +4,7 @@ using System.Linq;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -98,31 +99,40 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets all values for an <see cref="IDataTypeDefinition"/>
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IDataTypeDefinition"/> to retrieve prevalues from</param>
+        /// <returns>An enumerable list of string values</returns>
+        public IEnumerable<string> GetPreValuesByDataTypeId(int id)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            var dtos = uow.Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new {Id = id});
+            var list = dtos.Select(x => x.Value).ToList();
+            uow.Dispose();
+            return list;
+        }
+
+        /// <summary>
         /// Saves an <see cref="IDataTypeDefinition"/>
         /// </summary>
         /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to save</param>
         /// <param name="userId">Id of the user issueing the save</param>
         public void Save(IDataTypeDefinition dataTypeDefinition, int userId = -1)
         {
-            var e = new SaveEventArgs();
-            if (Saving != null)
-                Saving(dataTypeDefinition, e);
+	        if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this)) 
+				return;
+	        
+			var uow = _uowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow))
+	        {
+		        dataTypeDefinition.CreatorId = userId > -1 ? userId : 0;
+		        repository.AddOrUpdate(dataTypeDefinition);
+		        uow.Commit();
 
-            if (!e.Cancel)
-            {
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow))
-                {
-                    dataTypeDefinition.CreatorId = userId > -1 ? userId : 0;
-                    repository.AddOrUpdate(dataTypeDefinition);
-                    uow.Commit();
+		        Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this);
+	        }
 
-                    if (Saved != null)
-                        Saved(dataTypeDefinition, e);
-                }
-
-                Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition performed by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
-            }
+	        Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition performed by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
         }
 
         /// <summary>
@@ -135,48 +145,43 @@ namespace Umbraco.Core.Services
         /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to delete</param>
         /// <param name="userId">Optional Id of the user issueing the deletion</param>
         public void Delete(IDataTypeDefinition dataTypeDefinition, int userId = -1)
-        {
-            var e = new DeleteEventArgs { Id = dataTypeDefinition.Id };
-            if (Deleting != null)
-                Deleting(dataTypeDefinition, e);
+        {            
+	        if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition), this)) 
+				return;
+	        
+			var uow = _uowProvider.GetUnitOfWork();
+	        using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
+	        {
+		        //Find ContentTypes using this IDataTypeDefinition on a PropertyType
+		        var query = Query<PropertyType>.Builder.Where(x => x.DataTypeId == dataTypeDefinition.Id);
+		        var contentTypes = repository.GetByQuery(query);
 
-            if (!e.Cancel)
-            {
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
-                {
-                    //Find ContentTypes using this IDataTypeDefinition on a PropertyType
-                    var query = Query<PropertyType>.Builder.Where(x => x.DataTypeId == dataTypeDefinition.Id);
-                    var contentTypes = repository.GetByQuery(query);
+		        //Loop through the list of results and remove the PropertyTypes that references the DataTypeDefinition that is being deleted
+		        foreach (var contentType in contentTypes)
+		        {
+			        if (contentType == null) continue;
 
-                    //Loop through the list of results and remove the PropertyTypes that references the DataTypeDefinition that is being deleted
-                    foreach (var contentType in contentTypes)
-                    {
-                        if (contentType == null) continue;
+			        foreach (var group in contentType.PropertyGroups)
+			        {
+				        var types = @group.PropertyTypes.Where(x => x.DataTypeId == dataTypeDefinition.Id);
+				        foreach (var propertyType in types)
+				        {
+					        @group.PropertyTypes.Remove(propertyType);
+				        }
+			        }
 
-                        foreach (var group in contentType.PropertyGroups)
-                        {
-                            var types = group.PropertyTypes.Where(x => x.DataTypeId == dataTypeDefinition.Id);
-                            foreach (var propertyType in types)
-                            {
-                                group.PropertyTypes.Remove(propertyType);
-                            }
-                        }
+			        repository.AddOrUpdate(contentType);
+		        }
 
-                        repository.AddOrUpdate(contentType);
-                    }
+		        var dataTypeRepository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow);
+		        dataTypeRepository.Delete(dataTypeDefinition);
 
-                    var dataTypeRepository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow);
-                    dataTypeRepository.Delete(dataTypeDefinition);
+		        uow.Commit();
 
-                    uow.Commit();
+		        Deleted.RaiseEvent(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this); 		        
+	        }
 
-                    if (Deleted != null)
-                        Deleted(dataTypeDefinition, e);
-                }
-
-                Audit.Add(AuditTypes.Delete, string.Format("Delete DataTypeDefinition performed by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
-            }
+	        Audit.Add(AuditTypes.Delete, string.Format("Delete DataTypeDefinition performed by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
         }
 
         /// <summary>
@@ -202,22 +207,22 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Delete
         /// </summary>
-        public static event EventHandler<DeleteEventArgs> Deleting;
+		public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<IDataTypeDefinition>> Deleting;
 
         /// <summary>
         /// Occurs after Delete
         /// </summary>
-        public static event EventHandler<DeleteEventArgs> Deleted;
+		public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<IDataTypeDefinition>> Deleted;
 
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        public static event EventHandler<SaveEventArgs> Saving;
+		public static event TypedEventHandler<IDataTypeService, SaveEventArgs<IDataTypeDefinition>> Saving;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        public static event EventHandler<SaveEventArgs> Saved;
+		public static event TypedEventHandler<IDataTypeService, SaveEventArgs<IDataTypeDefinition>> Saved;
         #endregion
     }
 }
