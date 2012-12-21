@@ -14,6 +14,10 @@ namespace Umbraco.Core.Models
         {
         }
 
+		public MediaType(IMediaType parent) : base(parent)
+		{
+		}
+
         /// <summary>
         /// Method to call when Entity is being saved
         /// </summary>

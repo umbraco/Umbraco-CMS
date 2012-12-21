@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -68,20 +69,15 @@ namespace Umbraco.Core.Services
 	        }
 
 	        var media = new Models.Media(parentId, mediaType);
-	        var e = new NewEventArgs {Alias = mediaTypeAlias, ParentId = parentId};
 
-	        if (Creating != null)
-	            Creating(media, e);
+			if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this))
+				return media;
 
-	        if (!e.Cancel)
-	        {
-	            SetUser(media, userId);
+			SetUser(media, userId);
 
-	            if (Created != null)
-	                Created(media, e);
+			Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId), this);			
 
-	            Audit.Add(AuditTypes.New, "", media.CreatorId, media.Id);
-	        }
+			Audit.Add(AuditTypes.New, "", media.CreatorId, media.Id);
 
 	        return media;
 	    }
@@ -236,7 +232,7 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 			{
-				var query = Query<IMedia>.Builder.Where(x => x.ParentId == -20);
+				var query = Query<IMedia>.Builder.Where(x => x.ParentId == -21);
 				var medias = repository.GetByQuery(query);
 
 				return medias;
@@ -266,20 +262,15 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Id of the User moving the Media</param>
 		public void Move(IMedia media, int parentId, int userId = -1)
 		{
-			var e = new MoveEventArgs { ParentId = parentId };
-			if (Moving != null)
-				Moving(media, e);
+			if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, parentId), this))
+				return;
 
-			if (!e.Cancel)
-			{
-				media.ParentId = parentId;
-				Save(media, userId);
+			media.ParentId = parentId;
+			Save(media, userId);
 
-				if (Moved != null)
-					Moved(media, e);
+			Moved.RaiseEvent(new MoveEventArgs<IMedia>(media, false, parentId), this);
 
-				Audit.Add(AuditTypes.Move, "Move Media performed by user", userId == -1 ? 0 : userId, media.Id);
-			}
+			Audit.Add(AuditTypes.Move, "Move Media performed by user", userId == -1 ? 0 : userId, media.Id);
 		}
 
 	    /// <summary>
@@ -290,26 +281,21 @@ namespace Umbraco.Core.Services
 	    public void MoveToRecycleBin(IMedia media, int userId = -1)
 	    {
 	        //TODO If media item has children those should also be moved to the recycle bin as well
-	        var e = new MoveEventArgs {ParentId = -20};
-	        if (Trashing != null)
-	            Trashing(media, e);
+			if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, -21), this))
+				return;
 
-	        if (!e.Cancel)
-	        {
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateMediaRepository(uow))
-	            {
-	                ((Core.Models.Media) media).ChangeTrashedState(true);
-	                repository.AddOrUpdate(media);
-	                uow.Commit();
-	            }
+			var uow = _uowProvider.GetUnitOfWork();
+			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+			{
+				((Core.Models.Media)media).ChangeTrashedState(true);
+				repository.AddOrUpdate(media);
+				uow.Commit();
+			}
 
-	            if (Trashed != null)
-	                Trashed(media, e);
+			Trashed.RaiseEvent(new MoveEventArgs<IMedia>(media, false, -21), this);
 
-	            Audit.Add(AuditTypes.Move, "Move Media to Recycle Bin performed by user", userId == -1 ? 0 : userId,
-	                      media.Id);
-	        }
+			Audit.Add(AuditTypes.Move, "Move Media to Recycle Bin performed by user", userId == -1 ? 0 : userId,
+					  media.Id);
 	    }
 
 	    /// <summary>
@@ -317,15 +303,22 @@ namespace Umbraco.Core.Services
 		/// </summary>
 		public void EmptyRecycleBin()
 		{
+			//TODO: Why don't we have a base class to share between MediaService/ContentService as some of this is exacty the same?
+
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 			{
-				var query = Query<IMedia>.Builder.Where(x => x.ParentId == -20);
+				var query = Query<IMedia>.Builder.Where(x => x.ParentId == -21);
 				var contents = repository.GetByQuery(query);
 
 				foreach (var content in contents)
 				{
+					if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMedia>(content), this))
+						continue;
+
 					repository.Delete(content);
+
+					Deleted.RaiseEvent(new DeleteEventArgs<IMedia>(content, false), this);
 				}
 				uow.Commit();
 			}
@@ -340,35 +333,31 @@ namespace Umbraco.Core.Services
 	    /// <param name="mediaTypeId">Id of the <see cref="IMediaType"/></param>
 	    /// <param name="userId">Optional id of the user deleting the media</param>
 	    public void DeleteMediaOfType(int mediaTypeId, int userId = -1)
-	    {
+	    {			
 	        var uow = _uowProvider.GetUnitOfWork();
-	        var repository = _repositoryFactory.CreateMediaRepository(uow);
-	        //NOTE What about media that has the contenttype as part of its composition?
-	        //The ContentType has to be removed from the composition somehow as it would otherwise break
-	        //Dbl.check+test that the ContentType's Id is removed from the ContentType2ContentType table
-	        var query = Query<IMedia>.Builder.Where(x => x.ContentTypeId == mediaTypeId);
-	        var contents = repository.GetByQuery(query);
-
-	        var e = new DeleteEventArgs {Id = mediaTypeId};
-	        if (Deleting != null)
-	            Deleting(contents, e);
-
-	        if (!e.Cancel)
+	        using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 	        {
-	            foreach (var content in contents)
-	            {
-	                ((Core.Models.Media) content).ChangeTrashedState(true);
-	                repository.AddOrUpdate(content);
-	            }
+				//NOTE What about media that has the contenttype as part of its composition?
+				//The ContentType has to be removed from the composition somehow as it would otherwise break
+				//Dbl.check+test that the ContentType's Id is removed from the ContentType2ContentType table
+				var query = Query<IMedia>.Builder.Where(x => x.ContentTypeId == mediaTypeId);
+				var contents = repository.GetByQuery(query);
 
-	            uow.Commit();
-                uow.Dispose();
+				if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMedia>(contents), this))
+					return;
 
-	            if (Deleted != null)
-	                Deleted(contents, e);
+				foreach (var content in contents)
+				{
+					((Core.Models.Media)content).ChangeTrashedState(true);
+					repository.AddOrUpdate(content);
+				}
 
-	            Audit.Add(AuditTypes.Delete, "Delete Media items by Type performed by user", userId == -1 ? 0 : userId, -1);
-	        }
+				uow.Commit();
+
+				Deleted.RaiseEvent(new DeleteEventArgs<IMedia>(contents, false), this);
+	        }			
+
+			Audit.Add(AuditTypes.Delete, "Delete Media items by Type performed by user", userId == -1 ? 0 : userId, -1);
 	    }
 
 	    /// <summary>
@@ -382,24 +371,19 @@ namespace Umbraco.Core.Services
 	    /// <param name="userId">Id of the User deleting the Media</param>
 	    public void Delete(IMedia media, int userId = -1)
 	    {
-	        var e = new DeleteEventArgs {Id = media.Id};
-	        if (Deleting != null)
-	            Deleting(media, e);
+			if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMedia>(media), this))
+				return;
 
-	        if (!e.Cancel)
-	        {
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateMediaRepository(uow))
-	            {
-	                repository.Delete(media);
-	                uow.Commit();
-	            }
+			var uow = _uowProvider.GetUnitOfWork();
+			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+			{
+				repository.Delete(media);
+				uow.Commit();
+			}
 
-	            if (Deleted != null)
-	                Deleted(media, e);
+			Deleted.RaiseEvent(new DeleteEventArgs<IMedia>(media, false), this);
 
-	            Audit.Add(AuditTypes.Delete, "Delete Media performed by user", userId == -1 ? 0 : userId, media.Id);
-	        }
+			Audit.Add(AuditTypes.Delete, "Delete Media performed by user", userId == -1 ? 0 : userId, media.Id);
 	    }
 
         /// <summary>
@@ -410,24 +394,19 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
         public void DeleteVersions(int id, DateTime versionDate, int userId = -1)
         {
-            var e = new DeleteEventArgs { Id = id };
-            if (Deleting != null)
-                Deleting(versionDate, e);
+			if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, dateToRetain: versionDate), this))
+				return;
+			
+			var uow = _uowProvider.GetUnitOfWork();
+			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+			{
+				repository.DeleteVersions(id, versionDate);
+				uow.Commit();
+			}
 
-            if (!e.Cancel)
-            {
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateMediaRepository(uow))
-                {
-                    repository.DeleteVersions(id, versionDate);
-                    uow.Commit();
-                }
+	        DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate), this);
 
-                if (Deleted != null)
-                    Deleted(versionDate, e);
-
-                Audit.Add(AuditTypes.Delete, "Delete Media by version date performed by user", userId == -1 ? 0 : userId, -1);
-            }
+			Audit.Add(AuditTypes.Delete, "Delete Media by version date performed by user", userId == -1 ? 0 : userId, -1);
         }
 
         /// <summary>
@@ -445,24 +424,19 @@ namespace Umbraco.Core.Services
                 DeleteVersions(id, content.UpdateDate, userId);
             }
 
-            var e = new DeleteEventArgs { Id = id };
-            if (Deleting != null)
-                Deleting(versionId, e);
+			if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion:versionId), this))
+				return;
 
-            if (!e.Cancel)
-            {
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateMediaRepository(uow))
-                {
-                    repository.DeleteVersion(versionId);
-                    uow.Commit();
-                }
+			var uow = _uowProvider.GetUnitOfWork();
+			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+			{
+				repository.DeleteVersion(versionId);
+				uow.Commit();
+			}
 
-                if (Deleted != null)
-                    Deleted(versionId, e);
+	        DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, specificVersion: versionId), this);
 
-                Audit.Add(AuditTypes.Delete, "Delete Media by version performed by user", userId == -1 ? 0 : userId, -1);
-            }
+			Audit.Add(AuditTypes.Delete, "Delete Media by version performed by user", userId == -1 ? 0 : userId, -1);
         }
 
 	    /// <summary>
@@ -472,23 +446,20 @@ namespace Umbraco.Core.Services
 	    /// <param name="userId">Id of the User saving the Content</param>
 	    public void Save(IMedia media, int userId = -1)
 	    {
-	        var e = new SaveEventArgs();
-	        if (Saving != null)
-	            Saving(media, e);
 
-	        if (!e.Cancel)
-	        {
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateMediaRepository(uow))
-	            {
-	                SetUser(media, userId);
-	                repository.AddOrUpdate(media);
-	                uow.Commit();
-	            }
+			if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(media), this))
+				return;
 
-	            if (Saved != null)
-	                Saved(media, e);
-	        }
+			var uow = _uowProvider.GetUnitOfWork();
+			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+			{
+				SetUser(media, userId);
+				repository.AddOrUpdate(media);
+				uow.Commit();
+			}
+
+			Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this);
+
 	        Audit.Add(AuditTypes.Save, "Save Media performed by user", media.CreatorId, media.Id);
 	    }
 
@@ -499,28 +470,25 @@ namespace Umbraco.Core.Services
 	    /// <param name="userId">Id of the User saving the Content</param>
 	    public void Save(IEnumerable<IMedia> medias, int userId = -1)
 	    {
-	        var e = new SaveEventArgs();
-	        if (Saving != null)
-	            Saving(medias, e);
+			if (SavingCollection.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable<IMedia>>(medias), this))
+				return;
 
-	        if (!e.Cancel)
-	        {
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateMediaRepository(uow))
-	            {
-	                foreach (var media in medias)
-	                {
-	                    SetUser(media, userId);
-	                    repository.AddOrUpdate(media);
-	                }
-	                uow.Commit();
-	            }
+			var uow = _uowProvider.GetUnitOfWork();
+			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+			{
+				foreach (var media in medias)
+				{
+					SetUser(media, userId);
+					repository.AddOrUpdate(media);
+				}
 
-	            if (Saved != null)
-	                Saved(medias, e);
+				//commit the whole lot in one go
+				uow.Commit();
+			}
 
-	            Audit.Add(AuditTypes.Save, "Save Media items performed by user", userId == -1 ? 0 : userId, -1);
-	        }
+		    SavedCollection.RaiseEvent(new SaveEventArgs<IEnumerable<IMedia>>(medias, false), this);
+
+			Audit.Add(AuditTypes.Save, "Save Media items performed by user", userId == -1 ? 0 : userId, -1);
 	    }
 
 	    /// <summary>
@@ -564,30 +532,51 @@ namespace Umbraco.Core.Services
 		}
 
 		#region Event Handlers
+
 		/// <summary>
 		/// Occurs before Delete
-		/// </summary>
-		public static event EventHandler<DeleteEventArgs> Deleting;
+		/// </summary>		
+		public static event TypedEventHandler<IMediaService, DeleteRevisionsEventArgs> DeletingVersions;
 
 		/// <summary>
 		/// Occurs after Delete
 		/// </summary>
-		public static event EventHandler<DeleteEventArgs> Deleted;
+		public static event TypedEventHandler<IMediaService, DeleteRevisionsEventArgs> DeletedVersions;
+
+		/// <summary>
+		/// Occurs before Delete
+		/// </summary>
+		public static event TypedEventHandler<IMediaService, DeleteEventArgs<IMedia>> Deleting;
+
+		/// <summary>
+		/// Occurs after Delete
+		/// </summary>
+		public static event TypedEventHandler<IMediaService, DeleteEventArgs<IMedia>> Deleted;
 
 		/// <summary>
 		/// Occurs before Save
 		/// </summary>
-		public static event EventHandler<SaveEventArgs> Saving;
+		public static event TypedEventHandler<IMediaService, SaveEventArgs<IMedia>> Saving;
 
 		/// <summary>
 		/// Occurs after Save
 		/// </summary>
-		public static event EventHandler<SaveEventArgs> Saved;
+		public static event TypedEventHandler<IMediaService, SaveEventArgs<IMedia>> Saved;
+
+		/// <summary>
+		/// Occurs before saving a collection
+		/// </summary>
+		public static event TypedEventHandler<IMediaService, SaveEventArgs<IEnumerable<IMedia>>> SavingCollection;
+
+		/// <summary>
+		/// Occurs after saving a collection
+		/// </summary>
+		public static event TypedEventHandler<IMediaService, SaveEventArgs<IEnumerable<IMedia>>> SavedCollection;
 
 		/// <summary>
 		/// Occurs before Create
 		/// </summary>
-		public static event EventHandler<NewEventArgs> Creating;
+		public static event TypedEventHandler<IMediaService, NewEventArgs<IMedia>> Creating;
 
 		/// <summary>
 		/// Occurs after Create
@@ -596,27 +585,27 @@ namespace Umbraco.Core.Services
 		/// Please note that the Media object has been created, but not saved
 		/// so it does not have an identity yet (meaning no Id has been set).
 		/// </remarks>
-		public static event EventHandler<NewEventArgs> Created;
+		public static event TypedEventHandler<IMediaService, NewEventArgs<IMedia>> Created;
 
 		/// <summary>
 		/// Occurs before Content is moved to Recycle Bin
 		/// </summary>
-		public static event EventHandler<MoveEventArgs> Trashing;
+		public static event TypedEventHandler<IMediaService, MoveEventArgs<IMedia>> Trashing;		
 
 		/// <summary>
 		/// Occurs after Content is moved to Recycle Bin
 		/// </summary>
-		public static event EventHandler<MoveEventArgs> Trashed;
+		public static event TypedEventHandler<IMediaService, MoveEventArgs<IMedia>> Trashed;
 
 		/// <summary>
 		/// Occurs before Move
 		/// </summary>
-		public static event EventHandler<MoveEventArgs> Moving;
+		public static event TypedEventHandler<IMediaService, MoveEventArgs<IMedia>> Moving;
 
 		/// <summary>
 		/// Occurs after Move
 		/// </summary>
-		public static event EventHandler<MoveEventArgs> Moved;
+		public static event TypedEventHandler<IMediaService, MoveEventArgs<IMedia>> Moved;
 		#endregion
 	}
 }
