@@ -813,7 +813,7 @@ namespace Umbraco.Core.Services
 				uow.Commit();
 			}
 
-			DeletedRevisions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate), this);
+			DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate), this);
 			
 			Audit.Add(AuditTypes.Delete, "Delete Content by version date performed by user", userId == -1 ? 0 : userId, -1);
 		}
@@ -843,7 +843,7 @@ namespace Umbraco.Core.Services
 				uow.Commit();
 			}
 
-			DeletedRevisions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, specificVersion:versionId), this);
+			DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, specificVersion:versionId), this);
 
 			Audit.Add(AuditTypes.Delete, "Delete Content by version performed by user", userId == -1 ? 0 : userId, -1);
 	    }
@@ -1234,7 +1234,7 @@ namespace Umbraco.Core.Services
 		/// <summary>
 		/// Occurs after Delete
 		/// </summary>
-		public static event TypedEventHandler<IContentService, DeleteRevisionsEventArgs> DeletedRevisions;
+		public static event TypedEventHandler<IContentService, DeleteRevisionsEventArgs> DeletedVersions;
 
 		/// <summary>
 		/// Occurs before Save

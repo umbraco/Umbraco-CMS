@@ -94,11 +94,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Saves a collection of <see cref="IContent"/> objects.
-        /// </summary>
-        /// <remarks>
-        /// If the collection of content contains new objects that references eachother by Id or ParentId,
-        /// then use the overload Save method with a collection of Lazy <see cref="IContent"/>.
-        /// </remarks>
+        /// </summary>        
         /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
         void Save(IEnumerable<IContent> contents, int userId = -1);		
