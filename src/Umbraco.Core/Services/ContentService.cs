@@ -785,6 +785,7 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
+				//TODO: Why are we setting a writer if we are just deleting the object? (I'm probably overlooking something here...?)
 				SetWriter(content, userId);
 				repository.Delete(content);
 				uow.Commit();
@@ -944,6 +945,8 @@ namespace Umbraco.Core.Services
 		/// </summary>
 		public void EmptyRecycleBin()
 		{
+			//TODO: Why don't we have a base class to share between MediaService/ContentService as some of this is exacty the same?
+
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
@@ -952,7 +955,12 @@ namespace Umbraco.Core.Services
 
 				foreach (var content in contents)
 				{
+					if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(content), this))
+						continue;
+
 					repository.Delete(content);
+
+					Deleted.RaiseEvent(new DeleteEventArgs<IContent>(content, false), this);
 				}
 				uow.Commit();
 			}

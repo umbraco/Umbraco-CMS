@@ -303,7 +303,6 @@ namespace Umbraco.Core.Services
 		/// </summary>
 		public void EmptyRecycleBin()
 		{
-			//TODO: Should have an event for this.
 			//TODO: Why don't we have a base class to share between MediaService/ContentService as some of this is exacty the same?
 
 			var uow = _uowProvider.GetUnitOfWork();
@@ -314,7 +313,12 @@ namespace Umbraco.Core.Services
 
 				foreach (var content in contents)
 				{
+					if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMedia>(content), this))
+						continue;
+
 					repository.Delete(content);
+
+					Deleted.RaiseEvent(new DeleteEventArgs<IMedia>(content, false), this);
 				}
 				uow.Commit();
 			}
