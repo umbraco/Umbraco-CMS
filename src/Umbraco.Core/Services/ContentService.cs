@@ -1066,24 +1066,17 @@ namespace Umbraco.Core.Services
 		/// <returns>True if sending publication was succesfull otherwise false</returns>
 		internal bool SendToPublication(IContent content, int userId = -1)
 		{
-			//TODO Implement something similar to this
-			var e = new SendToPublishEventArgs();
 
-			if (SendingToPublish != null)
-				SendingToPublish(content, e);
+			if (SendingToPublish.IsRaisedEventCancelled(new SendToPublishEventArgs<IContent>(content), this))
+				return false;
 
-			if (!e.Cancel)
-			{
-				// Do some stuff here.. RunActionHandlers
+			//TODO: Do some stuff here.. RunActionHandlers
 
-				if (SentToPublish != null)
-					SentToPublish(content, e);
+			SentToPublish.RaiseEvent(new SendToPublishEventArgs<IContent>(content, false), this);
 
-				Audit.Add(AuditTypes.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
+			Audit.Add(AuditTypes.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
 
-			    return true;
-			}
-			return false;
+			return true;
 		}
 
 	    /// <summary>
@@ -1309,12 +1302,12 @@ namespace Umbraco.Core.Services
 		/// <summary>
 		/// Occurs before Send to Publish
 		/// </summary>
-		public static event EventHandler<SendToPublishEventArgs> SendingToPublish;
+		public static event TypedEventHandler<IContentService, SendToPublishEventArgs<IContent>> SendingToPublish;
 
 		/// <summary>
 		/// Occurs after Send to Publish
 		/// </summary>
-		public static event EventHandler<SendToPublishEventArgs> SentToPublish;
+		public static event TypedEventHandler<IContentService, SendToPublishEventArgs<IContent>> SentToPublish;
 		#endregion
 	}
 }
