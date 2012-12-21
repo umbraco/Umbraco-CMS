@@ -298,7 +298,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //If Published state has changed then previous versions should have their publish state reset
-            if (((ICanBeDirty)entity).IsPropertyDirty("Published"))
+            if (((ICanBeDirty)entity).IsPropertyDirty("Published") && entity.Published)
             {
                 var publishedDocs = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND published = @IsPublished", new { Id = entity.Id, IsPublished = true });
                 foreach (var doc in publishedDocs)

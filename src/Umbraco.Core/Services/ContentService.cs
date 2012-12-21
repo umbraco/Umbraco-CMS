@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -573,7 +572,7 @@ namespace Umbraco.Core.Services
 				return false;
 
 			//Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
-	            if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
+            if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
 			{
 				LogHelper.Info<ContentService>(
 					string.Format(
@@ -608,31 +607,30 @@ namespace Umbraco.Core.Services
 				{
 					var xml = content.ToXml();
 					var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
-					var exists =
-						uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = content.Id }) !=
-						null;
+				    var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new {Id = content.Id}) != null;
 					int result = exists
 									 ? uow.Database.Update(poco)
 									 : Convert.ToInt32(uow.Database.Insert(poco));
 				}
 			}
 
+            Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
+
 			//Save xml to db and call following method to fire event through PublishingStrategy to update cache
 			if (omitCacheRefresh == false)
 				_publishingStrategy.PublishingFinalized(content);
+            
+            //We need to check if children and their publish state to ensure that we republish content that was previously published
+	        if (HasChildren(content.Id))
+	        {
+	            var children = GetChildrenDeep(content.Id);
+	            var shouldBeRepublished = children.Where(child => HasPublishedVersion(child.Id));
 
-			Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
-                if (HasChildren(content.Id))
-                {
-                    var children = GetChildrenDeep(content.Id);
-                    var shouldBeRepublished = children.Where(child => HasPublishedVersion(child.Id));
+	            if (omitCacheRefresh == false)
+	                _publishingStrategy.PublishingFinalized(shouldBeRepublished, false);
+	        }
 
-                    if (omitCacheRefresh == false)
-                        _publishingStrategy.PublishingFinalized(shouldBeRepublished, false);
-                }
-
-
-			Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId == -1 ? 0 : userId, content.Id);
+	        Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId == -1 ? 0 : userId, content.Id);
 
 			return published;
 	    }
@@ -688,7 +686,6 @@ namespace Umbraco.Core.Services
 				{
 					foreach (var content in contents)
 					{
-
 						SetWriter(content, userId);
 
 						//Only change the publish state if the "previous" version was actually published
@@ -1102,7 +1099,6 @@ namespace Umbraco.Core.Services
 	    /// <returns>The newly created <see cref="IContent"/> object</returns>
 	    public IContent Rollback(int id, Guid versionId, int userId = -1)
 	    {
-	        
 	        var content = GetByVersion(versionId);
 
 			if (RollingBack.IsRaisedEventCancelled(new RollbackEventArgs<IContent>(content), this))
@@ -1149,7 +1145,7 @@ namespace Umbraco.Core.Services
         /// </remarks>
         /// <param name="parentId">Id of the parent to retrieve children from</param>
         /// <returns>A list of valid <see cref="IContent"/> that can be published</returns>
-        private List<IContent> GetChildrenDeep(int parentId)
+        private IEnumerable<IContent> GetChildrenDeep(int parentId)
         {
             var list = new List<IContent>();
             var children = GetChildren(parentId);
