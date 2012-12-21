@@ -139,7 +139,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the ContentType</param>
         public void Save(IEnumerable<IContentType> contentTypes, int userId = -1)
         {
-	        if (SavingContentTypeCollection.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable<IContentType>>(contentTypes), this)) 
+	        if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(contentTypes), this)) 
 				return;
 	        
 			var uow = _uowProvider.GetUnitOfWork();
@@ -154,7 +154,7 @@ namespace Umbraco.Core.Services
 				//save it all in one go
 				uow.Commit();
 
-		        SavedContentTypeCollection.RaiseEvent(new SaveEventArgs<IEnumerable<IContentType>>(contentTypes, false), this);
+		        SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(contentTypes, false), this);
 	        }
 
 	        Audit.Add(AuditTypes.Save, string.Format("Save ContentTypes performed by user"), userId == -1 ? 0 : userId, -1);
@@ -195,7 +195,7 @@ namespace Umbraco.Core.Services
         /// </remarks>
         public void Delete(IEnumerable<IContentType> contentTypes, int userId = -1)
         {
-	        if (DeletingContentTypeCollection.IsRaisedEventCancelled(new DeleteEventArgs<IEnumerable<IContentType>>(contentTypes), this)) 
+	        if (DeletingContentType.IsRaisedEventCancelled(new DeleteEventArgs<IContentType>(contentTypes), this)) 
 				return;
 	        
 			var contentTypeList = contentTypes.ToList();
@@ -214,7 +214,7 @@ namespace Umbraco.Core.Services
 
 		        uow.Commit();
 
-		        DeletedContentTypeCollection.RaiseEvent(new DeleteEventArgs<IEnumerable<IContentType>>(contentTypes, false), this);
+		        DeletedContentType.RaiseEvent(new DeleteEventArgs<IContentType>(contentTypes, false), this);
 	        }
 
 	        Audit.Add(AuditTypes.Delete, string.Format("Delete ContentTypes performed by user"), userId == -1 ? 0 : userId, -1);
@@ -307,7 +307,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user savging the MediaTypes</param>
         public void Save(IEnumerable<IMediaType> mediaTypes, int userId = -1)
         {
-			if (SavingMediaTypeCollection.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable<IMediaType>>(mediaTypes), this))
+			if (SavingMediaType.IsRaisedEventCancelled(new SaveEventArgs<IMediaType>(mediaTypes), this))
 				return;
 
 			var uow = _uowProvider.GetUnitOfWork();
@@ -323,7 +323,7 @@ namespace Umbraco.Core.Services
 				//save it all in one go
 				uow.Commit();
 
-				SavedMediaTypeCollection.RaiseEvent(new SaveEventArgs<IEnumerable<IMediaType>>(mediaTypes, false), this);
+				SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(mediaTypes, false), this);
 			}
 
 			Audit.Add(AuditTypes.Save, string.Format("Save MediaTypes performed by user"), userId == -1 ? 0 : userId, -1);
@@ -363,7 +363,7 @@ namespace Umbraco.Core.Services
         /// <remarks>Deleting a <see cref="IMediaType"/> will delete all the <see cref="IMedia"/> objects based on this <see cref="IMediaType"/></remarks>
         public void Delete(IEnumerable<IMediaType> mediaTypes, int userId = -1)
         {            
-	        if (DeletingMediaTypeCollection.IsRaisedEventCancelled(new DeleteEventArgs<IEnumerable<IMediaType>>(mediaTypes), this)) 
+	        if (DeletingMediaType.IsRaisedEventCancelled(new DeleteEventArgs<IMediaType>(mediaTypes), this)) 
 				return;
 	        
 			var mediaTypeList = mediaTypes.ToList();
@@ -381,7 +381,7 @@ namespace Umbraco.Core.Services
 		        }
 		        uow.Commit();
 
-				DeletedMediaTypeCollection.RaiseEvent(new DeleteEventArgs<IEnumerable<IMediaType>>(mediaTypes, false), this);		        
+				DeletedMediaType.RaiseEvent(new DeleteEventArgs<IMediaType>(mediaTypes, false), this);		        
 	        }
 
 	        Audit.Add(AuditTypes.Delete, string.Format("Delete MediaTypes performed by user"), userId == -1 ? 0 : userId, -1);
@@ -494,17 +494,7 @@ namespace Umbraco.Core.Services
 		/// Occurs after Delete
 		/// </summary>
 		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IContentType>> DeletedContentType;
-
-		/// <summary>
-		/// Occurs before Delete
-		/// </summary>
-		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IEnumerable<IContentType>>> DeletingContentTypeCollection;
-
-		/// <summary>
-		/// Occurs after Delete
-		/// </summary>
-		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IEnumerable<IContentType>>> DeletedContentTypeCollection;
-
+		
 		/// <summary>
 		/// Occurs before Delete
 		/// </summary>
@@ -514,17 +504,7 @@ namespace Umbraco.Core.Services
 		/// Occurs after Delete
 		/// </summary>
 		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IMediaType>> DeletedMediaType;
-
-		/// <summary>
-        /// Occurs before Delete
-        /// </summary>
-		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IEnumerable<IMediaType>>> DeletingMediaTypeCollection;
 		
-        /// <summary>
-        /// Occurs after Delete
-        /// </summary>
-		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IEnumerable<IMediaType>>> DeletedMediaTypeCollection;
-
         /// <summary>
         /// Occurs before Save
         /// </summary>
@@ -544,27 +524,6 @@ namespace Umbraco.Core.Services
 		/// Occurs after Save
 		/// </summary>
 		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IMediaType>> SavedMediaType;
-
-
-		/// <summary>
-		/// Occurs before saving a collection
-		/// </summary>
-		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IEnumerable<IContentType>>> SavingContentTypeCollection;
-
-		/// <summary>
-		/// Occurs after saving a collection
-		/// </summary>
-		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IEnumerable<IContentType>>> SavedContentTypeCollection;
-
-		/// <summary>
-		/// Occurs before saving a collection
-		/// </summary>
-		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IEnumerable<IMediaType>>> SavingMediaTypeCollection;
-
-		/// <summary>
-		/// Occurs after saving a collection
-		/// </summary>
-		public static event TypedEventHandler<IContentTypeService, SaveEventArgs<IEnumerable<IMediaType>>> SavedMediaTypeCollection;
 
         #endregion
     }
