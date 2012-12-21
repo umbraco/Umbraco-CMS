@@ -81,29 +81,28 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return contentType;
         }
 
-        public static ContentType CreateSimpleContentType(string alias, string name)
-        {
-            var contentType = new ContentType(-1)
-                                  {
-                                      Alias = alias,
-                                      Name = name,
-                                      Description = "ContentType used for simple text pages",
-                                      Icon = ".sprTreeDoc3",
-                                      Thumbnail = "doc2.png",
-                                      SortOrder = 1,
-                                      CreatorId = 0,
-                                      Trashed = false
-                                  };
+		public static ContentType CreateSimpleContentType(string alias, string name, IContentType parent = null)
+		{
+			var contentType = parent == null ? new ContentType(-1) : new ContentType(parent);
 
-            var contentCollection = new PropertyTypeCollection();
-            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
-            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "bodyText", Name = "Body Text", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeId = -87 });
-            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "author", Name = "Author", Description = "Name of the author", HelpText = "", Mandatory = false, SortOrder = 3, DataTypeId = -88 });
+			contentType.Alias = alias;
+			contentType.Name = name;
+			contentType.Description = "ContentType used for simple text pages";
+			contentType.Icon = ".sprTreeDoc3";
+			contentType.Thumbnail = "doc2.png";
+			contentType.SortOrder = 1;
+			contentType.CreatorId = 0;
+			contentType.Trashed = false;
+			
+			var contentCollection = new PropertyTypeCollection();
+			contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "title", Name = "Title", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+			contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "bodyText", Name = "Body Text", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeId = -87 });
+			contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "author", Name = "Author", Description = "Name of the author", HelpText = "", Mandatory = false, SortOrder = 3, DataTypeId = -88 });
 
-            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+			contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
 
-            return contentType;
-        }
+			return contentType;
+		}	    
 
         public static ContentType CreateSimpleContentType(string alias, string name, bool mandatory)
         {

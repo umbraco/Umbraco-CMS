@@ -22,6 +22,18 @@ namespace Umbraco.Core.Models
         {
         }
 
+		public Media(IMedia parent, IMediaType contentType)
+			: this(parent, contentType, new PropertyCollection())
+		{
+		}
+
+		public Media(IMedia parent, IMediaType contentType, PropertyCollection properties)
+			: base(parent, contentType, properties)
+		{
+			Mandate.ParameterNotNull(contentType, "contentType");
+			_contentType = contentType;
+		}
+
         /// <summary>
         /// Constructor for creating a Media object
         /// </summary>
@@ -30,6 +42,7 @@ namespace Umbraco.Core.Models
         /// <param name="properties">Collection of properties</param>
         public Media(int parentId, IMediaType contentType, PropertyCollection properties) : base(parentId, contentType, properties)
         {
+			Mandate.ParameterNotNull(contentType, "contentType");
             _contentType = contentType;
         }
 
