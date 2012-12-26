@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.Threading;
 using Umbraco.Core.Logging;
 using umbraco.DataLayer;
@@ -164,19 +165,28 @@ namespace umbraco.BusinessLogic
         /// <param name="comment">The comment.</param>
         public static void AddSynced(LogTypes type, int userId, int nodeId, string comment)
         {
-            try
+            var logTypeIsAuditType = type.GetType().GetField(type.ToString()).GetCustomAttributes(typeof(AuditTrailLogItem), true).Length != 0;
+
+            if (logTypeIsAuditType)
             {
-                SqlHelper.ExecuteNonQuery(
-                    "insert into umbracoLog (userId, nodeId, logHeader, logComment) values (@userId, @nodeId, @logHeader, @comment)",
-                    SqlHelper.CreateParameter("@userId", userId),
-                    SqlHelper.CreateParameter("@nodeId", nodeId),
-                    SqlHelper.CreateParameter("@logHeader", type.ToString()),
-                    SqlHelper.CreateParameter("@comment", comment));
+                try
+                {
+                    SqlHelper.ExecuteNonQuery(
+                        "insert into umbracoLog (userId, nodeId, logHeader, logComment) values (@userId, @nodeId, @logHeader, @comment)",
+                        SqlHelper.CreateParameter("@userId", userId),
+                        SqlHelper.CreateParameter("@nodeId", nodeId),
+                        SqlHelper.CreateParameter("@logHeader", type.ToString()),
+                        SqlHelper.CreateParameter("@comment", comment));
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.ToString(), "Error");
+                    Trace.WriteLine(e.ToString());
+                }
             }
-            catch (Exception e)
+            else
             {
-                Debug.WriteLine(e.ToString(), "Error");
-                Trace.WriteLine(e.ToString());
+                LogHelper.Info<Log>(string.Format("Redirected log call (please use Umbraco.Core.Logging.LogHelper instead of umbraco.BusinessLogic.Log) | Type: {0} | User: {1} | NodeId: {2} | Comment: {3}", type.ToString(), userId, nodeId.ToString(CultureInfo.InvariantCulture), comment));
             }
         }
 
