@@ -1597,7 +1597,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
                     }
                     else
                     {
-                        Log.Add(LogTypes.System, d.Id, "Document not published so XML cannot be generated");
+                        LogHelper.Debug<Document>(string.Format("Document {0} not published so XML cannot be generated", d.Id));
                     }
                 }
 

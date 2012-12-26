@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -66,7 +67,7 @@ namespace umbraco
             cms.businesslogic.media.Media d = new cms.businesslogic.media.Media(ParentID);
 
             // Log
-            BusinessLogic.Log.Add(BusinessLogic.LogTypes.Delete, User.GetCurrent(), d.Id, "");
+            LogHelper.Debug<mediaTasks>(string.Format("Delete media item {0} by user {1}", d.Id, User.GetCurrent().Id));
 
             d.delete();
             return true;

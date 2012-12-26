@@ -9,6 +9,7 @@ using System;
 using System.Web;
 using System.Text.RegularExpressions;
 using System.IO;
+using Umbraco.Core.Logging;
 using umbraco.IO;
 
 namespace umbraco.presentation.plugins.tinymce3
@@ -65,8 +66,7 @@ namespace umbraco.presentation.plugins.tinymce3
                 }
                 else
                 {
-                    BusinessLogic.Log.Add(global::umbraco.BusinessLogic.LogTypes.Error, -1,
-                        String.Format("TinyMCE: Error loading language '{0}'. Please download language pack from tinymce.moxiecode.com", lang));
+                    LogHelper.Info<GzipModule>(string.Format("TinyMCE: Error loading language '{0}'. Please download language pack from tinymce.moxiecode.com", lang));
                 }
             }
             // Add themes

@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 
 using System.Threading;
+using Umbraco.Core.Logging;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
 
@@ -155,7 +156,7 @@ namespace umbraco.dialogs
                     }
                 }
                 else {
-                    BusinessLogic.Log.Add(umbraco.BusinessLogic.LogTypes.Error, d.Id, "Publishing failed due to event cancelling the publishing");
+                    LogHelper.Debug<publish>(string.Format("Publishing node {0} failed due to event cancelling the publishing", d.Id));
                 }
             }
 		}

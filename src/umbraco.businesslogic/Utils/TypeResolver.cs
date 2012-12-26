@@ -120,30 +120,6 @@ namespace umbraco.BusinessLogic.Utils
                 }
             }
 
-            /*
-            try{
-                System.Collections.IList list = System.Web.Compilation.BuildManager.CodeAssemblies;
-                if (list != null && list.Count > 0) {
-                    Assembly asm;
-                    foreach (object o in list) {
-                        asm = o as Assembly;
-
-                        Log.Add(LogTypes.Debug, -1, "assembly " + asm.ToString()  );
-                        if (asm != null) {
-                            foreach (Type t in asm.GetExportedTypes()) {
-                                if (!t.IsInterface && assignTypeFrom.IsAssignableFrom(t))
-                                    result.Add(t.AssemblyQualifiedName);
-                            }
-                        }
-                    }
-                } else {
-                    Log.Add(LogTypes.Debug, -1, "No assemblies");
-                }
-            } catch(Exception ee) {
-                Log.Add(LogTypes.Debug, -1, ee.ToString());
-            }
-            */
-
             return result.ToArray();
         }
 

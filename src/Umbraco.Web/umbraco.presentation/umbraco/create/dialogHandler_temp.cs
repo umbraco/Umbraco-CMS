@@ -81,17 +81,6 @@ namespace umbraco.presentation.create
                 }
             }
 
-
-            //try
-            //{
-
-            //}
-            //catch (Exception ex)
-            //{
-            //    Log.Add(LogTypes.Error, UmbracoEnsuredPage.CurrentUser, -1, string.Format("Could not create node ({0},{1},{2},{3} ERROR: {4}", NodeType, TypeId, NodeId, Text, ex.Message));
-            //    return "";
-            //}
-
             return "";
         }
 

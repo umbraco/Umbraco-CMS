@@ -18,14 +18,6 @@ namespace umbraco.presentation
 	{
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-            /*
-			if (GlobalSettings.DebugMode)
-				BusinessLogic.Log.Add(
-					BusinessLogic.LogTypes.Ping, 
-					BusinessLogic.User.GetUser(0),
-					-1,
-					"");
-             */
 		}
 
 		#region Web Form Designer generated code

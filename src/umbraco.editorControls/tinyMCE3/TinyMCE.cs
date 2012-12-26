@@ -348,12 +348,6 @@ namespace umbraco.editorControls.tinyMCE3
                         if (parsedString.StartsWith("<div>") && parsedString.EndsWith("</div>"))
                             parsedString = parsedString.Substring("<div>".Length, parsedString.Length - "<div></div>".Length);
                     }
-                    else
-                    {
-                        // TODO
-                        // How to log errors? _data.NodeId does not exist?
-                        //BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, BusinessLogic.User.GetUser(0), _data.NodeId, "Error tidying txt from property: " + _data.PropertyId.ToString());
-                    }
                 }
 
                 // rescue umbraco tags

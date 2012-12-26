@@ -379,12 +379,12 @@ namespace umbraco
                             prov.UpdateNode(n);
                         else
                         {
-                            Log.Add(LogTypes.Error, d.Id, "Can't update Sitemap Provider due to empty Url in node");
+                            LogHelper.Debug<content>(string.Format("Can't update Sitemap Provider due to empty Url in node id: {0}", d.Id));
                         }
                     }
                     catch (Exception ee)
                     {
-                        Log.Add(LogTypes.Error, d.Id, string.Format("Error adding node to Sitemap Provider in PublishNodeDo(): {0}", ee));
+                        LogHelper.Error<content>(string.Format("Error adding node to Sitemap Provider in PublishNodeDo(): {0}", d.Id), ee);
                     }
                 }
             }
@@ -1041,7 +1041,7 @@ namespace umbraco
             lock (_readerWriterSyncLock)
             {
                 var xmlDoc = new XmlDocument();
-                Log.Add(LogTypes.System, User.GetUser(0), -1, "Loading content from disk cache...");
+                LogHelper.Info<content>("Loading content from disk cache...");
                 xmlDoc.Load(UmbracoXmlDiskCacheFileName);
                 _lastDiskCacheReadTime = DateTime.UtcNow;
                 return xmlDoc;
@@ -1078,7 +1078,7 @@ namespace umbraco
                 }
 
                 // Try to log to the DB
-                Log.Add(LogTypes.System, staticUser, -1, "Loading content from database...");
+                LogHelper.Info<content>("Loading content from database...");
 
                 var hierarchy = new Dictionary<int, List<int>>();
                 var nodeIndex = new Dictionary<int, XmlNode>();
@@ -1176,24 +1176,21 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                     }
                     catch (Exception ee)
                     {
-                        Log.Add(LogTypes.Error, staticUser, -1,
-                                string.Format("Error while generating XmlDocument from database: {0}", ee));
+                        LogHelper.Error<content>("Error while generating XmlDocument from database", ee);
                     }
                 }
-                catch (OutOfMemoryException)
+                catch (OutOfMemoryException ee)
                 {
-                    Log.Add(LogTypes.Error, staticUser, -1,
-                            string.Format("Error Republishing: Out Of Memory. Parents: {0}, Nodes: {1}",
-                                          hierarchy.Count, nodeIndex.Count));
+                    LogHelper.Error<content>(string.Format("Error Republishing: Out Of Memory. Parents: {0}, Nodes: {1}", hierarchy.Count, nodeIndex.Count), ee);
                 }
                 catch (Exception ee)
                 {
-                    Log.Add(LogTypes.Error, staticUser, -1, string.Format("Error Republishing: {0}", ee));
+                    LogHelper.Error<content>("Error Republishing", ee);
                 }
             }
             catch (Exception ee)
             {
-                Log.Add(LogTypes.Error, -1, string.Format("Error Republishing: {0}", ee));
+                LogHelper.Error<content>("Error Republishing", ee);
             }
 
             // An error of some sort must have stopped us from successfully generating
@@ -1304,7 +1301,8 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                         Trace.Write(string.Format(
                             "Error saving content on thread '{0}' due to '{1}' (Threadpool? {2})",
                             Thread.CurrentThread.Name, ee.Message, Thread.CurrentThread.IsThreadPoolThread));
-                        Log.Add(LogTypes.Error, staticUser, -1, string.Format("Xml wasn't saved: {0}", ee));
+
+                        LogHelper.Error<content>("Xml wasn't saved", ee);
                     }
                 }
             }
