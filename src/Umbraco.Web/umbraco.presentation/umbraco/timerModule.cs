@@ -1,8 +1,7 @@
 using System.Data;
 using System.Threading;
 using System.Web;
-
-
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 
 namespace umbraco
@@ -18,14 +17,14 @@ namespace umbraco
 
 		public void Init(HttpApplication context)
 		{
-			Log.Add((LogTypes)(-1), -1, "timer init");
+            LogHelper.Debug<timerModule>("timer init");
 
 			t = new Timer(new TimerCallback(this.doStuff), context.Context, 1000, 1000);
 		}
 
 		private void doStuff(object sender)
 		{
-			Log.Add((LogTypes)(-1), -1, "timer ping");
+            LogHelper.Debug<timerModule>("timer ping");
 		}
 
 		public void Dispose()

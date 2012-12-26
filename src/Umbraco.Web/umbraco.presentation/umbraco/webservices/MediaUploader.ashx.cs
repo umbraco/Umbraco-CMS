@@ -11,6 +11,7 @@ using System.Web.Security;
 using System.Web.UI;
 using System.Xml;
 using System.Xml.Serialization;
+using Umbraco.Core.Logging;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic.Exceptions;
@@ -190,18 +191,18 @@ namespace umbraco.presentation.umbraco.webservices
                     scripts.SyncTree(parentNode.Path, true);
 
                     // log succes
-                    Log.Add(LogTypes.New, parentNodeId, "Succes");
+                    LogHelper.Info<MediaUploader>(string.Format("Success uploading to parent {0}", parentNodeId));
                 }
                 catch (Exception e)
                 {
                     // log error
-                    Log.Add(LogTypes.Error, parentNodeId, e.ToString());
+                    LogHelper.Error<MediaUploader>(string.Format("Error uploading to parent {0}", parentNodeId), e);
                 }
             }
             else
             {
                 // log error
-                Log.Add(LogTypes.Error, -1, "Parent node id is in incorrect format");
+                LogHelper.Debug<MediaUploader>(string.Format("Parent node id is in incorrect format: {0}", parentNodeId));
             }
             
             

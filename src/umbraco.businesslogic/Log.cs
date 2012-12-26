@@ -247,7 +247,8 @@ namespace umbraco.BusinessLogic
 
                     SqlHelper.ExecuteNonQuery("delete from umbracoLog where datestamp < @oldestPermittedLogEntry and logHeader in ('open','system')",
                         SqlHelper.CreateParameter("@oldestPermittedLogEntry", formattedDate));
-                    Add(LogTypes.System, -1, "Log scrubbed.  Removed all items older than " + formattedDate);
+
+                    LogHelper.Info<Log>(string.Format("Log scrubbed.  Removed all items older than {0}", formattedDate));
                 }
                 catch (Exception e)
                 {

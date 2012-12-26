@@ -7,6 +7,7 @@ using System.Web;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
@@ -435,8 +436,7 @@ namespace Umbraco.Core.Services
                 }
                 catch (Exception exception)
                 {
-                    // Note, Log.Add quietly swallows the exception if it can't write to the database
-                    //Log.Add(LogTypes.System, -1, string.Format("{0} while trying to build DTD for Xml schema; is Umbraco installed correctly and the connection string configured?", exception.Message));
+                    LogHelper.Error<ContentTypeService>("Error while trying to build DTD for Xml schema; is Umbraco installed correctly and the connection string configured?", exception);
                 }
 
             }

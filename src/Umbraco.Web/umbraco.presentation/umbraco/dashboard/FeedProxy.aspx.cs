@@ -1,4 +1,6 @@
-﻿namespace dashboardUtilities
+﻿using Umbraco.Core.Logging;
+
+namespace dashboardUtilities
 {
     using System;
     using System.Linq;
@@ -40,7 +42,7 @@
                             }
                             else
                             {
-                                Log.Add(LogTypes.Error, -1, string.Format("Access to unallowed feedproxy attempted: {0}", requestUri));
+                                LogHelper.Debug<FeedProxy>(string.Format("Access to unallowed feedproxy attempted: {0}", requestUri));
                             }
                         }
                     }
@@ -48,7 +50,7 @@
             }
             catch (Exception ex)
             {
-                Log.Add(LogTypes.Error, -1, ex.ToString());
+                LogHelper.Error<FeedProxy>("Exception occurred", ex);
             }
         }
     }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
 using System.Threading;
 using System.Xml;
@@ -185,12 +186,7 @@ namespace umbraco.presentation.cache
 
         private static void LogDispatchBatchResult(int errorCount)
         {
-            Log.Add(
-                       LogTypes.System,
-                       User.GetUser(0),
-                       -1,
-                       string.Format("Distributed server push completed with {0} nodes reporting an error",
-                                     errorCount == 0 ? "no" : errorCount.ToString()));
+            LogHelper.Debug<dispatcher>(string.Format("Distributed server push completed with {0} nodes reporting an error", errorCount == 0 ? "no" : errorCount.ToString(CultureInfo.InvariantCulture)));
         }
 
         private static void LogDispatchNodeError(Exception ex)
@@ -230,11 +226,7 @@ namespace umbraco.presentation.cache
 
         private static void LogStartDispatch()
         {
-            Log.Add(
-                       LogTypes.System,
-                       User.GetUser(0),
-                       -1,
-                       "Submitting calls to distributed servers");
+            LogHelper.Info<dispatcher>("Submitting calls to distributed servers");
         }
 
         /// <summary>

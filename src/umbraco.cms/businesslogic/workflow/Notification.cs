@@ -56,9 +56,7 @@ namespace umbraco.cms.businesslogic.workflow
                 {
                     if (!u.Disabled && u.GetNotifications(Node.Path).IndexOf(Action.Letter.ToString()) > -1)
                     {
-                        Log.Add(LogTypes.Notify, User.GetUser(0), Node.Id,
-                                "Notification about " + ui.Text(Action.Alias, u) + " sent to " + u.Name + " (" + u.Email +
-                                ")");
+                        LogHelper.Debug<Notification>(string.Format("Notification about {0} sent to {1} ({2})", ui.Text(Action.Alias, u), u.Name, u.Email));
                         sendNotification(user, u, (Document)Node, Action);
                     }
                 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Logging;
+using Umbraco.Web;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.datatype;
 
@@ -74,7 +76,7 @@ namespace umbraco
 				}
 				catch (Exception ex)
 				{
-					Log.Add(LogTypes.Error, dataTypeDefinition.Id, ex.Message);
+                    LogHelper.Error<UmbracoHelper>(string.Format("uQuery error in datatype definition {0}", dataTypeDefinition.Id), ex);
 				}
 			}
 

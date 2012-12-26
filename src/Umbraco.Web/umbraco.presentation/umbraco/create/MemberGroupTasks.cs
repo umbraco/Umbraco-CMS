@@ -60,18 +60,6 @@ namespace umbraco
             {
                 return false;
             }
-            //try
-            //{
-
-            //    MembershipUser u = Membership.GetUser(_parentID);
-            //    Membership.DeleteUser(u.UserName);
-            //    return true;
-
-            //}catch
-            //{
-            //    Log.Add(LogTypes.Error, _parentID, "Member cannot be deleted.");
-            //    return false;
-            //}
         }
 
         public MemberGroupTasks()

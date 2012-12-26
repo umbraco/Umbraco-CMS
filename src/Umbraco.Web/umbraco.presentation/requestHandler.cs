@@ -588,8 +588,7 @@ namespace umbraco {
         public bool Execute(string url) {
 			try
 			{
-				Log.Add(LogTypes.NotFound, User.GetUser(0), -1,
-						url + " (from '" + HttpContext.Current.Request.UrlReferrer + "')");
+                LogHelper.Info<requestHandler>(string.Format("NotFound url {0} (from '{1}')", url, HttpContext.Current.Request.UrlReferrer));
 
 				// Test if the error404 not child elements
 				string error404 = umbraco.library.GetCurrentNotFoundPageId();

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Web;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
 using umbraco.BusinessLogic.Utils;
@@ -260,7 +261,8 @@ namespace umbraco.presentation
 						{
 						}
 
-						Log.Add(LogTypes.Error, staticUser, -1, error);
+                        LogHelper.Debug<requestModule>(error);
+
 						Trace.TraceError(error);
 						lock (unhandledErrors)
 						{
@@ -356,7 +358,8 @@ namespace umbraco.presentation
 
 				try
 				{
-					Log.Add(LogTypes.System, -1, "Application started at " + DateTime.Now);
+                    LogHelper.Info<requestModule>(string.Format("Application started at {0}", DateTime.Now));
+
 					if (UmbracoSettings.AutoCleanLogs)
 					{
 						AddTask(LOG_SCRUBBER_TASK_NAME, GetLogScrubbingInterval());
@@ -422,7 +425,7 @@ namespace umbraco.presentation
 			}
 			catch (Exception)
 			{
-				Log.Add(LogTypes.System, -1, "Unable to locate a log scrubbing interval.  Defaulting to 24 horus");
+                LogHelper.Info<requestModule>("Unable to locate a log scrubbing interval. Defaulting to 24 hours");
 			}
 			return interval;
 		}
@@ -437,7 +440,7 @@ namespace umbraco.presentation
 			}
 			catch (Exception)
 			{
-				Log.Add(LogTypes.System, -1, "Unable to locate a log scrubbing maximum age.  Defaulting to 24 horus");
+                LogHelper.Info<requestModule>("Unable to locate a log scrubbing maximum age. Defaulting to 24 hours");
 			}
 			return maximumAge;
 
