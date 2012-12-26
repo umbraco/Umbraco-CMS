@@ -30,6 +30,8 @@ namespace Umbraco.Tests.TestHelpers
             TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
 
+            UmbracoSettings.UseLegacyXmlSchema = false;
+
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
@@ -47,8 +49,6 @@ namespace Umbraco.Tests.TestHelpers
                 var engine = new SqlCeEngine(ConnectionString);
                 engine.CreateDatabase();
             }
-
-            UmbracoSettings.UseLegacyXmlSchema = false;
 
             RepositoryResolver.Current = new RepositoryResolver(
                 new RepositoryFactory());

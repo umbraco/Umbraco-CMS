@@ -92,6 +92,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return result > 0;
         }
 
+        public override bool SupportsClustered()
+        {
+            return false;
+        }
+
         protected override string FormatIdentity(ColumnDefinition column)
         {
             return column.IsIdentity ? AutoIncrementDefinition : string.Empty;

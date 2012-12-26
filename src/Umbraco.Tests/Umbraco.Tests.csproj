@@ -160,10 +160,17 @@
     <Compile Include="ContentStores\PublishMediaStoreTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
     <Compile Include="Migrations\FindingMigrationsTest.cs" />
+    <Compile Include="Migrations\SqlCeUpgradeTest.cs" />
+    <Compile Include="Migrations\SqlScripts\SqlResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SqlResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Stubs\AlterUserTableMigrationStub.cs" />
     <Compile Include="Migrations\PluginManagerExtensions.cs" />
     <Compile Include="Migrations\Stubs\Dummy.cs" />
     <Compile Include="Migrations\Stubs\FourNineMigration.cs" />
+    <Compile Include="Migrations\TargetVersionSixthMigrationsTest.cs" />
     <Compile Include="Persistence\Querying\ContentRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\Querying\ContentTypeRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\SyntaxProvider\SqlSyntaxProviderTests.cs" />
@@ -343,6 +350,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Migrations\SqlScripts\SqlResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SqlResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="TestHelpers\ExamineHelpers\ExamineResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ExamineResources.Designer.cs</LastGenOutput>
@@ -376,7 +387,11 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Migrations\SqlScripts\MySqlTotal-480.sql" />
+    <Content Include="Migrations\SqlScripts\SqlCeTotal-480.sql" />
+    <Content Include="Migrations\SqlScripts\SqlServerTotal-480.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /D

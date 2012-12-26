@@ -6,7 +6,7 @@ namespace Umbraco.Core.Models.Rdbms
     [TableName("cmsStylesheet")]
     [PrimaryKey("nodeId", autoIncrement = false)]
     [ExplicitColumns]
-    public class StylesheetDto
+    internal class StylesheetDto
     {
         [Column("nodeId")]
         [PrimaryKeyColumn(AutoIncrement = false)]

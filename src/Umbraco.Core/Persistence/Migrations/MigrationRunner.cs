@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Logging;
 
@@ -30,13 +31,9 @@ namespace Umbraco.Core.Persistence.Migrations
             LogHelper.Info<MigrationRunner>("Initializing database migration");
 
             var foundMigrations = PluginManager.Current.FindMigrations();
-            var migrations = (from migration in foundMigrations
-                              let migrationAttribute = migration.GetType().FirstAttribute<MigrationAttribute>()
-                              where migrationAttribute != null
-                              where
-                                  migrationAttribute.TargetVersion > _configuredVersion &&
-                                  migrationAttribute.TargetVersion <= _targetVersion
-                              select migration);
+            var migrations = isUpgrade
+                                 ? OrderedUpgradeMigrations(foundMigrations)
+                                 : OrderedDowngradeMigrations(foundMigrations);
 
             //Loop through migrations to generate sql
             var context = new MigrationContext();
@@ -52,7 +49,7 @@ namespace Umbraco.Core.Persistence.Migrations
                 }
             }
 
-            //Transactional execution of the sql that was generated from the found migrationsS
+            //Transactional execution of the sql that was generated from the found migrations
             using (Transaction transaction = database.GetTransaction())
             {
                 foreach (var expression in context.Expressions)
@@ -66,6 +63,32 @@ namespace Umbraco.Core.Persistence.Migrations
             }
 
             return true;
+        }
+
+        internal IEnumerable<IMigration> OrderedUpgradeMigrations(IEnumerable<IMigration> foundMigrations)
+        {
+            var migrations = (from migration in foundMigrations
+                              let migrationAttribute = migration.GetType().FirstAttribute<MigrationAttribute>()
+                              where migrationAttribute != null
+                              where
+                                  migrationAttribute.TargetVersion > _configuredVersion &&
+                                  migrationAttribute.TargetVersion <= _targetVersion
+                              orderby migrationAttribute.SortOrder ascending 
+                              select migration);
+            return migrations;
+        }
+
+        public IEnumerable<IMigration> OrderedDowngradeMigrations(IEnumerable<IMigration> foundMigrations)
+        {
+            var migrations = (from migration in foundMigrations
+                              let migrationAttribute = migration.GetType().FirstAttribute<MigrationAttribute>()
+                              where migrationAttribute != null
+                              where
+                                  migrationAttribute.TargetVersion > _configuredVersion &&
+                                  migrationAttribute.TargetVersion <= _targetVersion
+                              orderby migrationAttribute.SortOrder descending 
+                              select migration);
+            return migrations;
         }
     }
 }

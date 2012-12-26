@@ -45,5 +45,6 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string Format(ForeignKeyDefinition foreignKey);
         string FormatColumnRename(string tableName, string oldName, string newName);
         string FormatTableRename(string oldName, string newName);
+        bool SupportsClustered();
     }
 }

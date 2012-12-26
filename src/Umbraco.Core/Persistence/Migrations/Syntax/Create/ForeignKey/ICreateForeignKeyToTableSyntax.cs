@@ -2,6 +2,6 @@
 {
     public interface ICreateForeignKeyToTableSyntax : IFluentSyntax
     {
-        ICreateForeignKeyForeignColumnSyntax ToTable(string table);
+        ICreateForeignKeyPrimaryColumnSyntax ToTable(string table);
     }
 }

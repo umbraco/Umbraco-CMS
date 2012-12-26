@@ -12,6 +12,7 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
         private ConstraintType constraintType;
         public bool IsPrimaryKeyConstraint { get { return ConstraintType.PrimaryKey == constraintType; } }
         public bool IsUniqueConstraint { get { return ConstraintType.Unique == constraintType; } }
+        public bool IsNonUniqueConstraint { get { return ConstraintType.NonUnique == constraintType; } }
 
         public string SchemaName { get; set; }
         public string ConstraintName { get; set; }

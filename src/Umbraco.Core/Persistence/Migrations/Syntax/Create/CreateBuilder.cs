@@ -89,5 +89,13 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
             _context.Expressions.Add(expression);
             return new CreateConstraintBuilder(expression);
         }
+
+        public ICreateConstraintOnTableSyntax Constraint(string constraintName)
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.NonUnique);
+            expression.Constraint.ConstraintName = constraintName;
+            _context.Expressions.Add(expression);
+            return new CreateConstraintBuilder(expression);
+        }
     }
 }

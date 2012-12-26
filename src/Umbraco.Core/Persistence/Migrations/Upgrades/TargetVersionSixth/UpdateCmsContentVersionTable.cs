@@ -1,0 +1,16 @@
+﻿namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixth
+{
+    [MigrationAttribute("6.0.0", 8)]
+    public class UpdateCmsContentVersionTable : MigrationBase
+    {
+        public override void Up()
+        {
+            Alter.Table("cmsContentVersion").AddColumn("LanguageLocale").AsString(10).Nullable();
+        }
+
+        public override void Down()
+        {
+            Delete.Column("LanguageLocale").FromTable("cmsContentVersion");
+        }
+    }
+}

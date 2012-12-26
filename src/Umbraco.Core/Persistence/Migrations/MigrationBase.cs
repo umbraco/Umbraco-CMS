@@ -1,6 +1,7 @@
 ﻿using Umbraco.Core.Persistence.Migrations.Syntax.Alter;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create;
 using Umbraco.Core.Persistence.Migrations.Syntax.Delete;
+using Umbraco.Core.Persistence.Migrations.Syntax.Execute;
 using Umbraco.Core.Persistence.Migrations.Syntax.Insert;
 using Umbraco.Core.Persistence.Migrations.Syntax.Rename;
 using Umbraco.Core.Persistence.Migrations.Syntax.Update;
@@ -39,6 +40,11 @@ namespace Umbraco.Core.Persistence.Migrations
         public IDeleteBuilder Delete
         {
             get { return new DeleteBuilder(_context); }
+        }
+
+        public IExecuteBuilder Execute
+        {
+            get { return new ExecuteBuilder(_context); }
         }
 
         public IInsertBuilder Insert

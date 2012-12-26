@@ -16,6 +16,8 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
 
         public override string ToString()
         {
+            if (string.IsNullOrEmpty(Column.TableName))
+                Column.TableName = TableName;
 
             return string.Format(SyntaxConfig.SqlSyntaxProvider.AddColumn,
                                  SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(TableName),

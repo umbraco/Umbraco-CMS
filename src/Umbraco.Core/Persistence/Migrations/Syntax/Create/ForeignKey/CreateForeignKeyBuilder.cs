@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.ForeignKey
             return this;
         }
 
-        public ICreateForeignKeyForeignColumnSyntax ToTable(string table)
+        public ICreateForeignKeyPrimaryColumnSyntax ToTable(string table)
         {
             Expression.ForeignKey.PrimaryTable = table;
             return this;

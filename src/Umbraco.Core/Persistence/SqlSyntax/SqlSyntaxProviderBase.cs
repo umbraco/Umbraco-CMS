@@ -156,6 +156,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return false;
         }
 
+        public virtual bool SupportsClustered()
+        {
+            return true;
+        }
+
         public virtual string Format(TableDefinition table)
         {
             var statement = string.Format(CreateTable, GetQuotedTableName(table.Name), Format(table.Columns));
