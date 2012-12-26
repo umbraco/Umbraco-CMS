@@ -417,7 +417,7 @@ namespace umbraco.cms.businesslogic.web
             d.OnNew(e);
 
             // Log
-            Log.Add(LogTypes.New, u, d.Id, "");
+            LogHelper.Info<Document>(string.Format("New document {0}", d.Id));
 
             // Run Handler				
             umbraco.BusinessLogic.Actions.Action.RunActionHandlers(d, ActionNew.Instance);
