@@ -1,8 +1,8 @@
 using System;
-using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.DataLayer;
 using System.Collections.Generic;
@@ -17,32 +17,31 @@ namespace umbraco.BusinessLogic
     public class Log
     {
         #region Statics
-        private Interfaces.ILog m_externalLogger = null;
-        private bool m_externalLoggerInitiated = false;
+        private Interfaces.ILog _externalLogger;
+        private bool _externalLoggerInitiated;
 
         internal Interfaces.ILog ExternalLogger
         {
             get
             {
-                if (!m_externalLoggerInitiated)
+                if (!_externalLoggerInitiated)
                 {
-                    m_externalLoggerInitiated = true;
-                    if (!String.IsNullOrEmpty(UmbracoSettings.ExternalLoggerAssembly)
-                         && !String.IsNullOrEmpty(UmbracoSettings.ExternalLoggerType))
+                    _externalLoggerInitiated = true;
+                    if (!string.IsNullOrEmpty(UmbracoSettings.ExternalLoggerAssembly) && !string.IsNullOrEmpty(UmbracoSettings.ExternalLoggerType))
                     {
                         try
                         {
-                            string assemblyPath = IO.IOHelper.MapPath(UmbracoSettings.ExternalLoggerAssembly);
-                            m_externalLogger = Assembly.LoadFrom(assemblyPath).CreateInstance(UmbracoSettings.ExternalLoggerType) as Interfaces.ILog;
+                            var assemblyPath = IOHelper.MapPath(UmbracoSettings.ExternalLoggerAssembly);
+                            _externalLogger = Assembly.LoadFrom(assemblyPath).CreateInstance(UmbracoSettings.ExternalLoggerType) as Interfaces.ILog;
                         }
                         catch (Exception ee)
                         {
-							LogHelper.Error<Log>("Error loading external logger: " + ee.ToString(), ee);
+							LogHelper.Error<Log>("Error loading external logger", ee);
                         }
                     }
                 }
 
-                return m_externalLogger;
+                return _externalLogger;
             }
         }
 
@@ -74,8 +73,7 @@ namespace umbraco.BusinessLogic
             {
                 Instance.ExternalLogger.Add(type, user, nodeId, comment);
 
-                // Audit trail too?
-                if (!UmbracoSettings.ExternalLoggerLogAuditTrail && type.GetType().GetField(type.ToString()).GetCustomAttributes(typeof(AuditTrailLogItem), true) != null)
+                if (!UmbracoSettings.ExternalLoggerLogAuditTrail)
                 {
                     AddLocally(type, user, nodeId, comment);
                 }
@@ -111,12 +109,9 @@ namespace umbraco.BusinessLogic
             }
             else
             {
-                Exception ex2 = ee;
-                string error = String.Empty;
-                string errorMessage = string.Empty;
+                var ex2 = ee;
                 while (ex2 != null)
                 {
-                    error += ex2.ToString();
                     ex2 = ex2.InnerException;
                 }
 				LogHelper.Error<Log>("An error occurred", ee);
@@ -194,18 +189,18 @@ namespace umbraco.BusinessLogic
         {
             if (UmbracoSettings.ExternalLoggerLogAuditTrail && ExternalLogger != null)
                 return ExternalLogger.GetAuditLogReader(NodeId);
-            else
-                return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
-                    "select userId, nodeId, logHeader, DateStamp, logComment from umbracoLog where nodeId = @id and logHeader not in ('open','system') order by DateStamp desc",
-                    SqlHelper.CreateParameter("@id", NodeId)));
+            
+            return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
+                "select userId, nodeId, logHeader, DateStamp, logComment from umbracoLog where nodeId = @id and logHeader not in ('open','system') order by DateStamp desc",
+                SqlHelper.CreateParameter("@id", NodeId)));
         }
 
         public List<LogItem> GetLogItems(LogTypes type, DateTime sinceDate)
         {
             if (ExternalLogger != null)
                 return ExternalLogger.GetLogItems(type, sinceDate);
-            else
-                return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
+            
+            return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
                 "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
                 SqlHelper.CreateParameter("@logHeader", type),
                 SqlHelper.CreateParameter("@dateStamp", sinceDate)));
@@ -215,8 +210,8 @@ namespace umbraco.BusinessLogic
         {
             if (ExternalLogger != null)
                 return ExternalLogger.GetLogItems(nodeId);
-            else
-                return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
+            
+            return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
                 "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where id = @id order by dateStamp desc",
                 SqlHelper.CreateParameter("@id", nodeId)));
         }
@@ -225,8 +220,8 @@ namespace umbraco.BusinessLogic
         {
             if (ExternalLogger != null)
                 return ExternalLogger.GetLogItems(user, sinceDate);
-            else
-                return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
+            
+            return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
                 "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and DateStamp >= @dateStamp order by dateStamp desc",
                 SqlHelper.CreateParameter("@user", user.Id),
                 SqlHelper.CreateParameter("@dateStamp", sinceDate)));
@@ -236,8 +231,8 @@ namespace umbraco.BusinessLogic
         {
             if (ExternalLogger != null)
                 return ExternalLogger.GetLogItems(user, type, sinceDate);
-            else
-                return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
+            
+            return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
                 "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
                 SqlHelper.CreateParameter("@logHeader", type),
                 SqlHelper.CreateParameter("@user", user.Id),
@@ -371,14 +366,14 @@ namespace umbraco.BusinessLogic
 
         public static List<LogItem> ConvertIRecordsReader(IRecordsReader reader)
         {
-            List<LogItem> items = new List<LogItem>();
+            var items = new List<LogItem>();
             while (reader.Read())
             {
                 items.Add(new LogItem(
                     reader.GetInt("userId"),
                     reader.GetInt("nodeId"),
                     reader.GetDateTime("DateStamp"),
-                    convertLogHeader(reader.GetString("logHeader")),
+                    ConvertLogHeader(reader.GetString("logHeader")),
                     reader.GetString("logComment")));
             }
 
@@ -386,7 +381,7 @@ namespace umbraco.BusinessLogic
 
         }
 
-        private static LogTypes convertLogHeader(string logHeader)
+        private static LogTypes ConvertLogHeader(string logHeader)
         {
             try
             {
@@ -401,11 +396,5 @@ namespace umbraco.BusinessLogic
 
     public class AuditTrailLogItem : Attribute
     {
-        public AuditTrailLogItem()
-        {
-
-        }
     }
-
-
 }
