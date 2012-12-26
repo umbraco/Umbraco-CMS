@@ -98,7 +98,7 @@ namespace umbraco.controls.Images
             feedback.type = uicontrols.Feedback.feedbacktype.success;
             if (mainImage.StartsWith("~")) mainImage = mainImage.Substring(1);
             if (thumbnail.StartsWith("~")) thumbnail = thumbnail.Substring(1);
-            feedback.Text += "<div style=\"text-align: center\"> <a target=\"_blank\" href='" + umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/.." + mainImage + "'><img src='" + umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/.." + thumbnail + "' style='border: none;'/><br/><br/>";
+            feedback.Text += "<div style=\"text-align: center\"> <a target=\"_blank\" href='" + mainImage + "'><img src='" + thumbnail + "' style='border: none;'/><br/><br/>";
             feedback.Text += ui.Text("thumbnailimageclickfororiginal") + "</a><br/><br/></div>";
 
             if (!string.IsNullOrEmpty(OnClientUpload))
