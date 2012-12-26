@@ -72,8 +72,6 @@ namespace umbraco.editorControls.tinymce
                         }
                         else
                         {
-                            cleanTag = StripSrc(cleanTag, ht);
-
                             if (helper.FindAttribute(ht, "width") != "")
                             {
                                 cleanTag += " width=\"" + helper.FindAttribute(ht, "width") + "\"";
@@ -84,10 +82,6 @@ namespace umbraco.editorControls.tinymce
                     }
                     else
                     {
-                        // Add src, width and height properties
-                        cleanTag = StripSrc(cleanTag, ht);
-
-
                         if (helper.FindAttribute(ht, "width") != "")
                         {
                             cleanTag += " width=\"" + helper.FindAttribute(ht, "width") + "\"";
@@ -116,22 +110,6 @@ namespace umbraco.editorControls.tinymce
             }
 
             return html;
-        }
-
-        private static string StripSrc(string cleanTag, Hashtable ht)
-        {
-            string src = helper.FindAttribute(ht, "src");
-            //get the media folder, minus the starting '~'
-			string mediaRoot = global::Umbraco.Core.IO.SystemDirectories.Media.Replace("~", string.Empty);
-
-            // update orgSrc to remove umbraco reference
-            int mediaRootIndex = src.IndexOf(mediaRoot);
-            if (mediaRootIndex > -1)
-
-                src = src.Substring(mediaRootIndex, src.Length - mediaRootIndex);
-
-            cleanTag += " src=\"" + src + "\"";
-            return cleanTag;
         }
 
         private static string doResize(Hashtable attributes, out int finalWidth, out int finalHeight)
