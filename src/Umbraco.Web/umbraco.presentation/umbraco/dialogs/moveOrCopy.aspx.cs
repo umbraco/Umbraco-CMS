@@ -9,6 +9,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Xml;
+using Umbraco.Core.Persistence.Caching;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
 using umbraco.presentation;
@@ -292,10 +293,14 @@ namespace umbraco.dialogs
                         if (UmbracoContext.Current.Request["app"] == "content")
                         {
                             //PPH changed this to document instead of cmsNode to handle republishing.
-                            cms.businesslogic.web.Document d = new umbraco.cms.businesslogic.web.Document(int.Parse(helper.Request("id")));
+                            var documentId = int.Parse(helper.Request("id"));
+                            cms.businesslogic.web.Document d = new umbraco.cms.businesslogic.web.Document(documentId);
                             d.Move(int.Parse(helper.Request("copyTo")));
                             if (d.Published)
                             {
+                                //TODO HACK - Have to get the Document again, to get the new path from the database..
+                                d = new cms.businesslogic.web.Document(documentId);
+
                                 d.Publish(new umbraco.BusinessLogic.User(0));
                                 //using library.publish to support load balancing.
                                 //umbraco.library.PublishSingleNode(d.Id);
@@ -317,6 +322,7 @@ namespace umbraco.dialogs
                         {
                             Media m = new Media(int.Parse(UmbracoContext.Current.Request["id"]));
                             m.Move(int.Parse(UmbracoContext.Current.Request["copyTo"]));
+                            m = new Media(int.Parse(UmbracoContext.Current.Request["id"]));
                             m.XmlGenerate(new XmlDocument());
                             library.ClearLibraryCacheForMedia(m.Id);
                         }                                 

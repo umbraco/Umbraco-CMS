@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Xml;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Caching;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
@@ -548,9 +549,14 @@ order by level,sortOrder";
                 //make sure the node type is a document/media, if it is a recycle bin then this will not be equal
                 if (!IsTrashed && newParent.nodeObjectType == Document._objectType)
                 {
+                    // regenerate the xml of the current document
+                    var movedDocument = new Document(this.Id);
+                    movedDocument.XmlGenerate(new XmlDocument());
+
                     //regenerate the xml for the newParent node
-                    var d = new Document(newParent.Id);
-                    d.XmlGenerate(new XmlDocument());
+                    var parentDocument = new Document(newParent.Id);
+                    parentDocument.XmlGenerate(new XmlDocument());
+                    
                 }
                 else if (!IsTrashed && newParent.nodeObjectType == Media._objectType)
                 {
@@ -564,6 +570,9 @@ order by level,sortOrder";
                 {
                     c.Move(this);
                 }
+
+                //TODO: Properly refactor this, we're just clearing the cache so the changes will also be visible in the backoffice
+                InMemoryCacheProvider.Current.Clear();
 
                 FireAfterMove(e);
             }
