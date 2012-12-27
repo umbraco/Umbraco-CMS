@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Web.Script.Services;
 using System.Web.Services;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.Caching;
 using umbraco.BasePages;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
@@ -140,8 +141,10 @@ namespace umbraco.presentation.webservices
                             if (UmbracoSettings.UseDistributedCalls)
                                 library.RefreshContent();
                         }
-                       
-
+                        
+                        //TODO: Properly refactor this, we're just clearing the cache so the new sortorder will also be visible in the backoffice
+                        InMemoryCacheProvider.Current.Clear();
+      
                         // fire actionhandler, check for content
                         if ((helper.Request("app") == "content" | helper.Request("app") == "") && ParentId > 0)
                             global::umbraco.BusinessLogic.Actions.Action.RunActionHandlers(new Document(ParentId), ActionSort.Instance);                        

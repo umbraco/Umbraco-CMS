@@ -214,7 +214,7 @@ namespace umbraco.cms.businesslogic.media
                 //return refactored optimized method
                 //return Media.GetChildrenForTree(this.Id).ToArray();
 
-                var children = ApplicationContext.Current.Services.MediaService.GetChildren(Id);
+                var children = ApplicationContext.Current.Services.MediaService.GetChildren(Id).OrderBy(c => c.SortOrder);
                 return children.Select(x => new Media(x)).ToArray();
             }
         } 
