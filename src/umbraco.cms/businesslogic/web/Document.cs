@@ -6,6 +6,7 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.Caching;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.helpers;
@@ -849,8 +850,8 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                ApplicationContext.Current.Services.ContentService.UnPublish(Content, 0, true);
-
+                _published = ApplicationContext.Current.Services.ContentService.UnPublish(Content, 0, true);
+                
                 FireAfterUnPublish(e);
             }
         }
@@ -1258,7 +1259,7 @@ namespace umbraco.cms.businesslogic.web
             if (Content.ReleaseDate.HasValue)
                 _release = Content.ReleaseDate.Value;
 
-            _published = Content.HasPublishedVersion();
+            _published = Content.Published;
         }
 
         [Obsolete("Deprecated", false)]

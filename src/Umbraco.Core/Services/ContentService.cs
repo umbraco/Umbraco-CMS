@@ -1182,14 +1182,14 @@ namespace Umbraco.Core.Services
                 if (id == -20)
                     return false;
 
-                //We don't chech the System Root, so just continue
+                //We don't check the System Root, so just continue
                 if (id == -1) continue;
 
                 //If the current id equals that of the passed in content and if current shouldn't be checked we skip it.
                 if (checkCurrent == false && id == content.Id) continue;
 
-                //Check if the content for the current id has a published version - escape the loop if we encounter content with no published version
-                bool hasPublishedVersion = HasPublishedVersion(id);
+                //Check if the content for the current id is published - escape the loop if we encounter content that isn't published
+                var hasPublishedVersion = ApplicationContext.Current.Services.ContentService.GetById(id).Published;
                 if (hasPublishedVersion == false)
                     return false;
             }

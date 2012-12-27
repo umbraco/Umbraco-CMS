@@ -1,6 +1,7 @@
 using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core.Persistence.Caching;
 using umbraco.BusinessLogic.Actions;
 using umbraco.IO;
 using umbraco.uicontrols.DatePicker;
@@ -378,7 +379,7 @@ namespace umbraco.cms.presentation
 
         void UpdateNiceUrls()
         {
-            if (!_documentHasPublishedVersion)
+            if (!_documentHasPublishedVersion || _document.Published == false)
             {
                 UpdateNiceUrlProperties("<i>" + ui.Text("content", "itemNotPublished", base.getUser()) + "</i>", null);
                 return;
