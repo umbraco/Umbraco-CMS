@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -73,6 +74,12 @@ namespace Umbraco.Core.Persistence
                         //Turn off identity insert if db provider is not mysql
                         if (SyntaxConfig.SqlSyntaxProvider.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
                             db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName))));
+
+                        //Special case for MySql
+                        if (ApplicationContext.Current.DatabaseContext.ProviderName.Contains("MySql"))
+                        {
+                            db.Update<UserDto>("SET id = @IdAfter WHERE id = @IdBefore AND userLogin = @Login", new { IdAfter = 0, IdBefore = 1, Login = "admin" });
+                        }
                     }
 
                     //Loop through foreignkey statements and execute sql

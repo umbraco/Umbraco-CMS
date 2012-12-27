@@ -108,14 +108,14 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 sql.Select("*");
                 sql.From("cmsDictionary");
-                sql.InnerJoin("cmsLanguageText ON ([cmsDictionary].[id] = [cmsLanguageText].[UniqueId])");
+                sql.InnerJoin("cmsLanguageText ON (cmsDictionary.id = cmsLanguageText.UniqueId)");
             }
             return sql;
         }
 
         protected override string GetBaseWhereClause()
         {
-            return "[cmsDictionary].[pk] = @Id";
+            return "cmsDictionary.pk = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

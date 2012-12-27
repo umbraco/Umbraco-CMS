@@ -10,6 +10,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
@@ -76,8 +77,10 @@ namespace Umbraco.Tests.TestHelpers
         {
 			DatabaseContext.Database.Dispose();
 			//reset the app context            
-			ApplicationContext.ApplicationCache.ClearAllCache();           
-			
+			ApplicationContext.ApplicationCache.ClearAllCache();
+
+            SyntaxConfig.SqlSyntaxProvider = null;
+
 			//legacy API database connection close
 			SqlCeContextGuardian.CloseBackgroundConnection();
 			

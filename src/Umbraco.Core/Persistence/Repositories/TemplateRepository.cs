@@ -132,14 +132,14 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*");
             sql.From("cmsTemplate");
-            sql.InnerJoin("umbracoNode").On("[cmsTemplate].[nodeId] = [umbracoNode].[id]");
-            sql.Where("[umbracoNode].[nodeObjectType] = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
+            sql.InnerJoin("umbracoNode").On("cmsTemplate.nodeId = umbracoNode.id");
+            sql.Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
             return sql;
         }
 
         protected override string GetBaseWhereClause()
         {
-            return "[umbracoNode].[id] = @Id";
+            return "umbracoNode.id = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -317,7 +317,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public ITemplate Get(string alias)
         {
             var sql = GetBaseQuery(false);
-            sql.Where("[cmsTemplate].[alias] = @Alias", new { Alias = alias });
+            sql.Where("cmsTemplate.alias = @Alias", new { Alias = alias });
 
             var dto = Database.Fetch<TemplateDto, NodeDto>(sql).FirstOrDefault();
 

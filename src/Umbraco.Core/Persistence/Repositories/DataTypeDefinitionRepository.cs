@@ -87,14 +87,14 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*");
             sql.From("cmsDataType");
-            sql.InnerJoin("umbracoNode ON ([cmsDataType].[nodeId] = [umbracoNode].[id])");
-            sql.Where("[umbracoNode].[nodeObjectType] = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
+            sql.InnerJoin("umbracoNode ON (cmsDataType.nodeId = umbracoNode.id)");
+            sql.Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
             return sql;
         }
 
         protected override string GetBaseWhereClause()
         {
-            return "[umbracoNode].[id] = @Id";
+            return "umbracoNode.id = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

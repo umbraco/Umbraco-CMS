@@ -118,16 +118,16 @@ namespace Umbraco.Core.Persistence.Repositories
             //TODO Investigate the proper usage of IsDefault on cmsDocumentType
             sql.Select(isCount ? "COUNT(*)" : "*");
             sql.From("cmsDocumentType");
-            sql.RightJoin("cmsContentType ON ([cmsContentType].[nodeId] = [cmsDocumentType].[contentTypeNodeId])");
-            sql.InnerJoin("umbracoNode ON ([cmsContentType].[nodeId] = [umbracoNode].[id])");
-            sql.Where("[umbracoNode].[nodeObjectType] = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
-            sql.Where("[cmsDocumentType].[IsDefault] = @IsDefault", new { IsDefault = true });
+            sql.RightJoin("cmsContentType ON (cmsContentType.nodeId = cmsDocumentType.contentTypeNodeId)");
+            sql.InnerJoin("umbracoNode ON (cmsContentType.nodeId = umbracoNode.id)");
+            sql.Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
+            sql.Where("cmsDocumentType.IsDefault = @IsDefault", new { IsDefault = true });
             return sql;
         }
 
         protected override string GetBaseWhereClause()
         {
-            return "[umbracoNode].[id] = @Id";
+            return "umbracoNode.id = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

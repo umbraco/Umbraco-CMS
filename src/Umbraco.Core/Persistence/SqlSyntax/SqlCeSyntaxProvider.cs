@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -100,7 +101,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
             string columns = string.IsNullOrEmpty(columnDefinition.PrimaryKeyColumns)
                                  ? GetQuotedColumnName(columnDefinition.Name)
-                                 : columnDefinition.PrimaryKeyColumns;
+                                 : string.Join(", ", columnDefinition.PrimaryKeyColumns
+                                                                     .Split(new[]{',', ' '}, StringSplitOptions.RemoveEmptyEntries)
+                                                                     .Select(GetQuotedColumnName));
 
             return string.Format(CreateConstraint,
                                  GetQuotedTableName(table.Name),

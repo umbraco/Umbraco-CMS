@@ -113,16 +113,16 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
                 .From("cmsDocument")
-                .InnerJoin("cmsContentVersion").On("[cmsDocument].[versionId] = [cmsContentVersion].[VersionId]")
-                .InnerJoin("cmsContent").On("[cmsContentVersion].[ContentId] = [cmsContent].[nodeId]")
-                .InnerJoin("umbracoNode").On("[cmsContent].[nodeId] = [umbracoNode].[id]")
-                .Where("[umbracoNode].[nodeObjectType] = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
+                .InnerJoin("cmsContentVersion").On("cmsDocument.versionId = cmsContentVersion.VersionId")
+                .InnerJoin("cmsContent").On("cmsContentVersion.ContentId = cmsContent.nodeId")
+                .InnerJoin("umbracoNode").On("cmsContent.nodeId = umbracoNode.id")
+                .Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
             return sql;
         }
 
         protected override string GetBaseWhereClause()
         {
-            return "[umbracoNode].[id] = @Id";
+            return "umbracoNode.id = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -408,7 +408,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
-            sql.Where("[cmsContentVersion].[LanguageLocale] = @Language", new { Language = language });
+            sql.Where("cmsContentVersion.LanguageLocale = @Language", new { Language = language });
             sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
             var dto = Database.Query<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
@@ -426,9 +426,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var propertySql = new Sql();
             propertySql.Select("*");
             propertySql.From("cmsPropertyData");
-            propertySql.InnerJoin("cmsPropertyType ON ([cmsPropertyData].[propertytypeid] = [cmsPropertyType].[id])");
-            propertySql.Where("[cmsPropertyData].[contentNodeId] = @Id", new { Id = id });
-            propertySql.Where("[cmsPropertyData].[versionId] = @VersionId", new { VersionId = versionId });
+            propertySql.InnerJoin("cmsPropertyType ON (cmsPropertyData.propertytypeid = cmsPropertyType.id)");
+            propertySql.Where("cmsPropertyData.contentNodeId = @Id", new { Id = id });
+            propertySql.Where("cmsPropertyData.versionId = @VersionId", new { VersionId = versionId });
 
             var propertyDataDtos = Database.Fetch<PropertyDataDto, PropertyTypeDto>(propertySql);
             var propertyFactory = new PropertyFactory(contentType, versionId, id);

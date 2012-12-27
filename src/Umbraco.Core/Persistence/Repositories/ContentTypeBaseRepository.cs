@@ -37,8 +37,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = new Sql();
             sqlClause.Select("*");
             sqlClause.From("cmsPropertyTypeGroup");
-            sqlClause.RightJoin("cmsPropertyType ON [cmsPropertyTypeGroup].[id] = [cmsPropertyType].[propertyTypeGroupId]");
-            sqlClause.InnerJoin("cmsDataType ON [cmsPropertyType].[dataTypeId] = [cmsDataType].[nodeId]");
+            sqlClause.RightJoin("cmsPropertyType ON cmsPropertyTypeGroup.id = cmsPropertyType.propertyTypeGroupId");
+            sqlClause.InnerJoin("cmsDataType ON cmsPropertyType.dataTypeId = cmsDataType.nodeId");
 
             var translator = new SqlTranslator<PropertyType>(sqlClause, query);
             var sql = translator.Translate();
@@ -213,7 +213,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var allowedContentTypesSql = new Sql();
             allowedContentTypesSql.Select("*");
             allowedContentTypesSql.From("cmsContentTypeAllowedContentType");
-            allowedContentTypesSql.Where("[cmsContentTypeAllowedContentType].[Id] = @Id", new { Id = id });
+            allowedContentTypesSql.Where("cmsContentTypeAllowedContentType.Id = @Id", new { Id = id });
 
             var allowedContentTypeDtos = Database.Fetch<ContentTypeAllowedContentTypeDto>(allowedContentTypesSql);
             return allowedContentTypeDtos.Select(x => new ContentTypeSort { Id = new Lazy<int>(() => x.AllowedId), SortOrder = x.SortOrder }).ToList();
@@ -224,9 +224,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var propertySql = new Sql();
             propertySql.Select("*");
             propertySql.From("cmsPropertyTypeGroup");
-            propertySql.RightJoin("cmsPropertyType ON [cmsPropertyTypeGroup].[id] = [cmsPropertyType].[propertyTypeGroupId]");
-            propertySql.InnerJoin("cmsDataType ON [cmsPropertyType].[dataTypeId] = [cmsDataType].[nodeId]");
-            propertySql.Where("[cmsPropertyType].[contentTypeId] = @Id", new { Id = id });
+            propertySql.RightJoin("cmsPropertyType ON cmsPropertyTypeGroup.id = cmsPropertyType.propertyTypeGroupId");
+            propertySql.InnerJoin("cmsDataType ON cmsPropertyType.dataTypeId = cmsDataType.nodeId");
+            propertySql.Where("cmsPropertyType.contentTypeId = @Id", new { Id = id });
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, propertySql);
 

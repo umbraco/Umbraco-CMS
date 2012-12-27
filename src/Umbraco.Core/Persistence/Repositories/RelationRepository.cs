@@ -100,7 +100,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetBaseWhereClause()
         {
-            return "[umbracoRelation].[id] = @Id";
+            return "umbracoRelation.id = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

@@ -95,7 +95,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             {
                 string columns = string.IsNullOrEmpty(columnDefinition.PrimaryKeyColumns)
                                  ? GetQuotedColumnName(columnDefinition.Name)
-                                 : columnDefinition.PrimaryKeyColumns;
+                                 : string.Join(", ", columnDefinition.PrimaryKeyColumns
+                                                                     .Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                                                                     .Select(GetQuotedColumnName));
 
                 primaryKey = string.Format(", \nPRIMARY KEY {0} ({1})", columnDefinition.IsIndexed ? "CLUSTERED" : "NONCLUSTERED", columns);
             }

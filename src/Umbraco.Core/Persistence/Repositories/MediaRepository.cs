@@ -97,15 +97,15 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*");
             sql.From("cmsContentVersion");
-            sql.InnerJoin("cmsContent ON ([cmsContentVersion].[ContentId] = [cmsContent].[nodeId])");
-            sql.InnerJoin("umbracoNode ON ([cmsContent].[nodeId] = [umbracoNode].[id])");
-            sql.Where("[umbracoNode].[nodeObjectType] = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
+            sql.InnerJoin("cmsContent ON (cmsContentVersion.ContentId = cmsContent.nodeId)");
+            sql.InnerJoin("umbracoNode ON (cmsContent.nodeId = umbracoNode.id)");
+            sql.Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
             return sql;
         }
 
         protected override string GetBaseWhereClause()
         {
-            return "[umbracoNode].[id] = @Id";
+            return "umbracoNode.id = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -294,9 +294,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var propertySql = new Sql();
             propertySql.Select("*");
             propertySql.From("cmsPropertyData");
-            propertySql.InnerJoin("cmsPropertyType ON ([cmsPropertyData].[propertytypeid] = [cmsPropertyType].[id])");
-            propertySql.Where("[cmsPropertyData].[contentNodeId] = @Id", new { Id = id });
-            propertySql.Where("[cmsPropertyData].[versionId] = @VersionId", new { VersionId = versionId });
+            propertySql.InnerJoin("cmsPropertyType ON (cmsPropertyData.propertytypeid = cmsPropertyType.id)");
+            propertySql.Where("cmsPropertyData.contentNodeId = @Id", new { Id = id });
+            propertySql.Where("cmsPropertyData.versionId = @VersionId", new { VersionId = versionId });
 
             var propertyDataDtos = Database.Fetch<PropertyDataDto, PropertyTypeDto>(propertySql);
             var propertyFactory = new PropertyFactory(contentType, versionId, id);

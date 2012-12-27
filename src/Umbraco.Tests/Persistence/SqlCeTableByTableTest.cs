@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Persistence
                 //assign the service context
                 new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
 
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntaxProvider.Instance;
+            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             _database = new Database("Datasource=|DataDirectory|test.sdf",
                                      "System.Data.SqlServerCe.4.0");
