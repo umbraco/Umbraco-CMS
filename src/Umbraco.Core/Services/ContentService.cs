@@ -976,9 +976,13 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User copying the Content</param>
         /// <returns>The newly created <see cref="IContent"/> object</returns>
         public IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = -1)
-		{
+        {
 			var copy = ((Content)content).Clone();
 			copy.ParentId = parentId;
+
+            // A copy should never be set to published
+            // automatically even if the original was
+            this.UnPublish(copy);
 
 			if (Copying.IsRaisedEventCancelled(new CopyEventArgs<IContent>(content, copy, parentId), this))
 				return null;
@@ -987,7 +991,7 @@ namespace Umbraco.Core.Services
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
 				SetWriter(content, userId);
-
+			    
 				repository.AddOrUpdate(copy);
 				uow.Commit();
 

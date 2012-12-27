@@ -67,6 +67,7 @@ namespace umbraco.ActionHandlers
 					LogHelper.Debug<umbEnsureUniqueName>("Title changed from '" + documentObject.Text + "' to '" + currentName + "' for document  id" + documentObject.Id);
                     
                     documentObject.Text = currentName;
+                    documentObject.Save();
 
                     return true;
                 }
