@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Represents the contnet type that a <see cref="Content"/> object is based on
+    /// Represents the content type that a <see cref="Content"/> object is based on
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
