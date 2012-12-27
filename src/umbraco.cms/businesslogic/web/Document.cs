@@ -980,6 +980,8 @@ namespace umbraco.cms.businesslogic.web
                 
                 // Have to run the ActionNew handler to do umbEnsureUniqueName (for example)
                 BusinessLogic.Actions.Action.RunActionHandlers(newDoc, ActionNew.Instance);
+                // Then save to preserve any changes made by action handlers
+                newDoc.Save();
 
                 e.NewDocument = newDoc;
                 FireAfterCopy(e);
