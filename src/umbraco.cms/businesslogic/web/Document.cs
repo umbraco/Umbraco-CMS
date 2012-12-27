@@ -976,6 +976,9 @@ namespace umbraco.cms.businesslogic.web
                 // Make the new document
                 var content = ApplicationContext.Current.Services.ContentService.Copy(Content, CopyTo, RelateToOrignal, u.Id);
                 newDoc = new Document(content);
+                
+                // Have to run the ActionNew handler to do umbEnsureUniqueName (for example)
+                BusinessLogic.Actions.Action.RunActionHandlers(newDoc, ActionNew.Instance);
 
                 e.NewDocument = newDoc;
                 FireAfterCopy(e);

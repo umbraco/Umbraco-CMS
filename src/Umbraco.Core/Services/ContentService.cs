@@ -979,7 +979,6 @@ namespace Umbraco.Core.Services
 		{
 			var copy = ((Content)content).Clone();
 			copy.ParentId = parentId;
-			copy.Name = copy.Name + " (1)";
 
 			if (Copying.IsRaisedEventCancelled(new CopyEventArgs<IContent>(content, copy, parentId), this))
 				return null;
