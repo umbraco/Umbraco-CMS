@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class Member2MemberGroupDto
     {
         [Column("Member")]
-        [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsMember2MemberGroup", OnColumns = "[Member], [MemberGroup]")]
+        [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsMember2MemberGroup", OnColumns = "Member, MemberGroup")]
         [ForeignKey(typeof(MemberDto))]
         public int Member { get; set; }
 

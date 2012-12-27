@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Persistence
 
             SyntaxConfig.SqlSyntaxProvider = MySqlSyntaxProvider.Instance;
 
-            _database = new Database("Server = 192.168.1.108; Database = testDb; Uid = umbraco; Pwd = umbraco",
+            _database = new Database("Server = 169.254.120.3; Database = testdb; Uid = umbraco; Pwd = umbraco",
                                      "MySql.Data.MySqlClient");
         }
 

@@ -161,6 +161,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return true;
         }
 
+        public virtual bool SupportsIdentityInsert()
+        {
+            return true;
+        }
+
         public virtual string Format(TableDefinition table)
         {
             var statement = string.Format(CreateTable, GetQuotedTableName(table.Name), Format(table.Columns));

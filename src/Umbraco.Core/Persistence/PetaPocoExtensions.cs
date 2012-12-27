@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence
                 db.DropTable(tableName);
             }
 
-            if (!tableExist)
+            if (tableExist == false)
             {
                 using (var transaction = db.GetTransaction())
                 {
@@ -64,14 +64,14 @@ namespace Umbraco.Core.Persistence
                         var e = new TableCreationEventArgs();
 
                         //Turn on identity insert if db provider is not mysql
-						if (ApplicationContext.Current.DatabaseContext.ProviderName.Contains("MySql") == false && tableDefinition.Columns.Any(x => x.IsIdentity))
+                        if (SyntaxConfig.SqlSyntaxProvider.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
                             db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName))));
                         
                         //Call the NewTable-event to trigger the insert of base/default data
                         NewTable(tableName, db, e);
 
                         //Turn off identity insert if db provider is not mysql
-                        if (ApplicationContext.Current.DatabaseContext.ProviderName.Contains("MySql") == false && tableDefinition.Columns.Any(x => x.IsIdentity))
+                        if (SyntaxConfig.SqlSyntaxProvider.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
                             db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName))));
                     }
 
@@ -88,16 +88,6 @@ namespace Umbraco.Core.Persistence
                         int createdIndex = db.Execute(new Sql(sql));
                         LogHelper.Info<Database>(string.Format("Create Index sql {0}:\n {1}", createdIndex, sql));
                     }
-
-                    //Specific to Sql Ce - look for changes to Identity Seed
-                    //if (ApplicationContext.Current.DatabaseContext.ProviderName.Contains("SqlServerCe"))
-                    //{
-                    //    var seedSql = SyntaxConfig.SqlSyntaxProvider.ToAlterIdentitySeedStatements(tableDefinition);
-                    //    foreach (var sql in seedSql)
-                    //    {
-                    //        int createdSeed = db.Execute(new Sql(sql));
-                    //    }
-                    //}
 
                     transaction.Complete();
                 }
@@ -142,6 +132,11 @@ namespace Umbraco.Core.Persistence
             creation.InitializeDatabaseSchema();
 
             NewTable -= PetaPocoExtensions_NewTable;
+        }
+
+        public static DatabaseProviders GetDatabaseProvider(this Database db)
+        {
+            return ApplicationContext.Current.DatabaseContext.DatabaseProvider;
         }
 
         private static void PetaPocoExtensions_NewTable(string tableName, Database db, TableCreationEventArgs e)

@@ -253,11 +253,14 @@
     <Compile Include="Persistence\Mappers\UserMapper.cs" />
     <Compile Include="Persistence\Mappers\UserTypeMapper.cs" />
     <Compile Include="Persistence\Migrations\IMigration.cs" />
+    <Compile Include="Persistence\Migrations\IMigrationContext.cs" />
+    <Compile Include="Persistence\Migrations\IMigrationExpression.cs" />
     <Compile Include="Persistence\Migrations\Initial\BaseDataCreation.cs" />
     <Compile Include="Persistence\Migrations\Initial\DatabaseSchemaCreation.cs" />
     <Compile Include="Persistence\Migrations\MigrationAttribute.cs" />
     <Compile Include="Persistence\Migrations\MigrationBase.cs" />
     <Compile Include="Persistence\Migrations\MigrationContext.cs" />
+    <Compile Include="Persistence\Migrations\MigrationExpressionBase.cs" />
     <Compile Include="Persistence\Migrations\MigrationRunner.cs" />
     <Compile Include="Persistence\Migrations\PluginManagerExtension.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Alter\AlterSyntaxBuilder.cs" />
@@ -341,6 +344,8 @@
     <Compile Include="Persistence\Migrations\Syntax\Expressions\CreateIndexExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\IColumnOptionSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\IColumnTypeSyntax.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\IfDatabase\IfDatabaseBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\IfDatabase\IIfDatabaseBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\IFluentSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\IForeignKeyCascadeSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Insert\Expressions\InsertDataExpression.cs" />

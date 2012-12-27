@@ -309,7 +309,7 @@ namespace Umbraco.Core
                 {
                     var configuredVersion = new Version(GlobalSettings.ConfigurationStatus);
                     var targetVersion = UmbracoVersion.Current;
-                    var runner = new MigrationRunner(configuredVersion, targetVersion);
+                    var runner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
                     var upgraded = runner.Execute(database, true);
                 }
                 

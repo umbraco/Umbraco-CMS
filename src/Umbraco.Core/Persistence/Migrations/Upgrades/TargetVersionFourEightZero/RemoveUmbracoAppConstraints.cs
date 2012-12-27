@@ -1,15 +1,16 @@
 ﻿using System.Data;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourEightZero
 {
-    [MigrationAttribute("4.8.0", 0)]
+    [MigrationAttribute("4.8.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class RemoveUmbracoAppConstraints : MigrationBase
     {
         public override void Up()
         {
-            Delete.ForeignKey("FK_umbracoUser2app_umbracoApp").OnTable("umbracoUser2app");
+            Delete.ForeignKey().FromTable("umbracoUser2app").ForeignColumn("app").ToTable("umbracoApp").PrimaryColumn("appAlias");
 
-            Delete.ForeignKey("FK_umbracoAppTree_umbracoApp").OnTable("umbracoAppTree");
+            Delete.ForeignKey().FromTable("umbracoAppTree").ForeignColumn("appAlias").ToTable("umbracoApp").PrimaryColumn("appAlias");
         }
 
         public override void Down()

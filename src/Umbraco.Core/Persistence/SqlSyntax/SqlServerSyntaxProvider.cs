@@ -97,24 +97,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public override string DeleteDefaultConstraint
         {
-            get
-            {
-                return "DECLARE @default sysname, @sql nvarchar(max);\r\n\r\n" +
-                    "-- get name of default constraint\r\n" +
-                    "SELECT @default = name\r\n" +
-                    "FROM sys.default_constraints\r\n" +
-                    "WHERE parent_object_id = object_id('{0}')\r\n" + "" +
-                    "AND type = 'D'\r\n" + "" +
-                    "AND parent_column_id = (\r\n" + "" +
-                    "SELECT column_id\r\n" +
-                    "FROM sys.columns\r\n" +
-                    "WHERE object_id = object_id('{0}')\r\n" +
-                    "AND name = '{1}'\r\n" +
-                    ");\r\n\r\n" +
-                    "-- create alter table command to drop contraint as string and run it\r\n" +
-                    "SET @sql = N'ALTER TABLE {0} DROP CONSTRAINT ' + @default;\r\n" +
-                    "EXEC sp_executesql @sql;";
-            }
+            get { return "ALTER TABLE [{0}] DROP CONSTRAINT [DF_{0}_{1}]"; }
         }
 
         public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }

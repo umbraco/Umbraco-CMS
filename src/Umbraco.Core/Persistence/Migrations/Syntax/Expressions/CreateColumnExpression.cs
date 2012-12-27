@@ -3,9 +3,15 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
 {
-    public class CreateColumnExpression : IMigrationExpression
+    public class CreateColumnExpression : MigrationExpressionBase
     {
         public CreateColumnExpression()
+        {
+            Column = new ColumnDefinition { ModificationType = ModificationType.Create };
+        }
+
+        public CreateColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders)
+            : base(current, databaseProviders)
         {
             Column = new ColumnDefinition { ModificationType = ModificationType.Create };
         }
@@ -16,11 +22,14 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
 
         public override string ToString()
         {
+            if (IsExpressionSupported() == false)
+                return string.Empty;
+
             if (string.IsNullOrEmpty(Column.TableName))
                 Column.TableName = TableName;
 
             return string.Format(SyntaxConfig.SqlSyntaxProvider.AddColumn,
-                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(TableName),
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(Column.TableName),
                                  SyntaxConfig.SqlSyntaxProvider.Format(Column));
         }
     }

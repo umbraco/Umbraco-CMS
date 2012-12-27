@@ -3,9 +3,14 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 {
-    public class AlterColumnExpression : IMigrationExpression
+    public class AlterColumnExpression : MigrationExpressionBase
     {
         public AlterColumnExpression()
+        {
+            Column = new ColumnDefinition() { ModificationType = ModificationType.Alter };
+        }
+
+        public AlterColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
         {
             Column = new ColumnDefinition() { ModificationType = ModificationType.Alter };
         }

@@ -3,8 +3,16 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Update.Expressions
 {
-    public class UpdateDataExpression : IMigrationExpression
+    public class UpdateDataExpression : MigrationExpressionBase
     {
+        public UpdateDataExpression()
+        {
+        }
+
+        public UpdateDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
+        {
+        }
+
         public string SchemaName { get; set; }
         public string TableName { get; set; }
 

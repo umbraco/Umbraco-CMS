@@ -159,8 +159,8 @@
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="ContentStores\PublishMediaStoreTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
+    <Compile Include="Migrations\Upgrades\BaseUpgradeTest.cs" />
     <Compile Include="Migrations\FindingMigrationsTest.cs" />
-    <Compile Include="Migrations\SqlCeUpgradeTest.cs" />
     <Compile Include="Migrations\SqlScripts\SqlResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -171,6 +171,9 @@
     <Compile Include="Migrations\Stubs\Dummy.cs" />
     <Compile Include="Migrations\Stubs\FourNineMigration.cs" />
     <Compile Include="Migrations\TargetVersionSixthMigrationsTest.cs" />
+    <Compile Include="Migrations\Upgrades\MySqlUpgradeTest.cs" />
+    <Compile Include="Migrations\Upgrades\SqlCeUpgradeTest.cs" />
+    <Compile Include="Migrations\Upgrades\SqlServerUpgradeTest.cs" />
     <Compile Include="Persistence\Querying\ContentRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\Querying\ContentTypeRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\SyntaxProvider\SqlSyntaxProviderTests.cs" />

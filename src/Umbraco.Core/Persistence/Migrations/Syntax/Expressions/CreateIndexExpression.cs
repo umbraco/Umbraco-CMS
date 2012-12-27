@@ -3,9 +3,14 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
 {
-    public class CreateIndexExpression : IMigrationExpression
+    public class CreateIndexExpression : MigrationExpressionBase
     {
         public CreateIndexExpression()
+        {
+            Index = new IndexDefinition();
+        }
+
+        public CreateIndexExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
         {
             Index = new IndexDefinition();
         }

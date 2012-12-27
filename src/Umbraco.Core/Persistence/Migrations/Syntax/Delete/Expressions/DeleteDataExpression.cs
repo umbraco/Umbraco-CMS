@@ -5,9 +5,18 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
-    public class DeleteDataExpression : IMigrationExpression
+    public class DeleteDataExpression : MigrationExpressionBase
     {
         private readonly List<DeletionDataDefinition> _rows = new List<DeletionDataDefinition>();
+
+        public DeleteDataExpression()
+        {
+        }
+
+        public DeleteDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
+        {
+        }
+
         public virtual string SchemaName { get; set; }
         public string TableName { get; set; }
         public virtual bool IsAllRows { get; set; }

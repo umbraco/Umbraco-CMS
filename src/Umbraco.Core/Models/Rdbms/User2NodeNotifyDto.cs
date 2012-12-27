@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class User2NodeNotifyDto
     {
         [Column("userId")]
-        [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUser2NodeNotify", OnColumns = "[userId], [nodeId], [action]")]
+        [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUser2NodeNotify", OnColumns = "userId, nodeId, action")]
         [ForeignKey(typeof(UserDto))]
         public int UserId { get; set; }
 

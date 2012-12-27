@@ -2,8 +2,16 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 {
-    public class AlterDefaultConstraintExpression : IMigrationExpression
+    public class AlterDefaultConstraintExpression : MigrationExpressionBase
     {
+        public AlterDefaultConstraintExpression()
+        {
+        }
+
+        public AlterDefaultConstraintExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
+        {
+        }
+
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
         public virtual string ColumnName { get; set; }

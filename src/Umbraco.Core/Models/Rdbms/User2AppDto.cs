@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class User2AppDto
     {
         [Column("user")]
-        [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_user2app", OnColumns = "[user], [app]")]
+        [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_user2app", OnColumns = "user, app")]
         [ForeignKey(typeof(UserDto))]
         public int UserId { get; set; }
 

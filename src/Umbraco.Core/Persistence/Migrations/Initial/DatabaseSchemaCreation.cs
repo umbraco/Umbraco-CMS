@@ -72,8 +72,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 _database.CreateTable<ContentTypeDto>();
                 _database.CreateTable<DocumentTypeDto>();
 
-                _database.CreateTable<AppDto>();
-                _database.CreateTable<AppTreeDto>();
+                //_database.CreateTable<AppDto>();
+                //_database.CreateTable<AppTreeDto>();
 
                 _database.CreateTable<DataTypeDto>();
                 _database.CreateTable<DataTypePreValueDto>();

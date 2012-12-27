@@ -2,7 +2,7 @@
 
 namespace Umbraco.Tests.Migrations.Stubs
 {
-    [MigrationAttribute("6.0.0", 0)]
+    [MigrationAttribute("6.0.0", 0, "Test")]
     public class AlterUserTableMigrationStub : MigrationBase
     {
         public override void Up()

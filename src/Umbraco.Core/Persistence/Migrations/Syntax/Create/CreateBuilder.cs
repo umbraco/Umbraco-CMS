@@ -12,10 +12,12 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
     public class CreateBuilder : ICreateBuilder
     {
         private readonly IMigrationContext _context;
+        private readonly DatabaseProviders[] _databaseProviders;
 
-        public CreateBuilder(IMigrationContext context)
+        public CreateBuilder(IMigrationContext context, params DatabaseProviders[] databaseProviders)
         {
             _context = context;
+            _databaseProviders = databaseProviders;
         }
 
         public ICreateTableWithColumnSyntax Table(string tableName)
@@ -27,21 +29,27 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
 
         public ICreateColumnOnTableSyntax Column(string columnName)
         {
-            var expression = new CreateColumnExpression { Column = { Name = columnName } };
+            var expression = _databaseProviders == null 
+                ? new CreateColumnExpression { Column = { Name = columnName } }
+                : new CreateColumnExpression(_context.CurrentDatabaseProvider, _databaseProviders) { Column = { Name = columnName } };
             _context.Expressions.Add(expression);
             return new CreateColumnBuilder(expression, _context);
         }
 
         public ICreateForeignKeyFromTableSyntax ForeignKey()
         {
-            var expression = new CreateForeignKeyExpression();
+            var expression = _databaseProviders == null 
+                ? new CreateForeignKeyExpression()
+                : new CreateForeignKeyExpression(_context.CurrentDatabaseProvider, _databaseProviders);
             _context.Expressions.Add(expression);
             return new CreateForeignKeyBuilder(expression);
         }
 
         public ICreateForeignKeyFromTableSyntax ForeignKey(string foreignKeyName)
         {
-            var expression = new CreateForeignKeyExpression { ForeignKey = { Name = foreignKeyName } };
+            var expression = _databaseProviders == null 
+                ? new CreateForeignKeyExpression { ForeignKey = { Name = foreignKeyName } }
+                : new CreateForeignKeyExpression(_context.CurrentDatabaseProvider, _databaseProviders) { ForeignKey = { Name = foreignKeyName } };
             _context.Expressions.Add(expression);
             return new CreateForeignKeyBuilder(expression);
         }

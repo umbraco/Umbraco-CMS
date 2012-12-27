@@ -29,13 +29,35 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             AutoIncrementDefinition = "AUTO_INCREMENT";
             IntColumnDefinition = "int(11)";
             BoolColumnDefinition = "tinyint(1)";
+            DateTimeColumnDefinition = "TIMESTAMP";
             TimeColumnDefinition = "time";
             DecimalColumnDefinition = "decimal(38,6)";
-            GuidColumnDefinition = "char(32)";
+            GuidColumnDefinition = "char(36)";
             
             InitColumnTypeMap();
 
-            DefaultValueFormat = " DEFAULT '{0}'";
+            DefaultValueFormat = "DEFAULT '{0}'";
+        }
+
+        public override bool DoesTableExist(Database db, string tableName)
+        {
+            db.OpenSharedConnection();
+            var result =
+                db.ExecuteScalar<long>("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES " +
+                "WHERE TABLE_NAME = @TableName AND " +
+                "TABLE_SCHEMA = @TableSchema", new { TableName = tableName, TableSchema = db.Connection.Database });
+
+            return result > 0;
+        }
+
+        public override bool SupportsClustered()
+        {
+            return true;
+        }
+
+        public override bool SupportsIdentityInsert()
+        {
+            return false;
         }
 
         public override string GetQuotedTableName(string tableName)
@@ -65,6 +87,24 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return "NVARCHAR";
         }
 
+        public override string Format(TableDefinition table)
+        {
+            string primaryKey = string.Empty;
+            var columnDefinition = table.Columns.FirstOrDefault(x => x.IsPrimaryKey);
+            if (columnDefinition != null && columnDefinition.PrimaryKeyColumns.Contains(",") == false)
+            {
+                string columns = string.IsNullOrEmpty(columnDefinition.PrimaryKeyColumns)
+                                 ? GetQuotedColumnName(columnDefinition.Name)
+                                 : columnDefinition.PrimaryKeyColumns;
+
+                primaryKey = string.Format(", \nPRIMARY KEY {0} ({1})", columnDefinition.IsIndexed ? "CLUSTERED" : "NONCLUSTERED", columns);
+            }
+
+            var statement = string.Format(CreateTable, GetQuotedTableName(table.Name), Format(table.Columns), primaryKey);
+
+            return statement;
+        }
+
         public override string Format(IndexDefinition index)
         {
             string name = string.IsNullOrEmpty(index.Name)
@@ -81,20 +121,25 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                                  columns);
         }
 
-        public override bool DoesTableExist(Database db, string tableName)
+        public override string Format(ForeignKeyDefinition foreignKey)
         {
-            db.OpenSharedConnection();
-            var result =
-                db.ExecuteScalar<long>("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES " +
-                "WHERE TABLE_NAME = @TableName AND " +
-                "TABLE_SCHEMA = @TableSchema", new { TableName = tableName, TableSchema = db.Connection.Database });
-
-            return result > 0;
+            return string.Format(CreateForeignKeyConstraint,
+                                 GetQuotedTableName(foreignKey.ForeignTable),
+                                 GetQuotedColumnName(foreignKey.ForeignColumns.First()),
+                                 GetQuotedTableName(foreignKey.PrimaryTable),
+                                 GetQuotedColumnName(foreignKey.PrimaryColumns.First()),
+                                 FormatCascade("DELETE", foreignKey.OnDelete),
+                                 FormatCascade("UPDATE", foreignKey.OnUpdate));
         }
 
-        public override bool SupportsClustered()
+        public override string FormatPrimaryKey(TableDefinition table)
         {
-            return false;
+            return string.Empty;
+        }
+
+        protected override string FormatConstraint(ColumnDefinition column)
+        {
+            return string.Empty;
         }
 
         protected override string FormatIdentity(ColumnDefinition column)
@@ -125,9 +170,6 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         protected override string FormatPrimaryKey(ColumnDefinition column)
         {
-            if(column.IsPrimaryKey)
-                return "PRIMARY KEY";
-
             return string.Empty;
         }
 
@@ -158,12 +200,17 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public override string AlterColumn { get { return "ALTER TABLE {0} MODIFY COLUMN {1}"; } }
 
+        //CREATE TABLE {0} ({1}) ENGINE = INNODB versus CREATE TABLE {0} ({1}) ENGINE = MYISAM ?
+        public override string CreateTable { get { return "CREATE TABLE {0} ({1}{2})"; } }
+
+        public override string CreateIndex { get { return "CREATE INDEX {0} ON {1} ({2})"; } }
+
+        public override string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD FOREIGN KEY ({1}) REFERENCES {2} ({3}){4}{5}"; } }
+
         public override string DeleteConstraint { get { return "ALTER TABLE {0} DROP {1}{2}"; } }
 
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}"; } }
 
-        public override string CreateTable { get { return "CREATE TABLE {0} ({1}) ENGINE = INNODB"; } }
-
-        public override string CreateIndex { get { return "CREATE INDEX {0} ON {1} ({2})"; } }
+        public override string RenameColumn { get { return "ALTER TABLE {0} CHANGE {1} {2}"; } }
     }
 }

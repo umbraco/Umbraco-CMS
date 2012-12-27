@@ -1,13 +1,15 @@
-﻿namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixth
+﻿using Umbraco.Core.Configuration;
+
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixth
 {
-    [MigrationAttribute("6.0.0", 6)]
+    [MigrationAttribute("6.0.0", 6, GlobalSettings.UmbracoMigrationName)]
     public class RemoveMasterContentTypeColumn : MigrationBase
     {
         public override void Up()
         {
             //NOTE Don't think we can remove this column yet as it seems to be used by some starterkits
-            //Delete.UniqueConstraint("DF_cmsContentType_masterContentType").FromTable("cmsContentType");
-            Delete.DefaultConstraint().OnTable("cmsContentType").OnColumn("masterContentType");
+            IfDatabase(DatabaseProviders.SqlAzure, DatabaseProviders.SqlServer, DatabaseProviders.SqlServerCE)
+                .Delete.DefaultConstraint().OnTable("cmsContentType").OnColumn("masterContentType");
 
             Delete.Column("masterContentType").FromTable("cmsContentType");
         }

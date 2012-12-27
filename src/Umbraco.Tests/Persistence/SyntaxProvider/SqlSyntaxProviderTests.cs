@@ -41,6 +41,8 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
 
         [TearDown]
         public void TearDown()
-        {}
+        {
+            SyntaxConfig.SqlSyntaxProvider = null;
+        }
     }
 }

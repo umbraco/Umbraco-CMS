@@ -4,9 +4,15 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
-    public class DeleteForeignKeyExpression : IMigrationExpression
+    public class DeleteForeignKeyExpression : MigrationExpressionBase
     {
         public DeleteForeignKeyExpression()
+        {
+            ForeignKey = new ForeignKeyDefinition();
+        }
+
+        public DeleteForeignKeyExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders)
+            : base(current, databaseProviders)
         {
             ForeignKey = new ForeignKeyDefinition();
         }
@@ -15,12 +21,32 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 
         public override string ToString()
         {
+            if (IsExpressionSupported() == false)
+                return string.Empty;
+
             if (ForeignKey.ForeignTable == null)
                 throw new ArgumentNullException("Table name not specified, ensure you have appended the OnTable extension. Format should be Delete.ForeignKey(KeyName).OnTable(TableName)");
 
+            if(CurrentDatabaseProvider == DatabaseProviders.MySql)
+            {
+                //MySql naming "convention" for foreignkeys, which aren't explicitly named
+                if (string.IsNullOrEmpty(ForeignKey.Name))
+                    ForeignKey.Name = string.Format("{0}_ibfk_1", ForeignKey.ForeignTable.ToLower());
+
+                return string.Format(SyntaxConfig.SqlSyntaxProvider.DeleteConstraint,
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(ForeignKey.ForeignTable),
+                                 "FOREIGN KEY ",
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedName(ForeignKey.Name));
+            }
+
+            if (string.IsNullOrEmpty(ForeignKey.Name))
+            {
+                ForeignKey.Name = string.Format("FK_{0}_{1}", ForeignKey.ForeignTable, ForeignKey.PrimaryTable);
+            }
+
             return string.Format(SyntaxConfig.SqlSyntaxProvider.DeleteConstraint,
                                  SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(ForeignKey.ForeignTable),
-                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(ForeignKey.Name));
+                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedName(ForeignKey.Name));
         }
     }
 }

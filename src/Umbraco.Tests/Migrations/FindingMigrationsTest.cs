@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.Migrations.Stubs;
@@ -60,7 +61,7 @@ namespace Umbraco.Tests.Migrations
 
             Assert.That(list.Count, Is.EqualTo(3));
 
-            var context = new MigrationContext();
+            var context = new MigrationContext(DatabaseProviders.SqlServerCE);
             foreach (MigrationBase migration in list)
             {
                 migration.GetUpExpressions(context);
