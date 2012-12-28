@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -76,12 +77,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public override string FormatColumnRename(string tableName, string oldName, string newName)
         {
-            var sb = new StringBuilder();
+            //NOTE Sql CE doesn't support renaming a column, so a new column needs to be created, then copy data and finally remove old column
+            //This assumes that the new column has been created, and that the old column will be deleted after this statement has run.
             //http://stackoverflow.com/questions/3967353/microsoft-sql-compact-edition-rename-column
-            //Create new column
-            sb.AppendFormat("UPDATE {0} SET {1} = {2}", tableName, newName, oldName);
-            //Delete old column
-            return sb.ToString();
+
+            return string.Format("UPDATE {0} SET {1} = {2}", tableName, newName, oldName);
         }
 
         public override string FormatTableRename(string oldName, string newName)
@@ -101,7 +101,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
             string columns = string.IsNullOrEmpty(columnDefinition.PrimaryKeyColumns)
                                  ? GetQuotedColumnName(columnDefinition.Name)
-                                 : columnDefinition.PrimaryKeyColumns;
+                                 : string.Join(", ", columnDefinition.PrimaryKeyColumns
+                                                                     .Split(new[]{',', ' '}, StringSplitOptions.RemoveEmptyEntries)
+                                                                     .Select(GetQuotedColumnName));
 
             return string.Format(CreateConstraint,
                                  GetQuotedTableName(table.Name),
@@ -153,7 +155,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         {
             get
             {
-                return "ALTER TABLE {0} ALTER COLUMN {1} DROP DEFAULT";
+                return "ALTER TABLE [{0}] ALTER COLUMN [{1}] DROP DEFAULT";
             }
         }
 

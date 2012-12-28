@@ -326,7 +326,9 @@
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Routing\LookupByPageIdQuery.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
-    <Compile Include="Strategies\EnsureAppsTreesUpdatedOnUpgrade.cs" />
+    <Compile Include="Strategies\UpdateCacheAfterPublish.cs" />
+    <Compile Include="Strategies\UpdateCacheAfterUnPublish.cs" />
+    <Compile Include="Strategies\EnsureAppsTreesUpdatedOnUpgrade.cs" />    
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
@@ -2182,7 +2184,9 @@
       <CachedSettingsPropName>umbraco_org_umbraco_update_CheckForUpgrade</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Strategies\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

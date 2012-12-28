@@ -13,11 +13,13 @@ namespace Umbraco.Core.Persistence.Migrations
     {
         private readonly Version _configuredVersion;
         private readonly Version _targetVersion;
+        private readonly string _productName;
 
-        public MigrationRunner(Version configuredVersion, Version targetVersion)
+        public MigrationRunner(Version configuredVersion, Version targetVersion, string productName)
         {
             _configuredVersion = configuredVersion;
             _targetVersion = targetVersion;
+            _productName = productName;
         }
 
         /// <summary>
@@ -25,8 +27,20 @@ namespace Umbraco.Core.Persistence.Migrations
         /// </summary>
         /// <param name="database">The PetaPoco Database, which the migrations will be run against</param>
         /// <param name="isUpgrade">Boolean indicating whether this is an upgrade or downgrade</param>
-        /// <returns>True if migrations were applied, otherwise False</returns>
-        public bool Execute(Database database, bool isUpgrade)
+        /// <returns><c>True</c> if migrations were applied, otherwise <c>False</c></returns>
+        public bool Execute(Database database, bool isUpgrade = true)
+        {
+            return Execute(database, database.GetDatabaseProvider(), isUpgrade);
+        }
+
+        /// <summary>
+        /// Executes the migrations against the database.
+        /// </summary>
+        /// <param name="database">The PetaPoco Database, which the migrations will be run against</param>
+        /// <param name="databaseProvider"></param>
+        /// <param name="isUpgrade">Boolean indicating whether this is an upgrade or downgrade</param>
+        /// <returns><c>True</c> if migrations were applied, otherwise <c>False</c></returns>
+        public bool Execute(Database database, DatabaseProviders databaseProvider, bool isUpgrade = true)
         {
             LogHelper.Info<MigrationRunner>("Initializing database migration");
 
@@ -36,7 +50,7 @@ namespace Umbraco.Core.Persistence.Migrations
                                  : OrderedDowngradeMigrations(foundMigrations);
 
             //Loop through migrations to generate sql
-            var context = new MigrationContext();
+            var context = new MigrationContext(databaseProvider);
             foreach (MigrationBase migration in migrations)
             {
                 if (isUpgrade)
@@ -52,11 +66,19 @@ namespace Umbraco.Core.Persistence.Migrations
             //Transactional execution of the sql that was generated from the found migrations
             using (Transaction transaction = database.GetTransaction())
             {
+                int i = 1;
                 foreach (var expression in context.Expressions)
                 {
-                    var sql = expression.ToString();
-                    LogHelper.Info<MigrationRunner>("Executing sql: " + sql);
+                    var sql = expression.Process(database);
+                    if (string.IsNullOrEmpty(sql))
+                    {
+                        i++;
+                        continue;
+                    }
+
+                    LogHelper.Info<MigrationRunner>("Executing sql statement " + i + ": " + sql);
                     database.Execute(sql);
+                    i++;
                 }
 
                 transaction.Complete();
@@ -72,7 +94,8 @@ namespace Umbraco.Core.Persistence.Migrations
                               where migrationAttribute != null
                               where
                                   migrationAttribute.TargetVersion > _configuredVersion &&
-                                  migrationAttribute.TargetVersion <= _targetVersion
+                                  migrationAttribute.TargetVersion <= _targetVersion &&
+                                  migrationAttribute.ProductName == _productName
                               orderby migrationAttribute.SortOrder ascending 
                               select migration);
             return migrations;
@@ -85,7 +108,8 @@ namespace Umbraco.Core.Persistence.Migrations
                               where migrationAttribute != null
                               where
                                   migrationAttribute.TargetVersion > _configuredVersion &&
-                                  migrationAttribute.TargetVersion <= _targetVersion
+                                  migrationAttribute.TargetVersion <= _targetVersion &&
+                                  migrationAttribute.ProductName == _productName
                               orderby migrationAttribute.SortOrder descending 
                               select migration);
             return migrations;

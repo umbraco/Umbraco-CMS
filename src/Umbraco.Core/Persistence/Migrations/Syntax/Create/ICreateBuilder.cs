@@ -22,5 +22,6 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
 
         ICreateConstraintOnTableSyntax UniqueConstraint();
         ICreateConstraintOnTableSyntax UniqueConstraint(string constraintName);
+        ICreateConstraintOnTableSyntax Constraint(string constraintName);
     }
 }

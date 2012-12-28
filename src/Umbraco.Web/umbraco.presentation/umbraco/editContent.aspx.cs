@@ -1,27 +1,13 @@
 using System;
-using System.Collections;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using System.Reflection;
+using Umbraco.Core.Persistence.Caching;
 using umbraco.BusinessLogic.Actions;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.helpers;
 using umbraco.IO;
-using umbraco.uicontrols;
 using umbraco.uicontrols.DatePicker;
 using umbraco.BusinessLogic;
-using umbraco.presentation.preview;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation;
-using umbraco.cms.businesslogic.skinning;
-using System.Collections.Generic;
 using System.Linq;
 using Image = System.Web.UI.WebControls.Image;
 
@@ -291,8 +277,14 @@ namespace umbraco.cms.presentation
                 }
             }
 
-
-
+            //The value of the properties has been set on IData through IDataEditor in the ContentControl
+            //so we need to 'retrieve' that value and set it on the property of the new IContent object.
+            //NOTE This is a workaround for the legacy approach to saving values through the DataType instead of the Property 
+            //- (The DataType shouldn't be responsible for saving the value - especically directly to the db).
+            foreach (var item in cControl.DataTypes)
+            {
+                _document.getProperty(item.Key).Value = item.Value.Data.Value;
+            }
 
             // Run Handler				
             BusinessLogic.Actions.Action.RunActionHandlers(_document, ActionUpdate.Instance);
@@ -320,7 +312,7 @@ namespace umbraco.cms.presentation
         {
             if (Page.IsValid)
             {
-                if (_document.Level == 1 || new cms.businesslogic.web.Document(_document.Parent.Id).PathPublished)
+                if (_document.Level == 1 || _document.PathPublished)
                 {
                     Trace.Warn("before d.publish");
 
@@ -328,7 +320,6 @@ namespace umbraco.cms.presentation
                     {
 
                         ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));
-                        library.UpdateDocumentCache(_document);
 
                         littPublishStatus.Text = ui.Text("content", "lastPublished", base.getUser()) + ": " + _document.VersionDate.ToString() + "<br/>";
 
@@ -336,6 +327,9 @@ namespace umbraco.cms.presentation
                             UnPublish.Visible = true;
 
                         _documentHasPublishedVersion = _document.HasPublishedVersion();
+
+                        foreach (var descendant in _document.GetDescendants().Cast<Document>().Where(descendant => descendant.HasPublishedVersion()))
+                            library.UpdateDocumentCache(descendant.Id);
                     }
                     else
                     {
@@ -388,7 +382,7 @@ namespace umbraco.cms.presentation
 
         void UpdateNiceUrls()
         {
-            if (!_documentHasPublishedVersion)
+            if (!_documentHasPublishedVersion || _document.Published == false)
             {
                 UpdateNiceUrlProperties("<i>" + ui.Text("content", "itemNotPublished", base.getUser()) + "</i>", null);
                 return;

@@ -22,5 +22,12 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="template">Default <see cref="ITemplate"/></param>
         void SetDefaultTemplate(ITemplate template);
+
+        /// <summary>
+        /// Removes a template from the list of allowed templates
+        /// </summary>
+        /// <param name="template"><see cref="ITemplate"/> to remove</param>
+        /// <returns>True if template was removed, otherwise False</returns>
+        bool RemoveTemplate(ITemplate template);
     }
 }

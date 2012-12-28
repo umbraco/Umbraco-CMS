@@ -5,22 +5,14 @@ namespace Umbraco.Core.Persistence.Migrations
 {
     internal class MigrationContext : IMigrationContext
     {
-        public MigrationContext()
+        public MigrationContext(DatabaseProviders databaseProvider)
         {
             Expressions = new Collection<IMigrationExpression>();
+            CurrentDatabaseProvider = databaseProvider;
         }
 
-        public virtual ICollection<IMigrationExpression> Expressions { get; set; }
-    }
+        public ICollection<IMigrationExpression> Expressions { get; set; }
 
-    public interface IMigrationContext
-    {
-        ICollection<IMigrationExpression> Expressions { get; set; }
+        public DatabaseProviders CurrentDatabaseProvider { get; private set; }
     }
-
-    /// <summary>
-    /// Marker interface for migration expressions
-    /// </summary>
-    public interface IMigrationExpression
-    {}
 }

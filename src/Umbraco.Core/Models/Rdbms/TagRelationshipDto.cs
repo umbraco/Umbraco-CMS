@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class TagRelationshipDto
     {
         [Column("nodeId")]
-        [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsTagRelationship", OnColumns = "[nodeId], [tagId]")]
+        [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsTagRelationship", OnColumns = "nodeId, tagId")]
         [ForeignKey(typeof(NodeDto))]
         public int NodeId { get; set; }
 

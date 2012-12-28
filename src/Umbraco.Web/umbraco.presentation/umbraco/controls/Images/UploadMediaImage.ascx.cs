@@ -1,19 +1,12 @@
 ﻿using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Linq;
 using System.Xml;
 using umbraco.BasePages;
-using umbraco.uicontrols;
+using umbraco.cms.businesslogic.datatype;
 using umbraco.interfaces;
-using umbraco.cms.businesslogic.media;
+using Media = umbraco.cms.businesslogic.media.Media;
 
 namespace umbraco.controls.Images
 {
@@ -23,7 +16,7 @@ namespace umbraco.controls.Images
     /// Includes ability to select where in the media you would like it to upload and also supports client
     /// callback methods once complete.
     /// </summary>
-    public partial class UploadMediaImage : System.Web.UI.UserControl
+    public partial class UploadMediaImage : UserControl
     {
 
         public UploadMediaImage()
@@ -42,7 +35,7 @@ namespace umbraco.controls.Images
         /// </summary>
         public string OnClientUpload { get; set; }
 
-        protected IDataType UploadField = new cms.businesslogic.datatype.controls.Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+        protected IDataType UploadField = DataTypeDefinition.GetByDataTypeId(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c")).DataType;
 
         protected override void OnInit(EventArgs e)
         {
@@ -66,39 +59,35 @@ namespace umbraco.controls.Images
 
         protected void SubmitButton_Click(object sender, EventArgs e)
         {
-            int parent = int.Parse(MediaPickerControl.Value);
-            if (BusinessLogic.User.GetCurrent().StartMediaId != -1 && parent == -1)
-                parent = BusinessLogic.User.GetCurrent().StartNodeId;
+            var media = Media.MakeNew(TextBoxTitle.Text, cms.businesslogic.media.MediaType.GetByAlias("image"), BasePage.Current.getUser(), int.Parse(MediaPickerControl.Value));
 
-            Media m = Media.MakeNew(TextBoxTitle.Text, cms.businesslogic.media.MediaType.GetByAlias("image"), BasePage.Current.getUser(), int.Parse(MediaPickerControl.Value));
-            var props = m.getProperties;
-            foreach (cms.businesslogic.property.Property p in props)
+            foreach (var property in media.GenericProperties)
             {
-                if (p.PropertyType.DataTypeDefinition.DataType.Id == UploadField.Id)
+                if (property.PropertyType.DataTypeDefinition.DataType.Id == UploadField.Id)
                 {
-                    UploadField.DataTypeDefinitionId = p.PropertyType.DataTypeDefinition.Id;
-                    UploadField.Data.PropertyId = p.Id;
+                    UploadField.DataTypeDefinitionId = property.PropertyType.DataTypeDefinition.Id;
+                    UploadField.Data.PropertyId = property.Id;
                 }
             }
             UploadField.DataEditor.Save();
 
             // Generate xml on image
-            m.XmlGenerate(new XmlDocument());
+            media.XmlGenerate(new XmlDocument());
             pane_upload.Visible = false;
             
             //this seems real ugly since we apparently already have the properties above (props)... but this data layer is insane and undecipherable:)
-            string mainImage = m.getProperty("umbracoFile").Value.ToString();
+            string mainImage = media.getProperty("umbracoFile").Value.ToString();
             string extension = mainImage.Substring(mainImage.LastIndexOf(".") + 1, mainImage.Length - mainImage.LastIndexOf(".") - 1);            
             var thumbnail = mainImage.Remove(mainImage.Length - extension.Length - 1, extension.Length + 1) + "_thumb.jpg";
-            string width = m.getProperty("umbracoWidth").Value.ToString();
-            string height = m.getProperty("umbracoHeight").Value.ToString();
-            int id = m.Id;
+            string width = media.getProperty("umbracoWidth").Value.ToString();
+            string height = media.getProperty("umbracoHeight").Value.ToString();
+            int id = media.Id;
 
             feedback.Style.Add("margin-top", "8px");
             feedback.type = uicontrols.Feedback.feedbacktype.success;
             if (mainImage.StartsWith("~")) mainImage = mainImage.Substring(1);
             if (thumbnail.StartsWith("~")) thumbnail = thumbnail.Substring(1);
-            feedback.Text += "<div style=\"text-align: center\"> <a target=\"_blank\" href='" + umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/.." + mainImage + "'><img src='" + umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/.." + thumbnail + "' style='border: none;'/><br/><br/>";
+            feedback.Text += "<div style=\"text-align: center\"> <a target=\"_blank\" href='" + mainImage + "'><img src='" + thumbnail + "' style='border: none;'/><br/><br/>";
             feedback.Text += ui.Text("thumbnailimageclickfororiginal") + "</a><br/><br/></div>";
 
             if (!string.IsNullOrEmpty(OnClientUpload))
@@ -106,7 +95,7 @@ namespace umbraco.controls.Images
                 feedback.Text += @"
                 <script type=""text/javascript"">
                 jQuery(document).ready(function() { 
-                " + OnClientUpload + @".call(this, {imagePath: '" + mainImage + @"', thumbnailPath: '" + thumbnail + @"', width: " + width + @", height: " + height + @", id: " + id.ToString() + @"});  
+                " + OnClientUpload + @".call(this, {imagePath: '" + mainImage + @"', thumbnailPath: '" + thumbnail + @"', width: " + width + @", height: " + height + @", id: " + id + @"});  
                 });
                 </script>";
             }

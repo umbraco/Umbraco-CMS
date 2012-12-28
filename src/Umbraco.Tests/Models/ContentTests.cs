@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Models
             // Act
             var model = new TestEditorModel
                             {
-                                TestDateTime = DateTime.UtcNow,
+                                TestDateTime = DateTime.Now,
                                 TestDouble = 1.2,
                                 TestInt = 2,
                                 TestReadOnly = "Read-only string",

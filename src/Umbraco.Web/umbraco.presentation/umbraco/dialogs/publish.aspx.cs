@@ -33,7 +33,7 @@ namespace umbraco.dialogs
             cms.businesslogic.web.Document d = new cms.businesslogic.web.Document(nodeId);
             pageName = d.Text;
 
-			if (d.Level > 1 && !(new cms.businesslogic.web.Document(d.ParentId).PathPublished))
+			if (d.Level > 1 && d.PathPublished == false)
 			{
 				TheForm.Visible = false;
 				theEnd.Visible = true;

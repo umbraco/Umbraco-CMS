@@ -1,8 +1,12 @@
 ﻿namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 {
-    public class AlterTableExpression : IMigrationExpression
+    public class AlterTableExpression : MigrationExpressionBase
     {
         public AlterTableExpression()
+        {
+        }
+
+        public AlterTableExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
         {
         }
 

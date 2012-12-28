@@ -5,9 +5,15 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
-    public class DeleteColumnExpression : IMigrationExpression
+    public class DeleteColumnExpression : MigrationExpressionBase
     {
         public DeleteColumnExpression()
+        {
+            ColumnNames = new List<string>();
+        }
+
+        public DeleteColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders)
+            : base(current, databaseProviders)
         {
             ColumnNames = new List<string>();
         }
@@ -18,6 +24,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 
         public override string ToString()
         {
+            if (IsExpressionSupported() == false)
+                return string.Empty;
+
             var sb = new StringBuilder();
             foreach (string columnName in ColumnNames)
             {

@@ -22,8 +22,6 @@ namespace umbraco.cms.businesslogic.propertytype
     {
         #region Declarations
 
-        private static string _connstring = GlobalSettings.DbDSN;
-
         private static readonly object propertyTypeCacheSyncLock = new object();
         private static readonly string UmbracoPropertyTypeCacheKey = "UmbracoPropertyTypeCache";
         private readonly int _contenttypeid;
@@ -112,6 +110,7 @@ namespace umbraco.cms.businesslogic.propertytype
                 InvalidateCache();
             }
         }
+
         public int PropertyTypeGroup
         {
             get { return _propertyTypeGroup; }

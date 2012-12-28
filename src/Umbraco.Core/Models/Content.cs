@@ -102,10 +102,10 @@ namespace Umbraco.Core.Models
                 if(Trashed)
                     return ContentStatus.Trashed;
 
-                if(ExpireDate.HasValue && DateTime.UtcNow > ExpireDate.Value)
+                if(ExpireDate.HasValue && ExpireDate.Value > DateTime.MinValue && DateTime.Now > ExpireDate.Value)
                     return ContentStatus.Expired;
 
-                if(ReleaseDate.HasValue && ReleaseDate.Value > DateTime.UtcNow)
+                if(ReleaseDate.HasValue && ReleaseDate.Value > DateTime.MinValue && ReleaseDate.Value > DateTime.Now)
                     return ContentStatus.AwaitingRelease;
 
                 if(Published)
@@ -156,12 +156,6 @@ namespace Umbraco.Core.Models
             get { return _releaseDate; }
             set
             {
-                if(value.HasValue && value.Value > DateTime.UtcNow && Published)
-                    _published = false;
-
-                if (value.HasValue && value.Value < DateTime.UtcNow && !Published)
-                    _published = true;
-
                 _releaseDate = value;
                 OnPropertyChanged(ReleaseDateSelector);
             }
@@ -176,9 +170,6 @@ namespace Umbraco.Core.Models
             get { return _expireDate; }
             set
             {
-                if(value.HasValue && DateTime.UtcNow > value.Value && Published)
-                    _published = false;
-
                 _expireDate = value;
                 OnPropertyChanged(ExpireDateSelector);
             }
@@ -311,10 +302,10 @@ namespace Umbraco.Core.Models
         public override bool IsPropertyDirty(string propertyName)
         {
             bool existsInEntity = base.IsPropertyDirty(propertyName);
+            if (existsInEntity)
+                return true;
 
-            bool anyDirtyProperties = Properties.Any(x => x.IsPropertyDirty(propertyName));
-
-            return existsInEntity || anyDirtyProperties;
+            return Properties.Any(x => x.IsPropertyDirty(propertyName));
         }
 
         /// <summary>

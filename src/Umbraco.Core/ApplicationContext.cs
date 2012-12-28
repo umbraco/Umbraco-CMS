@@ -4,7 +4,6 @@ using System.Web;
 using System.Web.Caching;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 
 

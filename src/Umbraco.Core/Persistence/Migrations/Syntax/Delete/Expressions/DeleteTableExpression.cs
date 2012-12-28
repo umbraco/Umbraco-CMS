@@ -2,8 +2,16 @@
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
-    public class DeleteTableExpression : IMigrationExpression
+    public class DeleteTableExpression : MigrationExpressionBase
     {
+        public DeleteTableExpression()
+        {
+        }
+
+        public DeleteTableExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
+        {
+        }
+
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
 

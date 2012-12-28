@@ -2,7 +2,7 @@
 
 namespace Umbraco.Tests.Migrations.Stubs
 {
-    [MigrationAttribute("6.0.0", 1)]
+    [MigrationAttribute("6.0.0", 1, "Test")]
     public class FourNineMigration : MigrationBase
     {
         public override void Up()
@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Migrations.Stubs
         }
     }
 
-    [MigrationAttribute("6.0.0", 2)]
+    [MigrationAttribute("6.0.0", 2, "Test")]
     public class FourTenMigration : MigrationBase
     {
         public override void Up()
@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Migrations.Stubs
         }
     }
 
-    [MigrationAttribute("4.11.0", 0)]
+    [MigrationAttribute("4.11.0", 0, "Test")]
     public class FourElevenMigration : MigrationBase
     {
         public override void Up()

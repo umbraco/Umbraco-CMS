@@ -32,8 +32,8 @@ namespace Umbraco.Core.Models
             _name = name;
             _alias = alias;
 
-            CreateDate = DateTime.UtcNow;
-            UpdateDate = DateTime.UtcNow;
+            CreateDate = DateTime.Now;
+            UpdateDate = DateTime.Now;
         }
 
         [DataMember]

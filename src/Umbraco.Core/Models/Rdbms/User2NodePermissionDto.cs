@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class User2NodePermissionDto
     {
         [Column("userId")]
-        [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUser2NodePermission", OnColumns = "[userId], [nodeId], [permission]")]
+        [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUser2NodePermission", OnColumns = "userId, nodeId, permission")]
         [ForeignKey(typeof(UserDto))]
         public int UserId { get; set; }
 

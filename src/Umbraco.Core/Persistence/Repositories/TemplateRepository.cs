@@ -132,14 +132,14 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*");
             sql.From("cmsTemplate");
-            sql.InnerJoin("umbracoNode").On("[cmsTemplate].[nodeId] = [umbracoNode].[id]");
-            sql.Where("[umbracoNode].[nodeObjectType] = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
+            sql.InnerJoin("umbracoNode").On("cmsTemplate.nodeId = umbracoNode.id");
+            sql.Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
             return sql;
         }
 
         protected override string GetBaseWhereClause()
         {
-            return "[umbracoNode].[id] = @Id";
+            return "umbracoNode.id = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -224,6 +224,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 {
                     _masterpagesFileSystem.AddFile(entity.Name, stream, true);
                 }
+            }
+
+            //Look up parent to get and set the correct Path if ParentId has changed
+            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            {
+                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = ((Template)entity).ParentId });
+                entity.Path = string.Concat(parent.Path, ",", entity.Id);
             }
 
             //Get TemplateDto from db to get the Primary key of the entity
@@ -317,7 +324,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public ITemplate Get(string alias)
         {
             var sql = GetBaseQuery(false);
-            sql.Where("[cmsTemplate].[alias] = @Alias", new { Alias = alias });
+            sql.Where("cmsTemplate.alias = @Alias", new { Alias = alias });
 
             var dto = Database.Fetch<TemplateDto, NodeDto>(sql).FirstOrDefault();
 

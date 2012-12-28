@@ -161,6 +161,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return true;
         }
 
+        public virtual bool SupportsIdentityInsert()
+        {
+            return true;
+        }
+
         public virtual string Format(TableDefinition table)
         {
             var statement = string.Format(CreateTable, GetQuotedTableName(table.Name), Format(table.Columns));
@@ -244,7 +249,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
             string columns = string.IsNullOrEmpty(columnDefinition.PrimaryKeyColumns)
                                  ? GetQuotedColumnName(columnDefinition.Name)
-                                 : columnDefinition.PrimaryKeyColumns;
+                                 : string.Join(", ", columnDefinition.PrimaryKeyColumns
+                                                                     .Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                                                                     .Select(GetQuotedColumnName));
 
             string primaryKeyPart = string.Concat("PRIMARY KEY", columnDefinition.IsIndexed ? " CLUSTERED" : " NONCLUSTERED");
 

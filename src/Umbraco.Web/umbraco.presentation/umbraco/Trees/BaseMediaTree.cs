@@ -137,7 +137,7 @@ function openMedia(id) {
 		/// <returns></returns>
         public virtual string GetLinkValue(Media dd, string nodeLink)
         {
-            var props = dd.getProperties;
+            var props = dd.GenericProperties;
 			foreach (Property p in props)
 			{				
 				Guid currId = p.PropertyType.DataTypeDefinition.DataType.Id;

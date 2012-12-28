@@ -11,10 +11,12 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete
     public class DeleteBuilder : IDeleteBuilder
     {
         private readonly IMigrationContext _context;
+        private readonly DatabaseProviders[] _databaseProviders;
 
-        public DeleteBuilder(IMigrationContext context)
+        public DeleteBuilder(IMigrationContext context, params DatabaseProviders[] databaseProviders)
         {
             _context = context;
+            _databaseProviders = databaseProviders;
         }
 
         public void Table(string tableName)
@@ -25,21 +27,27 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete
 
         public IDeleteColumnFromTableSyntax Column(string columnName)
         {
-            var expression = new DeleteColumnExpression { ColumnNames = { columnName } };
+            var expression = _databaseProviders == null 
+                ? new DeleteColumnExpression { ColumnNames = { columnName } }
+                : new DeleteColumnExpression(_context.CurrentDatabaseProvider, _databaseProviders) { ColumnNames = { columnName } };
             _context.Expressions.Add(expression);
             return new DeleteColumnBuilder(expression);
         }
 
         public IDeleteForeignKeyFromTableSyntax ForeignKey()
         {
-            var expression = new DeleteForeignKeyExpression();
+            var expression = _databaseProviders == null 
+                ? new DeleteForeignKeyExpression()
+                : new DeleteForeignKeyExpression(_context.CurrentDatabaseProvider, _databaseProviders);
             _context.Expressions.Add(expression);
             return new DeleteForeignKeyBuilder(expression);
         }
 
         public IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName)
         {
-            var expression = new DeleteForeignKeyExpression { ForeignKey = { Name = foreignKeyName } };
+            var expression = _databaseProviders == null 
+                ? new DeleteForeignKeyExpression { ForeignKey = { Name = foreignKeyName } }
+                : new DeleteForeignKeyExpression(_context.CurrentDatabaseProvider, _databaseProviders) { ForeignKey = { Name = foreignKeyName } };
             _context.Expressions.Add(expression);
             return new DeleteForeignKeyBuilder(expression);
         }
@@ -87,7 +95,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete
 
         public IDeleteDefaultConstraintOnTableSyntax DefaultConstraint()
         {
-            var expression = new DeleteDefaultConstraintExpression();
+            var expression = _databaseProviders == null 
+                ? new DeleteDefaultConstraintExpression()
+                : new DeleteDefaultConstraintExpression(_context.CurrentDatabaseProvider, _databaseProviders);
             _context.Expressions.Add(expression);
             return new DeleteDefaultConstraintBuilder(expression);
         }

@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Web;
 using System.Xml;
+using Umbraco.Core;
+using Umbraco.Core.Models.Rdbms;
 using umbraco.cms.businesslogic.cache;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -571,6 +573,55 @@ namespace umbraco.cms.businesslogic.member
 
             if (!e.Cancel)
             {
+                var db = ApplicationContext.Current.DatabaseContext.Database;
+                using (var transaction = db.GetTransaction())
+                {
+                    foreach (var property in GenericProperties)
+                    {
+                        var poco = new PropertyDataDto
+                                       {
+                                           Id = property.Id,
+                                           PropertyTypeId = property.PropertyType.Id,
+                                           NodeId = Id,
+                                           VersionId = property.VersionId
+                                       };
+                        if (property.Value != null)
+                        {
+                            string dbType = property.PropertyType.DataTypeDefinition.DbType;
+                            if (dbType.Equals("dataInt"))
+                            {
+                                int value = 0;
+                                if (int.TryParse(property.Value.ToString(), out value))
+                                {
+                                    poco.Integer = value;
+                                }
+                            }
+                            else if (dbType.Equals("dataDate"))
+                            {
+                                poco.Date = DateTime.Parse(property.Value.ToString());
+                            }
+                            else if (dbType.Equals("dataNvarchar"))
+                            {
+                                poco.VarChar = property.Value.ToString();
+                            }
+                            else
+                            {
+                                poco.Text = property.Value.ToString();
+                            }
+                        }
+                        bool isNew = db.IsNew(poco);
+                        if (isNew)
+                        {
+                            db.Insert(poco);
+                        }
+                        else
+                        {
+                            db.Update(poco);
+                        }
+                    }
+                    transaction.Complete();
+                }
+
                 // re-generate xml
                 XmlDocument xd = new XmlDocument();
                 XmlGenerate(xd);

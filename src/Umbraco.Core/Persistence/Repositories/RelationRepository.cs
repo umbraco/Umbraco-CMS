@@ -100,7 +100,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetBaseWhereClause()
         {
-            return "[umbracoRelation].[id] = @Id";
+            return "umbracoRelation.id = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -125,7 +125,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             entity.AddingEntity();
 
-            var factory = new RelationFactory(null);
+            var factory = new RelationFactory(entity.RelationType);
             var dto = factory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(dto));
@@ -138,7 +138,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             entity.UpdatingEntity();
 
-            var factory = new RelationFactory(null);
+            var factory = new RelationFactory(entity.RelationType);
             var dto = factory.BuildDto(entity);
             Database.Update(dto);
 

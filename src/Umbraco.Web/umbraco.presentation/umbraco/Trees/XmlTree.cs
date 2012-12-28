@@ -342,8 +342,8 @@ namespace umbraco.cms.presentation.Trees
 			set
 			{
 				m_notPublished = value;
-				if (m_notPublished.HasValue && m_notPublished.Value)
-					this.Style.HighlightNode();
+			    if (m_notPublished.HasValue && m_notPublished.Value)
+                    this.Style.DimNode();
 			}
 		}
 

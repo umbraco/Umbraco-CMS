@@ -86,6 +86,15 @@ namespace Umbraco.Core.Persistence
             return sql.LeftJoin(SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName));
         }
 
+        public static Sql.SqlJoinClause LeftOuterJoin<T>(this Sql sql)
+        {
+            var type = typeof(T);
+            var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
+            string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
+
+            return sql.LeftOuterJoin(SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName));
+        }
+
         public static Sql.SqlJoinClause RightJoin<T>(this Sql sql)
         {
             var type = typeof (T);

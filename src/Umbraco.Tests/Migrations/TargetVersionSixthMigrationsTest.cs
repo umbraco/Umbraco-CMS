@@ -2,9 +2,11 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
+using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Tests.Migrations
 {
@@ -44,10 +46,10 @@ namespace Umbraco.Tests.Migrations
             var targetVersion = new Version("6.0.0");
             var foundMigrations = PluginManager.Current.FindMigrations();
 
-            var migrationRunner = new MigrationRunner(configuredVersion, targetVersion);
+            var migrationRunner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
             var migrations = migrationRunner.OrderedUpgradeMigrations(foundMigrations);
 
-            var context = new MigrationContext();
+            var context = new MigrationContext(DatabaseProviders.SqlServerCE);
             foreach (MigrationBase migration in migrations)
             {
                 migration.GetUpExpressions(context);

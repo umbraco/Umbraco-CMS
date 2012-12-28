@@ -4,7 +4,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions
 {
-    public class CreateConstraintExpression : IMigrationExpression
+    public class CreateConstraintExpression : MigrationExpressionBase
     {
         public CreateConstraintExpression(ConstraintType type)
         {

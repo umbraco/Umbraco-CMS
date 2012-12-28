@@ -13,6 +13,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
+using System.Security.Permissions;
 using System.Text;
 using System.Configuration;
 using System.Data.Common;
@@ -936,7 +938,7 @@ namespace Umbraco.Core.Persistence
 
 
 		// Instance data used by the Multipoco factory delegate - essentially a list of the nested poco factories to call
-		class MultiPocoFactory
+		public class MultiPocoFactory
 		{
 
 			public MultiPocoFactory(IEnumerable<Delegate> dels)
@@ -2324,6 +2326,7 @@ namespace Umbraco.Core.Persistence
 
 		public SqlJoinClause InnerJoin(string table) { return Join("INNER JOIN ", table); }
 		public SqlJoinClause LeftJoin(string table) { return Join("LEFT JOIN ", table); }
+        public SqlJoinClause LeftOuterJoin(string table) { return Join("LEFT OUTER JOIN ", table); }
         public SqlJoinClause RightJoin(string table) { return Join("RIGHT JOIN ", table); }
 
 		public class SqlJoinClause

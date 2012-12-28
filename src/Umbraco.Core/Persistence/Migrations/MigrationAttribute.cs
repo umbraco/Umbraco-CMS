@@ -9,10 +9,11 @@ namespace Umbraco.Core.Persistence.Migrations
     [AttributeUsage(AttributeTargets.Class)]
     public class MigrationAttribute : Attribute
     {
-        public MigrationAttribute(string targetVersion, int sortOrder)
+        public MigrationAttribute(string targetVersion, int sortOrder, string product)
         {
             TargetVersion = new Version(targetVersion);
             SortOrder = sortOrder;
+            ProductName = product;
         }
 
         /// <summary>
@@ -24,5 +25,10 @@ namespace Umbraco.Core.Persistence.Migrations
         /// Gets or sets the sort order, which is the order this migration will be run in.
         /// </summary>
         public int SortOrder { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the name of the product, which this migration belongs to.
+        /// </summary>
+        public string ProductName { get; set; }
     }
 }

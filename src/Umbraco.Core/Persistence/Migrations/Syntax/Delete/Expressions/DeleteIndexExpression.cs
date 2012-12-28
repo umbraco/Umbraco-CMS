@@ -3,9 +3,14 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
-    public class DeleteIndexExpression : IMigrationExpression
+    public class DeleteIndexExpression : MigrationExpressionBase
     {
         public DeleteIndexExpression()
+        {
+            Index = new IndexDefinition();
+        }
+
+        public DeleteIndexExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
         {
             Index = new IndexDefinition();
         }

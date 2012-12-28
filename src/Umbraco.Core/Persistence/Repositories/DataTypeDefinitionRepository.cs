@@ -87,14 +87,14 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*");
             sql.From("cmsDataType");
-            sql.InnerJoin("umbracoNode ON ([cmsDataType].[nodeId] = [umbracoNode].[id])");
-            sql.Where("[umbracoNode].[nodeObjectType] = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
+            sql.InnerJoin("umbracoNode ON (cmsDataType.nodeId = umbracoNode.id)");
+            sql.Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
             return sql;
         }
 
         protected override string GetBaseWhereClause()
         {
-            return "[umbracoNode].[id] = @Id";
+            return "umbracoNode.id = @Id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -152,6 +152,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //Updates Modified date and Version Guid
             ((DataTypeDefinition)entity).UpdatingEntity();
+
+            //Look up parent to get and set the correct Path if ParentId has changed
+            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            {
+                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
+                entity.Path = string.Concat(parent.Path, ",", entity.Id);
+            }
 
             var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
             //Look up DataTypeDefinition entry to get Primary for updating the DTO

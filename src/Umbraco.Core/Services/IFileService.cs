@@ -87,7 +87,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="alias">Alias of the template</param>
         /// <returns>A <see cref="ITemplate"/> object</returns>
-        ITemplate GetTemplateByAlias(string alias);
+        ITemplate GetTemplate(string alias);
+
+        /// <summary>
+        /// Gets a <see cref="ITemplate"/> object by its alias
+        /// </summary>
+        /// <param name="id">Id of the template</param>
+        /// <returns>A <see cref="ITemplate"/> object</returns>
+        ITemplate GetTemplate(int id);
 
         /// <summary>
         /// Saves a <see cref="ITemplate"/>

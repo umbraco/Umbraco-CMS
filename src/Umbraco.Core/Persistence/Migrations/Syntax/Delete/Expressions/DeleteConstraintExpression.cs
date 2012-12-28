@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
-    public class DeleteConstraintExpression : IMigrationExpression
+    public class DeleteConstraintExpression : MigrationExpressionBase
     {
         public DeleteConstraintExpression(ConstraintType type)
         {

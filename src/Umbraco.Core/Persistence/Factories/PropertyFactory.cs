@@ -54,11 +54,11 @@ namespace Umbraco.Core.Persistence.Factories
                 if (property.HasIdentity)
                     dto.Id = property.Id;
 
-                if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer && property.Value != null)
+                if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer && property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false)
                 {
                     dto.Integer = int.Parse(property.Value.ToString());
                 }
-                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Date && property.Value != null)
+                else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Date && property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false)
                 {
                     dto.Date = DateTime.Parse(property.Value.ToString());
                 }

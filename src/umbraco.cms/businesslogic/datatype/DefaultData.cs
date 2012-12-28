@@ -1,6 +1,9 @@
 using System;
-using System.Data;
+using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using umbraco.interfaces;
@@ -19,9 +22,17 @@ namespace umbraco.cms.businesslogic.datatype
         private bool m_PreviewMode;
         private bool m_ValueLoaded = false;
 
+        [Obsolete("Deprecated, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
+        }
+
+        //TODO Refactor this class to use the Database object instead of the SqlHelper
+        //NOTE DatabaseContext.Current.Database should eventually be replaced with that from the Repository-Resolver refactor branch. 
+        internal static Database Database
+        {
+            get { return ApplicationContext.Current.DatabaseContext.Database; }
         }
 
         /// <summary>
@@ -49,33 +60,29 @@ namespace umbraco.cms.businesslogic.datatype
         /// </summary>
         protected virtual void LoadValueFromDatabase()
         {
+            var sql = new Sql();
+            sql.Select("*")
+               .From<PropertyDataDto>()
+               .InnerJoin<PropertyTypeDto>()
+               .On<PropertyTypeDto, PropertyDataDto>(x => x.Id, y => y.PropertyTypeId)
+               .InnerJoin<DataTypeDto>()
+               .On<DataTypeDto, PropertyTypeDto>(x => x.DataTypeId, y => y.DataTypeId)
+               .Where("cmsPropertyData.id = @Id", new {Id = m_PropertyId});
+            var dto = Database.Fetch<PropertyDataDto, PropertyTypeDto, DataTypeDto>(sql).FirstOrDefault();
 
-            //this is an optimized version of this query. In one call it will return the data type
-            //and the values, this will then set the underlying db type and value of the BaseDataType object
-            //instead of having it query the database itself.
-            var sql = @"
-                SELECT dataInt, dataDate, dataNvarchar, dataNtext, dbType FROM cmsPropertyData 
-                INNER JOIN cmsPropertyType ON cmsPropertyType.id = cmsPropertyData.propertytypeid
-                INNER JOIN cmsDataType ON cmsDataType.nodeId = cmsPropertyType.dataTypeId
-                WHERE cmsPropertyData.id = " + m_PropertyId;
-
-            using (var r = SqlHelper.ExecuteReader(sql))
+            if (dto != null)
             {
-                if (r.Read())
-                {
-                    //the type stored in the cmsDataType table
-                    var strDbType = r.GetString("dbType"); 
-                    //get the enum of the data type
-                    var dbType = BaseDataType.GetDBType(strDbType); 
-                    //get the column name in the cmsPropertyData table that stores the correct information for the data type
-                    var fieldName = BaseDataType.GetDataFieldName(dbType);
-                    //get the value for the data type, if null, set it to an empty string
-                    m_Value = r.GetObject(fieldName) ?? string.Empty;
-
-                    //now that we've set our value, we can update our BaseDataType object with the correct values from the db
-                    //instead of making it query for itself. This is a peformance optimization enhancement.
-                    _dataType.SetDataTypeProperties(fieldName, dbType);
-                }                
+                //the type stored in the cmsDataType table
+                var strDbType = dto.PropertyTypeDto.DataTypeDto.DbType;
+                //get the enum of the data type
+                var dbType = BaseDataType.GetDBType(strDbType);
+                //get the column name in the cmsPropertyData table that stores the correct information for the data type
+                var fieldName = BaseDataType.GetDataFieldName(dbType);
+                //get the value for the data type, if null, set it to an empty string
+                m_Value = dto.GetValue;
+                //now that we've set our value, we can update our BaseDataType object with the correct values from the db
+                //instead of making it query for itself. This is a peformance optimization enhancement.
+                _dataType.SetDataTypeProperties(fieldName, dbType);
             }
         }
 
@@ -83,7 +90,7 @@ namespace umbraco.cms.businesslogic.datatype
         {
             get
             {
-                return this._dataType.DBType;
+                return _dataType.DBType;
             }
         }
 
@@ -95,7 +102,6 @@ namespace umbraco.cms.businesslogic.datatype
             }
         }
 
-
 		#region IData Members
 
         /// <summary>
@@ -106,7 +112,7 @@ namespace umbraco.cms.businesslogic.datatype
 		public virtual XmlNode ToXMl(XmlDocument data)
 		{
             string sValue = Value!=null ? Value.ToString() : String.Empty;
-			if (this._dataType.DBType == DBTypes.Ntext)
+			if (_dataType.DBType == DBTypes.Ntext)
                 return data.CreateCDataSection(sValue);
             return data.CreateTextNode(sValue);
 		}
@@ -129,38 +135,8 @@ namespace umbraco.cms.businesslogic.datatype
 			}
 			set 
 			{
-                if (!PreviewMode)
-                {
-                    // Try to set null values if possible
-                    try
-                    {
-                        //CHANGE:by Allan Laustsen to fix copy nodes
-                        //if (value == null)
-                        if (value == null ||
-                            (string.IsNullOrEmpty(value.ToString()) &&
-                             (this._dataType.DBType == DBTypes.Integer || this._dataType.DBType == DBTypes.Date)))
-                            SqlHelper.ExecuteNonQuery("update cmsPropertyData set " + _dataType.DataFieldName +
-                                                      " = NULL where id = " + m_PropertyId);
-                        else
-                        {
-                            // we need to be sure that the value doesn't contain malformatted xml
-                            if (_dataType.DBType == DBTypes.Ntext || _dataType.DBType == DBTypes.Nvarchar)
-                            {
-                                value = cms.helpers.xhtml.RemoveIllegalXmlCharacters(value.ToString());
-                            }
-                            SqlHelper.ExecuteNonQuery(
-                                "update cmsPropertyData set " + _dataType.DataFieldName + " = @value where id = " +
-                                m_PropertyId, SqlHelper.CreateParameter("@value", value));
-                        }
-                    }
-                    catch (Exception e)
-                    {
-						LogHelper.Error<DefaultData>("Error updating item", e);
-                        if (value == null) value = "";
-                        SqlHelper.ExecuteNonQuery("update cmsPropertyData set " + _dataType.DataFieldName + " = @value where id = " + m_PropertyId, SqlHelper.CreateParameter("@value", value));
-                    }
-                }
                 m_Value = value;
+                m_ValueLoaded = true;
 			}
 		}
 
@@ -206,12 +182,9 @@ namespace umbraco.cms.businesslogic.datatype
         public virtual Guid Version
         {
 			get
-            {
-                using (IRecordsReader dr = SqlHelper.ExecuteReader("SELECT versionId FROM cmsPropertyData WHERE id = " + PropertyId))
-                {
-                    dr.Read();
-                    return dr.GetGuid("versionId");
-                }
+			{
+			    var dto = Database.FirstOrDefault<PropertyDataDto>("WHERE id = @Id", new {Id = PropertyId});
+			    return dto.VersionId.HasValue ? dto.VersionId.Value : Guid.Empty;
 			}
 		}
 
@@ -222,8 +195,8 @@ namespace umbraco.cms.businesslogic.datatype
         public virtual int NodeId
         {
 			get
-            {
-				return SqlHelper.ExecuteScalar<int>("Select contentNodeid from cmsPropertyData where id = " + PropertyId);
+			{
+			    return Database.ExecuteScalar<int>("Select contentNodeid from cmsPropertyData where id = @Id", new {Id = PropertyId});
 			}
 		}
 
