@@ -19,6 +19,7 @@ namespace Umbraco.Web.Strategies
     /// <remarks>
     /// This implementation is meant as a seperation of the cache refresh from the ContentService
     /// and PublishingStrategy.
+    /// This event subscriber will only be relevant as long as there is an xml cache.
     /// </remarks>
     public class UpdateCacheAfterPublish : IApplicationStartupHandler
     {
@@ -27,23 +28,24 @@ namespace Umbraco.Web.Strategies
             PublishingStrategy.Published += PublishingStrategy_Published;
         }
 
-        void PublishingStrategy_Published(object sender, PublishingEventArgs e)
+        void PublishingStrategy_Published(IPublishingStrategy sender, PublishEventArgs<IContent> e)
         {
-            if (sender is IContent)
-            {
-                var content = sender as IContent;
-                UpdateSingleContentCache(content);
-            }
-            else if (sender is IEnumerable<IContent>)
+            if (e.PublishedEntities.Any())
             {
                 if (e.IsAllRepublished)
                 {
-                    var content = sender as IEnumerable<IContent>;
-                    UpdateMultipleContentCache(content);
+                    UpdateEntireCache();
+                    return;
+                }
+
+                if (e.PublishedEntities.Count() > 1)
+                {
+                    UpdateMultipleContentCache(e.PublishedEntities);
                 }
                 else
                 {
-                    UpdateEntireCache();
+                    var content = e.PublishedEntities.FirstOrDefault();
+                    UpdateSingleContentCache(content);
                 }
             }
         }

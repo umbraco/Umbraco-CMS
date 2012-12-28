@@ -10,9 +10,9 @@ namespace Umbraco.Core.Publishing
     /// <summary>
     /// Currently acts as an interconnection between the new public api and the legacy api for publishing
     /// </summary>
-    internal class PublishingStrategy : BasePublishingStrategy
+    public class PublishingStrategy : BasePublishingStrategy
     {
-        internal PublishingStrategy()
+        public PublishingStrategy()
         {
         }
 
@@ -24,49 +24,43 @@ namespace Umbraco.Core.Publishing
         /// <returns>True if the publish operation was successfull and not cancelled, otherwise false</returns>
         public override bool Publish(IContent content, int userId)
         {
-            var e = new PublishingEventArgs();
-            //Fire Publishing event
-            OnPublish(content, e);
+            if (Publishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(content), this))
+                return false;
 
-            if (!e.Cancel)
+            //Check if the Content is Expired to verify that it can in fact be published
+            if (content.Status == ContentStatus.Expired)
             {
-                //Check if the Content is Expired to verify that it can in fact be published
-                if (content.Status == ContentStatus.Expired)
-                {
-                    LogHelper.Info<PublishingStrategy>(
-                        string.Format("Content '{0}' with Id '{1}' has expired and could not be published.",
-                                      content.Name, content.Id));
-                    return false;
-                }
-
-                //Check if the Content is Awaiting Release to verify that it can in fact be published
-                if (content.Status == ContentStatus.AwaitingRelease)
-                {
-                    LogHelper.Info<PublishingStrategy>(
-                        string.Format("Content '{0}' with Id '{1}' is awaiting release and could not be published.",
-                                      content.Name, content.Id));
-                    return false;
-                }
-
-                //Check if the Content is Trashed to verify that it can in fact be published
-                if (content.Status == ContentStatus.Trashed)
-                {
-                    LogHelper.Info<PublishingStrategy>(
-                        string.Format("Content '{0}' with Id '{1}' is trashed and could not be published.",
-                                      content.Name, content.Id));
-                    return false;
-                }
-
-                content.ChangePublishedState(true);
-
                 LogHelper.Info<PublishingStrategy>(
-                    string.Format("Content '{0}' with Id '{1}' has been published.",
+                    string.Format("Content '{0}' with Id '{1}' has expired and could not be published.",
                                   content.Name, content.Id));
-
-                return true;
+                return false;
             }
 
-            return false;
+            //Check if the Content is Awaiting Release to verify that it can in fact be published
+            if (content.Status == ContentStatus.AwaitingRelease)
+            {
+                LogHelper.Info<PublishingStrategy>(
+                    string.Format("Content '{0}' with Id '{1}' is awaiting release and could not be published.",
+                                  content.Name, content.Id));
+                return false;
+            }
+
+            //Check if the Content is Trashed to verify that it can in fact be published
+            if (content.Status == ContentStatus.Trashed)
+            {
+                LogHelper.Info<PublishingStrategy>(
+                    string.Format("Content '{0}' with Id '{1}' is trashed and could not be published.",
+                                  content.Name, content.Id));
+                return false;
+            }
+
+            content.ChangePublishedState(true);
+
+            LogHelper.Info<PublishingStrategy>(
+                string.Format("Content '{0}' with Id '{1}' has been published.",
+                              content.Name, content.Id));
+
+            return true;
         }
 
         /// <summary>
@@ -77,17 +71,13 @@ namespace Umbraco.Core.Publishing
         /// <returns>True if the publish operation was successfull and not cancelled, otherwise false</returns>
         public override bool PublishWithChildren(IEnumerable<IContent> content, int userId)
         {
-            var e = new PublishingEventArgs();
-
             /* Only update content thats not already been published - we want to loop through
              * all unpublished content to write skipped content (expired and awaiting release) to log.
              */
             foreach (var item in content.Where(x => x.Published == false))
             {
                 //Fire Publishing event
-                OnPublish(item, e);
-                if (e.Cancel)
-                    return false;
+                if (Publishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(item), this))
 
                 //Check if the Content is Expired to verify that it can in fact be published
                 if (item.Status == ContentStatus.Expired)
@@ -134,33 +124,27 @@ namespace Umbraco.Core.Publishing
         /// <returns>True if the unpublish operation was successfull and not cancelled, otherwise false</returns>
         public override bool UnPublish(IContent content, int userId)
         {
-            var e = new PublishingEventArgs();
-            //Fire BeforeUnPublish event
-            OnUnPublish(content, e);
+            if (UnPublishing.IsRaisedEventCancelled(new UnPublishEventArgs<IContent>(content), this))
+                return false;
 
-            if (!e.Cancel)
+            //If Content has a release date set to before now, it should be removed so it doesn't interrupt an unpublish
+            //Otherwise it would remain released == published
+            if (content.ReleaseDate.HasValue && content.ReleaseDate.Value <= DateTime.Now)
             {
-                //If Content has a release date set to before now, it should be removed so it doesn't interrupt an unpublish
-                //Otherwise it would remain released == published
-                if (content.ReleaseDate.HasValue && content.ReleaseDate.Value <= DateTime.Now)
-                {
-                    content.ReleaseDate = null;
-
-                    LogHelper.Info<PublishingStrategy>(
-                        string.Format(
-                            "Content '{0}' with Id '{1}' had its release date removed, because it was unpublished.",
-                            content.Name, content.Id));
-                }
-
-                content.ChangePublishedState(false);
+                content.ReleaseDate = null;
 
                 LogHelper.Info<PublishingStrategy>(
-                    string.Format("Content '{0}' with Id '{1}' has been unpublished.",
-                                  content.Name, content.Id));
-                return true;
+                    string.Format(
+                        "Content '{0}' with Id '{1}' had its release date removed, because it was unpublished.",
+                        content.Name, content.Id));
             }
 
-            return false;
+            content.ChangePublishedState(false);
+
+            LogHelper.Info<PublishingStrategy>(
+                string.Format("Content '{0}' with Id '{1}' has been unpublished.",
+                              content.Name, content.Id));
+            return true;
         }
 
         /// <summary>
@@ -171,14 +155,11 @@ namespace Umbraco.Core.Publishing
         /// <returns>True if the unpublish operation was successfull and not cancelled, otherwise false</returns>
         public override bool UnPublish(IEnumerable<IContent> content, int userId)
         {
-            var e = new PublishingEventArgs();
-
             //Only update content thats already been published
             foreach (var item in content.Where(x => x.Published == true))
             {
-                //Fire UnPublished event
-                OnUnPublish(item, e);
-                if (e.Cancel)
+                //Fire UnPublishing event
+                if (UnPublishing.IsRaisedEventCancelled(new UnPublishEventArgs<IContent>(item), this))
                     return false;
 
                 //If Content has a release date set to before now, it should be removed so it doesn't interrupt an unpublish
@@ -212,7 +193,7 @@ namespace Umbraco.Core.Publishing
         /// <param name="content"><see cref="IContent"/> thats being published</param>
         public override void PublishingFinalized(IContent content)
         {
-            OnPublished(content, new PublishingEventArgs());
+            Published.RaiseEvent(new PublishEventArgs<IContent>(content, false, false), this);
         }
 
         /// <summary>
@@ -222,7 +203,8 @@ namespace Umbraco.Core.Publishing
         /// <param name="isAllRepublished">Boolean indicating whether its all content that is republished</param>
         public override void PublishingFinalized(IEnumerable<IContent> content, bool isAllRepublished)
         {
-			OnPublished(content, new PublishingEventArgs(isAllRepublished));
+            Published.RaiseEvent(new PublishEventArgs<IContent>(content, false, isAllRepublished), this);
+
         }
 
         /// <summary>
@@ -231,7 +213,7 @@ namespace Umbraco.Core.Publishing
         /// <param name="content"><see cref="IContent"/> thats being unpublished</param>
         public override void UnPublishingFinalized(IContent content)
         {
-            OnUnPublished(content, new PublishingEventArgs());
+            UnPublished.RaiseEvent(new UnPublishEventArgs<IContent>(content, false), this);
         }
 
         /// <summary>
@@ -240,7 +222,29 @@ namespace Umbraco.Core.Publishing
         /// <param name="content">An enumerable list of <see cref="IContent"/> thats being unpublished</param>
         public override void UnPublishingFinalized(IEnumerable<IContent> content)
         {
-            OnUnPublished(content, new PublishingEventArgs());
+            UnPublished.RaiseEvent(new UnPublishEventArgs<IContent>(content, false), this);
         }
+
+        /// <summary>
+        /// Occurs before publish
+        /// </summary>
+        public static event TypedEventHandler<IPublishingStrategy, PublishEventArgs<IContent>> Publishing;
+
+        /// <summary>
+        /// Occurs after publish
+        /// </summary>
+        public static event TypedEventHandler<IPublishingStrategy, PublishEventArgs<IContent>> Published;
+        
+        /// <summary>
+        /// Occurs before unpublish
+        /// </summary>
+        public static event TypedEventHandler<IPublishingStrategy, UnPublishEventArgs<IContent>> UnPublishing;
+
+        /// <summary>
+        /// Occurs after unpublish
+        /// </summary>
+        public static event TypedEventHandler<IPublishingStrategy, UnPublishEventArgs<IContent>> UnPublished;
+
+
     }
 }

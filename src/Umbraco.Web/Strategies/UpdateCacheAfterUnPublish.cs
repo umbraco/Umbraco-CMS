@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Publishing;
@@ -17,6 +18,7 @@ namespace Umbraco.Web.Strategies
     /// <remarks>
     /// This implementation is meant as a seperation of the cache refresh from the ContentService
     /// and PublishingStrategy.
+    /// This event subscriber will only be relevant as long as there is an xml cache.
     /// </remarks>
     public class UpdateCacheAfterUnPublish : IApplicationStartupHandler
     {
@@ -25,19 +27,21 @@ namespace Umbraco.Web.Strategies
             PublishingStrategy.UnPublished += PublishingStrategy_UnPublished;
         }
 
-        void PublishingStrategy_UnPublished(object sender, PublishingEventArgs e)
+        void PublishingStrategy_UnPublished(IPublishingStrategy sender, UnPublishEventArgs<IContent> e)
         {
-            if (sender is IContent)
+            if (e.UnPublishedEntities.Any())
             {
-                var content = sender as IContent;
-                UnPublishSingle(content);
-            }
-            else if (sender is IEnumerable<IContent>)
-            {
-                var content = sender as IEnumerable<IContent>;
-                foreach (var c in content)
+                if (e.UnPublishedEntities.Count() > 1)
                 {
-                    UnPublishSingle(c);
+                    foreach (var c in e.UnPublishedEntities)
+                    {
+                        UnPublishSingle(c);
+                    }
+                }
+                else
+                {
+                    var content = e.UnPublishedEntities.FirstOrDefault();
+                    UnPublishSingle(content);
                 }
             }
         }
