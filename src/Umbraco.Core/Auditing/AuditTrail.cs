@@ -24,7 +24,7 @@ namespace Umbraco.Core.Auditing
 
         public void AddEntry(AuditTypes type, string comment, int userId, int objectId)
         {
-            WriteProvider.WriteEntry(objectId, userId, DateTime.UtcNow, type.ToString(), comment);
+            WriteProvider.WriteEntry(objectId, userId, DateTime.Now, type.ToString(), comment);
         }
     }
 }

@@ -96,8 +96,8 @@ namespace Umbraco.Core.Models.EntityBase
         /// </summary>
         internal virtual void AddingEntity()
         {
-            CreateDate = DateTime.UtcNow;
-            UpdateDate = DateTime.UtcNow;
+            CreateDate = DateTime.Now;
+            UpdateDate = DateTime.Now;
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Umbraco.Core.Models.EntityBase
         /// </summary>
         internal virtual void UpdatingEntity()
         {
-            UpdateDate = DateTime.UtcNow;
+            UpdateDate = DateTime.Now;
         }
 
         /// <summary>

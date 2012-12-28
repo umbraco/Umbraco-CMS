@@ -269,7 +269,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                entity.UpdateDate = DateTime.UtcNow;
+                entity.UpdateDate = DateTime.Now;
             }
 
             //Look up parent to get and set the correct Path if ParentId has changed

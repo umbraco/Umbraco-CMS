@@ -142,7 +142,7 @@ namespace Umbraco.Core.Publishing
             {
                 //If Content has a release date set to before now, it should be removed so it doesn't interrupt an unpublish
                 //Otherwise it would remain released == published
-                if (content.ReleaseDate.HasValue && content.ReleaseDate.Value <= DateTime.UtcNow)
+                if (content.ReleaseDate.HasValue && content.ReleaseDate.Value <= DateTime.Now)
                 {
                     content.ReleaseDate = null;
 
@@ -183,7 +183,7 @@ namespace Umbraco.Core.Publishing
 
                 //If Content has a release date set to before now, it should be removed so it doesn't interrupt an unpublish
                 //Otherwise it would remain released == published
-                if (item.ReleaseDate.HasValue && item.ReleaseDate.Value <= DateTime.UtcNow)
+                if (item.ReleaseDate.HasValue && item.ReleaseDate.Value <= DateTime.Now)
                 {
                     item.ReleaseDate = null;
 

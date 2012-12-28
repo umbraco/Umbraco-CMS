@@ -286,7 +286,7 @@ namespace Umbraco.Core.Services
 		{
 			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 			{
-				var query = Query<IContent>.Builder.Where(x => x.Published == true && x.ExpireDate <= DateTime.UtcNow);
+				var query = Query<IContent>.Builder.Where(x => x.Published == true && x.ExpireDate <= DateTime.Now);
 				var contents = repository.GetByQuery(query);
 
 				return contents;
@@ -301,7 +301,7 @@ namespace Umbraco.Core.Services
 		{
 			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 			{
-				var query = Query<IContent>.Builder.Where(x => x.Published == false && x.ReleaseDate <= DateTime.UtcNow);
+				var query = Query<IContent>.Builder.Where(x => x.Published == false && x.ReleaseDate <= DateTime.Now);
 				var contents = repository.GetByQuery(query);
 
 				return contents;
