@@ -482,11 +482,17 @@ namespace umbraco.cms.businesslogic.packager
             }
         }
 
+		/// <summary>
+		/// Remove the temp installation folder
+		/// </summary>
+		/// <param name="packageId"></param>
+		/// <param name="tempDir"></param>
         public void InstallCleanUp(int packageId, string tempDir)
         {
-
-            //this will contain some logic to clean up all those old folders
-
+			if (Directory.Exists(tempDir))
+			{
+				Directory.Delete(tempDir, true);
+			}
         }
 
         /// <summary>

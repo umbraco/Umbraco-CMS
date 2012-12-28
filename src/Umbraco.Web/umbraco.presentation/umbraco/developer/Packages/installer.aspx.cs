@@ -14,6 +14,7 @@ using System.Xml.XPath;
 using umbraco.BasePages;
 using umbraco.IO;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Core;
 using BizLogicAction = umbraco.BusinessLogic.Actions.Action;
 
 namespace umbraco.presentation.developer.packages
@@ -44,15 +45,19 @@ namespace umbraco.presentation.developer.packages
                 ButtonLoadPackage.Attributes.Add("onClick", "jQuery(this).hide(); jQuery('#loadingbar').show();; return true;");
             }
 
-            //if we are actually in the middle of installing something... 
+            //if we are actually in the middle of installing something... meaning we keep redirecting back to this page with 
+ 			// custom query strings 
+			// TODO: SD: This process needs to be fixed/changed/etc... to use the InstallPackageController
+			//	http://issues.umbraco.org/issue/U4-1047
             if (!String.IsNullOrEmpty(helper.Request("installing")))
             {
                 HideAllPanes();
                 pane_installing.Visible = true;
-                ProcessInstall(helper.Request("installing"));
+                ProcessInstall(helper.Request("installing")); //process the current step
 
             }
-            else if (!String.IsNullOrEmpty(helper.Request("guid")) && !String.IsNullOrEmpty(helper.Request("repoGuid")))
+			else if (tempFile.Value.IsNullOrWhiteSpace() //if we haven't downloaded the .umb temp file yet
+				&& (!helper.Request("guid").IsNullOrWhiteSpace() && !helper.Request("repoGuid").IsNullOrWhiteSpace()))
             {
                 //we'll fetch the local information we have about our repo, to find out what webservice to query.
                 _repo = cms.businesslogic.packager.repositories.Repository.getByGuid(helper.Request("repoGuid"));
@@ -206,7 +211,7 @@ namespace umbraco.presentation.developer.packages
                     library.RefreshContent();
 
 
-                    if (_installer.Control != null && _installer.Control != "")
+                    if (!string.IsNullOrEmpty(_installer.Control))
                     {
                         Response.Redirect("installer.aspx?installing=customInstaller&dir=" + dir + "&pId=" + packageId.ToString());
                     }
@@ -216,7 +221,7 @@ namespace umbraco.presentation.developer.packages
                     }
                     break;
                 case "customInstaller":
-                    if (_installer.Control != null && _installer.Control != "")
+                    if (!string.IsNullOrEmpty(_installer.Control))
                     {
                         HideAllPanes();
 
@@ -225,43 +230,62 @@ namespace umbraco.presentation.developer.packages
 
                         pane_optional.Controls.Add(_configControl);
                         pane_optional.Visible = true;
+
+						//We still need to clean everything up which is normally done in the Finished Action
+						PerformPostInstallCleanup(packageId, dir);
                     }
                     else
                     {
-                        HideAllPanes();
-                        pane_success.Visible = true;
-                        BasePage.Current.ClientTools.ReloadActionNode(true, true);
+                        //if the custom installer control is empty here (though it should never be because we've already checked for it previously)
+						//then we should run the normal FinishedAction
+						PerformFinishedAction(packageId, dir);
                     }
                     break;
                 case "finished":
-                    HideAllPanes();
-                    string url = _installer.Url;
-                    string packageViewUrl = "installedPackage.aspx?id=" + packageId.ToString();
-
-                    bt_viewInstalledPackage.OnClientClick = "document.location = '" + packageViewUrl + "'; return false;";
-
-                    if (!string.IsNullOrEmpty(url))
-                        lit_authorUrl.Text = " <em>" + ui.Text("or") + "</em> <a href='" + url + "' target=\"_blank\">" + ui.Text("viewPackageWebsite") + "</a>";
-
-
-                    pane_success.Visible = true;
-                    BasePage.Current.ClientTools.ReloadActionNode(true, true);
-
-                    _installer.InstallCleanUp(packageId, dir);
-
-                    //clear the tree cache
-                    ClientTools.ClearClientTreeCache()
-                        .RefreshTree("packager");
-
-                    TreeDefinitionCollection.Instance.ReRegisterTrees();
-
-                    BizLogicAction.ReRegisterActionsAndHandlers();
-
+                    PerformFinishedAction(packageId, dir);
                     break;
                 default:
                     break;
             }
         }
+
+		/// <summary>
+		/// Perform the 'Finished' action of the installer
+		/// </summary>
+		/// <param name="packageId"></param>
+		/// <param name="dir"></param>
+		private void PerformFinishedAction(int packageId, string dir)
+		{
+			HideAllPanes();
+            string url = _installer.Url;
+            string packageViewUrl = "installedPackage.aspx?id=" + packageId.ToString();
+
+            bt_viewInstalledPackage.OnClientClick = "document.location = '" + packageViewUrl + "'; return false;";
+
+            if (!string.IsNullOrEmpty(url))
+                lit_authorUrl.Text = " <em>" + ui.Text("or") + "</em> <a href='" + url + "' target=\"_blank\">" + ui.Text("viewPackageWebsite") + "</a>";
+
+
+            pane_success.Visible = true;
+
+			PerformPostInstallCleanup(packageId, dir);
+		}
+
+		/// <summary>
+		/// Runs Post install actions such as clearning any necessary cache, reloading the correct tree nodes, etc...
+		/// </summary>
+		/// <param name="packageId"></param>
+		/// <param name="dir"></param>
+		private void PerformPostInstallCleanup(int packageId, string dir)
+		{
+			BasePage.Current.ClientTools.ReloadActionNode(true, true);
+			_installer.InstallCleanUp(packageId, dir);
+			//clear the tree cache
+			ClientTools.ClearClientTreeCache()
+				.RefreshTree("packager");
+			TreeDefinitionCollection.Instance.ReRegisterTrees();
+			BizLogicAction.ReRegisterActionsAndHandlers();
+		}
 
         //this accepts the package, creates the manifest and then installs the files.
         protected void startInstall(object sender, System.EventArgs e)
