@@ -203,6 +203,71 @@ namespace umbraco.cms.businesslogic.media
         #endregion
 
         #region Public Properties
+        public override int sortOrder
+        {
+            get
+            {
+                return _media == null ? base.sortOrder : _media.SortOrder;
+            }
+            set
+            {
+                if (_media == null)
+                {
+                    base.sortOrder = value;
+                }
+                else
+                {
+                    _media.SortOrder = value;
+                }
+            }
+        }
+
+        public override int Level
+        {
+            get
+            {
+                return _media == null ? base.Level : _media.Level;
+            }
+            set
+            {
+                if (_media == null)
+                {
+                    base.Level = value;
+                }
+                else
+                {
+                    _media.Level = value;
+                }
+            }
+        }
+
+        public override int ParentId
+        {
+            get
+            {
+                return _media == null ? base.ParentId : _media.ParentId;
+            }
+        }
+
+        public override string Path
+        {
+            get
+            {
+                return _media == null ? base.Path : _media.Path;
+            }
+            set
+            {
+                if (_media == null)
+                {
+                    base.Path = value;
+                }
+                else
+                {
+                    _media.Path = value;
+                }
+            }
+        }
+
         /// <summary>
         /// Retrieve a list of all medias underneath the current
         /// </summary>

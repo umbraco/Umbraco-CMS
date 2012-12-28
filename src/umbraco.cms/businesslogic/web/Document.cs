@@ -524,6 +524,71 @@ namespace umbraco.cms.businesslogic.web
 
         #region Public Properties
 
+        public override int sortOrder
+        {
+            get
+            {
+                return Content == null ? base.sortOrder : Content.SortOrder;
+            }
+            set
+            {
+                if (Content == null)
+                {
+                    base.sortOrder = value;
+                }
+                else
+                {
+                    Content.SortOrder = value;
+                }
+            }
+        }
+
+        public override int Level
+        {
+            get
+            {
+                return Content == null ? base.Level : Content.Level;
+            }
+            set
+            {
+                if (Content == null)
+                {
+                    base.Level = value;
+                }
+                else
+                {
+                    Content.Level = value;
+                }
+            }
+        }
+
+        public override int ParentId
+        {
+            get
+            {
+                return Content == null ? base.ParentId : Content.ParentId;
+            }
+        }
+
+        public override string Path
+        {
+            get
+            {
+                return Content == null ? base.Path : Content.Path;
+            }
+            set
+            {
+                if (Content == null)
+                {
+                    base.Path = value;
+                }
+                else
+                {
+                    Content.Path = value;
+                }
+            }
+        }
+
         /// <summary>
         /// Gets a value indicating whether the document was constructed for the optimized mode
         /// </summary>

@@ -680,7 +680,7 @@ order by level,sortOrder";
         /// Determines if the node is in the recycle bin.
         /// This is only relavent for node types that support a recyle bin (such as Document/Media)
         /// </summary>
-        public bool IsTrashed
+        public virtual bool IsTrashed
         {
             get
             {
@@ -704,7 +704,7 @@ order by level,sortOrder";
         /// Gets or sets the sort order.
         /// </summary>
         /// <value>The sort order.</value>
-        public int sortOrder
+        public virtual int sortOrder
         {
             get { return _sortOrder; }
             set
@@ -718,7 +718,7 @@ order by level,sortOrder";
         /// Gets or sets the create date time.
         /// </summary>
         /// <value>The create date time.</value>
-        public DateTime CreateDateTime
+        public virtual DateTime CreateDateTime
         {
             get { return _createDate; }
             set
@@ -752,7 +752,7 @@ order by level,sortOrder";
         /// <summary>
         /// Get the newParent id of the node
         /// </summary>
-        public int ParentId
+        public virtual int ParentId
         {
             get { return _parentid; }
         }
@@ -780,7 +780,7 @@ order by level,sortOrder";
         /// that indicates the path from the topmost node to the given node
         /// </summary>
         /// <value>The path.</value>
-        public string Path
+        public virtual string Path
         {
             get { return _path; }
             set
@@ -795,7 +795,7 @@ order by level,sortOrder";
         /// tree structure the given node is
         /// </summary>
         /// <value>The level.</value>
-        public int Level
+        public virtual int Level
         {
             get { return _level; }
             set

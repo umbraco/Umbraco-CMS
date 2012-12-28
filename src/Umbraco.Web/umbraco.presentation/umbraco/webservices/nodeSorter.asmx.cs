@@ -88,14 +88,16 @@ namespace umbraco.presentation.webservices
                         {
                             if (tmp[i] != "" && tmp[i].Trim() != "")
                             {
-                                new cms.businesslogic.CMSNode(int.Parse(tmp[i])).sortOrder = i;
-
                                 if (isContent)
                                 {
                                     var document = new Document(int.Parse(tmp[i]));
+                                    var published = document.Published;
+                                    document.sortOrder = i;
+                                    document.Save();
                                     // refresh the xml for the sorting to work
-                                    if (document.Published)
+                                    if (published)
                                     {
+                                        document.Publish(BusinessLogic.User.GetCurrent());
                                         document.refreshXmlSortOrder();
                                         library.UpdateDocumentCache(int.Parse(tmp[i]));
                                     }
@@ -103,7 +105,13 @@ namespace umbraco.presentation.webservices
                                 // to update the sortorder of the media node in the XML, re-save the node....
                                 else if (isMedia)
                                 {
-                                    new cms.businesslogic.media.Media(int.Parse(tmp[i])).Save();
+                                    var media = new cms.businesslogic.media.Media(int.Parse(tmp[i]));
+                                    media.sortOrder = i;
+                                    media.Save();
+                                }
+                                else
+                                {
+                                    new cms.businesslogic.CMSNode(int.Parse(tmp[i])).sortOrder = i;
                                 }
                             }
                         }
@@ -122,9 +130,6 @@ namespace umbraco.presentation.webservices
                             if (UmbracoSettings.UseDistributedCalls)
                                 library.RefreshContent();
                         }
-
-                        //TODO: Properly refactor this, we're just clearing the cache so the new sortorder will also be visible in the backoffice
-                        InMemoryCacheProvider.Current.Clear();
 
                         // fire actionhandler, check for content
                         if ((helper.Request("app") == "content" | helper.Request("app") == "") && ParentId > 0)
