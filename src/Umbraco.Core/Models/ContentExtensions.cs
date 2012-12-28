@@ -393,7 +393,7 @@ namespace Umbraco.Core.Models
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
             //var nodeName = content.ContentType.Alias.ToUmbracoAlias(StringAliasCaseType.CamelCase, true);
             var nodeName = content.ContentType.Alias;
-            var niceUrl = content.Name.Replace(" ", "-").ToLower();
+            var niceUrl = content.Name.FormatUrl().ToLower() ;
 
             var xml = new XElement(nodeName,
                                    new XAttribute("id", content.Id),
