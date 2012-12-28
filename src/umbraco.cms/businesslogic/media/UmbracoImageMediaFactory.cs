@@ -10,8 +10,6 @@ using Umbraco.Core.Logging;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.datatype;
-using Encoder = System.Text.Encoder;
-using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.media
 {
@@ -27,10 +25,10 @@ namespace umbraco.cms.businesslogic.media
             get { return new List<string> { "jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif" }; }
         }
 
-        public override void DoHandleMedia(Media media, PostedMediaFile postedFile, BusinessLogic.User user)
+        public override void DoHandleMedia(Media media, PostedMediaFile postedFile, User user)
         {
             // Get Image object, width and height
-            var image = System.Drawing.Image.FromStream(postedFile.InputStream);
+            var image = Image.FromStream(postedFile.InputStream);
             var fileWidth = image.Width;
             var fileHeight = image.Height;
 
@@ -43,9 +41,15 @@ namespace umbraco.cms.businesslogic.media
 
             // Set media properties
             media.getProperty("umbracoFile").Value = FileSystem.GetUrl(destFilePath);
-            media.getProperty("umbracoWidth").Value = fileWidth;
-            media.getProperty("umbracoHeight").Value = fileHeight;
-            media.getProperty("umbracoBytes").Value = postedFile.ContentLength;
+
+            if (media.getProperty("umbracoWidth") != null)
+                media.getProperty("umbracoWidth").Value = fileWidth;
+
+            if (media.getProperty("umbracoHeight") != null)
+                media.getProperty("umbracoHeight").Value = fileHeight;
+
+            if (media.getProperty("umbracoBytes") != null)
+                media.getProperty("umbracoBytes").Value = postedFile.ContentLength;
 
             if (media.getProperty("umbracoExtension") != null)
                 media.getProperty("umbracoExtension").Value = ext;
@@ -79,7 +83,10 @@ namespace umbraco.cms.businesslogic.media
                 // Get DataTypeDefinition of upload field
                 dataTypeDef = DataTypeDefinition.GetByDataTypeId(uploadFieldDataTypeId);
             }
-            catch { }
+            catch (Exception e)
+            {
+                LogHelper.Error<UmbracoImageMediaFactory>("Could get Upload Field datatype definition", e);
+            }
 
             if (dataTypeDef != null)
             {
@@ -95,8 +102,7 @@ namespace umbraco.cms.businesslogic.media
                     var thumbnailSizes = thumbnails.Split(";".ToCharArray());
                     foreach (var thumb in thumbnailSizes.Where(thumb => thumb != ""))
                     {
-                        GenerateThumbnail(image, int.Parse(thumb), fileWidth, fileHeight, ext,
-                                          destFilePath + "_" + thumb + ".jpg");
+                        GenerateThumbnail(image, int.Parse(thumb), fileWidth, fileHeight, ext, destFilePath + "_" + thumb + ".jpg");
                     }
                 }
             }
@@ -116,6 +122,7 @@ namespace umbraco.cms.businesslogic.media
             // fixes for empty width or height
             if (widthTh == 0)
                 widthTh = 1;
+
             if (heightTh == 0)
                 heightTh = 1;
 
@@ -132,15 +139,14 @@ namespace umbraco.cms.businesslogic.media
 
             // Copy metadata
             var codecs = ImageCodecInfo.GetImageEncoders();
-            ImageCodecInfo codec = null;
-            if (ext.ToLower() == "png" || ext.ToLower() == "gif")
-                codec = codecs.Single(t => t.MimeType.Equals("image/png"));
-            else
-                codec = codecs.Single(t => t.MimeType.Equals("image/jpeg"));
+
+            var codec = ext.ToLower() == "png" || ext.ToLower() == "gif"
+                                       ? codecs.Single(t => t.MimeType.Equals("image/png"))
+                                       : codecs.Single(t => t.MimeType.Equals("image/jpeg"));
 
             // Set compresion ratio to 90%
             var ep = new EncoderParameters();
-            ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 90L);
+            ep.Param[0] = new EncoderParameter(Encoder.Quality, 90L);
 
             // Save the new image
             if (codec != null)

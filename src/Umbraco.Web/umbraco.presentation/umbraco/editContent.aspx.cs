@@ -327,6 +327,9 @@ namespace umbraco.cms.presentation
                             UnPublish.Visible = true;
 
                         _documentHasPublishedVersion = _document.HasPublishedVersion();
+
+                        foreach (var descendant in _document.GetDescendants().Cast<Document>().Where(descendant => descendant.HasPublishedVersion()))
+                            library.UpdateDocumentCache(descendant.Id);
                     }
                     else
                     {

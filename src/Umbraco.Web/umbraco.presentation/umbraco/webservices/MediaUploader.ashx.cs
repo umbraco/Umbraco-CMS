@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Script.Serialization;
@@ -138,19 +136,15 @@ namespace umbraco.presentation.umbraco.webservices
                     {
                         var pathParts = context.Request["path"].Trim('/').Split('/');
                         
-                        foreach (var pathPart in pathParts)
-                        {
-                            if (!string.IsNullOrEmpty(pathPart))
-                            {
+                        foreach (var pathPart in pathParts.Where(part => string.IsNullOrWhiteSpace(part) == false))
                                 parentNode = GetOrCreateFolder(parentNode, pathPart);
-                            }
-                        }
+
                         parentNodeId = parentNode.Id;
                     }
 
                     // Check whether to replace existing
-                    var parsed = false;
-                    bool replaceExisting = (context.Request["replaceExisting"] == "1" || (bool.TryParse(context.Request["replaceExisting"], out parsed) && parsed));
+                    bool parsed;
+                    var replaceExisting = (context.Request["replaceExisting"] == "1" || (bool.TryParse(context.Request["replaceExisting"], out parsed) && parsed));
 
                     // loop through uploaded files
                     for (var j = 0; j < context.Request.Files.Count; j++)
@@ -202,10 +196,8 @@ namespace umbraco.presentation.umbraco.webservices
             else
             {
                 // log error
-                LogHelper.Debug<MediaUploader>(string.Format("Parent node id is in incorrect format: {0}", parentNodeId));
+                LogHelper.Warn<MediaUploader>(string.Format("Parent node id is in incorrect format: {0}", parentNodeId));
             }
-            
-            
             
             return new UploadResponse();
         }
@@ -218,16 +210,16 @@ namespace umbraco.presentation.umbraco.webservices
             if (GlobalSettings.UseSSL && !context.Request.IsSecureConnection)
                 throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
 
-            string username = context.Request["username"];
-            string password = context.Request["password"];
-            string ticket = context.Request["ticket"];
+            var username = context.Request["username"];
+            var password = context.Request["password"];
+            var ticket = context.Request["ticket"];
 
-            bool isValid = false;
+            var isValid = false;
 
             if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
             {
                 var mp = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider];
-                if (mp.ValidateUser(username, password))
+                if (mp != null && mp.ValidateUser(username, password))
                 {
                     var user = new User(username);
                     isValid = user.Applications.Any(app => app.alias == "media");
@@ -240,6 +232,8 @@ namespace umbraco.presentation.umbraco.webservices
             {
                 var t = FormsAuthentication.Decrypt(ticket);
                 var user = new User(username);
+
+                if (t != null)
                 isValid = user.LoginName.ToLower() == t.Name.ToLower() && user.Applications.Any(app => app.alias == "media");
 
                 if (isValid)
@@ -279,14 +273,13 @@ namespace umbraco.presentation.umbraco.webservices
             if (appSetting > 0)
                 return appSetting;
 
-            var configXml = new XmlDocument();
-            configXml.PreserveWhitespace = true;
+            var configXml = new XmlDocument { PreserveWhitespace = true };
             configXml.Load(HttpContext.Current.Server.MapPath("/web.config"));
 
             var requestLimitsNode = configXml.SelectSingleNode("//configuration/system.webServer/security/requestFiltering/requestLimits");
             if (requestLimitsNode != null)
             {
-                if (requestLimitsNode.Attributes["maxAllowedContentLength"] != null)
+                if (requestLimitsNode.Attributes != null && requestLimitsNode.Attributes["maxAllowedContentLength"] != null)
                 {
                     var maxAllowedContentLength = Convert.ToInt32(requestLimitsNode.Attributes["maxAllowedContentLength"].Value);
                     if (maxAllowedContentLength > 0)
@@ -295,10 +288,8 @@ namespace umbraco.presentation.umbraco.webservices
             }
 
             var httpRuntime = ConfigurationManager.GetSection("system.web/httpRuntime") as HttpRuntimeSection;
-            if (httpRuntime != null)
-                return httpRuntime.MaxRequestLength;
 
-            return 4096;
+            return httpRuntime == null ? 4096 : httpRuntime.MaxRequestLength;
         }
 
         private Media GetOrCreateFolder(Media parent, string name)
