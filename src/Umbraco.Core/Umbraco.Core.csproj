@@ -133,7 +133,6 @@
     <Compile Include="Events\RollbackEventArgs.cs" />
     <Compile Include="Events\SaveEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
-    <Compile Include="Events\UnPublishEventArgs.cs" />
     <Compile Include="MacroPropertyTypeResolver.cs" />
     <Compile Include="Models\ContentBase.cs" />
     <Compile Include="Models\ContentExtensions.cs" />
