@@ -1268,12 +1268,12 @@ namespace Umbraco.Core.Services
 		public static event TypedEventHandler<IContentService, DeleteEventArgs<IContent>> Deleted;
 
 		/// <summary>
-		/// Occurs before Delete
+		/// Occurs before Delete Versions
 		/// </summary>		
 		public static event TypedEventHandler<IContentService, DeleteRevisionsEventArgs> DeletingVersions;
 
 		/// <summary>
-		/// Occurs after Delete
+		/// Occurs after Delete Versions
 		/// </summary>
 		public static event TypedEventHandler<IContentService, DeleteRevisionsEventArgs> DeletedVersions;
 

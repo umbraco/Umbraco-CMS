@@ -125,14 +125,15 @@
     <Compile Include="Events\CancellableObjectEventArgs.cs" />
     <Compile Include="Events\DeleteRevisionsEventArgs.cs" />
     <Compile Include="Events\EventExtensions.cs" />
+    <Compile Include="Events\PublishEventArgs.cs" />
     <Compile Include="Events\TypedEventHandler.cs" />
-    <Compile Include="Events\PublishingEventArgs.cs" />
     <Compile Include="Events\MoveEventArgs.cs" />
     <Compile Include="Events\NewEventArgs.cs" />
     <Compile Include="Events\RefreshContentEventArgs.cs" />
     <Compile Include="Events\RollbackEventArgs.cs" />
     <Compile Include="Events\SaveEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
+    <Compile Include="Events\UnPublishEventArgs.cs" />
     <Compile Include="MacroPropertyTypeResolver.cs" />
     <Compile Include="Models\ContentBase.cs" />
     <Compile Include="Models\ContentExtensions.cs" />
@@ -153,6 +154,7 @@
     <Compile Include="Models\Css\TrieNode.cs" />
     <Compile Include="Models\DictionaryItem.cs" />
     <Compile Include="Models\DictionaryTranslation.cs" />
+    <Compile Include="Models\EntityBase\IUmbracoEntity.cs" />
     <Compile Include="Models\File.cs" />
     <Compile Include="Models\IDataTypeDefinition.cs" />
     <Compile Include="Models\IDictionaryItem.cs" />

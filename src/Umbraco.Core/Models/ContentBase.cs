@@ -31,7 +31,6 @@ namespace Umbraco.Core.Models
             Mandate.ParameterNotNull(contentType, "contentType");
             Mandate.ParameterNotNull(properties, "properties");
 
-            //_parentId = parentId;
             _parentId = new Lazy<int>(() => parentId);
 
             _contentTypeId = int.Parse(contentType.Id.ToString(CultureInfo.InvariantCulture));
@@ -74,7 +73,6 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the Id of the Parent entity
         /// </summary>
-        /// <remarks>Might not be necessary if handled as a relation?</remarks>
         [DataMember]
         public virtual int ParentId
         {
