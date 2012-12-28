@@ -223,7 +223,7 @@ namespace Umbraco.Core.Configuration
         /// <value>The fullpath to root.</value>
         public static string FullpathToRoot
         {
-            get { return IOHelper.GetRootDirectorySafe(); }
+            get { return IOHelper.GetRootDirectorySafe() + System.IO.Path.DirectorySeparatorChar; }
         }
 
         /// <summary>
