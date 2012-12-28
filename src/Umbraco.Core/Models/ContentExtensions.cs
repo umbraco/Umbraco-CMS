@@ -12,6 +12,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models
 {
@@ -369,6 +370,18 @@ namespace Umbraco.Core.Models
 			}
         }
 
+        /// <summary>
+        /// Checks whether an <see cref="IContent"/> item has any published versions
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns>True if the content has any published versiom otherwise False</returns>
+        public static bool HasPublishedVersion(this IContent content)
+        {
+            if (content.HasIdentity == false)
+                return false;
+
+            return ApplicationContext.Current.Services.ContentService.HasPublishedVersion(content.Id);
+        }
 
         /// <summary>
         /// Creates the xml representation for the <see cref="IContent"/> object

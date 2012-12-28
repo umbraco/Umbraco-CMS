@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Persistence;
 using umbraco.BusinessLogic.Utils;
 using umbraco.DataLayer;
 using umbraco.businesslogic;
@@ -58,20 +59,25 @@ namespace umbraco.BusinessLogic
                                                   new XAttribute("icon", attr.Icon),
                                                   new XAttribute("sortOrder", attr.SortOrder)));
                     }
-					
-					var dbApps = SqlHelper.ExecuteReader("SELECT * FROM umbracoApp WHERE appAlias NOT IN (" + inString + ")");
-					while (dbApps.Read())
-					{
-						doc.Root.Add(new XElement("add",
-													new XAttribute("alias", dbApps.GetString("appAlias")),
-													new XAttribute("name", dbApps.GetString("appName")),
-													new XAttribute("icon", dbApps.GetString("appIcon")),
-													new XAttribute("sortOrder", dbApps.GetByte("sortOrder"))));
-					}
-					
+                    
+                    var db = ApplicationContext.Current.DatabaseContext.Database;
+                    var exist = db.TableExist("umbracoApp");
+                    if (exist)
+                    {
+                        var dbApps = SqlHelper.ExecuteReader("SELECT * FROM umbracoApp WHERE appAlias NOT IN (" + inString + ")");
+                        while (dbApps.Read())
+                        {
+                            doc.Root.Add(new XElement("add",
+                                                      new XAttribute("alias", dbApps.GetString("appAlias")),
+                                                      new XAttribute("name", dbApps.GetString("appName")),
+                                                      new XAttribute("icon", dbApps.GetString("appIcon")),
+                                                      new XAttribute("sortOrder", dbApps.GetByte("sortOrder"))));
+                        }
+                    }
 
                 }, true);
-
+            
+            //TODO Shouldn't this be enabled and then delete the whole table?
             //SqlHelper.ExecuteNonQuery("DELETE FROM umbracoApp");
         }
     }

@@ -75,7 +75,7 @@ namespace Umbraco.Core.Models.Rdbms
                     return Text;
                 }
 
-                return null;
+                return string.Empty;
             }
         }
     }

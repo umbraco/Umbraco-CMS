@@ -71,7 +71,7 @@ namespace umbraco.controls.Images
                 parent = BusinessLogic.User.GetCurrent().StartNodeId;
 
             Media m = Media.MakeNew(TextBoxTitle.Text, cms.businesslogic.media.MediaType.GetByAlias("image"), BasePage.Current.getUser(), int.Parse(MediaPickerControl.Value));
-            var props = m.getProperties;
+            var props = m.GenericProperties;
             foreach (cms.businesslogic.property.Property p in props)
             {
                 if (p.PropertyType.DataTypeDefinition.DataType.Id == UploadField.Id)

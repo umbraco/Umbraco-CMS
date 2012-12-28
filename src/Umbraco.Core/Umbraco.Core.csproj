@@ -247,6 +247,7 @@
     <Compile Include="Persistence\Mappers\MediaMapper.cs" />
     <Compile Include="Persistence\Mappers\ModelDtoMapper.cs" />
     <Compile Include="Persistence\Mappers\PropertyGroupMapper.cs" />
+    <Compile Include="Persistence\Mappers\PropertyMapper.cs" />
     <Compile Include="Persistence\Mappers\PropertyTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\RelationMapper.cs" />
     <Compile Include="Persistence\Mappers\RelationTypeMapper.cs" />

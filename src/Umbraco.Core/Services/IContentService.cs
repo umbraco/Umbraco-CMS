@@ -270,5 +270,12 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User copying the Content</param>
         /// <returns>The newly created <see cref="IContent"/> object</returns>
         IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = -1);
+
+        /// <summary>
+        /// Checks if the passed in <see cref="IContent"/> can be published based on the anscestors publish state.
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> to check if anscestors are published</param>
+        /// <returns>True if the Content can be published, otherwise False</returns>
+        bool IsPublishable(IContent content);
     }
 }

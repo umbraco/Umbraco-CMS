@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using Umbraco.Core.Configuration;
 using umbraco.cms.businesslogic.installer;
 using umbraco.IO;
-using umbraco.DataLayer.Utility.Installer;
-using umbraco.DataLayer;
 
 namespace umbraco.presentation.install.steps.Definitions
 {
@@ -41,9 +37,11 @@ namespace umbraco.presentation.install.steps.Definitions
             bool retval = false;
             try
             {
-                IInstallerUtility m_Installer = BusinessLogic.Application.SqlHelper.Utility.CreateInstaller();
-                retval = m_Installer.IsLatestVersion;
-                m_Installer = null;
+                var configuredVersion = new Version(Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus);
+                var targetVersion = UmbracoVersion.Current;
+
+                retval = targetVersion > configuredVersion;
+
             } catch {
                 // this step might fail due to missing connectionstring
                 return false;

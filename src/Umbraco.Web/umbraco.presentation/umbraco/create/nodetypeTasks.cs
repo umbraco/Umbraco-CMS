@@ -59,6 +59,8 @@ namespace umbraco
                 dt.MasterContentType = TypeID;
             }
 
+            dt.Save();
+
             m_returnUrl = "settings/editNodeTypeNew.aspx?id=" + dt.Id.ToString();
 
             return true;

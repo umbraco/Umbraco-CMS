@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Represents the contnet type that a <see cref="Content"/> object is based on
+    /// Represents the content type that a <see cref="Content"/> object is based on
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
@@ -79,6 +79,24 @@ namespace Umbraco.Core.Models
                 templates.Add(template);
                 AllowedTemplates = templates;
             }
+        }
+
+        /// <summary>
+        /// Removes a template from the list of allowed templates
+        /// </summary>
+        /// <param name="template"><see cref="ITemplate"/> to remove</param>
+        /// <returns>True if template was removed, otherwise False</returns>
+        public bool RemoveTemplate(ITemplate template)
+        {
+            if (DefaultTemplateId == template.Id)
+                DefaultTemplateId = default(int);
+
+            var templates = AllowedTemplates.ToList();
+            var remove = templates.FirstOrDefault(x => x.Id == template.Id);
+            var result = templates.Remove(remove);
+            AllowedTemplates = templates;
+
+            return result;
         }
 
         /// <summary>

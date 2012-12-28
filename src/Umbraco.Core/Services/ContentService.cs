@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -354,6 +353,24 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Checks if the passed in <see cref="IContent"/> can be published based on the anscestors publish state.
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> to check if anscestors are published</param>
+        /// <returns>True if the Content can be published, otherwise False</returns>
+        public bool IsPublishable(IContent content)
+        {
+            //If the passed in content has yet to be saved we "fallback" to checking the Parent
+            //because if the Parent is publishable then the current content can be Saved and Published
+            if (content.HasIdentity == false)
+            {
+                IContent parent = GetById(content.ParentId);
+                return IsPublishable(parent, true);
+            }
+
+            return IsPublishable(content, false);
+        }
+
 	    /// <summary>
 	    /// Re-Publishes all Content
 	    /// </summary>
@@ -442,11 +459,11 @@ namespace Umbraco.Core.Services
             //TODO Refactor this so omitCacheRefresh isn't exposed in the public method, but only in an internal one as its purely there for legacy reasons.
 
 	        //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
-	        if (content.ParentId != -1 && content.ParentId != -20 && HasPublishedVersion(content.ParentId) == false)
+	        if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
 	        {
 	            LogHelper.Info<ContentService>(
 	                string.Format(
-	                    "Content '{0}' with Id '{1}' could not be published because its parent is not published.",
+	                    "Content '{0}' with Id '{1}' could not be published because its parent or one of its ancestors is not published.",
 	                    content.Name, content.Id));
 	            return false;
 	        }
@@ -518,17 +535,7 @@ namespace Umbraco.Core.Services
 	    {
             //TODO Refactor this so omitCacheRefresh isn't exposed in the public method, but only in an internal one as its purely there for legacy reasons.
 
-	        //Look for children and unpublish them if any exists, otherwise just unpublish the passed in Content.
-	        var children = GetChildrenDeep(content.Id);
-	        var hasChildren = children.Any();
-
-	        if (hasChildren)
-	            children.Add(content);
-
-	        var unpublished = hasChildren
-	                              ? _publishingStrategy.UnPublish(children, userId)
-	                              : _publishingStrategy.UnPublish(content, userId);
-
+	        var unpublished = _publishingStrategy.UnPublish(content, userId);
 	        if (unpublished)
 	        {
 	            var uow = _uowProvider.GetUnitOfWork();
@@ -536,24 +543,8 @@ namespace Umbraco.Core.Services
 	            {
 	                repository.AddOrUpdate(content);
 
-	                if (hasChildren)
-	                {
-	                    foreach (var child in children)
-	                    {
-	                        SetWriter(child, userId);
-	                        repository.AddOrUpdate(child);
-	                    }
-	                }
-
-	                //Remove 'published' xml from the cmsContentXml table for the unpublished content and its (possible) children
+	                //Remove 'published' xml from the cmsContentXml table for the unpublished content
 	                uow.Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new {Id = content.Id});
-	                if (hasChildren)
-	                {
-	                    foreach (var child in children)
-	                    {
-	                        uow.Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new {Id = child.Id});
-	                    }
-	                }
 
                     uow.Commit();
 	            }
@@ -581,7 +572,7 @@ namespace Umbraco.Core.Services
 				return false;
 
 			//Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
-			if (content.ParentId != -1 && content.ParentId != -20 && HasPublishedVersion(content.ParentId) == false)
+            if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
 			{
 				LogHelper.Info<ContentService>(
 					string.Format(
@@ -616,22 +607,30 @@ namespace Umbraco.Core.Services
 				{
 					var xml = content.ToXml();
 					var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
-					var exists =
-						uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = content.Id }) !=
-						null;
+				    var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new {Id = content.Id}) != null;
 					int result = exists
 									 ? uow.Database.Update(poco)
 									 : Convert.ToInt32(uow.Database.Insert(poco));
 				}
 			}
 
+            Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
+
 			//Save xml to db and call following method to fire event through PublishingStrategy to update cache
 			if (omitCacheRefresh == false)
 				_publishingStrategy.PublishingFinalized(content);
+            
+            //We need to check if children and their publish state to ensure that we republish content that was previously published
+	        if (HasChildren(content.Id))
+	        {
+	            var children = GetChildrenDeep(content.Id);
+	            var shouldBeRepublished = children.Where(child => HasPublishedVersion(child.Id));
 
-			Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
+	            if (omitCacheRefresh == false)
+	                _publishingStrategy.PublishingFinalized(shouldBeRepublished, false);
+	        }
 
-			Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId == -1 ? 0 : userId, content.Id);
+	        Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId == -1 ? 0 : userId, content.Id);
 
 			return published;
 	    }
@@ -687,7 +686,6 @@ namespace Umbraco.Core.Services
 				{
 					foreach (var content in contents)
 					{
-
 						SetWriter(content, userId);
 
 						//Only change the publish state if the "previous" version was actually published
@@ -978,10 +976,13 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User copying the Content</param>
         /// <returns>The newly created <see cref="IContent"/> object</returns>
         public IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = -1)
-		{
+        {
 			var copy = ((Content)content).Clone();
 			copy.ParentId = parentId;
-			copy.Name = copy.Name + " (1)";
+
+            // A copy should never be set to published
+            // automatically even if the original was
+            this.UnPublish(copy);
 
 			if (Copying.IsRaisedEventCancelled(new CopyEventArgs<IContent>(content, copy, parentId), this))
 				return null;
@@ -990,7 +991,7 @@ namespace Umbraco.Core.Services
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
 				SetWriter(content, userId);
-
+			    
 				repository.AddOrUpdate(copy);
 				uow.Commit();
 
@@ -1101,7 +1102,6 @@ namespace Umbraco.Core.Services
 	    /// <returns>The newly created <see cref="IContent"/> object</returns>
 	    public IContent Rollback(int id, Guid versionId, int userId = -1)
 	    {
-	        
 	        var content = GetByVersion(versionId);
 
 			if (RollingBack.IsRaisedEventCancelled(new RollbackEventArgs<IContent>(content), this))
@@ -1148,7 +1148,7 @@ namespace Umbraco.Core.Services
         /// </remarks>
         /// <param name="parentId">Id of the parent to retrieve children from</param>
         /// <returns>A list of valid <see cref="IContent"/> that can be published</returns>
-        private List<IContent> GetChildrenDeep(int parentId)
+        private IEnumerable<IContent> GetChildrenDeep(int parentId)
         {
             var list = new List<IContent>();
             var children = GetChildren(parentId);
@@ -1161,6 +1161,40 @@ namespace Umbraco.Core.Services
                 }
             }
             return list;
+        }
+
+        /// <summary>
+        /// Checks if the passed in <see cref="IContent"/> can be published based on the anscestors publish state.
+        /// </summary>
+        /// <remarks>
+        /// Check current is only used when falling back to checking the Parent of non-saved content, as
+        /// non-saved content doesn't have a valid path yet.
+        /// </remarks>
+        /// <param name="content"><see cref="IContent"/> to check if anscestors are published</param>
+        /// <param name="checkCurrent">Boolean indicating whether the passed in content should also be checked for published versions</param>
+        /// <returns>True if the Content can be published, otherwise False</returns>
+        private bool IsPublishable(IContent content, bool checkCurrent)
+        {
+            var ids = content.Path.Split(',').Select(int.Parse).ToList();
+            foreach (var id in ids)
+            {
+                //If Id equals that of the recycle bin we return false because nothing in the bin can be published
+                if (id == -20)
+                    return false;
+
+                //We don't check the System Root, so just continue
+                if (id == -1) continue;
+
+                //If the current id equals that of the passed in content and if current shouldn't be checked we skip it.
+                if (checkCurrent == false && id == content.Id) continue;
+
+                //Check if the content for the current id is published - escape the loop if we encounter content that isn't published
+                var hasPublishedVersion = ApplicationContext.Current.Services.ContentService.GetById(id).Published;
+                if (hasPublishedVersion == false)
+                    return false;
+            }
+
+            return true;
         }
 
 		/// <summary>

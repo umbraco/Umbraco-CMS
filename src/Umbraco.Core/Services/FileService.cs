@@ -213,11 +213,24 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="alias">Alias of the template</param>
         /// <returns>A <see cref="Template"/> object</returns>
-        public ITemplate GetTemplateByAlias(string alias)
+        public ITemplate GetTemplate(string alias)
         {
             using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
             {
                 return repository.Get(alias);
+            }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="ITemplate"/> object by its alias
+        /// </summary>
+        /// <param name="id">Id of the template</param>
+        /// <returns>A <see cref="ITemplate"/> object</returns>
+        public ITemplate GetTemplate(int id)
+        {
+            using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(id);
             }
         }
 

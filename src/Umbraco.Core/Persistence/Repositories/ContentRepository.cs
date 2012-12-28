@@ -260,7 +260,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(IContent entity)
         {
-            //A new version should only be created if published state has changed
+            //A new version should only be created if published state (or language) has changed
             bool shouldCreateNewVersion = ((ICanBeDirty)entity).IsPropertyDirty("Published") || ((ICanBeDirty)entity).IsPropertyDirty("Language");
             if (shouldCreateNewVersion)
             {
@@ -298,7 +298,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //If Published state has changed then previous versions should have their publish state reset
-            if (shouldCreateNewVersion && entity.Published)
+            if (((ICanBeDirty)entity).IsPropertyDirty("Published") && entity.Published)
             {
                 var publishedDocs = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND published = @IsPublished", new { Id = entity.Id, IsPublished = true });
                 foreach (var doc in publishedDocs)
@@ -374,7 +374,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
             var uploadFieldId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
-            //Loop through properties to check if the content contains media that should be deleted
+            //Loop through properties to check if the content contains images/files that should be deleted
             foreach (var property in entity.Properties)
             {
                 if (property.PropertyType.DataTypeControlId == uploadFieldId &&

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
-
 using System.Xml;
-
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Caching;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
@@ -11,11 +11,13 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
 using umbraco.IO;
-using umbraco.cms.businesslogic.media;
 using System.Collections;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.workflow;
 using umbraco.cms.businesslogic.Tags;
+using File = System.IO.File;
+using Media = umbraco.cms.businesslogic.media.Media;
+using Task = umbraco.cms.businesslogic.task.Task;
 
 namespace umbraco.cms.businesslogic
 {
@@ -27,6 +29,7 @@ namespace umbraco.cms.businesslogic
     /// The child classes are required to implement an identifier (Guid) which is used as the objecttype identifier, for 
     /// distinguishing the different types of CMSNodes (ex. Documents/Medias/Stylesheets/documenttypes and so forth).
     /// </summary>
+    [Obsolete("Deprecated, This class will eventually be phased out", false)]
     public class CMSNode : BusinessLogic.console.IconI
     {
         #region Private Members
@@ -397,6 +400,11 @@ namespace umbraco.cms.businesslogic
             PopulateCMSNodeFromReader(reader);
         }
 
+        protected internal CMSNode(IEntity entity)
+        {
+            _id = entity.Id;
+        }
+
         #endregion
 
         #region Public Methods
@@ -541,9 +549,14 @@ order by level,sortOrder";
                 //make sure the node type is a document/media, if it is a recycle bin then this will not be equal
                 if (!IsTrashed && newParent.nodeObjectType == Document._objectType)
                 {
+                    // regenerate the xml of the current document
+                    var movedDocument = new Document(this.Id);
+                    movedDocument.XmlGenerate(new XmlDocument());
+
                     //regenerate the xml for the newParent node
-                    var d = new Document(newParent.Id);
-                    d.XmlGenerate(new XmlDocument());
+                    var parentDocument = new Document(newParent.Id);
+                    parentDocument.XmlGenerate(new XmlDocument());
+                    
                 }
                 else if (!IsTrashed && newParent.nodeObjectType == Media._objectType)
                 {
@@ -557,6 +570,9 @@ order by level,sortOrder";
                 {
                     c.Move(this);
                 }
+
+                //TODO: Properly refactor this, we're just clearing the cache so the changes will also be visible in the backoffice
+                InMemoryCacheProvider.Current.Clear();
 
                 FireAfterMove(e);
             }
@@ -1062,6 +1078,34 @@ order by level,sortOrder";
             _userId = dr.GetInt("nodeUser");
             _createDate = dr.GetDateTime("createDate");
             _isTrashed = dr.GetBoolean("trashed");
+        }
+
+        internal protected void PopulateCMSNodeFromContentBase(IContentBase content, Guid objectType)
+        {
+            _uniqueID = content.Key;
+            _nodeObjectType = objectType;
+            _level = content.Level;
+            _path = content.Path;
+            _parentid = content.ParentId;
+            _text = content.Name;
+            _sortOrder = content.SortOrder;
+            _userId = content.CreatorId;
+            _createDate = content.CreateDate;
+            _isTrashed = content.Trashed;
+        }
+
+        internal protected void PopulateCMSNodeFromContentTypeBase(IContentTypeBase contentType, Guid objectType)
+        {
+            _uniqueID = contentType.Key;
+            _nodeObjectType = objectType;
+            _level = contentType.Level;
+            _path = contentType.Path;
+            _parentid = contentType.ParentId;
+            _text = contentType.Name;
+            _sortOrder = contentType.SortOrder;
+            _userId = contentType.CreatorId;
+            _createDate = contentType.CreateDate;
+            _isTrashed = false;
         }
 
         #endregion

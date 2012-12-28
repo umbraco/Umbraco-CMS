@@ -110,6 +110,21 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Checks whether an <see cref="IContentType"/> item has any children
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContentType"/></param>
+        /// <returns>True if the content type has any children otherwise False</returns>
+        public bool HasChildren(int id)
+        {
+            using (var repository = _repositoryFactory.CreateContentTypeRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IContentType>.Builder.Where(x => x.ParentId == id);
+                int count = repository.Count(query);
+                return count > 0;
+            }
+        }
+
+        /// <summary>
         /// Saves a single <see cref="IContentType"/> object
         /// </summary>
         /// <param name="contentType"><see cref="IContentType"/> to save</param>
@@ -275,6 +290,21 @@ namespace Umbraco.Core.Services
                 var query = Query<IMediaType>.Builder.Where(x => x.ParentId == id);
                 var contentTypes = repository.GetByQuery(query);
                 return contentTypes;
+            }
+        }
+
+        /// <summary>
+        /// Checks whether an <see cref="IMediaType"/> item has any children
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMediaType"/></param>
+        /// <returns>True if the media type has any children otherwise False</returns>
+        public bool MediaTypeHasChildren(int id)
+        {
+            using (var repository = _repositoryFactory.CreateMediaTypeRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IMediaType>.Builder.Where(x => x.ParentId == id);
+                int count = repository.Count(query);
+                return count > 0;
             }
         }
 

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -234,6 +236,13 @@ namespace Umbraco.Core.Persistence.Repositories
             //Updates Modified date
             ((Models.Media)entity).UpdatingEntity();
 
+            //Look up parent to get and set the correct Path if ParentId has changed
+            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            {
+                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
+                entity.Path = string.Concat(parent.Path, ",", entity.Id);
+            }
+
             var factory = new MediaFactory(NodeObjectTypeId, entity.Id);
             //Look up Content entry to get Primary for updating the DTO
             var contentDto = Database.SingleOrDefault<ContentDto>("WHERE nodeId = @Id", new { Id = entity.Id });
@@ -285,6 +294,36 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
+        }
+
+        protected override void PersistDeletedItem(IMedia entity)
+        {
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+            var uploadFieldId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
+            //Loop through properties to check if the media item contains images/file that should be deleted
+            foreach (var property in entity.Properties)
+            {
+                if (property.PropertyType.DataTypeControlId == uploadFieldId &&
+                    string.IsNullOrEmpty(property.Value.ToString()) == false
+                    && fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
+                {
+                    var relativeFilePath = fs.GetRelativePath(property.Value.ToString());
+                    var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);
+
+                    // don't want to delete the media folder if not using directories.
+                    if (UmbracoSettings.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
+                    {
+                        //issue U4-771: if there is a parent directory the recursive parameter should be true
+                        fs.DeleteDirectory(parentDirectory, String.IsNullOrEmpty(parentDirectory) == false);
+                    }
+                    else
+                    {
+                        fs.DeleteFile(relativeFilePath, true);
+                    }
+                }
+            }
+
+            base.PersistDeletedItem(entity);
         }
 
         #endregion

@@ -124,6 +124,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                string.Format("DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id"),
                                string.Format("DELETE FROM cmsTagRelationship WHERE nodeId = @Id"),
                                string.Format("DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @Id"),
+                               string.Format("DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @Id"),
                                string.Format("DELETE FROM cmsContentType2ContentType WHERE parentContentTypeId = @Id"),
                                string.Format("DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @Id"),
                                string.Format("DELETE FROM cmsPropertyType WHERE contentTypeId = @Id"),
@@ -159,6 +160,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //Updates Modified date
             ((MediaType)entity).UpdatingEntity();
+
+            //Look up parent to get and set the correct Path if ParentId has changed
+            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            {
+                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
+                entity.Path = string.Concat(parent.Path, ",", entity.Id);
+            }
 
             var factory = new MediaTypeFactory(NodeObjectTypeId);
             var dto = factory.BuildDto(entity);

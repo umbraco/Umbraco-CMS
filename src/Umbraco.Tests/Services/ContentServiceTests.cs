@@ -308,7 +308,15 @@ namespace Umbraco.Tests.Services
             Assert.That(content.Published, Is.False);
         }
 
-        [Test]
+        /// <summary>
+        /// This test is ignored because the way children are handled when
+        /// parent is unpublished is treated differently now then from when this test
+        /// was written.
+        /// The correct case is now that Root is UnPublished removing the children
+        /// from cache, but still having them "Published" in the "background".
+        /// Once the Parent is Published the Children should re-appear as published.
+        /// </summary>
+        [Test, NUnit.Framework.Ignore]
         public void Can_UnPublish_Root_Content_And_Verify_Children_Is_UnPublished()
         {
             // Arrange
@@ -707,7 +715,27 @@ namespace Umbraco.Tests.Services
             Assert.That(c2.Value.ParentId > 0, Is.True);
         }
 
-		private IEnumerable<IContent> CreateContentHierarchy()
+        [Test]
+        public void Can_Verify_Content_Has_Published_Version()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.GetById(1046);
+            bool published = contentService.PublishWithChildren(content, 0);
+            var homepage = contentService.GetById(1046);
+            homepage.Name = "Homepage";
+            ServiceContext.ContentService.Save(homepage);
+
+            // Act
+            bool hasPublishedVersion = ServiceContext.ContentService.HasPublishedVersion(1046);
+
+            // Assert
+            Assert.That(published, Is.True);
+            Assert.That(homepage.Published, Is.False);
+            Assert.That(hasPublishedVersion, Is.True);
+        }
+
+        private IEnumerable<IContent> CreateContentHierarchy()
         {
             var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
             var root = ServiceContext.ContentService.GetById(1046);

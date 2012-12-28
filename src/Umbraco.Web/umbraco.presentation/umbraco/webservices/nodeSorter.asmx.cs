@@ -3,7 +3,9 @@ using System.Collections;
 using System.ComponentModel;
 using System.Web.Script.Services;
 using System.Web.Services;
+using System.Xml;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.Caching;
 using umbraco.BasePages;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
@@ -24,11 +26,10 @@ namespace umbraco.presentation.webservices
         {
             if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
             {
-                SortNode parent = new SortNode();
-                parent.Id = ParentId;
+                var parent = new SortNode { Id = ParentId };
 
-                ArrayList _nodes = new ArrayList();
-                cms.businesslogic.CMSNode n = new cms.businesslogic.CMSNode(ParentId);
+                var nodes = new ArrayList();
+                var cmsNode = new cms.businesslogic.CMSNode(ParentId);
 
                 // Root nodes?
                 if (ParentId == -1)
@@ -36,34 +37,32 @@ namespace umbraco.presentation.webservices
                     if (App == "media")
                     {
                         foreach (cms.businesslogic.media.Media child in cms.businesslogic.media.Media.GetRootMedias())
-                            _nodes.Add(new SortNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime));
+                            nodes.Add(new SortNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime));
                     }
                     else
-                        foreach (cms.businesslogic.web.Document child in cms.businesslogic.web.Document.GetRootDocuments())
-                            _nodes.Add(new SortNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime));
+                        foreach (Document child in Document.GetRootDocuments())
+                            nodes.Add(new SortNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime));
                 }
                 else
                 {
                     // "hack for stylesheet"
                     if (App == "settings")
                     {
-                        StyleSheet ss = new StyleSheet(n.Id);
-                        foreach (cms.businesslogic.web.StylesheetProperty child in ss.Properties)
-                            _nodes.Add(new SortNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime));
+                        var styleSheet = new StyleSheet(cmsNode.Id);
+                        foreach (var child in styleSheet.Properties)
+                            nodes.Add(new SortNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime));
 
                     }
                     else
                     {
                         //store children array here because iterating over an Array property object is very inneficient.
-                        var children = n.Children;
+                        var children = cmsNode.Children;
                         foreach (cms.businesslogic.CMSNode child in children)
-                        {
-                            _nodes.Add(new SortNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime));
-                        }
+                            nodes.Add(new SortNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime));
                     }
                 }
 
-                parent.SortNodes = (SortNode[])_nodes.ToArray(typeof(SortNode));
+                parent.SortNodes = (SortNode[])nodes.ToArray(typeof(SortNode));
 
                 return parent;
             }
@@ -74,29 +73,18 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public void UpdateSortOrder(int ParentId, string SortOrder)
         {
-
             try
             {
                 if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
                 {
-
                     if (SortOrder.Trim().Length > 0)
                     {
-                        string[] tmp = SortOrder.Split(',');
+                        var tmp = SortOrder.Split(',');
 
-                        bool isContent = false;
-                        if (helper.Request("app") == "content" | helper.Request("app") == "")
-                            isContent = true;
+                        var isContent = helper.Request("app") == "content" | helper.Request("app") == "";
+                        var isMedia = helper.Request("app") == "media";
 
-                        //CHANGE:Allan Stegelmann Laustsen, we need to know if the node is in media.
-                        bool isMedia = false;
-                        if (helper.Request("app") == "media")
-                        {
-                            isMedia = true;
-                        }
-                        //CHANGE:End
-
-                        for (int i = 0; i < tmp.Length; i++)
+                        for (var i = 0; i < tmp.Length; i++)
                         {
                             if (tmp[i] != "" && tmp[i].Trim() != "")
                             {
@@ -104,32 +92,26 @@ namespace umbraco.presentation.webservices
 
                                 if (isContent)
                                 {
-                                    Document d = new Document(int.Parse(tmp[i]));
+                                    var document = new Document(int.Parse(tmp[i]));
                                     // refresh the xml for the sorting to work
-                                    if (d.Published)
+                                    if (document.Published)
                                     {
-                                        d.refreshXmlSortOrder();
+                                        document.refreshXmlSortOrder();
                                         library.UpdateDocumentCache(int.Parse(tmp[i]));
                                     }
                                 }
-                                //CHANGE:Allan Laustsen, to update the sortorder of the media node in the XML, re-save the node....
+                                // to update the sortorder of the media node in the XML, re-save the node....
                                 else if (isMedia)
                                 {
                                     new cms.businesslogic.media.Media(int.Parse(tmp[i])).Save();
                                 }
-                                //CHANGE:End
                             }
                         }
 
                         // Refresh sort order on cached xml
                         if (isContent)
                         {
-                            System.Xml.XmlNode parentNode;
-
-                            if (ParentId == -1)
-                                parentNode = content.Instance.XmlContent.DocumentElement;
-                            else
-                                parentNode = content.Instance.XmlContent.GetElementById(ParentId.ToString());
+                            XmlNode parentNode = ParentId == -1 ? content.Instance.XmlContent.DocumentElement : content.Instance.XmlContent.GetElementById(ParentId.ToString());
 
                             //only try to do the content sort if the the parent node is available... 
                             if (parentNode != null)
@@ -140,23 +122,24 @@ namespace umbraco.presentation.webservices
                             if (UmbracoSettings.UseDistributedCalls)
                                 library.RefreshContent();
                         }
-                       
+
+                        //TODO: Properly refactor this, we're just clearing the cache so the new sortorder will also be visible in the backoffice
+                        InMemoryCacheProvider.Current.Clear();
 
                         // fire actionhandler, check for content
                         if ((helper.Request("app") == "content" | helper.Request("app") == "") && ParentId > 0)
-                            global::umbraco.BusinessLogic.Actions.Action.RunActionHandlers(new Document(ParentId), ActionSort.Instance);                        
+                            global::umbraco.BusinessLogic.Actions.Action.RunActionHandlers(new Document(ParentId), ActionSort.Instance);
                     }
                 }
 
             }
             catch (Exception ex)
             {
-				LogHelper.Error<nodeSorter>("An error occurred", ex);
+                LogHelper.Error<nodeSorter>("An error occurred", ex);
             }
 
         }
     }
-
 
     [Serializable]
     public class SortNode
@@ -178,8 +161,7 @@ namespace umbraco.presentation.webservices
             get { return _sortNodes != null ? _sortNodes.Length : 0; }
             set { int test = value; }
         }
-
-
+        
         public SortNode(int Id, int SortOrder, string Name, DateTime CreateDate)
         {
             _id = Id;
@@ -195,8 +177,7 @@ namespace umbraco.presentation.webservices
             get { return _createDate; }
             set { _createDate = value; }
         }
-
-
+        
         private string _name;
 
         public string Name
@@ -204,8 +185,7 @@ namespace umbraco.presentation.webservices
             get { return _name; }
             set { _name = value; }
         }
-
-
+        
         private int _sortOrder;
 
         public int SortOrder
@@ -213,7 +193,6 @@ namespace umbraco.presentation.webservices
             get { return _sortOrder; }
             set { _sortOrder = value; }
         }
-
 
         private int _id;
 

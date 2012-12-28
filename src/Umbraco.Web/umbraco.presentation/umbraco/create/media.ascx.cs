@@ -1,12 +1,7 @@
 namespace umbraco.cms.presentation.create.controls
 {
 	using System;
-	using System.Data;
-	using System.Drawing;
-	using System.Web;
 	using System.Web.UI.WebControls;
-	using System.Web.UI.HtmlControls;
-	using umbraco.cms.helpers;
 	using umbraco.BasePages;
 
 	/// <summary>
@@ -28,7 +23,7 @@ namespace umbraco.cms.presentation.create.controls
 				allowedIds = c.ContentType.AllowedChildContentTypeIDs;
 			}
 
-			foreach(cms.businesslogic.ContentType dt in cms.businesslogic.media.MediaType.GetAll) 
+            foreach (var dt in cms.businesslogic.media.MediaType.GetAllAsList())
 			{
 				ListItem li = new ListItem();
 				li.Text = dt.Text;
