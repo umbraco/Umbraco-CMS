@@ -1,24 +1,24 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Umbraco.Core.Events
 {
-	public class SaveEventArgs<TEntity> : CancellableObjectEventArgs<IEnumerable<TEntity>>
-	{
-		/// <summary>
-		/// Constructor accepting multiple entities that are used in the saving operation
+    public class PublishEventArgs<TEntity> : CancellableObjectEventArgs<IEnumerable<TEntity>>
+    {
+        /// <summary>
+		/// Constructor accepting multiple entities that are used in the publish operation
 		/// </summary>
 		/// <param name="eventObject"></param>
 		/// <param name="canCancel"></param>
-		public SaveEventArgs(IEnumerable<TEntity> eventObject, bool canCancel)
+		public PublishEventArgs(IEnumerable<TEntity> eventObject, bool canCancel)
 			: base(eventObject, canCancel)
 		{
 		}
 
 		/// <summary>
-		/// Constructor accepting multiple entities that are used in the saving operation
+		/// Constructor accepting multiple entities that are used in the publish operation
 		/// </summary>
 		/// <param name="eventObject"></param>
-		public SaveEventArgs(IEnumerable<TEntity> eventObject)
+		public PublishEventArgs(IEnumerable<TEntity> eventObject)
 			: base(eventObject)
 		{
 		}
@@ -27,7 +27,7 @@ namespace Umbraco.Core.Events
 		/// Constructor accepting a single entity instance
 		/// </summary>
 		/// <param name="eventObject"></param>
-		public SaveEventArgs(TEntity eventObject)
+		public PublishEventArgs(TEntity eventObject)
 			: base(new List<TEntity> { eventObject })
 		{
 		}
@@ -37,20 +37,17 @@ namespace Umbraco.Core.Events
 		/// </summary>
 		/// <param name="eventObject"></param>
 		/// <param name="canCancel"></param>
-		public SaveEventArgs(TEntity eventObject, bool canCancel)
+        public PublishEventArgs(TEntity eventObject, bool canCancel)
 			: base(new List<TEntity> { eventObject }, canCancel)
 		{
 		}
 
 		/// <summary>
-		/// Returns all entities that were saved during the operation
+		/// Returns all entities that were published during the operation
 		/// </summary>
-		public IEnumerable<TEntity> SavedEntities
+		public IEnumerable<TEntity> PublishedEntities
 		{
 			get { return EventObject; }
 		}
-
-
-
-	}
+    }
 }
