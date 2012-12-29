@@ -158,6 +158,7 @@
     <Compile Include="CodeFirst\TypeInheritanceTest.cs" />
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="ContentStores\PublishMediaStoreTests.cs" />
+    <Compile Include="LegacyApi\MediaTypeTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
     <Compile Include="Migrations\Upgrades\BaseUpgradeTest.cs" />
     <Compile Include="Migrations\FindingMigrationsTest.cs" />
