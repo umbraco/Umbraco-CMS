@@ -11,13 +11,13 @@ using System.Web.Services;
 using System.Web.UI;
 using System.Xml;
 using System.Xml.Xsl;
+using Umbraco.Core.IO;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.cache;
 using System.Net;
-using umbraco.IO;
 using System.Collections;
 using umbraco.NodeFactory;
 using umbraco.scripting;
@@ -34,8 +34,7 @@ namespace umbraco.presentation.webservices
     public class codeEditorSave : WebService
     {
         [WebMethod]
-        public string Save(string fileName, string fileAlias, string fileContents, string fileType, int fileID,
-                           int masterID, bool ignoreDebug)
+        public string Save(string fileName, string fileAlias, string fileContents, string fileType, int fileID, int masterID, bool ignoreDebug)
         {
             return "Not implemented";
         }
@@ -338,6 +337,49 @@ namespace umbraco.presentation.webservices
 
             return "false";
         }
+
+		[WebMethod]
+		public string SavePartialView(string filename, string oldName, string contents)
+		{
+			if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
+			{
+				var folderPath = SystemDirectories.MvcViews + "/Partials/";
+
+				// validate file
+				IOHelper.ValidateEditPath(IOHelper.MapPath(folderPath + filename), folderPath);
+				// validate extension
+				IOHelper.ValidateFileExtension(IOHelper.MapPath(folderPath + filename), new[] {"cshtml"}.ToList());
+
+
+				var val = contents;
+				string returnValue;
+				var saveOldPath = oldName.StartsWith("~/") ? IOHelper.MapPath(oldName) : IOHelper.MapPath(folderPath + oldName);
+				var savePath = filename.StartsWith("~/") ? IOHelper.MapPath(filename) : IOHelper.MapPath(folderPath + filename);
+
+				//Directory check.. only allow files in script dir and below to be edited
+				if (savePath.StartsWith(IOHelper.MapPath(folderPath)))
+				{
+					//deletes the old file
+					if (savePath != saveOldPath)
+					{
+						if (File.Exists(saveOldPath))
+							File.Delete(saveOldPath);
+					}
+					using (var sw = File.CreateText(savePath))
+					{
+						sw.Write(val);
+					}
+					returnValue = "true";
+				}
+				else
+				{
+					returnValue = "illegalPath";
+				}
+
+				return returnValue;
+			}
+			return "false";
+		}
 
         [WebMethod]
         public string SaveScript(string filename, string oldName, string contents)

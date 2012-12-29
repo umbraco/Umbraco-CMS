@@ -30,17 +30,32 @@
         },
 
         doSubmit: function () {
+            /// <summary>Submits the data to the server for saving</summary>
             var codeVal = UmbClientMgr.contentFrame().UmbEditor.GetCode();
             var self = this;
 
-            umbraco.presentation.webservices.codeEditorSave.SaveTemplate(
-                this._opts.nameTxtBox.val(),
-                this._opts.aliasTxtBox.val(),
-                codeVal,
-                this._opts.templateId,
-                this._opts.masterPageDropDown.val(),
-                function (t) { self.submitSuccess(t); },
-                function (t) { self.submitFailure(t); });
+            if (this._opts.editorType == "Template") {
+                //saving a template view
+                
+                umbraco.presentation.webservices.codeEditorSave.SaveTemplate(
+                    this._opts.nameTxtBox.val(),
+                    this._opts.aliasTxtBox.val(),
+                    codeVal,
+                    this._opts.templateId,
+                    this._opts.masterPageDropDown.val(),
+                    function(t) { self.submitSuccess(t); },
+                    function(t) { self.submitFailure(t); });
+            }
+            else {
+                //saving a partial view    
+                
+                umbraco.presentation.webservices.codeEditorSave.SavePartialView(
+                    this._opts.nameTxtBox.val(),
+                    this._opts.originalFileName,
+                    codeVal,
+                    function (t) { self.submitSuccess(t); },
+                    function (t) { self.submitFailure(t); });
+            }
         },
         
         submitSuccess: function (t) {

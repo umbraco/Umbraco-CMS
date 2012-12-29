@@ -14,6 +14,8 @@
             $(document).ready(function () {
                 //create a new EditView object
                 var editView = new Umbraco.Editors.EditView({
+                    editorType: "<%= EditorType.ToString() %>",
+                    originalFileName: "<%=OriginalFileName %>",
                     masterPageDropDown: $("#<%= MasterTemplate.ClientID %>"),
                     nameTxtBox: $("#<%= NameTxt.ClientID %>"),
                     aliasTxtBox: $("#<%= AliasTxt.ClientID %>"),
@@ -40,6 +42,7 @@
 
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
+    
     <cc1:UmbracoPanel ID="Panel1" runat="server" Width="608px" Height="336px" hasMenu="true">
         <cc1:Pane ID="Pane7" runat="server" Height="44px" Width="528px">
             

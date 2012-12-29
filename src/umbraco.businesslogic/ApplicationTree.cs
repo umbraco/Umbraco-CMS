@@ -404,7 +404,7 @@ namespace umbraco.BusinessLogic
                                              addElement.Attribute("title").Value,
                                              addElement.Attribute("iconClosed").Value,
                                              addElement.Attribute("iconOpen").Value,
-                                             addElement.Attribute("assembly").Value,
+											 (string)addElement.Attribute("assembly"), //this could be empty: http://issues.umbraco.org/issue/U4-1360
                                              addElement.Attribute("type").Value,
                                              addElement.Attribute("action") != null ? addElement.Attribute("action").Value : ""));
                         }

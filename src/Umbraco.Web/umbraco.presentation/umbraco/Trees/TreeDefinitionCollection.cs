@@ -166,8 +166,23 @@ namespace umbraco.cms.presentation.Trees
 					//find the Application tree's who's combination of assembly name and tree type is equal to 
 					//the Type that was found's full name.
 					//Since a tree can exist in multiple applications we'll need to register them all.
+					
+					//The logic of this has changed in 6.0: http://issues.umbraco.org/issue/U4-1360
+					// we will support the old legacy way but the normal way is to match on assembly qualified names
+
 					var appTreesForType = appTrees.FindAll(
-						tree => (string.Format("{0}.{1}", tree.AssemblyName, tree.Type) == type.FullName)
+						tree =>
+							{
+								//match the type on assembly qualified name if the assembly attribute is empty or if the
+								// tree type contains a comma (meaning it is assembly qualified)
+								if (tree.AssemblyName.IsNullOrWhiteSpace() || tree.Type.Contains(","))
+								{									
+									return tree.Type == type.GetFullNameWithAssembly();
+								}
+
+								//otherwise match using legacy match rules
+								return (string.Format("{0}.{1}", tree.AssemblyName, tree.Type).InvariantEquals(type.FullName));									
+							}
 						);
 
 					foreach (var appTree in appTreesForType)

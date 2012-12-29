@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core.IO;
+using Umbraco.Web.Trees;
 using umbraco;
 using umbraco.BasePages;
-using umbraco.IO;
 using umbraco.cms.businesslogic.template;
+using umbraco.cms.helpers;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Core;
 using umbraco.uicontrols;
 
 namespace Umbraco.Web.UI.Umbraco.Settings.Views
@@ -16,29 +20,37 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 	public partial class EditView : global::umbraco.BasePages.UmbracoEnsuredPage
 	{
 		private Template _template;
-
-		protected global::ClientDependency.Core.Controls.CssInclude CssInclude1;
-		protected global::ClientDependency.Core.Controls.JsInclude JsInclude;
-
-		protected global::umbraco.uicontrols.UmbracoPanel Panel1;
-		protected global::umbraco.uicontrols.Pane Pane7;
-		protected global::umbraco.uicontrols.PropertyPanel pp_name;
-		protected global::System.Web.UI.WebControls.TextBox NameTxt;
-		protected global::umbraco.uicontrols.PropertyPanel pp_alias;
-		protected global::System.Web.UI.WebControls.TextBox AliasTxt;
-		protected global::umbraco.uicontrols.PropertyPanel pp_masterTemplate;
-		protected global::System.Web.UI.WebControls.DropDownList MasterTemplate;
-		protected global::umbraco.uicontrols.PropertyPanel pp_source;
-		protected global::umbraco.uicontrols.CodeArea editorSource;
-		protected global::System.Web.UI.WebControls.Repeater rpt_codeTemplates;
-		protected global::System.Web.UI.WebControls.Repeater rpt_macros;
-		protected MenuIconI SaveButton;		
-
+		protected MenuIconI SaveButton;
 
 		public EditView()
 		{
 			CurrentApp = global::umbraco.BusinessLogic.DefaultApps.settings.ToString();
 		}
+
+		/// <summary>
+		/// The type of MVC/Umbraco view the editor is editing
+		/// </summary>
+		public enum ViewEditorType
+		{
+			Template,
+			PartialView
+		}
+
+		/// <summary>
+		/// Returns the type of view being edited
+		/// </summary>
+		protected ViewEditorType EditorType
+		{
+			get { return _template == null ? ViewEditorType.PartialView : ViewEditorType.Template; }
+		}
+
+		/// <summary>
+		/// Returns the original file name that the editor was loaded with
+		/// </summary>
+		/// <remarks>
+		/// this is used for editing a partial view
+		/// </remarks>
+		protected string OriginalFileName { get; private set; }
 
 		protected override void OnLoad(EventArgs e)
 		{
@@ -46,48 +58,81 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 
 			if (!IsPostBack)
 			{
-				MasterTemplate.Items.Add(new ListItem(ui.Text("none"), "0"));
-				var selectedTemplate = string.Empty;
 
-				foreach (Template t in Template.GetAllAsList())
+				//configure screen for editing a template
+				if (_template != null)
 				{
-					if (t.Id == _template.Id) continue;
+					MasterTemplate.Items.Add(new ListItem(ui.Text("none"), "0"));
+					var selectedTemplate = string.Empty;
 
-					var li = new ListItem(t.Text, t.Id.ToString());
-                    li.Attributes.Add("id", t.Alias.Replace(" ", "") + ".cshtml");
-                    MasterTemplate.Items.Add(li);
-				}
+					foreach (Template t in Template.GetAllAsList())
+					{
+						if (t.Id == _template.Id) continue;
 
-                try
-                {
-                    if (_template.MasterTemplate > 0)
-                        MasterTemplate.SelectedValue = _template.MasterTemplate.ToString();
-                }
-                catch (Exception ex)
-                {
-				}
+						var li = new ListItem(t.Text, t.Id.ToString());
+						li.Attributes.Add("id", t.Alias.Replace(" ", "") + ".cshtml");
+						MasterTemplate.Items.Add(li);
+					}
 
-				MasterTemplate.SelectedValue = selectedTemplate;
+					try
+					{
+						if (_template.MasterTemplate > 0)
+							MasterTemplate.SelectedValue = _template.MasterTemplate.ToString();
+					}
+					catch (Exception ex)
+					{
+					}
 
-				NameTxt.Text = _template.GetRawText();
-				AliasTxt.Text = _template.Alias;
-				editorSource.Text = _template.Design;
+					MasterTemplate.SelectedValue = selectedTemplate;
+					NameTxt.Text = _template.GetRawText();
+					AliasTxt.Text = _template.Alias;
+					editorSource.Text = _template.Design;
 
-				ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadTemplates>().Tree.Alias)
+					ClientTools
+					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<PartialViewsTree>().Tree.Alias)
 					.SyncTree("-1,init," + _template.Path.Replace("-1,", ""), false);
+				}
+				else
+				{
+					//configure editor for editing a file....
+
+					NameTxt.Text = OriginalFileName;
+					var file = IOHelper.MapPath(SystemDirectories.MvcViews + "/Partials/" + OriginalFileName);
+
+					using (var sr = File.OpenText(file))
+					{
+						var s = sr.ReadToEnd();
+						editorSource.Text = s;
+					}					
+					
+					//string path = DeepLink.GetTreePathFromFilePath(file);
+					//ClientTools
+					//	.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadPython>().Tree.Alias)
+					//	.SyncTree(path, false);
+				}							
 			}
 		}
 
 
 		protected override void OnInit(EventArgs e)
 		{
-			_template = new Template(int.Parse(Request.QueryString["templateID"]));
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
 			base.OnInit(e);
+
+			//check if a templateId is assigned, meaning we are editing a template
+			if (!Request.QueryString["templateID"].IsNullOrWhiteSpace())
+			{
+				_template = new Template(int.Parse(Request.QueryString["templateID"]));	
+			}
+			else if (!Request.QueryString["file"].IsNullOrWhiteSpace())
+			{
+				//we are editing a view (i.e. partial view)
+				OriginalFileName = Request.QueryString["file"];
+			}
+			else
+			{
+				throw new InvalidOperationException("Cannot render the editor without a supplied templateId or a file");
+			}
+			
 			Panel1.hasMenu = true;
 
 			SaveButton = Panel1.Menu.NewIcon();
@@ -129,6 +174,44 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 
 			Panel1.Menu.NewElement("div", "splitButtonMacroPlaceHolder", "sbPlaceHolder", 40);
 
+
+			if (_template == null)
+			{
+				InitializeEditorForPartialView();
+			}
+			else
+			{
+				InitializeEditorForTemplate();	
+			}
+			
+
+			//Spit button
+			Panel1.Menu.InsertSplitter();
+			Panel1.Menu.NewElement("div", "splitButtonPlaceHolder", "sbPlaceHolder", 40);			
+		}
+
+		protected override void OnPreRender(EventArgs e)
+		{
+			base.OnPreRender(e);
+			ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/codeEditorSave.asmx"));
+			ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
+		}
+		
+		/// <summary>
+		/// Configure the editor for partial view editing
+		/// </summary>
+		private void InitializeEditorForPartialView()
+		{
+			pp_masterTemplate.Visible = false;
+			pp_alias.Visible = false;
+			pp_name.Text = "Filename";
+		}
+
+		/// <summary>
+		/// Configure the editor for editing a template
+		/// </summary>
+		private void InitializeEditorForTemplate()
+		{
 			if (UmbracoSettings.UseAspNetMasterPages)
 			{
 				Panel1.Menu.InsertSplitter();
@@ -150,40 +233,6 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 						IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/insertMasterpageContent.aspx?id=" +
 						_template.Id, ui.Text("template", "insertContentArea"), 470, 300);
 			}
-
-
-			//Spit button
-			Panel1.Menu.InsertSplitter();
-			Panel1.Menu.NewElement("div", "splitButtonPlaceHolder", "sbPlaceHolder", 40);
-
-			// Help
-			Panel1.Menu.InsertSplitter();
-
-			MenuIconI helpIcon = Panel1.Menu.NewIcon();
-			helpIcon.OnClickCommand =
-				ClientTools.Scripts.OpenModalWindow(
-					IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/settings/modals/showumbracotags.aspx?alias=" +
-					_template.Alias, ui.Text("template", "quickGuide"), 600, 580);
-			helpIcon.ImageURL = UmbracoPath + "/images/editor/help.png";
-			helpIcon.AltText = ui.Text("template", "quickGuide");
-		}
-
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
-
-		}
-
-
-
-		protected override void OnPreRender(EventArgs e)
-		{
-			base.OnPreRender(e);
-			ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/codeEditorSave.asmx"));
-			ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
 		}
 
 	}

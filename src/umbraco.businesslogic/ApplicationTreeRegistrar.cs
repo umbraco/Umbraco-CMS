@@ -34,10 +34,8 @@ namespace umbraco.BusinessLogic
                 {
                     var type = tuple.Item1;
                     var attr = tuple.Item2;
-
-                    var typeParts = type.AssemblyQualifiedName.Split(',');
-                    var assemblyName = typeParts[1].Trim();
-                    var typeName = typeParts[0].Substring(assemblyName.Length + 1).Trim();
+					
+					//Add the new tree that doesn't exist in the config that was found by type finding
 
                     doc.Root.Add(new XElement("add",
                                               new XAttribute("silent", attr.Silent),
@@ -48,10 +46,16 @@ namespace umbraco.BusinessLogic
                                               new XAttribute("title", attr.Title),
                                               new XAttribute("iconClosed", attr.IconClosed),
                                               new XAttribute("iconOpen", attr.IconOpen),
-                                              new XAttribute("assembly", assemblyName),
-                                              new XAttribute("type", typeName),
+											  // don't add the assembly, we don't need this:
+											  //	http://issues.umbraco.org/issue/U4-1360
+                                              //new XAttribute("assembly", assemblyName),
+                                              //new XAttribute("type", typeName),
+											  // instead, store the assembly type name
+											  new XAttribute("type", type.GetFullNameWithAssembly()),
                                               new XAttribute("action", attr.Action)));
                 }
+
+				//add any trees that were found in the database that don't exist in the config
 
                 var db = ApplicationContext.Current.DatabaseContext.Database;
                 var exist = db.TableExist("umbracoAppTree");

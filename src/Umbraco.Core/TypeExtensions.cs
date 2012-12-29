@@ -296,5 +296,24 @@ namespace Umbraco.Core
             var attrs = propertyInfo.GetCustomAttributes(typeof(TAttribute), inherit);
             return (attrs.Length > 0 ? attrs.ToList().ConvertAll(input => (TAttribute)input) : null);
         }
+
+		/// <summary>
+		/// Returns the full type name with the assembly but without all of the assembly specific version information.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// This method is like an 'inbetween' of Type.FullName and Type.AssemblyQualifiedName which returns the type and the assembly separated
+		/// by a comma.
+		/// </remarks>
+		/// <example>
+		/// The output of this class would be:
+		/// 
+		/// Umbraco.Core.TypeExtensions, Umbraco.Core
+		/// </example>
+		public static string GetFullNameWithAssembly(this Type type)
+		{
+			return string.Concat(type.FullName, ", ", type.Assembly.GetName().Name);
+		}
 	}
 }
