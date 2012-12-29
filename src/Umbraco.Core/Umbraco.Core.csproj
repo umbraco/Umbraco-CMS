@@ -194,6 +194,7 @@
     <Compile Include="Persistence\Caching\IRepositoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\NullCacheProvider.cs" />
     <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
+    <Compile Include="Persistence\Mappers\PetaPocoMapper.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ConstraintAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\SpecialDbTypeAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\LengthAttribute.cs" />
