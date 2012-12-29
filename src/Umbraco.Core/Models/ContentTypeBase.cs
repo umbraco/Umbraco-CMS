@@ -149,7 +149,7 @@ namespace Umbraco.Core.Models
             get { return _alias; }
             set
             {
-                _alias = value.ToUmbracoAlias(StringAliasCaseType.CamelCase, true);
+                _alias = value;
                 OnPropertyChanged(AliasSelector);
             }
         }
