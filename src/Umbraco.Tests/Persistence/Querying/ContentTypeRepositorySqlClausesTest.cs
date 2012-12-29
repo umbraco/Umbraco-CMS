@@ -21,8 +21,8 @@ namespace Umbraco.Tests.Persistence.Querying
                 .On("[cmsContentType].[nodeId] = [cmsDocumentType].[contentTypeNodeId]")
                 .InnerJoin("[umbracoNode]")
                 .On("[cmsContentType].[nodeId] = [umbracoNode].[id]")
-                .Where("nodeObjectType = 'a2cb7800-f571-4787-9638-bc48539a0efb'")
-                .Where("IsDefault = 'True'");
+                .Where("[umbracoNode].[nodeObjectType] = 'a2cb7800-f571-4787-9638-bc48539a0efb'")
+                .Where("[cmsDocumentType].[IsDefault] = 'True'");
 
             var sql = new Sql();
             sql.Select("*")
@@ -51,9 +51,9 @@ namespace Umbraco.Tests.Persistence.Querying
                 .On("[cmsContentType].[nodeId] = [cmsDocumentType].[contentTypeNodeId]")
                 .InnerJoin("[umbracoNode]")
                 .On("[cmsContentType].[nodeId] = [umbracoNode].[id]")
-                .Where("nodeObjectType = 'a2cb7800-f571-4787-9638-bc48539a0efb'")
-                .Where("IsDefault = 'True'")
-                .Where("id = 1050");
+                .Where("[umbracoNode].[nodeObjectType] = 'a2cb7800-f571-4787-9638-bc48539a0efb'")
+                .Where("[cmsDocumentType].[IsDefault] = 'True'")
+                .Where("[umbracoNode].[id] = 1050");
 
             var sql = new Sql();
             sql.Select("*")

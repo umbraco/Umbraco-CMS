@@ -10,8 +10,10 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
     {
         public static TableDefinition GetTableDefinition(Type modelType)
         {
+            //Looks for PetaPoco's TableNameAtribute for the name of the table
+            //If no attribute is set we use the name of the Type as the default convention
             var tableNameAttribute = modelType.FirstAttribute<TableNameAttribute>();
-            string tableName = tableNameAttribute.Value;
+            string tableName = tableNameAttribute == null ? modelType.Name : tableNameAttribute.Value;
 
             var tableDefinition = new TableDefinition {Name = tableName};
             var objProperties = modelType.GetProperties().ToList();

@@ -245,8 +245,9 @@
     <Compile Include="Persistence\Mappers\DictionaryTranslationMapper.cs" />
     <Compile Include="Persistence\Mappers\DtoMapModel.cs" />
     <Compile Include="Persistence\Mappers\LanguageMapper.cs" />
+    <Compile Include="Persistence\Mappers\MappingResolver.cs" />
     <Compile Include="Persistence\Mappers\MediaMapper.cs" />
-    <Compile Include="Persistence\Mappers\ModelDtoMapper.cs" />
+    <Compile Include="Persistence\Mappers\MediaTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\PropertyGroupMapper.cs" />
     <Compile Include="Persistence\Mappers\PropertyMapper.cs" />
     <Compile Include="Persistence\Mappers\PropertyTypeMapper.cs" />
@@ -384,8 +385,9 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixth\RenameCmsTabTable.cs" />
     <Compile Include="Persistence\PetaPocoExtensions.cs" />
     <Compile Include="Persistence\PetaPocoSqlExtensions.cs" />
-    <Compile Include="Persistence\Querying\ExpressionHelper.cs" />
+    <Compile Include="Persistence\Querying\PocoToSqlExpressionHelper.cs" />
     <Compile Include="Persistence\Querying\IQuery.cs" />
+    <Compile Include="Persistence\Querying\ModelToSqlExpressionHelper.cs" />
     <Compile Include="Persistence\Querying\Query.cs" />
     <Compile Include="Persistence\Querying\SqlTranslator.cs" />
     <Compile Include="Persistence\Relators\DictionaryLanguageTextRelator.cs" />

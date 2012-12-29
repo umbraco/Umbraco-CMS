@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence
 
         public static Sql Where<T>(this Sql sql, Expression<Func<T, bool>> predicate)
         {
-            var expresionist = new ExpressionHelper<T>();
+            var expresionist = new PocoToSqlExpressionHelper<T>();
             string whereExpression = expresionist.Visit(predicate);
 
             return sql.Where(whereExpression);

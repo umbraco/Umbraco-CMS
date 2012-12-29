@@ -7,7 +7,7 @@ using umbraco.cms.businesslogic.media;
 
 namespace Umbraco.Tests.LegacyApi
 {
-    [TestFixture]
+    [TestFixture, Ignore]
     public class MediaTypeTests : BaseDatabaseFactoryTest
     {
         [SetUp]
