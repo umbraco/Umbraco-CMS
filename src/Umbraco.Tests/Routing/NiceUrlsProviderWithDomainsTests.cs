@@ -181,17 +181,16 @@ namespace Umbraco.Tests.Routing
 		// with one simple domain "domain1.com"
 		// basic tests
 		[TestCase(1001, "http://domain1.com", false, "/")]
-		[TestCase(10011, "http://domain1.com", false, "/1001-1")]
-		[TestCase(1002, "http://domain1.com", false, "/1002")]
+		[TestCase(10011, "http://domain1.com", false, "/1001-1/")]
+		[TestCase(1002, "http://domain1.com", false, "/1002/")]
 		// absolute tests
 		[TestCase(1001, "http://domain1.com", true, "http://domain1.com/")]
-		[TestCase(10011, "http://domain1.com", true, "http://domain1.com/1001-1")]
+		[TestCase(10011, "http://domain1.com", true, "http://domain1.com/1001-1/")]
 		// different current tests
 		[TestCase(1001, "http://domain2.com", false, "http://domain1.com/")]
-		[TestCase(10011, "http://domain2.com", false, "http://domain1.com/1001-1")]
+		[TestCase(10011, "http://domain2.com", false, "http://domain1.com/1001-1/")]
 		[TestCase(1001, "https://domain1.com", false, "/")]
-		[TestCase(10011, "https://domain1.com", false, "/1001-1")]
-
+		[TestCase(10011, "https://domain1.com", false, "/1001-1/")]
 		public void Get_Nice_Url_SimpleDomain(int nodeId, string currentUrl, bool absolute, string expected)
 		{
 			var routingContext = GetRoutingContext("/test", 1111);
@@ -210,18 +209,17 @@ namespace Umbraco.Tests.Routing
 
 		// with one complete domain "http://domain1.com/foo"
 		// basic tests
-		[TestCase(1001, "http://domain1.com", false, "/foo")]
-		[TestCase(10011, "http://domain1.com", false, "/foo/1001-1")]
-		[TestCase(1002, "http://domain1.com", false, "/1002")]
+		[TestCase(1001, "http://domain1.com", false, "/foo/")]
+		[TestCase(10011, "http://domain1.com", false, "/foo/1001-1/")]
+		[TestCase(1002, "http://domain1.com", false, "/1002/")]
 		// absolute tests
-		[TestCase(1001, "http://domain1.com", true, "http://domain1.com/foo")]
-		[TestCase(10011, "http://domain1.com", true, "http://domain1.com/foo/1001-1")]
+		[TestCase(1001, "http://domain1.com", true, "http://domain1.com/foo/")]
+		[TestCase(10011, "http://domain1.com", true, "http://domain1.com/foo/1001-1/")]
 		// different current tests
-		[TestCase(1001, "http://domain2.com", false, "http://domain1.com/foo")]
-		[TestCase(10011, "http://domain2.com", false, "http://domain1.com/foo/1001-1")]
-		[TestCase(1001, "https://domain1.com", false, "http://domain1.com/foo")]
-		[TestCase(10011, "https://domain1.com", false, "http://domain1.com/foo/1001-1")]
-
+		[TestCase(1001, "http://domain2.com", false, "http://domain1.com/foo/")]
+		[TestCase(10011, "http://domain2.com", false, "http://domain1.com/foo/1001-1/")]
+		[TestCase(1001, "https://domain1.com", false, "http://domain1.com/foo/")]
+		[TestCase(10011, "https://domain1.com", false, "http://domain1.com/foo/1001-1/")]
 		public void Get_Nice_Url_SimpleWithSchemeAndPath(int nodeId, string currentUrl, bool absolute, string expected)
 		{
 			var routingContext = GetRoutingContext("/test", 1111);
@@ -239,11 +237,10 @@ namespace Umbraco.Tests.Routing
 		}
 
 		// with one domain, not at root
-		[TestCase(1001, "http://domain1.com", false, "/1001")]
+		[TestCase(1001, "http://domain1.com", false, "/1001/")]
 		[TestCase(10011, "http://domain1.com", false, "/")]
-		[TestCase(100111, "http://domain1.com", false, "/1001-1-1")]
-		[TestCase(1002, "http://domain1.com", false, "/1002")]
-
+		[TestCase(100111, "http://domain1.com", false, "/1001-1-1/")]
+		[TestCase(1002, "http://domain1.com", false, "/1002/")]
 		public void Get_Nice_Url_DeepDomain(int nodeId, string currentUrl, bool absolute, string expected)
 		{
 			var routingContext = GetRoutingContext("/test", 1111);
@@ -262,16 +259,15 @@ namespace Umbraco.Tests.Routing
 
 		// with nested domains
 		[TestCase(1001, "http://domain1.com", false, "/")]
-		[TestCase(10011, "http://domain1.com", false, "/en")]
-		[TestCase(100111, "http://domain1.com", false, "/en/1001-1-1")]
-		[TestCase(10012, "http://domain1.com", false, "/fr")]
-		[TestCase(100121, "http://domain1.com", false, "/fr/1001-2-1")]
-		[TestCase(10013, "http://domain1.com", false, "/1001-3")]
-		[TestCase(1002, "http://domain1.com", false, "/1002")]
+		[TestCase(10011, "http://domain1.com", false, "/en/")]
+		[TestCase(100111, "http://domain1.com", false, "/en/1001-1-1/")]
+		[TestCase(10012, "http://domain1.com", false, "/fr/")]
+		[TestCase(100121, "http://domain1.com", false, "/fr/1001-2-1/")]
+		[TestCase(10013, "http://domain1.com", false, "/1001-3/")]
+		[TestCase(1002, "http://domain1.com", false, "/1002/")]
 		[TestCase(1003, "http://domain3.com", false, "/")]
-		[TestCase(10031, "http://domain3.com", false, "/en")]
-		[TestCase(100321, "http://domain3.com", false, "/fr/1003-2-1")]
-
+		[TestCase(10031, "http://domain3.com", false, "/en/")]
+		[TestCase(100321, "http://domain3.com", false, "/fr/1003-2-1/")]
 		public void Get_Nice_Url_NestedDomains(int nodeId, string currentUrl, bool absolute, string expected)
 		{
 			var routingContext = GetRoutingContext("/test", 1111);
@@ -329,14 +325,14 @@ namespace Umbraco.Tests.Routing
 
 			// use the cache
 			Assert.AreEqual("/", routingContext.NiceUrlProvider.GetNiceUrl(1001, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/en", routingContext.NiceUrlProvider.GetNiceUrl(10011, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/en/1001-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100111, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/fr", routingContext.NiceUrlProvider.GetNiceUrl(10012, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/fr/1001-2-1", routingContext.NiceUrlProvider.GetNiceUrl(100121, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/1001-3", routingContext.NiceUrlProvider.GetNiceUrl(10013, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/1002", routingContext.NiceUrlProvider.GetNiceUrl(1002, new Uri("http://domain1.com"), false));
+			Assert.AreEqual("/en/", routingContext.NiceUrlProvider.GetNiceUrl(10011, new Uri("http://domain1.com"), false));
+			Assert.AreEqual("/en/1001-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100111, new Uri("http://domain1.com"), false));
+			Assert.AreEqual("/fr/", routingContext.NiceUrlProvider.GetNiceUrl(10012, new Uri("http://domain1.com"), false));
+			Assert.AreEqual("/fr/1001-2-1/", routingContext.NiceUrlProvider.GetNiceUrl(100121, new Uri("http://domain1.com"), false));
+			Assert.AreEqual("/1001-3/", routingContext.NiceUrlProvider.GetNiceUrl(10013, new Uri("http://domain1.com"), false));
+			Assert.AreEqual("/1002/", routingContext.NiceUrlProvider.GetNiceUrl(1002, new Uri("http://domain1.com"), false));
 
-			Assert.AreEqual("http://domain1.com/fr/1001-2-1", routingContext.NiceUrlProvider.GetNiceUrl(100121, new Uri("http://domain2.com"), false));
+			Assert.AreEqual("http://domain1.com/fr/1001-2-1/", routingContext.NiceUrlProvider.GetNiceUrl(100121, new Uri("http://domain2.com"), false));
 		}
 
 		void CheckRoute(IDictionary<int, string> routes, IDictionary<string, int> ids, int id, string route)
@@ -359,17 +355,17 @@ namespace Umbraco.Tests.Routing
 			SetDomains4();
 
 			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
-			Assert.AreEqual("/en/1001-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100111));
-			Assert.AreEqual("http://domain3.com/en/1003-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100311));
+			Assert.AreEqual("/en/1001-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100111));
+			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100311));
 
 			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = true;
-			Assert.AreEqual("http://domain1.com/en/1001-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100111));
-			Assert.AreEqual("http://domain3.com/en/1003-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100311));
+			Assert.AreEqual("http://domain1.com/en/1001-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100111));
+			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100311));
 
 			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
 			routingContext.NiceUrlProvider.EnforceAbsoluteUrls = true;
-			Assert.AreEqual("http://domain1.com/en/1001-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100111));
-			Assert.AreEqual("http://domain3.com/en/1003-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100311));
+			Assert.AreEqual("http://domain1.com/en/1001-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100111));
+			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100311));
 		}
 
 		[Test]
@@ -389,9 +385,9 @@ namespace Umbraco.Tests.Routing
 			// all of them
 			// including the local one - duplicate?! - then must manually exclude?
 			Assert.AreEqual(3, result.Count());
-			Assert.IsTrue(result.Contains("http://domain1.com/en/1001-1-1"));
-			Assert.IsTrue(result.Contains("http://domain1a.com/en/1001-1-1"));
-			Assert.IsTrue(result.Contains("http://domain1b.com/en/1001-1-1"));
+			Assert.IsTrue(result.Contains("http://domain1.com/en/1001-1-1/"));
+			Assert.IsTrue(result.Contains("http://domain1a.com/en/1001-1-1/"));
+			Assert.IsTrue(result.Contains("http://domain1b.com/en/1001-1-1/"));
 		}
 	}
 }
