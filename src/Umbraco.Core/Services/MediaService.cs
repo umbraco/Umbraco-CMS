@@ -446,7 +446,6 @@ namespace Umbraco.Core.Services
 	    /// <param name="userId">Id of the User saving the Content</param>
 	    public void Save(IMedia media, int userId = -1)
 	    {
-
 			if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(media), this))
 				return;
 

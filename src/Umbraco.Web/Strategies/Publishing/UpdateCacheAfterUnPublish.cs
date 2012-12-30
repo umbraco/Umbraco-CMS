@@ -7,7 +7,7 @@ using umbraco;
 using umbraco.interfaces;
 using umbraco.presentation.cache;
 
-namespace Umbraco.Web.Strategies
+namespace Umbraco.Web.Strategies.Publishing
 {
     /// <summary>
     /// Represents the UpdateCacheAfterUnPublish class, which subscribes to the UnPublished event

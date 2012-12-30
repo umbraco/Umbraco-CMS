@@ -9,7 +9,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using umbraco.presentation.cache;
 
-namespace Umbraco.Web.Strategies
+namespace Umbraco.Web.Strategies.Publishing
 {
     /// <summary>
     /// Represents the UpdateCacheAfterPublish class, which subscribes to the Published event
