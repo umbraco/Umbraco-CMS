@@ -10,7 +10,8 @@ namespace Umbraco.Core.Persistence.Querying
     /// <typeparam name="T"></typeparam>
     public class Query<T> : IQuery<T>
     {
-        private readonly ExpressionHelper<T> _expresionist = new ExpressionHelper<T>();
+        //private readonly ExpressionHelper<T> _expresionist = new ExpressionHelper<T>();
+        private readonly ModelToSqlExpressionHelper<T> _expresionist = new ModelToSqlExpressionHelper<T>();
         private readonly List<string> _wheres = new List<string>();
 
         public Query()

@@ -5,29 +5,17 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Querying
 {
-    internal class ExpressionHelper<T>
+    internal class PocoToSqlExpressionHelper<T>
     {
-        private string selectExpression = string.Empty;
-        private string whereExpression;
-        private string groupBy = string.Empty;
-        private string havingExpression;
-        private string orderBy = string.Empty;
-
-        IList<string> updateFields = new List<string>();
-        IList<string> insertFields = new List<string>();
-
         private string sep = " ";
-        private bool useFieldName = false;
         private Database.PocoData pd;
 
-        public ExpressionHelper()
+        public PocoToSqlExpressionHelper()
         {
-            Database.Mapper = new ModelDtoMapper();
             pd = new Database.PocoData(typeof(T));
         }
 
@@ -173,10 +161,7 @@ namespace Umbraco.Core.Persistence.Querying
 
             if (m.Expression != null && m.Expression.NodeType != ExpressionType.Constant)
             {
-                //Database.Mapper = new ModelDtoMapper();
-                //var def = new Database.PocoData(m.Expression.Type);
-                var def = new Database.PocoData(typeof(T));
-                string field = GetFieldName(def, m.Member.Name);
+                string field = GetFieldName(pd, m.Member.Name);
                 return field;
             }
 
@@ -502,20 +487,9 @@ namespace Umbraco.Core.Persistence.Querying
         protected virtual string GetFieldName(Database.PocoData pocoData, string name)
         {
             var column = pocoData.Columns.FirstOrDefault(x => x.Value.PropertyInfo.Name == name);
-            return column.Value.ColumnName;
-        }
-
-        protected virtual string GetFieldName(string name)
-        {
-
-            if (useFieldName)
-            {
-                return SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(name);
-            }
-            else
-            {
-                return name;
-            }
+            return string.Format("{0}.{1}",
+                SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(pocoData.TableInfo.TableName),
+                SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(column.Value.ColumnName));
         }
 
         protected string RemoveQuote(string exp)

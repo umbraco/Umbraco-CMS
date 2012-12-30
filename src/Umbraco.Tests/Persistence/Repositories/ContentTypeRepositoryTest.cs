@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -225,6 +226,48 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Assert
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
             Assert.That(contentType.PropertyGroups.Count(), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void Can_Verify_AllowedChildContentTypes_On_ContentType()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
+
+            var subpageContentType = MockedContentTypes.CreateSimpleContentType("umbSubpage", "Subpage");
+            var simpleSubpageContentType = MockedContentTypes.CreateSimpleContentType("umbSimpleSubpage", "Simple Subpage");
+            repository.AddOrUpdate(subpageContentType);
+            repository.AddOrUpdate(simpleSubpageContentType);
+            unitOfWork.Commit();
+
+            // Act
+            var contentType = repository.Get(1045);
+            contentType.AllowedContentTypes = new List<ContentTypeSort>
+                                                  {
+                                                      new ContentTypeSort
+                                                          {
+                                                              Alias = subpageContentType.Alias,
+                                                              Id = new Lazy<int>(() => subpageContentType.Id),
+                                                              SortOrder = 0
+                                                          },
+                                                      new ContentTypeSort
+                                                          {
+                                                              Alias = simpleSubpageContentType.Alias,
+                                                              Id = new Lazy<int>(() => simpleSubpageContentType.Id),
+                                                              SortOrder = 1
+                                                          }
+                                                  };
+            repository.AddOrUpdate(contentType);
+            unitOfWork.Commit();
+
+            //Assert
+            var updated = repository.Get(1045);
+
+            Assert.That(updated.AllowedContentTypes.Any(), Is.True);
+            Assert.That(updated.AllowedContentTypes.Any(x => x.Alias == subpageContentType.Alias), Is.True);
+            Assert.That(updated.AllowedContentTypes.Any(x => x.Alias == simpleSubpageContentType.Alias), Is.True);
         }
 
         public void CreateTestData()

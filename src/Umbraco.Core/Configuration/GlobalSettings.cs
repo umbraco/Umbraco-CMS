@@ -201,7 +201,7 @@ namespace Umbraco.Core.Configuration
                 }
             }
 
-            string fileName = String.Concat(vDir, "web.config");
+            string fileName = System.IO.Path.Combine(vDir, "web.config");
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
             
             var appSettings = xml.Root.Descendants("appSettings").Single();
@@ -223,7 +223,7 @@ namespace Umbraco.Core.Configuration
         /// <value>The fullpath to root.</value>
         public static string FullpathToRoot
         {
-            get { return HttpRuntime.AppDomainAppPath; }
+            get { return IOHelper.GetRootDirectorySafe(); }
         }
 
         /// <summary>

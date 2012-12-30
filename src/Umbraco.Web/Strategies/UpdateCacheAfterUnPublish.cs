@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -27,20 +26,20 @@ namespace Umbraco.Web.Strategies
             PublishingStrategy.UnPublished += PublishingStrategy_UnPublished;
         }
 
-        void PublishingStrategy_UnPublished(IPublishingStrategy sender, UnPublishEventArgs<IContent> e)
+        void PublishingStrategy_UnPublished(IPublishingStrategy sender, PublishEventArgs<IContent> e)
         {
-            if (e.UnPublishedEntities.Any())
+            if (e.PublishedEntities.Any())
             {
-                if (e.UnPublishedEntities.Count() > 1)
+                if (e.PublishedEntities.Count() > 1)
                 {
-                    foreach (var c in e.UnPublishedEntities)
+                    foreach (var c in e.PublishedEntities)
                     {
                         UnPublishSingle(c);
                     }
                 }
                 else
                 {
-                    var content = e.UnPublishedEntities.FirstOrDefault();
+                    var content = e.PublishedEntities.FirstOrDefault();
                     UnPublishSingle(content);
                 }
             }

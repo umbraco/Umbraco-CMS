@@ -48,11 +48,11 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\SQLCE4\System.Data.SqlServerCe.dll</HintPath>
+      <HintPath>..\packages\SqlServerCE.4.0.0.0\lib\System.Data.SqlServerCe.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.SqlServerCe.Entity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\SQLCE4\System.Data.SqlServerCe.Entity.dll</HintPath>
+      <HintPath>..\packages\SqlServerCE.4.0.0.0\lib\System.Data.SqlServerCe.Entity.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Caching" />
@@ -133,7 +133,6 @@
     <Compile Include="Events\RollbackEventArgs.cs" />
     <Compile Include="Events\SaveEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
-    <Compile Include="Events\UnPublishEventArgs.cs" />
     <Compile Include="MacroPropertyTypeResolver.cs" />
     <Compile Include="Models\ContentBase.cs" />
     <Compile Include="Models\ContentExtensions.cs" />
@@ -195,6 +194,7 @@
     <Compile Include="Persistence\Caching\IRepositoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\NullCacheProvider.cs" />
     <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
+    <Compile Include="Persistence\Mappers\PetaPocoMapper.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ConstraintAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\SpecialDbTypeAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\LengthAttribute.cs" />
@@ -246,8 +246,9 @@
     <Compile Include="Persistence\Mappers\DictionaryTranslationMapper.cs" />
     <Compile Include="Persistence\Mappers\DtoMapModel.cs" />
     <Compile Include="Persistence\Mappers\LanguageMapper.cs" />
+    <Compile Include="Persistence\Mappers\MappingResolver.cs" />
     <Compile Include="Persistence\Mappers\MediaMapper.cs" />
-    <Compile Include="Persistence\Mappers\ModelDtoMapper.cs" />
+    <Compile Include="Persistence\Mappers\MediaTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\PropertyGroupMapper.cs" />
     <Compile Include="Persistence\Mappers\PropertyMapper.cs" />
     <Compile Include="Persistence\Mappers\PropertyTypeMapper.cs" />
@@ -385,8 +386,9 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixth\RenameCmsTabTable.cs" />
     <Compile Include="Persistence\PetaPocoExtensions.cs" />
     <Compile Include="Persistence\PetaPocoSqlExtensions.cs" />
-    <Compile Include="Persistence\Querying\ExpressionHelper.cs" />
+    <Compile Include="Persistence\Querying\PocoToSqlExpressionHelper.cs" />
     <Compile Include="Persistence\Querying\IQuery.cs" />
+    <Compile Include="Persistence\Querying\ModelToSqlExpressionHelper.cs" />
     <Compile Include="Persistence\Querying\Query.cs" />
     <Compile Include="Persistence\Querying\SqlTranslator.cs" />
     <Compile Include="Persistence\Relators\DictionaryLanguageTextRelator.cs" />

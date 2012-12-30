@@ -6,6 +6,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
@@ -39,6 +40,7 @@ namespace Umbraco.Core
 
 			//create database and service contexts for the app context
 			var dbFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName);
+		    UmbracoDatabase.Mapper = new PetaPocoMapper();
 			var dbContext = new DatabaseContext(dbFactory);
 			var serviceContext = new ServiceContext(
 				new PetaPocoUnitOfWorkProvider(dbFactory), 

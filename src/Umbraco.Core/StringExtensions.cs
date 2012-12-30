@@ -9,6 +9,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
+using System.Xml;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core
 {
@@ -738,6 +740,25 @@ namespace Umbraco.Core
             return !string.IsNullOrWhiteSpace(input)
                        ? input
                        : alternative;
+        }
+
+        public static string FormatUrl(this string url)
+        {
+            string newUrl = url;
+            XmlNode replaceChars = UmbracoSettings.UrlReplaceCharacters;
+            foreach (XmlNode n in replaceChars.SelectNodes("char"))
+            {
+                if (n.Attributes.GetNamedItem("org") != null && n.Attributes.GetNamedItem("org").Value != "")
+                    newUrl = newUrl.Replace(n.Attributes.GetNamedItem("org").Value, XmlHelper.GetNodeValue(n));
+            }
+
+            // check for double dashes
+            if (UmbracoSettings.RemoveDoubleDashesFromUrlReplacing)
+            {
+                newUrl = Regex.Replace(newUrl, @"[-]{2,}", "-");
+            }
+
+            return newUrl;
         }
     }
 }

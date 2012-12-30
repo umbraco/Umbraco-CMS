@@ -124,7 +124,7 @@ namespace Umbraco.Core.Publishing
         /// <returns>True if the unpublish operation was successfull and not cancelled, otherwise false</returns>
         public override bool UnPublish(IContent content, int userId)
         {
-            if (UnPublishing.IsRaisedEventCancelled(new UnPublishEventArgs<IContent>(content), this))
+            if (UnPublishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(content), this))
                 return false;
 
             //If Content has a release date set to before now, it should be removed so it doesn't interrupt an unpublish
@@ -159,7 +159,7 @@ namespace Umbraco.Core.Publishing
             foreach (var item in content.Where(x => x.Published == true))
             {
                 //Fire UnPublishing event
-                if (UnPublishing.IsRaisedEventCancelled(new UnPublishEventArgs<IContent>(item), this))
+                if (UnPublishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(item), this))
                     return false;
 
                 //If Content has a release date set to before now, it should be removed so it doesn't interrupt an unpublish
@@ -213,7 +213,7 @@ namespace Umbraco.Core.Publishing
         /// <param name="content"><see cref="IContent"/> thats being unpublished</param>
         public override void UnPublishingFinalized(IContent content)
         {
-            UnPublished.RaiseEvent(new UnPublishEventArgs<IContent>(content, false), this);
+            UnPublished.RaiseEvent(new PublishEventArgs<IContent>(content, false, false), this);
         }
 
         /// <summary>
@@ -222,7 +222,7 @@ namespace Umbraco.Core.Publishing
         /// <param name="content">An enumerable list of <see cref="IContent"/> thats being unpublished</param>
         public override void UnPublishingFinalized(IEnumerable<IContent> content)
         {
-            UnPublished.RaiseEvent(new UnPublishEventArgs<IContent>(content, false), this);
+            UnPublished.RaiseEvent(new PublishEventArgs<IContent>(content, false, false), this);
         }
 
         /// <summary>
@@ -238,12 +238,12 @@ namespace Umbraco.Core.Publishing
         /// <summary>
         /// Occurs before unpublish
         /// </summary>
-        public static event TypedEventHandler<IPublishingStrategy, UnPublishEventArgs<IContent>> UnPublishing;
+        public static event TypedEventHandler<IPublishingStrategy, PublishEventArgs<IContent>> UnPublishing;
 
         /// <summary>
         /// Occurs after unpublish
         /// </summary>
-        public static event TypedEventHandler<IPublishingStrategy, UnPublishEventArgs<IContent>> UnPublished;
+        public static event TypedEventHandler<IPublishingStrategy, PublishEventArgs<IContent>> UnPublished;
 
 
     }
