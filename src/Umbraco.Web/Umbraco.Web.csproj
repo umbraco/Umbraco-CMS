@@ -328,9 +328,9 @@
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Routing\LookupByPageIdQuery.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
-    <Compile Include="Strategies\UpdateCacheAfterPublish.cs" />
-    <Compile Include="Strategies\UpdateCacheAfterUnPublish.cs" />
-    <Compile Include="Strategies\EnsureAppsTreesUpdatedOnUpgrade.cs" />
+    <Compile Include="Strategies\Publishing\UpdateCacheAfterPublish.cs" />
+    <Compile Include="Strategies\Publishing\UpdateCacheAfterUnPublish.cs" />
+    <Compile Include="Strategies\Migrations\EnsureAppsTreesUpdatedOnUpgrade.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="Trees\PartialViewMacrosTree.cs" />

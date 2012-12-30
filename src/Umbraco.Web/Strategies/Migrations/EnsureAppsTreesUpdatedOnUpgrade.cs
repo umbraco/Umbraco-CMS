@@ -2,7 +2,7 @@
 using umbraco.BusinessLogic;
 using umbraco.interfaces;
 
-namespace Umbraco.Web.Strategies
+namespace Umbraco.Web.Strategies.Migrations
 {
     /// <summary>
     /// This is kind of a hack to ensure that Apps and Trees that might still reside in the db is
