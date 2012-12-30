@@ -1,20 +1,62 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.IO;
-//using System.Linq;
-//using System.Text;
-//using Umbraco.Core.Configuration;
-//using Umbraco.Core.IO;
-//using umbraco.BusinessLogic.Actions;
-//using umbraco.businesslogic;
-//using umbraco.cms.presentation.Trees;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
+using umbraco.BusinessLogic.Actions;
+using umbraco.businesslogic;
+using umbraco.cms.businesslogic.template;
+using umbraco.cms.presentation.Trees;
+using umbraco.interfaces;
 
-//namespace Umbraco.Web.Trees
-//{
-//	[Tree("settings", "partialViews", "Partial Views", sortOrder: 2)]
-//	public class PartialViewsTree : BaseTree
-//	{
-//		public PartialViewsTree(string application) : base(application) { }
+namespace Umbraco.Web.Trees
+{
+	[Tree("settings", "partialViews", "Partial Views", sortOrder: 2)]
+	public class PartialViewsTree : FileSystemTree
+	{
+		public PartialViewsTree(string application) : base(application) { }
+
+		public override void RenderJS(ref StringBuilder javascript)
+		{
+			javascript.Append(
+				@"
+		                 function openPartialView(id) {
+		                    UmbClientMgr.contentFrame('Settings/Views/EditView.aspx?file=' + id);
+					    }
+		                ");
+		}
+
+		protected override void CreateRootNode(ref XmlTreeNode rootNode)
+		{
+			rootNode.NodeType = "init" + TreeAlias;
+			rootNode.NodeID = "init";
+		}
+
+		protected override string FilePath
+		{
+			get { return SystemDirectories.MvcViews + "/Partials/"; }
+		}
+
+		protected override string FileSearchPattern
+		{
+			get { return "*.*"; }
+		}
+
+		//protected override void OnRenderFolderNode(ref XmlTreeNode xNode)
+		//{
+		//	xNode.Menu = new List<IAction>(new IAction[] { ActionDelete.Instance, ContextMenuSeperator.Instance, ActionNew.Instance, ContextMenuSeperator.Instance, ActionRefresh.Instance });
+		//	xNode.NodeType = "scriptsFolder";
+		//}
+
+		protected override void OnRenderFileNode(ref XmlTreeNode xNode)
+		{
+			xNode.Action = xNode.Action.Replace("openFile", "openPartialView");
+			xNode.Icon = "settingsScript.gif";
+			xNode.OpenIcon = "settingsScript.gif";
+		}
 
 //		protected override void CreateRootNode(ref XmlTreeNode rootNode)
 //		{
@@ -22,6 +64,7 @@
 //			rootNode.NodeID = "init";
 //		}
 
+//		private string _partialViewsFolder = SystemDirectories.MvcViews + "/Partials/";
 
 //		public override void RenderJS(ref StringBuilder Javascript)
 //		{
@@ -38,22 +81,19 @@
 //		public override void Render(ref XmlTree tree)
 //		{
 //			string folder = global::umbraco.library.Request("folder");
-//			string folderPath = umbraco.library.Request("folderPath");
+//			string folderPath = global::umbraco.library.Request("folderPath");
 
 //			if (!string.IsNullOrEmpty(folder))
 //				RenderTemplateFolderItems(folder, folderPath, ref tree);
 //			else
 //			{
-//				if (UmbracoSettings.EnableTemplateFolders)
-//					RenderTemplateFolders(ref tree);
-
 //				RenderTemplates(ref tree);
 //			}
 //		}
 
 //		private void RenderTemplateFolderItems(string folder, string folderPath, ref XmlTree tree)
 //		{
-//			string relPath = SystemDirectories.Masterpages + "/" + folder;
+//			string relPath = _partialViewsFolder + folder;
 //			if (!string.IsNullOrEmpty(folderPath))
 //				relPath += folderPath;
 
@@ -127,7 +167,7 @@
 //		{
 //			if (base.m_id == -1)
 //			{
-//				foreach (string s in Directory.GetDirectories(IO.IOHelper.MapPath(IO.SystemDirectories.Masterpages)))
+//				foreach (string s in Directory.GetDirectories(IOHelper.MapPath(_partialViewsFolder)))
 //				{
 //					var _s = Path.GetFileNameWithoutExtension(s);
 
@@ -205,5 +245,6 @@
 //			actions.AddRange(new IAction[] { ActionNew.Instance, ActionDelete.Instance, 
 //				ContextMenuSeperator.Instance, ActionRefresh.Instance });
 //		}
-//	}
-//}
+		
+	}
+}

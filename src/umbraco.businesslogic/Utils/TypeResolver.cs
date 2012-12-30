@@ -15,6 +15,7 @@ namespace umbraco.BusinessLogic.Utils
     /// The typeresolver is a collection of utillities for finding and determining types and classes with reflection.
     /// </summary>
     [Serializable]
+	[Obsolete("This class is not longer used and will be removed in future versions")]
     public class TypeResolver : MarshalByRefObject
     {
         /// <summary>
