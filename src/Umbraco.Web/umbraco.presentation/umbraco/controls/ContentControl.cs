@@ -130,7 +130,8 @@ namespace umbraco.controls
                 // Iterate through the property types and add them to the tab
                 // zb-00036 #29889 : fix property types getter to get the right set of properties
                 // ge : had a bit of a corrupt db and got weird NRE errors so rewrote this to catch the error and rethrow with detail
-                foreach (PropertyType propertyType in tab.GetPropertyTypes(_content.ContentType.Id))
+                var propertyTypes = tab.GetPropertyTypes(_content.ContentType.Id);
+                foreach (PropertyType propertyType in propertyTypes)
                 {
                     var property = _content.getProperty(propertyType);
                     if (property != null && tabPage != null)

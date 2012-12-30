@@ -46,7 +46,13 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets a list of ContentType aliases from the current composition 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>An enumerable list of string aliases</returns>
         IEnumerable<string> CompositionAliases();
+
+        /// <summary>
+        /// Gets a list of ContentType Ids from the current composition 
+        /// </summary>
+        /// <returns>An enumerable list of integer ids</returns>
+        IEnumerable<int> CompositionIds();
     }
 }

@@ -582,14 +582,25 @@ namespace umbraco.cms.businesslogic
                 if (m_masterContentTypes == null)
                 {
                     m_masterContentTypes = new List<int>();
-                    using (var dr = SqlHelper.ExecuteReader(@"SELECT parentContentTypeId FROM cmsContentType2ContentType WHERE childContentTypeId = @id", SqlHelper.CreateParameter("@id", Id)))
+                    if (_contentType == null)
                     {
-                        while (dr.Read())
+                        //TODO Make this recursive, so it looks up Masters of the Master ContentType
+                        using (
+                            var dr =
+                                SqlHelper.ExecuteReader(
+                                    @"SELECT parentContentTypeId FROM cmsContentType2ContentType WHERE childContentTypeId = @id",
+                                    SqlHelper.CreateParameter("@id", Id)))
                         {
-                            m_masterContentTypes.Add(dr.GetInt("parentContentTypeId"));
+                            while (dr.Read())
+                            {
+                                m_masterContentTypes.Add(dr.GetInt("parentContentTypeId"));
+                            }
                         }
                     }
-
+                    else
+                    {
+                        m_masterContentTypes = _contentType.CompositionIds().ToList();
+                    }
 
                 }
                 return m_masterContentTypes;

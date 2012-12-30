@@ -116,13 +116,25 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets a list of ContentType aliases from the current composition 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>An enumerable list of string aliases</returns>
         /// <remarks>Does not contain the alias of the Current ContentType</remarks>
         public IEnumerable<string> CompositionAliases()
         {
             return ContentTypeComposition
                 .Select(x => x.Alias)
                 .Union(ContentTypeComposition.SelectMany(x => x.CompositionAliases()));
+        }
+
+        /// <summary>
+        /// Gets a list of ContentType Ids from the current composition 
+        /// </summary>
+        /// <returns>An enumerable list of integer ids</returns>
+        /// <remarks>Does not contain the Id of the Current ContentType</remarks>
+        public IEnumerable<int> CompositionIds()
+        {
+            return ContentTypeComposition
+                .Select(x => x.Id)
+                .Union(ContentTypeComposition.SelectMany(x => x.CompositionIds()));
         }
     }
 }
