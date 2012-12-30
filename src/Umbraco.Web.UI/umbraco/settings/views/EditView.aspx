@@ -2,6 +2,7 @@
     CodeBehind="EditView.aspx.cs" Inherits="Umbraco.Web.UI.Umbraco.Settings.Views.EditView"
     ValidateRequest="False" %>
 
+<%@ Import Namespace="Umbraco.Core" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
@@ -16,17 +17,12 @@
                 var editView = new Umbraco.Editors.EditView({
                     editorType: "<%= EditorType.ToString() %>",
                     originalFileName: "<%=OriginalFileName %>",
+                    restServiceLocation: "<%= Url.GetSaveFileServicePath() %>",                    
                     masterPageDropDown: $("#<%= MasterTemplate.ClientID %>"),
                     nameTxtBox: $("#<%= NameTxt.ClientID %>"),
                     aliasTxtBox: $("#<%= AliasTxt.ClientID %>"),
                     saveButton: $("#<%= ((Control)SaveButton).ClientID %>"),
-                    templateId: '<%= Request.QueryString["templateID"] %>',
-                    msgs: {
-                        templateErrorHeader: "<%= umbraco.ui.Text("speechBubbles", "templateErrorHeader") %>",
-                        templateErrorText: "<%= umbraco.ui.Text("speechBubbles", "templateErrorText") %>",
-                        templateSavedHeader: "<%= umbraco.ui.Text("speechBubbles", "templateSavedHeader") %>",
-                        templateSavedText: "<%= umbraco.ui.Text("speechBubbles", "templateSavedText") %>"                        
-                    }
+                    templateId: '<%= Request.QueryString["templateID"] %>'                    
                 });
                 //initialize it.
                 editView.init();

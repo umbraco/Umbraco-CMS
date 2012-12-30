@@ -338,48 +338,48 @@ namespace umbraco.presentation.webservices
             return "false";
         }
 
-		[WebMethod]
-		public string SavePartialView(string filename, string oldName, string contents)
-		{
-			if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
-			{
-				var folderPath = SystemDirectories.MvcViews + "/Partials/";
+		//[WebMethod]
+		//public string SavePartialView(string filename, string oldName, string contents)
+		//{
+		//	if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
+		//	{
+		//		var folderPath = SystemDirectories.MvcViews + "/Partials/";
 
-				// validate file
-				IOHelper.ValidateEditPath(IOHelper.MapPath(folderPath + filename), folderPath);
-				// validate extension
-				IOHelper.ValidateFileExtension(IOHelper.MapPath(folderPath + filename), new[] {"cshtml"}.ToList());
+		//		// validate file
+		//		IOHelper.ValidateEditPath(IOHelper.MapPath(folderPath + filename), folderPath);
+		//		// validate extension
+		//		IOHelper.ValidateFileExtension(IOHelper.MapPath(folderPath + filename), new[] {"cshtml"}.ToList());
 
 
-				var val = contents;
-				string returnValue;
-				var saveOldPath = oldName.StartsWith("~/") ? IOHelper.MapPath(oldName) : IOHelper.MapPath(folderPath + oldName);
-				var savePath = filename.StartsWith("~/") ? IOHelper.MapPath(filename) : IOHelper.MapPath(folderPath + filename);
+		//		var val = contents;
+		//		string returnValue;
+		//		var saveOldPath = oldName.StartsWith("~/") ? IOHelper.MapPath(oldName) : IOHelper.MapPath(folderPath + oldName);
+		//		var savePath = filename.StartsWith("~/") ? IOHelper.MapPath(filename) : IOHelper.MapPath(folderPath + filename);
 
-				//Directory check.. only allow files in script dir and below to be edited
-				if (savePath.StartsWith(IOHelper.MapPath(folderPath)))
-				{
-					//deletes the old file
-					if (savePath != saveOldPath)
-					{
-						if (File.Exists(saveOldPath))
-							File.Delete(saveOldPath);
-					}
-					using (var sw = File.CreateText(savePath))
-					{
-						sw.Write(val);
-					}
-					returnValue = "true";
-				}
-				else
-				{
-					returnValue = "illegalPath";
-				}
+		//		//Directory check.. only allow files in script dir and below to be edited
+		//		if (savePath.StartsWith(IOHelper.MapPath(folderPath)))
+		//		{
+		//			//deletes the old file
+		//			if (savePath != saveOldPath)
+		//			{
+		//				if (File.Exists(saveOldPath))
+		//					File.Delete(saveOldPath);
+		//			}
+		//			using (var sw = File.CreateText(savePath))
+		//			{
+		//				sw.Write(val);
+		//			}
+		//			returnValue = "true";
+		//		}
+		//		else
+		//		{
+		//			returnValue = "illegalPath";
+		//		}
 
-				return returnValue;
-			}
-			return "false";
-		}
+		//		return returnValue;
+		//	}
+		//	return "false";
+		//}
 
         [WebMethod]
         public string SaveScript(string filename, string oldName, string contents)
@@ -445,6 +445,7 @@ namespace umbraco.presentation.webservices
             return "false";
         }
         
+		[Obsolete("This method has been superceded by the REST service /Umbraco/RestServices/SaveFile/SaveTemplate which is powered by the SafeFileController.")]
         [WebMethod]
         public string SaveTemplate(string templateName, string templateAlias, string templateContents, int templateID, int masterTemplateID)
         {

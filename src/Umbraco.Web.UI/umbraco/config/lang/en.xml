@@ -780,7 +780,11 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="xsltPermissionErrorText">Xslt could not be saved, check file permissions</key>
     <key alias="xsltSavedHeader">Xslt saved</key>
     <key alias="xsltSavedText">No errors in xslt</key>
-    <key alias="contentUnpublished">Content unpublished</key>    
+    <key alias="contentUnpublished">Content unpublished</key>
+		<key alias="partialViewSavedHeader">Partial view saved</key>
+		<key alias="partialViewSavedText">Partial view saved without any errors!</key>
+		<key alias="partialViewErrorHeader">Partial view not saved</key>
+		<key alias="partialViewErrorText">An error occurred saving the file.</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>

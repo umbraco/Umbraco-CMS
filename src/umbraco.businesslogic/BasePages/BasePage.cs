@@ -2,6 +2,8 @@ using System;
 using System.Data;
 using System.Web;
 using System.Linq;
+using System.Web.Mvc;
+using System.Web.Routing;
 using System.Web.Security;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
@@ -69,6 +71,18 @@ namespace umbraco.BasePages
                 return HttpContext.Current.CurrentHandler as BasePage;
             }
         }
+
+	    private UrlHelper _url;
+		/// <summary>
+		/// Returns a UrlHelper
+		/// </summary>
+		/// <remarks>
+		/// This URL helper is created without any route data and an empty request context
+		/// </remarks>
+	    public UrlHelper Url
+	    {
+		    get { return _url ?? (_url = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData()))); }
+	    }
 
         /// <summary>
         /// Returns a refernce of an instance of ClientTools for access to the pages client API
