@@ -97,7 +97,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 					//configure editor for editing a file....
 
 					NameTxt.Text = OriginalFileName;
-					var file = IOHelper.MapPath(SystemDirectories.MvcViews + "/Partials/" + OriginalFileName);
+					var file = IOHelper.MapPath(SystemDirectories.MvcViews.EnsureEndsWith('/') + OriginalFileName);
 
 					using (var sr = File.OpenText(file))
 					{
@@ -126,7 +126,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			else if (!Request.QueryString["file"].IsNullOrWhiteSpace())
 			{
 				//we are editing a view (i.e. partial view)
-				OriginalFileName = Request.QueryString["file"];
+				OriginalFileName = HttpUtility.UrlDecode(Request.QueryString["file"]);
 			}
 			else
 			{

@@ -11,6 +11,7 @@ using umbraco;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.template;
 using umbraco.presentation.cache;
+using Umbraco.Core;
 
 namespace Umbraco.Web.WebServices
 {
@@ -35,7 +36,7 @@ namespace Umbraco.Web.WebServices
 		[HttpPost]
 		public JsonResult SavePartialView(string filename, string oldName, string contents)
 		{
-			var folderPath = SystemDirectories.MvcViews + "/Partials/";
+			var folderPath = SystemDirectories.MvcViews.EnsureEndsWith('/');// +"/Partials/";
 
 			// validate file
 			IOHelper.ValidateEditPath(IOHelper.MapPath(folderPath + filename), folderPath);

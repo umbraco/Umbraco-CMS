@@ -10,7 +10,7 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
-    public class ScriptTasks : interfaces.ITaskReturnUrl
+	public class ScriptTasks : interfaces.ITaskReturnUrl
     {
         private string _alias;
         private int _parentID;

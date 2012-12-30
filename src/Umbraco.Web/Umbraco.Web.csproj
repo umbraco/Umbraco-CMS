@@ -333,6 +333,7 @@
     <Compile Include="Strategies\EnsureAppsTreesUpdatedOnUpgrade.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
+    <Compile Include="Trees\PartialViewMacrosTree.cs" />
     <Compile Include="Trees\PartialViewsTree.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -351,6 +352,7 @@
     <Compile Include="umbraco.presentation\MacroCacheContent.cs" />
     <Compile Include="umbraco.presentation\macroCacheRefresh.cs" />
     <Compile Include="umbraco.presentation\ScriptingMacroResult.cs" />
+    <Compile Include="umbraco.presentation\umbraco\create\PartialViewTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
