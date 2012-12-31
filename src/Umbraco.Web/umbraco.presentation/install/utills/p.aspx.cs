@@ -59,7 +59,10 @@ namespace umbraco.presentation.install.utills
             LogHelper.Info<p>("Running 'installOrUpgrade' service");
 
             var result = ApplicationContext.Current.DatabaseContext.CreateDatabaseSchemaAndDataOrUpgrade();
-
+            
+            // Remove legacy umbracoDbDsn configuration setting if it exists
+            Umbraco.Core.Configuration.GlobalSettings.RemoveSetting(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName);
+            
             var js = new JavaScriptSerializer();
             var jsonResult = js.Serialize(result);
             return jsonResult;

@@ -1,4 +1,5 @@
 using System;
+using System.Configuration;
 using System.Data.Common;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
@@ -19,7 +20,13 @@ namespace umbraco.presentation.install.steps
         /// </summary>
         protected bool IsEmbeddedDatabase
         {
-            get { return Request["database"] == "embedded" || GlobalSettings.DbDSN.ToLower().Contains("SQLCE4Umbraco.SqlCEHelper".ToLower()); }
+            get
+            {
+                var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
+                var configuredDatabaseIsEmbedded = databaseSettings != null && databaseSettings.ProviderName.ToLower().Contains("SqlServerCe".ToLower());
+
+                return Request["database"] == "embedded" || configuredDatabaseIsEmbedded;
+            }
         }
 
         protected bool IsConfigured

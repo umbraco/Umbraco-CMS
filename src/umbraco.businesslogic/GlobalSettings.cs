@@ -78,6 +78,7 @@ namespace umbraco
         /// Gets the database connection string
         /// </summary>
         /// <value>The database connection string.</value>
+        [Obsolete("Use System.ConfigurationManager.ConnectionStrings to get the connection with the key Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName instead")]
         public static string DbDSN
         {
 			get { return Umbraco.Core.Configuration.GlobalSettings.DbDsn; }
