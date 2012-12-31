@@ -349,5 +349,13 @@
 			<delete assembly="umbraco" type="PartialViewTasks" />
 		</tasks>
 	</nodeType>
+	<nodeType alias="partialViewMacros">
+		<header>Macro</header>
+		<usercontrol>/create/simple.ascx</usercontrol>
+		<tasks>
+			<create assembly="umbraco" type="MacroPartialViewTasks" />
+			<delete assembly="umbraco" type="MacroPartialViewTasks" />
+		</tasks>
+	</nodeType>
 	
 </createUI>
