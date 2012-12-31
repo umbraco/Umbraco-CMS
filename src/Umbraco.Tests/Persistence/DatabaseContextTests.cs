@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Persistence
             }
 
             //Get the connectionstring settings from config
-            var settings = ConfigurationManager.ConnectionStrings["umbracoDbDsn"];
+            var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
 
             //Create the Sql CE database
             var engine = new SqlCeEngine(settings.ConnectionString);

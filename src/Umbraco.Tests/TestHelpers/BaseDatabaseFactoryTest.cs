@@ -42,7 +42,10 @@ namespace Umbraco.Tests.TestHelpers
 
 			RepositoryResolver.Current = new RepositoryResolver(
 				new RepositoryFactory());
-
+            
+            DatabaseContext.Database.Dispose();
+            SqlCeContextGuardian.CloseBackgroundConnection();
+			
             //Delete database file before continueing
             string filePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
             if (File.Exists(filePath))
@@ -51,8 +54,8 @@ namespace Umbraco.Tests.TestHelpers
             }
 
             //Get the connectionstring settings from config
-            var settings = ConfigurationManager.ConnectionStrings["umbracoDbDsn"];
-            ConfigurationManager.AppSettings.Set("umbracoDbDSN", @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf");
+            var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            ConfigurationManager.AppSettings.Set(Core.Configuration.GlobalSettings.UmbracoConnectionName, @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf");
             
             //Create the Sql CE database
             var engine = new SqlCeEngine(settings.ConnectionString);

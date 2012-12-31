@@ -2,6 +2,7 @@
 using System.Data.SqlServerCe;
 using System.IO;
 using NUnit.Framework;
+using SQLCE4Umbraco;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -20,7 +21,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             }
 
             //Get the connectionstring settings from config
-            var settings = ConfigurationManager.ConnectionStrings["umbracoDbDsn"];
+            var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
 
             //Create the Sql CE database
             var engine = new SqlCeEngine(settings.ConnectionString);
@@ -29,6 +30,9 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public override void DatabaseSpecificTearDown()
         {
+            //legacy API database connection close
+            SqlCeContextGuardian.CloseBackgroundConnection();
+			
             string filePath = string.Concat(Path, "\\UmbracoPetaPocoTests.sdf");
             if (File.Exists(filePath))
             {
