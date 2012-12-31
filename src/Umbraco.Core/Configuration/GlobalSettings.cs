@@ -168,7 +168,14 @@ namespace Umbraco.Core.Configuration
             {
                 if (DbDsn != value)
                 {
-                    SaveSetting("umbracoDbDSN", value);
+                    if (value.ToLower().Contains("SQLCE4Umbraco.SqlCEHelper".ToLower()))
+                    {
+                        ApplicationContext.Current.DatabaseContext.ConfigureDatabaseConnection();
+                    }
+                    else
+                    {
+                        ApplicationContext.Current.DatabaseContext.ConfigureDatabaseConnection(value);
+                    } 
                 }
             }
         }
@@ -229,7 +236,7 @@ namespace Umbraco.Core.Configuration
             var appSettings = xml.Root.Descendants("appSettings").Single();
 
             var setting = appSettings.Descendants("add").FirstOrDefault(s => s.Attribute("key").Value == key);
-            if(setting != null)
+            if (setting != null)
                 setting.Remove();
 
             xml.Save(fileName, SaveOptions.DisableFormatting);
