@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -78,7 +79,8 @@ namespace umbraco.BusinessLogic
                 {
                     try
                     {
-                        _sqlHelper = DataLayerHelper.CreateSqlHelper(GlobalSettings.DbDSN);
+                        var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
+                        _sqlHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString);
                     }
                     catch { }
                 }

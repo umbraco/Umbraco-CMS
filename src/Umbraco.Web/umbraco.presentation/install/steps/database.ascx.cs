@@ -6,6 +6,7 @@ using System.Web.UI.HtmlControls;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using System.IO;
+using umbraco.DataLayer;
 using umbraco.IO;
 
 namespace umbraco.presentation.install.steps
@@ -79,13 +80,10 @@ namespace umbraco.presentation.install.steps
         {
                 // Parse the connection string
                 DbConnectionStringBuilder connectionStringBuilder = new DbConnectionStringBuilder();
-                connectionStringBuilder.ConnectionString = GlobalSettings.DbDSN;
 
-                // "Data Source=.\\SQLEXPRESS;Initial Catalog=BB_Umbraco_Sandbox1;integrated security=false;user id=umbraco;pwd=umbraco"
-
-                // Prepare the fields
-                string database = GetConnectionStringValue(connectionStringBuilder, "database");
-                string server = GetConnectionStringValue(connectionStringBuilder, "server"); 
+                var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
+                var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString);
+                connectionStringBuilder.ConnectionString = dataHelper.ConnectionString;
 
                 // Prepare data layer type
                 string datalayerType = GetConnectionStringValue(connectionStringBuilder, "datalayer");
@@ -95,7 +93,7 @@ namespace umbraco.presentation.install.steps
                         if (item.Value != String.Empty && ((string)datalayerType).Contains(item.Value))
                             DatabaseType.SelectedValue = item.Value;
                 }
-                else if (GlobalSettings.DbDSN != "server=.\\SQLEXPRESS;database=DATABASE;user id=USER;password=PASS")
+                else if (dataHelper.ConnectionString != "server=.\\SQLEXPRESS;database=DATABASE;user id=USER;password=PASS")
                     DatabaseType.SelectedValue = "SqlServer";
                 
                 DatabaseType_SelectedIndexChanged(this, new EventArgs());

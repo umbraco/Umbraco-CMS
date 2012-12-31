@@ -8,6 +8,7 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using umbraco.BusinessLogic;
+using umbraco.DataLayer;
 using umbraco.IO;
 
 namespace umbraco
@@ -385,10 +386,13 @@ namespace umbraco
         {
 			get
 			{
+                var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
+                var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString);
+
 				if (HttpContext.Current != null)
 				{
 					HttpContext.Current.Response.Write("ContentXML :" + ContentXML + "\n");
-					HttpContext.Current.Response.Write("DbDSN :" + DbDSN + "\n");
+					HttpContext.Current.Response.Write("DbDSN :" + dataHelper.ConnectionString + "\n");
 					HttpContext.Current.Response.Write("DebugMode :" + DebugMode + "\n");
 					HttpContext.Current.Response.Write("DefaultUILanguage :" + DefaultUILanguage + "\n");
 					HttpContext.Current.Response.Write("VersionCheckPeriod :" + VersionCheckPeriod + "\n");
