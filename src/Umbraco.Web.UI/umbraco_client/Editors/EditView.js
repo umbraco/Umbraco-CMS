@@ -33,7 +33,7 @@
         insertMacroMarkup: function(alias) {
             /// <summary>callback used to insert the markup for a macro with no parameters</summary>
             
-            UmbEditor.Insert("Helloworld!", "", this._opts.codeEditorElementId);
+            UmbEditor.Insert("@Umbraco.RenderMacro(\"" + alias + "\")", "", this._opts.codeEditorElementId);
         },
         
         openMacroModal: function (alias) {
