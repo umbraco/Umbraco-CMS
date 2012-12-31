@@ -44,6 +44,9 @@ namespace umbraco.DataLayer
             if (String.IsNullOrEmpty(connectionString))
                 throw new ArgumentNullException("connectionString");
 
+            if(IsEmbeddedDatabase(connectionString) && connectionString.ToLower().Contains("SQLCE4Umbraco".ToLower()) == false)
+                connectionString = string.Format("datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;{0}", connectionString);
+
             /* try to parse connection string */
             DbConnectionStringBuilder connectionStringBuilder = new DbConnectionStringBuilder();
             try
@@ -119,7 +122,7 @@ namespace umbraco.DataLayer
 
         public static bool IsEmbeddedDatabase(string connectionString)
         {
-            return connectionString.ToLower().Contains(@"data source=|DataDirectory|\Umbraco.sdf".ToLower());
+            return connectionString.ToLower().Contains("|DataDirectory|".ToLower());
         }
 
         #endregion

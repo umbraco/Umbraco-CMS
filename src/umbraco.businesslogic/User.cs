@@ -1,6 +1,4 @@
 using System;
-using System.Data;
-using System.Configuration;
 using System.Collections;
 using Umbraco.Core.Logging;
 using umbraco.DataLayer;
@@ -202,7 +200,6 @@ namespace umbraco.BusinessLogic
                 SqlHelper.ExecuteScalar<string>("select UserPassword from umbracoUser where id = @id",
                 SqlHelper.CreateParameter("@id", this.Id));
         }
-        static string _connstring = GlobalSettings.DbDSN;
 
         /// <summary>
         /// Determines whether this user is an admin.

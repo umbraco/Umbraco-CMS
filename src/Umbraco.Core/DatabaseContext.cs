@@ -3,7 +3,6 @@ using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
 using System.Linq;
-using System.Web;
 using System.Web.Configuration;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
@@ -110,11 +109,10 @@ namespace Umbraco.Core
         /// </summary>
         public void ConfigureDatabaseConnection()
         {
-            var providerName = "System.Data.SqlServerCe.4.0";
-            var connectionString = "Datasource=|DataDirectory|Umbraco.sdf";
-            var appSettingsConnection = @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf";
+            const string providerName = "System.Data.SqlServerCe.4.0";
+            const string connectionString = "Datasource=|DataDirectory|Umbraco.sdf";
 
-            SaveConnectionString(connectionString, appSettingsConnection, providerName);
+            SaveConnectionString(connectionString, providerName);
 
             var path = Path.Combine(GlobalSettings.FullpathToRoot, "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
@@ -135,7 +133,7 @@ namespace Umbraco.Core
         /// <param name="connectionString"></param>
         public void ConfigureDatabaseConnection(string connectionString)
         {
-            SaveConnectionString(connectionString, connectionString, string.Empty);
+            SaveConnectionString(connectionString, string.Empty);
             Initialize(string.Empty);
         }
 
@@ -150,26 +148,22 @@ namespace Umbraco.Core
         public void ConfigureDatabaseConnection(string server, string databaseName, string user, string password, string databaseProvider)
         {
             string connectionString;
-            string appSettingsConnection;
             string providerName = "System.Data.SqlClient";
             if(databaseProvider.ToLower().Contains("mysql"))
             {
                 providerName = "MySql.Data.MySqlClient";
                 connectionString = string.Format("Server={0}; Database={1};Uid={2};Pwd={3}", server, databaseName, user, password);
-                appSettingsConnection = connectionString;
             }
             else if(databaseProvider.ToLower().Contains("azure"))
             {
                 connectionString = string.Format("Server=tcp:{0}.database.windows.net;Database={1};User ID={2}@{0};Password={3}", server, databaseName, user, password);
-                appSettingsConnection = connectionString;
             }
             else
             {
                 connectionString = string.Format("server={0};database={1};user id={2};password={3}", server, databaseName, user, password);
-                appSettingsConnection = connectionString;
             }
 
-            SaveConnectionString(connectionString, appSettingsConnection, providerName);
+            SaveConnectionString(connectionString, providerName);
             Initialize(providerName);
         }
 
@@ -180,9 +174,8 @@ namespace Umbraco.Core
         /// Saves the ConnectionString in the very nasty 'medium trust'-supportive way.
         /// </remarks>
         /// <param name="connectionString"></param>
-        /// <param name="appSettingsConnection"></param>
         /// <param name="providerName"></param>
-        private void SaveConnectionString(string connectionString, string appSettingsConnection, string providerName)
+        private void SaveConnectionString(string connectionString, string providerName)
         {
             //Set the connection string for the new datalayer
             var connectionStringSettings = string.IsNullOrEmpty(providerName)
@@ -194,9 +187,6 @@ namespace Umbraco.Core
             _connectionString = connectionString;
             _providerName = providerName;
 
-            //Set the connection string in appsettings used in the legacy datalayer
-            GlobalSettings.DbDsn = appSettingsConnection;
-
             var webConfig = new WebConfigurationFileMap();
             var vDir = GlobalSettings.FullpathToRoot;
             foreach (VirtualDirectoryMapping v in webConfig.VirtualDirectories)
@@ -207,7 +197,7 @@ namespace Umbraco.Core
                 }
             }
 
-            string fileName = System.IO.Path.Combine(vDir, "web.config");
+            var fileName = Path.Combine(vDir, "web.config");
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
             var connectionstrings = xml.Root.Descendants("connectionStrings").Single();
 

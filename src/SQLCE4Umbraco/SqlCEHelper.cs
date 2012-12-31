@@ -94,7 +94,7 @@ namespace SqlCE4Umbraco
                 var dataDirectory = AppDomain.CurrentDomain.GetData("DataDirectory") as string;
                 if (!string.IsNullOrEmpty(dataDirectory))
                 {
-                    path = path.Replace("|DataDirectory|", dataDirectory);
+                    path = path.Replace("|DataDirectory|", dataDirectory + System.IO.Path.DirectorySeparatorChar);
                 }
             }
 

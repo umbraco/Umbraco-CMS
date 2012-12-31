@@ -37,12 +37,6 @@ namespace umbraco.cms.businesslogic
         private string _text;
         private int _id = 0;
         private Guid _uniqueID;
-
-        /// <summary>
-        /// Private connectionstring
-        /// </summary>
-        protected static readonly string _ConnString = GlobalSettings.DbDSN;
-
         private int _parentid;
         private Guid _nodeObjectType;
         private int _level;
