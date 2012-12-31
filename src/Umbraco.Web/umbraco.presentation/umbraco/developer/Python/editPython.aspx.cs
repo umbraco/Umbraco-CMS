@@ -13,9 +13,9 @@ using System.IO;
 using System.Xml;
 using System.Xml.Xsl;
 using System.Text.RegularExpressions;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.presentation.Trees;
-using umbraco.IO;
 using umbraco.cms.helpers;
 
 namespace umbraco.cms.presentation.developer
@@ -98,8 +98,8 @@ namespace umbraco.cms.presentation.developer
         {
             base.OnPreRender(e);
 
-            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.Webservices) + "/codeEditorSave.asmx"));
-            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.Webservices) + "/legacyAjaxCalls.asmx"));
+            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices) + "/codeEditorSave.asmx"));
+			ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices) + "/legacyAjaxCalls.asmx"));
         }
     }
 }
