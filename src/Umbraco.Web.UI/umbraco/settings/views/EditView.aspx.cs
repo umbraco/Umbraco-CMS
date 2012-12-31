@@ -137,7 +137,6 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 
 			SaveButton = Panel1.Menu.NewIcon();
 			SaveButton.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
-			//SaveButton.OnClickCommand = "doSubmit()";
 			SaveButton.AltText = ui.Text("save");
 			SaveButton.ID = "save";
 
@@ -167,14 +166,13 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 					640, 550);
 			umbDictionary.AltText = "Insert umbraco dictionary item";
 
-			//uicontrols.MenuIconI umbMacro = Panel1.Menu.NewIcon();
-			//umbMacro.ImageURL = UmbracoPath + "/images/editor/insMacro.gif";
-			//umbMacro.AltText = ui.Text("template", "insertMacro");
-			//umbMacro.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/editMacro.aspx?objectId=" + editorSource.ClientID, ui.Text("template", "insertMacro"), 470, 530);
-
-			Panel1.Menu.NewElement("div", "splitButtonMacroPlaceHolder", "sbPlaceHolder", 40);
-
-
+			var macroSplitButton = new Controls.InsertMacroSplitButton
+				{
+					ClientCallbackInsertMacroMarkup = "function(alias) {editViewEditor.insertMacroMarkup(alias);}",
+					ClientCallbackOpenMacroModel = "function(alias) {editViewEditor.openMacroModal(alias);}"
+				};
+			Panel1.Menu.InsertNewControl(macroSplitButton, 40);
+			
 			if (_template == null)
 			{
 				InitializeEditorForPartialView();
@@ -184,10 +182,6 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 				InitializeEditorForTemplate();	
 			}
 			
-
-			//Spit button
-			Panel1.Menu.InsertSplitter();
-			Panel1.Menu.NewElement("div", "splitButtonPlaceHolder", "sbPlaceHolder", 40);			
 		}
 
 		protected override void OnPreRender(EventArgs e)
@@ -212,27 +206,28 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 		/// </summary>
 		private void InitializeEditorForTemplate()
 		{
-			if (UmbracoSettings.UseAspNetMasterPages)
-			{
-				Panel1.Menu.InsertSplitter();
+			
+			//TODO: implement content placeholders, etc... just like we had in v5
 
-				MenuIconI umbContainer = Panel1.Menu.NewIcon();
-				umbContainer.ImageURL = UmbracoPath + "/images/editor/masterpagePlaceHolder.gif";
-				umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
-				umbContainer.OnClickCommand =
-					ClientTools.Scripts.OpenModalWindow(
-						IOHelper.ResolveUrl(SystemDirectories.Umbraco) +
-						"/dialogs/insertMasterpagePlaceholder.aspx?&id=" + _template.Id,
-						ui.Text("template", "insertContentAreaPlaceHolder"), 470, 320);
+			//Panel1.Menu.InsertSplitter();
 
-				MenuIconI umbContent = Panel1.Menu.NewIcon();
-				umbContent.ImageURL = UmbracoPath + "/images/editor/masterpageContent.gif";
-				umbContent.AltText = ui.Text("template", "insertContentArea");
-				umbContent.OnClickCommand =
-					ClientTools.Scripts.OpenModalWindow(
-						IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/insertMasterpageContent.aspx?id=" +
-						_template.Id, ui.Text("template", "insertContentArea"), 470, 300);
-			}
+			//MenuIconI umbContainer = Panel1.Menu.NewIcon();
+			//umbContainer.ImageURL = UmbracoPath + "/images/editor/masterpagePlaceHolder.gif";
+			//umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
+			//umbContainer.OnClickCommand =
+			//	ClientTools.Scripts.OpenModalWindow(
+			//		IOHelper.ResolveUrl(SystemDirectories.Umbraco) +
+			//		"/dialogs/insertMasterpagePlaceholder.aspx?&id=" + _template.Id,
+			//		ui.Text("template", "insertContentAreaPlaceHolder"), 470, 320);
+
+			//MenuIconI umbContent = Panel1.Menu.NewIcon();
+			//umbContent.ImageURL = UmbracoPath + "/images/editor/masterpageContent.gif";
+			//umbContent.AltText = ui.Text("template", "insertContentArea");
+			//umbContent.OnClickCommand =
+			//	ClientTools.Scripts.OpenModalWindow(
+			//		IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/insertMasterpageContent.aspx?id=" +
+			//		_template.Id, ui.Text("template", "insertContentArea"), 470, 300);
+			
 		}
 
 	}

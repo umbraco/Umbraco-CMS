@@ -335,6 +335,8 @@
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="Trees\PartialViewMacrosTree.cs" />
     <Compile Include="Trees\PartialViewsTree.cs" />
+    <Compile Include="UI\Controls\InsertMacroSplitButton.cs" />
+    <Compile Include="UI\Controls\UmbracoControl.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1945,7 +1947,9 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\create.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\cruds.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\editMacro.aspx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\editMacro.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\emptyTrashcan.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\exportDocumenttype.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\imageViewer.aspx" />
