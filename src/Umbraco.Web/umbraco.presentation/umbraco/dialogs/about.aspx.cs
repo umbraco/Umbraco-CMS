@@ -1,17 +1,6 @@
 using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using System.Reflection;
-using System.Diagnostics;
+using System.Globalization;
 using Umbraco.Core.Configuration;
-using umbraco.IO;
 
 namespace umbraco.dialogs
 {
@@ -21,17 +10,11 @@ namespace umbraco.dialogs
 	public partial class about : BasePages.UmbracoEnsuredPage
 	{
 
-		protected void Page_Load(object sender, System.EventArgs e)
+		protected void Page_Load(object sender, EventArgs e)
 		{
 			// Put user code to initialize the page here
-            version.Text = UmbracoVersion.Current.ToString(3);
-			thisYear.Text = DateTime.Now.Year.ToString();
-
-
-			// Get the version of the umbraco.dll by looking at a class in that dll
-            // Had to do it like this due to medium trust issues, see: http://haacked.com/archive/2010/11/04/assembly-location-and-medium-trust.aspx
-            var versionNumber = new AssemblyName(typeof(Umbraco.Web.ApplicationContextExtensions).Assembly.FullName).Version.ToString();
-            version.Text += string.Format(" (Assembly version: {0})", versionNumber);
+			thisYear.Text = DateTime.Now.Year.ToString(CultureInfo.InvariantCulture);
+            version.Text = string.Format("{0} (Assembly version: {1})", UmbracoVersion.Current.ToString(3), UmbracoVersion.AssemblyVersion);
 		}
 
 		#region Web Form Designer generated code

@@ -1,10 +1,11 @@
 using System;
+using System.Reflection;
 
 namespace Umbraco.Core.Configuration
 {
     public class UmbracoVersion
     {
-        private static readonly Version Version = new Version(6,0,0);
+        private static readonly Version Version = new Version(6, 0, 0);
 
         /// <summary>
         /// Gets the current version of Umbraco.
@@ -23,5 +24,9 @@ namespace Umbraco.Core.Configuration
         /// </summary>
         /// <value>The version comment.</value>
         public static string CurrentComment { get { return ""; } }
+
+        // Get the version of the umbraco.dll by looking at a class in that dll
+        // Had to do it like this due to medium trust issues, see: http://haacked.com/archive/2010/11/04/assembly-location-and-medium-trust.aspx
+        public static string AssemblyVersion { get { return new AssemblyName(typeof(ActionsResolver).Assembly.FullName).Version.ToString(); } }
     }
 }
