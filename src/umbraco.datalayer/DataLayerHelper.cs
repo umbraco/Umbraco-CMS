@@ -44,9 +44,15 @@ namespace umbraco.DataLayer
             if (String.IsNullOrEmpty(connectionString))
                 throw new ArgumentNullException("connectionString");
 
-            if(IsEmbeddedDatabase(connectionString) && connectionString.ToLower().Contains("SQLCE4Umbraco".ToLower()) == false)
-                connectionString = string.Format("datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;{0}", connectionString);
+            if (IsEmbeddedDatabase(connectionString) && connectionString.ToLower().Contains("SQLCE4Umbraco".ToLower()) == false)
+            {
+                // Input is : Datasource=|DataDirectory|Umbraco.sdf
+                // Should be: datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf
 
+                connectionString = connectionString.Replace("Datasource", "data source");
+                connectionString = connectionString.Insert(connectionString.LastIndexOf('|') + 1, "\\");
+                connectionString = string.Format("datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;{0}", connectionString);
+            }
             /* try to parse connection string */
             DbConnectionStringBuilder connectionStringBuilder = new DbConnectionStringBuilder();
             try

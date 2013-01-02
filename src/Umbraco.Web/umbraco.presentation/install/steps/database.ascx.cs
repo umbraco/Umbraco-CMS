@@ -40,15 +40,16 @@ namespace umbraco.presentation.install.steps
         /// </summary>
         protected bool HasEmbeddedDatabaseFiles
         {
-            get {
+            get
+            {
                 // check if sql ce is present
-                    if (
-                        !File.Exists(IOHelper.MapPath(Path.Combine(IOHelper.ResolveUrl(SystemDirectories.Bin), "System.Data.SqlServerCe.dll"))) ||
-                        !File.Exists(IOHelper.MapPath(Path.Combine(IOHelper.ResolveUrl(SystemDirectories.Bin), "SQLCE4Umbraco.dll")))
-                        )
-                        return false;
-                    else
-                        return true;
+                if (
+                    !File.Exists(IOHelper.MapPath(Path.Combine(IOHelper.ResolveUrl(SystemDirectories.Bin), "System.Data.SqlServerCe.dll"))) ||
+                    !File.Exists(IOHelper.MapPath(Path.Combine(IOHelper.ResolveUrl(SystemDirectories.Bin), "SQLCE4Umbraco.dll")))
+                    )
+                    return false;
+                else
+                    return true;
             }
         }
 
@@ -70,7 +71,7 @@ namespace umbraco.presentation.install.steps
             // Does the user have to enter a connection string?
             if (settings.Visible && !Page.IsPostBack)
                 ShowDatabaseSettings();
-            
+
         }
 
         /// <summary>
@@ -78,10 +79,12 @@ namespace umbraco.presentation.install.steps
         /// </summary>
         protected void ShowDatabaseSettings()
         {
-                // Parse the connection string
-                DbConnectionStringBuilder connectionStringBuilder = new DbConnectionStringBuilder();
+            // Parse the connection string
+            DbConnectionStringBuilder connectionStringBuilder = new DbConnectionStringBuilder();
 
-                var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            if (databaseSettings != null)
+            {
                 var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString);
                 connectionStringBuilder.ConnectionString = dataHelper.ConnectionString;
 
@@ -90,38 +93,43 @@ namespace umbraco.presentation.install.steps
                 if (datalayerType.Length > 0)
                 {
                     foreach (ListItem item in DatabaseType.Items)
-                        if (item.Value != String.Empty && ((string)datalayerType).Contains(item.Value))
+                        if (item.Value != String.Empty && datalayerType.Contains(item.Value))
                             DatabaseType.SelectedValue = item.Value;
                 }
                 else if (dataHelper.ConnectionString != "server=.\\SQLEXPRESS;database=DATABASE;user id=USER;password=PASS")
                     DatabaseType.SelectedValue = "SqlServer";
-                
-                DatabaseType_SelectedIndexChanged(this, new EventArgs());
+            }
+            else
+            {
+                DatabaseType.SelectedValue = "SqlServer";
+            }
+            
+            DatabaseType_SelectedIndexChanged(this, new EventArgs());
 
-                // Prepare other fields
-                DatabaseServer.Text = GetConnectionStringValue(connectionStringBuilder, "server");
-                if (string.IsNullOrEmpty(DatabaseServer.Text)) DatabaseServer.Text = GetConnectionStringValue(connectionStringBuilder, "Data Source");
-                DatabaseName.Text = GetConnectionStringValue(connectionStringBuilder, "database");
-                if (string.IsNullOrEmpty(DatabaseName.Text)) DatabaseName.Text = GetConnectionStringValue(connectionStringBuilder, "Initial Catalog");
-                DatabaseUsername.Text = GetConnectionStringValue(connectionStringBuilder, "user id");
-                DatabasePassword.Text = GetConnectionStringValue(connectionStringBuilder, "password");
-                if (string.IsNullOrEmpty(DatabasePassword.Text)) DatabasePassword.Text = GetConnectionStringValue(connectionStringBuilder, "pwd");
+            // Prepare other fields
+            DatabaseServer.Text = GetConnectionStringValue(connectionStringBuilder, "server");
+            if (string.IsNullOrEmpty(DatabaseServer.Text)) DatabaseServer.Text = GetConnectionStringValue(connectionStringBuilder, "Data Source");
+            DatabaseName.Text = GetConnectionStringValue(connectionStringBuilder, "database");
+            if (string.IsNullOrEmpty(DatabaseName.Text)) DatabaseName.Text = GetConnectionStringValue(connectionStringBuilder, "Initial Catalog");
+            DatabaseUsername.Text = GetConnectionStringValue(connectionStringBuilder, "user id");
+            DatabasePassword.Text = GetConnectionStringValue(connectionStringBuilder, "password");
+            if (string.IsNullOrEmpty(DatabasePassword.Text)) DatabasePassword.Text = GetConnectionStringValue(connectionStringBuilder, "pwd");
 
-                toggleVisible(DatabaseServerItem, !ManualConnectionString && !IsEmbeddedDatabase);
-                toggleVisible(DatabaseUsernameItem, !ManualConnectionString && !IsEmbeddedDatabase);
-                toggleVisible(DatabasePasswordItem, !ManualConnectionString && !IsEmbeddedDatabase);
-                toggleVisible(DatabaseNameItem, !ManualConnectionString && !IsEmbeddedDatabase);
+            toggleVisible(DatabaseServerItem, !ManualConnectionString && !IsEmbeddedDatabase);
+            toggleVisible(DatabaseUsernameItem, !ManualConnectionString && !IsEmbeddedDatabase);
+            toggleVisible(DatabasePasswordItem, !ManualConnectionString && !IsEmbeddedDatabase);
+            toggleVisible(DatabaseNameItem, !ManualConnectionString && !IsEmbeddedDatabase);
 
 
-                if (IsEmbeddedDatabase)
-                    dbinit.Text = "$('#databaseOptionEmbedded').click();$('#databaseOptionEmbedded').change();";
-                else if(ManualConnectionString)
-                    dbinit.Text = "$('#databaseOptionAdvanced').click();$('#databaseOptionAdvanced').change();";
-                else if(DatabaseType.SelectedValue == "SqlServer")
-                    dbinit.Text = "$('#databaseOptionBlank').click();$('#databaseOptionBlank').change();";
-                else if (DatabaseType.SelectedValue == "SqlAzure")
-                    dbinit.Text = "$('#databaseOptionBlank').click();$('#databaseOptionBlank').change();";
-                //toggleVisible(DatabaseConnectionString, ManualConnectionString);
+            if (IsEmbeddedDatabase)
+                dbinit.Text = "$('#databaseOptionEmbedded').click();$('#databaseOptionEmbedded').change();";
+            else if (ManualConnectionString)
+                dbinit.Text = "$('#databaseOptionAdvanced').click();$('#databaseOptionAdvanced').change();";
+            else if (DatabaseType.SelectedValue == "SqlServer")
+                dbinit.Text = "$('#databaseOptionBlank').click();$('#databaseOptionBlank').change();";
+            else if (DatabaseType.SelectedValue == "SqlAzure")
+                dbinit.Text = "$('#databaseOptionBlank').click();$('#databaseOptionBlank').change();";
+            //toggleVisible(DatabaseConnectionString, ManualConnectionString);
 
             // Make sure ASP.Net displays the password text
             DatabasePassword.Attributes["value"] = DatabasePassword.Text;
@@ -136,7 +144,7 @@ namespace umbraco.presentation.install.steps
             {
                 if (string.IsNullOrEmpty(ConnectionString.Text) == false)
                 {
-					ApplicationContext.Current.DatabaseContext.ConfigureDatabaseConnection(ConnectionString.Text);
+                    ApplicationContext.Current.DatabaseContext.ConfigureDatabaseConnection(ConnectionString.Text);
                 }
                 else if (IsEmbeddedDatabase)
                 {
@@ -153,7 +161,7 @@ namespace umbraco.presentation.install.steps
             {
                 LogHelper.Error<detect>("Exception was thrown during the setup of the database in 'saveDBConfig'.", ex);
             }
-            
+
             settings.Visible = false;
             installing.Visible = true;
         }
@@ -182,7 +190,7 @@ namespace umbraco.presentation.install.steps
             toggleVisible(DatabaseUsernameItem, !ManualConnectionString && !IsEmbeddedDatabase);
             toggleVisible(DatabasePasswordItem, !ManualConnectionString && !IsEmbeddedDatabase);
             toggleVisible(DatabaseNameItem, !ManualConnectionString && !IsEmbeddedDatabase);
-            
+
             //toggleVisible(DatabaseConnectionString, ManualConnectionString);
         }
 
@@ -203,7 +211,7 @@ namespace umbraco.presentation.install.steps
 
             jsVars.Text = "showDatabaseSettings();";
         }
-        
+
         protected void gotoNextStep(object sender, EventArgs e)
         {
             Helper.RedirectToNextStep(this.Page);
