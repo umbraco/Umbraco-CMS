@@ -1,7 +1,6 @@
 using System;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
 using umbraco.DataLayer;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,7 +19,7 @@ namespace umbraco.cms.businesslogic.media
 	{
         #region Constants and static members
 
-	    private IMedia _media;
+	    protected internal IMedia MediaItem;
         private const string m_SQLOptimizedMany = @"
 			select 
 				count(children.id) as children, cmsContentType.isContainer, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate, umbracoNode.nodeUser, umbracoNode.text, 
@@ -207,17 +206,17 @@ namespace umbraco.cms.businesslogic.media
         {
             get
             {
-                return _media == null ? base.sortOrder : _media.SortOrder;
+                return MediaItem == null ? base.sortOrder : MediaItem.SortOrder;
             }
             set
             {
-                if (_media == null)
+                if (MediaItem == null)
                 {
                     base.sortOrder = value;
                 }
                 else
                 {
-                    _media.SortOrder = value;
+                    MediaItem.SortOrder = value;
                 }
             }
         }
@@ -226,17 +225,17 @@ namespace umbraco.cms.businesslogic.media
         {
             get
             {
-                return _media == null ? base.Level : _media.Level;
+                return MediaItem == null ? base.Level : MediaItem.Level;
             }
             set
             {
-                if (_media == null)
+                if (MediaItem == null)
                 {
                     base.Level = value;
                 }
                 else
                 {
-                    _media.Level = value;
+                    MediaItem.Level = value;
                 }
             }
         }
@@ -245,7 +244,7 @@ namespace umbraco.cms.businesslogic.media
         {
             get
             {
-                return _media == null ? base.ParentId : _media.ParentId;
+                return MediaItem == null ? base.ParentId : MediaItem.ParentId;
             }
         }
 
@@ -253,17 +252,17 @@ namespace umbraco.cms.businesslogic.media
         {
             get
             {
-                return _media == null ? base.Path : _media.Path;
+                return MediaItem == null ? base.Path : MediaItem.Path;
             }
             set
             {
-                if (_media == null)
+                if (MediaItem == null)
                 {
                     base.Path = value;
                 }
                 else
                 {
-                    _media.Path = value;
+                    MediaItem.Path = value;
                 }
             }
         }
@@ -297,14 +296,14 @@ namespace umbraco.cms.businesslogic.media
 
             foreach (var property in GenericProperties)
             {
-                _media.SetValue(property.PropertyType.Alias, property.Value);
+                MediaItem.SetValue(property.PropertyType.Alias, property.Value);
             }
 
             FireBeforeSave(e);
 
             if (!e.Cancel)
             {
-                ApplicationContext.Current.Services.MediaService.Save(_media);
+                ApplicationContext.Current.Services.MediaService.Save(MediaItem);
 
                 base.Save();
 
@@ -417,14 +416,14 @@ namespace umbraco.cms.businesslogic.media
         #region Private methods
         private void SetupNode(IMedia media)
         {
-            _media = media;
+            MediaItem = media;
 
             //Setting private properties from IContentBase replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
-            base.PopulateCMSNodeFromContentBase(_media, _objectType);
+            base.PopulateCMSNodeFromContentBase(MediaItem, _objectType);
 
             //If the version is empty we update with the latest version from the current IContent.
             if (Version == Guid.Empty)
-                Version = _media.Version;
+                Version = MediaItem.Version;
         }
 
         [Obsolete("Deprecated, This method is no longer needed", false)]
@@ -458,9 +457,9 @@ namespace umbraco.cms.businesslogic.media
                 // Remove all files
                 //DeleteAssociatedMediaFiles();
 
-                if (_media != null)
+                if (MediaItem != null)
                 {
-                    ApplicationContext.Current.Services.MediaService.Delete(_media);
+                    ApplicationContext.Current.Services.MediaService.Delete(MediaItem);
                 }
                 else
                 {
@@ -487,9 +486,9 @@ namespace umbraco.cms.businesslogic.media
 
             if (!e.Cancel)
             {
-                if (_media != null)
+                if (MediaItem != null)
                 {
-                    ApplicationContext.Current.Services.MediaService.MoveToRecycleBin(_media);
+                    ApplicationContext.Current.Services.MediaService.MoveToRecycleBin(MediaItem);
                 }
                 else
                 {

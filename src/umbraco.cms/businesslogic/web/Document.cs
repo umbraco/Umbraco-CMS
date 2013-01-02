@@ -931,15 +931,16 @@ namespace umbraco.cms.businesslogic.web
         public override void Save()
         {
             var e = new SaveEventArgs();
+
+            foreach (var property in GenericProperties)
+            {
+                Content.SetValue(property.PropertyType.Alias, property.Value);
+            }
+
             FireBeforeSave(e);
 
             if (!e.Cancel)
             {
-                foreach (var property in GenericProperties)
-                {
-                    Content.SetValue(property.PropertyType.Alias, property.Value);
-                }
-
                 ApplicationContext.Current.Services.ContentService.Save(Content);
 
                 base.Save();

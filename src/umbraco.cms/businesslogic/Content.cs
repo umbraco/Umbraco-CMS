@@ -38,7 +38,7 @@ namespace umbraco.cms.businesslogic
         private string _contentTypeIcon;
         private ContentType _contentType;
         private Properties m_LoadedProperties = null;
-        private IContentBase _contentBase;
+        protected internal IContentBase ContentBase;
 
         #endregion
 
@@ -55,9 +55,9 @@ namespace umbraco.cms.businesslogic
         protected internal Content(IContentBase contentBase)
             : base(contentBase)
         {
-            _contentBase = contentBase;
-            _version = _contentBase.Version;
-            _versionDate = _contentBase.UpdateDate;
+            ContentBase = contentBase;
+            _version = ContentBase.Version;
+            _versionDate = ContentBase.UpdateDate;
             _versionDateInitialized = true;
         }
 
@@ -646,9 +646,9 @@ namespace umbraco.cms.businesslogic
         {
             m_LoadedProperties = new Properties();
 
-            if (_contentBase != null)
+            if (ContentBase != null)
             {
-                m_LoadedProperties.AddRange(_contentBase.Properties.Select(x => new Property(x)));
+                m_LoadedProperties.AddRange(ContentBase.Properties.Select(x => new Property(x)));
                 return;
             }
 

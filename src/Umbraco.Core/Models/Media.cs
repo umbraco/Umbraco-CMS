@@ -102,7 +102,7 @@ namespace Umbraco.Core.Models
             //If Content is trashed the parent id should be set to that of the RecycleBin
             if (isTrashed)
             {
-                ParentId = -20;
+                ParentId = -21;
             }
             else//otherwise set the parent id to the optional parameter, -1 being the fallback
             {

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
 using umbraco.cms.businesslogic.Files;
 using umbraco.cms.businesslogic.property;
 using umbraco.IO;
+using IContent = Umbraco.Core.Models.IContent;
+using IMedia = Umbraco.Core.Models.IMedia;
 
 namespace umbraco.cms.businesslogic.datatype
 {
@@ -83,31 +84,21 @@ namespace umbraco.cms.businesslogic.datatype
                         }
 
                         // check for auto fill of other properties (width, height, extension and filesize)
-                        string propertyTypeAlias = new Property(PropertyId).PropertyType.Alias;
                         if (UmbracoSettings.ImageAutoFillImageProperties != null)
                         {
+                            string propertyTypeAlias = new Property(PropertyId).PropertyType.Alias;
+
                             XmlNode uploadFieldConfigNode =
                                 UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
                                     string.Format("uploadField [@alias = \"{0}\"]", propertyTypeAlias));
+
                             if (uploadFieldConfigNode != null)
                             {
-                                // get the current document
-                                Content content = Content.GetContentFromVersion(Version);
-                                // only add dimensions to web images
-                                if (um.SupportsResizing)
+                                var legacy = Content.GetContentFromVersion(Version);
+                                if (legacy.ContentBase is IContent == false && legacy.ContentBase is IMedia == false)
                                 {
-                                    updateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias",
-                                                          um.GetDimensions().Item1);
-                                    updateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias",
-                                                          um.GetDimensions().Item2);
+                                    FillProperties(uploadFieldConfigNode, legacy, um);
                                 }
-                                else
-                                {
-                                    updateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias", String.Empty);
-                                    updateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias", String.Empty);
-                                }
-                                updateContentProperty(uploadFieldConfigNode, content, "lengthFieldAlias", um.Length);
-                                updateContentProperty(uploadFieldConfigNode, content, "extensionFieldAlias", um.Extension);
                             }
                         }
 
@@ -129,7 +120,7 @@ namespace umbraco.cms.businesslogic.datatype
                 }
             }
         }
-        
+
         private void clearRelatedValues()
         {
             string propertyTypeAlias = new Property(PropertyId).PropertyType.Alias;
@@ -141,14 +132,24 @@ namespace umbraco.cms.businesslogic.datatype
                 if (uploadFieldConfigNode != null)
                 {
                     // get the current document
-                    Content content = Content.GetContentFromVersion(Version);
+                    Content legacy = Content.GetContentFromVersion(Version);
                     // only add dimensions to web images
-                    updateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias", String.Empty);
-                    updateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias", String.Empty);
-                    updateContentProperty(uploadFieldConfigNode, content, "lengthFieldAlias", String.Empty);
-                    updateContentProperty(uploadFieldConfigNode, content, "extensionFieldAlias", String.Empty);
+                    updateContentProperty(uploadFieldConfigNode, legacy, "widthFieldAlias", String.Empty);
+                    updateContentProperty(uploadFieldConfigNode, legacy, "heightFieldAlias", String.Empty);
+                    updateContentProperty(uploadFieldConfigNode, legacy, "lengthFieldAlias", String.Empty);
+                    updateContentProperty(uploadFieldConfigNode, legacy, "extensionFieldAlias", String.Empty);
                 }
             }
+        }
+
+        private void FillProperties(XmlNode uploadFieldConfigNode, Content content, UmbracoFile um)
+        {
+            // only add dimensions to web images
+            updateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias", um.SupportsResizing ? um.GetDimensions().Item1.ToString() : string.Empty);
+            updateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias", um.SupportsResizing ? um.GetDimensions().Item2.ToString() : string.Empty);
+
+            updateContentProperty(uploadFieldConfigNode, content, "lengthFieldAlias", um.Length);
+            updateContentProperty(uploadFieldConfigNode, content, "extensionFieldAlias", um.Extension);
         }
 
         private void updateContentProperty(XmlNode uploadFieldConfigNode, Content content, string propertyAlias,
