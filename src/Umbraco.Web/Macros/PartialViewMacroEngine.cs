@@ -58,13 +58,25 @@ namespace Umbraco.Web.Macros
 		{
 			get { return EngineName; }
 		}
+
+		//NOTE: We do not return any supported extensions because we don't want the MacroEngineFactory to return this
+		// macro engine when searching for engines via extension. Those types of engines are reserved for files that are
+		// stored in the ~/macroScripts folder and each engine must support unique extensions. This is a total Hack until 
+		// we rewrite how macro engines work.
 		public IEnumerable<string> SupportedExtensions
 		{
-			get { return new[] {"cshtml", "vbhtml"}; }
+			get { return Enumerable.Empty<string>(); }
+			//get { return new[] {"cshtml", "vbhtml"}; }
 		}
+
+		//NOTE: We do not return any supported extensions because we don't want the MacroEngineFactory to return this
+		// macro engine when searching for engines via extension. Those types of engines are reserved for files that are
+		// stored in the ~/macroScripts folder and each engine must support unique extensions. This is a total Hack until 
+		// we rewrite how macro engines work.
 		public IEnumerable<string> SupportedUIExtensions
 		{
-			get { return new[] { "cshtml", "vbhtml" }; }
+			get { return Enumerable.Empty<string>(); }
+			//get { return new[] { "cshtml", "vbhtml" }; }
 		}
 		public Dictionary<string, IMacroGuiRendering> SupportedProperties
 		{

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Web;
 using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -19,8 +20,20 @@ namespace umbraco
 		private int _typeId;
 		private int _userId;
 
-		private const string EditViewFile = "Settings/Views/EditView.aspx";
-		private readonly string _basePath = SystemDirectories.MvcViews + "/Partials/";
+		protected virtual string EditViewFile
+		{
+			get { return "Settings/Views/EditView.aspx"; }
+		}
+
+		protected string BasePath
+		{
+			get { return SystemDirectories.MvcViews + "/" + ParentFolderName.EnsureEndsWith('/'); }
+		}
+
+		protected virtual string ParentFolderName
+		{
+			get { return "Partials"; }
+		}
 
 		public int UserId
 		{
@@ -48,30 +61,35 @@ namespace umbraco
 		public bool Save()
 		{
 			var fileName = _alias + ".cshtml";
-			var fullFilePath = IOHelper.MapPath(_basePath + fileName);
+			var fullFilePath = IOHelper.MapPath(BasePath + fileName);
 			
 			//return the link to edit the file if it already exists
 			if (File.Exists(fullFilePath))
 			{
-				_returnUrl = string.Format(EditViewFile + "?file={0}", fileName);
+				_returnUrl = string.Format(EditViewFile + "?file={0}", HttpUtility.UrlEncode(ParentFolderName.EnsureEndsWith('/') + fileName));
 				return true;
 			}	
 
 			//create the file
 			using (var sw = File.CreateText(fullFilePath))
 			{
-				//write out the template header
-				sw.Write("@inherits ");
-				sw.Write(typeof(UmbracoViewPage<>).FullName.TrimEnd("`1"));
-				sw.Write("<dynamic>");
+				WriteTemplateHeader(sw);
 			}
-			_returnUrl = string.Format(EditViewFile + "?file={0}", fileName);
+			_returnUrl = string.Format(EditViewFile + "?file={0}", HttpUtility.UrlEncode(ParentFolderName.EnsureEndsWith('/') + fileName));
 			return true;
+		}
+
+		protected virtual void WriteTemplateHeader(StreamWriter sw)
+		{
+			//write out the template header
+			sw.Write("@inherits ");
+			sw.Write(typeof(UmbracoViewPage<>).FullName.TrimEnd("`1"));
+			sw.Write("<dynamic>");
 		}
 
 		public bool Delete()
 		{
-			var path = IOHelper.MapPath(_basePath + _alias.TrimStart('/'));
+			var path = IOHelper.MapPath(BasePath + _alias.TrimStart('/'));
 
 			if (File.Exists(path))
 				File.Delete(path);

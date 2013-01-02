@@ -6,9 +6,11 @@ using System.Text;
 using System.Web.Mvc;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Web.Macros;
 using Umbraco.Web.Mvc;
 using umbraco;
 using umbraco.BasePages;
+using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.template;
 using umbraco.presentation.cache;
 using Umbraco.Core;
@@ -43,6 +45,10 @@ namespace Umbraco.Web.WebServices
 			// validate extension
 			IOHelper.ValidateFileExtension(IOHelper.MapPath(folderPath + filename), new[] { "cshtml" }.ToList());
 			
+			//TODO: Validate using the macro engine
+			var engine = MacroEngineFactory.GetEngine(PartialViewMacroEngine.EngineName);
+			//engine.Validate(...)
+
 			var val = contents;
 			var saveOldPath = oldName.StartsWith("~/") ? IOHelper.MapPath(oldName) : IOHelper.MapPath(folderPath + oldName);
 			var savePath = filename.StartsWith("~/") ? IOHelper.MapPath(filename) : IOHelper.MapPath(folderPath + filename);

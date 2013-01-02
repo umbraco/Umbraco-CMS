@@ -20,5 +20,23 @@ namespace Umbraco.Web.UI.Umbraco.Masterpages {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::ClientDependency.Core.Controls.JsInclude JsInclude10;
+        
+        /// <summary>
+        /// JsInclude11 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude11;
+        
+        /// <summary>
+        /// JsInclude12 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude12;
     }
 }

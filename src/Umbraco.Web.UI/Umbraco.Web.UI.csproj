@@ -145,6 +145,7 @@
       <Private>True</Private>
       <HintPath>..\packages\SqlServerCE.4.0.0.0\lib\System.Data.SqlServerCe.Entity.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Web">
       <Name>System.Web</Name>
@@ -285,6 +286,13 @@
     <Compile Include="Umbraco\Developer\Packages\StarterKits.aspx.designer.cs">
       <DependentUpon>StarterKits.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Dialogs\EditMacro.aspx.cs">
+      <DependentUpon>EditMacro.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Dialogs\EditMacro.aspx.designer.cs">
+      <DependentUpon>EditMacro.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Masterpages\UmbracoDialog.master.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -418,6 +426,7 @@
     <Content Include="Umbraco\Developer\RelationTypes\RelationTypesWebService.asmx" />
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionDeleteRelationType.js" />
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionNewRelationType.js" />
+    <Content Include="Umbraco\Dialogs\EditMacro.aspx" />
     <Content Include="Umbraco\Images\delete.gif" />
     <Content Include="Umbraco\Images\delete.png" />
     <Content Include="Umbraco\Images\download.png" />
@@ -617,6 +626,8 @@
     <Content Include="Umbraco_Client\CodeMirror\Js\Theme\xq-dark.css" />
     <Content Include="Umbraco_Client\ContextMenu\Css\jquery.contextMenu.css" />
     <Content Include="Umbraco_Client\ContextMenu\Js\jquery.contextMenu.js" />
+    <Content Include="Umbraco_Client\Dialogs\EditMacro.css" />
+    <Content Include="Umbraco_Client\Dialogs\EditMacro.js" />
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
     <Content Include="Umbraco_Client\Editors\EditMacro.css" />
     <Content Include="Umbraco_Client\Editors\EditView.js" />
@@ -632,6 +643,7 @@
     <Content Include="Umbraco_Client\Installer\Images\btn-confirm.png" />
     <Content Include="Umbraco_Client\Installer\Images\pbar.gif" />
     <Content Include="Umbraco_Client\Installer\Js\PackageInstaller.js" />
+    <Content Include="Umbraco_Client\Splitbutton\InsertMacroSplitButton.js" />
     <Content Include="Umbraco_Client\Splitbutton\jquery.splitbutton.js" />
     <Content Include="Umbraco_Client\Tags\Css\jquery.tagsinput.css" />
     <Content Include="Umbraco_Client\Tags\Js\jquery.tagsinput.js" />
@@ -1677,7 +1689,6 @@
     <Content Include="Umbraco\Dialogs\AssignDomain.aspx" />
     <Content Include="Umbraco\Dialogs\create.aspx" />
     <Content Include="Umbraco\Dialogs\cruds.aspx" />
-    <Content Include="Umbraco\Dialogs\editMacro.aspx" />
     <Content Include="Umbraco\Dialogs\emptyTrashcan.aspx" />
     <Content Include="Umbraco\Dialogs\exportDocumenttype.aspx" />
     <Content Include="Umbraco\Dialogs\imageViewer.aspx" />

@@ -30,6 +30,21 @@
             });
         },
 
+        insertMacroMarkup: function(alias) {
+            /// <summary>callback used to insert the markup for a macro with no parameters</summary>
+            
+            UmbEditor.Insert("@Umbraco.RenderMacro(\"" + alias + "\")", "", this._opts.codeEditorElementId);
+        },
+        
+        openMacroModal: function (alias) {
+            /// <summary>callback used to display the modal dialog to insert a macro with parameters</summary>
+            var t = "";
+            if (alias != null && alias != "") {
+                t = "&alias=" + alias;
+            }
+            UmbClientMgr.openModalWindow(this._opts.modalUrl + '?objectId=' + this._opts.codeEditorElementId + t, 'Insert Macro', true, 470, 530, 0, 0, '', '');
+        },
+
         doSubmit: function () {
             /// <summary>Submits the data to the server for saving</summary>
             var codeVal = UmbClientMgr.contentFrame().UmbEditor.GetCode();

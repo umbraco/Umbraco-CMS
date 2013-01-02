@@ -68,8 +68,8 @@ namespace Umbraco.Web.Trees
 		protected override void OnRenderFileNode(ref XmlTreeNode xNode)
 		{
 			ChangeNodeAction(xNode);
-			xNode.Icon = "settingsScript.gif";
-			xNode.OpenIcon = "settingsScript.gif";
+			xNode.Icon = "settingView.gif";
+			xNode.OpenIcon = "settingView.gif";
 		}
 
 		
