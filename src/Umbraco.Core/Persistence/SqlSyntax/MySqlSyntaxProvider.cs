@@ -164,7 +164,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 return string.Format(DefaultValueFormat, method);
             }
 
-            if (column.DefaultValue.ToString().Equals("getdate()"))
+            if (column.DefaultValue.ToString().ToLower().Equals("getdate()".ToLower()))
                 return "DEFAULT CURRENT_TIMESTAMP";
 
             return string.Format(DefaultValueFormat, column.DefaultValue);

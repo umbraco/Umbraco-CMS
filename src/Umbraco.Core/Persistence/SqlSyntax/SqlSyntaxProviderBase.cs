@@ -357,6 +357,10 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             if (column.DefaultValue == null)
                 return string.Empty;
 
+            // TODO: Actually use the SystemMethods on the DTO. For now I've put a hack in to catch getdate(), not using the others at the moment
+            if (column.DefaultValue.ToString().ToLower().Equals("getdate()".ToLower()))
+                return string.Format(DefaultValueFormat, column.DefaultValue);
+
             // see if this is for a system method
             if (column.DefaultValue is SystemMethods)
             {
