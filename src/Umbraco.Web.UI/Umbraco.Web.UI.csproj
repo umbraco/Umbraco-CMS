@@ -626,6 +626,8 @@
     <Content Include="Umbraco_Client\CodeMirror\Js\Theme\xq-dark.css" />
     <Content Include="Umbraco_Client\ContextMenu\Css\jquery.contextMenu.css" />
     <Content Include="Umbraco_Client\ContextMenu\Js\jquery.contextMenu.js" />
+    <Content Include="Umbraco_Client\Dialogs\EditMacro.css" />
+    <Content Include="Umbraco_Client\Dialogs\EditMacro.js" />
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
     <Content Include="Umbraco_Client\Editors\EditMacro.css" />
     <Content Include="Umbraco_Client\Editors\EditView.js" />
