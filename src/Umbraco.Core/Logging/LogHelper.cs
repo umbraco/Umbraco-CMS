@@ -9,14 +9,14 @@ namespace Umbraco.Core.Logging
 	///<summary>
 	/// Used for logging
 	///</summary>
-	internal static class LogHelper
+	public static class LogHelper
 	{
 		///<summary>
 		/// Returns a logger for the type specified
 		///</summary>
 		///<typeparam name="T"></typeparam>
 		///<returns></returns>
-		public static ILog LoggerFor<T>()
+		internal static ILog LoggerFor<T>()
 		{
 			return LogManager.GetLogger(typeof(T));
 		}
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Logging
 		/// </summary>
 		/// <param name="getTypeFromInstance"></param>
 		/// <returns></returns>
-		public static ILog LoggerFor(object getTypeFromInstance)
+		internal static ILog LoggerFor(object getTypeFromInstance)
 		{
 			if (getTypeFromInstance == null) throw new ArgumentNullException("getTypeFromInstance");
 			

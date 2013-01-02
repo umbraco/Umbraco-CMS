@@ -153,6 +153,7 @@ namespace umbraco.BusinessLogic
 		/// Use this log action for custom log messages that should be shown in the audit trail
 		/// </summary>
 		[AuditTrailLogItem]
+		[Obsolete("Use LogHelper to write custom log messages")]
 		Custom
 	}
 }

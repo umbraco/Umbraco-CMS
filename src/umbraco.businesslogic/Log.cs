@@ -177,13 +177,19 @@ namespace umbraco.BusinessLogic
                 {
 					LogHelper.Error<Log>("An error occurred adding an audit trail log to the umbracoLog table", e);
                 }
+
+				//Because 'Custom' log types are also Audit trail (for some wacky reason) but we also want these logged normally so we have to check for this:
+				if (type != LogTypes.Custom)
+				{
+					return;
+				}
+
             }
-            else
-            {
-                LogHelper.Info<Log>(
-					"Redirected log call (please use Umbraco.Core.Logging.LogHelper instead of umbraco.BusinessLogic.Log) | Type: {0} | User: {1} | NodeId: {2} | Comment: {3}",
-					() => type.ToString(), () => userId, () => nodeId.ToString(CultureInfo.InvariantCulture), () => comment);
-            }
+
+			//if we've made it this far it means that the log type is not an audit trail log or is a custom log.
+			LogHelper.Info<Log>(
+				"Redirected log call (please use Umbraco.Core.Logging.LogHelper instead of umbraco.BusinessLogic.Log) | Type: {0} | User: {1} | NodeId: {2} | Comment: {3}",
+				() => type.ToString(), () => userId, () => nodeId.ToString(CultureInfo.InvariantCulture), () => comment);            
         }
 
         public List<LogItem> GetAuditLogItems(int NodeId)
