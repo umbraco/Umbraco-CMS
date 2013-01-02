@@ -211,6 +211,7 @@ namespace Umbraco.Core
             else
             {
                 setting.Attribute("connectionString").Value = connectionString;
+                setting.Attribute("providerName").Value = providerName;
             }
 
             xml.Save(fileName, SaveOptions.DisableFormatting);
