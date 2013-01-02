@@ -28,9 +28,10 @@ namespace umbraco.dialogs
 			thisYear.Text = DateTime.Now.Year.ToString();
 
 
-			// umbraco.dll version
-			FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(IOHelper.MapPath(SystemDirectories.Bin + "/umbraco.dll"));
-			version.Text += " (Assembly version: " + myFileVersionInfo.FileVersion + ")";
+			// Get the version of the umbraco.dll by looking at a class in that dll
+            // Had to do it like this due to medium trust issues, see: http://haacked.com/archive/2010/11/04/assembly-location-and-medium-trust.aspx
+            var versionNumber = new AssemblyName(typeof(Umbraco.Web.ApplicationContextExtensions).Assembly.FullName).Version.ToString();
+            version.Text += string.Format(" (Assembly version: {0})", versionNumber);
 		}
 
 		#region Web Form Designer generated code
