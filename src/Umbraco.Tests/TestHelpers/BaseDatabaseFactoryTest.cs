@@ -24,7 +24,7 @@ namespace Umbraco.Tests.TestHelpers
 	
     /// <summary>
     /// Use this abstract class for tests that requires a Sql Ce database populated with the umbraco db schema.
-    /// The PetaPoco Database class should be used through the <see cref="DatabaseFactory"/> singleton.
+    /// The PetaPoco Database class should be used through the <see cref="DefaultDatabaseFactory"/>.
     /// </summary>
     [TestFixture, RequiresSTA]
     public abstract class BaseDatabaseFactoryTest
@@ -43,7 +43,9 @@ namespace Umbraco.Tests.TestHelpers
 			RepositoryResolver.Current = new RepositoryResolver(
 				new RepositoryFactory());
             
-            DatabaseContext.Database.Dispose();
+            //Ensure that any database connections from a previous test is disposed. This is really just double safety as its also done in the TearDown.
+            if(ApplicationContext != null && DatabaseContext != null)
+                DatabaseContext.Database.Dispose();
             SqlCeContextGuardian.CloseBackgroundConnection();
 			
             //Delete database file before continueing
@@ -84,7 +86,7 @@ namespace Umbraco.Tests.TestHelpers
 
             SyntaxConfig.SqlSyntaxProvider = null;
 
-			//legacy API database connection close
+			//legacy API database connection close - because a unit test using PetaPoco db-layer can trigger the usage of SqlHelper we need to ensure that a possible connection is closed.
 			SqlCeContextGuardian.CloseBackgroundConnection();
 			
 			ApplicationContext.Current = null;

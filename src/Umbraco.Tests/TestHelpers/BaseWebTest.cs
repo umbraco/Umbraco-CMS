@@ -3,14 +3,12 @@ using System.IO;
 using System.Web.Routing;
 using System.Xml;
 using NUnit.Framework;
+using SQLCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Publishing;
-using Umbraco.Core.Services;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -53,12 +51,16 @@ namespace Umbraco.Tests.TestHelpers
             TestHelper.CleanContentDirectories();
 
             //reset the app context
+            DatabaseContext.Database.Dispose();
             ApplicationContext.ApplicationCache.ClearAllCache();
             ApplicationContext.Current = null;
             Resolution.IsFrozen = false;
 
             if (RequiresDbSetup)
+            {
                 TestHelper.ClearDatabase();
+                SqlCeContextGuardian.CloseBackgroundConnection();
+            }
 
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
