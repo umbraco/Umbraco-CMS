@@ -97,6 +97,14 @@ namespace Umbraco.Core.Models
             return this.Any(x => x.Alias == propertyAlias);
         }
 
+        public void RemoveItem(string propertyTypeAlias)
+        {
+            var key = IndexOfKey(propertyTypeAlias);
+            //Only removes an item if the key was found
+            if(key != -1)
+                RemoveItem(key);
+        }
+
         public int IndexOfKey(string key)
         {
             for (var i = 0; i < this.Count; i++)

@@ -934,6 +934,9 @@ namespace umbraco.cms.businesslogic.web
 
             foreach (var property in GenericProperties)
             {
+                if (property.Value == null)
+                    continue;
+
                 Content.SetValue(property.PropertyType.Alias, property.Value);
             }
 
@@ -962,6 +965,9 @@ namespace umbraco.cms.businesslogic.web
 
             foreach (var property in GenericProperties)
             {
+                if(property.Value == null)
+                    continue;
+
                 Content.SetValue(property.PropertyType.Alias, property.Value);
             }
 

@@ -8,14 +8,15 @@ using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
-using umbraco.cms.presentation.Trees;
 using umbraco.controls.GenericProperties;
 using umbraco.IO;
 using umbraco.presentation;
-using umbraco.cms.businesslogic;
 using umbraco.BasePages;
-using Tuple = System.Tuple;
+using ContentType = umbraco.cms.businesslogic.ContentType;
 
 namespace umbraco.controls
 {
@@ -60,7 +61,19 @@ namespace umbraco.controls
             base.OnInit(e);
 
             int docTypeId = getDocTypeId();
-            cType = new cms.businesslogic.ContentType(docTypeId);
+            //Fairly hacky code to load the ContentType as the real type instead of its base type, so it can be properly saved.
+            if (Request.Path.ToLowerInvariant().Contains("editnodetypenew.aspx"))
+            {
+                cType =  new cms.businesslogic.web.DocumentType(docTypeId);
+            }
+            else if (Request.Path.ToLowerInvariant().Contains("editmediatype.aspx"))
+            {
+                cType =  new cms.businesslogic.media.MediaType(docTypeId);
+            }
+            else
+            {
+                cType = new cms.businesslogic.ContentType(docTypeId);
+            }
 
             setupInfoPane();
             if (!HideStructure)
@@ -126,6 +139,15 @@ namespace umbraco.controls
             SaveTabs();
 
             SaveAllowedChildTypes();
+
+            if (cType.ContentTypeItem is IContentType)
+            {
+                ((DocumentType)cType).Save();
+            }
+            else if (cType.ContentTypeItem is IMediaType)
+            {
+                ((umbraco.cms.businesslogic.media.MediaType)cType).Save();
+            }
 
             // reload content type (due to caching)
             cType = new ContentType(cType.Id);
@@ -319,8 +341,8 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         }
         private void bindDataGenericProperties(bool Refresh)
         {
-            cms.businesslogic.ContentType.TabI[] tabs = cType.getVirtualTabs;
-            cms.businesslogic.datatype.DataTypeDefinition[] dtds = cms.businesslogic.datatype.DataTypeDefinition.GetAll();
+            var tabs = cType.getVirtualTabs.DistinctBy(x => x.ContentType).ToArray();
+            var dtds = cms.businesslogic.datatype.DataTypeDefinition.GetAll();
 
             PropertyTypes.Controls.Clear();
 
@@ -517,8 +539,14 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
         protected void gpw_Delete(object sender, System.EventArgs e)
         {
-            GenericProperties.GenericPropertyWrapper gpw = (GenericProperties.GenericPropertyWrapper)sender;
+            var gpw = (GenericProperties.GenericPropertyWrapper)sender;
+            var alias = gpw.PropertyType.Alias;
+            
             gpw.GenricPropertyControl.PropertyType.delete();
+            //We have to ensure that the property type is removed from the underlying IContentType object
+            cType.ContentTypeItem.RemovePropertyType(alias);
+            cType.Save();
+
             cType = ContentType.GetContentType(cType.Id);
             this.bindDataGenericProperties(true);
         }
@@ -765,14 +793,15 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             dt.Columns.Add("name");
             dt.Columns.Add("id");
             dt.Columns.Add("order");
-            foreach (cms.businesslogic.ContentType.TabI tb in cType.getVirtualTabs.ToList())
+
+            foreach (var grp in cType.PropertyTypeGroups)
             {
-                if (tb.ContentType == cType.Id)
+                if (grp.ContentTypeId == cType.Id)
                 {
                     DataRow dr = dt.NewRow();
-                    dr["name"] = tb.GetRawCaption();
-                    dr["id"] = tb.Id;
-                    dr["order"] = tb.SortOrder;
+                    dr["name"] = grp.Name;
+                    dr["id"] = grp.Id;
+                    dr["order"] = grp.SortOrder;
                     dt.Rows.Add(dr);
                 }
             }

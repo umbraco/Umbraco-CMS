@@ -296,6 +296,9 @@ namespace umbraco.cms.businesslogic.media
 
             foreach (var property in GenericProperties)
             {
+                if (property.Value == null)
+                    continue;
+
                 MediaItem.SetValue(property.PropertyType.Alias, property.Value);
             }
 

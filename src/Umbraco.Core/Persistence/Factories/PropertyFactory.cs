@@ -56,7 +56,19 @@ namespace Umbraco.Core.Persistence.Factories
 
                 if (property.DataTypeDatabaseType == DataTypeDatabaseType.Integer && property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false)
                 {
-                    dto.Integer = int.Parse(property.Value.ToString());
+                    if (property.Value is bool)
+                    {
+                        int val = Convert.ToInt32(property.Value);
+                        dto.Integer = val;
+                    }
+                    else
+                    {
+                        int val;
+                        if (int.TryParse(property.Value.ToString(), out val))
+                        {
+                            dto.Integer = val;
+                        }
+                    }
                 }
                 else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Date && property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false)
                 {
