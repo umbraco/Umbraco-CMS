@@ -8,44 +8,13 @@ namespace Umbraco.Core.Models
     /// Defines the base for a Content object with properties that
     /// are shared between Content and Media.
     /// </summary>
-    public interface IContentBase : IAggregateRoot
+    public interface IContentBase : IUmbracoEntity
     {
-        /// <summary>
-        /// Gets or Sets the Id of the Parent for the Content
-        /// </summary>
-        int ParentId { get; set; }
-
         /// <summary>
         /// Gets or Sets the Name of the Content
         /// </summary>
         string Name { get; set; }
-
-        /// <summary>
-        /// Gets or Sets the Sort Order of the Content
-        /// </summary>
-        int SortOrder { get; set; }
-
-        /// <summary>
-        /// Gets or Sets the Level of the Content
-        /// </summary>
-        int Level { get; set; }
-
-        /// <summary>
-        /// Gets or Sets the Path of the Content
-        /// </summary>
-        string Path { get; set; }
-
-        /// <summary>
-        /// Id of the user who created the Content
-        /// </summary>
-        int CreatorId { get; set; }
-
-        /// <summary>
-        /// Boolean indicating whether this Content is Trashed or not.
-        /// If Content is Trashed it will be located in the Recyclebin.
-        /// </summary>
-        bool Trashed { get; }
-        
+       
         /// <summary>
         /// Integer Id of the default ContentType
         /// </summary>

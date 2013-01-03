@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Models.EntityBase
 {
-    internal interface IUmbracoEntity : IEntity
+    public interface IUmbracoEntity : IAggregateRoot
     {
         /// <summary>
         /// Gets or sets the Id of the Parent entity

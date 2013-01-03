@@ -81,7 +81,7 @@ namespace Umbraco.Core.Models
 	            var val = _parentId.Value;
 				if (val == 0)
 				{
-					throw new InvalidOperationException("The ParentId cannot be a value of 0. Perhaps the parent object used to instantiate this object has not been persisted to the data store.");
+					throw new InvalidOperationException("The ParentId cannot have a value of 0. Perhaps the parent object used to instantiate this object has not been persisted to the data store.");
 				}
 				return val;
             }

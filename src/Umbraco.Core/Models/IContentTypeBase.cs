@@ -8,7 +8,7 @@ namespace Umbraco.Core.Models
     /// Defines the base for a ContentType with properties that
     /// are shared between ContentTypes and MediaTypes.
     /// </summary>
-    public interface IContentTypeBase : IAggregateRoot
+    public interface IContentTypeBase : IUmbracoEntity
     {
         /// <summary>
         /// Gets or Sets the Alias of the ContentType
@@ -21,29 +21,9 @@ namespace Umbraco.Core.Models
         string Name { get; set; }
 
         /// <summary>
-        /// Gets or Sets the Id of Parent of the ContentType
-        /// </summary>
-        int ParentId { get; set; }
-
-        /// <summary>
-        /// Gets or Sets the Level of the Content
-        /// </summary>
-        int Level { get; set; }
-
-        /// <summary>
-        /// Gets or Sets the Path of the Content
-        /// </summary>
-        string Path { get; set; }
-
-        /// <summary>
         /// Gets or Sets the Description for the ContentType
         /// </summary>
         string Description { get; set; }
-
-        /// <summary>
-        /// Gets or Sets the Sort Order of the ContentType
-        /// </summary>
-        int SortOrder { get; set; }
 
         /// <summary>
         /// Gets or Sets the Icon for the ContentType
@@ -54,11 +34,6 @@ namespace Umbraco.Core.Models
         /// Gets or Sets the Thumbnail for the ContentType
         /// </summary>
         string Thumbnail { get; set; }
-
-        /// <summary>
-        /// Gets or Sets the Id of the User who created the ContentType
-        /// </summary>
-        int CreatorId { get; set; }
 
         /// <summary>
         /// Gets or Sets a boolean indicating whether this ContentType is allowed at the root
