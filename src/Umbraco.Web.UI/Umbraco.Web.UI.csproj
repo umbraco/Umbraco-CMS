@@ -1707,7 +1707,6 @@
     <Content Include="Umbraco\Dialogs\umbracoField.aspx" />
     <Content Include="Umbraco\Dialogs\uploadImage.aspx" />
     <Content Include="Umbraco\Dialogs\viewAuditTrail.aspx" />
-    <Content Include="Umbraco\Images\about.png" />
     <Content Include="Umbraco\Images\Editor\anchor_symbol.gif" />
     <Content Include="Umbraco\Images\Editor\backcolor.gif" />
     <Content Include="Umbraco\Images\Editor\bold_de_se.gif" />
@@ -2023,7 +2022,6 @@
     <Content Include="Umbraco\Images\help.png" />
     <Content Include="Umbraco\Images\htmldoc.small.png" />
     <Content Include="Umbraco\Images\Lminus.png" />
-    <Content Include="Umbraco\Images\loginBg.gif" />
     <Content Include="Umbraco\Images\logout.png" />
     <Content Include="Umbraco\Images\logout_small.gif" />
     <Content Include="Umbraco\Images\logout_small.png" />
@@ -2069,7 +2067,6 @@
     <Content Include="Umbraco\Images\Tminus.png" />
     <Content Include="Umbraco\Images\topGradient.gif" />
     <Content Include="Umbraco\Images\Tplus.png" />
-    <Content Include="Umbraco\Images\umbracoSplash.gif" />
     <Content Include="Umbraco\Images\Umbraco\developerCacheItem.gif" />
     <Content Include="Umbraco\Images\Umbraco\developerCacheTypes.gif" />
     <Content Include="Umbraco\Images\Umbraco\developerMacro.gif" />
