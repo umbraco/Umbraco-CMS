@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Xml;
@@ -31,8 +30,7 @@ namespace Umbraco.Web.Strategies.DataTypes
             if (UmbracoSettings.ImageAutoFillImageProperties != null)
             {
                 var property =
-                    sender.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id ==
-                                                                 new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+                    sender.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id == new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
                 if (property == null)
                     return;
 
@@ -46,9 +44,8 @@ namespace Umbraco.Web.Strategies.DataTypes
             if (UmbracoSettings.ImageAutoFillImageProperties != null)
             {
                 var property =
-                    sender.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id ==
-                                                                 new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
-                if(property == null)
+                    sender.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id == new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+                if (property == null)
                     return;
 
 
@@ -59,12 +56,12 @@ namespace Umbraco.Web.Strategies.DataTypes
         private void FillProperties(IContentBase content, global::umbraco.cms.businesslogic.property.Property property)
         {
             XmlNode uploadFieldConfigNode =
-                    global::umbraco.UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
-                        string.Format("uploadField [@alias = \"{0}\"]", property.PropertyType.Alias));
+                    global::umbraco.UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(string.Format("uploadField [@alias = \"{0}\"]", property.PropertyType.Alias));
 
             if (uploadFieldConfigNode != null)
             {
                 var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+
                 string path = string.IsNullOrEmpty(property.Value.ToString())
                                   ? string.Empty
                                   : VirtualPathUtility.ToAbsolute(property.Value.ToString(), SystemDirectories.Root)
@@ -75,23 +72,20 @@ namespace Umbraco.Web.Strategies.DataTypes
                                : new UmbracoFile(path);
 
                 // only add dimensions to web images
-                UpdateProperty(uploadFieldConfigNode, content, "widthFieldAlias",
-                                      file.SupportsResizing ? file.GetDimensions().Item1.ToString() : string.Empty);
-                UpdateProperty(uploadFieldConfigNode, content, "heightFieldAlias",
-                                      file.SupportsResizing ? file.GetDimensions().Item2.ToString() : string.Empty);
+                UpdateProperty(uploadFieldConfigNode, content, "widthFieldAlias", file.SupportsResizing ? file.GetDimensions().Item1.ToString() : string.Empty);
+                UpdateProperty(uploadFieldConfigNode, content, "heightFieldAlias", file.SupportsResizing ? file.GetDimensions().Item2.ToString() : string.Empty);
 
                 UpdateProperty(uploadFieldConfigNode, content, "lengthFieldAlias", file.Length == default(long) ? string.Empty : file.Length.ToString());
                 UpdateProperty(uploadFieldConfigNode, content, "extensionFieldAlias", string.IsNullOrEmpty(file.Extension) ? string.Empty : file.Extension);
             }
         }
 
-        private void UpdateProperty(XmlNode uploadFieldConfigNode, IContentBase content, string propertyAlias,
-                                           object propertyValue)
+        private void UpdateProperty(XmlNode uploadFieldConfigNode, IContentBase content, string propertyAlias, object propertyValue)
         {
             XmlNode propertyNode = uploadFieldConfigNode.SelectSingleNode(propertyAlias);
             if (propertyNode != null && !String.IsNullOrEmpty(propertyNode.FirstChild.Value))
             {
-                if (content.Properties[propertyNode.FirstChild.Value] != null)
+                if (content.Properties.Contains(propertyNode.FirstChild.Value) && content.Properties[propertyNode.FirstChild.Value] != null)
                 {
                     content.SetValue(propertyNode.FirstChild.Value, propertyValue);
                 }
