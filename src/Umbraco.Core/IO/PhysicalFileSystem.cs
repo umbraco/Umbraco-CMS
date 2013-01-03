@@ -150,6 +150,11 @@ namespace Umbraco.Core.IO
             return File.Exists(GetFullPath(path));
         }
 
+        public string GetExtension(string path)
+        {
+            return Path.GetExtension(GetFullPath(path));
+        }
+
         public string GetRelativePath(string fullPathOrUrl)
         {
             var relativePath = fullPathOrUrl
