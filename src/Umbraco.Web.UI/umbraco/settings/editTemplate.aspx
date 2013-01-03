@@ -1,5 +1,5 @@
 <%@ Page MasterPageFile="../masterpages/umbracoPage.Master" Language="c#" CodeBehind="EditTemplate.aspx.cs"
-    ValidateRequest="false" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Umbraco.Settings.EditTemplate" %>
+    ValidateRequest="false" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Umbraco.Settings.EditTemplate" %><asp:Content ID="DocTypeContent" ContentPlaceHolderID="DocType" runat="server"><!DOCTYPE html></asp:Content>
 
 <%@ Import Namespace="Umbraco.Core.IO" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>

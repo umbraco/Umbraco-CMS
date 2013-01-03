@@ -1,5 +1,5 @@
 <%@ Page ValidateRequest="false" Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master"
-    CodeBehind="editPython.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.developer.editPython" %>
+    CodeBehind="editPython.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.developer.editPython" %><asp:Content ID="DocTypeContent" ContentPlaceHolderID="DocType" runat="server"><!DOCTYPE html></asp:Content>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <asp:Content ID="cp0" runat="server" ContentPlaceHolderID="head">

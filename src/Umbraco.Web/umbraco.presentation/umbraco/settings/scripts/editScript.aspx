@@ -1,6 +1,6 @@
 <%@ Page Language="C#" MasterPageFile="../../masterpages/umbracoPage.Master" AutoEventWireup="true"
     CodeBehind="editScript.aspx.cs" Inherits="umbraco.cms.presentation.settings.scripts.editScript"
-    ValidateRequest="False" %>
+    ValidateRequest="False" %><asp:Content ID="DocTypeContent" ContentPlaceHolderID="DocType" runat="server"><!DOCTYPE html></asp:Content>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">

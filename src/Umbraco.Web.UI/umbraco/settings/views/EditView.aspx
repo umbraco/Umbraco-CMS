@@ -1,6 +1,6 @@
 <%@ Page Language="C#" MasterPageFile="../../masterpages/umbracoPage.Master" AutoEventWireup="True"
     CodeBehind="EditView.aspx.cs" Inherits="Umbraco.Web.UI.Umbraco.Settings.Views.EditView"
-    ValidateRequest="False" %>
+    ValidateRequest="False" %><asp:Content ID="DocTypeContent" ContentPlaceHolderID="DocType" runat="server"><!DOCTYPE html></asp:Content>
 
 <%@ Import Namespace="Umbraco.Core" %>
 <%@ Import Namespace="Umbraco.Core.IO" %>

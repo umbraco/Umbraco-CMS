@@ -1,9 +1,8 @@
-﻿<%@ Master Language="C#" AutoEventWireup="True" CodeBehind="UmbracoDialog.master.cs" Inherits="Umbraco.Web.UI.Umbraco.Masterpages.UmbracoDialog" %>
+﻿<%@ Master Language="C#" AutoEventWireup="True" CodeBehind="UmbracoDialog.master.cs" Inherits="Umbraco.Web.UI.Umbraco.Masterpages.UmbracoDialog" %><asp:ContentPlaceHolder ID="DocType" runat="server"><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"></asp:ContentPlaceHolder>
 
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head id="Head1" runat="server">
     <title></title>
