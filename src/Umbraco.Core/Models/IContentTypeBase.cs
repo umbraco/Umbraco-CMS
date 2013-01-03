@@ -63,6 +63,16 @@ namespace Umbraco.Core.Models
         /// </summary>
         IEnumerable<PropertyType> PropertyTypes { get; }
 
+        /// <summary>
+        /// Removes a PropertyType from the current ContentType
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the <see cref="PropertyType"/> to remove</param>
+        void RemovePropertyType(string propertyTypeAlias);
+
+        /// <summary>
+        /// Sets the ParentId from the lazy integer id
+        /// </summary>
+        /// <param name="id">Id of the Parent</param>
         void SetLazyParentId(Lazy<int> id);
     }
 }

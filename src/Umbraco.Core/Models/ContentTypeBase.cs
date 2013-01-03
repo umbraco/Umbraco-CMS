@@ -93,11 +93,6 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public void SetLazyParentId(Lazy<int> id)
-        {
-            _parentId = id;
-        }
-
         /// <summary>
         /// Gets or sets the name of the current entity
         /// </summary>
@@ -307,6 +302,27 @@ namespace Umbraco.Core.Models
         public virtual IEnumerable<PropertyType> PropertyTypes
         {
             get { return PropertyGroups.SelectMany(x => x.PropertyTypes); }
+        }
+
+        /// <summary>
+        /// Removes a PropertyType from the current ContentType
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the <see cref="PropertyType"/> to remove</param>
+        public void RemovePropertyType(string propertyTypeAlias)
+        {
+            foreach (var propertyGroup in PropertyGroups)
+            {
+                propertyGroup.PropertyTypes.RemoveItem(propertyTypeAlias);
+            }
+        }
+
+        /// <summary>
+        /// Sets the ParentId from the lazy integer id
+        /// </summary>
+        /// <param name="id">Id of the Parent</param>
+        public void SetLazyParentId(Lazy<int> id)
+        {
+            _parentId = id;
         }
 
         //TODO Implement moving PropertyType between groups.

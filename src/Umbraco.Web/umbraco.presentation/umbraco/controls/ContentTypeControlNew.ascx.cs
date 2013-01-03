@@ -9,12 +9,14 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
 using umbraco.controls.GenericProperties;
 using umbraco.IO;
 using umbraco.presentation;
-using umbraco.cms.businesslogic;
 using umbraco.BasePages;
+using ContentType = umbraco.cms.businesslogic.ContentType;
 
 namespace umbraco.controls
 {
@@ -59,7 +61,19 @@ namespace umbraco.controls
             base.OnInit(e);
 
             int docTypeId = getDocTypeId();
-            cType = new cms.businesslogic.ContentType(docTypeId);
+            //Fairly hacky code to load the ContentType as the real type instead of its base type, so it can be properly saved.
+            if (Request.Path.ToLowerInvariant().Contains("editnodetypenew.aspx"))
+            {
+                cType =  new cms.businesslogic.web.DocumentType(docTypeId);
+            }
+            else if (Request.Path.ToLowerInvariant().Contains("editmediatype.aspx"))
+            {
+                cType =  new cms.businesslogic.media.MediaType(docTypeId);
+            }
+            else
+            {
+                cType = new cms.businesslogic.ContentType(docTypeId);
+            }
 
             setupInfoPane();
             if (!HideStructure)
@@ -125,6 +139,15 @@ namespace umbraco.controls
             SaveTabs();
 
             SaveAllowedChildTypes();
+
+            if (cType.ContentTypeItem is IContentType)
+            {
+                ((DocumentType)cType).Save();
+            }
+            else if (cType.ContentTypeItem is IMediaType)
+            {
+                ((umbraco.cms.businesslogic.media.MediaType)cType).Save();
+            }
 
             // reload content type (due to caching)
             cType = new ContentType(cType.Id);
@@ -516,8 +539,14 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
         protected void gpw_Delete(object sender, System.EventArgs e)
         {
-            GenericProperties.GenericPropertyWrapper gpw = (GenericProperties.GenericPropertyWrapper)sender;
+            var gpw = (GenericProperties.GenericPropertyWrapper)sender;
+            var alias = gpw.PropertyType.Alias;
+            
             gpw.GenricPropertyControl.PropertyType.delete();
+            //We have to ensure that the property type is removed from the underlying IContentType object
+            cType.ContentTypeItem.RemovePropertyType(alias);
+            cType.Save();
+
             cType = ContentType.GetContentType(cType.Id);
             this.bindDataGenericProperties(true);
         }
