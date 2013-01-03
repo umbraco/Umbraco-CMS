@@ -23,16 +23,15 @@ namespace Umbraco.Web.Strategies.DataTypes
     {
         public LegacyUploadFieldWorkaround()
         {
-            global::umbraco.cms.businesslogic.media.Media.BeforeSave += Media_BeforeSave;
-            global::umbraco.cms.businesslogic.web.Document.BeforeSave += Document_BeforeSave;
+            global::umbraco.cms.businesslogic.media.Media.BeforeSave += MediaBeforeSave;
+            global::umbraco.cms.businesslogic.web.Document.BeforeSave += DocumentBeforeSave;
         }
 
-        void Document_BeforeSave(global::umbraco.cms.businesslogic.web.Document sender, global::umbraco.cms.businesslogic.SaveEventArgs e)
+        void DocumentBeforeSave(global::umbraco.cms.businesslogic.web.Document sender, global::umbraco.cms.businesslogic.SaveEventArgs e)
         {
             if (UmbracoSettings.ImageAutoFillImageProperties != null)
             {
-                var property =
-                    sender.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id == new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+                var property = sender.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id == new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
                 if (property == null)
                     return;
 
@@ -41,12 +40,11 @@ namespace Umbraco.Web.Strategies.DataTypes
             }
         }
 
-        void Media_BeforeSave(global::umbraco.cms.businesslogic.media.Media sender, global::umbraco.cms.businesslogic.SaveEventArgs e)
+        void MediaBeforeSave(global::umbraco.cms.businesslogic.media.Media sender, global::umbraco.cms.businesslogic.SaveEventArgs e)
         {
             if (UmbracoSettings.ImageAutoFillImageProperties != null)
             {
-                var property =
-                    sender.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id == new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+                var property = sender.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id == new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
                 if (property == null)
                     return;
 
@@ -57,32 +55,38 @@ namespace Umbraco.Web.Strategies.DataTypes
 
         private void FillProperties(IContentBase content, global::umbraco.cms.businesslogic.property.Property property)
         {
-            XmlNode uploadFieldConfigNode =
-                    global::umbraco.UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(string.Format("uploadField [@alias = \"{0}\"]", property.PropertyType.Alias));
+            XmlNode uploadFieldConfigNode = global::umbraco.UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(string.Format("uploadField [@alias = \"{0}\"]", property.PropertyType.Alias));
 
             if (uploadFieldConfigNode != null)
             {
-                var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+                var fileSystem = new PhysicalFileSystem("/");
 
-                string path = string.IsNullOrEmpty(property.Value.ToString())
-                                  ? string.Empty
-                                  : System.Web.Hosting.HostingEnvironment.MapPath(property.Value.ToString());
+                var path = string.IsNullOrEmpty(property.Value.ToString())
+                    ? string.Empty
+                    : System.Web.Hosting.HostingEnvironment.MapPath(property.Value.ToString());
 
-                FileStream s = System.IO.File.OpenRead(path);
-                long size = s.Length;
-                s.Close();
-                var extension = Path.GetExtension(path) != null
-                    ? Path.GetExtension(path).Substring(1).ToLowerInvariant()
-                    : "";
-                var supportsResizing = ("," + UmbracoSettings.ImageFileTypes + ",").Contains(string.Format(",{0},", extension));
-                var dimensions = supportsResizing ? GetDimensions(path) : null;
+                if (string.IsNullOrWhiteSpace(path) == false && fileSystem.FileExists(path))
+                {
+                    long size;
+                    using (var fileStream = fileSystem.OpenFile(path))
+                    {
+                        size = fileStream.Length;
+                    }
 
-                // only add dimensions to web images
-                UpdateProperty(uploadFieldConfigNode, content, "widthFieldAlias", supportsResizing ? dimensions.Item1.ToString(CultureInfo.InvariantCulture) : string.Empty);
-                UpdateProperty(uploadFieldConfigNode, content, "heightFieldAlias", supportsResizing ? dimensions.Item2.ToString(CultureInfo.InvariantCulture) : string.Empty);
+                    var extension = fileSystem.GetExtension(path) != null
+                        ? fileSystem.GetExtension(path).Substring(1).ToLowerInvariant()
+                        : "";
 
-                UpdateProperty(uploadFieldConfigNode, content, "lengthFieldAlias", size == default(long) ? string.Empty : size.ToString(CultureInfo.InvariantCulture));
-                UpdateProperty(uploadFieldConfigNode, content, "extensionFieldAlias", string.IsNullOrEmpty(extension) ? string.Empty : extension);
+                    var supportsResizing = ("," + UmbracoSettings.ImageFileTypes + ",").Contains(string.Format(",{0},", extension));
+                    var dimensions = supportsResizing ? GetDimensions(path) : null;
+
+                    // only add dimensions to web images
+                    UpdateProperty(uploadFieldConfigNode, content, "widthFieldAlias", supportsResizing ? dimensions.Item1.ToString(CultureInfo.InvariantCulture) : string.Empty);
+                    UpdateProperty(uploadFieldConfigNode, content, "heightFieldAlias", supportsResizing ? dimensions.Item2.ToString(CultureInfo.InvariantCulture) : string.Empty);
+
+                    UpdateProperty(uploadFieldConfigNode, content, "lengthFieldAlias", size == default(long) ? string.Empty : size.ToString(CultureInfo.InvariantCulture));
+                    UpdateProperty(uploadFieldConfigNode, content, "extensionFieldAlias", string.IsNullOrEmpty(extension) ? string.Empty : extension);
+                }
             }
         }
 
@@ -100,12 +104,18 @@ namespace Umbraco.Web.Strategies.DataTypes
 
         private Tuple<int, int> GetDimensions(string path)
         {
-            var fs = System.IO.File.OpenRead(path);
-            var image = Image.FromStream(fs);
-            var fileWidth = image.Width;
-            var fileHeight = image.Height;
-            fs.Close();
-            image.Dispose();
+            var fileSystem = new PhysicalFileSystem("/");
+            
+            int fileWidth;
+            int fileHeight;
+            using (var stream = fileSystem.OpenFile(path))
+            {
+                using (var image = Image.FromStream(stream))
+                {
+                    fileWidth = image.Width;
+                    fileHeight = image.Height;
+                }
+            }
 
             return new Tuple<int, int>(fileWidth, fileHeight);
         }
