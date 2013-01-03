@@ -2032,7 +2032,7 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\create\simple.ascx" />
     <Content Include="umbraco.presentation\umbraco\create\xslt.ascx">
-      <SubType>UserControl</SubType>
+      <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dashboard.aspx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\LatestEdits.ascx" />

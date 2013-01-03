@@ -75,6 +75,15 @@ namespace umbraco
 			{
 				WriteTemplateHeader(sw);
 			}
+
+			// Create macro?
+			if (ParentID == 1)
+			{
+				var m = cms.businesslogic.macro.Macro.MakeNew(
+					helper.SpaceCamelCasing(fileName.Substring(0, (fileName.LastIndexOf('.') + 1)).Trim('.')));
+				m.ScriptingFile = BasePath + fileName;
+			}
+			
 			_returnUrl = string.Format(EditViewFile + "?file={0}", HttpUtility.UrlEncode(ParentFolderName.EnsureEndsWith('/') + fileName));
 			return true;
 		}

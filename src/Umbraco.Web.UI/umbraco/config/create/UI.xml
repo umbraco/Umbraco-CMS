@@ -351,7 +351,7 @@
 	</nodeType>
 	<nodeType alias="partialViewMacros">
 		<header>Macro</header>
-		<usercontrol>/create/simple.ascx</usercontrol>
+		<usercontrol>/Create/PartialViewMacro.ascx</usercontrol>
 		<tasks>
 			<create assembly="umbraco" type="MacroPartialViewTasks" />
 			<delete assembly="umbraco" type="MacroPartialViewTasks" />

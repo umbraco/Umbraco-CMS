@@ -3,9 +3,9 @@ using System;
 using System.Xml;
 using System.Xml.XPath;
 using System.Reflection;
+using Umbraco.Core.IO;
 using umbraco.BusinessLogic;
 using umbraco.BasePages;
-using umbraco.IO;
 
 namespace umbraco.presentation.create
 {
@@ -61,13 +61,13 @@ namespace umbraco.presentation.create
 
             Assembly assembly = Assembly.LoadFrom( IOHelper.MapPath(SystemDirectories.Bin + "/" + taskAssembly + ".dll"));
             Type type = assembly.GetType(taskAssembly + "." + taskType);
-            interfaces.ITask typeInstance = Activator.CreateInstance(type) as interfaces.ITask;
+            var typeInstance = Activator.CreateInstance(type) as interfaces.ITask;
             if (typeInstance != null)
             {
                 typeInstance.TypeID = TypeId;
                 typeInstance.ParentID = NodeId;
                 typeInstance.Alias = Text;
-                typeInstance.UserId = BasePages.UmbracoEnsuredPage.GetUserId(BasePages.UmbracoEnsuredPage.umbracoUserContextID);
+                typeInstance.UserId = BasePages.BasePage.GetUserId(BasePages.BasePage.umbracoUserContextID);
                 typeInstance.Save();
 
                 // check for returning url

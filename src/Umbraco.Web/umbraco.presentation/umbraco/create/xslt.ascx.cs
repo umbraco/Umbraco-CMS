@@ -5,9 +5,9 @@ using System.Web;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.IO;
+using Umbraco.Core.IO;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
-using umbraco.IO;
 
 namespace umbraco.presentation.create
 {
@@ -53,7 +53,7 @@ namespace umbraco.presentation.create
         }
         #endregion
 
-        private string getXsltTemplatePath()
+        private static string getXsltTemplatePath()
         {
             if (UmbracoSettings.UseLegacyXmlSchema) {
                 return "/xslt/templates";

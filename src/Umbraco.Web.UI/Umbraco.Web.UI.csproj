@@ -272,6 +272,13 @@
       <DependentUpon>loadStarterKits.ascx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Umbraco\Create\PartialViewMacro.ascx.cs">
+      <DependentUpon>PartialViewMacro.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Create\PartialViewMacro.ascx.designer.cs">
+      <DependentUpon>PartialViewMacro.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Developer\Macros\EditMacro.aspx.cs">
       <DependentUpon>editMacro.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -415,6 +422,7 @@
     <Content Include="Umbraco\Config\Lang\ru.xml" />
     <Content Include="Umbraco\Config\Lang\zh.xml" />
     <Content Include="Umbraco\Controls\Tree\CustomTreeService.asmx" />
+    <Content Include="Umbraco\Create\PartialViewMacro.ascx" />
     <Content Include="Umbraco\Dashboard\Images\access-denied.png" />
     <Content Include="Umbraco\Dashboard\Scripts\swfobject.js" />
     <Content Include="Umbraco\Dashboard\MediaDashboardFolderBrowser.ascx" />
@@ -626,6 +634,7 @@
     <Content Include="Umbraco_Client\CodeMirror\Js\Theme\xq-dark.css" />
     <Content Include="Umbraco_Client\ContextMenu\Css\jquery.contextMenu.css" />
     <Content Include="Umbraco_Client\ContextMenu\Js\jquery.contextMenu.js" />
+    <Content Include="Umbraco_Client\Dialogs\CreateDialog.css" />
     <Content Include="Umbraco_Client\Dialogs\EditMacro.css" />
     <Content Include="Umbraco_Client\Dialogs\EditMacro.js" />
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
