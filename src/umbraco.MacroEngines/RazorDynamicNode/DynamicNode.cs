@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -44,6 +45,9 @@ namespace umbraco.MacroEngines
         private readonly Guid DATATYPE_DATEPICKER_GUID = new Guid("23e93522-3200-44e2-9f29-e61a6fcbb79a");
         //private readonly Guid DATATYPE_INTEGER_GUID = new Guid("1413afcb-d19a-4173-8e9a-68288d2a73b8");
         #endregion
+
+		private DynamicNodeList _cachedChildren;
+		private readonly ConcurrentDictionary<string, object> _cachedMemberOutput = new ConcurrentDictionary<string, object>();
 
         internal readonly DynamicBackingItem n;
 
@@ -154,13 +158,20 @@ namespace umbraco.MacroEngines
         {
             get
             {
-                List<DynamicBackingItem> children = n.ChildrenAsList;
-                //testing
-                if (children.Count == 0 && n.Id == 0)
-                {
-                    return new DynamicNodeList(new List<DynamicBackingItem> { this.n });
-                }
-                return new DynamicNodeList(n.ChildrenAsList);
+	            if (_cachedChildren == null)
+	            {
+					List<DynamicBackingItem> children = n.ChildrenAsList;
+					//testing
+					if (children.Count == 0 && n.Id == 0)
+					{
+						_cachedChildren = new DynamicNodeList(new List<DynamicBackingItem> {this.n});
+					}
+					else
+					{
+						_cachedChildren = new DynamicNodeList(n.ChildrenAsList);	
+					}
+	            }
+				return _cachedChildren;
             }
         }
         public DynamicNodeList XPath(string xPath)
@@ -470,13 +481,21 @@ namespace umbraco.MacroEngines
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
+			var name = binder.Name;
 
-            var name = binder.Name;
+			//check the cache first!
+			if (_cachedMemberOutput.TryGetValue(name, out result))
+			{
+				return true;
+			}
+
             result = null; //this will never be returned
 
             if (name == "ChildrenAsList" || name == "Children")
             {
                 result = GetChildrenAsList;
+				//cache the result so we don't have to re-process the whole thing
+				_cachedMemberOutput.TryAdd(name, result);
                 return true;
             }
             bool propertyExists = false;
@@ -524,6 +543,8 @@ namespace umbraco.MacroEngines
                             if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, data.Value, out instance))
                             {
                                 result = instance;
+								//cache the result so we don't have to re-process the whole thing
+								_cachedMemberOutput.TryAdd(name, result);
                                 return true;
                             }
                             else
@@ -547,6 +568,8 @@ namespace umbraco.MacroEngines
                             if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, data.Value, out instance))
                             {
                                 result = instance;
+								//cache the result so we don't have to re-process the whole thing
+								_cachedMemberOutput.TryAdd(name, result);
                                 return true;
                             }
                             else
@@ -561,8 +584,10 @@ namespace umbraco.MacroEngines
                     }
                     
 					//convert the string value to a known type
-                    return ConvertPropertyValueByDataType(ref result, name, dataType);
-
+                    var returnVal = ConvertPropertyValueByDataType(ref result, name, dataType);
+					//cache the result so we don't have to re-process the whole thing
+					_cachedMemberOutput.TryAdd(name, result);
+	                return returnVal;
                 }
 
                 //check if the alias is that of a child type
@@ -577,6 +602,8 @@ namespace umbraco.MacroEngines
                     if (filteredTypeChildren.Any())
                     {
                         result = new DynamicNodeList(filteredTypeChildren);
+						//cache the result so we don't have to re-process the whole thing
+						_cachedMemberOutput.TryAdd(name, result);
                         return true;
                     }
 
@@ -591,6 +618,8 @@ namespace umbraco.MacroEngines
                                                       null,
                                                       n,
                                                       null);
+					//cache the result so we don't have to re-process the whole thing
+					_cachedMemberOutput.TryAdd(name, result);
                     return true;
                 }
                 catch
