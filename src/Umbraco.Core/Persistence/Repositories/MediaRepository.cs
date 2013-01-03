@@ -114,14 +114,16 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                            {
-                               string.Format("DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id"),
-                               string.Format("DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id"),
-                               string.Format("DELETE FROM cmsTagRelationship WHERE nodeId = @Id"),
-                               string.Format("DELETE FROM cmsDocument WHERE NodeId = @Id"),
-                               string.Format("DELETE FROM cmsPropertyData WHERE contentNodeId = @Id"),
-                               string.Format("DELETE FROM cmsContentVersion WHERE ContentId = @Id"),
-                               string.Format("DELETE FROM cmsContent WHERE NodeId = @Id"),
-                               string.Format("DELETE FROM umbracoNode WHERE id = @Id")
+                               "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
+                               "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                               "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
+                               "DELETE FROM cmsDocument WHERE NodeId = @Id",
+                               "DELETE FROM cmsPropertyData WHERE contentNodeId = @Id",
+                               "DELETE FROM cmsPreviewXml WHERE nodeId = @Id",
+                               "DELETE FROM cmsContentVersion WHERE ContentId = @Id",
+                               "DELETE FROM cmsContentXml WHERE nodeID = @Id",
+                               "DELETE FROM cmsContent WHERE NodeId = @Id",
+                               "DELETE FROM umbracoNode WHERE id = @Id"
                            };
             return list;
         }

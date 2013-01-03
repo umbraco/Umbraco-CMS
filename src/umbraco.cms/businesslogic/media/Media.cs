@@ -352,21 +352,6 @@ namespace umbraco.cms.businesslogic.media
         {
             var descendants = ApplicationContext.Current.Services.MediaService.GetDescendants(Id);
             return descendants.Select(x => new Media(x));
-
-            /*var tmp = new List<Media>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany.Trim(), "umbracoNode.path LIKE '%," + this.Id + ",%'", "umbracoNode.level"),
-                                            SqlHelper.CreateParameter("@nodeObjectType", Media._objectType)))
-            {
-                while (dr.Read())
-                {
-                    Media d = new Media(dr.GetInt("id"), true);
-                    d.PopulateMediaFromReader(dr);
-                    tmp.Add(d);
-                }
-            }
-
-            return tmp.ToArray();*/
         }
 
         #endregion
@@ -374,7 +359,7 @@ namespace umbraco.cms.businesslogic.media
         #region Protected methods
         protected override void setupNode()
         {
-            if (Id == -1)
+            if (Id == -1 || Id == -21)
             {
                 base.setupNode();
                 return;
@@ -449,14 +434,6 @@ namespace umbraco.cms.businesslogic.media
 
             if (!e.Cancel)
             {
-                /*foreach (Media m in Children.ToList())
-                {
-                    m.DeletePermanently();
-                } */              
-
-                // Remove all files
-                //DeleteAssociatedMediaFiles();
-
                 if (MediaItem != null)
                 {
                     ApplicationContext.Current.Services.MediaService.Delete(MediaItem);
