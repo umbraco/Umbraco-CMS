@@ -820,7 +820,7 @@ namespace umbraco.cms.businesslogic.web
         }
 
         /// <summary>
-        /// Publishing a document
+        /// Saves and Publishes a document.
         /// A xmlrepresentation of the document and its data are exposed to the runtime data
         /// (an xmlrepresentation is added -or updated if the document previously are published) ,
         /// this will lead to a new version of the document being created, for continuing editing of
@@ -830,7 +830,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.Publish()", false)]
         public void Publish(User u)
         {
-            ApplicationContext.Current.Services.ContentService.Publish(Content, u.Id, true);
+            SaveAndPublish(u);
         }
 
         /// <summary>
@@ -850,7 +850,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                var result = ApplicationContext.Current.Services.ContentService.Publish(Content, u.Id);
+                var result = ApplicationContext.Current.Services.ContentService.Publish(Content, u.Id, true);
                 _published = result;
 
                 FireAfterPublish(e);
@@ -949,6 +949,38 @@ namespace umbraco.cms.businesslogic.web
 
                 FireAfterSave(e);
             }
+        }
+
+        /// <summary>
+        /// Saves and publishes a document
+        /// </summary>
+        /// <param name="u">The usercontext under which the action are performed</param>
+        /// <returns></returns>
+        public bool SaveAndPublish(User u)
+        {
+            var e = new SaveEventArgs();
+
+            foreach (var property in GenericProperties)
+            {
+                Content.SetValue(property.PropertyType.Alias, property.Value);
+            }
+
+            FireBeforeSave(e);
+
+            if (!e.Cancel)
+            {
+                var result = ApplicationContext.Current.Services.ContentService.SaveAndPublish(Content, u.Id, true);
+
+                base.Save();
+                // update preview xml
+                SaveXmlPreview(new XmlDocument());
+
+                FireAfterSave(e);
+
+                return result;
+            }
+
+            return false;
         }
 
         [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.HasPublishedVersion()", false)]
