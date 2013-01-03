@@ -22,10 +22,69 @@
             document.getElementById("label" + macroAlias).innerHTML = "</b><i>updated with id: " + treePicker + "</i><b><br/>";
         },
 
+        _getMacroParameter: function (macroAliasKeyVal) {
+            /// <summary>Returns a string to insert a macro parameter into the code like: MyPropertyName = "MyValue" </summary>
+            var paramString = "";
+
+            var controlId = macroAliasKeyVal[0];
+            var propertyName = macroAliasKeyVal[1];
+
+            var control = jQuery("#" + controlId);
+            if (control == null || (!control.is('input') && !control.is('select') && !control.is('textarea'))) {
+                // hack for tree based macro parameter types
+                var picker = Umbraco.Controls.TreePicker.GetPickerById(controlId);
+                if (picker != undefined) {
+                    paramString += propertyName + "=\"" + picker.GetValue() + "\" ";
+                }
+            }
+            else {
+                if (control.is(':checkbox')) {
+                    if (control.is(':checked')) {
+                        paramString += propertyName + "=\"1\" ";
+                    }
+                    else {
+                        paramString += propertyName + "=\"0\" ";
+                    }
+                }
+                else if (control[0].tagName.toLowerCase() == 'select') {
+                    var tempValue = '';
+                    control.find(':selected').each(function (i, selected) {
+                        tempValue += jQuery(this).attr('value') + ', ';
+                    });
+                    /*
+                                    for (var j=0; j<document.forms[0][controlId].length;j++) {
+                                        if (document.forms[0][controlId][j].selected)
+                                            tempValue += document.forms[0][controlId][j].value + ', ';
+                                    }
+            */
+                    if (tempValue.length > 2) {
+                        tempValue = tempValue.substring(0, tempValue.length - 2);
+                    }
+
+                    paramString += propertyName + "=\"" + tempValue + "\" ";
+
+                }
+                else {
+                    paramString += propertyName + "=\"" + this._pseudoHtmlEncode(document.forms[0][controlId].value) + "\" ";
+                }
+            }
+            return paramString;
+        },
+
         _getMacroSyntaxMvc: function() {
             /// <summary>Return the macro syntax to insert for MVC</summary>
 
-            return "@Umbraco.RenderMacro(\"" + this._opts.macroAlias + "\")";
+            var macroString = "@Umbraco.RenderMacro(\"" + this._opts.macroAlias + "\", new {";
+
+            for (var i = 0; i < this._macroAliases.length; i++) {
+                macroString += this._getMacroParameter(this._macroAliases[i]);
+                if (i < this._macroAliases.length - 1) {
+                    macroString += ", ";
+                }
+            }
+
+            macroString += "});";
+            return macroString;
         },
 
         _getMacroSyntaxWebForms: function () {
@@ -42,48 +101,7 @@
             var macroString = '<' + macroElement + ' ';
 
             for (var i = 0; i < this._macroAliases.length; i++) {
-                var controlId = this._macroAliases[i][0];
-                var propertyName = this._macroAliases[i][1];
-
-                var control = jQuery("#" + controlId);
-                if (control == null || (!control.is('input') && !control.is('select') && !control.is('textarea'))) {
-                    // hack for tree based macro parameter types
-                    var picker = Umbraco.Controls.TreePicker.GetPickerById(controlId);
-                    if (picker != undefined) {
-                        macroString += propertyName + "=\"" + picker.GetValue() + "\" ";
-                    }
-                }
-                else {
-                    if (control.is(':checkbox')) {
-                        if (control.is(':checked')) {
-                            macroString += propertyName + "=\"1\" ";
-                        }
-                        else {
-                            macroString += propertyName + "=\"0\" ";
-                        }
-                    }
-                    else if (control[0].tagName.toLowerCase() == 'select') {
-                        var tempValue = '';
-                        control.find(':selected').each(function (i, selected) {
-                            tempValue += jQuery(this).attr('value') + ', ';
-                        });
-                        /*
-                                        for (var j=0; j<document.forms[0][controlId].length;j++) {
-                                            if (document.forms[0][controlId][j].selected)
-                                                tempValue += document.forms[0][controlId][j].value + ', ';
-                                        }
-                */
-                        if (tempValue.length > 2) {
-                            tempValue = tempValue.substring(0, tempValue.length - 2);
-                        }
-
-                        macroString += propertyName + "=\"" + tempValue + "\" ";
-
-                    }
-                    else {
-                        macroString += propertyName + "=\"" + this._pseudoHtmlEncode(document.forms[0][controlId].value) + "\" ";
-                    }
-                }
+                macroString += this._getMacroParameter(this._macroAliases[i]);
             }
 
             if (macroString.length > 1)
