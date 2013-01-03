@@ -8,14 +8,13 @@ using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
+using Umbraco.Core;
 using umbraco.cms.helpers;
-using umbraco.cms.presentation.Trees;
 using umbraco.controls.GenericProperties;
 using umbraco.IO;
 using umbraco.presentation;
 using umbraco.cms.businesslogic;
 using umbraco.BasePages;
-using Tuple = System.Tuple;
 
 namespace umbraco.controls
 {
@@ -319,8 +318,8 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         }
         private void bindDataGenericProperties(bool Refresh)
         {
-            cms.businesslogic.ContentType.TabI[] tabs = cType.getVirtualTabs;
-            cms.businesslogic.datatype.DataTypeDefinition[] dtds = cms.businesslogic.datatype.DataTypeDefinition.GetAll();
+            var tabs = cType.getVirtualTabs.DistinctBy(x => x.ContentType).ToArray();
+            var dtds = cms.businesslogic.datatype.DataTypeDefinition.GetAll();
 
             PropertyTypes.Controls.Clear();
 
@@ -765,14 +764,15 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             dt.Columns.Add("name");
             dt.Columns.Add("id");
             dt.Columns.Add("order");
-            foreach (cms.businesslogic.ContentType.TabI tb in cType.getVirtualTabs.ToList())
+
+            foreach (var grp in cType.PropertyTypeGroups)
             {
-                if (tb.ContentType == cType.Id)
+                if (grp.ContentTypeId == cType.Id)
                 {
                     DataRow dr = dt.NewRow();
-                    dr["name"] = tb.GetRawCaption();
-                    dr["id"] = tb.Id;
-                    dr["order"] = tb.SortOrder;
+                    dr["name"] = grp.Name;
+                    dr["id"] = grp.Id;
+                    dr["order"] = grp.SortOrder;
                     dt.Rows.Add(dr);
                 }
             }

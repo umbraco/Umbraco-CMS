@@ -543,7 +543,11 @@ namespace umbraco.cms.businesslogic
                     TimeSpan.FromMinutes(15),
                     delegate
                     {
-                        List<PropertyType> result = new List<PropertyType>();
+                        //MCH NOTE: For the timing being I have changed this to a dictionary to ensure that property types
+                        //aren't added multiple times through the MasterContentType structure, because each level loads
+                        //its own + inherited property types, which is wrong. Once we are able to fully switch to the new api
+                        //this should no longer be a problem as the composition always contains a correct list of property types.
+                        var result = new Dictionary<int, PropertyType>();
                         using (IRecordsReader dr =
                             SqlHelper.ExecuteReader(
                                 "select id from cmsPropertyType where contentTypeId = @ctId order by sortOrder",
@@ -554,7 +558,7 @@ namespace umbraco.cms.businesslogic
                                 int id = dr.GetInt("id");
                                 PropertyType pt = PropertyType.GetPropertyType(id);
                                 if (pt != null)
-                                    result.Add(pt);
+                                    result.Add(pt.Id, pt);
                             }
                         }
 
@@ -563,14 +567,15 @@ namespace umbraco.cms.businesslogic
                         {
                             foreach (var mct in MasterContentTypes)
                             {
-                                List<PropertyType> pts = ContentType.GetContentType(mct).PropertyTypes;
+                                var pts = ContentType.GetContentType(mct).PropertyTypes;
                                 foreach (PropertyType pt in pts)
                                 {
-                                    result.Add(pt);
+                                    if(result.ContainsKey(pt.Id) == false)
+                                        result.Add(pt.Id, pt);
                                 }
                             }
                         }
-                        return result;
+                        return result.Select(x => x.Value).ToList();
                     });
             }
         }
