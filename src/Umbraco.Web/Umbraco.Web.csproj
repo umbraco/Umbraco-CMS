@@ -255,6 +255,7 @@
     <Compile Include="Dynamics\ExpressionParser.cs" />
     <Compile Include="Dynamics\ExtensionMethods.cs" />
     <Compile Include="Dynamics\Grouping.cs" />
+    <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="Install\InstallPackageController.cs" />
     <Compile Include="Install\UmbracoInstallAuthorizeAttribute.cs" />
     <Compile Include="Macros\PartialViewMacroController.cs" />
@@ -338,6 +339,7 @@
     <Compile Include="Trees\PartialViewsTree.cs" />
     <Compile Include="UI\Controls\InsertMacroSplitButton.cs" />
     <Compile Include="UI\Controls\UmbracoControl.cs" />
+    <Compile Include="umbraco.presentation\AttributeCollectionAdapter.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

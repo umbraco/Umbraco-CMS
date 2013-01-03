@@ -42,7 +42,9 @@
             if (alias != null && alias != "") {
                 t = "&alias=" + alias;
             }
-            UmbClientMgr.openModalWindow(this._opts.modalUrl + '?objectId=' + this._opts.codeEditorElementId + t, 'Insert Macro', true, 470, 530, 0, 0, '', '');
+            UmbClientMgr.openModalWindow(
+                this._opts.modalUrl + '?renderingEngine=Mvc&objectId=' + this._opts.codeEditorElementId + t,
+                'Insert Macro', true, 470, 530, 0, 0, '', '');
         },
 
         doSubmit: function () {

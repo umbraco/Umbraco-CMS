@@ -22,36 +22,15 @@
             document.getElementById("label" + macroAlias).innerHTML = "</b><i>updated with id: " + treePicker + "</i><b><br/>";
         },
 
-        // Constructor
-        constructor: function () {
+        _getMacroSyntaxMvc: function() {
+            /// <summary>Return the macro syntax to insert for MVC</summary>
+
+            return "@Umbraco.RenderMacro(\"" + this._opts.macroAlias + "\")";
         },
 
-        //public methods
-        
-        init: function (opts) {
-            /// <summary>Initializes the class and any UI bindings</summary>
-
-            // Merge options with default
-            this._opts = $.extend({
-                // Default options go here
-            }, opts);
-
-            var self = this;
-
-            //The knockout js view model for the selected item
-            var koViewModel = {
-                cancelModal: function () {
-                    UmbClientMgr.closeModalWindow();
-                },
-                updateMacro: function () {
-                    self.updateMacro();
-                }
-            };
-
-            ko.applyBindings(koViewModel);
-        },
-        
-        updateMacro: function () {
+        _getMacroSyntaxWebForms: function () {
+            /// <summary>Return the macro syntax to insert for webforms</summary>
+            
             var macroElement;
             if (this._opts.useAspNetMasterPages) {
                 macroElement = "umbraco:Macro";
@@ -120,9 +99,51 @@
             else {
                 macroString += "></" + macroElement + ">";
             }
+            return macroString;
+        },
 
+        // Constructor
+        constructor: function () {
+        },
+
+        //public methods
+        
+        init: function (opts) {
+            /// <summary>Initializes the class and any UI bindings</summary>
+
+            // Merge options with default
+            this._opts = $.extend({
+                // Default options go here
+            }, opts);
+
+            var self = this;
+
+            //The knockout js view model for the selected item
+            var koViewModel = {
+                cancelModal: function () {
+                    UmbClientMgr.closeModalWindow();
+                },
+                updateMacro: function () {
+                    self.updateMacro();
+                }
+            };
+
+            ko.applyBindings(koViewModel);
+        },
+        
+        updateMacro: function () {
+
+            var macroSyntax = null;
+            //if it is Mvc or empty, then use Mvc
+            if (this._opts.renderingEngine == "Mvc" || this._opts.renderingEngine == "") {
+                macroSyntax = this._getMacroSyntaxMvc();
+            }
+            else {
+                macroSyntax = this._getMacroSyntaxWebForms();
+            }
+           
             UmbClientMgr.contentFrame().focus();
-            UmbClientMgr.contentFrame().UmbEditor.Insert(macroString, '', this._opts.codeEditorElementId);
+            UmbClientMgr.contentFrame().UmbEditor.Insert(macroSyntax, '', this._opts.codeEditorElementId);
             UmbClientMgr.closeModalWindow();
         },
 

@@ -163,7 +163,7 @@
             if(alias != null && alias != ""){
                 t = "&alias="+alias;
             }
-            UmbClientMgr.openModalWindow('<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco) %>/dialogs/editMacro.aspx?objectId=<%= editorSource.ClientID %>' + t, 'Insert Macro', true, 470, 530, 0, 0, '', '');
+            UmbClientMgr.openModalWindow('<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco) %>/dialogs/editMacro.aspx?renderingEngine=Webforms&objectId=<%= editorSource.ClientID %>' + t, 'Insert Macro', true, 470, 530, 0, 0, '', '');
        }
 
     </script>
