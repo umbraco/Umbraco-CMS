@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Drawing;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Xml;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using umbraco.cms.businesslogic.Files;
 using umbraco.interfaces;
 
 namespace Umbraco.Web.Strategies.DataTypes
@@ -64,19 +66,23 @@ namespace Umbraco.Web.Strategies.DataTypes
 
                 string path = string.IsNullOrEmpty(property.Value.ToString())
                                   ? string.Empty
-                                  : VirtualPathUtility.ToAbsolute(property.Value.ToString(), SystemDirectories.Root)
-                                                      .Replace(fs.GetUrl(""), "");
+                                  : System.Web.Hosting.HostingEnvironment.MapPath(property.Value.ToString());
 
-                var file = string.IsNullOrEmpty(path)
-                               ? new UmbracoFile()
-                               : new UmbracoFile(path);
+                FileStream s = System.IO.File.OpenRead(path);
+                long size = s.Length;
+                s.Close();
+                var extension = Path.GetExtension(path) != null
+                    ? Path.GetExtension(path).Substring(1).ToLowerInvariant()
+                    : "";
+                var supportsResizing = ("," + UmbracoSettings.ImageFileTypes + ",").Contains(string.Format(",{0},", extension));
+                var dimensions = supportsResizing ? GetDimensions(path) : null;
 
                 // only add dimensions to web images
-                UpdateProperty(uploadFieldConfigNode, content, "widthFieldAlias", file.SupportsResizing ? file.GetDimensions().Item1.ToString() : string.Empty);
-                UpdateProperty(uploadFieldConfigNode, content, "heightFieldAlias", file.SupportsResizing ? file.GetDimensions().Item2.ToString() : string.Empty);
+                UpdateProperty(uploadFieldConfigNode, content, "widthFieldAlias", supportsResizing ? dimensions.Item1.ToString(CultureInfo.InvariantCulture) : string.Empty);
+                UpdateProperty(uploadFieldConfigNode, content, "heightFieldAlias", supportsResizing ? dimensions.Item2.ToString(CultureInfo.InvariantCulture) : string.Empty);
 
-                UpdateProperty(uploadFieldConfigNode, content, "lengthFieldAlias", file.Length == default(long) ? string.Empty : file.Length.ToString());
-                UpdateProperty(uploadFieldConfigNode, content, "extensionFieldAlias", string.IsNullOrEmpty(file.Extension) ? string.Empty : file.Extension);
+                UpdateProperty(uploadFieldConfigNode, content, "lengthFieldAlias", size == default(long) ? string.Empty : size.ToString(CultureInfo.InvariantCulture));
+                UpdateProperty(uploadFieldConfigNode, content, "extensionFieldAlias", string.IsNullOrEmpty(extension) ? string.Empty : extension);
             }
         }
 
@@ -90,6 +96,18 @@ namespace Umbraco.Web.Strategies.DataTypes
                     content.SetValue(propertyNode.FirstChild.Value, propertyValue);
                 }
             }
+        }
+
+        private Tuple<int, int> GetDimensions(string path)
+        {
+            var fs = System.IO.File.OpenRead(path);
+            var image = Image.FromStream(fs);
+            var fileWidth = image.Width;
+            var fileHeight = image.Height;
+            fs.Close();
+            image.Dispose();
+
+            return new Tuple<int, int>(fileWidth, fileHeight);
         }
     }
 }
