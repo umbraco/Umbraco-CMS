@@ -91,7 +91,6 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContent>(sqlClause, query);
             var sql = translator.Translate();
-            //sql.OrderBy("[cmsContentVersion].[VersionDate] DESC");
 
             //NOTE: This doesn't allow properties to be part of the query
             var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
@@ -112,11 +111,14 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
-                .From("cmsDocument")
-                .InnerJoin("cmsContentVersion").On("cmsDocument.versionId = cmsContentVersion.VersionId")
-                .InnerJoin("cmsContent").On("cmsContentVersion.ContentId = cmsContent.nodeId")
-                .InnerJoin("umbracoNode").On("cmsContent.nodeId = umbracoNode.id")
-                .Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
+                .From<DocumentDto>()
+                .InnerJoin<ContentVersionDto>()
+                .On<DocumentDto, ContentVersionDto>(left => left.VersionId, right => right.VersionId)
+                .InnerJoin<ContentDto>()
+                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>()
+                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId );
             return sql;
         }
 
@@ -423,14 +425,15 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private PropertyCollection GetPropertyCollection(int id, Guid versionId, IContentType contentType)
         {
-            var propertySql = new Sql();
-            propertySql.Select("*");
-            propertySql.From("cmsPropertyData");
-            propertySql.InnerJoin("cmsPropertyType ON (cmsPropertyData.propertytypeid = cmsPropertyType.id)");
-            propertySql.Where("cmsPropertyData.contentNodeId = @Id", new { Id = id });
-            propertySql.Where("cmsPropertyData.versionId = @VersionId", new { VersionId = versionId });
+            var sql = new Sql();
+            sql.Select("*")
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>()
+                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .Where<PropertyDataDto>(x => x.NodeId == id)
+                .Where<PropertyDataDto>(x => x.VersionId == versionId);
 
-            var propertyDataDtos = Database.Fetch<PropertyDataDto, PropertyTypeDto>(propertySql);
+            var propertyDataDtos = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql);
             var propertyFactory = new PropertyFactory(contentType, versionId, id);
             var properties = propertyFactory.BuildEntity(propertyDataDtos);
             return new PropertyCollection(properties);
