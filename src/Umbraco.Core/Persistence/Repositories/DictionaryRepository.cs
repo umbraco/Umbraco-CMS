@@ -101,14 +101,15 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
             if(isCount)
             {
-                sql.Select("COUNT(*)");
-                sql.From("cmsDictionary");
+                sql.Select("COUNT(*)")
+                    .From<DictionaryDto>();
             }
             else
             {
-                sql.Select("*");
-                sql.From("cmsDictionary");
-                sql.InnerJoin("cmsLanguageText ON (cmsDictionary.id = cmsLanguageText.UniqueId)");
+                sql.Select("*")
+                   .From<DictionaryDto>()
+                   .InnerJoin<LanguageTextDto>()
+                   .On<DictionaryDto, LanguageTextDto>(left => left.UniqueId, right => right.UniqueId);
             }
             return sql;
         }

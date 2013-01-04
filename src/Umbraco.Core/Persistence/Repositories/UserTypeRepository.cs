@@ -83,8 +83,8 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*");
-            sql.From("umbracoUserType");
+            sql.Select(isCount ? "COUNT(*)" : "*")
+                .From<UserTypeDto>();
             return sql;
         }
 
@@ -97,8 +97,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                            {
-                               string.Format("DELETE FROM umbracoUser WHERE userType = @Id"),
-                               string.Format("DELETE FROM umbracoUserType WHERE id = @Id")
+                               "DELETE FROM umbracoUser WHERE userType = @Id",
+                               "DELETE FROM umbracoUserType WHERE id = @Id"
                            };
             return list;
         }
