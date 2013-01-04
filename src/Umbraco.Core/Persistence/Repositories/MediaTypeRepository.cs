@@ -104,10 +104,11 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*");
-            sql.From("cmsContentType");
-            sql.InnerJoin("umbracoNode ON (cmsContentType.nodeId = umbracoNode.id)");
-            sql.Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
+            sql.Select(isCount ? "COUNT(*)" : "*")
+                .From<ContentTypeDto>()
+                .InnerJoin<NodeDto>()
+                .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 
@@ -120,17 +121,17 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                            {
-                               string.Format("DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id"),
-                               string.Format("DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id"),
-                               string.Format("DELETE FROM cmsTagRelationship WHERE nodeId = @Id"),
-                               string.Format("DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @Id"),
-                               string.Format("DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @Id"),
-                               string.Format("DELETE FROM cmsContentType2ContentType WHERE parentContentTypeId = @Id"),
-                               string.Format("DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @Id"),
-                               string.Format("DELETE FROM cmsPropertyType WHERE contentTypeId = @Id"),
-                               string.Format("DELETE FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @Id"),
-                               string.Format("DELETE FROM cmsContentType WHERE NodeId = @Id"),
-                               string.Format("DELETE FROM umbracoNode WHERE id = @Id")
+                               "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
+                               "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                               "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
+                               "DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @Id",
+                               "DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @Id",
+                               "DELETE FROM cmsContentType2ContentType WHERE parentContentTypeId = @Id",
+                               "DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @Id",
+                               "DELETE FROM cmsPropertyType WHERE contentTypeId = @Id",
+                               "DELETE FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @Id",
+                               "DELETE FROM cmsContentType WHERE NodeId = @Id",
+                               "DELETE FROM umbracoNode WHERE id = @Id"
                            };
             return list;
         }
