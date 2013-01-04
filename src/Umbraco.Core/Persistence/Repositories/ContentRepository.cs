@@ -410,7 +410,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
-            sql.Where("cmsContentVersion.LanguageLocale = @Language", new { Language = language });
+            sql.Where<ContentVersionDto>(x => x.Language == language);
             sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
             var dto = Database.Query<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();

@@ -85,10 +85,11 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*");
-            sql.From("cmsDataType");
-            sql.InnerJoin("umbracoNode ON (cmsDataType.nodeId = umbracoNode.id)");
-            sql.Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
+            sql.Select(isCount ? "COUNT(*)" : "*")
+               .From<DataTypeDto>()
+               .InnerJoin<NodeDto>()
+               .On<DataTypeDto, NodeDto>(left => left.DataTypeId, right => right.NodeId)
+               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 

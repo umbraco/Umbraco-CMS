@@ -178,7 +178,10 @@
     <Compile Include="Persistence\Mappers\MappingResolverTests.cs" />
     <Compile Include="Persistence\Querying\ContentRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\Querying\ContentTypeRepositorySqlClausesTest.cs" />
+    <Compile Include="Persistence\Querying\DataTypeDefinitionRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\Querying\ExpressionTests.cs" />
+    <Compile Include="Persistence\Querying\MediaRepositorySqlClausesTest.cs" />
+    <Compile Include="Persistence\Querying\MediaTypeRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\SyntaxProvider\SqlSyntaxProviderTests.cs" />
     <Compile Include="PublishedContent\DynamicXmlTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
