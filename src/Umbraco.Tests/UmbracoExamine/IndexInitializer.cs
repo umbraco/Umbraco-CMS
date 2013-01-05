@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Examine;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis.Standard;
@@ -18,36 +19,17 @@ namespace Umbraco.Tests.UmbracoExamine
 			var i = new UmbracoContentIndexer(new IndexCriteria(
 				                                  new[]
 					                                  {
-						                                  new TestIndexField { Name = "id", EnableSorting = true, Type = "Number" }, 
-						                                  new TestIndexField { Name = "nodeName", EnableSorting = true },
-						                                  new TestIndexField { Name = "updateDate", EnableSorting = true, Type = "DateTime" }, 
-						                                  new TestIndexField { Name = "writerName" }, 
-						                                  new TestIndexField { Name = "path" }, 
-						                                  new TestIndexField { Name = "nodeTypeAlias" }, 
-						                                  new TestIndexField { Name = "parentID" }
+						                                  new TestIndexField {Name = "id", EnableSorting = true, Type = "Number"},
+						                                  new TestIndexField {Name = "nodeName", EnableSorting = true},
+						                                  new TestIndexField {Name = "updateDate", EnableSorting = true, Type = "DateTime"},
+						                                  new TestIndexField {Name = "writerName"},
+						                                  new TestIndexField {Name = "path"},
+						                                  new TestIndexField {Name = "nodeTypeAlias"},
+						                                  new TestIndexField {Name = "parentID"}
 					                                  },
-				                                  new[]
-					                                  {
-						                                  new TestIndexField { Name = "headerText" }, 
-						                                  new TestIndexField { Name = "bodyText" },
-						                                  new TestIndexField { Name = "metaDescription" }, 
-						                                  new TestIndexField { Name = "metaKeywords" }, 
-						                                  new TestIndexField { Name = "bodyTextColOne" }, 
-						                                  new TestIndexField { Name = "bodyTextColTwo" }, 
-						                                  new TestIndexField { Name = "xmlStorageTest" }
-					                                  },
-				                                  new[]
-					                                  {
-						                                  "CWS_Home", 
-						                                  "CWS_Textpage",
-						                                  "CWS_TextpageTwoCol", 
-						                                  "CWS_NewsEventsList", 
-						                                  "CWS_NewsItem", 
-						                                  "CWS_Gallery", 
-						                                  "CWS_EventItem", 
-						                                  "Image", 
-					                                  },
-				                                  new string[] { },
+				                                  Enumerable.Empty<IIndexField>(),
+				                                  Enumerable.Empty<string>(),
+				                                  new string[] {},
 				                                  -1),
 			                                  luceneDir, //custom lucene directory
 			                                  new TestDataService(),

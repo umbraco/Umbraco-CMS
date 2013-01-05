@@ -118,6 +118,7 @@
     <Compile Include="IndexTypes.cs" />
     <Compile Include="LegacyLibrary.cs" />
     <Compile Include="LoggingLevel.cs" />
+    <Compile Include="UmbracoEventManager.cs" />
     <Compile Include="UmbracoMemberIndexer.cs" />
     <Compile Include="ContentExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

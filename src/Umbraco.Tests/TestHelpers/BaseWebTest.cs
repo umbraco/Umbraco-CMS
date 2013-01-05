@@ -1,4 +1,6 @@
 using System;
+using System.Configuration;
+using System.Data.SqlServerCe;
 using System.IO;
 using System.Web.Routing;
 using System.Xml;
@@ -9,6 +11,10 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Publishing;
+using Umbraco.Core.Services;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -24,45 +30,107 @@ namespace Umbraco.Tests.TestHelpers
         [SetUp]
         public virtual void Initialize()
         {
-            TestHelper.SetupLog4NetForTests();
-            TestHelper.InitializeContentDirectories();
+			TestHelper.SetupLog4NetForTests();
+			TestHelper.InitializeContentDirectories();
 
-            AppDomain.CurrentDomain.SetData("DataDirectory", TestHelper.CurrentAssemblyDirectory);
+			string path = TestHelper.CurrentAssemblyDirectory;
+			AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            if (RequiresDbSetup)
-                TestHelper.InitializeDatabase();
+			UmbracoSettings.UseLegacyXmlSchema = false;
 
-            Resolution.Freeze();
+			RepositoryResolver.Current = new RepositoryResolver(
+				new RepositoryFactory());
 
-			//NOTE: We are not constructing with the service context here because it is not required for these tests (currently)
-			// if we do, this means that we have to initialized the RepositoryResolver too.
-			ApplicationContext.Current = new ApplicationContext
-				{
-					IsReady = true,
-					//assign the db context
-					DatabaseContext = new DatabaseContext(new DefaultDatabaseFactory())
-				};
+			//Ensure that any database connections from a previous test is disposed. This is really just double safety as its also done in the TearDown.
+			if (ApplicationContext != null && DatabaseContext != null)
+				DatabaseContext.Database.Dispose();
+			SqlCeContextGuardian.CloseBackgroundConnection();
+
+			//Delete database file before continueing
+			string filePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
+			if (File.Exists(filePath))
+			{
+				File.Delete(filePath);
+			}
+
+			//Get the connectionstring settings from config
+			var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+			ConfigurationManager.AppSettings.Set(Core.Configuration.GlobalSettings.UmbracoConnectionName, @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf");
+
+			//Create the Sql CE database
+			var engine = new SqlCeEngine(settings.ConnectionString);
+	        if (RequiresDbSetup)
+	        {
+				engine.CreateDatabase();
+	        }
+
+			Resolution.Freeze();
+			ApplicationContext.Current = new ApplicationContext(
+				//assign the db context
+				new DatabaseContext(new DefaultDatabaseFactory()),
+				//assign the service context
+				new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
+
+			//Configure the Database and Sql Syntax based on connection string set in config
+			DatabaseContext.Initialize();
+			if (RequiresDbSetup)
+			{
+				//Create the umbraco database and its base data
+				DatabaseContext.Database.CreateDatabaseSchema();	
+			}
+			
+
+			//if (RequiresDbSetup)
+			//	TestHelper.InitializeDatabase();
 			
         }
 
         [TearDown]
         public virtual void TearDown()
         {
-            TestHelper.CleanContentDirectories();
+			DatabaseContext.Database.Dispose();
+			//reset the app context            
+			ApplicationContext.ApplicationCache.ClearAllCache();
 
-            //reset the app context
-            DatabaseContext.Database.Dispose();
-            ApplicationContext.ApplicationCache.ClearAllCache();
-            ApplicationContext.Current = null;
-            Resolution.IsFrozen = false;
+			SyntaxConfig.SqlSyntaxProvider = null;
 
-            if (RequiresDbSetup)
-            {
-                TestHelper.ClearDatabase();
-                SqlCeContextGuardian.CloseBackgroundConnection();
-            }
+	        if (RequiresDbSetup)
+	        {
+				//legacy API database connection close - because a unit test using PetaPoco db-layer can trigger the usage of SqlHelper we need to ensure that a possible connection is closed.
+				SqlCeContextGuardian.CloseBackgroundConnection();
+	        }
+	        
 
-            AppDomain.CurrentDomain.SetData("DataDirectory", null);
+			ApplicationContext.Current = null;
+			Resolution.IsFrozen = false;
+			RepositoryResolver.Reset();
+
+			TestHelper.CleanContentDirectories();
+
+			string path = TestHelper.CurrentAssemblyDirectory;
+			AppDomain.CurrentDomain.SetData("DataDirectory", null);
+
+			string filePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
+			if (File.Exists(filePath))
+			{
+				File.Delete(filePath);
+			}
+
+			//TestHelper.CleanContentDirectories();
+
+			////reset the app context
+			//DatabaseContext.Database.Dispose();
+			//ApplicationContext.ApplicationCache.ClearAllCache();
+			//ApplicationContext.Current = null;
+			//Resolution.IsFrozen = false;
+			//RepositoryResolver.Reset();
+			//if (RequiresDbSetup)
+			//{
+			//	TestHelper.ClearDatabase();
+			//	SqlCeContextGuardian.CloseBackgroundConnection();
+			//}
+
+			//AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
             Cache.ClearAllCache();
 
