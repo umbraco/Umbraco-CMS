@@ -9,13 +9,14 @@ using Examine;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis.Standard;
+using Lucene.Net.Store;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.ExamineHelpers;
+using Umbraco.Tests.UmbracoExamine;
 using Umbraco.Web;
 using UmbracoExamine;
 using UmbracoExamine.DataServices;
@@ -111,93 +112,98 @@ namespace Umbraco.Tests.PublishedContent
 		[Test]
 		public void Children_With_Examine()
 		{
-			var newIndexFolder = new DirectoryInfo(Path.Combine("App_Data\\CWSIndexSetTest", Guid.NewGuid().ToString()));
-			var indexInit = new IndexInitializer();
-			var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);
-			indexer.RebuildIndex();
+			using (var luceneDir = new RAMDirectory())
+			{
+				var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+				indexer.RebuildIndex();
 
-			var store = new DefaultPublishedMediaStore(indexInit.GetUmbracoSearcher(newIndexFolder));
+				var store = new DefaultPublishedMediaStore(IndexInitializer.GetUmbracoSearcher(luceneDir));
 
-			//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
-			var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 1111);
-			var rootChildren = publishedMedia.Children();
-			Assert.IsTrue(rootChildren.Select(x => x.Id).ContainsAll(new[] { 2222, 1113, 1114, 1115, 1116 }));
+				//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
+				var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 1111);
+				var rootChildren = publishedMedia.Children();
+				Assert.IsTrue(rootChildren.Select(x => x.Id).ContainsAll(new[] { 2222, 1113, 1114, 1115, 1116 }));
 
-			var publishedChild1 = store.GetDocumentById(GetUmbracoContext("/test", 1234), 2222);
-			var subChildren = publishedChild1.Children();
-			Assert.IsTrue(subChildren.Select(x => x.Id).ContainsAll(new[] { 2112 }));
+				var publishedChild1 = store.GetDocumentById(GetUmbracoContext("/test", 1234), 2222);
+				var subChildren = publishedChild1.Children();
+				Assert.IsTrue(subChildren.Select(x => x.Id).ContainsAll(new[] { 2112 }));	
+			}			
 		}
 
 		[Test]
 		public void Descendants_With_Examine()
 		{
-			var newIndexFolder = new DirectoryInfo(Path.Combine("App_Data\\CWSIndexSetTest", Guid.NewGuid().ToString()));
-			var indexInit = new IndexInitializer();
-			var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);
-			indexer.RebuildIndex();
+			using (var luceneDir = new RAMDirectory())
+			{
+				var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+				indexer.RebuildIndex();
 
-			var store = new DefaultPublishedMediaStore(indexInit.GetUmbracoSearcher(newIndexFolder));
+				var store = new DefaultPublishedMediaStore(IndexInitializer.GetUmbracoSearcher(luceneDir));
 
-			//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
-			var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 1111);
-			var rootDescendants = publishedMedia.Descendants();
-			Assert.IsTrue(rootDescendants.Select(x => x.Id).ContainsAll(new[] { 2112, 2222, 1113, 1114, 1115, 1116 }));
+				//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
+				var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 1111);
+				var rootDescendants = publishedMedia.Descendants();
+				Assert.IsTrue(rootDescendants.Select(x => x.Id).ContainsAll(new[] { 2112, 2222, 1113, 1114, 1115, 1116 }));
 
-			var publishedChild1 = store.GetDocumentById(GetUmbracoContext("/test", 1234), 2222);
-			var subDescendants = publishedChild1.Descendants();
-			Assert.IsTrue(subDescendants.Select(x => x.Id).ContainsAll(new[] { 2112, 3113 }));
+				var publishedChild1 = store.GetDocumentById(GetUmbracoContext("/test", 1234), 2222);
+				var subDescendants = publishedChild1.Descendants();
+				Assert.IsTrue(subDescendants.Select(x => x.Id).ContainsAll(new[] { 2112, 3113 }));	
+			}			
 		}
 
 		[Test]
 		public void DescendantsOrSelf_With_Examine()
 		{
-			var newIndexFolder = new DirectoryInfo(Path.Combine("App_Data\\CWSIndexSetTest", Guid.NewGuid().ToString()));
-			var indexInit = new IndexInitializer();
-			var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);
-			indexer.RebuildIndex();
+			using (var luceneDir = new RAMDirectory())
+			{
+				var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+				indexer.RebuildIndex();
+				var store = new DefaultPublishedMediaStore(IndexInitializer.GetUmbracoSearcher(luceneDir));
 
-			var store = new DefaultPublishedMediaStore(indexInit.GetUmbracoSearcher(newIndexFolder));
+				//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
+				var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 1111);
+				var rootDescendants = publishedMedia.DescendantsOrSelf();
+				Assert.IsTrue(rootDescendants.Select(x => x.Id).ContainsAll(new[] { 1111, 2112, 2222, 1113, 1114, 1115, 1116 }));
 
-			//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
-			var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 1111);
-			var rootDescendants = publishedMedia.DescendantsOrSelf();
-			Assert.IsTrue(rootDescendants.Select(x => x.Id).ContainsAll(new[] { 1111, 2112, 2222, 1113, 1114, 1115, 1116 }));
-
-			var publishedChild1 = store.GetDocumentById(GetUmbracoContext("/test", 1234), 2222);
-			var subDescendants = publishedChild1.DescendantsOrSelf();
-			Assert.IsTrue(subDescendants.Select(x => x.Id).ContainsAll(new[] { 2222, 2112, 3113 }));
+				var publishedChild1 = store.GetDocumentById(GetUmbracoContext("/test", 1234), 2222);
+				var subDescendants = publishedChild1.DescendantsOrSelf();
+				Assert.IsTrue(subDescendants.Select(x => x.Id).ContainsAll(new[] { 2222, 2112, 3113 }));	
+			}			
 		}
 
 		[Test]
 		public void Ancestors_With_Examine()
 		{
-			var newIndexFolder = new DirectoryInfo(Path.Combine("App_Data\\CWSIndexSetTest", Guid.NewGuid().ToString()));
-			var indexInit = new IndexInitializer();
-			var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);
-			indexer.RebuildIndex();
+			using (var luceneDir = new RAMDirectory())
+			{
+				var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+				indexer.RebuildIndex();
 
-			var store = new DefaultPublishedMediaStore(indexInit.GetUmbracoSearcher(newIndexFolder));
+				var store = new DefaultPublishedMediaStore(IndexInitializer.GetUmbracoSearcher(luceneDir));
 
-			//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
-			var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 3113);
-			var ancestors = publishedMedia.Ancestors();
-			Assert.IsTrue(ancestors.Select(x => x.Id).ContainsAll(new[] { 2112, 2222, 1111 }));
+				//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
+				var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 3113);
+				var ancestors = publishedMedia.Ancestors();
+				Assert.IsTrue(ancestors.Select(x => x.Id).ContainsAll(new[] { 2112, 2222, 1111 }));
+			}
+			
 		}
 
 		[Test]
 		public void AncestorsOrSelf_With_Examine()
 		{
-			var newIndexFolder = new DirectoryInfo(Path.Combine("App_Data\\CWSIndexSetTest", Guid.NewGuid().ToString()));
-			var indexInit = new IndexInitializer();
-			var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);
-			indexer.RebuildIndex();
+			using (var luceneDir = new RAMDirectory())
+			{
+				var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+				indexer.RebuildIndex();
 
-			var store = new DefaultPublishedMediaStore(indexInit.GetUmbracoSearcher(newIndexFolder));
+				var store = new DefaultPublishedMediaStore(IndexInitializer.GetUmbracoSearcher(luceneDir));
 
-			//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
-			var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 3113);
-			var ancestors = publishedMedia.AncestorsOrSelf();
-			Assert.IsTrue(ancestors.Select(x => x.Id).ContainsAll(new[] { 3113, 2112, 2222, 1111 }));
+				//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
+				var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 3113);
+				var ancestors = publishedMedia.AncestorsOrSelf();
+				Assert.IsTrue(ancestors.Select(x => x.Id).ContainsAll(new[] { 3113, 2112, 2222, 1111 }));				
+			}			
 		}
 
 		[Test]
