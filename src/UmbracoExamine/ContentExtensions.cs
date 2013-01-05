@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using System.Xml;
@@ -28,11 +29,12 @@ namespace UmbracoExamine
         /// the xml. 
         /// </remarks>
 		[SecuritySafeCritical]
+		[Obsolete("This method is no longer used and will be removed in future versions")]
         public static XDocument ToXDocument(this Content node, bool cacheOnly)
         {
             if (cacheOnly && node.GetType().Equals(typeof(Document)))
             {
-                var umbXml = library.GetXmlNodeById(node.Id.ToString());
+                var umbXml = LegacyLibrary.GetXmlNodeById(node.Id.ToString());
                 if (umbXml != null)
                 {
                     return umbXml.ToXDocument();    
@@ -50,7 +52,8 @@ namespace UmbracoExamine
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
-		[SecuritySafeCritical]        
+		[SecuritySafeCritical] 
+       	[Obsolete("This method is no longer used and will be removed in future versions")]
         private static XDocument ToXDocument(this Content node)
         {
             var xDoc = new XmlDocument();

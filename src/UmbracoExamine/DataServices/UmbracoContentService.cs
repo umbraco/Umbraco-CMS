@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using System.Text;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using umbraco;
 using System.Xml.Linq;
 using System.Xml;
@@ -18,8 +22,21 @@ using System.Diagnostics;
 
 namespace UmbracoExamine.DataServices
 {
-    public class UmbracoContentService : UmbracoExamine.DataServices.IContentService
+    public class UmbracoContentService : IContentService
     {
+
+		private readonly ServiceContext _services;
+
+		public UmbracoContentService()
+			: this(ApplicationContext.Current.Services)
+		{
+
+		}
+
+		public UmbracoContentService(ServiceContext services)
+		{
+			_services = services;
+		}
 
         /// <summary>
         /// removes html markup from a string
@@ -29,7 +46,7 @@ namespace UmbracoExamine.DataServices
 		[SecuritySafeCritical]
 		public string StripHtml(string value)
         {
-            return library.StripHtml(value);
+			return value.StripHtml();
         }
 
         /// <summary>
@@ -40,7 +57,10 @@ namespace UmbracoExamine.DataServices
 		[SecuritySafeCritical]
 		public XDocument GetPublishedContentByXPath(string xpath)
         {
-            return library.GetXmlNodeByXPath(xpath).ToXDocument();
+			//TODO: Remove the need for this, the best way would be to remove all requirements of examine based on Xml but that
+			// would take some time. Another way in the in-term would be to add a static delegate to this class which can be set
+			// on the WebBootManager to set how to get the XmlNodeByXPath but that is still ugly :(
+            return LegacyLibrary.GetXmlNodeByXPath(xpath).ToXDocument();
         }
 
         /// <summary>
@@ -52,25 +72,11 @@ namespace UmbracoExamine.DataServices
         /// <returns></returns>
 		[SecuritySafeCritical]
 		public XDocument GetLatestContentByXPath(string xpath)
-        {   
-
-            var rootContent = Document.GetRootDocuments();
+        {
             var xmlContent = XDocument.Parse("<content></content>");
-            var xDoc = new XmlDocument();
-            foreach (var c in rootContent)
+			foreach (var c in _services.ContentService.GetRootContent())
             {
-                var xNode = xDoc.CreateNode(XmlNodeType.Element, "node", "");
-                c.XmlPopulate(xDoc, ref xNode, true);
-
-                if (xNode.Attributes["nodeTypeAlias"] == null)
-                {
-                    //we'll add the nodeTypeAlias ourselves                                
-                    XmlAttribute d = xDoc.CreateAttribute("nodeTypeAlias");
-                    d.Value = c.ContentType.Alias;
-                    xNode.Attributes.Append(d);
-                }
-
-                xmlContent.Root.Add(xNode.ToXElement());
+				xmlContent.Root.Add(c.ToXml());				
             }
             var result = ((IEnumerable)xmlContent.XPathEvaluate(xpath)).Cast<XElement>();
             return result.ToXDocument();
@@ -84,9 +90,9 @@ namespace UmbracoExamine.DataServices
         /// <param name="documentId"></param>
         /// <returns></returns>
 		[SecuritySafeCritical]
-		private XmlNode GetPage(int documentId)
+		private static XmlNode GetPage(int documentId)
         {
-            XmlNode x = Access.AccessXml.SelectSingleNode("/access/page [@id=" + documentId.ToString() + "]");
+            var x = Access.AccessXml.SelectSingleNode("/access/page [@id=" + documentId.ToString() + "]");
             return x;
         }
 
@@ -100,24 +106,17 @@ namespace UmbracoExamine.DataServices
         /// <returns></returns>
         public bool IsProtected(int nodeId, string path)
         {
-            foreach (string id in path.Split(','))
-            {
-                if (GetPage(int.Parse(id)) != null)
-                {
-                    return true;
-                }
-            }
-            return false;
+	        return path.Split(',').Any(id => GetPage(int.Parse(id)) != null);
         }
 
-        /// <summary>
+	    /// <summary>
         /// Returns a list of all of the user defined property names in Umbraco
         /// </summary>
         /// <returns></returns>
 		[SecuritySafeCritical]
 		public IEnumerable<string> GetAllUserPropertyNames()
         {
-            //this is how umb codebase 4.0 does this... booo, should be in the data layer, will fix in 4.1
+            //TODO: this is how umb codebase 4.0 does this... convert to new data layer
 
             var aliases = new List<string>();
             var fieldSql = "select distinct alias from cmsPropertyType order by alias";
@@ -139,12 +138,11 @@ namespace UmbracoExamine.DataServices
                     //we don't want to crash the app because of this so we'll actually swallow this
                     //exception... Unfortunately logging probably won't work in this situation either :(
 
-                    Debug.WriteLine("EXCEPTION OCCURRED reading GetAllUserPropertyNames: " + ex.Message, "Error");
-                    Trace.WriteLine("EXCEPTION OCCURRED reading GetAllUserPropertyNames: " + ex.Message, "Error");
+                    LogHelper.Error<UmbracoContentService>("EXCEPTION OCCURRED reading GetAllUserPropertyNames", ex);
                 }
                 else
                 {
-                    throw ex;
+                    throw;
                 }
             }
 

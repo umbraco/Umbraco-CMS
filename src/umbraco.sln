@@ -61,7 +61,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{66AB04
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoExamine", "UmbracoExamine\UmbracoExamine.csproj", "{07FBC26B-2927-4A22-8D96-D644C667FECC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UmbracoExamineLibs", "UmbracoExamineLibs", "{DD32977B-EF54-475B-9A1B-B97A502C6E58}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UmbracoExamine Libraries", "UmbracoExamine Libraries", "{DD32977B-EF54-475B-9A1B-B97A502C6E58}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoExamine.PDF", "UmbracoExamine.PDF\UmbracoExamine.PDF.csproj", "{F30DDDB8-3994-4673-82AE-057123C6E1A8}"
 EndProject

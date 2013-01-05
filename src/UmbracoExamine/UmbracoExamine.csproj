@@ -116,6 +116,7 @@
     <Compile Include="DataServices\UmbracoContentService.cs" />
     <Compile Include="DataServices\UmbracoMediaService.cs" />
     <Compile Include="IndexTypes.cs" />
+    <Compile Include="LegacyLibrary.cs" />
     <Compile Include="LoggingLevel.cs" />
     <Compile Include="UmbracoMemberIndexer.cs" />
     <Compile Include="ContentExtensions.cs" />
@@ -123,7 +124,6 @@
     <Compile Include="UmbracoContentIndexer.cs" />
     <Compile Include="UmbracoExamineSearcher.cs" />
     <Compile Include="DataServices\UmbracoLogService.cs" />
-    <Compile Include="UmbracoEventManager.cs" />
     <Compile Include="XsltExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +152,10 @@
       <Project>{ccd75ec3-63db-4184-b49d-51c1dd337230}</Project>
       <Name>umbraco.cms</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
+      <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
+      <Name>Umbraco.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\umbraco.datalayer\umbraco.datalayer.csproj">
       <Project>{c7cb79f0-1c97-4b33-bfa7-00731b579ae2}</Project>
       <Name>umbraco.datalayer</Name>
@@ -159,10 +163,6 @@
     <ProjectReference Include="..\umbraco.interfaces\umbraco.interfaces.csproj">
       <Project>{511f6d8d-7717-440a-9a57-a507e9a8b27f}</Project>
       <Name>umbraco.interfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
-      <Project>{651e1350-91b6-44b7-bd60-7207006d7003}</Project>
-      <Name>Umbraco.Web</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

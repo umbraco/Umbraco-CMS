@@ -7,6 +7,8 @@ namespace UmbracoExamine.DataServices
         void AddErrorLog(int nodeId, string msg);
         void AddInfoLog(int nodeId, string msg);
         void AddVerboseLog(int nodeId, string msg);
-        LoggingLevel LogLevel { get; set; }
+
+		[Obsolete("This value is no longer used since we support the log levels that are available with LogHelper")]
+		LoggingLevel LogLevel { get; set; }
     }
 }
