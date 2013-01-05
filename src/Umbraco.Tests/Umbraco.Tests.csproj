@@ -271,6 +271,7 @@
     <Compile Include="UmbracoExamine\EventsTest.cs" />
     <Compile Include="UmbracoExamine\IndexInitializer.cs" />
     <Compile Include="UmbracoExamine\IndexTest.cs" />
+    <Compile Include="UmbracoExamine\PdfIndexerTests.cs" />
     <Compile Include="UmbracoExamine\TestDataService.cs" />
     <Compile Include="UmbracoExamine\TestFiles.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -357,6 +358,10 @@
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>Umbraco.Web</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UmbracoExamine.PDF\UmbracoExamine.PDF.csproj">
+      <Project>{f30dddb8-3994-4673-82ae-057123c6e1a8}</Project>
+      <Name>UmbracoExamine.PDF</Name>
     </ProjectReference>
     <ProjectReference Include="..\UmbracoExamine\UmbracoExamine.csproj">
       <Project>{07fbc26b-2927-4a22-8d96-d644c667fecc}</Project>

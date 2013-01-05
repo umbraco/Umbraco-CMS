@@ -3,6 +3,7 @@ using Examine;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis.Standard;
 using UmbracoExamine;
+using UmbracoExamine.PDF;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
@@ -100,17 +101,17 @@ namespace Umbraco.Tests.UmbracoExamine
 		{
 			return new LuceneSearcher(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29));
 		}
-		//public static PDFIndexer GetPdfIndexer(Lucene.Net.Store.Directory luceneDir)
-		//{
-		//	var i = new PDFIndexer(luceneDir,
-		//							  new TestDataService(),
-		//							  new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29),
-		//							  false);
+		public static PDFIndexer GetPdfIndexer(Lucene.Net.Store.Directory luceneDir)
+		{
+			var i = new PDFIndexer(luceneDir,
+									  new TestDataService(),
+									  new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29),
+									  false);
 
-		//	i.IndexingError += IndexingError;
+			i.IndexingError += IndexingError;
 
-		//	return i;
-		//}
+			return i;
+		}
 		public static MultiIndexSearcher GetMultiSearcher(Lucene.Net.Store.Directory pdfDir, Lucene.Net.Store.Directory simpleDir, Lucene.Net.Store.Directory conventionDir, Lucene.Net.Store.Directory cwsDir)
 		{
 			var i = new MultiIndexSearcher(new[] { pdfDir, simpleDir, conventionDir, cwsDir }, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29));
