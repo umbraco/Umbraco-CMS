@@ -10,58 +10,42 @@ namespace Umbraco.Tests.PropertyEditors
 	[TestFixture]
 	public class PropertyEditorValueConverterTests
 	{
-		[Test]
-		public void CanConvertDatePickerPropertyEditor()
+		[TestCase("2012-11-10", true)]
+		[TestCase("2012/11/10", true)]
+		[TestCase("10/11/2012", true)]
+		[TestCase("11/10/2012", false)]
+		[TestCase("Sat 10, Nov 2012", true)]
+		[TestCase("Saturday 10, Nov 2012", true)]
+		[TestCase("Sat 10, November 2012", true)]
+		[TestCase("Saturday 10, November 2012", true)]
+		[TestCase("2012-11-10 13:14:15", true)]
+		[TestCase("", false)]
+		public void CanConvertDatePickerPropertyEditor(string date, bool expected)
 		{
 			var converter = new DatePickerPropertyEditorValueConverter();
 			var dateTime = new DateTime(2012, 11, 10, 13, 14, 15);
-			var testCases = new Dictionary<string, bool>
-			{
-				{"2012-11-10", true},
-				{"2012/11/10", true},
-				{"10/11/2012", true},
-				{"11/10/2012", false},
-				{"Sat 10, Nov 2012", true},
-				{"Saturday 10, Nov 2012", true},
-				{"Sat 10, November 2012", true},
-				{"Saturday 10, November 2012", true},
-				{"2012-11-10 13:14:15", true},
-				{"", false}
-			};
+			var result = converter.ConvertPropertyValue(date);
 
-			foreach (var testCase in testCases)
-			{
-				var result = converter.ConvertPropertyValue(testCase.Key);
-
-				Assert.IsTrue(result.Success);
-				Assert.AreEqual(DateTime.Equals(dateTime.Date, ((DateTime)result.Result).Date), testCase.Value);
-			}
+			Assert.IsTrue(result.Success);
+			Assert.AreEqual(DateTime.Equals(dateTime.Date, ((DateTime) result.Result).Date), expected);
 		}
 
-		[Test]
-		public void CanConvertYesNoPropertyEditor()
+		[TestCase("TRUE", true)]
+		[TestCase("True", true)]
+		[TestCase("true", true)]
+		[TestCase("1", true)]
+		[TestCase("FALSE", false)]
+		[TestCase("False", false)]
+		[TestCase("false", false)]
+		[TestCase("0", false)]
+		[TestCase("", false)]
+		public void CanConvertYesNoPropertyEditor(string value, bool expected)
 		{
 			var converter = new YesNoPropertyEditorValueConverter();
-			var testCases = new Dictionary<string, bool>
-			{
-				{"TRUE", true},
-				{"True", true},
-				{"true", true},
-				{"1", true},
-				{"FALSE", false},
-				{"False", false},
-				{"false", false},
-				{"0", false},
-				{"", false}
-			};
+			var result = converter.ConvertPropertyValue(value);
 
-			foreach (var testCase in testCases)
-			{
-				var result = converter.ConvertPropertyValue(testCase.Key);
-
-				Assert.IsTrue(result.Success);
-				Assert.AreEqual(testCase.Value, result.Result);
-			}
+			Assert.IsTrue(result.Success);
+			Assert.AreEqual(expected, result.Result);
 		}
 	}
 }
