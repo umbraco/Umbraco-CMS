@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Web.Script.Serialization;
 using System.Web.Script.Services;
 using System.Web.Services;
@@ -60,9 +61,18 @@ namespace umbraco.presentation.install.utills
 
             var result = ApplicationContext.Current.DatabaseContext.CreateDatabaseSchemaAndDataOrUpgrade();
             
-            // Remove legacy umbracoDbDsn configuration setting if it exists
-            Umbraco.Core.Configuration.GlobalSettings.RemoveSetting(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName);
-            
+            // Remove legacy umbracoDbDsn configuration setting if it exists and connectionstring also exists
+            if (ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName] != null)
+            {
+                Umbraco.Core.Configuration.GlobalSettings.RemoveSetting(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName);
+            }
+            else
+            {
+                var ex = new ArgumentNullException(string.Format("ConfigurationManager.ConnectionStrings[{0}]", Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName), "Install / upgrade did not complete successfully, umbracoDbDSN was not set in the connectionStrings section");
+                LogHelper.Error<p>("", ex);
+                throw ex;
+            }
+
             var js = new JavaScriptSerializer();
             var jsonResult = js.Serialize(result);
             return jsonResult;

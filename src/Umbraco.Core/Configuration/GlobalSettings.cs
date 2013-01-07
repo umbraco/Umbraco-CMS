@@ -234,15 +234,15 @@ namespace Umbraco.Core.Configuration
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
             var appSettings = xml.Root.Descendants("appSettings").Single();
-
             var setting = appSettings.Descendants("add").FirstOrDefault(s => s.Attribute("key").Value == key);
+
             if (setting != null)
+            {
                 setting.Remove();
-
-            xml.Save(fileName, SaveOptions.DisableFormatting);
-            ConfigurationManager.RefreshSection("appSettings");
+                xml.Save(fileName, SaveOptions.DisableFormatting);
+                ConfigurationManager.RefreshSection("appSettings");
+            }
         }
-
 
         private static string GetFullWebConfigFileName()
         {
