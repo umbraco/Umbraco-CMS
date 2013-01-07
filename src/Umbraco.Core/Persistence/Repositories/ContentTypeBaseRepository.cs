@@ -35,10 +35,12 @@ namespace Umbraco.Core.Persistence.Repositories
         protected IEnumerable<int> PerformGetByQuery(IQuery<PropertyType> query)
         {
             var sqlClause = new Sql();
-            sqlClause.Select("*");
-            sqlClause.From("cmsPropertyTypeGroup");
-            sqlClause.RightJoin("cmsPropertyType ON cmsPropertyTypeGroup.id = cmsPropertyType.propertyTypeGroupId");
-            sqlClause.InnerJoin("cmsDataType ON cmsPropertyType.dataTypeId = cmsDataType.nodeId");
+            sqlClause.Select("*")
+               .From<PropertyTypeGroupDto>()
+               .RightJoin<PropertyTypeDto>()
+               .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
+               .InnerJoin<DataTypeDto>()
+               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId);
 
             var translator = new SqlTranslator<PropertyType>(sqlClause, query);
             var sql = translator.Translate();
@@ -210,25 +212,27 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected IEnumerable<ContentTypeSort> GetAllowedContentTypeIds(int id)
         {
-            var allowedContentTypesSql = new Sql();
-            allowedContentTypesSql.Select("*");
-            allowedContentTypesSql.From("cmsContentTypeAllowedContentType");
-            allowedContentTypesSql.Where("cmsContentTypeAllowedContentType.Id = @Id", new { Id = id });
+            var sql = new Sql();
+            sql.Select("*")
+               .From<ContentTypeAllowedContentTypeDto>()
+               .Where<ContentTypeAllowedContentTypeDto>(x => x.Id == id);
 
-            var allowedContentTypeDtos = Database.Fetch<ContentTypeAllowedContentTypeDto>(allowedContentTypesSql);
+            var allowedContentTypeDtos = Database.Fetch<ContentTypeAllowedContentTypeDto>(sql);
             return allowedContentTypeDtos.Select(x => new ContentTypeSort { Id = new Lazy<int>(() => x.AllowedId), SortOrder = x.SortOrder }).ToList();
         }
 
         protected PropertyGroupCollection GetPropertyGroupCollection(int id)
         {
-            var propertySql = new Sql();
-            propertySql.Select("*");
-            propertySql.From("cmsPropertyTypeGroup");
-            propertySql.RightJoin("cmsPropertyType ON cmsPropertyTypeGroup.id = cmsPropertyType.propertyTypeGroupId");
-            propertySql.InnerJoin("cmsDataType ON cmsPropertyType.dataTypeId = cmsDataType.nodeId");
-            propertySql.Where("cmsPropertyType.contentTypeId = @Id", new { Id = id });
+            var sql = new Sql();
+            sql.Select("*")
+               .From<PropertyTypeGroupDto>()
+               .RightJoin<PropertyTypeDto>()
+               .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
+               .InnerJoin<DataTypeDto>()
+               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+               .Where<PropertyTypeDto>(x => x.ContentTypeId == id);
 
-            var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, propertySql);
+            var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
 
             var propertyFactory = new PropertyGroupFactory(id);
             var propertyGroups = propertyFactory.BuildEntity(dtos);

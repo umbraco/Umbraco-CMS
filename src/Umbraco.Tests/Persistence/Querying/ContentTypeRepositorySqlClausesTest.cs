@@ -70,5 +70,69 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Console.WriteLine(sql.SQL);
         }
+
+        [Test]
+        public void Can_Verify_PerformQuery_Clause()
+        {
+            var expected = new Sql();
+            expected.Select("*")
+                .From("[cmsPropertyTypeGroup]")
+                .RightJoin("[cmsPropertyType]").On("[cmsPropertyTypeGroup].[id] = [cmsPropertyType].[propertyTypeGroupId]")
+                .InnerJoin("[cmsDataType]").On("[cmsPropertyType].[dataTypeId] = [cmsDataType].[nodeId]");
+
+            var sql = new Sql();
+            sql.Select("*")
+               .From<PropertyTypeGroupDto>()
+               .RightJoin<PropertyTypeDto>()
+               .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
+               .InnerJoin<DataTypeDto>()
+               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId);
+
+            Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
+
+            Console.WriteLine(sql.SQL);
+        }
+
+        [Test]
+        public void Can_Verify_AllowedContentTypeIds_Clause()
+        {
+            var expected = new Sql();
+            expected.Select("*")
+                .From("[cmsContentTypeAllowedContentType]")
+                .Where("[cmsContentTypeAllowedContentType].[Id] = 1050");
+
+            var sql = new Sql();
+            sql.Select("*")
+               .From<ContentTypeAllowedContentTypeDto>()
+               .Where<ContentTypeAllowedContentTypeDto>(x => x.Id == 1050);
+
+            Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
+
+            Console.WriteLine(sql.SQL);
+        }
+
+        [Test]
+        public void Can_Verify_PropertyGroupCollection_Clause()
+        {
+            var expected = new Sql();
+            expected.Select("*")
+                .From("[cmsPropertyTypeGroup]")
+                .RightJoin("[cmsPropertyType]").On("[cmsPropertyTypeGroup].[id] = [cmsPropertyType].[propertyTypeGroupId]")
+                .InnerJoin("[cmsDataType]").On("[cmsPropertyType].[dataTypeId] = [cmsDataType].[nodeId]")
+                .Where("[cmsPropertyType].[contentTypeId] = 1050");
+
+            var sql = new Sql();
+            sql.Select("*")
+               .From<PropertyTypeGroupDto>()
+               .RightJoin<PropertyTypeDto>()
+               .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
+               .InnerJoin<DataTypeDto>()
+               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+               .Where<PropertyTypeDto>(x => x.ContentTypeId == 1050);
+
+            Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
+
+            Console.WriteLine(sql.SQL);
+        }
     }
 }

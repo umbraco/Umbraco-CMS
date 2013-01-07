@@ -85,8 +85,8 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*");
-            sql.From("umbracoLanguage");
+            sql.Select(isCount ? "COUNT(*)" : "*")
+               .From<LanguageDto>();
             return sql;
         }
 
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //NOTE: There is no constraint between the Language and cmsDictionary/cmsLanguageText tables (?)
             var list = new List<string>
                            {
-                               string.Format("DELETE FROM umbracoLanguage WHERE id = @Id")
+                               "DELETE FROM umbracoLanguage WHERE id = @Id"
                            };
             return list;
         }

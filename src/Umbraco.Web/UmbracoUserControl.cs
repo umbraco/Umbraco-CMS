@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Routing;
 using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Services;
@@ -67,6 +70,18 @@ namespace Umbraco.Web
         public DatabaseContext DatabaseContext
         {
             get { return ApplicationContext.DatabaseContext; }
+        }
+
+        private UrlHelper _url;
+        /// <summary>
+        /// Returns a UrlHelper
+        /// </summary>
+        /// <remarks>
+        /// This URL helper is created without any route data and an empty request context
+        /// </remarks>
+        public UrlHelper Url
+        {
+            get { return _url ?? (_url = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData()))); }
         }
     }
 }

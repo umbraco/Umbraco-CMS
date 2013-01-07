@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Xml.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using umbraco.DataLayer;
 using umbraco.IO;
 using System.Runtime.CompilerServices;
@@ -78,24 +79,29 @@ namespace umbraco.BusinessLogic
             {
                 if (_sqlHelper == null)
                 {
+                    var connectionString = string.Empty;
+
                     try
                     {
                         const string umbracoDsn = Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName;
-                        
-                        var connectionString = string.Empty;
-
+                    
                         var databaseSettings = ConfigurationManager.ConnectionStrings[umbracoDsn];
-                        if(databaseSettings != null) 
+                        if (databaseSettings != null)
                             connectionString = databaseSettings.ConnectionString;
-                        
+
                         // During upgrades we might still have the old appSettings connectionstring, and not the new one, so get that one instead
-                        if (string.IsNullOrWhiteSpace(connectionString) && ConfigurationManager.AppSettings.ContainsKey(umbracoDsn))
+                        if (string.IsNullOrWhiteSpace(connectionString) &&
+                            ConfigurationManager.AppSettings.ContainsKey(umbracoDsn))
                             connectionString = ConfigurationManager.AppSettings[umbracoDsn];
 
                         _sqlHelper = DataLayerHelper.CreateSqlHelper(connectionString);
                     }
-                    catch { }
+                    catch(Exception ex)
+                    {
+                        LogHelper.Error<Application>(string.Format("Can't instantiate SQLHelper with connectionstring \"{0}\"", connectionString), ex);
+                    }
                 }
+
                 return _sqlHelper;
             }
         }

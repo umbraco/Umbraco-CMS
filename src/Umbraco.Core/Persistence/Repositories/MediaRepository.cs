@@ -97,11 +97,13 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*");
-            sql.From("cmsContentVersion");
-            sql.InnerJoin("cmsContent ON (cmsContentVersion.ContentId = cmsContent.nodeId)");
-            sql.InnerJoin("umbracoNode ON (cmsContent.nodeId = umbracoNode.id)");
-            sql.Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
+            sql.Select(isCount ? "COUNT(*)" : "*")
+                .From<ContentVersionDto>()
+                .InnerJoin<ContentDto>()
+                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>()
+                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 
@@ -332,14 +334,15 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private PropertyCollection GetPropertyCollection(int id, Guid versionId, IMediaType contentType)
         {
-            var propertySql = new Sql();
-            propertySql.Select("*");
-            propertySql.From("cmsPropertyData");
-            propertySql.InnerJoin("cmsPropertyType ON (cmsPropertyData.propertytypeid = cmsPropertyType.id)");
-            propertySql.Where("cmsPropertyData.contentNodeId = @Id", new { Id = id });
-            propertySql.Where("cmsPropertyData.versionId = @VersionId", new { VersionId = versionId });
+            var sql = new Sql();
+            sql.Select("*")
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>()
+                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .Where<PropertyDataDto>(x => x.NodeId == id)
+                .Where<PropertyDataDto>(x => x.VersionId == versionId);
 
-            var propertyDataDtos = Database.Fetch<PropertyDataDto, PropertyTypeDto>(propertySql);
+            var propertyDataDtos = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql);
             var propertyFactory = new PropertyFactory(contentType, versionId, id);
             var properties = propertyFactory.BuildMediaEntity(propertyDataDtos);
             return new PropertyCollection(properties);

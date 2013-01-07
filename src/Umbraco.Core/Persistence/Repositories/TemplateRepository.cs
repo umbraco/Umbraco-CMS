@@ -130,10 +130,11 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*");
-            sql.From("cmsTemplate");
-            sql.InnerJoin("umbracoNode").On("cmsTemplate.nodeId = umbracoNode.id");
-            sql.Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = NodeObjectTypeId });
+            sql.Select(isCount ? "COUNT(*)" : "*")
+                .From<TemplateDto>()
+                .InnerJoin<NodeDto>()
+                .On<TemplateDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 
@@ -147,11 +148,11 @@ namespace Umbraco.Core.Persistence.Repositories
             //TODO check for references in DocumentDto and remove value (nullable)
             var list = new List<string>
                            {
-                               string.Format("DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id"),
-                               string.Format("DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id"),
-                               string.Format("DELETE FROM cmsDocumentType WHERE templateNodeId = @Id"),
-                               string.Format("DELETE FROM cmsTemplate WHERE nodeId = @Id"),
-                               string.Format("DELETE FROM umbracoNode WHERE id = @Id")
+                               "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
+                               "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                               "DELETE FROM cmsDocumentType WHERE templateNodeId = @Id",
+                               "DELETE FROM cmsTemplate WHERE nodeId = @Id",
+                               "DELETE FROM umbracoNode WHERE id = @Id"
                            };
             return list;
         }

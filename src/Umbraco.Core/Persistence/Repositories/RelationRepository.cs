@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
@@ -93,8 +92,8 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*");
-            sql.From("umbracoRelation");
+            sql.Select(isCount ? "COUNT(*)" : "*")
+               .From<RelationDto>();
             return sql;
         }
 
@@ -107,7 +106,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                            {
-                               string.Format("DELETE FROM umbracoRelation WHERE id = @Id")
+                               "DELETE FROM umbracoRelation WHERE id = @Id"
                            };
             return list;
         }

@@ -104,5 +104,31 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Console.WriteLine(sql.SQL);
         }
+
+        [Test]
+        public void Can_Verify_Property_Collection_Query()
+        {
+            var versionId = new Guid("2b543516-a944-4ee6-88c6-8813da7aaa07");
+            var id = 1050;
+
+            var expected = new Sql();
+            expected.Select("*");
+            expected.From("[cmsPropertyData]");
+            expected.InnerJoin("[cmsPropertyType]").On("[cmsPropertyData].[propertytypeid] = [cmsPropertyType].[id]");
+            expected.Where("[cmsPropertyData].[contentNodeId] = 1050");
+            expected.Where("[cmsPropertyData].[versionId] = '2b543516-a944-4ee6-88c6-8813da7aaa07'");
+
+            var sql = new Sql();
+            sql.Select("*")
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>()
+                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .Where<PropertyDataDto>(x => x.NodeId == id)
+                .Where<PropertyDataDto>(x => x.VersionId == versionId);
+
+            Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
+
+            Console.WriteLine(sql.SQL);
+        }
     }
 }
