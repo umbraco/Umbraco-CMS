@@ -110,14 +110,20 @@ namespace umbraco.editorControls
                 // we update additional properties post image upload
                 if (_data.Value != DBNull.Value && !string.IsNullOrEmpty(_data.Value.ToString()))
                 {
-	                var content = _data.LoadedContentItem;
-                    
-					// update extension in UI				
-	                UpdateLabelValue("umbracoExtension", "prop_umbracoExtension", Page, content);					
-                    // update file size in UI
-					UpdateLabelValue("umbracoBytes", "prop_umbracoBytes", Page, content);
-					UpdateLabelValue("umbracoWidth", "prop_umbracoWidth", Page, content);
-					UpdateLabelValue("umbracoHeight", "prop_umbracoHeight", Page, content);                    
+					//check the FileHandlerData to see if it already loaded in the content item and set it's properties.
+					//if not, then the properties haven't changed so skip.
+	                if (_data.LoadedContentItem != null)
+	                {
+						var content = _data.LoadedContentItem;
+
+						// update extension in UI				
+						UpdateLabelValue("umbracoExtension", "prop_umbracoExtension", Page, content);
+						// update file size in UI
+						UpdateLabelValue("umbracoBytes", "prop_umbracoBytes", Page, content);
+						UpdateLabelValue("umbracoWidth", "prop_umbracoWidth", Page, content);
+						UpdateLabelValue("umbracoHeight", "prop_umbracoHeight", Page, content);                        
+	                }
+					
                 }
                 Text = _data.Value.ToString();
             }
@@ -249,8 +255,8 @@ namespace umbraco.editorControls
             {
                 var relativeFilePath = _fs.GetRelativePath(_text);
                 var ext = relativeFilePath.Substring(relativeFilePath.LastIndexOf(".") + 1, relativeFilePath.Length - relativeFilePath.LastIndexOf(".") - 1);
-                var relativeThumbFilePath = relativeFilePath.Replace("." + ext, "_thumb.jpg");
-                var hasThumb = false;
+                var relativeThumbFilePath = relativeFilePath.Replace("." + ext, "_thumb.jpg");	            
+				var hasThumb = false;
                 try
                 {
                     hasThumb = _fs.FileExists(relativeThumbFilePath);
