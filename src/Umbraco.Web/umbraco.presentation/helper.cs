@@ -27,8 +27,10 @@ namespace umbraco
 
 		[Obsolete("This method has been superceded. Use the extension method for HttpRequest or HttpRequestBase method: GetItemAsString instead.")]
         public static string Request(string text)
-        {
-            
+		{
+			if (HttpContext.Current == null)
+				return string.Empty;
+
             if (HttpContext.Current.Request[text.ToLower()] != null)
 				if (HttpContext.Current.Request[text] != string.Empty)
 					return HttpContext.Current.Request[text];

@@ -13,12 +13,12 @@ namespace Umbraco.Core.IO
 	[UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1156", "Will be declared public after 4.10")]
     internal class PhysicalFileSystem : IFileSystem
     {
-        private readonly string _rootPath;
+		internal string RootPath { get; private set; }
         private readonly string _rootUrl;
 
         public PhysicalFileSystem(string virtualRoot)
         {
-            _rootPath = System.Web.Hosting.HostingEnvironment.MapPath(virtualRoot);
+            RootPath = System.Web.Hosting.HostingEnvironment.MapPath(virtualRoot);
             _rootUrl = VirtualPathUtility.ToAbsolute(virtualRoot);
         }
 
@@ -30,7 +30,7 @@ namespace Umbraco.Core.IO
             if (string.IsNullOrEmpty(rootUrl))
                 throw new ArgumentException("The argument 'rootUrl' cannot be null or empty.");
 
-            _rootPath = rootPath;
+            RootPath = rootPath;
             _rootUrl = rootUrl;
         }
 
@@ -150,17 +150,12 @@ namespace Umbraco.Core.IO
             return File.Exists(GetFullPath(path));
         }
 
-        public string GetExtension(string path)
-        {
-            return Path.GetExtension(GetFullPath(path));
-        }
-
         public string GetRelativePath(string fullPathOrUrl)
         {
             var relativePath = fullPathOrUrl
                 .TrimStart(_rootUrl)
                 .Replace('/', Path.DirectorySeparatorChar)
-                .TrimStart(_rootPath)
+                .TrimStart(RootPath)
                 .TrimStart(Path.DirectorySeparatorChar);
 
             return relativePath;
@@ -168,8 +163,8 @@ namespace Umbraco.Core.IO
 
         public string GetFullPath(string path)
         {
-            return !path.StartsWith(_rootPath) 
-                ? Path.Combine(_rootPath, path)
+            return !path.StartsWith(RootPath) 
+                ? Path.Combine(RootPath, path)
                 : path;
         }
 

@@ -16,11 +16,13 @@ namespace umbraco.cms.businesslogic.datatype
     /// </summary>
     public class DefaultData : IData, IDataWithPreview
 	{
-		private int m_PropertyId;
-		private object m_Value;
+		private int _propertyId;
+		private object _value;
 		protected BaseDataType _dataType;
-        private bool m_PreviewMode;
-        private bool m_ValueLoaded = false;
+        private bool _previewMode;
+        private bool _valueLoaded = false;
+		private Guid? _version = null;
+		private int? _nodeId = null;
 
         [Obsolete("Deprecated, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
@@ -51,8 +53,8 @@ namespace umbraco.cms.businesslogic.datatype
         /// <param name="InitPropertyId">The init property id.</param>
         public virtual void Initialize(object InitValue, int InitPropertyId)
         {
-            m_PropertyId = InitPropertyId;
-            m_Value = InitValue;
+            _propertyId = InitPropertyId;
+            _value = InitValue;
         }
 
         /// <summary>
@@ -67,7 +69,7 @@ namespace umbraco.cms.businesslogic.datatype
                .On<PropertyTypeDto, PropertyDataDto>(x => x.Id, y => y.PropertyTypeId)
                .InnerJoin<DataTypeDto>()
                .On<DataTypeDto, PropertyTypeDto>(x => x.DataTypeId, y => y.DataTypeId)
-               .Where("cmsPropertyData.id = @Id", new {Id = m_PropertyId});
+               .Where("cmsPropertyData.id = @Id", new {Id = _propertyId});
             var dto = Database.Fetch<PropertyDataDto, PropertyTypeDto, DataTypeDto>(sql).FirstOrDefault();
 
             if (dto != null)
@@ -79,7 +81,7 @@ namespace umbraco.cms.businesslogic.datatype
                 //get the column name in the cmsPropertyData table that stores the correct information for the data type
                 var fieldName = BaseDataType.GetDataFieldName(dbType);
                 //get the value for the data type, if null, set it to an empty string
-                m_Value = dto.GetValue;
+                _value = dto.GetValue;
                 //now that we've set our value, we can update our BaseDataType object with the correct values from the db
                 //instead of making it query for itself. This is a peformance optimization enhancement.
                 _dataType.SetDataTypeProperties(fieldName, dbType);
@@ -126,17 +128,17 @@ namespace umbraco.cms.businesslogic.datatype
 			get 
 			{
                 //Lazy load the value when it is required.
-                if (!m_ValueLoaded)
+                if (!_valueLoaded)
                 {
                     LoadValueFromDatabase();
-                    m_ValueLoaded = true;
+                    _valueLoaded = true;
                 } 
-				return m_Value;
+				return _value;
 			}
 			set 
 			{
-                m_Value = value;
-                m_ValueLoaded = true;
+                _value = value;
+                _valueLoaded = true;
 			}
 		}
 
@@ -168,23 +170,27 @@ namespace umbraco.cms.businesslogic.datatype
 		{
 			get
             {
-				return m_PropertyId;
+				return _propertyId;
 			}
 			set
 			{
-				m_PropertyId = value;
+				_propertyId = value;
                 //LoadValueFromDatabase();
 			}
 		}
-
+		
 		// TODO: clean up Legacy - these are needed by the wysiwyeditor, in order to feed the richtextholder with version and nodeid
 		// solution, create a new version of the richtextholder, which does not depend on these.
         public virtual Guid Version
         {
 			get
 			{
-			    var dto = Database.FirstOrDefault<PropertyDataDto>("WHERE id = @Id", new {Id = PropertyId});
-			    return dto.VersionId.HasValue ? dto.VersionId.Value : Guid.Empty;
+				if (_version == null)
+				{
+					var dto = Database.FirstOrDefault<PropertyDataDto>("WHERE id = @Id", new { Id = PropertyId });
+					_version = dto.VersionId.HasValue ? dto.VersionId.Value : Guid.Empty;	
+				}
+				return _version.Value;
 			}
 		}
 
@@ -196,7 +202,11 @@ namespace umbraco.cms.businesslogic.datatype
         {
 			get
 			{
-			    return Database.ExecuteScalar<int>("Select contentNodeid from cmsPropertyData where id = @Id", new {Id = PropertyId});
+				if (_nodeId == null)
+				{
+					_nodeId = Database.ExecuteScalar<int>("Select contentNodeid from cmsPropertyData where id = @Id", new { Id = PropertyId });	
+				}
+				return _nodeId.Value;
 			}
 		}
 
@@ -215,16 +225,16 @@ namespace umbraco.cms.businesslogic.datatype
         {
             get
             {
-                return m_PreviewMode;
+                return _previewMode;
             }
             set
             {
-                if (m_PreviewMode != value)
+                if (_previewMode != value)
                 {
                     // if preview mode is switched off, reload the value from persistent storage
                     if (!value)
                         LoadValueFromDatabase();
-                    m_PreviewMode = value;
+                    _previewMode = value;
                 }
             }
         }
