@@ -33,12 +33,12 @@ namespace Umbraco.Tests.UmbracoExamine
 			var protectedQuery = new BooleanQuery();
 			protectedQuery.Add(
 				new BooleanClause(
-					new TermQuery(new Term(UmbracoContentIndexer.IndexTypeFieldName, IndexTypes.Content)),
+					new TermQuery(new Term(LuceneIndexer.IndexTypeFieldName, IndexTypes.Content)),
 					BooleanClause.Occur.MUST));
 
 			protectedQuery.Add(
 				new BooleanClause(
-					new TermQuery(new Term(UmbracoContentIndexer.IndexNodeIdFieldName, TestContentService.ProtectedNode.ToString())),
+					new TermQuery(new Term(LuceneIndexer.IndexNodeIdFieldName, TestContentService.ProtectedNode.ToString())),
 					BooleanClause.Occur.MUST));
 
 			var collector = new AllHitsCollector(false, true);
