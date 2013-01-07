@@ -11,8 +11,9 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Xml;
 using System.Xml.XPath;
+using Umbraco.Core.IO;
+using Umbraco.Web;
 using umbraco.BasePages;
-using umbraco.IO;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using BizLogicAction = umbraco.BusinessLogic.Actions.Action;
@@ -31,7 +32,7 @@ namespace umbraco.presentation.developer.packages
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
-            Exception ex = new Exception();
+            var ex = new Exception();
             if (!cms.businesslogic.packager.Settings.HasFileAccess(ref ex))
             {
                 fb.Style.Add("margin-top", "7px");
@@ -49,29 +50,29 @@ namespace umbraco.presentation.developer.packages
  			// custom query strings 
 			// TODO: SD: This process needs to be fixed/changed/etc... to use the InstallPackageController
 			//	http://issues.umbraco.org/issue/U4-1047
-            if (!String.IsNullOrEmpty(helper.Request("installing")))
+            if (!string.IsNullOrEmpty(Request.GetItemAsString("installing")))
             {
                 HideAllPanes();
                 pane_installing.Visible = true;
-                ProcessInstall(helper.Request("installing")); //process the current step
+                ProcessInstall(Request.GetItemAsString("installing")); //process the current step
 
             }
 			else if (tempFile.Value.IsNullOrWhiteSpace() //if we haven't downloaded the .umb temp file yet
-				&& (!helper.Request("guid").IsNullOrWhiteSpace() && !helper.Request("repoGuid").IsNullOrWhiteSpace()))
+				&& (!Request.GetItemAsString("guid").IsNullOrWhiteSpace() && !Request.GetItemAsString("repoGuid").IsNullOrWhiteSpace()))
             {
                 //we'll fetch the local information we have about our repo, to find out what webservice to query.
-                _repo = cms.businesslogic.packager.repositories.Repository.getByGuid(helper.Request("repoGuid"));
+				_repo = cms.businesslogic.packager.repositories.Repository.getByGuid(Request.GetItemAsString("repoGuid"));
 
                 if (_repo.HasConnection())
                 {
                     //from the webservice we'll fetch some info about the package.
-                    cms.businesslogic.packager.repositories.Package pack = _repo.Webservice.PackageByGuid(helper.Request("guid"));
+					cms.businesslogic.packager.repositories.Package pack = _repo.Webservice.PackageByGuid(Request.GetItemAsString("guid"));
 
                     //if the package is protected we will ask for the users credentials. (this happens every time they try to fetch anything)
                     if (!pack.Protected)
                     {
                         //if it isn't then go straigt to the accept licens screen
-                        tempFile.Value = _installer.Import(_repo.fetch(helper.Request("guid")));
+						tempFile.Value = _installer.Import(_repo.fetch(Request.GetItemAsString("guid")));
                         UpdateSettings();
 
                     }
@@ -191,73 +192,76 @@ namespace umbraco.presentation.developer.packages
 
         private void ProcessInstall(string currentStep)
         {
-            string dir = helper.Request("dir");
-            int packageId = 0;
-            int.TryParse(helper.Request("pId"), out packageId);
-
-            //first load in the config from the temporary directory
-            //this will ensure that the installer have access to all the new files and the package manifest
-
-            _installer.LoadConfig(dir);
+			var dir = Request.GetItemAsString("dir");
+            var packageId = 0;
+			int.TryParse(Request.GetItemAsString("pId"), out packageId);
 
             switch (currentStep)
             {
                 case "businesslogic":
-
+					//first load in the config from the temporary directory
+					//this will ensure that the installer have access to all the new files and the package manifest
+					_installer.LoadConfig(dir);
                     _installer.InstallBusinessLogic(packageId, dir);
 
 
                     //making sure that publishing actions performed from the cms layer gets pushed to the presentation
                     library.RefreshContent();
-
-
+					
                     if (!string.IsNullOrEmpty(_installer.Control))
                     {
-                        Response.Redirect("installer.aspx?installing=customInstaller&dir=" + dir + "&pId=" + packageId.ToString());
+						Response.Redirect("installer.aspx?installing=customInstaller&dir=" + dir + "&pId=" + packageId.ToString() + "&customControl=" + Server.UrlEncode(_installer.Control) + "&customUrl=" + Server.UrlEncode(_installer.Url));
                     }
                     else
                     {
-                        Response.Redirect("installer.aspx?installing=finished&dir=" + dir + "&pId=" + packageId.ToString());
+                        Response.Redirect("installer.aspx?installing=finished&dir=" + dir + "&pId=" + packageId.ToString() + "&customUrl=" + Server.UrlEncode(_installer.Url));
                     }
                     break;
                 case "customInstaller":
-                    if (!string.IsNullOrEmpty(_installer.Control))
+		            var customControl = Request.GetItemAsString("customControl");
+
+					if (!customControl.IsNullOrWhiteSpace())
                     {
                         HideAllPanes();
 
-                        _configControl = new System.Web.UI.UserControl().LoadControl(SystemDirectories.Root + _installer.Control);
+						_configControl = new System.Web.UI.UserControl().LoadControl(SystemDirectories.Root + customControl);
                         _configControl.ID = "packagerConfigControl";
 
                         pane_optional.Controls.Add(_configControl);
                         pane_optional.Visible = true;
 
-						//We still need to clean everything up which is normally done in the Finished Action
-						PerformPostInstallCleanup(packageId, dir);
+						if (!IsPostBack)
+						{
+							//We still need to clean everything up which is normally done in the Finished Action
+							PerformPostInstallCleanup(packageId, dir);	
+						}
+						
                     }
                     else
                     {
                         //if the custom installer control is empty here (though it should never be because we've already checked for it previously)
 						//then we should run the normal FinishedAction
-						PerformFinishedAction(packageId, dir);
+						PerformFinishedAction(packageId, dir, Request.GetItemAsString("customUrl"));
                     }
                     break;
                 case "finished":
-                    PerformFinishedAction(packageId, dir);
+					PerformFinishedAction(packageId, dir, Request.GetItemAsString("customUrl"));
                     break;
                 default:
                     break;
             }
         }
 
-		/// <summary>
-		/// Perform the 'Finished' action of the installer
-		/// </summary>
-		/// <param name="packageId"></param>
-		/// <param name="dir"></param>
-		private void PerformFinishedAction(int packageId, string dir)
+	    /// <summary>
+	    /// Perform the 'Finished' action of the installer
+	    /// </summary>
+	    /// <param name="packageId"></param>
+	    /// <param name="dir"></param>
+	    /// <param name="url"></param>
+	    private void PerformFinishedAction(int packageId, string dir, string url)
 		{
 			HideAllPanes();
-            string url = _installer.Url;
+			//string url = _installer.Url;
             string packageViewUrl = "installedPackage.aspx?id=" + packageId.ToString();
 
             bt_viewInstalledPackage.OnClientClick = "document.location = '" + packageViewUrl + "'; return false;";
@@ -281,8 +285,7 @@ namespace umbraco.presentation.developer.packages
 			BasePage.Current.ClientTools.ReloadActionNode(true, true);
 			_installer.InstallCleanUp(packageId, dir);
 			//clear the tree cache
-			ClientTools.ClearClientTreeCache()
-				.RefreshTree("packager");
+			ClientTools.ClearClientTreeCache().RefreshTree("packager");
 			TreeDefinitionCollection.Instance.ReRegisterTrees();
 			BizLogicAction.ReRegisterActionsAndHandlers();
 		}
