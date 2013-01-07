@@ -311,9 +311,18 @@ namespace umbraco.BasePages
 
         private void DeleteLogin()
         {
-            SqlHelper.ExecuteNonQuery(
+            // Added try-catch in case login doesn't exist in the database
+            // Either due to old cookie or running multiple sessions on localhost with different port number
+            try
+            {
+                SqlHelper.ExecuteNonQuery(
                 "DELETE FROM umbracoUserLogins WHERE contextId = @contextId",
                 SqlHelper.CreateParameter("@contextId", umbracoUserContextID));
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<BasePage>(string.Format("Login with contextId {0} didn't exist in the database", umbracoUserContextID), ex);
+            }
         }
 
         private void UpdateLogin()

@@ -14,7 +14,7 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override string Name
         {
-          get { return "Database"; }
+            get { return "Database"; }
         }
 
         public override string UserControl
@@ -22,7 +22,7 @@ namespace umbraco.presentation.install.steps.Definitions
             get { return SystemDirectories.Install + "/steps/database.ascx"; }
         }
 
-        
+
         public override bool MoveToNextStepAutomaticly
         {
             get
@@ -34,22 +34,10 @@ namespace umbraco.presentation.install.steps.Definitions
         //here we determine if the installer should skip this step...
         public override bool Completed()
         {
-            bool retval = false;
-            try
-            {
-                var configuredVersion = new Version(Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus);
-                var targetVersion = UmbracoVersion.Current;
-
-                retval = targetVersion > configuredVersion;
-
-            } catch {
-                // this step might fail due to missing connectionstring
-                return false;
-            }
-
-            return retval;
+            var configuredVersion = new Version(Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus);
+            var targetVersion = UmbracoVersion.Current;
+            
+            return targetVersion < configuredVersion;
         }
-
-        
     }
 }
