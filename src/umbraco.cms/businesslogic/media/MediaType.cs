@@ -12,7 +12,7 @@ namespace umbraco.cms.businesslogic.media
     /// 
     /// Due to the inheritance of the ContentType class,it enables definition of generic datafields on a Media.
     /// </summary>
-    [Obsolete("Deprecated, Use Umbraco.Core.Models.MediaType", false)]
+    [Obsolete("Obsolete, Use Umbraco.Core.Models.MediaType", false)]
     public class MediaType : ContentType
     {
         #region Constructors
@@ -57,7 +57,7 @@ namespace umbraco.cms.businesslogic.media
         /// </summary>
         /// <param name="Alias">The alias of the MediaType</param>
         /// <returns>The MediaType with the alias</returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentTypeService.GetMediaType()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetMediaType()", false)]
         public static new MediaType GetByAlias(string Alias)
         {
             var mediaType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(Alias);
@@ -76,7 +76,7 @@ namespace umbraco.cms.businesslogic.media
             }
         }
 
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentTypeService.GetMediaType()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetMediaType()", false)]
         public static IEnumerable<MediaType> GetAllAsList()
         {
             var mediaTypes = ApplicationContext.Current.Services.ContentTypeService.GetAllMediaTypes();
@@ -89,7 +89,7 @@ namespace umbraco.cms.businesslogic.media
         /// <param name="u">The Umbraco user context</param>
         /// <param name="Text">The name of the MediaType</param>
         /// <returns>The new MediaType</returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Models.MediaType and Umbraco.Core.Services.ContentTypeService.Save()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Models.MediaType and Umbraco.Core.Services.ContentTypeService.Save()", false)]
         public static MediaType MakeNew(BusinessLogic.User u, string Text)
         {
             var mediaType = new Umbraco.Core.Models.MediaType(-1) { Name = Text, Alias = Text, CreatorId = u.Id, Thumbnail = "folder.png", Icon = "folder.gif" };

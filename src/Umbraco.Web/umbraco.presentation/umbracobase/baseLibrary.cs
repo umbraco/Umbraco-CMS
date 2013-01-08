@@ -17,26 +17,26 @@ using umbraco.cms.businesslogic.property;
 
 namespace umbraco.presentation.umbracobase.library
 {
-	[Obsolete("Deprecated, use Umbraco.Web.BaseRest.MemberRest.")]
+	[Obsolete("Obsolete, use Umbraco.Web.BaseRest.MemberRest.")]
     public class library
     {
-		[Obsolete("Deprecated, use Umbraco.Web.BaseRest.MemberRest.GetCurrentMember().", false)]
+		[Obsolete("Obsolete, use Umbraco.Web.BaseRest.MemberRest.GetCurrentMember().", false)]
 		public static Member GetCurrentMember()
         {
 			return Member.GetCurrentMember();
         }
 
-		[Obsolete("Deprecated, use Umbraco.Web.BaseRest.MemberRest.GetCurrentMemberId().", false)]
+		[Obsolete("Obsolete, use Umbraco.Web.BaseRest.MemberRest.GetCurrentMemberId().", false)]
         public static int CurrentMemberId()
         {
 			return Member.CurrentMemberId();
         }
     }
 
-	[Obsolete("Deprecated, use Umbraco.Web.BaseRest.MemberRest.")]
+	[Obsolete("Obsolete, use Umbraco.Web.BaseRest.MemberRest.")]
     public class member
     {
-		[Obsolete("Deprecated, use Umbraco.Web.BaseRest.MemberRest.Login(login, password).", false)]
+		[Obsolete("Obsolete, use Umbraco.Web.BaseRest.MemberRest.Login(login, password).", false)]
 		public static int login(string loginname, string password)
         {
             Member m = Member.GetMemberFromLoginNameAndPassword(loginname, password);
@@ -56,7 +56,7 @@ namespace umbraco.presentation.umbracobase.library
                 return library.CurrentMemberId();
         }
 
-        [Obsolete("Deprecated, use Umbraco.Web.BaseRest.MemberRest.Logout().", false)]
+        [Obsolete("Obsolete, use Umbraco.Web.BaseRest.MemberRest.Logout().", false)]
         public static int logout()
         {
             Member m = library.GetCurrentMember();
@@ -70,7 +70,7 @@ namespace umbraco.presentation.umbracobase.library
                 return 0;
         }
 
-		[Obsolete("Deprecated, use Umbraco.Web.BaseRest.MemberRest.Logout().", false)]
+		[Obsolete("Obsolete, use Umbraco.Web.BaseRest.MemberRest.Logout().", false)]
 		public static int logout(int NodeId)
         {
             int _currentMemberId = library.CurrentMemberId();
@@ -84,7 +84,7 @@ namespace umbraco.presentation.umbracobase.library
                 return 0;
         }
 
-		[Obsolete("Deprecated, use Umbraco.Web.BaseRest.MemberRest.GetCurrentMemberAsXml().", false)]
+		[Obsolete("Obsolete, use Umbraco.Web.BaseRest.MemberRest.GetCurrentMemberAsXml().", false)]
 		public static XPathNodeIterator data()
         {
             if (library.GetCurrentMember() != null)
@@ -98,13 +98,13 @@ namespace umbraco.presentation.umbracobase.library
                 return null;
         }
 
-		[Obsolete("Deprecated, use Umbraco.Web.BaseRest.MemberRest.GetCurrentMemberId().", false)]
+		[Obsolete("Obsolete, use Umbraco.Web.BaseRest.MemberRest.GetCurrentMemberId().", false)]
 		public static int id()
         {
             return library.CurrentMemberId();
         }
 
-		[Obsolete("Deprecated, use Umbraco.Web.BaseRest.MemberRest.SetProperty(alias, value).", false)]
+		[Obsolete("Obsolete, use Umbraco.Web.BaseRest.MemberRest.SetProperty(alias, value).", false)]
 		public static string setProperty(string alias, object value)
         {
             string retVal = "False";
