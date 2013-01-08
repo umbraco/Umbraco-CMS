@@ -117,13 +117,12 @@ namespace Umbraco.Core.Persistence.Repositories
             //TODO Investigate the proper usage of IsDefault on cmsDocumentType
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
-                .From<DocumentTypeDto>()
-                .RightJoin<ContentTypeDto>()
-                .On<ContentTypeDto, DocumentTypeDto>(left => left.NodeId, right => right.ContentTypeNodeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                .Where<DocumentTypeDto>(x => x.IsDefault == true);
+               .From<DocumentTypeDto>()
+               .RightJoin<ContentTypeDto>()
+               .On<ContentTypeDto, DocumentTypeDto>(left => left.NodeId, right => right.ContentTypeNodeId)
+               .InnerJoin<NodeDto>()
+               .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
             return sql;
         }
