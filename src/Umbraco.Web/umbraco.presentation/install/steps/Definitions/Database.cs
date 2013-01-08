@@ -34,6 +34,10 @@ namespace umbraco.presentation.install.steps.Definitions
         //here we determine if the installer should skip this step...
         public override bool Completed()
         {
+            // Fresh installs don't have a version number so this step cannot be complete yet
+            if (string.IsNullOrEmpty(Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus)) 
+                return false;
+
             var configuredVersion = new Version(Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus);
             var targetVersion = UmbracoVersion.Current;
             
