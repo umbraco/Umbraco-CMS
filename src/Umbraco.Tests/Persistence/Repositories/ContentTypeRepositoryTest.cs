@@ -270,6 +270,128 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(updated.AllowedContentTypes.Any(x => x.Alias == simpleSubpageContentType.Alias), Is.True);
         }
 
+        [Test]
+        public void Can_Verify_Removal_Of_Used_PropertyType_From_ContentType()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
+            var contentRepository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            var contentType = repository.Get(1046);
+
+            var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
+            contentRepository.AddOrUpdate(subpage);
+            unitOfWork.Commit();
+
+            // Act
+            contentType.RemovePropertyType("keywords");
+            repository.AddOrUpdate(contentType);
+            unitOfWork.Commit();
+
+            // Assert
+            Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(3));
+            Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "keywords"), Is.False);
+            Assert.That(subpage.Properties.First(x => x.Alias == "metaDescription").Value, Is.EqualTo("This is the meta description for a textpage"));
+        }
+
+        [Test]
+        public void Can_Verify_Addition_Of_PropertyType_After_ContentType_Is_Used()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
+            var contentRepository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            var contentType = repository.Get(1046);
+
+            var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
+            contentRepository.AddOrUpdate(subpage);
+            unitOfWork.Commit();
+
+            // Act
+            var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
+            propertyGroup.PropertyTypes.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "metaAuthor", Name = "Meta Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            repository.AddOrUpdate(contentType);
+            unitOfWork.Commit();
+
+            // Assert
+            Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(5));
+            Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);
+        }
+
+        [Test]
+        public void Can_Verify_Usage_Of_New_PropertyType_On_Content()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
+            var contentRepository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            var contentType = repository.Get(1046);
+
+            var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
+            contentRepository.AddOrUpdate(subpage);
+            unitOfWork.Commit();
+
+            var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
+            propertyGroup.PropertyTypes.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "metaAuthor", Name = "Meta Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            repository.AddOrUpdate(contentType);
+            unitOfWork.Commit();
+
+            // Act
+            var content = contentRepository.Get(subpage.Id);
+            content.SetValue("metaAuthor", "John Doe");
+            contentRepository.AddOrUpdate(content);
+            unitOfWork.Commit();
+
+            //Assert
+            var updated = contentRepository.Get(subpage.Id);
+            Assert.That(updated.GetValue("metaAuthor").ToString(), Is.EqualTo("John Doe"));
+            Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(5));
+            Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);
+        }
+
+        [Test]
+        public void
+            Can_Verify_That_A_Combination_Of_Adding_And_Deleting_PropertyTypes_Doesnt_Cause_Issues_For_Content_And_ContentType
+            ()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
+            var contentRepository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            var contentType = repository.Get(1046);
+
+            var subpage = MockedContent.CreateTextpageContent(contentType, "Text Page 1", contentType.Id);
+            contentRepository.AddOrUpdate(subpage);
+            unitOfWork.Commit();
+
+            //Remove PropertyType
+            contentType.RemovePropertyType("keywords");
+            //Add PropertyType
+            var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
+            propertyGroup.PropertyTypes.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "metaAuthor", Name = "Meta Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            repository.AddOrUpdate(contentType);
+            unitOfWork.Commit();
+
+            // Act
+            var content = contentRepository.Get(subpage.Id);
+            content.SetValue("metaAuthor", "John Doe");
+            contentRepository.AddOrUpdate(content);
+            unitOfWork.Commit();
+
+            //Assert
+            var updated = contentRepository.Get(subpage.Id);
+            Assert.That(updated.GetValue("metaAuthor").ToString(), Is.EqualTo("John Doe"));
+            Assert.That(updated.Properties.First(x => x.Alias == "metaDescription").Value, Is.EqualTo("This is the meta description for a textpage"));
+
+            Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
+            Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);
+            Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "keywords"), Is.False);
+        }
+
         public void CreateTestData()
         {
             //Create and Save ContentType "umbTextpage" -> 1045

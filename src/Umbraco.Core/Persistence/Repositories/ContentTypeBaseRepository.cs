@@ -168,11 +168,19 @@ namespace Umbraco.Core.Persistence.Repositories
             if (((ICanBeDirty)entity).IsPropertyDirty("PropertyGroups") || entity.PropertyGroups.Any(x => x.IsDirty()))
             {
                 //Delete PropertyTypes by excepting entries from db with entries from collections
-                var dbPropertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new { Id = entity.Id }).Select(x => x.Alias);
-                var entityPropertyTypes = entity.PropertyTypes.Select(x => x.Alias);
-                var aliases = dbPropertyTypes.Except(entityPropertyTypes);
+                var dbPropertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new { Id = entity.Id });
+                var dbPropertyTypeAlias = dbPropertyTypes.Select(x => x.Alias.ToLowerInvariant());
+                var entityPropertyTypes = entity.PropertyTypes.Select(x => x.Alias.ToLowerInvariant());
+                var aliases = dbPropertyTypeAlias.Except(entityPropertyTypes);
                 foreach (var alias in aliases)
                 {
+                    //Before a PropertyType can be deleted, all Properties based on that PropertyType should be deleted.
+                    var propertyType = dbPropertyTypes.FirstOrDefault(x => x.Alias.ToLowerInvariant() == alias);
+                    if (propertyType != null)
+                    {
+                        Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new { Id = propertyType.Id });
+                    }
+
                     Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND Alias = @Alias", new { Id = entity.Id, Alias = alias });
                 }
                 //Delete Tabs/Groups by excepting entries from db with entries from collections

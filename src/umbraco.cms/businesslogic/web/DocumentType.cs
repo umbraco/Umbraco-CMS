@@ -420,14 +420,11 @@ namespace umbraco.cms.businesslogic.web
             return doc;
         }
 
-        [Obsolete("Deprecated, Use RemoveTemplate() on Umbraco.Core.Models.ContentType", false)]
+        [Obsolete("Deprecated, Use SetDefaultTemplate(null) on Umbraco.Core.Models.ContentType", false)]
         public void RemoveDefaultTemplate()
         {
             _defaultTemplate = 0;
-
-            var template = _contentType.DefaultTemplate;
-            if(template != null)
-                _contentType.RemoveTemplate(template);
+            _contentType.SetDefaultTemplate(null);
         }
 
         public bool HasTemplate()
@@ -457,8 +454,10 @@ namespace umbraco.cms.businesslogic.web
 
                 ApplicationContext.Current.Services.ContentTypeService.Save(_contentType);
 
-                //Ensure that DocumentTypes are reloaded from db by clearing cache
+                //Ensure that DocumentTypes are reloaded from db by clearing cache.
+                //NOTE Would be nice if we could clear cache by type instead of emptying the entire cache.
                 InMemoryCacheProvider.Current.Clear();
+                RuntimeCacheProvider.Current.Clear();//Runtime cache is used for Content, so we clear that as well
 
                 base.Save();
                 FireAfterSave(e);
