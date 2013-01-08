@@ -420,14 +420,11 @@ namespace umbraco.cms.businesslogic.web
             return doc;
         }
 
-        [Obsolete("Deprecated, Use RemoveTemplate() on Umbraco.Core.Models.ContentType", false)]
+        [Obsolete("Deprecated, Use SetDefaultTemplate(null) on Umbraco.Core.Models.ContentType", false)]
         public void RemoveDefaultTemplate()
         {
             _defaultTemplate = 0;
-
-            var template = _contentType.DefaultTemplate;
-            if(template != null)
-                _contentType.RemoveTemplate(template);
+            _contentType.SetDefaultTemplate(null);
         }
 
         public bool HasTemplate()
