@@ -61,6 +61,11 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
             if (!e.Cancel)
             {
+                // MySQL seems to think that this HAS to be the very first table created?
+                _database.CreateTable<UserDto>();
+                _database.CreateTable<UserLoginDto>();
+                _database.CreateTable<UserTypeDto>();
+
                 _database.CreateTable<NodeDto>();
 
                 _database.CreateTable<TemplateDto>();
@@ -109,10 +114,6 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
                 _database.CreateTable<TagDto>();
                 _database.CreateTable<TagRelationshipDto>();
-
-                _database.CreateTable<UserLoginDto>();
-                _database.CreateTable<UserTypeDto>();
-                _database.CreateTable<UserDto>();
 
                 _database.CreateTable<TaskTypeDto>();
                 _database.CreateTable<TaskDto>();
