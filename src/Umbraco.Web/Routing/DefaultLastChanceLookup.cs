@@ -46,16 +46,66 @@ namespace Umbraco.Web.Routing
 
 		//FIXME: this is temporary and should be obsoleted
 
+		string GetLegacyUrlForNotFoundHandlers(PublishedContentRequest docRequest)
+		{
+			// that's not backward-compatible because when requesting "/foo.aspx"
+			// 4.9  : url = "foo.aspx"
+			// 4.10 : url = "/foo"
+			//return docRequest.Uri.AbsolutePath;
+
+			// so we have to run the legacy code for url preparation :-(
+
+			// code from requestModule.UmbracoRewrite
+			string tmp = HttpContext.Current.Request.Path.ToLower();
+			
+			// note: requestModule.UmbracoRewrite also does some confusing stuff
+			// with stripping &umbPage from the querystring?! ignored.
+
+			// code from requestHandler.cleanUrl
+			string root = Umbraco.Core.IO.SystemDirectories.Root.ToLower();
+			if (!string.IsNullOrEmpty(root) && tmp.StartsWith(root))
+				tmp = tmp.Substring(root.Length);
+			tmp = tmp.TrimEnd('/');
+			if (tmp == "/default.aspx")
+				tmp = string.Empty;
+			else if (tmp == root)
+				tmp = string.Empty;
+
+			// code from UmbracoDefault.Page_PreInit
+			if (tmp != "" && HttpContext.Current.Request["umbPageID"] == null)
+			{
+                string tryIntParse = tmp.Replace("/", "").Replace(".aspx", string.Empty);
+                int result;
+                if (int.TryParse(tryIntParse, out result))
+                    tmp = tmp.Replace(".aspx", string.Empty);
+			}
+			else if (!string.IsNullOrEmpty(HttpContext.Current.Request["umbPageID"]))
+			{
+				int result;
+				if (int.TryParse(HttpContext.Current.Request["umbPageID"], out result))
+				{
+					tmp = HttpContext.Current.Request["umbPageID"];
+				}
+			}
+
+			// code from requestHandler.ctor
+			if (tmp != "")
+				tmp = tmp.Substring(1);
+
+			return tmp;
+		}
+
 		IPublishedContent HandlePageNotFound(PublishedContentRequest docRequest)
         {
 			LogHelper.Debug<DefaultLastChanceLookup>("Running for url='{0}'.", () => docRequest.Uri.AbsolutePath);
 			
 			//XmlNode currentPage = null;
 			IPublishedContent currentPage = null;
+			var url = GetLegacyUrlForNotFoundHandlers(docRequest);
 
             foreach (var handler in GetNotFoundHandlers())
             {
-				if (handler.Execute(docRequest.Uri.AbsolutePath) && handler.redirectID > 0)
+				if (handler.Execute(url) && handler.redirectID > 0)
                 {
                     //currentPage = umbracoContent.GetElementById(handler.redirectID.ToString());
 					currentPage = docRequest.RoutingContext.PublishedContentStore.GetDocumentById(
