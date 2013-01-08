@@ -460,6 +460,7 @@ namespace umbraco.cms.businesslogic.web
                 //Ensure that DocumentTypes are reloaded from db by clearing cache.
                 //NOTE Would be nice if we could clear cache by type instead of emptying the entire cache.
                 InMemoryCacheProvider.Current.Clear();
+                RuntimeCacheProvider.Current.Clear();//Runtime cache is used for Content, so we clear that as well
 
                 base.Save();
                 FireAfterSave(e);

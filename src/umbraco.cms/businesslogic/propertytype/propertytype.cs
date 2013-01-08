@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Umbraco.Core.Persistence.Caching;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.datatype;
@@ -461,10 +462,10 @@ namespace umbraco.cms.businesslogic.propertytype
             // clear cache in contentype
             Cache.ClearCacheItem("ContentType_PropertyTypes_Content:" + _contenttypeid);
 
-            // clear cache in tab
-			// zb-00040 #29889 : clear the right cache! t.ContentType is the ctype which _defines_ the tab, not the current one.
-            //            foreach (ContentType.TabI t in new ContentType(ContentTypeId).getVirtualTabs)
-            //				ContentType.FlushTabCache(t.Id, ContentTypeId);
+            //Ensure that DocumentTypes are reloaded from db by clearing cache - this similar to the Save method on DocumentType.
+            //NOTE Would be nice if we could clear cache by type instead of emptying the entire cache.
+            InMemoryCacheProvider.Current.Clear();
+            RuntimeCacheProvider.Current.Clear();
         }
 
         public static PropertyType GetPropertyType(int id)

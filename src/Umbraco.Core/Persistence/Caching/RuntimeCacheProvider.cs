@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.Caching;
+using System.Threading;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Persistence.Caching
@@ -23,9 +24,10 @@ namespace Umbraco.Core.Persistence.Caching
 
         #endregion
 
-        private readonly ObjectCache _memoryCache = new MemoryCache("in-memory");
         //TODO Save this in cache as well, so its not limited to a single server usage
         private ConcurrentDictionary<string, string> _keyTracker = new ConcurrentDictionary<string, string>();
+        private ObjectCache _memoryCache = new MemoryCache("in-memory");
+        private static readonly ReaderWriterLockSlim ClearLock = new ReaderWriterLockSlim();
 
         public IEntity GetById(Type type, Guid id)
         {
@@ -75,6 +77,16 @@ namespace Umbraco.Core.Persistence.Caching
             var keyBeSure = _keyTracker.TryGetValue(key, out throwaway);
             object itemRemoved = _memoryCache.Remove(key);
             _keyTracker.TryRemove(key, out throwaway);
+        }
+
+        public void Clear()
+        {
+            using (new ReadLock(ClearLock))
+            {
+                _keyTracker.Clear();
+                _memoryCache.DisposeIfDisposable();
+                _memoryCache = new MemoryCache("in-memory");
+            }
         }
 
         private string GetCompositeId(Type type, Guid id)
