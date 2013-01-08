@@ -1331,7 +1331,7 @@ namespace umbraco.cms.businesslogic.web
         #endregion
 
         #region Protected Methods
-        [Obsolete("Deprecated", false)]
+        [Obsolete("Obsolete", false)]
         protected override void setupNode()
         {
             var content = Version == Guid.Empty
@@ -1371,7 +1371,7 @@ namespace umbraco.cms.businesslogic.web
             _published = Content.Published;
         }
 
-        [Obsolete("Deprecated", false)]
+        [Obsolete("Obsolete", false)]
         protected void InitializeDocument(User InitUser, User InitWriter, string InitText, int InitTemplate,
                                           DateTime InitReleaseDate, DateTime InitExpireDate, DateTime InitUpdateDate,
                                           bool InitPublished)
@@ -1394,7 +1394,7 @@ namespace umbraco.cms.businesslogic.web
             _published = InitPublished;
         }
 
-        [Obsolete("Deprecated", false)]
+        [Obsolete("Obsolete", false)]
         protected void PopulateDocumentFromReader(IRecordsReader dr)
         {
             bool _hc = false;
@@ -1437,7 +1437,7 @@ namespace umbraco.cms.businesslogic.web
         #endregion
 
         #region Private Methods
-        [Obsolete("Deprecated", false)]
+        [Obsolete("Obsolete", false)]
         private void SetupDocumentForTree(Guid uniqueId, int level, int parentId, int creator, int writer, bool publish, string path,
                                          string text, DateTime createDate, DateTime updateDate,
                                          DateTime versionDate, string icon, bool hasChildren, string contentTypeAlias, string contentTypeThumb,
