@@ -174,10 +174,10 @@ namespace Umbraco.Core.Models
 
                 //Look up Prevalues for this upload datatype - if it is an upload datatype
                 var uploadFieldId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
-                if (property.PropertyType.DataTypeControlId == uploadFieldId)
+                if (property.PropertyType.DataTypeId == uploadFieldId)
                 {
                     //Get Prevalues by the DataType's Id: property.PropertyType.DataTypeId
-                    var values = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(property.PropertyType.DataTypeId);
+                    var values = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId);
                     var thumbnailSizes = values.FirstOrDefault();
                     //Additional thumbnails configured as prevalues on the DataType
                     if (thumbnailSizes != null)

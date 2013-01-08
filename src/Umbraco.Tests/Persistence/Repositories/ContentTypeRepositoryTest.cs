@@ -85,7 +85,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 HelpText = "",
                 Mandatory = false,
                 SortOrder = 1,
-                DataTypeId = -88
+                DataTypeDefinitionId = -88
             });
             repository.AddOrUpdate(contentType);
             unitOfWork.Commit();

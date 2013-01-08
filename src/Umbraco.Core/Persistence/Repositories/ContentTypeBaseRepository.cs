@@ -130,7 +130,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                     //Update the current PropertyType with correct ControlId and DatabaseType
                     var dataTypeDto = Database.FirstOrDefault<DataTypeDto>("WHERE nodeId = @Id", new { Id = propertyTypeDto.DataTypeId });
-                    propertyType.DataTypeControlId = dataTypeDto.ControlId;
+                    propertyType.DataTypeId = dataTypeDto.ControlId;
                     propertyType.DataTypeDatabaseType = dataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true);
                 }
             }

@@ -159,7 +159,7 @@ namespace Umbraco.Tests.Models
                                                                             HelpText = "",
                                                                             Mandatory = false,
                                                                             SortOrder = 3,
-                                                                            DataTypeId = -88
+                                                                            DataTypeDefinitionId = -88
                                                                         });
 
             // Assert
@@ -177,7 +177,7 @@ namespace Umbraco.Tests.Models
             // Act
             var propertyType = new PropertyType(new Guid(), DataTypeDatabaseType.Ntext)
                                    {
-                                       Alias = "subtitle", Name = "Subtitle", Description = "Optional subtitle", HelpText = "", Mandatory = false, SortOrder = 3, DataTypeId = -88
+                                       Alias = "subtitle", Name = "Subtitle", Description = "Optional subtitle", HelpText = "", Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -88
                                    };
             contentType.PropertyGroups["Content"].PropertyTypes.Add(propertyType);
             content.Properties.Add(new Property(propertyType){Value = "This is a subtitle Test"});
@@ -203,7 +203,7 @@ namespace Umbraco.Tests.Models
                                        HelpText = "",
                                        Mandatory = false,
                                        SortOrder = 3,
-                                       DataTypeId = -88
+                                       DataTypeDefinitionId = -88
                                    };
             var propertyGroup = new PropertyGroup {Name = "Test Group", SortOrder = 3};
             propertyGroup.PropertyTypes.Add(propertyType);
@@ -228,7 +228,7 @@ namespace Umbraco.Tests.Models
             // Act - note that the PropertyType's properties like SortOrder is not updated through the Content object
             var propertyType = new PropertyType(new Guid(), DataTypeDatabaseType.Ntext)
                                    {
-                                       Alias = "title", Name = "Title", Description = "Title description added", HelpText = "", Mandatory = false, SortOrder = 10, DataTypeId = -88
+                                       Alias = "title", Name = "Title", Description = "Title description added", HelpText = "", Mandatory = false, SortOrder = 10, DataTypeDefinitionId = -88
                                    };
             content.Properties.Add(new Property(propertyType));
 
@@ -377,7 +377,7 @@ namespace Umbraco.Tests.Models
                                        HelpText = "",
                                        Mandatory = false,
                                        SortOrder = 3,
-                                       DataTypeId = -88
+                                       DataTypeDefinitionId = -88
                                    };
             contentType.PropertyGroups["Content"].PropertyTypes.Add(propertyType);
 
@@ -404,7 +404,7 @@ namespace Umbraco.Tests.Models
                                                                                                     HelpText = "",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
-                                                                                                    DataTypeId = -88
+                                                                                                    DataTypeDefinitionId = -88
                                                                                                 }
                                                                                         }));
 
@@ -437,7 +437,7 @@ namespace Umbraco.Tests.Models
                                                                                                     HelpText = "",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
-                                                                                                    DataTypeId = -88
+                                                                                                    DataTypeDefinitionId = -88
                                                                                                 }
                                                                                         }));
 
@@ -472,7 +472,7 @@ namespace Umbraco.Tests.Models
                                                                                                     HelpText = "",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
-                                                                                                    DataTypeId = -88
+                                                                                                    DataTypeDefinitionId = -88
                                                                                                 }
                                                                                         }));
             var mixin2 = MockedContentTypes.CreateSimpleContentType("mixin2", "Mixin2", new PropertyTypeCollection(
@@ -486,7 +486,7 @@ namespace Umbraco.Tests.Models
                                                                                                     HelpText = "",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
-                                                                                                    DataTypeId = -88
+                                                                                                    DataTypeDefinitionId = -88
                                                                                                 }
                                                                                         }));
 

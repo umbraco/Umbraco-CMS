@@ -996,13 +996,13 @@ namespace Umbraco.Core.Services
 				uow.Commit();
 
 				var uploadFieldId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
-				if (content.Properties.Any(x => x.PropertyType.DataTypeControlId == uploadFieldId))
+				if (content.Properties.Any(x => x.PropertyType.DataTypeId == uploadFieldId))
 				{
 					bool isUpdated = false;
 					var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
 					//Loop through properties to check if the content contains media that should be deleted
-					foreach (var property in content.Properties.Where(x => x.PropertyType.DataTypeControlId == uploadFieldId
+					foreach (var property in content.Properties.Where(x => x.PropertyType.DataTypeId == uploadFieldId
 						&& string.IsNullOrEmpty(x.Value.ToString()) == false))
 					{
 						if (fs.FileExists(IOHelper.MapPath(property.Value.ToString())))

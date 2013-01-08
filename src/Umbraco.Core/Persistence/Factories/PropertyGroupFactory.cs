@@ -34,7 +34,7 @@ namespace Umbraco.Core.Persistence.Factories
                                                              typeDto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
                                                 {
                                                     Alias = typeDto.Alias,
-                                                    DataTypeId = typeDto.DataTypeId,
+                                                    DataTypeDefinitionId = typeDto.DataTypeId,
                                                     Description = typeDto.Description,
                                                     Id = typeDto.Id,
                                                     Name = typeDto.Name,
@@ -82,7 +82,7 @@ namespace Umbraco.Core.Persistence.Factories
                                       {
                                           Alias = propertyType.Alias,
                                           ContentTypeId = _id,
-                                          DataTypeId = propertyType.DataTypeId,
+                                          DataTypeId = propertyType.DataTypeDefinitionId,
                                           Description = propertyType.Description,
                                           HelpText = propertyType.HelpText,
                                           Mandatory = propertyType.Mandatory,
