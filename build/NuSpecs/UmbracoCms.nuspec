@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>UmbracoCms</id>
-        <version>4.11.1</version>
+        <version>4.11.2</version>
         <title>Umbraco Cms</title>
         <authors>Morten Christensen</authors>
         <owners>Umbraco HQ</owners>
@@ -15,7 +15,7 @@
         <language>en-US</language>
         <tags>umbraco</tags>
         <dependencies>
-            <dependency id="UmbracoCms.Core" version="4.11.1" />
+            <dependency id="UmbracoCms.Core" version="4.11.2" />
         </dependencies>
     </metadata>
   <files>
