@@ -37,6 +37,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentTypeSql = GetBaseQuery(false);
             contentTypeSql.Where(GetBaseWhereClause(), new { Id = id });
 
+            // The SQL will contain one record for each allowed template, so order to put the default one
+            // at the top to populate the default template property correctly.
+            contentTypeSql.OrderByDescending<DocumentTypeDto>(x => x.IsDefault);
+
             var dto = Database.Query<DocumentTypeDto, ContentTypeDto, NodeDto>(contentTypeSql).FirstOrDefault();
 
             if (dto == null)
@@ -114,7 +118,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql GetBaseQuery(bool isCount)
         {
-            //TODO Investigate the proper usage of IsDefault on cmsDocumentType
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
                .From<DocumentTypeDto>()
