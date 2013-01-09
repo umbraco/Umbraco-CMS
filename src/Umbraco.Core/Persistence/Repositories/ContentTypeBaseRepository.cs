@@ -193,7 +193,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     Database.Delete<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id AND text = @Name", new { Id = entity.Id, Name = tabName });
                 }
 
-                //Run through all groups and types to insert or update entries
+                //Run through all groups to insert or update entries
                 foreach (var propertyGroup in entity.PropertyGroups)
                 {
                     var tabDto = propertyFactory.BuildGroupDto(propertyGroup);
@@ -202,19 +202,17 @@ namespace Umbraco.Core.Persistence.Repositories
                                               : Convert.ToInt32(Database.Insert(tabDto));
                     if (!propertyGroup.HasIdentity)
                         propertyGroup.Id = groupPrimaryKey;//Set Id on new PropertyGroup
+                }
 
-                    //This should indicate that neither group nor property types has been touched, but this implies a deeper 'Dirty'-lookup
-                    //if(!propertyGroup.IsDirty()) continue;
-
-                    foreach (var propertyType in propertyGroup.PropertyTypes)
-                    {
-                        var propertyTypeDto = propertyFactory.BuildPropertyTypeDto(propertyGroup.Id, propertyType);
-                        int typePrimaryKey = propertyType.HasIdentity
-                                                 ? Database.Update(propertyTypeDto)
-                                                 : Convert.ToInt32(Database.Insert(propertyTypeDto));
-                        if (!propertyType.HasIdentity)
-                            propertyType.Id = typePrimaryKey;//Set Id on new PropertyType
-                    }
+                //Run through all PropertyTypes to insert or update entries
+                foreach (var propertyType in entity.PropertyTypes)
+                {
+                    var propertyTypeDto = propertyFactory.BuildPropertyTypeDto(propertyType.PropertyGroupId, propertyType);
+                    int typePrimaryKey = propertyType.HasIdentity
+                                             ? Database.Update(propertyTypeDto)
+                                             : Convert.ToInt32(Database.Insert(propertyTypeDto));
+                    if (!propertyType.HasIdentity)
+                        propertyType.Id = typePrimaryKey;//Set Id on new PropertyType
                 }
             }
         }
@@ -247,6 +245,37 @@ namespace Umbraco.Core.Persistence.Repositories
             var propertyFactory = new PropertyGroupFactory(id);
             var propertyGroups = propertyFactory.BuildEntity(dtos);
             return new PropertyGroupCollection(propertyGroups);
+        }
+
+        protected PropertyTypeCollection GetPropertyTypeCollection(int id)
+        {
+            var sql = new Sql();
+            sql.Select("*")
+               .From<PropertyTypeDto>()
+               .InnerJoin<DataTypeDto>()
+               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+               .Where<PropertyTypeDto>(x => x.ContentTypeId == id);
+
+            var dtos = Database.Fetch<PropertyTypeDto, DataTypeDto>(sql);
+
+            //TODO Move this to a PropertyTypeFactory
+            var list = (from dto in dtos
+                        where (dto.PropertyTypeGroupId > 0) == false
+                        select
+                            new PropertyType(dto.DataTypeDto.ControlId,
+                                             dto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
+                                {
+                                    Alias = dto.Alias,
+                                    DataTypeDefinitionId = dto.DataTypeId,
+                                    Description = dto.Description,
+                                    Id = dto.Id,
+                                    Name = dto.Name,
+                                    HelpText = dto.HelpText,
+                                    Mandatory = dto.Mandatory,
+                                    SortOrder = dto.SortOrder
+                                });
+            
+            return new PropertyTypeCollection(list);
         }
     }
 }

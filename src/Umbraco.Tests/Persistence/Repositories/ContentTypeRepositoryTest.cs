@@ -229,6 +229,39 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Verify_PropertyType_With_No_Group()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
+            var contentType = repository.Get(1046);
+
+            // Act
+            var urlAlias = new PropertyType(new Guid(), DataTypeDatabaseType.Nvarchar)
+                               {
+                                   Alias = "urlAlias",
+                                   Name = "Url Alias",
+                                   Description = "",
+                                   HelpText = "",
+                                   Mandatory = false,
+                                   SortOrder = 1,
+                                   DataTypeDefinitionId = -88
+                               };
+            var list = new List<PropertyType> {urlAlias};
+            ((ContentType) contentType).PropertyTypes = list;
+            repository.AddOrUpdate(contentType);
+            unitOfWork.Commit();
+
+            // Assert
+            var updated = repository.Get(1046);
+            Assert.That(updated.PropertyGroups.Count(), Is.EqualTo(2));
+            Assert.That(updated.PropertyTypes.Count(), Is.EqualTo(5));
+            Assert.That(updated.PropertyTypes.Any(x => x.Alias == "urlAlias"), Is.True);
+            Assert.AreEqual(updated.PropertyTypes.First(x => x.Alias == "urlAlias").PropertyGroupId, default(int));
+        }
+
+        [Test]
         public void Can_Verify_AllowedChildContentTypes_On_ContentType()
         {
             // Arrange

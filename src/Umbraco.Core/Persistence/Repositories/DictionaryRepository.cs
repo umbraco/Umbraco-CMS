@@ -82,9 +82,9 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IEnumerable<IDictionaryItem> PerformGetByQuery(IQuery<IDictionaryItem> query)
         {
             var sqlClause = GetBaseQuery(false);
-            sqlClause.OrderBy<DictionaryDto>(x => x.UniqueId);
             var translator = new SqlTranslator<IDictionaryItem>(sqlClause, query);
             var sql = translator.Translate();
+            sql.OrderBy<DictionaryDto>(x => x.UniqueId);
 
             var dtos = Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql);
 

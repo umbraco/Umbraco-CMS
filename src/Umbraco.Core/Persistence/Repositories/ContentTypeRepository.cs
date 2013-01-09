@@ -51,6 +51,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             contentType.AllowedContentTypes = GetAllowedContentTypeIds(id);
             contentType.PropertyGroups = GetPropertyGroupCollection(id);
+            ((ContentType)contentType).PropertyTypes = GetPropertyTypeCollection(id);
 
             var templates = Database.Fetch<DocumentTypeDto>("WHERE contentTypeNodeId = @Id", new { Id = id });
             if(templates.Any())

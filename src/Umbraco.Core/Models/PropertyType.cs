@@ -18,6 +18,7 @@ namespace Umbraco.Core.Models
         private string _alias;
         private string _description;
         private int _dataTypeDefinitionId;
+        private int _propertyGroupId;
         private Guid _dataTypeId;
         private DataTypeDatabaseType _dataTypeDatabaseType;
         private bool _mandatory;
@@ -60,6 +61,7 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo HelpTextSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.HelpText);
         private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.SortOrder);
         private static readonly PropertyInfo ValidationRegExpSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationRegExp);
+        private static readonly PropertyInfo PropertyGroupIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.PropertyGroupId);
 
         /// <summary>
         /// Gets of Sets the Name of the PropertyType
@@ -144,6 +146,20 @@ namespace Umbraco.Core.Models
             {
                 _dataTypeDatabaseType = value;
                 OnPropertyChanged(DataTypeDatabaseTypeSelector);
+            }
+        }
+
+        /// <summary>
+        /// Gets or Sets the PropertyGroup's Id for which this PropertyType belongs
+        /// </summary>
+        [DataMember]
+        internal int PropertyGroupId
+        {
+            get { return _propertyGroupId; }
+            set
+            {
+                _propertyGroupId = value;
+                OnPropertyChanged(PropertyGroupIdSelector);
             }
         }
 
