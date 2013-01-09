@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Caching;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
@@ -1128,6 +1129,9 @@ namespace umbraco.cms.businesslogic
         /// <param name="Id">The id.</param>
         public static void FlushFromCache(int id)
         {
+            //Ensure that MediaTypes are reloaded from db by clearing cache
+            InMemoryCacheProvider.Current.Clear();
+
             ContentType ct = new ContentType(id);
             Cache.ClearCacheItem(string.Format("UmbracoContentType{0}", id));
             Cache.ClearCacheItem(ct.GetPropertiesCacheKey());

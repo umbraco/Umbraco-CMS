@@ -235,12 +235,12 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
             sql.Select("*")
                .From<PropertyTypeGroupDto>()
-               .RightJoin<PropertyTypeDto>()
+               .LeftJoin<PropertyTypeDto>()
                .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
-               .InnerJoin<DataTypeDto>()
+               .LeftJoin<DataTypeDto>()
                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
-               .Where<PropertyTypeDto>(x => x.ContentTypeId == id)
-               .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
+               .Where<PropertyTypeGroupDto>(x => x.ContentTypeNodeId == id)
+               .OrderBy<PropertyTypeGroupDto>(x => x.Id);
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
 

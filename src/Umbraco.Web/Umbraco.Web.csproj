@@ -2072,7 +2072,9 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx" />
     <Content Include="umbraco.presentation\umbraco\settings\editLanguage.aspx" />
-    <Content Include="umbraco.presentation\umbraco\settings\EditMediaType.aspx" />
+    <Content Include="umbraco.presentation\umbraco\settings\EditMediaType.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
