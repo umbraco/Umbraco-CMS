@@ -24,7 +24,7 @@ namespace umbraco.cms.businesslogic.datatype
 		private Guid? _version = null;
 		private int? _nodeId = null;
 
-        [Obsolete("Deprecated, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }

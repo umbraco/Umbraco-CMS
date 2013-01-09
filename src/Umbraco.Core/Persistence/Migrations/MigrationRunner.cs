@@ -44,7 +44,22 @@ namespace Umbraco.Core.Persistence.Migrations
         {
             LogHelper.Info<MigrationRunner>("Initializing database migration");
 
-            var foundMigrations = PluginManager.Current.FindMigrations();
+            var foundMigrations = new List<IMigration>
+                                      {
+                                          new Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints(),
+                                          new Upgrades.TargetVersionSixth.DeleteAppTables(),
+                                          new Upgrades.TargetVersionSixth.EnsureAppsTreesUpdated(),
+                                          new Upgrades.TargetVersionSixth.MoveMasterContentTypeData(),
+                                          new Upgrades.TargetVersionSixth.NewCmsContentType2ContentTypeTable(),
+                                          new Upgrades.TargetVersionSixth.RemoveMasterContentTypeColumn(),
+                                          new Upgrades.TargetVersionSixth.RenameCmsTabTable(),
+                                          new Upgrades.TargetVersionSixth.RenameTabIdColumn(),
+                                          new Upgrades.TargetVersionSixth.UpdateCmsContentTypeAllowedContentTypeTable(),
+                                          new Upgrades.TargetVersionSixth.UpdateCmsContentTypeTable(),
+                                          new Upgrades.TargetVersionSixth.UpdateCmsContentVersionTable(),
+                                          new Upgrades.TargetVersionSixth.UpdateCmsPropertyTypeGroupTable()
+                                      };
+
             var migrations = isUpgrade
                                  ? OrderedUpgradeMigrations(foundMigrations)
                                  : OrderedDowngradeMigrations(foundMigrations);

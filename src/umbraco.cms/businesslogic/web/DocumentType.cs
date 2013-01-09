@@ -18,7 +18,7 @@ namespace umbraco.cms.businesslogic.web
     /// <summary>
     /// Summary description for DocumentType.
     /// </summary>
-    [Obsolete("Deprecated, Use Umbraco.Core.Models.ContentType", false)]
+    [Obsolete("Obsolete, Use Umbraco.Core.Models.ContentType", false)]
     public class DocumentType : ContentType
     {
         #region Constructors
@@ -68,7 +68,7 @@ namespace umbraco.cms.businesslogic.web
         /// Generates the complete (simplified) XML DTD 
         /// </summary>
         /// <returns>The DTD as a string</returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentTypeService.GetDtd()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetDtd()", false)]
         public static string GenerateDtd()
         {
             StringBuilder dtd = new StringBuilder();
@@ -83,7 +83,7 @@ namespace umbraco.cms.businesslogic.web
             return dtd.ToString();
         }
 
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentTypeService.GetContentTypesDtd()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetContentTypesDtd()", false)]
         public static string GenerateXmlDocumentType()
         {
             StringBuilder dtd = new StringBuilder();
@@ -124,7 +124,7 @@ namespace umbraco.cms.businesslogic.web
 
         }
 
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentTypeService.GetContentType()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetContentType()", false)]
         public new static DocumentType GetByAlias(string Alias)
         {
             try
@@ -138,7 +138,7 @@ namespace umbraco.cms.businesslogic.web
             }
         }
 
-        [Obsolete("Deprecated, Use Umbraco.Core.Models.ContentType and Umbraco.Core.Services.ContentTypeService.Save()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Models.ContentType and Umbraco.Core.Services.ContentTypeService.Save()", false)]
         public static DocumentType MakeNew(User u, string Text)
         {
             var contentType = new Umbraco.Core.Models.ContentType(-1) { Name = Text, Alias = Text, CreatorId = u.Id, Thumbnail = "folder.png", Icon = "folder.gif" };
@@ -161,7 +161,7 @@ namespace umbraco.cms.businesslogic.web
             }
         }
 
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentTypeService.GetAllContentTypes()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetAllContentTypes()", false)]
         public static List<DocumentType> GetAllAsList()
         {
             var contentTypes = ApplicationContext.Current.Services.ContentTypeService.GetAllContentTypes();
@@ -173,7 +173,7 @@ namespace umbraco.cms.businesslogic.web
         #endregion
 
         #region Public Properties
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentTypeService.HasChildren()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.HasChildren()", false)]
         public override bool HasChildren
         {
             get
@@ -191,7 +191,7 @@ namespace umbraco.cms.businesslogic.web
             }
         }
 
-        [Obsolete("Deprecated, Use SetDefaultTemplate() on Umbraco.Core.Models.ContentType", false)]
+        [Obsolete("Obsolete, Use SetDefaultTemplate() on Umbraco.Core.Models.ContentType", false)]
         public int DefaultTemplate
         {
             get { return _defaultTemplate; }
@@ -211,7 +211,7 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Gets/sets the allowed templates for this document type.
         /// </summary>
-        [Obsolete("Deprecated, Use AllowedTemplates property on Umbraco.Core.Models.ContentType", false)]
+        [Obsolete("Obsolete, Use AllowedTemplates property on Umbraco.Core.Models.ContentType", false)]
         public template.Template[] allowedTemplates
         {
             get
@@ -281,7 +281,7 @@ namespace umbraco.cms.businesslogic.web
 
         #region Public Methods
 
-        [Obsolete("Deprecated, Use RemoveTemplate() on Umbraco.Core.Models.ContentType", false)]
+        [Obsolete("Obsolete, Use RemoveTemplate() on Umbraco.Core.Models.ContentType", false)]
         public void RemoveTemplate(int templateId)
         {
             // remove if default template
@@ -305,7 +305,7 @@ namespace umbraco.cms.businesslogic.web
         /// 
         /// </summary>
         /// <exception cref="ArgumentException">Throws an exception if trying to delete a document type that is assigned as a master document type</exception>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentTypeService.Delete()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.Delete()", false)]
         public override void delete()
         {
             DeleteEventArgs e = new DeleteEventArgs();
@@ -420,7 +420,7 @@ namespace umbraco.cms.businesslogic.web
             return doc;
         }
 
-        [Obsolete("Deprecated, Use SetDefaultTemplate(null) on Umbraco.Core.Models.ContentType", false)]
+        [Obsolete("Obsolete, Use SetDefaultTemplate(null) on Umbraco.Core.Models.ContentType", false)]
         public void RemoveDefaultTemplate()
         {
             _defaultTemplate = 0;
@@ -435,7 +435,7 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
         /// </summary>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentTypeService.Save()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.Save()", false)]
         public override void Save()
         {
             SaveEventArgs e = new SaveEventArgs();

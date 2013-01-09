@@ -1048,7 +1048,7 @@ namespace umbraco.cms.businesslogic.member
         /// Can be used in the public website
         /// </summary>
         /// <param name="m">Member to remove</param>
-        [Obsolete("Deprecated, use the RemoveMemberFromCache(int NodeId) instead", false)]
+        [Obsolete("Obsolete, use the RemoveMemberFromCache(int NodeId) instead", false)]
         public static void RemoveMemberFromCache(Member m)
         {
             RemoveMemberFromCache(m.Id);
@@ -1071,7 +1071,7 @@ namespace umbraco.cms.businesslogic.member
         /// Can be used in the public website
         /// </summary>
         /// <param name="m">Member</param>
-        [Obsolete("Deprecated, use the ClearMemberFromClient(int NodeId) instead", false)]
+        [Obsolete("Obsolete, use the ClearMemberFromClient(int NodeId) instead", false)]
         public static void ClearMemberFromClient(Member m)
         {
 

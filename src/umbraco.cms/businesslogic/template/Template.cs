@@ -18,7 +18,7 @@ namespace umbraco.cms.businesslogic.template
     /// <summary>
     /// Summary description for Template.
     /// </summary>
-    //[Obsolete("Deprecated, This class will eventually be phased out - Use Umbraco.Core.Models.Template", false)]
+    //[Obsolete("Obsolete, This class will eventually be phased out - Use Umbraco.Core.Models.Template", false)]
     public class Template : CMSNode
     {
         
