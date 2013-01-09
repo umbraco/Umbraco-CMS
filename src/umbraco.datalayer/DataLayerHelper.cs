@@ -91,7 +91,7 @@ namespace umbraco.DataLayer
 
             // find the right type
             Type helperType;
-            if (_dataHelperTypeName == string.Empty)
+            if (string.IsNullOrWhiteSpace(_dataHelperTypeName))
                 _dataHelperTypeName = DefaultDataHelperName;
 
             if (_dataHelperTypeName.Contains(".") == false)
