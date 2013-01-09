@@ -238,7 +238,8 @@ namespace Umbraco.Core.Persistence.Repositories
                .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
                .InnerJoin<DataTypeDto>()
                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
-               .Where<PropertyTypeDto>(x => x.ContentTypeId == id);
+               .Where<PropertyTypeDto>(x => x.ContentTypeId == id)
+               .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
 

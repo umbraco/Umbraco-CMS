@@ -1612,7 +1612,7 @@ namespace umbraco.cms.businesslogic.web
         {
             if (AfterSave != null)
             {
-                AfterSave(this, e);
+                AfterSave(new Document(this.Id), e);
             }
         }
 
