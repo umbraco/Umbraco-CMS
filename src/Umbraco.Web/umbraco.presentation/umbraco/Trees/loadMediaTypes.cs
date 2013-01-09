@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using Umbraco.Core.Services;
+using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
 using umbraco.cms.presentation.Trees;
+using umbraco.interfaces;
 
 namespace umbraco
 {
@@ -16,6 +19,14 @@ namespace umbraco
         {
             rootNode.NodeType = "init" + TreeAlias;
             rootNode.NodeID = "init";
+        }
+
+        protected override void CreateAllowedActions(ref List<IAction> actions)
+        {
+            actions.Clear();
+            actions.Add(ActionNew.Instance);
+            actions.Add(ContextMenuSeperator.Instance);
+            actions.Add(ActionDelete.Instance);
         }
 
         public override void RenderJS(ref StringBuilder Javascript)

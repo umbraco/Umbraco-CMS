@@ -92,7 +92,12 @@ namespace umbraco.cms.businesslogic.media
         [Obsolete("Obsolete, Use Umbraco.Core.Models.MediaType and Umbraco.Core.Services.ContentTypeService.Save()", false)]
         public static MediaType MakeNew(BusinessLogic.User u, string Text)
         {
-            var mediaType = new Umbraco.Core.Models.MediaType(-1) { Name = Text, Alias = Text, CreatorId = u.Id, Thumbnail = "folder.png", Icon = "folder.gif" };
+            return MakeNew(u, Text, -1);
+        }
+
+        internal static MediaType MakeNew(BusinessLogic.User u, string text, int parentId)
+        {
+            var mediaType = new Umbraco.Core.Models.MediaType(parentId) { Name = text, Alias = text, CreatorId = u.Id, Thumbnail = "folder.png", Icon = "folder.gif" };
             ApplicationContext.Current.Services.ContentTypeService.Save(mediaType, u.Id);
             var mt = new MediaType(mediaType.Id);
 
@@ -114,6 +119,15 @@ namespace umbraco.cms.businesslogic.media
 
             if (!e.Cancel)
             {
+                if (MasterContentType != 0)
+                    _mediaType.ParentId = MasterContentType;
+
+                foreach (var masterContentType in MasterContentTypes)
+                {
+                    var contentType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(masterContentType);
+                    _mediaType.AddContentType(contentType);
+                }
+
                 ApplicationContext.Current.Services.ContentTypeService.Save(_mediaType);
 
                 //Ensure that MediaTypes are reloaded from db by clearing cache
