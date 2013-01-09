@@ -118,6 +118,7 @@ namespace umbraco.cms.businesslogic.media
 
                 //Ensure that MediaTypes are reloaded from db by clearing cache
                 InMemoryCacheProvider.Current.Clear();
+                RuntimeCacheProvider.Current.Clear();
 
                 base.Save();
 
