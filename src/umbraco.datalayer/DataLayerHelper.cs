@@ -18,9 +18,6 @@ namespace umbraco.DataLayer
     /// </summary>
     public class DataLayerHelper
     {
-        private static string _dataHelperTypeName;
-        private static string _dataHelperAssemblyName;
-
         #region Private Constants
 
         /// <summary>Name of the property that identifies the SQL helper type.</summary>
@@ -29,6 +26,10 @@ namespace umbraco.DataLayer
         private const string DefaultDataHelperName = "SqlServer";
         /// <summary>Format used when the SQL helper is qualified by its simple name, instead of the full class name.</summary>
         private const string DefaultDataHelperFormat = "umbraco.DataLayer.SqlHelpers.{0}.{0}Helper";
+
+        private static string _dataHelperTypeName;
+        private static string _dataHelperAssemblyName;
+        private static string _connectionString;
 
         #endregion
 
@@ -69,7 +70,7 @@ namespace umbraco.DataLayer
             var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
 
             if (databaseSettings != null)
-                SetDataHelperNames(databaseSettings.ProviderName);
+                SetDataHelperNames(databaseSettings);
             else
                 SetDataHelperNamesLegacyConnectionString(connectionStringBuilder);
 
@@ -113,7 +114,7 @@ namespace umbraco.DataLayer
             // finally, return the helper
             try
             {
-                return constructor.Invoke(new object[] { connectionStringBuilder.ConnectionString }) as ISqlHelper;
+                return constructor.Invoke(new object[] { _connectionString }) as ISqlHelper;
             }
             catch (Exception exception)
             {
@@ -121,14 +122,18 @@ namespace umbraco.DataLayer
             }
         }
 
-        private static void SetDataHelperNames(string providerName)
+        private static void SetDataHelperNames(ConnectionStringSettings connectionStringSettings)
         {
-            if (providerName.StartsWith("MySql"))
+            _connectionString = connectionStringSettings.ConnectionString;
+
+            var provider = connectionStringSettings.ProviderName;
+
+            if (provider.StartsWith("MySql"))
             {
                 _dataHelperTypeName = "MySql";
             }
-            
-            if (providerName.StartsWith("System.Data.SqlServerCe"))
+
+            if (provider.StartsWith("System.Data.SqlServerCe"))
             {
                 _dataHelperTypeName = "SQLCE4Umbraco.SqlCEHelper";
                 _dataHelperAssemblyName = "SQLCE4Umbraco";
@@ -144,6 +149,8 @@ namespace umbraco.DataLayer
                 datalayerType = connectionStringBuilder[ConnectionStringDataLayerIdentifier].ToString();
                 connectionStringBuilder.Remove(ConnectionStringDataLayerIdentifier);
             }
+
+            _connectionString = connectionStringBuilder.ConnectionString;
 
             var datalayerTypeParts = datalayerType.Split(",".ToCharArray());
 
