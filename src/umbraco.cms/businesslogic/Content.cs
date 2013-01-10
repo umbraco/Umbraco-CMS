@@ -284,8 +284,7 @@ namespace umbraco.cms.businesslogic
         {
             EnsureProperties();
 
-            var prop = m_LoadedProperties.SingleOrDefault(x => x.PropertyType.Alias == alias);
-            return prop;
+            return m_LoadedProperties.SingleOrDefault(x => x.PropertyType.Alias == alias);
         }
 
         /// <summary>
@@ -297,10 +296,7 @@ namespace umbraco.cms.businesslogic
         {
             EnsureProperties();
 
-            var prop = m_LoadedProperties.SingleOrDefault(x => x.PropertyType.Id == pt.Id);
-
-            return prop;
-
+            return m_LoadedProperties.SingleOrDefault(x => x.PropertyType.Id == pt.Id);
         }
 
         /// <summary>

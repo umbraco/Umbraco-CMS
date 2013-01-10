@@ -293,6 +293,7 @@ namespace umbraco.cms.businesslogic.media
         public override void Save()
         {
             SaveEventArgs e = new SaveEventArgs();
+            FireBeforeSave(e);
 
             foreach (var property in GenericProperties)
             {
@@ -301,9 +302,7 @@ namespace umbraco.cms.businesslogic.media
 
                 MediaItem.SetValue(property.PropertyType.Alias, property.Value);
             }
-
-            FireBeforeSave(e);
-
+            
             if (!e.Cancel)
             {
                 ApplicationContext.Current.Services.MediaService.Save(MediaItem);
