@@ -172,6 +172,7 @@
     <Compile Include="Migrations\Stubs\FourNineMigration.cs" />
     <Compile Include="Migrations\TargetVersionSixthMigrationsTest.cs" />
     <Compile Include="Migrations\Upgrades\MySqlUpgradeTest.cs" />
+    <Compile Include="Migrations\Upgrades\SqlCeDataUpgradeTest.cs" />
     <Compile Include="Migrations\Upgrades\SqlCeUpgradeTest.cs" />
     <Compile Include="Migrations\Upgrades\SqlServerUpgradeTest.cs" />
     <Compile Include="Persistence\Mappers\MappingResolverTests.cs" />
@@ -397,6 +398,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Migrations\SqlScripts\MySqlTotal-480.sql" />
+    <Content Include="Migrations\SqlScripts\SqlCe-SchemaAndData-4110.sql" />
     <Content Include="Migrations\SqlScripts\SqlCeTotal-480.sql" />
     <Content Include="Migrations\SqlScripts\SqlServerTotal-480.sql" />
   </ItemGroup>

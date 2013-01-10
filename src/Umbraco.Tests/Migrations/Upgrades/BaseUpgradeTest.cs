@@ -9,6 +9,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web.Strategies.Migrations;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Tests.Migrations.Upgrades
@@ -54,7 +55,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         }
 
         [Test]
-        public void Can_Upgrade_From_470_To_600()
+        public virtual void Can_Upgrade_From_470_To_600()
         {
             var configuredVersion = new Version("4.7.0");
             var targetVersion = new Version("6.0.0");
@@ -68,9 +69,9 @@ namespace Umbraco.Tests.Migrations.Upgrades
             // execute all non-empty statements
             foreach (string statement in statements.Split(";".ToCharArray()))
             {
-                string rawStatement = statement.Trim();
+                string rawStatement = statement.Replace("GO", "").Trim();
                 if (rawStatement.Length > 0)
-                    db.Execute(rawStatement);
+                    db.Execute(new Sql(rawStatement));
             }
 
             //Setup the MigrationRunner
