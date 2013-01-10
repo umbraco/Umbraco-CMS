@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<language alias="en" intName="English (UK)" localName="English (UK)" lcid="" culture="en-GB">
+<language alias="en_us" intName="English (US)" localName="English (US)" lcid="" culture="en-US">
   <creator>
     <name>umbraco</name>
     <link>http://umbraco.org</link>
@@ -23,7 +23,6 @@
     <key alias="notify">Notifications</key>
     <key alias="protect">Public access</key>
     <key alias="publish">Publish</key>
-    <key alias="unpublish">Unpublish</key>
     <key alias="refreshNode">Reload nodes</key>
     <key alias="republish">Republish entire site</key>
     <key alias="rights">Permissions</key>
@@ -780,7 +779,6 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="xsltPermissionErrorText">Xslt could not be saved, check file permissions</key>
     <key alias="xsltSavedHeader">Xslt saved</key>
     <key alias="xsltSavedText">No errors in xslt</key>
-    <key alias="contentUnpublished">Content unpublished</key>
     <key alias="partialViewSavedHeader">Partial view saved</key>
     <key alias="partialViewSavedText">Partial view saved without any errors!</key>
     <key alias="partialViewErrorHeader">Partial view not saved</key>
