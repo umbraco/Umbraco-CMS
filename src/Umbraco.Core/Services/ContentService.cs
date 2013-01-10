@@ -1189,7 +1189,7 @@ namespace Umbraco.Core.Services
                 if (checkCurrent == false && id == content.Id) continue;
 
                 //Check if the content for the current id is published - escape the loop if we encounter content that isn't published
-                var hasPublishedVersion = ApplicationContext.Current.Services.ContentService.GetById(id).Published;
+                var hasPublishedVersion = HasPublishedVersion(id);
                 if (hasPublishedVersion == false)
                     return false;
             }

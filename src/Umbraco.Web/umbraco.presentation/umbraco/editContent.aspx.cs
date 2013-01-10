@@ -382,7 +382,7 @@ namespace umbraco.cms.presentation
 
         void UpdateNiceUrls()
         {
-            if (!_documentHasPublishedVersion || _document.Published == false)
+            if (_documentHasPublishedVersion == false)
             {
                 UpdateNiceUrlProperties("<i>" + ui.Text("content", "itemNotPublished", base.getUser()) + "</i>", null);
                 return;
