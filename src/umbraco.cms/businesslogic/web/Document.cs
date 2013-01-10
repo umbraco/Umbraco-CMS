@@ -780,11 +780,15 @@ namespace umbraco.cms.businesslogic.web
 		{
 			get
 			{
+				// get all nodes in the path to the document, and get all matching published documents
+				// the difference should be zero if everything is published
+				// test nodeObjectType to make sure we only count _content_ nodes
 				int x = SqlHelper.ExecuteScalar<int>(@"select count(node.id) - count(doc.nodeid)
 from umbracoNode as node 
 left join cmsDocument as doc on (node.id=doc.nodeId and doc.published=1)
-where '" + Path + ",' like " + SqlHelper.Concat("node.path", "'%'"));
-				return (x == 1);
+where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'") + @"
+and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
+				return (x == 0);
 			}
 		}
 

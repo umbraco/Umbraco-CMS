@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Globalization;
+using System.IO; 
 using System.Linq;
-using System.Text;
 using System.Web;
 using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
 {
-
 	[UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1156", "Will be declared public after 4.10")]
     internal class PhysicalFileSystem : IFileSystem
     {
@@ -43,9 +43,13 @@ namespace Umbraco.Core.IO
                     return Directory.EnumerateDirectories(path).Select(GetRelativePath);
             }
             catch (UnauthorizedAccessException ex)
-            { }
+            {
+                LogHelper.Error<PhysicalFileSystem>("Not authorized to get directories", ex);
+            }
             catch (DirectoryNotFoundException ex)
-            { }
+            {
+                LogHelper.Error<PhysicalFileSystem>("Directory not found", ex);
+            }
 
             return Enumerable.Empty<string>();
         }
@@ -65,7 +69,9 @@ namespace Umbraco.Core.IO
                 Directory.Delete(GetFullPath(path), recursive);
             }
             catch (DirectoryNotFoundException ex)
-            { }
+            {
+                LogHelper.Error<PhysicalFileSystem>("Directory not found", ex);
+            }
         }
 
         public bool DirectoryExists(string path)
@@ -80,9 +86,7 @@ namespace Umbraco.Core.IO
 
         public void AddFile(string path, Stream stream, bool overrideIfExists)
         {
-            if (FileExists(path) && !overrideIfExists)
-                throw new InvalidOperationException(string.Format("A file at path '{0}' already exists",
-                    path));
+            if (FileExists(path) && !overrideIfExists) throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
 
             EnsureDirectory(Path.GetDirectoryName(path));
 
@@ -108,9 +112,13 @@ namespace Umbraco.Core.IO
                     return Directory.EnumerateFiles(path, filter).Select(GetRelativePath);
             }
             catch (UnauthorizedAccessException ex)
-            { }
+            {
+                LogHelper.Error<PhysicalFileSystem>("Not authorized to get directories", ex);
+            }
             catch (DirectoryNotFoundException ex)
-            { }
+            {
+                LogHelper.Error<PhysicalFileSystem>("Directory not found", ex);
+            }
 
             return Enumerable.Empty<string>();
         }
@@ -130,7 +138,9 @@ namespace Umbraco.Core.IO
                 File.Delete(GetFullPath(path));
             }
             catch (FileNotFoundException ex)
-            { }
+            {
+                LogHelper.Error<PhysicalFileSystem>("File not found", ex);
+            }
         }
 
         public bool FileExists(string path)
@@ -188,7 +198,7 @@ namespace Umbraco.Core.IO
 
         protected string EnsureTrailingSeparator(string path)
         {
-            if (!path.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
+            if (!path.EndsWith(Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal))
                 path = path + Path.DirectorySeparatorChar;
 
             return path;

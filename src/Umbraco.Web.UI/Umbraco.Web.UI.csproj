@@ -415,6 +415,7 @@
       <DependentUpon>UI.xml</DependentUpon>
     </None>
     <Content Include="Global.asax" />
+    <Content Include="Umbraco\config\lang\en_us.xml" />
     <Content Include="Umbraco\config\lang\he.xml" />
     <Content Include="Umbraco\config\lang\ja.xml" />
     <Content Include="Umbraco\config\lang\pl.xml" />
@@ -985,6 +986,10 @@
     <Content Include="umbraco_client\tinymce3\plugins\umbracocss\js\dialog.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracocss\langs\en.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracocss\langs\en_dlg.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracocss\langs\en_us.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracocss\langs\en_us_dlg.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracocss\langs\it.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracocss\langs\it_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracocss\langs\ru.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracocss\langs\ru_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracocss\langs\zh.js" />
@@ -995,8 +1000,14 @@
     <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\img\ajax-loader.gif" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\img\embed.gif" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\js\dialog.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\langs\de.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\langs\de_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\langs\en.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\langs\en_dlg.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\langs\en_us.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\langs\en_us_dlg.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\langs\it.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\langs\it_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\langs\ru.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\langs\ru_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\langs\zh.js" />
@@ -1004,6 +1015,7 @@
     <Content Include="umbraco_client\tinymce3\plugins\umbracoimg\editor_plugin_src.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoimg\js\image.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoimg\langs\en_dlg.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracoimg\langs\en_us_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoimg\langs\he_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoimg\langs\ja_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoimg\langs\ru_dlg.js" />
@@ -1011,6 +1023,7 @@
     <Content Include="umbraco_client\tinymce3\plugins\umbracolink\editor_plugin_src.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracolink\js\umbracolink.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracolink\langs\en_dlg.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracolink\langs\en_us_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracolink\langs\he_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracolink\langs\ja_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracolink\langs\ru_dlg.js" />
@@ -1021,6 +1034,8 @@
     <Content Include="umbraco_client\tinymce3\plugins\umbracomacro\js\dialog.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracomacro\langs\en.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracomacro\langs\en_dlg.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracomacro\langs\en_us.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracomacro\langs\en_us_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracomacro\langs\he.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracomacro\langs\he_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracomacro\langs\ja.js" />
@@ -1188,6 +1203,8 @@
     <Content Include="umbraco_client\tinymce3\themes\umbraco\langs\de_dlg.js" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\langs\en.js" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\langs\en_dlg.js" />
+    <Content Include="umbraco_client\tinymce3\themes\umbraco\langs\en_us.js" />
+    <Content Include="umbraco_client\tinymce3\themes\umbraco\langs\en_us_dlg.js" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\langs\es.js" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\langs\es_dlg.js" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\langs\fr.js" />

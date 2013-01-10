@@ -42,7 +42,7 @@ namespace Umbraco.Web
 						DescendantDocumentById = "//node [@id={0}]";
 						DescendantDocumentByAlias = "//node[("
 							+ "contains(concat(',',translate(data [@alias='umbracoUrlAlias'], ' ', ''),','),',{0},')"
-							+ " or contains(concat(',',translate(data [@alias='umbracoUrlAlias'], ' ', ''),','),',/{0},'"
+							+ " or contains(concat(',',translate(data [@alias='umbracoUrlAlias'], ' ', ''),','),',/{0},')"
 							+ ")]";
 						ChildDocumentByUrlName = "/node [@urlName='{0}']";
 						RootDocumentWithLowestSortOrder = "/root/node [not(@sortOrder > ../node/@sortOrder)][1]";
