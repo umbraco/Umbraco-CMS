@@ -43,6 +43,7 @@ namespace Umbraco.Core.Persistence.Repositories
             
             contentType.AllowedContentTypes = GetAllowedContentTypeIds(id);
             contentType.PropertyGroups = GetPropertyGroupCollection(id);
+            ((MediaType)contentType).PropertyTypes = GetPropertyTypeCollection(id);
 
             var list = Database.Fetch<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id", new{ Id = id});
             foreach (var contentTypeDto in list)

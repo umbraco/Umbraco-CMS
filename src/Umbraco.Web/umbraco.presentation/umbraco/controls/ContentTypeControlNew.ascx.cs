@@ -341,7 +341,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         }
         private void bindDataGenericProperties(bool Refresh)
         {
-            var tabs = cType.getVirtualTabs.DistinctBy(x => x.ContentType).ToArray();
+            var tabs = cType.getVirtualTabs;
             var dtds = cms.businesslogic.datatype.DataTypeDefinition.GetAll();
 
             PropertyTypes.Controls.Clear();

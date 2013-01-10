@@ -134,7 +134,9 @@
   </nodeType>
   <nodeType alias="mediaTypes">
     <header>Medie type</header>
+    <usercontrol>/create/simple.ascx</usercontrol>
     <tasks>
+      <create assembly="umbraco" type="MediaTypeTasks" />
       <delete assembly="umbraco" type="MediaTypeTasks" />
     </tasks>
   </nodeType>

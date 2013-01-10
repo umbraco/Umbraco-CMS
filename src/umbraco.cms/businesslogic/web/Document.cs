@@ -21,7 +21,7 @@ namespace umbraco.cms.businesslogic.web
     /// 
     /// Pubished Documents are exposed to the runtime/the public website in a cached xml document.
     /// </summary>
-    [Obsolete("Deprecated, Use Umbraco.Core.Models.Content", false)]
+    [Obsolete("Obsolete, Use Umbraco.Core.Models.Content", false)]
     public class Document : Content
     {
         #region Constructors
@@ -325,7 +325,7 @@ namespace umbraco.cms.businesslogic.web
         /// <param name="u">The usercontext under which the action are performed</param>
         /// <param name="ParentId">The id of the parent to the document</param>
         /// <returns>The newly created document</returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.CreateContent()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.CreateContent()", false)]
         public static Document MakeNew(string Name, DocumentType dct, User u, int ParentId)
         {
             //allows you to cancel a document before anything goes to the DB
@@ -371,7 +371,7 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         /// <param name="nodeId"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.GetById()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetById()", false)]
         public static bool IsDocument(int nodeId)
         {
             bool isDoc = false;
@@ -386,7 +386,7 @@ namespace umbraco.cms.businesslogic.web
         /// Used to get the firstlevel/root documents of the hierachy
         /// </summary>
         /// <returns>Root documents</returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.GetRootContent()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetRootContent()", false)]
         public static Document[] GetRootDocuments()
         {
             var content = ApplicationContext.Current.Services.ContentService.GetRootContent();
@@ -411,13 +411,13 @@ namespace umbraco.cms.businesslogic.web
         /// Note: use with care: this method can result in wast amount of data being deleted.
         /// </summary>
         /// <param name="dt">The type of which documents should be deleted</param>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.DeleteContentOfType()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.DeleteContentOfType()", false)]
         public static void DeleteFromType(DocumentType dt)
         {
             ApplicationContext.Current.Services.ContentService.DeleteContentOfType(dt.Id);
         }
 
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.GetContentOfContentType()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetContentOfContentType()", false)]
         public static IEnumerable<Document> GetDocumentsOfDocumentType(int docTypeId)
         {
             var contents = ApplicationContext.Current.Services.ContentService.GetContentOfContentType(docTypeId);
@@ -435,7 +435,7 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         /// <param name="NodeId">The parentdocuments id</param>
         /// <returns></returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.GetChildren()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetChildren()", false)]
         public static Document[] GetChildrenForTree(int NodeId)
         {
             var children = ApplicationContext.Current.Services.ContentService.GetChildren(NodeId).OrderBy(c => c.SortOrder);
@@ -443,14 +443,14 @@ namespace umbraco.cms.businesslogic.web
             return list.ToArray();
         }
 
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.GetChildrenByName()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetChildrenByName()", false)]
         public static List<Document> GetChildrenBySearch(int NodeId, string searchString)
         {
             var children = ApplicationContext.Current.Services.ContentService.GetChildrenByName(NodeId, searchString);
             return children.Select(x => new Document(x)).ToList();
         }
 
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.RePublishAll()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.RePublishAll()", false)]
         public static void RePublishAll()
         {
             XmlDocument xd = new XmlDocument();
@@ -502,7 +502,7 @@ namespace umbraco.cms.businesslogic.web
         /// Retrieve a list of documents with an expirationdate greater than today
         /// </summary>
         /// <returns>A list of documents with expirationdates than today</returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.GetContentForExpiration()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetContentForExpiration()", false)]
         public static Document[] GetDocumentsForExpiration()
         {
             var contents = ApplicationContext.Current.Services.ContentService.GetContentForExpiration();
@@ -513,7 +513,7 @@ namespace umbraco.cms.businesslogic.web
         /// Retrieve a list of documents with with releasedate greater than today
         /// </summary>
         /// <returns>Retrieve a list of documents with with releasedate greater than today</returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.GetContentForRelease()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetContentForRelease()", false)]
         public static Document[] GetDocumentsForRelease()
         {
             var contents = ApplicationContext.Current.Services.ContentService.GetContentForRelease();
@@ -657,7 +657,7 @@ namespace umbraco.cms.businesslogic.web
 		/// <remarks>A document can be published yet not visible, because of one or more of its
 		/// parents being unpublished. Use <c>PathPublished</c> to get a value indicating whether
 		/// the node and all its parents are published, and therefore whether the node is visible.</remarks>
-        [Obsolete("Deprecated, Use Published property on Umbraco.Core.Models.Content", false)]
+        [Obsolete("Obsolete, Use Published property on Umbraco.Core.Models.Content", false)]
         public bool Published
         {
             get { return _published; }
@@ -674,7 +674,7 @@ namespace umbraco.cms.businesslogic.web
 		/// <summary>
 		/// Gets a value indicating whether the document and all its parents are published.
 		/// </summary>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.IsPublishable()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.IsPublishable()", false)]
         public bool PathPublished
 		{
 			get
@@ -683,7 +683,7 @@ namespace umbraco.cms.businesslogic.web
 			}
 		}
 
-        [Obsolete("Deprecated, Use Name property on Umbraco.Core.Models.Content", false)]
+        [Obsolete("Obsolete, Use Name property on Umbraco.Core.Models.Content", false)]
         public override string Text
         {
             get
@@ -706,7 +706,7 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// The date of the last update of the document
         /// </summary>
-        [Obsolete("Deprecated, Use UpdateDate property on Umbraco.Core.Models.Content", false)]
+        [Obsolete("Obsolete, Use UpdateDate property on Umbraco.Core.Models.Content", false)]
         public DateTime UpdateDate
         {
             get { return _updated; }
@@ -723,7 +723,7 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// A datestamp which indicates when a document should be published, used in automated publish/unpublish scenarios
         /// </summary>
-        [Obsolete("Deprecated, Use ReleaseDate property on Umbraco.Core.Models.Content", false)]
+        [Obsolete("Obsolete, Use ReleaseDate property on Umbraco.Core.Models.Content", false)]
         public DateTime ReleaseDate
         {
             get { return _release; }
@@ -737,7 +737,7 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// A datestamp which indicates when a document should be unpublished, used in automated publish/unpublish scenarios
         /// </summary>
-        [Obsolete("Deprecated, Use ExpireDate property on Umbraco.Core.Models.Content", false)]
+        [Obsolete("Obsolete, Use ExpireDate property on Umbraco.Core.Models.Content", false)]
         public DateTime ExpireDate
         {
             get { return _expire; }
@@ -758,7 +758,7 @@ namespace umbraco.cms.businesslogic.web
         /// 
         /// ?altTemplate=[templatealias]
         /// </summary>
-        [Obsolete("Deprecated, Use Template property on Umbraco.Core.Models.Content", false)]
+        [Obsolete("Obsolete, Use Template property on Umbraco.Core.Models.Content", false)]
         public int Template
         {
             get { return _template; }
@@ -780,7 +780,7 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// A collection of documents imidiately underneath this document ie. the childdocuments
         /// </summary>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.GetChildren()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetChildren()", false)]
         public new Document[] Children
         {
             get
@@ -827,7 +827,7 @@ namespace umbraco.cms.businesslogic.web
         /// the data.
         /// </summary>
         /// <param name="u">The usercontext under which the action are performed</param>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.Publish()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
         public void Publish(User u)
         {
             SaveAndPublish(u);
@@ -842,7 +842,7 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         /// <param name="u">The usercontext under which the action are performed</param>
         /// <returns>True if the publishing succeed. Possible causes for not publishing is if an event aborts the publishing</returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.Publish()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
         public bool PublishWithResult(User u)
         {
             var e = new PublishEventArgs();
@@ -863,7 +863,7 @@ namespace umbraco.cms.businesslogic.web
             }
         }
 
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
         public bool PublishWithChildrenWithResult(User u)
         {
             return ApplicationContext.Current.Services.ContentService.PublishWithChildren(Content, u.Id, true);
@@ -875,7 +875,7 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         /// <param name="u">The usercontext under which the action are performed</param>
         /// <param name="VersionId">The unique Id of the version to roll back to</param>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.Rollback()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Rollback()", false)]
         public void RollBack(Guid VersionId, User u)
         {
             var e = new RollBackEventArgs();
@@ -895,7 +895,7 @@ namespace umbraco.cms.businesslogic.web
         /// Envoking this method will publish the documents and all children recursive.
         /// </summary>
         /// <param name="u">The usercontext under which the action are performed</param>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
         public void PublishWithSubs(User u)
         {
             PublishEventArgs e = new PublishEventArgs();
@@ -909,7 +909,7 @@ namespace umbraco.cms.businesslogic.web
             }
         }
 
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.UnPublish()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.UnPublish()", false)]
         public void UnPublish()
         {
             UnPublishEventArgs e = new UnPublishEventArgs();
@@ -927,7 +927,7 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Used to persist object changes to the database. 
         /// </summary>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.Save()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Save()", false)]
         public override void Save()
         {
             var e = new SaveEventArgs();
@@ -989,7 +989,7 @@ namespace umbraco.cms.businesslogic.web
             return false;
         }
 
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.HasPublishedVersion()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.HasPublishedVersion()", false)]
         public bool HasPublishedVersion()
         {
             return Content.HasPublishedVersion();
@@ -1001,7 +1001,7 @@ namespace umbraco.cms.businesslogic.web
         /// then this is considered a change.
         /// </summary>
         /// <returns></returns>
-        [Obsolete("Deprecated, Instead of calling this just check if the latest version of the content is published", false)]
+        [Obsolete("Obsolete, Instead of calling this just check if the latest version of the content is published", false)]
         public bool HasPendingChanges()
         {
             return Content.Published == false;
@@ -1011,7 +1011,7 @@ namespace umbraco.cms.businesslogic.web
         /// Used for rolling back documents to a previous version
         /// </summary>
         /// <returns> Previous published versions of the document</returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.GetVersions()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetVersions()", false)]
         public DocumentVersionList[] GetVersions()
         {
             var versions = ApplicationContext.Current.Services.ContentService.GetVersions(Id);
@@ -1024,7 +1024,7 @@ namespace umbraco.cms.businesslogic.web
         /// Returns the published version of this document
         /// </summary>
         /// <returns>The published version of this document</returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.GetPublishedVersion()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetPublishedVersion()", false)]
         public DocumentVersionList GetPublishedVersion()
         {
             var version = ApplicationContext.Current.Services.ContentService.GetPublishedVersion(Id);
@@ -1058,7 +1058,7 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         /// <param name="CopyTo">The parentid where the document should be copied to</param>
         /// <param name="u">The usercontext under which the action are performed</param>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.Copy()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Copy()", false)]
         public Document Copy(int CopyTo, User u)
         {
             return Copy(CopyTo, u, false);
@@ -1071,7 +1071,7 @@ namespace umbraco.cms.businesslogic.web
         /// <param name="CopyTo"></param>
         /// <param name="u"></param>
         /// <param name="RelateToOrignal"></param>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.Copy()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Copy()", false)]
         public Document Copy(int CopyTo, User u, bool RelateToOrignal)
         {
             var e = new CopyEventArgs();
@@ -1100,7 +1100,7 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Puts the current document in the trash
         /// </summary>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.MoveToRecycleBin()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.MoveToRecycleBin()", false)]
         public override void delete()
         {
             MoveToTrash();
@@ -1110,7 +1110,7 @@ namespace umbraco.cms.businesslogic.web
         /// With either move the document to the trash or permanently remove it from the database.
         /// </summary>
         /// <param name="deletePermanently">flag to set whether or not to completely remove it from the database or just send to trash</param>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.Delete() or Umbraco.Core.Services.ContentService.MoveToRecycleBin()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Delete() or Umbraco.Core.Services.ContentService.MoveToRecycleBin()", false)]
         public void delete(bool deletePermanently)
         {
             if (!deletePermanently)
@@ -1127,7 +1127,7 @@ namespace umbraco.cms.businesslogic.web
         /// Returns all decendants of the current document
         /// </summary>
         /// <returns></returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.GetDescendants()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetDescendants()", false)]
         public override IEnumerable GetDescendants()
         {
             var descendants = Content == null
@@ -1142,7 +1142,7 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         /// <param name="xd">The source xmldocument</param>
         /// <param name="x">The previous xmlrepresentation of the document</param>
-        [Obsolete("Deprecated, Doesn't appear to be used anywhere", false)]
+        [Obsolete("Obsolete, Doesn't appear to be used anywhere", false)]
         public void XmlNodeRefresh(XmlDocument xd, ref XmlNode x)
         {
             x.Attributes.RemoveAll();
@@ -1331,7 +1331,7 @@ namespace umbraco.cms.businesslogic.web
         #endregion
 
         #region Protected Methods
-        [Obsolete("Deprecated", false)]
+        [Obsolete("Obsolete", false)]
         protected override void setupNode()
         {
             var content = Version == Guid.Empty
@@ -1371,7 +1371,7 @@ namespace umbraco.cms.businesslogic.web
             _published = Content.Published;
         }
 
-        [Obsolete("Deprecated", false)]
+        [Obsolete("Obsolete", false)]
         protected void InitializeDocument(User InitUser, User InitWriter, string InitText, int InitTemplate,
                                           DateTime InitReleaseDate, DateTime InitExpireDate, DateTime InitUpdateDate,
                                           bool InitPublished)
@@ -1394,7 +1394,7 @@ namespace umbraco.cms.businesslogic.web
             _published = InitPublished;
         }
 
-        [Obsolete("Deprecated", false)]
+        [Obsolete("Obsolete", false)]
         protected void PopulateDocumentFromReader(IRecordsReader dr)
         {
             bool _hc = false;
@@ -1437,7 +1437,7 @@ namespace umbraco.cms.businesslogic.web
         #endregion
 
         #region Private Methods
-        [Obsolete("Deprecated", false)]
+        [Obsolete("Obsolete", false)]
         private void SetupDocumentForTree(Guid uniqueId, int level, int parentId, int creator, int writer, bool publish, string path,
                                          string text, DateTime createDate, DateTime updateDate,
                                          DateTime versionDate, string icon, bool hasChildren, string contentTypeAlias, string contentTypeThumb,
@@ -1486,7 +1486,7 @@ namespace umbraco.cms.businesslogic.web
         /// Used internally to permanently delete the data from the database
         /// </summary>
         /// <returns>returns true if deletion isn't cancelled</returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.Delete()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Delete()", false)]
         private bool DeletePermanently()
         {
             DeleteEventArgs e = new DeleteEventArgs();
@@ -1518,7 +1518,7 @@ namespace umbraco.cms.businesslogic.web
         /// Used internally to move the node to the recyle bin
         /// </summary>
         /// <returns>Returns true if the move was not cancelled</returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.MoveToRecycleBin()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.MoveToRecycleBin()", false)]
         private bool MoveToTrash()
         {
             MoveToTrashEventArgs e = new MoveToTrashEventArgs();
@@ -1612,7 +1612,7 @@ namespace umbraco.cms.businesslogic.web
         {
             if (AfterSave != null)
             {
-                AfterSave(this, e);
+                AfterSave(new Document(this.Id), e);
             }
         }
 

@@ -29,6 +29,7 @@ namespace Umbraco.Core.Models
         private bool _isContainer;
         private bool _trashed;
         private PropertyGroupCollection _propertyGroups;
+        private PropertyTypeCollection _propertyTypes;
         private IEnumerable<ContentTypeSort> _allowedContentTypes;
 
         protected ContentTypeBase(int parentId)
@@ -38,6 +39,7 @@ namespace Umbraco.Core.Models
             _parentId = new Lazy<int>(() => parentId);
             _allowedContentTypes = new List<ContentTypeSort>();
             _propertyGroups = new PropertyGroupCollection();
+            _propertyTypes = new PropertyTypeCollection();
         }
 
 		protected ContentTypeBase(IContentTypeBase parent)
@@ -47,6 +49,7 @@ namespace Umbraco.Core.Models
 			_parentId = new Lazy<int>(() => parent.Id);
 			_allowedContentTypes = new List<ContentTypeSort>();
 			_propertyGroups = new PropertyGroupCollection();
+            _propertyTypes = new PropertyTypeCollection();
 		}
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Name);
@@ -64,10 +67,16 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.Trashed);
         private static readonly PropertyInfo AllowedContentTypesSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<ContentTypeSort>>(x => x.AllowedContentTypes);
         private static readonly PropertyInfo PropertyGroupCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, PropertyGroupCollection>(x => x.PropertyGroups);
+        private static readonly PropertyInfo PropertyTypeCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<PropertyType>>(x => x.PropertyTypes);
 
         protected void PropertyGroupsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(PropertyGroupCollectionSelector);
+        }
+
+        protected void PropertyTypesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(PropertyTypeCollectionSelector);
         }
 
         /// <summary>
@@ -301,7 +310,16 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         public virtual IEnumerable<PropertyType> PropertyTypes
         {
-            get { return PropertyGroups.SelectMany(x => x.PropertyTypes); }
+            get
+            {
+                var types = _propertyTypes.Union(PropertyGroups.SelectMany(x => x.PropertyTypes));
+                return types;
+            }
+            internal set
+            {
+                _propertyTypes = new PropertyTypeCollection(value);
+                _propertyTypes.CollectionChanged += PropertyTypesChanged;
+            }
         }
 
         /// <summary>

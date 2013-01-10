@@ -425,7 +425,7 @@ namespace umbraco.cms.businesslogic.packager
                         for (int i = 0; i < allowed.Count; i++)
                             adt[i] = (int)allowed[i];
                         dt.AllowedChildContentTypeIDs = adt;
-
+                        dt.Save();
                         //PPH we log the document type install here.
                         insPack.Data.Documenttypes.Add(dt.Id.ToString());
                         saveNeeded = true;

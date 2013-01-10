@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using Umbraco.Core.Configuration;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourEightZero
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero
 {
     [MigrationAttribute("4.8.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class RemoveUmbracoAppConstraints : MigrationBase

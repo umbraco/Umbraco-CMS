@@ -36,7 +36,7 @@ namespace umbraco.editorControls.tinymce
 
 		public override string DataTypeName
 		{
-			get { return "TinyMCE wysiwyg (deprecated, upgrade to tinymce v3!)"; }
+			get { return "TinyMCE wysiwyg (Obsolete, upgrade to tinymce v3!)"; }
 		}
 
 		public override umbraco.interfaces.IDataPrevalue PrevalueEditor
