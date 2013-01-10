@@ -13,7 +13,7 @@
         PathNameAlias="UmbracoClient" />
     <umb:JsInclude ID="JsInclude" runat="server" FilePath="splitbutton/jquery.splitbutton.js"
         PathNameAlias="UmbracoClient" Priority="1" />
-    <script language="javascript" type="text/javascript">
+    <script type="text/javascript">
         jQuery(document).ready(function() {
             //macro split button
             jQuery('#sbMacro').splitbutton({menu:'#macroMenu'});

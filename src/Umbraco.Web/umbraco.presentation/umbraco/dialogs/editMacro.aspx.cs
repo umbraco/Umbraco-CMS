@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Text;
 using System.IO;
 using Umbraco.Core.IO;
+using Umbraco.Web;
 using umbraco.DataLayer;
 
 
@@ -25,10 +26,9 @@ namespace umbraco.dialogs
 	{
 		protected Button Button1;
 
-		private cms.businesslogic.macro.Macro _m;
+		protected cms.businesslogic.macro.Macro MacroObject { get; private set; }
 
 		public string _macroAlias = "";
-
 
 		protected void renderProperties(object sender, EventArgs e)
 		{
@@ -48,22 +48,22 @@ namespace umbraco.dialogs
 			pl_edit.Visible = true;
 			pl_insert.Visible = false;
 
-			_m = cms.businesslogic.macro.Macro.GetByAlias(alias);
+			MacroObject = cms.businesslogic.macro.Macro.GetByAlias(alias);
 
-			_macroAlias = _m.Alias;
+			_macroAlias = MacroObject.Alias;
 
 
 			//If no properties, we will exit now...
-			if (_m.Properties.Length == 0)
+			if (MacroObject.Properties.Length == 0)
 			{
-				var noProps = new Literal();
-				noProps.Text = "<script type='text/javascript'>Umbraco.Dialogs.EditMacro.getInstance().updateMacro()</script>";
-				macroProperties.Controls.Add(noProps);
+				//var noProps = new Literal();
+				//noProps.Text = "<script type='text/javascript'>Umbraco.Dialogs.EditMacro.getInstance().updateMacro()</script>";
+				//macroProperties.Controls.Add(noProps);
 			}
 			else
 			{
 				//if we have properties, we'll render the controls for them...
-				foreach (cms.businesslogic.macro.MacroProperty mp in _m.Properties)
+				foreach (cms.businesslogic.macro.MacroProperty mp in MacroObject.Properties)
 				{
 					var macroAssembly = mp.Type.Assembly;
 					var macroType = mp.Type.Type;
@@ -126,7 +126,7 @@ namespace umbraco.dialogs
 				else
 				{
 					IRecordsReader macroRenderings;
-					if (helper.Request("editor") != "")
+					if (Request.GetItemAsString("editor") != "")
 						macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro where macroUseInEditor = 1 order by macroName");
 					else
 						macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro order by macroName");
@@ -138,32 +138,8 @@ namespace umbraco.dialogs
 					macroRenderings.Close();
 				}
 			}
-			else
-			{
 
-				ScriptManager.RegisterOnSubmitStatement(Page, Page.GetType(), "myHandlerKey", "Umbraco.Dialogs.EditMacro.getInstance().updateMacro()");
-			}
-		}
-
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
-
-		}
-		#endregion
+		}		
 
 		/// <summary>
 		/// pl_edit control.
