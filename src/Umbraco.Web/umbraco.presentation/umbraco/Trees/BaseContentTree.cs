@@ -112,8 +112,13 @@ function openContent(id) {
                 node.Icon = dd.ContentTypeIcon;
                 node.OpenIcon = dd.ContentTypeIcon;
             }
-			if (!dd.Published)
-				node.Style.DimNode();
+
+            if (dd.Published == false)
+                node.Style.DimNode();
+
+            if (dd.HasPendingChanges())
+                node.Style.HighlightNode();
+
             return node;
         }
 
