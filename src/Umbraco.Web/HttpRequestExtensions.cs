@@ -16,8 +16,9 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="request"></param>
 		/// <param name="key"></param>
+		/// <param name="valueIfNotFound">The value to return if the key is not found in the collection</param>
 		/// <returns></returns>
-		public static string GetItemAsString(this HttpRequest request, string key)
+		public static string GetItemAsString(this HttpRequest request, string key, string valueIfNotFound = "")
 		{
 			return new HttpRequestWrapper(request).GetItemAsString(key);
 		}
@@ -27,11 +28,12 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="request"></param>
 		/// <param name="key"></param>
+		/// <param name="valueIfNotFound">The value to return if the key is not found in the collection</param>
 		/// <returns></returns>
-		public static string GetItemAsString(this HttpRequestBase request, string key)
+		public static string GetItemAsString(this HttpRequestBase request, string key, string valueIfNotFound = "")
 		{
 			var val = HttpContext.Current.Request[key];
-			return !val.IsNullOrWhiteSpace() ? val : string.Empty;
+			return !val.IsNullOrWhiteSpace() ? val : valueIfNotFound;
 		}
 
 		/// <summary>

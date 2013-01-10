@@ -130,8 +130,9 @@
             /// <summary>Initializes the class and any UI bindings</summary>
 
             // Merge options with default
-            this._opts = $.extend({
+            this._opts = $.extend({                
                 // Default options go here
+                renderingEngine: "Mvc"
             }, opts);
 
             var self = this;
@@ -152,8 +153,8 @@
         updateMacro: function () {
 
             var macroSyntax = null;
-            //if it is Mvc or empty, then use Mvc
-            if (this._opts.renderingEngine == "Mvc" || this._opts.renderingEngine == "") {
+            
+            if (this._opts.renderingEngine == "Mvc") {
                 macroSyntax = this._getMacroSyntaxMvc();
             }
             else {
