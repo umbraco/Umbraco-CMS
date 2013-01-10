@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -15,7 +17,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
     public abstract class BaseUpgradeTest
     {
         /// <summary>Regular expression that finds multiline block comments.</summary>
-        private static readonly Regex m_findComments = new Regex(@"\/\*.*?\*\/", RegexOptions.Singleline | RegexOptions.Compiled);
+        private static readonly Regex FindComments = new Regex(@"\/\*.*?\*\/", RegexOptions.Singleline | RegexOptions.Compiled);
 
         [SetUp]
         public virtual void Initialize()
@@ -27,15 +29,24 @@ namespace Umbraco.Tests.Migrations.Upgrades
             AppDomain.CurrentDomain.SetData("DataDirectory", Path);
 
             UmbracoSettings.UseLegacyXmlSchema = false;
+           
+			MigrationResolver.Current = new MigrationResolver(new List<Type>
+				{
+					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints),
+					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionSixth.DeleteAppTables),
+					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionSixth.EnsureAppsTreesUpdated),
+					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionSixth.MoveMasterContentTypeData),
+					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionSixth.NewCmsContentType2ContentTypeTable),
+					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionSixth.RemoveMasterContentTypeColumn),
+					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionSixth.RenameCmsTabTable),
+					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionSixth.RenameTabIdColumn),
+					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionSixth.UpdateCmsContentTypeAllowedContentTypeTable),
+					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionSixth.UpdateCmsContentTypeTable),
+					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionSixth.UpdateCmsContentVersionTable),
+					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionSixth.UpdateCmsPropertyTypeGroupTable)
+				});
 
-            //this ensures its reset
-            PluginManager.Current = new PluginManager(false);
-
-            //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-            PluginManager.Current.AssembliesToScan = new[]
-                                                         {
-                                                             typeof (MigrationRunner).Assembly
-                                                         };
+			Resolution.Freeze();
 
             DatabaseSpecificSetUp();
 
@@ -53,7 +64,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             //Create db schema and data from old Total.sql file for Sql Ce
             string statements = GetDatabaseSpecificSqlScript();
             // replace block comments by whitespace
-            statements = m_findComments.Replace(statements, " ");
+            statements = FindComments.Replace(statements, " ");
             // execute all non-empty statements
             foreach (string statement in statements.Split(";".ToCharArray()))
             {
@@ -82,6 +93,8 @@ namespace Umbraco.Tests.Migrations.Upgrades
         {
             PluginManager.Current = null;
             SyntaxConfig.SqlSyntaxProvider = null;
+			MigrationResolver.Reset();
+	        Resolution.IsFrozen = false;
 
             TestHelper.CleanContentDirectories();
 
