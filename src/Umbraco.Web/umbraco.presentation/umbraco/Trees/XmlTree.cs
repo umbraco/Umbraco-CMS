@@ -339,12 +339,7 @@ namespace umbraco.cms.presentation.Trees
 		public bool? NotPublished
 		{
 			get { return m_notPublished; }
-			set
-			{
-				m_notPublished = value;
-			    if (m_notPublished.HasValue && m_notPublished.Value)
-                    this.Style.DimNode();
-			}
+			set { m_notPublished = value; }
 		}
 
 		/// <summary>
