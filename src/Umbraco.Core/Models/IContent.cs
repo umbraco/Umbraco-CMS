@@ -69,8 +69,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Changes the Published state of the content object
         /// </summary>
-        /// <param name="isPublished">Boolean indicating whether content is published (true) or unpublished (false)</param>
-        void ChangePublishedState(bool isPublished);
+        void ChangePublishedState(PublishedState state);
 
         /// <summary>
         /// Changes the Trashed state of the content object

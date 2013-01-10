@@ -652,7 +652,7 @@ namespace Umbraco.Core.Services
 
 				//Only change the publish state if the "previous" version was actually published
 				if (content.Published)
-					content.ChangePublishedState(false);
+                    content.ChangePublishedState(PublishedState.Saved);
 
 				repository.AddOrUpdate(content);
 				uow.Commit();
@@ -690,7 +690,7 @@ namespace Umbraco.Core.Services
 
 						//Only change the publish state if the "previous" version was actually published
 						if (content.Published)
-							content.ChangePublishedState(false);
+                            content.ChangePublishedState(PublishedState.Saved);
 
 						repository.AddOrUpdate(content);
 						uow.Commit();

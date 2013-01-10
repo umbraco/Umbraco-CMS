@@ -319,7 +319,7 @@ namespace Umbraco.Tests.Models
 
             // Act
             content.ResetDirtyProperties();
-            content.ChangePublishedState(true);
+            content.ChangePublishedState(PublishedState.Published);
 
             // Assert
             Assert.That(content.IsPropertyDirty("Published"), Is.True);

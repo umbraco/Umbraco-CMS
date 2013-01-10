@@ -665,9 +665,15 @@ namespace umbraco.cms.businesslogic.web
             set
             {
                 _published = value;
-                Content.ChangePublishedState(value);
-                /*SqlHelper.ExecuteNonQuery(
-                    string.Format("update cmsDocument set published = {0} where nodeId = {1}", Id, value ? 1 : 0));*/
+                if (_published)
+                {
+                    Content.ChangePublishedState(PublishedState.Published);
+                }
+                else
+                {
+                    Content.ChangePublishedState(PublishedState.Unpublished);
+                    
+                }
             }
         }
 

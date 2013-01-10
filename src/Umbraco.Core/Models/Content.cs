@@ -246,13 +246,13 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Changes the Published state of the content object
         /// </summary>
-        /// <param name="isPublished">Boolean indicating whether content is published (true) or unpublished (false)</param>
-        public void ChangePublishedState(bool isPublished)
+        public void ChangePublishedState(PublishedState state)
         {
-            Published = isPublished;
-            //NOTE Should this be checked against the Expire/Release dates?
-            //TODO possibly create new (unpublished version)?
+            Published = state == PublishedState.Published;
+            PublishedState = state;
         }
+
+        internal PublishedState PublishedState { get; set; }
 
         /// <summary>
         /// Changes the Trashed state of the content object
@@ -276,7 +276,7 @@ namespace Umbraco.Core.Models
             //If the content is trashed and is published it should be marked as unpublished
             if (isTrashed && Published)
             {
-                ChangePublishedState(false);
+                ChangePublishedState(PublishedState.Unpublished);
             }
         }
 

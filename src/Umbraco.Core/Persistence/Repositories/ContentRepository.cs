@@ -262,8 +262,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(IContent entity)
         {
+            var publishedState = ((Content) entity).PublishedState;
             //A new version should only be created if published state (or language) has changed
-            bool shouldCreateNewVersion = ((ICanBeDirty)entity).IsPropertyDirty("Published") || ((ICanBeDirty)entity).IsPropertyDirty("Language");
+            bool shouldCreateNewVersion = (((ICanBeDirty)entity).IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished) || ((ICanBeDirty)entity).IsPropertyDirty("Language");
             if (shouldCreateNewVersion)
             {
                 //Updates Modified date and Version Guid
@@ -299,8 +300,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Update(newContentDto);
             }
 
-            //If Published state has changed then previous versions should have their publish state reset
-            if (((ICanBeDirty)entity).IsPropertyDirty("Published") && entity.Published)
+            //If Published state has changed then previous versions should have their publish state reset.
+            //If state has been changed to unpublished the previous versions publish state should also be reset.
+            if (((ICanBeDirty)entity).IsPropertyDirty("Published") && (entity.Published || publishedState == PublishedState.Unpublished))
             {
                 var publishedDocs = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND published = @IsPublished", new { Id = entity.Id, IsPublished = true });
                 foreach (var doc in publishedDocs)
