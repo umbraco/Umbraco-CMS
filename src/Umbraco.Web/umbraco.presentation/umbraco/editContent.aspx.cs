@@ -1,6 +1,8 @@
 using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Caching;
 using umbraco.BusinessLogic.Actions;
 using umbraco.IO;
@@ -321,14 +323,15 @@ namespace umbraco.cms.presentation
                         library.UpdateDocumentCache(_document.Id);
                         ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));
 
-                        littPublishStatus.Text = ui.Text("content", "lastPublished", base.getUser()) + ": " + _document.VersionDate.ToString() + "<br/>";
+                        littPublishStatus.Text = string.Format("{0}: {1}<br/>", ui.Text("content", "lastPublished", base.getUser()), _document.VersionDate.ToString());
 
                         if (base.getUser().GetPermissions(_document.Path).IndexOf("U") > -1)
                             UnPublish.Visible = true;
 
                         _documentHasPublishedVersion = _document.HasPublishedVersion();
 
-                        foreach (var descendant in _document.GetDescendants().Cast<Document>().Where(descendant => descendant.HasPublishedVersion()))
+                        var descendants = ApplicationContext.Current.Services.ContentService.GetDescendants(_document.Id);
+                        foreach (var descendant in descendants.Where(descendant => descendant.HasPublishedVersion()))
                             library.UpdateDocumentCache(descendant.Id);
                     }
                     else
@@ -337,13 +340,10 @@ namespace umbraco.cms.presentation
                     }
                 }
                 else
+                {
                     ClientTools.ShowSpeechBubble(speechBubbleIcon.warning, ui.Text("publish"), ui.Text("speechBubbles", "editContentPublishedFailedByParent"));
-
-                // page cache disabled...
-                //			cms.businesslogic.cache.Cache.ClearCacheObjectTypes("umbraco.page");
-
-
-                // Update links
+                    
+                }
             }
         }
 

@@ -150,21 +150,12 @@ namespace Umbraco.Core.Persistence.Querying
 
         protected virtual string VisitMemberAccess(MemberExpression m)
         {
-            if (m.Expression != null &&
-               m.Expression.NodeType == ExpressionType.Parameter
-               && m.Expression.Type == typeof(T))
+            if (m.Expression != null && m.Expression.NodeType == ExpressionType.Parameter && m.Expression.Type == typeof(T))
             {
                 var field = _mapper.Map(m.Member.Name);
                 return field;
             }
-
-            if (m.Expression != null && m.Expression.NodeType != ExpressionType.Constant)
-            {
-                var field = _mapper.Map(m.Member.Name);
-                return field;
-            }
-
-
+            
             var member = Expression.Convert(m, typeof(object));
             var lambda = Expression.Lambda<Func<object>>(member);
             var getter = lambda.Compile();
@@ -190,9 +181,7 @@ namespace Umbraco.Core.Persistence.Querying
                 var r = new StringBuilder();
                 foreach (Object e in exprs)
                 {
-                    r.AppendFormat("{0}{1}",
-                                   r.Length > 0 ? "," : "",
-                                   e);
+                    r.AppendFormat("{0}{1}", r.Length > 0 ? "," : "", e);
                 }
                 return r.ToString();
             }
