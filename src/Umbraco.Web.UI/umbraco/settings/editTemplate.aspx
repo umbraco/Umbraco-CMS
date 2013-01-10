@@ -9,31 +9,31 @@
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
-    <umb:CssInclude ID="CssInclude1" runat="server" FilePath="splitbutton/splitbutton.css"
-        PathNameAlias="UmbracoClient" />
-    <umb:JsInclude ID="JsInclude" runat="server" FilePath="splitbutton/jquery.splitbutton.js"
-        PathNameAlias="UmbracoClient" Priority="1" />
+    <umb:CssInclude ID="CssInclude1" runat="server" FilePath="splitbutton/splitbutton.css" PathNameAlias="UmbracoClient" />
+    <umb:JsInclude ID="JsInclude" runat="server" FilePath="splitbutton/jquery.splitbutton.js" PathNameAlias="UmbracoClient" />
+    
     <script type="text/javascript">
         jQuery(document).ready(function() {
             //macro split button
-            jQuery('#sbMacro').splitbutton({menu:'#macroMenu'});
-            jQuery("#splitButtonMacro").appendTo("#splitButtonMacroPlaceHolder");
-            jQuery(".macro").click(function(){
-                var alias = jQuery(this).attr("rel");
-               if(jQuery(this).attr("params") == "1")
-                {
-                    openMacroModal(alias);
-                }
-                else
-                {
-                    insertMacro(alias);
-                }
-            });
-            applySplitButtonOverflow('mcontainer','innerc','macroMenu','.macro', 'showMoreMacros');
             
-            //razor macro split button
-            jQuery('#sb').splitbutton({menu:'#codeTemplateMenu'});
-            jQuery("#splitButton").appendTo("#splitButtonPlaceHolder");
+            jQuery("#splitButtonMacro").appendTo("#splitButtonMacroPlaceHolder");
+            jQuery('#sbMacro').splitbutton({menu:'#macroMenu'});
+            //jQuery(".macro").click(function(){
+            //    var alias = jQuery(this).attr("rel");
+            //   if(jQuery(this).attr("params") == "1")
+            //    {
+            //        openMacroModal(alias);
+            //    }
+            //    else
+            //    {
+            //        insertMacro(alias);
+            //    }
+            //});
+            //applySplitButtonOverflow('mcontainer','innerc','macroMenu','.macro', 'showMoreMacros');
+            
+            ////razor macro split button
+            //jQuery('#sb').splitbutton({menu:'#codeTemplateMenu'});
+            //jQuery("#splitButton").appendTo("#splitButtonPlaceHolder");
 
             jQuery(".codeTemplate").click(function(){              
                 insertCodeBlockFromTemplate(jQuery(this).attr("rel"));

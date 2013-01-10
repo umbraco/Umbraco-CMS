@@ -15,7 +15,7 @@
     
     <umb:JsInclude ID="JsInclude1" runat="server" FilePath="Editors/EditView.js" PathNameAlias="UmbracoClient" />
 
-    <script language="javascript" type="text/javascript">
+    <script type="text/javascript">
 
         //we need to have this as a global object since we reference this object with callbacks.
         var editViewEditor;
