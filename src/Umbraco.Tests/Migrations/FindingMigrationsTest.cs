@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -19,31 +20,25 @@ namespace Umbraco.Tests.Migrations
         {
             TestHelper.SetupLog4NetForTests();
 
-            //this ensures its reset
-            PluginManager.Current = new PluginManager(false);
+			MigrationResolver.Current = new MigrationResolver(new List<Type>
+				{
+					typeof (AlterUserTableMigrationStub),
+					typeof(Dummy),
+					typeof (FourNineMigration),					
+					typeof (FourTenMigration),
+					typeof (FourElevenMigration),
+					typeof (FourElevenMigration)
+				});
 
-            //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-            PluginManager.Current.AssembliesToScan = new[]
-                                                         {
-                                                             typeof (FourNineMigration).Assembly
-                                                         };
+			Resolution.Freeze();
 
             SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
-        }
-
-        [Test]
-        public void Can_Find_Migrations_In_Current_Assembly()
-        {
-            var foundTypes = PluginManager.Current.ResolveMigrationTypes();
-
-            Assert.That(foundTypes.Any(), Is.True);
-            Assert.That(foundTypes.Count(), Is.EqualTo(4));
-        }
+        }       
 
         [Test]
         public void Can_Find_Migrations_With_Targtet_Version_Six()
         {
-            var foundMigrations = PluginManager.Current.FindMigrations();
+	        var foundMigrations = MigrationResolver.Current.Migrations;
             var targetVersion = new Version("6.0.0");
             var list = new List<IMigration>();
 
@@ -78,8 +73,9 @@ namespace Umbraco.Tests.Migrations
 
         [TearDown]
         public void TearDown()
-        {
-            PluginManager.Current = null;
+        {	        
+            MigrationResolver.Reset();
+			Resolution.IsFrozen = false;
         }
     }
 }
