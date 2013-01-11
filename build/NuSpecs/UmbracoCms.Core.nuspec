@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>UmbracoCms.Core</id>
-        <version>4.11.2</version>
+        <version>4.11.2.2</version>
         <title>Umbraco Cms Core Binaries</title>
         <authors>Morten Christensen</authors>
         <owners>Umbraco HQ</owners>
@@ -26,6 +26,7 @@
 		<file src="..\_BuildOutput\WebApp\bin\ICSharpCode.SharpZipLib.dll" target="lib\ICSharpCode.SharpZipLib.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\interfaces.dll" target="lib\interfaces.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\Lucene.Net.dll" target="lib\Lucene.Net.dll" />
+		<file src="..\_BuildOutput\WebApp\bin\log4net.dll" target="lib\log4net.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\Microsoft.ApplicationBlocks.Data.dll" target="lib\Microsoft.ApplicationBlocks.Data.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\Microsoft.Web.Helpers.dll" target="lib\Microsoft.Web.Helpers.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\Microsoft.Web.Infrastructure.dll" target="lib\Microsoft.Web.Infrastructure.dll" />
