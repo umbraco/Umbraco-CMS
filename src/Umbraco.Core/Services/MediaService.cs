@@ -280,14 +280,20 @@ namespace Umbraco.Core.Services
 	    /// <param name="userId">Id of the User deleting the Media</param>
 	    public void MoveToRecycleBin(IMedia media, int userId = -1)
 	    {
-	        //TODO If media item has children those should also be moved to the recycle bin as well
-			if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, -21), this))
+	        if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, -21), this))
 				return;
+
+            //Move children to Recycle Bin before the 'possible parent' is moved there
+            var children = GetChildren(media.Id);
+            foreach (var child in children)
+            {
+                MoveToRecycleBin(child, userId);
+            }
 
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 			{
-				((Core.Models.Media)media).ChangeTrashedState(true);
+				media.ChangeTrashedState(true);
 				repository.AddOrUpdate(media);
 				uow.Commit();
 			}

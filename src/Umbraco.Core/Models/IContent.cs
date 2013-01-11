@@ -70,12 +70,5 @@ namespace Umbraco.Core.Models
         /// Changes the Published state of the content object
         /// </summary>
         void ChangePublishedState(PublishedState state);
-
-        /// <summary>
-        /// Changes the Trashed state of the content object
-        /// </summary>
-        /// <param name="isTrashed">Boolean indicating whether content is trashed (true) or not trashed (false)</param>
-        /// <param name="parentId"> </param>
-        void ChangeTrashedState(bool isTrashed, int parentId = -1);
     }
 }
