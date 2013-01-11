@@ -155,6 +155,12 @@ namespace Umbraco.Core.Persistence.Querying
                 var field = _mapper.Map(m.Member.Name);
                 return field;
             }
+
+            if (m.Expression != null && m.Expression.NodeType == ExpressionType.Convert)
+            {
+                var field = _mapper.Map(m.Member.Name);
+                return field;
+            }
             
             var member = Expression.Convert(m, typeof(object));
             var lambda = Expression.Lambda<Func<object>>(member);

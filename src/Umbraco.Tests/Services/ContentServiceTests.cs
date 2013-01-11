@@ -204,6 +204,23 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Get_Descendents_Of_Contnet()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var hierarchy = CreateContentHierarchy();
+            contentService.Save(hierarchy, 0);
+
+            // Act
+            var contents = contentService.GetDescendants(1046);
+
+            // Assert
+            Assert.That(contents, Is.Not.Null);
+            Assert.That(contents.Any(), Is.True);
+            Assert.That(contents.Count(), Is.EqualTo(53));
+        }
+
+        [Test]
         public void Can_Get_All_Versions_Of_Content()
         {
             // Arrange
