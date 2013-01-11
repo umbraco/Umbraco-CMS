@@ -23,6 +23,7 @@
 	<files>
 		<file src="..\_BuildOutput\WebApp\bin\businesslogic.dll" target="lib\businesslogic.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\ClientDependency.Core.dll" target="lib\ClientDependency.Core.dll" />
+		<file src="..\_BuildOutput\WebApp\bin\ClientDependency.Core.Mvc.dll" target="lib\ClientDependency.Core.Mvc.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\cms.dll" target="lib\cms.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\controls.dll" target="lib\controls.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\CookComputing.XmlRpcV2.dll" target="lib\CookComputing.XmlRpcV2.dll" />
