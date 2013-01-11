@@ -936,9 +936,6 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Save()", false)]
         public override void Save()
         {
-            var e = new SaveEventArgs();
-            FireBeforeSave(e);
-
             foreach (var property in GenericProperties)
             {
                 if (property.Value == null)
@@ -947,6 +944,9 @@ namespace umbraco.cms.businesslogic.web
                 Content.SetValue(property.PropertyType.Alias, property.Value);
             }
             
+            var e = new SaveEventArgs();
+            FireBeforeSave(e);
+
             if (!e.Cancel)
             {
                 ApplicationContext.Current.Services.ContentService.Save(Content);
