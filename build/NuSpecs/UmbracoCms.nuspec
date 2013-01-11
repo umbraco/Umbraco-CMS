@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>UmbracoCms</id>
-        <version>4.11.2</version>
+        <version>4.11.2.2</version>
         <title>Umbraco Cms</title>
         <authors>Morten Christensen</authors>
         <owners>Umbraco HQ</owners>
@@ -15,7 +15,7 @@
         <language>en-US</language>
         <tags>umbraco</tags>
         <dependencies>
-            <dependency id="UmbracoCms.Core" version="4.11.2" />
+            <dependency id="UmbracoCms.Core" version="4.11.2.2" />
         </dependencies>
     </metadata>
   <files>
@@ -27,16 +27,19 @@
 	<file src="..\_BuildOutput\WebApp\scripts\**" target="Content\scripts" />
 	<file src="..\_BuildOutput\WebApp\usercontrols\**" target="Content\usercontrols" />
 	<file src="..\_BuildOutput\WebApp\xslt\**" target="Content\xslt" />
+	<file src="..\_BuildOutput\WebApp\Views\**" target="Content\Views" />
 	<file src="..\_BuildOutput\WebApp\default.aspx" target="Content\default.aspx" />
 	<file src="..\_BuildOutput\WebApp\Web.config" target="Content\Web.config" />
 	<file src="..\_BuildOutput\WebApp\App_Browsers\**" target="UmbracoFiles\App_Browsers" />
 	<file src="..\_BuildOutput\WebApp\App_Code\**" target="UmbracoFiles\App_Code" />
 	<file src="..\_BuildOutput\WebApp\App_Data\**" target="UmbracoFiles\App_Data" />
+	<file src="..\_BuildOutput\WebApp\App_Plugins\**" target="UmbracoFiles\App_Plugins" />
 	<file src="..\_BuildOutput\WebApp\config\**" target="UmbracoFiles\config" />
 	<file src="..\_BuildOutput\WebApp\install\**" target="UmbracoFiles\install" />
 	<file src="..\_BuildOutput\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
 	<file src="..\_BuildOutput\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
 	<file src="..\_BuildOutput\WebApp\Web.config" target="UmbracoFiles\Web.config" />
+	<file src="..\_BuildOutput\WebApp\Global.asax" target="UmbracoFiles\Global.asax" />
     <file src="tools\install.ps1" target="tools\install.ps1" />
     <file src="tools\Readme.txt" target="tools\Readme.txt" />
   </files>
