@@ -33,9 +33,9 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
 		{
 			base.PopulateFieldsOnLoad(macro, macroAssemblyValue, macroTypeValue);
 			//check if the ScriptingFile property contains the MacroPartials path
-			if (!macro.ScriptingFile.IsNullOrWhiteSpace() 
-				&& (macro.ScriptingFile.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
-				|| (Regex.IsMatch(macro.ScriptingFile, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled))))
+			if (macro.ScriptingFile.IsNullOrWhiteSpace() == false &&
+                macro.ScriptingFile.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
+				|| (Regex.IsMatch(macro.ScriptingFile, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled)))
 			{
 				macroPython.Text = "";
 				SelectedPartialView.Text = macro.ScriptingFile;
