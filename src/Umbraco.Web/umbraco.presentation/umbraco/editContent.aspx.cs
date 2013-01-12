@@ -401,7 +401,7 @@ namespace umbraco.cms.presentation
                 while (parent != null && parent.Published);
 
                 if (parent == null) // oops - internal error
-                    niceUrlText = "<i>" + ui.Text("content", "parentNotPublished", "???", base.getUser()) + "</i>";
+                    niceUrlText = "<i>" + ui.Text("content", "parentNotPublishedAnomaly", base.getUser()) + "</i>";
                 else
                     niceUrlText = "<i>" + ui.Text("content", "parentNotPublished", parent.Text, base.getUser()) + "</i>";
             }
