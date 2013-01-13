@@ -10,12 +10,22 @@ using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.template;
+using System.Collections.Generic;
+using System.Web.Security;
 
 namespace Umbraco.Web.Mvc
 {
 	public class RenderRouteHandler : IRouteHandler
 	{
-		
+        // Define reserved dictionary keys for controller, action and area specified in route additional values data
+        private static string RESERVED_ADDITIONAL_KEY_CONTROLLER = "c";
+        private static string RESERVED_ADDITIONAL_KEY_ACTION = "a";
+        private static string RESERVED_ADDITIONAL_KEY_AREA = "ar";
+        private static string[] RESERVED_ADDITIONAL_KEYS = new string[] { 
+            RESERVED_ADDITIONAL_KEY_CONTROLLER, 
+            RESERVED_ADDITIONAL_KEY_ACTION, 
+            RESERVED_ADDITIONAL_KEY_AREA };
+
 		public RenderRouteHandler(IControllerFactory controllerFactory)
 		{
 			if (controllerFactory == null) throw new ArgumentNullException("controllerFactory");			
@@ -91,6 +101,45 @@ namespace Umbraco.Web.Mvc
 			requestContext.RouteData.DataTokens.Add("umbraco-context", UmbracoContext); //required for UmbracoTemplatePage
 		}
 
+        /// <summary>
+        /// Decrypt additional route values
+        /// </summary>
+        /// <param name="requestContext"></param>
+        /// <returns></returns>
+        public static IDictionary<string, string> AdditionalRouteValues(RequestContext requestContext)
+        {
+            Dictionary<string, string> values = new Dictionary<string, string>();
+
+            if (requestContext.HttpContext.Request.RequestType != "POST")
+                return values;
+
+            //this field will contain a base64 encoded version of the surface route vals 
+            if (requestContext.HttpContext.Request["uformpostroutevals"].IsNullOrWhiteSpace())
+                return values;
+
+            var encodedVal = requestContext.HttpContext.Request["uformpostroutevals"];
+
+            if (!string.IsNullOrWhiteSpace(encodedVal))
+            {
+                // Decrypt additional values
+                var decodedBytes = MachineKey.Decode(encodedVal, MachineKeyProtection.All);
+                var decodedString = Encoding.UTF8.GetString(decodedBytes);
+
+                // Parse as query string
+                var decodedParts = decodedString.Split('&').Select(x => new { Key = x.Split('=')[0], Value = x.Split('=')[1] }).ToArray();
+
+                if (decodedParts != null)
+                {
+                    foreach (var part in decodedParts)
+                    {
+                        values[part.Key] = HttpUtility.UrlDecode(part.Value);
+                    }
+                }
+            }
+
+            return values;
+        }
+
 		/// <summary>
 		/// Checks the request and query strings to see if it matches the definition of having a Surface controller
 		/// posted value, if so, then we return a PostedDataProxyInfo object with the correct information.
@@ -106,22 +155,20 @@ namespace Umbraco.Web.Mvc
 			if (requestContext.HttpContext.Request["uformpostroutevals"].IsNullOrWhiteSpace())
 				return null;
 
-			var encodedVal = requestContext.HttpContext.Request["uformpostroutevals"];
-			var decodedString = Encoding.UTF8.GetString(Convert.FromBase64String(encodedVal));
-			//the value is formatted as query strings
-			var decodedParts = decodedString.Split('&').Select(x => new { Key = x.Split('=')[0], Value = x.Split('=')[1] }).ToArray();
+            // U4-1455 SurfaceController additionalRouteVal parameters should be encrypted
+            var decodedParts = AdditionalRouteValues(requestContext);
 
 			//validate all required keys exist
 
 			//the controller
-			if (!decodedParts.Any(x => x.Key == "c"))
-				return null;
-			//the action
-			if (!decodedParts.Any(x => x.Key == "a"))
-				return null;
-			//the area
-			if (!decodedParts.Any(x => x.Key == "ar"))
-				return null;
+            if (!decodedParts.Any(x => x.Key == RESERVED_ADDITIONAL_KEY_CONTROLLER))
+                return null;
+            //the action
+            if (!decodedParts.Any(x => x.Key == RESERVED_ADDITIONAL_KEY_ACTION))
+                return null;
+            //the area
+            if (!decodedParts.Any(x => x.Key == RESERVED_ADDITIONAL_KEY_AREA))
+                return null;
 
 			////the controller type, if it contains this then it is a plugin controller, not locally declared.
 			//if (decodedParts.Any(x => x.Key == "t"))
@@ -135,12 +182,19 @@ namespace Umbraco.Web.Mvc
 			//    };				
 			//}
 
+            //U4-1453 SurfaceController additionalRouteVal parameters not passed to controller action
+            foreach (var item in decodedParts.Where(x => !RESERVED_ADDITIONAL_KEYS.Contains(x.Key)))
+            {
+                // Populate route with additional values which aren't reserved values
+                requestContext.RouteData.Values.Add(item.Key, item.Value);
+            }
+
 			//return the proxy info without the surface id... could be a local controller.
 			return new PostedDataProxyInfo
 			{
-				ControllerName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "c").Value),
-				ActionName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "a").Value),
-				Area = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "ar").Value),
+                ControllerName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == RESERVED_ADDITIONAL_KEY_CONTROLLER).Value),
+                ActionName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == RESERVED_ADDITIONAL_KEY_ACTION).Value),
+                Area = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == RESERVED_ADDITIONAL_KEY_AREA).Value),
 			};
 
 		}

@@ -11,6 +11,7 @@ using Umbraco.Core.Dynamics;
 using Umbraco.Web.Mvc;
 using umbraco;
 using umbraco.cms.businesslogic.member;
+using System.Web.Security;
 
 namespace Umbraco.Web
 {
@@ -112,18 +113,36 @@ namespace Umbraco.Web
 														  viewContext.HttpContext.Server.UrlEncode(surfaceAction),
 														  area);
 
-				var additionalRouteValsAsQuery = additionalRouteVals.ToDictionary<object>().ToQueryString();
-				if (!additionalRouteValsAsQuery.IsNullOrWhiteSpace())
-					surfaceRouteParams = "&" + additionalRouteValsAsQuery;
+				//var additionalRouteValsAsQuery = additionalRouteVals.ToDictionary<object>().ToQueryString();
 
-				_base64String = Convert.ToBase64String(Encoding.UTF8.GetBytes(surfaceRouteParams));
+                //U4-1454 SurfaceController additionalRouteVal parameters do not handle equals sign correctly
+                string additionalRouteValsAsQuery = string.Empty;
+                var additionalRouteValsDict = additionalRouteVals.ToDictionary<object>();
+
+                foreach (var item in additionalRouteValsDict)
+                {
+                    additionalRouteValsAsQuery += viewContext.HttpContext.Server.UrlEncode(item.Key) + "=" + viewContext.HttpContext.Server.UrlEncode(item.Value.ToString()) + "&";
+                }
+
+                if (additionalRouteValsAsQuery.Length > 0)
+                    additionalRouteValsAsQuery = additionalRouteValsAsQuery.Substring(0, additionalRouteValsAsQuery.Length - 1);
+
+                if (!additionalRouteValsAsQuery.IsNullOrWhiteSpace())
+                    surfaceRouteParams += "&" + additionalRouteValsAsQuery;
+
+                if (!string.IsNullOrWhiteSpace(surfaceRouteParams))
+                {
+                    //U4-1455 SurfaceController additionalRouteVal parameters should be encrypted
+                    var bytesToEncrypt = Encoding.UTF8.GetBytes(surfaceRouteParams);
+                    _encryptedString = MachineKey.Encode(bytesToEncrypt, MachineKeyProtection.All);
+                }
 
 				_textWriter = viewContext.Writer;
 			}
 
 
 			private bool _disposed;
-			private readonly string _base64String;
+            private readonly string _encryptedString;
 			private readonly TextWriter _textWriter;
 
 			protected override void Dispose(bool disposing)
@@ -133,7 +152,7 @@ namespace Umbraco.Web
 				this._disposed = true;
 
 				//write out the hidden surface form routes
-				_textWriter.Write("<input name='uformpostroutevals' type='hidden' value='" + _base64String + "' />");
+                _textWriter.Write("<input name='uformpostroutevals' type='hidden' value='" + _encryptedString + "' />");
 
 				base.Dispose(disposing);
 			}
