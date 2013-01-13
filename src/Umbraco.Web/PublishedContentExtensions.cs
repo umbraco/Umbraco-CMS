@@ -590,42 +590,42 @@ namespace Umbraco.Web
 			var ancestors = content.AncestorsOrSelf();
 			return content.IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.Id == other.Id) != null);
 		}
-		public static HtmlString IsDescendantOrSelf(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue)
+		public static HtmlString IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
 		{
 			var ancestors = content.AncestorsOrSelf();
 			return content.IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.Id == other.Id) != null, valueIfTrue);
 		}
-		public static HtmlString IsDescendantOrSelf(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue, string valueIfFalse)
+		public static HtmlString IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
 		{
 			var ancestors = content.AncestorsOrSelf();
 			return content.IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.Id == other.Id) != null, valueIfTrue, valueIfFalse);
 		}
-		public static bool IsAncestor(this IPublishedContent content, DynamicPublishedContent other)
+		public static bool IsAncestor(this IPublishedContent content, IPublishedContent other)
 		{
 			var descendants = content.Descendants();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null);
 		}
-		public static HtmlString IsAncestor(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue)
+		public static HtmlString IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
 		{
 			var descendants = content.Descendants();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null, valueIfTrue);
 		}
-		public static HtmlString IsAncestor(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue, string valueIfFalse)
+		public static HtmlString IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
 		{
 			var descendants = content.Descendants();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null, valueIfTrue, valueIfFalse);
 		}
-		public static bool IsAncestorOrSelf(this IPublishedContent content, DynamicPublishedContent other)
+		public static bool IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other)
 		{
 			var descendants = content.DescendantsOrSelf();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null);
 		}
-		public static HtmlString IsAncestorOrSelf(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue)
+		public static HtmlString IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
 		{
 			var descendants = content.DescendantsOrSelf();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null, valueIfTrue);
 		}
-		public static HtmlString IsAncestorOrSelf(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue, string valueIfFalse)
+		public static HtmlString IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
 		{
 			var descendants = content.DescendantsOrSelf();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null, valueIfTrue, valueIfFalse);
