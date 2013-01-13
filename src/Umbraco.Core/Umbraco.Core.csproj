@@ -118,6 +118,7 @@
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
     <Compile Include="Dynamics\DynamicInstanceHelper.cs" />
+    <Compile Include="Dynamics\DynamicXmlConverter.cs" />
     <Compile Include="Events\CancellableEventArgs.cs" />
     <Compile Include="Events\ContentCacheEventArgs.cs" />
     <Compile Include="Events\CopyEventArgs.cs" />
