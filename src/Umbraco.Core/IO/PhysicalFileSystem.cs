@@ -9,8 +9,7 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.IO
 {
-	[UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1156", "Will be declared public after 4.10")]
-    internal class PhysicalFileSystem : IFileSystem
+    public class PhysicalFileSystem : IFileSystem
     {
         private readonly string _rootPath;
         private readonly string _rootUrl;
