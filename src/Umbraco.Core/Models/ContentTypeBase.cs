@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
@@ -153,7 +154,12 @@ namespace Umbraco.Core.Models
             get { return _alias; }
             set
             {
-                _alias = value;
+                //Ensures a valid ContentType alias
+                //Would have liked to use .ToUmbracoAlias() but that would break casing upon saving older/upgraded ContentTypes
+                var result = Regex.Replace(value, @"[^a-zA-Z0-9\s\.-]+", "", RegexOptions.Compiled);
+                result = result.Replace(" ", "");
+
+                _alias = result;
                 OnPropertyChanged(AliasSelector);
             }
         }
