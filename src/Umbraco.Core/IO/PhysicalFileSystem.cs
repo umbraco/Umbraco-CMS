@@ -18,8 +18,8 @@ namespace Umbraco.Core.IO
 
         public PhysicalFileSystem(string virtualRoot)
         {
-            RootPath = System.Web.Hosting.HostingEnvironment.MapPath(virtualRoot);
-            _rootUrl = VirtualPathUtility.ToAbsolute(virtualRoot);
+            RootPath = IOHelper.MapPath(virtualRoot);
+            _rootUrl = IOHelper.ResolveUrl(virtualRoot);
         }
 
         public PhysicalFileSystem(string rootPath, string rootUrl)

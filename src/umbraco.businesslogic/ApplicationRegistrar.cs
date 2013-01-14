@@ -24,7 +24,7 @@ namespace umbraco.BusinessLogic
                     try
                     {
                         var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
-                        _sqlHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString);
+                        _sqlHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false);
                     }
                     catch { }
                 }

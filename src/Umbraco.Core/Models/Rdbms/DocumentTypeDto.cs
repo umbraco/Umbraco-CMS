@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int ContentTypeNodeId { get; set; }
 
         [Column("templateNodeId")]
-        /*[ForeignKey(typeof(TemplateDto))]*/
+        [ForeignKey(typeof(TemplateDto), Column = "nodeId")]
         public int TemplateNodeId { get; set; }
 
         [Column("IsDefault")]

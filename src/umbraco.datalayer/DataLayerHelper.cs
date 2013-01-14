@@ -42,11 +42,16 @@ namespace umbraco.DataLayer
         /// <remarks>This method will change to allow the addition of external SQL helpers.</remarks>
         public static ISqlHelper CreateSqlHelper(string connectionString)
         {
+            return CreateSqlHelper(connectionString, true);
+        }
+
+        public static ISqlHelper CreateSqlHelper(string connectionString, bool forceLegacyConnection)
+        {
             /* check arguments */
             if (string.IsNullOrEmpty(connectionString))
                 throw new ArgumentNullException("connectionString");
 
-            if (IsEmbeddedDatabase(connectionString) && connectionString.ToLower().Contains("SQLCE4Umbraco".ToLower()) == false)
+            if (forceLegacyConnection == false && IsEmbeddedDatabase(connectionString) && connectionString.ToLower().Contains("SQLCE4Umbraco".ToLower()) == false)
             {
                 // Input is : Datasource=|DataDirectory|Umbraco.sdf
                 // Should be: datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf
@@ -67,10 +72,10 @@ namespace umbraco.DataLayer
                 throw new ArgumentException("Bad connection string.", "connectionString", ex);
             }
 
-            var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
-
-            if (databaseSettings != null)
-                SetDataHelperNames(databaseSettings);
+            var connectionStringSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            
+            if (forceLegacyConnection == false && connectionStringSettings != null)
+                SetDataHelperNames(connectionStringSettings);
             else
                 SetDataHelperNamesLegacyConnectionString(connectionStringBuilder);
 

@@ -345,7 +345,7 @@ namespace umbraco.cms.businesslogic.web
             //Create a new IContent object based on the passed in DocumentType's alias, set the name and save it
             IContent content = ApplicationContext.Current.Services.ContentService.CreateContent(ParentId, dct.Alias, u.Id);
             content.Name = Name;
-            ApplicationContext.Current.Services.ContentService.Save(content);
+            ApplicationContext.Current.Services.ContentService.Save(content, u.Id);
 
             //read the whole object from the db
             Document d = new Document(content);
@@ -949,7 +949,9 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                ApplicationContext.Current.Services.ContentService.Save(Content);
+                var current = User.GetCurrent();
+                int userId = current == null ? 0 : current.Id;
+                ApplicationContext.Current.Services.ContentService.Save(Content, userId);
 
                 base.Save();
                 // update preview xml
@@ -966,9 +968,6 @@ namespace umbraco.cms.businesslogic.web
         /// <returns></returns>
         public bool SaveAndPublish(User u)
         {
-            var e = new SaveEventArgs();
-            FireBeforeSave(e);
-
             foreach (var property in GenericProperties)
             {
                 if(property.Value == null)
@@ -976,6 +975,9 @@ namespace umbraco.cms.businesslogic.web
 
                 Content.SetValue(property.PropertyType.Alias, property.Value);
             }
+
+            var e = new SaveEventArgs();
+            FireBeforeSave(e);
 
             if (!e.Cancel)
             {
@@ -1054,6 +1056,16 @@ namespace umbraco.cms.businesslogic.web
             if (tempPath.Length > 0)
                 tempPath = tempPath.Substring(0, tempPath.Length - 1);
             return tempPath;
+        }
+
+        /// <summary>
+        /// Overrides the moving of a <see cref="Document"/> object to a new location by changing its parent id.
+        /// </summary>
+        public override void Move(int newParentId)
+        {
+            var current = User.GetCurrent();
+            int userId = current == null ? 0 : current.Id;
+            ApplicationContext.Current.Services.ContentService.Move(Content, newParentId, userId);
         }
 
         /// <summary>

@@ -387,7 +387,7 @@ namespace umbraco
 			get
 			{
                 var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
-                var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString);
+                var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false);
 
 				if (HttpContext.Current != null)
 				{

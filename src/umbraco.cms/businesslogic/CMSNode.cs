@@ -576,7 +576,7 @@ order by level,sortOrder";
         /// Moves the CMSNode from the current position in the hierarchy to the target
         /// </summary>
         /// <param name="NewParentId">Target CMSNode id</param>
-        public void Move(int newParentId)
+        public virtual void Move(int newParentId)
         {
             CMSNode parent = new CMSNode(newParentId);
             Move(parent);

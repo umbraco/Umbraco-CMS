@@ -33,8 +33,8 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         private void EnsureDependencies()
-        {
-            _fileSystem = FileSystemProviderManager.Current.GetFileSystemProvider("macros");
+        {            
+			_fileSystem = new PhysicalFileSystem("~/App_Data/Macros");
             var serviceStackSerializer = new ServiceStackJsonSerializer();
             _serializationService = new SerializationService(serviceStackSerializer);
         }
