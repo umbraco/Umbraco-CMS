@@ -6,6 +6,7 @@ using System.Web.UI.HtmlControls;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using System.IO;
+using Umbraco.Core.Persistence;
 using umbraco.DataLayer;
 using umbraco.IO;
 
@@ -85,7 +86,7 @@ namespace umbraco.presentation.install.steps
             var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
             if (databaseSettings != null)
             {
-                var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString);
+                var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false);
                 connectionStringBuilder.ConnectionString = dataHelper.ConnectionString;
 
                 // Prepare data layer type

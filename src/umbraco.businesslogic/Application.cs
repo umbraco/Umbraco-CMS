@@ -94,7 +94,7 @@ namespace umbraco.BusinessLogic
                             ConfigurationManager.AppSettings.ContainsKey(umbracoDsn))
                             connectionString = ConfigurationManager.AppSettings[umbracoDsn];
 
-                        _sqlHelper = DataLayerHelper.CreateSqlHelper(connectionString);
+                        _sqlHelper = DataLayerHelper.CreateSqlHelper(connectionString, false);
                     }
                     catch(Exception ex)
                     {

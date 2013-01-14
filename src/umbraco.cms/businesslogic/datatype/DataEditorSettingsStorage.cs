@@ -14,9 +14,9 @@ namespace umbraco.cms.businesslogic.datatype
         public DataEditorSettingsStorage()
         {
             var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
-            var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString);
+            var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false);
 
-            init(DataLayerHelper.CreateSqlHelper(dataHelper.ConnectionString));
+            init(DataLayerHelper.CreateSqlHelper(dataHelper.ConnectionString, false));
         }
 
         private void init(ISqlHelper connection)
