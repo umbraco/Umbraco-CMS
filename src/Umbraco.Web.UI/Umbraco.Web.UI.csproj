@@ -658,6 +658,7 @@
     <Content Include="umbraco_client\tinymce3\langs\da.js" />
     <Content Include="umbraco_client\tinymce3\langs\de.js" />
     <Content Include="umbraco_client\tinymce3\langs\en.js" />
+    <Content Include="umbraco_client\tinymce3\langs\en_us.js" />
     <Content Include="umbraco_client\tinymce3\langs\fi.js" />
     <Content Include="umbraco_client\tinymce3\langs\fr.js" />
     <Content Include="umbraco_client\tinymce3\langs\he.js" />
