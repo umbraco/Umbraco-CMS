@@ -40,9 +40,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IContent PerformGet(int id)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+            var sql = GetBaseQuery(false)
+                .Where(GetBaseWhereClause(), new { Id = id })
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
             var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
 
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var content = factory.BuildEntity(dto);
 
             //Check if template id is set on DocumentDto, and get ITemplate if it is.
-            if (dto.TemplateId.HasValue)
+            if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
             {
                 content.Template = _templateRepository.Get(dto.TemplateId.Value);
             }
