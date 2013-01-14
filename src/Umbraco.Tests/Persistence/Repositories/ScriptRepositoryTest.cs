@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [SetUp]
         public void Initialize()
         {
-            _fileSystem = FileSystemProviderManager.Current.GetFileSystemProvider("scripts");
+            _fileSystem = new PhysicalFileSystem(SystemDirectories.Scripts, "/scripts");
             var stream = CreateStream("Umbraco.Sys.registerNamespace(\"Umbraco.Utils\");");
             _fileSystem.AddFile("test-script.js", stream);
         }
@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            var repository = new ScriptRepository(unitOfWork);
+			var repository = new ScriptRepository(unitOfWork, _fileSystem);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ScriptRepository(unitOfWork);
+			var repository = new ScriptRepository(unitOfWork, _fileSystem);
 
             // Act
             var script = new Script("test-add-script.js") {Content = "/// <reference name=\"MicrosoftAjax.js\"/>"};
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ScriptRepository(unitOfWork);
+			var repository = new ScriptRepository(unitOfWork, _fileSystem);
 
             // Act
             var script = new Script("test-updated-script.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
@@ -83,7 +83,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ScriptRepository(unitOfWork);
+			var repository = new ScriptRepository(unitOfWork, _fileSystem);
 
             // Act
             var script = repository.Get("test-script.js");
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ScriptRepository(unitOfWork);
+			var repository = new ScriptRepository(unitOfWork, _fileSystem);
 
             // Act
             var exists = repository.Get("test-script.js");
@@ -117,7 +117,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ScriptRepository(unitOfWork);
+			var repository = new ScriptRepository(unitOfWork, _fileSystem);
 
             var script = new Script("test-script1.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
             repository.AddOrUpdate(script);
@@ -143,7 +143,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ScriptRepository(unitOfWork);
+            var repository = new ScriptRepository(unitOfWork, _fileSystem);
 
             var script = new Script("test-script1.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
             repository.AddOrUpdate(script);
@@ -169,7 +169,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ScriptRepository(unitOfWork);
+            var repository = new ScriptRepository(unitOfWork, _fileSystem);
 
             // Act
             var exists = repository.Exists("test-script.js");
@@ -183,7 +183,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             _fileSystem = null;
             //Delete all files
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider("scripts");
+	        var fs = new PhysicalFileSystem(SystemDirectories.Scripts, "/scripts");
             var files = fs.GetFiles("", "*.js");
             foreach (var file in files)
             {

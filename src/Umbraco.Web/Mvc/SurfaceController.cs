@@ -15,7 +15,7 @@ namespace Umbraco.Web.Mvc
 	//		//return Content("<html><body>hello</body></html>");
 	//	}
 
-	//	public ActionResult PostVals(string name)
+	//	public ActionResult PostVals(TestFormModel model)
 	//	{
 	//		ModelState.AddModelError("name", "bad name!");
 	//		return CurrentUmbracoPage();
@@ -28,6 +28,11 @@ namespace Umbraco.Web.Mvc
 	//	}
 	//}
 
+	//public class TestFormModel
+	//{
+	//	public string Name { get; set; }
+	//}
+
 	//public class LocalSurfaceController : SurfaceController
 	//{
 	//	public ActionResult Index()
@@ -35,9 +40,9 @@ namespace Umbraco.Web.Mvc
 	//		return View();
 	//	}
 
-	//	public ActionResult PostVals([Bind(Prefix = "blah")]string name)
+	//	public ActionResult PostVals([Bind(Prefix = "blah")]TestFormModel model)
 	//	{
-	//		ModelState.AddModelError("name", "you suck!");
+	//		ModelState.AddModelError("Name", "you suck!");
 	//		return this.RedirectToCurrentUmbracoPage();
 	//	}
 

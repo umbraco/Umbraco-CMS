@@ -44,8 +44,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private void EnsureDepedencies()
         {
-            _masterpagesFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider("masterpages");
-            _viewsFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider("views");
+            _masterpagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
+            _viewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
         }
 
         #region Overrides of RepositoryBase<int,ITemplate>
