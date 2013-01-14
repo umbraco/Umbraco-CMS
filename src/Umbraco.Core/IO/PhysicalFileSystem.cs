@@ -18,7 +18,11 @@ namespace Umbraco.Core.IO
 
         public PhysicalFileSystem(string virtualRoot)
         {
-            RootPath = IOHelper.MapPath(virtualRoot);
+	        if (virtualRoot == null) throw new ArgumentNullException("virtualRoot");
+			if (!virtualRoot.StartsWith("~/"))
+				throw new ArgumentException("The virtualRoot argument must be a virtual path and start with '~/'");
+
+	        RootPath = IOHelper.MapPath(virtualRoot);
             _rootUrl = IOHelper.ResolveUrl(virtualRoot);
         }
 
@@ -29,6 +33,9 @@ namespace Umbraco.Core.IO
 
             if (string.IsNullOrEmpty(rootUrl))
                 throw new ArgumentException("The argument 'rootUrl' cannot be null or empty.");
+
+			if (rootPath.StartsWith("~/"))
+				throw new ArgumentException("The rootPath argument cannot be a virtual path and cannot start with '~/'");
 
             RootPath = rootPath;
             _rootUrl = rootUrl;

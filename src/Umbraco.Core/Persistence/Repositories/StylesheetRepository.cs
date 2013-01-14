@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class StylesheetRepository : FileRepository<string, Stylesheet>, IStylesheetRepository
     {
-		public StylesheetRepository(IUnitOfWork work, IFileSystem fileSystem)
+		internal StylesheetRepository(IUnitOfWork work, IFileSystem fileSystem)
 			: base(work, fileSystem)
 	    {
 		    

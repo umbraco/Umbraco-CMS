@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class ScriptRepository : FileRepository<string, Script>, IScriptRepository
     {
-		public ScriptRepository(IUnitOfWork work, IFileSystem fileSystem)
+		internal ScriptRepository(IUnitOfWork work, IFileSystem fileSystem)
 			: base(work, fileSystem)
 	    {		    
 	    }

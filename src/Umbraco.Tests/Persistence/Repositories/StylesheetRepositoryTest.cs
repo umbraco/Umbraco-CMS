@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [SetUp]
         public void Initialize()
         {
-            _fileSystem = new PhysicalFileSystem(SystemDirectories.Css, "/css");
+            _fileSystem = new PhysicalFileSystem(SystemDirectories.Css);
             var stream = CreateStream("body {background:#EE7600; color:#FFF;}");
             _fileSystem.AddFile("styles.css", stream);
         }

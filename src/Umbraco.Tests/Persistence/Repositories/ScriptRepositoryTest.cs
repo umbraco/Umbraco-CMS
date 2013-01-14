@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [SetUp]
         public void Initialize()
         {
-            _fileSystem = new PhysicalFileSystem(SystemDirectories.Scripts, "/scripts");
+            _fileSystem = new PhysicalFileSystem(SystemDirectories.Scripts);
             var stream = CreateStream("Umbraco.Sys.registerNamespace(\"Umbraco.Utils\");");
             _fileSystem.AddFile("test-script.js", stream);
         }
@@ -183,7 +183,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             _fileSystem = null;
             //Delete all files
-	        var fs = new PhysicalFileSystem(SystemDirectories.Scripts, "/scripts");
+	        var fs = new PhysicalFileSystem(SystemDirectories.Scripts);
             var files = fs.GetFiles("", "*.js");
             foreach (var file in files)
             {
