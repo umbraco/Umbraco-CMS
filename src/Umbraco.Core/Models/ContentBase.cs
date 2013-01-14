@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Web;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
@@ -256,11 +257,93 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Sets the value of a Property
+        /// Sets the <see cref="System.Object"/> value of a Property
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
         /// <param name="value">Value to set for the Property</param>
         public virtual void SetValue(string propertyTypeAlias, object value)
+        {
+            // .NET magic to call one of the 'SetPropertyValue' handlers with matching signature 
+            ((dynamic)this).SetPropertyValue(propertyTypeAlias, (dynamic)value);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="System.String"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, string value)
+        {
+            SetValueOnProperty(propertyTypeAlias, value);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="System.Int32"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, int value)
+        {
+            SetValueOnProperty(propertyTypeAlias, value);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="System.Boolean"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, bool value)
+        {
+            int val = Convert.ToInt32(value);
+            SetValueOnProperty(propertyTypeAlias, val);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="System.DateTime"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, DateTime value)
+        {
+            SetValueOnProperty(propertyTypeAlias, value);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="System.Web.HttpPostedFile"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFile value)
+        {
+            ContentExtensions.SetValue(this, propertyTypeAlias, value);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="System.Web.HttpPostedFileBase"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFileBase value)
+        {
+            ContentExtensions.SetValue(this, propertyTypeAlias, value);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="System.Web.HttpPostedFileWrapper"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFileWrapper value)
+        {
+            ContentExtensions.SetValue(this, propertyTypeAlias, value);
+        }
+
+        /// <summary>
+        /// Private method to set the value of a property
+        /// </summary>
+        /// <param name="propertyTypeAlias"></param>
+        /// <param name="value"></param>
+        private void SetValueOnProperty(string propertyTypeAlias, object value)
         {
             if (Properties.Contains(propertyTypeAlias))
             {

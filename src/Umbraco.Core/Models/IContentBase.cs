@@ -66,7 +66,7 @@ namespace Umbraco.Core.Models
         TPassType GetValue<TPassType>(string propertyTypeAlias);
 
         /// <summary>
-        /// Sets the value of a Property
+        /// Sets the <see cref="System.Object"/> value of a Property
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
         /// <param name="value">Value to set for the Property</param>
