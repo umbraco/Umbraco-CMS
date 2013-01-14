@@ -41,7 +41,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // at the top to populate the default template property correctly.
             contentTypeSql.OrderByDescending<DocumentTypeDto>(x => x.IsDefault);
 
-            var dto = Database.Query<DocumentTypeDto, ContentTypeDto, NodeDto>(contentTypeSql).FirstOrDefault();
+            var dto = Database.Fetch<DocumentTypeDto, ContentTypeDto, NodeDto>(contentTypeSql).FirstOrDefault();
 
             if (dto == null)
                 return null;

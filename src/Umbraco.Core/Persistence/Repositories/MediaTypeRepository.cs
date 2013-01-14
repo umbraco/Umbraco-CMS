@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentTypeSql = GetBaseQuery(false);
             contentTypeSql.Where(GetBaseWhereClause(), new { Id = id});
 
-            var dto = Database.Query<ContentTypeDto, NodeDto>(contentTypeSql).FirstOrDefault();
+            var dto = Database.Fetch<ContentTypeDto, NodeDto>(contentTypeSql).FirstOrDefault();
 
             if (dto == null)
                 return null;
