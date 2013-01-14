@@ -905,9 +905,13 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Optional Id of the User moving the Content</param>
 		public void Move(IContent content, int parentId, int userId = -1)
 		{
-            //TODO Verify that SortOrder + Path is updated correctly
-            //TODO Add a check to see if parentId = -20 because then we should change the TrashState
-			
+            //This ensures that the correct method is called if this method is used to Move to recycle bin.
+			if (parentId == -20)
+			{
+			    MoveToRecycleBin(content, userId);
+                return;
+			}
+
 			if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, parentId), this)) 
 				return;
 			
