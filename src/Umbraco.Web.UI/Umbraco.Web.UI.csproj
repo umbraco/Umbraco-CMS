@@ -1809,6 +1809,23 @@
       <DependentUpon>applications.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
+    <Content Include="Umbraco\scripting\templates\cshtml\EmptyTemplate.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Umbraco\scripting\templates\cshtml\Gallery.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListAncestorsFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesFromChangeableSource.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesOrderedByDate.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesOrderedByName.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesOrderedByProperty.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesWithDoctype.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListDescendantsFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListImagesFromMediaFolder.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Umbraco\scripting\templates\cshtml\MultinodeTree-picker.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\TwitterFeed.cshtml" />
     <None Include="umbraco_client\CodeMirror\js\mode\coffeescript\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\pascal\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\perl\LICENSE" />

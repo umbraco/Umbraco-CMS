@@ -1,0 +1,10 @@
+@inherits umbraco.MacroEngines.DynamicNodeContext
+
+
+<ul>
+	@*OrderBy() takes the property to sort by*@
+    @foreach (var page in Model.Children.Where("Visible").OrderBy("Name"))
+    { 
+        <li><a href="@page.Url">@page.Name</a></li>
+    }
+</ul>
