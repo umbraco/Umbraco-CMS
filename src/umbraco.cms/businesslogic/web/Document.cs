@@ -966,9 +966,6 @@ namespace umbraco.cms.businesslogic.web
         /// <returns></returns>
         public bool SaveAndPublish(User u)
         {
-            var e = new SaveEventArgs();
-            FireBeforeSave(e);
-
             foreach (var property in GenericProperties)
             {
                 if(property.Value == null)
@@ -976,6 +973,9 @@ namespace umbraco.cms.businesslogic.web
 
                 Content.SetValue(property.PropertyType.Alias, property.Value);
             }
+
+            var e = new SaveEventArgs();
+            FireBeforeSave(e);
 
             if (!e.Cancel)
             {

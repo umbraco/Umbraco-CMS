@@ -5,8 +5,6 @@ using System.Xml;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.Files;
 using umbraco.cms.businesslogic.property;
-using IContent = Umbraco.Core.Models.IContent;
-using IMedia = Umbraco.Core.Models.IMedia;
 
 namespace umbraco.cms.businesslogic.datatype
 {
