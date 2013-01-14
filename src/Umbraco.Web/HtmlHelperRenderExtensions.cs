@@ -112,7 +112,7 @@ namespace Umbraco.Web
 														  viewContext.HttpContext.Server.UrlEncode(surfaceAction),
 														  area);
 
-				var additionalRouteValsAsQuery = additionalRouteVals.ToDictionary<object>().ToQueryString();
+				var additionalRouteValsAsQuery = additionalRouteVals != null ? additionalRouteVals.ToDictionary<object>().ToQueryString() : null;
 
 				if (!additionalRouteValsAsQuery.IsNullOrWhiteSpace())
 					surfaceRouteParams += "&" + additionalRouteValsAsQuery;
