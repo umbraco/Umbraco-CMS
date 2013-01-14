@@ -149,6 +149,8 @@
     <Compile Include="ApplicationTree.cs" />
     <Compile Include="ApplicationTreeRegistrar.cs" />
     <Compile Include="DefaultApps.cs" />
+    <Compile Include="MacroErrorBehaviour.cs" />
+    <Compile Include="MacroErrorConfig.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="TreeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

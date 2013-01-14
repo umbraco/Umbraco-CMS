@@ -61,5 +61,13 @@ namespace umbraco.cms.businesslogic {
     {
         public bool CancelChildren { get; set; }
     }
-    
+
+    // Provides information on the macro that caused an error
+    public class MacroErrorEventArgs : System.EventArgs
+    {
+        public string Name { get; set; }
+        public string Alias { get; set; }
+        public string File { get; set; }
+        public Exception Exception { get; set; }
+    }
 }
