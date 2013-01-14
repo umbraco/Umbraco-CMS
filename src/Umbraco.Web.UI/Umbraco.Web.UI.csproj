@@ -1849,14 +1849,8 @@
     <Content Include="Umbraco\masterpages\umbracoDialog.Master" />
     <Content Include="Umbraco\Search\QuickSearchHandler.ashx" />
     <Content Include="Umbraco\scripting\templates\cshtml\Breadcrumb.cshtml" />
-    <Content Include="Umbraco\scripting\templates\cshtml\ListSubPagesByDateAndLimit.cshtml" />
-    <Content Include="Umbraco\scripting\templates\cshtml\Macro-Parameters.cshtml" />
-    <Content Include="Umbraco\scripting\templates\cshtml\Media.cshtml" />
     <Content Include="Umbraco\scripting\templates\cshtml\Navigation.cshtml" />
-    <Content Include="Umbraco\scripting\templates\cshtml\Paging.cshtml" />
-    <Content Include="Umbraco\scripting\templates\cshtml\SelectChildrenByDocumentType.cshtml" />
     <Content Include="Umbraco\scripting\templates\cshtml\SiteMap.cshtml" />
-    <Content Include="Umbraco\scripting\templates\cshtml\UsingRelatedLinks.cshtml" />
     <None Include="Umbraco\scripting\templates\py\SubpagesAsThumnbnails.py" />
     <None Include="Umbraco\scripting\templates\py\SubpagesFromAChangeableSource.py" />
     <None Include="Umbraco\scripting\templates\py\SubpagesFromCurrentPage.py" />
