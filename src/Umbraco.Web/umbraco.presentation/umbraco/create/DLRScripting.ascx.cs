@@ -62,13 +62,16 @@ namespace umbraco.presentation.create
             list.Items.Clear();
 
             // always add the option of an empty one
-            list.Items.Add(new ListItem("Empty template", ""));
+            list.Items.Add(scriptType == "cshtml"
+                               ? new ListItem("Empty template", "cshtml/EmptyTemplate.cshtml")
+                               : new ListItem("Empty template", ""));
 
             if (System.IO.Directory.Exists(abPath))
             {
                 string extension = "." + scriptType;
 
-                foreach (System.IO.FileInfo fi in new System.IO.DirectoryInfo(abPath).GetFiles("*" + extension))
+                //Already adding Empty Template as the first item, so don't add it again
+                foreach (System.IO.FileInfo fi in new System.IO.DirectoryInfo(abPath).GetFiles("*" + extension).Where(fi => fi.Name != "EmptyTemplate.cshtml"))
                 {
                     string filename = System.IO.Path.GetFileName(fi.FullName);
 
