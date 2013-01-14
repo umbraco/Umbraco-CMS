@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
+using System.Web.Security;
 
 namespace Umbraco.Core
 {
@@ -18,6 +19,28 @@ namespace Umbraco.Core
     ///</summary>
     public static class StringExtensions
     {
+		/// <summary>
+		/// Encrypt the string using the MachineKey in medium trust
+		/// </summary>
+		/// <param name="toEncrypt"></param>
+		/// <returns></returns>
+		public static string EncryptWithMachineKey(this string toEncrypt)
+		{
+			var output = FormsAuthentication.Encrypt(new FormsAuthenticationTicket(0, "temp", DateTime.Now, DateTime.MaxValue, false, toEncrypt));
+			return output;
+		}
+
+		/// <summary>
+		/// Decrypt the encrypted string using the Machine key in medium trust
+		/// </summary>
+		/// <param name="encrypted"></param>
+		/// <returns></returns>
+		public static string DecryptWithMachineKey(this string encrypted)
+		{
+			var output = FormsAuthentication.Decrypt(encrypted);
+			return output.UserData;
+		}
+
 		//this is from SqlMetal and just makes it a bit of fun to allow pluralisation
 		public static string MakePluralName(this string name)
 		{
