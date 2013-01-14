@@ -262,6 +262,13 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Id of the User moving the Media</param>
 		public void Move(IMedia media, int parentId, int userId = -1)
 		{
+            //This ensures that the correct method is called if this method is used to Move to recycle bin.
+            if (parentId == -21)
+            {
+                MoveToRecycleBin(media, userId);
+                return;
+            }
+
 			if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, parentId), this))
 				return;
 

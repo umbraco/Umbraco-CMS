@@ -240,11 +240,13 @@ namespace Umbraco.Core.Persistence.Repositories
             //Updates Modified date
             ((Models.Media)entity).UpdatingEntity();
 
-            //Look up parent to get and set the correct Path if ParentId has changed
+            //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
             if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
             {
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
+                var maxSortOrder = Database.ExecuteScalar<int>("SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId", new { ParentId = entity.ParentId });
+                entity.SortOrder = maxSortOrder;
             }
 
             var factory = new MediaFactory(NodeObjectTypeId, entity.Id);

@@ -275,7 +275,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 entity.UpdateDate = DateTime.Now;
             }
 
-            //Look up parent to get and set the correct Path if ParentId has changed
+            //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
             if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
             {
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
