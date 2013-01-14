@@ -1059,6 +1059,16 @@ namespace umbraco.cms.businesslogic.web
         }
 
         /// <summary>
+        /// Overrides the moving of a <see cref="Document"/> object to a new location by changing its parent id.
+        /// </summary>
+        public override void Move(int newParentId)
+        {
+            var current = User.GetCurrent();
+            int userId = current == null ? 0 : current.Id;
+            ApplicationContext.Current.Services.ContentService.Move(Content, newParentId, userId);
+        }
+
+        /// <summary>
         /// Creates a new document of the same type and copies all data from the current onto it. Due to backwards compatibility we can't return
         /// the new Document, but it's included in the CopyEventArgs.Document if you subscribe to the AfterCopy event
         /// </summary>

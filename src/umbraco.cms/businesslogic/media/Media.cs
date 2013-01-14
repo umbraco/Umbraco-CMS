@@ -1,6 +1,7 @@
 using System;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using System.Collections;
 using System.Collections.Generic;
@@ -285,6 +286,16 @@ namespace umbraco.cms.businesslogic.media
         #endregion
 
         #region Public methods
+
+        /// <summary>
+        /// Overrides the moving of a <see cref="Media"/> object to a new location by changing its parent id.
+        /// </summary>
+        public override void Move(int newParentId)
+        {
+            var current = User.GetCurrent();
+            int userId = current == null ? 0 : current.Id;
+            ApplicationContext.Current.Services.MediaService.Move(MediaItem, newParentId, userId);
+        }
 
         /// <summary>
         /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
