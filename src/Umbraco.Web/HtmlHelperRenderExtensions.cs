@@ -112,16 +112,7 @@ namespace Umbraco.Web
 														  viewContext.HttpContext.Server.UrlEncode(surfaceAction),
 														  area);
 
-				string additionalRouteValsAsQuery = string.Empty;
-				var additionalRouteValsDict = additionalRouteVals.ToDictionary<object>();
-
-				foreach (var item in additionalRouteValsDict)
-				{
-					additionalRouteValsAsQuery += viewContext.HttpContext.Server.UrlEncode(item.Key) + "=" + viewContext.HttpContext.Server.UrlEncode(item.Value.ToString()) + "&";
-				}
-
-				if (additionalRouteValsAsQuery.Length > 0)
-					additionalRouteValsAsQuery = additionalRouteValsAsQuery.Substring(0, additionalRouteValsAsQuery.Length - 1);
+				var additionalRouteValsAsQuery = additionalRouteVals.ToDictionary<object>().ToQueryString();
 
 				if (!additionalRouteValsAsQuery.IsNullOrWhiteSpace())
 					surfaceRouteParams += "&" + additionalRouteValsAsQuery;
