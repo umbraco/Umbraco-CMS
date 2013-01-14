@@ -1830,14 +1830,31 @@
       <DependentUpon>applications.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <None Include="Umbraco_Client\CodeMirror\Js\Mode\Coffeescript\LICENSE" />
-    <None Include="Umbraco_Client\CodeMirror\Js\Mode\Pascal\LICENSE" />
-    <None Include="Umbraco_Client\CodeMirror\Js\Mode\Perl\LICENSE" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Razor\LICENSE" />
-    <None Include="Umbraco_Client\CodeMirror\Js\Mode\Ruby\LICENSE" />
-    <None Include="Umbraco_Client\CodeMirror\Js\Mode\R\LICENSE" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Sieve\LICENSE" />
-    <None Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\LICENSE" />
+    <Content Include="Umbraco\scripting\templates\cshtml\EmptyTemplate.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Umbraco\scripting\templates\cshtml\Gallery.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListAncestorsFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesFromChangeableSource.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesOrderedByDate.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesOrderedByName.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesOrderedByProperty.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesWithDoctype.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListDescendantsFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListImagesFromMediaFolder.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Umbraco\scripting\templates\cshtml\MultinodeTree-picker.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\TwitterFeed.cshtml" />
+    <None Include="umbraco_client\CodeMirror\js\mode\coffeescript\LICENSE" />
+    <None Include="umbraco_client\CodeMirror\js\mode\pascal\LICENSE" />
+    <None Include="umbraco_client\CodeMirror\js\mode\perl\LICENSE" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\razor\LICENSE" />
+    <None Include="umbraco_client\CodeMirror\js\mode\ruby\LICENSE" />
+    <None Include="umbraco_client\CodeMirror\js\mode\r\LICENSE" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\sieve\LICENSE" />
+    <None Include="umbraco_client\CodeMirror\js\mode\xquery\LICENSE" />
     <Content Include="Views\Web.config" />
     <Content Include="Web.config" />
     <None Include="web.Template.Debug.config">
