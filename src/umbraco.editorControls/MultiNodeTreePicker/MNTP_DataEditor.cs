@@ -55,7 +55,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 			                                                                                       "umbraco.editorControls",
 			                                                                                       "MultiNodeTreePicker.FilteredContentTree",
 			                                                                                       contentTree.Tree.Action),
-			                                             contentTree.App);
+                                                                                                   contentTree.App);
 
 			//find the media tree to duplicate
 			var mediaTree = TreeDefinitionCollection.Instance.Single(x => x.Tree.Alias.ToUpper() == "MEDIA");
@@ -63,13 +63,13 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 			                                           new umbraco.BusinessLogic.ApplicationTree(true, false, 0,
 			                                                                                     mediaTree.Tree.ApplicationAlias,
 			                                                                                     "FilteredMediaTree",
-			                                                                                     contentTree.Tree.Title,
-			                                                                                     contentTree.Tree.IconClosed,
-			                                                                                     contentTree.Tree.IconOpened,
+                                                                                                 mediaTree.Tree.Title,
+                                                                                                 mediaTree.Tree.IconClosed,
+                                                                                                 mediaTree.Tree.IconOpened,
 			                                                                                     "umbraco.editorControls",
 			                                                                                     "MultiNodeTreePicker.FilteredMediaTree",
-			                                                                                     contentTree.Tree.Action),
-			                                           contentTree.App);
+                                                                                                 mediaTree.Tree.Action),
+                                                                                                 mediaTree.App);
 
 			//add it to the collection at runtime
 			TreeDefinitionCollection.Instance.Add(filteredContentTree);
