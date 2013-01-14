@@ -10,8 +10,7 @@ using Umbraco.Core.Publishing;
 
 namespace Umbraco.Core.IO
 {
-	[UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1156", "Will be declared public after 4.10")]
-    internal class PhysicalFileSystem : IFileSystem
+    public class PhysicalFileSystem : IFileSystem
     {
 		internal string RootPath { get; private set; }
         private readonly string _rootUrl;
