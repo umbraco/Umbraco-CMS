@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Dynamic;
 using System.Reflection;
@@ -11,6 +12,7 @@ using System.Web;
 
 namespace Umbraco.Core.Dynamics
 {
+    [TypeConverter(typeof(DynamicXmlConverter))]
     public class DynamicXml : DynamicObject, IEnumerable<DynamicXml>, IEnumerable<XElement>
     {
         public XElement BaseElement { get; set; }
@@ -72,51 +74,51 @@ namespace Umbraco.Core.Dynamics
                 return true; //anyway
             }
 
-			//ok, now lets try to match by member, property, extensino method
-			var attempt = DynamicInstanceHelper.TryInvokeMember(this, binder, args, new[]
+            //ok, now lets try to match by member, property, extensino method
+            var attempt = DynamicInstanceHelper.TryInvokeMember(this, binder, args, new[]
 				{
 					typeof (IEnumerable<DynamicXml>),
 					typeof (IEnumerable<XElement>),
 					typeof (DynamicXml)
 				});
 
-			if (attempt.Success)
-			{
-				result = attempt.Result.ObjectResult;
+            if (attempt.Success)
+            {
+                result = attempt.Result.ObjectResult;
 
-				//need to check the return type and possibly cast if result is from an extension method found
-				if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod)
-				{
-					//if the result is already a DynamicXml instance, then we do not need to cast
-					if (attempt.Result.ObjectResult != null && !(attempt.Result.ObjectResult is DynamicXml))
-					{
-						if (attempt.Result.ObjectResult is XElement)
-						{
-							result = new DynamicXml((XElement)attempt.Result.ObjectResult);
-						}
-						else if (attempt.Result.ObjectResult is IEnumerable<XElement>)
-						{
-							result = ((IEnumerable<XElement>)attempt.Result.ObjectResult).Select(x => new DynamicXml(x));
-						}
-						else if (attempt.Result.ObjectResult is IEnumerable<DynamicXml>)
-						{
-							result = ((IEnumerable<DynamicXml>)attempt.Result.ObjectResult).Select(x => new DynamicXml(x.BaseElement));
-						}
-					}
-				}
-				return true;
-			}
+                //need to check the return type and possibly cast if result is from an extension method found
+                if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod)
+                {
+                    //if the result is already a DynamicXml instance, then we do not need to cast
+                    if (attempt.Result.ObjectResult != null && !(attempt.Result.ObjectResult is DynamicXml))
+                    {
+                        if (attempt.Result.ObjectResult is XElement)
+                        {
+                            result = new DynamicXml((XElement)attempt.Result.ObjectResult);
+                        }
+                        else if (attempt.Result.ObjectResult is IEnumerable<XElement>)
+                        {
+                            result = ((IEnumerable<XElement>)attempt.Result.ObjectResult).Select(x => new DynamicXml(x));
+                        }
+                        else if (attempt.Result.ObjectResult is IEnumerable<DynamicXml>)
+                        {
+                            result = ((IEnumerable<DynamicXml>)attempt.Result.ObjectResult).Select(x => new DynamicXml(x.BaseElement));
+                        }
+                    }
+                }
+                return true;
+            }
 
-			//this is the result of an extension method execution gone wrong so we return dynamic null
-			if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod
-				&& attempt.Error != null && attempt.Error is TargetInvocationException)
-			{
-				result = new DynamicNull();
-				return true;
-			}
+            //this is the result of an extension method execution gone wrong so we return dynamic null
+            if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod
+                && attempt.Error != null && attempt.Error is TargetInvocationException)
+            {
+                result = new DynamicNull();
+                return true;
+            }
 
-			result = null;
-			return false;
+            result = null;
+            return false;
 
         }
         public override bool TryGetMember(GetMemberBinder binder, out object result)
@@ -213,6 +215,16 @@ namespace Umbraco.Core.Dynamics
             }
             return root;
         }
+
+        /// <summary>
+        /// Return the string version of Xml
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return ToXml();
+        }
+
         public IHtmlString ToHtml()
         {
             return new HtmlString(this.ToXml());
@@ -228,40 +240,40 @@ namespace Umbraco.Core.Dynamics
             return new DynamicXml(this.BaseElement.XPathSelectElements(expression).FirstOrDefault());
         }
 
-	    IEnumerator<XElement> IEnumerable<XElement>.GetEnumerator()
-	    {
-			return this.BaseElement.Elements().GetEnumerator();
-	    }
+        IEnumerator<XElement> IEnumerable<XElement>.GetEnumerator()
+        {
+            return this.BaseElement.Elements().GetEnumerator();
+        }
 
-	    public IEnumerator<DynamicXml> GetEnumerator()
-	    {
-			return this.BaseElement.Elements().Select(e => new DynamicXml(e)).GetEnumerator();
-	    }
+        public IEnumerator<DynamicXml> GetEnumerator()
+        {
+            return this.BaseElement.Elements().Select(e => new DynamicXml(e)).GetEnumerator();
+        }
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-	    
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
         public int Count()
         {
-			return ((IEnumerable<XElement>)this).Count();
+            return ((IEnumerable<XElement>)this).Count();
         }
 
         public bool Any()
         {
-			return ((IEnumerable<XElement>)this).Any();
+            return ((IEnumerable<XElement>)this).Any();
         }
 
-		public IEnumerable<DynamicXml> Take(int count)
-		{
-			return ((IEnumerable<DynamicXml>)this).Take(count);
-		}
+        public IEnumerable<DynamicXml> Take(int count)
+        {
+            return ((IEnumerable<DynamicXml>)this).Take(count);
+        }
 
-		public IEnumerable<DynamicXml> Skip(int count)
-		{
-			return ((IEnumerable<DynamicXml>)this).Skip(count);
-		} 
+        public IEnumerable<DynamicXml> Skip(int count)
+        {
+            return ((IEnumerable<DynamicXml>)this).Skip(count);
+        }
 
         public bool IsNull()
         {
@@ -503,72 +515,72 @@ namespace Umbraco.Core.Dynamics
         public HtmlString IsDescendant(DynamicXml other, string valueIfTrue)
         {
             var ancestors = this.Ancestors();
-			return IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue);
+            return IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue);
         }
         public HtmlString IsDescendant(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
             var ancestors = this.Ancestors();
-			return IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
+            return IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
         }
         public bool IsDescendantOrSelf(DynamicXml other)
         {
             var ancestors = this.AncestorsOrSelf();
-			return IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.BaseElement == other.BaseElement) != null);
+            return IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.BaseElement == other.BaseElement) != null);
         }
         public HtmlString IsDescendantOrSelf(DynamicXml other, string valueIfTrue)
         {
             var ancestors = this.AncestorsOrSelf();
-			return IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue);
+            return IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue);
         }
         public HtmlString IsDescendantOrSelf(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
             var ancestors = this.AncestorsOrSelf();
-			return IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
+            return IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
         }
         public bool IsAncestor(DynamicXml other)
         {
             var descendants = this.Descendants();
-			return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null);
+            return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null);
         }
         public HtmlString IsAncestor(DynamicXml other, string valueIfTrue)
         {
             var descendants = this.Descendants();
-			return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue);
+            return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue);
         }
         public HtmlString IsAncestor(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
             var descendants = this.Descendants();
-			return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
+            return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
         }
         public bool IsAncestorOrSelf(DynamicXml other)
         {
             var descendants = this.DescendantsOrSelf();
-			return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null);
+            return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null);
         }
         public HtmlString IsAncestorOrSelf(DynamicXml other, string valueIfTrue)
         {
             var descendants = this.DescendantsOrSelf();
-			return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue);
+            return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue);
         }
         public HtmlString IsAncestorOrSelf(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
             var descendants = this.DescendantsOrSelf();
-			return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
+            return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
         }
         public IEnumerable<DynamicXml> Descendants()
         {
             return Descendants(n => true);
         }
-		public IEnumerable<DynamicXml> Descendants(Func<XElement, bool> func)
+        public IEnumerable<DynamicXml> Descendants(Func<XElement, bool> func)
         {
             var flattenedNodes = this.BaseElement.Elements().Map(func, (XElement n) => { return n.Elements(); });
             return flattenedNodes.ToList().ConvertAll(n => new DynamicXml(n));
         }
-		public IEnumerable<DynamicXml> DescendantsOrSelf()
+        public IEnumerable<DynamicXml> DescendantsOrSelf()
         {
             return DescendantsOrSelf(n => true);
         }
-		public IEnumerable<DynamicXml> DescendantsOrSelf(Func<XElement, bool> func)
+        public IEnumerable<DynamicXml> DescendantsOrSelf(Func<XElement, bool> func)
         {
             var flattenedNodes = this.BaseElement.Elements().Map(func, (XElement n) => { return n.Elements(); });
             var list = new List<DynamicXml>();
@@ -576,11 +588,11 @@ namespace Umbraco.Core.Dynamics
             list.AddRange(flattenedNodes.ToList().ConvertAll(n => new DynamicXml(n)));
             return list;
         }
-		public IEnumerable<DynamicXml> Ancestors()
+        public IEnumerable<DynamicXml> Ancestors()
         {
             return Ancestors(item => true);
         }
-		public IEnumerable<DynamicXml> Ancestors(Func<XElement, bool> func)
+        public IEnumerable<DynamicXml> Ancestors(Func<XElement, bool> func)
         {
             var ancestorList = new List<XElement>();
             var node = this.BaseElement;
@@ -611,11 +623,11 @@ namespace Umbraco.Core.Dynamics
             ancestorList.Reverse();
             return ancestorList.ConvertAll(item => new DynamicXml(item));
         }
-		public IEnumerable<DynamicXml> AncestorsOrSelf()
+        public IEnumerable<DynamicXml> AncestorsOrSelf()
         {
             return AncestorsOrSelf(item => true);
         }
-		public IEnumerable<DynamicXml> AncestorsOrSelf(Func<XElement, bool> func)
+        public IEnumerable<DynamicXml> AncestorsOrSelf(Func<XElement, bool> func)
         {
             List<XElement> ancestorList = new List<XElement>();
             var node = this.BaseElement;
@@ -730,6 +742,6 @@ namespace Umbraco.Core.Dynamics
             }
         }
 
-	    
+
     }
 }
