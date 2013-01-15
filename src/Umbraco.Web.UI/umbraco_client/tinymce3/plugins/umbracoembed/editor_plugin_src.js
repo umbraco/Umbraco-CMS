@@ -37,7 +37,7 @@
 
 			// Register example button
 			ed.addButton('umbracoembed', {
-				title : 'Embed third party media',
+				title : 'umbracoembed.desc',
 				cmd : 'mceUmbracoEmbed',
 				image : url + '/img/embed.gif'
 			});
