@@ -24,6 +24,9 @@
  <PropertyGroup Condition="'$(BUILD_NUMBER)'!=''">
    <DECIMAL_BUILD_NUMBER>.$(BUILD_NUMBER)</DECIMAL_BUILD_NUMBER>
  </PropertyGroup>
+ <PropertyGroup Condition="'$(BUILD_RELEASE)'!=''">
+   <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)</DECIMAL_BUILD_NUMBER>
+ </PropertyGroup>
  
  <PropertyGroup>
    <BuildConfiguration>Release</BuildConfiguration>
@@ -232,11 +235,11 @@
    <Message Text="Finished compiling projects" Importance="high" />
  </Target>
  
- <Target Name="SetVersionNumber">
+ <Target Name="SetVersionNumber" Condition="'$(BUILD_RELEASE)'!=''">
     <!-- Match & replace 3 and 4 digit version numbers and -beta (if it's there) -->
     <FileUpdate Files="..\src\Umbraco.Core\Configuration\GlobalSettings.cs"
       Regex="(\d+)\.(\d+)\.(\d+)(.(\d+))?(-([a-zA-Z]+))?"
-      ReplacementText="$(BUILD_NUMBER)"/>
+      ReplacementText="$(BUILD_RELEASE)"/>
  </Target>
  
  <Target Name="AfterBuild">
