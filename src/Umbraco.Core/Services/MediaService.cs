@@ -44,11 +44,12 @@ namespace Umbraco.Core.Services
 	    /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
 	    /// that this Media is based on.
 	    /// </summary>
+        /// <param name="name">Name of the Media object</param>
 	    /// <param name="parentId">Id of Parent for the new Media item</param>
 	    /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
 	    /// <param name="userId">Optional id of the user creating the media item</param>
 	    /// <returns><see cref="IMedia"/></returns>
-	    public IMedia CreateMedia(int parentId, string mediaTypeAlias, int userId = -1)
+	    public IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = -1)
 	    {
 	        IMediaType mediaType = null;
 	        var uow = _uowProvider.GetUnitOfWork();
@@ -68,7 +69,7 @@ namespace Umbraco.Core.Services
 	                                                  mediaTypeAlias));
 	        }
 
-	        var media = new Models.Media(parentId, mediaType);
+	        var media = new Models.Media(name, parentId, mediaType);
 
 			if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this))
 				return media;

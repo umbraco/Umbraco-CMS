@@ -59,15 +59,16 @@ namespace Umbraco.Core.Services
             _repositoryFactory = repositoryFactory;
 		}
 
-		/// <summary>
-		/// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
-		/// that this Content is based on.
-		/// </summary>
-		/// <param name="parentId">Id of Parent for the new Content</param>
-		/// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
-		/// <param name="userId">Optional id of the user creating the content</param>
-		/// <returns><see cref="IContent"/></returns>
-		public IContent CreateContent(int parentId, string contentTypeAlias, int userId = -1)
+	    /// <summary>
+	    /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+	    /// that this Content is based on.
+	    /// </summary>
+        /// <param name="name">Name of the Content object</param>
+	    /// <param name="parentId">Id of Parent for the new Content</param>
+	    /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+	    /// <param name="userId">Optional id of the user creating the content</param>
+	    /// <returns><see cref="IContent"/></returns>
+	    public IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = -1)
 		{
 		    IContentType contentType = null;
             IContent content = null;
@@ -89,7 +90,7 @@ namespace Umbraco.Core.Services
 		                                              contentTypeAlias));
 		    }
 
-            content = new Content(parentId, contentType);
+            content = new Content(name, parentId, contentType);
 
 			if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
 				return content;

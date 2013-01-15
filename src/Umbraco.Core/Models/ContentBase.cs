@@ -17,7 +17,7 @@ namespace Umbraco.Core.Models
     {
         protected IContentTypeComposition ContentTypeBase;
         private Lazy<int> _parentId;
-        private string _name;
+        private string _name;//NOTE Once localization is introduced this will be the localized Name of the Content/Media.
         private int _sortOrder;
         private int _level;
         private string _path;
@@ -26,33 +26,47 @@ namespace Umbraco.Core.Models
         private int _contentTypeId;
         private PropertyCollection _properties;
 
-        protected ContentBase(int parentId, IContentTypeComposition contentType, PropertyCollection properties)
+        /// <summary>
+        /// Protected constructor for ContentBase (Base for Content and Media)
+        /// </summary>
+        /// <param name="name">Localized Name of the entity</param>
+        /// <param name="parentId"></param>
+        /// <param name="contentType"></param>
+        /// <param name="properties"></param>
+        protected ContentBase(string name, int parentId, IContentTypeComposition contentType, PropertyCollection properties)
         {
             Mandate.ParameterCondition(parentId != 0, "parentId");
             Mandate.ParameterNotNull(contentType, "contentType");
             Mandate.ParameterNotNull(properties, "properties");
 
             _parentId = new Lazy<int>(() => parentId);
-
+            _name = name;
             _contentTypeId = int.Parse(contentType.Id.ToString(CultureInfo.InvariantCulture));
-            ContentTypeBase = contentType;
             _properties = properties;
             _properties.EnsurePropertyTypes(PropertyTypes);
+            ContentTypeBase = contentType;
             Version = Guid.NewGuid();
         }
 
-		protected ContentBase(IContentBase parent, IContentTypeComposition contentType, PropertyCollection properties)
+        /// <summary>
+        /// Protected constructor for ContentBase (Base for Content and Media)
+        /// </summary>
+        /// <param name="name">Localized Name of the entity</param>
+        /// <param name="parent"></param>
+        /// <param name="contentType"></param>
+        /// <param name="properties"></param>
+        protected ContentBase(string name, IContentBase parent, IContentTypeComposition contentType, PropertyCollection properties)
 		{
 			Mandate.ParameterNotNull(parent, "parent");
 			Mandate.ParameterNotNull(contentType, "contentType");
 			Mandate.ParameterNotNull(properties, "properties");
 
 			_parentId = new Lazy<int>(() => parent.Id);
-
+            _name = name;
 			_contentTypeId = int.Parse(contentType.Id.ToString(CultureInfo.InvariantCulture));
-			ContentTypeBase = contentType;
 			_properties = properties;
 			_properties.EnsurePropertyTypes(PropertyTypes);
+            ContentTypeBase = contentType;
 			Version = Guid.NewGuid();
 		}
 

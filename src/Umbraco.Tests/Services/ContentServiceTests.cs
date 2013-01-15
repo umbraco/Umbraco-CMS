@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act
-            var content = contentService.CreateContent(-1, "umbTextpage", 0);
+            var content = contentService.CreateContent("Test", -1, "umbTextpage", 0);
 
             // Assert
             Assert.That(content, Is.Not.Null);
@@ -87,7 +87,7 @@ namespace Umbraco.Tests.Services
             contentService.SetHttpContext(base.GetUmbracoContext("/test", 1234).HttpContext);
 
             // Act
-            var content = contentService.CreateContent(-1, "umbTextpage");
+            var content = contentService.CreateContent("Test", -1, "umbTextpage");
 
             // Assert
             Assert.That(content, Is.Not.Null);
@@ -127,7 +127,7 @@ namespace Umbraco.Tests.Services
             // Act
             var contentService = ServiceContext.ContentService as ContentService;
             contentService.SetHttpContext(null);
-            var content = contentService.CreateContent(-1, "umbTextpage");
+            var content = contentService.CreateContent("Test", -1, "umbTextpage");
 
             // Assert
             Assert.That(content, Is.Not.Null);
@@ -142,7 +142,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             // Act & Assert
-            Assert.Throws<Exception>(() => contentService.CreateContent(-1, "umbAliasDoesntExist"));
+            Assert.Throws<Exception>(() => contentService.CreateContent("Test", -1, "umbAliasDoesntExist"));
         }
 
         [Test]
@@ -483,8 +483,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.CreateContent(1046, "umbTextpage", 0);
-            content.Name = "Subpage with Unpublisehed Parent";
+            var content = contentService.CreateContent("Subpage with Unpublisehed Parent", 1046, "umbTextpage", 0);
             contentService.Save(content, 0);
 
             // Act
@@ -516,8 +515,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.CreateContent(-1, "umbTextpage", 0);
-            content.Name = "Home US";
+            var content = contentService.CreateContent("Home US", - 1, "umbTextpage", 0);
             content.SetValue("author", "Barack Obama");
 
             // Act
@@ -534,8 +532,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.CreateContent(-1, "umbTextpage", 0);
-            content.Name = "Home US";
+            var content = contentService.CreateContent("Home US", - 1, "umbTextpage", 0);
             content.SetValue("author", "Barack Obama");
 
             // Act

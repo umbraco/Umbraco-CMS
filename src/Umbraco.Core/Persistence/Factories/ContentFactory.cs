@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IContent BuildEntity(DocumentDto dto)
         {
-            return new Content(dto.ContentVersionDto.ContentDto.NodeDto.ParentId, _contentType)
+            return new Content(dto.Text, dto.ContentVersionDto.ContentDto.NodeDto.ParentId, _contentType)
             {
                 Id = _id,
                 Key =

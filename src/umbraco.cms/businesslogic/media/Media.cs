@@ -77,8 +77,7 @@ namespace umbraco.cms.businesslogic.media
         [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.CreateMedia()", false)]
         public static Media MakeNew(string Name, MediaType dct, BusinessLogic.User u, int ParentId)
         {
-            var media = ApplicationContext.Current.Services.MediaService.CreateMedia(ParentId, dct.Alias, u.Id);
-            media.Name = Name;
+            var media = ApplicationContext.Current.Services.MediaService.CreateMedia(Name, ParentId, dct.Alias, u.Id);
             ApplicationContext.Current.Services.MediaService.Save(media);
             var tmp = new Media(media);
 

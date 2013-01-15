@@ -29,14 +29,13 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IMedia BuildEntity(ContentVersionDto dto)
         {
-            return new Models.Media(dto.ContentDto.NodeDto.ParentId, _contentType)
+            return new Models.Media(dto.ContentDto.NodeDto.Text, dto.ContentDto.NodeDto.ParentId, _contentType)
                        {
                            Id = _id,
                            Key =
                                dto.ContentDto.NodeDto.UniqueId.HasValue
                                    ? dto.ContentDto.NodeDto.UniqueId.Value
                                    : _id.ToGuid(),
-                           Name = dto.ContentDto.NodeDto.Text,
                            Path = dto.ContentDto.NodeDto.Path,
                            CreatorId = dto.ContentDto.NodeDto.UserId.Value,
                            Level = dto.ContentDto.NodeDto.Level,
