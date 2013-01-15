@@ -49,7 +49,7 @@ namespace Umbraco.Core
 
 			foreach (var part in parts)
 			{
-				var encrpytedBlock = FormsAuthentication.Encrypt(new FormsAuthenticationTicket(1, string.Empty, DateTime.Now, DateTime.Now, false, part));
+				var encrpytedBlock = FormsAuthentication.Encrypt(new FormsAuthenticationTicket(0, string.Empty, DateTime.Now, DateTime.MaxValue, false, part));
 				encrpytedValue.AppendLine(encrpytedBlock);
 			}
 
