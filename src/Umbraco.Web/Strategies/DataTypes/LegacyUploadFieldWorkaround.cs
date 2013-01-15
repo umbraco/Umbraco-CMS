@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Drawing;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Web;
 using System.Xml;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models;
 using umbraco.interfaces;
 
 namespace Umbraco.Web.Strategies.DataTypes
@@ -36,7 +33,7 @@ namespace Umbraco.Web.Strategies.DataTypes
 					return;
 
 
-				FillProperties(sender.Content, property);
+				FillProperties(sender, property);
 			}
 		}
 
@@ -49,11 +46,11 @@ namespace Umbraco.Web.Strategies.DataTypes
 					return;
 
 
-				FillProperties(sender.MediaItem, property);
+				FillProperties(sender, property);
 			}
 		}
 
-		private void FillProperties(IContentBase content, global::umbraco.cms.businesslogic.property.Property property)
+        private void FillProperties(global::umbraco.cms.businesslogic.Content content, global::umbraco.cms.businesslogic.property.Property property)
 		{
 			XmlNode uploadFieldConfigNode = global::umbraco.UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(string.Format("uploadField [@alias = \"{0}\"]", property.PropertyType.Alias));
 
@@ -87,14 +84,14 @@ namespace Umbraco.Web.Strategies.DataTypes
 			}
 		}
 
-		private void UpdateProperty(XmlNode uploadFieldConfigNode, IContentBase content, string propertyAlias, object propertyValue)
+        private void UpdateProperty(XmlNode uploadFieldConfigNode, global::umbraco.cms.businesslogic.Content content, string propertyAlias, object propertyValue)
 		{
 			XmlNode propertyNode = uploadFieldConfigNode.SelectSingleNode(propertyAlias);
 			if (propertyNode != null && !String.IsNullOrEmpty(propertyNode.FirstChild.Value))
 			{
-				if (content.Properties.Contains(propertyNode.FirstChild.Value) && content.Properties[propertyNode.FirstChild.Value] != null)
+                if (content.GenericProperties.Any(x => x.PropertyType.Alias == propertyNode.FirstChild.Value) && content.getProperty(propertyNode.FirstChild.Value) != null)
 				{
-					content.SetValue(propertyNode.FirstChild.Value, propertyValue);
+				    content.getProperty(propertyNode.FirstChild.Value).Value = propertyValue;
 				}
 			}
 		}
