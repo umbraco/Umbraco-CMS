@@ -161,13 +161,14 @@
    <!-- DONE -->
    <Message Text="Finished compiling projects" Importance="high" />
  </Target>
- 
- <Target Name="SetVersionNumber">
+
+ <Target Name="SetVersionNumber" Condition="'$(BUILD_RELEASE)'!=''">
     <!-- Match & replace 3 and 4 digit version numbers and -beta (if it's there) -->
-    <FileUpdate Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
+    <FileUpdate 
+      Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
       Regex="(\d+)\.(\d+)\.(\d+)(.(\d+))?"
-      ReplacementText="$(BUILD_NUMBER)"/>
-	  
+      ReplacementText="$(BUILD_RELEASE)"/>
+
     <FileUpdate Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
       Regex="CurrentComment { get { return &quot;([a-zA-Z]+)?&quot;"
       ReplacementText="CurrentComment { get { return &quot;$(BUILD_COMMENT)&quot;"/>
