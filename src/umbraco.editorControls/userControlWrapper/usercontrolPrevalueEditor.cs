@@ -165,6 +165,10 @@ namespace umbraco.editorControls.userControlGrapper
 
 		private void LoadSetttings(string fileName)
 		{
+            // due to legacy, some user controls may not have the tilde start
+            if (fileName.StartsWith("~/"))
+                fileName = fileName.Substring(2);
+
 			if (System.IO.File.Exists(IOHelper.MapPath("~/" + fileName)))
 			{
 			  
