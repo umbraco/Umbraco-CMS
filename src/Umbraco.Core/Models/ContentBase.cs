@@ -39,13 +39,14 @@ namespace Umbraco.Core.Models
             Mandate.ParameterNotNull(contentType, "contentType");
             Mandate.ParameterNotNull(properties, "properties");
 
+            ContentTypeBase = contentType;
+            Version = Guid.NewGuid();
+
             _parentId = new Lazy<int>(() => parentId);
             _name = name;
             _contentTypeId = int.Parse(contentType.Id.ToString(CultureInfo.InvariantCulture));
             _properties = properties;
             _properties.EnsurePropertyTypes(PropertyTypes);
-            ContentTypeBase = contentType;
-            Version = Guid.NewGuid();
         }
 
         /// <summary>
@@ -61,13 +62,14 @@ namespace Umbraco.Core.Models
 			Mandate.ParameterNotNull(contentType, "contentType");
 			Mandate.ParameterNotNull(properties, "properties");
 
+            ContentTypeBase = contentType;
+            Version = Guid.NewGuid();
+
 			_parentId = new Lazy<int>(() => parent.Id);
             _name = name;
 			_contentTypeId = int.Parse(contentType.Id.ToString(CultureInfo.InvariantCulture));
 			_properties = properties;
 			_properties.EnsurePropertyTypes(PropertyTypes);
-            ContentTypeBase = contentType;
-			Version = Guid.NewGuid();
 		}
 
 	    private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Name);
