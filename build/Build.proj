@@ -23,6 +23,12 @@
  <!-- NB: BUILD_NUMBER is passed in by the build server -->
  <PropertyGroup Condition="'$(BUILD_NUMBER)'!=''">
    <DECIMAL_BUILD_NUMBER>.$(BUILD_NUMBER)</DECIMAL_BUILD_NUMBER>
+ </PropertyGroup> 
+ <PropertyGroup Condition="'$(BUILD_RELEASE)'!=''">
+   <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)</DECIMAL_BUILD_NUMBER>
+ </PropertyGroup>
+ <PropertyGroup Condition="'$(BUILD_RELEASE) AND $(BUILD_COMMENT)'!=''">
+   <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)-$(BUILD_COMMENT)</DECIMAL_BUILD_NUMBER>
  </PropertyGroup>
  
  <PropertyGroup>
