@@ -4,7 +4,6 @@ using System.Security;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
-using System.Security.Cryptography;
 
 namespace Umbraco.Tests
 {
