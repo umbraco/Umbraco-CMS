@@ -279,6 +279,12 @@ namespace Umbraco.Core.Models
         /// <param name="value">Value to set for the Property</param>
         public virtual void SetValue(string propertyTypeAlias, object value)
         {
+            if (value == null)
+            {
+                SetValueOnProperty(propertyTypeAlias, value);
+                return;
+            }
+
             // .NET magic to call one of the 'SetPropertyValue' handlers with matching signature 
             ((dynamic)this).SetPropertyValue(propertyTypeAlias, (dynamic)value);
         }
