@@ -11,13 +11,35 @@ namespace Umbraco.Tests
     public class StringExtensionsTests
     {
 
-		[TestCase("This is a string to encrypt")]		
+		[TestCase("This is a string to encrypt")]
+		[TestCase("This is a string to encrypt\nThis is a second line")]
+		[TestCase("    White space is preserved    ")]
+		[TestCase("\nWhite space is preserved\n")]
 		public void Encrypt_And_Decrypt(string input)
 		{
 			var encrypted = input.EncryptWithMachineKey();
 			var decrypted = encrypted.DecryptWithMachineKey();
 			Assert.AreNotEqual(input, encrypted);
 			Assert.AreEqual(input, decrypted);
+		}
+
+		[Test()]
+		public void Encrypt_And_Decrypt_Long_Value()
+		{
+			// Generate a really long string
+			char[] chars = { 'a', 'b', 'c', '1', '2', '3', '\n' };
+
+			string valueToTest = string.Empty;
+
+			// Create a string 7035 chars long
+			for (int i = 0; i < 1005; i++)
+				for (int j = 0; j < chars.Length; j++)
+					valueToTest += chars[j].ToString();
+
+			var encrypted = valueToTest.ToString().EncryptWithMachineKey();
+			var decrypted = encrypted.DecryptWithMachineKey();
+			Assert.AreNotEqual(valueToTest, encrypted);
+			Assert.AreEqual(valueToTest, decrypted);
 		}
 
         [TestCase("Hello this is my string", " string", "Hello this is my")]

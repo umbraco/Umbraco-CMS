@@ -119,7 +119,7 @@ namespace Umbraco.Web
 
 				if (!string.IsNullOrWhiteSpace(surfaceRouteParams))
 				{
-					_base64String = Convert.ToBase64String(Encoding.UTF8.GetBytes(surfaceRouteParams));
+					_encryptedString = surfaceRouteParams.EncryptWithMachineKey();
 				}
 
 				_textWriter = viewContext.Writer;
@@ -127,7 +127,7 @@ namespace Umbraco.Web
 
 
 			private bool _disposed;
-			private readonly string _base64String;
+			private readonly string _encryptedString;
 			private readonly TextWriter _textWriter;
 
 			protected override void Dispose(bool disposing)
@@ -137,7 +137,7 @@ namespace Umbraco.Web
 				this._disposed = true;
 
 				//write out the hidden surface form routes
-				_textWriter.Write("<input name='uformpostroutevals' type='hidden' value='" + _base64String + "' />");
+				_textWriter.Write("<input name='uformpostroutevals' type='hidden' value='" + _encryptedString + "' />");
 
 				base.Dispose(disposing);
 			}
