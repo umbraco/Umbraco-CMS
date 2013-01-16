@@ -69,6 +69,7 @@ namespace Umbraco.Tests.PublishedContent
 			return doc;
 		}
 
+        [Ignore]
 		[Test]
 		public void Type_Test()
 		{
@@ -78,6 +79,7 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.AreEqual("John Smith", result[1].ArticleAuthor);
 		}
 
+        [Ignore]
 		[Test]
 		public void As_Test()
 		{

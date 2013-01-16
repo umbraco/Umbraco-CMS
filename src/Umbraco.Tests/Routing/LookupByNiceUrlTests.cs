@@ -23,7 +23,8 @@ namespace Umbraco.Tests.Routing
 		{
 			get { return false; }
 		}
-
+        
+        [Ignore]
 		[TestCase("/", 1046)]
 		[TestCase("/default.aspx", 1046)] //this one is actually rather important since this is the path that comes through when we are running in pre-IIS 7 for the root document '/' !
 		[TestCase("/Sub1", 1173)]
@@ -35,7 +36,6 @@ namespace Umbraco.Tests.Routing
 		// we've made it return "/test-page" => we have to support that url back in the lookup...
 		[TestCase("/home", 1046)]
 		[TestCase("/test-page", 1172)]
-
 		public void Match_Document_By_Url_Hide_Top_Level(string urlString, int expectedId)
 		{
 			var routingContext = GetRoutingContext(urlString);
@@ -57,6 +57,7 @@ namespace Umbraco.Tests.Routing
 			}
 		}
 
+        [Ignore]
 		[TestCase("/", 1046)]
 		[TestCase("/default.aspx", 1046)] //this one is actually rather important since this is the path that comes through when we are running in pre-IIS 7 for the root document '/' !
 		[TestCase("/home", 1046)]

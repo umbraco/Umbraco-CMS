@@ -199,6 +199,7 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.AreEqual(4444, result.Id);
 		}
 
+        [Ignore]
 		[Test]
 		public void Complex_Linq()
 		{
@@ -228,6 +229,7 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.AreEqual(3, doc.Index());
 		}
 
+        [Ignore]
 		[Test]
 		public void Is_First()
 		{
@@ -241,6 +243,7 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.IsFalse(doc.IsFirst());
 		}
 
+        [Ignore]
 		[Test]
 		public void Is_Not_First()
 		{
@@ -254,6 +257,7 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.IsTrue(doc.IsNotFirst());
 		}
 
+        [Ignore]
 		[Test]
 		public void Is_Position()
 		{
@@ -415,6 +419,7 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.AreEqual("<div>This is some content</div>", asDynamic.Content.ToString());
 		}
 
+        [Ignore]
 		[Test]
 		public void Get_Children_With_Pluralized_Alias()
 		{
@@ -442,6 +447,7 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.AreEqual("Custom data with same property name as the member name", asDynamic.GetPropertyValue("CreatorName"));
 		}
 
+        [Ignore]
 		[Test]
 		public void GetPropertyValue_Reflected()
 		{
@@ -462,6 +468,7 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.AreEqual("admin", asDynamic.CreatorName);
 		}
 
+        [Ignore]
 		[Test]
 		public void Get_Member_Property()
 		{
