@@ -90,7 +90,7 @@ namespace Umbraco.Tests.TestHelpers
 			SqlCeContextGuardian.CloseBackgroundConnection();
 			
 			ApplicationContext.Current = null;
-			Resolution.IsFrozen = false;
+			Resolution.Unfreeze();
 			RepositoryResolver.Reset();
 
             TestHelper.CleanContentDirectories();

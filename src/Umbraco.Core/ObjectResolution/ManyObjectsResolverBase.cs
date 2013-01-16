@@ -17,6 +17,7 @@ namespace Umbraco.Core.ObjectResolution
 	{
 		private IEnumerable<TResolved> _applicationInstances = null;
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+		private readonly string _httpContextKey;
 		private readonly List<Type> _instanceTypes = new List<Type>(); 
 
 		private int _defaultPluginWeight = 10;
@@ -41,6 +42,8 @@ namespace Umbraco.Core.ObjectResolution
 			}
 
 			LifetimeScope = scope;
+			if (scope == ObjectLifetimeScope.HttpRequest)
+				_httpContextKey = this.GetType().FullName;
 			_instanceTypes = new List<Type>();
 		}
 
@@ -56,6 +59,7 @@ namespace Umbraco.Core.ObjectResolution
 			if (httpContext == null)
 				throw new ArgumentNullException("httpContext");
 			LifetimeScope = ObjectLifetimeScope.HttpRequest;
+			_httpContextKey = this.GetType().FullName;
 			CurrentHttpContext = httpContext;
 			_instanceTypes = new List<Type>();
 		}
@@ -155,10 +159,10 @@ namespace Umbraco.Core.ObjectResolution
 		protected IEnumerable<TResolved> Values
 		{
 			get
-			{				
-				// cannot return values unless resolution is frozen, or we can
-				if (!CanResolveBeforeFrozen && !Resolution.IsFrozen)
-					throw new InvalidOperationException("Values cannot be returned until resolution is frozen");
+			{
+				// ensure we can
+				if (!CanResolveBeforeFrozen)
+					Resolution.EnsureIsFrozen();
 
 				// note: we apply .ToArray() to the output of CreateInstance() because that is an IEnumerable that
 				// comes from the PluginManager we want to be _sure_ that it's not a Linq of some sort, but the
@@ -168,16 +172,15 @@ namespace Umbraco.Core.ObjectResolution
 				{
 					case ObjectLifetimeScope.HttpRequest:
 						// create new instances per HttpContext
-						var key = this.GetType().FullName; // use full type name as key
 						using (var l = new UpgradeableReadLock(_lock))
 						{
 							// create if not already there
-							if (CurrentHttpContext.Items[key] == null)
+							if (CurrentHttpContext.Items[_httpContextKey] == null)
 							{
 								l.UpgradeToWriteLock();
-								CurrentHttpContext.Items[key] = CreateInstances().ToArray();
+								CurrentHttpContext.Items[_httpContextKey] = CreateInstances().ToArray();
 							}
-							return (List<TResolved>)CurrentHttpContext.Items[key];
+							return (List<TResolved>)CurrentHttpContext.Items[_httpContextKey];
 						}
 
 					case ObjectLifetimeScope.Application:
@@ -210,19 +213,19 @@ namespace Umbraco.Core.ObjectResolution
 			return PluginManager.Current.CreateInstances<TResolved>(InstanceTypes);
 		}
 
+		#region Types collection manipulation
+
 		/// <summary>
 		/// Ensures that a type is a valid type for the resolver.
 		/// </summary>
 		/// <param name="value">The type to test.</param>
-		/// <exception cref="InvalidOperationException"> the type is not a valid type for the resolver.</exception>
+		/// <exception cref="InvalidOperationException">the type is not a valid type for the resolver.</exception>
 		protected void EnsureCorrectType(Type value)
 		{
 			if (!TypeHelper.IsTypeAssignableFrom<TResolved>(value))
 				throw new InvalidOperationException(string.Format(
 					"Type {0} is not an acceptable type for resolver {1}.", value.FullName, this.GetType().FullName));
 		}
-
-		#region Types collection manipulation
 
 		/// <summary>
 		/// Removes a type.
@@ -233,8 +236,8 @@ namespace Umbraco.Core.ObjectResolution
 		public virtual void RemoveType(Type value)
 		{
 			EnsureRemoveSupport();
-			EnsureResolutionNotFrozen();
 
+			using (Resolution.Configuration)
 			using (var l = new UpgradeableReadLock(_lock))
 			{
 				EnsureCorrectType(value);
@@ -265,8 +268,8 @@ namespace Umbraco.Core.ObjectResolution
 		protected void AddTypes(IEnumerable<Type> types)
 		{
 			EnsureAddSupport();
-			EnsureResolutionNotFrozen();
 
+			using (Resolution.Configuration)
 			using (new WriteLock(_lock))
 			{
 				foreach(var t in types)
@@ -292,8 +295,8 @@ namespace Umbraco.Core.ObjectResolution
 		public virtual void AddType(Type value)
 		{
 			EnsureAddSupport();
-			EnsureResolutionNotFrozen();
 
+			using (Resolution.Configuration)
 			using (var l = new UpgradeableReadLock(_lock))
 			{
 				EnsureCorrectType(value);
@@ -327,8 +330,8 @@ namespace Umbraco.Core.ObjectResolution
 		public virtual void Clear()
 		{
 			EnsureClearSupport();
-			EnsureResolutionNotFrozen();
 
+			using (Resolution.Configuration)
 			using (new WriteLock(_lock))
 			{
 				_instanceTypes.Clear();
@@ -346,8 +349,8 @@ namespace Umbraco.Core.ObjectResolution
 		public virtual void InsertType(int index, Type value)
 		{			
 			EnsureInsertSupport();
-			EnsureResolutionNotFrozen();
 
+			using (Resolution.Configuration)
 			using (var l = new UpgradeableReadLock(_lock))
 			{
 				EnsureCorrectType(value);
@@ -373,6 +376,7 @@ namespace Umbraco.Core.ObjectResolution
 			InsertType(index, typeof(T));
 		}
 
+		/// <summary>
 		/// Inserts a type before a specified, already existing type.
 		/// </summary>
 		/// <param name="existingType">The existing type before which to insert.</param>
@@ -383,8 +387,8 @@ namespace Umbraco.Core.ObjectResolution
 		public virtual void InsertTypeBefore(Type existingType, Type value)
 		{
 			EnsureInsertSupport();
-			EnsureResolutionNotFrozen();
 
+			using (Resolution.Configuration)
 			using (var l = new UpgradeableReadLock(_lock))
 			{
 				EnsureCorrectType(existingType);
@@ -451,15 +455,6 @@ namespace Umbraco.Core.ObjectResolution
 		protected WriteLock GetWriteLock()
 		{
 			return new WriteLock(_lock);
-		}
-		
-		/// <summary>
-		/// Throws an exception if resolution is frozen
-		/// </summary>
-		protected void EnsureResolutionNotFrozen()
-		{
-			if (Resolution.IsFrozen)
-				throw new InvalidOperationException("The type list cannot be modified after resolution has been frozen");
 		}
 
 		/// <summary>

@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Resolvers
 		public void TearDown()
 		{
 			PackageActionsResolver.Reset();
-			Resolution.IsFrozen = false;
+			Resolution.Unfreeze();
 		}
 
 		/// <summary>

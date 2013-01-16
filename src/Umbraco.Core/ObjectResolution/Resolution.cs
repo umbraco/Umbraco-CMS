@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace Umbraco.Core.ObjectResolution
 {
@@ -6,12 +7,12 @@ namespace Umbraco.Core.ObjectResolution
 	/// Represents the status of objects resolution.
 	/// </summary>
 	/// <remarks>
-	/// <para>Objects resolution can be frozen ie nothing can change anymore.</para>
-	/// <para>Nothing in resolution is thread-safe, because everything should take place when the application is starting.</para>
+	/// <para>Before resolution is frozen it is possible to access its configuration, but not to get values.</para>
+	/// <para>Once resolution is frozen, it is not possible to access its configuration anymore, but it is possible to get values.</para>
 	/// </remarks>
-	internal class Resolution
+	internal static class Resolution
 	{
-		// NOTE : must clarify freezing... SingleObjectResolverBase does not honor it...
+		private static readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
 		/// <summary>
 		/// Occurs when resolution is frozen.
@@ -22,17 +23,30 @@ namespace Umbraco.Core.ObjectResolution
 		/// <summary>
 		/// Gets or sets a value indicating whether resolution of objects is frozen.
 		/// </summary>
-		/// <remarks>The internal setter is to be used in unit tests.</remarks>
-		public static bool IsFrozen { get; internal set; }
+		public static bool IsFrozen { get; private set; }
+
+		public static void EnsureIsFrozen()
+		{
+			if (!IsFrozen)
+				throw new Exception("Resolution is not frozen, it is not yet possible to get values from it.");
+		}
 
 		/// <summary>
-		/// Ensures that resolution is not frozen, else throws.
+		/// Returns a disposable object that represents safe access to unfrozen resolution configuration.
 		/// </summary>
-		/// <exception cref="InvalidOperationException">resolution is frozen.</exception>
-		public static void EnsureNotFrozen()
+		/// <remarks>Should be used in a <c>using(Resolution.Configuration) { ... }</c>  mode.</remarks>
+		public static IDisposable Configuration
 		{
-			if (Resolution.IsFrozen)
-				throw new InvalidOperationException("Resolution is frozen. It is not possible to modify resolvers once resolution is frozen.");
+			get
+			{
+				IDisposable l = new WriteLock(_lock);
+				if (Resolution.IsFrozen)
+				{
+					l.Dispose();
+					throw new InvalidOperationException("Resolution is frozen, it is not possible to configure it anymore.");
+				}
+				return l;
+			}
 		}
 
 		/// <summary>
@@ -47,6 +61,15 @@ namespace Umbraco.Core.ObjectResolution
 			IsFrozen = true;
 			if (Frozen != null)
 				Frozen(null, null);
+		}
+
+		/// <summary>
+		/// Unfreezes resolution.
+		/// </summary>
+		/// <remarks>To be used in unit tests.</remarks>
+		internal static void Unfreeze()
+		{
+			IsFrozen = false;
 		}
 	}
 }

@@ -63,7 +63,10 @@ namespace Umbraco.Core.ObjectResolution
 		/// <remarks>To be used in unit tests.</remarks>
 		internal static void Reset()
 		{
-			_resolver = null;
+			using (new WriteLock(ResolversLock))
+			{
+				_resolver = null;
+			}
 		}
 	}
 }

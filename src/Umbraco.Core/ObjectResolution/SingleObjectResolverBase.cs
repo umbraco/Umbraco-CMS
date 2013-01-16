@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace Umbraco.Core.ObjectResolution
 {
@@ -14,10 +15,9 @@ namespace Umbraco.Core.ObjectResolution
 		where TResolved : class
 		where TResolver : class
 	{
-		TResolved _resolved;
-		readonly bool _canBeNull;
-
-		// NOTE - we're not freezing resolution here so it is potentially possible to change the instance at any time?
+		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+		private readonly bool _canBeNull;
+		private TResolved _value;
 
 		#region Constructors
 
@@ -39,7 +39,7 @@ namespace Umbraco.Core.ObjectResolution
 		protected SingleObjectResolverBase(TResolved value)
 			: this(false)
 		{
-			_resolved = value;
+			_value = value;
 		}
 
 		/// <summary>
@@ -63,7 +63,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// otherwise an exception will be thrown when reading it.</remarks>
 		protected SingleObjectResolverBase(TResolved value, bool canBeNull)
 		{
-			_resolved = value;
+			_value = value;
 			_canBeNull = canBeNull;
 		}
 
@@ -82,7 +82,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// </summary>
 		public bool HasValue
 		{
-			get { return _resolved != null; }
+			get { return _value != null; }
 		}
 
 		/// <summary>
@@ -90,21 +90,34 @@ namespace Umbraco.Core.ObjectResolution
 		/// </summary>
 		/// <remarks></remarks>
 		/// <exception cref="ArgumentNullException">value is set to null, but cannot be null (<c>CanBeNull</c> is <c>false</c>).</exception>
-		/// <exception cref="InvalidOperationException">value is read and is null, but cannot be null (<c>CanBeNull</c> is <c>false</c>).</exception>
+		/// <exception cref="InvalidOperationException">value is read and is null, but cannot be null (<c>CanBeNull</c> is <c>false</c>),
+		/// or value is set (read) and resolution is (not) frozen.</exception>
 		protected TResolved Value
 		{
 			get
 			{
-				if (!_canBeNull && _resolved == null)
-					throw new InvalidOperationException("");
-				return _resolved;
+				Resolution.EnsureIsFrozen();
+				using (new ReadLock(_lock))
+				{
+					if (!_canBeNull && _value == null)
+						throw new InvalidOperationException(string.Format(
+							"Resolver {0} requires a value, and none was supplied.", this.GetType().FullName));
+
+					return _value;
+				}
 			}
 
 			set
 			{
-				if (!_canBeNull && value == null)
-					throw new ArgumentNullException("value");
-				_resolved = value;
+				using (Resolution.Configuration)
+				using (var l = new UpgradeableReadLock(_lock))
+				{
+					if (!_canBeNull && value == null)
+						throw new ArgumentNullException("value");
+
+					l.UpgradeToWriteLock();
+					_value = value;
+				}
 			}
 		}
 	}

@@ -102,7 +102,7 @@ namespace Umbraco.Tests.TestHelpers
 	        
 
 			ApplicationContext.Current = null;
-			Resolution.IsFrozen = false;
+			Resolution.Unfreeze();
 			RepositoryResolver.Reset();
 
 			TestHelper.CleanContentDirectories();
@@ -122,7 +122,7 @@ namespace Umbraco.Tests.TestHelpers
 			//DatabaseContext.Database.Dispose();
 			//ApplicationContext.ApplicationCache.ClearAllCache();
 			//ApplicationContext.Current = null;
-			//Resolution.IsFrozen = false;
+			//Resolution.Unfreeze();
 			//RepositoryResolver.Reset();
 			//if (RequiresDbSetup)
 			//{

@@ -1,15 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web;
 using System.Web.UI;
-using Umbraco.Core.Macros;
+using System.Linq;
+using Umbraco.Core.ObjectResolution;
 using umbraco.interfaces;
 
-namespace Umbraco.Core.ObjectResolution
+namespace Umbraco.Core.Macros
 {
-	// FIXME - specific resolvers should not be in Umbraco.Core.ObjectResolution ??
-
 	/// <summary>
 	/// A resolver to return all IMacroGuiRendering objects
 	/// </summary>

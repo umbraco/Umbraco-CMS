@@ -3,6 +3,7 @@ using System.Linq;
 using System.Web.UI;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Macros;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.TestHelpers;
 using umbraco.interfaces;
@@ -36,7 +37,7 @@ namespace Umbraco.Tests.Resolvers
 		public void TearDown()
 		{
 			MacroFieldEditorsResolver.Reset();
-			Resolution.IsFrozen = false;
+			Resolution.Unfreeze();
 			PluginManager.Current.AssembliesToScan = null;
 		}
 

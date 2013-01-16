@@ -440,7 +440,7 @@
     <Compile Include="Persistence\Repositories\UserTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\VersionableRepositoryBase.cs" />
     <Compile Include="Persistence\RepositoryFactory.cs" />
-    <Compile Include="ObjectResolution\LazyManyObjectsResolverbase.cs" />
+    <Compile Include="ObjectResolution\LazyManyObjectsResolverBase.cs" />
     <Compile Include="Persistence\RepositoryResolver.cs" />
     <Compile Include="Persistence\SqlSyntax\ColumnInfo.cs" />
     <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />
@@ -605,7 +605,7 @@
     <Compile Include="Logging\AsynchronousRollingFileAppender.cs" />
     <Compile Include="Logging\LoggingTaskExtension.cs" />
     <Compile Include="Logging\LogHelper.cs" />
-    <Compile Include="ObjectResolution\MacroFieldEditorsResolver.cs" />
+    <Compile Include="Macros\MacroFieldEditorsResolver.cs" />
     <Compile Include="Macros\PersistableMacroProperty.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueConvertersResolver.cs" />

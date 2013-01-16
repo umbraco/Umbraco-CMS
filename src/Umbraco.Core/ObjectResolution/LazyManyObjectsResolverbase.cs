@@ -149,9 +149,8 @@ namespace Umbraco.Core.ObjectResolution
 		{
 			EnsureAddSupport();
 
-			EnsureResolutionNotFrozen();
-
-			using (GetWriteLock())
+            using (Resolution.Configuration)
+            using (GetWriteLock())
 			{
 				foreach (var t in types)
 				{				
@@ -168,9 +167,8 @@ namespace Umbraco.Core.ObjectResolution
 		{
 			EnsureAddSupport();
 
-			EnsureResolutionNotFrozen();
-
-			using (GetWriteLock())
+            using (Resolution.Configuration)
+            using (GetWriteLock())
 			{
 				_listOfTypeListDelegates.Add(typeListDelegate);
 			}
@@ -184,9 +182,8 @@ namespace Umbraco.Core.ObjectResolution
 		{
 			EnsureAddSupport();
 
-			EnsureResolutionNotFrozen();
-
-			using (GetWriteLock())
+            using (Resolution.Configuration)
+            using (GetWriteLock())
 			{				
 				_lazyTypeList.Add(value);
 			}
@@ -208,9 +205,8 @@ namespace Umbraco.Core.ObjectResolution
 		{
 			EnsureClearSupport();
 
-			EnsureResolutionNotFrozen();
-
-			using (GetWriteLock())
+            using (Resolution.Configuration)
+            using (GetWriteLock())
 			{
 				_lazyTypeList.Clear();
 			}
