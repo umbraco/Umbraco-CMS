@@ -4,7 +4,6 @@ web.Template.[a-zA-Z0-9]*.Debug.config
 
 syntax: glob
 *.obj
-*.exe
 *.pdb
 *.user
 *.aps
