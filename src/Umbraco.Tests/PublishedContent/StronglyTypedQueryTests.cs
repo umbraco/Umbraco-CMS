@@ -69,26 +69,26 @@ namespace Umbraco.Tests.PublishedContent
 			return doc;
 		}
 
-        [Ignore]
-		[Test]
-		public void Type_Test()
-		{
-			var doc = GetNode(1);
-			var result = doc.NewsArticles(TraversalType.Descendants).ToArray();
-			Assert.AreEqual("John doe", result[0].ArticleAuthor);
-			Assert.AreEqual("John Smith", result[1].ArticleAuthor);
-		}
+        //[Ignore]
+        //[Test]
+        //public void Type_Test()
+        //{
+        //    var doc = GetNode(1);
+        //    var result = doc.NewsArticles(TraversalType.Descendants).ToArray();
+        //    Assert.AreEqual("John doe", result[0].ArticleAuthor);
+        //    Assert.AreEqual("John Smith", result[1].ArticleAuthor);
+        //}
 
-        [Ignore]
-		[Test]
-		public void As_Test()
-		{
-			var doc = GetNode(1);
-			var result = doc.AsHome();
-			Assert.AreEqual("Test site", result.SiteName);
+        //[Ignore]
+        //[Test]
+        //public void As_Test()
+        //{
+        //    var doc = GetNode(1);
+        //    var result = doc.AsHome();
+        //    Assert.AreEqual("Test site", result.SiteName);
 
-			Assert.Throws<InvalidOperationException>(() => doc.AsContentPage());
-		}
+        //    Assert.Throws<InvalidOperationException>(() => doc.AsContentPage());
+        //}
 
 	}
 
