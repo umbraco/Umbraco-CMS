@@ -13,20 +13,20 @@ namespace Umbraco.Web.Routing
 		/// Initializes a new instance of the <see cref="RoutingContext"/> class.
 		/// </summary>
 		/// <param name="umbracoContext"> </param>
-		/// <param name="documentLookups">The document lookups resolver.</param>
-		/// <param name="documentLastChanceLookup"> </param>
+		/// <param name="contentFinders">The document lookups resolver.</param>
+		/// <param name="contentLastChanceFinder"> </param>
 		/// <param name="publishedContentStore">The content store.</param>
 		/// <param name="niceUrlResolver">The nice urls resolver.</param>
 		internal RoutingContext(
 			UmbracoContext umbracoContext,
-			IEnumerable<IPublishedContentLookup> documentLookups,
-			IDocumentLastChanceLookup documentLastChanceLookup,
+			IEnumerable<IPublishedContentFinder> contentFinders,
+			IPublishedContentFinder contentLastChanceFinder,
             IPublishedContentStore publishedContentStore,
 			NiceUrlProvider niceUrlResolver)
         {
 			this.UmbracoContext = umbracoContext;
-			this.DocumentLookups = documentLookups;
-			DocumentLastChanceLookup = documentLastChanceLookup;
+			this.PublishedContentFinders = contentFinders;
+			this.PublishedContentLastChanceFinder = contentLastChanceFinder;
 			this.PublishedContentStore = publishedContentStore;
         	this.NiceUrlProvider = niceUrlResolver;
         }
@@ -37,14 +37,14 @@ namespace Umbraco.Web.Routing
 		public UmbracoContext UmbracoContext { get; private set; }
 
 		/// <summary>
-		/// Gets the document lookups resolver.
+		/// Gets the published content finders.
 		/// </summary>
-		internal IEnumerable<IPublishedContentLookup> DocumentLookups { get; private set; }
+		internal IEnumerable<IPublishedContentFinder> PublishedContentFinders { get; private set; }
 
 		/// <summary>
-		/// Gets the last chance lookup
+		/// Gets the published content last chance finder.
 		/// </summary>
-		internal IDocumentLastChanceLookup DocumentLastChanceLookup { get; private set; }
+		internal IPublishedContentFinder PublishedContentLastChanceFinder { get; private set; }
 
 		/// <summary>
 		/// Gets the content store.

@@ -7,9 +7,9 @@ namespace Umbraco.Web.Routing
 	/// This is used by library.RenderTemplate and also some of the macro rendering functionality like in
 	/// insertMacro.aspx and macroResultWrapper.aspx
 	/// </remarks>
-	internal class LookupByPageIdQuery : IPublishedContentLookup
+	internal class FinderByPageIdQuery : IPublishedContentFinder
 	{
-		public bool TrySetDocument(PublishedContentRequest docRequest)
+		public bool TryFindDocument(PublishedContentRequest docRequest)
 		{
 			int pageId;
 			if (int.TryParse(docRequest.RoutingContext.UmbracoContext.HttpContext.Request["umbPageID"], out pageId))

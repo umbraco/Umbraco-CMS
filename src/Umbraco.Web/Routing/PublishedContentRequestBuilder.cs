@@ -182,7 +182,7 @@ namespace Umbraco.Web.Routing
 				() => string.Format("{0}Begin resolvers", tracePrefix),
 				() => string.Format("{0}End resolvers, {1}", tracePrefix, (_publishedContentRequest.HasNode ? "a document was found" : "no document was found"))))
 			{
-				_routingContext.DocumentLookups.Any(lookup => lookup.TrySetDocument(_publishedContentRequest));
+				_routingContext.PublishedContentFinders.Any(lookup => lookup.TryFindDocument(_publishedContentRequest));
 			}
 		}
 
@@ -220,8 +220,8 @@ namespace Umbraco.Web.Routing
 					LogHelper.Debug<PublishedContentRequest>("{0}No document, try last chance lookup", () => tracePrefix);
 
 					// if it fails then give up, there isn't much more that we can do
-					var lastChance = _routingContext.DocumentLastChanceLookup;
-					if (lastChance == null || !lastChance.TrySetDocument(_publishedContentRequest))
+					var lastChance = _routingContext.PublishedContentLastChanceFinder;
+					if (lastChance == null || !lastChance.TryFindDocument(_publishedContentRequest))
 					{
 						LogHelper.Debug<PublishedContentRequest>("{0}Failed to find a document, give up", () => tracePrefix);
 						break;

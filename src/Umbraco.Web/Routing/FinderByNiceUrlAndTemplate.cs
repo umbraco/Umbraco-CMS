@@ -9,14 +9,13 @@ using Template = umbraco.cms.businesslogic.template.Template;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Provides an implementation of <see cref="IPublishedContentLookup"/> that handles page nice urls and a template.
+	/// Provides an implementation of <see cref="IPublishedContentFinder"/> that handles page nice urls and a template.
 	/// </summary>
 	/// <remarks>
 	/// <para>Handles <c>/foo/bar/template</c> where <c>/foo/bar</c> is the nice url of a document, and <c>template</c> a template alias.</para>
 	/// <para>If successful, then the template of the document request is also assigned.</para>
 	/// </remarks>
-	//[ResolutionWeight(30)]
-    internal class LookupByNiceUrlAndTemplate : LookupByNiceUrl, IPublishedContentLookup
+    internal class FinderByNiceUrlAndTemplate : FinderByNiceUrl, IPublishedContentFinder
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
@@ -24,7 +23,7 @@ namespace Umbraco.Web.Routing
 		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		/// <remarks>If successful, also assigns the template.</remarks>
-		public override bool TrySetDocument(PublishedContentRequest docRequest)
+		public override bool TryFindDocument(PublishedContentRequest docRequest)
         {
             IPublishedContent node = null;
 			string path = docRequest.Uri.GetAbsolutePathDecoded();
@@ -45,7 +44,7 @@ namespace Umbraco.Web.Routing
                 var template = Template.GetByAlias(templateAlias);
                 if (template != null)
                 {
-					LogHelper.Debug<LookupByNiceUrlAndTemplate>("Valid template: \"{0}\"", () => templateAlias);
+					LogHelper.Debug<FinderByNiceUrlAndTemplate>("Valid template: \"{0}\"", () => templateAlias);
 
 					var route = docRequest.HasDomain ? (docRequest.Domain.RootNodeId.ToString() + path) : path;
 					node = LookupDocumentNode(docRequest, route);
@@ -55,12 +54,12 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-					LogHelper.Debug<LookupByNiceUrlAndTemplate>("Not a valid template: \"{0}\"", () => templateAlias);
+					LogHelper.Debug<FinderByNiceUrlAndTemplate>("Not a valid template: \"{0}\"", () => templateAlias);
                 }
             }
             else
             {
-				LogHelper.Debug<LookupByNiceUrlAndTemplate>("No template in path \"/\"");
+				LogHelper.Debug<FinderByNiceUrlAndTemplate>("No template in path \"/\"");
             }
 
             return node != null;

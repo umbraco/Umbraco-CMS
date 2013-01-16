@@ -8,7 +8,7 @@ using umbraco.cms.businesslogic.template;
 namespace Umbraco.Tests.Routing
 {
 	[TestFixture]
-	public class LookupByNiceUrlTests : BaseRoutingTest
+	public class FinderByNiceUrlTests : BaseRoutingTest
 	{
 		public override void Initialize()
 		{
@@ -40,10 +40,10 @@ namespace Umbraco.Tests.Routing
 			var routingContext = GetRoutingContext(urlString);
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
 			var docreq = new PublishedContentRequest(url, routingContext);
-			var lookup = new LookupByNiceUrl();
+			var lookup = new FinderByNiceUrl();
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
 
-			var result = lookup.TrySetDocument(docreq);
+			var result = lookup.TryFindDocument(docreq);
 
 			if (expectedId > 0)
 			{
@@ -67,9 +67,9 @@ namespace Umbraco.Tests.Routing
 			var routingContext = GetRoutingContext(urlString);
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl;	//very important to use the cleaned up umbraco url		
 			var docreq = new PublishedContentRequest(url, routingContext);			
-			var lookup = new LookupByNiceUrl();
+			var lookup = new FinderByNiceUrl();
 
-			var result = lookup.TrySetDocument(docreq);
+			var result = lookup.TryFindDocument(docreq);
 
 			Assert.IsTrue(result);
 			Assert.AreEqual(expectedId, docreq.DocumentId);

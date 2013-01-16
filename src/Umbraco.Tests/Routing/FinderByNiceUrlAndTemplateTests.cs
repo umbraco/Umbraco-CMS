@@ -7,7 +7,7 @@ using umbraco.cms.businesslogic.template;
 namespace Umbraco.Tests.Routing
 {
 	[TestFixture]
-	public class LookupByNiceUrlAndTemplateTests : BaseRoutingTest
+	public class FinderByNiceUrlAndTemplateTests : BaseRoutingTest
 	{
 		public override void Initialize()
 		{
@@ -27,9 +27,9 @@ namespace Umbraco.Tests.Routing
 			var routingContext = GetRoutingContext(urlAsString, template);
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
 			var docRequest = new PublishedContentRequest(url, routingContext);
-			var lookup = new LookupByNiceUrlAndTemplate();
+			var lookup = new FinderByNiceUrlAndTemplate();
 
-			var result = lookup.TrySetDocument(docRequest);
+			var result = lookup.TryFindDocument(docRequest);
 
 			Assert.IsTrue(result);
 			Assert.IsNotNull(docRequest.PublishedContent);

@@ -12,7 +12,7 @@ using System.Configuration;
 namespace Umbraco.Tests.Routing
 {
 	[TestFixture]
-	public class LookupByNiceUrlWithDomainsTests : BaseRoutingTest
+	public class FinderByNiceUrlWithDomainsTests : BaseRoutingTest
 	{
 		public override void Initialize()
 		{
@@ -164,8 +164,8 @@ namespace Umbraco.Tests.Routing
 			var builder = new PublishedContentRequestBuilder(docreq);
 			builder.LookupDomain();
 
-			var lookup = new LookupByNiceUrl();
-			var result = lookup.TrySetDocument(docreq);
+			var lookup = new FinderByNiceUrl();
+			var result = lookup.TryFindDocument(docreq);
 			Assert.IsTrue(result);
 			Assert.AreEqual(expectedId, docreq.DocumentId);
 		}
@@ -204,8 +204,8 @@ namespace Umbraco.Tests.Routing
 			builder.LookupDomain();
 			Assert.AreEqual(expectedCulture, docreq.Culture.Name);
 
-			var lookup = new LookupByNiceUrl();
-			var result = lookup.TrySetDocument(docreq);
+			var lookup = new FinderByNiceUrl();
+			var result = lookup.TryFindDocument(docreq);
 			Assert.IsTrue(result);
 			Assert.AreEqual(expectedId, docreq.DocumentId);
 		}

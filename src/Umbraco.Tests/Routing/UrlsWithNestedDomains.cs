@@ -49,8 +49,8 @@ namespace Umbraco.Tests.Routing
 			Assert.IsTrue(docreq.HasDomain);
 
 			// check that it's been routed
-			var lookup = new LookupByNiceUrl();
-			var result = lookup.TrySetDocument(docreq);
+			var lookup = new FinderByNiceUrl();
+			var result = lookup.TryFindDocument(docreq);
 			Assert.IsTrue(result);
 			Assert.AreEqual(100111, docreq.DocumentId);
 

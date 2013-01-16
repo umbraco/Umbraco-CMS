@@ -8,7 +8,7 @@ using Umbraco.Core;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Provides an implementation of <see cref="IPublishedContentLookup"/> that handles profiles.
+	/// Provides an implementation of <see cref="IPublishedContentFinder"/> that handles profiles.
 	/// </summary>
 	/// <remarks>
 	/// <para>Handles <c>/profile/login</c> where <c>/profile</c> is the profile page nice url and <c>login</c> the login of a member.</para>
@@ -16,14 +16,14 @@ namespace Umbraco.Web.Routing
 	/// We keep it for backward compatility reasons.</para>
 	/// </remarks>
 	//[ResolutionWeight(40)]
-    internal class LookupByProfile : LookupByNiceUrl
+    internal class FinderByProfile : FinderByNiceUrl
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
 		/// </summary>
 		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-		public override bool TrySetDocument(PublishedContentRequest docRequest)
+		public override bool TryFindDocument(PublishedContentRequest docRequest)
         {
             IPublishedContent node = null;
 			var path = docRequest.Uri.GetAbsolutePathDecoded();
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Routing
                 if (path == GlobalSettings.ProfileUrl)
                 {
                     isProfile = true;
-					LogHelper.Debug<LookupByProfile>("Path \"{0}\" is the profile path", () => path);
+					LogHelper.Debug<FinderByProfile>("Path \"{0}\" is the profile path", () => path);
 
 					var route = docRequest.HasDomain ? (docRequest.Domain.RootNodeId.ToString() + path) : path;
 					node = LookupDocumentNode(docRequest, route);
@@ -50,14 +50,14 @@ namespace Umbraco.Web.Routing
                     }                        
                     else
                     {
-						LogHelper.Debug<LookupByProfile>("No document matching profile path?");
+						LogHelper.Debug<FinderByProfile>("No document matching profile path?");
                     }
                 }
             }
 
             if (!isProfile)
             {
-				LogHelper.Debug<LookupByProfile>("Not the profile path");
+				LogHelper.Debug<FinderByProfile>("Not the profile path");
             }
 
             return node != null;

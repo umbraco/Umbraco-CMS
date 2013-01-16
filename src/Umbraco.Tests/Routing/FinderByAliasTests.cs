@@ -5,7 +5,7 @@ using Umbraco.Web.Routing;
 namespace Umbraco.Tests.Routing
 {
 	[TestFixture]
-	public class LookupByAliasTests : BaseRoutingTest
+	public class FinderByAliasTests : BaseRoutingTest
 	{
 		public override void Initialize()
 		{
@@ -32,9 +32,9 @@ namespace Umbraco.Tests.Routing
 			var routingContext = GetRoutingContext(urlAsString);
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
 			var docRequest = new PublishedContentRequest(url, routingContext);
-			var lookup = new LookupByAlias();
+			var lookup = new FinderByAlias();
 			
-			var result = lookup.TrySetDocument(docRequest);
+			var result = lookup.TryFindDocument(docRequest);
 
 			Assert.IsTrue(result);
 			Assert.AreEqual(docRequest.DocumentId, nodeMatch);

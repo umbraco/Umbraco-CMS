@@ -62,8 +62,8 @@ namespace Umbraco.Web
 			// create the RoutingContext, and assign
 			var routingContext = new RoutingContext(
 				umbracoContext,
-				DocumentLookupsResolver.Current.DocumentLookups,
-				LastChanceLookupResolver.Current.LastChanceLookup,
+				IPublishedContentFinderResolver.Current.Finders,
+				IPublishedContentLastChanceFinderResolver.Current.Finder,
 				PublishedContentStoreResolver.Current.PublishedContentStore,
 				niceUrls);
 			umbracoContext.RoutingContext = routingContext;

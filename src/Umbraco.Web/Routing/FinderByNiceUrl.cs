@@ -8,20 +8,19 @@ using Umbraco.Core;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Provides an implementation of <see cref="IPublishedContentLookup"/> that handles page nice urls.
+	/// Provides an implementation of <see cref="IPublishedContentFinder"/> that handles page nice urls.
 	/// </summary>
 	/// <remarks>
 	/// <para>Handles <c>/foo/bar</c> where <c>/foo/bar</c> is the nice url of a document.</para>
 	/// </remarks>
-	//[ResolutionWeight(10)]
-	internal class LookupByNiceUrl : IPublishedContentLookup
+	internal class FinderByNiceUrl : IPublishedContentFinder
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
 		/// </summary>
 		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-		public virtual bool TrySetDocument(PublishedContentRequest docRequest)
+		public virtual bool TryFindDocument(PublishedContentRequest docRequest)
         {
 			string route;
 			if (docRequest.HasDomain)
@@ -41,7 +40,7 @@ namespace Umbraco.Web.Routing
 		/// <returns>The document node, or null.</returns>
         protected IPublishedContent LookupDocumentNode(PublishedContentRequest docreq, string route)
         {
-			LogHelper.Debug<LookupByNiceUrl>("Test route \"{0}\"", () => route);
+			LogHelper.Debug<FinderByNiceUrl>("Test route \"{0}\"", () => route);
 
 			// first ask the cache for a node
 			// return '0' if in preview mode
@@ -61,7 +60,7 @@ namespace Umbraco.Web.Routing
                 if (node != null)
                 {
                     docreq.PublishedContent = node;
-					LogHelper.Debug<LookupByNiceUrl>("Cache hit, id={0}", () => nodeId);
+					LogHelper.Debug<FinderByNiceUrl>("Cache hit, id={0}", () => nodeId);
                 }
                 else
                 {
@@ -72,7 +71,7 @@ namespace Umbraco.Web.Routing
 			// if we still have no node, get it by route
             if (node == null)
             {
-				LogHelper.Debug<LookupByNiceUrl>("Cache miss, query");
+				LogHelper.Debug<FinderByNiceUrl>("Cache miss, query");
 				node = docreq.RoutingContext.PublishedContentStore.GetDocumentByRoute(
 					docreq.RoutingContext.UmbracoContext,
 					route);
@@ -80,11 +79,11 @@ namespace Umbraco.Web.Routing
                 if (node != null)
                 {
                     docreq.PublishedContent = node;
-					LogHelper.Debug<LookupByNiceUrl>("Query matches, id={0}", () => docreq.DocumentId);
+					LogHelper.Debug<FinderByNiceUrl>("Query matches, id={0}", () => docreq.DocumentId);
 
 					var iscanon = !DomainHelper.ExistsDomainInPath(docreq.Domain, node.Path);
 					if (!iscanon)
-						LogHelper.Debug<LookupByNiceUrl>("Non canonical url");
+						LogHelper.Debug<FinderByNiceUrl>("Non canonical url");
 
 					// do not store if previewing or if non-canonical
 					if (!docreq.RoutingContext.UmbracoContext.InPreviewMode && iscanon)
@@ -93,7 +92,7 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-					LogHelper.Debug<LookupByNiceUrl>("Query does not match");
+					LogHelper.Debug<FinderByNiceUrl>("Query does not match");
                 }
             }
 

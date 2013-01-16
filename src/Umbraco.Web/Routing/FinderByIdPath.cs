@@ -9,20 +9,19 @@ using Umbraco.Core;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Provides an implementation of <see cref="IPublishedContentLookup"/> that handles page identifiers.
+	/// Provides an implementation of <see cref="IPublishedContentFinder"/> that handles page identifiers.
 	/// </summary>
 	/// <remarks>
 	/// <para>Handles <c>/1234</c> where <c>1234</c> is the identified of a document.</para>
 	/// </remarks>
-	//[ResolutionWeight(20)]
-	internal class LookupByIdPath : IPublishedContentLookup
+	internal class FinderByIdPath : IPublishedContentFinder
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
 		/// </summary>
 		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-		public bool TrySetDocument(PublishedContentRequest docRequest)
+		public bool TryFindDocument(PublishedContentRequest docRequest)
         {
             IPublishedContent node = null;
 			var path = docRequest.Uri.GetAbsolutePathDecoded();
@@ -37,7 +36,7 @@ namespace Umbraco.Web.Routing
 
                 if (nodeId > 0)
                 {
-					LogHelper.Debug<LookupByIdPath>("Id={0}", () => nodeId);
+					LogHelper.Debug<FinderByIdPath>("Id={0}", () => nodeId);
 					node = docRequest.RoutingContext.PublishedContentStore.GetDocumentById(
 						docRequest.RoutingContext.UmbracoContext,
 						nodeId);
@@ -45,7 +44,7 @@ namespace Umbraco.Web.Routing
                     if (node != null)
                     {
 						docRequest.PublishedContent = node;
-						LogHelper.Debug<LookupByIdPath>("Found node with id={0}", () => docRequest.DocumentId);
+						LogHelper.Debug<FinderByIdPath>("Found node with id={0}", () => docRequest.DocumentId);
                     }
                     else
                     {
@@ -55,7 +54,7 @@ namespace Umbraco.Web.Routing
             }
 
             if (nodeId == -1)
-				LogHelper.Debug<LookupByIdPath>("Not a node id");
+				LogHelper.Debug<FinderByIdPath>("Not a node id");
 
             return node != null;
         }
