@@ -8,6 +8,8 @@ using umbraco.interfaces;
 
 namespace Umbraco.Core.ObjectResolution
 {
+	// FIXME - specific resolvers should not be in Umbraco.Core.ObjectResolution ??
+
 	/// <summary>
 	/// A resolver to return all IMacroGuiRendering objects
 	/// </summary>

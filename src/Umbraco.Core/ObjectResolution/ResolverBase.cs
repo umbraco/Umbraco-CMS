@@ -4,16 +4,17 @@ using System.Threading;
 namespace Umbraco.Core.ObjectResolution
 {
 	/// <summary>
-	/// base class for resolvers which declare a singleton accessor
+	/// The base class for all resolvers.
 	/// </summary>
-	/// <typeparam name="TResolver"></typeparam>
-	internal abstract class ResolverBase<TResolver> 
+	/// <typeparam name="TResolver">The type of the concrete resolver class.</typeparam>
+	/// <remarks>Provides singleton management to all resolvers.</remarks>
+	public abstract class ResolverBase<TResolver> 
 		where TResolver : class
 	{
 		static TResolver _resolver;
 		
 		/// <summary>
-		/// The lock for the singleton
+		/// The lock for the singleton.
 		/// </summary>
 		/// <remarks>
 		/// Though resharper says this is in error, it is actually correct. We want a different lock object for each generic type.
@@ -21,6 +22,12 @@ namespace Umbraco.Core.ObjectResolution
 		/// </remarks>
 		static readonly ReaderWriterLockSlim ResolversLock = new ReaderWriterLockSlim();
 
+		/// <summary>
+		/// Gets or sets the resolver singleton instance.
+		/// </summary>
+		/// <remarks>The value can be set only once, and cannot be read before it has been set.</remarks>
+		/// <exception cref="InvalidOperationException">value is read before it has been set, or value is set again once it has already been set.</exception>
+		/// <exception cref="ArgumentNullException">value is <c>null</c>.</exception>
 		public static TResolver Current
 		{
 			get
@@ -28,7 +35,9 @@ namespace Umbraco.Core.ObjectResolution
 				using (new ReadLock(ResolversLock))
 				{
 					if (_resolver == null)
-						throw new InvalidOperationException("Current has not been initialized on " + typeof(TResolver) + ". You must initialize Current before trying to read it.");
+						throw new InvalidOperationException(string.Format(
+							"Current has not been initialized on {0}. You must initialize Current before trying to read it.",
+							typeof(TResolver).FullName));
 					return _resolver;
 				}
 			}
@@ -40,15 +49,18 @@ namespace Umbraco.Core.ObjectResolution
 					if (value == null)
 						throw new ArgumentNullException("value");
 					if (_resolver != null)
-						throw new InvalidOperationException("Current has already been initialized. It is not possible to re-initialize Current once it has been initialized.");
+						throw new InvalidOperationException(string.Format(
+							"Current has already been initialized on {0}. It is not possible to re-initialize Current once it has been initialized.",
+							typeof(TResolver).FullName));
 					_resolver = value;
 				}
 			}
 		}
 
 		/// <summary>
-		/// used in unit tests to reset current to null
+		/// Resets the resolver singleton instance to null.
 		/// </summary>
+		/// <remarks>To be used in unit tests.</remarks>
 		internal static void Reset()
 		{
 			_resolver = null;
