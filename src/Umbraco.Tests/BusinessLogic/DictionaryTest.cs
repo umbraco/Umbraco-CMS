@@ -26,241 +26,241 @@ namespace Umbraco.Tests.BusinessLogic
 			CreateNew();
 		}
 
-        //[Ignore]
-        //[Test()]
-        //public void Dictionary_Get_Top_Level_Items()
-        //{
-        //    var items = Dictionary.getTopMostItems;
+        [Ignore]
+        [Test()]
+        public void Dictionary_Get_Top_Level_Items()
+        {
+            var items = Dictionary.getTopMostItems;
 
-        //    var d = CreateNew();
+            var d = CreateNew();
 
-        //    Assert.AreEqual(items.Count() + 1, Dictionary.getTopMostItems.Count());
+            Assert.AreEqual(items.Count() + 1, Dictionary.getTopMostItems.Count());
 
-        //    DeleteItem(d);
-        //}
+            DeleteItem(d);
+        }
 
         /// <summary>
         /// Creates a new dictionary entry, adds values for all languages assigned, then deletes the 
         /// entry and ensure that all other data is gone too.
         ///</summary>
-        //[Ignore]
-        //[Test()]
-        //public void Dictionary_Create_Add_Text_And_Delete()
-        //{
-        //    var d = CreateNew();
+        [Ignore]
+		[Test()]
+        public void Dictionary_Create_Add_Text_And_Delete()
+        {
+            var d = CreateNew();
 
-        //    //set the values for all languages
-        //    var langs = Language.GetAllAsList();
-        //    foreach (var l in langs)
-        //    {
-        //        var val = "TEST" + Guid.NewGuid().ToString("N");
-        //        d.setValue(l.id, val);
-        //        //make sure the values are there
-        //        Assert.AreEqual(val, d.Value(l.id));
-        //    }
+            //set the values for all languages
+            var langs = Language.GetAllAsList();
+            foreach (var l in langs)
+            {
+                var val = "TEST" + Guid.NewGuid().ToString("N");
+                d.setValue(l.id, val);
+                //make sure the values are there
+                Assert.AreEqual(val, d.Value(l.id));
+            }
 
-        //    DeleteItem(d);
+            DeleteItem(d);
 
-        //}
+        }
 
         /// <summary>
         ///A test for IsTopMostItem
         ///</summary>
-        //[Ignore]
-        //[Test()]
-        //public void Dictionary_IsTopMostItem()
-        //{
-        //    var parent = CreateNew();
+        [Ignore]
+		[Test()]
+        public void Dictionary_IsTopMostItem()
+        {
+            var parent = CreateNew();
 
-        //    //create a child
-        //    var childId = Dictionary.DictionaryItem.addKey("Test" + Guid.NewGuid().ToString("N"), "", parent.key);
-        //    Assert.IsTrue(childId > 0);
-        //    var child = new Dictionary.DictionaryItem(childId);
-        //    Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<Dictionary.DictionaryItem>(child));
+            //create a child
+            var childId = Dictionary.DictionaryItem.addKey("Test" + Guid.NewGuid().ToString("N"), "", parent.key);
+            Assert.IsTrue(childId > 0);
+            var child = new Dictionary.DictionaryItem(childId);
+			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<Dictionary.DictionaryItem>(child));
 
-        //    Assert.IsTrue(parent.IsTopMostItem());
-        //    Assert.IsFalse(child.IsTopMostItem());
+            Assert.IsTrue(parent.IsTopMostItem());
+            Assert.IsFalse(child.IsTopMostItem());
 
-        //    DeleteItem(child);
-        //    DeleteItem(parent);
-        //}
+            DeleteItem(child);
+            DeleteItem(parent);
+        }
 
         /// <summary>
         /// Test the Parent and Children properties and ensures that the relationships work both ways
         ///</summary>
-        //[Ignore]
-        //[Test()]
-        //public void Dictionary_Parent_Child_Relationship()
-        //{
-        //    var parent = CreateNew();
+        [Ignore]
+		[Test()]
+        public void Dictionary_Parent_Child_Relationship()
+        {
+            var parent = CreateNew();
 
-        //    //create a child
-        //    var childId = Dictionary.DictionaryItem.addKey("Test" + Guid.NewGuid().ToString("N"), "", parent.key);
-        //    Assert.IsTrue(childId > 0);
-        //    var child = new Dictionary.DictionaryItem(childId);
-        //    Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<Dictionary.DictionaryItem>(child));
+            //create a child
+            var childId = Dictionary.DictionaryItem.addKey("Test" + Guid.NewGuid().ToString("N"), "", parent.key);
+            Assert.IsTrue(childId > 0);
+            var child = new Dictionary.DictionaryItem(childId);
+			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<Dictionary.DictionaryItem>(child));
 
-        //    //set the parent relationship
-        //    Assert.AreEqual(parent.id, child.Parent.id);
-        //    Assert.AreEqual(parent.key, child.Parent.key);
-        //    Assert.AreEqual(parent.UniqueId, child.Parent.UniqueId);
+            //set the parent relationship
+            Assert.AreEqual(parent.id, child.Parent.id);
+            Assert.AreEqual(parent.key, child.Parent.key);
+            Assert.AreEqual(parent.UniqueId, child.Parent.UniqueId);
 
-        //    //test the child relationship
-        //    Assert.IsTrue(parent.hasChildren);
-        //    Assert.AreEqual(1, parent.Children.Length);
-        //    Assert.AreEqual(child.id, parent.Children.First().id);
-        //    Assert.AreEqual(child.key, parent.Children.First().key);
-        //    Assert.AreEqual(child.UniqueId, parent.Children.First().UniqueId);
+            //test the child relationship
+            Assert.IsTrue(parent.hasChildren);
+            Assert.AreEqual(1, parent.Children.Length);
+            Assert.AreEqual(child.id, parent.Children.First().id);
+            Assert.AreEqual(child.key, parent.Children.First().key);
+            Assert.AreEqual(child.UniqueId, parent.Children.First().UniqueId);
 
-        //    DeleteItem(child);
-        //    DeleteItem(parent);
-        //}
+            DeleteItem(child);
+            DeleteItem(parent);
+        }
 
         /// <summary>
         /// Deletes a parent with existing children and ensures they are all gone.
         /// </summary>
-        //[Ignore]
-        //[Test()]
-        //public void Dictionary_Delete_Parent_With_Children()
-        //{
-        //    var parent = CreateNew();
+        [Ignore]
+        [Test()]
+        public void Dictionary_Delete_Parent_With_Children()
+        {
+            var parent = CreateNew();
 
-        //    //create a child
-        //    var childId1 = Dictionary.DictionaryItem.addKey("Test" + Guid.NewGuid().ToString("N"), "", parent.key);
-        //    Assert.IsTrue(childId1 > 0);
-        //    var child1 = new Dictionary.DictionaryItem(childId1);
-        //    Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<Dictionary.DictionaryItem>(child1));
+            //create a child
+            var childId1 = Dictionary.DictionaryItem.addKey("Test" + Guid.NewGuid().ToString("N"), "", parent.key);
+            Assert.IsTrue(childId1 > 0);
+            var child1 = new Dictionary.DictionaryItem(childId1);
+			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<Dictionary.DictionaryItem>(child1));
 
-        //    //create a child
-        //    var childId2 = Dictionary.DictionaryItem.addKey("Test" + Guid.NewGuid().ToString("N"), "", parent.key);
-        //    Assert.IsTrue(childId2 > 0);
-        //    var child2 = new Dictionary.DictionaryItem(childId2);
-        //    Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<Dictionary.DictionaryItem>(child2));
+            //create a child
+            var childId2 = Dictionary.DictionaryItem.addKey("Test" + Guid.NewGuid().ToString("N"), "", parent.key);
+            Assert.IsTrue(childId2 > 0);
+            var child2 = new Dictionary.DictionaryItem(childId2);
+			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<Dictionary.DictionaryItem>(child2));
 
-        //    Assert.IsTrue(parent.hasChildren);
-        //    Assert.AreEqual(2, parent.Children.Length);
+            Assert.IsTrue(parent.hasChildren);
+            Assert.AreEqual(2, parent.Children.Length);
 
 
-        //    DeleteItem(parent);
+            DeleteItem(parent);
 
-        //    //make sure kids are gone
-        //    var notFound = false;
-        //    try
-        //    {
-        //        var check = new Dictionary.DictionaryItem(childId1);
-        //    }
-        //    catch (ArgumentException)
-        //    {
-        //        notFound = true;
-        //    }
-        //    Assert.IsTrue(notFound);
+            //make sure kids are gone
+            var notFound = false;
+            try
+            {
+                var check = new Dictionary.DictionaryItem(childId1);
+            }
+            catch (ArgumentException)
+            {
+                notFound = true;
+            }
+            Assert.IsTrue(notFound);
 
-        //    notFound = false;
-        //    try
-        //    {
-        //        var check = new Dictionary.DictionaryItem(childId2);
-        //    }
-        //    catch (ArgumentException)
-        //    {
-        //        notFound = true;
-        //    }
-        //    Assert.IsTrue(notFound);
+            notFound = false;
+            try
+            {
+                var check = new Dictionary.DictionaryItem(childId2);
+            }
+            catch (ArgumentException)
+            {
+                notFound = true;
+            }
+            Assert.IsTrue(notFound);
 
-        //}
+        }
 
         /// <summary>
         /// Guid constructor test
         ///</summary>
-        //[Ignore]
-        //[Test()]
-        //public void Dictionary_Contructor_Guid()
-        //{
-        //    var d = CreateNew();
+        [Ignore]
+        [Test()]
+        public void Dictionary_Contructor_Guid()
+        {
+            var d = CreateNew();
 
-        //    var same = new Dictionary.DictionaryItem(d.UniqueId);
+            var same = new Dictionary.DictionaryItem(d.UniqueId);
 
-        //    Assert.AreEqual(d.id, same.id);
-        //    Assert.AreEqual(d.key, same.key);
-        //    Assert.AreEqual(d.UniqueId, same.UniqueId);
+            Assert.AreEqual(d.id, same.id);
+            Assert.AreEqual(d.key, same.key);
+            Assert.AreEqual(d.UniqueId, same.UniqueId);
 
-        //    DeleteItem(d);
-        //}
+            DeleteItem(d);
+        }
 
         /// <summary>
         /// key constructor test
         /// </summary>
-        //[Ignore]
-        //[Test()]
-        //public void Dictionary_Contructor_Key()
-        //{
-        //    var d = CreateNew();
+        [Ignore]
+        [Test()]
+        public void Dictionary_Contructor_Key()
+        {
+            var d = CreateNew();
 
-        //    var same = new Dictionary.DictionaryItem(d.key);
+            var same = new Dictionary.DictionaryItem(d.key);
 
-        //    Assert.AreEqual(d.id, same.id);
-        //    Assert.AreEqual(d.key, same.key);
-        //    Assert.AreEqual(d.UniqueId, same.UniqueId);
+            Assert.AreEqual(d.id, same.id);
+            Assert.AreEqual(d.key, same.key);
+            Assert.AreEqual(d.UniqueId, same.UniqueId);
 
-        //    DeleteItem(d);
-        //}
+            DeleteItem(d);
+        }
 
         /// <summary>
         ///A test for ToXml
         ///</summary>
-        //[Ignore]
-        //[Test()]
-        //public void Dictionary_ToXml()
-        //{
-        //    var d = CreateNew();
+        [Ignore]
+        [Test()]
+        public void Dictionary_ToXml()
+        {
+            var d = CreateNew();
 
-        //    //create a child
-        //    var childId = Dictionary.DictionaryItem.addKey("Test" + Guid.NewGuid().ToString("N"), "", d.key);
-        //    Assert.IsTrue(childId > 0);
-        //    var child = new Dictionary.DictionaryItem(childId);
-        //    Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<Dictionary.DictionaryItem>(child));
+            //create a child
+            var childId = Dictionary.DictionaryItem.addKey("Test" + Guid.NewGuid().ToString("N"), "", d.key);
+            Assert.IsTrue(childId > 0);
+            var child = new Dictionary.DictionaryItem(childId);
+			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<Dictionary.DictionaryItem>(child));
             
-        //    var xml = new XmlDocument();
+            var xml = new XmlDocument();
 
-        //    var output = d.ToXml(xml);
+            var output = d.ToXml(xml);
 
-        //    Assert.AreEqual("DictionaryItem", output.Name);
-        //    Assert.IsTrue(output.HasChildNodes);
-        //    Assert.IsNotNull(output.Attributes["Key"].Value);
-        //    Assert.AreEqual(1, output.ChildNodes.OfType<XmlElement>().Where(x => x.Name == "DictionaryItem").Count());
+            Assert.AreEqual("DictionaryItem", output.Name);
+            Assert.IsTrue(output.HasChildNodes);
+            Assert.IsNotNull(output.Attributes["Key"].Value);
+            Assert.AreEqual(1, output.ChildNodes.OfType<XmlElement>().Where(x => x.Name == "DictionaryItem").Count());
 
-        //    DeleteItem(child);
-        //    DeleteItem(d);
-        //}
+            DeleteItem(child);
+            DeleteItem(d);
+        }
 
         /// <summary>
         ///A test to change the key of an element
         ///</summary>
-        //[Ignore]
-        //[Test()]
-        //public void Dictionary_Change_Key()
-        //{
-        //    //System.Diagnostics.Debugger.Break();
+        [Ignore]
+        [Test()]
+        public void Dictionary_Change_Key()
+        {
+            //System.Diagnostics.Debugger.Break();
             
-        //    var d = CreateNew();
+            var d = CreateNew();
 
-        //    var oldKey = d.key;
-        //    var newKey = "NEWKEY" + Guid.NewGuid().ToString("N");
+            var oldKey = d.key;
+            var newKey = "NEWKEY" + Guid.NewGuid().ToString("N");
             
-        //    d.key = newKey;
-        //    Assert.AreNotEqual(oldKey, d.key);
-        //    Assert.AreEqual(newKey, d.key);
+            d.key = newKey;
+            Assert.AreNotEqual(oldKey, d.key);
+            Assert.AreEqual(newKey, d.key);
 
-        //    //check with sql that the key is definitely changed
-        //    var count = Application.SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsDictionary WHERE [key]=@key",
-        //        Application.SqlHelper.CreateParameter("@key", newKey));
-        //    Assert.AreEqual(1, count);
+            //check with sql that the key is definitely changed
+            var count = Application.SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsDictionary WHERE [key]=@key",
+                Application.SqlHelper.CreateParameter("@key", newKey));
+            Assert.AreEqual(1, count);
             
-        //    count = Application.SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsDictionary WHERE [key]=@key",
-        //        Application.SqlHelper.CreateParameter("@key", oldKey));
-        //    Assert.AreEqual(0, count);
+            count = Application.SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsDictionary WHERE [key]=@key",
+                Application.SqlHelper.CreateParameter("@key", oldKey));
+            Assert.AreEqual(0, count);
 
-        //    DeleteItem(d);
-        //}
+            DeleteItem(d);
+        }
 
         /// <summary>
         /// Tries to create a duplicate key and ensures it's not possible.
