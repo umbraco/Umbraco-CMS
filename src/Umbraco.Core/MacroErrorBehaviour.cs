@@ -1,4 +1,4 @@
-﻿namespace umbraco.businesslogic
+﻿namespace Umbraco.Core
 {
     public enum MacroErrorBehaviour
     {

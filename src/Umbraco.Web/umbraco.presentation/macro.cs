@@ -21,7 +21,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
-using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.member;
@@ -431,11 +430,12 @@ namespace umbraco
 							LogHelper.WarnWithException<macro>("Error loading userControl (" + Model.TypeName + ")", true, e);
 
                             // Invoke any error handlers for this macro
-                            OnError(new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, File = Model.TypeName, Exception = e});
+                            var macroErrorEventArgs = new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, File = Model.TypeName, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour};
+                            OnError(macroErrorEventArgs);
 
-                            // Check how to handle the error for this macro
-                            var macroErrorConfig = MacroErrorConfig.getForMacroName(Model.Name);
-                            switch (macroErrorConfig.Behaviour)
+                            // Check how to handle the error for this macro.
+                            // (note the error event above may have changed the default behaviour as defined in settings)
+                            switch (macroErrorEventArgs.Behaviour)
                             {
                                 case MacroErrorBehaviour.Inline:
                                     macroControl = new LiteralControl("Error loading userControl '" + Model.TypeName + "'");
@@ -468,11 +468,12 @@ namespace umbraco
 	                                                           ", Type: '" + Model.TypeName + "'", true, e);
 
                             // Invoke any error handlers for this macro
-                            OnError(new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, File = Model.TypeAssembly, Exception = e});
+                            var macroErrorEventArgs = new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, File = Model.TypeAssembly, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour};
+                            OnError(macroErrorEventArgs);
 
-                            // Check how to handle the error for this macro
-                            var macroErrorConfig = MacroErrorConfig.getForMacroName(Model.Name);
-                            switch (macroErrorConfig.Behaviour)
+                            // Check how to handle the error for this macro.
+                            // (note the error event above may have changed the default behaviour as defined in settings)
+                            switch (macroErrorEventArgs.Behaviour)
                             {
                                 case MacroErrorBehaviour.Inline:
                                     macroControl = new LiteralControl("Error loading customControl (Assembly: " + Model.TypeAssembly + ", Type: '" + Model.TypeName + "'");
@@ -515,11 +516,12 @@ namespace umbraco
 		                        e);
 
                             // Invoke any error handlers for this macro
-                            OnError(new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, File = ScriptFile, Exception = e});
+                            var macroErrorEventArgs = new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, File = ScriptFile, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour};
+                            OnError(macroErrorEventArgs);
 
-                            // Check how to handle the error for this macro
-                            var macroErrorConfig = MacroErrorConfig.getForMacroName(Model.Name);
-                            switch (macroErrorConfig.Behaviour)
+                            // Check how to handle the error for this macro.
+                            // (note the error event above may have changed the default behaviour as defined in settings)
+                            switch (macroErrorEventArgs.Behaviour)
                             {
                                 case MacroErrorBehaviour.Inline:
                                     macroControl = new LiteralControl("Error loading MacroEngine script (file: " + ScriptFile + ")");
@@ -829,11 +831,12 @@ namespace umbraco
                         Control macroControl = null;
 
                         // Invoke any error handlers for this macro
-                        OnError(new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, File = Model.Xslt, Exception = e});
+                        var macroErrorEventArgs = new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, File = Model.Xslt, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour};
+                        OnError(macroErrorEventArgs);
 
-                        // Check how to handle the error for this macro
-                        var macroErrorConfig = MacroErrorConfig.getForMacroName(Model.Name);
-                        switch (macroErrorConfig.Behaviour)
+                        // Check how to handle the error for this macro.
+                        // (note the error event above may have changed the default behaviour as defined in settings)
+                        switch (macroErrorEventArgs.Behaviour)
                         {
                             case MacroErrorBehaviour.Inline:
                                 macroControl = new LiteralControl("Error reading XSLT file: \\xslt\\" + XsltFile);
