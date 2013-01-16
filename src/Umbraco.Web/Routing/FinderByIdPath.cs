@@ -44,7 +44,7 @@ namespace Umbraco.Web.Routing
                     if (node != null)
                     {
 						docRequest.PublishedContent = node;
-						LogHelper.Debug<FinderByIdPath>("Found node with id={0}", () => docRequest.DocumentId);
+						LogHelper.Debug<FinderByIdPath>("Found node with id={0}", () => docRequest.PublishedContentId);
                     }
                     else
                     {

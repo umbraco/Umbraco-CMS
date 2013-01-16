@@ -23,8 +23,8 @@ using Template = umbraco.cms.businesslogic.template.Template;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// represents a request for one specified Umbraco document to be rendered
-	/// by one specified template, using one particular culture.
+	/// Represents a request for one specified Umbraco IPublishedContent to be rendered
+	/// by one specified Template, using one specified Culture and RenderingEngine.
 	/// </summary>
 	internal class PublishedContentRequest
     {
@@ -79,7 +79,7 @@ namespace Umbraco.Web.Routing
 			{
 				httpContext.Response.StatusCode = 404;
 
-				if (!this.HasNode)
+				if (!this.HasPublishedContent)
 				{
 					httpContext.RemapHandler(new PublishedContentNotFoundHandler());
 					return;
@@ -90,7 +90,7 @@ namespace Umbraco.Web.Routing
 			}
 
 			// just be safe - should never ever happen
-			if (!this.HasNode)
+			if (!this.HasPublishedContent)
 				throw new Exception("No document to render.");
 
 			// trigger PublishedContentRequest.Rendering event?
@@ -105,7 +105,7 @@ namespace Umbraco.Web.Routing
 			this.UmbracoPage = new page(this);
 
 			// these two are used by many legacy objects
-			httpContext.Items["pageID"] = this.DocumentId;
+			httpContext.Items["pageID"] = this.PublishedContentId;
 			httpContext.Items["pageElements"] = this.UmbracoPage.Elements;
 
 			if (onSuccess != null)
@@ -137,7 +137,7 @@ namespace Umbraco.Web.Routing
 			// here .Is404 _has_ to be true
 			httpContext.Response.StatusCode = 404;
 
-			if (!this.HasNode)
+			if (!this.HasPublishedContent)
 			{
 				// means the builder could not find a proper document to handle 404
 				// restore the saved content so we know it exists
@@ -162,7 +162,7 @@ namespace Umbraco.Web.Routing
 			this.UmbracoPage = new page(this);
 
 			// these two are used by many legacy objects
-			httpContext.Items["pageID"] = this.DocumentId;
+			httpContext.Items["pageID"] = this.PublishedContentId;
 			httpContext.Items["pageElements"] = this.UmbracoPage.Elements;
 
 			switch (this.RenderingEngine)
@@ -192,86 +192,27 @@ namespace Umbraco.Web.Routing
 
 			_builder = new PublishedContentRequestBuilder(this);
 			
-			// set default
+			// default is Mvc
 			this.RenderingEngine = RenderingEngine.Mvc;			
         }
 
-        #region Properties
-
-		/// <summary>
-		/// The identifier of the requested node, if any, else zero.
-		/// </summary>
-		int _nodeId = 0;
-
-		/// <summary>
-		/// The requested node, if any, else <c>null</c>.
-		/// </summary>
-		private IPublishedContent _publishedContent = null;
-
-		/// <summary>
-		/// The "umbraco page" object.
-		/// </summary>
-		private page _umbracoPage;
-
-		/// <summary>
-		/// Gets or sets the current RoutingContext.
-		/// </summary>
-		public RoutingContext RoutingContext { get; private set; }
-		
 		/// <summary>
 		/// Gets or sets the cleaned up Uri used for routing.
 		/// </summary>
+		/// <remarks>The cleaned up Uri has no virtual directory, no trailing slash, no .aspx extension, etc.</remarks>
 		public Uri Uri { get; private set; }
 
-        /// <summary>
-        /// Gets or sets the content request's domain.
-        /// </summary>
-        public Domain Domain { get; internal set; }
+		#region PublishedContent
 
 		/// <summary>
-		/// Gets or sets the content request's domain Uri.
+		/// The identifier of the requested IPublishedContent, if any, else zero.
 		/// </summary>
-		/// <remarks>The <c>Domain</c> may contain "example.com" whereas the <c>Uri</c> will be fully qualified eg "http://example.com/".</remarks>
-		public Uri DomainUri { get; internal set; }
+		private int _publishedContentId = 0;
 
 		/// <summary>
-		/// Gets or sets whether the rendering engine is MVC or WebForms.
+		/// The requested IPublishedContent, if any, else <c>null</c>.
 		/// </summary>
-		public RenderingEngine RenderingEngine { get; internal set; }
-
-        /// <summary>
-        /// Gets a value indicating whether the content request has a domain.
-        /// </summary>
-        public bool HasDomain
-        {
-            get { return this.Domain != null; }
-        }
-
-        /// <summary>
-        /// Gets or sets the content request's culture.
-        /// </summary>
-        public CultureInfo Culture { get; set; }
-
-		/// <summary>
-		/// Gets or sets the "umbraco page" object.
-		/// </summary>
-		/// <remarks>
-		/// This value is only used for legacy/webforms code.
-		/// </remarks>
-		internal page UmbracoPage
-		{
-			get
-			{
-				if (_umbracoPage == null)
-					throw new InvalidOperationException("The umbraco page object is only available once Finalize()");
-
-				return _umbracoPage;
-			}
-			set { _umbracoPage = value; }
-		}
-		
-		// TODO: fixme - do we want to have an ordered list of alternate cultures,
-        //         to allow for fallbacks when doing dictionnary lookup and such?
+		private IPublishedContent _publishedContent = null;
 
 		/// <summary>
 		/// Gets or sets the requested content.
@@ -285,11 +226,37 @@ namespace Umbraco.Web.Routing
 				_publishedContent = value;
 				this.Template = null;
 				this.AlternateTemplateAlias = null;
-				_nodeId = _publishedContent != null ? _publishedContent.Id : 0;
+				_publishedContentId = _publishedContent != null ? _publishedContent.Id : 0;
 			}
 		}
 
         /// <summary>
+        /// Gets the identifier of the requested content.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown when the content request has no content.</exception>
+        public int PublishedContentId
+        {
+            get
+            {
+                if (this.PublishedContent == null)
+                    throw new InvalidOperationException("PublishedContentRequest has no document.");
+                return _publishedContentId;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the content request has a content.
+        /// </summary>
+        public bool HasPublishedContent
+        {
+            get { return this.PublishedContent != null; }
+        }
+
+		#endregion
+
+		#region Template
+
+	    /// <summary>
         /// Gets or sets the template to use to display the requested content.
         /// </summary>
 		public Template Template { get; set; }
@@ -312,29 +279,79 @@ namespace Umbraco.Web.Routing
 		/// </remarks>
 		public string AlternateTemplateAlias { get; set; }
 
-        /// <summary>
-        /// Gets the identifier of the requested content.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown when the content request has no content.</exception>
-        public int DocumentId
-        {
-            get
-            {
-                if (this.PublishedContent == null)
-                    throw new InvalidOperationException("PublishedContentRequest has no document.");
-                return _nodeId;
-            }
-        }
+		#endregion
 
-        /// <summary>
-        /// Gets a value indicating whether the content request has a content.
-        /// </summary>
-        public bool HasNode
-        {
-            get { return this.PublishedContent != null; }
-        }
+		#region Domain and Culture
 
-        /// <summary>
+		/// <summary>
+        /// Gets or sets the content request's domain.
+        /// </summary>
+        public Domain Domain { get; internal set; }
+
+		/// <summary>
+		/// Gets or sets the content request's domain Uri.
+		/// </summary>
+		/// <remarks>The <c>Domain</c> may contain "example.com" whereas the <c>Uri</c> will be fully qualified eg "http://example.com/".</remarks>
+		public Uri DomainUri { get; internal set; }
+
+		/// <summary>
+		/// Gets a value indicating whether the content request has a domain.
+		/// </summary>
+		public bool HasDomain
+		{
+			get { return this.Domain != null; }
+		}
+
+		/// <summary>
+		/// Gets or sets the content request's culture.
+		/// </summary>
+		public CultureInfo Culture { get; set; }
+
+		// TODO: fixme - do we want to have an ordered list of alternate cultures,
+        //         to allow for fallbacks when doing dictionnary lookup and such?
+
+		#endregion
+
+		#region Rendering
+
+		/// <summary>
+		/// Gets or sets whether the rendering engine is MVC or WebForms.
+		/// </summary>
+		public RenderingEngine RenderingEngine { get; internal set; }
+
+		#endregion
+
+		/// <summary>
+		/// Gets or sets the current RoutingContext.
+		/// </summary>
+		public RoutingContext RoutingContext { get; private set; }
+
+		/// <summary>
+		/// The "umbraco page" object.
+		/// </summary>
+		private page _umbracoPage;
+
+		/// <summary>
+		/// Gets or sets the "umbraco page" object.
+		/// </summary>
+		/// <remarks>
+		/// This value is only used for legacy/webforms code.
+		/// </remarks>
+		internal page UmbracoPage
+		{
+			get
+			{
+				if (_umbracoPage == null)
+					throw new InvalidOperationException("The umbraco page object is only available once Finalize()");
+
+				return _umbracoPage;
+			}
+			set { _umbracoPage = value; }
+		}
+
+		#region Status
+
+		/// <summary>
         /// Gets or sets a value indicating whether the requested content could not be found.
         /// </summary>
 		/// <remarks>This is set in the <c>PublishedContentRequestBuilder</c>.</remarks>

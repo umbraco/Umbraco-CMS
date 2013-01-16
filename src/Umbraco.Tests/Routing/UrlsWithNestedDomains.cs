@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Routing
 			var lookup = new FinderByNiceUrl();
 			var result = lookup.TryFindDocument(docreq);
 			Assert.IsTrue(result);
-			Assert.AreEqual(100111, docreq.DocumentId);
+			Assert.AreEqual(100111, docreq.PublishedContentId);
 
 			// has the cache been polluted?
 			cachedRoutes = ((DefaultRoutesCache)routingContext.UmbracoContext.RoutesCache).GetCachedRoutes();

@@ -213,7 +213,7 @@ namespace umbraco
 			var builder = new Umbraco.Web.Routing.PublishedContentRequestBuilder(docreq);
 			builder.LookupDomain();
 			builder.LookupDocument1(); // will _not_ follow redirects, handle 404, nothing - just run lookups
-			return docreq.HasNode ? docreq.DocumentId : uQuery.RootNodeId;
+			return docreq.HasPublishedContent ? docreq.PublishedContentId : uQuery.RootNodeId;
 		}
 
 		/// <summary>

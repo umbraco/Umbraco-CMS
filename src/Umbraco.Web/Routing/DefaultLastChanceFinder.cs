@@ -40,7 +40,7 @@ namespace Umbraco.Web.Routing
 		public bool TryFindDocument(PublishedContentRequest docRequest)
         {
 			docRequest.PublishedContent = HandlePageNotFound(docRequest);
-            return docRequest.HasNode;
+            return docRequest.HasPublishedContent;
         }
 
 		#region Copied over from presentation.requestHandler

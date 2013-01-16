@@ -30,7 +30,7 @@ namespace Umbraco.Web.Routing
 
 			var docreq = UmbracoContext.Current.PublishedContentRequest;
 			var reason = "Cannot render the page at url '{0}'.";
-			if (!docreq.HasNode)
+			if (!docreq.HasPublishedContent)
 				reason = "No umbraco document matches the url '{0}'.";
 			else if (!docreq.HasTemplate)
 				reason = "No template exists to render the document at url '{0}'.";

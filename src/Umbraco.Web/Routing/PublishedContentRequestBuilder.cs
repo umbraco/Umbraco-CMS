@@ -162,7 +162,7 @@ namespace Umbraco.Web.Routing
 			// handle wildcard domains
 			HandleWildcardDomains();
 
-			bool resolved = _publishedContentRequest.HasNode && _publishedContentRequest.HasTemplate;
+			bool resolved = _publishedContentRequest.HasPublishedContent && _publishedContentRequest.HasTemplate;
 			return resolved;
 		}
 
@@ -180,7 +180,7 @@ namespace Umbraco.Web.Routing
 
 			using (DisposableTimer.DebugDuration<PluginManager>(
 				() => string.Format("{0}Begin resolvers", tracePrefix),
-				() => string.Format("{0}End resolvers, {1}", tracePrefix, (_publishedContentRequest.HasNode ? "a document was found" : "no document was found"))))
+				() => string.Format("{0}End resolvers, {1}", tracePrefix, (_publishedContentRequest.HasPublishedContent ? "a document was found" : "no document was found"))))
 			{
 				_routingContext.PublishedContentFinders.Any(lookup => lookup.TryFindDocument(_publishedContentRequest));
 			}
@@ -214,7 +214,7 @@ namespace Umbraco.Web.Routing
 				LogHelper.Debug<PublishedContentRequest>("{0}{1}", () => tracePrefix, () => (i == 0 ? "Begin" : "Loop"));
 
 				// handle not found
-				if (!_publishedContentRequest.HasNode)
+				if (!_publishedContentRequest.HasPublishedContent)
 				{
 					_publishedContentRequest.Is404 = true;
 					LogHelper.Debug<PublishedContentRequest>("{0}No document, try last chance lookup", () => tracePrefix);
@@ -237,14 +237,14 @@ namespace Umbraco.Web.Routing
 					break;
 
 				// ensure access
-				if (_publishedContentRequest.HasNode)
+				if (_publishedContentRequest.HasPublishedContent)
 					EnsureNodeAccess();
 
 				// loop while we don't have page, ie the redirect or access
 				// got us to nowhere and now we need to run the notFoundLookup again
 				// as long as it's not running out of control ie infinite loop of some sort
 
-			} while (!_publishedContentRequest.HasNode && i++ < maxLoop);
+			} while (!_publishedContentRequest.HasPublishedContent && i++ < maxLoop);
 
 			if (i == maxLoop || j == maxLoop)
 			{
@@ -255,7 +255,7 @@ namespace Umbraco.Web.Routing
 			// resolve template - will do nothing if a template is already set
 			// moved out of the loop because LookupTemplate does set .PublishedContent to null anymore
 			// (see node in LookupTemplate)
-			if (_publishedContentRequest.HasNode)
+			if (_publishedContentRequest.HasPublishedContent)
 				LookupTemplate();
 			
 			LogHelper.Debug<PublishedContentRequest>("{0}End", () => tracePrefix);
@@ -293,7 +293,7 @@ namespace Umbraco.Web.Routing
 					//_publishedContentRequest.Document = null; // no! that would be to force a 404
 					LogHelper.Debug<PublishedContentRequest>("{0}Failed to redirect to id={1}: invalid value", () => tracePrefix, () => internalRedirect);
 				}
-				else if (internalRedirectId == _publishedContentRequest.DocumentId)
+				else if (internalRedirectId == _publishedContentRequest.PublishedContentId)
 				{
 					// redirect to self
 					LogHelper.Debug<PublishedContentRequest>("{0}Redirecting to self, ignore", () => tracePrefix);
@@ -334,7 +334,7 @@ namespace Umbraco.Web.Routing
 
 			var path = _publishedContentRequest.PublishedContent.Path;
 
-			if (Access.IsProtected(_publishedContentRequest.DocumentId, path))
+			if (Access.IsProtected(_publishedContentRequest.PublishedContentId, path))
 			{
 				LogHelper.Debug<PublishedContentRequest>("{0}Page is protected, check for access", () => tracePrefix);
 
@@ -352,16 +352,16 @@ namespace Umbraco.Web.Routing
 				{
 					LogHelper.Debug<PublishedContentRequest>("{0}Not logged in, redirect to login page", () => tracePrefix);
 					var loginPageId = Access.GetLoginPage(path);
-					if (loginPageId != _publishedContentRequest.DocumentId)
+					if (loginPageId != _publishedContentRequest.PublishedContentId)
 						_publishedContentRequest.PublishedContent = _routingContext.PublishedContentStore.GetDocumentById(
 							_umbracoContext,
 							loginPageId);
 				}
-				else if (!Access.HasAccces(_publishedContentRequest.DocumentId, user.ProviderUserKey))
+				else if (!Access.HasAccces(_publishedContentRequest.PublishedContentId, user.ProviderUserKey))
 				{
 					LogHelper.Debug<PublishedContentRequest>("{0}Current member has not access, redirect to error page", () => tracePrefix);
 					var errorPageId = Access.GetErrorPage(path);
-					if (errorPageId != _publishedContentRequest.DocumentId)
+					if (errorPageId != _publishedContentRequest.PublishedContentId)
 						_publishedContentRequest.PublishedContent = _routingContext.PublishedContentStore.GetDocumentById(
 							_umbracoContext,
 							errorPageId);
@@ -471,7 +471,7 @@ namespace Umbraco.Web.Routing
 		/// <remarks>As per legacy, if the redirect does not work, we just ignore it.</remarks>
 		private void FollowRedirect()
 		{
-			if (_publishedContentRequest.HasNode)
+			if (_publishedContentRequest.HasPublishedContent)
 			{
 				var redirectId = _publishedContentRequest.PublishedContent.GetPropertyValue<int>("umbracoRedirect", -1);
 				
@@ -490,7 +490,7 @@ namespace Umbraco.Web.Routing
 		{
 			const string tracePrefix = "HandleWildcardDomains: ";
 
-			if (!_publishedContentRequest.HasNode)
+			if (!_publishedContentRequest.HasPublishedContent)
 				return;
 
 			var nodePath = _publishedContentRequest.PublishedContent.Path;
