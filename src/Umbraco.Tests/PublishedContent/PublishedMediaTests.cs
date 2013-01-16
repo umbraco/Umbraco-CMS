@@ -200,6 +200,7 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.IsTrue(ancestors.Select(x => x.Id).ContainsAll(new[] { 3113, 2112, 2222, 1111 }));
 		}
 
+        [Ignore]
 		[Test]
 		public void Children_Without_Examine()
 		{
