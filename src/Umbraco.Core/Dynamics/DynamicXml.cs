@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Dynamic;
 using System.Reflection;
@@ -12,7 +11,6 @@ using System.Web;
 
 namespace Umbraco.Core.Dynamics
 {
-    [TypeConverter(typeof(DynamicXmlConverter))]
     public class DynamicXml : DynamicObject, IEnumerable<DynamicXml>, IEnumerable<XElement>
     {
         public XElement BaseElement { get; set; }
@@ -215,16 +213,6 @@ namespace Umbraco.Core.Dynamics
             }
             return root;
         }
-
-        /// <summary>
-        /// Return the string version of Xml
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString()
-        {
-            return ToXml();
-        }
-
         public IHtmlString ToHtml()
         {
             return new HtmlString(this.ToXml());
