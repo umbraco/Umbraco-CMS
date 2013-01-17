@@ -27,7 +27,7 @@
  <PropertyGroup Condition="'$(BUILD_RELEASE)'!=''">
    <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)</DECIMAL_BUILD_NUMBER>
  </PropertyGroup>
- <PropertyGroup Condition="'$(BUILD_RELEASE) AND $(BUILD_COMMENT)'!=''">
+ <PropertyGroup Condition="'$(BUILD_RELEASE)'!='' AND '$(BUILD_COMMENT)'!=''">
    <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)-$(BUILD_COMMENT)</DECIMAL_BUILD_NUMBER>
  </PropertyGroup>
  
