@@ -32,8 +32,9 @@ namespace Umbraco.Web.Routing
 			// code from requestModule.UmbracoRewrite
 			string tmp = httpContext.Request.Path.ToLower();
 
-			// note: requestModule.UmbracoRewrite also does some confusing stuff
-			// with stripping &umbPage from the querystring?! ignored.
+			// note: requestModule.UmbracoRewrite also did some stripping of &umbPage
+			// from the querystring... that was in v3.x to fix some issues with pre-forms
+			// auth. Paul Sterling confirmed in jan. 2013 that we can get rid of it.
 
 			// code from requestHandler.cleanUrl
 			string root = Umbraco.Core.IO.SystemDirectories.Root.ToLower();

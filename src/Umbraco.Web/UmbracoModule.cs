@@ -101,19 +101,13 @@ namespace Umbraco.Web
 
 			// ok, process
 
-			// legacy - if query contains umbPage=something then url is rewritten to /something
-			//   because with Umbraco 3.x on .NET 2.x the form auth url would be something like
-			//     login.aspx?ReturnUrl=default.aspx&umbPage=solutions.aspx
-			//   and then the next request would be default.aspx?umbPage=solutions.aspx
-			//   instead of being solutions.aspx -- are we still impacted by that one now that
-			//   we rewrite the urls properly internally? I guess not?
-			// there's a 2008 discussion here http://forum.umbraco.org/yaf_postst5377_FormsAuthenticationRedirectToLoginPage-problem.aspx
-			var uri = umbracoContext.CleanedUmbracoUrl;
-			LegacyCleanUmbPageFromQueryString(ref uri);
+			// note: requestModule.UmbracoRewrite also did some stripping of &umbPage
+			// from the querystring... that was in v3.x to fix some issues with pre-forms
+			// auth. Paul Sterling confirmed in jan. 2013 that we can get rid of it.
 
 			// instanciate, prepare and process the published content request
 			// important to use CleanedUmbracoUrl - lowercase path-only version of the current url
-			var pcr = new PublishedContentRequest(uri /*umbracoContext.CleanedUmbracoUrl*/, umbracoContext.RoutingContext);
+			var pcr = new PublishedContentRequest(umbracoContext.CleanedUmbracoUrl, umbracoContext.RoutingContext);
 			umbracoContext.PublishedContentRequest = pcr;
 			pcr.Prepare();
 			if (pcr.IsRedirect)
@@ -363,48 +357,6 @@ namespace Umbraco.Web
 			}
 
 		}
-
-		#region Legacy
-
-		// "Clean umbPage from querystring, caused by .NET 2.0 default Auth Controls"
-		// but really, at the moment I have no idea what this does, and why...
-		// SD: I also have no idea what this does, I've googled umbPage and really nothing shows up
-		internal static void LegacyCleanUmbPageFromQueryString(ref Uri uri)
-		{
-			string receivedQuery = uri.Query;
-			string path = uri.AbsolutePath;
-			string query = null;
-
-			if (receivedQuery.Length > 0)
-			{
-				// Clean umbPage from querystring, caused by .NET 2.0 default Auth Controls
-				if (receivedQuery.IndexOf("umbPage") > 0)
-				{
-					int ampPos = receivedQuery.IndexOf('&');
-					// query contains no ampersand?
-					if (ampPos < 0)
-					{
-						// no ampersand means no original query string
-						query = String.Empty;
-						// ampersand would occur past then end the of received query
-						ampPos = receivedQuery.Length;
-					}
-					else
-					{
-						// original query string past ampersand
-						query = receivedQuery.Substring(ampPos + 1,
-														receivedQuery.Length - ampPos - 1);
-					}
-					// get umbPage out of query string (9 = "&umbPage".Length() + 1)
-					path = receivedQuery.Substring(9, ampPos - 9); //this will fail if there are < 9 characters before the &umbPage query string
-
-					// --added when refactoring--
-					uri = uri.Rewrite(path, query);
-				}
-			}
-		}
-
-		#endregion
 
 		#region IHttpModule
 
