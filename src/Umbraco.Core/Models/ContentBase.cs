@@ -310,6 +310,17 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Sets the <see cref="System.Int64"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, long value)
+        {
+            string val = value.ToString();
+            SetValueOnProperty(propertyTypeAlias, val);
+        }
+
+        /// <summary>
         /// Sets the <see cref="System.Boolean"/> value of a Property
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
