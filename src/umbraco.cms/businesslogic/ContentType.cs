@@ -1224,7 +1224,7 @@ namespace umbraco.cms.businesslogic
             temporaryList.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
 
             // now that we aren't going to modify the list, we can set it to the class-scoped variable.
-            m_VirtualTabs = temporaryList;
+            m_VirtualTabs = temporaryList.DistinctBy(x => x.Id).ToList();
         }
 
         private void populateMasterContentTypes(PropertyType pt, int docTypeId)
