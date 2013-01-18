@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Migrations
             var migrationRunner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
             var migrations = migrationRunner.OrderedUpgradeMigrations(foundMigrations);
 
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE);
+            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null);
             foreach (MigrationBase migration in migrations)
             {
                 migration.GetUpExpressions(context);

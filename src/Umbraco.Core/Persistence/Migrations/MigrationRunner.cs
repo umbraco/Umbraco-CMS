@@ -55,7 +55,7 @@ namespace Umbraco.Core.Persistence.Migrations
                 return false;
 
             //Loop through migrations to generate sql
-            var context = new MigrationContext(databaseProvider);
+            var context = new MigrationContext(databaseProvider, database);
             foreach (MigrationBase migration in migrations)
             {
                 if (isUpgrade)

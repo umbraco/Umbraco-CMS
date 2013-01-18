@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Migrations
 
             Assert.That(list.Count, Is.EqualTo(3));
 
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE);
+            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null);
             foreach (MigrationBase migration in list)
             {
                 migration.GetUpExpressions(context);

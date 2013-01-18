@@ -11,61 +11,61 @@ namespace Umbraco.Core.Persistence.Migrations
 {
     public abstract class MigrationBase : IMigration
     {
-        internal IMigrationContext _context;
+        internal IMigrationContext Context;
 
         public abstract void Up();
         public abstract void Down();
 
         public virtual void GetUpExpressions(IMigrationContext context)
         {
-            _context = context;
+            Context = context;
             Up();
         }
 
         public virtual void GetDownExpressions(IMigrationContext context)
         {
-            _context = context;
+            Context = context;
             Down();
         }
 
         public IAlterSyntaxBuilder Alter
         {
-            get { return new AlterSyntaxBuilder(_context); }
+            get { return new AlterSyntaxBuilder(Context); }
         }
 
         public ICreateBuilder Create
         {
-            get { return new CreateBuilder(_context); }
+            get { return new CreateBuilder(Context); }
         }
 
         public IDeleteBuilder Delete
         {
-            get { return new DeleteBuilder(_context); }
+            get { return new DeleteBuilder(Context); }
         }
 
         public IExecuteBuilder Execute
         {
-            get { return new ExecuteBuilder(_context); }
+            get { return new ExecuteBuilder(Context); }
         }
 
         public IInsertBuilder Insert
         {
-            get { return new InsertBuilder(_context); }
+            get { return new InsertBuilder(Context); }
         }
 
         public IRenameBuilder Rename
         {
-            get { return new RenameBuilder(_context); }
+            get { return new RenameBuilder(Context); }
         }
 
         public IUpdateBuilder Update
         {
-            get { return new UpdateBuilder(_context); }
+            get { return new UpdateBuilder(Context); }
         }
 
         public IIfDatabaseBuilder IfDatabase(params DatabaseProviders[] databaseProviders)
         {
-            return new IfDatabaseBuilder(_context, databaseProviders);
+            return new IfDatabaseBuilder(Context, databaseProviders);
         }
     }
 }
