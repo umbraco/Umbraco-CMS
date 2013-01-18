@@ -15,7 +15,6 @@ namespace Umbraco.Web.Routing
 	/// <para>This should rather be done with a rewriting rule. There would be multiple profile pages in multi-sites/multi-langs setups.
 	/// We keep it for backward compatility reasons.</para>
 	/// </remarks>
-	//[ResolutionWeight(40)]
     internal class ContentFinderByProfile : ContentFinderByNiceUrl
     {
 		/// <summary>
