@@ -101,9 +101,8 @@ namespace Umbraco.Web.Templates
 			}
 
 			//ok, we have a document and a template assigned, now to do some rendering.
-			var builder = new PublishedContentRequestBuilder(contentRequest);
 			//determine the rendering engine
-			builder.DetermineRenderingEngine();
+			contentRequest.Engine.FindRenderingEngine();
 
 			//First, save all of the items locally that we know are used in the chain of execution, we'll need to restore these
 			//after this page has rendered.

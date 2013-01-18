@@ -158,16 +158,15 @@ namespace Umbraco.Tests.Routing
 
 			var routingContext = GetRoutingContext(url);
 			var uri = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
-			var docreq = new PublishedContentRequest(uri, routingContext);
+			var pcr = new PublishedContentRequest(uri, routingContext);
 
 			// must lookup domain else lookup by url fails
-			var builder = new PublishedContentRequestBuilder(docreq);
-			builder.LookupDomain();
+			pcr.Engine.FindDomain();
 
 			var lookup = new FinderByNiceUrl();
-			var result = lookup.TryFindDocument(docreq);
+			var result = lookup.TryFindDocument(pcr);
 			Assert.IsTrue(result);
-			Assert.AreEqual(expectedId, docreq.PublishedContentId);
+			Assert.AreEqual(expectedId, pcr.PublishedContentId);
 		}
 
 		[TestCase("http://domain1.com/", 1001, "en-US")]
@@ -197,17 +196,16 @@ namespace Umbraco.Tests.Routing
 
 			var routingContext = GetRoutingContext(url);
 			var uri = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
-			var docreq = new PublishedContentRequest(uri, routingContext);
+			var pcr = new PublishedContentRequest(uri, routingContext);
 
 			// must lookup domain else lookup by url fails
-			var builder = new PublishedContentRequestBuilder(docreq);
-			builder.LookupDomain();
-			Assert.AreEqual(expectedCulture, docreq.Culture.Name);
+			pcr.Engine.FindDomain();
+			Assert.AreEqual(expectedCulture, pcr.Culture.Name);
 
 			var lookup = new FinderByNiceUrl();
-			var result = lookup.TryFindDocument(docreq);
+			var result = lookup.TryFindDocument(pcr);
 			Assert.IsTrue(result);
-			Assert.AreEqual(expectedId, docreq.PublishedContentId);
+			Assert.AreEqual(expectedId, pcr.PublishedContentId);
 		}
 	}
 }

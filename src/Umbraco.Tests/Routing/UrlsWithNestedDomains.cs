@@ -43,16 +43,15 @@ namespace Umbraco.Tests.Routing
 			// route a rogue url
 			url = "http://domain1.com/1001-1/1001-1-1";
 			var uri = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
-			var docreq = new PublishedContentRequest(uri, routingContext);
-			var builder = new PublishedContentRequestBuilder(docreq);
-			builder.LookupDomain();
-			Assert.IsTrue(docreq.HasDomain);
+			var pcr = new PublishedContentRequest(uri, routingContext);
+			pcr.Engine.FindDomain();
+			Assert.IsTrue(pcr.HasDomain);
 
 			// check that it's been routed
 			var lookup = new FinderByNiceUrl();
-			var result = lookup.TryFindDocument(docreq);
+			var result = lookup.TryFindDocument(pcr);
 			Assert.IsTrue(result);
-			Assert.AreEqual(100111, docreq.PublishedContentId);
+			Assert.AreEqual(100111, pcr.PublishedContentId);
 
 			// has the cache been polluted?
 			cachedRoutes = ((DefaultRoutesCache)routingContext.UmbracoContext.RoutesCache).GetCachedRoutes();

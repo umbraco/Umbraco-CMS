@@ -80,9 +80,9 @@ namespace Umbraco.Web
 				return;
 
 			if (UmbracoContext.Current == null)
-				throw new NullReferenceException("The UmbracoContext.Current is null, ProcessRequest cannot proceed unless there is a current UmbracoContext");
+				throw new InvalidOperationException("The UmbracoContext.Current is null, ProcessRequest cannot proceed unless there is a current UmbracoContext");
 			if (UmbracoContext.Current.RoutingContext == null)
-				throw new NullReferenceException("The UmbracoContext.RoutingContext has not been assigned, ProcessRequest cannot proceed unless there is a RoutingContext assigned to the UmbracoContext");
+				throw new InvalidOperationException("The UmbracoContext.RoutingContext has not been assigned, ProcessRequest cannot proceed unless there is a RoutingContext assigned to the UmbracoContext");
 
 			var umbracoContext = UmbracoContext.Current;		
 
@@ -101,16 +101,32 @@ namespace Umbraco.Web
 
 			// ok, process
 
-			var uri = umbracoContext.OriginalRequestUrl;
-
-			// legacy - no idea what this is but does something with the query strings
+			// legacy - if query contains umbPage=something then url is rewritten to /something
+			//   because with Umbraco 3.x on .NET 2.x the form auth url would be something like
+			//     login.aspx?ReturnUrl=default.aspx&umbPage=solutions.aspx
+			//   and then the next request would be default.aspx?umbPage=solutions.aspx
+			//   instead of being solutions.aspx -- are we still impacted by that one now that
+			//   we rewrite the urls properly internally? I guess not?
+			// there's a 2008 discussion here http://forum.umbraco.org/yaf_postst5377_FormsAuthenticationRedirectToLoginPage-problem.aspx
+			var uri = umbracoContext.CleanedUmbracoUrl;
 			LegacyCleanUmbPageFromQueryString(ref uri);
 
-			// instanciate a request a process
+			// instanciate, prepare and process the published content request
 			// important to use CleanedUmbracoUrl - lowercase path-only version of the current url
-			var docreq = new PublishedContentRequest(umbracoContext.CleanedUmbracoUrl, umbracoContext.RoutingContext);
-			docreq.ProcessRequest(httpContext, umbracoContext, 
-				docreq2 => RewriteToUmbracoHandler(HttpContext.Current, uri.Query, docreq2.RenderingEngine));
+			var pcr = new PublishedContentRequest(uri /*umbracoContext.CleanedUmbracoUrl*/, umbracoContext.RoutingContext);
+			umbracoContext.PublishedContentRequest = pcr;
+			pcr.Prepare();
+			if (pcr.IsRedirect)
+			{
+				httpContext.Response.Redirect(pcr.RedirectUrl, true);
+				return;
+			}
+			if (pcr.Is404)
+				httpContext.Response.StatusCode = 404;
+			if (!pcr.HasPublishedContent)
+				httpContext.RemapHandler(new PublishedContentNotFoundHandler());
+			else
+				RewriteToUmbracoHandler(httpContext, pcr);
 		}
 
 		/// <summary>
@@ -307,22 +323,23 @@ namespace Umbraco.Web
 		/// <param name="context"></param>
 		/// <param name="currentQuery"></param>
 		/// <param name="engine"> </param>
-		private void RewriteToUmbracoHandler(HttpContext context, string currentQuery, RenderingEngine engine)
+		private void RewriteToUmbracoHandler(HttpContextBase context, PublishedContentRequest pcr)
 		{
+			// NOTE: we do not want to use TransferRequest even though many docs say it is better with IIS7, turns out this is
+			// not what we need. The purpose of TransferRequest is to ensure that .net processes all of the rules for the newly
+			// rewritten url, but this is not what we want!
+			// read: http://forums.iis.net/t/1146511.aspx
 
-			//NOTE: We do not want to use TransferRequest even though many docs say it is better with IIS7, turns out this is
-			//not what we need. The purpose of TransferRequest is to ensure that .net processes all of the rules for the newly
-			//rewritten url, but this is not what we want!
-			// http://forums.iis.net/t/1146511.aspx
+			string query = pcr.Uri.Query.TrimStart(new[] { '?' });
 
 			string rewritePath;
-			switch (engine)
+			switch (pcr.RenderingEngine)
 			{
 				case RenderingEngine.Mvc:
 					// GlobalSettings.Path has already been through IOHelper.ResolveUrl() so it begins with / and vdir (if any)
 					rewritePath = GlobalSettings.Path.TrimEnd(new[] { '/' }) + "/RenderMvc";
-					// we rewrite the path to the path of the handler (i.e. default.aspx or /umbraco/RenderMvc )
-					context.RewritePath(rewritePath, "", currentQuery.TrimStart(new[] { '?' }), false);
+					// rewrite the path to the path of the handler (i.e. /umbraco/RenderMvc)
+					context.RewritePath(rewritePath, "", query, false);
 
 					//if it is MVC we need to do something special, we are not using TransferRequest as this will 
 					//require us to rewrite the path with query strings and then reparse the query strings, this would 
@@ -333,17 +350,15 @@ namespace Umbraco.Web
 					//we also cannot re-create this functionality because the setter for the HttpContext.Request.RequestContext is internal
 					//so really, this is pretty much the only way without using Server.TransferRequest and if we did that, we'd have to rethink
 					//a bunch of things!
-
 					var urlRouting = new UrlRoutingModule();
-					urlRouting.PostResolveRequestCache(new HttpContextWrapper(context));
-
+					urlRouting.PostResolveRequestCache(context);
 					break;
+
 				case RenderingEngine.WebForms:
 				default:
 					rewritePath = "~/default.aspx";
-					// rewrite the path to the path of the handler (i.e. default.aspx or /umbraco/RenderMvc )
-					context.RewritePath(rewritePath, "", currentQuery.TrimStart(new[] { '?' }), false);
-
+					// rewrite the path to the path of the handler (i.e. default.aspx)
+					context.RewritePath(rewritePath, "", query, false);
 					break;
 			}
 

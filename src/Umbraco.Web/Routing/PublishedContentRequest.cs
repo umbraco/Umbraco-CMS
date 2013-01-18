@@ -29,153 +29,17 @@ namespace Umbraco.Web.Routing
 	internal class PublishedContentRequest
     {
 		/// <summary>
-		/// Assigns the request to the http context and proceeds to process the request. If everything is successful, invoke the callback.
+		/// Triggers once the published content request has been prepared, but before it is processed.
 		/// </summary>
-		/// <param name="httpContext"></param>
-		/// <param name="umbracoContext"></param>
-		/// <param name="onSuccess"></param>
-		internal void ProcessRequest(HttpContextBase httpContext, UmbracoContext umbracoContext, Action<PublishedContentRequest> onSuccess)
-		{
-			if (umbracoContext == null)
-				throw new NullReferenceException("The UmbracoContext.Current is null, ProcessRequest cannot proceed unless there is a current UmbracoContext");
-			if (umbracoContext.RoutingContext == null)
-				throw new NullReferenceException("The UmbracoContext.RoutingContext has not been assigned, ProcessRequest cannot proceed unless there is a RoutingContext assigned to the UmbracoContext");
+		/// <remarks>When the event triggers, preparation is done ie domain, culture, document, template,
+		/// rendering engine, etc. have been setup. It is then possible to change anything, before
+		/// the request is actually processed and rendered by Umbraco.</remarks>
+		public static event EventHandler<EventArgs> Prepared;
 
-			//assign back since this is a front-end request
-			umbracoContext.PublishedContentRequest = this;
-
-			// note - at that point the original legacy module did something do handle IIS custom 404 errors
-			//   ie pages looking like /anything.aspx?404;/path/to/document - I guess the reason was to support
-			//   "directory urls" without having to do wildcard mapping to ASP.NET on old IIS. This is a pain
-			//   to maintain and probably not used anymore - removed as of 06/2012. @zpqrtbnk.
-			//
-			//   to trigger Umbraco's not-found, one should configure IIS and/or ASP.NET custom 404 errors
-			//   so that they point to a non-existing page eg /redirect-404.aspx
-			//   TODO: SD: We need more information on this for when we release 4.10.0 as I'm not sure what this means.
-
-			//find domain
-			_builder.LookupDomain();
-			// redirect if it has been flagged
-			if (this.IsRedirect)
-				httpContext.Response.Redirect(this.RedirectUrl, true);
-			//set the culture on the thread - once, so it's set when running document lookups
-			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = this.Culture;
-			//find the document, found will be true if the doc request has found BOTH a node and a template
-			// though currently we don't use this value.
-			var found = _builder.LookupDocument();
-			//set the culture on the thread -- again, 'cos it might have changed due to a wildcard domain
-			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = this.Culture;
-			//this could be called in the LookupDocument method, but I've just put it here for clarity.
-			_builder.DetermineRenderingEngine();
-
-			//TODO: here we should launch an event so that people can modify the doc request to do whatever they want.
-
-			// redirect if it has been flagged
-			if (this.IsRedirect)
-				httpContext.Response.Redirect(this.RedirectUrl, true);
-
-			// handle 404
-			if (this.Is404)
-			{
-				httpContext.Response.StatusCode = 404;
-
-				if (!this.HasPublishedContent)
-				{
-					httpContext.RemapHandler(new PublishedContentNotFoundHandler());
-					return;
-				}
-
-				// else we have a document to render
-				// not having a template is ok here, MVC will take care of it
-			}
-
-			// just be safe - should never ever happen
-			if (!this.HasPublishedContent)
-				throw new Exception("No document to render.");
-
-			// trigger PublishedContentRequest.Rendering event?
-			// with complete access to the content request?
-
-			// render even though we might have no template
-			// to give MVC a chance to hijack routes
-			// pass off to our handlers (mvc or webforms)
-
-			// assign the legacy page back to the docrequest
-			// handlers like default.aspx will want it and most macros currently need it
-			this.UmbracoPage = new page(this);
-
-			// these two are used by many legacy objects
-			httpContext.Items["pageID"] = this.PublishedContentId;
-			httpContext.Items["pageElements"] = this.UmbracoPage.Elements;
-
-			if (onSuccess != null)
-				onSuccess(this);
-		}
-
-		/// <summary>
-		/// After execution is handed off to MVC, we can finally check if the request has: No Template assigned and also the 
-		/// route is not hijacked. When this occurs, we need to send the routing back through the builder to check for 
-		/// not found handlers.
-		/// </summary>
-		/// <param name="httpContext"></param>
-		/// <returns></returns>
-		internal IHttpHandler ProcessNoTemplateInMvc(HttpContextBase httpContext)
-		{
-			var content = this.PublishedContent;
-			this.PublishedContent = null;
-
-			_builder.LookupDocument2();
-			_builder.DetermineRenderingEngine();
-
-			// redirect if it has been flagged
-			if (this.IsRedirect)
-			{
-				httpContext.Response.Redirect(this.RedirectUrl, true);
-			}
-				
-
-			// here .Is404 _has_ to be true
-			httpContext.Response.StatusCode = 404;
-
-			if (!this.HasPublishedContent)
-			{
-				// means the builder could not find a proper document to handle 404
-				// restore the saved content so we know it exists
-				this.PublishedContent = content;
-				return new PublishedContentNotFoundHandler();
-			}
-
-			if (!this.HasTemplate)
-			{
-				// means the builder could find a proper document, but the document has no template
-				// at that point there isn't much we can do and there is no point returning
-				// to Mvc since Mvc can't do much
-				return new PublishedContentNotFoundHandler("In addition, no template exists to render the custom 404.");
-			}
-
-			// render even though we might have no template
-			// to give MVC a chance to hijack routes
-			// pass off to our handlers (mvc or webforms)
-
-			// assign the legacy page back to the docrequest
-			// handlers like default.aspx will want it and most macros currently need it
-			this.UmbracoPage = new page(this);
-
-			// these two are used by many legacy objects
-			httpContext.Items["pageID"] = this.PublishedContentId;
-			httpContext.Items["pageElements"] = this.UmbracoPage.Elements;
-
-			switch (this.RenderingEngine)
-			{
-				case Core.RenderingEngine.Mvc:
-					return null;
-				case Core.RenderingEngine.WebForms:
-				default:
-					return (global::umbraco.UmbracoDefault)System.Web.Compilation.BuildManager.CreateInstanceFromVirtualPath("~/default.aspx", typeof(global::umbraco.UmbracoDefault));
-			}
-		}
-
-		private PublishedContentRequestBuilder _builder;
+		// the engine that does all the processing
+		// because in order to keep things clean and separated,
+		// the content request is just a data holder
+		private PublishedContentRequestEngine _engine;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PublishedContentRequest"/> class with a specific Uri and routing context.
@@ -183,18 +47,47 @@ namespace Umbraco.Web.Routing
 		/// <param name="uri">The request <c>Uri</c>.</param>
 		/// <param name="routingContext">A routing context.</param>
 		public PublishedContentRequest(Uri uri, RoutingContext routingContext)
-        {
+		{
 			if (uri == null) throw new ArgumentNullException("uri");
 			if (routingContext == null) throw new ArgumentNullException("routingContext");
 
 			this.Uri = uri;
 			this.RoutingContext = routingContext;
 
-			_builder = new PublishedContentRequestBuilder(this);
-			
-			// default is Mvc
-			this.RenderingEngine = RenderingEngine.Mvc;			
-        }
+			_engine = new PublishedContentRequestEngine(this);
+
+			this.RenderingEngine = RenderingEngine.Mvc; // default
+		}
+
+		/// <summary>
+		/// Gets the engine associated to the request.
+		/// </summary>
+		internal PublishedContentRequestEngine Engine { get { return _engine; } }
+
+		/// <summary>
+		/// Prepares the request.
+		/// </summary>
+		internal void Prepare()
+		{
+			_engine.PrepareRequest();
+		}
+
+		/// <summary>
+		/// Updates the request when there is no template to render the content.
+		/// </summary>
+		internal void UpdateOnMissingTemplate()
+		{
+			_engine.UpdateRequestOnMissingTemplate();
+		}
+
+		/// <summary>
+		/// Triggers the Prepared event.
+		/// </summary>
+		internal void OnPrepared()
+		{
+			if (Prepared != null)
+				Prepared(this, EventArgs.Empty);
+		}
 
 		/// <summary>
 		/// Gets or sets the cleaned up Uri used for routing.
@@ -215,6 +108,13 @@ namespace Umbraco.Web.Routing
 		private IPublishedContent _publishedContent = null;
 
 		/// <summary>
+		/// The initial requested IPublishedContent, if any, else <c>null</c>.
+		/// </summary>
+		/// <remarks>The initial requested content is the content that was found by the finders,
+		/// before anything such as 404, redirect... took place.</remarks>
+		private IPublishedContent _initialPublishedContent = null;
+
+		/// <summary>
 		/// Gets or sets the requested content.
 		/// </summary>
 		/// <remarks>Setting the requested content clears both <c>Template</c> and <c>AlternateTemplateAlias</c>.</remarks>
@@ -225,9 +125,24 @@ namespace Umbraco.Web.Routing
 			{
 				_publishedContent = value;
 				this.Template = null;
-				this.AlternateTemplateAlias = null;
 				_publishedContentId = _publishedContent != null ? _publishedContent.Id : 0;
 			}
+		}
+
+		/// <summary>
+		/// Gets the initial requested content.
+		/// </summary>
+		/// <remarks>The initial requested content is the content that was found by the finders,
+		/// before anything such as 404, redirect... took place.</remarks>
+		public IPublishedContent InitialPublishedContent { get { return _initialPublishedContent; } }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the current published content is the initial one.
+		/// </summary>
+		public bool IsInitialPublishedContent 
+		{
+			get { return _initialPublishedContent != null && _initialPublishedContent == _publishedContent; }
+			set { _initialPublishedContent = _publishedContent; }
 		}
 
         /// <summary>
@@ -268,16 +183,6 @@ namespace Umbraco.Web.Routing
         {
             get { return this.Template != null ; }
         }
-
-		/// <summary>
-		/// Gets or sets the alternate template alias.
-		/// </summary>
-		/// <remarks>
-		/// <para>When <c>null</c> or empty, use the default template.</para>
-		/// <para>Alternate template works only when displaying the intended document and should be set
-		/// after <c>PublishedContent</c> since setting <c>PublishedContent</c> clears the alternate template.</para>
-		/// </remarks>
-		public string AlternateTemplateAlias { get; set; }
 
 		#endregion
 

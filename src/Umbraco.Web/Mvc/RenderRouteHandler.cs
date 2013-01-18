@@ -283,6 +283,25 @@ namespace Umbraco.Web.Mvc
 			return def;
 		}
 
+		internal IHttpHandler GetHandlerOnMissingTemplate(PublishedContentRequest pcr)
+		{
+			if (!pcr.HasPublishedContent)
+				// means the builder could not find a proper document to handle 404
+				return new PublishedContentNotFoundHandler();
+
+			if (!pcr.HasTemplate)
+				// means the engine could find a proper document, but the document has no template
+				// at that point there isn't much we can do and there is no point returning
+				// to Mvc since Mvc can't do much
+				return new PublishedContentNotFoundHandler("In addition, no template exists to render the custom 404.");
+
+			if (pcr.RenderingEngine != RenderingEngine.Mvc)
+				// back to webforms
+				return (global::umbraco.UmbracoDefault)System.Web.Compilation.BuildManager.CreateInstanceFromVirtualPath("~/default.aspx", typeof(global::umbraco.UmbracoDefault));
+
+			return null;
+		}
+
 		/// <summary>
 		/// this will determine the controller and set the values in the route data
 		/// </summary>
@@ -303,13 +322,15 @@ namespace Umbraco.Web.Mvc
 			//we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
 			if (!publishedContentRequest.HasTemplate && !routeDef.HasHijackedRoute)
 			{
-				var handler = publishedContentRequest.ProcessNoTemplateInMvc(requestContext.HttpContext);
-				//though this code should never execute if the ProcessNoTemplateInMvc method redirects, it seems that we should check it
-				//and return null, this could be required for unit testing as well
+				publishedContentRequest.UpdateOnMissingTemplate();
 				if (publishedContentRequest.IsRedirect)
 				{
+					requestContext.HttpContext.Response.Redirect(publishedContentRequest.RedirectUrl, true);
 					return null;
 				}
+				if (publishedContentRequest.Is404)
+					requestContext.HttpContext.Response.StatusCode = 404;
+				var handler = GetHandlerOnMissingTemplate(publishedContentRequest);
 
 				// if it's not null it can be either the PublishedContentNotFoundHandler (no document was
 				// found to handle 404, or document with no template was found) or the WebForms handler 
