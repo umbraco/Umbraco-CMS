@@ -296,6 +296,8 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 }
                 dualAllowedContentTypes.Value = chosenContentTypeIDs;
             }
+            
+            allowAtRoot.Checked = cType.AllowAtRoot;
         }
 
         private void SaveAllowedChildTypes()
@@ -309,6 +311,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             int[] ids = new int[tmp.Count];
             for (int i = 0; i < tmp.Count; i++) ids[i] = (int)tmp[i];
             cType.AllowedChildContentTypeIDs = ids;
+            cType.AllowAtRoot = allowAtRoot.Checked;
         }
 
         #endregion
