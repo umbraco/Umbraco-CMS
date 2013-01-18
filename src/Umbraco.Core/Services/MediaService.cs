@@ -276,6 +276,16 @@ namespace Umbraco.Core.Services
 			media.ParentId = parentId;
 			Save(media, userId);
 
+            //Ensure that Path and Level is updated on children
+            var children = GetChildren(media.Id);
+            if (children.Any())
+            {
+                var parentPath = media.Path;
+                var parentLevel = media.Level;
+                var updatedDescendents = UpdatePathAndLevelOnChildren(children, parentPath, parentLevel);
+                Save(updatedDescendents, userId);
+            }
+
 			Moved.RaiseEvent(new MoveEventArgs<IMedia>(media, false, parentId), this);
 
 			Audit.Add(AuditTypes.Move, "Move Media performed by user", userId == -1 ? 0 : userId, media.Id);
@@ -512,6 +522,32 @@ namespace Umbraco.Core.Services
 		{
 			_httpContext = httpContext;
 		}
+
+        /// <summary>
+        /// Updates the Path and Level on a collection of <see cref="IMedia"/> objects
+        /// based on the Parent's Path and Level.
+        /// </summary>
+        /// <param name="children">Collection of <see cref="IMedia"/> objects to update</param>
+        /// <param name="parentPath">Path of the Parent media</param>
+        /// <param name="parentLevel">Level of the Parent media</param>
+        /// <returns>Collection of updated <see cref="IMedia"/> objects</returns>
+        private List<IMedia> UpdatePathAndLevelOnChildren(IEnumerable<IMedia> children, string parentPath, int parentLevel)
+        {
+            var list = new List<IMedia>();
+            foreach (var child in children)
+            {
+                child.Path = string.Concat(parentPath, ",", child.Id);
+                child.Level = parentLevel + 1;
+                list.Add(child);
+
+                var grandkids = GetChildren(child.Id);
+                if (grandkids.Any())
+                {
+                    list.AddRange(UpdatePathAndLevelOnChildren(grandkids, child.Path, child.Level));
+                }
+            }
+            return list;
+        }
 
 		/// <summary>
 		/// Updates a media object with the User (id), who created the content.
