@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using Umbraco.Core.Configuration;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixth
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
 {
-    [MigrationAttribute("6.0.0", 1, GlobalSettings.UmbracoMigrationName)]
+    [Migration("6.0.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class UpdateCmsPropertyTypeGroupTable : MigrationBase
     {
         public override void Up()

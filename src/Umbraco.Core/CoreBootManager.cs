@@ -8,11 +8,11 @@ using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Migrations;
+using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
-using MigrationsVersionSixth = Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixth;
 using MigrationsVersionFourNineZero = Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero;
 
 namespace Umbraco.Core
@@ -146,17 +146,17 @@ namespace Umbraco.Core
 			MigrationResolver.Current = new MigrationResolver(new List<Type>
 				{
 					typeof (MigrationsVersionFourNineZero.RemoveUmbracoAppConstraints),
-					typeof (MigrationsVersionSixth.DeleteAppTables),
-					typeof (MigrationsVersionSixth.EnsureAppsTreesUpdated),
-					typeof (MigrationsVersionSixth.MoveMasterContentTypeData),
-					typeof (MigrationsVersionSixth.NewCmsContentType2ContentTypeTable),
-					typeof (MigrationsVersionSixth.RemoveMasterContentTypeColumn),
-					typeof (MigrationsVersionSixth.RenameCmsTabTable),
-					typeof (MigrationsVersionSixth.RenameTabIdColumn),
-					typeof (MigrationsVersionSixth.UpdateCmsContentTypeAllowedContentTypeTable),
-					typeof (MigrationsVersionSixth.UpdateCmsContentTypeTable),
-					typeof (MigrationsVersionSixth.UpdateCmsContentVersionTable),
-					typeof (MigrationsVersionSixth.UpdateCmsPropertyTypeGroupTable)
+					typeof (DeleteAppTables),
+					typeof (EnsureAppsTreesUpdated),
+					typeof (MoveMasterContentTypeData),
+					typeof (NewCmsContentType2ContentTypeTable),
+					typeof (RemoveMasterContentTypeColumn),
+					typeof (RenameCmsTabTable),
+					typeof (RenameTabIdColumn),
+					typeof (UpdateCmsContentTypeAllowedContentTypeTable),
+					typeof (UpdateCmsContentTypeTable),
+					typeof (UpdateCmsContentVersionTable),
+					typeof (UpdateCmsPropertyTypeGroupTable)
 				});
 		}
 	}

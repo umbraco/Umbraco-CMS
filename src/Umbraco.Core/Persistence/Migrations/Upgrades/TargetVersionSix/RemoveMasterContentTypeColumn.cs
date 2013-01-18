@@ -1,8 +1,8 @@
 ﻿using Umbraco.Core.Configuration;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixth
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
 {
-    [MigrationAttribute("6.0.0", 6, GlobalSettings.UmbracoMigrationName)]
+    [Migration("6.0.0", 6, GlobalSettings.UmbracoMigrationName)]
     public class RemoveMasterContentTypeColumn : MigrationBase
     {
         public override void Up()

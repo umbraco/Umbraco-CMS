@@ -1,9 +1,9 @@
 ﻿using System;
 using Umbraco.Core.Configuration;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixth
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
 {
-    [MigrationAttribute("6.0.0", 9, GlobalSettings.UmbracoMigrationName)]
+    [Migration("6.0.0", 9, GlobalSettings.UmbracoMigrationName)]
     public class EnsureAppsTreesUpdated : MigrationBase
     {
         public override void Up()

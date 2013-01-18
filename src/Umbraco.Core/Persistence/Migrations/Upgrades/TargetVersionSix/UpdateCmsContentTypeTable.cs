@@ -1,8 +1,8 @@
 ﻿using Umbraco.Core.Configuration;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixth
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
 {
-    [MigrationAttribute("6.0.0", 2, GlobalSettings.UmbracoMigrationName)]
+    [Migration("6.0.0", 2, GlobalSettings.UmbracoMigrationName)]
     public class UpdateCmsContentTypeTable : MigrationBase
     {
         public override void Up()
