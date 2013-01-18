@@ -19,8 +19,8 @@ namespace Umbraco.Web.Routing
 		/// <param name="niceUrlResolver">The nice urls resolver.</param>
 		internal RoutingContext(
 			UmbracoContext umbracoContext,
-			IEnumerable<IPublishedContentFinder> contentFinders,
-			IPublishedContentFinder contentLastChanceFinder,
+			IEnumerable<IContentFinder> contentFinders,
+			IContentFinder contentLastChanceFinder,
             IPublishedContentStore publishedContentStore,
 			NiceUrlProvider niceUrlResolver)
         {
@@ -39,12 +39,12 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Gets the published content finders.
 		/// </summary>
-		internal IEnumerable<IPublishedContentFinder> PublishedContentFinders { get; private set; }
+		internal IEnumerable<IContentFinder> PublishedContentFinders { get; private set; }
 
 		/// <summary>
 		/// Gets the published content last chance finder.
 		/// </summary>
-		internal IPublishedContentFinder PublishedContentLastChanceFinder { get; private set; }
+		internal IContentFinder PublishedContentLastChanceFinder { get; private set; }
 
 		/// <summary>
 		/// Gets the content store.

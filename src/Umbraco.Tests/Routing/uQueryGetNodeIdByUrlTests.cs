@@ -35,8 +35,8 @@ namespace Umbraco.Tests.Routing
 
 			var url = "/test";
 			
-			var lookup = new Umbraco.Web.Routing.FinderByNiceUrl();
-			var lookups = new Umbraco.Web.Routing.IPublishedContentFinder[] { lookup };
+			var lookup = new Umbraco.Web.Routing.ContentFinderByNiceUrl();
+			var lookups = new Umbraco.Web.Routing.IContentFinder[] { lookup };
 
 			var t = Template.MakeNew("test", new User(0));
 

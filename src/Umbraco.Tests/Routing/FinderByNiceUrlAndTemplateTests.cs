@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Routing
 			var routingContext = GetRoutingContext(urlAsString, template);
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
 			var docRequest = new PublishedContentRequest(url, routingContext);
-			var lookup = new FinderByNiceUrlAndTemplate();
+			var lookup = new ContentFinderByNiceUrlAndTemplate();
 
 			var result = lookup.TryFindDocument(docRequest);
 

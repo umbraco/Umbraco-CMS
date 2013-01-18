@@ -6,14 +6,14 @@ namespace Umbraco.Web.Routing
 	/// <summary>
 	/// Resolver for the last chance IPublishedContentFinder object.
 	/// </summary>
-	internal sealed class IPublishedContentLastChanceFinderResolver : SingleObjectResolverBase<IPublishedContentLastChanceFinderResolver, IPublishedContentFinder>
+	internal sealed class IContentLastChanceFinderResolver : SingleObjectResolverBase<IContentLastChanceFinderResolver, IContentFinder>
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="IPublishedContentLastChanceFinderResolver"/> class with an instance of a finder.
+		/// Initializes a new instance of the <see cref="IContentLastChanceFinderResolver"/> class with an instance of a finder.
 		/// </summary>
 		/// <param name="finder">A instance of a finder.</param>
 		/// <remarks>The resolver is created by the <c>WebBootManager</c> and thus the constructor remains internal.</remarks>
-		internal IPublishedContentLastChanceFinderResolver(IPublishedContentFinder finder)
+		internal IContentLastChanceFinderResolver(IContentFinder finder)
 			: base(finder)
 		{ } 
 	
@@ -22,7 +22,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		/// <param name="finder">The finder.</param>
 		/// <remarks>For developers, at application startup.</remarks>
-		public void SetFinder(IPublishedContentFinder finder)
+		public void SetFinder(IContentFinder finder)
 		{
 			Value = finder;
 		}
@@ -30,7 +30,7 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Gets the last chance finder.
 		/// </summary>
-		public IPublishedContentFinder Finder
+		public IContentFinder Finder
 		{
 			get { return Value; }
 		}

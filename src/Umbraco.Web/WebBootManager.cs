@@ -193,19 +193,19 @@ namespace Umbraco.Web
 						typeof (RenderControllerFactory)
 					});
 
-			IPublishedContentLastChanceFinderResolver.Current = new IPublishedContentLastChanceFinderResolver(new DefaultLastChanceFinder());
+			IContentLastChanceFinderResolver.Current = new IContentLastChanceFinderResolver(new ContentLastChanceFinder());
 
-			IPublishedContentFinderResolver.Current = new IPublishedContentFinderResolver(
+			IContentFinderResolver.Current = new IContentFinderResolver(
 				//add all known resolvers in the correct order, devs can then modify this list on application startup either by binding to events
 				//or in their own global.asax
 				new[]
 					{
-						typeof (FinderByPageIdQuery),
-						typeof (FinderByNiceUrl),
-						typeof (FinderByIdPath),
-						typeof (FinderByNiceUrlAndTemplate),
-						typeof (FinderByProfile),
-						typeof (FinderByAlias)
+						typeof (ContentFinderByPageIdQuery),
+						typeof (ContentFinderByNiceUrl),
+						typeof (ContentFinderByIdPath),
+						typeof (ContentFinderByNiceUrlAndTemplate),
+						typeof (ContentFinderByProfile),
+						typeof (ContentFinderByUrlAlias)
 					});
 
             RoutesCacheResolver.Current = new RoutesCacheResolver(new DefaultRoutesCache(_isForTesting == false));

@@ -9,12 +9,12 @@ using Umbraco.Core;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Provides an implementation of <see cref="IPublishedContentFinder"/> that handles page identifiers.
+	/// Provides an implementation of <see cref="IContentFinder"/> that handles page identifiers.
 	/// </summary>
 	/// <remarks>
 	/// <para>Handles <c>/1234</c> where <c>1234</c> is the identified of a document.</para>
 	/// </remarks>
-	internal class FinderByIdPath : IPublishedContentFinder
+	internal class ContentFinderByIdPath : IContentFinder
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Routing
 
                 if (nodeId > 0)
                 {
-					LogHelper.Debug<FinderByIdPath>("Id={0}", () => nodeId);
+					LogHelper.Debug<ContentFinderByIdPath>("Id={0}", () => nodeId);
 					node = docRequest.RoutingContext.PublishedContentStore.GetDocumentById(
 						docRequest.RoutingContext.UmbracoContext,
 						nodeId);
@@ -44,7 +44,7 @@ namespace Umbraco.Web.Routing
                     if (node != null)
                     {
 						docRequest.PublishedContent = node;
-						LogHelper.Debug<FinderByIdPath>("Found node with id={0}", () => docRequest.PublishedContentId);
+						LogHelper.Debug<ContentFinderByIdPath>("Found node with id={0}", () => docRequest.PublishedContentId);
                     }
                     else
                     {
@@ -54,7 +54,7 @@ namespace Umbraco.Web.Routing
             }
 
             if (nodeId == -1)
-				LogHelper.Debug<FinderByIdPath>("Not a node id");
+				LogHelper.Debug<ContentFinderByIdPath>("Not a node id");
 
             return node != null;
         }

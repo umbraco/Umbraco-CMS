@@ -9,13 +9,13 @@ using Template = umbraco.cms.businesslogic.template.Template;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Provides an implementation of <see cref="IPublishedContentFinder"/> that handles page nice urls and a template.
+	/// Provides an implementation of <see cref="IContentFinder"/> that handles page nice urls and a template.
 	/// </summary>
 	/// <remarks>
 	/// <para>Handles <c>/foo/bar/template</c> where <c>/foo/bar</c> is the nice url of a document, and <c>template</c> a template alias.</para>
 	/// <para>If successful, then the template of the document request is also assigned.</para>
 	/// </remarks>
-    internal class FinderByNiceUrlAndTemplate : FinderByNiceUrl, IPublishedContentFinder
+    internal class ContentFinderByNiceUrlAndTemplate : ContentFinderByNiceUrl, IContentFinder
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
@@ -44,7 +44,7 @@ namespace Umbraco.Web.Routing
                 var template = Template.GetByAlias(templateAlias);
                 if (template != null)
                 {
-					LogHelper.Debug<FinderByNiceUrlAndTemplate>("Valid template: \"{0}\"", () => templateAlias);
+					LogHelper.Debug<ContentFinderByNiceUrlAndTemplate>("Valid template: \"{0}\"", () => templateAlias);
 
 					var route = docRequest.HasDomain ? (docRequest.Domain.RootNodeId.ToString() + path) : path;
 					node = LookupDocumentNode(docRequest, route);
@@ -54,12 +54,12 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-					LogHelper.Debug<FinderByNiceUrlAndTemplate>("Not a valid template: \"{0}\"", () => templateAlias);
+					LogHelper.Debug<ContentFinderByNiceUrlAndTemplate>("Not a valid template: \"{0}\"", () => templateAlias);
                 }
             }
             else
             {
-				LogHelper.Debug<FinderByNiceUrlAndTemplate>("No template in path \"/\"");
+				LogHelper.Debug<ContentFinderByNiceUrlAndTemplate>("No template in path \"/\"");
             }
 
             return node != null;

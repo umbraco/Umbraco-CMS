@@ -8,13 +8,13 @@ using Umbraco.Core;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Provides an implementation of <see cref="IPublishedContentFinder"/> that handles page aliases.
+	/// Provides an implementation of <see cref="IContentFinder"/> that handles page aliases.
 	/// </summary>
 	/// <remarks>
 	/// <para>Handles <c>/just/about/anything</c> where <c>/just/about/anything</c> is contained in the <c>umbracoUrlAlias</c> property of a document.</para>
 	/// <para>The alias is the full path to the document. There can be more than one alias, separated by commas.</para>
 	/// </remarks>
-	internal class FinderByAlias : IPublishedContentFinder
+	internal class ContentFinderByUrlAlias : IContentFinder
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Routing
 				if (node != null)
 				{					
 					docRequest.PublishedContent = node;
-					LogHelper.Debug<FinderByAlias>("Path \"{0}\" is an alias for id={1}", () => docRequest.Uri.AbsolutePath, () => docRequest.PublishedContentId);
+					LogHelper.Debug<ContentFinderByUrlAlias>("Path \"{0}\" is an alias for id={1}", () => docRequest.Uri.AbsolutePath, () => docRequest.PublishedContentId);
 				}
 			}
 

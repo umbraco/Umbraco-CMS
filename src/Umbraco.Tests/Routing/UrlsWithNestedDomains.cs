@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Routing
 			Assert.IsTrue(pcr.HasDomain);
 
 			// check that it's been routed
-			var lookup = new FinderByNiceUrl();
+			var lookup = new ContentFinderByNiceUrl();
 			var result = lookup.TryFindDocument(pcr);
 			Assert.IsTrue(result);
 			Assert.AreEqual(100111, pcr.PublishedContentId);

@@ -8,7 +8,7 @@ using Umbraco.Core;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Provides an implementation of <see cref="IPublishedContentFinder"/> that handles profiles.
+	/// Provides an implementation of <see cref="IContentFinder"/> that handles profiles.
 	/// </summary>
 	/// <remarks>
 	/// <para>Handles <c>/profile/login</c> where <c>/profile</c> is the profile page nice url and <c>login</c> the login of a member.</para>
@@ -16,7 +16,7 @@ namespace Umbraco.Web.Routing
 	/// We keep it for backward compatility reasons.</para>
 	/// </remarks>
 	//[ResolutionWeight(40)]
-    internal class FinderByProfile : FinderByNiceUrl
+    internal class ContentFinderByProfile : ContentFinderByNiceUrl
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Routing
                 if (path == GlobalSettings.ProfileUrl)
                 {
                     isProfile = true;
-					LogHelper.Debug<FinderByProfile>("Path \"{0}\" is the profile path", () => path);
+					LogHelper.Debug<ContentFinderByProfile>("Path \"{0}\" is the profile path", () => path);
 
 					var route = docRequest.HasDomain ? (docRequest.Domain.RootNodeId.ToString() + path) : path;
 					node = LookupDocumentNode(docRequest, route);
@@ -50,14 +50,14 @@ namespace Umbraco.Web.Routing
                     }                        
                     else
                     {
-						LogHelper.Debug<FinderByProfile>("No document matching profile path?");
+						LogHelper.Debug<ContentFinderByProfile>("No document matching profile path?");
                     }
                 }
             }
 
             if (!isProfile)
             {
-				LogHelper.Debug<FinderByProfile>("Not the profile path");
+				LogHelper.Debug<ContentFinderByProfile>("Not the profile path");
             }
 
             return node != null;

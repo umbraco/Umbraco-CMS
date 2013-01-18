@@ -12,10 +12,10 @@ using umbraco.interfaces;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Provides an implementation of <see cref="IPublishedContentFinder"/> to be used as a last chance finder,
+	/// Provides an implementation of <see cref="IContentFinder"/> to be used as a last chance finder,
 	/// that handles backward compatilibty with legacy <c>INotFoundHandler</c>.
 	/// </summary>
-    internal class DefaultLastChanceFinder : IPublishedContentFinder
+    internal class ContentLastChanceFinder : IContentFinder
     {
 		// notes
 		//
@@ -98,7 +98,7 @@ namespace Umbraco.Web.Routing
 
 		IPublishedContent HandlePageNotFound(PublishedContentRequest docRequest)
         {
-			LogHelper.Debug<DefaultLastChanceFinder>("Running for url='{0}'.", () => docRequest.Uri.AbsolutePath);
+			LogHelper.Debug<ContentLastChanceFinder>("Running for url='{0}'.", () => docRequest.Uri.AbsolutePath);
 			
 			//XmlNode currentPage = null;
 			IPublishedContent currentPage = null;
@@ -115,7 +115,7 @@ namespace Umbraco.Web.Routing
 
                     // FIXME - could it be null?
 
-					LogHelper.Debug<DefaultLastChanceFinder>("Handler '{0}' found node with id={1}.", () => handler.GetType().FullName, () => handler.redirectID);                    
+					LogHelper.Debug<ContentLastChanceFinder>("Handler '{0}' found node with id={1}.", () => handler.GetType().FullName, () => handler.redirectID);                    
 
                     //// check for caching
                     //if (handler.CacheUrl)
@@ -146,7 +146,7 @@ namespace Umbraco.Web.Routing
             // initialize handlers
             // create the definition cache
 
-			LogHelper.Debug<DefaultLastChanceFinder>("Registering custom handlers.");                    
+			LogHelper.Debug<ContentLastChanceFinder>("Registering custom handlers.");                    
 
             var customHandlerTypes = new List<Type>();
 
@@ -171,7 +171,7 @@ namespace Umbraco.Web.Routing
 					continue;
 				}
 
-				LogHelper.Debug<DefaultLastChanceFinder>("Registering '{0}.{1},{2}'.", () => ns, () => typeName, () => assemblyName);
+				LogHelper.Debug<ContentLastChanceFinder>("Registering '{0}.{1},{2}'.", () => ns, () => typeName, () => assemblyName);
 
 				Type type = null;
 				try
@@ -184,7 +184,7 @@ namespace Umbraco.Web.Routing
                 }
                 catch (Exception e)
                 {
-					LogHelper.Error<DefaultLastChanceFinder>("Error registering handler, ignoring.", e);                       
+					LogHelper.Error<ContentLastChanceFinder>("Error registering handler, ignoring.", e);                       
                 }
 
                 if (type != null)
@@ -217,7 +217,7 @@ namespace Umbraco.Web.Routing
                 }
                 catch (Exception e)
                 {
-					LogHelper.Error<DefaultLastChanceFinder>(string.Format("Error instanciating handler {0}, ignoring.", type.FullName), e);                         
+					LogHelper.Error<ContentLastChanceFinder>(string.Format("Error instanciating handler {0}, ignoring.", type.FullName), e);                         
                 }
             }
 

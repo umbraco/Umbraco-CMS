@@ -2,7 +2,7 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Stubs
 {
-	internal class FakeLastChanceFinder : IPublishedContentFinder
+	internal class FakeLastChanceFinder : IContentFinder
 	{
 		public bool TryFindDocument(PublishedContentRequest docRequest)
 		{
