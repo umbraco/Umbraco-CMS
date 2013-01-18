@@ -56,8 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var templates = Database.Fetch<DocumentTypeDto>("WHERE contentTypeNodeId = @Id", new { Id = id });
             if(templates.Any())
             {
-                contentType.AllowedTemplates =
-                    templates.Select(template => _templateRepository.Get(template.TemplateNodeId));
+                contentType.AllowedTemplates = templates.Select(template => _templateRepository.Get(template.TemplateNodeId)).ToList();
             }
 
             var list = Database.Fetch<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id", new { Id = id});
