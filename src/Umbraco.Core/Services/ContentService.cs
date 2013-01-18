@@ -894,56 +894,76 @@ namespace Umbraco.Core.Services
 	    }
 
 	    /// <summary>
-		/// Moves an <see cref="IContent"/> object to a new location by changing its parent id.
-		/// </summary>
-		/// <remarks>
-		/// If the <see cref="IContent"/> object is already published it will be
-		/// published after being moved to its new location. Otherwise it'll just
-		/// be saved with a new parent id.
-		/// </remarks>
-		/// <param name="content">The <see cref="IContent"/> to move</param>
-		/// <param name="parentId">Id of the Content's new Parent</param>
-		/// <param name="userId">Optional Id of the User moving the Content</param>
-		public void Move(IContent content, int parentId, int userId = -1)
-		{
-            //This ensures that the correct method is called if this method is used to Move to recycle bin.
-			if (parentId == -20)
-			{
-			    MoveToRecycleBin(content, userId);
-                return;
-			}
+	    /// Moves an <see cref="IContent"/> object to a new location by changing its parent id.
+	    /// </summary>
+	    /// <remarks>
+	    /// If the <see cref="IContent"/> object is already published it will be
+	    /// published after being moved to its new location. Otherwise it'll just
+	    /// be saved with a new parent id.
+	    /// </remarks>
+	    /// <param name="content">The <see cref="IContent"/> to move</param>
+	    /// <param name="parentId">Id of the Content's new Parent</param>
+	    /// <param name="userId">Optional Id of the User moving the Content</param>
+	    public void Move(IContent content, int parentId, int userId = -1)
+	    {
+	        //This ensures that the correct method is called if this method is used to Move to recycle bin.
+	        if (parentId == -20)
+	        {
+	            MoveToRecycleBin(content, userId);
+	            return;
+	        }
 
-			if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, parentId), this)) 
-				return;
-			
-			SetWriter(content, userId);
+	        if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, parentId), this))
+	            return;
 
-			//If Content is being moved away from Recycle Bin, its state should be un-trashed
-			if (content.Trashed && parentId != -20)
-			{
-				content.ChangeTrashedState(false, parentId);
-			}
-			else
-			{
-				content.ParentId = parentId;
-			}
+	        SetWriter(content, userId);
 
-			//If Content is published, it should be (re)published from its new location
-			if (content.Published)
-			{
-				SaveAndPublish(content, userId);
-			}
-			else
-			{
-				Save(content, userId);
-			}
+	        //If Content is being moved away from Recycle Bin, its state should be un-trashed
+	        if (content.Trashed && parentId != -20)
+	        {
+	            content.ChangeTrashedState(false, parentId);
+	        }
+	        else
+	        {
+	            content.ParentId = parentId;
+	        }
 
-			Moved.RaiseEvent(new MoveEventArgs<IContent>(content, false, parentId), this);
+	        //If Content is published, it should be (re)published from its new location
+	        if (content.Published)
+	        {
+	            SaveAndPublish(content, userId);
+	        }
+	        else
+	        {
+	            Save(content, userId);
+	        }
+
+	        //Ensure that Path and Level is updated on children
+	        var children = GetChildren(content.Id);
+	        if (children.Any())
+	        {
+	            var parentPath = content.Path;
+	            var parentLevel = content.Level;
+	            var updatedDescendents = UpdatePathAndLevelOnChildren(children, parentPath, parentLevel);
+
+                //collection of descendents that needs to be saved and published
+                var descendentsToSaveAndPublish = updatedDescendents.Where(x => x.Published);
+	            foreach (var c in descendentsToSaveAndPublish)
+	            {
+	                SaveAndPublish(c, userId);
+	            }
+
+                //collection of descendents that only needs to be saved
+                var descendentsToSave = updatedDescendents.Where(x => x.Published == false);
+	            Save(descendentsToSave, userId);
+	        }
+
+	        Moved.RaiseEvent(new MoveEventArgs<IContent>(content, false, parentId), this);
 
 			Audit.Add(AuditTypes.Move, "Move Content performed by user", userId == -1 ? 0 : userId, content.Id);
 		}
 
-		/// <summary>
+        /// <summary>
 		/// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
 		/// </summary>
 		public void EmptyRecycleBin()
@@ -1200,6 +1220,32 @@ namespace Umbraco.Core.Services
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Updates the Path and Level on a collection of <see cref="IContent"/> objects
+        /// based on the Parent's Path and Level.
+        /// </summary>
+        /// <param name="children">Collection of <see cref="IContent"/> objects to update</param>
+        /// <param name="parentPath">Path of the Parent content</param>
+        /// <param name="parentLevel">Level of the Parent content</param>
+        /// <returns>Collection of updated <see cref="IContent"/> objects</returns>
+        private List<IContent> UpdatePathAndLevelOnChildren(IEnumerable<IContent> children, string parentPath, int parentLevel)
+        {
+            var list = new List<IContent>();
+            foreach (var child in children)
+            {
+                child.Path = string.Concat(parentPath, ",", child.Id);
+                child.Level = parentLevel + 1;
+                list.Add(child);
+
+                var grandkids = GetChildren(child.Id);
+                if (grandkids.Any())
+                {
+                    list.AddRange(UpdatePathAndLevelOnChildren(grandkids, child.Path, child.Level));
+                }
+            }
+            return list;
         }
 
 		/// <summary>
