@@ -47,11 +47,6 @@ namespace Umbraco.Web
 			if (umbracoApplication == null) throw new ArgumentNullException("umbracoApplication");
 		}
 
-		public void Boot()
-		{
-			InitializeResolvers();
-		}
-
 		/// <summary>
 		/// Initialize objects before anything during the boot cycle happens
 		/// </summary>
