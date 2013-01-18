@@ -135,29 +135,16 @@ namespace Umbraco.Core
             MacroPropertyTypeResolver.Current = new MacroPropertyTypeResolver(
                 PluginManager.Current.ResolveMacroPropertyTypes());
 
+            //the database migration objects
+            MigrationResolver.Current = new MigrationResolver(
+                PluginManager.Current.ResolveMigrationTypes());
+
 			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
 				PluginManager.Current.ResolvePropertyEditorValueConverters());
 			//add the internal ones, these are not public currently so need to add them manually
 			PropertyEditorValueConvertersResolver.Current.AddType<DatePickerPropertyEditorValueConverter>();
 			PropertyEditorValueConvertersResolver.Current.AddType<TinyMcePropertyEditorValueConverter>();
 			PropertyEditorValueConvertersResolver.Current.AddType<YesNoPropertyEditorValueConverter>();
-
-			//the database migration objects
-			MigrationResolver.Current = new MigrationResolver(new List<Type>
-				{
-					typeof (MigrationsVersionFourNineZero.RemoveUmbracoAppConstraints),
-					typeof (DeleteAppTables),
-					typeof (EnsureAppsTreesUpdated),
-					typeof (MoveMasterContentTypeData),
-					typeof (NewCmsContentType2ContentTypeTable),
-					typeof (RemoveMasterContentTypeColumn),
-					typeof (RenameCmsTabTable),
-					typeof (RenameTabIdColumn),
-					typeof (UpdateCmsContentTypeAllowedContentTypeTable),
-					typeof (UpdateCmsContentTypeTable),
-					typeof (UpdateCmsContentVersionTable),
-					typeof (UpdateCmsPropertyTypeGroupTable)
-				});
-		}
+        }
 	}
 }

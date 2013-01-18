@@ -12,12 +12,12 @@ namespace Umbraco.Core.Persistence.Migrations
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		/// <param name="surfaceControllers"></param>
+		/// <param name="migrations"></param>
 		/// <remarks>
 		/// Use transient objects as we don't want these as singletons and take up memory that is not required
 		/// </remarks>
-		public MigrationResolver(IEnumerable<Type> surfaceControllers)
-			: base(surfaceControllers, ObjectLifetimeScope.Transient)
+		public MigrationResolver(IEnumerable<Type> migrations)
+			: base(migrations, ObjectLifetimeScope.Transient)
 		{			
 		}
 

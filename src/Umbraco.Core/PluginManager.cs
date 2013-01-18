@@ -11,6 +11,7 @@ using System.Xml.Linq;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.PropertyEditors;
 using umbraco.interfaces;
 using File = System.IO.File;
@@ -456,6 +457,15 @@ namespace Umbraco.Core
         internal IEnumerable<Type> ResolveMacroPropertyTypes()
         {
             return ResolveTypes<IMacroPropertyType>();
+        }
+
+        /// <summary>
+        /// Returns all available IMigrations in application
+        /// </summary>
+        /// <returns></returns>
+        internal IEnumerable<Type> ResolveMigrationTypes()
+        {
+            return ResolveTypes<IMigration>();
         }
 
         /// <summary>
