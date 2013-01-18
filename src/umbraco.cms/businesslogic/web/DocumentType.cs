@@ -348,6 +348,7 @@ namespace umbraco.cms.businesslogic.web
             info.AppendChild(XmlHelper.AddTextNode(xd, "Icon", IconUrl));
             info.AppendChild(XmlHelper.AddTextNode(xd, "Thumbnail", Thumbnail));
             info.AppendChild(XmlHelper.AddTextNode(xd, "Description", Description));
+            info.AppendChild(XmlHelper.AddTextNode(xd, "AllowAtRoot", AllowAtRoot.ToString()));
 
             //TODO: Add support for mixins!
             if (this.MasterContentType > 0)

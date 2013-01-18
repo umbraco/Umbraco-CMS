@@ -714,6 +714,15 @@ namespace umbraco.cms.businesslogic.packager
             dt.Thumbnail = xmlHelper.GetNodeValue(n.SelectSingleNode("Info/Thumbnail"));
             dt.Description = xmlHelper.GetNodeValue(n.SelectSingleNode("Info/Description"));
 
+            // Allow at root (check for node due to legacy)
+            bool allowAtRoot = false;
+            string allowAtRootNode = xmlHelper.GetNodeValue(n.SelectSingleNode("Info/AllowAtRoot"));
+            if (!String.IsNullOrEmpty(allowAtRootNode))
+            {
+                bool.TryParse(allowAtRootNode, out allowAtRoot);
+            }
+            dt.AllowAtRoot = allowAtRoot;
+            
             // Templates	
             ArrayList templates = new ArrayList();
             foreach (XmlNode tem in n.SelectNodes("Info/AllowedTemplates/Template"))
