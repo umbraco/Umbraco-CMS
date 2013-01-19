@@ -46,7 +46,7 @@ namespace Umbraco.Web
 			_umbracoApplication = umbracoApplication;
 			if (umbracoApplication == null) throw new ArgumentNullException("umbracoApplication");
 		}
-
+		
 		/// <summary>
 		/// Initialize objects before anything during the boot cycle happens
 		/// </summary>

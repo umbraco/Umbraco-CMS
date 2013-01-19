@@ -6,52 +6,6 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.Mvc
 {
-	//[PluginController("MyTestSurfaceController")]
-	//public class TestSurfaceController : SurfaceController
-	//{
-	//	public ActionResult Index()
-	//	{
-	//		return View();
-	//		//return Content("<html><body>hello</body></html>");
-	//	}
-
-	//	public ActionResult PostVals(TestFormModel model)
-	//	{
-	//		ModelState.AddModelError("name", "bad name!");
-	//		return CurrentUmbracoPage();
-	//	}
-
-	//	[ChildActionOnly]
-	//	public ActionResult DoThis(string asdf)
-	//	{
-	//		return PartialView("DoThis", asdf + " DONE!");
-	//	}
-	//}
-
-	//public class TestFormModel
-	//{
-	//	public string Name { get; set; }
-	//}
-
-	//public class LocalSurfaceController : SurfaceController
-	//{
-	//	public ActionResult Index()
-	//	{
-	//		return View();
-	//	}
-
-	//	public ActionResult PostVals([Bind(Prefix = "blah")]TestFormModel model)
-	//	{
-	//		ModelState.AddModelError("Name", "you suck!");
-	//		return this.RedirectToCurrentUmbracoPage();
-	//	}
-
-	//	[ChildActionOnly]
-	//	public ActionResult DoThis(string asdf)
-	//	{
-	//		return PartialView("DoThis", asdf + " DONE Again!");
-	//	}
-	//}
 
 	/// <summary>
 	/// The base controller that all Presentation Add-in controllers should inherit from
