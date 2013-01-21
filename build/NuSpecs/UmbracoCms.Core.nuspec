@@ -68,7 +68,5 @@
 		<file src="..\_BuildOutput\WebApp\bin\umbraco.XmlSerializers.dll" target="lib\umbraco.XmlSerializers.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\UmbracoExamine.dll" target="lib\UmbracoExamine.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\UrlRewritingNet.UrlRewriter.dll" target="lib\UrlRewritingNet.UrlRewriter.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\amd64\**" target="Content\bin\amd64" />
-		<file src="..\_BuildOutput\WebApp\bin\x86\**" target="Content\bin\x86" />
 	</files>
 </package>
