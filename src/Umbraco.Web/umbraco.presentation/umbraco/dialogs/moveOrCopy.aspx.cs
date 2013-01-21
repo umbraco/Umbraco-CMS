@@ -261,26 +261,7 @@ namespace umbraco.dialogs
                             var documentId = int.Parse(helper.Request("id"));
                             var document = new Document(documentId);
                             document.Move(int.Parse(helper.Request("copyTo")));
-                            if (document.Published)
-                            {
-                                //TODO HACK - Have to get the Document again, to get the new path from the database..
-                                document = new Document(documentId);
-
-                                document.Publish(new umbraco.BusinessLogic.User(0));
-                                //using library.publish to support load balancing.
-                                //umbraco.library.PublishSingleNode(d.Id);
-                                umbraco.library.UpdateDocumentCache(document.Id);
-
-                                //PPH added handling of load balanced moving of multiple nodes...
-                                if (document.HasChildren)
-                                    handleChildNodes(document);
-
-                                //Using the general Refresh content method instead as it supports load balancing. 
-                                //we only need to do this if the node is actually published.
-                                library.RefreshContent();
-                            }
-
-                            document.Save(); //stub to save stuff to the db.
+                            library.RefreshContent();
                         }
                         else
                         {

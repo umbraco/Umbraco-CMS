@@ -246,7 +246,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(content.Path));
+                var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(content.Path) && x.Id != content.Id);
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -643,25 +643,7 @@ namespace Umbraco.Core.Services
 	    /// <param name="userId">Optional Id of the User saving the Content</param>
 	    public void Save(IContent content, int userId = -1)
 	    {
-			if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
-				return;
-
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateContentRepository(uow))
-			{
-				SetWriter(content, userId);
-
-				//Only change the publish state if the "previous" version was actually published
-				if (content.Published)
-                    content.ChangePublishedState(PublishedState.Saved);
-
-				repository.AddOrUpdate(content);
-				uow.Commit();
-			}
-			
-			Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
-
-			Audit.Add(AuditTypes.Save, "Save Content performed by user", userId == -1 ? 0 : userId, content.Id);
+			Save(content, true, userId);
 	    }
 
 	    /// <summary>
@@ -917,6 +899,9 @@ namespace Umbraco.Core.Services
 	            return;
 
 	        SetWriter(content, userId);
+	        var parent = GetById(parentId);
+	        content.Path = string.Concat(parent.Path, ",", content.Id);
+	        content.Level = parent.Level + 1;
 
 	        //If Content is being moved away from Recycle Bin, its state should be un-trashed
 	        if (content.Trashed && parentId != -20)
@@ -931,7 +916,28 @@ namespace Umbraco.Core.Services
 	        //If Content is published, it should be (re)published from its new location
 	        if (content.Published)
 	        {
-	            SaveAndPublish(content, userId);
+                //If Content is Publishable its saved and published
+                //otherwise we save the content without changing the publish state, and generate new xml because the Path, Level and Parent has changed.
+                if (IsPublishable(content))
+                {
+                    SaveAndPublish(content, userId);
+                }
+                else
+                {
+                    Save(content, false, userId);
+
+                    using (var uow = _uowProvider.GetUnitOfWork())
+                    {
+                        var xml = content.ToXml();
+                        var poco = new ContentXmlDto {NodeId = content.Id, Xml = xml.ToString(SaveOptions.None)};
+                        var exists =
+                            uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new {Id = content.Id}) !=
+                            null;
+                        int result = exists
+                                         ? uow.Database.Update(poco)
+                                         : Convert.ToInt32(uow.Database.Insert(poco));
+                    }
+                }
 	        }
 	        else
 	        {
@@ -942,20 +948,10 @@ namespace Umbraco.Core.Services
 	        var children = GetChildren(content.Id);
 	        if (children.Any())
 	        {
-	            var parentPath = content.Path;
-	            var parentLevel = content.Level;
-	            var updatedDescendents = UpdatePathAndLevelOnChildren(children, parentPath, parentLevel);
-
-                //collection of descendents that needs to be saved and published
-                var descendentsToSaveAndPublish = updatedDescendents.Where(x => x.Published);
-	            foreach (var c in descendentsToSaveAndPublish)
+	            foreach (var child in children)
 	            {
-	                SaveAndPublish(c, userId);
+	                Move(child, content.Id, userId);
 	            }
-
-                //collection of descendents that only needs to be saved
-                var descendentsToSave = updatedDescendents.Where(x => x.Published == false);
-	            Save(descendentsToSave, userId);
 	        }
 
 	        Moved.RaiseEvent(new MoveEventArgs<IContent>(content, false, parentId), this);
@@ -1162,6 +1158,35 @@ namespace Umbraco.Core.Services
 
         #region Private Methods
 
+	    /// <summary>
+	    /// Saves a single <see cref="IContent"/> object
+	    /// </summary>
+	    /// <param name="content">The <see cref="IContent"/> to save</param>
+	    /// <param name="changeState">Boolean indicating whether or not to change the Published state upon saving</param>
+	    /// <param name="userId">Optional Id of the User saving the Content</param>
+	    private void Save(IContent content, bool changeState, int userId = -1)
+        {
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
+                return;
+
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                SetWriter(content, userId);
+
+                //Only change the publish state if the "previous" version was actually published
+                if (changeState && content.Published)
+                    content.ChangePublishedState(PublishedState.Saved);
+
+                repository.AddOrUpdate(content);
+                uow.Commit();
+            }
+
+            Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
+
+            Audit.Add(AuditTypes.Save, "Save Content performed by user", userId == -1 ? 0 : userId, content.Id);
+        }
+
         /// <summary>
         /// Gets a flat list of decendents of content from parent id
         /// </summary>
@@ -1220,32 +1245,6 @@ namespace Umbraco.Core.Services
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Updates the Path and Level on a collection of <see cref="IContent"/> objects
-        /// based on the Parent's Path and Level.
-        /// </summary>
-        /// <param name="children">Collection of <see cref="IContent"/> objects to update</param>
-        /// <param name="parentPath">Path of the Parent content</param>
-        /// <param name="parentLevel">Level of the Parent content</param>
-        /// <returns>Collection of updated <see cref="IContent"/> objects</returns>
-        private List<IContent> UpdatePathAndLevelOnChildren(IEnumerable<IContent> children, string parentPath, int parentLevel)
-        {
-            var list = new List<IContent>();
-            foreach (var child in children)
-            {
-                child.Path = string.Concat(parentPath, ",", child.Id);
-                child.Level = parentLevel + 1;
-                list.Add(child);
-
-                var grandkids = GetChildren(child.Id);
-                if (grandkids.Any())
-                {
-                    list.AddRange(UpdatePathAndLevelOnChildren(grandkids, child.Path, child.Level));
-                }
-            }
-            return list;
         }
 
 		/// <summary>

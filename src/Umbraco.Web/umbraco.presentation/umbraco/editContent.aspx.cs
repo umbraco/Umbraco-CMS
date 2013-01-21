@@ -331,8 +331,15 @@ namespace umbraco.cms.presentation
                         _documentHasPublishedVersion = _document.HasPublishedVersion();
 
                         var descendants = ApplicationContext.Current.Services.ContentService.GetDescendants(_document.Id);
-                        foreach (var descendant in descendants.Where(descendant => descendant.HasPublishedVersion()))
-                            library.UpdateDocumentCache(descendant.Id);
+                        var publishableDescendants = descendants.Where(descendant => descendant.HasPublishedVersion()).ToList();
+                        if(publishableDescendants.Any())
+                        {
+                            foreach (var descendant in publishableDescendants)
+                            {
+                                library.UpdateDocumentCache(descendant.Id);
+                            }
+                            library.RefreshContent();
+                        }
                     }
                     else
                     {
