@@ -48,9 +48,9 @@ namespace Umbraco.Core.Persistence.Migrations
 	        var foundMigrations = MigrationResolver.Current.Migrations;
 
             var migrations = isUpgrade
-                                 ? OrderedUpgradeMigrations(foundMigrations)
-                                 : OrderedDowngradeMigrations(foundMigrations);
-
+                                 ? OrderedUpgradeMigrations(foundMigrations).ToList()
+                                 : OrderedDowngradeMigrations(foundMigrations).ToList();
+            
             if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(migrations, _configuredVersion, _targetVersion, true), this))
                 return false;
 
