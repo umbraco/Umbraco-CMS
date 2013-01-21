@@ -247,13 +247,13 @@ namespace umbraco.controls {
         protected global::System.Web.UI.WebControls.Panel pnlStructure;
         
         /// <summary>
-        /// Pane5 control.
+        /// Pane6 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane5;
+        protected global::umbraco.uicontrols.Pane Pane6;
         
         /// <summary>
         /// pp_Root control.
@@ -272,6 +272,15 @@ namespace umbraco.controls {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox allowAtRoot;
+        
+        /// <summary>
+        /// Pane5 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane Pane5;
         
         /// <summary>
         /// pp_allowedChildren control.
