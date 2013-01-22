@@ -23,6 +23,7 @@ namespace Umbraco.Core
 		/// Encrypt the string using the MachineKey in medium trust
 		/// </summary>
 		/// <param name="value">The string value to be encrypted.</param>
+		/// <param name="value">The string value to be encrypted.</param>
 		/// <returns></returns>
 		public static string EncryptWithMachineKey(this string value)
 		{
