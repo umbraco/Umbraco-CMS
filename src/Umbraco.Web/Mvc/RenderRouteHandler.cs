@@ -115,8 +115,8 @@ namespace Umbraco.Web.Mvc
 				return null;
 
 			var encodedVal = requestContext.HttpContext.Request["uformpostroutevals"];
-			var decodedString = Encoding.UTF8.GetString(Convert.FromBase64String(encodedVal));
-			var parsedQueryString = HttpUtility.ParseQueryString(decodedString);
+			var decryptedString = encodedVal.DecryptWithMachineKey();
+			var parsedQueryString = HttpUtility.ParseQueryString(decryptedString);
 
 			var decodedParts = new Dictionary<string, string>();
 
