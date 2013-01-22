@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Root Home", -1);
             ServiceContext.ContentService.Save(content, 0);
 
-            var nodeName = content.ContentType.Alias.ToUmbracoAlias(StringAliasCaseType.CamelCase, true);
+            var nodeName = content.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             // Act
             XElement element = content.ToXml();

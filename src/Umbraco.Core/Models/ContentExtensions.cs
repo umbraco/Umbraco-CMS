@@ -392,8 +392,7 @@ namespace Umbraco.Core.Models
         public static XElement ToXml(this IContent content)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            //var nodeName = content.ContentType.Alias.ToUmbracoAlias(StringAliasCaseType.CamelCase, true);
-            var nodeName = content.ContentType.Alias;
+            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
             var niceUrl = content.Name.FormatUrl().ToLower();
 
             var xml = new XElement(nodeName,
@@ -412,7 +411,8 @@ namespace Umbraco.Core.Models
                                    new XAttribute("writerName", content.GetWriterProfile().Name),
                                    new XAttribute("creatorName", content.GetCreatorProfile().Name),
                                    new XAttribute("path", content.Path),
-                                   new XAttribute("isDoc", ""));
+                                   new XAttribute("isDoc", ""),
+                                   UmbracoSettings.UseLegacyXmlSchema ? new XAttribute("nodeTypeAlias", content.ContentType.Alias) : null);
 
             foreach (var property in content.Properties)
             {
