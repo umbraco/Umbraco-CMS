@@ -376,63 +376,10 @@ namespace Umbraco.Core.Services
 	    /// Re-Publishes all Content
 	    /// </summary>
 	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
-	    /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this RePublish method. By default this method will update the cache.</param>
 	    /// <returns>True if publishing succeeded, otherwise False</returns>
-	    public bool RePublishAll(int userId = -1, bool omitCacheRefresh = false)
+	    public bool RePublishAll(int userId = -1)
 	    {
-            //TODO Refactor this so omitCacheRefresh isn't exposed in the public method, but only in an internal one as its purely there for legacy reasons.
-	        var list = new List<IContent>();
-	        var updated = new List<IContent>();
-
-	        //Consider creating a Path query instead of recursive method:
-	        //var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith("-1"));
-
-	        var rootContent = GetRootContent();
-	        foreach (var content in rootContent)
-	        {
-	            if (content.IsValid())
-	            {
-	                list.Add(content);
-	                list.AddRange(GetChildrenDeep(content.Id));
-	            }
-	        }
-
-	        //Publish and then update the database with new status
-	        var published = _publishingStrategy.PublishWithChildren(list, userId);
-	        if (published)
-	        {
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
-	            {
-	                //Only loop through content where the Published property has been updated
-	                foreach (var item in list.Where(x => ((ICanBeDirty) x).IsPropertyDirty("Published")))
-	                {
-	                    SetWriter(item, userId);
-	                    repository.AddOrUpdate(item);
-	                    updated.Add(item);
-	                }
-
-	                uow.Commit();
-
-	                foreach (var c in updated)
-	                {
-	                    var xml = c.ToXml();
-	                    var poco = new ContentXmlDto {NodeId = c.Id, Xml = xml.ToString(SaveOptions.None)};
-	                    var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new {Id = c.Id}) !=
-	                                 null;
-	                    int result = exists
-	                                     ? uow.Database.Update(poco)
-	                                     : Convert.ToInt32(uow.Database.Insert(poco));
-	                }
-	            }
-	            //Updating content to published state is finished, so we fire event through PublishingStrategy to have cache updated
-	            if (omitCacheRefresh == false)
-	                _publishingStrategy.PublishingFinalized(updated, true);
-	        }
-
-	        Audit.Add(AuditTypes.Publish, "RePublish All performed by user", userId == -1 ? 0 : userId, -1);
-
-	        return published;
+	        return RePublishAllDo(false, userId);
 	    }
 
 	    /// <summary>
@@ -440,12 +387,10 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to publish</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        public bool Publish(IContent content, int userId = -1, bool omitCacheRefresh = false)
+        public bool Publish(IContent content, int userId = -1)
         {
-            //TODO Refactor this so omitCacheRefresh isn't exposed in the public method, but only in an internal one as its purely there for legacy reasons.
-            return SaveAndPublish(content, userId, omitCacheRefresh);
+            return SaveAndPublishDo(content, false, userId);
         }
 
 	    /// <summary>
@@ -453,76 +398,10 @@ namespace Umbraco.Core.Services
 	    /// </summary>
 	    /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
 	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
-	    /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
 	    /// <returns>True if publishing succeeded, otherwise False</returns>
-	    public bool PublishWithChildren(IContent content, int userId = -1, bool omitCacheRefresh = false)
+	    public bool PublishWithChildren(IContent content, int userId = -1)
 	    {
-            //TODO Refactor this so omitCacheRefresh isn't exposed in the public method, but only in an internal one as its purely there for legacy reasons.
-
-	        //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
-	        if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
-	        {
-	            LogHelper.Info<ContentService>(
-	                string.Format(
-	                    "Content '{0}' with Id '{1}' could not be published because its parent or one of its ancestors is not published.",
-	                    content.Name, content.Id));
-	            return false;
-	        }
-
-	        //Content contains invalid property values and can therefore not be published - fire event?
-	        if (!content.IsValid())
-	        {
-	            LogHelper.Info<ContentService>(
-	                string.Format("Content '{0}' with Id '{1}' could not be published because of invalid properties.",
-	                              content.Name, content.Id));
-	            return false;
-	        }
-
-	        //Consider creating a Path query instead of recursive method:
-	        //var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(content.Path));
-
-	        var updated = new List<IContent>();
-	        var list = new List<IContent>();
-	        list.Add(content);
-	        list.AddRange(GetChildrenDeep(content.Id));
-
-	        //Publish and then update the database with new status
-	        var published = _publishingStrategy.PublishWithChildren(list, userId);
-	        if (published)
-	        {
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
-	            {
-	                //Only loop through content where the Published property has been updated
-	                foreach (var item in list.Where(x => ((ICanBeDirty) x).IsPropertyDirty("Published")))
-	                {
-	                    SetWriter(item, userId);
-	                    repository.AddOrUpdate(item);
-	                    updated.Add(item);
-	                }
-
-	                uow.Commit();
-
-	                foreach (var c in updated)
-	                {
-	                    var xml = c.ToXml();
-	                    var poco = new ContentXmlDto {NodeId = c.Id, Xml = xml.ToString(SaveOptions.None)};
-	                    var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new {Id = c.Id}) !=
-	                                 null;
-	                    int result = exists
-	                                     ? uow.Database.Update(poco)
-	                                     : Convert.ToInt32(uow.Database.Insert(poco));
-	                }
-	            }
-	            //Save xml to db and call following method to fire event:
-	            if (omitCacheRefresh == false)
-	                _publishingStrategy.PublishingFinalized(updated, false);
-
-	            Audit.Add(AuditTypes.Publish, "Publish with Children performed by user", userId == -1 ? 0 : userId,
-	                      content.Id);
-	        }
-
-	        return published;
+	        return PublishWithChildrenDo(content, false, userId);
 	    }
 
 	    /// <summary>
@@ -530,33 +409,10 @@ namespace Umbraco.Core.Services
 	    /// </summary>
 	    /// <param name="content">The <see cref="IContent"/> to publish</param>
 	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
-	    /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Unpublish method. By default this method will update the cache.</param>
 	    /// <returns>True if unpublishing succeeded, otherwise False</returns>
-	    public bool UnPublish(IContent content, int userId = -1, bool omitCacheRefresh = false)
+	    public bool UnPublish(IContent content, int userId = -1)
 	    {
-            //TODO Refactor this so omitCacheRefresh isn't exposed in the public method, but only in an internal one as its purely there for legacy reasons.
-
-	        var unpublished = _publishingStrategy.UnPublish(content, userId);
-	        if (unpublished)
-	        {
-	            var uow = _uowProvider.GetUnitOfWork();
-	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
-	            {
-	                repository.AddOrUpdate(content);
-
-	                //Remove 'published' xml from the cmsContentXml table for the unpublished content
-	                uow.Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new {Id = content.Id});
-
-                    uow.Commit();
-	            }
-	            //Delete xml from db? and call following method to fire event through PublishingStrategy to update cache
-	            if (omitCacheRefresh == false)
-	                _publishingStrategy.UnPublishingFinalized(content);
-
-	            Audit.Add(AuditTypes.UnPublish, "UnPublish performed by user", userId == -1 ? 0 : userId, content.Id);
-	        }
-
-	        return unpublished;
+	        return UnPublishDo(content, false, userId);
 	    }
 
 	    /// <summary>
@@ -564,76 +420,10 @@ namespace Umbraco.Core.Services
 	    /// </summary>
 	    /// <param name="content">The <see cref="IContent"/> to save and publish</param>
 	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
-	    /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
 	    /// <returns>True if publishing succeeded, otherwise False</returns>
-	    public bool SaveAndPublish(IContent content, int userId = -1, bool omitCacheRefresh = false)
+	    public bool SaveAndPublish(IContent content, int userId = -1)
 	    {
-            //TODO Refactor this so omitCacheRefresh isn't exposed in the public method, but only in an internal one as its purely there for legacy reasons.
-			if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
-				return false;
-
-			//Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
-            if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
-			{
-				LogHelper.Info<ContentService>(
-					string.Format(
-						"Content '{0}' with Id '{1}' could not be published because its parent is not published.",
-						content.Name, content.Id));
-				return false;
-			}
-
-			//Content contains invalid property values and can therefore not be published - fire event?
-			if (!content.IsValid())
-			{
-				LogHelper.Info<ContentService>(
-					string.Format(
-						"Content '{0}' with Id '{1}' could not be published because of invalid properties.",
-						content.Name, content.Id));
-				return false;
-			}
-
-			//Publish and then update the database with new status
-			bool published = _publishingStrategy.Publish(content, userId);
-
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateContentRepository(uow))
-			{
-				//Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
-				SetWriter(content, userId);
-				repository.AddOrUpdate(content);
-
-				uow.Commit();
-
-				if (published)
-				{
-					var xml = content.ToXml();
-					var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
-				    var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new {Id = content.Id}) != null;
-					int result = exists
-									 ? uow.Database.Update(poco)
-									 : Convert.ToInt32(uow.Database.Insert(poco));
-				}
-			}
-
-            Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
-
-			//Save xml to db and call following method to fire event through PublishingStrategy to update cache
-			if (omitCacheRefresh == false)
-				_publishingStrategy.PublishingFinalized(content);
-            
-            //We need to check if children and their publish state to ensure that we republish content that was previously published
-	        if (HasChildren(content.Id))
-	        {
-	            var children = GetChildrenDeep(content.Id);
-	            var shouldBeRepublished = children.Where(child => HasPublishedVersion(child.Id));
-
-	            if (omitCacheRefresh == false)
-	                _publishingStrategy.PublishingFinalized(shouldBeRepublished, false);
-	        }
-
-	        Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId == -1 ? 0 : userId, content.Id);
-
-			return published;
+			return SaveAndPublishDo(content, false, userId);
 	    }
 
 	    /// <summary>
@@ -1003,7 +793,7 @@ namespace Umbraco.Core.Services
 
             // A copy should never be set to published
             // automatically even if the original was
-            this.UnPublish(copy);
+            this.UnPublish(copy, userId);
 
 			if (Copying.IsRaisedEventCancelled(new CopyEventArgs<IContent>(content, copy, parentId), this))
 				return null;
@@ -1154,9 +944,314 @@ namespace Umbraco.Core.Services
 		{
 			_httpContext = httpContext;
 		}
+
+        /// <summary>
+        /// Internal method to Re-Publishes all Content for legacy purposes.
+        /// </summary>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this RePublish method. By default this method will not update the cache.</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        internal bool RePublishAll(bool omitCacheRefresh = true, int userId = -1)
+        {
+            return RePublishAllDo(omitCacheRefresh, userId);
+        }
+
+        /// <summary>
+        /// Internal method that Publishes a single <see cref="IContent"/> object for legacy purposes.
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will not update the cache.</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        internal bool Publish(IContent content, bool omitCacheRefresh = true, int userId = -1)
+        {
+            return SaveAndPublishDo(content, omitCacheRefresh, userId);
+        }
+
+        /// <summary>
+        /// Internal method that Publishes a <see cref="IContent"/> object and all its children for legacy purposes.
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will not update the cache.</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        internal bool PublishWithChildren(IContent content, bool omitCacheRefresh = true, int userId = -1)
+        {
+            return PublishWithChildrenDo(content, omitCacheRefresh, userId);
+        }
+
+        /// <summary>
+        /// Internal method that UnPublishes a single <see cref="IContent"/> object for legacy purposes.
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Unpublish method. By default this method will not update the cache.</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if unpublishing succeeded, otherwise False</returns>
+        internal bool UnPublish(IContent content, bool omitCacheRefresh = true, int userId = -1)
+        {
+            return UnPublishDo(content, omitCacheRefresh, userId);
+        }
+
+        /// <summary>
+        /// Saves and Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save and publish</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will not update the cache.</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        internal bool SaveAndPublish(IContent content, bool omitCacheRefresh = true, int userId = -1)
+        {
+            return SaveAndPublishDo(content, omitCacheRefresh, userId);
+        }
+
         #endregion
 
         #region Private Methods
+
+        /// <summary>
+        /// Re-Publishes all Content
+        /// </summary>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this RePublish method. By default this method will update the cache.</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        private bool RePublishAllDo(bool omitCacheRefresh = false, int userId = -1)
+        {
+            var list = new List<IContent>();
+            var updated = new List<IContent>();
+
+            //Consider creating a Path query instead of recursive method:
+            //var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith("-1"));
+
+            var rootContent = GetRootContent();
+            foreach (var content in rootContent)
+            {
+                if (content.IsValid())
+                {
+                    list.Add(content);
+                    list.AddRange(GetChildrenDeep(content.Id));
+                }
+            }
+
+            //Publish and then update the database with new status
+            var published = _publishingStrategy.PublishWithChildren(list, userId);
+            if (published)
+            {
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateContentRepository(uow))
+                {
+                    //Only loop through content where the Published property has been updated
+                    foreach (var item in list.Where(x => ((ICanBeDirty)x).IsPropertyDirty("Published")))
+                    {
+                        SetWriter(item, userId);
+                        repository.AddOrUpdate(item);
+                        updated.Add(item);
+                    }
+
+                    uow.Commit();
+
+                    foreach (var c in updated)
+                    {
+                        var xml = c.ToXml();
+                        var poco = new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) };
+                        var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id }) !=
+                                     null;
+                        int result = exists
+                                         ? uow.Database.Update(poco)
+                                         : Convert.ToInt32(uow.Database.Insert(poco));
+                    }
+                }
+                //Updating content to published state is finished, so we fire event through PublishingStrategy to have cache updated
+                if (omitCacheRefresh == false)
+                    _publishingStrategy.PublishingFinalized(updated, true);
+            }
+
+            Audit.Add(AuditTypes.Publish, "RePublish All performed by user", userId == -1 ? 0 : userId, -1);
+
+            return published;
+        }
+
+        /// <summary>
+        /// Publishes a <see cref="IContent"/> object and all its children
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        private bool PublishWithChildrenDo(IContent content, bool omitCacheRefresh = false, int userId = -1)
+        {
+            //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
+            if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
+            {
+                LogHelper.Info<ContentService>(
+                    string.Format(
+                        "Content '{0}' with Id '{1}' could not be published because its parent or one of its ancestors is not published.",
+                        content.Name, content.Id));
+                return false;
+            }
+
+            //Content contains invalid property values and can therefore not be published - fire event?
+            if (!content.IsValid())
+            {
+                LogHelper.Info<ContentService>(
+                    string.Format("Content '{0}' with Id '{1}' could not be published because of invalid properties.",
+                                  content.Name, content.Id));
+                return false;
+            }
+
+            //Consider creating a Path query instead of recursive method:
+            //var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(content.Path));
+
+            var updated = new List<IContent>();
+            var list = new List<IContent>();
+            list.Add(content);
+            list.AddRange(GetChildrenDeep(content.Id));
+
+            //Publish and then update the database with new status
+            var published = _publishingStrategy.PublishWithChildren(list, userId);
+            if (published)
+            {
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateContentRepository(uow))
+                {
+                    //Only loop through content where the Published property has been updated
+                    foreach (var item in list.Where(x => ((ICanBeDirty)x).IsPropertyDirty("Published")))
+                    {
+                        SetWriter(item, userId);
+                        repository.AddOrUpdate(item);
+                        updated.Add(item);
+                    }
+
+                    uow.Commit();
+
+                    foreach (var c in updated)
+                    {
+                        var xml = c.ToXml();
+                        var poco = new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) };
+                        var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id }) !=
+                                     null;
+                        int result = exists
+                                         ? uow.Database.Update(poco)
+                                         : Convert.ToInt32(uow.Database.Insert(poco));
+                    }
+                }
+                //Save xml to db and call following method to fire event:
+                if (omitCacheRefresh == false)
+                    _publishingStrategy.PublishingFinalized(updated, false);
+
+                Audit.Add(AuditTypes.Publish, "Publish with Children performed by user", userId == -1 ? 0 : userId,
+                          content.Id);
+            }
+
+            return published;
+        }
+
+        /// <summary>
+        /// UnPublishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Unpublish method. By default this method will update the cache.</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if unpublishing succeeded, otherwise False</returns>
+        private bool UnPublishDo(IContent content, bool omitCacheRefresh = false, int userId = -1)
+        {
+            var unpublished = _publishingStrategy.UnPublish(content, userId);
+            if (unpublished)
+            {
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateContentRepository(uow))
+                {
+                    repository.AddOrUpdate(content);
+
+                    //Remove 'published' xml from the cmsContentXml table for the unpublished content
+                    uow.Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new { Id = content.Id });
+
+                    uow.Commit();
+                }
+                //Delete xml from db? and call following method to fire event through PublishingStrategy to update cache
+                if (omitCacheRefresh == false)
+                    _publishingStrategy.UnPublishingFinalized(content);
+
+                Audit.Add(AuditTypes.UnPublish, "UnPublish performed by user", userId == -1 ? 0 : userId, content.Id);
+            }
+
+            return unpublished;
+        }
+
+        /// <summary>
+        /// Saves and Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save and publish</param>
+        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        private bool SaveAndPublishDo(IContent content, bool omitCacheRefresh = false, int userId = -1)
+        {
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
+                return false;
+
+            //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
+            if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
+            {
+                LogHelper.Info<ContentService>(
+                    string.Format(
+                        "Content '{0}' with Id '{1}' could not be published because its parent is not published.",
+                        content.Name, content.Id));
+                return false;
+            }
+
+            //Content contains invalid property values and can therefore not be published - fire event?
+            if (!content.IsValid())
+            {
+                LogHelper.Info<ContentService>(
+                    string.Format(
+                        "Content '{0}' with Id '{1}' could not be published because of invalid properties.",
+                        content.Name, content.Id));
+                return false;
+            }
+
+            //Publish and then update the database with new status
+            bool published = _publishingStrategy.Publish(content, userId);
+
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                //Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
+                SetWriter(content, userId);
+                repository.AddOrUpdate(content);
+
+                uow.Commit();
+
+                if (published)
+                {
+                    var xml = content.ToXml();
+                    var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
+                    var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = content.Id }) != null;
+                    int result = exists
+                                     ? uow.Database.Update(poco)
+                                     : Convert.ToInt32(uow.Database.Insert(poco));
+                }
+            }
+
+            Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
+
+            //Save xml to db and call following method to fire event through PublishingStrategy to update cache
+            if (omitCacheRefresh == false)
+                _publishingStrategy.PublishingFinalized(content);
+
+            //We need to check if children and their publish state to ensure that we republish content that was previously published
+            if (HasChildren(content.Id))
+            {
+                var children = GetChildrenDeep(content.Id);
+                var shouldBeRepublished = children.Where(child => HasPublishedVersion(child.Id));
+
+                if (omitCacheRefresh == false)
+                    _publishingStrategy.PublishingFinalized(shouldBeRepublished, false);
+            }
+
+            Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId == -1 ? 0 : userId, content.Id);
+
+            return published;
+        }
 
 	    /// <summary>
 	    /// Saves a single <see cref="IContent"/> object

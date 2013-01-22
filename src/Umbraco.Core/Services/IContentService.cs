@@ -210,45 +210,40 @@ namespace Umbraco.Core.Services
         /// Re-Publishes all Content
         /// </summary>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this RePublish method. By default this method will update the cache.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        bool RePublishAll(int userId = -1, bool omitCacheRefresh = false);
+        bool RePublishAll(int userId = -1);
 
         /// <summary>
         /// Publishes a single <see cref="IContent"/> object
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to publish</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        bool Publish(IContent content, int userId = -1, bool omitCacheRefresh = false);
+        bool Publish(IContent content, int userId = -1);
 
         /// <summary>
         /// Publishes a <see cref="IContent"/> object and all its children
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        bool PublishWithChildren(IContent content, int userId = -1, bool omitCacheRefresh = false);
+        bool PublishWithChildren(IContent content, int userId = -1);
 
         /// <summary>
         /// UnPublishes a single <see cref="IContent"/> object
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to publish</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Unpublish method. By default this method will update the cache.</param>
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
-        bool UnPublish(IContent content, int userId = -1, bool omitCacheRefresh = false);
+        bool UnPublish(IContent content, int userId = -1);
 
         /// <summary>
         /// Saves and Publishes a single <see cref="IContent"/> object
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to save and publish</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        bool SaveAndPublish(IContent content, int userId = -1, bool omitCacheRefresh = false);
+        bool SaveAndPublish(IContent content, int userId = -1);
 
         /// <summary>
         /// Permanently deletes an <see cref="IContent"/> object.
