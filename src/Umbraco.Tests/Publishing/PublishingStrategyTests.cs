@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Publishing
             //reset the app context
             DataTypesResolver.Reset();
             ApplicationContext.Current = null;
-			Resolution.Unfreeze();
+			Resolution.Reset();
 
             RepositoryResolver.Reset();
 

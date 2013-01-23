@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Migrations
         public void TearDown()
         {	        
             MigrationResolver.Reset();
-			Resolution.Unfreeze();
+			Resolution.Reset();
         }
     }
 }

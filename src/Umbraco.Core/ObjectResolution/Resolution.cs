@@ -28,7 +28,7 @@ namespace Umbraco.Core.ObjectResolution
 		public static void EnsureIsFrozen()
 		{
 			if (!IsFrozen)
-				throw new Exception("Resolution is not frozen, it is not yet possible to get values from it.");
+                throw new InvalidOperationException("Resolution is not frozen, it is not yet possible to get values from it.");
 		}
 
 		/// <summary>
@@ -62,14 +62,15 @@ namespace Umbraco.Core.ObjectResolution
 			if (Frozen != null)
 				Frozen(null, null);
 		}
-
-		/// <summary>
-		/// Unfreezes resolution.
-		/// </summary>
-		/// <remarks>To be used in unit tests.</remarks>
-		internal static void Unfreeze()
-		{
-			IsFrozen = false;
-		}
+        
+        /// <summary>
+        /// Resets resolution, ie unfreezes it and clears Frozen event.
+        /// </summary>
+        /// <remarks>To be used in unit tests.</remarks>
+        internal static void Reset()
+        {
+            IsFrozen = false;
+            Frozen = null;
+        }
 	}
 }

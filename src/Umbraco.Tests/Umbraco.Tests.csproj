@@ -246,6 +246,9 @@
     <Compile Include="ContentStores\PublishContentStoreTests.cs" />
     <Compile Include="DataTypeFactoryTests.cs" />
     <Compile Include="Resolvers\LazyManyObjectResolverTests.cs" />
+    <Compile Include="Resolvers\ManyResolverTests.cs" />
+    <Compile Include="Resolvers\SingleResolverTests.cs" />
+    <Compile Include="Resolvers\ResolutionTests.cs" />
     <Compile Include="Routing\ContentFinderByNiceUrlWithDomainsTests.cs" />
     <Compile Include="Routing\NiceUrlsProviderWithDomainsTests.cs" />
     <Compile Include="Routing\uQueryGetNodeIdByUrlTests.cs" />
@@ -293,7 +296,6 @@
     <Compile Include="UriUtilityTests.cs" />
     <Compile Include="Resolvers\MacroFieldEditorsResolverTests.cs" />
     <Compile Include="MacroEngineFactoryTests.cs" />
-    <Compile Include="Resolvers\ManyObjectResolverTests.cs" />
     <Compile Include="MediaFactoryTests.cs" />
     <Compile Include="Resolvers\PackageActionsResolverTests.cs" />
     <Compile Include="PluginManagerExtensions.cs" />

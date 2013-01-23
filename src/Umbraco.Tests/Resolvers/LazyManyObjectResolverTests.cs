@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Resolvers
 		[TearDown]
 		public void TearDown()
 		{
-            Resolution.Unfreeze();
+            Resolution.Reset();
 		}
 
 		[Test]

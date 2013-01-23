@@ -180,7 +180,7 @@ namespace Umbraco.Core.ObjectResolution
 								l.UpgradeToWriteLock();
 								CurrentHttpContext.Items[_httpContextKey] = CreateInstances().ToArray();
 							}
-							return (List<TResolved>)CurrentHttpContext.Items[_httpContextKey];
+							return (TResolved[])CurrentHttpContext.Items[_httpContextKey];
 						}
 
 					case ObjectLifetimeScope.Application:
@@ -254,6 +254,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// <exception cref="InvalidOperationException">the resolver does not support removing types, or 
 		/// the type is not a valid type for the resolver.</exception>
 		public void RemoveType<T>()
+            where T : TResolved
 		{
 			RemoveType(typeof(T));
 		}
@@ -319,6 +320,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// <exception cref="InvalidOperationException">the resolver does not support adding types, or 
 		/// the type is not a valid type for the resolver, or the type is already in the collection of types.</exception>
 		public void AddType<T>()
+            where T : TResolved
 		{
 			AddType(typeof(T));
 		}
@@ -372,6 +374,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// <param name="index">The zero-based index at which the type should be inserted.</param>
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is out of range.</exception>
 		public void InsertType<T>(int index)
+            where T : TResolved
 		{
 			InsertType(index, typeof(T));
 		}
@@ -419,6 +422,8 @@ namespace Umbraco.Core.ObjectResolution
 		/// one of the types is not a valid type for the resolver, or the existing type is not in the collection,
 		/// or the new type is already in the collection of types.</exception>
 		public void InsertTypeBefore<Texisting, T>()
+            where Texisting : TResolved
+            where T : TResolved
 		{
 			InsertTypeBefore(typeof(Texisting), typeof(T));
 		}
@@ -442,6 +447,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// <typeparam name="T">The type to look for.</typeparam>
 		/// <returns>A value indicating whether the type is already in the collection of types.</returns>
 		public bool ContainsType<T>()
+            where T : TResolved
 		{
 			return ContainsType(typeof(T));
 		}

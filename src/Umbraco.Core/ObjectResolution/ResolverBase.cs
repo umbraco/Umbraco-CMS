@@ -44,6 +44,7 @@ namespace Umbraco.Core.ObjectResolution
 
 			set
 			{
+                using (Resolution.Configuration)
 				using (new WriteLock(ResolversLock))
 				{
 					if (value == null)
@@ -57,12 +58,28 @@ namespace Umbraco.Core.ObjectResolution
 			}
 		}
 
+        /// <summary>
+        /// Gets a value indicating whether a the singleton nstance has been set.
+        /// </summary>
+        /// <remarks>To be used in unit tests.</remarks>
+        internal static bool HasCurrent
+        {
+            get
+            {
+                using (new ReadLock(ResolversLock))
+                {
+                    return _resolver != null;
+                }
+            }
+        }
+
 		/// <summary>
 		/// Resets the resolver singleton instance to null.
 		/// </summary>
 		/// <remarks>To be used in unit tests.</remarks>
 		internal static void Reset()
 		{
+            using (Resolution.Configuration)
 			using (new WriteLock(ResolversLock))
 			{
 				_resolver = null;
