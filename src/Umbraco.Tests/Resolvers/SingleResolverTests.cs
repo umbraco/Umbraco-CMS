@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Resolvers
         public class Resolved
         { }
 
-        public class SingleResolver : SingleObjectResolverBase<SingleResolver, Resolved>
+        public sealed class SingleResolver : SingleObjectResolverBase<SingleResolver, Resolved>
         {
             public SingleResolver()
                 : base()

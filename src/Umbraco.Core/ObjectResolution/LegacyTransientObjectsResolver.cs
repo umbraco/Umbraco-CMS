@@ -27,18 +27,17 @@ namespace Umbraco.Core.ObjectResolution
 		#region Constructors
 		
 		/// <summary>
-		/// Constructor
+		/// Initializes a new instance of the <see cref="LegacyTransientObjectsResolver{TResolver, TResolved}"/> class with an initial list of object types.
 		/// </summary>
-		/// <param name="types"></param>
+		/// <param name="value">A function returning the list of object types.</param>
 		/// <remarks>
 		/// We are creating Transient instances (new instances each time) because this is how the legacy code worked and
 		/// I don't want to muck anything up by changing them to application based instances. 
 		/// TODO: However, it would make much more sense to do this and would speed up the application plus this would make the GetById method much easier.
 		/// </remarks>
-		protected LegacyTransientObjectsResolver(Func<IEnumerable<Type>> types)
-			: base(types, ObjectLifetimeScope.Transient) //  new objects every time
-		{			
-		}
+		protected LegacyTransientObjectsResolver(Func<IEnumerable<Type>> value)
+			: base(value, ObjectLifetimeScope.Transient) //  new objects every time
+		{ }
 		#endregion
 
 		/// <summary>

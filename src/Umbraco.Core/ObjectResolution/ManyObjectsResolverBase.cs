@@ -25,7 +25,8 @@ namespace Umbraco.Core.ObjectResolution
 		#region Constructors
 			
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an empty list of objects.
+		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an empty list of objects,
+        /// and an optional lifetime scope.
 		/// </summary>
 		/// <param name="scope">The lifetime scope of instantiated objects, default is per Application.</param>
 		/// <remarks>If <paramref name="scope"/> is per HttpRequest then there must be a current HttpContext.</remarks>
@@ -65,7 +66,8 @@ namespace Umbraco.Core.ObjectResolution
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an initial list of object types.
+		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an initial list of object types,
+        /// and an optional lifetime scope.
 		/// </summary>
 		/// <param name="value">The list of object types.</param>
 		/// <param name="scope">The lifetime scope of instantiated objects, default is per Application.</param>
@@ -216,18 +218,6 @@ namespace Umbraco.Core.ObjectResolution
 		#region Types collection manipulation
 
 		/// <summary>
-		/// Ensures that a type is a valid type for the resolver.
-		/// </summary>
-		/// <param name="value">The type to test.</param>
-		/// <exception cref="InvalidOperationException">the type is not a valid type for the resolver.</exception>
-		protected void EnsureCorrectType(Type value)
-		{
-			if (!TypeHelper.IsTypeAssignableFrom<TResolved>(value))
-				throw new InvalidOperationException(string.Format(
-					"Type {0} is not an acceptable type for resolver {1}.", value.FullName, this.GetType().FullName));
-		}
-
-		/// <summary>
 		/// Removes a type.
 		/// </summary>
 		/// <param name="value">The type to remove.</param>
@@ -235,7 +225,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// the type is not a valid type for the resolver.</exception>
 		public virtual void RemoveType(Type value)
 		{
-			EnsureRemoveSupport();
+			EnsureSupportsRemove();
 
 			using (Resolution.Configuration)
 			using (var l = new UpgradeableReadLock(_lock))
@@ -268,7 +258,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// a type is not a valid type for the resolver, or a type is already in the collection of types.</exception>
 		protected void AddTypes(IEnumerable<Type> types)
 		{
-			EnsureAddSupport();
+			EnsureSupportsAdd();
 
 			using (Resolution.Configuration)
 			using (new WriteLock(_lock))
@@ -276,7 +266,7 @@ namespace Umbraco.Core.ObjectResolution
 				foreach(var t in types)
 				{
 					EnsureCorrectType(t);
-					if (InstanceTypes.Contains(t))
+                    if (_instanceTypes.Contains(t))
 					{
 						throw new InvalidOperationException(string.Format(
 							"Type {0} is already in the collection of types.", t.FullName));
@@ -295,13 +285,13 @@ namespace Umbraco.Core.ObjectResolution
 		/// the type is not a valid type for the resolver, or the type is already in the collection of types.</exception>
 		public virtual void AddType(Type value)
 		{
-			EnsureAddSupport();
+			EnsureSupportsAdd();
 
 			using (Resolution.Configuration)
 			using (var l = new UpgradeableReadLock(_lock))
 			{
 				EnsureCorrectType(value);
-				if (InstanceTypes.Contains(value))
+                if (_instanceTypes.Contains(value))
 				{
 					throw new InvalidOperationException(string.Format(
 						"Type {0} is already in the collection of types.", value.FullName));
@@ -331,7 +321,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// <exception cref="InvalidOperationException">the resolver does not support clearing types.</exception>
 		public virtual void Clear()
 		{
-			EnsureClearSupport();
+			EnsureSupportsClear();
 
 			using (Resolution.Configuration)
 			using (new WriteLock(_lock))
@@ -350,13 +340,13 @@ namespace Umbraco.Core.ObjectResolution
 		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is out of range.</exception>
 		public virtual void InsertType(int index, Type value)
 		{			
-			EnsureInsertSupport();
+			EnsureSupportsInsert();
 
 			using (Resolution.Configuration)
 			using (var l = new UpgradeableReadLock(_lock))
 			{
 				EnsureCorrectType(value);
-				if (InstanceTypes.Contains(value))
+                if (_instanceTypes.Contains(value))
 				{
 					throw new InvalidOperationException(string.Format(
 						"Type {0} is already in the collection of types.", value.FullName));
@@ -389,24 +379,24 @@ namespace Umbraco.Core.ObjectResolution
 		/// or the new type is already in the collection of types.</exception>
 		public virtual void InsertTypeBefore(Type existingType, Type value)
 		{
-			EnsureInsertSupport();
+			EnsureSupportsInsert();
 
 			using (Resolution.Configuration)
 			using (var l = new UpgradeableReadLock(_lock))
 			{
 				EnsureCorrectType(existingType);
 				EnsureCorrectType(value);
-				if (!InstanceTypes.Contains(existingType))
+                if (!_instanceTypes.Contains(existingType))
 				{
 					throw new InvalidOperationException(string.Format(
 						"Type {0} is not in the collection of types.", existingType.FullName));
 				}
-				if (InstanceTypes.Contains(value))
+                if (_instanceTypes.Contains(value))
 				{
 					throw new InvalidOperationException(string.Format(
 						"Type {0} is already in the collection of types.", value.FullName));
 				}
-				int index = InstanceTypes.IndexOf(existingType);
+                int index = _instanceTypes.IndexOf(existingType);
 
 				l.UpgradeToWriteLock();
 				_instanceTypes.Insert(index, value);
@@ -463,60 +453,95 @@ namespace Umbraco.Core.ObjectResolution
 			return new WriteLock(_lock);
 		}
 
-		/// <summary>
-		/// Throws an exception if this does not support Remove
-		/// </summary>
-		protected void EnsureRemoveSupport()
+        #region Type utilities
+
+        /// <summary>
+        /// Ensures that a type is a valid type for the resolver.
+        /// </summary>
+        /// <param name="value">The type to test.</param>
+        /// <exception cref="InvalidOperationException">the type is not a valid type for the resolver.</exception>
+        protected void EnsureCorrectType(Type value)
+        {
+            if (!TypeHelper.IsTypeAssignableFrom<TResolved>(value))
+                throw new InvalidOperationException(string.Format(
+                    "Type {0} is not an acceptable type for resolver {1}.", value.FullName, this.GetType().FullName));
+        }
+
+        #endregion
+
+        #region Types collection manipulation support
+
+        /// <summary>
+        /// Ensures that the resolver supports removing types.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">The resolver does not support removing types.</exception>
+        protected void EnsureSupportsRemove()
 		{
 			if (!SupportsRemove)
-				throw new InvalidOperationException("This resolver does not support Removing types");
+                throw new InvalidOperationException("This resolver does not support removing types");
 		}
 
-		/// <summary>
-		/// Throws an exception if this does not support Clear
-		/// </summary>
-		protected void EnsureClearSupport()
-		{
+        /// <summary>
+        /// Ensures that the resolver supports clearing types.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">The resolver does not support clearing types.</exception>
+        protected void EnsureSupportsClear()		{
 			if (!SupportsClear)
-				throw new InvalidOperationException("This resolver does not support Clearing types");
+                throw new InvalidOperationException("This resolver does not support clearing types");
 		}
 
-		/// <summary>
-		/// Throws an exception if this does not support Add
-		/// </summary>
-		protected void EnsureAddSupport()
+        /// <summary>
+        /// Ensures that the resolver supports adding types.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">The resolver does not support adding types.</exception>
+        protected void EnsureSupportsAdd()
 		{
 			if (!SupportsAdd)
-				throw new InvalidOperationException("This resolver does not support Adding new types");
+                throw new InvalidOperationException("This resolver does not support adding new types");
 		}
 
-		/// <summary>
-		/// Throws an exception if this does not support insert
-		/// </summary>
-		protected void EnsureInsertSupport()
+        /// <summary>
+        /// Ensures that the resolver supports inserting types.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">The resolver does not support inserting types.</exception>
+        protected void EnsureSupportsInsert()
 		{
 			if (!SupportsInsert)
-				throw new InvalidOperationException("This resolver does not support Inserting new types");
+                throw new InvalidOperationException("This resolver does not support inserting new types");
 		}
 
+        /// <summary>
+        /// Gets a value indicating whether the resolver supports adding types.
+        /// </summary>
 		protected virtual bool SupportsAdd
 		{
 			get { return true; }
 		}
 
-		protected virtual bool SupportsInsert
+        /// <summary>
+        /// Gets a value indicating whether the resolver supports inserting types.
+        /// </summary>
+        protected virtual bool SupportsInsert
 		{
 			get { return true; }
 		}
 
-		protected virtual bool SupportsClear
+        /// <summary>
+        /// Gets a value indicating whether the resolver supports clearing types.
+        /// </summary>
+        protected virtual bool SupportsClear
 		{
 			get { return true; }
 		}
 
-		protected virtual bool SupportsRemove
+        /// <summary>
+        /// Gets a value indicating whether the resolver supports removing types.
+        /// </summary>
+        protected virtual bool SupportsRemove
 		{
 			get { return true; }
-		}
-	}
+        }
+
+        #endregion
+    }
 }

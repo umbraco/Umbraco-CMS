@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Resolvers
         public class Resolved4 // not! : Resolved
         { }
 
-        public class ManyResolver : ManyObjectsResolverBase<ManyResolver, Resolved>
+        public sealed class ManyResolver : ManyObjectsResolverBase<ManyResolver, Resolved>
         {
             public ManyResolver()
                 : base()

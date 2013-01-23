@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Linq;
@@ -24,9 +25,7 @@ namespace Umbraco.Core.Macros
 		/// <param name="macroEditors"></param>		
 		internal MacroFieldEditorsResolver(Func<IEnumerable<Type>> macroEditors)
 			: base(macroEditors, ObjectLifetimeScope.Transient)
-		{
-
-		}
+		{ }
 
 		/// <summary>
 		/// Gets the <see cref="IMacroGuiRendering"/> implementations.
