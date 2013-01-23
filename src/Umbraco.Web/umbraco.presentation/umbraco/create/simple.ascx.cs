@@ -1,16 +1,9 @@
+using System;
+using umbraco.BasePages;
+
 namespace umbraco.cms.presentation.create.controls
 {
-	using System;
-	using System.Data;
-	using System.Drawing;
-	using System.Web;
-	using System.Web.UI.WebControls;
-	using System.Web.UI.HtmlControls;
-	using umbraco.cms.helpers;
-	using umbraco.BasePages;
-    using umbraco.BusinessLogic;
-
-	/// <summary>
+    /// <summary>
 	///		Summary description for simple.
 	/// </summary>
 	public partial class simple : System.Web.UI.UserControl
@@ -46,7 +39,10 @@ namespace umbraco.cms.presentation.create.controls
 		{
 			if (Page.IsValid) 
 			{
-				int nodeId = -1;
+				int nodeId;
+			    if (int.TryParse(Request.QueryString["nodeId"], out nodeId) == false)
+			        nodeId = -1;
+
 				if (umbraco.helper.Request("nodeId") != "init")
 					nodeId = int.Parse(umbraco.helper.Request("nodeId"));
 

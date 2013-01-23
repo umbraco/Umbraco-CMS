@@ -40,7 +40,8 @@ namespace Umbraco.Core.Persistence.Repositories
                .RightJoin<PropertyTypeDto>()
                .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
                .InnerJoin<DataTypeDto>()
-               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId);
+               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+               .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
 
             var translator = new SqlTranslator<PropertyType>(sqlClause, query);
             var sql = translator.Translate();
@@ -130,7 +131,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                     //Update the current PropertyType with correct ControlId and DatabaseType
                     var dataTypeDto = Database.FirstOrDefault<DataTypeDto>("WHERE nodeId = @Id", new { Id = propertyTypeDto.DataTypeId });
-                    propertyType.DataTypeControlId = dataTypeDto.ControlId;
+                    propertyType.DataTypeId = dataTypeDto.ControlId;
                     propertyType.DataTypeDatabaseType = dataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true);
                 }
             }
@@ -168,11 +169,19 @@ namespace Umbraco.Core.Persistence.Repositories
             if (((ICanBeDirty)entity).IsPropertyDirty("PropertyGroups") || entity.PropertyGroups.Any(x => x.IsDirty()))
             {
                 //Delete PropertyTypes by excepting entries from db with entries from collections
-                var dbPropertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new { Id = entity.Id }).Select(x => x.Alias);
-                var entityPropertyTypes = entity.PropertyTypes.Select(x => x.Alias);
-                var aliases = dbPropertyTypes.Except(entityPropertyTypes);
+                var dbPropertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new { Id = entity.Id });
+                var dbPropertyTypeAlias = dbPropertyTypes.Select(x => x.Alias.ToLowerInvariant());
+                var entityPropertyTypes = entity.PropertyTypes.Select(x => x.Alias.ToLowerInvariant());
+                var aliases = dbPropertyTypeAlias.Except(entityPropertyTypes);
                 foreach (var alias in aliases)
                 {
+                    //Before a PropertyType can be deleted, all Properties based on that PropertyType should be deleted.
+                    var propertyType = dbPropertyTypes.FirstOrDefault(x => x.Alias.ToLowerInvariant() == alias);
+                    if (propertyType != null)
+                    {
+                        Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new { Id = propertyType.Id });
+                    }
+
                     Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND Alias = @Alias", new { Id = entity.Id, Alias = alias });
                 }
                 //Delete Tabs/Groups by excepting entries from db with entries from collections
@@ -184,7 +193,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     Database.Delete<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id AND text = @Name", new { Id = entity.Id, Name = tabName });
                 }
 
-                //Run through all groups and types to insert or update entries
+                //Run through all groups to insert or update entries
                 foreach (var propertyGroup in entity.PropertyGroups)
                 {
                     var tabDto = propertyFactory.BuildGroupDto(propertyGroup);
@@ -193,19 +202,17 @@ namespace Umbraco.Core.Persistence.Repositories
                                               : Convert.ToInt32(Database.Insert(tabDto));
                     if (!propertyGroup.HasIdentity)
                         propertyGroup.Id = groupPrimaryKey;//Set Id on new PropertyGroup
+                }
 
-                    //This should indicate that neither group nor property types has been touched, but this implies a deeper 'Dirty'-lookup
-                    //if(!propertyGroup.IsDirty()) continue;
-
-                    foreach (var propertyType in propertyGroup.PropertyTypes)
-                    {
-                        var propertyTypeDto = propertyFactory.BuildPropertyTypeDto(propertyGroup.Id, propertyType);
-                        int typePrimaryKey = propertyType.HasIdentity
-                                                 ? Database.Update(propertyTypeDto)
-                                                 : Convert.ToInt32(Database.Insert(propertyTypeDto));
-                        if (!propertyType.HasIdentity)
-                            propertyType.Id = typePrimaryKey;//Set Id on new PropertyType
-                    }
+                //Run through all PropertyTypes to insert or update entries
+                foreach (var propertyType in entity.PropertyTypes)
+                {
+                    var propertyTypeDto = propertyFactory.BuildPropertyTypeDto(propertyType.PropertyGroupId, propertyType);
+                    int typePrimaryKey = propertyType.HasIdentity
+                                             ? Database.Update(propertyTypeDto)
+                                             : Convert.ToInt32(Database.Insert(propertyTypeDto));
+                    if (!propertyType.HasIdentity)
+                        propertyType.Id = typePrimaryKey;//Set Id on new PropertyType
                 }
             }
         }
@@ -226,17 +233,49 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
             sql.Select("*")
                .From<PropertyTypeGroupDto>()
-               .RightJoin<PropertyTypeDto>()
+               .LeftJoin<PropertyTypeDto>()
                .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
-               .InnerJoin<DataTypeDto>()
+               .LeftJoin<DataTypeDto>()
                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
-               .Where<PropertyTypeDto>(x => x.ContentTypeId == id);
+               .Where<PropertyTypeGroupDto>(x => x.ContentTypeNodeId == id)
+               .OrderBy<PropertyTypeGroupDto>(x => x.Id);
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
 
             var propertyFactory = new PropertyGroupFactory(id);
             var propertyGroups = propertyFactory.BuildEntity(dtos);
             return new PropertyGroupCollection(propertyGroups);
+        }
+
+        protected PropertyTypeCollection GetPropertyTypeCollection(int id)
+        {
+            var sql = new Sql();
+            sql.Select("*")
+               .From<PropertyTypeDto>()
+               .InnerJoin<DataTypeDto>()
+               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+               .Where<PropertyTypeDto>(x => x.ContentTypeId == id);
+
+            var dtos = Database.Fetch<PropertyTypeDto, DataTypeDto>(sql);
+
+            //TODO Move this to a PropertyTypeFactory
+            var list = (from dto in dtos
+                        where (dto.PropertyTypeGroupId > 0) == false
+                        select
+                            new PropertyType(dto.DataTypeDto.ControlId,
+                                             dto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
+                                {
+                                    Alias = dto.Alias,
+                                    DataTypeDefinitionId = dto.DataTypeId,
+                                    Description = dto.Description,
+                                    Id = dto.Id,
+                                    Name = dto.Name,
+                                    HelpText = dto.HelpText,
+                                    Mandatory = dto.Mandatory,
+                                    SortOrder = dto.SortOrder
+                                });
+            
+            return new PropertyTypeCollection(list);
         }
     }
 }

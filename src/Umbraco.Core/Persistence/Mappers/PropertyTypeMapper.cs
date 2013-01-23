@@ -29,14 +29,14 @@ namespace Umbraco.Core.Persistence.Mappers
             {
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.Id, dto => dto.Id);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.Alias, dto => dto.Alias);
-                CacheMap<PropertyType, PropertyTypeDto>(src => src.DataTypeId, dto => dto.DataTypeId);
+                CacheMap<PropertyType, PropertyTypeDto>(src => src.DataTypeDefinitionId, dto => dto.DataTypeId);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.Description, dto => dto.Description);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.HelpText, dto => dto.HelpText);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.Mandatory, dto => dto.Mandatory);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.Name, dto => dto.Name);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.SortOrder, dto => dto.SortOrder);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.ValidationRegExp, dto => dto.ValidationRegExp);
-                CacheMap<PropertyType, DataTypeDto>(src => src.DataTypeControlId, dto => dto.ControlId);
+                CacheMap<PropertyType, DataTypeDto>(src => src.DataTypeId, dto => dto.ControlId);
                 CacheMap<PropertyType, DataTypeDto>(src => src.DataTypeDatabaseType, dto => dto.DbType);
             }
         }

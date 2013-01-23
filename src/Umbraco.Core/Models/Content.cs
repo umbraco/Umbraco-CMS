@@ -19,25 +19,28 @@ namespace Umbraco.Core.Models
         private DateTime? _releaseDate;
         private DateTime? _expireDate;
         private int _writer;
-        private string _nodeName;
+        private string _nodeName;//NOTE Once localization is introduced this will be the non-localized Node Name.
 
         /// <summary>
         /// Constructor for creating a Content object
         /// </summary>
-        /// <param name="parentId">Id of the Parent content</param>
+        /// <param name="name">Name of the content</param>
+        /// <param name="parent">Parent <see cref="IContent"/> object</param>
         /// <param name="contentType">ContentType for the current Content object</param>
-        public Content(int parentId, IContentType contentType) 
-			: this(parentId, contentType, new PropertyCollection())
-        {
-        }
-
-		public Content(IContent parent, IContentType contentType)
-			: this(parent, contentType, new PropertyCollection())
+        public Content(string name, IContent parent, IContentType contentType)
+			: this(name, parent, contentType, new PropertyCollection())
 		{			
 		}
 
-		public Content(IContent parent, IContentType contentType, PropertyCollection properties)
-			: base(parent, contentType, properties)
+        /// <summary>
+        /// Constructor for creating a Content object
+        /// </summary>
+        /// <param name="name">Name of the content</param>
+        /// <param name="parent">Parent <see cref="IContent"/> object</param>
+        /// <param name="contentType">ContentType for the current Content object</param>
+        /// <param name="properties">Collection of properties</param>
+		public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties)
+			: base(name, parent, contentType, properties)
 		{
 			Mandate.ParameterNotNull(contentType, "contentType");
 
@@ -47,11 +50,23 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Constructor for creating a Content object
         /// </summary>
+        /// <param name="name">Name of the content</param>
+        /// <param name="parentId">Id of the Parent content</param>
+        /// <param name="contentType">ContentType for the current Content object</param>
+        public Content(string name, int parentId, IContentType contentType)
+            : this(name, parentId, contentType, new PropertyCollection())
+        {
+        }
+
+        /// <summary>
+        /// Constructor for creating a Content object
+        /// </summary>
+        /// <param name="name">Name of the content</param>
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
-        public Content(int parentId, IContentType contentType, PropertyCollection properties) 
-			: base(parentId, contentType, properties)
+        public Content(string name, int parentId, IContentType contentType, PropertyCollection properties) 
+			: base(name, parentId, contentType, properties)
         {
             Mandate.ParameterNotNull(contentType, "contentType");
 
@@ -189,6 +204,12 @@ namespace Umbraco.Core.Models
             }
         }
 
+        /// <summary>
+        /// Name of the Node (non-localized).
+        /// </summary>
+        /// <remarks>
+        /// This Property is kept internal until localization is introduced.
+        /// </remarks>
         internal string NodeName
         {
             get { return _nodeName; }
@@ -246,20 +267,20 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Changes the Published state of the content object
         /// </summary>
-        /// <param name="isPublished">Boolean indicating whether content is published (true) or unpublished (false)</param>
-        public void ChangePublishedState(bool isPublished)
+        public void ChangePublishedState(PublishedState state)
         {
-            Published = isPublished;
-            //NOTE Should this be checked against the Expire/Release dates?
-            //TODO possibly create new (unpublished version)?
+            Published = state == PublishedState.Published;
+            PublishedState = state;
         }
+
+        internal PublishedState PublishedState { get; set; }
 
         /// <summary>
         /// Changes the Trashed state of the content object
         /// </summary>
         /// <param name="isTrashed">Boolean indicating whether content is trashed (true) or not trashed (false)</param>
         /// <param name="parentId"> </param>
-        public void ChangeTrashedState(bool isTrashed, int parentId = -1)
+        public override void ChangeTrashedState(bool isTrashed, int parentId = -1)
         {
             Trashed = isTrashed;
 
@@ -276,7 +297,7 @@ namespace Umbraco.Core.Models
             //If the content is trashed and is published it should be marked as unpublished
             if (isTrashed && Published)
             {
-                ChangePublishedState(false);
+                ChangePublishedState(PublishedState.Unpublished);
             }
         }
 

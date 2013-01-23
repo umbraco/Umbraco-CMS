@@ -41,7 +41,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(GetBaseWhereClause(), new { Id = id });
             sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dto = Database.Query<ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -145,7 +145,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
             sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dto = Database.Query<ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -240,11 +240,14 @@ namespace Umbraco.Core.Persistence.Repositories
             //Updates Modified date
             ((Models.Media)entity).UpdatingEntity();
 
-            //Look up parent to get and set the correct Path if ParentId has changed
+            //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
             if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
             {
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
+                entity.Level = parent.Level + 1;
+                var maxSortOrder = Database.ExecuteScalar<int>("SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId", new { ParentId = entity.ParentId });
+                entity.SortOrder = maxSortOrder;
             }
 
             var factory = new MediaFactory(NodeObjectTypeId, entity.Id);
@@ -307,7 +310,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Loop through properties to check if the media item contains images/file that should be deleted
             foreach (var property in entity.Properties)
             {
-                if (property.PropertyType.DataTypeControlId == uploadFieldId &&
+                if (property.PropertyType.DataTypeId == uploadFieldId &&
                     string.IsNullOrEmpty(property.Value.ToString()) == false
                     && fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
                 {

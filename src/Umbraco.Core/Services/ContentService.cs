@@ -59,15 +59,16 @@ namespace Umbraco.Core.Services
             _repositoryFactory = repositoryFactory;
 		}
 
-		/// <summary>
-		/// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
-		/// that this Content is based on.
-		/// </summary>
-		/// <param name="parentId">Id of Parent for the new Content</param>
-		/// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
-		/// <param name="userId">Optional id of the user creating the content</param>
-		/// <returns><see cref="IContent"/></returns>
-		public IContent CreateContent(int parentId, string contentTypeAlias, int userId = -1)
+	    /// <summary>
+	    /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+	    /// that this Content is based on.
+	    /// </summary>
+        /// <param name="name">Name of the Content object</param>
+	    /// <param name="parentId">Id of Parent for the new Content</param>
+	    /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+	    /// <param name="userId">Optional id of the user creating the content</param>
+	    /// <returns><see cref="IContent"/></returns>
+	    public IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = -1)
 		{
 		    IContentType contentType = null;
             IContent content = null;
@@ -89,7 +90,7 @@ namespace Umbraco.Core.Services
 		                                              contentTypeAlias));
 		    }
 
-            content = new Content(parentId, contentType);
+            content = new Content(name, parentId, contentType);
 
 			if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
 				return content;
@@ -652,7 +653,7 @@ namespace Umbraco.Core.Services
 
 				//Only change the publish state if the "previous" version was actually published
 				if (content.Published)
-					content.ChangePublishedState(false);
+                    content.ChangePublishedState(PublishedState.Saved);
 
 				repository.AddOrUpdate(content);
 				uow.Commit();
@@ -690,7 +691,7 @@ namespace Umbraco.Core.Services
 
 						//Only change the publish state if the "previous" version was actually published
 						if (content.Published)
-							content.ChangePublishedState(false);
+                            content.ChangePublishedState(PublishedState.Saved);
 
 						repository.AddOrUpdate(content);
 						uow.Commit();
@@ -893,52 +894,76 @@ namespace Umbraco.Core.Services
 	    }
 
 	    /// <summary>
-		/// Moves an <see cref="IContent"/> object to a new location by changing its parent id.
-		/// </summary>
-		/// <remarks>
-		/// If the <see cref="IContent"/> object is already published it will be
-		/// published after being moved to its new location. Otherwise it'll just
-		/// be saved with a new parent id.
-		/// </remarks>
-		/// <param name="content">The <see cref="IContent"/> to move</param>
-		/// <param name="parentId">Id of the Content's new Parent</param>
-		/// <param name="userId">Optional Id of the User moving the Content</param>
-		public void Move(IContent content, int parentId, int userId = -1)
-		{
-            //TODO Verify that SortOrder + Path is updated correctly
-            //TODO Add a check to see if parentId = -20 because then we should change the TrashState
-			
-			if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, parentId), this)) 
-				return;
-			
-			SetWriter(content, userId);
+	    /// Moves an <see cref="IContent"/> object to a new location by changing its parent id.
+	    /// </summary>
+	    /// <remarks>
+	    /// If the <see cref="IContent"/> object is already published it will be
+	    /// published after being moved to its new location. Otherwise it'll just
+	    /// be saved with a new parent id.
+	    /// </remarks>
+	    /// <param name="content">The <see cref="IContent"/> to move</param>
+	    /// <param name="parentId">Id of the Content's new Parent</param>
+	    /// <param name="userId">Optional Id of the User moving the Content</param>
+	    public void Move(IContent content, int parentId, int userId = -1)
+	    {
+	        //This ensures that the correct method is called if this method is used to Move to recycle bin.
+	        if (parentId == -20)
+	        {
+	            MoveToRecycleBin(content, userId);
+	            return;
+	        }
 
-			//If Content is being moved away from Recycle Bin, its state should be un-trashed
-			if (content.Trashed && parentId != -20)
-			{
-				content.ChangeTrashedState(false, parentId);
-			}
-			else
-			{
-				content.ParentId = parentId;
-			}
+	        if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, parentId), this))
+	            return;
 
-			//If Content is published, it should be (re)published from its new location
-			if (content.Published)
-			{
-				SaveAndPublish(content, userId);
-			}
-			else
-			{
-				Save(content, userId);
-			}
+	        SetWriter(content, userId);
 
-			Moved.RaiseEvent(new MoveEventArgs<IContent>(content, false, parentId), this);
+	        //If Content is being moved away from Recycle Bin, its state should be un-trashed
+	        if (content.Trashed && parentId != -20)
+	        {
+	            content.ChangeTrashedState(false, parentId);
+	        }
+	        else
+	        {
+	            content.ParentId = parentId;
+	        }
+
+	        //If Content is published, it should be (re)published from its new location
+	        if (content.Published)
+	        {
+	            SaveAndPublish(content, userId);
+	        }
+	        else
+	        {
+	            Save(content, userId);
+	        }
+
+	        //Ensure that Path and Level is updated on children
+	        var children = GetChildren(content.Id);
+	        if (children.Any())
+	        {
+	            var parentPath = content.Path;
+	            var parentLevel = content.Level;
+	            var updatedDescendents = UpdatePathAndLevelOnChildren(children, parentPath, parentLevel);
+
+                //collection of descendents that needs to be saved and published
+                var descendentsToSaveAndPublish = updatedDescendents.Where(x => x.Published);
+	            foreach (var c in descendentsToSaveAndPublish)
+	            {
+	                SaveAndPublish(c, userId);
+	            }
+
+                //collection of descendents that only needs to be saved
+                var descendentsToSave = updatedDescendents.Where(x => x.Published == false);
+	            Save(descendentsToSave, userId);
+	        }
+
+	        Moved.RaiseEvent(new MoveEventArgs<IContent>(content, false, parentId), this);
 
 			Audit.Add(AuditTypes.Move, "Move Content performed by user", userId == -1 ? 0 : userId, content.Id);
 		}
 
-		/// <summary>
+        /// <summary>
 		/// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
 		/// </summary>
 		public void EmptyRecycleBin()
@@ -996,13 +1021,13 @@ namespace Umbraco.Core.Services
 				uow.Commit();
 
 				var uploadFieldId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
-				if (content.Properties.Any(x => x.PropertyType.DataTypeControlId == uploadFieldId))
+				if (content.Properties.Any(x => x.PropertyType.DataTypeId == uploadFieldId))
 				{
 					bool isUpdated = false;
 					var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
 					//Loop through properties to check if the content contains media that should be deleted
-					foreach (var property in content.Properties.Where(x => x.PropertyType.DataTypeControlId == uploadFieldId
+					foreach (var property in content.Properties.Where(x => x.PropertyType.DataTypeId == uploadFieldId
 						&& string.IsNullOrEmpty(x.Value.ToString()) == false))
 					{
 						if (fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
@@ -1189,12 +1214,38 @@ namespace Umbraco.Core.Services
                 if (checkCurrent == false && id == content.Id) continue;
 
                 //Check if the content for the current id is published - escape the loop if we encounter content that isn't published
-                var hasPublishedVersion = ApplicationContext.Current.Services.ContentService.GetById(id).Published;
+                var hasPublishedVersion = HasPublishedVersion(id);
                 if (hasPublishedVersion == false)
                     return false;
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Updates the Path and Level on a collection of <see cref="IContent"/> objects
+        /// based on the Parent's Path and Level.
+        /// </summary>
+        /// <param name="children">Collection of <see cref="IContent"/> objects to update</param>
+        /// <param name="parentPath">Path of the Parent content</param>
+        /// <param name="parentLevel">Level of the Parent content</param>
+        /// <returns>Collection of updated <see cref="IContent"/> objects</returns>
+        private List<IContent> UpdatePathAndLevelOnChildren(IEnumerable<IContent> children, string parentPath, int parentLevel)
+        {
+            var list = new List<IContent>();
+            foreach (var child in children)
+            {
+                child.Path = string.Concat(parentPath, ",", child.Id);
+                child.Level = parentLevel + 1;
+                list.Add(child);
+
+                var grandkids = GetChildren(child.Id);
+                if (grandkids.Any())
+                {
+                    list.AddRange(UpdatePathAndLevelOnChildren(grandkids, child.Path, child.Level));
+                }
+            }
+            return list;
         }
 
 		/// <summary>

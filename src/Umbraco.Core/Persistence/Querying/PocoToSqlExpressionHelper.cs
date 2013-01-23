@@ -159,12 +159,11 @@ namespace Umbraco.Core.Persistence.Querying
                 return field;
             }
 
-            if (m.Expression != null && m.Expression.NodeType != ExpressionType.Constant)
+            if (m.Expression != null && m.Expression.NodeType == ExpressionType.Convert)
             {
                 string field = GetFieldName(pd, m.Member.Name);
                 return field;
             }
-
 
             var member = Expression.Convert(m, typeof(object));
             var lambda = Expression.Lambda<Func<object>>(member);

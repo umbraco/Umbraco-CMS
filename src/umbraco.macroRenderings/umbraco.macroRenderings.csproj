@@ -88,7 +88,7 @@
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
     <DefineConstants>TRACE</DefineConstants>
-    <DocumentationFile>bin\Release\umbraco.macroRenderings.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\umbraco.macroRenderings.xml</DocumentationFile>
     <DebugSymbols>false</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <NoStdLib>false</NoStdLib>

@@ -13,6 +13,13 @@ namespace Umbraco.Tests.IO
     public class IOHelperTest
     {
 
+		[Test]
+		public void IOHelper_ResolveUrl()
+		{
+			var result = IOHelper.ResolveUrl("~/Scripts");
+			Assert.AreEqual("/Scripts", result);
+		}
+
         /// <summary>
         ///A test for MapPath verifying that HttpContext method (which includes vdirs) matches non-HttpContext method
         ///</summary>

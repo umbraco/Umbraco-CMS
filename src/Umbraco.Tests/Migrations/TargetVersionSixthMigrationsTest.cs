@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
+using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
@@ -18,38 +21,38 @@ namespace Umbraco.Tests.Migrations
         {
             TestHelper.SetupLog4NetForTests();
 
-            //this ensures its reset
-            PluginManager.Current = new PluginManager(false);
+			MigrationResolver.Current = new MigrationResolver(new List<Type>
+				{
+					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints),
+					typeof (DeleteAppTables),
+					typeof (EnsureAppsTreesUpdated),
+					typeof (MoveMasterContentTypeData),
+					typeof (NewCmsContentType2ContentTypeTable),
+					typeof (RemoveMasterContentTypeColumn),
+					typeof (RenameCmsTabTable),
+					typeof (RenameTabIdColumn),
+					typeof (UpdateCmsContentTypeAllowedContentTypeTable),
+					typeof (UpdateCmsContentTypeTable),
+					typeof (UpdateCmsContentVersionTable),
+					typeof (UpdateCmsPropertyTypeGroupTable)
+				});
 
-            //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-            PluginManager.Current.AssembliesToScan = new[]
-                                                         {
-                                                             typeof (MigrationRunner).Assembly
-                                                         };
+			Resolution.Freeze();
 
             SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
         }
-
-        [Test]
-        public void Can_Find_Migrations_In_Current_Assembly()
-        {
-            var foundTypes = PluginManager.Current.ResolveMigrationTypes();
-
-            Assert.That(foundTypes.Any(), Is.True);
-            Assert.That(foundTypes.Count(), Is.GreaterThanOrEqualTo(11));
-        }
-
+		
         [Test]
         public void Can_Find_Targetted_Migrations()
         {
             var configuredVersion = new Version("4.11.0");
             var targetVersion = new Version("6.0.0");
-            var foundMigrations = PluginManager.Current.FindMigrations();
+	        var foundMigrations = MigrationResolver.Current.Migrations;
 
             var migrationRunner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
             var migrations = migrationRunner.OrderedUpgradeMigrations(foundMigrations);
 
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE);
+            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null);
             foreach (MigrationBase migration in migrations)
             {
                 migration.GetUpExpressions(context);
@@ -66,7 +69,8 @@ namespace Umbraco.Tests.Migrations
         [TearDown]
         public void TearDown()
         {
-            PluginManager.Current = null;
+            MigrationResolver.Reset();
+			Resolution.IsFrozen = false;
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Data.Common;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Persistence
 {
@@ -14,10 +15,7 @@ namespace Umbraco.Core.Persistence
 	/// </remarks>
 	public class UmbracoDatabase : Database
 	{
-
-
-
-		private readonly Guid _instanceId = Guid.NewGuid();
+        private readonly Guid _instanceId = Guid.NewGuid();
 		/// <summary>
 		/// Used for testing
 		/// </summary>
@@ -41,5 +39,11 @@ namespace Umbraco.Core.Persistence
 		public UmbracoDatabase(string connectionStringName) : base(connectionStringName)
 		{
 		}
+
+        public override void OnException(Exception x)
+        {
+            LogHelper.Info<UmbracoDatabase>(x.StackTrace);
+            base.OnException(x);
+        }
 	}
 }

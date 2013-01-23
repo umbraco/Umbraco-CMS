@@ -39,7 +39,7 @@ namespace Umbraco.Tests.BusinessLogic
         private void ClearDatabase()
         {
             var databaseSettings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
-            var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString) as SqlCEHelper;
+            var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false) as SqlCEHelper;
 			
             if (dataHelper == null)
                 throw new InvalidOperationException("The sql helper for unit tests must be of type SqlCEHelper, check the ensure the connection string used for this test is set to use SQLCE");
@@ -57,7 +57,7 @@ namespace Umbraco.Tests.BusinessLogic
             AppDomain.CurrentDomain.SetData("DataDirectory", TestHelper.CurrentAssemblyDirectory);
 
             var databaseSettings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
-            var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString) as SqlCEHelper;
+            var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false) as SqlCEHelper;
 			
             var installer = dataHelper.Utility.CreateInstaller();
             if (installer.CanConnect)

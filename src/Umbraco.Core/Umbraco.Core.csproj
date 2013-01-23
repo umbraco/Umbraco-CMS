@@ -31,6 +31,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Umbraco.Core.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
@@ -118,6 +119,7 @@
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
     <Compile Include="Dynamics\DynamicInstanceHelper.cs" />
+    <Compile Include="Dynamics\DynamicXmlConverter.cs" />
     <Compile Include="Events\CancellableEventArgs.cs" />
     <Compile Include="Events\ContentCacheEventArgs.cs" />
     <Compile Include="Events\CopyEventArgs.cs" />
@@ -125,6 +127,7 @@
     <Compile Include="Events\CancellableObjectEventArgs.cs" />
     <Compile Include="Events\DeleteRevisionsEventArgs.cs" />
     <Compile Include="Events\EventExtensions.cs" />
+    <Compile Include="Events\MigrationEventArgs.cs" />
     <Compile Include="Events\PublishEventArgs.cs" />
     <Compile Include="Events\TypedEventHandler.cs" />
     <Compile Include="Events\MoveEventArgs.cs" />
@@ -181,6 +184,7 @@
     <Compile Include="Models\PropertyExtensions.cs" />
     <Compile Include="Models\PropertyTypeExtensions.cs" />
     <Compile Include="Models\PublishedItemType.cs" />
+    <Compile Include="Models\PublishedState.cs" />
     <Compile Include="Models\Rdbms\ContentType2ContentTypeDto.cs" />
     <Compile Include="Models\Rdbms\PropertyTypeGroupDto.cs" />
     <Compile Include="Models\Relation.cs" />
@@ -265,8 +269,8 @@
     <Compile Include="Persistence\Migrations\MigrationBase.cs" />
     <Compile Include="Persistence\Migrations\MigrationContext.cs" />
     <Compile Include="Persistence\Migrations\MigrationExpressionBase.cs" />
+    <Compile Include="Persistence\Migrations\MigrationResolver.cs" />
     <Compile Include="Persistence\Migrations\MigrationRunner.cs" />
-    <Compile Include="Persistence\Migrations\PluginManagerExtension.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Alter\AlterSyntaxBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Alter\Column\AlterColumnBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Alter\Column\IAlterColumnOptionForeignKeyCascadeSyntax.cs" />
@@ -372,18 +376,18 @@
     <Compile Include="Persistence\Migrations\Syntax\Update\IUpdateWhereSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Update\UpdateBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Update\UpdateDataBuilder.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourEightZero\RemoveUmbracoAppConstraints.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixth\DeleteAppTables.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixth\EnsureAppsTreesUpdated.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixth\MoveMasterContentTypeData.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixth\NewCmsContentType2ContentTypeTable.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixth\RemoveMasterContentTypeColumn.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixth\RenameTabIdColumn.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixth\UpdateCmsContentTypeAllowedContentTypeTable.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixth\UpdateCmsContentTypeTable.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixth\UpdateCmsContentVersionTable.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixth\UpdateCmsPropertyTypeGroupTable.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixth\RenameCmsTabTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourNineZero\RemoveUmbracoAppConstraints.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\DeleteAppTables.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\EnsureAppsTreesUpdated.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\MoveMasterContentTypeData.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\NewCmsContentType2ContentTypeTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\RemoveMasterContentTypeColumn.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\RenameTabIdColumn.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\UpdateCmsContentTypeAllowedContentTypeTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\UpdateCmsContentTypeTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\UpdateCmsContentVersionTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\UpdateCmsPropertyTypeGroupTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\RenameCmsTabTable.cs" />
     <Compile Include="Persistence\PetaPocoExtensions.cs" />
     <Compile Include="Persistence\PetaPocoSqlExtensions.cs" />
     <Compile Include="Persistence\Querying\PocoToSqlExpressionHelper.cs" />

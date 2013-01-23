@@ -15,7 +15,7 @@
                 Umbraco.Dialogs.EditMacro.getInstance().init({
                     useAspNetMasterPages: <%=umbraco.UmbracoSettings.UseAspNetMasterPages.ToString().ToLower() %>,
                     codeEditorElementId: "<%=Request.GetItemAsString("objectId")%>",
-                    renderingEngine: "<%=Request.GetItemAsString("renderingEngine")%>",
+                    renderingEngine: "<%=Request.GetItemAsString("renderingEngine", "Mvc")%>",
                     macroAlias: '<%= _macroAlias %>'
                 });
             });
@@ -35,6 +35,19 @@
             <em>or </em>
             <a data-bind="click: cancelModal" ><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
         </p>
+        
+        <script type="text/javascript">
+            (function($) {
+                //when this panel loads, check if there are any macro properties, if not then load the macro content into the editor and close the modal
+                $(document).ready(function() {
+                    var countOfProperties = <%=CountOfMacroProperties %>;
+                    if (countOfProperties == 0) {
+                        Umbraco.Dialogs.EditMacro.getInstance().updateMacro();
+                    }
+                });
+            })(jQuery);
+        </script>
+
     </asp:Panel>
     <asp:Panel ID="pl_insert" runat="server">
         <cc2:Pane ID="pane_insert" runat="server">

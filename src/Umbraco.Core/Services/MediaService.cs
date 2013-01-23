@@ -44,11 +44,12 @@ namespace Umbraco.Core.Services
 	    /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
 	    /// that this Media is based on.
 	    /// </summary>
+        /// <param name="name">Name of the Media object</param>
 	    /// <param name="parentId">Id of Parent for the new Media item</param>
 	    /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
 	    /// <param name="userId">Optional id of the user creating the media item</param>
 	    /// <returns><see cref="IMedia"/></returns>
-	    public IMedia CreateMedia(int parentId, string mediaTypeAlias, int userId = -1)
+	    public IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = -1)
 	    {
 	        IMediaType mediaType = null;
 	        var uow = _uowProvider.GetUnitOfWork();
@@ -68,7 +69,7 @@ namespace Umbraco.Core.Services
 	                                                  mediaTypeAlias));
 	        }
 
-	        var media = new Models.Media(parentId, mediaType);
+	        var media = new Models.Media(name, parentId, mediaType);
 
 			if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this))
 				return media;
@@ -262,11 +263,28 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Id of the User moving the Media</param>
 		public void Move(IMedia media, int parentId, int userId = -1)
 		{
+            //This ensures that the correct method is called if this method is used to Move to recycle bin.
+            if (parentId == -21)
+            {
+                MoveToRecycleBin(media, userId);
+                return;
+            }
+
 			if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, parentId), this))
 				return;
 
 			media.ParentId = parentId;
 			Save(media, userId);
+
+            //Ensure that Path and Level is updated on children
+            var children = GetChildren(media.Id);
+            if (children.Any())
+            {
+                var parentPath = media.Path;
+                var parentLevel = media.Level;
+                var updatedDescendents = UpdatePathAndLevelOnChildren(children, parentPath, parentLevel);
+                Save(updatedDescendents, userId);
+            }
 
 			Moved.RaiseEvent(new MoveEventArgs<IMedia>(media, false, parentId), this);
 
@@ -280,14 +298,20 @@ namespace Umbraco.Core.Services
 	    /// <param name="userId">Id of the User deleting the Media</param>
 	    public void MoveToRecycleBin(IMedia media, int userId = -1)
 	    {
-	        //TODO If media item has children those should also be moved to the recycle bin as well
-			if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, -21), this))
+	        if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, -21), this))
 				return;
+
+            //Move children to Recycle Bin before the 'possible parent' is moved there
+            var children = GetChildren(media.Id);
+            foreach (var child in children)
+            {
+                MoveToRecycleBin(child, userId);
+            }
 
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 			{
-				((Core.Models.Media)media).ChangeTrashedState(true);
+				media.ChangeTrashedState(true);
 				repository.AddOrUpdate(media);
 				uow.Commit();
 			}
@@ -498,6 +522,32 @@ namespace Umbraco.Core.Services
 		{
 			_httpContext = httpContext;
 		}
+
+        /// <summary>
+        /// Updates the Path and Level on a collection of <see cref="IMedia"/> objects
+        /// based on the Parent's Path and Level.
+        /// </summary>
+        /// <param name="children">Collection of <see cref="IMedia"/> objects to update</param>
+        /// <param name="parentPath">Path of the Parent media</param>
+        /// <param name="parentLevel">Level of the Parent media</param>
+        /// <returns>Collection of updated <see cref="IMedia"/> objects</returns>
+        private List<IMedia> UpdatePathAndLevelOnChildren(IEnumerable<IMedia> children, string parentPath, int parentLevel)
+        {
+            var list = new List<IMedia>();
+            foreach (var child in children)
+            {
+                child.Path = string.Concat(parentPath, ",", child.Id);
+                child.Level = parentLevel + 1;
+                list.Add(child);
+
+                var grandkids = GetChildren(child.Id);
+                if (grandkids.Any())
+                {
+                    list.AddRange(UpdatePathAndLevelOnChildren(grandkids, child.Path, child.Level));
+                }
+            }
+            return list;
+        }
 
 		/// <summary>
 		/// Updates a media object with the User (id), who created the content.

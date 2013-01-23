@@ -74,16 +74,20 @@
         _getMacroSyntaxMvc: function() {
             /// <summary>Return the macro syntax to insert for MVC</summary>
 
-            var macroString = "@Umbraco.RenderMacro(\"" + this._opts.macroAlias + "\", new {";
-
-            for (var i = 0; i < this._macroAliases.length; i++) {
-                macroString += this._getMacroParameter(this._macroAliases[i]);
-                if (i < this._macroAliases.length - 1) {
-                    macroString += ", ";
-                }
+            var macroString = "@Umbraco.RenderMacro(\"" + this._opts.macroAlias + "\"";
+            
+            if (this._macroAliases.length > 0) {
+                macroString += ", new {";                
+                for (var i = 0; i < this._macroAliases.length; i++) {
+                    macroString += this._getMacroParameter(this._macroAliases[i]);
+                    if (i < this._macroAliases.length - 1) {
+                        macroString += ", ";
+                    }
+                }                
+                macroString += "}";
             }
-
-            macroString += "});";
+            
+            macroString += ")";            
             return macroString;
         },
 
@@ -130,8 +134,9 @@
             /// <summary>Initializes the class and any UI bindings</summary>
 
             // Merge options with default
-            this._opts = $.extend({
+            this._opts = $.extend({                
                 // Default options go here
+                renderingEngine: "Mvc"
             }, opts);
 
             var self = this;
@@ -152,8 +157,8 @@
         updateMacro: function () {
 
             var macroSyntax = null;
-            //if it is Mvc or empty, then use Mvc
-            if (this._opts.renderingEngine == "Mvc" || this._opts.renderingEngine == "") {
+            
+            if (this._opts.renderingEngine == "Mvc") {
                 macroSyntax = this._getMacroSyntaxMvc();
             }
             else {

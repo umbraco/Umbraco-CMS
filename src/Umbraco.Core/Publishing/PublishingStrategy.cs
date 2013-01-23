@@ -54,7 +54,7 @@ namespace Umbraco.Core.Publishing
                 return false;
             }
 
-            content.ChangePublishedState(true);
+            content.ChangePublishedState(PublishedState.Published);
 
             LogHelper.Info<PublishingStrategy>(
                 string.Format("Content '{0}' with Id '{1}' has been published.",
@@ -106,7 +106,7 @@ namespace Umbraco.Core.Publishing
                     continue;
                 }
 
-                item.ChangePublishedState(true);
+                item.ChangePublishedState(PublishedState.Published);
 
                 LogHelper.Info<PublishingStrategy>(
                     string.Format("Content '{0}' with Id '{1}' has been published.",
@@ -138,8 +138,8 @@ namespace Umbraco.Core.Publishing
                         "Content '{0}' with Id '{1}' had its release date removed, because it was unpublished.",
                         content.Name, content.Id));
             }
-
-            content.ChangePublishedState(false);
+            
+            content.ChangePublishedState(PublishedState.Unpublished);
 
             LogHelper.Info<PublishingStrategy>(
                 string.Format("Content '{0}' with Id '{1}' has been unpublished.",
@@ -173,7 +173,7 @@ namespace Umbraco.Core.Publishing
                                       item.Name, item.Id));
                 }
 
-                item.ChangePublishedState(false);
+                item.ChangePublishedState(PublishedState.Unpublished);
 
                 LogHelper.Info<PublishingStrategy>(
                     string.Format("Content '{0}' with Id '{1}' has been unpublished.",

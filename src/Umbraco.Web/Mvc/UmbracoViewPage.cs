@@ -93,5 +93,24 @@ namespace Umbraco.Web.Mvc
 			get { return _helper ?? (_helper = new UmbracoHelper(UmbracoContext)); }
 		}
 
+		/// <summary>
+		/// Ensure that the current view context is added to the route data tokens so we can extract it if we like
+		/// </summary>
+		/// <remarks>
+		/// Currently this is required by mvc macro engines
+		/// </remarks>
+		protected override void InitializePage()
+		{
+			base.InitializePage();
+			if (!ViewContext.IsChildAction)
+			{
+				if (!ViewContext.RouteData.DataTokens.ContainsKey(Constants.DataTokenCurrentViewContext))
+				{
+					ViewContext.RouteData.DataTokens.Add(Constants.DataTokenCurrentViewContext, this.ViewContext);		
+				}
+			}
+			
+		}
+
 	}
 }

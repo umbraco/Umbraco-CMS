@@ -424,7 +424,14 @@ namespace Umbraco.Core.Persistence
 				}
 				else if (t == typeof(string))
 				{
-					p.Size = Math.Max((item as string).Length + 1, 4000);		// Help query plan caching by using common size
+                    // out of memory exception occurs if trying to save more than 4000 characters to SQL Server CE NText column. Set before attempting to set Size, or Size will always max out at 4000
+                    if ((item as string).Length + 1 > 4000 && p.GetType().Name == "SqlCeParameter")
+                        p.GetType().GetProperty("SqlDbType").SetValue(p, SqlDbType.NText, null); 
+
+                    p.Size = (item as string).Length + 1;
+                    if(p.Size < 4000)
+                        p.Size = Math.Max((item as string).Length + 1, 4000);		// Help query plan caching by using common size
+
 					p.Value = item;
 				}
 				else if (t == typeof(AnsiString))

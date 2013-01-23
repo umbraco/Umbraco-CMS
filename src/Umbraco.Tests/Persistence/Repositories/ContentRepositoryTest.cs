@@ -167,8 +167,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
 
             var contentType = contentTypeRepository.Get(1045);
-            var content = new Content(1048, contentType);
-            content.Name = "Textpage 2 Child Node";
+            var content = new Content("Textpage 2 Child Node", 1048, contentType);
             content.CreatorId = 0;
             content.WriterId = 0;
 

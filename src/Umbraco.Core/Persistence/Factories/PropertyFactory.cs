@@ -32,13 +32,19 @@ namespace Umbraco.Core.Persistence.Factories
         public IEnumerable<Property> BuildEntity(IEnumerable<PropertyDataDto> dtos)
         {
             var properties = new List<Property>();
+
             foreach (var dto in dtos)
             {
-                var propertyType = _contentType.CompositionPropertyTypes.FirstOrDefault(x => x.Id == dto.PropertyTypeId);
-                var property = propertyType.CreatePropertyFromRawValue(dto.GetValue, dto.VersionId.Value, dto.Id);
-                property.ResetDirtyProperties();
-                properties.Add(property);
+                if (_contentType.CompositionPropertyTypes.Any(x => x.Id == dto.PropertyTypeId))
+                {
+                    var propertyType = _contentType.CompositionPropertyTypes.First(x => x.Id == dto.PropertyTypeId);
+                    var property = propertyType.CreatePropertyFromRawValue(dto.GetValue, dto.VersionId.Value, dto.Id);
+
+                    property.ResetDirtyProperties();
+                    properties.Add(property);
+                }
             }
+
             return properties;
         }
 
@@ -95,10 +101,14 @@ namespace Umbraco.Core.Persistence.Factories
             var properties = new List<Property>();
             foreach (var dto in dtos)
             {
-                var propertyType = _mediaType.PropertyTypes.FirstOrDefault(x => x.Id == dto.PropertyTypeId);
-                var property = propertyType.CreatePropertyFromRawValue(dto.GetValue, dto.VersionId.Value, dto.Id);
-                property.ResetDirtyProperties();
-                properties.Add(property);
+                if (_mediaType.CompositionPropertyTypes.Any(x => x.Id == dto.PropertyTypeId))
+                {
+                    var propertyType = _mediaType.CompositionPropertyTypes.First(x => x.Id == dto.PropertyTypeId);
+                    var property = propertyType.CreatePropertyFromRawValue(dto.GetValue, dto.VersionId.Value, dto.Id);
+
+                    property.ResetDirtyProperties();
+                    properties.Add(property);
+                }
             }
             return properties;
         }

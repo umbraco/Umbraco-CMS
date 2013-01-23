@@ -14,6 +14,9 @@
 
         public override string ToString()
         {
+            if (IsExpressionSupported() == false)
+                return string.Empty;
+
             return SqlStatement;
         }
     }

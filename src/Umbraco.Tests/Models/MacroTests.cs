@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Models
             // Arrange
             var serviceStackSerializer = new ServiceStackJsonSerializer();
             var serializationService = new SerializationService(serviceStackSerializer);
-            var fileSystem = FileSystemProviderManager.Current.GetFileSystemProvider("macros");
+	        var fileSystem = new PhysicalFileSystem("~/App_Data/Macros");
 
             var macro = new Macro
                             {
@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Models
             // Arrange
             var serviceStackSerializer = new ServiceStackJsonSerializer();
             var serializationService = new SerializationService(serviceStackSerializer);
-            var fileSystem = FileSystemProviderManager.Current.GetFileSystemProvider("macros");
+			var fileSystem = new PhysicalFileSystem("~/App_Data/Macros");
 
             var macro = new Macro
                             {

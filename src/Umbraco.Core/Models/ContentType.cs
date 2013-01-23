@@ -72,6 +72,12 @@ namespace Umbraco.Core.Models
         /// <param name="template">Default <see cref="ITemplate"/></param>
         public void SetDefaultTemplate(ITemplate template)
         {
+            if (template == null)
+            {
+                DefaultTemplateId = 0;
+                return;
+            }
+
             DefaultTemplateId = template.Id;
             if(_allowedTemplates.Any(x => x != null && x.Id == template.Id) == false)
             {

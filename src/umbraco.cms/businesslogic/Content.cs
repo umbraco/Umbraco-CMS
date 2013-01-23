@@ -26,7 +26,7 @@ namespace umbraco.cms.businesslogic
     /// Note that Content data in umbraco is *not* tablular but in a treestructure.
     /// 
     /// </summary>
-    [Obsolete("Deprecated, Use Umbraco.Core.Models.Content or Umbraco.Core.Models.Media", false)]
+    [Obsolete("Obsolete, Use Umbraco.Core.Models.Content or Umbraco.Core.Models.Media", false)]
     public class Content : CMSNode
     {
         #region Private Members
@@ -70,7 +70,7 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         /// <param name="ct">The ContentType</param>
         /// <returns>A list of Content objects sharing the ContentType defined.</returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.GetContentOfContentType() or Umbraco.Core.Services.MediaService.GetMediaOfMediaType()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetContentOfContentType() or Umbraco.Core.Services.MediaService.GetMediaOfMediaType()", false)]
         public static Content[] getContentOfContentType(ContentType ct)
         {
             var list = new List<Content>();
@@ -88,7 +88,7 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         /// <param name="version">The version identifier</param>
         /// <returns>The Content object from the given version</returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.ContentService.GetByIdVersion() or Umbraco.Core.Services.MediaService.GetByIdVersion()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetByIdVersion() or Umbraco.Core.Services.MediaService.GetByIdVersion()", false)]
         public static Content GetContentFromVersion(Guid version)
         {
             var content = ApplicationContext.Current.Services.ContentService.GetByVersion(version);
@@ -284,8 +284,7 @@ namespace umbraco.cms.businesslogic
         {
             EnsureProperties();
 
-            var prop = m_LoadedProperties.SingleOrDefault(x => x.PropertyType.Alias == alias);
-            return prop;
+            return m_LoadedProperties.SingleOrDefault(x => x.PropertyType.Alias == alias);
         }
 
         /// <summary>
@@ -297,10 +296,7 @@ namespace umbraco.cms.businesslogic
         {
             EnsureProperties();
 
-            var prop = m_LoadedProperties.SingleOrDefault(x => x.PropertyType.Id == pt.Id);
-
-            return prop;
-
+            return m_LoadedProperties.SingleOrDefault(x => x.PropertyType.Id == pt.Id);
         }
 
         /// <summary>
@@ -677,9 +673,13 @@ namespace umbraco.cms.businesslogic
                     continue;
 
                 //get the propertyId
-                var property = propData.LastOrDefault(x => x.PropertyTypeId == pt.Id);
+                var property = propData.SingleOrDefault(x => x.PropertyTypeId == pt.Id);
                 if (property == null)
-                    continue;
+                {
+                    //continue;
+                    var prop = Property.MakeNew(pt, this, Version);
+                    property = new {Id = prop.Id, PropertyTypeId = pt.Id};
+                }
                 var propertyId = property.Id;
 
                 Property p = null;

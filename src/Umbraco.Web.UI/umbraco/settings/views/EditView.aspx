@@ -1,16 +1,21 @@
 <%@ Page Language="C#" MasterPageFile="../../masterpages/umbracoPage.Master" AutoEventWireup="True"
     CodeBehind="EditView.aspx.cs" Inherits="Umbraco.Web.UI.Umbraco.Settings.Views.EditView"
-    ValidateRequest="False" %><asp:Content ID="DocTypeContent" ContentPlaceHolderID="DocType" runat="server"><!DOCTYPE html></asp:Content>
+    ValidateRequest="False" %>
 
 <%@ Import Namespace="Umbraco.Core" %>
 <%@ Import Namespace="Umbraco.Core.IO" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+
+<asp:Content ID="DocTypeContent" ContentPlaceHolderID="DocType" runat="server">
+    <!DOCTYPE html>
+</asp:Content>
+
 <asp:Content ContentPlaceHolderID="head" runat="server">
     
     <umb:JsInclude ID="JsInclude1" runat="server" FilePath="Editors/EditView.js" PathNameAlias="UmbracoClient" />
 
-    <script language="javascript" type="text/javascript">
+    <script type="text/javascript">
 
         //we need to have this as a global object since we reference this object with callbacks.
         var editViewEditor;

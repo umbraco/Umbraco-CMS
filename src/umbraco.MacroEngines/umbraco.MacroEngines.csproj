@@ -39,6 +39,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\umbraco.MacroEngines.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Examine, Version=0.1.43.2941, Culture=neutral, processorArchitecture=MSIL">

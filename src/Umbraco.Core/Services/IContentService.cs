@@ -13,11 +13,12 @@ namespace Umbraco.Core.Services
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
         /// that this Content is based on.
         /// </summary>
+        /// <param name="name">Name of the Content object</param>
         /// <param name="parentId">Id of Parent for the new Content</param>
         /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional id of the user creating the content</param>
         /// <returns><see cref="IContent"/></returns>
-        IContent CreateContent(int parentId, string contentTypeAlias, int userId = -1);
+        IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = -1);
 
         /// <summary>
         /// Gets an <see cref="IContent"/> object by Id

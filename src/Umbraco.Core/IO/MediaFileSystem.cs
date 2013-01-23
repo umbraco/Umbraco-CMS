@@ -11,8 +11,7 @@ namespace Umbraco.Core.IO
 	/// A custom file system provider for media
 	/// </summary>
 	[FileSystemProvider("media")]
-	[UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1156", "Will be declared public after 4.10")]
-	internal class MediaFileSystem : FileSystemWrapper
+	public class MediaFileSystem : FileSystemWrapper
 	{
 		public MediaFileSystem(IFileSystem wrapped)
 			: base(wrapped)

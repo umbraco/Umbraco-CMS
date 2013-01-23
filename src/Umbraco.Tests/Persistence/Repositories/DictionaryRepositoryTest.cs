@@ -160,6 +160,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(exists, Is.True);
         }
 
+        [Ignore]
         [Test]
         public void Can_Perform_Update_On_DictionaryRepository()
         {

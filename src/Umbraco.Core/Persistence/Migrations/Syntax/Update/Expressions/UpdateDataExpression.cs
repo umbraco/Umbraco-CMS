@@ -22,6 +22,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Update.Expressions
 
         public override string ToString()
         {
+            if (IsExpressionSupported() == false)
+                return string.Empty;
+
             var updateItems = new List<string>();
             var whereClauses = new List<string>();
 

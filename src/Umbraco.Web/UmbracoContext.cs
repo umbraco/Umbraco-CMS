@@ -49,6 +49,7 @@ namespace Umbraco.Web
             if (applicationContext == null) throw new ArgumentNullException("applicationContext");
 
     		ObjectCreated = DateTime.Now;
+	        UmbracoRequestId = Guid.NewGuid();
 
             HttpContext = httpContext;            
             Application = applicationContext;
@@ -108,6 +109,11 @@ namespace Umbraco.Web
 		/// We can then determine complete rendering time from that.
 		/// </summary>
 		internal DateTime ObjectCreated { get; private set; }
+
+		/// <summary>
+		/// This is used internally for debugging and also used to define anything required to distinguish this request from another.
+		/// </summary>
+		internal Guid UmbracoRequestId { get; private set; }
 
         /// <summary>
         /// Gets the current ApplicationContext

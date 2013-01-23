@@ -76,7 +76,7 @@ namespace Umbraco.Core.Persistence
                             db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName))));
 
                         //Special case for MySql
-                        if (ApplicationContext.Current.DatabaseContext.ProviderName.Contains("MySql"))
+                        if (SyntaxConfig.SqlSyntaxProvider is MySqlSyntaxProvider && tableName.Equals("umbracoUser"))
                         {
                             db.Update<UserDto>("SET id = @IdAfter WHERE id = @IdBefore AND userLogin = @Login", new { IdAfter = 0, IdBefore = 1, Login = "admin" });
                         }

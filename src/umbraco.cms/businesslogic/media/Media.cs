@@ -1,6 +1,7 @@
 using System;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace umbraco.cms.businesslogic.media
 	///  
 	/// By inheriting the Content class it has a generic datafields which enables custumization
 	/// </summary>
-    [Obsolete("Deprecated, Use Umbraco.Core.Models.Media", false)]
+    [Obsolete("Obsolete, Use Umbraco.Core.Models.Media", false)]
     public class Media : Content
 	{
         #region Constants and static members
@@ -73,11 +74,10 @@ namespace umbraco.cms.businesslogic.media
         /// <param name="u">The user creating the media</param>
         /// <param name="ParentId">The id of the folder under which the media is created</param>
         /// <returns></returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.MediaService.CreateMedia()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.CreateMedia()", false)]
         public static Media MakeNew(string Name, MediaType dct, BusinessLogic.User u, int ParentId)
         {
-            var media = ApplicationContext.Current.Services.MediaService.CreateMedia(ParentId, dct.Alias, u.Id);
-            media.Name = Name;
+            var media = ApplicationContext.Current.Services.MediaService.CreateMedia(Name, ParentId, dct.Alias, u.Id);
             ApplicationContext.Current.Services.MediaService.Save(media);
             var tmp = new Media(media);
 
@@ -100,7 +100,7 @@ namespace umbraco.cms.businesslogic.media
         /// Retrieve a list of all toplevel medias and folders
         /// </summary>
         /// <returns></returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.MediaService.GetRootMedia()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.GetRootMedia()", false)]
         public static Media[] GetRootMedias()
         {
             var children = ApplicationContext.Current.Services.MediaService.GetRootMedia();
@@ -117,7 +117,7 @@ namespace umbraco.cms.businesslogic.media
             return retval;*/
         }
 
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.MediaService.GetChildren()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.GetChildren()", false)]
         public static List<Media> GetChildrenForTree(int nodeId)
         {
             var children = ApplicationContext.Current.Services.MediaService.GetChildren(nodeId);
@@ -144,7 +144,7 @@ namespace umbraco.cms.businesslogic.media
             return tmp;*/
         }
 
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.MediaService.GetMediaOfMediaType()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.GetMediaOfMediaType()", false)]
         public static IEnumerable<Media> GetMediaOfMediaType(int mediaTypeId)
         {
             var children = ApplicationContext.Current.Services.MediaService.GetMediaOfMediaType(mediaTypeId);
@@ -174,7 +174,7 @@ namespace umbraco.cms.businesslogic.media
         /// Use with care.
         /// </summary>
         /// <param name="dt"></param>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.MediaService.DeleteMediaOfType()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.DeleteMediaOfType()", false)]
         public static void DeleteFromType(MediaType dt)
         {
             ApplicationContext.Current.Services.MediaService.DeleteMediaOfType(dt.Id);
@@ -270,7 +270,7 @@ namespace umbraco.cms.businesslogic.media
         /// <summary>
         /// Retrieve a list of all medias underneath the current
         /// </summary>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.MediaService.GetChildren()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.GetChildren()", false)]
         public new Media[] Children
         {
             get
@@ -287,12 +287,23 @@ namespace umbraco.cms.businesslogic.media
         #region Public methods
 
         /// <summary>
+        /// Overrides the moving of a <see cref="Media"/> object to a new location by changing its parent id.
+        /// </summary>
+        public override void Move(int newParentId)
+        {
+            var current = User.GetCurrent();
+            int userId = current == null ? 0 : current.Id;
+            ApplicationContext.Current.Services.MediaService.Move(MediaItem, newParentId, userId);
+        }
+
+        /// <summary>
         /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
         /// </summary>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.MediaService.Save()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.Save()", false)]
         public override void Save()
         {
             SaveEventArgs e = new SaveEventArgs();
+            FireBeforeSave(e);
 
             foreach (var property in GenericProperties)
             {
@@ -301,9 +312,7 @@ namespace umbraco.cms.businesslogic.media
 
                 MediaItem.SetValue(property.PropertyType.Alias, property.Value);
             }
-
-            FireBeforeSave(e);
-
+            
             if (!e.Cancel)
             {
                 ApplicationContext.Current.Services.MediaService.Save(MediaItem);
@@ -327,7 +336,7 @@ namespace umbraco.cms.businesslogic.media
         /// <summary>
         /// Moves the media to the trash
         /// </summary>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.MediaService.MoveToRecycleBin()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.MoveToRecycleBin()", false)]
         public override void delete()
         {
             MoveToTrash();
@@ -337,7 +346,7 @@ namespace umbraco.cms.businesslogic.media
         /// With either move the media to the trash or permanently remove it from the database.
         /// </summary>
         /// <param name="deletePermanently">flag to set whether or not to completely remove it from the database or just send to trash</param>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.MediaService.Delete() or Umbraco.Core.Services.MediaService.MoveToRecycleBin()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.Delete() or Umbraco.Core.Services.MediaService.MoveToRecycleBin()", false)]
         public void delete(bool deletePermanently)
         {
             if (!deletePermanently)
@@ -350,7 +359,7 @@ namespace umbraco.cms.businesslogic.media
             }
         }
 
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.MediaService.GetDescendants()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.GetDescendants()", false)]
         public override IEnumerable GetDescendants()
         {
             var descendants = ApplicationContext.Current.Services.MediaService.GetDescendants(Id);
@@ -378,7 +387,7 @@ namespace umbraco.cms.businesslogic.media
             SetupNode(media);
         }
         
-        [Obsolete("Deprecated, This method is no longer used")]
+        [Obsolete("Obsolete, This method is no longer used")]
         protected void PopulateMediaFromReader(IRecordsReader dr)
         {
             var hc = dr.GetInt("children") > 0;
@@ -414,7 +423,7 @@ namespace umbraco.cms.businesslogic.media
                 Version = MediaItem.Version;
         }
 
-        [Obsolete("Deprecated, This method is no longer needed", false)]
+        [Obsolete("Obsolete, This method is no longer needed", false)]
         private void SetupMediaForTree(Guid uniqueId, int level, int parentId, int user, string path,
                                           string text, DateTime createDate, string icon, bool hasChildren, string contentTypeAlias, string contentTypeThumb,
                                             string contentTypeDesc, int? masterContentType, int contentTypeId, bool isContainer)
@@ -428,7 +437,7 @@ namespace umbraco.cms.businesslogic.media
         /// Used internally to permanently delete the data from the database
         /// </summary>      
         /// <returns>returns true if deletion isn't cancelled</returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.MediaService.Delete()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.Delete()", false)]
         private bool DeletePermanently()
         {
             DeleteEventArgs e = new DeleteEventArgs();
@@ -458,7 +467,7 @@ namespace umbraco.cms.businesslogic.media
         /// Used internally to move the node to the recyle bin
         /// </summary>
         /// <returns>Returns true if the move was not cancelled</returns>
-        [Obsolete("Deprecated, Use Umbraco.Core.Services.MediaService.MoveToRecycleBin()", false)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.MoveToRecycleBin()", false)]
         private bool MoveToTrash()
         {
             MoveToTrashEventArgs e = new MoveToTrashEventArgs();

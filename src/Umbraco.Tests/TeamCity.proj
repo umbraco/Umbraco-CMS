@@ -1,0 +1,19 @@
+<Project DefaultTargets="RunTests" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<PropertyGroup>
+		<MSBuildCommunityTasksPath>..\..\tools\MSBuildCommunityTasks</MSBuildCommunityTasksPath>
+	</PropertyGroup>
+
+	<Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets" />
+
+	<Target Name="RunTests">
+
+		<ItemGroup>
+			<TestAssemblies Include=".\bin\Debug\Umbraco.Tests.dll" />
+		</ItemGroup>
+
+		<NUnit ToolPath="..\..\tools\NUnit\" Assemblies="@(TestAssemblies)" OutputXmlFile=".\NUnitTestResults.xml" />
+		
+	</Target>
+
+</Project>

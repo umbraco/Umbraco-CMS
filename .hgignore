@@ -4,7 +4,6 @@ web.Template.[a-zA-Z0-9]*.Debug.config
 
 syntax: glob
 *.obj
-*.exe
 *.pdb
 *.user
 *.aps
@@ -63,6 +62,7 @@ src/Umbraco.Web.UI/Views/*.vbhtml
 src/Umbraco.Tests/config/umbracoSettings.config
 src/Umbraco.Web.UI/App_Plugins/*
 src/Umbraco.Web.UI/Views/*
+src/packages/
 
-src\Umbraco.Web.UI\[Ww]eb.config
+src\Umbraco.Web.UI\[W]eb.config
 *.transformed

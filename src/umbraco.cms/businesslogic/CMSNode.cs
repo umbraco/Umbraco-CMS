@@ -29,7 +29,7 @@ namespace umbraco.cms.businesslogic
     /// The child classes are required to implement an identifier (Guid) which is used as the objecttype identifier, for 
     /// distinguishing the different types of CMSNodes (ex. Documents/Medias/Stylesheets/documenttypes and so forth).
     /// </summary>
-    [Obsolete("Deprecated, This class will eventually be phased out", false)]
+    [Obsolete("Obsolete, This class will eventually be phased out", false)]
     public class CMSNode : BusinessLogic.console.IconI
     {
         #region Private Members
@@ -576,7 +576,7 @@ order by level,sortOrder";
         /// Moves the CMSNode from the current position in the hierarchy to the target
         /// </summary>
         /// <param name="NewParentId">Target CMSNode id</param>
-        public void Move(int newParentId)
+        public virtual void Move(int newParentId)
         {
             CMSNode parent = new CMSNode(newParentId);
             Move(parent);
