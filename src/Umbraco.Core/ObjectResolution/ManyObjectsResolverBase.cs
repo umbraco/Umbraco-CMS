@@ -320,16 +320,7 @@ namespace Umbraco.Core.ObjectResolution
 		{
 			return new WriteLock(_lock);
 		}
-
-		/// <summary>
-		/// Returns an upgradeable read lock for use when reading/modifying collections
-		/// </summary>
-		/// <returns></returns>
-		protected UpgradeableReadLock GetUpgradeableReadLock()
-		{
-			return new UpgradeableReadLock(_lock);
-		}
-
+		
 		/// <summary>
 		/// Throws an exception if resolution is frozen
 		/// </summary>

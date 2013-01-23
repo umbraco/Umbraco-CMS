@@ -15,14 +15,14 @@ namespace Umbraco.Core.ObjectResolution
 	/// Much of this classes methods are based on legacy code from umbraco.editorControls.macrocontainer.MacroControlFactory
 	/// this code should probably be reviewed and cleaned up if necessary.
 	/// </remarks>
-	internal sealed class MacroFieldEditorsResolver : ManyObjectsResolverBase<MacroFieldEditorsResolver, IMacroGuiRendering>
+	internal sealed class MacroFieldEditorsResolver : LazyManyObjectsResolverBase<MacroFieldEditorsResolver, IMacroGuiRendering>
 	{
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="macroEditors"></param>		
-		internal MacroFieldEditorsResolver(IEnumerable<Type> macroEditors)
+		internal MacroFieldEditorsResolver(Func<IEnumerable<Type>> macroEditors)
 			: base(macroEditors, ObjectLifetimeScope.Transient)
 		{
 

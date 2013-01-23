@@ -94,19 +94,19 @@ namespace Umbraco.Core
 		protected virtual void InitializeResolvers()
 		{
 			CacheRefreshersResolver.Current = new CacheRefreshersResolver(
-				PluginManager.Current.ResolveCacheRefreshers());
+				() => PluginManager.Current.ResolveCacheRefreshers());
 
 			DataTypesResolver.Current = new DataTypesResolver(
-				PluginManager.Current.ResolveDataTypes());
+				() => PluginManager.Current.ResolveDataTypes());
 
 			MacroFieldEditorsResolver.Current = new MacroFieldEditorsResolver(
-				PluginManager.Current.ResolveMacroRenderings());
+				() => PluginManager.Current.ResolveMacroRenderings());
 
 			PackageActionsResolver.Current = new PackageActionsResolver(
-				PluginManager.Current.ResolvePackageActions());
+				() => PluginManager.Current.ResolvePackageActions());
 
 			ActionsResolver.Current = new ActionsResolver(
-				PluginManager.Current.ResolveActions());
+				() => PluginManager.Current.ResolveActions());
 
 			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
 				PluginManager.Current.ResolvePropertyEditorValueConverters());

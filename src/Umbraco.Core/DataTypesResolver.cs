@@ -16,7 +16,7 @@ namespace Umbraco.Core
 		/// Constructor
 		/// </summary>
 		/// <param name="dataTypes"></param>		
-		internal DataTypesResolver(IEnumerable<Type> dataTypes)
+		internal DataTypesResolver(Func<IEnumerable<Type>> dataTypes)
 			: base(dataTypes)
 		{
 

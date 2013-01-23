@@ -8,14 +8,14 @@ namespace Umbraco.Core
 	/// <summary>
 	/// A resolver to return all IPackageAction objects
 	/// </summary>
-	internal sealed class PackageActionsResolver : ManyObjectsResolverBase<PackageActionsResolver, IPackageAction>
+	internal sealed class PackageActionsResolver : LazyManyObjectsResolverBase<PackageActionsResolver, IPackageAction>
 	{
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="packageActions"></param>		
-		internal PackageActionsResolver(IEnumerable<Type> packageActions)
+		internal PackageActionsResolver(Func<IEnumerable<Type>> packageActions)
 			: base(packageActions)
 		{
 			

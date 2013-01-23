@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Web;
 
 namespace Umbraco.Core.ObjectResolution
@@ -83,6 +84,7 @@ namespace Umbraco.Core.ObjectResolution
 		private readonly List<Lazy<Type>> _lazyTypeList = new List<Lazy<Type>>();
 		private readonly List<Func<IEnumerable<Type>>> _listOfTypeListDelegates = new List<Func<IEnumerable<Type>>>();
 		private List<Type> _resolvedTypes = null;
+		private readonly ReaderWriterLockSlim _typeResolutionLock = new ReaderWriterLockSlim();
 		
 		/// <summary>
 		/// Used for unit tests
@@ -99,7 +101,7 @@ namespace Umbraco.Core.ObjectResolution
 		{
 			get
 			{
-				using (var lck = GetUpgradeableReadLock())
+				using (var lck = new UpgradeableReadLock(_typeResolutionLock))
 				{
 					var lazyTypeList = _lazyTypeList.Select(x => x.Value).ToArray();
 					var listofTypeListDelegates = _listOfTypeListDelegates.SelectMany(x => x()).ToArray();

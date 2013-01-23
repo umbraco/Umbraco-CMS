@@ -59,7 +59,7 @@ namespace umbraco.BusinessLogic.Actions
 
 				//TODO: Based on the above, this is a big hack as types should all be cleared on package install!
 				ActionsResolver.Current = new ActionsResolver(
-					TypeFinder.FindClassesOfType<IAction>(PluginManager.Current.AssembliesToScan));
+					() => TypeFinder.FindClassesOfType<IAction>(PluginManager.Current.AssembliesToScan));
 
 				RegisterIActionHandlers();
 			}
