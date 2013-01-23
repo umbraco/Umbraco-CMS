@@ -188,6 +188,17 @@ namespace umbraco.DataLayer
         /// <remarks>Abstract factory pattern</remarks>
         public abstract IParameter CreateParameter(string parameterName, object value);
 
+        bool SilentCommand(ref string commandText)
+        {
+            bool writelog = true;
+            if (commandText.StartsWith("#"))
+            {
+                writelog = false;
+                commandText = commandText.Substring(1);
+            }
+            return writelog;
+		}
+
         /// <summary>
         /// Executes a command that returns a single value.
         /// </summary>
@@ -198,6 +209,7 @@ namespace umbraco.DataLayer
         /// <exception cref="umbraco.DataLayer.SqlHelperException">If a data source error occurs.</exception>
         public T ExecuteScalar<T>(string commandText, params IParameter[] parameters)
         {
+            bool writelog = SilentCommand(ref commandText);
             string commandConverted = ConvertCommand(commandText);
             P[] parametersConverted = ConvertParameters(parameters);
             try
@@ -206,7 +218,8 @@ namespace umbraco.DataLayer
             }
             catch (Exception e)
             {
-                LogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
+                if (writelog)
+                    LogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
                 throw new SqlHelperException("ExecuteScalar", commandText, parameters, e);
             }
         }
@@ -222,7 +235,8 @@ namespace umbraco.DataLayer
         /// <exception cref="umbraco.DataLayer.SqlHelperException">If a data source error occurs.</exception>
         public int ExecuteNonQuery(string commandText, params IParameter[] parameters)
         {
-            string commandConverted = ConvertCommand(commandText);
+            bool writelog = SilentCommand(ref commandText);
+			string commandConverted = ConvertCommand(commandText);
             P[] parametersConverted = ConvertParameters(parameters);
             try
             {
@@ -230,7 +244,8 @@ namespace umbraco.DataLayer
             }
             catch (Exception e)
             {
-                LogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
+                if (writelog)
+                    LogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
                 throw new SqlHelperException("ExecuteNonQuery", commandText, parameters, e);
             }
         }
@@ -246,7 +261,8 @@ namespace umbraco.DataLayer
         /// <exception cref="umbraco.DataLayer.SqlHelperException">If a data source error occurs.</exception>
         public IRecordsReader ExecuteReader(string commandText, params IParameter[] parameters)
         {
-            string commandConverted = ConvertCommand(commandText);
+            bool writelog = SilentCommand(ref commandText);
+			string commandConverted = ConvertCommand(commandText);
             P[] parametersConverted = ConvertParameters(parameters);
             try
             {
@@ -254,7 +270,8 @@ namespace umbraco.DataLayer
             }
             catch (Exception e)
             {
-                LogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
+                if (writelog)
+                    LogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
                 throw new SqlHelperException("ExecuteReader", commandText, parameters, e);
             }
         }
@@ -270,7 +287,8 @@ namespace umbraco.DataLayer
         /// <exception cref="umbraco.DataLayer.SqlHelperException">If a data source error occurs.</exception>
         public XmlReader ExecuteXmlReader(string commandText, params IParameter[] parameters)
         {
-            string commandConverted = ConvertCommand(commandText);
+            bool writelog = SilentCommand(ref commandText);
+			string commandConverted = ConvertCommand(commandText);
             P[] parametersConverted = ConvertParameters(parameters);
             try
             {
@@ -278,7 +296,8 @@ namespace umbraco.DataLayer
             }
             catch (Exception e)
             {
-                LogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
+                if (writelog)
+                    LogHelper.Error<SqlHelper<P>>(string.Format("Error executing query {0}", commandText), e);
                 throw new SqlHelperException("ExecuteXmlReader", commandText, parameters, e);
             }
         }
