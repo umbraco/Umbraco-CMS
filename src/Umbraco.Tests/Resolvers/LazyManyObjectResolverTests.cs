@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -42,6 +43,58 @@ namespace Umbraco.Tests.Resolvers
 			Assert.IsTrue(instances1.Select(x => x.GetType()).ContainsAll(new []{typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3)}));
 		}
 
+		[Test]
+		public void Type_List_Delegates_Combination()
+		{
+			Func<IEnumerable<Type>> types = () => new[] { typeof(TransientObject3), typeof(TransientObject2) };
+
+			var resolver = new LazyResolver(types);
+			resolver.AddTypeListDelegate(() => new[] { typeof(TransientObject1)});
+
+			Resolution.Freeze();
+
+			var instances1 = resolver.Objects;
+
+			Assert.AreEqual(3, instances1.Count());
+			Assert.IsTrue(instances1.Select(x => x.GetType()).ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }));
+		}
+
+		[Test]
+		public void Type_List_Delegates_And_Lazy_Type_Combination()
+		{
+			Func<IEnumerable<Type>> types = () => new[] { typeof(TransientObject3) };
+
+			var resolver = new LazyResolver(types);
+			resolver.AddType(new Lazy<Type>(() => typeof(TransientObject2)));
+			resolver.AddType<TransientObject1>();
+
+			Resolution.Freeze();
+
+			var instances1 = resolver.Objects;
+
+			Assert.AreEqual(3, instances1.Count());
+			Assert.IsTrue(instances1.Select(x => x.GetType()).ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }));
+		}
+
+		[Test]
+		public void Throws_If_Duplication()
+		{
+			Func<IEnumerable<Type>> types = () => new[] { typeof(TransientObject3), typeof(TransientObject2), typeof(TransientObject1) };
+
+			var resolver = new LazyResolver(types);
+			//duplicate, but will not throw here
+			resolver.AddType<TransientObject1>();
+
+			Resolution.Freeze();
+
+			Assert.Throws<InvalidOperationException>(() =>
+				{
+					var instances = resolver.Objects;
+				});
+
+
+		}
+
 		#region Test classes
 
 		private interface ITestInterface
@@ -71,6 +124,12 @@ namespace Umbraco.Tests.Resolvers
 				:base (values, ObjectLifetimeScope.Transient)
 			{
 				
+			}
+
+			public LazyResolver(Func<IEnumerable<Type>> typeList)
+				: base(typeList, ObjectLifetimeScope.Transient)
+			{
+
 			}
 
 			public IEnumerable<ITestInterface> Objects
