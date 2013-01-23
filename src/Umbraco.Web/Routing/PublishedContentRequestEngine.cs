@@ -237,63 +237,73 @@ namespace Umbraco.Web.Routing
 
 		#region Rendering engine
 
+        /// <summary>
+        /// Finds the rendering engine to use to render a template specified by its alias.
+        /// </summary>
+        /// <param name="alias">The alias of the template.</param>
+        /// <returns>The rendering engine, or Unknown if the template was not found.</returns>
+        internal RenderingEngine FindTemplateRenderingEngine(string alias)
+        {
+            if (string.IsNullOrWhiteSpace(alias))
+                return RenderingEngine.Unknown;
+
+            alias = alias.Replace('\\', '/'); // forward slashes only
+
+            // NOTE: we could start with what's the current default?
+
+            if (FindTemplateRenderingEngineInDirectory(new DirectoryInfo(IOHelper.MapPath(SystemDirectories.MvcViews)),
+                    alias, new[] { ".cshtml", ".vbhtml" }))
+                return RenderingEngine.Mvc;
+
+            if (FindTemplateRenderingEngineInDirectory(new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Masterpages)),
+                    alias, new[] { ".master" }))
+                return RenderingEngine.WebForms;
+
+            return RenderingEngine.Unknown;
+        }
+
+        internal bool FindTemplateRenderingEngineInDirectory(DirectoryInfo directory, string alias, string[] extensions)
+        {
+            if (directory == null || !directory.Exists)
+                return false;
+
+            var pos = alias.IndexOf('/');
+            if (pos > 0)
+            {
+                // recurse
+                var subdir = directory.GetDirectories(alias.Substring(0, pos)).FirstOrDefault();
+                alias = alias.Substring(pos + 1);
+                return subdir == null ? false : FindTemplateRenderingEngineInDirectory(subdir, alias, extensions);
+            }
+            else
+            {
+                // look here
+                return directory.GetFiles().Any(f => extensions.Any(e => f.Name.InvariantEquals(alias + e)));
+            }
+        }
+
 		/// <summary>
 		/// Finds the rendering engine to use, and updates the PublishedContentRequest accordingly.
 		/// </summary>
 		internal void FindRenderingEngine()
 		{
-			//First, if there is no template, we will default to use MVC because MVC supports Hijacking routes which
-			//sometimes don't require a template since the developer may want full control over the rendering. 
-			//Webforms doesn't support this so MVC it is. MVC will also handle what to do if no template or hijacked route
-			//is there (i.e. blank page)
-			if (!_pcr.HasTemplate)
-			{
-				_pcr.RenderingEngine = RenderingEngine.Mvc;
-				return;
-			}
+            RenderingEngine renderingEngine = RenderingEngine.Unknown;
 
-			//NOTE: Not sure how the alias is actually saved with a space as this shouldn't ever be the case? 
-			// but apparently this happens. I think what should actually be done always is the template alias 
-			// should be saved using the ToUmbracoAlias method and then we can use this here too, that way it
-			// it 100% consistent. I'll leave this here for now until further invenstigation.
-			var templateAlias = _pcr.Template.Alias.Replace(" ", string.Empty);
-			//var templateAlias = _pcr.Template.Alias.ToUmbracoAlias(StringAliasCaseType.PascalCase);
+            // NOTE: Not sure how the alias is actually saved with a space as this shouldn't ever be the case? 
+            // but apparently this happens. I think what should actually be done always is the template alias 
+            // should be saved using the ToUmbracoAlias method and then we can use this here too, that way it
+            // it 100% consistent. I'll leave this here for now until further invenstigation.
+            if (_pcr.HasTemplate)
+                renderingEngine = FindTemplateRenderingEngine(_pcr.Template.Alias.Replace(" ", ""));
 
-			Func<DirectoryInfo, string, string[], RenderingEngine, bool> determineEngine =
-				(directory, alias, extensions, renderingEngine) =>
-				{
-					//so we have a template, now we need to figure out where the template is, this is done just by the Alias field					
-					//ensure it exists
-					if (!directory.Exists) Directory.CreateDirectory(directory.FullName);
-					var file = directory.GetFiles()
-						.FirstOrDefault(x => extensions.Any(e => x.Name.InvariantEquals(alias + e)));
+            // Unkwnown means that no template was found. Default to Mvc because Mvc supports hijacking
+            // routes which sometimes doesn't require a template since the developer may want full control
+            // over the rendering. Can't do it in WebForms, so Mvc it is. And Mvc will also handle what to
+            // do if no template or hijacked route is exist.
+            if (renderingEngine == RenderingEngine.Unknown)
+                renderingEngine = RenderingEngine.Mvc;
 
-					if (file != null)
-					{
-						//it is mvc since we have a template there that exists with this alias
-						_pcr.RenderingEngine = renderingEngine;
-						return true;
-					}
-					return false;
-				};
-
-			//first determine if it is MVC, we will favor mvc if there is a template with the same name in both 
-			// folders, if it is then MVC will be selected
-			if (!determineEngine(
-				new DirectoryInfo(IOHelper.MapPath(SystemDirectories.MvcViews)),
-				templateAlias,
-				new[] { ".cshtml", ".vbhtml" },
-				RenderingEngine.Mvc))
-			{
-				//if not, then determine if it is webforms (this should def match if a template is assigned and its not in the MVC folder)
-				// if it doesn't match, then MVC will be used by default anyways.
-				determineEngine(
-					new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Masterpages)),
-					templateAlias,
-					new[] { ".master" },
-					RenderingEngine.WebForms);
-			}
-
+            _pcr.RenderingEngine = renderingEngine;
 		}
 
 		#endregion

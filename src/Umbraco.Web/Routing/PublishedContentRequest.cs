@@ -24,7 +24,7 @@ namespace Umbraco.Web.Routing
 {
 	/// <summary>
 	/// Represents a request for one specified Umbraco IPublishedContent to be rendered
-	/// by one specified Template, using one specified Culture and RenderingEngine.
+	/// by one specified template, using one specified Culture and RenderingEngine.
 	/// </summary>
 	internal class PublishedContentRequest
     {
@@ -117,7 +117,7 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Gets or sets the requested content.
 		/// </summary>
-		/// <remarks>Setting the requested content clears both <c>Template</c> and <c>AlternateTemplateAlias</c>.</remarks>
+		/// <remarks>Setting the requested content clears <c>Template</c>.</remarks>
 		public IPublishedContent PublishedContent
 		{			
 			get { return _publishedContent; }
@@ -181,7 +181,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public bool HasTemplate
         {
-            get { return this.Template != null ; }
+            get { return this.Template != null; }
         }
 
 		#endregion
