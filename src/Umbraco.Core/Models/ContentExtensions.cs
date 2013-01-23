@@ -405,7 +405,10 @@ namespace Umbraco.Core.Models
         {
 
 			//nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
+			//var nodeName = content.ContentType.Alias.ToUmbracoAlias(StringAliasCaseType.CamelCase, true);
+            var niceUrl = content.Name.FormatUrl().ToLower();
+			var nodeName = content.ContentType.Alias;
+
 			var x = content.ToXml(nodeName);
 			x.Add(new XAttribute("nodeType", content.ContentType.Id));
 			x.Add(new XAttribute("creatorName", content.GetCreatorProfile().Name));
@@ -458,8 +461,7 @@ namespace Umbraco.Core.Models
 								   new XAttribute("nodeName", contentBase.Name),
 								   new XAttribute("urlName", niceUrl),//Format Url ?								   
 								   new XAttribute("path", contentBase.Path),
-                                   new XAttribute("isDoc", ""),
-                                   UmbracoSettings.UseLegacyXmlSchema ? new XAttribute("nodeTypeAlias", content.ContentType.Alias) : null);
+								   new XAttribute("isDoc", ""));
 
 			foreach (var property in contentBase.Properties)
 			{
