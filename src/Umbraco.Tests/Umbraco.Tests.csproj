@@ -86,6 +86,7 @@
     <Compile Include="ObjectExtensionsTests.cs" />
     <Compile Include="ContentStores\PublishContentStoreTests.cs" />
     <Compile Include="DataTypeFactoryTests.cs" />
+    <Compile Include="Resolvers\LazyManyObjectResolverTests.cs" />
     <Compile Include="Routing\LookupByNiceUrlWithDomainsTests.cs" />
     <Compile Include="Routing\NiceUrlsProviderWithDomainsTests.cs" />
     <Compile Include="Routing\uQueryGetNodeIdByUrlTests.cs" />

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web;
 using System.Web.UI;
 using Umbraco.Core.Macros;
@@ -56,7 +57,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// </remarks>
 		internal List<Type> MacroControlTypes
 		{
-			get { return InstanceTypes; }
+			get { return InstanceTypes.ToList(); }
 		}
 
 		/// <summary>
