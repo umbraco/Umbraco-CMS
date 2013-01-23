@@ -68,6 +68,7 @@ namespace Umbraco.Tests.Routing
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl;	//very important to use the cleaned up umbraco url		
 			var docreq = new PublishedContentRequest(url, routingContext);			
 			var lookup = new ContentFinderByNiceUrl();
+            ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false");
 
 			var result = lookup.TryFindDocument(docreq);
 

@@ -33,12 +33,12 @@ namespace Umbraco.Tests.Routing
 		/// This checks that when we retreive a NiceUrl for multiple items that there are no issues with cache overlap 
 		/// and that they are all cached correctly.
         /// </summary>
-        [Ignore]
 		[Test]
 		public void Ensure_Cache_Is_Correct()
 		{
 			var routingContext = GetRoutingContext("/test", 1111);
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
+            Umbraco.Core.Configuration.UmbracoSettings.AddTrailingSlash = false;
 
 			var samples = new Dictionary<int, string> {
 				{ 1046, "/home" },

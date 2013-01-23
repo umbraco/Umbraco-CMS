@@ -4,6 +4,7 @@ using System.Data.SqlServerCe;
 using System.IO;
 using System.Web.Routing;
 using System.Xml;
+using System.Configuration;
 using NUnit.Framework;
 using SQLCE4Umbraco;
 using Umbraco.Core;

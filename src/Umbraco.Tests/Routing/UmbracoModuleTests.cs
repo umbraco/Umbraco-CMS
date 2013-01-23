@@ -17,33 +17,6 @@ using umbraco.cms.businesslogic.template;
 namespace Umbraco.Tests.Routing
 {
 	[TestFixture, RequiresSTA]
-	public class PublishedContentRequestBuilderTests : BaseRoutingTest
-	{
-
-		//[Test]
-		//public void Alt_Template()
-		//{
-		//	var template = Template.MakeNew("test", new User(0));
-		//	var altTemplate = Template.MakeNew("alt", new User(0));
-		//	var umbracoContext = GetUmbracoContext("/home?altTemplate=" + altTemplate.Alias, template.Id);
-		//	// create the new document request since we're rendering a document on the front-end
-		//	var docreq = PublishedContentRequest.CreateForFrontEndRequest(umbracoContext);
-				
-		//	//create the searcher
-		//	var searcher = new PublishedContentRequestBuilder(docreq);
-		//	//find domain
-		//	searcher.LookupDomain();
-		//	// redirect if it has been flagged
-		//	Assert.IsFalse(docreq.IsRedirect);
-			
-		//	//find the document, found will be true if the doc request has found BOTH a node and a template			
-		//	var found = searcher.LookupDocument();
-			
-		//}
-
-	}
-
-	[TestFixture, RequiresSTA]
 	public class UmbracoModuleTests : BaseRoutingTest
 	{
 		private UmbracoModule _module;
