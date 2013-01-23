@@ -146,20 +146,6 @@ namespace Umbraco.Web.Routing
 		}
 
         /// <summary>
-        /// Gets the identifier of the requested content.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown when the content request has no content.</exception>
-        public int PublishedContentId
-        {
-            get
-            {
-                if (this.PublishedContent == null)
-                    throw new InvalidOperationException("PublishedContentRequest has no document.");
-                return _publishedContentId;
-            }
-        }
-
-        /// <summary>
         /// Gets a value indicating whether the content request has a content.
         /// </summary>
         public bool HasPublishedContent

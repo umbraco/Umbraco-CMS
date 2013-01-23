@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Routing
 			if (expectedId > 0)
 			{
 				Assert.IsTrue(result);
-				Assert.AreEqual(expectedId, docreq.PublishedContentId);
+				Assert.AreEqual(expectedId, docreq.PublishedContent.Id);
 			}
 			else
 			{
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Routing
 			var result = lookup.TryFindDocument(docreq);
 
 			Assert.IsTrue(result);
-			Assert.AreEqual(expectedId, docreq.PublishedContentId);
+			Assert.AreEqual(expectedId, docreq.PublishedContent.Id);
 		}
 
 	}

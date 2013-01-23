@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Routing
 			var result = lookup.TryFindDocument(docRequest);
 
 			Assert.IsTrue(result);
-			Assert.AreEqual(docRequest.PublishedContentId, nodeMatch);
+			Assert.AreEqual(docRequest.PublishedContent.Id, nodeMatch);
 		}
 	}
 }

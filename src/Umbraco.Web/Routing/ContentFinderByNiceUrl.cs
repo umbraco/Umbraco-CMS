@@ -79,7 +79,7 @@ namespace Umbraco.Web.Routing
                 if (node != null)
                 {
                     docreq.PublishedContent = node;
-					LogHelper.Debug<ContentFinderByNiceUrl>("Query matches, id={0}", () => docreq.PublishedContentId);
+					LogHelper.Debug<ContentFinderByNiceUrl>("Query matches, id={0}", () => docreq.PublishedContent.Id);
 
 					var iscanon = !DomainHelper.ExistsDomainInPath(docreq.Domain, node.Path);
 					if (!iscanon)
@@ -87,7 +87,7 @@ namespace Umbraco.Web.Routing
 
 					// do not store if previewing or if non-canonical
 					if (!docreq.RoutingContext.UmbracoContext.InPreviewMode && iscanon)
-						docreq.RoutingContext.UmbracoContext.RoutesCache.Store(docreq.PublishedContentId, route);
+						docreq.RoutingContext.UmbracoContext.RoutesCache.Store(docreq.PublishedContent.Id, route);
                     
                 }
                 else

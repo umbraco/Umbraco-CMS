@@ -168,7 +168,7 @@ namespace Umbraco.Web.Templates
 			// handlers like default.aspx will want it and most macros currently need it
 			contentRequest.UmbracoPage = new page(contentRequest);
 			//now, set the new ones for this page execution
-			_umbracoContext.HttpContext.Items["pageID"] = contentRequest.PublishedContentId;
+			_umbracoContext.HttpContext.Items["pageID"] = contentRequest.PublishedContent.Id;
 			_umbracoContext.HttpContext.Items["pageElements"] = contentRequest.UmbracoPage.Elements;
 			_umbracoContext.HttpContext.Items["altTemplate"] = null;
 			_umbracoContext.PublishedContentRequest = contentRequest;

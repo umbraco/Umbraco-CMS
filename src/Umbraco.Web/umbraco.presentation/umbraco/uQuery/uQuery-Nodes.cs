@@ -213,7 +213,7 @@ namespace umbraco
 			// partially prepare the request: do _not_ follow redirects, handle 404, nothing - just find a content
 			pcr.Engine.FindDomain();
 			pcr.Engine.FindPublishedContent();
-			return pcr.HasPublishedContent ? pcr.PublishedContentId : uQuery.RootNodeId;
+			return pcr.HasPublishedContent ? pcr.PublishedContent.Id : uQuery.RootNodeId;
 		}
 
 		/// <summary>

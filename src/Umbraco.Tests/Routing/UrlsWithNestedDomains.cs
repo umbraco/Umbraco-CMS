@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Routing
 			var lookup = new ContentFinderByNiceUrl();
 			var result = lookup.TryFindDocument(pcr);
 			Assert.IsTrue(result);
-			Assert.AreEqual(100111, pcr.PublishedContentId);
+			Assert.AreEqual(100111, pcr.PublishedContent.Id);
 
 			// has the cache been polluted?
 			cachedRoutes = ((DefaultRoutesCache)routingContext.UmbracoContext.RoutesCache).GetCachedRoutes();

@@ -166,7 +166,7 @@ namespace Umbraco.Tests.Routing
 			var lookup = new ContentFinderByNiceUrl();
 			var result = lookup.TryFindDocument(pcr);
 			Assert.IsTrue(result);
-			Assert.AreEqual(expectedId, pcr.PublishedContentId);
+			Assert.AreEqual(expectedId, pcr.PublishedContent.Id);
 		}
 
 		[TestCase("http://domain1.com/", 1001, "en-US")]
@@ -205,7 +205,7 @@ namespace Umbraco.Tests.Routing
 			var lookup = new ContentFinderByNiceUrl();
 			var result = lookup.TryFindDocument(pcr);
 			Assert.IsTrue(result);
-			Assert.AreEqual(expectedId, pcr.PublishedContentId);
+			Assert.AreEqual(expectedId, pcr.PublishedContent.Id);
 		}
 	}
 }

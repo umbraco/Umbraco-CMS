@@ -104,7 +104,7 @@ namespace Umbraco.Web.Routing
 			_pcr.UmbracoPage = new page(_pcr);
 
 			// these two are used by many legacy objects
-			_routingContext.UmbracoContext.HttpContext.Items["pageID"] = _pcr.PublishedContentId;
+			_routingContext.UmbracoContext.HttpContext.Items["pageID"] = _pcr.PublishedContent.Id;
 			_routingContext.UmbracoContext.HttpContext.Items["pageElements"] = _pcr.UmbracoPage.Elements;
 		}
 
@@ -148,7 +148,7 @@ namespace Umbraco.Web.Routing
 			_pcr.UmbracoPage = new page(_pcr);
 
 			// these two are used by many legacy objects
-			_routingContext.UmbracoContext.HttpContext.Items["pageID"] = _pcr.PublishedContentId;
+			_routingContext.UmbracoContext.HttpContext.Items["pageID"] = _pcr.PublishedContent.Id;
 			_routingContext.UmbracoContext.HttpContext.Items["pageElements"] = _pcr.UmbracoPage.Elements;
 		}
 
@@ -455,7 +455,7 @@ namespace Umbraco.Web.Routing
 					//_pcr.Document = null; // no! that would be to force a 404
 					LogHelper.Debug<PublishedContentRequestEngine>("{0}Failed to redirect to id={1}: invalid value", () => tracePrefix, () => internalRedirect);
 				}
-				else if (internalRedirectId == _pcr.PublishedContentId)
+				else if (internalRedirectId == _pcr.PublishedContent.Id)
 				{
 					// redirect to self
 					LogHelper.Debug<PublishedContentRequestEngine>("{0}Redirecting to self, ignore", () => tracePrefix);
@@ -494,7 +494,7 @@ namespace Umbraco.Web.Routing
 
 			var path = _pcr.PublishedContent.Path;
 
-			if (Access.IsProtected(_pcr.PublishedContentId, path))
+			if (Access.IsProtected(_pcr.PublishedContent.Id, path))
 			{
 				LogHelper.Debug<PublishedContentRequestEngine>("{0}Page is protected, check for access", () => tracePrefix);
 
@@ -512,14 +512,14 @@ namespace Umbraco.Web.Routing
 				{
 					LogHelper.Debug<PublishedContentRequestEngine>("{0}Not logged in, redirect to login page", () => tracePrefix);
 					var loginPageId = Access.GetLoginPage(path);
-					if (loginPageId != _pcr.PublishedContentId)
+					if (loginPageId != _pcr.PublishedContent.Id)
 						_pcr.PublishedContent = _routingContext.PublishedContentStore.GetDocumentById(_routingContext.UmbracoContext, loginPageId);
 				}
-				else if (!Access.HasAccces(_pcr.PublishedContentId, user.ProviderUserKey))
+				else if (!Access.HasAccces(_pcr.PublishedContent.Id, user.ProviderUserKey))
 				{
 					LogHelper.Debug<PublishedContentRequestEngine>("{0}Current member has not access, redirect to error page", () => tracePrefix);
 					var errorPageId = Access.GetErrorPage(path);
-					if (errorPageId != _pcr.PublishedContentId)
+					if (errorPageId != _pcr.PublishedContent.Id)
 						_pcr.PublishedContent = _routingContext.PublishedContentStore.GetDocumentById(_routingContext.UmbracoContext, errorPageId);
 				}
 				else
