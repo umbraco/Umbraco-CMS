@@ -34,7 +34,7 @@ namespace Umbraco.Web.Routing
 
 			if (id > 0)
 			{
-				LogHelper.Debug<ContentFinderByLegacy404>("Got id={1}.", () => id);
+				LogHelper.Debug<ContentFinderByLegacy404>("Got id={0}.", () => id);
 
 				content = pcr.RoutingContext.PublishedContentStore.GetDocumentById(
 						pcr.RoutingContext.UmbracoContext,

@@ -329,6 +329,7 @@
     <Compile Include="Routing\ContentFinderByNotFoundHandler.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQuery.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
+    <Compile Include="Routing\ContentFinderByNotFoundHandlers.cs" />
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
     <Compile Include="Routing\PublishedContentRequestEngine.cs" />
     <Compile Include="Search\ExamineEvents.cs" />
@@ -429,7 +430,6 @@
     <Compile Include="WebBootManager.cs" />
     <Compile Include="Routing\LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
-    <Compile Include="Routing\ContentLastChanceFinder.cs" />
     <Compile Include="Routing\IContentLastChanceFinderResolver.cs" />
     <Compile Include="Routing\ContentFinderByUrlAlias.cs" />
     <Compile Include="Media\ThumbnailProviders\AbstractThumbnailProvider.cs" />

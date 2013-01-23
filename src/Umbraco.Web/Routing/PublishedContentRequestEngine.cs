@@ -524,7 +524,7 @@ namespace Umbraco.Web.Routing
 		}
 
 		/// <summary>
-		/// Finds a template for the current node.
+		/// Finds a template for the current node, if any.
 		/// </summary>
 		private void FindTemplate()
 		{
@@ -534,8 +534,11 @@ namespace Umbraco.Web.Routing
 
 			const string tracePrefix = "FindTemplate: ";
 
-			if (_pcr.PublishedContent == null)
-				throw new InvalidOperationException("There is no PublishedContent.");
+            if (_pcr.PublishedContent == null)
+            {
+                _pcr.Template = null;
+                return;
+            }
 
 			// read the alternate template alias, from querystring, form, cookie or server vars,
 			// only if the published content is the initial once, else the alternate template

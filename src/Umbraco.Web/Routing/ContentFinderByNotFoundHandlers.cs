@@ -12,25 +12,18 @@ using umbraco.interfaces;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Provides an implementation of <see cref="IContentFinder"/> to be used as a last chance finder,
-	/// that handles backward compatilibty with legacy <c>INotFoundHandler</c>.
+	/// Provides an implementation of <see cref="IContentFinder"/> that runs legacy <c>INotFoundHandler</c>.
 	/// </summary>
-    internal class ContentLastChanceFinder : IContentFinder
+    internal class ContentFinderByNotFoundHandlers : IContentFinder
     {
 		// notes
 		//
 		// at the moment we load the legacy INotFoundHandler
-		// excluding those that have been replaced by proper lookups,
+		// excluding those that have been replaced by proper finders,
 		// and run them.
 		//
-		// when we finaly obsolete INotFoundHandler, we'll have to move
-		// over here code from legacy requestHandler.hande404, which
-		// basically uses umbraco.library.GetCurrentNotFoundPageId();
-		// which also would need to be refactored / migrated here.
-		//
-		// the best way to do this would be to create a DefaultLastChanceLookup2
-		// that would do everything by itself, and let ppl use it if they
-		// want, then make it the default one, then remove this one.
+        // code from requestHandler.handle404 has been moved over to
+        // the new ContentFinderByLegacy404 finder.
 
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
@@ -49,7 +42,7 @@ namespace Umbraco.Web.Routing
 
 		IPublishedContent HandlePageNotFound(PublishedContentRequest docRequest)
         {
-			LogHelper.Debug<ContentLastChanceFinder>("Running for url='{0}'.", () => docRequest.Uri.AbsolutePath);
+			LogHelper.Debug<ContentFinderByNotFoundHandlers>("Running for url='{0}'.", () => docRequest.Uri.AbsolutePath);
 			
 			//XmlNode currentPage = null;
 			IPublishedContent currentPage = null;
@@ -66,7 +59,7 @@ namespace Umbraco.Web.Routing
 
                     // FIXME - could it be null?
 
-					LogHelper.Debug<ContentLastChanceFinder>("Handler '{0}' found node with id={1}.", () => handler.GetType().FullName, () => handler.redirectID);                    
+					LogHelper.Debug<ContentFinderByNotFoundHandlers>("Handler '{0}' found node with id={1}.", () => handler.GetType().FullName, () => handler.redirectID);                    
 
                     //// check for caching
                     //if (handler.CacheUrl)
@@ -97,7 +90,7 @@ namespace Umbraco.Web.Routing
             // initialize handlers
             // create the definition cache
 
-			LogHelper.Debug<ContentLastChanceFinder>("Registering custom handlers.");                    
+			LogHelper.Debug<ContentFinderByNotFoundHandlers>("Registering custom handlers.");                    
 
             var customHandlerTypes = new List<Type>();
 
@@ -108,21 +101,17 @@ namespace Umbraco.Web.Routing
             {
                 var assemblyName = n.Attributes.GetNamedItem("assembly").Value;
 
+                // skip those that are in umbraco.dll because we have replaced them with finders
+                if (assemblyName == "umbraco")
+                    continue;
+
                 var typeName = n.Attributes.GetNamedItem("type").Value;
                 string ns = assemblyName;
                 var nsAttr = n.Attributes.GetNamedItem("namespace");
                 if (nsAttr != null && !string.IsNullOrWhiteSpace(nsAttr.Value))
                     ns = nsAttr.Value;
 
-				if (assemblyName == "umbraco" && (ns + "." + typeName) != "umbraco.handle404")
-				{
-					// skip those that are in umbraco.dll because we have replaced them with IContentFinder
-					// but do not skip "handle404" as that's the built-in legacy final handler, and for the time
-					// being people will have it in their config.
-					continue;
-				}
-
-				LogHelper.Debug<ContentLastChanceFinder>("Registering '{0}.{1},{2}'.", () => ns, () => typeName, () => assemblyName);
+				LogHelper.Debug<ContentFinderByNotFoundHandlers>("Registering '{0}.{1},{2}'.", () => ns, () => typeName, () => assemblyName);
 
 				Type type = null;
 				try
@@ -135,7 +124,7 @@ namespace Umbraco.Web.Routing
                 }
                 catch (Exception e)
                 {
-					LogHelper.Error<ContentLastChanceFinder>("Error registering handler, ignoring.", e);                       
+					LogHelper.Error<ContentFinderByNotFoundHandlers>("Error registering handler, ignoring.", e);                       
                 }
 
                 if (type != null)
@@ -168,7 +157,7 @@ namespace Umbraco.Web.Routing
                 }
                 catch (Exception e)
                 {
-					LogHelper.Error<ContentLastChanceFinder>(string.Format("Error instanciating handler {0}, ignoring.", type.FullName), e);                         
+					LogHelper.Error<ContentFinderByNotFoundHandlers>(string.Format("Error instanciating handler {0}, ignoring.", type.FullName), e);                         
                 }
             }
 
