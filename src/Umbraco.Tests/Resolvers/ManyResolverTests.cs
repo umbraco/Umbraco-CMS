@@ -87,6 +87,28 @@ namespace Umbraco.Tests.Resolvers
         }
 
         [Test]
+        public void ManyResolverCanClearBeforeFreeze()
+        {
+            var resolver = new ManyResolver();
+            resolver.AddType<Resolved1>();
+            resolver.AddType<Resolved2>();
+            resolver.Clear();
+            Assert.IsFalse(resolver.ContainsType<Resolved1>());
+            Assert.IsFalse(resolver.ContainsType<Resolved2>());
+        }
+
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void ManyResolverCannotClearOnceFrozen()
+        {
+            var resolver = new ManyResolver();
+            resolver.AddType<Resolved1>();
+            resolver.AddType<Resolved2>();
+            Resolution.Freeze();
+            resolver.Clear();
+        }
+
+        [Test]
         public void ManyResolverCanAddTypeBeforeFreeze()
         {
             var resolver = new ManyResolver();
