@@ -6,5 +6,6 @@ namespace Umbraco.Core.Persistence.Migrations
     {
         ICollection<IMigrationExpression> Expressions { get; set; }
         DatabaseProviders CurrentDatabaseProvider { get; }
+        Database Database { get; }
     }
 }

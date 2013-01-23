@@ -1,5 +1,4 @@
 ﻿using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Tests.TestHelpers.Entities
 {
@@ -7,9 +6,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
     {
          public static IMedia CreateMediaImage(IMediaType mediaType, int parentId)
          {
-             var media = new Media(parentId, mediaType)
+             var media = new Media("Test Image", parentId, mediaType)
                              {
-                                 Name = "Test Image",
                                  CreatorId = 0
                              };
 
@@ -24,9 +22,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
          public static IMedia CreateMediaFile(IMediaType mediaType, int parentId)
          {
-             var media = new Media(parentId, mediaType)
+             var media = new Media("Test File", parentId, mediaType)
                              {
-                                 Name = "Test File",
                                  CreatorId = 0
                              };
 
@@ -39,9 +36,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
          public static IMedia CreateMediaFolder(IMediaType mediaType, int parentId)
          {
-             var media = new Media(parentId, mediaType)
+             var media = new Media("Test Folder", parentId, mediaType)
                              {
-                                 Name = "Test Folder",
                                  CreatorId = 0
                              };
 

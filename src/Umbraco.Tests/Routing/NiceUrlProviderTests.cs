@@ -32,7 +32,8 @@ namespace Umbraco.Tests.Routing
 		/// <summary>
 		/// This checks that when we retreive a NiceUrl for multiple items that there are no issues with cache overlap 
 		/// and that they are all cached correctly.
-		/// </summary>
+        /// </summary>
+        [Ignore]
 		[Test]
 		public void Ensure_Cache_Is_Correct()
 		{

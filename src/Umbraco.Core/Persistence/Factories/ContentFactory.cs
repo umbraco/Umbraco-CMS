@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IContent BuildEntity(DocumentDto dto)
         {
-            return new Content(dto.ContentVersionDto.ContentDto.NodeDto.ParentId, _contentType)
+            return new Content(dto.Text, dto.ContentVersionDto.ContentDto.NodeDto.ParentId, _contentType)
             {
                 Id = _id,
                 Key =
@@ -57,20 +57,23 @@ namespace Umbraco.Core.Persistence.Factories
 
         public DocumentDto BuildDto(IContent entity)
         {
-            //NOTE Currently doesn't add Alias and templateId (legacy stuff that eventually will go away)
+            //NOTE Currently doesn't add Alias (legacy that eventually will go away)
             var documentDto = new DocumentDto
-            {
-                Newest = true,
-                NodeId = entity.Id,
-                Published = entity.Published,
-                Text = entity.Name,
-                UpdateDate = entity.UpdateDate,
-                WriterUserId = entity.WriterId,
-                VersionId = entity.Version,
-                ExpiresDate = null,
-                ReleaseDate = null,
-                ContentVersionDto = BuildContentVersionDto(entity)
-            };
+                                  {
+                                      Newest = true,
+                                      NodeId = entity.Id,
+                                      Published = entity.Published,
+                                      Text = entity.Name,
+                                      UpdateDate = entity.UpdateDate,
+                                      WriterUserId = entity.WriterId,
+                                      VersionId = entity.Version,
+                                      ExpiresDate = null,
+                                      ReleaseDate = null,
+                                      ContentVersionDto = BuildContentVersionDto(entity)
+                                  };
+
+            if (entity.Template != null && entity.Template.Id > 0)
+                documentDto.TemplateId = entity.Template.Id;
 
             if (entity.ExpireDate.HasValue)
                 documentDto.ExpiresDate = entity.ExpireDate.Value;

@@ -7,10 +7,13 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.Migrations;
+using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
+using MigrationsVersionFourNineZero = Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero;
 
 namespace Umbraco.Core
 {
@@ -40,7 +43,7 @@ namespace Umbraco.Core
 
 			//create database and service contexts for the app context
 			var dbFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName);
-		    UmbracoDatabase.Mapper = new PetaPocoMapper();
+		    Database.Mapper = new PetaPocoMapper();
 			var dbContext = new DatabaseContext(dbFactory);
 			var serviceContext = new ServiceContext(
 				new PetaPocoUnitOfWorkProvider(dbFactory), 
@@ -132,12 +135,33 @@ namespace Umbraco.Core
             MacroPropertyTypeResolver.Current = new MacroPropertyTypeResolver(
                 PluginManager.Current.ResolveMacroPropertyTypes());
 
+            //TODO: Y U NO WORK?
+            //MigrationResolver.Current = new MigrationResolver(
+            //    PluginManager.Current.ResolveMigrationTypes());
+            
+			//the database migration objects
+			MigrationResolver.Current = new MigrationResolver(new List<Type>
+				{
+					typeof (MigrationsVersionFourNineZero.RemoveUmbracoAppConstraints),
+					typeof (DeleteAppTables),
+					typeof (EnsureAppsTreesUpdated),
+					typeof (MoveMasterContentTypeData),
+					typeof (NewCmsContentType2ContentTypeTable),
+					typeof (RemoveMasterContentTypeColumn),
+					typeof (RenameCmsTabTable),
+					typeof (RenameTabIdColumn),
+					typeof (UpdateCmsContentTypeAllowedContentTypeTable),
+					typeof (UpdateCmsContentTypeTable),
+					typeof (UpdateCmsContentVersionTable),
+					typeof (UpdateCmsPropertyTypeGroupTable)
+				});
+
 			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
 				PluginManager.Current.ResolvePropertyEditorValueConverters());
 			//add the internal ones, these are not public currently so need to add them manually
 			PropertyEditorValueConvertersResolver.Current.AddType<DatePickerPropertyEditorValueConverter>();
 			PropertyEditorValueConvertersResolver.Current.AddType<TinyMcePropertyEditorValueConverter>();
 			PropertyEditorValueConvertersResolver.Current.AddType<YesNoPropertyEditorValueConverter>();
-		}
+        }
 	}
 }

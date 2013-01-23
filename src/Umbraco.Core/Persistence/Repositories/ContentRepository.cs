@@ -40,11 +40,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IContent PerformGet(int id)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+            var sql = GetBaseQuery(false)
+                .Where(GetBaseWhereClause(), new { Id = id })
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dto = Database.Query<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var content = factory.BuildEntity(dto);
 
             //Check if template id is set on DocumentDto, and get ITemplate if it is.
-            if (dto.TemplateId.HasValue)
+            if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
             {
                 content.Template = _templateRepository.Get(dto.TemplateId.Value);
             }
@@ -163,7 +163,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
             sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dto = Database.Query<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -262,8 +262,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(IContent entity)
         {
+            var publishedState = ((Content) entity).PublishedState;
             //A new version should only be created if published state (or language) has changed
-            bool shouldCreateNewVersion = ((ICanBeDirty)entity).IsPropertyDirty("Published") || ((ICanBeDirty)entity).IsPropertyDirty("Language");
+            bool shouldCreateNewVersion = (((ICanBeDirty)entity).IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished) || ((ICanBeDirty)entity).IsPropertyDirty("Language");
             if (shouldCreateNewVersion)
             {
                 //Updates Modified date and Version Guid
@@ -274,11 +275,14 @@ namespace Umbraco.Core.Persistence.Repositories
                 entity.UpdateDate = DateTime.Now;
             }
 
-            //Look up parent to get and set the correct Path if ParentId has changed
+            //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
             if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
             {
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
+                entity.Level = parent.Level + 1;
+                var maxSortOrder = Database.ExecuteScalar<int>("SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId", new { ParentId = entity.ParentId });
+                entity.SortOrder = maxSortOrder;
             }
 
             var factory = new ContentFactory(NodeObjectTypeId, entity.Id);
@@ -299,8 +303,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Update(newContentDto);
             }
 
-            //If Published state has changed then previous versions should have their publish state reset
-            if (((ICanBeDirty)entity).IsPropertyDirty("Published") && entity.Published)
+            //If Published state has changed then previous versions should have their publish state reset.
+            //If state has been changed to unpublished the previous versions publish state should also be reset.
+            if (((ICanBeDirty)entity).IsPropertyDirty("Published") && (entity.Published || publishedState == PublishedState.Unpublished))
             {
                 var publishedDocs = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND published = @IsPublished", new { Id = entity.Id, IsPublished = true });
                 foreach (var doc in publishedDocs)
@@ -365,6 +370,8 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 foreach (var property in entity.Properties)
                 {
+                    if(keyDictionary.ContainsKey(property.PropertyTypeId) == false) continue;
+
                     property.Id = keyDictionary[property.PropertyTypeId];
                 }
             }
@@ -379,7 +386,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Loop through properties to check if the content contains images/files that should be deleted
             foreach (var property in entity.Properties)
             {
-                if (property.PropertyType.DataTypeControlId == uploadFieldId &&
+                if (property.PropertyType.DataTypeId == uploadFieldId &&
                     string.IsNullOrEmpty(property.Value.ToString()) == false
                     && fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
                 {
@@ -413,7 +420,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where<ContentVersionDto>(x => x.Language == language);
             sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            var dto = Database.Query<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
+            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
 
             if (dto == null)
                 return null;

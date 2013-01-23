@@ -32,6 +32,7 @@
     <key alias="sort">Ordina</key>
     <key alias="toPublish">Invia la pubblicazione</key>
     <key alias="translate">Traduci</key>
+    <key alias="unpublish">Annulla pubblicazione</key>
     <key alias="update">Aggiorna</key>
   </area>
    <area alias="assignDomain">
@@ -40,8 +41,9 @@
     <key alias="domainCreated"><![CDATA[Il dominio '%0%' è stato creato]]></key>
     <key alias="domainDeleted"><![CDATA[Il dominio '%0%' è stato cancellato]]></key>
     <key alias="domainExists"><![CDATA[Il dominio '%0%' è già stato assegnato]]></key>
-    <key alias="domainHelp">per esempio: yourdomain.com, www.yourdomain.com</key>
+    <key alias="domainHelp"><![CDATA[per esempio: yourdomain.com, www.yourdomain.com]]></key>
     <key alias="domainUpdated"><![CDATA[Il dominio '%0%' è stato aggiornato]]></key>
+    <key alias="invalidDomain">Hostname non valido</key>
     <key alias="orEdit">Modifica il dominio corrente</key>
   </area>
   <area alias="auditTrails">
@@ -69,6 +71,7 @@
     <key alias="saveAndPublish">Salva e pubblica</key>
     <key alias="saveToPublish">Salva e invia per approvazione</key>
     <key alias="showPage">Anteprima</key>
+    <key alias="showPageDisabled"><![CDATA[L'anteprima è disabilitata dato che non è stato assegnato alcun template]]></key>
     <key alias="styleChoose">Scegli lo stile</key>
     <key alias="styleShow">Mostra gli stili</key>
     <key alias="tableInsert">Inserisci tabella</key>
@@ -553,6 +556,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
   </area>
   <area alias="publish">
     <key alias="contentPublishedFailedByEvent"><![CDATA[%0% non può esser pubblicato a causa di una estensione di terze parti che causa l'annullamento dell'operazione]]></key>
+    <key alias="contentPublishedFailedByParent"><![CDATA[%0% non può essere pubblicato perchè una pagina padre non è pubblicata.]]></key>
     <key alias="includeUnpublished"><![CDATA[Includi tutte le pagine figlio non pubblicate]]></key>
     <key alias="inProgress"><![CDATA[Pubblicazione in corso - attendere...]]></key>
     <key alias="inProgressCounter"><![CDATA[%0% su di %1% pagine sono state pubblicate...]]></key>
@@ -600,6 +604,9 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="users">Utenti</key>
   </area>
   <area alias="settings">
+    <key alias="asAContentMasterType"><![CDATA[come tipo di contenuto master. Le tab del tipo di contenuto master non sono mostrate e possono essere modificate solo direttamente dal tipo di contenuto master.]]></key>
+    <key alias="contentTypeEnabled">Tipo di contenuto master abilitato</key>
+    <key alias="contentTypeUses">Questo tipo di contenuto usa</key>
     <key alias="defaulttemplate"><![CDATA[Template di base]]></key>
     <key alias="dictionary editor egenskab"><![CDATA[Dictionary Key]]></key>
     <key alias="importDocumentTypeHelp"><![CDATA[Importa  un tipo di documento, trova il file con estensione ".udt" sul tuo computer dopo aver cliccato il pulsante "Sfoglia" e poi clicca  "Importa" (potrebbe chiederti una conferma nella prossima schermata)]]></key>
@@ -627,6 +634,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="contentTypeTabCreated">Tab creata</key>
     <key alias="contentTypeTabDeleted">Tab eliminata</key>
     <key alias="contentTypeTabDeletedText">Tab con id: %0% eliminata</key>
+    <key alias="contentUnpublished">Contenuto non pubblicato</key>
     <key alias="cssErrorHeader"><![CDATA[Foglio di stile non salvato]]></key>
     <key alias="cssSavedHeader"><![CDATA[Foglio di stile salvato]]></key>
     <key alias="cssSavedText"><![CDATA[Foglio di stile salvato correttamente]]></key>
@@ -651,6 +659,10 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="fileSavedHeader"><![CDATA[File salvato]]></key>
     <key alias="fileSavedText"><![CDATA[File salvato con successo]]></key>
     <key alias="languageSaved"><![CDATA[Lingua salvata]]></key>
+    <key alias="partialViewSavedHeader">Partial view salvata</key>    
+    <key alias="partialViewSavedText">Partial view salvata senza errori!</key>    
+    <key alias="partialViewErrorHeader">Partial view non salvata</key>   
+    <key alias="partialViewErrorText">Errore durante il salvataggio del file.</key>
     <key alias="pythonErrorHeader"><![CDATA[Script Python non salvato]]></key>
     <key alias="pythonErrorText"><![CDATA[A causa di un errore lo script Python non può essere salvato]]></key>
     <key alias="pythonSavedHeader"><![CDATA[Script Python salvato]]></key>
@@ -802,6 +814,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="categoryField">Campo Categoria</key>
     <key alias="changePassword">Cambia la tua password</key>
     <key alias="changePasswordDescription"><![CDATA[È possibile modificare la password di accesso al Back Office Umbraco compilando il modulo sottostante e clicca sul pulsante 'Modifica password']]></key>
+    <key alias="confirmNewPassword">Conferma la nuova password</key>
     <key alias="contentChannel">Contenuto del canale</key>
     <key alias="defaultToLiveEditing">Ridireziona al canvas al login</key>
     <key alias="descriptionField">Campo Descrizione</key>
@@ -813,6 +826,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="loginname">Login</key>
     <key alias="mediastartnode"><![CDATA[Nodo di inizio nella sezione Media]]></key>
     <key alias="modules">Sezioni</key>
+    <key alias="newPassword">Modifica la tua password</key>
     <key alias="noConsole"><![CDATA[Disabilita l'accesso ad Umbraco]]></key>
     <key alias="password">Password</key>
     <key alias="passwordChanged"><![CDATA[La tua password è stata cambiata!]]></key>

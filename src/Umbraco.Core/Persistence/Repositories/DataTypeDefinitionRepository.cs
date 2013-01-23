@@ -34,7 +34,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var dataTypeSql = GetBaseQuery(false);
             dataTypeSql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var dataTypeDto = Database.Query<DataTypeDto, NodeDto>(dataTypeSql).FirstOrDefault();
+            var dataTypeDto = Database.Fetch<DataTypeDto, NodeDto>(dataTypeSql).FirstOrDefault();
 
             if (dataTypeDto == null)
                 return null;

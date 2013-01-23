@@ -1,7 +1,12 @@
 <%@ Page ValidateRequest="false" Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master"
-    CodeBehind="editPython.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.developer.editPython" %><asp:Content ID="DocTypeContent" ContentPlaceHolderID="DocType" runat="server"><!DOCTYPE html></asp:Content>
+    CodeBehind="editPython.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.developer.editPython" %>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+
+<asp:Content ID="DocTypeContent" ContentPlaceHolderID="DocType" runat="server">
+    <!DOCTYPE html>
+</asp:Content>
+
 <asp:Content ID="cp0" runat="server" ContentPlaceHolderID="head">
     <script type="text/javascript">
         function closeErrorDiv() {

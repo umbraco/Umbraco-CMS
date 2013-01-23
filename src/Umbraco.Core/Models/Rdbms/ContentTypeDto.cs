@@ -43,11 +43,6 @@ namespace Umbraco.Core.Models.Rdbms
         [Constraint(Default = "0")]
         public bool AllowAtRoot { get; set; }
 
-        [Column("masterContentType")]
-        [Constraint(Default = "0")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public int MasterContentType { get; set; }//TODO Delete once "masterContentType" has been removed from the Core
-
         [ResultColumn]
         public NodeDto NodeDto { get; set; }
     }

@@ -73,6 +73,7 @@ function init() {
 	* EO UMBRACO SPECIFIC 
 	*/
 
+	elm = inst.dom.getParent(elm, "A");
 	if (elm != null && elm.nodeName == "A")
 	    action = "update";
 

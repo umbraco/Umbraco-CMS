@@ -32,6 +32,7 @@
     <key alias="sort">排序</key>
     <key alias="toPublish">提交至发布者</key>
     <key alias="translate">翻译</key>
+    <key alias="unpublish">取消发布</key>
     <key alias="update">更新</key>
   </area>
   <area alias="assignDomain">
@@ -40,8 +41,13 @@
     <key alias="domainCreated">新域名 '%0%' 已创建</key>
     <key alias="domainDeleted">域名 '%0%' 已删除</key>
     <key alias="domainExists">域名 '%0%' 已使用</key>
-    <key alias="domainHelp">例如：yourdomain.com、www.yourdomain.com</key>
+    <key alias="domainHelp">
+    <![CDATA[例如：example.com、www.example.com、example.com:8080、<br/>
+        https://www.example.com/、example.com/en、……使用 * 代表任意域名，<br/>
+	只需要设置语言部分即可。]]>
+	</key>
     <key alias="domainUpdated">域名 '%0%' 已更新</key>
+    <key alias="invalidDomain">域名错误</key> 
     <key alias="orEdit">编辑当前域名</key>
   </area>
   <area alias="auditTrails">
@@ -69,6 +75,7 @@
     <key alias="saveAndPublish">保存并发布</key>
     <key alias="saveToPublish">保存并提交审核</key>
     <key alias="showPage">预览</key>
+    <key alias="showPageDisabled">因未设置模板无法预览</key>
     <key alias="styleChoose">选择样式</key>
     <key alias="styleShow">显示样式</key>
     <key alias="tableInsert">插入表格</key>
@@ -580,6 +587,11 @@
   <area alias="publish">
     <key alias="contentPublishedFailedByEvent"><![CDATA[%0% 无法发布，第三方组件造成失败。
     ]]></key>
+    <key alias="contentPublishedFailedByParent">
+      <![CDATA[
+      %0% 不能发布，因为上级页面没有发布。
+    ]]>
+    </key>  
     <key alias="includeUnpublished">包含未发布的子项</key>
     <key alias="inProgress">正在发布，请稍候…</key>
     <key alias="inProgressCounter">%0% 中的 %1% 页面已发布…</key>
@@ -629,6 +641,9 @@
     <key alias="users">用户</key>
   </area>
   <area alias="settings">
+    <key alias="asAContentMasterType">作为主控文档类型. 主控文档类型的标签只能在主控文档类型里修改。</key>
+    <key alias="contentTypeEnabled">主控文档类型激活</key>
+    <key alias="contentTypeUses">该文档类型使用</key>
     <key alias="defaulttemplate">默认模板</key>
     <key alias="dictionary editor egenskab">字典键</key>
     <key alias="importDocumentTypeHelp">要导入文档类型，请点击“浏览”按钮，再点击“导入”，然后在您电脑上查找 ".udt"文件导入（下一页中需要您再次确认）</key>
@@ -656,6 +671,7 @@
     <key alias="contentTypeTabCreated">选项卡已创建</key>
     <key alias="contentTypeTabDeleted">选项卡已删除</key>
     <key alias="contentTypeTabDeletedText">id为%0%的选项卡已删除</key>
+    <key alias="contentUnpublished">内容已取消发布</key>
     <key alias="cssErrorHeader">样式表未保存</key>
     <key alias="cssSavedHeader">样式表已保存</key>
     <key alias="cssSavedText">样式表保存，无错误。</key>
@@ -693,6 +709,10 @@
     <key alias="xsltPermissionErrorText">XSLT无法保存，请检查权限。</key>
     <key alias="xsltSavedHeader">XSLT已保存</key>
     <key alias="xsltSavedText">XSLT无错误</key>
+    <key alias="partialViewSavedHeader">Partial视图已保存</key>
+    <key alias="partialViewSavedText">Partial视图保存，无错误。</key>
+    <key alias="partialViewErrorHeader">Partial视图未保存</key>
+    <key alias="partialViewErrorText">Partial视图因为错误未能保存</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">使用CSS语法，如：h1、.redHeader、.blueTex。</key>
@@ -828,6 +848,7 @@
     <key alias="categoryField">分类字段</key>
     <key alias="changePassword">更改密码</key>
     <key alias="changePasswordDescription">要改变密码，请在框中输入新密码，然后单击“更改密码”。</key>
+    <key alias="confirmNewPassword">确认新密码</key>
     <key alias="contentChannel">内容频道</key>
     <key alias="defaultToLiveEditing">登录后进入实时编辑模式</key>
     <key alias="descriptionField">描述字段</key>
@@ -839,6 +860,7 @@
     <key alias="loginname">登录</key>
     <key alias="mediastartnode">默认打开媒体项</key>
     <key alias="modules">区域</key>
+    <key alias="newPassword">更改密码</key>
     <key alias="noConsole">禁用后台管理界面</key>
     <key alias="password">密码</key>
     <key alias="passwordChanged">您的密码已更改！</key>

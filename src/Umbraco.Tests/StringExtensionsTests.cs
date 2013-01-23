@@ -10,6 +10,16 @@ namespace Umbraco.Tests
 	[TestFixture]
     public class StringExtensionsTests
     {
+
+		[TestCase("This is a string to encrypt")]		
+		public void Encrypt_And_Decrypt(string input)
+		{
+			var encrypted = input.EncryptWithMachineKey();
+			var decrypted = encrypted.DecryptWithMachineKey();
+			Assert.AreNotEqual(input, encrypted);
+			Assert.AreEqual(input, decrypted);
+		}
+
         [TestCase("Hello this is my string", " string", "Hello this is my")]
         [TestCase("Hello this is my string strung", " string", "Hello this is my string strung")]
         [TestCase("Hello this is my string string", " string", "Hello this is my")]

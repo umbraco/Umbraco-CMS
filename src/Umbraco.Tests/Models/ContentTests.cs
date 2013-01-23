@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Web;
 using NUnit.Framework;
+using Rhino.Mocks;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers.Entities;
 
@@ -38,6 +41,46 @@ namespace Umbraco.Tests.Models
             Assert.That(content.Properties["title"], Is.Not.Null);
             Assert.That(content.Properties["title"].Value, Is.EqualTo("This is the new title"));
         }
+
+        [Test]
+        public void Can_Set_Property_Value_As_String()
+        {
+            // Arrange
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+
+            // Act
+            content.SetValue("title", "This is the new title");
+
+            // Assert
+            Assert.That(content.Properties.Any(), Is.True);
+            Assert.That(content.Properties["title"], Is.Not.Null);
+            Assert.That(content.Properties["title"].Value, Is.EqualTo("This is the new title"));
+        }
+
+        [Test]
+        public void Can_Set_Property_Value_As_HttpPostedFileBase()
+        {
+            // Arrange
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+
+            var stream = new MemoryStream(System.Text.Encoding.Default.GetBytes("TestContent"));
+            var httpPostedFileBase = MockRepository.GenerateMock<HttpPostedFileBase>();
+            httpPostedFileBase.Stub(x => x.ContentLength).Return(Convert.ToInt32(stream.Length));
+            httpPostedFileBase.Stub(x => x.ContentType).Return("text/plain");
+            httpPostedFileBase.Stub(x => x.FileName).Return("sample.txt");
+            httpPostedFileBase.Stub(x => x.InputStream).Return(stream);
+
+            // Assert
+            content.SetValue("title", httpPostedFileBase);
+
+            // Assert
+            Assert.That(content.Properties.Any(), Is.True);
+            Assert.That(content.Properties["title"], Is.Not.Null);
+            Assert.That(content.Properties["title"].Value, Is.StringContaining("sample.txt"));
+        }
+
 
         [Test]
         public void Can_Clone_Content()
@@ -159,7 +202,7 @@ namespace Umbraco.Tests.Models
                                                                             HelpText = "",
                                                                             Mandatory = false,
                                                                             SortOrder = 3,
-                                                                            DataTypeId = -88
+                                                                            DataTypeDefinitionId = -88
                                                                         });
 
             // Assert
@@ -177,7 +220,7 @@ namespace Umbraco.Tests.Models
             // Act
             var propertyType = new PropertyType(new Guid(), DataTypeDatabaseType.Ntext)
                                    {
-                                       Alias = "subtitle", Name = "Subtitle", Description = "Optional subtitle", HelpText = "", Mandatory = false, SortOrder = 3, DataTypeId = -88
+                                       Alias = "subtitle", Name = "Subtitle", Description = "Optional subtitle", HelpText = "", Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -88
                                    };
             contentType.PropertyGroups["Content"].PropertyTypes.Add(propertyType);
             content.Properties.Add(new Property(propertyType){Value = "This is a subtitle Test"});
@@ -203,7 +246,7 @@ namespace Umbraco.Tests.Models
                                        HelpText = "",
                                        Mandatory = false,
                                        SortOrder = 3,
-                                       DataTypeId = -88
+                                       DataTypeDefinitionId = -88
                                    };
             var propertyGroup = new PropertyGroup {Name = "Test Group", SortOrder = 3};
             propertyGroup.PropertyTypes.Add(propertyType);
@@ -228,7 +271,7 @@ namespace Umbraco.Tests.Models
             // Act - note that the PropertyType's properties like SortOrder is not updated through the Content object
             var propertyType = new PropertyType(new Guid(), DataTypeDatabaseType.Ntext)
                                    {
-                                       Alias = "title", Name = "Title", Description = "Title description added", HelpText = "", Mandatory = false, SortOrder = 10, DataTypeId = -88
+                                       Alias = "title", Name = "Title", Description = "Title description added", HelpText = "", Mandatory = false, SortOrder = 10, DataTypeDefinitionId = -88
                                    };
             content.Properties.Add(new Property(propertyType));
 
@@ -319,7 +362,7 @@ namespace Umbraco.Tests.Models
 
             // Act
             content.ResetDirtyProperties();
-            content.ChangePublishedState(true);
+            content.ChangePublishedState(PublishedState.Published);
 
             // Assert
             Assert.That(content.IsPropertyDirty("Published"), Is.True);
@@ -377,7 +420,7 @@ namespace Umbraco.Tests.Models
                                        HelpText = "",
                                        Mandatory = false,
                                        SortOrder = 3,
-                                       DataTypeId = -88
+                                       DataTypeDefinitionId = -88
                                    };
             contentType.PropertyGroups["Content"].PropertyTypes.Add(propertyType);
 
@@ -404,7 +447,7 @@ namespace Umbraco.Tests.Models
                                                                                                     HelpText = "",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
-                                                                                                    DataTypeId = -88
+                                                                                                    DataTypeDefinitionId = -88
                                                                                                 }
                                                                                         }));
 
@@ -437,7 +480,7 @@ namespace Umbraco.Tests.Models
                                                                                                     HelpText = "",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
-                                                                                                    DataTypeId = -88
+                                                                                                    DataTypeDefinitionId = -88
                                                                                                 }
                                                                                         }));
 
@@ -472,7 +515,7 @@ namespace Umbraco.Tests.Models
                                                                                                     HelpText = "",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
-                                                                                                    DataTypeId = -88
+                                                                                                    DataTypeDefinitionId = -88
                                                                                                 }
                                                                                         }));
             var mixin2 = MockedContentTypes.CreateSimpleContentType("mixin2", "Mixin2", new PropertyTypeCollection(
@@ -486,7 +529,7 @@ namespace Umbraco.Tests.Models
                                                                                                     HelpText = "",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
-                                                                                                    DataTypeId = -88
+                                                                                                    DataTypeDefinitionId = -88
                                                                                                 }
                                                                                         }));
 

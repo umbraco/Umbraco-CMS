@@ -23,20 +23,20 @@ namespace Umbraco.Core.Persistence.Repositories
         private IFileSystem _masterpagesFileSystem;
         private IFileSystem _viewsFileSystem;
 
-		public TemplateRepository(IDatabaseUnitOfWork work)
-			: base(work)
+        public TemplateRepository(IDatabaseUnitOfWork work)
+            : base(work)
         {
             EnsureDepedencies();
         }
 
-		public TemplateRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
-			: base(work, cache)
+        public TemplateRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
+            : base(work, cache)
         {
             EnsureDepedencies();
         }
 
-		internal TemplateRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem)
-			: base(work, cache)
+        internal TemplateRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem)
+            : base(work, cache)
         {
             _masterpagesFileSystem = masterpageFileSystem;
             _viewsFileSystem = viewFileSystem;
@@ -44,8 +44,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private void EnsureDepedencies()
         {
-            _masterpagesFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider("masterpages");
-            _viewsFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider("views");
+            _masterpagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
+            _viewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
         }
 
         #region Overrides of RepositoryBase<int,ITemplate>
@@ -74,17 +74,20 @@ namespace Umbraco.Core.Persistence.Repositories
                 template.MasterTemplateId = dto.Master.Value;
             }
 
-            if(_viewsFileSystem.FileExists(csViewName))
+            if (_viewsFileSystem.FileExists(csViewName))
             {
                 PopulateViewTemplate(template, csViewName);
             }
-            else if(_viewsFileSystem.FileExists(vbViewName))
+            else if (_viewsFileSystem.FileExists(vbViewName))
             {
                 PopulateViewTemplate(template, vbViewName);
             }
             else
             {
-                PopulateMasterpageTemplate(template, masterpageName);
+                if (_masterpagesFileSystem.FileExists(masterpageName))
+                {
+                    PopulateMasterpageTemplate(template, masterpageName);
+                }
             }
 
             return template;
@@ -164,9 +167,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(ITemplate entity)
         {
-            using(var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content)))
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content)))
             {
-                if(entity.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
+                if (entity.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
                 {
                     _viewsFileSystem.AddFile(entity.Name, stream, true);
                 }
@@ -337,7 +340,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<ITemplate> GetAll(params string[] aliases)
         {
-            if(aliases.Any())
+            if (aliases.Any())
             {
                 foreach (var id in aliases)
                 {
@@ -352,7 +355,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     yield return Get(nodeDto.NodeId);
                 }
             }
-            
+
         }
 
         #endregion

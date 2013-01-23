@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Web;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
@@ -16,7 +17,7 @@ namespace Umbraco.Core.Models
     {
         protected IContentTypeComposition ContentTypeBase;
         private Lazy<int> _parentId;
-        private string _name;
+        private string _name;//NOTE Once localization is introduced this will be the localized Name of the Content/Media.
         private int _sortOrder;
         private int _level;
         private string _path;
@@ -25,34 +26,50 @@ namespace Umbraco.Core.Models
         private int _contentTypeId;
         private PropertyCollection _properties;
 
-        protected ContentBase(int parentId, IContentTypeComposition contentType, PropertyCollection properties)
+        /// <summary>
+        /// Protected constructor for ContentBase (Base for Content and Media)
+        /// </summary>
+        /// <param name="name">Localized Name of the entity</param>
+        /// <param name="parentId"></param>
+        /// <param name="contentType"></param>
+        /// <param name="properties"></param>
+        protected ContentBase(string name, int parentId, IContentTypeComposition contentType, PropertyCollection properties)
         {
             Mandate.ParameterCondition(parentId != 0, "parentId");
             Mandate.ParameterNotNull(contentType, "contentType");
             Mandate.ParameterNotNull(properties, "properties");
 
-            _parentId = new Lazy<int>(() => parentId);
-
-            _contentTypeId = int.Parse(contentType.Id.ToString(CultureInfo.InvariantCulture));
             ContentTypeBase = contentType;
+            Version = Guid.NewGuid();
+
+            _parentId = new Lazy<int>(() => parentId);
+            _name = name;
+            _contentTypeId = int.Parse(contentType.Id.ToString(CultureInfo.InvariantCulture));
             _properties = properties;
             _properties.EnsurePropertyTypes(PropertyTypes);
-            Version = Guid.NewGuid();
         }
 
-		protected ContentBase(IContentBase parent, IContentTypeComposition contentType, PropertyCollection properties)
+        /// <summary>
+        /// Protected constructor for ContentBase (Base for Content and Media)
+        /// </summary>
+        /// <param name="name">Localized Name of the entity</param>
+        /// <param name="parent"></param>
+        /// <param name="contentType"></param>
+        /// <param name="properties"></param>
+        protected ContentBase(string name, IContentBase parent, IContentTypeComposition contentType, PropertyCollection properties)
 		{
 			Mandate.ParameterNotNull(parent, "parent");
 			Mandate.ParameterNotNull(contentType, "contentType");
 			Mandate.ParameterNotNull(properties, "properties");
 
-			_parentId = new Lazy<int>(() => parent.Id);
+            ContentTypeBase = contentType;
+            Version = Guid.NewGuid();
 
+			_parentId = new Lazy<int>(() => parent.Id);
+            _name = name;
 			_contentTypeId = int.Parse(contentType.Id.ToString(CultureInfo.InvariantCulture));
-			ContentTypeBase = contentType;
 			_properties = properties;
 			_properties.EnsurePropertyTypes(PropertyTypes);
-			Version = Guid.NewGuid();
 		}
 
 	    private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Name);
@@ -256,11 +273,110 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Sets the value of a Property
+        /// Sets the <see cref="System.Object"/> value of a Property
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
         /// <param name="value">Value to set for the Property</param>
         public virtual void SetValue(string propertyTypeAlias, object value)
+        {
+            if (value == null)
+            {
+                SetValueOnProperty(propertyTypeAlias, value);
+                return;
+            }
+
+            // .NET magic to call one of the 'SetPropertyValue' handlers with matching signature 
+            ((dynamic)this).SetPropertyValue(propertyTypeAlias, (dynamic)value);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="System.String"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, string value)
+        {
+            SetValueOnProperty(propertyTypeAlias, value);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="System.Int32"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, int value)
+        {
+            SetValueOnProperty(propertyTypeAlias, value);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="System.Int64"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, long value)
+        {
+            string val = value.ToString();
+            SetValueOnProperty(propertyTypeAlias, val);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="System.Boolean"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, bool value)
+        {
+            int val = Convert.ToInt32(value);
+            SetValueOnProperty(propertyTypeAlias, val);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="System.DateTime"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, DateTime value)
+        {
+            SetValueOnProperty(propertyTypeAlias, value);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="System.Web.HttpPostedFile"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFile value)
+        {
+            ContentExtensions.SetValue(this, propertyTypeAlias, value);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="System.Web.HttpPostedFileBase"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFileBase value)
+        {
+            ContentExtensions.SetValue(this, propertyTypeAlias, value);
+        }
+
+        /// <summary>
+        /// Sets the <see cref="System.Web.HttpPostedFileWrapper"/> value of a Property
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="value">Value to set for the Property</param>
+        public virtual void SetPropertyValue(string propertyTypeAlias, HttpPostedFileWrapper value)
+        {
+            ContentExtensions.SetValue(this, propertyTypeAlias, value);
+        }
+
+        /// <summary>
+        /// Private method to set the value of a property
+        /// </summary>
+        /// <param name="propertyTypeAlias"></param>
+        /// <param name="value"></param>
+        private void SetValueOnProperty(string propertyTypeAlias, object value)
         {
             if (Properties.Contains(propertyTypeAlias))
             {
@@ -284,5 +400,7 @@ namespace Umbraco.Core.Models
         {
             return Properties.Any(property => !property.IsValid()) == false;
         }
+
+        public abstract void ChangeTrashedState(bool isTrashed, int parentId = -1);
     }
 }

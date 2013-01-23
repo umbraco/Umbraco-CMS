@@ -23,6 +23,12 @@
  <!-- NB: BUILD_NUMBER is passed in by the build server -->
  <PropertyGroup Condition="'$(BUILD_NUMBER)'!=''">
    <DECIMAL_BUILD_NUMBER>.$(BUILD_NUMBER)</DECIMAL_BUILD_NUMBER>
+ </PropertyGroup> 
+ <PropertyGroup Condition="'$(BUILD_RELEASE)'!=''">
+   <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)</DECIMAL_BUILD_NUMBER>
+ </PropertyGroup>
+ <PropertyGroup Condition="'$(BUILD_RELEASE)'!='' AND '$(BUILD_COMMENT)'!=''">
+   <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)-$(BUILD_COMMENT)</DECIMAL_BUILD_NUMBER>
  </PropertyGroup>
  
  <PropertyGroup>
@@ -141,7 +147,7 @@
  </Target>
  
  <!-- Copy the transformed web.config file to the root -->
- <Target Name="CopyTransformedWebConfig"  DependsOnTargets="CompileProjects">
+ <Target Name="CopyTransformedWebConfig"  DependsOnTargets="CopyXmlDocumentation">
    <ItemGroup>
      <WebConfigFile Include="..\src\Umbraco.Web.UI\web.$(BuildConfiguration).Config.transformed" />
    </ItemGroup>
@@ -152,7 +158,20 @@
        SkipUnchangedFiles="false" />
  </Target>
  
- <Target Name="CompileProjects">
+ <!-- Copy the xml documentation to the bin folder -->
+ <Target Name="CopyXmlDocumentation"  DependsOnTargets="CompileProjects">
+   <ItemGroup>
+     <XmlDocumentationFiles Include="$(SolutionBinFolder)*.xml" />
+   </ItemGroup>
+   
+   <Copy SourceFiles="@(XmlDocumentationFiles)"
+       DestinationFiles="@(XmlDocumentationFiles->'$(WebAppFolder)bin\%(RecursiveDir)%(Filename)%(Extension)')"
+       OverwriteReadOnlyFiles="true"
+       SkipUnchangedFiles="false" />
+	<Message Text="CopyXmlDocumentation" />
+ </Target>
+ 
+ <Target Name="CompileProjects" DependsOnTargets="SetVersionNumber">
    <Message Text="Compiling web project to build\$(BuildFolder)" Importance="high" />
    <!-- For UseWPP_CopyWebApplication=True see http://stackoverflow.com/questions/1983575/copywebapplication-with-web-config-transformations -->
    <MSBuild Projects="..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderAbsolutePath);WebProjectOutputDir=$(WebAppFolderAbsolutePath)" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
@@ -161,5 +180,16 @@
    <!-- DONE -->
    <Message Text="Finished compiling projects" Importance="high" />
  </Target>
- 
+
+ <Target Name="SetVersionNumber" Condition="'$(BUILD_RELEASE)'!=''">
+    <!-- Match & replace 3 and 4 digit version numbers and -beta (if it's there) -->
+    <FileUpdate 
+      Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
+      Regex="(\d+)\.(\d+)\.(\d+)(.(\d+))?"
+      ReplacementText="$(BUILD_RELEASE)"/>
+
+    <FileUpdate Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
+      Regex="CurrentComment { get { return &quot;([a-zA-Z]+)?&quot;"
+      ReplacementText="CurrentComment { get { return &quot;$(BUILD_COMMENT)&quot;"/>
+ </Target>
 </Project>

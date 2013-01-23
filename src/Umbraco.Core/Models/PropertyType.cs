@@ -17,8 +17,9 @@ namespace Umbraco.Core.Models
         private string _name;
         private string _alias;
         private string _description;
-        private int _dataTypeId;
-        private Guid _dataTypeControlId;
+        private int _dataTypeDefinitionId;
+        private int _propertyGroupId;
+        private Guid _dataTypeId;
         private DataTypeDatabaseType _dataTypeDatabaseType;
         private bool _mandatory;
         private string _helpText;
@@ -28,9 +29,9 @@ namespace Umbraco.Core.Models
         public PropertyType(IDataTypeDefinition dataTypeDefinition)
         {
             if(dataTypeDefinition.HasIdentity)
-                DataTypeId = dataTypeDefinition.Id;
+                DataTypeDefinitionId = dataTypeDefinition.Id;
 
-            DataTypeControlId = dataTypeDefinition.ControlId;
+            DataTypeId = dataTypeDefinition.ControlId;
             DataTypeDatabaseType = dataTypeDefinition.DatabaseType;
 
             EnsureSerializationService();
@@ -38,7 +39,7 @@ namespace Umbraco.Core.Models
 
         internal PropertyType(Guid dataTypeControlId, DataTypeDatabaseType dataTypeDatabaseType)
         {
-            DataTypeControlId = dataTypeControlId;
+            DataTypeId = dataTypeControlId;
             DataTypeDatabaseType = dataTypeDatabaseType;
 
             EnsureSerializationService();
@@ -53,13 +54,14 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Name);
         private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Alias);
         private static readonly PropertyInfo DescriptionSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Description);
-        private static readonly PropertyInfo DataTypeIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.DataTypeId);
-        private static readonly PropertyInfo DataTypeControlIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, Guid>(x => x.DataTypeControlId);
+        private static readonly PropertyInfo DataTypeDefinitionIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.DataTypeDefinitionId);
+        private static readonly PropertyInfo DataTypeControlIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, Guid>(x => x.DataTypeId);
         private static readonly PropertyInfo DataTypeDatabaseTypeSelector = ExpressionHelper.GetPropertyInfo<PropertyType, DataTypeDatabaseType>(x => x.DataTypeDatabaseType);
         private static readonly PropertyInfo MandatorySelector = ExpressionHelper.GetPropertyInfo<PropertyType, bool>(x => x.Mandatory);
         private static readonly PropertyInfo HelpTextSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.HelpText);
         private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.SortOrder);
         private static readonly PropertyInfo ValidationRegExpSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationRegExp);
+        private static readonly PropertyInfo PropertyGroupIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.PropertyGroupId);
 
         /// <summary>
         /// Gets of Sets the Name of the PropertyType
@@ -108,13 +110,13 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>This is actually the Id of the <see cref="IDataTypeDefinition"/></remarks>
         [DataMember]
-        public int DataTypeId
+        public int DataTypeDefinitionId
         {
-            get { return _dataTypeId; }
+            get { return _dataTypeDefinitionId; }
             set
             {
-                _dataTypeId = value;
-                OnPropertyChanged(DataTypeIdSelector);
+                _dataTypeDefinitionId = value;
+                OnPropertyChanged(DataTypeDefinitionIdSelector);
             }
         }
 
@@ -123,12 +125,12 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>This is the Id of the actual DataType control</remarks>
         [DataMember]
-        internal Guid DataTypeControlId
+        public Guid DataTypeId
         {
-            get { return _dataTypeControlId; }
-            set
+            get { return _dataTypeId; }
+            internal set
             {
-                _dataTypeControlId = value;
+                _dataTypeId = value;
                 OnPropertyChanged(DataTypeControlIdSelector);
             }
         }
@@ -144,6 +146,20 @@ namespace Umbraco.Core.Models
             {
                 _dataTypeDatabaseType = value;
                 OnPropertyChanged(DataTypeDatabaseTypeSelector);
+            }
+        }
+
+        /// <summary>
+        /// Gets or Sets the PropertyGroup's Id for which this PropertyType belongs
+        /// </summary>
+        [DataMember]
+        internal int PropertyGroupId
+        {
+            get { return _propertyGroupId; }
+            set
+            {
+                _propertyGroupId = value;
+                OnPropertyChanged(PropertyGroupIdSelector);
             }
         }
 
@@ -280,7 +296,7 @@ namespace Umbraco.Core.Models
                 return argument == type;
             }*/
 
-            if (DataTypeControlId != Guid.Empty)
+            if (DataTypeId != Guid.Empty)
             {
                 //Find DataType by Id
                 //IDataType dataType = DataTypesResolver.Current.GetById(DataTypeControlId);

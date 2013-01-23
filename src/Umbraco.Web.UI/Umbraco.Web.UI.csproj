@@ -117,17 +117,21 @@
     <Reference Include="Microsoft.Web.Mvc.FixedDisplayModes">
       <HintPath>..\packages\Microsoft.AspNet.Mvc.FixedDisplayModes.1.0.0\lib\net40\Microsoft.Web.Mvc.FixedDisplayModes.dll</HintPath>
     </Reference>
+    <Reference Include="MySql.Data, Version=5.1.2.2, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MySQL.Data.5.1.2.2\lib\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="Our.Umbraco.uGoLive, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\uGoLive.1.0.0\lib\Our.Umbraco.uGoLive.dll</HintPath>
+      <HintPath>..\packages\uGoLive.1.3.0\lib\Our.Umbraco.uGoLive.dll</HintPath>
     </Reference>
     <Reference Include="Our.Umbraco.uGoLive.47x, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\uGoLive.1.0.0\lib\Our.Umbraco.uGoLive.47x.dll</HintPath>
+      <HintPath>..\packages\uGoLive.1.3.0\lib\Our.Umbraco.uGoLive.47x.dll</HintPath>
     </Reference>
     <Reference Include="Our.Umbraco.uGoLive.Checks, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\uGoLive.1.0.0\lib\Our.Umbraco.uGoLive.Checks.dll</HintPath>
+      <HintPath>..\packages\uGoLive.1.3.0\lib\Our.Umbraco.uGoLive.Checks.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -1014,6 +1018,8 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\en_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\en_us.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\en_us_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\it.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\it_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\ru.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\ru_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\zh.js" />
@@ -1024,10 +1030,14 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Img\ajax-loader.gif" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Img\embed.gif" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Js\dialog.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\de.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\de_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\en.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\en_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\en_us.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\en_us_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\it.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\it_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\ru.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\ru_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\zh.js" />
@@ -1824,14 +1834,31 @@
       <DependentUpon>applications.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <None Include="Umbraco_Client\CodeMirror\Js\Mode\Coffeescript\LICENSE" />
-    <None Include="Umbraco_Client\CodeMirror\Js\Mode\Pascal\LICENSE" />
-    <None Include="Umbraco_Client\CodeMirror\Js\Mode\Perl\LICENSE" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Razor\LICENSE" />
-    <None Include="Umbraco_Client\CodeMirror\Js\Mode\Ruby\LICENSE" />
-    <None Include="Umbraco_Client\CodeMirror\Js\Mode\R\LICENSE" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Sieve\LICENSE" />
-    <None Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\LICENSE" />
+    <Content Include="Umbraco\scripting\templates\cshtml\EmptyTemplate.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Umbraco\scripting\templates\cshtml\Gallery.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListAncestorsFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesFromChangeableSource.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesOrderedByDate.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesOrderedByName.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesOrderedByProperty.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesWithDoctype.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListDescendantsFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\ListImagesFromMediaFolder.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Umbraco\scripting\templates\cshtml\MultinodeTree-picker.cshtml" />
+    <Content Include="Umbraco\scripting\templates\cshtml\TwitterFeed.cshtml" />
+    <None Include="umbraco_client\CodeMirror\js\mode\coffeescript\LICENSE" />
+    <None Include="umbraco_client\CodeMirror\js\mode\pascal\LICENSE" />
+    <None Include="umbraco_client\CodeMirror\js\mode\perl\LICENSE" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\razor\LICENSE" />
+    <None Include="umbraco_client\CodeMirror\js\mode\ruby\LICENSE" />
+    <None Include="umbraco_client\CodeMirror\js\mode\r\LICENSE" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\sieve\LICENSE" />
+    <None Include="umbraco_client\CodeMirror\js\mode\xquery\LICENSE" />
     <Content Include="Views\Web.config" />
     <Content Include="Web.config" />
     <None Include="web.Template.Debug.config">
@@ -1848,14 +1875,8 @@
     <Content Include="Umbraco\Masterpages\umbracoDialog.Master" />
     <Content Include="Umbraco\Search\QuickSearchHandler.ashx" />
     <Content Include="Umbraco\Scripting\Templates\Cshtml\Breadcrumb.cshtml" />
-    <Content Include="Umbraco\Scripting\Templates\Cshtml\ListSubPagesByDateAndLimit.cshtml" />
-    <Content Include="Umbraco\Scripting\Templates\Cshtml\Macro-Parameters.cshtml" />
-    <Content Include="Umbraco\Scripting\Templates\Cshtml\Media.cshtml" />
     <Content Include="Umbraco\Scripting\Templates\Cshtml\Navigation.cshtml" />
-    <Content Include="Umbraco\Scripting\Templates\Cshtml\Paging.cshtml" />
-    <Content Include="Umbraco\Scripting\Templates\Cshtml\SelectChildrenByDocumentType.cshtml" />
     <Content Include="Umbraco\Scripting\Templates\Cshtml\SiteMap.cshtml" />
-    <Content Include="Umbraco\Scripting\Templates\Cshtml\UsingRelatedLinks.cshtml" />
     <None Include="Umbraco\Scripting\Templates\Py\SubpagesAsThumnbnails.py" />
     <None Include="Umbraco\Scripting\Templates\Py\SubpagesFromAChangeableSource.py" />
     <None Include="Umbraco\Scripting\Templates\Py\SubpagesFromCurrentPage.py" />

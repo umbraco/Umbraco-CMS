@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixth;
+﻿using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
 using umbraco.BusinessLogic;
 using umbraco.interfaces;
 

@@ -422,6 +422,11 @@ namespace umbraco
                         try
                         {
 							TraceInfo("umbracoMacro","Usercontrol added (" + Model.TypeName + ")");
+                            
+                            // Add tilde for v4 defined macros
+                            if (string.IsNullOrEmpty(Model.TypeName) == false && Model.TypeName.StartsWith("~") == false)
+                                Model.TypeName = "~/" + Model.TypeName;
+
                             macroControl = loadUserControl(ScriptType, Model, pageElements);
                             break;
                         }

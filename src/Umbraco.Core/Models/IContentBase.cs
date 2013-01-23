@@ -66,7 +66,7 @@ namespace Umbraco.Core.Models
         TPassType GetValue<TPassType>(string propertyTypeAlias);
 
         /// <summary>
-        /// Sets the value of a Property
+        /// Sets the <see cref="System.Object"/> value of a Property
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
         /// <param name="value">Value to set for the Property</param>
@@ -77,5 +77,12 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <returns>True if content is valid otherwise false</returns>
         bool IsValid();
+
+        /// <summary>
+        /// Changes the Trashed state of the content object
+        /// </summary>
+        /// <param name="isTrashed">Boolean indicating whether content is trashed (true) or not trashed (false)</param>
+        /// <param name="parentId"> </param>
+        void ChangeTrashedState(bool isTrashed, int parentId = -1);
     }
 }

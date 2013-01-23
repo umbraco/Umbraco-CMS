@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
+using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -23,9 +25,16 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IEnumerable<TEntity> GetAllVersions(int id)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+            var sql = new Sql();
+            sql.Select("*")
+                .From<ContentVersionDto>()
+                .InnerJoin<ContentDto>()
+                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>()
+                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                .Where<NodeDto>(x => x.NodeId == id)
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
             var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
             foreach (var dto in dtos)

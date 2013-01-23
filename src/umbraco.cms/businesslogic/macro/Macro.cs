@@ -333,6 +333,10 @@ namespace umbraco.cms.businesslogic.macro
                 m.Xslt = xmlHelper.GetNodeValue(n.SelectSingleNode("xslt"));
                 m.RefreshRate = int.Parse(xmlHelper.GetNodeValue(n.SelectSingleNode("refreshRate")));
 
+                // we need to validate if the usercontrol is missing the tilde prefix requirement introduced in v6
+                if (String.IsNullOrEmpty(m.Assembly) && !String.IsNullOrEmpty(m.Type) && !m.Type.StartsWith("~"))
+                    m.Type = "~/" + m.Type;
+
                 if (n.SelectSingleNode("scriptingFile") != null)
                     m.ScriptingFile = xmlHelper.GetNodeValue(n.SelectSingleNode("scriptingFile"));
 

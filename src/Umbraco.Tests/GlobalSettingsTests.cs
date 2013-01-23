@@ -30,6 +30,7 @@ namespace Umbraco.Tests
 			ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "");
 		}
 
+        [Ignore]
         [Test]
         public void Is_Version_From_Assembly_Correct()
         {

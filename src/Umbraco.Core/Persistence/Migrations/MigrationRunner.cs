@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Persistence.Migrations
 {
-    /// <summary>
+	/// <summary>
     /// Represents the Migration Runner, which is used to apply migrations to
     /// the umbraco database.
     /// </summary>
@@ -44,13 +45,17 @@ namespace Umbraco.Core.Persistence.Migrations
         {
             LogHelper.Info<MigrationRunner>("Initializing database migration");
 
-            var foundMigrations = PluginManager.Current.FindMigrations();
+	        var foundMigrations = MigrationResolver.Current.Migrations;
+
             var migrations = isUpgrade
-                                 ? OrderedUpgradeMigrations(foundMigrations)
-                                 : OrderedDowngradeMigrations(foundMigrations);
+                                 ? OrderedUpgradeMigrations(foundMigrations).ToList()
+                                 : OrderedDowngradeMigrations(foundMigrations).ToList();
+            
+            if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(migrations, _configuredVersion, _targetVersion, true), this))
+                return false;
 
             //Loop through migrations to generate sql
-            var context = new MigrationContext(databaseProvider);
+            var context = new MigrationContext(databaseProvider, database);
             foreach (MigrationBase migration in migrations)
             {
                 if (isUpgrade)
@@ -84,6 +89,8 @@ namespace Umbraco.Core.Persistence.Migrations
                 transaction.Complete();
             }
 
+            Migrated.RaiseEvent(new MigrationEventArgs(migrations, context, _configuredVersion, _targetVersion, false), this);
+
             return true;
         }
 
@@ -114,5 +121,15 @@ namespace Umbraco.Core.Persistence.Migrations
                               select migration);
             return migrations;
         }
+
+        /// <summary>
+        /// Occurs before Migration
+        /// </summary>
+        public static event TypedEventHandler<MigrationRunner, MigrationEventArgs> Migrating;
+
+        /// <summary>
+        /// Occurs after Migration
+        /// </summary>
+        public static event TypedEventHandler<MigrationRunner, MigrationEventArgs> Migrated;
     }
 }

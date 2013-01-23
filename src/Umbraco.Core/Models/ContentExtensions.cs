@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -53,13 +54,14 @@ namespace Umbraco.Core.Models
             }
         }
 
+        /*
         /// <summary>
         /// Sets and uploads the file from a HttpPostedFileBase object as the property value
         /// </summary>
         /// <param name="media"><see cref="IMedia"/> to add property value to</param>
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="value">The <see cref="HttpPostedFileBase"/> containing the file that will be uploaded</param>
-        public static void SetValue(this IMedia media, string propertyTypeAlias, HttpPostedFileBase value)
+        public static void SetPropertyValue(this IMedia media, string propertyTypeAlias, HttpPostedFileBase value)
         {
             var name =
                 IOHelper.SafeFileName(
@@ -77,7 +79,7 @@ namespace Umbraco.Core.Models
         /// <param name="media"><see cref="IMedia"/> to add property value to</param>
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="value">The <see cref="HttpPostedFile"/> containing the file that will be uploaded</param>
-        public static void SetValue(this IMedia media, string propertyTypeAlias, HttpPostedFile value)
+        public static void SetPropertyValue(this IMedia media, string propertyTypeAlias, HttpPostedFile value)
         {
             var name =
                 IOHelper.SafeFileName(
@@ -95,19 +97,19 @@ namespace Umbraco.Core.Models
         /// <param name="media"><see cref="IMedia"/> to add property value to</param>
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="value">The <see cref="HttpPostedFileWrapper"/> containing the file that will be uploaded</param>
-        public static void SetValue(this IMedia media, string propertyTypeAlias, HttpPostedFileWrapper value)
+        public static void SetPropertyValue(this IMedia media, string propertyTypeAlias, HttpPostedFileWrapper value)
         {
             if (string.IsNullOrEmpty(value.FileName) == false)
                 SetFileOnContent(media, propertyTypeAlias, value.FileName, value.InputStream);
         }
-
+        */
         /// <summary>
         /// Sets and uploads the file from a HttpPostedFileBase object as the property value
         /// </summary>
         /// <param name="content"><see cref="IContent"/> to add property value to</param>
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="value">The <see cref="HttpPostedFileBase"/> containing the file that will be uploaded</param>
-        public static void SetValue(this IContent content, string propertyTypeAlias, HttpPostedFileBase value)
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileBase value)
         {
             var name =
                 IOHelper.SafeFileName(
@@ -125,7 +127,7 @@ namespace Umbraco.Core.Models
         /// <param name="content"><see cref="IContent"/> to add property value to</param>
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="value">The <see cref="HttpPostedFile"/> containing the file that will be uploaded</param>
-        public static void SetValue(this IContent content, string propertyTypeAlias, HttpPostedFile value)
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFile value)
         {
             var name =
                 IOHelper.SafeFileName(
@@ -143,7 +145,7 @@ namespace Umbraco.Core.Models
         /// <param name="content"><see cref="IContent"/> to add property value to</param>
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="value">The <see cref="HttpPostedFileWrapper"/> containing the file that will be uploaded</param>
-        public static void SetValue(this IContent content, string propertyTypeAlias, HttpPostedFileWrapper value)
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileWrapper value)
         {
             if (string.IsNullOrEmpty(value.FileName) == false)
                 SetFileOnContent(content, propertyTypeAlias, value.FileName, value.InputStream);
@@ -174,10 +176,10 @@ namespace Umbraco.Core.Models
 
                 //Look up Prevalues for this upload datatype - if it is an upload datatype
                 var uploadFieldId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
-                if (property.PropertyType.DataTypeControlId == uploadFieldId)
+                if (property.PropertyType.DataTypeId == uploadFieldId)
                 {
                     //Get Prevalues by the DataType's Id: property.PropertyType.DataTypeId
-                    var values = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(property.PropertyType.DataTypeId);
+                    var values = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId);
                     var thumbnailSizes = values.FirstOrDefault();
                     //Additional thumbnails configured as prevalues on the DataType
                     if (thumbnailSizes != null)
@@ -208,8 +210,8 @@ namespace Umbraco.Core.Models
                     //Only add dimensions to web images
                     if (supportsResizing)
                     {
-                        SetPropertyValue(content, uploadFieldConfigNode, "widthFieldAlias", GetDimensions(fs, fileName).Item1);
-                        SetPropertyValue(content, uploadFieldConfigNode, "heightFieldAlias", GetDimensions(fs, fileName).Item2);
+                        SetPropertyValue(content, uploadFieldConfigNode, "widthFieldAlias", GetDimensions(fs, fileName).Item1.ToString(CultureInfo.InvariantCulture));
+                        SetPropertyValue(content, uploadFieldConfigNode, "heightFieldAlias", GetDimensions(fs, fileName).Item2.ToString(CultureInfo.InvariantCulture));
                     }
                     else
                     {
@@ -217,7 +219,7 @@ namespace Umbraco.Core.Models
                         SetPropertyValue(content, uploadFieldConfigNode, "heightFieldAlias", string.Empty);
                     }
 
-                    SetPropertyValue(content, uploadFieldConfigNode, "lengthFieldAlias", fs.GetSize(fileName));
+                    SetPropertyValue(content, uploadFieldConfigNode, "lengthFieldAlias", fs.GetSize(fileName).ToString(CultureInfo.InvariantCulture));
                     SetPropertyValue(content, uploadFieldConfigNode, "extensionFieldAlias", extension);
                 }
             }
@@ -226,7 +228,7 @@ namespace Umbraco.Core.Models
             property.Value = fs.GetUrl(fileName);
         }
 
-        private static void SetPropertyValue(IContentBase content, XmlNode uploadFieldConfigNode, string propertyAlias, object propertyValue)
+        private static void SetPropertyValue(IContentBase content, XmlNode uploadFieldConfigNode, string propertyAlias, string propertyValue)
         {
             XmlNode propertyNode = uploadFieldConfigNode.SelectSingleNode(propertyAlias);
             if (propertyNode != null && string.IsNullOrEmpty(propertyNode.FirstChild.Value) == false)
@@ -403,9 +405,7 @@ namespace Umbraco.Core.Models
         {
 
 			//nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-			//var nodeName = content.ContentType.Alias.ToUmbracoAlias(StringAliasCaseType.CamelCase, true);
-			var nodeName = content.ContentType.Alias;
-
+            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
 			var x = content.ToXml(nodeName);
 			x.Add(new XAttribute("nodeType", content.ContentType.Id));
 			x.Add(new XAttribute("creatorName", content.GetCreatorProfile().Name));
@@ -458,7 +458,8 @@ namespace Umbraco.Core.Models
 								   new XAttribute("nodeName", contentBase.Name),
 								   new XAttribute("urlName", niceUrl),//Format Url ?								   
 								   new XAttribute("path", contentBase.Path),
-								   new XAttribute("isDoc", ""));
+                                   new XAttribute("isDoc", ""),
+                                   UmbracoSettings.UseLegacyXmlSchema ? new XAttribute("nodeTypeAlias", content.ContentType.Alias) : null);
 
 			foreach (var property in contentBase.Properties)
 			{

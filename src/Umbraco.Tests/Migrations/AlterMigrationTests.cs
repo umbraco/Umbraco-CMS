@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Migrations
         public void Can_Get_Up_Migration_From_MigrationStub()
         {
             // Arrange
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE);
+            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null);
             var stub = new AlterUserTableMigrationStub();
 
             // Act

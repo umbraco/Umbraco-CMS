@@ -110,6 +110,7 @@ namespace Umbraco.Tests.IO
             _fileSystem.DeleteDirectory("test", true);
         }
 
+        [Ignore]
         [Test]
         public void Can_Get_File_Dates()
         {

@@ -302,6 +302,8 @@ namespace Umbraco.Web.Models
 				var parent = ((IPublishedContent) context).Parent;
 				if (parent == null) break;
 				prop = context.GetPropertyInternal(alias, context.PublishedContent);
+				//update context, fixes issue: http://issues.umbraco.org/issue/U4-1451
+				context = parent.AsDynamicPublishedContent();
 			}
 			return prop;
 		}

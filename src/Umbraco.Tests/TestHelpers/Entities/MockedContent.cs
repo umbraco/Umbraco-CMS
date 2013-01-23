@@ -8,7 +8,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
     {
         public static Content CreateSimpleContent(IContentType contentType)
         {
-            var content = new Content(-1, contentType) { Name = "Home", Language = "en-US", Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
+            var content = new Content("Home", -1, contentType) { Language = "en-US", Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
             object obj =
                 new
                     {
@@ -24,7 +24,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
         public static Content CreateSimpleContent(IContentType contentType, string name, int parentId)
         {
-            var content = new Content(parentId, contentType) { Name = name, Language = "en-US", CreatorId = 0, WriterId = 0 };
+            var content = new Content(name, parentId, contentType) { Language = "en-US", CreatorId = 0, WriterId = 0 };
             object obj =
                 new
                 {
@@ -40,7 +40,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
 		public static Content CreateSimpleContent(IContentType contentType, string name, IContent parent)
 		{
-			var content = new Content(parent, contentType) { Name = name, Language = "en-US", CreatorId = 0, WriterId = 0 };
+			var content = new Content(name, parent, contentType) { Language = "en-US", CreatorId = 0, WriterId = 0 };
 			object obj =
 				new
 				{
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
         public static Content CreateTextpageContent(IContentType contentType, string name, int parentId)
         {
-            var content = new Content(parentId, contentType) { Name = name, Language = "en-US", CreatorId = 0, WriterId = 0};
+            var content = new Content(name, parentId, contentType) { Language = "en-US", CreatorId = 0, WriterId = 0};
             object obj =
                 new
                 {
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             for (int i = 0; i < amount; i++)
             {
                 var name = "Textpage No-" + i;
-                var content = new Content(parentId, contentType) { Name = name, Language = "en-US", CreatorId = 0, WriterId = 0 };
+                var content = new Content(name, parentId, contentType) { Language = "en-US", CreatorId = 0, WriterId = 0 };
                 object obj =
                     new
                     {

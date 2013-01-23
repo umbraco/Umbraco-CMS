@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 using System.Xml;
+using Umbraco.Core;
+using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.interfaces;
@@ -191,6 +193,14 @@ namespace umbraco.cms.presentation.Trees
         private bool m_isInitialized = false;
 
         private XmlTree m_xTree = new XmlTree();
+
+        /// <summary>
+        /// Provides easy access to the ServiceContext
+        /// </summary>
+        protected internal ServiceContext Services
+        {
+            get { return ApplicationContext.Current.Services; }
+        }
 
         /// <summary>
         /// Initializes the class if it hasn't been done already

@@ -34,13 +34,13 @@ namespace Umbraco.Tests.Persistence.Mappers
         }
 
         [Test]
-        public void Can_Map_DataTypeId_Property()
+        public void Can_Map_DataTypeDefinitionId_Property()
         {
             // Arrange
             SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = PropertyTypeMapper.Instance.Map("DataTypeId");
+            string column = PropertyTypeMapper.Instance.Map("DataTypeDefinitionId");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsPropertyType].[dataTypeId]"));
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Persistence.Mappers
             SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
-            string column = PropertyTypeMapper.Instance.Map("DataTypeControlId");
+            string column = PropertyTypeMapper.Instance.Map("DataTypeId");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsDataType].[controlId]"));

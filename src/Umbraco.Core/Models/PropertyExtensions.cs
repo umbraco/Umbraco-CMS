@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Xml;
 using System.Xml.Linq;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Models
 {
@@ -13,7 +14,7 @@ namespace Umbraco.Core.Models
         /// <returns>Xml of the property and its value</returns>
         public static XElement ToXml(this Property property)
         {
-            string nodeName = property.Alias.ToUmbracoAlias(StringAliasCaseType.CamelCase, true);
+            string nodeName = UmbracoSettings.UseLegacyXmlSchema ? "data" : property.Alias.ToSafeAlias();
 
             var xd = new XmlDocument();
             XmlNode xmlNode = xd.CreateNode(XmlNodeType.Element, nodeName, "");

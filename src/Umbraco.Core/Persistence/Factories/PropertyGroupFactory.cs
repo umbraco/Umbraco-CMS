@@ -28,19 +28,22 @@ namespace Umbraco.Core.Persistence.Factories
                 group.SortOrder = groupDto.SortOrder;
                 group.PropertyTypes = new PropertyTypeCollection();
 
-                foreach (var typeDto in groupDto.PropertyTypeDtos)
+                //Because we are likely to have a group with no PropertyTypes we need to ensure that these are excluded
+                var typeDtos = groupDto.PropertyTypeDtos.Where(x => x.Id > 0);
+                foreach (var typeDto in typeDtos)
                 {
                     group.PropertyTypes.Add(new PropertyType(typeDto.DataTypeDto.ControlId,
                                                              typeDto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
                                                 {
                                                     Alias = typeDto.Alias,
-                                                    DataTypeId = typeDto.DataTypeId,
+                                                    DataTypeDefinitionId = typeDto.DataTypeId,
                                                     Description = typeDto.Description,
                                                     Id = typeDto.Id,
                                                     Name = typeDto.Name,
                                                     HelpText = typeDto.HelpText,
                                                     Mandatory = typeDto.Mandatory,
-                                                    SortOrder = typeDto.SortOrder
+                                                    SortOrder = typeDto.SortOrder,
+                                                    PropertyGroupId = groupDto.Id
                                                 });
 
                 }
@@ -53,7 +56,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IEnumerable<PropertyTypeGroupDto> BuildDto(IEnumerable<PropertyGroup> entity)
         {
-            return entity.Select(propertyGroup => BuildGroupDto(propertyGroup)).ToList();
+            return entity.Select(BuildGroupDto).ToList();
         }
 
         #endregion
@@ -82,14 +85,16 @@ namespace Umbraco.Core.Persistence.Factories
                                       {
                                           Alias = propertyType.Alias,
                                           ContentTypeId = _id,
-                                          DataTypeId = propertyType.DataTypeId,
+                                          DataTypeId = propertyType.DataTypeDefinitionId,
                                           Description = propertyType.Description,
                                           HelpText = propertyType.HelpText,
                                           Mandatory = propertyType.Mandatory,
                                           Name = propertyType.Name,
-                                          SortOrder = propertyType.SortOrder,
-                                          PropertyTypeGroupId = tabId
+                                          SortOrder = propertyType.SortOrder
                                       };
+
+            if (tabId != default(int))
+                propertyTypeDto.PropertyTypeGroupId = tabId;
 
             if (propertyType.HasIdentity)
                 propertyTypeDto.Id = propertyType.Id;

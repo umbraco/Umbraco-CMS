@@ -15,20 +15,23 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Constructor for creating a Media object
         /// </summary>
-        /// <param name="parentId"> </param>
+        /// <param name="name">ame of the Media object</param>
+        /// <param name="parent">Parent <see cref="IMedia"/> object</param>
         /// <param name="contentType">MediaType for the current Media object</param>
-        public Media(int parentId, IMediaType contentType)
-            : this(parentId, contentType, new PropertyCollection())
-        {
-        }
-
-		public Media(IMedia parent, IMediaType contentType)
-			: this(parent, contentType, new PropertyCollection())
+        public Media(string name, IMedia parent, IMediaType contentType)
+			: this(name, parent, contentType, new PropertyCollection())
 		{
 		}
 
-		public Media(IMedia parent, IMediaType contentType, PropertyCollection properties)
-			: base(parent, contentType, properties)
+        /// <summary>
+        /// Constructor for creating a Media object
+        /// </summary>
+        /// <param name="name">ame of the Media object</param>
+        /// <param name="parent">Parent <see cref="IMedia"/> object</param>
+        /// <param name="contentType">MediaType for the current Media object</param>
+        /// <param name="properties">Collection of properties</param>
+        public Media(string name, IMedia parent, IMediaType contentType, PropertyCollection properties)
+			: base(name, parent, contentType, properties)
 		{
 			Mandate.ParameterNotNull(contentType, "contentType");
 			_contentType = contentType;
@@ -37,10 +40,23 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Constructor for creating a Media object
         /// </summary>
-        /// <param name="parentId"> </param>
+        /// <param name="name">ame of the Media object</param>
+        /// <param name="parentId">Id of the Parent IMedia</param>
+        /// <param name="contentType">MediaType for the current Media object</param>
+        public Media(string name, int parentId, IMediaType contentType)
+            : this(name, parentId, contentType, new PropertyCollection())
+        {
+        }
+
+        /// <summary>
+        /// Constructor for creating a Media object
+        /// </summary>
+        /// <param name="name">Name of the Media object</param>
+        /// <param name="parentId">Id of the Parent IMedia</param>
         /// <param name="contentType">MediaType for the current Media object</param>
         /// <param name="properties">Collection of properties</param>
-        public Media(int parentId, IMediaType contentType, PropertyCollection properties) : base(parentId, contentType, properties)
+        public Media(string name, int parentId, IMediaType contentType, PropertyCollection properties) 
+            : base(name, parentId, contentType, properties)
         {
 			Mandate.ParameterNotNull(contentType, "contentType");
             _contentType = contentType;
@@ -95,7 +111,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="isTrashed">Boolean indicating whether content is trashed (true) or not trashed (false)</param>
         /// <param name="parentId"> </param>
-        internal void ChangeTrashedState(bool isTrashed, int parentId = -1)
+        public override void ChangeTrashedState(bool isTrashed, int parentId = -1)
         {
             Trashed = isTrashed;
 

@@ -588,7 +588,7 @@ namespace umbraco.cms.businesslogic.member
                         if (property.Value != null)
                         {
                             string dbType = property.PropertyType.DataTypeDefinition.DbType;
-                            if (dbType.Equals("dataInt"))
+                            if (dbType.Equals("Int"))
                             {
                                 int value = 0;
                                 if (int.TryParse(property.Value.ToString(), out value))
@@ -596,11 +596,11 @@ namespace umbraco.cms.businesslogic.member
                                     poco.Integer = value;
                                 }
                             }
-                            else if (dbType.Equals("dataDate"))
+                            else if (dbType.Equals("Date"))
                             {
                                 poco.Date = DateTime.Parse(property.Value.ToString());
                             }
-                            else if (dbType.Equals("dataNvarchar"))
+                            else if (dbType.Equals("Nvarchar"))
                             {
                                 poco.VarChar = property.Value.ToString();
                             }
@@ -1048,7 +1048,7 @@ namespace umbraco.cms.businesslogic.member
         /// Can be used in the public website
         /// </summary>
         /// <param name="m">Member to remove</param>
-        [Obsolete("Deprecated, use the RemoveMemberFromCache(int NodeId) instead", false)]
+        [Obsolete("Obsolete, use the RemoveMemberFromCache(int NodeId) instead", false)]
         public static void RemoveMemberFromCache(Member m)
         {
             RemoveMemberFromCache(m.Id);
@@ -1071,7 +1071,7 @@ namespace umbraco.cms.businesslogic.member
         /// Can be used in the public website
         /// </summary>
         /// <param name="m">Member</param>
-        [Obsolete("Deprecated, use the ClearMemberFromClient(int NodeId) instead", false)]
+        [Obsolete("Obsolete, use the ClearMemberFromClient(int NodeId) instead", false)]
         public static void ClearMemberFromClient(Member m)
         {
 
