@@ -5,7 +5,7 @@ using Umbraco.Web.Routing;
 namespace Umbraco.Tests.Routing
 {
 	[TestFixture]
-	public class FinderByAliasTests : BaseRoutingTest
+	public class ContentFinderByAliasTests : BaseRoutingTest
 	{
 		public override void Initialize()
 		{

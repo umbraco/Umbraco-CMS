@@ -12,7 +12,7 @@ using System.Configuration;
 namespace Umbraco.Tests.Routing
 {
 	[TestFixture]
-	public class FinderByNiceUrlWithDomainsTests : BaseRoutingTest
+	public class ContentFinderByNiceUrlWithDomainsTests : BaseRoutingTest
 	{
 		public override void Initialize()
 		{

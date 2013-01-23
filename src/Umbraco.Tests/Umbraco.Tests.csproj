@@ -246,7 +246,7 @@
     <Compile Include="ContentStores\PublishContentStoreTests.cs" />
     <Compile Include="DataTypeFactoryTests.cs" />
     <Compile Include="Resolvers\LazyManyObjectResolverTests.cs" />
-    <Compile Include="Routing\FinderByNiceUrlWithDomainsTests.cs" />
+    <Compile Include="Routing\ContentFinderByNiceUrlWithDomainsTests.cs" />
     <Compile Include="Routing\NiceUrlsProviderWithDomainsTests.cs" />
     <Compile Include="Routing\uQueryGetNodeIdByUrlTests.cs" />
     <Compile Include="Routing\UrlsWithNestedDomains.cs" />
@@ -260,11 +260,11 @@
     <Compile Include="TestHelpers\BaseDatabaseFactoryTest.cs" />
     <Compile Include="TestHelpers\BaseRoutingTest.cs" />
     <Compile Include="GlobalSettingsTests.cs" />
-    <Compile Include="Routing\FinderByAliasTests.cs" />
-    <Compile Include="Routing\FinderByIdTests.cs" />
-    <Compile Include="Routing\FinderByNiceUrlAndTemplateTests.cs" />
-    <Compile Include="Routing\FinderByNiceUrlTests.cs" />
-    <Compile Include="Routing\FinderByPageIdQueryTests.cs" />
+    <Compile Include="Routing\ContentFinderByAliasTests.cs" />
+    <Compile Include="Routing\ContentFinderByIdTests.cs" />
+    <Compile Include="Routing\ContentFinderByNiceUrlAndTemplateTests.cs" />
+    <Compile Include="Routing\ContentFinderByNiceUrlTests.cs" />
+    <Compile Include="Routing\ContentFinderByPageIdQueryTests.cs" />
     <Compile Include="Routing\NiceUrlProviderTests.cs" />
     <Compile Include="Routing\RenderRouteHandlerTests.cs" />
     <Compile Include="Routing\RouteTestExtensions.cs" />

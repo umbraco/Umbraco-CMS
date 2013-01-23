@@ -8,7 +8,7 @@ using umbraco.cms.businesslogic.template;
 namespace Umbraco.Tests.Routing
 {
 	[TestFixture]
-	public class FinderByNiceUrlTests : BaseRoutingTest
+	public class ContentFinderByNiceUrlTests : BaseRoutingTest
 	{
 		public override void Initialize()
 		{

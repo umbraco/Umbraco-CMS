@@ -8,7 +8,7 @@ using umbraco.cms.businesslogic.template;
 namespace Umbraco.Tests.Routing
 {
 	[TestFixture]
-	public class FinderByPageIdQueryTests : BaseRoutingTest
+	public class ContentFinderByPageIdQueryTests : BaseRoutingTest
 	{
 		/// <summary>
 		/// We don't need a db for this test, will run faster without one
