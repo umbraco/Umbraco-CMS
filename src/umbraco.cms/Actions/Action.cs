@@ -53,16 +53,18 @@ namespace umbraco.BusinessLogic.Actions
 		{
 			lock (Lock)
 			{
+                using (Umbraco.Core.ObjectResolution.Resolution.DirtyBackdoorToConfiguration)
+                {
+                    //TODO: Based on the above, this is a big hack as types should all be cleared on package install!
+                    ActionsResolver.Reset();
+                    ActionHandlers.Clear();
 
-				//TODO: Based on the above, this is a big hack as types should all be cleared on package install!
-				ActionsResolver.Reset();
-				ActionHandlers.Clear();
+                    //TODO: Based on the above, this is a big hack as types should all be cleared on package install!
+                    ActionsResolver.Current = new ActionsResolver(
+					    () => TypeFinder.FindClassesOfType<IAction>(PluginManager.Current.AssembliesToScan));
 
-				//TODO: Based on the above, this is a big hack as types should all be cleared on package install!
-				ActionsResolver.Current = new ActionsResolver(
-					() => TypeFinder.FindClassesOfType<IAction>(PluginManager.Current.AssembliesToScan));
-
-				RegisterIActionHandlers();
+                    RegisterIActionHandlers();
+                }
 			}
 		}
 

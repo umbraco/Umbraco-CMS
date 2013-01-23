@@ -49,6 +49,41 @@ namespace Umbraco.Core.ObjectResolution
 			}
 		}
 
+        /// <summary>
+        /// Returns a disposable object that reprents dirty access to temporarily unfrozen resolution configuration.
+        /// </summary>
+        /// <remarks>
+        /// <para>Should not be used.</para>
+        /// <para>Should be used in a <c>using(Resolution.DirtyBackdoorToConfiguration) { ... }</c> mode.</para>
+        /// <para>Because we just lift the frozen state, and we don't actually re-freeze, the <c>Frozen</c> event does not trigger.</para>
+        /// </remarks>
+        internal static IDisposable DirtyBackdoorToConfiguration
+        {
+            get { return new DirtyBackdoor(); }
+        }
+
+        // keep the class here because it needs write-access to Resolution.IsFrozen
+        private class DirtyBackdoor : IDisposable
+        {
+            private static readonly System.Threading.ReaderWriterLockSlim _dirtyLock = new ReaderWriterLockSlim();
+
+            private IDisposable _lock;
+            private bool _frozen;
+
+            public DirtyBackdoor()
+            {
+                _lock = new WriteLock(_dirtyLock);
+                _frozen = Resolution.IsFrozen;
+                Resolution.IsFrozen = false;
+            }
+
+            public void Dispose()
+            {
+                Resolution.IsFrozen = _frozen;
+                _lock.Dispose();
+            }
+        }
+
 		/// <summary>
 		/// Freezes resolution.
 		/// </summary>
