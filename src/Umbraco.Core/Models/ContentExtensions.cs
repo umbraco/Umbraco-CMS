@@ -405,16 +405,18 @@ namespace Umbraco.Core.Models
         {
 
 			//nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-			//var nodeName = content.ContentType.Alias.ToUmbracoAlias(StringAliasCaseType.CamelCase, true);
-            var niceUrl = content.Name.FormatUrl().ToLower();
-			var nodeName = content.ContentType.Alias;
-
+			var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
+			
 			var x = content.ToXml(nodeName);
 			x.Add(new XAttribute("nodeType", content.ContentType.Id));
 			x.Add(new XAttribute("creatorName", content.GetCreatorProfile().Name));
 			x.Add(new XAttribute("writerName", content.GetWriterProfile().Name));
 			x.Add(new XAttribute("writerID", content.WriterId));
 			x.Add(new XAttribute("template", content.Template == null ? "0" : content.Template.Id.ToString()));
+			if (UmbracoSettings.UseLegacyXmlSchema)
+			{
+				x.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
+			}
 
 			return x;
 
@@ -428,14 +430,17 @@ namespace Umbraco.Core.Models
 		internal static XElement ToXml(this IMedia media)
 		{
 			//nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-			//var nodeName = content.ContentType.Alias.ToUmbracoAlias(StringAliasCaseType.CamelCase, true);
-			var nodeName = media.ContentType.Alias;
+			var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
 			
 			var x = media.ToXml(nodeName);
 			x.Add(new XAttribute("nodeType", media.ContentType.Id));
 			x.Add(new XAttribute("creatorName", media.GetCreatorProfile().Name));
 			x.Add(new XAttribute("writerID", 0));
 			x.Add(new XAttribute("template", 0));
+			if (UmbracoSettings.UseLegacyXmlSchema)
+			{
+				x.Add(new XAttribute("nodeTypeAlias", media.ContentType.Alias));
+			}
 
 			return x;
 		}
