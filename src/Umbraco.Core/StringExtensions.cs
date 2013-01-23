@@ -771,5 +771,54 @@ namespace Umbraco.Core
 
             return newUrl;
         }
+
+        /// <summary>
+        /// An extention method to ensure that an Alias string doesn't contains any illegal characters
+        /// which is defined in a private constant 'ValidCharacters' in this class. 
+        /// Conventions over configuration, baby. You can't touch this - MC Hammer!
+        /// </summary>
+        /// <remarks>
+        /// Copied and cleaned up a bit from umbraco.cms.helpers.Casing.
+        /// </remarks>
+        /// <param name="alias">The alias.</param>
+        /// <returns>An alias guaranteed not to contain illegal characters</returns>
+        public static string ToSafeAlias(this string alias)
+        {
+            const string validAliasCharacters = "_-abcdefghijklmnopqrstuvwxyz1234567890";
+            const string invalidFirstCharacters = "01234567890";
+            var safeString = new StringBuilder();
+            int aliasLength = alias.Length;
+            for (int i = 0; i < aliasLength; i++)
+            {
+                string currentChar = alias.Substring(i, 1);
+                if (validAliasCharacters.Contains(currentChar.ToLower()))
+                {
+                    // check for camel (if previous character is a space, we'll upper case the current one
+                    if (safeString.Length == 0 && invalidFirstCharacters.Contains(currentChar.ToLower()))
+                    {
+                        currentChar = "";
+                    }
+                    else
+                    {
+                        if (i < aliasLength - 1 && i > 0 && alias.Substring(i - 1, 1) == " ")
+                            currentChar = currentChar.ToUpper();
+
+                        safeString.Append(currentChar);
+                    }
+                }
+            }
+
+            return safeString.ToString();
+        }
+
+        public static string ToSafeAliasWithForcingCheck(this string alias)
+        {
+            if (UmbracoSettings.ForceSafeAliases)
+            {
+                return alias.ToSafeAlias();
+            }
+            
+            return alias;
+        }
     }
 }

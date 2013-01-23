@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Caching;
+using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.helpers;
@@ -855,7 +856,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                var result = ApplicationContext.Current.Services.ContentService.Publish(Content, u.Id, true);
+                var result = ((ContentService)ApplicationContext.Current.Services.ContentService).Publish(Content, true, u.Id);
                 _published = result;
 
                 FireAfterPublish(e);
@@ -871,7 +872,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
         public bool PublishWithChildrenWithResult(User u)
         {
-            return ApplicationContext.Current.Services.ContentService.PublishWithChildren(Content, u.Id, true);
+            return ((ContentService)ApplicationContext.Current.Services.ContentService).PublishWithChildren(Content, true, u.Id);
         }
 
         /// <summary>
@@ -908,7 +909,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                var published = ApplicationContext.Current.Services.ContentService.PublishWithChildren(Content, u.Id, true);
+                var published = ((ContentService)ApplicationContext.Current.Services.ContentService).PublishWithChildren(Content, true, u.Id);
 
                 FireAfterPublish(e);
             }
@@ -923,7 +924,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                _published = ApplicationContext.Current.Services.ContentService.UnPublish(Content, 0, true);
+                _published = ((ContentService)ApplicationContext.Current.Services.ContentService).UnPublish(Content, true, 0);
                 
                 FireAfterUnPublish(e);
             }
@@ -980,7 +981,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                var result = ApplicationContext.Current.Services.ContentService.SaveAndPublish(Content, u.Id, true);
+                var result = ((ContentService)ApplicationContext.Current.Services.ContentService).SaveAndPublish(Content, true, u.Id);
 
                 base.Save();
                 // update preview xml

@@ -217,7 +217,7 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(contents, Is.Not.Null);
             Assert.That(contents.Any(), Is.True);
-            Assert.That(contents.Count(), Is.EqualTo(53));
+            Assert.That(contents.Count(), Is.EqualTo(52));
         }
 
         [Test]

@@ -36,7 +36,6 @@
 		<file src="..\_BuildOutput\WebApp\bin\interfaces.dll" target="lib\interfaces.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\interfaces.xml" target="lib\interfaces.xml" />
 		<file src="..\_BuildOutput\WebApp\bin\log4net.dll" target="lib\log4net.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\log4net.xml" target="lib\log4net.xml" />
 		<file src="..\_BuildOutput\WebApp\bin\Lucene.Net.dll" target="lib\Lucene.Net.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\Lucene.Net.xml" target="lib\Lucene.Net.xml" />
 		<file src="..\_BuildOutput\WebApp\bin\Microsoft.ApplicationBlocks.Data.dll" target="lib\Microsoft.ApplicationBlocks.Data.dll" />
@@ -69,7 +68,5 @@
 		<file src="..\_BuildOutput\WebApp\bin\umbraco.XmlSerializers.dll" target="lib\umbraco.XmlSerializers.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\UmbracoExamine.dll" target="lib\UmbracoExamine.dll" />
 		<file src="..\_BuildOutput\WebApp\bin\UrlRewritingNet.UrlRewriter.dll" target="lib\UrlRewritingNet.UrlRewriter.dll" />
-		<file src="..\_BuildOutput\WebApp\bin\amd64\**" target="Content\bin\amd64" />
-		<file src="..\_BuildOutput\WebApp\bin\x86\**" target="Content\bin\x86" />
 	</files>
 </package>

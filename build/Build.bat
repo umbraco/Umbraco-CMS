@@ -1,6 +1,6 @@
 @ECHO OFF
 SET release=6.0.0
-SET comment=beta
+SET comment=RC
 SET version=%release%
 
 IF [%comment%] EQU [] (SET version=%release%) ELSE (SET version=%release%-%comment%)
