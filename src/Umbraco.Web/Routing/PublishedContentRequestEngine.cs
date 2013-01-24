@@ -73,13 +73,13 @@ namespace Umbraco.Web.Routing
 			// set the culture on the thread -- again, 'cos it might have changed due to a wildcard domain
 			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
 
-			// find the rendering engine
-			FindRenderingEngine();
-
 			// trigger the Prepared event - at that point it is still possible to change about anything
 			_pcr.OnPrepared();
 
-			// set the culture on the thread -- again, 'cos it might have changed in the event handler
+            // we don't take care of anything xcept finding the rendering engine again
+            // so if the content has changed, it's up to the user to find out the template
+
+            // set the culture on the thread -- again, 'cos it might have changed in the event handler
 			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
 
 			// if request has been flagged to redirect then return
@@ -120,7 +120,6 @@ namespace Umbraco.Web.Routing
 
 			HandlePublishedContent(); // will go 404
 			FindTemplate();
-			FindRenderingEngine();
 
 			// if request has been flagged to redirect then return
 			// whoever called us is in charge of redirecting
@@ -281,30 +280,6 @@ namespace Umbraco.Web.Routing
                 return directory.GetFiles().Any(f => extensions.Any(e => f.Name.InvariantEquals(alias + e)));
             }
         }
-
-		/// <summary>
-		/// Finds the rendering engine to use, and updates the PublishedContentRequest accordingly.
-		/// </summary>
-		internal void FindRenderingEngine()
-		{
-            RenderingEngine renderingEngine = RenderingEngine.Unknown;
-
-            // NOTE: Not sure how the alias is actually saved with a space as this shouldn't ever be the case? 
-            // but apparently this happens. I think what should actually be done always is the template alias 
-            // should be saved using the ToUmbracoAlias method and then we can use this here too, that way it
-            // it 100% consistent. I'll leave this here for now until further invenstigation.
-            if (_pcr.HasTemplate)
-                renderingEngine = FindTemplateRenderingEngine(_pcr.Template.Alias.Replace(" ", ""));
-
-            // Unkwnown means that no template was found. Default to Mvc because Mvc supports hijacking
-            // routes which sometimes doesn't require a template since the developer may want full control
-            // over the rendering. Can't do it in WebForms, so Mvc it is. And Mvc will also handle what to
-            // do if no template or hijacked route is exist.
-            if (renderingEngine == RenderingEngine.Unknown)
-                renderingEngine = RenderingEngine.Mvc;
-
-            _pcr.RenderingEngine = renderingEngine;
-		}
 
 		#endregion
 
@@ -546,7 +521,7 @@ namespace Umbraco.Web.Routing
 
             if (_pcr.PublishedContent == null)
             {
-                _pcr.Template = null;
+                _pcr.TemplateModel = null;
                 return;
             }
 
@@ -581,7 +556,7 @@ namespace Umbraco.Web.Routing
 					var template = Template.GetTemplate(templateId);
 					if (template == null)
 						throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render");
-					_pcr.Template = template;
+					_pcr.TemplateModel = template;
 					LogHelper.Debug<PublishedContentRequestEngine>("{0}Got template id={1} alias=\"{2}\"", () => tracePrefix, () => template.Id, () => template.Alias);
 				}
 				else
@@ -604,7 +579,7 @@ namespace Umbraco.Web.Routing
 				var template = Template.GetByAlias(altTemplate, true);
 				if (template != null)
 				{
-					_pcr.Template = template;
+					_pcr.TemplateModel = template;
 					LogHelper.Debug<PublishedContentRequestEngine>("{0}Got template id={1} alias=\"{2}\"", () => tracePrefix, () => template.Id, () => template.Alias);
 				}
 				else
@@ -628,7 +603,7 @@ namespace Umbraco.Web.Routing
 			}
 			else
 			{
-				LogHelper.Debug<PublishedContentRequestEngine>("{0}Running with template id={1} alias=\"{2}\"", () => tracePrefix, () => _pcr.Template.Id, () => _pcr.Template.Alias);
+				LogHelper.Debug<PublishedContentRequestEngine>("{0}Running with template id={1} alias=\"{2}\"", () => tracePrefix, () => _pcr.TemplateModel.Id, () => _pcr.TemplateModel.Alias);
 			}
 		}
 

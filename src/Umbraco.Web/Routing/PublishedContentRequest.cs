@@ -56,7 +56,7 @@ namespace Umbraco.Web.Routing
 
 			_engine = new PublishedContentRequestEngine(this);
 
-			this.RenderingEngine = RenderingEngine.Mvc; // default
+            this.RenderingEngine = RenderingEngine.Unknown;
 		}
 
 		/// <summary>
@@ -124,7 +124,7 @@ namespace Umbraco.Web.Routing
 			set
 			{
 				_publishedContent = value;
-				this.Template = null;
+				this.TemplateModel = null;
 				_publishedContentId = _publishedContent != null ? _publishedContent.Id : 0;
 			}
 		}
@@ -157,17 +157,92 @@ namespace Umbraco.Web.Routing
 
 		#region Template
 
-	    /// <summary>
-        /// Gets or sets the template to use to display the requested content.
+        /// <summary>
+        /// The template model, if any, else <c>null</c>.
         /// </summary>
-		public Template Template { get; set; }
+        //private Umbraco.Core.Models.ITemplate _templateModel;
+        private Template _template;
+
+	    /// <summary>
+        /// Gets or sets the template model to use to display the requested content.
+        /// </summary>
+        // NOTE - should use Umbraco.Core.Models.ITemplate/Template
+        // NOTE - this is for legacy, better use .Template / TrySetTemplate
+        //internal Umbraco.Core.Models.ITemplate TemplateModel 
+		internal Template TemplateModel 
+        {
+            get
+            {
+                return _template;
+            }
+
+            set
+            {
+                _template = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the template to use to display the requested content.
+        /// </summary>
+        public string Template
+        {
+            get 
+            { 
+                return _template == null ? null : _template.Alias; 
+            }
+        }
+
+        /// <summary>
+        /// Tries to set the template to use to display the requested content.
+        /// </summary>
+        /// <param name="value">The name of the template.</param>
+        /// <returns>A value indicating whether a valid template with the specified name was found.</returns>
+        /// <remarks>Setting the template resets <c>RenderingEngine</c> to <c>Unknown</c>.</remarks>
+        public bool TrySetTemplate(string name)
+        {
+            this.RenderingEngine = Core.RenderingEngine.Unknown; // reset
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                _template = null;
+                return true;
+            }
+            else
+            {
+                // NOTE - can we stil get it with whitespaces in it due to old legacy bugs?
+                name = name.Replace(" ", "");
+
+                var model = global::umbraco.cms.businesslogic.template.Template.GetByAlias(name);
+                var nmodel = ApplicationContext.Current.Services.FileService.GetTemplate(name);
+                if (model == null)
+                {
+                    _template = null;
+                    return false;
+                }
+                else
+                {
+                    _template = model;
+                    this.RenderingEngine = _engine.FindTemplateRenderingEngine(name);
+
+                    // Unkwnown means that no template was found. Default to Mvc because Mvc supports hijacking
+                    // routes which sometimes doesn't require a template since the developer may want full control
+                    // over the rendering. Can't do it in WebForms, so Mvc it is. And Mvc will also handle what to
+                    // do if no template or hijacked route is exist.
+                    if (this.RenderingEngine == RenderingEngine.Unknown)
+                        this.RenderingEngine = RenderingEngine.Mvc;
+                    
+                    return true;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether the content request has a template.
         /// </summary>
         public bool HasTemplate
         {
-            get { return this.Template != null; }
+            get { return _template != null; }
         }
 
 		#endregion
