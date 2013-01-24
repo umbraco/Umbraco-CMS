@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Xml.Linq;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -479,6 +481,13 @@ namespace Umbraco.Core.Services
 				SetUser(media, userId);
 				repository.AddOrUpdate(media);
 				uow.Commit();
+
+                var xml = media.ToXml();
+                var poco = new ContentXmlDto { NodeId = media.Id, Xml = xml.ToString(SaveOptions.None) };
+                var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = media.Id }) != null;
+                int result = exists
+                                 ? uow.Database.Update(poco)
+                                 : Convert.ToInt32(uow.Database.Insert(poco));
 			}
 
 			Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this);

@@ -320,8 +320,6 @@ namespace umbraco.cms.businesslogic.template
 
             // remove from documents
             Document.RemoveTemplateFromDocument(this.Id);
-
-
         }
 
         public void RemoveFromDocumentTypes()
@@ -329,6 +327,7 @@ namespace umbraco.cms.businesslogic.template
             foreach (DocumentType dt in DocumentType.GetAllAsList().Where(x => x.allowedTemplates.Select(t => t.Id).Contains(this.Id)))
             {
                 dt.RemoveTemplate(this.Id);
+                dt.Save();
             }
         }
 
