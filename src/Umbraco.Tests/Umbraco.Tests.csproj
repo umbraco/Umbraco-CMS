@@ -175,6 +175,7 @@
     <Compile Include="Migrations\Upgrades\SqlCeDataUpgradeTest.cs" />
     <Compile Include="Migrations\Upgrades\SqlCeUpgradeTest.cs" />
     <Compile Include="Migrations\Upgrades\SqlServerUpgradeTest.cs" />
+    <Compile Include="Models\MediaXmlTest.cs" />
     <Compile Include="Persistence\Mappers\MappingResolverTests.cs" />
     <Compile Include="Persistence\Querying\ContentRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\Querying\ContentTypeRepositorySqlClausesTest.cs" />
