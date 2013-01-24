@@ -1252,7 +1252,7 @@ namespace Umbraco.Core.Services
             //We need to check if children and their publish state to ensure that we republish content that was previously published
             if (HasChildren(content.Id))
             {
-                var children = GetChildrenDeep(content.Id);
+                var children = GetDescendants(content);
                 var shouldBeRepublished = children.Where(child => HasPublishedVersion(child.Id));
 
                 if (omitCacheRefresh == false)
