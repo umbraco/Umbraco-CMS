@@ -85,7 +85,7 @@ namespace Umbraco.Core.Models.EntityBase
             }
         }
 
-        protected void ResetIdentity()
+        internal virtual void ResetIdentity()
         {
             _hasIdentity = false;
             _id = default(int);
