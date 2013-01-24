@@ -311,7 +311,7 @@ namespace umbraco
 
             Model.CacheIdentifier = GetCacheIdentifier(Model, pageElements, pageId);
 
-            if (Model.CacheDuration > 0)
+            if (!UmbracoContext.Current.InPreviewMode && Model.CacheDuration > 0)
             {
                 if (cacheMacroAsString(Model))
                 {
