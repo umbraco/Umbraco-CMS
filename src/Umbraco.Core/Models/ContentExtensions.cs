@@ -299,21 +299,9 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets the <see cref="IProfile"/> for the Creator of this media item.
+        /// Gets the <see cref="IProfile"/> for the Creator of this content/media item.
         /// </summary>
-        internal static IProfile GetCreatorProfile(this IMedia media)
-        {
-            using (var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
-                PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
-            {
-                return repository.GetProfileById(media.CreatorId);
-            }
-        }
-
-        /// <summary>
-        /// Gets the <see cref="IProfile"/> for the Creator of this content.
-        /// </summary>
-        public static IProfile GetCreatorProfile(this IContent content)
+        public static IProfile GetCreatorProfile(this IContentBase content)
         {
             using (var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
                 PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
@@ -383,7 +371,9 @@ namespace Umbraco.Core.Models
 
             var x = media.ToXml(nodeName);
             x.Add(new XAttribute("nodeType", media.ContentType.Id));
-            x.Add(new XAttribute("writerName", media.GetCreatorProfile().Name));
+            //TODO Using the GetCreatorProfile extension method seems to be causing threading/connection problems because of the way the repo is used
+            //x.Add(new XAttribute("writerName", media.GetCreatorProfile().Name));
+            x.Add(new XAttribute("writerName", string.Empty));
             x.Add(new XAttribute("writerID", media.CreatorId));
             x.Add(new XAttribute("version", media.Version));
             x.Add(new XAttribute("template", 0));
