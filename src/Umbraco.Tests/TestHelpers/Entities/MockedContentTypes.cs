@@ -169,5 +169,31 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
             return mediaType;
         }
+
+        public static MediaType CreateImageMediaType()
+        {
+            var mediaType = new MediaType(-1)
+            {
+                Alias = "image",
+                Name = "Image",
+                Description = "ContentType used for images",
+                Icon = ".sprTreeDoc3",
+                Thumbnail = "doc.png",
+                SortOrder = 1,
+                CreatorId = 0,
+                Trashed = false
+            };
+
+            var contentCollection = new PropertyTypeCollection();
+            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Nvarchar) { Alias = "umbracoFile", Name = "File", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -90 });
+            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Integer) { Alias = "umbracoWidth", Name = "Width", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
+            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Integer) { Alias = "umbracoHeight", Name = "Height", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
+            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Integer) { Alias = "umbracoBytes", Name = "Bytes", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
+            contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Integer) { Alias = "umbracoExtension", Name = "File Extension", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
+
+            mediaType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Media", SortOrder = 1 });
+
+            return mediaType;
+        }
     }
 }

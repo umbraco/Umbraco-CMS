@@ -154,7 +154,7 @@ namespace Umbraco.Core.Models
         private static void SetFileOnContent(IContentBase content, string propertyTypeAlias, string name, Stream fileStream)
         {
             var property = content.Properties.FirstOrDefault(x => x.Alias == propertyTypeAlias);
-            if(property == null)
+            if (property == null)
                 return;
 
             bool supportsResizing = false;
@@ -204,7 +204,7 @@ namespace Umbraco.Core.Models
                 XmlNode uploadFieldConfigNode =
                     UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
                         string.Format("uploadField [@alias = \"{0}\"]", propertyTypeAlias));
-                
+
                 if (uploadFieldConfigNode != null)
                 {
                     //Only add dimensions to web images
@@ -236,7 +236,7 @@ namespace Umbraco.Core.Models
                 content.SetValue(propertyNode.FirstChild.Value, propertyValue);
             }
         }
-        
+
         private static string Resize(MediaFileSystem fileSystem, string path, string extension, int maxWidthHeight, string fileNameAddition)
         {
             var fileNameThumb = DoResize(fileSystem, path, extension, GetDimensions(fileSystem, path).Item1, GetDimensions(fileSystem, path).Item2, maxWidthHeight, fileNameAddition);
@@ -348,15 +348,27 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Gets the <see cref="IProfile"/> for the Creator of this media item.
+        /// </summary>
+        internal static IProfile GetCreatorProfile(this IMedia media)
+        {
+            using (var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
+                PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
+            {
+                return repository.GetProfileById(media.CreatorId);
+            }
+        }
+
+        /// <summary>
         /// Gets the <see cref="IProfile"/> for the Creator of this content.
         /// </summary>
         public static IProfile GetCreatorProfile(this IContent content)
         {
-			using (var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
-				PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
-			{
-				return repository.GetProfileById(content.CreatorId);
-			}
+            using (var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
+                PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
+            {
+                return repository.GetProfileById(content.CreatorId);
+            }
         }
 
         /// <summary>
@@ -364,11 +376,11 @@ namespace Umbraco.Core.Models
         /// </summary>
         public static IProfile GetWriterProfile(this IContent content)
         {
-			using(var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
-				PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
-			{
-				return repository.GetProfileById(content.WriterId);	
-			}
+            using (var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
+                PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
+            {
+                return repository.GetProfileById(content.WriterId);
+            }
         }
 
         /// <summary>
@@ -391,30 +403,73 @@ namespace Umbraco.Core.Models
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         public static XElement ToXml(this IContent content)
         {
+
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
             var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
-            var niceUrl = content.Name.FormatUrl().ToLower();
+
+            var x = content.ToXml(nodeName);
+            x.Add(new XAttribute("nodeType", content.ContentType.Id));
+            x.Add(new XAttribute("creatorName", content.GetCreatorProfile().Name));
+            x.Add(new XAttribute("writerName", content.GetWriterProfile().Name));
+            x.Add(new XAttribute("writerID", content.WriterId));
+            x.Add(new XAttribute("template", content.Template == null ? "0" : content.Template.Id.ToString()));
+            if (UmbracoSettings.UseLegacyXmlSchema)
+            {
+                x.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
+            }
+
+            return x;
+
+        }
+
+        /// <summary>
+        /// Creates the xml representation for the <see cref="IMedia"/> object
+        /// </summary>
+        /// <param name="media"><see cref="IContent"/> to generate xml for</param>
+        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        internal static XElement ToXml(this IMedia media)
+        {
+            //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
+            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
+
+            var x = media.ToXml(nodeName);
+            x.Add(new XAttribute("nodeType", media.ContentType.Id));
+            x.Add(new XAttribute("writerName", media.GetCreatorProfile().Name));
+            x.Add(new XAttribute("writerID", media.CreatorId));
+            x.Add(new XAttribute("version", media.Version));
+            x.Add(new XAttribute("template", 0));
+            if (UmbracoSettings.UseLegacyXmlSchema)
+            {
+                x.Add(new XAttribute("nodeTypeAlias", media.ContentType.Alias));
+            }
+
+            return x;
+        }
+
+        /// <summary>
+        /// Creates the xml representation for the <see cref="IContentBase"/> object
+        /// </summary>
+        /// <param name="contentBase"><see cref="IContent"/> to generate xml for</param>
+        /// <param name="nodeName"></param>
+        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        private static XElement ToXml(this IContentBase contentBase, string nodeName)
+        {
+            var niceUrl = contentBase.Name.FormatUrl().ToLower();
 
             var xml = new XElement(nodeName,
-                                   new XAttribute("id", content.Id),
-                                   new XAttribute("parentID", content.Level > 1 ? content.ParentId : -1),
-                                   new XAttribute("level", content.Level),
-                                   new XAttribute("writerID", content.WriterId),
-                                   new XAttribute("creatorID", content.CreatorId),
-                                   new XAttribute("nodeType", content.ContentType.Id),
-                                   new XAttribute("template", content.Template == null ? "0" : content.Template.Id.ToString()),
-                                   new XAttribute("sortOrder", content.SortOrder),
-                                   new XAttribute("createDate", content.CreateDate.ToString("s")),
-                                   new XAttribute("updateDate", content.UpdateDate.ToString("s")),
-                                   new XAttribute("nodeName", content.Name),
-                                   new XAttribute("urlName", niceUrl),//Format Url ?
-                                   new XAttribute("writerName", content.GetWriterProfile().Name),
-                                   new XAttribute("creatorName", content.GetCreatorProfile().Name),
-                                   new XAttribute("path", content.Path),
-                                   new XAttribute("isDoc", ""),
-                                   UmbracoSettings.UseLegacyXmlSchema ? new XAttribute("nodeTypeAlias", content.ContentType.Alias) : null);
+                                   new XAttribute("id", contentBase.Id),
+                                   new XAttribute("parentID", contentBase.Level > 1 ? contentBase.ParentId : -1),
+                                   new XAttribute("level", contentBase.Level),
+                                   new XAttribute("creatorID", contentBase.CreatorId),
+                                   new XAttribute("sortOrder", contentBase.SortOrder),
+                                   new XAttribute("createDate", contentBase.CreateDate.ToString("s")),
+                                   new XAttribute("updateDate", contentBase.UpdateDate.ToString("s")),
+                                   new XAttribute("nodeName", contentBase.Name),
+                                   new XAttribute("urlName", niceUrl),//Format Url ?								   
+                                   new XAttribute("path", contentBase.Path),
+                                   new XAttribute("isDoc", ""));
 
-            foreach (var property in content.Properties)
+            foreach (var property in contentBase.Properties)
             {
                 if (property == null) continue;
 
