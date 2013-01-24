@@ -175,7 +175,6 @@
     <Compile Include="Migrations\Upgrades\SqlCeDataUpgradeTest.cs" />
     <Compile Include="Migrations\Upgrades\SqlCeUpgradeTest.cs" />
     <Compile Include="Migrations\Upgrades\SqlServerUpgradeTest.cs" />
-    <Compile Include="Models\MediaXmlTest.cs" />
     <Compile Include="Persistence\Mappers\MappingResolverTests.cs" />
     <Compile Include="Persistence\Querying\ContentRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\Querying\ContentTypeRepositorySqlClausesTest.cs" />
@@ -313,6 +312,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="TestHelpers\ExamineHelpers\umbraco.config" />
     <None Include="unit-test-log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -402,6 +402,7 @@
     <Content Include="Migrations\SqlScripts\SqlCe-SchemaAndData-4110.sql" />
     <Content Include="Migrations\SqlScripts\SqlCeTotal-480.sql" />
     <Content Include="Migrations\SqlScripts\SqlServerTotal-480.sql" />
+    <Content Include="TestHelpers\ExamineHelpers\media.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

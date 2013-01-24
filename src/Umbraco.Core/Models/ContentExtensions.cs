@@ -54,55 +54,6 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /*
-        /// <summary>
-        /// Sets and uploads the file from a HttpPostedFileBase object as the property value
-        /// </summary>
-        /// <param name="media"><see cref="IMedia"/> to add property value to</param>
-        /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
-        /// <param name="value">The <see cref="HttpPostedFileBase"/> containing the file that will be uploaded</param>
-        public static void SetPropertyValue(this IMedia media, string propertyTypeAlias, HttpPostedFileBase value)
-        {
-            var name =
-                IOHelper.SafeFileName(
-                    value.FileName.Substring(value.FileName.LastIndexOf(IOHelper.DirSepChar) + 1,
-                                             value.FileName.Length - value.FileName.LastIndexOf(IOHelper.DirSepChar) - 1)
-                         .ToLower());
-
-            if(string.IsNullOrEmpty(name) == false)
-                SetFileOnContent(media, propertyTypeAlias, name, value.InputStream);
-        }
-
-        /// <summary>
-        /// Sets and uploads the file from a HttpPostedFile object as the property value
-        /// </summary>
-        /// <param name="media"><see cref="IMedia"/> to add property value to</param>
-        /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
-        /// <param name="value">The <see cref="HttpPostedFile"/> containing the file that will be uploaded</param>
-        public static void SetPropertyValue(this IMedia media, string propertyTypeAlias, HttpPostedFile value)
-        {
-            var name =
-                IOHelper.SafeFileName(
-                    value.FileName.Substring(value.FileName.LastIndexOf(IOHelper.DirSepChar) + 1,
-                                            value.FileName.Length - value.FileName.LastIndexOf(IOHelper.DirSepChar) - 1)
-                        .ToLower());
-
-            if (string.IsNullOrEmpty(name) == false)
-                SetFileOnContent(media, propertyTypeAlias, name, value.InputStream);
-        }
-
-        /// <summary>
-        /// Sets and uploads the file from a HttpPostedFileWrapper object as the property value
-        /// </summary>
-        /// <param name="media"><see cref="IMedia"/> to add property value to</param>
-        /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
-        /// <param name="value">The <see cref="HttpPostedFileWrapper"/> containing the file that will be uploaded</param>
-        public static void SetPropertyValue(this IMedia media, string propertyTypeAlias, HttpPostedFileWrapper value)
-        {
-            if (string.IsNullOrEmpty(value.FileName) == false)
-                SetFileOnContent(media, propertyTypeAlias, value.FileName, value.InputStream);
-        }
-        */
         /// <summary>
         /// Sets and uploads the file from a HttpPostedFileBase object as the property value
         /// </summary>
@@ -348,21 +299,9 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets the <see cref="IProfile"/> for the Creator of this media item.
+        /// Gets the <see cref="IProfile"/> for the Creator of this content/media item.
         /// </summary>
-        internal static IProfile GetCreatorProfile(this IMedia media)
-        {
-            using (var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
-                PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
-            {
-                return repository.GetProfileById(media.CreatorId);
-            }
-        }
-
-        /// <summary>
-        /// Gets the <see cref="IProfile"/> for the Creator of this content.
-        /// </summary>
-        public static IProfile GetCreatorProfile(this IContent content)
+        public static IProfile GetCreatorProfile(this IContentBase content)
         {
             using (var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
                 PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
@@ -403,7 +342,6 @@ namespace Umbraco.Core.Models
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         public static XElement ToXml(this IContent content)
         {
-
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
             var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
@@ -419,7 +357,6 @@ namespace Umbraco.Core.Models
             }
 
             return x;
-
         }
 
         /// <summary>
@@ -427,14 +364,16 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="media"><see cref="IContent"/> to generate xml for</param>
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
-        internal static XElement ToXml(this IMedia media)
+        public static XElement ToXml(this IMedia media)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
             var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
             var x = media.ToXml(nodeName);
             x.Add(new XAttribute("nodeType", media.ContentType.Id));
-            x.Add(new XAttribute("writerName", media.GetCreatorProfile().Name));
+            //TODO Using the GetCreatorProfile extension method seems to be causing threading/connection problems because of the way the repo is used
+            //x.Add(new XAttribute("writerName", media.GetCreatorProfile().Name));
+            x.Add(new XAttribute("writerName", string.Empty));
             x.Add(new XAttribute("writerID", media.CreatorId));
             x.Add(new XAttribute("version", media.Version));
             x.Add(new XAttribute("template", 0));

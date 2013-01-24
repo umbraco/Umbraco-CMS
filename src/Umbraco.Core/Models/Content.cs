@@ -312,6 +312,12 @@ namespace Umbraco.Core.Models
             clone.Version = Guid.NewGuid();
             clone.ResetIdentity();
 
+            foreach (var property in clone.Properties)
+            {
+                property.ResetIdentity();
+                property.Version = clone.Version;
+            }
+
             return clone;
         }
 

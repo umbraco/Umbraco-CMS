@@ -791,9 +791,8 @@ namespace Umbraco.Core.Services
 			var copy = ((Content)content).Clone();
 			copy.ParentId = parentId;
 
-            // A copy should never be set to published
-            // automatically even if the original was
-            this.UnPublish(copy, userId);
+            // A copy should never be set to published automatically even if the original was.
+            copy.ChangePublishedState(PublishedState.Unpublished);
 
 			if (Copying.IsRaisedEventCancelled(new CopyEventArgs<IContent>(content, copy, parentId), this))
 				return null;
@@ -806,14 +805,15 @@ namespace Umbraco.Core.Services
 				repository.AddOrUpdate(copy);
 				uow.Commit();
 
-				var uploadFieldId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
-				if (content.Properties.Any(x => x.PropertyType.DataTypeId == uploadFieldId))
+                //Special case for the Upload DataType
+				var uploadDataTypeId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
+				if (content.Properties.Any(x => x.PropertyType.DataTypeId == uploadDataTypeId))
 				{
 					bool isUpdated = false;
 					var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
 					//Loop through properties to check if the content contains media that should be deleted
-					foreach (var property in content.Properties.Where(x => x.PropertyType.DataTypeId == uploadFieldId
+					foreach (var property in content.Properties.Where(x => x.PropertyType.DataTypeId == uploadDataTypeId
 						&& string.IsNullOrEmpty(x.Value.ToString()) == false))
 					{
 						if (fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
@@ -841,6 +841,17 @@ namespace Umbraco.Core.Services
 						uow.Commit();
 					}
 				}
+
+                //Special case for the Tags DataType
+                var tagsDataTypeId = new Guid("4023e540-92f5-11dd-ad8b-0800200c9a66");
+                if (content.Properties.Any(x => x.PropertyType.DataTypeId == tagsDataTypeId))
+                {
+                    var tags = uow.Database.Fetch<TagRelationshipDto>("WHERE nodeId = @Id", new {Id = content.Id});
+                    foreach (var tag in tags)
+                    {
+                        uow.Database.Insert(new TagRelationshipDto {NodeId = copy.Id, TagId = tag.TagId});
+                    }
+                }
 			}
 
 			//NOTE This 'Relation' part should eventually be delegated to a RelationService
@@ -1241,7 +1252,7 @@ namespace Umbraco.Core.Services
             //We need to check if children and their publish state to ensure that we republish content that was previously published
             if (HasChildren(content.Id))
             {
-                var children = GetChildrenDeep(content.Id);
+                var children = GetDescendants(content);
                 var shouldBeRepublished = children.Where(child => HasPublishedVersion(child.Id));
 
                 if (omitCacheRefresh == false)

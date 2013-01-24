@@ -123,6 +123,7 @@
     <Compile Include="Events\CancellableEventArgs.cs" />
     <Compile Include="Events\ContentCacheEventArgs.cs" />
     <Compile Include="Events\CopyEventArgs.cs" />
+    <Compile Include="Events\DatabaseCreationEventArgs.cs" />
     <Compile Include="Events\DeleteEventArgs.cs" />
     <Compile Include="Events\CancellableObjectEventArgs.cs" />
     <Compile Include="Events\DeleteRevisionsEventArgs.cs" />
@@ -265,6 +266,7 @@
     <Compile Include="Persistence\Migrations\IMigrationExpression.cs" />
     <Compile Include="Persistence\Migrations\Initial\BaseDataCreation.cs" />
     <Compile Include="Persistence\Migrations\Initial\DatabaseSchemaCreation.cs" />
+    <Compile Include="Persistence\Migrations\Initial\DatabaseSchemaResult.cs" />
     <Compile Include="Persistence\Migrations\MigrationAttribute.cs" />
     <Compile Include="Persistence\Migrations\MigrationBase.cs" />
     <Compile Include="Persistence\Migrations\MigrationContext.cs" />
