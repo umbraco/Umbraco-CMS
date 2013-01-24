@@ -1,21 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Examine.Providers;
+﻿using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web;
-using umbraco.BusinessLogic;
 using Examine;
 using UmbracoExamine;
 using Lucene.Net.Documents;
-using umbraco.businesslogic;
-using umbraco.cms.businesslogic.media;
-using umbraco.interfaces;
-using Content = umbraco.cms.businesslogic.Content;
 
 namespace umbraco.presentation.umbraco.Search
 {
