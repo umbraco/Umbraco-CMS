@@ -8,7 +8,7 @@ namespace Umbraco.Web.Routing
 	/// <summary>
 	/// Provides an implementation of <see cref="IContentFinder"/> that runs legacy <c>INotFoundHandler</c>.
 	/// </summary>
-    internal class ContentFinderByNotFoundHandlers : IContentFinder
+    public class ContentFinderByNotFoundHandlers : IContentFinder
     {
 		// notes
 		//

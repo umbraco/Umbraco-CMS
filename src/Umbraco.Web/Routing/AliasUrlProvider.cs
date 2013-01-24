@@ -9,7 +9,7 @@ namespace Umbraco.Web.Routing
     /// <summary>
     /// Provides urls using the <c>umbracoUrlAlias</c> property.
     /// </summary>
-    internal class AliasUrlProvider : IUrlProvider
+    public class AliasUrlProvider : IUrlProvider
     {
         // note - at the moment we seem to accept pretty much anything as an alias
         // without any form of validation ... could even prob. kill the XPath ...

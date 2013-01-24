@@ -10,7 +10,7 @@ namespace Umbraco.Web.Routing
     /// <summary>
     /// Provides utilities to handle domains.
     /// </summary>
-	internal class DomainHelper
+	public class DomainHelper
 	{
         #region Temp. abstract Umbraco's API
 
@@ -272,7 +272,7 @@ namespace Umbraco.Web.Routing
         /// <param name="path">The full path of the uri.</param>
         /// <returns>The path part relative to the uri of the domain.</returns>
         /// <remarks>Eg the relative part of <c>/foo/bar/nil</c> to domain <c>example.com/foo</c> is <c>/bar/nil</c>.</remarks>
-        internal static string PathRelativeToDomain(Uri domainUri, string path)
+        public static string PathRelativeToDomain(Uri domainUri, string path)
         {
             return path.Substring(domainUri.AbsolutePath.Length).EnsureStartsWith('/');
         }

@@ -6,7 +6,7 @@ namespace Umbraco.Web.Routing
 	/// <summary>
     /// Resolves the last chance IPublishedContentFinder object.
 	/// </summary>
-	internal sealed class ContentLastChanceFinderResolver : SingleObjectResolverBase<ContentLastChanceFinderResolver, IContentFinder>
+	public sealed class ContentLastChanceFinderResolver : SingleObjectResolverBase<ContentLastChanceFinderResolver, IContentFinder>
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ContentLastChanceFinderResolver"/> class with no finder.

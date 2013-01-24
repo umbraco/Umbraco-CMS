@@ -11,7 +11,7 @@ namespace Umbraco.Web.Routing
 	/// <para>Handles <c>/foo/bar/template</c> where <c>/foo/bar</c> is the nice url of a document, and <c>template</c> a template alias.</para>
 	/// <para>If successful, then the template of the document request is also assigned.</para>
 	/// </remarks>
-    internal class ContentFinderByNiceUrlAndTemplate : ContentFinderByNiceUrl
+    public class ContentFinderByNiceUrlAndTemplate : ContentFinderByNiceUrl
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.

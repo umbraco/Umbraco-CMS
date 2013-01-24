@@ -46,6 +46,6 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Gets the urls provider.
 		/// </summary>
-		internal UrlProvider UrlProvider { get; private set; }
+		public UrlProvider UrlProvider { get; private set; }
     }
 }

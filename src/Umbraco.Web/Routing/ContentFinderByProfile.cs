@@ -13,7 +13,7 @@ namespace Umbraco.Web.Routing
 	/// <para>This should rather be done with a rewriting rule. There would be multiple profile pages in multi-sites/multi-langs setups.
 	/// We keep it for backward compatility reasons.</para>
 	/// </remarks>
-    internal class ContentFinderByProfile : ContentFinderByNiceUrl
+    public class ContentFinderByProfile : ContentFinderByNiceUrl
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.

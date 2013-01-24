@@ -13,7 +13,7 @@ namespace Umbraco.Web.Routing
 	/// Represents a request for one specified Umbraco IPublishedContent to be rendered
 	/// by one specified template, using one specified Culture and RenderingEngine.
 	/// </summary>
-	internal class PublishedContentRequest
+	public class PublishedContentRequest
     {
 		/// <summary>
 		/// Triggers once the published content request has been prepared, but before it is processed.
@@ -33,7 +33,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		/// <param name="uri">The request <c>Uri</c>.</param>
 		/// <param name="routingContext">A routing context.</param>
-		public PublishedContentRequest(Uri uri, RoutingContext routingContext)
+		internal PublishedContentRequest(Uri uri, RoutingContext routingContext)
 		{
 			if (uri == null) throw new ArgumentNullException("uri");
 			if (routingContext == null) throw new ArgumentNullException("routingContext");

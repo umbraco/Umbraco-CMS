@@ -16,7 +16,7 @@ namespace Umbraco.Web.Routing
 	/// <para>Handles <c>/just/about/anything</c> where <c>/just/about/anything</c> is contained in the <c>umbracoUrlAlias</c> property of a document.</para>
 	/// <para>The alias is the full path to the document. There can be more than one alias, separated by commas.</para>
 	/// </remarks>
-	internal class ContentFinderByUrlAlias : IContentFinder
+    public class ContentFinderByUrlAlias : IContentFinder
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.

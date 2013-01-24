@@ -10,7 +10,7 @@
     /// the true, pre-4.10, always-relative behavior of Umbraco.</para>
     /// <para>For the time being, the default option is <c>AutoLegacy</c> although in the future it will be <c>Auto</c>.</para>
     /// </remarks>
-    internal enum UrlProviderMode
+    public enum UrlProviderMode
     {
         /// <summary>
         /// Indicates that the url provider should determine automatically whether to return relative or absolute urls,

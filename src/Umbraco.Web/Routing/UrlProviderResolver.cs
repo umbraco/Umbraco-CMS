@@ -10,7 +10,7 @@ namespace Umbraco.Web.Routing
     /// <summary>
     /// Resolves IUrlProvider objects.
     /// </summary>
-    internal sealed class UrlProviderResolver : ManyObjectsResolverBase<UrlProviderResolver, IUrlProvider>
+    public sealed class UrlProviderResolver : ManyObjectsResolverBase<UrlProviderResolver, IUrlProvider>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="UrlProviderResolver"/> class with an initial list of provider types.

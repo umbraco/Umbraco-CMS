@@ -10,7 +10,7 @@ namespace Umbraco.Web.Routing
     /// <para>In Umbraco it is valid to create domains with name such as <c>example.com</c>, <c>https://www.example.com</c>, <c>example.com/foo/</c>.</para>
     /// <para>The normalized uri of a domain begins with a scheme and ends with no slash, eg <c>http://example.com/</c>, <c>https://www.example.com/</c>, <c>http://example.com/foo/</c>.</para>
     /// </remarks>
-    internal class DomainAndUri
+    public class DomainAndUri
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DomainAndUri"/> class with a Domain and a uri scheme.

@@ -10,7 +10,7 @@ namespace Umbraco.Web.Routing
 	/// <remarks>
 	/// <para>Handles <c>/foo/bar</c> where <c>/foo/bar</c> is the nice url of a document.</para>
 	/// </remarks>
-	internal class ContentFinderByNiceUrl : IContentFinder
+    public class ContentFinderByNiceUrl : IContentFinder
     {
 	    /// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.

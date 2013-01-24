@@ -7,7 +7,7 @@ namespace Umbraco.Web.Routing
 	/// This is used by library.RenderTemplate and also some of the macro rendering functionality like in
 	/// insertMacro.aspx and macroResultWrapper.aspx
 	/// </remarks>
-	internal class ContentFinderByPageIdQuery : IContentFinder
+    public class ContentFinderByPageIdQuery : IContentFinder
 	{
 		public bool TryFindContent(PublishedContentRequest docRequest)
 		{

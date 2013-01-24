@@ -13,7 +13,7 @@ namespace Umbraco.Web.Routing
     /// <summary>
     /// Provides urls.
     /// </summary>
-    internal class DefaultUrlProvider : IUrlProvider
+    public class DefaultUrlProvider : IUrlProvider
     {
         #region GetUrl
 
