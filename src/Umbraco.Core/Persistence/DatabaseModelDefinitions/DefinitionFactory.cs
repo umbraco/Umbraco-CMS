@@ -84,10 +84,14 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
             var primaryKeyColumnAttribute = propertyInfo.FirstAttribute<PrimaryKeyColumnAttribute>();
             if (primaryKeyColumnAttribute != null)
             {
+                string primaryKeyName = string.IsNullOrEmpty(primaryKeyColumnAttribute.Name)
+                                            ? string.Format("PK_{0}", tableName)
+                                            : primaryKeyColumnAttribute.Name;
+
                 definition.IsPrimaryKey = true;
                 definition.IsIdentity = primaryKeyColumnAttribute.AutoIncrement;
                 definition.IsIndexed = primaryKeyColumnAttribute.Clustered;
-                definition.PrimaryKeyName = primaryKeyColumnAttribute.Name ?? string.Empty;
+                definition.PrimaryKeyName = primaryKeyName;
                 definition.PrimaryKeyColumns = primaryKeyColumnAttribute.OnColumns ?? string.Empty;
                 definition.Seeding = primaryKeyColumnAttribute.IdentitySeed;
             }
@@ -120,9 +124,13 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
                                           ? referencedPrimaryKey.Value
                                           : attribute.Column;
 
+            string foreignKeyName = string.IsNullOrEmpty(attribute.Name)
+                                        ? string.Format("FK_{0}_{1}_{2}", tableName, referencedTable.Value, referencedColumn)
+                                        : attribute.Name;
+
             var definition = new ForeignKeyDefinition
                                  {
-                                     Name = attribute.Name,
+                                     Name = foreignKeyName,
                                      ForeignTable = tableName,
                                      PrimaryTable = referencedTable.Value
                                  };
@@ -134,9 +142,13 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
 
         public static IndexDefinition GetIndexDefinition(Type modelType, PropertyInfo propertyInfo, IndexAttribute attribute, string columnName, string tableName)
         {
+            string indexName = string.IsNullOrEmpty(attribute.Name)
+                                   ? string.Format("IX_{0}_{1}", tableName, columnName)
+                                   : attribute.Name;
+
             var definition = new IndexDefinition
                                  {
-                                     Name = attribute.Name,
+                                     Name = indexName,
                                      IndexType = attribute.IndexType,
                                      ColumnName = columnName,
                                      TableName = tableName,

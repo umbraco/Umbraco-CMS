@@ -1,4 +1,7 @@
-﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
@@ -47,6 +50,38 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public override string GetQuotedName(string name)
         {
             return string.Format("[{0}]", name);
+        }
+
+        public override IEnumerable<string> GetTablesInSchema(Database db)
+        {
+            var items = db.Fetch<dynamic>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES");
+            return items.Select(x => x.TABLE_NAME).Cast<string>().ToList();
+        }
+
+        public override IEnumerable<ColumnInfo> GetColumnsInSchema(Database db)
+        {
+            var items = db.Fetch<dynamic>("SELECT TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS");
+            return
+                items.Select(
+                    item =>
+                    new ColumnInfo(item.TABLE_NAME, item.COLUMN_NAME, item.ORDINAL_POSITION, item.COLUMN_DEFAULT,
+                                   item.IS_NULLABLE, item.DATA_TYPE)).ToList();
+        }
+
+        public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db)
+        {
+            var items =
+                db.Fetch<dynamic>(
+                    "SELECT TABLE_NAME, CONSTRAINT_NAME FROM SELECT * FROM INFORMATION_SCHEMA.CONSTRAINT_TABLE_USAGE");
+            return items.Select(item => new Tuple<string, string>(item.TABLE_NAME, item.CONSTRAINT_NAME)).ToList();
+        }
+
+        public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db)
+        {
+            var items =
+                db.Fetch<dynamic>(
+                    "SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE");
+            return items.Select(item => new Tuple<string, string, string>(item.TABLE_NAME, item.COLUMN_NAME, item.CONSTRAINT_NAME)).ToList();
         }
 
         public override bool DoesTableExist(Database db, string tableName)

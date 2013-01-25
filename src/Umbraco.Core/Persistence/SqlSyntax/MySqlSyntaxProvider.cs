@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -37,6 +38,27 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             InitColumnTypeMap();
 
             DefaultValueFormat = "DEFAULT '{0}'";
+        }
+
+        public override IEnumerable<string> GetTablesInSchema(Database db)
+        {
+            var items = db.Fetch<dynamic>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES");
+            return items.Select(x => x.TABLE_NAME).Cast<string>().ToList();
+        }
+
+        public override IEnumerable<ColumnInfo> GetColumnsInSchema(Database db)
+        {
+            return new List<ColumnInfo>();
+        }
+
+        public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db)
+        {
+            return new List<Tuple<string, string>>();
+        }
+
+        public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db)
+        {
+            return new List<Tuple<string, string, string>>();
         }
 
         public override bool DoesTableExist(Database db, string tableName)

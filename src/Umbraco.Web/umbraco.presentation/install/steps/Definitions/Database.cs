@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using umbraco.cms.businesslogic.installer;
 using umbraco.IO;
@@ -35,8 +36,16 @@ namespace umbraco.presentation.install.steps.Definitions
         public override bool Completed()
         {
             // Fresh installs don't have a version number so this step cannot be complete yet
-            if (string.IsNullOrEmpty(Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus)) 
-                return false;
+            if (string.IsNullOrEmpty(Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus))
+            {
+                //Even though the ConfigurationStatus is blank we try to determine the version if we can connect to the database
+                var result = ApplicationContext.Current.DatabaseContext.ValidateDatabaseSchema();
+                var determinedVersion = result.DetermineInstalledVersion();
+                if(determinedVersion.Equals(new Version(0, 0, 0)))
+                    return false;
+
+                return UmbracoVersion.Current < determinedVersion;
+            }
 
             var configuredVersion = new Version(Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus);
             var targetVersion = UmbracoVersion.Current;
