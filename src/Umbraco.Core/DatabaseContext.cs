@@ -258,6 +258,7 @@ namespace Umbraco.Core
                 {
                     //Must be sql azure
                     SaveConnectionString(legacyConnString, "System.Data.SqlClient");
+                    Initialize("System.Data.SqlClient");
                 }
                 else if (legacyConnString.ToLowerInvariant().Contains("Uid") &&
                          legacyConnString.ToLowerInvariant().Contains("Pwd") &&
@@ -265,11 +266,13 @@ namespace Umbraco.Core
                 {
                     //Must be MySql
                     SaveConnectionString(legacyConnString, "MySql.Data.MySqlClient");
+                    Initialize("MySql.Data.MySqlClient");
                 }
                 else
                 {
                     //Must be sql
                     SaveConnectionString(legacyConnString, "System.Data.SqlClient");
+                    Initialize("System.Data.SqlClient");
                 }
 
                 //Remove the legacy connection string, so we don't end up in a loop if something goes wrong.
