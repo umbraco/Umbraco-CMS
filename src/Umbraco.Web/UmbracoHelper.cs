@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
-using System.Web.Configuration;
 using System.Web.Security;
 using System.Web.UI;
 using System.Xml.Linq;
@@ -13,18 +12,14 @@ using HtmlAgilityPack;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 using umbraco;
 using System.Collections.Generic;
 using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.templateControls;
-using HtmlTagWrapper = Umbraco.Web.Mvc.HtmlTagWrapper;
 
 namespace Umbraco.Web
 {
@@ -64,7 +59,29 @@ namespace Umbraco.Web
 			}
 		}
 
-		/// <summary>
+        /// <summary>
+        /// Returns the current IPublishedContent item assigned to the UmbracoHelper
+        /// </summary>
+        /// <remarks>
+        /// Note that this is the assigned IPublishedContent item to the UmbracoHelper, this is not necessarily the Current IPublishedContent item
+        /// being rendered. This IPublishedContent object is contextual to the current UmbracoHelper instance.
+        /// 
+        /// In some cases accessing this property will throw an exception if there is not IPublishedContent assigned to the Helper
+        /// this will only ever happen if the Helper is constructed with an UmbracoContext and it is not a front-end request
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">Thrown if the UmbracoHelper is constructed with an UmbracoContext and it is not a front-end request</exception>
+	    public IPublishedContent AssignedContentItem
+	    {
+	        get
+	        {
+	            if (_currentPage == null)
+                    throw new InvalidOperationException("Cannot return the " + typeof(IPublishedContent).Name + " because the " + typeof(UmbracoHelper).Name + " was constructed with an " + typeof(UmbracoContext).Name + " and the current request is not a front-end request.");
+                
+                return _currentPage;
+	        }
+	    }
+
+	    /// <summary>
 		/// Renders the template for the specified pageId and an optional altTemplateId
 		/// </summary>
 		/// <param name="pageId"></param>
@@ -209,12 +226,8 @@ namespace Umbraco.Web
 
             //TODO: commented out until as it is not implemented by umbraco:item yet
             //,string formatString = "")
-		{
-			if (_currentPage == null)
-			{
-				throw new InvalidOperationException("Cannot call this method when not rendering a front-end document");
-			}
-            return Field(_currentPage, fieldAlias, altFieldAlias,
+		{			
+            return Field(AssignedContentItem, fieldAlias, altFieldAlias,
                 altText, insertBefore, insertAfter, recursive, convertLineBreaks, removeParagraphTags,
                 casing, encoding, formatAsDate, formatAsDateWithTime, formatAsDateWithTimeSeparator); // formatString);
 		}
@@ -301,7 +314,6 @@ namespace Umbraco.Web
 
 		    var item = new Item()
 		                   {
-		                       //NodeId = currentPage.Id.ToString();
 		                       Field = fieldAlias,
 		                       TextIfEmpty = altText,
 		                       LegacyAttributes = attributesForItem
