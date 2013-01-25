@@ -29,14 +29,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="macro"><see cref="IMacro"/> to delete</param>
         /// <param name="userId">Optional id of the user deleting the macro</param>
-        void Delete(IMacro macro, int userId = -1);
+        void Delete(IMacro macro, int userId = 0);
 
         /// <summary>
         /// Saves an <see cref="IMacro"/>
         /// </summary>
         /// <param name="macro"><see cref="IMacro"/> to save</param>
         /// <param name="userId">Optional id of the user saving the macro</param>
-        void Save(IMacro macro, int userId = -1);
+        void Save(IMacro macro, int userId = 0);
 
         /// <summary>
         /// Gets a list all available <see cref="IMacroPropertyType"/> plugins

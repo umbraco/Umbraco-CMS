@@ -136,7 +136,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="dictionaryItem"><see cref="IDictionaryItem"/> to save</param>
         /// <param name="userId">Optional id of the user saving the dictionary item</param>
-        public void Save(IDictionaryItem dictionaryItem, int userId = -1)
+        public void Save(IDictionaryItem dictionaryItem, int userId = 0)
         {
 	        if (SavingDictionaryItem.IsRaisedEventCancelled(new SaveEventArgs<IDictionaryItem>(dictionaryItem), this)) 
 				return;
@@ -150,8 +150,7 @@ namespace Umbraco.Core.Services
 		        SavedDictionaryItem.RaiseEvent(new SaveEventArgs<IDictionaryItem>(dictionaryItem, false), this);
 	        }
 
-	        Audit.Add(AuditTypes.Save, "Save DictionaryItem performed by user", userId == -1 ? 0 : userId,
-	                  dictionaryItem.Id);
+	        Audit.Add(AuditTypes.Save, "Save DictionaryItem performed by user", userId, dictionaryItem.Id);
         }
 
         /// <summary>
@@ -160,7 +159,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="dictionaryItem"><see cref="IDictionaryItem"/> to delete</param>
         /// <param name="userId">Optional id of the user deleting the dictionary item</param>
-        public void Delete(IDictionaryItem dictionaryItem, int userId = -1)
+        public void Delete(IDictionaryItem dictionaryItem, int userId = 0)
         {
 	        if (DeletingDictionaryItem.IsRaisedEventCancelled(new DeleteEventArgs<IDictionaryItem>(dictionaryItem), this)) 
 				return;
@@ -175,7 +174,7 @@ namespace Umbraco.Core.Services
 		        DeletedDictionaryItem.RaiseEvent(new DeleteEventArgs<IDictionaryItem>(dictionaryItem, false), this);
 	        }
 
-	        Audit.Add(AuditTypes.Delete, "Delete DictionaryItem performed by user", userId == -1 ? 0 : userId, dictionaryItem.Id);
+	        Audit.Add(AuditTypes.Delete, "Delete DictionaryItem performed by user", userId, dictionaryItem.Id);
         }
 
         /// <summary>
@@ -225,7 +224,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="language"><see cref="ILanguage"/> to save</param>
         /// <param name="userId">Optional id of the user saving the language</param>
-        public void Save(ILanguage language, int userId = -1)
+        public void Save(ILanguage language, int userId = 0)
         {
 	        if (SavingLanguage.IsRaisedEventCancelled(new SaveEventArgs<ILanguage>(language), this)) 
 				return;
@@ -239,7 +238,7 @@ namespace Umbraco.Core.Services
 		        SavedLanguage.RaiseEvent(new SaveEventArgs<ILanguage>(language, false), this);
 	        }
 
-	        Audit.Add(AuditTypes.Save, "Save Language performed by user", userId == -1 ? 0 : userId, language.Id);
+	        Audit.Add(AuditTypes.Save, "Save Language performed by user", userId, language.Id);
         }
 
         /// <summary>
@@ -247,7 +246,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="language"><see cref="ILanguage"/> to delete</param>
         /// <param name="userId">Optional id of the user deleting the language</param>
-        public void Delete(ILanguage language, int userId = -1)
+        public void Delete(ILanguage language, int userId = 0)
         {
             if (DeletingLanguage.IsRaisedEventCancelled(new DeleteEventArgs<ILanguage>(language), this)) 
 				return;
@@ -262,7 +261,7 @@ namespace Umbraco.Core.Services
 		        DeletedLanguage.RaiseEvent(new DeleteEventArgs<ILanguage>(language, false), this);
 	        }
 
-	        Audit.Add(AuditTypes.Delete, "Delete Language performed by user", userId == -1 ? 0 : userId, language.Id);
+	        Audit.Add(AuditTypes.Delete, "Delete Language performed by user", userId, language.Id);
         }
 
         #region Event Handlers

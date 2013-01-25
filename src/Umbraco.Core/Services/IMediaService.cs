@@ -18,7 +18,7 @@ namespace Umbraco.Core.Services
         /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
         /// <param name="userId">Optional id of the user creating the media item</param>
         /// <returns><see cref="IMedia"/></returns>
-        IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = -1);
+        IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = 0);
 
         /// <summary>
         /// Gets an <see cref="IMedia"/> object by Id
@@ -66,14 +66,14 @@ namespace Umbraco.Core.Services
         /// <param name="media">The <see cref="IMedia"/> to move</param>
         /// <param name="parentId">Id of the Media's new Parent</param>
         /// <param name="userId">Id of the User moving the Media</param>
-        void Move(IMedia media, int parentId, int userId = -1);
+        void Move(IMedia media, int parentId, int userId = 0);
 
         /// <summary>
         /// Deletes an <see cref="IMedia"/> object by moving it to the Recycle Bin
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        void MoveToRecycleBin(IMedia media, int userId = -1);
+        void MoveToRecycleBin(IMedia media, int userId = 0);
 
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
@@ -86,7 +86,7 @@ namespace Umbraco.Core.Services
         /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
         /// <param name="mediaTypeId">Id of the <see cref="IMediaType"/></param>
         /// <param name="userId">Optional Id of the user deleting Media</param>
-        void DeleteMediaOfType(int mediaTypeId, int userId = -1);
+        void DeleteMediaOfType(int mediaTypeId, int userId = 0);
 
         /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object
@@ -97,21 +97,21 @@ namespace Umbraco.Core.Services
         /// </remarks>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        void Delete(IMedia media, int userId = -1);
+        void Delete(IMedia media, int userId = 0);
 
         /// <summary>
         /// Saves a single <see cref="IMedia"/> object
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
-        void Save(IMedia media, int userId = -1);
+        void Save(IMedia media, int userId = 0);
 
         /// <summary>
         /// Saves a collection of <see cref="IMedia"/> objects
         /// </summary>
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
-        void Save(IEnumerable<IMedia> medias, int userId = -1);
+        void Save(IEnumerable<IMedia> medias, int userId = 0);
 
         /// <summary>
         /// Gets an <see cref="IMedia"/> object by its 'UniqueId'
@@ -154,7 +154,7 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the <see cref="IMedia"/> object to delete versions from</param>
         /// <param name="versionDate">Latest version date</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        void DeleteVersions(int id, DateTime versionDate, int userId = -1);
+        void DeleteVersions(int id, DateTime versionDate, int userId = 0);
 
         /// <summary>
         /// Permanently deletes specific version(s) from an <see cref="IMedia"/> object.
@@ -163,6 +163,6 @@ namespace Umbraco.Core.Services
         /// <param name="versionId">Id of the version to delete</param>
         /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = -1);
+        void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = 0);
     }
 }

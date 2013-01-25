@@ -24,9 +24,7 @@ namespace Umbraco.Core.Services
 	{
 		private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 		private readonly IPublishingStrategy _publishingStrategy;
-		private readonly IUserService _userService;
         private readonly RepositoryFactory _repositoryFactory;
-		private HttpContextBase _httpContext;
 
         public ContentService()
             : this(new RepositoryFactory())
@@ -44,18 +42,10 @@ namespace Umbraco.Core.Services
             : this(provider, repositoryFactory, new PublishingStrategy())
         { }
 
-        internal ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy)
+	    public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy)
 		{
 			_uowProvider = provider;
 			_publishingStrategy = publishingStrategy;
-            _repositoryFactory = repositoryFactory;
-		}
-
-        internal ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy, IUserService userService)
-		{
-            _uowProvider = provider;
-			_publishingStrategy = publishingStrategy;
-			_userService = userService;
             _repositoryFactory = repositoryFactory;
 		}
 
@@ -68,7 +58,7 @@ namespace Umbraco.Core.Services
 	    /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
 	    /// <param name="userId">Optional id of the user creating the content</param>
 	    /// <returns><see cref="IContent"/></returns>
-	    public IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = -1)
+	    public IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = 0)
 		{
 		    IContentType contentType = null;
             IContent content = null;
@@ -95,8 +85,8 @@ namespace Umbraco.Core.Services
 			if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
 				return content;
 
-			SetUser(content, userId);
-			SetWriter(content, userId);
+	        content.CreatorId = userId;
+			content.WriterId = userId;
 
 			Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this);
 
@@ -377,7 +367,7 @@ namespace Umbraco.Core.Services
 	    /// </summary>
 	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
 	    /// <returns>True if publishing succeeded, otherwise False</returns>
-	    public bool RePublishAll(int userId = -1)
+	    public bool RePublishAll(int userId = 0)
 	    {
 	        return RePublishAllDo(false, userId);
 	    }
@@ -388,7 +378,7 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to publish</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        public bool Publish(IContent content, int userId = -1)
+        public bool Publish(IContent content, int userId = 0)
         {
             return SaveAndPublishDo(content, false, userId);
         }
@@ -399,7 +389,7 @@ namespace Umbraco.Core.Services
 	    /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
 	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
 	    /// <returns>True if publishing succeeded, otherwise False</returns>
-	    public bool PublishWithChildren(IContent content, int userId = -1)
+	    public bool PublishWithChildren(IContent content, int userId = 0)
 	    {
 	        return PublishWithChildrenDo(content, false, userId);
 	    }
@@ -410,7 +400,7 @@ namespace Umbraco.Core.Services
 	    /// <param name="content">The <see cref="IContent"/> to publish</param>
 	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
 	    /// <returns>True if unpublishing succeeded, otherwise False</returns>
-	    public bool UnPublish(IContent content, int userId = -1)
+	    public bool UnPublish(IContent content, int userId = 0)
 	    {
 	        return UnPublishDo(content, false, userId);
 	    }
@@ -421,7 +411,7 @@ namespace Umbraco.Core.Services
 	    /// <param name="content">The <see cref="IContent"/> to save and publish</param>
 	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
 	    /// <returns>True if publishing succeeded, otherwise False</returns>
-	    public bool SaveAndPublish(IContent content, int userId = -1)
+	    public bool SaveAndPublish(IContent content, int userId = 0)
 	    {
 			return SaveAndPublishDo(content, false, userId);
 	    }
@@ -431,7 +421,7 @@ namespace Umbraco.Core.Services
 	    /// </summary>
 	    /// <param name="content">The <see cref="IContent"/> to save</param>
 	    /// <param name="userId">Optional Id of the User saving the Content</param>
-	    public void Save(IContent content, int userId = -1)
+	    public void Save(IContent content, int userId = 0)
 	    {
 			Save(content, true, userId);
 	    }
@@ -445,7 +435,7 @@ namespace Umbraco.Core.Services
 	    /// </remarks>
 	    /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
 	    /// <param name="userId">Optional Id of the User saving the Content</param>
-	    public void Save(IEnumerable<IContent> contents, int userId = -1)
+	    public void Save(IEnumerable<IContent> contents, int userId = 0)
 	    {
 			if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(contents), this))
 				return;
@@ -459,7 +449,7 @@ namespace Umbraco.Core.Services
 				{
 					foreach (var content in contents)
 					{
-						SetWriter(content, userId);
+					    content.WriterId = userId;
 
 						//Only change the publish state if the "previous" version was actually published
 						if (content.Published)
@@ -473,7 +463,7 @@ namespace Umbraco.Core.Services
 				{
 					foreach (var content in contents)
 					{
-						SetWriter(content, userId);
+						content.WriterId = userId;
 						repository.AddOrUpdate(content);
 					}
 					uow.Commit();
@@ -491,7 +481,7 @@ namespace Umbraco.Core.Services
 	    /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
 	    /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
 	    /// <param name="userId">Optional Id of the user issueing the delete operation</param>
-	    public void DeleteContentOfType(int contentTypeId, int userId = -1)
+	    public void DeleteContentOfType(int contentTypeId, int userId = 0)
 	    {	        
 			using (var uow = _uowProvider.GetUnitOfWork())
 			{
@@ -523,7 +513,7 @@ namespace Umbraco.Core.Services
 
 			Audit.Add(AuditTypes.Delete,
 					  string.Format("Delete Content of Type {0} performed by user", contentTypeId),
-					  userId == -1 ? 0 : userId, -1);
+					  userId, -1);
 	    }
 
 	    /// <summary>
@@ -535,7 +525,7 @@ namespace Umbraco.Core.Services
         /// <remarks>Please note that this method will completely remove the Content from the database</remarks>
         /// <param name="content">The <see cref="IContent"/> to delete</param>
         /// <param name="userId">Optional Id of the User deleting the Content</param>
-		public void Delete(IContent content, int userId = -1)
+		public void Delete(IContent content, int userId = 0)
 		{
 	        if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(content), this)) 
 				return;
@@ -556,15 +546,13 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
-				//TODO: Why are we setting a writer if we are just deleting the object? (I'm probably overlooking something here...?)
-				SetWriter(content, userId);
 				repository.Delete(content);
 				uow.Commit();
 			}
 
 			Deleted.RaiseEvent(new DeleteEventArgs<IContent>(content, false), this);
 
-			Audit.Add(AuditTypes.Delete, "Delete Content performed by user", userId == -1 ? 0 : userId, content.Id);
+			Audit.Add(AuditTypes.Delete, "Delete Content performed by user", userId, content.Id);
 		}
 
 		/// <summary>
@@ -573,7 +561,7 @@ namespace Umbraco.Core.Services
 		/// <param name="id">Id of the <see cref="IContent"/> object to delete versions from</param>
 		/// <param name="versionDate">Latest version date</param>
 		/// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-		public void DeleteVersions(int id, DateTime versionDate, int userId = -1)
+		public void DeleteVersions(int id, DateTime versionDate, int userId = 0)
 		{
 			//TODO: We should check if we are going to delete the most recent version because if that happens it means the 
 			// entity is completely deleted and we should raise the normal Deleting/Deleted event
@@ -590,7 +578,7 @@ namespace Umbraco.Core.Services
 
 			DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate), this);
 			
-			Audit.Add(AuditTypes.Delete, "Delete Content by version date performed by user", userId == -1 ? 0 : userId, -1);
+			Audit.Add(AuditTypes.Delete, "Delete Content by version date performed by user", userId, -1);
 		}
 
 		/// <summary>
@@ -600,7 +588,7 @@ namespace Umbraco.Core.Services
 	    /// <param name="versionId">Id of the version to delete</param>
 	    /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
 	    /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-	    public void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = -1)
+	    public void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = 0)
 	    {
 			//TODO: We should check if we are going to delete the most recent version because if that happens it means the 
 			// entity is completely deleted and we should raise the normal Deleting/Deleted event
@@ -623,7 +611,7 @@ namespace Umbraco.Core.Services
 
 			DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, specificVersion:versionId), this);
 
-			Audit.Add(AuditTypes.Delete, "Delete Content by version performed by user", userId == -1 ? 0 : userId, -1);
+			Audit.Add(AuditTypes.Delete, "Delete Content by version performed by user", userId, -1);
 	    }
 
 	    /// <summary>
@@ -632,7 +620,7 @@ namespace Umbraco.Core.Services
 	    /// <remarks>Move an item to the Recycle Bin will result in the item being unpublished</remarks>
 	    /// <param name="content">The <see cref="IContent"/> to delete</param>
 	    /// <param name="userId">Optional Id of the User deleting the Content</param>
-	    public void MoveToRecycleBin(IContent content, int userId = -1)
+	    public void MoveToRecycleBin(IContent content, int userId = 0)
 	    {
 			if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, -20), this))
 				return;
@@ -653,7 +641,7 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
-				SetWriter(content, userId);
+			    content.WriterId = userId;
 				content.ChangeTrashedState(true);
 				repository.AddOrUpdate(content);
 				uow.Commit();
@@ -661,8 +649,7 @@ namespace Umbraco.Core.Services
 
 			Trashed.RaiseEvent(new MoveEventArgs<IContent>(content, false, -20), this);
 
-			Audit.Add(AuditTypes.Move, "Move Content to Recycle Bin performed by user", userId == -1 ? 0 : userId,
-					  content.Id);
+			Audit.Add(AuditTypes.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
 	    }
 
 	    /// <summary>
@@ -676,7 +663,7 @@ namespace Umbraco.Core.Services
 	    /// <param name="content">The <see cref="IContent"/> to move</param>
 	    /// <param name="parentId">Id of the Content's new Parent</param>
 	    /// <param name="userId">Optional Id of the User moving the Content</param>
-	    public void Move(IContent content, int parentId, int userId = -1)
+	    public void Move(IContent content, int parentId, int userId = 0)
 	    {
 	        //This ensures that the correct method is called if this method is used to Move to recycle bin.
 	        if (parentId == -20)
@@ -688,7 +675,7 @@ namespace Umbraco.Core.Services
 	        if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, parentId), this))
 	            return;
 
-	        SetWriter(content, userId);
+	        content.WriterId = userId;
 	        var parent = GetById(parentId);
 	        content.Path = string.Concat(parent.Path, ",", content.Id);
 	        content.Level = parent.Level + 1;
@@ -746,7 +733,7 @@ namespace Umbraco.Core.Services
 
 	        Moved.RaiseEvent(new MoveEventArgs<IContent>(content, false, parentId), this);
 
-			Audit.Add(AuditTypes.Move, "Move Content performed by user", userId == -1 ? 0 : userId, content.Id);
+			Audit.Add(AuditTypes.Move, "Move Content performed by user", userId, content.Id);
 		}
 
         /// <summary>
@@ -786,7 +773,7 @@ namespace Umbraco.Core.Services
         /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
         /// <param name="userId">Optional Id of the User copying the Content</param>
         /// <returns>The newly created <see cref="IContent"/> object</returns>
-        public IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = -1)
+        public IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = 0)
         {
 			var copy = ((Content)content).Clone();
 			copy.ParentId = parentId;
@@ -800,8 +787,7 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
-				SetWriter(content, userId);
-			    
+				content.WriterId = userId;
 				repository.AddOrUpdate(copy);
 				uow.Commit();
 
@@ -895,7 +881,7 @@ namespace Umbraco.Core.Services
 		/// <param name="content">The <see cref="IContent"/> to send to publication</param>
 		/// <param name="userId">Optional Id of the User issueing the send to publication</param>
 		/// <returns>True if sending publication was succesfull otherwise false</returns>
-		internal bool SendToPublication(IContent content, int userId = -1)
+		internal bool SendToPublication(IContent content, int userId = 0)
 		{
 
 			if (SendingToPublish.IsRaisedEventCancelled(new SendToPublishEventArgs<IContent>(content), this))
@@ -922,7 +908,7 @@ namespace Umbraco.Core.Services
 	    /// <param name="versionId">Id of the version to rollback to</param>
 	    /// <param name="userId">Optional Id of the User issueing the rollback of the Content</param>
 	    /// <returns>The newly created <see cref="IContent"/> object</returns>
-	    public IContent Rollback(int id, Guid versionId, int userId = -1)
+	    public IContent Rollback(int id, Guid versionId, int userId = 0)
 	    {
 	        var content = GetByVersion(versionId);
 
@@ -932,8 +918,8 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
-				SetUser(content, userId);
-				SetWriter(content, userId);
+				content.WriterId = userId;
+			    content.CreatorId = userId;
 
 				repository.AddOrUpdate(content);
 				uow.Commit();
@@ -948,21 +934,12 @@ namespace Umbraco.Core.Services
 
         #region Internal Methods
         /// <summary>
-		/// Internal method to set the HttpContextBase for testing.
-		/// </summary>
-		/// <param name="httpContext"><see cref="HttpContextBase"/></param>
-		internal void SetHttpContext(HttpContextBase httpContext)
-		{
-			_httpContext = httpContext;
-		}
-
-        /// <summary>
         /// Internal method to Re-Publishes all Content for legacy purposes.
         /// </summary>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this RePublish method. By default this method will not update the cache.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        internal bool RePublishAll(bool omitCacheRefresh = true, int userId = -1)
+        internal bool RePublishAll(bool omitCacheRefresh = true, int userId = 0)
         {
             return RePublishAllDo(omitCacheRefresh, userId);
         }
@@ -974,7 +951,7 @@ namespace Umbraco.Core.Services
         /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will not update the cache.</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        internal bool Publish(IContent content, bool omitCacheRefresh = true, int userId = -1)
+        internal bool Publish(IContent content, bool omitCacheRefresh = true, int userId = 0)
         {
             return SaveAndPublishDo(content, omitCacheRefresh, userId);
         }
@@ -986,7 +963,7 @@ namespace Umbraco.Core.Services
         /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will not update the cache.</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        internal bool PublishWithChildren(IContent content, bool omitCacheRefresh = true, int userId = -1)
+        internal bool PublishWithChildren(IContent content, bool omitCacheRefresh = true, int userId = 0)
         {
             return PublishWithChildrenDo(content, omitCacheRefresh, userId);
         }
@@ -998,7 +975,7 @@ namespace Umbraco.Core.Services
         /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Unpublish method. By default this method will not update the cache.</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
-        internal bool UnPublish(IContent content, bool omitCacheRefresh = true, int userId = -1)
+        internal bool UnPublish(IContent content, bool omitCacheRefresh = true, int userId = 0)
         {
             return UnPublishDo(content, omitCacheRefresh, userId);
         }
@@ -1010,7 +987,7 @@ namespace Umbraco.Core.Services
         /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will not update the cache.</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        internal bool SaveAndPublish(IContent content, bool omitCacheRefresh = true, int userId = -1)
+        internal bool SaveAndPublish(IContent content, bool omitCacheRefresh = true, int userId = 0)
         {
             return SaveAndPublishDo(content, omitCacheRefresh, userId);
         }
@@ -1025,7 +1002,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this RePublish method. By default this method will update the cache.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        private bool RePublishAllDo(bool omitCacheRefresh = false, int userId = -1)
+        private bool RePublishAllDo(bool omitCacheRefresh = false, int userId = 0)
         {
             var list = new List<IContent>();
             var updated = new List<IContent>();
@@ -1039,7 +1016,7 @@ namespace Umbraco.Core.Services
                 if (content.IsValid())
                 {
                     list.Add(content);
-                    list.AddRange(GetChildrenDeep(content.Id));
+                    list.AddRange(GetDescendants(content));
                 }
             }
 
@@ -1053,7 +1030,7 @@ namespace Umbraco.Core.Services
                     //Only loop through content where the Published property has been updated
                     foreach (var item in list.Where(x => ((ICanBeDirty)x).IsPropertyDirty("Published")))
                     {
-                        SetWriter(item, userId);
+                        item.WriterId = userId;
                         repository.AddOrUpdate(item);
                         updated.Add(item);
                     }
@@ -1076,7 +1053,7 @@ namespace Umbraco.Core.Services
                     _publishingStrategy.PublishingFinalized(updated, true);
             }
 
-            Audit.Add(AuditTypes.Publish, "RePublish All performed by user", userId == -1 ? 0 : userId, -1);
+            Audit.Add(AuditTypes.Publish, "RePublish All performed by user", userId, -1);
 
             return published;
         }
@@ -1088,7 +1065,7 @@ namespace Umbraco.Core.Services
         /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        private bool PublishWithChildrenDo(IContent content, bool omitCacheRefresh = false, int userId = -1)
+        private bool PublishWithChildrenDo(IContent content, bool omitCacheRefresh = false, int userId = 0)
         {
             //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
             if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
@@ -1115,7 +1092,7 @@ namespace Umbraco.Core.Services
             var updated = new List<IContent>();
             var list = new List<IContent>();
             list.Add(content);
-            list.AddRange(GetChildrenDeep(content.Id));
+            list.AddRange(GetDescendants(content));
 
             //Publish and then update the database with new status
             var published = _publishingStrategy.PublishWithChildren(list, userId);
@@ -1127,7 +1104,7 @@ namespace Umbraco.Core.Services
                     //Only loop through content where the Published property has been updated
                     foreach (var item in list.Where(x => ((ICanBeDirty)x).IsPropertyDirty("Published")))
                     {
-                        SetWriter(item, userId);
+                        item.WriterId = userId;
                         repository.AddOrUpdate(item);
                         updated.Add(item);
                     }
@@ -1149,8 +1126,7 @@ namespace Umbraco.Core.Services
                 if (omitCacheRefresh == false)
                     _publishingStrategy.PublishingFinalized(updated, false);
 
-                Audit.Add(AuditTypes.Publish, "Publish with Children performed by user", userId == -1 ? 0 : userId,
-                          content.Id);
+                Audit.Add(AuditTypes.Publish, "Publish with Children performed by user", userId, content.Id);
             }
 
             return published;
@@ -1163,7 +1139,7 @@ namespace Umbraco.Core.Services
         /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Unpublish method. By default this method will update the cache.</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
-        private bool UnPublishDo(IContent content, bool omitCacheRefresh = false, int userId = -1)
+        private bool UnPublishDo(IContent content, bool omitCacheRefresh = false, int userId = 0)
         {
             var unpublished = _publishingStrategy.UnPublish(content, userId);
             if (unpublished)
@@ -1171,6 +1147,7 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentRepository(uow))
                 {
+                    content.WriterId = userId;
                     repository.AddOrUpdate(content);
 
                     //Remove 'published' xml from the cmsContentXml table for the unpublished content
@@ -1182,7 +1159,7 @@ namespace Umbraco.Core.Services
                 if (omitCacheRefresh == false)
                     _publishingStrategy.UnPublishingFinalized(content);
 
-                Audit.Add(AuditTypes.UnPublish, "UnPublish performed by user", userId == -1 ? 0 : userId, content.Id);
+                Audit.Add(AuditTypes.UnPublish, "UnPublish performed by user", userId, content.Id);
             }
 
             return unpublished;
@@ -1195,7 +1172,7 @@ namespace Umbraco.Core.Services
         /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        private bool SaveAndPublishDo(IContent content, bool omitCacheRefresh = false, int userId = -1)
+        private bool SaveAndPublishDo(IContent content, bool omitCacheRefresh = false, int userId = 0)
         {
             if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
                 return false;
@@ -1227,7 +1204,8 @@ namespace Umbraco.Core.Services
             using (var repository = _repositoryFactory.CreateContentRepository(uow))
             {
                 //Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
-                SetWriter(content, userId);
+                content.WriterId = userId;
+
                 repository.AddOrUpdate(content);
 
                 uow.Commit();
@@ -1259,7 +1237,7 @@ namespace Umbraco.Core.Services
                     _publishingStrategy.PublishingFinalized(shouldBeRepublished, false);
             }
 
-            Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId == -1 ? 0 : userId, content.Id);
+            Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId, content.Id);
 
             return published;
         }
@@ -1270,7 +1248,7 @@ namespace Umbraco.Core.Services
 	    /// <param name="content">The <see cref="IContent"/> to save</param>
 	    /// <param name="changeState">Boolean indicating whether or not to change the Published state upon saving</param>
 	    /// <param name="userId">Optional Id of the User saving the Content</param>
-	    private void Save(IContent content, bool changeState, int userId = -1)
+	    private void Save(IContent content, bool changeState, int userId = 0)
         {
             if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
                 return;
@@ -1278,7 +1256,7 @@ namespace Umbraco.Core.Services
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateContentRepository(uow))
             {
-                SetWriter(content, userId);
+                content.WriterId = userId;
 
                 //Only change the publish state if the "previous" version was actually published
                 if (changeState && content.Published)
@@ -1290,33 +1268,7 @@ namespace Umbraco.Core.Services
 
             Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
 
-            Audit.Add(AuditTypes.Save, "Save Content performed by user", userId == -1 ? 0 : userId, content.Id);
-        }
-
-        /// <summary>
-        /// Gets a flat list of decendents of content from parent id
-        /// </summary>
-        /// <remarks>
-        /// Only contains valid <see cref="IContent"/> objects, which means
-        /// that everything in the returned list can be published.
-        /// If an invalid <see cref="IContent"/> object is found it will not
-        /// be added to the list neither will its children.
-        /// </remarks>
-        /// <param name="parentId">Id of the parent to retrieve children from</param>
-        /// <returns>A list of valid <see cref="IContent"/> that can be published</returns>
-        private IEnumerable<IContent> GetChildrenDeep(int parentId)
-        {
-            var list = new List<IContent>();
-            var children = GetChildren(parentId);
-            foreach (var child in children)
-            {
-                if (child.IsValid())
-                {
-                    list.Add(child);
-                    list.AddRange(GetChildrenDeep(child.Id));
-                }
-            }
-            return list;
+            Audit.Add(AuditTypes.Save, "Save Content performed by user", userId, content.Id);
         }
 
         /// <summary>
@@ -1352,63 +1304,6 @@ namespace Umbraco.Core.Services
 
             return true;
         }
-
-		/// <summary>
-		/// Updates a content object with the User (id), who created the content.
-		/// </summary>
-		/// <param name="content"><see cref="IContent"/> object to update</param>
-		/// <param name="userId">Optional Id of the User</param>
-		private void SetUser(IContent content, int userId)
-		{
-			if (userId > -1)
-			{
-				//If a user id was passed in we use that
-				content.CreatorId = userId;
-			}
-			else if (UserServiceOrContext())
-			{
-				var profile = _httpContext == null
-								  ? _userService.GetCurrentBackOfficeUser()
-								  : _userService.GetCurrentBackOfficeUser(_httpContext);
-				content.CreatorId = profile.Id.SafeCast<int>();
-			}
-			else
-			{
-				//Otherwise we default to Admin user, which should always exist (almost always)
-				content.CreatorId = 0;
-			}
-		}
-
-		/// <summary>
-		/// Updates a content object with a Writer (user id), who updated the content.
-		/// </summary>
-		/// <param name="content"><see cref="IContent"/> object to update</param>
-		/// <param name="userId">Optional Id of the Writer</param>
-		private void SetWriter(IContent content, int userId)
-		{
-			if (userId > -1)
-			{
-				//If a user id was passed in we use that
-				content.WriterId = userId;
-			}
-			else if (UserServiceOrContext())
-			{
-				var profile = _httpContext == null
-								  ? _userService.GetCurrentBackOfficeUser()
-								  : _userService.GetCurrentBackOfficeUser(_httpContext);
-				content.WriterId = profile.Id.SafeCast<int>();
-			}
-			else
-			{
-				//Otherwise we default to Admin user, which should always exist (almost always)
-				content.WriterId = 0;
-			}
-		}
-
-		private bool UserServiceOrContext()
-		{
-			return _userService != null && (HttpContext.Current != null || _httpContext != null);
-		}
 
         #endregion
 

@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Web;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
@@ -23,9 +21,7 @@ namespace Umbraco.Core.Services
 	    private readonly RepositoryFactory _repositoryFactory;
 	    private readonly IContentService _contentService;
         private readonly IMediaService _mediaService;
-        private readonly IUserService _userService;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
-        private HttpContextBase _httpContext;
 
         public ContentTypeService(IContentService contentService, IMediaService mediaService)
 			: this(new PetaPocoUnitOfWorkProvider(), new RepositoryFactory(), contentService, mediaService)
@@ -41,15 +37,6 @@ namespace Umbraco.Core.Services
 	        _repositoryFactory = repositoryFactory;
 	        _contentService = contentService;
             _mediaService = mediaService;
-        }
-
-		internal ContentTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IContentService contentService, IMediaService mediaService, IUserService userService)
-        {
-            _uowProvider = provider;
-			_repositoryFactory = repositoryFactory;
-			_contentService = contentService;
-            _mediaService = mediaService;
-            _userService = userService;
         }
 
         /// <summary>
@@ -129,7 +116,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="contentType"><see cref="IContentType"/> to save</param>
         /// <param name="userId">Optional id of the user saving the ContentType</param>
-        public void Save(IContentType contentType, int userId = -1)
+        public void Save(IContentType contentType, int userId = 0)
         {
 	        if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(contentType), this)) 
 				return;
@@ -137,7 +124,7 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 	        using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
 	        {
-		        SetUser(contentType, userId);
+		        contentType.CreatorId = userId;
 		        repository.AddOrUpdate(contentType);
 
 		        uow.Commit();
@@ -145,7 +132,7 @@ namespace Umbraco.Core.Services
 				SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(contentType, false), this);
 	        }
 
-	        Audit.Add(AuditTypes.Save, string.Format("Save ContentType performed by user"), userId == -1 ? 0 : userId, contentType.Id);
+	        Audit.Add(AuditTypes.Save, string.Format("Save ContentType performed by user"), userId, contentType.Id);
         }
 
         /// <summary>
@@ -153,7 +140,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="contentTypes">Collection of <see cref="IContentType"/> to save</param>
         /// <param name="userId">Optional id of the user saving the ContentType</param>
-        public void Save(IEnumerable<IContentType> contentTypes, int userId = -1)
+        public void Save(IEnumerable<IContentType> contentTypes, int userId = 0)
         {
 	        if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(contentTypes), this)) 
 				return;
@@ -163,7 +150,7 @@ namespace Umbraco.Core.Services
 	        {
 		        foreach (var contentType in contentTypes)
 		        {
-			        SetUser(contentType, userId);
+		            contentType.CreatorId = userId;
 			        repository.AddOrUpdate(contentType);					
 		        }
 
@@ -173,7 +160,7 @@ namespace Umbraco.Core.Services
 		        SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(contentTypes, false), this);
 	        }
 
-	        Audit.Add(AuditTypes.Save, string.Format("Save ContentTypes performed by user"), userId == -1 ? 0 : userId, -1);
+	        Audit.Add(AuditTypes.Save, string.Format("Save ContentTypes performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -182,7 +169,7 @@ namespace Umbraco.Core.Services
         /// <param name="contentType"><see cref="IContentType"/> to delete</param>
         /// <param name="userId">Optional id of the user issueing the delete</param>
         /// <remarks>Deleting a <see cref="IContentType"/> will delete all the <see cref="IContent"/> objects based on this <see cref="IContentType"/></remarks>
-        public void Delete(IContentType contentType, int userId = -1)
+        public void Delete(IContentType contentType, int userId = 0)
         {            
 	        if (DeletingContentType.IsRaisedEventCancelled(new DeleteEventArgs<IContentType>(contentType), this)) 
 				return;
@@ -198,7 +185,7 @@ namespace Umbraco.Core.Services
 		        DeletedContentType.RaiseEvent(new DeleteEventArgs<IContentType>(contentType, false), this);
 	        }
 
-	        Audit.Add(AuditTypes.Delete, string.Format("Delete ContentType performed by user"), userId == -1 ? 0 : userId, contentType.Id);
+	        Audit.Add(AuditTypes.Delete, string.Format("Delete ContentType performed by user"), userId, contentType.Id);
         }
 
         /// <summary>
@@ -209,7 +196,7 @@ namespace Umbraco.Core.Services
         /// <remarks>
         /// Deleting a <see cref="IContentType"/> will delete all the <see cref="IContent"/> objects based on this <see cref="IContentType"/>
         /// </remarks>
-        public void Delete(IEnumerable<IContentType> contentTypes, int userId = -1)
+        public void Delete(IEnumerable<IContentType> contentTypes, int userId = 0)
         {
 	        if (DeletingContentType.IsRaisedEventCancelled(new DeleteEventArgs<IContentType>(contentTypes), this)) 
 				return;
@@ -233,7 +220,7 @@ namespace Umbraco.Core.Services
 		        DeletedContentType.RaiseEvent(new DeleteEventArgs<IContentType>(contentTypes, false), this);
 	        }
 
-	        Audit.Add(AuditTypes.Delete, string.Format("Delete ContentTypes performed by user"), userId == -1 ? 0 : userId, -1);
+	        Audit.Add(AuditTypes.Delete, string.Format("Delete ContentTypes performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -313,7 +300,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="mediaType"><see cref="IMediaType"/> to save</param>
         /// <param name="userId">Optional Id of the user saving the MediaType</param>
-        public void Save(IMediaType mediaType, int userId = -1)
+        public void Save(IMediaType mediaType, int userId = 0)
         {
 	        if (SavingMediaType.IsRaisedEventCancelled(new SaveEventArgs<IMediaType>(mediaType), this)) 
 				return;
@@ -321,14 +308,14 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 	        using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
 	        {
-		        SetUser(mediaType, userId);
+                mediaType.CreatorId = userId;
 		        repository.AddOrUpdate(mediaType);
 		        uow.Commit();
 
 				SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(mediaType, false), this);
 	        }
 
-	        Audit.Add(AuditTypes.Save, string.Format("Save MediaType performed by user"), userId == -1 ? 0 : userId, mediaType.Id);
+	        Audit.Add(AuditTypes.Save, string.Format("Save MediaType performed by user"), userId, mediaType.Id);
         }
 
         /// <summary>
@@ -336,7 +323,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="mediaTypes">Collection of <see cref="IMediaType"/> to save</param>
         /// <param name="userId">Optional Id of the user savging the MediaTypes</param>
-        public void Save(IEnumerable<IMediaType> mediaTypes, int userId = -1)
+        public void Save(IEnumerable<IMediaType> mediaTypes, int userId = 0)
         {
 			if (SavingMediaType.IsRaisedEventCancelled(new SaveEventArgs<IMediaType>(mediaTypes), this))
 				return;
@@ -347,7 +334,7 @@ namespace Umbraco.Core.Services
 
 				foreach (var mediaType in mediaTypes)
 				{
-					SetUser(mediaType, userId);
+					mediaType.CreatorId = userId;
 					repository.AddOrUpdate(mediaType);					
 				}
 
@@ -357,7 +344,7 @@ namespace Umbraco.Core.Services
 				SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(mediaTypes, false), this);
 			}
 
-			Audit.Add(AuditTypes.Save, string.Format("Save MediaTypes performed by user"), userId == -1 ? 0 : userId, -1);
+			Audit.Add(AuditTypes.Save, string.Format("Save MediaTypes performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -366,7 +353,7 @@ namespace Umbraco.Core.Services
         /// <param name="mediaType"><see cref="IMediaType"/> to delete</param>
         /// <param name="userId">Optional Id of the user deleting the MediaType</param>
         /// <remarks>Deleting a <see cref="IMediaType"/> will delete all the <see cref="IMedia"/> objects based on this <see cref="IMediaType"/></remarks>
-        public void Delete(IMediaType mediaType, int userId = -1)
+        public void Delete(IMediaType mediaType, int userId = 0)
         {
 	        if (DeletingMediaType.IsRaisedEventCancelled(new DeleteEventArgs<IMediaType>(mediaType), this)) 
 				return;
@@ -383,7 +370,7 @@ namespace Umbraco.Core.Services
 		        DeletedMediaType.RaiseEvent(new DeleteEventArgs<IMediaType>(mediaType, false), this);
 	        }
 
-	        Audit.Add(AuditTypes.Delete, string.Format("Delete MediaType performed by user"), userId == -1 ? 0 : userId, mediaType.Id);
+	        Audit.Add(AuditTypes.Delete, string.Format("Delete MediaType performed by user"), userId, mediaType.Id);
         }
 
         /// <summary>
@@ -392,7 +379,7 @@ namespace Umbraco.Core.Services
         /// <param name="mediaTypes">Collection of <see cref="IMediaType"/> to delete</param>
         /// <param name="userId"></param>
         /// <remarks>Deleting a <see cref="IMediaType"/> will delete all the <see cref="IMedia"/> objects based on this <see cref="IMediaType"/></remarks>
-        public void Delete(IEnumerable<IMediaType> mediaTypes, int userId = -1)
+        public void Delete(IEnumerable<IMediaType> mediaTypes, int userId = 0)
         {            
 	        if (DeletingMediaType.IsRaisedEventCancelled(new DeleteEventArgs<IMediaType>(mediaTypes), this)) 
 				return;
@@ -415,7 +402,7 @@ namespace Umbraco.Core.Services
 				DeletedMediaType.RaiseEvent(new DeleteEventArgs<IMediaType>(mediaTypes, false), this);		        
 	        }
 
-	        Audit.Add(AuditTypes.Delete, string.Format("Delete MediaTypes performed by user"), userId == -1 ? 0 : userId, -1);
+	        Audit.Add(AuditTypes.Delete, string.Format("Delete MediaTypes performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -471,46 +458,6 @@ namespace Umbraco.Core.Services
 
             }
             return dtd.ToString();
-        }
-
-        /// <summary>
-        /// Internal method to set the HttpContextBase for testing.
-        /// </summary>
-        /// <param name="httpContext"><see cref="HttpContextBase"/></param>
-        internal void SetHttpContext(HttpContextBase httpContext)
-        {
-            _httpContext = httpContext;
-        }
-
-        /// <summary>
-        /// Updates a content object with the User (id), who created the content.
-        /// </summary>
-        /// <param name="contentType">ContentType object to update</param>
-        /// <param name="userId">Optional Id of the User</param>
-        private void SetUser(IContentTypeBase contentType, int userId)
-        {
-            if (userId > -1)
-            {
-                //If a user id was passed in we use that
-                contentType.CreatorId = userId;
-            }
-            else if (UserServiceOrContext())
-            {
-                var profile = _httpContext == null
-                                  ? _userService.GetCurrentBackOfficeUser()
-                                  : _userService.GetCurrentBackOfficeUser(_httpContext);
-                contentType.CreatorId = profile.Id.SafeCast<int>();
-            }
-            else
-            {
-                //Otherwise we default to Admin user, which should always exist (almost always)
-                contentType.CreatorId = 0;
-            }
-        }
-
-        private bool UserServiceOrContext()
-        {
-            return _userService != null && (HttpContext.Current != null || _httpContext != null);
         }
 
         #region Event Handlers

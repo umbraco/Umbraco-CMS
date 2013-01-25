@@ -117,7 +117,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to save</param>
         /// <param name="userId">Id of the user issueing the save</param>
-        public void Save(IDataTypeDefinition dataTypeDefinition, int userId = -1)
+        public void Save(IDataTypeDefinition dataTypeDefinition, int userId = 0)
         {
 	        if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this)) 
 				return;
@@ -125,14 +125,14 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 	        using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow))
 	        {
-		        dataTypeDefinition.CreatorId = userId > -1 ? userId : 0;
+		        dataTypeDefinition.CreatorId = userId;
 		        repository.AddOrUpdate(dataTypeDefinition);
 		        uow.Commit();
 
 		        Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this);
 	        }
 
-	        Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition performed by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
+	        Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace Umbraco.Core.Services
         /// </remarks>
         /// <param name="dataTypeDefinition"><see cref="IDataTypeDefinition"/> to delete</param>
         /// <param name="userId">Optional Id of the user issueing the deletion</param>
-        public void Delete(IDataTypeDefinition dataTypeDefinition, int userId = -1)
+        public void Delete(IDataTypeDefinition dataTypeDefinition, int userId = 0)
         {            
 	        if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition), this)) 
 				return;
@@ -181,7 +181,7 @@ namespace Umbraco.Core.Services
 		        Deleted.RaiseEvent(new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this); 		        
 	        }
 
-	        Audit.Add(AuditTypes.Delete, string.Format("Delete DataTypeDefinition performed by user"), userId == -1 ? 0 : userId, dataTypeDefinition.Id);
+	        Audit.Add(AuditTypes.Delete, string.Format("Delete DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
         }
 
         /// <summary>
