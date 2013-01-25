@@ -13,6 +13,8 @@ using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using umbraco.editorControls.tinyMCE3;
+using umbraco.interfaces;
 
 namespace Umbraco.Tests.Services
 {
@@ -25,6 +27,20 @@ namespace Umbraco.Tests.Services
 		[SetUp]
 		public override void Initialize()
 		{
+            //NOTE The DataTypesResolver is only necessary because we are using the Save method in the MediaService
+            //this ensures its reset
+            PluginManager.Current = new PluginManager();
+
+            //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
+            PluginManager.Current.AssembliesToScan = new[]
+				{
+                    typeof(IDataType).Assembly,
+                    typeof(tinyMCE3dataType).Assembly
+				};
+
+            DataTypesResolver.Current = new DataTypesResolver(
+                PluginManager.Current.ResolveDataTypes());
+
 			base.Initialize();
 			
 			//we need to use our own custom IDatabaseFactory for the DatabaseContext because we MUST ensure that 
@@ -47,6 +63,9 @@ namespace Umbraco.Tests.Services
 		[TearDown]
 		public override void TearDown()
 		{
+            //reset the app context
+            DataTypesResolver.Reset();
+
 			_error = null;
 
 			//dispose!

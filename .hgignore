@@ -14,6 +14,7 @@ syntax: glob
 obj/
 [Rr]elease*/
 _ReSharper*/
+_NCrunch_*/
 *.ncrunchsolution
 *.ncrunchsolution.user
 *.ncrunchproject

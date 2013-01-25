@@ -81,15 +81,6 @@ namespace umbraco.cms.businesslogic.media
             ApplicationContext.Current.Services.MediaService.Save(media);
             var tmp = new Media(media);
 
-            /*Guid newId = Guid.NewGuid();
-            // Updated to match level from base node
-            CMSNode n = new CMSNode(ParentId);
-            int newLevel = n.Level;
-            newLevel++;
-            CMSNode.MakeNew(ParentId, _objectType, u.Id, newLevel, Name, newId);
-            Media tmp = new Media(newId);
-            tmp.CreateContent(dct);*/
-
             NewEventArgs e = new NewEventArgs();
             tmp.OnNew(e);
 
@@ -105,16 +96,6 @@ namespace umbraco.cms.businesslogic.media
         {
             var children = ApplicationContext.Current.Services.MediaService.GetRootMedia();
             return children.Select(x => new Media(x)).ToArray();
-
-            /*Guid[] topNodeIds = CMSNode.TopMostNodeIds(_objectType);
-
-            Media[] retval = new Media[topNodeIds.Length];
-            for (int i = 0; i < topNodeIds.Length; i++)
-            {
-                Media d = new Media(topNodeIds[i]);
-                retval[i] = d;
-            }
-            return retval;*/
         }
 
         [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.GetChildren()", false)]
@@ -122,26 +103,6 @@ namespace umbraco.cms.businesslogic.media
         {
             var children = ApplicationContext.Current.Services.MediaService.GetChildren(nodeId);
             return children.Select(x => new Media(x)).ToList();
-
-            /*List<Media> tmp = new List<Media>();
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(
-                    string.Format(m_SQLOptimizedMany.Trim()
-                        , "umbracoNode.parentID = @parentId"
-                        , "umbracoNode.sortOrder")
-                    , SqlHelper.CreateParameter("@nodeObjectType", _objectType)
-                    , SqlHelper.CreateParameter("@parentId", nodeId)))
-            {
-
-                while (dr.Read())
-                {
-                    Media d = new Media(dr.GetInt("id"), true);
-                    d.PopulateMediaFromReader(dr);                    
-                    tmp.Add(d);
-                }
-
-            }
-            return tmp;*/
         }
 
         [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.GetMediaOfMediaType()", false)]
@@ -149,23 +110,6 @@ namespace umbraco.cms.businesslogic.media
         {
             var children = ApplicationContext.Current.Services.MediaService.GetMediaOfMediaType(mediaTypeId);
             return children.Select(x => new Media(x)).ToList();
-
-            /*var tmp = new List<Media>();
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany.Trim(), "cmsContent.contentType = @contentTypeId", "umbracoNode.sortOrder"),
-                                        SqlHelper.CreateParameter("@nodeObjectType", _objectType),
-                                        SqlHelper.CreateParameter("@contentTypeId", mediaTypeId)))
-            {
-                while (dr.Read())
-                {
-                    Media d = new Media(dr.GetInt("id"), true);
-                    d.PopulateMediaFromReader(dr);
-                    tmp.Add(d);
-                }
-            }
-
-            return tmp.ToArray();*/
         }
 
         /// <summary>
@@ -178,25 +122,6 @@ namespace umbraco.cms.businesslogic.media
         public static void DeleteFromType(MediaType dt)
         {
             ApplicationContext.Current.Services.MediaService.DeleteMediaOfType(dt.Id);
-
-            //get all document for the document type and order by level (top level first)
-            /*var medias = Media.GetMediaOfMediaType(dt.Id)
-                .OrderByDescending(x => x.Level);
-
-            foreach (Media media in medias)
-            {
-                //before we delete this document, we need to make sure we don't end up deleting other documents that 
-                //are not of this document type that are children. So we'll move all of it's children to the trash first.
-                foreach (Media m in media.GetDescendants())
-                {
-                    if (m.ContentType.Id != dt.Id)
-                    {
-                        m.MoveToTrash();
-                    }
-                }
-
-                media.DeletePermanently();
-            }*/
         }
         
         #endregion

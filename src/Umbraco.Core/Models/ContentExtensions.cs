@@ -54,55 +54,6 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /*
-        /// <summary>
-        /// Sets and uploads the file from a HttpPostedFileBase object as the property value
-        /// </summary>
-        /// <param name="media"><see cref="IMedia"/> to add property value to</param>
-        /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
-        /// <param name="value">The <see cref="HttpPostedFileBase"/> containing the file that will be uploaded</param>
-        public static void SetPropertyValue(this IMedia media, string propertyTypeAlias, HttpPostedFileBase value)
-        {
-            var name =
-                IOHelper.SafeFileName(
-                    value.FileName.Substring(value.FileName.LastIndexOf(IOHelper.DirSepChar) + 1,
-                                             value.FileName.Length - value.FileName.LastIndexOf(IOHelper.DirSepChar) - 1)
-                         .ToLower());
-
-            if(string.IsNullOrEmpty(name) == false)
-                SetFileOnContent(media, propertyTypeAlias, name, value.InputStream);
-        }
-
-        /// <summary>
-        /// Sets and uploads the file from a HttpPostedFile object as the property value
-        /// </summary>
-        /// <param name="media"><see cref="IMedia"/> to add property value to</param>
-        /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
-        /// <param name="value">The <see cref="HttpPostedFile"/> containing the file that will be uploaded</param>
-        public static void SetPropertyValue(this IMedia media, string propertyTypeAlias, HttpPostedFile value)
-        {
-            var name =
-                IOHelper.SafeFileName(
-                    value.FileName.Substring(value.FileName.LastIndexOf(IOHelper.DirSepChar) + 1,
-                                            value.FileName.Length - value.FileName.LastIndexOf(IOHelper.DirSepChar) - 1)
-                        .ToLower());
-
-            if (string.IsNullOrEmpty(name) == false)
-                SetFileOnContent(media, propertyTypeAlias, name, value.InputStream);
-        }
-
-        /// <summary>
-        /// Sets and uploads the file from a HttpPostedFileWrapper object as the property value
-        /// </summary>
-        /// <param name="media"><see cref="IMedia"/> to add property value to</param>
-        /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
-        /// <param name="value">The <see cref="HttpPostedFileWrapper"/> containing the file that will be uploaded</param>
-        public static void SetPropertyValue(this IMedia media, string propertyTypeAlias, HttpPostedFileWrapper value)
-        {
-            if (string.IsNullOrEmpty(value.FileName) == false)
-                SetFileOnContent(media, propertyTypeAlias, value.FileName, value.InputStream);
-        }
-        */
         /// <summary>
         /// Sets and uploads the file from a HttpPostedFileBase object as the property value
         /// </summary>
@@ -154,7 +105,7 @@ namespace Umbraco.Core.Models
         private static void SetFileOnContent(IContentBase content, string propertyTypeAlias, string name, Stream fileStream)
         {
             var property = content.Properties.FirstOrDefault(x => x.Alias == propertyTypeAlias);
-            if(property == null)
+            if (property == null)
                 return;
 
             bool supportsResizing = false;
@@ -204,7 +155,7 @@ namespace Umbraco.Core.Models
                 XmlNode uploadFieldConfigNode =
                     UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
                         string.Format("uploadField [@alias = \"{0}\"]", propertyTypeAlias));
-                
+
                 if (uploadFieldConfigNode != null)
                 {
                     //Only add dimensions to web images
@@ -236,7 +187,7 @@ namespace Umbraco.Core.Models
                 content.SetValue(propertyNode.FirstChild.Value, propertyValue);
             }
         }
-        
+
         private static string Resize(MediaFileSystem fileSystem, string path, string extension, int maxWidthHeight, string fileNameAddition)
         {
             var fileNameThumb = DoResize(fileSystem, path, extension, GetDimensions(fileSystem, path).Item1, GetDimensions(fileSystem, path).Item2, maxWidthHeight, fileNameAddition);
@@ -360,15 +311,14 @@ namespace Umbraco.Core.Models
 		}
 
         /// <summary>
-        /// Gets the <see cref="IProfile"/> for the Creator of this content.
         /// </summary>
-        public static IProfile GetCreatorProfile(this IContent content)
+        public static IProfile GetCreatorProfile(this IContentBase content)
         {
-			using (var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
-				PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
-			{
-				return repository.GetProfileById(content.CreatorId);
-			}
+            using (var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
+                PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
+            {
+                return repository.GetProfileById(content.CreatorId);
+            }
         }
 
         /// <summary>
@@ -376,11 +326,11 @@ namespace Umbraco.Core.Models
         /// </summary>
         public static IProfile GetWriterProfile(this IContent content)
         {
-			using(var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
-				PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
-			{
-				return repository.GetProfileById(content.WriterId);	
-			}
+            using (var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
+                PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
+            {
+                return repository.GetProfileById(content.WriterId);
+            }
         }
 
         /// <summary>
@@ -406,69 +356,71 @@ namespace Umbraco.Core.Models
 
 			//nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
 			var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
-			
-			var x = content.ToXml(nodeName);
-			x.Add(new XAttribute("nodeType", content.ContentType.Id));
-			x.Add(new XAttribute("creatorName", content.GetCreatorProfile().Name));
-			x.Add(new XAttribute("writerName", content.GetWriterProfile().Name));
-			x.Add(new XAttribute("writerID", content.WriterId));
-			x.Add(new XAttribute("template", content.Template == null ? "0" : content.Template.Id.ToString()));
-			if (UmbracoSettings.UseLegacyXmlSchema)
-			{
-				x.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
-			}
 
-			return x;
+            var x = content.ToXml(nodeName);
+            x.Add(new XAttribute("nodeType", content.ContentType.Id));
+            x.Add(new XAttribute("creatorName", content.GetCreatorProfile().Name));
+            x.Add(new XAttribute("writerName", content.GetWriterProfile().Name));
+            x.Add(new XAttribute("writerID", content.WriterId));
+            x.Add(new XAttribute("template", content.Template == null ? "0" : content.Template.Id.ToString()));
+            if (UmbracoSettings.UseLegacyXmlSchema)
+            {
+                x.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
+            }
 
+            return x;
         }
 
-		/// <summary>
-		/// Creates the xml representation for the <see cref="IMedia"/> object
-		/// </summary>
-		/// <param name="media"><see cref="IContent"/> to generate xml for</param>
-		/// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
-		internal static XElement ToXml(this IMedia media)
-		{
-			//nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
-			var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
-			
-			var x = media.ToXml(nodeName);
-			x.Add(new XAttribute("nodeType", media.ContentType.Id));
-			x.Add(new XAttribute("creatorName", media.GetCreatorProfile().Name));
-			x.Add(new XAttribute("writerID", 0));
-			x.Add(new XAttribute("template", 0));
-			if (UmbracoSettings.UseLegacyXmlSchema)
-			{
-				x.Add(new XAttribute("nodeTypeAlias", media.ContentType.Alias));
-			}
+        /// <summary>
+        /// Creates the xml representation for the <see cref="IMedia"/> object
+        /// </summary>
+        /// <param name="media"><see cref="IContent"/> to generate xml for</param>
+        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        public static XElement ToXml(this IMedia media)
+        {
+            //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
+            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
-			return x;
-		}
+            var x = media.ToXml(nodeName);
+            x.Add(new XAttribute("nodeType", media.ContentType.Id));
+            //TODO Using the GetCreatorProfile extension method seems to be causing threading/connection problems because of the way the repo is used
+            //x.Add(new XAttribute("writerName", media.GetCreatorProfile().Name));
+            x.Add(new XAttribute("writerName", string.Empty));
+            x.Add(new XAttribute("writerID", media.CreatorId));
+            x.Add(new XAttribute("version", media.Version));
+            x.Add(new XAttribute("template", 0));
+            if (UmbracoSettings.UseLegacyXmlSchema)
+            {
+                x.Add(new XAttribute("nodeTypeAlias", media.ContentType.Alias));
+            }
 
-	    /// <summary>
-		/// Creates the xml representation for the <see cref="IContentBase"/> object
-	    /// </summary>
-	    /// <param name="contentBase"><see cref="IContent"/> to generate xml for</param>
-	    /// <param name="nodeName"></param>
-	    /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
-	    private static XElement ToXml(this IContentBase contentBase, string nodeName)
-		{
-			var niceUrl = contentBase.Name.FormatUrl().ToLower();
+            return x;
+        }
+
+        /// <summary>
+        /// Creates the xml representation for the <see cref="IContentBase"/> object
+        /// </summary>
+        /// <param name="contentBase"><see cref="IContent"/> to generate xml for</param>
+        /// <param name="nodeName"></param>
+        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        private static XElement ToXml(this IContentBase contentBase, string nodeName)
+        {
+            var niceUrl = contentBase.Name.FormatUrl().ToLower();
 
 			var xml = new XElement(nodeName,
-								   new XAttribute("id", contentBase.Id),
-								   new XAttribute("parentID", contentBase.Level > 1 ? contentBase.ParentId : -1),
-								   new XAttribute("level", contentBase.Level),
-								   new XAttribute("creatorID", contentBase.CreatorId),
-								   new XAttribute("sortOrder", contentBase.SortOrder),
-								   new XAttribute("createDate", contentBase.CreateDate.ToString("s")),
-								   new XAttribute("updateDate", contentBase.UpdateDate.ToString("s")),
-								   new XAttribute("nodeName", contentBase.Name),
-								   new XAttribute("urlName", niceUrl),//Format Url ?								   
-								   new XAttribute("path", contentBase.Path),
-								   new XAttribute("isDoc", ""));
+                                   new XAttribute("id", contentBase.Id),
+                                   new XAttribute("parentID", contentBase.Level > 1 ? contentBase.ParentId : -1),
+                                   new XAttribute("level", contentBase.Level),
+                                   new XAttribute("creatorID", contentBase.CreatorId),
+                                   new XAttribute("sortOrder", contentBase.SortOrder),
+                                   new XAttribute("createDate", contentBase.CreateDate.ToString("s")),
+                                   new XAttribute("updateDate", contentBase.UpdateDate.ToString("s")),
+                                   new XAttribute("nodeName", contentBase.Name),
+                                   new XAttribute("urlName", niceUrl),//Format Url ?								   
+                                   new XAttribute("path", contentBase.Path),
+                                   new XAttribute("isDoc", ""));
 
-			foreach (var property in contentBase.Properties)
+            foreach (var property in contentBase.Properties)
 			{
 				if (property == null) continue;
 
