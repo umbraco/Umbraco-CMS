@@ -1237,7 +1237,8 @@ namespace umbraco.cms.businesslogic.web
                 if (p != null)
                 {
                     x.AppendChild(p.ToXml(xd));
-                    if (p.PropertyType.Alias == "umbracoUrlName" && p.Value.ToString().Trim() != string.Empty)
+                    if (p.PropertyType.Alias == "umbracoUrlName" && p.Value != null 
+                            && p.Value.ToString().Trim() != string.Empty)
                         urlName = p.Value.ToString();
                 }
 
