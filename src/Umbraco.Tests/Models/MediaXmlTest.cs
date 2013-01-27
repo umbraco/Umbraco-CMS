@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Models
                 };
 
             DataTypesResolver.Current = new DataTypesResolver(
-                PluginManager.Current.ResolveDataTypes());
+                () => PluginManager.Current.ResolveDataTypes());
 
             base.Initialize();
         }
@@ -61,7 +61,6 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(media.Id.ToString(), (string)element.Attribute("id"));
             Assert.AreEqual(media.ParentId.ToString(), (string)element.Attribute("parentID"));
             Assert.AreEqual(media.Level.ToString(), (string)element.Attribute("level"));
-            //Assert.AreEqual(media.CreatorId.ToString(), (string)element.Attribute("creatorID"));
             Assert.AreEqual(media.SortOrder.ToString(), (string)element.Attribute("sortOrder"));
             Assert.AreEqual(media.CreateDate.ToString("s"), (string)element.Attribute("createDate"));
             Assert.AreEqual(media.UpdateDate.ToString("s"), (string)element.Attribute("updateDate"));
@@ -70,7 +69,6 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(media.Path, (string)element.Attribute("path"));
             Assert.AreEqual("", (string)element.Attribute("isDoc"));
             Assert.AreEqual(media.ContentType.Id.ToString(), (string)element.Attribute("nodeType"));
-            //Assert.AreEqual(media.GetCreatorProfile().Name, (string)element.Attribute("creatorName"));
             Assert.AreEqual(media.GetCreatorProfile().Name, (string)element.Attribute("writerName"));
             Assert.AreEqual(media.CreatorId.ToString(), (string)element.Attribute("writerID"));
             Assert.AreEqual(media.Version.ToString(), (string)element.Attribute("version"));

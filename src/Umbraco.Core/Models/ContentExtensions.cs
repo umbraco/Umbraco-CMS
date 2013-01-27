@@ -311,6 +311,7 @@ namespace Umbraco.Core.Models
 		}
 
         /// <summary>
+        /// Gets the <see cref="IProfile"/> for the Creator of this content item.
         /// </summary>
         public static IProfile GetCreatorProfile(this IContentBase content)
         {
@@ -353,7 +354,6 @@ namespace Umbraco.Core.Models
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         public static XElement ToXml(this IContent content)
         {
-
 			//nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
 			var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
@@ -427,7 +427,8 @@ namespace Umbraco.Core.Models
 				xml.Add(property.ToXml());
 
 				//Check for umbracoUrlName convention
-				if (property.Alias == "umbracoUrlName" && property.Value.ToString().Trim() != string.Empty)
+                if (property.Alias == "umbracoUrlName" && property.Value != null && 
+                        property.Value.ToString().Trim() != string.Empty)
 					xml.SetAttributeValue("urlName", property.Value);
 			}
 

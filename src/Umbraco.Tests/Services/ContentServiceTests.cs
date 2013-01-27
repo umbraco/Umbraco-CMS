@@ -53,80 +53,14 @@ namespace Umbraco.Tests.Services
             Assert.That(content, Is.Not.Null);
             Assert.That(content.HasIdentity, Is.False);
         }
-
+        
         [Test]
-        public void Can_Create_Content_Using_HttpContext_To_Set_User()
+        public void Can_Create_Content_Without_Explicitly_Set_User()
         {
             // Arrange
-            var userId =
-                Convert.ToInt32(
-                    DatabaseContext.Database.Insert(new UserDto
-                                                        {
-                                                            ContentStartId = -1,
-                                                            DefaultPermissions = null,
-                                                            DefaultToLiveEditing = false,
-                                                            Disabled = false,
-                                                            Email = "my@email.com",
-                                                            Login = "editor",
-                                                            MediaStartId = -1,
-                                                            NoConsole = false,
-                                                            Password = "1234",
-                                                            Type = 3,
-                                                            UserLanguage = "en",
-                                                            UserName = "John Doe the Editor"
-                                                        }));
-
-            DatabaseContext.Database.Insert(new UserLoginDto
-                                                {
-                                                    UserId = userId,
-                                                    ContextId = new Guid("FBA996E7-D6BE-489B-B199-2B0F3D2DD826"),
-                                                    Timeout = 634596443995451258
-                                                });
-
             var contentService = ServiceContext.ContentService as ContentService;
-            contentService.SetHttpContext(base.GetUmbracoContext("/test", 1234).HttpContext);
 
             // Act
-            var content = contentService.CreateContent("Test", -1, "umbTextpage");
-
-            // Assert
-            Assert.That(content, Is.Not.Null);
-            Assert.That(content.HasIdentity, Is.False);
-            Assert.That(content.CreatorId, Is.EqualTo(userId));
-        }
-
-        [Test]
-        public void Can_Create_Content_Without_HttpContext_To_Set_User()
-        {
-            // Arrange
-            var userId =
-                Convert.ToInt32(
-                    DatabaseContext.Database.Insert(new UserDto
-                                                        {
-                                                            ContentStartId = -1,
-                                                            DefaultPermissions = null,
-                                                            DefaultToLiveEditing = false,
-                                                            Disabled = false,
-                                                            Email = "my@email.com",
-                                                            Login = "editor",
-                                                            MediaStartId = -1,
-                                                            NoConsole = false,
-                                                            Password = "1234",
-                                                            Type = 3,
-                                                            UserLanguage = "en",
-                                                            UserName = "John Doe the Editor"
-                                                        }));
-
-            DatabaseContext.Database.Insert(new UserLoginDto
-                                                {
-                                                    UserId = userId,
-                                                    ContextId = new Guid("FBA996E7-D6BE-489B-B199-2B0F3D2DD826"),
-                                                    Timeout = 634596443995451258
-                                                });
-
-            // Act
-            var contentService = ServiceContext.ContentService as ContentService;
-            contentService.SetHttpContext(null);
             var content = contentService.CreateContent("Test", -1, "umbTextpage");
 
             // Assert

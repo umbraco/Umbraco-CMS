@@ -85,7 +85,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="macro"><see cref="IMacro"/> to delete</param>
         /// <param name="userId">Optional id of the user deleting the macro</param>
-        public void Delete(IMacro macro, int userId = -1)
+        public void Delete(IMacro macro, int userId = 0)
         {
 			if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMacro>(macro), this))
 				return;
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Services
 				Deleted.RaiseEvent(new DeleteEventArgs<IMacro>(macro, false), this);
 			}
 
-			Audit.Add(AuditTypes.Delete, "Delete Macro performed by user", userId > -1 ? userId : 0, -1);
+			Audit.Add(AuditTypes.Delete, "Delete Macro performed by user", userId, -1);
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="macro"><see cref="IMacro"/> to save</param>
         /// <param name="userId">Optional Id of the user deleting the macro</param>
-        public void Save(IMacro macro, int userId = -1)
+        public void Save(IMacro macro, int userId = 0)
         {
 	        if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMacro>(macro), this)) 
 				return;
@@ -121,7 +121,7 @@ namespace Umbraco.Core.Services
 		        Saved.RaiseEvent(new SaveEventArgs<IMacro>(macro, false), this);
 	        }
 
-	        Audit.Add(AuditTypes.Save, "Save Macro performed by user", userId > -1 ? userId : 0, -1);
+	        Audit.Add(AuditTypes.Save, "Save Macro performed by user", userId, -1);
         }
 
         /// <summary>

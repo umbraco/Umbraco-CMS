@@ -63,7 +63,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="stylesheet"><see cref="Stylesheet"/> to save</param>
         /// <param name="userId"></param>
-        public void SaveStylesheet(Stylesheet stylesheet, int userId = -1)
+        public void SaveStylesheet(Stylesheet stylesheet, int userId = 0)
         {
 	        if (SavingStylesheet.IsRaisedEventCancelled(new SaveEventArgs<Stylesheet>(stylesheet), this)) 
 				return;
@@ -77,7 +77,7 @@ namespace Umbraco.Core.Services
 		        SavedStylesheet.RaiseEvent(new SaveEventArgs<Stylesheet>(stylesheet, false), this);
 	        }
 
-	        Audit.Add(AuditTypes.Save, string.Format("Save Stylesheet performed by user"), userId == -1 ? 0 : userId, -1);
+	        Audit.Add(AuditTypes.Save, string.Format("Save Stylesheet performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="name">Name incl. extension of the Stylesheet to delete</param>
         /// <param name="userId"></param>
-        public void DeleteStylesheet(string name, int userId = -1)
+        public void DeleteStylesheet(string name, int userId = 0)
         {
             var uow = _fileUowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateStylesheetRepository(uow))
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Services
 
 				DeletedStylesheet.RaiseEvent(new DeleteEventArgs<Stylesheet>(stylesheet, false), this);
 
-				Audit.Add(AuditTypes.Delete, string.Format("Delete Stylesheet performed by user"), userId == -1 ? 0 : userId, -1);
+				Audit.Add(AuditTypes.Delete, string.Format("Delete Stylesheet performed by user"), userId, -1);
             }
         }
 
@@ -144,7 +144,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="script"><see cref="Script"/> to save</param>
         /// <param name="userId"></param>
-        public void SaveScript(Script script, int userId = -1)
+        public void SaveScript(Script script, int userId = 0)
         {
 	        if (SavingScript.IsRaisedEventCancelled(new SaveEventArgs<Script>(script), this)) 
 				return;
@@ -158,7 +158,7 @@ namespace Umbraco.Core.Services
 		        SavedScript.RaiseEvent(new SaveEventArgs<Script>(script, false), this);
 	        }
 
-	        Audit.Add(AuditTypes.Save, string.Format("Save Script performed by user"), userId == -1 ? 0 : userId, -1);
+	        Audit.Add(AuditTypes.Save, string.Format("Save Script performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="name">Name incl. extension of the Script to delete</param>
         /// <param name="userId"></param>
-        public void DeleteScript(string name, int userId = -1)
+        public void DeleteScript(string name, int userId = 0)
         {
             var uow = _fileUowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateScriptRepository(uow))
@@ -181,8 +181,7 @@ namespace Umbraco.Core.Services
 
 				DeletedScript.RaiseEvent(new DeleteEventArgs<Script>(script, false), this);
 
-				Audit.Add(AuditTypes.Delete, string.Format("Delete Script performed by user"),
-						  userId == -1 ? 0 : userId, -1);
+				Audit.Add(AuditTypes.Delete, string.Format("Delete Script performed by user"), userId, -1);
             }
         }
 
@@ -239,7 +238,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="template"><see cref="Template"/> to save</param>
         /// <param name="userId"></param>
-        public void SaveTemplate(ITemplate template, int userId = -1)
+        public void SaveTemplate(ITemplate template, int userId = 0)
         {
 	        if (SavingTemplate.IsRaisedEventCancelled(new SaveEventArgs<ITemplate>(template), this)) 
 				return;
@@ -253,7 +252,7 @@ namespace Umbraco.Core.Services
 		        SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(template, false), this);
 	        }
 
-	        Audit.Add(AuditTypes.Save, string.Format("Save Template performed by user"), userId == -1 ? 0 : userId, template.Id);
+	        Audit.Add(AuditTypes.Save, string.Format("Save Template performed by user"), userId, template.Id);
         }
 
         /// <summary>
@@ -261,7 +260,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="alias">Alias of the <see cref="ITemplate"/> to delete</param>
         /// <param name="userId"></param>
-        public void DeleteTemplate(string alias, int userId = -1)
+        public void DeleteTemplate(string alias, int userId = 0)
         {
             var uow = _dataUowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateTemplateRepository(uow))
@@ -276,8 +275,7 @@ namespace Umbraco.Core.Services
 
 				DeletedTemplate.RaiseEvent(new DeleteEventArgs<ITemplate>(template, false), this);
 
-				Audit.Add(AuditTypes.Delete, string.Format("Delete Template performed by user"),
-						  userId == -1 ? 0 : userId, template.Id);
+				Audit.Add(AuditTypes.Delete, string.Format("Delete Template performed by user"), userId, template.Id);
             }
         }
 

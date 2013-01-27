@@ -18,7 +18,7 @@ namespace Umbraco.Core.Services
         /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional id of the user creating the content</param>
         /// <returns><see cref="IContent"/></returns>
-        IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = -1);
+        IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = 0);
 
         /// <summary>
         /// Gets an <see cref="IContent"/> object by Id
@@ -91,14 +91,14 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
-        void Save(IContent content, int userId = -1);
+        void Save(IContent content, int userId = 0);
 
         /// <summary>
         /// Saves a collection of <see cref="IContent"/> objects.
         /// </summary>        
         /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
-        void Save(IEnumerable<IContent> contents, int userId = -1);		
+        void Save(IEnumerable<IContent> contents, int userId = 0);		
 
         /// <summary>
         /// Deletes all content of specified type. All children of deleted content is moved to Recycle Bin.
@@ -106,7 +106,7 @@ namespace Umbraco.Core.Services
         /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
         /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional Id of the user issueing the delete operation</param>
-        void DeleteContentOfType(int contentTypeId, int userId = -1);
+        void DeleteContentOfType(int contentTypeId, int userId = 0);
 
         /// <summary>
         /// Permanently deletes versions from an <see cref="IContent"/> object prior to a specific date.
@@ -114,7 +114,7 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the <see cref="IContent"/> object to delete versions from</param>
         /// <param name="versionDate">Latest version date</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        void DeleteVersions(int id, DateTime versionDate, int userId = -1);
+        void DeleteVersions(int id, DateTime versionDate, int userId = 0);
 
         /// <summary>
         /// Permanently deletes a specific version from an <see cref="IContent"/> object.
@@ -123,7 +123,7 @@ namespace Umbraco.Core.Services
         /// <param name="versionId">Id of the version to delete</param>
         /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = -1);
+        void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = 0);
 
         /// <summary>
         /// Deletes an <see cref="IContent"/> object by moving it to the Recycle Bin
@@ -131,7 +131,7 @@ namespace Umbraco.Core.Services
         /// <remarks>Move an item to the Recycle Bin will result in the item being unpublished</remarks>
         /// <param name="content">The <see cref="IContent"/> to delete</param>
         /// <param name="userId">Optional Id of the User deleting the Content</param>
-        void MoveToRecycleBin(IContent content, int userId = -1);
+        void MoveToRecycleBin(IContent content, int userId = 0);
 
         /// <summary>
         /// Moves an <see cref="IContent"/> object to a new location
@@ -139,7 +139,7 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to move</param>
         /// <param name="parentId">Id of the Content's new Parent</param>
         /// <param name="userId">Optional Id of the User moving the Content</param>
-        void Move(IContent content, int parentId, int userId = -1);
+        void Move(IContent content, int parentId, int userId = 0);
 
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IContent"/> that resides in the bin
@@ -154,7 +154,7 @@ namespace Umbraco.Core.Services
         /// <param name="versionId">Id of the version to rollback to</param>
         /// <param name="userId">Optional Id of the User issueing the rollback of the Content</param>
         /// <returns>The newly created <see cref="IContent"/> object</returns>
-        IContent Rollback(int id, Guid versionId, int userId = -1);
+        IContent Rollback(int id, Guid versionId, int userId = 0);
 
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by its name or partial name
@@ -211,7 +211,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        bool RePublishAll(int userId = -1);
+        bool RePublishAll(int userId = 0);
 
         /// <summary>
         /// Publishes a single <see cref="IContent"/> object
@@ -219,7 +219,7 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to publish</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        bool Publish(IContent content, int userId = -1);
+        bool Publish(IContent content, int userId = 0);
 
         /// <summary>
         /// Publishes a <see cref="IContent"/> object and all its children
@@ -227,7 +227,7 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        bool PublishWithChildren(IContent content, int userId = -1);
+        bool PublishWithChildren(IContent content, int userId = 0);
 
         /// <summary>
         /// UnPublishes a single <see cref="IContent"/> object
@@ -235,7 +235,7 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to publish</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
-        bool UnPublish(IContent content, int userId = -1);
+        bool UnPublish(IContent content, int userId = 0);
 
         /// <summary>
         /// Saves and Publishes a single <see cref="IContent"/> object
@@ -243,7 +243,7 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to save and publish</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        bool SaveAndPublish(IContent content, int userId = -1);
+        bool SaveAndPublish(IContent content, int userId = 0);
 
         /// <summary>
         /// Permanently deletes an <see cref="IContent"/> object.
@@ -254,7 +254,7 @@ namespace Umbraco.Core.Services
         /// <remarks>Please note that this method will completely remove the Content from the database</remarks>
         /// <param name="content">The <see cref="IContent"/> to delete</param>
         /// <param name="userId">Optional Id of the User deleting the Content</param>
-        void Delete(IContent content, int userId = -1);
+        void Delete(IContent content, int userId = 0);
 
         /// <summary>
         /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current 
@@ -265,7 +265,7 @@ namespace Umbraco.Core.Services
         /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
         /// <param name="userId">Optional Id of the User copying the Content</param>
         /// <returns>The newly created <see cref="IContent"/> object</returns>
-        IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = -1);
+        IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = 0);
 
         /// <summary>
         /// Checks if the passed in <see cref="IContent"/> can be published based on the anscestors publish state.

@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Xml.Linq;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
@@ -21,8 +19,6 @@ namespace Umbraco.Core.Services
 	{
 		private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 		private readonly RepositoryFactory _repositoryFactory;
-		private readonly IUserService _userService;
-		private HttpContextBase _httpContext;
 
 		public MediaService(RepositoryFactory repositoryFactory)
 			: this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
@@ -35,13 +31,6 @@ namespace Umbraco.Core.Services
 			_repositoryFactory = repositoryFactory;
 		}
 
-		internal MediaService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IUserService userService)
-		{
-			_uowProvider = provider;
-			_repositoryFactory = repositoryFactory;
-			_userService = userService;
-		}
-
 	    /// <summary>
 	    /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
 	    /// that this Media is based on.
@@ -51,7 +40,7 @@ namespace Umbraco.Core.Services
 	    /// <param name="mediaTypeAlias">Alias of the <see cref="IMediaType"/></param>
 	    /// <param name="userId">Optional id of the user creating the media item</param>
 	    /// <returns><see cref="IMedia"/></returns>
-	    public IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = -1)
+	    public IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = 0)
 	    {
 	        IMediaType mediaType = null;
 	        var uow = _uowProvider.GetUnitOfWork();
@@ -76,7 +65,7 @@ namespace Umbraco.Core.Services
 			if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this))
 				return media;
 
-			SetUser(media, userId);
+			media.CreatorId = userId;
 
 			Created.RaiseEvent(new NewEventArgs<IMedia>(media, false, mediaTypeAlias, parentId), this);			
 
@@ -263,7 +252,7 @@ namespace Umbraco.Core.Services
 		/// <param name="media">The <see cref="IMedia"/> to move</param>
 		/// <param name="parentId">Id of the Media's new Parent</param>
 		/// <param name="userId">Id of the User moving the Media</param>
-		public void Move(IMedia media, int parentId, int userId = -1)
+		public void Move(IMedia media, int parentId, int userId = 0)
 		{
             //This ensures that the correct method is called if this method is used to Move to recycle bin.
             if (parentId == -21)
@@ -290,7 +279,7 @@ namespace Umbraco.Core.Services
 
 			Moved.RaiseEvent(new MoveEventArgs<IMedia>(media, false, parentId), this);
 
-			Audit.Add(AuditTypes.Move, "Move Media performed by user", userId == -1 ? 0 : userId, media.Id);
+			Audit.Add(AuditTypes.Move, "Move Media performed by user", userId, media.Id);
 		}
 
 	    /// <summary>
@@ -298,7 +287,7 @@ namespace Umbraco.Core.Services
 	    /// </summary>
 	    /// <param name="media">The <see cref="IMedia"/> to delete</param>
 	    /// <param name="userId">Id of the User deleting the Media</param>
-	    public void MoveToRecycleBin(IMedia media, int userId = -1)
+	    public void MoveToRecycleBin(IMedia media, int userId = 0)
 	    {
 	        if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, -21), this))
 				return;
@@ -320,8 +309,7 @@ namespace Umbraco.Core.Services
 
 			Trashed.RaiseEvent(new MoveEventArgs<IMedia>(media, false, -21), this);
 
-			Audit.Add(AuditTypes.Move, "Move Media to Recycle Bin performed by user", userId == -1 ? 0 : userId,
-					  media.Id);
+			Audit.Add(AuditTypes.Move, "Move Media to Recycle Bin performed by user", userId, media.Id);
 	    }
 
 	    /// <summary>
@@ -358,7 +346,7 @@ namespace Umbraco.Core.Services
 	    /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
 	    /// <param name="mediaTypeId">Id of the <see cref="IMediaType"/></param>
 	    /// <param name="userId">Optional id of the user deleting the media</param>
-	    public void DeleteMediaOfType(int mediaTypeId, int userId = -1)
+	    public void DeleteMediaOfType(int mediaTypeId, int userId = 0)
 	    {			
 	        var uow = _uowProvider.GetUnitOfWork();
 	        using (var repository = _repositoryFactory.CreateMediaRepository(uow))
@@ -383,7 +371,7 @@ namespace Umbraco.Core.Services
 				Deleted.RaiseEvent(new DeleteEventArgs<IMedia>(contents, false), this);
 	        }			
 
-			Audit.Add(AuditTypes.Delete, "Delete Media items by Type performed by user", userId == -1 ? 0 : userId, -1);
+			Audit.Add(AuditTypes.Delete, "Delete Media items by Type performed by user", userId, -1);
 	    }
 
 	    /// <summary>
@@ -395,7 +383,7 @@ namespace Umbraco.Core.Services
 	    /// </remarks>
 	    /// <param name="media">The <see cref="IMedia"/> to delete</param>
 	    /// <param name="userId">Id of the User deleting the Media</param>
-	    public void Delete(IMedia media, int userId = -1)
+	    public void Delete(IMedia media, int userId = 0)
 	    {
 			if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMedia>(media), this))
 				return;
@@ -409,7 +397,7 @@ namespace Umbraco.Core.Services
 
 			Deleted.RaiseEvent(new DeleteEventArgs<IMedia>(media, false), this);
 
-			Audit.Add(AuditTypes.Delete, "Delete Media performed by user", userId == -1 ? 0 : userId, media.Id);
+			Audit.Add(AuditTypes.Delete, "Delete Media performed by user", userId, media.Id);
 	    }
 
         /// <summary>
@@ -418,7 +406,7 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the <see cref="IMedia"/> object to delete versions from</param>
         /// <param name="versionDate">Latest version date</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        public void DeleteVersions(int id, DateTime versionDate, int userId = -1)
+        public void DeleteVersions(int id, DateTime versionDate, int userId = 0)
         {
 			if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, dateToRetain: versionDate), this))
 				return;
@@ -432,7 +420,7 @@ namespace Umbraco.Core.Services
 
 	        DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate), this);
 
-			Audit.Add(AuditTypes.Delete, "Delete Media by version date performed by user", userId == -1 ? 0 : userId, -1);
+			Audit.Add(AuditTypes.Delete, "Delete Media by version date performed by user", userId, -1);
         }
 
         /// <summary>
@@ -442,7 +430,7 @@ namespace Umbraco.Core.Services
         /// <param name="versionId">Id of the version to delete</param>
         /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        public void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = -1)
+        public void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = 0)
         {
             if (deletePriorVersions)
             {
@@ -462,7 +450,7 @@ namespace Umbraco.Core.Services
 
 	        DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, specificVersion: versionId), this);
 
-			Audit.Add(AuditTypes.Delete, "Delete Media by version performed by user", userId == -1 ? 0 : userId, -1);
+			Audit.Add(AuditTypes.Delete, "Delete Media by version performed by user", userId, -1);
         }
 
 	    /// <summary>
@@ -470,7 +458,7 @@ namespace Umbraco.Core.Services
 	    /// </summary>
 	    /// <param name="media">The <see cref="IMedia"/> to save</param>
 	    /// <param name="userId">Id of the User saving the Content</param>
-	    public void Save(IMedia media, int userId = -1)
+	    public void Save(IMedia media, int userId = 0)
 	    {
 			if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(media), this))
 				return;
@@ -478,7 +466,7 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 			{
-				SetUser(media, userId);
+				media.CreatorId = userId;
 				repository.AddOrUpdate(media);
 				uow.Commit();
 
@@ -500,7 +488,7 @@ namespace Umbraco.Core.Services
 	    /// </summary>
 	    /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
 	    /// <param name="userId">Id of the User saving the Content</param>
-	    public void Save(IEnumerable<IMedia> medias, int userId = -1)
+	    public void Save(IEnumerable<IMedia> medias, int userId = 0)
 	    {
 			if (SavingCollection.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable<IMedia>>(medias), this))
 				return;
@@ -510,7 +498,7 @@ namespace Umbraco.Core.Services
 			{
 				foreach (var media in medias)
 				{
-					SetUser(media, userId);
+					media.CreatorId = userId;
 					repository.AddOrUpdate(media);
 				}
 
@@ -520,17 +508,8 @@ namespace Umbraco.Core.Services
 
 		    SavedCollection.RaiseEvent(new SaveEventArgs<IEnumerable<IMedia>>(medias, false), this);
 
-			Audit.Add(AuditTypes.Save, "Save Media items performed by user", userId == -1 ? 0 : userId, -1);
+			Audit.Add(AuditTypes.Save, "Save Media items performed by user", userId, -1);
 	    }
-
-	    /// <summary>
-		/// Internal method to set the HttpContextBase for testing.
-		/// </summary>
-		/// <param name="httpContext"><see cref="HttpContextBase"/></param>
-		internal void SetHttpContext(HttpContextBase httpContext)
-		{
-			_httpContext = httpContext;
-		}
 
         /// <summary>
         /// Updates the Path and Level on a collection of <see cref="IMedia"/> objects
@@ -540,7 +519,7 @@ namespace Umbraco.Core.Services
         /// <param name="parentPath">Path of the Parent media</param>
         /// <param name="parentLevel">Level of the Parent media</param>
         /// <returns>Collection of updated <see cref="IMedia"/> objects</returns>
-        private List<IMedia> UpdatePathAndLevelOnChildren(IEnumerable<IMedia> children, string parentPath, int parentLevel)
+        private IEnumerable<IMedia> UpdatePathAndLevelOnChildren(IEnumerable<IMedia> children, string parentPath, int parentLevel)
         {
             var list = new List<IMedia>();
             foreach (var child in children)
@@ -557,37 +536,6 @@ namespace Umbraco.Core.Services
             }
             return list;
         }
-
-		/// <summary>
-		/// Updates a media object with the User (id), who created the content.
-		/// </summary>
-		/// <param name="media"><see cref="IMedia"/> object to update</param>
-		/// <param name="userId">Optional Id of the User</param>
-		private void SetUser(IMedia media, int userId)
-		{
-			if (userId > -1)
-			{
-				//If a user id was passed in we use that
-				media.CreatorId = userId;
-			}
-			else if (UserServiceOrContext())
-			{
-				var profile = _httpContext == null
-								  ? _userService.GetCurrentBackOfficeUser()
-								  : _userService.GetCurrentBackOfficeUser(_httpContext);
-				media.CreatorId = profile.Id.SafeCast<int>();
-			}
-			else
-			{
-				//Otherwise we default to Admin user, which should always exist (almost always)
-				media.CreatorId = 0;
-			}
-		}
-
-		private bool UserServiceOrContext()
-		{
-			return _userService != null && (HttpContext.Current != null || _httpContext != null);
-		}
 
 		#region Event Handlers
 

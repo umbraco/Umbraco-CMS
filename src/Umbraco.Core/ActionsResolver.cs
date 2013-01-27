@@ -9,14 +9,14 @@ namespace Umbraco.Core
 	/// <summary>
 	/// A resolver to return all IAction objects
 	/// </summary>
-	internal sealed class ActionsResolver : ManyObjectsResolverBase<ActionsResolver, IAction>
+	internal sealed class ActionsResolver : LazyManyObjectsResolverBase<ActionsResolver, IAction>
 	{
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="packageActions"></param>		
-		internal ActionsResolver(IEnumerable<Type> packageActions)
+		internal ActionsResolver(Func<IEnumerable<Type>> packageActions)
 			: base(packageActions)
 		{
 
@@ -34,9 +34,9 @@ namespace Umbraco.Core
 		}
 
 		protected override IEnumerable<IAction> CreateInstances()
-		{
+		{					
 			var actions = new List<IAction>();
-			var foundIActions = PluginManager.Current.ResolveActions();
+			var foundIActions = InstanceTypes;
 			foreach (var type in foundIActions)
 			{
 				IAction typeInstance;

@@ -51,10 +51,10 @@ namespace Umbraco.Core.Services
 				_userService = new Lazy<UserService>(() => new UserService(provider, repositoryFactory.Value));
 
             if (_contentService == null)
-				_contentService = new Lazy<ContentService>(() => new ContentService(provider, repositoryFactory.Value, publishingStrategy, _userService.Value));
+				_contentService = new Lazy<ContentService>(() => new ContentService(provider, repositoryFactory.Value, publishingStrategy));
 
             if(_mediaService == null)
-                _mediaService = new Lazy<MediaService>(() => new MediaService(provider, repositoryFactory.Value, _userService.Value));
+                _mediaService = new Lazy<MediaService>(() => new MediaService(provider, repositoryFactory.Value));
 
             if(_macroService == null)
 				_macroService = new Lazy<MacroService>(() => new MacroService(fileProvider, repositoryFactory.Value));

@@ -5,7 +5,7 @@ namespace Umbraco.Web
 	/// <summary>
 	/// An object resolver to return the IPublishedMediaStore
 	/// </summary>
-	internal class PublishedMediaStoreResolver : SingleObjectResolverBase<PublishedMediaStoreResolver, IPublishedMediaStore>
+	internal sealed class PublishedMediaStoreResolver : SingleObjectResolverBase<PublishedMediaStoreResolver, IPublishedMediaStore>
 	{
 		internal PublishedMediaStoreResolver(IPublishedMediaStore publishedMediaStore)
 			: base(publishedMediaStore)
