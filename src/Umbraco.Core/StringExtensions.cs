@@ -21,15 +21,62 @@ namespace Umbraco.Core
     ///</summary>
     public static class StringExtensions
     {
-        public static string EncryptWithMachineKey(this string toEncrypt)
+		/// <summary>
+		/// Encrypt the string using the MachineKey in medium trust
+		/// </summary>
+		/// <param name="value">The string value to be encrypted.</param>
+		/// <returns>The encrypted string.</returns>
+		public static string EncryptWithMachineKey(this string value)
         {
-            var output = FormsAuthentication.Encrypt(new FormsAuthenticationTicket(0, "temp", DateTime.Now, DateTime.MaxValue, false, toEncrypt));
-            return output;
+			if (value == null)
+				return null;
+
+			string valueToEncrypt = value;
+			List<string> parts = new List<string>();
+
+			const int EncrpytBlockSize = 500;
+
+			while (valueToEncrypt.Length > EncrpytBlockSize)
+			{
+				parts.Add(valueToEncrypt.Substring(0, EncrpytBlockSize));
+				valueToEncrypt = valueToEncrypt.Remove(0, EncrpytBlockSize);
+			}
+
+			if (valueToEncrypt.Length > 0)
+			{
+				parts.Add(valueToEncrypt);
+			}
+
+			StringBuilder encrpytedValue = new StringBuilder();
+
+			foreach (var part in parts)
+			{
+				var encrpytedBlock = FormsAuthentication.Encrypt(new FormsAuthenticationTicket(0, string.Empty, DateTime.Now, DateTime.MaxValue, false, part));
+				encrpytedValue.AppendLine(encrpytedBlock);
+			}
+
+			return encrpytedValue.ToString().TrimEnd();
         }
-        public static string DecryptWithMachineKey(this string encrypted)
+		/// <summary>
+		/// Decrypt the encrypted string using the Machine key in medium trust
+		/// </summary>
+		/// <param name="value">The string value to be decrypted</param>
+		/// <returns>The decrypted string.</returns>
+		public static string DecryptWithMachineKey(this string value)
         {
-            var output = FormsAuthentication.Decrypt(encrypted);
-            return output.UserData;
+			if (value == null)
+				return null;
+
+			string[] parts = value.Split('\n');
+
+			StringBuilder decryptedValue = new StringBuilder();
+
+			foreach (var part in parts)
+			{
+				decryptedValue.Append(FormsAuthentication.Decrypt(part.TrimEnd()).UserData);
+			}
+
+			return decryptedValue.ToString();
         }
         //this is from SqlMetal and just makes it a bit of fun to allow pluralisation
         public static string MakePluralName(this string name)
@@ -708,7 +755,6 @@ namespace Umbraco.Core
                                 .TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
             return currentFolder;
         }
-
 
         /// <summary>
         /// Truncates the specified text string.

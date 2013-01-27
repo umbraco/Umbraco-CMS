@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Resolvers
 				};
 
 			MacroFieldEditorsResolver.Current = new MacroFieldEditorsResolver(
-				PluginManager.Current.ResolveMacroRenderings());
+				() => PluginManager.Current.ResolveMacroRenderings());
 
 			Resolution.Freeze();
 		}

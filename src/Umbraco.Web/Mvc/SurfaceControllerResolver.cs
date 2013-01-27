@@ -4,7 +4,7 @@ using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.Mvc
 {
-	internal class SurfaceControllerResolver : ManyObjectsResolverBase<SurfaceControllerResolver, SurfaceController>
+	internal sealed class SurfaceControllerResolver : ManyObjectsResolverBase<SurfaceControllerResolver, SurfaceController>
 	{
 		public SurfaceControllerResolver(IEnumerable<Type> surfaceControllers)
 			: base(surfaceControllers)

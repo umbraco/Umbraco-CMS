@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Resolvers
 			Assert.IsFalse(object.ReferenceEquals(instances1.Single(), instances3.Single()));
 		}
 
-		#region
+		#region Test classes
 
 		private interface ITestInterface
 		{

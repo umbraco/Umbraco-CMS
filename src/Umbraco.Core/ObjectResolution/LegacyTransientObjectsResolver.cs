@@ -17,7 +17,7 @@ namespace Umbraco.Core.ObjectResolution
 	/// these old classes don't contain metadata, the objects need to be instantiated first to get their metadata, we then store this
 	/// for use in the GetById method.
 	/// </remarks>
-	internal abstract class LegacyTransientObjectsResolver<TResolver, TResolved> : ManyObjectsResolverBase<TResolver, TResolved>
+	internal abstract class LegacyTransientObjectsResolver<TResolver, TResolved> : LazyManyObjectsResolverBase<TResolver, TResolved>
 		where TResolved : class
 		where TResolver : class
 	{
@@ -27,16 +27,15 @@ namespace Umbraco.Core.ObjectResolution
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		/// <param name="refreshers"></param>
+		/// <param name="types"></param>
 		/// <remarks>
 		/// We are creating Transient instances (new instances each time) because this is how the legacy code worked and
 		/// I don't want to muck anything up by changing them to application based instances. 
 		/// TODO: However, it would make much more sense to do this and would speed up the application plus this would make the GetById method much easier.
 		/// </remarks>
-		protected LegacyTransientObjectsResolver(IEnumerable<Type> refreshers)
-			: base(ObjectLifetimeScope.Transient) //  new objects every time
-		{
-			AddTypes(refreshers);
+		protected LegacyTransientObjectsResolver(Func<IEnumerable<Type>> types)
+			: base(types, ObjectLifetimeScope.Transient) //  new objects every time
+		{			
 		}
 		#endregion
 
@@ -55,7 +54,7 @@ namespace Umbraco.Core.ObjectResolution
 		protected abstract Guid GetUniqueIdentifier(TResolved obj); 
 
 		/// <summary>
-		/// Returns a new ICacheRefresher instance by id
+		/// Returns a new TResolved instance by id
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
