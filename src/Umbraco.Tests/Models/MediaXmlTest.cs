@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Models
                 };
 
             DataTypesResolver.Current = new DataTypesResolver(
-                PluginManager.Current.ResolveDataTypes());
+                () => PluginManager.Current.ResolveDataTypes());
 
             base.Initialize();
         }
