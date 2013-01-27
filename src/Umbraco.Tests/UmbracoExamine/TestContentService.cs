@@ -16,8 +16,10 @@ namespace Umbraco.Tests.UmbracoExamine
 		public const int ProtectedNode = 1142;
 
 		public TestContentService()
-		{			
-			_xDoc = XDocument.Parse(TestFiles.umbraco);
+		{
+            // TestFiles.umbraco was created by Shannon but the file is missing in Mercurial?
+            //_xDoc = XDocument.Parse(TestFiles.umbraco);
+            _xDoc = null;
 		}
 
 		#region IContentService Members
