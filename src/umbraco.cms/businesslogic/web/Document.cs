@@ -1353,6 +1353,12 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete", false)]
         protected override void setupNode()
         {
+            if (Id == -1 || Id == -20)
+            {
+                base.setupNode();
+                return;
+            }
+
             var content = Version == Guid.Empty
                            ? ApplicationContext.Current.Services.ContentService.GetById(Id)
                            : ApplicationContext.Current.Services.ContentService.GetByVersion(Version);

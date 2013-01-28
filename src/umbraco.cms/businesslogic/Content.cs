@@ -157,7 +157,7 @@ namespace umbraco.cms.businesslogic
             {
                 if (_contentTypeIcon == null && this.ContentType != null)
                     _contentTypeIcon = this.ContentType.IconUrl;
-                return _contentTypeIcon;
+                return _contentTypeIcon ?? string.Empty;
             }
             set
             {
