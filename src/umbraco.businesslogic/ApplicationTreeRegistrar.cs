@@ -13,8 +13,10 @@ namespace umbraco.BusinessLogic
     {
         public ApplicationTreeRegistrar()
         {
-			//don't do anything if the application is not configured!
-			if (ApplicationContext.Current == null || !ApplicationContext.Current.IsConfigured)
+			//don't do anything if the application or database is not configured!
+			if (ApplicationContext.Current == null 
+                || !ApplicationContext.Current.IsConfigured 
+                || !ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured)
 				return;
 
             // Load all Trees by attribute and add them to the XML config
