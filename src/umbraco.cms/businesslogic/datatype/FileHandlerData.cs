@@ -18,38 +18,41 @@ namespace umbraco.cms.businesslogic.datatype
             _thumbnailSizes = thumbnailSizes;
         }
 
-		/// <summary>
-		/// Gets/sets the loaded Conent object which we can resolve from other classes since this class sets it's properties
-		/// </summary>
-		internal Content LoadedContentItem { get; set; }
+        /// <summary>
+        /// Gets/sets the loaded Conent object which we can resolve from other classes since this class sets it's properties
+        /// </summary>
+        internal Content LoadedContentItem { get; set; }
 
-		/// <summary>
-		/// Called to ensure we have a valid LoadedContentItem.
-		/// </summary>
-		/// <param name="version"></param>
-		private void EnsureLoadedContentItem(Guid version)
-		{
-			if (LoadedContentItem == null)
-			{
-				LoadedContentItem = Content.GetContentFromVersion(Version);
-			}
-		}
+        /// <summary>
+        /// Called to ensure we have a valid LoadedContentItem.
+        /// </summary>
+        /// <param name="version"></param>
+        private void EnsureLoadedContentItem(Guid version)
+        {
+            if (LoadedContentItem == null)
+            {
+                LoadedContentItem = Content.GetContentFromVersion(Version);
+            }
+        }
 
         public override object Value
         {
             get { return base.Value; }
             set
             {
-	            if (value is HttpPostedFile || value is HttpPostedFileBase)
+                if (value is HttpPostedFile || value is HttpPostedFileBase)
                 {
-	                Stream fileStream = null;
+                    var postedFileName = value is HttpPostedFile 
+                        ? ((HttpPostedFile)value).FileName 
+                        : ((HttpPostedFileBase)value).FileName;
 
-					var file = value as HttpPostedFile;
-					var name = IOHelper.SafeFileName(file.FileName.Substring(file.FileName.LastIndexOf(IOHelper.DirSepChar) + 1, file.FileName.Length - file.FileName.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
-					fileStream = file.InputStream;
+                    var name = IOHelper.SafeFileName(postedFileName.Substring(postedFileName.LastIndexOf(IOHelper.DirSepChar) + 1, postedFileName.Length - postedFileName.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
 
-	                // handle upload
+                    var fileStream = value is HttpPostedFile 
+                        ? ((HttpPostedFile)value).InputStream 
+                        : ((HttpPostedFileBase)value).InputStream;
 
+                    // handle upload
                     if (name != String.Empty)
                     {
                         string fileName = UmbracoSettings.UploadAllowDirectories
@@ -91,8 +94,8 @@ namespace umbraco.cms.businesslogic.datatype
 
                             if (uploadFieldConfigNode != null)
                             {
-	                            EnsureLoadedContentItem(Version);								
-								FillProperties(uploadFieldConfigNode, LoadedContentItem, um);                                
+                                EnsureLoadedContentItem(Version);
+                                FillProperties(uploadFieldConfigNode, LoadedContentItem, um);
                             }
                         }
 
@@ -127,12 +130,12 @@ namespace umbraco.cms.businesslogic.datatype
                 {
                     // get the current document
                     //Content legacy = Content.GetContentFromVersion(Version);
-	                EnsureLoadedContentItem(Version);
+                    EnsureLoadedContentItem(Version);
                     // only add dimensions to web images
                     UpdateContentProperty(uploadFieldConfigNode, LoadedContentItem, "widthFieldAlias", String.Empty);
-					UpdateContentProperty(uploadFieldConfigNode, LoadedContentItem, "heightFieldAlias", String.Empty);
-					UpdateContentProperty(uploadFieldConfigNode, LoadedContentItem, "lengthFieldAlias", String.Empty);
-					UpdateContentProperty(uploadFieldConfigNode, LoadedContentItem, "extensionFieldAlias", String.Empty);
+                    UpdateContentProperty(uploadFieldConfigNode, LoadedContentItem, "heightFieldAlias", String.Empty);
+                    UpdateContentProperty(uploadFieldConfigNode, LoadedContentItem, "lengthFieldAlias", String.Empty);
+                    UpdateContentProperty(uploadFieldConfigNode, LoadedContentItem, "extensionFieldAlias", String.Empty);
                 }
             }
         }
