@@ -11,11 +11,6 @@ namespace Umbraco.Core.Models
     public interface IContentBase : IUmbracoEntity
     {
         /// <summary>
-        /// Gets or Sets the Name of the Content
-        /// </summary>
-        string Name { get; set; }
-       
-        /// <summary>
         /// Integer Id of the default ContentType
         /// </summary>
         int ContentTypeId { get; }

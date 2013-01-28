@@ -3,14 +3,9 @@
     public interface IUmbracoEntity : IAggregateRoot
     {
         /// <summary>
-        /// Gets or sets the Id of the Parent entity
+        /// Profile of the user who created this Entity
         /// </summary>
-        int ParentId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the sort order of the Entity
-        /// </summary>
-        int SortOrder { get; set; }
+        int CreatorId { get; set; }
 
         /// <summary>
         /// Gets or sets the level of the Entity
@@ -18,14 +13,24 @@
         int Level { get; set; }
 
         /// <summary>
+        /// Gets or Sets the Name of the Entity
+        /// </summary>
+        string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Id of the Parent Entity
+        /// </summary>
+        int ParentId { get; set; }
+
+        /// <summary>
         /// Gets or sets the path to the Entity
         /// </summary>
         string Path { get; set; }
 
         /// <summary>
-        /// Profile of the user who created this Entity
+        /// Gets or sets the sort order of the Entity
         /// </summary>
-        int CreatorId { get; set; }
+        int SortOrder { get; set; }
 
         /// <summary>
         /// Boolean indicating whether this Entity is Trashed or not.
