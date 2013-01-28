@@ -72,7 +72,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         {
             var items =
                 db.Fetch<dynamic>(
-                    "SELECT TABLE_NAME, CONSTRAINT_NAME FROM SELECT * FROM INFORMATION_SCHEMA.CONSTRAINT_TABLE_USAGE");
+                    "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.CONSTRAINT_TABLE_USAGE");
             return items.Select(item => new Tuple<string, string>(item.TABLE_NAME, item.CONSTRAINT_NAME)).ToList();
         }
 

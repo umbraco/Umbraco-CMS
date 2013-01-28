@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Initial
 {
@@ -59,7 +61,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                     return new Version(4, 7, 0);
                 }
 
-                return new Version(4, 10, 0);
+                return new Version(4, 9, 0);
             }
 
             return new Version(0, 0, 0);
@@ -71,7 +73,48 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         /// <returns>A string containing a human readable string with a summary message</returns>
         public string GetSummary()
         {
-            return string.Empty;
+            var sb = new StringBuilder();
+            if (Errors.Any() == false)
+            {
+                sb.AppendLine("The database schema validation didn't find any errors.");
+                return sb.ToString();
+            }
+
+            //Table error summary
+            if (Errors.Any(x => x.Item1.Equals("Table")))
+            {
+                sb.AppendLine("The following tables were found in the database, but are not in the current schema:");
+                sb.AppendLine(string.Join(",", Errors.Where(x => x.Item1.Equals("Table")).Select(x => x.Item2)));
+                sb.AppendLine(" ");
+            }
+            //Column error summary
+            if (Errors.Any(x => x.Item1.Equals("Column")))
+            {
+                sb.AppendLine("The following columns were found in the database, but are not in the current schema:");
+                sb.AppendLine(string.Join(",", Errors.Where(x => x.Item1.Equals("Column")).Select(x => x.Item2)));
+                sb.AppendLine(" ");
+            }
+            //Constraint error summary
+            if (Errors.Any(x => x.Item1.Equals("Constraint")))
+            {
+                sb.AppendLine("The following constraints (Primary Keys, Foreign Keys and Indexes) were found in the database, but are not in the current schema:");
+                sb.AppendLine(string.Join(",", Errors.Where(x => x.Item1.Equals("Constraint")).Select(x => x.Item2)));
+                sb.AppendLine(" ");
+            }
+            //Unknown constraint error summary
+            if (Errors.Any(x => x.Item1.Equals("Unknown")))
+            {
+                sb.AppendLine("The following unknown constraints (Primary Keys, Foreign Keys and Indexes) were found in the database, but are not in the current schema:");
+                sb.AppendLine(string.Join(",", Errors.Where(x => x.Item1.Equals("Unknown")).Select(x => x.Item2)));
+                sb.AppendLine(" ");
+            }
+
+            if (SyntaxConfig.SqlSyntaxProvider is MySqlSyntaxProvider)
+            {
+                sb.AppendLine("Please note that the constraints could not be validated because the current dataprovider is MySql.");
+            }
+
+            return sb.ToString();
         }
     }
 }

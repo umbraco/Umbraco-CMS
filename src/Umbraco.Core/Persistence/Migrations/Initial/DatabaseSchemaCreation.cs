@@ -132,6 +132,11 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 result.Errors.Add(new Tuple<string, string>("Column", column));
             }
 
+            //MySql doesn't conform to the "normal" naming of constraints, so there is currently no point in doing these checks.
+            //NOTE: At a later point we do other checks for MySql, but ideally it should be necessary to do special checks for different providers.
+            if (SyntaxConfig.SqlSyntaxProvider is MySqlSyntaxProvider)
+                return result;
+
             //Check constraints in configured database against constraints in schema
             var constraintsInDatabase = SyntaxConfig.SqlSyntaxProvider.GetConstraintsPerColumn(_database).DistinctBy(x => x.Item3).ToList();
             var foreignKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.StartsWith("FK_")).Select(x => x.Item3).ToList();

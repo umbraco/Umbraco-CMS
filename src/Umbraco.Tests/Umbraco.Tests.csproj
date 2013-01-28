@@ -313,7 +313,9 @@
     <Compile Include="Routing\UmbracoModuleTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="TestHelpers\ExamineHelpers\umbraco.config" />
     <None Include="unit-test-log4net.config">

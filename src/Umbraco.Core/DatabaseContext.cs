@@ -26,8 +26,9 @@ namespace Umbraco.Core
 	    private bool _configured;
         private string _connectionString;
         private string _providerName;
+        private DatabaseSchemaResult _result;
 
-		internal DatabaseContext(IDatabaseFactory factory)
+        internal DatabaseContext(IDatabaseFactory factory)
         {
 	        _factory = factory;
         }
@@ -245,7 +246,7 @@ namespace Umbraco.Core
 
                 Initialize(providerName);
             }
-            else if (ConfigurationManager.AppSettings.ContainsKey(GlobalSettings.UmbracoConnectionName))
+            else if (ConfigurationManager.AppSettings.ContainsKey(GlobalSettings.UmbracoConnectionName) && string.IsNullOrEmpty(ConfigurationManager.AppSettings[GlobalSettings.UmbracoConnectionName]) == false)
             {
                 //A valid connectionstring does not exist, but the legacy appSettings key was found, so we'll reconfigure the conn.string.
                 var legacyConnString = ConfigurationManager.AppSettings[GlobalSettings.UmbracoConnectionName];
@@ -308,10 +309,13 @@ namespace Umbraco.Core
             if (_configured == false || (string.IsNullOrEmpty(_connectionString) || string.IsNullOrEmpty(ProviderName)))
                 return new DatabaseSchemaResult();
 
-            var database = new UmbracoDatabase(_connectionString, ProviderName);
-            var dbSchema = new DatabaseSchemaCreation(database);
-            var result = dbSchema.ValidateSchema();
-            return result;
+            if (_result == null)
+            {
+                var database = new UmbracoDatabase(_connectionString, ProviderName);
+                var dbSchema = new DatabaseSchemaCreation(database);
+                _result = dbSchema.ValidateSchema();
+            }
+            return _result;
         }
 
         internal Result CreateDatabaseSchemaAndDataOrUpgrade()
@@ -332,11 +336,13 @@ namespace Umbraco.Core
                 var database = new UmbracoDatabase(_connectionString, ProviderName);
                 var schemaResult = ValidateDatabaseSchema();
                 var installedVersion = schemaResult.DetermineInstalledVersion();
+                string message;
 
                 //If Configuration Status is empty and the determined version is "empty" its a new install - otherwise upgrade the existing
                 if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) && installedVersion.Equals(new Version(0, 0, 0)))
                 {
                     database.CreateDatabaseSchema();
+                    message = "Installation completed!";
                 }
                 else
                 {
@@ -346,13 +352,28 @@ namespace Umbraco.Core
                     var targetVersion = UmbracoVersion.Current;
                     var runner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
                     var upgraded = runner.Execute(database, true);
+                    message = "Upgrade completed!";
                 }
                 
-                return new Result { Message = "Installation completed!", Success = true, Percentage = "100" };
+                return new Result { Message = message, Success = true, Percentage = "100" };
             }
             catch (Exception ex)
             {
-                return new Result { Message = ex.Message, Success = false, Percentage = "90" };
+                LogHelper.Info<DatabaseContext>("Database configuration failed with the following error and stack trace: " + ex.Message + "\n" + ex.StackTrace);
+
+                if (_result != null)
+                {
+                    LogHelper.Info<DatabaseContext>("The database schema validation produced the following summary: \n" + _result.GetSummary());
+                }
+
+                return new Result
+                           {
+                               Message =
+                                   "The database configuration failed with the following message: " + ex.Message +
+                                   "\n Please check log file for addtional information (can be found in '/App_Data/Logs/UmbracoTraceLog.txt')",
+                               Success = false,
+                               Percentage = "90"
+                           };
             }
         }
 

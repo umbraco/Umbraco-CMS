@@ -42,23 +42,86 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public override IEnumerable<string> GetTablesInSchema(Database db)
         {
-            var items = db.Fetch<dynamic>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES");
-            return items.Select(x => x.TABLE_NAME).Cast<string>().ToList();
+            List<string> list;
+            try
+            {
+                db.OpenSharedConnection();
+                var items =
+                    db.Fetch<dynamic>(
+                        "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = @TableSchema",
+                        new {TableSchema = db.Connection.Database});
+                list = items.Select(x => x.TABLE_NAME).Cast<string>().ToList();
+            }
+            finally
+            {
+                db.CloseSharedConnection();
+            }
+            return list;
         }
 
         public override IEnumerable<ColumnInfo> GetColumnsInSchema(Database db)
         {
-            return new List<ColumnInfo>();
+            List<ColumnInfo> list;
+            try
+            {
+                db.OpenSharedConnection();
+                var items =
+                    db.Fetch<dynamic>(
+                        "SELECT TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = @TableSchema",
+                        new {TableSchema = db.Connection.Database});
+                list =
+                    items.Select(
+                        item =>
+                        new ColumnInfo(item.TABLE_NAME, item.COLUMN_NAME, item.ORDINAL_POSITION, item.COLUMN_DEFAULT,
+                                       item.IS_NULLABLE, item.DATA_TYPE)).ToList();
+            }
+            finally
+            {
+                db.CloseSharedConnection();
+            }
+            return list;
         }
 
         public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db)
         {
-            return new List<Tuple<string, string>>();
+            List<Tuple<string, string>> list;
+            try
+            {
+                //Does not include indexes and constraints are named differently
+                var items =
+                    db.Fetch<dynamic>(
+                        "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = @TableSchema",
+                        new {TableSchema = db.Connection.Database});
+                list = items.Select(item => new Tuple<string, string>(item.TABLE_NAME, item.CONSTRAINT_NAME)).ToList();
+            }
+            finally
+            {
+                db.CloseSharedConnection();
+            }
+            return list;
         }
 
         public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db)
         {
-            return new List<Tuple<string, string, string>>();
+            List<Tuple<string, string, string>> list;
+            try
+            {
+                //Does not include indexes and constraints are named differently
+                var items =
+                    db.Fetch<dynamic>(
+                        "SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA = @TableSchema",
+                        new {TableSchema = db.Connection.Database});
+                list =
+                    items.Select(
+                        item =>
+                        new Tuple<string, string, string>(item.TABLE_NAME, item.COLUMN_NAME, item.CONSTRAINT_NAME))
+                         .ToList();
+            }
+            finally
+            {
+                db.CloseSharedConnection();
+            }
+            return list;
         }
 
         public override bool DoesTableExist(Database db, string tableName)

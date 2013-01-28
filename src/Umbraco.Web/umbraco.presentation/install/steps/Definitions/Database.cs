@@ -41,7 +41,7 @@ namespace umbraco.presentation.install.steps.Definitions
                 //Even though the ConfigurationStatus is blank we try to determine the version if we can connect to the database
                 var result = ApplicationContext.Current.DatabaseContext.ValidateDatabaseSchema();
                 var determinedVersion = result.DetermineInstalledVersion();
-                if(determinedVersion.Equals(new Version(0, 0, 0)))
+                if (determinedVersion.Equals(new Version(0, 0, 0)))
                     return false;
 
                 return UmbracoVersion.Current < determinedVersion;
