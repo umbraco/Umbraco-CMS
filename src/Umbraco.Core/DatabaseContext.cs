@@ -9,6 +9,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
+using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core
@@ -25,8 +26,9 @@ namespace Umbraco.Core
 	    private bool _configured;
         private string _connectionString;
         private string _providerName;
+        private DatabaseSchemaResult _result;
 
-		internal DatabaseContext(IDatabaseFactory factory)
+        internal DatabaseContext(IDatabaseFactory factory)
         {
 	        _factory = factory;
         }
@@ -242,20 +244,40 @@ namespace Umbraco.Core
                     
                 }
 
-                if (providerName.StartsWith("MySql"))
+                Initialize(providerName);
+            }
+            else if (ConfigurationManager.AppSettings.ContainsKey(GlobalSettings.UmbracoConnectionName) && string.IsNullOrEmpty(ConfigurationManager.AppSettings[GlobalSettings.UmbracoConnectionName]) == false)
+            {
+                //A valid connectionstring does not exist, but the legacy appSettings key was found, so we'll reconfigure the conn.string.
+                var legacyConnString = ConfigurationManager.AppSettings[GlobalSettings.UmbracoConnectionName];
+                if (legacyConnString.ToLowerInvariant().Contains("sqlce4umbraco"))
                 {
-                    SyntaxConfig.SqlSyntaxProvider = MySqlSyntax.Provider;
+                    ConfigureDatabaseConnection();
                 }
-                else if (providerName.Contains("SqlServerCe"))
+                else if (legacyConnString.ToLowerInvariant().Contains("database.windows.net") &&
+                         legacyConnString.ToLowerInvariant().Contains("tcp:"))
                 {
-                    SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+                    //Must be sql azure
+                    SaveConnectionString(legacyConnString, "System.Data.SqlClient");
+                    Initialize("System.Data.SqlClient");
+                }
+                else if (legacyConnString.ToLowerInvariant().Contains("Uid") &&
+                         legacyConnString.ToLowerInvariant().Contains("Pwd") &&
+                         legacyConnString.ToLowerInvariant().Contains("Server"))
+                {
+                    //Must be MySql
+                    SaveConnectionString(legacyConnString, "MySql.Data.MySqlClient");
+                    Initialize("MySql.Data.MySqlClient");
                 }
                 else
                 {
-                    SyntaxConfig.SqlSyntaxProvider = SqlServerSyntax.Provider;
+                    //Must be sql
+                    SaveConnectionString(legacyConnString, "System.Data.SqlClient");
+                    Initialize("System.Data.SqlClient");
                 }
 
-                _configured = true;
+                //Remove the legacy connection string, so we don't end up in a loop if something goes wrong.
+                GlobalSettings.RemoveSetting(GlobalSettings.UmbracoConnectionName);
             }
             else
             {
@@ -277,38 +299,81 @@ namespace Umbraco.Core
             {
                 SyntaxConfig.SqlSyntaxProvider = SqlServerSyntax.Provider;
             }
-
+            
+            _providerName = providerName;
             _configured = true;
+        }
+
+        internal DatabaseSchemaResult ValidateDatabaseSchema()
+        {
+            if (_configured == false || (string.IsNullOrEmpty(_connectionString) || string.IsNullOrEmpty(ProviderName)))
+                return new DatabaseSchemaResult();
+
+            if (_result == null)
+            {
+                var database = new UmbracoDatabase(_connectionString, ProviderName);
+                var dbSchema = new DatabaseSchemaCreation(database);
+                _result = dbSchema.ValidateSchema();
+            }
+            return _result;
         }
 
         internal Result CreateDatabaseSchemaAndDataOrUpgrade()
         {
             if (_configured == false || (string.IsNullOrEmpty(_connectionString) || string.IsNullOrEmpty(ProviderName)))
             {
-                return new Result{Message = "Database configuration is invalid", Success = false, Percentage = "10"};
+                return new Result
+                           {
+                               Message =
+                                   "Database configuration is invalid. Please check that the entered database exists and that the provided username and password has write access to the database.",
+                               Success = false,
+                               Percentage = "10"
+                           };
             }
 
             try
             {
                 var database = new UmbracoDatabase(_connectionString, ProviderName);
-                //If Configuration Status is empty its a new install - otherwise upgrade the existing
-                if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus))
+                var schemaResult = ValidateDatabaseSchema();
+                var installedVersion = schemaResult.DetermineInstalledVersion();
+                string message;
+
+                //If Configuration Status is empty and the determined version is "empty" its a new install - otherwise upgrade the existing
+                if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) && installedVersion.Equals(new Version(0, 0, 0)))
                 {
                     database.CreateDatabaseSchema();
+                    message = "Installation completed!";
                 }
                 else
                 {
-                    var configuredVersion = new Version(GlobalSettings.ConfigurationStatus);
+                    var configuredVersion = string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus)
+                                                ? installedVersion
+                                                : new Version(GlobalSettings.ConfigurationStatus);
                     var targetVersion = UmbracoVersion.Current;
                     var runner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
                     var upgraded = runner.Execute(database, true);
+                    message = "Upgrade completed!";
                 }
                 
-                return new Result { Message = "Installation completed!", Success = true, Percentage = "100" };
+                return new Result { Message = message, Success = true, Percentage = "100" };
             }
             catch (Exception ex)
             {
-                return new Result { Message = ex.Message, Success = false, Percentage = "90" };
+                LogHelper.Info<DatabaseContext>("Database configuration failed with the following error and stack trace: " + ex.Message + "\n" + ex.StackTrace);
+
+                if (_result != null)
+                {
+                    LogHelper.Info<DatabaseContext>("The database schema validation produced the following summary: \n" + _result.GetSummary());
+                }
+
+                return new Result
+                           {
+                               Message =
+                                   "The database configuration failed with the following message: " + ex.Message +
+                                   "\n Please check log file for addtional information (can be found in '/App_Data/Logs/UmbracoTraceLog.txt')",
+                               Success = false,
+                               Percentage = "90"
+                           };
             }
         }
 

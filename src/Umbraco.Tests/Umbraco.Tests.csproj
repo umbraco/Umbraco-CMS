@@ -175,6 +175,7 @@
     <Compile Include="Migrations\Upgrades\SqlCeDataUpgradeTest.cs" />
     <Compile Include="Migrations\Upgrades\SqlCeUpgradeTest.cs" />
     <Compile Include="Migrations\Upgrades\SqlServerUpgradeTest.cs" />
+    <Compile Include="Migrations\Upgrades\ValidateOlderSchemaTest.cs" />
     <Compile Include="Models\MediaXmlTest.cs" />
     <Compile Include="Persistence\Mappers\MappingResolverTests.cs" />
     <Compile Include="Persistence\Querying\ContentRepositorySqlClausesTest.cs" />
@@ -183,6 +184,7 @@
     <Compile Include="Persistence\Querying\ExpressionTests.cs" />
     <Compile Include="Persistence\Querying\MediaRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\Querying\MediaTypeRepositorySqlClausesTest.cs" />
+    <Compile Include="Persistence\SchemaValidationTest.cs" />
     <Compile Include="Persistence\SyntaxProvider\SqlSyntaxProviderTests.cs" />
     <Compile Include="PublishedContent\DynamicXmlTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
@@ -311,7 +313,9 @@
     <Compile Include="Routing\UmbracoModuleTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="TestHelpers\ExamineHelpers\umbraco.config" />
     <None Include="unit-test-log4net.config">
