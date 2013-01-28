@@ -552,8 +552,7 @@ namespace Umbraco.Web.Routing
 				if (templateId > 0)
 				{
 					LogHelper.Debug<PublishedContentRequestEngine>("{0}Look for template id={1}", () => tracePrefix, () => templateId);
-					// don't use the Template ctor as the result is not cached... instead use this static method
-					var template = Template.GetTemplate(templateId);
+					var template = ApplicationContext.Current.Services.FileService.GetTemplate(templateId);
 					if (template == null)
 						throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render");
 					_pcr.TemplateModel = template;
@@ -576,7 +575,7 @@ namespace Umbraco.Web.Routing
 					LogHelper.Debug<PublishedContentRequestEngine>("{0}Has a template already, but also an alternate template.", () => tracePrefix);
 				LogHelper.Debug<PublishedContentRequestEngine>("{0}Look for alternate template alias=\"{1}\"", () => tracePrefix, () => altTemplate);
 
-				var template = Template.GetByAlias(altTemplate, true);
+				var template = ApplicationContext.Current.Services.FileService.GetTemplate(altTemplate);
 				if (template != null)
 				{
 					_pcr.TemplateModel = template;

@@ -273,7 +273,7 @@ namespace Umbraco.Web.Mvc
 				{
 					//check if the custom controller has an action with the same name as the template name (we convert ToUmbracoAlias since the template name might have invalid chars).
 					//NOTE: This also means that all custom actions MUST be PascalCase.. but that should be standard.
-					var templateName = publishedContentRequest.Template.Alias.Split('.')[0].ToUmbracoAlias(StringAliasCaseType.PascalCase);
+					var templateName = publishedContentRequest.Template.Split('.')[0].ToUmbracoAlias(StringAliasCaseType.PascalCase);
 					def.ActionName = templateName;
 				}
 	
@@ -285,6 +285,9 @@ namespace Umbraco.Web.Mvc
 
 		internal IHttpHandler GetHandlerOnMissingTemplate(PublishedContentRequest pcr)
 		{
+            // missing template, so we're in a 404 here
+            // so the content, if any, is a custom 404 page of some sort
+
 			if (!pcr.HasPublishedContent)
 				// means the builder could not find a proper document to handle 404
 				return new PublishedContentNotFoundHandler();
@@ -295,9 +298,11 @@ namespace Umbraco.Web.Mvc
 				// to Mvc since Mvc can't do much
 				return new PublishedContentNotFoundHandler("In addition, no template exists to render the custom 404.");
 
-			if (pcr.RenderingEngine != RenderingEngine.Mvc)
-				// back to webforms
-				return (global::umbraco.UmbracoDefault)System.Web.Compilation.BuildManager.CreateInstanceFromVirtualPath("~/default.aspx", typeof(global::umbraco.UmbracoDefault));
+            // so we have a template, so we should have a rendering engine
+            if (pcr.RenderingEngine == RenderingEngine.WebForms) // back to webforms ?                
+                return (global::umbraco.UmbracoDefault)System.Web.Compilation.BuildManager.CreateInstanceFromVirtualPath("~/default.aspx", typeof(global::umbraco.UmbracoDefault));
+            else if (pcr.RenderingEngine != RenderingEngine.Mvc) // else ?
+                return new PublishedContentNotFoundHandler("In addition, no rendering engine exists to render the custom 404.");
 
 			return null;
 		}
@@ -322,13 +327,13 @@ namespace Umbraco.Web.Mvc
 			//we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
 			if (!publishedContentRequest.HasTemplate && !routeDef.HasHijackedRoute)
 			{
-				publishedContentRequest.UpdateOnMissingTemplate();
+				publishedContentRequest.UpdateOnMissingTemplate(); // will go 404
 				if (publishedContentRequest.IsRedirect)
 				{
 					requestContext.HttpContext.Response.Redirect(publishedContentRequest.RedirectUrl, true);
 					return null;
 				}
-				if (publishedContentRequest.Is404)
+				if (publishedContentRequest.Is404) // should always be the case
 					requestContext.HttpContext.Response.StatusCode = 404;
 				var handler = GetHandlerOnMissingTemplate(publishedContentRequest);
 

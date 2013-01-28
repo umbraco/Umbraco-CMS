@@ -327,6 +327,16 @@ namespace Umbraco.Web
 			string query = pcr.Uri.Query.TrimStart(new[] { '?' });
 
 			string rewritePath;
+
+            if (pcr.RenderingEngine == RenderingEngine.Unknown)
+            {
+                // Unkwnown means that no template was found. Default to Mvc because Mvc supports hijacking
+                // routes which sometimes doesn't require a template since the developer may want full control
+                // over the rendering. Can't do it in WebForms, so Mvc it is. And Mvc will also handle what to
+                // do if no template or hijacked route is exist.
+                pcr.RenderingEngine = RenderingEngine.Mvc;
+            }
+
 			switch (pcr.RenderingEngine)
 			{
 				case RenderingEngine.Mvc:
@@ -349,13 +359,14 @@ namespace Umbraco.Web
 					break;
 
 				case RenderingEngine.WebForms:
-				default:
 					rewritePath = "~/default.aspx";
 					// rewrite the path to the path of the handler (i.e. default.aspx)
 					context.RewritePath(rewritePath, "", query, false);
 					break;
-			}
 
+                default:
+                    throw new Exception("Invalid RenderingEngine.");
+            }
 		}
 
 		#region IHttpModule

@@ -3,10 +3,10 @@ using System.Linq;
 using System.Web.Routing;
 using NUnit.Framework;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Models;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
-using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Tests.TestHelpers
 {

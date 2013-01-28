@@ -82,9 +82,9 @@ namespace Umbraco.Web.Templates
 			//set the doc that was found by id
 			contentRequest.PublishedContent = doc;
 			//set the template, either based on the AltTemplate found or the standard template of the doc
-			contentRequest.Template = !AltTemplate.HasValue 
-				? global::umbraco.cms.businesslogic.template.Template.GetTemplate(doc.TemplateId)
-				: global::umbraco.cms.businesslogic.template.Template.GetTemplate(AltTemplate.Value);
+			contentRequest.TemplateModel = !AltTemplate.HasValue 
+				? ApplicationContext.Current.Services.FileService.GetTemplate(doc.TemplateId)
+				: ApplicationContext.Current.Services.FileService.GetTemplate(AltTemplate.Value);
 
 			//if there is not template then exit
 			if (!contentRequest.HasTemplate)
@@ -99,10 +99,6 @@ namespace Umbraco.Web.Templates
 				}
 				return;
 			}
-
-			//ok, we have a document and a template assigned, now to do some rendering.
-			//determine the rendering engine
-			contentRequest.Engine.FindRenderingEngine();
 
 			//First, save all of the items locally that we know are used in the chain of execution, we'll need to restore these
 			//after this page has rendered.

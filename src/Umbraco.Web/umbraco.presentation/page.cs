@@ -109,7 +109,7 @@ namespace umbraco
 			if (docreq.HasTemplate)
 			{
 
-				this._template = docreq.Template.Id;
+				this._template = docreq.TemplateModel.Id;
 				_elements["template"] = _template.ToString();				
 			}
 

@@ -2,7 +2,7 @@ using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.template;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Routing
 {
@@ -22,8 +22,10 @@ namespace Umbraco.Tests.Routing
 		[TestCase("/home/Sub1.aspx/blah")]
 		public void Match_Document_By_Url_With_Template(string urlAsString)
 		{
-			var template = Template.MakeNew("test", new User(0));
-			var altTemplate = Template.MakeNew("blah", new User(0));
+			var template = new Template("test");
+            ApplicationContext.Services.FileService.SaveTemplate(template);
+			var altTemplate = new Template("blah");
+            ApplicationContext.Services.FileService.SaveTemplate(altTemplate);
 			var routingContext = GetRoutingContext(urlAsString, template);
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
 			var docRequest = new PublishedContentRequest(url, routingContext);
@@ -34,7 +36,7 @@ namespace Umbraco.Tests.Routing
 			Assert.IsTrue(result);
 			Assert.IsNotNull(docRequest.PublishedContent);
 			Assert.IsNotNull(docRequest.Template);
-			Assert.AreEqual("blah".ToUpperInvariant(), docRequest.Template.Alias.ToUpperInvariant());
+			Assert.AreEqual("blah".ToUpperInvariant(), docRequest.Template.ToUpperInvariant());
 		}
 	}
 }
