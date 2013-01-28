@@ -42,11 +42,11 @@ namespace umbraco.cms.businesslogic.datatype
             {
                 if (value is HttpPostedFile || value is HttpPostedFileBase)
                 {
-                    var filename = value is HttpPostedFile 
+                    var postedFileName = value is HttpPostedFile 
                         ? ((HttpPostedFile)value).FileName 
                         : ((HttpPostedFileBase)value).FileName;
 
-                    var name = IOHelper.SafeFileName(filename.Substring(filename.LastIndexOf(IOHelper.DirSepChar) + 1, filename.Length - filename.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
+                    var name = IOHelper.SafeFileName(postedFileName.Substring(postedFileName.LastIndexOf(IOHelper.DirSepChar) + 1, postedFileName.Length - postedFileName.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
 
                     var fileStream = value is HttpPostedFile 
                         ? ((HttpPostedFile)value).InputStream 
