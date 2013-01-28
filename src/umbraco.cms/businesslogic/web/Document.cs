@@ -1228,7 +1228,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
 
         public bool HasPublishedVersion()
         {
-            return (SqlHelper.ExecuteScalar<int>("select Count(published) as tmp from cmsDocument where published = 1 And nodeId =" + Id) > 0);
+            return (SqlHelper.ExecuteScalar<int>("select Count(published) as tmp from cmsDocument where published = 1 And newest = 1 And nodeId =" + Id) > 0);
         }
 
         /// <summary>
