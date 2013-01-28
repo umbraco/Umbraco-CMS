@@ -1235,9 +1235,22 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
             }
         }
 
+        /// <summary>
+        /// Returns true if the document is published
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// If the document is in the trash then this will return false
+        /// </remarks>
         public bool HasPublishedVersion()
         {
-            return (SqlHelper.ExecuteScalar<int>("select Count(published) as tmp from cmsDocument where published = 1 And newest = 1 And nodeId =" + Id) > 0);
+            var count = SqlHelper.ExecuteScalar<int>(@"
+select Count(published) as CountOfPublished 
+from cmsDocument 
+inner join umbracoNode on cmsDocument.nodeId = umbracoNode.id
+where published = 1 And nodeId = @nodeId And trashed = 0", SqlHelper.CreateParameter("@nodeId", Id));
+
+            return count > 0;
         }
 
         /// <summary>
