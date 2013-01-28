@@ -145,7 +145,7 @@
     <value>The XPath expression that is evaluated to match a start node can be evaluated at a global tree level, or matched from the current node being edited.</value>
   </data>
   <data name="Desc_XPathFilter" xml:space="preserve">
-    <value>An xpath filter to match nodes that will be either enabled or disabled from being clicked (depending on what is selected for the XPath filter type). This XPath filter is for one node only so it should be formatted to select only one node. The XML to XPath against is the same as the Umbraco XML for one node.&lt;br/&gt;&lt;br/&gt;Example: &lt;code&gt;/*[self::'myNodeType or self::yourNodeType]&lt;/code&gt;&lt;br/&gt;&lt;br/&gt;The above would make all nodes of types: myNodeType or yourNodeType not selectable in the tree</value>
+    <value>An xpath filter to match nodes that will be either enabled or disabled from being clicked (depending on what is selected for the XPath filter type). This XPath filter is for one node only so it should be formatted to select only one node. The XML to XPath against is the same as the Umbraco XML for one node.&lt;br/&gt;&lt;br/&gt;Example: &lt;code&gt;/*[self::myNodeType or self::yourNodeType]&lt;/code&gt;&lt;br/&gt;&lt;br/&gt;The above would make all nodes of types: myNodeType or yourNodeType not selectable in the tree</value>
   </data>
   <data name="Desc_XPathFilterType" xml:space="preserve">
     <value>Should the XPath filter match nodes to enable nodes or disable nodes. If Enable is selected, this means that only nodes that match the XPath filter will be allowed to be selected in the tree picker and vise versa for Disabled</value>
