@@ -303,23 +303,15 @@ namespace Umbraco.Core.Models
 		/// </summary>
 		public static IProfile GetCreatorProfile(this IMedia media)
 		{
-			using (var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
-				PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
-			{
-				return repository.GetProfileById(media.CreatorId);
-			}
-		}
+            return ApplicationContext.Current.Services.UserService.GetProfileById(media.CreatorId);
+        }
 
         /// <summary>
         /// Gets the <see cref="IProfile"/> for the Creator of this content item.
         /// </summary>
         public static IProfile GetCreatorProfile(this IContentBase content)
         {
-            using (var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
-                PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
-            {
-                return repository.GetProfileById(content.CreatorId);
-            }
+            return ApplicationContext.Current.Services.UserService.GetProfileById(content.CreatorId);
         }
 
         /// <summary>
@@ -327,11 +319,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         public static IProfile GetWriterProfile(this IContent content)
         {
-            using (var repository = RepositoryResolver.Current.Factory.CreateUserRepository(
-                PetaPocoUnitOfWorkProvider.CreateUnitOfWork()))
-            {
-                return repository.GetProfileById(content.WriterId);
-            }
+            return ApplicationContext.Current.Services.UserService.GetProfileById(content.WriterId);
         }
 
         /// <summary>
@@ -359,6 +347,7 @@ namespace Umbraco.Core.Models
 
             var x = content.ToXml(nodeName);
             x.Add(new XAttribute("nodeType", content.ContentType.Id));
+            //TODO see below, do we have the same issues with GetXxxProfile threading problems?
             x.Add(new XAttribute("creatorName", content.GetCreatorProfile().Name));
             x.Add(new XAttribute("writerName", content.GetWriterProfile().Name));
             x.Add(new XAttribute("writerID", content.WriterId));
