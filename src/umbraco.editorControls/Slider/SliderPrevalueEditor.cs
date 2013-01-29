@@ -220,41 +220,41 @@ namespace umbraco.editorControls.Slider
             var javascriptMethod = string.Format(
                 @"
 $('#{0}').click(function(){{
-	var disable = !$(this).attr('checked');
-	$('#{1},#{3}').attr('disabled', disable);
-	$('#{6}').val(disable && !checkDecimals() ? 'Integer' : 'Nvarchar');
-	if(!disable) disable = $('#{1}').val() != '';
+    var disable = !$(this).attr('checked');
+    $('#{1},#{3}').attr('disabled', disable);
+    $('#{6}').val(disable && !checkDecimals() ? 'Integer' : 'Nvarchar');
+    if(!disable) disable = $('#{1}').val() != '';
     
 }});
 $('#{1}').change(function(){{
-	var disable = $(this).val() != '';
-	$('#{3}').attr('disabled', disable);
+    var disable = $(this).val() != '';
+    $('#{3}').attr('disabled', disable);
 }});
 $('#{4}').click(function(){{
-	var disable = !$(this).attr('checked');
-	$('#{5}').attr('disabled', disable);
+    var disable = !$(this).attr('checked');
+    $('#{5}').attr('disabled', disable);
 }});
 $('#{6}').change(function(){{
-	var disable = $(this).val() == 'Integer';
+    var disable = $(this).val() == 'Integer';
     if (checkDecimals() && disable) {{
         $('#{6}').val('Nvarchar');
         alert('Please remove decimal points below if you wish to use the Integer datatype');  
     }}
     else {{
-	$('#{0}').removeAttr('checked');
-	$('#{1},#{3}').attr('disabled', disable);
+    $('#{0}').removeAttr('checked');
+    $('#{1},#{3}').attr('disabled', disable);
     }}
 }});
 $('.slider-numeric').keydown(function(event) {{
-	// Allow only backspace and delete
-	if ( event.keyCode == 46 || event.keyCode == 8 || ($(this).hasClass('slider-decimal') && (event.keyCode == 110 || event.keyCode == 190))) {{
-		// let it happen, don't do anything
-	}} else {{
-		// Ensure that it is a number and stop the keypress
-		if ( (event.keyCode < 48 || event.keyCode > 57 ) && (event.keyCode < 96 || event.keyCode > 105 ) ) {{
-			event.preventDefault();
-		}}
-	}}
+    // Allow only backspace and delete
+    if ( event.keyCode == 46 || event.keyCode == 8 || ($(this).hasClass('slider-decimal') && (event.keyCode == 110 || event.keyCode == 190))) {{
+        // let it happen, don't do anything
+    }} else {{
+        // Ensure that it is a number and stop the keypress
+        if ( (event.keyCode < 48 || event.keyCode > 57 ) && (event.keyCode < 96 || event.keyCode > 105 ) ) {{
+            event.preventDefault();
+        }}
+    }}
 }});
 $('.slider-numeric').keyup(function(event) {{
     if ($('#{6}').val() != 'Nvarchar' && checkDecimals()) {{

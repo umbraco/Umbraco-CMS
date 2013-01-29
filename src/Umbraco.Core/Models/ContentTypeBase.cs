@@ -154,12 +154,7 @@ namespace Umbraco.Core.Models
             get { return _alias; }
             set
             {
-                //Ensures a valid ContentType alias
-                //Would have liked to use .ToUmbracoAlias() but that would break casing upon saving older/upgraded ContentTypes
-                var result = Regex.Replace(value, @"[^a-zA-Z0-9\s\.-]+", "", RegexOptions.Compiled);
-                result = result.Replace(" ", "");
-
-                _alias = result;
+                _alias = value.ToSafeAlias();
                 OnPropertyChanged(AliasSelector);
             }
         }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using umbraco.cms.businesslogic.installer;
+﻿using umbraco.cms.businesslogic.installer;
 
 namespace umbraco.presentation.install.steps.Definitions
 {

@@ -397,6 +397,15 @@ namespace Umbraco.Core
         private IEnumerable<Assembly> _assemblies;
 
         /// <summary>
+        /// Returns all available IApplicationStartupHandler objects
+        /// </summary>
+        /// <returns></returns>
+        internal IEnumerable<Type> ResolveApplicationStartupHandlers()
+        {
+            return ResolveTypes<IApplicationStartupHandler>();
+        }
+
+        /// <summary>
         /// Returns all classes attributed with XsltExtensionAttribute attribute
         /// </summary>
         /// <returns></returns>

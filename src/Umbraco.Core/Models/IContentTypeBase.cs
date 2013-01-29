@@ -16,11 +16,6 @@ namespace Umbraco.Core.Models
         string Alias { get; set; }
 
         /// <summary>
-        /// Gets or Sets the Name of the ContentType
-        /// </summary>
-        string Name { get; set; }
-
-        /// <summary>
         /// Gets or Sets the Description for the ContentType
         /// </summary>
         string Description { get; set; }

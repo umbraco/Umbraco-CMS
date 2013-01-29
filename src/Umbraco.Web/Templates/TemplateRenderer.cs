@@ -1,5 +1,7 @@
 using System;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Web.Compilation;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -8,6 +10,7 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using umbraco;
+using umbraco.cms.businesslogic.language;
 
 namespace Umbraco.Web.Templates
 {
@@ -61,8 +64,21 @@ namespace Umbraco.Web.Templates
 				return;
 			}
 
-			//set the culture to the same as is currently rendering
-			contentRequest.Culture = _umbracoContext.PublishedContentRequest.Culture;
+            //in some cases the UmbracoContext will not have a PublishedContentRequest assigned to it if we are not in the
+            //execution of a front-end rendered page. In this case set the culture to the default.
+            //set the culture to the same as is currently rendering
+            if (_umbracoContext.PublishedContentRequest == null)
+            {
+                var defaultLanguage = Language.GetAllAsList().FirstOrDefault();
+                contentRequest.Culture = defaultLanguage == null 
+                    ? CultureInfo.CurrentUICulture 
+                    : new CultureInfo(defaultLanguage.CultureAlias);
+            }
+            else
+            {
+                contentRequest.Culture = _umbracoContext.PublishedContentRequest.Culture;    
+            }
+			
 			//set the doc that was found by id
 			contentRequest.PublishedContent = doc;
 			//set the template, either based on the AltTemplate found or the standard template of the doc

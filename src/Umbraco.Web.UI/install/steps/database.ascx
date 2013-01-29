@@ -269,10 +269,42 @@
     <!-- installing umbraco -->
     <div class="tab  install-tab" id="datebase-tab">
         <div class="container">
-            <h1>Installing Umbraco</h1>
-            <p>
-                The Umbraco database is being configured. This process populates your chosen database with a blank Umbraco instance.
-            </p>
+            <asp:PlaceHolder ID="installProgress" runat="server" Visible="True">
+                <div class="progress-status-container">
+                    <h1>Installing Umbraco</h1>
+                    <p>
+                        The Umbraco database is being configured. This process populates your chosen database with a blank Umbraco instance.
+                    </p>
+                </div>
+                <div class="result-status-container" style="display: none;">
+                    <h1>Database installed</h1>
+                    <div class="success">
+                        <p>
+                            Umbraco
+				            <%=UmbracoVersion.Current.ToString(3)%>
+				            has now been copied to your database. Press <b>Continue</b> to proceed.
+                        </p>
+                    </div>
+                </div>
+            </asp:PlaceHolder>
+            <asp:PlaceHolder ID="upgradeProgress" runat="server" Visible="False">
+                <div class="progress-status-container">
+                    <h1>Upgrading Umbraco</h1>
+                    <p>
+                        The Umbraco database is being configured. This process upgrades your Umbraco database.
+                    </p>
+                </div>
+                <div class="result-status-container" style="display: none;">
+                    <h1>Database upgraded</h1>
+                    <div class="success">
+                        <p>
+                            Your database has been upgraded to version: 
+					            <%=UmbracoVersion.Current.ToString(3)%>.<br />
+                            Press <b>Continue</b> to proceed.
+                        </p>
+                    </div>                    
+                </div>
+            </asp:PlaceHolder>
             <div class="loader">
                 <div class="hold">
                     <div class="progress-bar">
@@ -310,6 +342,8 @@
                     if (json.Success) {    
                         $(".btn-box").show();
                         $('.ui-progressbar-value').css("background-image", "url(../umbraco_client/installer/images/pbar.gif)");
+                        $(".result-status-container").show();
+                        $(".progress-status-container").hide();
                     } else {
                         $(".btn-continue").hide();
                         $(".btn-back").show();
@@ -321,31 +355,3 @@
     </script>
 
 </asp:PlaceHolder>
-
-<asp:Panel ID="confirms" runat="server" Visible="False">
-    <asp:PlaceHolder ID="installConfirm" runat="server" Visible="False">
-        <h1>Database installed</h1>
-        <div class="success">
-            <p>
-                Umbraco
-				<%=UmbracoVersion.Current.ToString(3)%>
-				has now been copied to your database. Press <b>Continue</b> to proceed.
-            </p>
-        </div>
-    </asp:PlaceHolder>
-    <asp:PlaceHolder ID="upgradeConfirm" runat="server" Visible="False">
-        <h1>Database upgraded</h1>
-        <div class="success">
-            <p>
-                Your database has been upgraded to version: 
-					<%=UmbracoVersion.Current.ToString(3)%>.<br />
-                Press <b>Continue</b> to proceed.
-            </p>
-        </div>
-    </asp:PlaceHolder>
-    <!-- btn box -->
-    <footer class="btn-box" style="display: none;">
-        <div class="t">&nbsp;</div>
-        <asp:LinkButton class="btn-step btn btn-continue" runat="server" OnClick="gotoNextStep"><span>Continue</span></asp:LinkButton>
-    </footer>
-</asp:Panel>

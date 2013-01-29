@@ -3,7 +3,9 @@ using System.IO;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 
@@ -59,6 +61,14 @@ namespace Umbraco.Web.Mvc
 		{
 			get { return ApplicationContext.DatabaseContext; }
 		}
+
+        /// <summary>
+        /// Returns the Current published content item for rendering the content
+        /// </summary>
+	    protected IPublishedContent CurrentPage
+	    {
+	        get { return PublishedContentRequest.PublishedContent; }
+	    }
 
 		//TODO: make this protected once we make PublishedContentRequest not internal after we figure out what it should actually contain
 		/// <summary>

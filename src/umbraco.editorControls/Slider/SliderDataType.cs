@@ -149,7 +149,7 @@ namespace umbraco.editorControls.Slider
                 }
                 else
                 {
-                    this.Data.Value = value1;
+                    this.Data.Value = value1.ToString();
                 }
             }
         }

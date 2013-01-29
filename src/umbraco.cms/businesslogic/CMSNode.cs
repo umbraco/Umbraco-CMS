@@ -48,6 +48,7 @@ namespace umbraco.cms.businesslogic
         private bool _hasChildrenInitialized;
         private string m_image = "default.png";
         private bool? _isTrashed = null;
+        private IUmbracoEntity _entity;
 
         #endregion
 
@@ -55,6 +56,7 @@ namespace umbraco.cms.businesslogic
 
         private static readonly string m_DefaultIconCssFile = IOHelper.MapPath(SystemDirectories.Umbraco_client + "/Tree/treeIcons.css");
         private static List<string> m_DefaultIconClasses = new List<string>();
+
         private static void initializeIconClasses()
         {
             StreamReader re = File.OpenText(m_DefaultIconCssFile);
@@ -394,9 +396,10 @@ namespace umbraco.cms.businesslogic
             PopulateCMSNodeFromReader(reader);
         }
 
-        protected internal CMSNode(IEntity entity)
+        protected internal CMSNode(IUmbracoEntity entity)
         {
             _id = entity.Id;
+            _entity = entity;
         }
 
         #endregion
@@ -515,14 +518,16 @@ order by level,sortOrder";
                         SqlHelper.CreateParameter("@parentId", newParent.Id));
 
                     this.Parent = newParent;
-                    this.sortOrder = maxSortOrder + 1;
+                    this.sortOrder = maxSortOrder + 1;                    
+                }
+                
+                //detect if we have moved, then update the level and path
+                // issue: http://issues.umbraco.org/issue/U4-1579
+                if (this.Path != newParent.Path + "," + this.Id.ToString())
+                {
                     this.Level = newParent.Level + 1;
                     this.Path = newParent.Path + "," + this.Id.ToString();
                 }
-
-                //this.Parent = newParent;
-                //this.Level = newParent.Level + 1;
-                //this.Path = newParent.Path + "," + this.Id.ToString();
 
                 //this code block should not be here but since the class structure is very poor and doesn't use 
                 //overrides (instead using shadows/new) for the Children property, when iterating over the children
@@ -576,6 +581,7 @@ order by level,sortOrder";
         /// Moves the CMSNode from the current position in the hierarchy to the target
         /// </summary>
         /// <param name="NewParentId">Target CMSNode id</param>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Move() or Umbraco.Core.Services.MediaService.Move()", false)]
         public virtual void Move(int newParentId)
         {
             CMSNode parent = new CMSNode(newParentId);
@@ -705,6 +711,9 @@ order by level,sortOrder";
             {
                 _sortOrder = value;
                 SqlHelper.ExecuteNonQuery("update umbracoNode set sortOrder = '" + value + "' where id = " + this.Id.ToString());
+
+                if (_entity != null)
+                    _entity.SortOrder = value;
             }
         }
 
@@ -766,6 +775,9 @@ order by level,sortOrder";
             {
                 _parentid = value.Id;
                 SqlHelper.ExecuteNonQuery("update umbracoNode set parentId = " + value.Id.ToString() + " where id = " + this.Id.ToString());
+
+                if (_entity != null)
+                    _entity.ParentId = value.Id;
             }
         }
 
@@ -781,6 +793,9 @@ order by level,sortOrder";
             {
                 _path = value;
                 SqlHelper.ExecuteNonQuery("update umbracoNode set path = '" + _path + "' where id = " + this.Id.ToString());
+
+                if (_entity != null)
+                    _entity.Path = value;
             }
         }
 
@@ -796,6 +811,9 @@ order by level,sortOrder";
             {
                 _level = value;
                 SqlHelper.ExecuteNonQuery("update umbracoNode set level = " + _level.ToString() + " where id = " + this.Id.ToString());
+
+                if (_entity != null)
+                    _entity.Level = value;
             }
         }
 
@@ -915,6 +933,8 @@ order by level,sortOrder";
                                           SqlHelper.CreateParameter("@text", value.Trim()),
                                           SqlHelper.CreateParameter("@id", this.Id));
 
+                if (_entity != null)
+                    _entity.Name = value;
             }
         }
 
@@ -966,6 +986,9 @@ order by level,sortOrder";
         protected void SetText(string txt)
         {
             _text = txt;
+
+            if (_entity != null)
+                _entity.Name = txt;
         }
 
         /// <summary>
@@ -1086,6 +1109,7 @@ order by level,sortOrder";
             _userId = content.CreatorId;
             _createDate = content.CreateDate;
             _isTrashed = content.Trashed;
+            _entity = content;
         }
 
         internal protected void PopulateCMSNodeFromContentTypeBase(IContentTypeBase contentType, Guid objectType)
@@ -1100,6 +1124,7 @@ order by level,sortOrder";
             _userId = contentType.CreatorId;
             _createDate = contentType.CreateDate;
             _isTrashed = false;
+            _entity = contentType;
         }
 
         #endregion

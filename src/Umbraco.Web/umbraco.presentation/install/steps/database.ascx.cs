@@ -71,8 +71,29 @@ namespace umbraco.presentation.install.steps
         {
             // Does the user have to enter a connection string?
             if (settings.Visible && !Page.IsPostBack)
-                ShowDatabaseSettings();
+            {
+                //If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
+                if (
+                    ConfigurationManager.ConnectionStrings[
+                        Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName] == null
+                    ||
+                    string.IsNullOrEmpty(
+                        ConfigurationManager.ConnectionStrings[
+                            Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName].ConnectionString))
+                {
+                    installProgress.Visible = true;
+                    upgradeProgress.Visible = false;
+                    ShowDatabaseSettings();
+                }
+                else
+                {
+                    installProgress.Visible = false;
+                    upgradeProgress.Visible = true;
 
+                    settings.Visible = false;
+                    installing.Visible = true;
+                }
+            }
         }
 
         /// <summary>

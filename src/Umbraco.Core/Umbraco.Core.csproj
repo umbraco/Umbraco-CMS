@@ -137,6 +137,7 @@
     <Compile Include="Events\RollbackEventArgs.cs" />
     <Compile Include="Events\SaveEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
+    <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="MacroPropertyTypeResolver.cs" />
     <Compile Include="Models\ContentBase.cs" />
     <Compile Include="Models\ContentExtensions.cs" />
@@ -195,6 +196,7 @@
     <Compile Include="Models\Task.cs" />
     <Compile Include="Models\TaskType.cs" />
     <Compile Include="Models\Template.cs" />
+    <Compile Include="ObjectResolution\ApplicationEventsResolver.cs" />
     <Compile Include="Persistence\Caching\InMemoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\IRepositoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\NullCacheProvider.cs" />
@@ -440,6 +442,7 @@
     <Compile Include="Persistence\RepositoryFactory.cs" />
     <Compile Include="ObjectResolution\LazyManyObjectsResolverbase.cs" />
     <Compile Include="Persistence\RepositoryResolver.cs" />
+    <Compile Include="Persistence\SqlSyntax\ColumnInfo.cs" />
     <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />
     <Compile Include="Persistence\SqlSyntax\ISqlSyntaxProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\MySqlSyntaxProvider.cs" />
@@ -650,6 +653,7 @@
     <Compile Include="ReadLock.cs" />
     <Compile Include="TypeFinder.cs" />
     <Compile Include="TypeHelper.cs" />
+    <Compile Include="UmbracoApplicationBase.cs" />
     <Compile Include="UpgradeableReadLock.cs" />
     <Compile Include="DelegateEqualityComparer.cs" />
     <Compile Include="Media\IEmbedProvider.cs" />
