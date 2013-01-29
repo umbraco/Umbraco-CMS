@@ -81,7 +81,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         public virtual void TearDown()
         {
             SyntaxConfig.SqlSyntaxProvider = null;
-            Resolution.IsFrozen = false;
+            Resolution.Reset();
 
             TestHelper.CleanContentDirectories();
 

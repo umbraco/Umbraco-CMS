@@ -23,11 +23,11 @@ namespace Umbraco.Web.Search
 	/// </summary>
 	public class ExamineEvents : IApplicationEventHandler
 	{
-		public void OnApplicationInitialized(UmbracoApplication httpApplication, ApplicationContext applicationContext)
+		public void OnApplicationInitialized(UmbracoApplicationBase httpApplication, ApplicationContext applicationContext)
 		{			
 		}
 
-		public void OnApplicationStarting(UmbracoApplication httpApplication, ApplicationContext applicationContext)
+		public void OnApplicationStarting(UmbracoApplicationBase httpApplication, ApplicationContext applicationContext)
 		{			
 		}
 
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Search
 		/// We need to do this on the Started event as to guarantee that all resolvers are setup properly.
 		/// </remarks>
 		[SecuritySafeCritical]
-		public void OnApplicationStarted(UmbracoApplication httpApplication, ApplicationContext applicationContext)
+		public void OnApplicationStarted(UmbracoApplicationBase httpApplication, ApplicationContext applicationContext)
 		{
 			var registeredProviders = ExamineManager.Instance.IndexProviderCollection
 				.OfType<BaseUmbracoIndexer>().Count(x => x.EnableDefaultEventHandler);
