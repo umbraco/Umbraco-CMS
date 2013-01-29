@@ -24,31 +24,31 @@ namespace Umbraco.Web
 		/// </remarks>
 		public sealed class CacheHelperApplicationEventListener : IApplicationEventHandler
 		{
-			public void OnApplicationInitialized(UmbracoApplication httpApplication, ApplicationContext applicationContext)
+            public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
 			{
-				if (ApplicationContext.Current != null)
+                if (applicationContext != null)
 				{
 					//bind to events to clear the cache, after publish, after media save and after member save
 
 					Document.AfterPublish
 						+= (sender, args) =>
-						   ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
+                           applicationContext.ApplicationCache.ClearPartialViewCache();
 
 					global::umbraco.cms.businesslogic.media.Media.AfterSave
 						+= (sender, args) =>
-						   ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
+                           applicationContext.ApplicationCache.ClearPartialViewCache();
 
 					global::umbraco.cms.businesslogic.member.Member.AfterSave
 						+= (sender, args) =>
-						   ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
+                           applicationContext.ApplicationCache.ClearPartialViewCache();
 				}
 			}
 
-			public void OnApplicationStarting(UmbracoApplication httpApplication, ApplicationContext applicationContext)
+            public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
 			{
 			}
 
-			public void OnApplicationStarted(UmbracoApplication httpApplication, ApplicationContext applicationContext)
+            public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
 			{
 			}
 		}

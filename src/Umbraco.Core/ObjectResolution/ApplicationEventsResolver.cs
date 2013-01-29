@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.ObjectResolution;
 using umbraco.interfaces;
 
-namespace Umbraco.Web
+namespace Umbraco.Core.ObjectResolution
 {
 	/// <summary>
 	/// A resolver to return all IApplicationEvents objects

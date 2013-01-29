@@ -30,10 +30,21 @@ namespace Umbraco.Core
 		private bool _isInitialized = false;
 		private bool _isStarted = false;
 		private bool _isComplete = false;
-
+        private readonly UmbracoApplicationBase _umbracoApplication;
 		protected ApplicationContext ApplicationContext { get; private set; }
 
-		public virtual IBootManager Initialize()
+	    protected UmbracoApplicationBase UmbracoApplication
+	    {
+	        get { return _umbracoApplication; }
+	    }
+
+	    public CoreBootManager(UmbracoApplicationBase umbracoApplication)
+        {            
+            if (umbracoApplication == null) throw new ArgumentNullException("umbracoApplication");
+            _umbracoApplication = umbracoApplication;
+        }
+
+	    public virtual IBootManager Initialize()
 		{
 			if (_isInitialized)
 				throw new InvalidOperationException("The boot manager has already been initialized");
@@ -56,15 +67,41 @@ namespace Umbraco.Core
             //initialize the DatabaseContext
 			dbContext.Initialize();
 
+            InitializeApplicationEventsResolver();
+
 			InitializeResolvers();
+            
+            //now we need to call the initialize methods
+            ApplicationEventsResolver.Current.ApplicationEventHandlers
+                .ForEach(x => x.OnApplicationInitialized(UmbracoApplication, ApplicationContext));
+
 
 			_isInitialized = true;
 
 			return this;
 		}
 
+        /// <summary>
+        /// Special method to initialize the ApplicationEventsResolver and any modifications required for it such 
+        /// as adding custom types to the resolver.
+        /// </summary>
+        protected virtual void InitializeApplicationEventsResolver()
+        {
+            //find and initialize the application startup handlers, we need to initialize this resolver here because
+            //it is a special resolver where they need to be instantiated first before any other resolvers in order to bind to 
+            //events and to call their events during bootup.
+            //ApplicationStartupHandler.RegisterHandlers();
+            //... and set the special flag to let us resolve before frozen resolution
+            ApplicationEventsResolver.Current = new ApplicationEventsResolver(
+                PluginManager.Current.ResolveApplicationStartupHandlers())
+            {
+                CanResolveBeforeFrozen = true
+            };
+        }
+
 		/// <summary>
-		/// Fires after initialization and calls the callback to allow for customizations to occur
+		/// Fires after initialization and calls the callback to allow for customizations to occur & 
+        /// Ensure that the OnApplicationStarting methods of the IApplicationEvents are called
 		/// </summary>
 		/// <param name="afterStartup"></param>
 		/// <returns></returns>
@@ -77,6 +114,10 @@ namespace Umbraco.Core
 			{
 				afterStartup(ApplicationContext.Current);	
 			}
+
+            //call OnApplicationStarting of each application events handler
+            ApplicationEventsResolver.Current.ApplicationEventHandlers
+                .ForEach(x => x.OnApplicationStarting(UmbracoApplication, ApplicationContext));
 
 			_isStarted = true;
 
@@ -104,7 +145,14 @@ namespace Umbraco.Core
 				afterComplete(ApplicationContext.Current);	
 			}
 
+            //call OnApplicationStarting of each application events handler
+            ApplicationEventsResolver.Current.ApplicationEventHandlers
+                .ForEach(x => x.OnApplicationStarted(UmbracoApplication, ApplicationContext));
+
 			_isComplete = true;
+
+            // we're ready to serve content!
+            ApplicationContext.IsReady = true;
 
 			return this;
 		}

@@ -123,6 +123,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auditing\AuditTests.cs" />
+    <Compile Include="BootManagers\CoreBootManagerTests.cs" />
     <Compile Include="BusinessLogic\DictionaryTest.cs" />
     <Compile Include="CodeFirst\Attributes\AliasAttribute.cs" />
     <Compile Include="CodeFirst\Attributes\ContentTypeAttribute.cs" />

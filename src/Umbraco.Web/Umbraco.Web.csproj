@@ -245,7 +245,6 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
-    <Compile Include="ApplicationEventsResolver.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
     <Compile Include="Dynamics\DynamicExpression.cs" />
     <Compile Include="Dynamics\DynamicGrouping.cs" />
@@ -290,7 +289,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="HtmlHelperRenderExtensions.cs" />
-    <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IPublishedStore.cs" />
     <Compile Include="IPublishedMediaStore.cs" />
     <Compile Include="LegacyScheduledTasks.cs" />
