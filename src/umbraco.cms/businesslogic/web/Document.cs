@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -150,7 +151,7 @@ namespace umbraco.cms.businesslogic.web
 	                umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as isPublished, umbracoNode.createDate, 
                     cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsDocument.releaseDate, cmsDocument.expireDate, cmsContentType.icon, cmsContentType.alias,
 	                cmsContentType.thumbnail, cmsContentType.description, cmsContentType.nodeId as contentTypeId,
-                    umbracoNode.nodeUser
+                    umbracoNode.nodeUser, umbracoNode.trashed
                 from umbracoNode
                     left join umbracoNode children on children.parentId = umbracoNode.id
                     inner join cmsContent on cmsContent.nodeId = umbracoNode.id
@@ -166,6 +167,7 @@ namespace umbraco.cms.businesslogic.web
 	                coalesce(publishCheck.published,0), umbracoNode.createDate, cmsDocument.text, 
 	                cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, 
                     cmsContentType.nodeId, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsDocument.releaseDate, cmsDocument.expireDate, umbracoNode.nodeUser
+                    umbracoNode.nodeUser, umbracoNode.trashed
                 order by {1}
                 ";
 
@@ -382,6 +384,7 @@ namespace umbraco.cms.businesslogic.web
             return isDoc;
         }
 
+        
         /// <summary>
         /// Used to get the firstlevel/root documents of the hierachy
         /// </summary>
@@ -850,7 +853,12 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         /// <param name="u">The usercontext under which the action are performed</param>
         /// <returns>True if the publishing succeed. Possible causes for not publishing is if an event aborts the publishing</returns>
+        /// <remarks>
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
+        /// This method needs to be marked with [MethodImpl(MethodImplOptions.Synchronized)]
+        /// because we execute multiple queries affecting the same data, if two thread are to do this at the same time for the same node we may have problems
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public bool PublishWithResult(User u)
         {
             var e = new PublishEventArgs();
@@ -1416,24 +1424,21 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete", false)]
         protected void PopulateDocumentFromReader(IRecordsReader dr)
         {
-            bool _hc = false;
-
-            if (dr.GetInt("children") > 0)
-                _hc = true;
+            var hc = dr.GetInt("children") > 0;
 
             SetupDocumentForTree(dr.GetGuid("uniqueId")
                 , dr.GetShort("level")
                 , dr.GetInt("parentId")
                 , dr.GetInt("nodeUser")
                 , dr.GetInt("documentUser")
-                , (dr.GetInt("isPublished") == 1)
+                , !dr.GetBoolean("trashed") && (dr.GetInt("isPublished") == 1) //set published... double check trashed property
                 , dr.GetString("path")
                 , dr.GetString("text")
                 , dr.GetDateTime("createDate")
                 , dr.GetDateTime("updateDate")
                 , dr.GetDateTime("versionDate")
                 , dr.GetString("icon")
-                , _hc
+                , hc
                 , dr.GetString("alias")
                 , dr.GetString("thumbnail")
                 , dr.GetString("description")
