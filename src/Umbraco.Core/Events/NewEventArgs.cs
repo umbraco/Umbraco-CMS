@@ -10,7 +10,7 @@ namespace Umbraco.Core.Events
 			ParentId = parentId;
 		}
 
-        public NewEventArgs(TEntity eventObject, bool canCancel, string @alias, IContent parent)
+        public NewEventArgs(TEntity eventObject, bool canCancel, string @alias, TEntity parent)
             : base(eventObject, canCancel)
         {
             Alias = alias;
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Events
 			ParentId = parentId;
 		}
 
-        public NewEventArgs(TEntity eventObject, string @alias, IContent parent)
+        public NewEventArgs(TEntity eventObject, string @alias, TEntity parent)
             : base(eventObject)
         {
             Alias = alias;
@@ -51,6 +51,6 @@ namespace Umbraco.Core.Events
         /// <summary>
         /// Gets or Sets the parent IContent object.
         /// </summary>
-        public IContent Parent { get; private set; }
+        public TEntity Parent { get; private set; }
 	}
 }
