@@ -82,7 +82,7 @@ namespace umbraco.cms.presentation
             }
 
             // we need to check if there's a published version of this document
-            _documentHasPublishedVersion = _document.HasPublishedVersion();
+            _documentHasPublishedVersion = _document.Published;
 
             // Check publishing permissions
             if (!base.getUser().GetPermissions(_document.Path).Contains(ActionPublish.Instance.Letter.ToString()))
@@ -322,10 +322,13 @@ namespace umbraco.cms.presentation
                         if (base.getUser().GetPermissions(_document.Path).IndexOf("U") > -1)
                             UnPublish.Visible = true;
 
-                        _documentHasPublishedVersion = _document.HasPublishedVersion();
+                        _documentHasPublishedVersion = _document.Published;
 
-                        foreach (var descendant in _document.GetDescendants().Cast<Document>().Where(descendant => descendant.HasPublishedVersion()))
+                        foreach (var descendant in _document.GetPathPublishedDescendants())
+                        {
                             library.UpdateDocumentCache(descendant.Id);
+                        }
+                            
                     }
                     else
                     {
