@@ -3,6 +3,7 @@ using System.IO;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
