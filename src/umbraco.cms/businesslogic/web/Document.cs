@@ -111,67 +111,8 @@ namespace umbraco.cms.businesslogic.web
         #endregion
 
         #region Constants and Static members
-        // NH: Modified to support SQL CE 4 (doesn't support nested selects)
-        private const string m_SQLOptimizedSingle = @"
-                Select 
-                    CASE WHEN (childrenTable.total>0) THEN childrenTable.total ELSE 0 END as Children,
-                    CASE WHEN (publishedTable.publishedTotal>0) THEN publishedTable.publishedTotal ELSE 0 END as Published,
-	                cmsContentType.isContainer,
-                    cmsContentVersion.VersionId,
-                    cmsContentVersion.versionDate,	                
-	                contentTypeNode.uniqueId as ContentTypeGuid, 
-					cmsContent.ContentType, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.nodeId as contentTypeId,
-	                published, documentUser, coalesce(templateId, cmsDocumentType.templateNodeId) as templateId, cmsDocument.text as DocumentText, releaseDate, expireDate, updateDate, 
-	                umbracoNode.createDate, umbracoNode.trashed, umbracoNode.parentId, umbracoNode.nodeObjectType, umbracoNode.nodeUser, umbracoNode.level, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.uniqueId, umbracoNode.text 
-                from 
-	                umbracoNode 
-                    inner join cmsContentVersion on cmsContentVersion.contentID = umbracoNode.id
-                    inner join cmsDocument on cmsDocument.versionId = cmsContentVersion.versionId
-                    inner join cmsContent on cmsDocument.nodeId = cmsContent.NodeId
-                    inner join cmsContentType on cmsContentType.nodeId = cmsContent.ContentType
-                    inner join umbracoNode contentTypeNode on contentTypeNode.id = cmsContentType.nodeId
-                    left join cmsDocumentType on cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1 
-                    /* SQL CE support */
-                    left outer join (select count(id) as total, parentId from umbracoNode where parentId = @id group by parentId) as childrenTable on childrenTable.parentId = umbracoNode.id
-                    left outer join (select Count(published) as publishedTotal, nodeId from cmsDocument where published = 1 And nodeId = @id group by nodeId) as publishedTable on publishedTable.nodeId = umbracoNode.id
-                    /* end SQL CE support */
-                where umbracoNode.nodeObjectType = @nodeObjectType AND {0}
-                order by {1}
-                ";
-
-        // NH: Had to modify this for SQL CE 4. Only change is that the "coalesce(publishCheck.published,0) as published" didn't work in SQL CE 4
-        // because there's already a column called published. I've changed it to isPublished and updated the other places
-        //
-        // zb-00010 #29443 : removed the following lines + added constraint on cmsDocument.newest in where clause (equivalent + handles duplicate dates)
-        //            inner join (select contentId, max(versionDate) as versionDate from cmsContentVersion group by contentId) temp
-        //                on cmsContentVersion.contentId = temp.contentId and cmsContentVersion.versionDate = temp.versionDate
-        private const string m_SQLOptimizedMany = @"
-                select count(children.id) as children, cmsContentType.isContainer, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, 
-	                cmsDocument.documentUser, coalesce(cmsDocument.templateId, cmsDocumentType.templateNodeId) as templateId, 
-	                umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as isPublished, umbracoNode.createDate, 
-                    cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsDocument.releaseDate, cmsDocument.expireDate, cmsContentType.icon, cmsContentType.alias,
-	                cmsContentType.thumbnail, cmsContentType.description, cmsContentType.nodeId as contentTypeId,
-                    umbracoNode.nodeUser, umbracoNode.trashed
-                from umbracoNode
-                    left join umbracoNode children on children.parentId = umbracoNode.id
-                    inner join cmsContent on cmsContent.nodeId = umbracoNode.id
-                    inner join cmsContentType on cmsContentType.nodeId = cmsContent.contentType
-                    inner join cmsContentVersion on cmsContentVersion.contentId = umbracoNode.id
-                    inner join cmsDocument on cmsDocument.versionId = cmsContentversion.versionId
-                    left join cmsDocument publishCheck on publishCheck.nodeId = cmsContent.nodeID and publishCheck.published = 1
-                    left join cmsDocumentType on cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1
-                where umbracoNode.nodeObjectType = @nodeObjectType AND cmsDocument.newest = 1 AND {0}
-                group by 
-	                cmsContentType.isContainer, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, 
-	                cmsDocument.templateId, cmsDocumentType.templateNodeId, umbracoNode.path, umbracoNode.sortOrder, 
-	                coalesce(publishCheck.published,0), umbracoNode.createDate, cmsDocument.text, 
-	                cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, 
-                    cmsContentType.nodeId, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsDocument.releaseDate, cmsDocument.expireDate, umbracoNode.nodeUser
-                    umbracoNode.nodeUser, umbracoNode.trashed
-                order by {1}
-                ";
-
-        private const string m_SQLOptimizedForPreview = @"
+        
+        private const string SqlOptimizedForPreview = @"
                 select umbracoNode.id, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsDocument.versionId, cmsPreviewXml.xml from cmsDocument
                 inner join umbracoNode on umbracoNode.id = cmsDocument.nodeId
                 inner join cmsPreviewXml on cmsPreviewXml.nodeId = cmsDocument.nodeId and cmsPreviewXml.versionId = cmsDocument.versionId
@@ -853,12 +794,12 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         /// <param name="u">The usercontext under which the action are performed</param>
         /// <returns>True if the publishing succeed. Possible causes for not publishing is if an event aborts the publishing</returns>
-        /// <remarks>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
+        /// <remarks>        
         /// This method needs to be marked with [MethodImpl(MethodImplOptions.Synchronized)]
         /// because we execute multiple queries affecting the same data, if two thread are to do this at the same time for the same node we may have problems
         /// </remarks>
         [MethodImpl(MethodImplOptions.Synchronized)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
         public bool PublishWithResult(User u)
         {
             var e = new PublishEventArgs();
@@ -1330,7 +1271,7 @@ namespace umbraco.cms.businesslogic.web
 
             string pathExp = childrenOnly ? Path + ",%" : Path;
 
-            IRecordsReader dr = SqlHelper.ExecuteReader(String.Format(m_SQLOptimizedForPreview, pathExp));
+            IRecordsReader dr = SqlHelper.ExecuteReader(String.Format(SqlOptimizedForPreview, pathExp));
             while (dr.Read())
                 nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("versionId"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml")));
             dr.Close();
