@@ -271,9 +271,10 @@ namespace Umbraco.Web.Mvc
 				// to the index Action
 				if (publishedContentRequest.HasTemplate)
 				{
-					//check if the custom controller has an action with the same name as the template name (we convert ToUmbracoAlias since the template name might have invalid chars).
-					//NOTE: This also means that all custom actions MUST be PascalCase.. but that should be standard.
-					var templateName = publishedContentRequest.Template.Alias.Split('.')[0].ToUmbracoAlias(StringAliasCaseType.PascalCase);
+					//the template Alias should always be already saved with a safe name.
+                    //if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
+                    // with the action name attribute.
+                    var templateName = publishedContentRequest.Template.Alias.Split('.')[0];
 					def.ActionName = templateName;
 				}
 	

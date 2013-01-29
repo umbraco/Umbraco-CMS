@@ -21,6 +21,14 @@ namespace Umbraco.Tests.BootManagers
             _testApp = new TestApp();
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _testApp = null;
+            ApplicationEventsResolver.Reset();
+            Resolution.IsFrozen = false;
+        }
+
         /// <summary>
         /// test application using a CoreBootManager instance to boot
         /// </summary>
@@ -51,6 +59,11 @@ namespace Umbraco.Tests.BootManagers
                         CanResolveBeforeFrozen = true
                     };
                 ApplicationEventsResolver.Current.AddType<TestApplicationEventHandler>();
+            }
+
+            protected override void InitializeResolvers()
+            {
+                //Do nothing as we don't want to initialize all resolvers in this test
             }
         }
 

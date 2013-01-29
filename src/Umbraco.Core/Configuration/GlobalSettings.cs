@@ -170,7 +170,7 @@ namespace Umbraco.Core.Configuration
                 {
                     if (value.ToLower().Contains("SQLCE4Umbraco.SqlCEHelper".ToLower()))
                     {
-                        ApplicationContext.Current.DatabaseContext.ConfigureDatabaseConnection();
+                        ApplicationContext.Current.DatabaseContext.ConfigureEmbeddedDatabaseConnection();
                     }
                     else
                     {

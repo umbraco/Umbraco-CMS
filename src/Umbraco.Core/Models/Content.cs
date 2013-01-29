@@ -280,19 +280,10 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="isTrashed">Boolean indicating whether content is trashed (true) or not trashed (false)</param>
         /// <param name="parentId"> </param>
-        public override void ChangeTrashedState(bool isTrashed, int parentId = -1)
+        public override void ChangeTrashedState(bool isTrashed, int parentId = -20)
         {
             Trashed = isTrashed;
-
-            //If Content is trashed the parent id should be set to that of the RecycleBin
-            if(isTrashed)
-            {
-                ParentId = -20;
-            }
-            else//otherwise set the parent id to the optional parameter, -1 being the fallback
-            {
-                ParentId = parentId;
-            }
+            ParentId = parentId;
 
             //If the content is trashed and is published it should be marked as unpublished
             if (isTrashed && Published)
