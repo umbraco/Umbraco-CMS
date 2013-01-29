@@ -87,8 +87,21 @@ namespace umbraco.presentation.install.steps
                 }
                 else
                 {
-                    installProgress.Visible = false;
-                    upgradeProgress.Visible = true;
+                    //Since a connection string was present we verify whether this is an upgrade or an empty db
+                    var result = ApplicationContext.Current.DatabaseContext.ValidateDatabaseSchema();
+                    var determinedVersion = result.DetermineInstalledVersion();
+                    if (determinedVersion.Equals(new Version(0, 0, 0)))
+                    {
+                        //Fresh install
+                        installProgress.Visible = true;
+                        upgradeProgress.Visible = false;
+                    }
+                    else
+                    {
+                        //Upgrade
+                        installProgress.Visible = false;
+                        upgradeProgress.Visible = true;
+                    }
 
                     settings.Visible = false;
                     installing.Visible = true;
@@ -170,7 +183,7 @@ namespace umbraco.presentation.install.steps
                 }
                 else if (IsEmbeddedDatabase)
                 {
-                    ApplicationContext.Current.DatabaseContext.ConfigureDatabaseConnection();
+                    ApplicationContext.Current.DatabaseContext.ConfigureEmbeddedDatabaseConnection();
                 }
                 else
                 {
