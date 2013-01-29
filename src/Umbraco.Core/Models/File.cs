@@ -61,16 +61,5 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <returns>True if file is valid, otherwise false</returns>
         public abstract bool IsValid();
-
-        /// <summary>
-        /// Indicates whether the current entity has an identity, which in this case is a path/name.
-        /// </summary>
-        /// <remarks>
-        /// Overrides the default Entity identity check.
-        /// </remarks>
-        public override bool HasIdentity
-        {
-            get { return string.IsNullOrEmpty(Path) == false; }
-        }
     }
 }

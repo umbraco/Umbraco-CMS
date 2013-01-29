@@ -147,6 +147,17 @@ namespace Umbraco.Core.Models
             
             return !parser.Errors.Any();
         }
+
+        /// <summary>
+        /// Indicates whether the current entity has an identity, which in this case is a path/name.
+        /// </summary>
+        /// <remarks>
+        /// Overrides the default Entity identity check.
+        /// </remarks>
+        public override bool HasIdentity
+        {
+            get { return string.IsNullOrEmpty(Path) == false; }
+        }
     }
 
     /// <summary>

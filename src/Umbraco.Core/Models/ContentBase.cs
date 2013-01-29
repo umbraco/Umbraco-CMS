@@ -401,6 +401,6 @@ namespace Umbraco.Core.Models
             return Properties.Any(property => !property.IsValid()) == false;
         }
 
-        public abstract void ChangeTrashedState(bool isTrashed, int parentId = -1);
+        public abstract void ChangeTrashedState(bool isTrashed, int parentId = -20);
     }
 }

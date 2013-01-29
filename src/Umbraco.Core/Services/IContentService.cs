@@ -21,6 +21,17 @@ namespace Umbraco.Core.Services
         IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = 0);
 
         /// <summary>
+        /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+        /// that this Content is based on.
+        /// </summary>
+        /// <param name="name">Name of the Content object</param>
+        /// <param name="parent">Parent <see cref="IContent"/> object for the new Content</param>
+        /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
+        /// <returns><see cref="IContent"/></returns>
+        IContent CreateContent(string name, IContent parent, string contentTypeAlias, int userId = 0);
+
+        /// <summary>
         /// Gets an <see cref="IContent"/> object by Id
         /// </summary>
         /// <param name="id">Id of the Content to retrieve</param>
@@ -91,14 +102,16 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
-        void Save(IContent content, int userId = 0);
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        void Save(IContent content, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Saves a collection of <see cref="IContent"/> objects.
         /// </summary>        
         /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
-        void Save(IEnumerable<IContent> contents, int userId = 0);		
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        void Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);		
 
         /// <summary>
         /// Deletes all content of specified type. All children of deleted content is moved to Recycle Bin.
@@ -242,8 +255,9 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to save and publish</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        bool SaveAndPublish(IContent content, int userId = 0);
+        bool SaveAndPublish(IContent content, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Permanently deletes an <see cref="IContent"/> object.
