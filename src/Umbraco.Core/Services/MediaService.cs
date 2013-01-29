@@ -170,17 +170,26 @@ namespace Umbraco.Core.Services
 		/// <returns>An Enumerable flat list of <see cref="IMedia"/> objects</returns>
 		public IEnumerable<IMedia> GetDescendants(int id)
 		{
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
-			{
-				var media = repository.Get(id);
-
-				var query = Query<IMedia>.Builder.Where(x => x.Path.StartsWith(media.Path));
-				var medias = repository.GetByQuery(query);
-
-				return medias;
-			}			
+            var media = GetById(id);
+		    return GetDescendants(media);
 		}
+
+        /// <summary>
+        /// Gets descendants of a <see cref="IMedia"/> object by its Id
+        /// </summary>
+        /// <param name="media">The Parent <see cref="IMedia"/> object to retrieve descendants from</param>
+        /// <returns>An Enumerable flat list of <see cref="IMedia"/> objects</returns>
+        public IEnumerable<IMedia> GetDescendants(IMedia media)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+            {
+                var query = Query<IMedia>.Builder.Where(x => x.Path.StartsWith(media.Path) && x.Id != media.Id);
+                var medias = repository.GetByQuery(query);
+
+                return medias;
+            }
+        }
 
 		/// <summary>
 		/// Gets a collection of <see cref="IMedia"/> objects by the Id of the <see cref="IContentType"/>
@@ -292,18 +301,22 @@ namespace Umbraco.Core.Services
 	        if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, -21), this))
 				return;
 
-            //Move children to Recycle Bin before the 'possible parent' is moved there
-            var children = GetChildren(media.Id);
-            foreach (var child in children)
-            {
-                MoveToRecycleBin(child, userId);
-            }
+            //Find Descendants, which will be moved to the recycle bin along with the parent/grandparent.
+            var descendants = GetDescendants(media).ToList();
 
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 			{
-				media.ChangeTrashedState(true);
+				media.ChangeTrashedState(true, -21);
 				repository.AddOrUpdate(media);
+
+                //Loop through descendants to update their trash state, but ensuring structure by keeping the ParentId
+                foreach (var descendant in descendants)
+                {
+                    descendant.ChangeTrashedState(true, descendant.ParentId);
+                    repository.AddOrUpdate(descendant);
+                }
+
 				uow.Commit();
 			}
 

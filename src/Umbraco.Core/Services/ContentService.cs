@@ -631,12 +631,12 @@ namespace Umbraco.Core.Services
 				UnPublish(content, userId);
 			}
 
-			//Move children to Recycle Bin before the 'possible parent' is moved there
-			var children = GetChildren(content.Id);
-			foreach (var child in children)
-			{
-				MoveToRecycleBin(child, userId);
-			}
+            //Unpublish descendents of the content item that is being moved to trash
+	        var descendants = GetDescendants(content).ToList();
+	        foreach (var descendant in descendants)
+	        {
+                UnPublish(descendant, userId);
+	        }
 
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
@@ -644,6 +644,15 @@ namespace Umbraco.Core.Services
 			    content.WriterId = userId;
 				content.ChangeTrashedState(true);
 				repository.AddOrUpdate(content);
+
+                //Loop through descendants to update their trash state, but ensuring structure by keeping the ParentId
+			    foreach (var descendant in descendants)
+			    {
+                    descendant.WriterId = userId;
+                    descendant.ChangeTrashedState(true, descendant.ParentId);
+                    repository.AddOrUpdate(descendant);
+			    }
+
 				uow.Commit();
 			}
 
