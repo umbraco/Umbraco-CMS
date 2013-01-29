@@ -183,7 +183,7 @@ namespace umbraco.presentation.install.steps
                 }
                 else if (IsEmbeddedDatabase)
                 {
-                    ApplicationContext.Current.DatabaseContext.ConfigureDatabaseConnection();
+                    ApplicationContext.Current.DatabaseContext.ConfigureEmbeddedDatabaseConnection();
                 }
                 else
                 {

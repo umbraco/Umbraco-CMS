@@ -72,7 +72,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 list =
                     items.Select(
                         item =>
-                        new ColumnInfo(item.TABLE_NAME, item.COLUMN_NAME, item.ORDINAL_POSITION, item.COLUMN_DEFAULT,
+                        new ColumnInfo(item.TABLE_NAME, item.COLUMN_NAME, int.Parse(item.ORDINAL_POSITION.ToString()), item.COLUMN_DEFAULT ?? "",
                                        item.IS_NULLABLE, item.DATA_TYPE)).ToList();
             }
             finally

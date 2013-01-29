@@ -22,15 +22,15 @@ namespace Umbraco.Core
     /// </remarks>
     public class DatabaseContext
     {
-	    private readonly IDatabaseFactory _factory;
-	    private bool _configured;
+        private readonly IDatabaseFactory _factory;
+        private bool _configured;
         private string _connectionString;
         private string _providerName;
         private DatabaseSchemaResult _result;
 
         internal DatabaseContext(IDatabaseFactory factory)
         {
-	        _factory = factory;
+            _factory = factory;
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Configure a ConnectionString for the embedded database.
         /// </summary>
-        public void ConfigureDatabaseConnection()
+        public void ConfigureEmbeddedDatabaseConnection()
         {
             const string providerName = "System.Data.SqlServerCe.4.0";
             const string connectionString = "Datasource=|DataDirectory|Umbraco.sdf";
@@ -151,12 +151,12 @@ namespace Umbraco.Core
         {
             string connectionString;
             string providerName = "System.Data.SqlClient";
-            if(databaseProvider.ToLower().Contains("mysql"))
+            if (databaseProvider.ToLower().Contains("mysql"))
             {
                 providerName = "MySql.Data.MySqlClient";
                 connectionString = string.Format("Server={0}; Database={1};Uid={2};Pwd={3}", server, databaseName, user, password);
             }
-            else if(databaseProvider.ToLower().Contains("azure"))
+            else if (databaseProvider.ToLower().Contains("azure"))
             {
                 connectionString = string.Format("Server=tcp:{0}.database.windows.net;Database={1};User ID={2}@{0};Password={3}", server, databaseName, user, password);
             }
@@ -206,7 +206,7 @@ namespace Umbraco.Core
             // Update connectionString if it exists, or else create a new appSetting for the given key and value
             var setting = connectionstrings.Descendants("add").FirstOrDefault(s => s.Attribute("name").Value == GlobalSettings.UmbracoConnectionName);
             if (setting == null)
-                connectionstrings.Add(new XElement("add", 
+                connectionstrings.Add(new XElement("add",
                     new XAttribute("name", GlobalSettings.UmbracoConnectionName),
                     new XAttribute("connectionString", connectionStringSettings),
                     new XAttribute("providerName", providerName)));
@@ -241,7 +241,7 @@ namespace Umbraco.Core
 
                     _connectionString =
                         ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ConnectionString;
-                    
+
                 }
 
                 Initialize(providerName);
@@ -252,7 +252,7 @@ namespace Umbraco.Core
                 var legacyConnString = ConfigurationManager.AppSettings[GlobalSettings.UmbracoConnectionName];
                 if (legacyConnString.ToLowerInvariant().Contains("sqlce4umbraco"))
                 {
-                    ConfigureDatabaseConnection();
+                    ConfigureEmbeddedDatabaseConnection();
                 }
                 else if (legacyConnString.ToLowerInvariant().Contains("database.windows.net") &&
                          legacyConnString.ToLowerInvariant().Contains("tcp:"))
@@ -261,12 +261,16 @@ namespace Umbraco.Core
                     SaveConnectionString(legacyConnString, "System.Data.SqlClient");
                     Initialize("System.Data.SqlClient");
                 }
-                else if (legacyConnString.ToLowerInvariant().Contains("Uid") &&
-                         legacyConnString.ToLowerInvariant().Contains("Pwd") &&
-                         legacyConnString.ToLowerInvariant().Contains("Server"))
+                else if (legacyConnString.ToLowerInvariant().Contains("datalayer=mysql"))
                 {
                     //Must be MySql
-                    SaveConnectionString(legacyConnString, "MySql.Data.MySqlClient");
+
+                    //Need to strip the datalayer part off
+                    var connectionStringWithoutDatalayer = string.Empty;
+                    foreach (var variable in legacyConnString.Split(';').Where(x => x.ToLowerInvariant().StartsWith("datalayer") == false))
+                        connectionStringWithoutDatalayer = string.Format("{0}{1};", connectionStringWithoutDatalayer, variable);
+
+                    SaveConnectionString(connectionStringWithoutDatalayer, "MySql.Data.MySqlClient");
                     Initialize("MySql.Data.MySqlClient");
                 }
                 else
@@ -299,7 +303,7 @@ namespace Umbraco.Core
             {
                 SyntaxConfig.SqlSyntaxProvider = SqlServerSyntax.Provider;
             }
-            
+
             _providerName = providerName;
             _configured = true;
         }
@@ -354,7 +358,7 @@ namespace Umbraco.Core
                     var upgraded = runner.Execute(database, true);
                     message = "Upgrade completed!";
                 }
-                
+
                 return new Result { Message = message, Success = true, Percentage = "100" };
             }
             catch (Exception ex)
