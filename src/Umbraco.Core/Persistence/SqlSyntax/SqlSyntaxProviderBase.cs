@@ -151,6 +151,26 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return "NVARCHAR";
         }
 
+        public virtual IEnumerable<string> GetTablesInSchema(Database db)
+        {
+            return new List<string>();
+        }
+
+        public virtual IEnumerable<ColumnInfo> GetColumnsInSchema(Database db)
+        {
+            return new List<ColumnInfo>();
+        }
+
+        public virtual IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db)
+        {
+            return new List<Tuple<string, string>>();
+        }
+
+        public virtual IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db)
+        {
+            return new List<Tuple<string, string, string>>();
+        }
+
         public virtual bool DoesTableExist(Database db, string tableName)
         {
             return false;

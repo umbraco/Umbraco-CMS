@@ -6,11 +6,6 @@ namespace Umbraco.Core.Models
     public interface IDataTypeDefinition : IUmbracoEntity
     {
         /// <summary>
-        /// Gets or sets the name of the current entity
-        /// </summary>
-        string Name { get; set; }
-
-        /// <summary>
         /// Id of the DataType control
         /// </summary>
         Guid ControlId { get; }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Xml.Linq;
+using Umbraco.Core;
 using umbraco.DataLayer;
 using umbraco.IO;
 
@@ -395,7 +396,18 @@ namespace umbraco.BusinessLogic
                                     return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
                                 }))
                         {
-                            list.Add(new ApplicationTree(
+
+                            var applicationAlias = (string)addElement.Attribute("application");
+                            var type = (string)addElement.Attribute("type");
+                            var assembly = (string)addElement.Attribute("assembly");
+
+                            //check if the tree definition (applicationAlias + type + assembly) is already in the list
+
+                            if (!list.Any(tree => tree.ApplicationAlias.InvariantEquals(applicationAlias)
+                                && tree.Type.InvariantEquals(type)
+                                && tree.AssemblyName.InvariantEquals(assembly)))
+                            {
+                                list.Add(new ApplicationTree(
                                              addElement.Attribute("silent") != null ? Convert.ToBoolean(addElement.Attribute("silent").Value) : false,
                                              addElement.Attribute("initialize") != null ? Convert.ToBoolean(addElement.Attribute("initialize").Value) : true,
                                              addElement.Attribute("sortOrder") != null ? Convert.ToByte(addElement.Attribute("sortOrder").Value) : (byte)0,
@@ -404,9 +416,12 @@ namespace umbraco.BusinessLogic
                                              addElement.Attribute("title").Value,
                                              addElement.Attribute("iconClosed").Value,
                                              addElement.Attribute("iconOpen").Value,
-											 (string)addElement.Attribute("assembly"), //this could be empty: http://issues.umbraco.org/issue/U4-1360
+                                             (string)addElement.Attribute("assembly"), //this could be empty: http://issues.umbraco.org/issue/U4-1360
                                              addElement.Attribute("type").Value,
                                              addElement.Attribute("action") != null ? addElement.Attribute("action").Value : ""));
+                            }
+
+                            
                         }
                     }, false);
 

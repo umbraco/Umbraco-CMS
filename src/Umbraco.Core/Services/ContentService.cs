@@ -1228,13 +1228,12 @@ namespace Umbraco.Core.Services
                 _publishingStrategy.PublishingFinalized(content);
 
             //We need to check if children and their publish state to ensure that we republish content that was previously published
-            if (HasChildren(content.Id))
+            if (omitCacheRefresh == false && HasChildren(content.Id))
             {
                 var children = GetDescendants(content);
                 var shouldBeRepublished = children.Where(child => HasPublishedVersion(child.Id));
 
-                if (omitCacheRefresh == false)
-                    _publishingStrategy.PublishingFinalized(shouldBeRepublished, false);
+                _publishingStrategy.PublishingFinalized(shouldBeRepublished, false);
             }
 
             Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId, content.Id);

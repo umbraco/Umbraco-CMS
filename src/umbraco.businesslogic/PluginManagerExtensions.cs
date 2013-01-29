@@ -11,16 +11,6 @@ namespace umbraco.businesslogic
 	public static class PluginManagerExtensions
 	{
 		/// <summary>
-		/// Returns all available IApplicationStartupHandler objects
-		/// </summary>
-		/// <param name="resolver"></param>
-		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveApplicationStartupHandlers(this PluginManager resolver)
-		{
-			return resolver.ResolveTypes<IApplicationStartupHandler>();
-		}
-
-		/// <summary>
 		/// Returns all available IApplication in application
 		/// </summary>
 		/// <param name="resolver"></param>

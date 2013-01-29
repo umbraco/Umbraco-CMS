@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -47,5 +48,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string FormatTableRename(string oldName, string newName);
         bool SupportsClustered();
         bool SupportsIdentityInsert();
+        IEnumerable<string> GetTablesInSchema(Database db);
+        IEnumerable<ColumnInfo> GetColumnsInSchema(Database db);
+        IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db);
+        IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db);
     }
 }

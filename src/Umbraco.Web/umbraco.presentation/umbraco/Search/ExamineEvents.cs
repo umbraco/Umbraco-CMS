@@ -15,20 +15,20 @@ namespace umbraco.presentation.umbraco.Search
     public class ExamineEvents : IApplicationEventHandler
     {
 
-        public void OnApplicationInitialized(UmbracoApplication httpApplication, ApplicationContext applicationContext)
+        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
         }
 
-        public void OnApplicationStarting(UmbracoApplication httpApplication, ApplicationContext applicationContext)
+        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
         }
 
         /// <summary>
         /// Once the app has booted, then bind to the events
         /// </summary>
-        /// <param name="httpApplication"></param>
+        /// <param name="umbracoApplication"></param>
         /// <param name="applicationContext"></param>
-        public void OnApplicationStarted(UmbracoApplication httpApplication, ApplicationContext applicationContext)
+        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             //do not continue if the app context or database is not ready
             if (!applicationContext.IsConfigured || !applicationContext.DatabaseContext.IsDatabaseConfigured)

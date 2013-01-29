@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Media;
@@ -27,9 +28,8 @@ namespace Umbraco.Web
     public class WebBootManager : CoreBootManager
     {
         private readonly bool _isForTesting;
-        private readonly UmbracoApplication _umbracoApplication;
 
-        public WebBootManager(UmbracoApplication umbracoApplication)
+		public WebBootManager(UmbracoApplicationBase umbracoApplication)
             : this(umbracoApplication, false)
         {
 			
@@ -40,11 +40,10 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="umbracoApplication"></param>
         /// <param name="isForTesting"></param>
-        internal WebBootManager(UmbracoApplication umbracoApplication, bool isForTesting)
+		internal WebBootManager(UmbracoApplicationBase umbracoApplication, bool isForTesting)
+            : base(umbracoApplication)
         {
-            _isForTesting = isForTesting;
-            _umbracoApplication = umbracoApplication;
-            if (umbracoApplication == null) throw new ArgumentNullException("umbracoApplication");
+			_isForTesting = isForTesting;			
         }
 
         /// <summary>
@@ -71,42 +70,17 @@ namespace Umbraco.Web
             //set model binder
             ModelBinders.Binders.Add(new KeyValuePair<Type, IModelBinder>(typeof(RenderModel), new RenderModelBinder()));
 
-
-            //find and initialize the application startup handlers, we need to initialize this resolver here because
-            //it is a special resolver where they need to be instantiated first before any other resolvers in order to bind to 
-            //events and to call their events during bootup.
-            //ApplicationStartupHandler.RegisterHandlers();
-            //... and set the special flag to let us resolve before frozen resolution
-            ApplicationEventsResolver.Current = new ApplicationEventsResolver(
-                PluginManager.Current.ResolveApplicationStartupHandlers())
-            {
-                CanResolveBeforeFrozen = true
-            };
-            //add the internal types since we don't want to mark these public
-            ApplicationEventsResolver.Current.AddType<CacheHelperExtensions.CacheHelperApplicationEventListener>();
-            ApplicationEventsResolver.Current.AddType<LegacyScheduledTasks>();
-
-            //now we need to call the initialize methods
-            ApplicationEventsResolver.Current.ApplicationEventHandlers
-                .ForEach(x => x.OnApplicationInitialized(_umbracoApplication, ApplicationContext));
-
             return this;
         }
 
         /// <summary>
-        /// Ensure that the OnApplicationStarting methods of the IApplicationEvents are called
+        /// Adds custom types to the ApplicationEventsResolver
         /// </summary>
-        /// <param name="afterStartup"></param>
-        /// <returns></returns>
-        public override IBootManager Startup(Action<ApplicationContext> afterStartup)
+        protected override void InitializeApplicationEventsResolver()
         {
-            base.Startup(afterStartup);
-
-            //call OnApplicationStarting of each application events handler
-            ApplicationEventsResolver.Current.ApplicationEventHandlers
-                .ForEach(x => x.OnApplicationStarting(_umbracoApplication, ApplicationContext));
-
-            return this;
+            base.InitializeApplicationEventsResolver();
+            ApplicationEventsResolver.Current.AddType<CacheHelperExtensions.CacheHelperApplicationEventListener>();
+            ApplicationEventsResolver.Current.AddType<LegacyScheduledTasks>();
         }
 
         /// <summary>
@@ -120,13 +94,6 @@ namespace Umbraco.Web
             CreateRoutes();
 
             base.Complete(afterComplete);
-
-            //call OnApplicationStarting of each application events handler
-            ApplicationEventsResolver.Current.ApplicationEventHandlers
-                .ForEach(x => x.OnApplicationStarted(_umbracoApplication, ApplicationContext));
-
-            // we're ready to serve content!
-            ApplicationContext.IsReady = true;
 
             return this;
         }
