@@ -113,7 +113,7 @@ function openContent(id) {
                 node.OpenIcon = dd.ContentTypeIcon;
             }
 
-            if (dd.Published == false)
+            if (!dd.PathPublished)
                 node.Style.DimNode();
 
             if (dd.HasPendingChanges())
@@ -193,7 +193,7 @@ function openContent(id) {
         protected void SetNonPublishedAttribute(ref XmlTreeNode treeElement, Document dd)
         {
             treeElement.NotPublished = false;
-            if (dd.Published)
+            if (dd.PathPublished)
             {
                 //if (Math.Round(new TimeSpan(dd.UpdateDate.Ticks - dd.VersionDate.Ticks).TotalSeconds, 0) > 1)
                 //    treeElement.NotPublished = true;
