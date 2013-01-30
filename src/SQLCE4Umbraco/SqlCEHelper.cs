@@ -119,6 +119,25 @@ namespace SqlCE4Umbraco
         }
 
         /// <summary>
+        /// Drops all foreign keys on a table.
+        /// </summary>
+        /// <param name="table">The name of the table.</param>
+        /// <remarks>To be used in unit tests.</remarks>
+        internal void DropForeignKeys(string table)
+        {
+            var constraints = new List<string>();
+            using (var reader = ExecuteReader("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' and table_name = '" + table + "' order by constraint_name"))
+            {
+                while (reader.Read()) constraints.Add(reader.GetString("constraint_name").Trim());
+            }
+            foreach (var constraint in constraints)
+            {
+                // SQL may need "[dbo].[table]"
+                ExecuteNonQuery("alter table [" + table + "] drop constraint [" + constraint + "]");
+            }
+        }
+
+        /// <summary>
         /// Replaces the data directory with a local path.
         /// </summary>
         /// <param name="path">The path.</param>
