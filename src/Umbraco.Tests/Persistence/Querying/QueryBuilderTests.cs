@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Tests.TestHelpers;
@@ -76,6 +77,36 @@ namespace Umbraco.Tests.Persistence.Querying
             // Assert
             Assert.That(strResult, Is.Not.Empty);
             Assert.That(strResult, Is.EqualTo(expectedResult));
+            Console.WriteLine(strResult);
+        }
+
+        [Test]
+        public void Can_Build_PublishedDescendants_Query_For_IContent()
+        {
+            // Arrange
+            var path = "-1,1046,1076,1089";
+            var id = 1046;
+            var nodeObjectTypeId = new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972");
+
+            var sql = new Sql();
+            sql.Select("*")
+                .From<DocumentDto>()
+                .InnerJoin<ContentVersionDto>()
+                .On<DocumentDto, ContentVersionDto>(left => left.VersionId, right => right.VersionId)
+                .InnerJoin<ContentDto>()
+                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>()
+                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == nodeObjectTypeId);
+
+            var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(path) && x.Id != id && x.Published == true && x.Trashed == false);
+
+            // Act
+            var translator = new SqlTranslator<IContent>(sql, query);
+            var result = translator.Translate();
+            var strResult = result.SQL;
+
+            // Assert
             Console.WriteLine(strResult);
         }
     }

@@ -4,6 +4,7 @@ using System.Web.UI.WebControls;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Caching;
+using Umbraco.Core.Services;
 using umbraco.BusinessLogic.Actions;
 using umbraco.IO;
 using umbraco.uicontrols.DatePicker;
@@ -316,6 +317,8 @@ namespace umbraco.cms.presentation
             {
                 if (_document.Level == 1 || _document.PathPublished)
                 {
+                    var previouslyPublished = _document.HasPublishedVersion();
+
                     Trace.Warn("before d.publish");
 
                     if (_document.PublishWithResult(base.getUser()))
@@ -330,15 +333,19 @@ namespace umbraco.cms.presentation
 
                         _documentHasPublishedVersion = _document.HasPublishedVersion();
 
-                        var descendants = ApplicationContext.Current.Services.ContentService.GetDescendants(_document.Id);
-                        var publishableDescendants = descendants.Where(descendant => descendant.HasPublishedVersion()).ToList();
-                        if(publishableDescendants.Any())
+                        if (previouslyPublished == false)
                         {
-                            foreach (var descendant in publishableDescendants)
+                            var descendants = ((ContentService) ApplicationContext.Current.Services.ContentService)
+                                .GetPublishedDescendants(_document.Content).ToList();
+
+                            if (descendants.Any())
                             {
-                                library.UpdateDocumentCache(descendant.Id);
+                                foreach (var descendant in descendants)
+                                {
+                                    library.UpdateDocumentCache(descendant.Id);
+                                }
+                                library.RefreshContent();
                             }
-                            library.RefreshContent();
                         }
                     }
                     else
