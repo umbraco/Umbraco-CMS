@@ -1298,11 +1298,27 @@ namespace Umbraco.Core.Services
                 if (published)
                 {
                     var xml = content.ToXml();
-                    var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
-                    var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = content.Id }) != null;
-                    int result = exists
-                                     ? uow.Database.Update(poco)
-                                     : Convert.ToInt32(uow.Database.Insert(poco));
+                    //Content Xml
+                    var contentPoco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
+                    var contentExists = uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = content.Id }) != 0;
+                    int contentResult = contentExists
+                                            ? uow.Database.Update(contentPoco)
+                                            : Convert.ToInt32(uow.Database.Insert(contentPoco));
+                    //Preview Xml
+                    var previewPoco = new PreviewXmlDto
+                                          {
+                                              NodeId = content.Id,
+                                              Timestamp = DateTime.Now,
+                                              VersionId = content.Version,
+                                              Xml = xml.ToString(SaveOptions.None)
+                                          };
+                    var previewExists =
+                        uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
+                                                                   new {Id = content.Id, Version = content.Version}) != 0;
+                    int previewResult = previewExists
+                                            ? uow.Database.Update(previewPoco)
+                                            : Convert.ToInt32(uow.Database.Insert(previewPoco));
+
                 }
             }
 
@@ -1352,6 +1368,22 @@ namespace Umbraco.Core.Services
 
                 repository.AddOrUpdate(content);
                 uow.Commit();
+
+                //Preview Xml
+                var xml = content.ToXml();
+                var previewPoco = new PreviewXmlDto
+                                      {
+                                          NodeId = content.Id,
+                                          Timestamp = DateTime.Now,
+                                          VersionId = content.Version,
+                                          Xml = xml.ToString(SaveOptions.None)
+                                      };
+                var previewExists =
+                    uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
+                                                               new { Id = content.Id, Version = content.Version }) != 0;
+                int previewResult = previewExists
+                                        ? uow.Database.Update(previewPoco)
+                                        : Convert.ToInt32(uow.Database.Insert(previewPoco));
             }
 
             if(raiseEvents)
