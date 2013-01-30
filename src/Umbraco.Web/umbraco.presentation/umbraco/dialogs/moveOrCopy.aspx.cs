@@ -152,7 +152,7 @@ namespace umbraco.dialogs
                 if (cd.Published) {
                     cd.Publish(new umbraco.BusinessLogic.User(0));
                     //using library.publish to support load balancing.
-                    umbraco.library.UpdateDocumentCache(cd.Id);
+                    umbraco.library.UpdateDocumentCache(cd);
 
 
                     if (cd.HasChildren) {
@@ -299,7 +299,7 @@ namespace umbraco.dialogs
                                 d.Publish(new umbraco.BusinessLogic.User(0));
                                 //using library.publish to support load balancing.
                                 //umbraco.library.PublishSingleNode(d.Id);
-                                umbraco.library.UpdateDocumentCache(d.Id);
+                                umbraco.library.UpdateDocumentCache(d);
 
                                 //PPH added handling of load balanced moving of multiple nodes...
                                 if (d.HasChildren)
