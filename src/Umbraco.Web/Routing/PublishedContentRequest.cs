@@ -309,7 +309,17 @@ namespace Umbraco.Web.Routing
         /// Gets or sets a value indicating whether the requested content could not be found.
         /// </summary>
 		/// <remarks>This is set in the <c>PublishedContentRequestBuilder</c>.</remarks>
-        internal bool Is404 { get; set; }
+        public bool Is404 { get; internal set; }
+
+        /// <summary>
+        /// Indicates that the requested content could not be found.
+        /// </summary>
+        /// <remarks>This is for public access, in custom content finders or <c>Prepared</c> event handlers,
+        /// where we want to allow developers to indicate a request is 404 but not to cancel it.</remarks>
+        public void SetIs404()
+        {
+            this.Is404 = true;
+        }
 
         /// <summary>
         /// Gets a value indicating whether the content request triggers a redirect.
