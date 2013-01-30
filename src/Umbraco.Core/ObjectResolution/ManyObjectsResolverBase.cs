@@ -357,7 +357,18 @@ namespace Umbraco.Core.ObjectResolution
 			}
 		}
 
-		/// <summary>
+        /// <summary>
+        /// Inserts a type at the beginning of the list.
+        /// </summary>
+        /// <param name="value">The type to insert.</param>
+        /// <exception cref="InvalidOperationException">the resolver does not support inserting types, or 
+        /// the type is not a valid type for the resolver, or the type is already in the collection of types.</exception>
+        public virtual void InsertType(Type value)
+        {
+            InsertType(0, value);
+        }
+
+        /// <summary>
 		/// Inserts a type at the specified index.
 		/// </summary>
 		/// <typeparam name="T">The type to insert.</typeparam>
@@ -369,7 +380,17 @@ namespace Umbraco.Core.ObjectResolution
 			InsertType(index, typeof(T));
 		}
 
-		/// <summary>
+        /// <summary>
+        /// Inserts a type at the beginning of the list.
+        /// </summary>
+        /// <typeparam name="T">The type to insert.</typeparam>
+        public void InsertType<T>()
+            where T : TResolved
+        {
+            InsertType(0, typeof(T));
+        }
+        
+        /// <summary>
 		/// Inserts a type before a specified, already existing type.
 		/// </summary>
 		/// <param name="existingType">The existing type before which to insert.</param>
