@@ -602,7 +602,7 @@ namespace umbraco
         /// This means the node gets unpublished from the website.
         /// </summary>
         /// <param name="doc">The document</param>
-        public virtual void ClearDocumentCache(Document doc)
+        internal void ClearDocumentCache(Document doc)
         {
             var e = new DocumentCacheEventArgs();
             FireBeforeClearDocumentCache(doc, e);

@@ -1541,7 +1541,7 @@ where published = 1 And nodeId = @nodeId And trashed = 0", SqlHelper.CreateParam
         /// Returns all descendants that are published on the front-end (hava a full published path)
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<Document> GetPublishedDescendants()
+        internal IEnumerable<Document> GetPublishedDescendants()
         {            
             var documents = new List<Document>();
             using (var dr = SqlHelper.ExecuteReader(

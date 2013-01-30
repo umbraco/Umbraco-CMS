@@ -201,7 +201,7 @@ namespace umbraco
         /// marked unpublished by setting the publish property on the document object to false
         /// </summary>
         /// <param name="document">The Document to be unpublished</param>
-        public static void UnPublishSingleNode(Document document)
+        internal static void UnPublishSingleNode(Document document)
         {
             if (UmbracoSettings.UseDistributedCalls)
                 dispatcher.Remove(
@@ -232,7 +232,7 @@ namespace umbraco
         /// which means we have to re-look up the document in the db again when we already have it, this should save on a few 
         /// dozen sql calls when publishing.
         /// </remarks>
-        public static void UpdateDocumentCache(Document doc)
+        internal static void UpdateDocumentCache(Document doc)
         {
             if (UmbracoSettings.UseDistributedCalls)
                 dispatcher.Refresh(
