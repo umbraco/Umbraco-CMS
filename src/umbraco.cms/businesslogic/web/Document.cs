@@ -230,7 +230,12 @@ order by {1}
         /// a backing property for the 'Published' property
         /// </summary>
         private bool? _published;
-        
+
+        /// <summary>
+        /// a backing property for the 'HasPublishedVersion()' method
+        /// </summary>
+        private bool? _hasPublishedVersion;
+
         /// <summary>
         /// Used as a value flag to indicate that we've already executed the sql for IsPathPublished()
         /// </summary>
@@ -558,23 +563,48 @@ order by {1}
         /// <returns></returns>
         public static Document[] GetChildrenForTree(int NodeId)
         {
-            var tmp = new List<Document>();
-            using (IRecordsReader dr =
+            var documents = GetChildrenForTreeInternal(NodeId).ToList();
+            if (NodeId > 0)
+            {
+                var parent = new Document(NodeId);
+                //update the Published/PathPublished correctly for all documents added to this list
+                UpdatePublishedOnDescendants(documents, parent);    
+            }
+            return documents.ToArray();
+        }
+
+        /// <summary>
+        /// Performance tuned method for use in the tree
+        /// </summary>
+        /// <param name="parent">The parent document</param>
+        /// <returns></returns>
+        public static Document[] GetChildrenForTree(Document parent)
+        {
+            var documents = GetChildrenForTreeInternal(parent.Id).ToList();
+            //update the Published/PathPublished correctly for all documents added to this list
+            UpdatePublishedOnDescendants(documents, parent);
+            return documents.ToArray();
+        }
+
+        public static IEnumerable<Document> GetChildrenForTreeInternal(int nodeId)
+        {
+            var documents = new List<Document>();
+            using (var dr =
                 SqlHelper.ExecuteReader(
                                         string.Format(SqlOptimizedMany.Trim(), "umbracoNode.parentID = @parentId", "umbracoNode.sortOrder"),
                                         SqlHelper.CreateParameter("@nodeObjectType", Document._objectType),
-                                        SqlHelper.CreateParameter("@parentId", NodeId)))
+                                        SqlHelper.CreateParameter("@parentId", nodeId)))
             {
                 while (dr.Read())
                 {
-                    Document d = new Document(dr.GetInt("id"), true);
+                    var d = new Document(dr.GetInt("id"), true);
                     d.PopulateDocumentFromReader(dr);
-                    tmp.Add(d);
+                    documents.Add(d);
                 }
             }
-
-            return tmp.ToArray();
+            return documents;
         }
+
 
         public static List<Document> GetChildrenBySearch(int NodeId, string searchString)
         {
@@ -780,13 +810,18 @@ order by {1}
             {
                 if (!_published.HasValue)
                 {
-                    var count = SqlHelper.ExecuteScalar<int>(@"
-select Count(published) as CountOfPublished 
-from cmsDocument 
-inner join umbracoNode on cmsDocument.nodeId = umbracoNode.id
-where published = 1 And nodeId = @nodeId And trashed = 0", SqlHelper.CreateParameter("@nodeId", Id));
+                    // get all nodes in the path to the document, and get all matching published documents
+                    // the difference should be zero if everything is published
+                    // test nodeObjectType to make sure we only count _content_ nodes
+                    var sql = @"select count(node.id) - count(doc.nodeid)
+from umbracoNode as node 
+left join cmsDocument as doc on (node.id=doc.nodeId and doc.published=1)
+where (('" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'") + @")
+ or ('" + Path + @"' = node.path)) and node.id <> -1
+and node.nodeObjectType=@nodeObjectType";
 
-                    _published = count > 0;
+                    var count = SqlHelper.ExecuteScalar<int>(sql, SqlHelper.CreateParameter("@nodeObjectType", Document._objectType));
+                    _published = (count == 0);                    
                 }
                 return _published.Value;
             }
@@ -799,25 +834,10 @@ where published = 1 And nodeId = @nodeId And trashed = 0", SqlHelper.CreateParam
         }
 
         /// <summary>
-        /// Returns true if the document has a front-end published version (all documents in it's path are published)
+        /// Returns true if the document's ancestors are all published
         /// </summary>
         /// <returns></returns>
         /// <remarks>
-        /// A document may be marked as published in the database but not published on the front-end. This occurs when you have a node structure such as
-        /// - Home
-        /// -- Page 1
-        /// --- Sub 1
-        /// --- Sub 2
-        /// 
-        /// And they are all published, but then you unpublish 'Page 1'. What happens is that Page 1 and all of it's descendants are removed from the front-end
-        /// published cache and the 'Page 1' item is flagged as not published in the database, however both "Sub" pages will still be flagged in the database
-        /// as published. This is for performance and tracking reasons since these Sub pages have not physically been unpublished, they just cannot be seen on the 
-        /// front -end.
-        /// 
-        /// This method will return true or false based on whether or not there is published version on the front-end but this lookup is based purely on the databse
-        /// by comparing the ancesctors published count of the current node.
-        /// 
-        /// If a node is in the recycle bin it will also be deemed not published
         /// </remarks>
 		public bool PathPublished
 		{
@@ -957,7 +977,7 @@ and node.nodeObjectType=@nodeObjectType";
             {
                 //cache the documents children so that this db call doesn't have to occur again
                 if (this._children == null)
-                    this._children = Document.GetChildrenForTree(this.Id);
+                    this._children = GetChildrenForTree(this);
 
                 return this._children.ToArray();
             }
@@ -1291,13 +1311,20 @@ and node.nodeObjectType=@nodeObjectType";
         /// This will still return true if this document is not published on the front-end in some cases if one of it's ancestors are 
         /// not-published. If you have a published document and unpublish one of it's ancestors, it will retain it's published flag in the
         /// database.
-        /// 
-        /// If you are wanting to check if this document is published on the front end use the IsPathPublished() method.
         /// </remarks>
-        [Obsolete("Use the Published property instead")]
         public bool HasPublishedVersion()
         {
-            return Published;
+            if (!_hasPublishedVersion.HasValue)
+            {
+                var count = SqlHelper.ExecuteScalar<int>(@"
+select Count(published) as CountOfPublished 
+from cmsDocument 
+inner join umbracoNode on cmsDocument.nodeId = umbracoNode.id
+where published = 1 And nodeId = @nodeId And trashed = 0", SqlHelper.CreateParameter("@nodeId", Id));
+
+                _hasPublishedVersion = count > 0;
+            }
+            return _hasPublishedVersion.Value;
         }
 
         /// <summary>
@@ -1514,7 +1541,7 @@ and node.nodeObjectType=@nodeObjectType";
         /// Returns all descendants that are published on the front-end (hava a full published path)
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<Document> GetPathPublishedDescendants()
+        public IEnumerable<Document> GetPublishedDescendants()
         {            
             var documents = new List<Document>();
             using (var dr = SqlHelper.ExecuteReader(
@@ -1529,11 +1556,11 @@ and node.nodeObjectType=@nodeObjectType";
                 }
             }
 
-            //update the PathPublished correctly for all documents added to this list
-            UpdatePathPublishedOnDescendants(documents);
+            //update the Published/PathPublished correctly for all documents added to this list
+            UpdatePublishedOnDescendants(documents, this);
 
-            //now, we only want to return any descendants that have a PathPublished = true
-            return documents.Where(x => x.PathPublished);
+            //now, we only want to return any descendants that have a Published = true (full published path)
+            return documents.Where(x => x.Published);
         } 
 
         /// <summary>
@@ -1555,8 +1582,8 @@ and node.nodeObjectType=@nodeObjectType";
                 }
             }
 
-            //update the PathPublished correctly for all documents added to this list
-            UpdatePathPublishedOnDescendants(documents);
+            //update the Published/PathPublished correctly for all documents added to this list
+            UpdatePublishedOnDescendants(documents, this);
 
             return documents.ToArray();
         }
@@ -1867,19 +1894,20 @@ and node.nodeObjectType=@nodeObjectType";
         #region Private Methods
 
         /// <summary>
-        /// Updates this the PathPublished property for all pre-populated descendant nodes in list format
+        /// Updates this the Published property for all pre-populated descendant nodes in list format
         /// </summary>
-        /// <param name="descendantsList">The pre-populated list of descendants of the root node passed in</param>        
+        /// <param name="descendantsList">The pre-populated list of descendants of the root node passed in</param>
+        /// <param name="root">The very root document retreiving the ancestors</param>
         /// <remarks>
-        /// This method will ensure that the document's PathPublished is automatically set based on this (the root ancestor) document.
-        /// It will set the PathPublished based on the documents with the shortest path first since the parent document to those documents
-        /// are 'this' document. Then we will go to the next level and set the PathPublished based on their parent documents... since they will
-        /// now have the PathPublished property set. and so on.
+        /// This method will ensure that the document's Published is automatically set based on this (the root ancestor) document.
+        /// It will set the Published based on the documents with the shortest path first since the parent document to those documents
+        /// are 'this' document. Then we will go to the next level and set the Published based on their parent documents... since they will
+        /// now have the Published property set. and so on.
         /// </remarks>
-        private void UpdatePathPublishedOnDescendants(List<Document> descendantsList)
+        private static void UpdatePublishedOnDescendants(List<Document> descendantsList, Document root)
         {
             //create a new list containing 'this' so the list becomes DescendantsAndSelf
-            var descendantsAndSelf = descendantsList.Concat(new[] {this}).ToList();
+            var descendantsAndSelf = descendantsList.Concat(new[] { root }).ToList();
 
             //determine all path lengths in the list
             var pathLengths = descendantsList.Select(x => x.Path.Split(',').Length).Distinct();
@@ -1895,11 +1923,11 @@ and node.nodeObjectType=@nodeObjectType";
                     var parent = descendantsAndSelf.SingleOrDefault(x => x.Id == d.ParentId);
                     if (parent != null)
                     {
-                        //here we jsut check what the parent document's PathPublished property is. 
-                        // If it is false then the current 'd' document's PathPublished is also false.
-                        // If it is true and if the current 'd' document's Published is true, the the 'd' document's PathPublished is also true.
-                        // If it is true and if the current 'd' document's Published is false, the the 'd' document's PathPublished is false.
-                        d.PathPublished = parent.PathPublished && d.Published;
+                        //we are published if our parent is published and we have a published version
+                        d.Published = parent.Published && d.HasPublishedVersion();
+                        
+                        //our path is published if our parent is published
+                        d.PathPublished = parent.Published;
                     }
                 }
             }
@@ -1907,7 +1935,29 @@ and node.nodeObjectType=@nodeObjectType";
             
         }
 
-        private void SetupDocumentForTree(Guid uniqueId, int level, int parentId, int creator, int writer, bool publish, string path,
+        /// <summary>
+        /// Sets properties on this object based on the parameters
+        /// </summary>
+        /// <param name="uniqueId"></param>
+        /// <param name="level"></param>
+        /// <param name="parentId"></param>
+        /// <param name="creator"></param>
+        /// <param name="writer"></param>
+        /// <param name="hasPublishedVersion">If this document has a published version</param>
+        /// <param name="path"></param>
+        /// <param name="text"></param>
+        /// <param name="createDate"></param>
+        /// <param name="updateDate"></param>
+        /// <param name="versionDate"></param>
+        /// <param name="icon"></param>
+        /// <param name="hasChildren"></param>
+        /// <param name="contentTypeAlias"></param>
+        /// <param name="contentTypeThumb"></param>
+        /// <param name="contentTypeDesc"></param>
+        /// <param name="masterContentType"></param>
+        /// <param name="contentTypeId"></param>
+        /// <param name="templateId"></param>
+        private void SetupDocumentForTree(Guid uniqueId, int level, int parentId, int creator, int writer, bool hasPublishedVersion, string path,
                                          string text, DateTime createDate, DateTime updateDate,
                                          DateTime versionDate, string icon, bool hasChildren, string contentTypeAlias, string contentTypeThumb,
                                            string contentTypeDesc, int? masterContentType, int contentTypeId, int templateId)
@@ -1915,7 +1965,7 @@ and node.nodeObjectType=@nodeObjectType";
             SetupNodeForTree(uniqueId, _objectType, level, parentId, creator, path, text, createDate, hasChildren);
 
             _writerId = writer;
-            _published = publish;
+            _hasPublishedVersion = hasPublishedVersion;
             _updated = updateDate;
             _template = templateId;
             ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, masterContentType);

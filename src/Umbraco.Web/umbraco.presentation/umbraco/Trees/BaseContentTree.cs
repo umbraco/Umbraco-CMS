@@ -35,7 +35,7 @@ namespace umbraco.cms.presentation.Trees
 
         public BaseContentTree(string application) : base(application) { }
 
-        private User m_user;
+        private User _user;
 
         /// <summary>
         /// Returns the current User. This ensures that we don't instantiate a new User object 
@@ -45,7 +45,7 @@ namespace umbraco.cms.presentation.Trees
         {
             get
             {
-                return (m_user == null ? (m_user = UmbracoEnsuredPage.CurrentUser) : m_user);
+                return (_user == null ? (_user = UmbracoEnsuredPage.CurrentUser) : _user);
             }
         }
 
@@ -113,7 +113,7 @@ function openContent(id) {
                 node.OpenIcon = dd.ContentTypeIcon;
             }
 
-            if (!dd.PathPublished)
+            if (!dd.Published)
                 node.Style.DimNode();
 
             if (dd.HasPendingChanges())
@@ -193,7 +193,7 @@ function openContent(id) {
         protected void SetNonPublishedAttribute(ref XmlTreeNode treeElement, Document dd)
         {
             treeElement.NotPublished = false;
-            if (dd.PathPublished)
+            if (dd.Published)
             {
                 //if (Math.Round(new TimeSpan(dd.UpdateDate.Ticks - dd.VersionDate.Ticks).TotalSeconds, 0) > 1)
                 //    treeElement.NotPublished = true;
