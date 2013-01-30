@@ -309,6 +309,8 @@ namespace umbraco.cms.presentation
             {
                 if (_document.Level == 1 || new cms.businesslogic.web.Document(_document.Parent.Id).PathPublished)
                 {
+                    var previouslyPublished = _document.Published;
+
                     Trace.Warn("before d.publish");
 
                     if (_document.PublishWithResult(base.getUser()))
@@ -322,13 +324,17 @@ namespace umbraco.cms.presentation
                         if (base.getUser().GetPermissions(_document.Path).IndexOf("U") > -1)
                             UnPublish.Visible = true;
 
-                        _documentHasPublishedVersion = _document.HasPublishedVersion();
-
-                        foreach (var descendant in _document.GetPublishedDescendants())
+                        
+                        if (previouslyPublished == false)
                         {
-                            library.UpdateDocumentCache(descendant);
+                            _documentHasPublishedVersion = _document.HasPublishedVersion();
+
+                            foreach (var descendant in _document.GetPublishedDescendants())
+                            {
+                                library.UpdateDocumentCache(descendant);
+                            }
                         }
-                            
+
                     }
                     else
                     {
