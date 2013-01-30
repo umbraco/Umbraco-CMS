@@ -78,7 +78,9 @@ namespace Umbraco.Core.Persistence.Factories
                 }
                 else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Date && property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false)
                 {
-                    dto.Date = DateTime.Parse(property.Value.ToString());
+                    DateTime date;
+                    if(DateTime.TryParse(property.Value.ToString(), out date))
+                        dto.Date = date;
                 }
                 else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Ntext && property.Value != null)
                 {
