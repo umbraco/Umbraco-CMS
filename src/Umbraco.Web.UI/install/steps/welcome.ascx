@@ -48,3 +48,8 @@
     </footer>
 
 </div>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        umbraco.presentation.webservices.CheckForUpgrade.InstallStatus(false, navigator.userAgent, "");
+    });
+</script>

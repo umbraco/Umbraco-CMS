@@ -11,7 +11,7 @@
     <meta charset="utf-8">
 
     <umb1:PageTitle runat="server" />
-    
+
     <link rel="icon" type="image/png" href="<%=umbraco.GlobalSettings.Path + "/images/pinnedIcons/umb.ico" %>" />
 
     <link media="all" rel="stylesheet" href="../umbraco_client/installer/css/jquery-ui-1.8.6.custom.css" />
@@ -40,7 +40,11 @@
 
 
     <form runat="server">
-        <asp:ScriptManager ID="ScriptManager1" EnablePageMethods="true" runat="server" />
+        <asp:ScriptManager ID="ScriptManager1" EnablePageMethods="true" runat="server">
+            <Services>
+                <asp:ServiceReference Path="../umbraco/webservices/CheckForUpgrade.asmx" />
+            </Services>
+        </asp:ScriptManager>
         <!-- all page -->
 
         <section id="wrapper">
