@@ -181,6 +181,31 @@ namespace Umbraco.Core.Configuration
                 SaveSetting("umbracoConfigurationStatus", value);
             }
         }
+
+        /// <summary>
+        /// Returns the configuration status version as a versoin object or null if it cannot parse
+        /// </summary>
+        /// <returns></returns>
+        internal static Version GetConfigurationVersion()
+        {
+            //create a real version out of the one stored in the settings
+            var configVersion = ConfigurationStatus.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+            if (configVersion.Length == 0)
+                return null;
+
+            int major;
+            var minor = 0;
+            var patch = 0;
+            int currentPart;
+            if (configVersion.Length > 0 && int.TryParse(configVersion[0], out currentPart))
+                major = currentPart;
+            else
+                return null; //couldn't parse, no valid version
+            if (configVersion.Length > 1 && int.TryParse(configVersion[1], out currentPart)) minor = currentPart;
+            if (configVersion.Length > 2 && int.TryParse(configVersion[2], out currentPart)) patch = currentPart;
+
+            return new Version(major, minor, patch);
+        }
 		
         /// <summary>
         /// Saves a setting into the configuration file.

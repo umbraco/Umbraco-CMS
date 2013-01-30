@@ -9,7 +9,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Collections.Specialized;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.installer;
 using System.Collections.Generic;
 
@@ -36,7 +36,7 @@ namespace umbraco.presentation.install
 		private void loadContent(InstallerStep currentStep)
 		{
 			PlaceHolderStep.Controls.Clear();
-			PlaceHolderStep.Controls.Add(new System.Web.UI.UserControl().LoadControl(IOHelper.ResolveUrl(currentStep.UserControl)));
+			PlaceHolderStep.Controls.Add(LoadControl(IOHelper.ResolveUrl(currentStep.UserControl)));
 			step.Value = currentStep.Alias;
 			currentStepClass = currentStep.Alias;
 		}
@@ -136,6 +136,7 @@ namespace umbraco.presentation.install
 			ics.Add(new install.steps.Definitions.Welcome());
 			ics.Add(new install.steps.Definitions.License());
 			ics.Add(new install.steps.Definitions.FilePermissions());
+            ics.Add(new install.steps.Definitions.UpgradeScripts());
 			ics.Add(new install.steps.Definitions.Database());
 			ics.Add(new install.steps.Definitions.DefaultUser());
 			ics.Add(new install.steps.Definitions.Skinning());

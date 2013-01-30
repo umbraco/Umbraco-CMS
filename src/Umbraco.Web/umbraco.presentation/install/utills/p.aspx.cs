@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Web.Install.UpgradeScripts;
 using umbraco.DataLayer.Utility.Installer;
 using umbraco.DataLayer;
 
@@ -97,6 +98,8 @@ namespace umbraco.presentation.install.utills
 
                     Helper.setProgress(100, "Database is up-to-date", "");
 
+                    return "upgraded";
+
                 }
                 else
                 {
@@ -136,6 +139,7 @@ namespace umbraco.presentation.install.utills
                         installer = null;
 
                         library.RefreshContent();
+
                         return "upgraded";
                     }
                 }
@@ -146,5 +150,8 @@ namespace umbraco.presentation.install.utills
 
             return "no connection;";
         }
+
+        
+
     }
 }

@@ -9,6 +9,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Dictionary;
+using Umbraco.Web.Install.UpgradeScripts;
 using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Models;
@@ -90,6 +91,7 @@ namespace Umbraco.Web
             //add the internal types since we don't want to mark these public
             ApplicationEventsResolver.Current.AddType<CacheHelperExtensions.CacheHelperApplicationEventListener>();
             ApplicationEventsResolver.Current.AddType<LegacyScheduledTasks>();
+            ApplicationEventsResolver.Current.AddType<UpgradeScriptRegistrar>();
 
             //now we need to call the initialize methods
             ApplicationEventsResolver.Current.ApplicationEventHandlers
