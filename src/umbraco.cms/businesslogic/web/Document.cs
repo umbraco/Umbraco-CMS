@@ -227,9 +227,9 @@ order by {1}
         private int _template;
 
         /// <summary>
-        /// a backing property for the 'Published' property
+        /// a backing property for the 'IsDocumentLive()' method
         /// </summary>
-        private bool? _published;
+        private bool? _isDocumentLive;
 
         /// <summary>
         /// a backing property for the 'HasPublishedVersion()' method
@@ -808,29 +808,39 @@ order by {1}
         {
             get
             {
-                if (!_published.HasValue)
-                {
-                    // get all nodes in the path to the document, and get all matching published documents
-                    // the difference should be zero if everything is published
-                    // test nodeObjectType to make sure we only count _content_ nodes
-                    var sql = @"select count(node.id) - count(doc.nodeid)
+                //this is always the same as HasPublishedVersion in 4.x
+                return HasPublishedVersion();
+            }
+            set
+            {
+                _hasPublishedVersion = value;
+                SqlHelper.ExecuteNonQuery(
+                    string.Format("update cmsDocument set published = {0} where nodeId = {1}", Id, value ? 1 : 0));
+            }
+        }
+
+        /// <summary>
+        /// Will return true if the document is published and live on the front-end.
+        /// </summary>
+        /// <returns></returns>
+        internal bool IsDocumentLive()
+        {
+            if (!_isDocumentLive.HasValue)
+            {
+                // get all nodes in the path to the document, and get all matching published documents
+                // the difference should be zero if everything is published
+                // test nodeObjectType to make sure we only count _content_ nodes
+                var sql = @"select count(node.id) - count(doc.nodeid)
 from umbracoNode as node 
 left join cmsDocument as doc on (node.id=doc.nodeId and doc.published=1)
 where (('" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'") + @")
  or ('" + Path + @"' = node.path)) and node.id <> -1
 and node.nodeObjectType=@nodeObjectType";
 
-                    var count = SqlHelper.ExecuteScalar<int>(sql, SqlHelper.CreateParameter("@nodeObjectType", Document._objectType));
-                    _published = (count == 0);                    
-                }
-                return _published.Value;
+                var count = SqlHelper.ExecuteScalar<int>(sql, SqlHelper.CreateParameter("@nodeObjectType", Document._objectType));
+                _isDocumentLive = (count == 0);
             }
-            set
-            {
-                _published = value;
-                SqlHelper.ExecuteNonQuery(
-                    string.Format("update cmsDocument set published = {0} where nodeId = {1}", Id, value ? 1 : 0));
-            }
+            return _isDocumentLive.Value;
         }
 
         /// <summary>
@@ -1093,7 +1103,7 @@ and node.nodeObjectType=@nodeObjectType";
                     _template = new DocumentType(this.ContentType.Id).DefaultTemplate;
                 }
 
-                _published = true;
+                _hasPublishedVersion = true;
                 string tempVersion = Version.ToString();
                 DateTime versionDate = DateTime.Now;
                 Guid newVersion = createNewVersion(versionDate);
@@ -1231,7 +1241,7 @@ and node.nodeObjectType=@nodeObjectType";
 
             if (!e.Cancel)
             {
-                _published = true;
+                _hasPublishedVersion = true;
                 string tempVersion = Version.ToString();
                 DateTime versionDate = DateTime.Now;
                 Guid newVersion = createNewVersion(versionDate);
@@ -1259,7 +1269,7 @@ and node.nodeObjectType=@nodeObjectType";
 
         public void UnPublish()
         {
-            UnPublishEventArgs e = new UnPublishEventArgs();
+            var e = new UnPublishEventArgs();
 
             FireBeforeUnPublish(e);
 
@@ -1267,7 +1277,7 @@ and node.nodeObjectType=@nodeObjectType";
             {
                 SqlHelper.ExecuteNonQuery(string.Format("update cmsDocument set published = 0 where nodeId = {0}", Id));
 
-                _published = false;
+                _hasPublishedVersion = false;
 
                 FireAfterUnPublish(e);
             }
@@ -1278,7 +1288,7 @@ and node.nodeObjectType=@nodeObjectType";
         /// </summary>
         public override void Save()
         {
-            SaveEventArgs e = new SaveEventArgs();
+            var e = new SaveEventArgs();
             FireBeforeSave(e);
 
             if (!e.Cancel)
@@ -1314,6 +1324,7 @@ and node.nodeObjectType=@nodeObjectType";
         /// </remarks>
         public bool HasPublishedVersion()
         {
+            //lazy load the value if it is not set.
             if (!_hasPublishedVersion.HasValue)
             {
                 var count = SqlHelper.ExecuteScalar<int>(@"
@@ -1841,7 +1852,7 @@ where published = 1 And nodeId = @nodeId And trashed = 0", SqlHelper.CreateParam
             _release = InitReleaseDate;
             _expire = InitExpireDate;
             _updated = InitUpdateDate;
-            _published = InitPublished;
+            _hasPublishedVersion = InitPublished;
         }
 
         /// <summary>

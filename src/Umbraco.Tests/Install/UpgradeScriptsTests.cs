@@ -32,7 +32,8 @@ namespace Umbraco.Tests.Install
             var startVersionParts = startVersion.Split('.').Select(int.Parse).ToArray();
             var endVersionParts = endVersion.Split('.').Select(int.Parse).ToArray();
             
-            UpgradeScriptManager.AddUpgradeScript<UpgradeScript1>(
+            UpgradeScriptManager.AddUpgradeScript(
+                () => new UpgradeScript1(), 
                 new VersionRange(
                     new Version(startVersionParts[0], startVersionParts[1], startVersionParts[2]),
                     new Version(endVersionParts[0], endVersionParts[1], endVersionParts[2])));
@@ -45,7 +46,8 @@ namespace Umbraco.Tests.Install
         {            
             var currentVersion = new Version(4, 10, 0);
 
-            UpgradeScriptManager.AddUpgradeScript<UpgradeScript1>(
+            UpgradeScriptManager.AddUpgradeScript(
+                () => new UpgradeScript1(), 
                 new VersionRange(
                     new Version(4, 10, 0)));
 
