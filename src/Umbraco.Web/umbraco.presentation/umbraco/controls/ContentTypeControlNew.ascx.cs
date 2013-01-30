@@ -545,10 +545,14 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             var gpw = (GenericProperties.GenericPropertyWrapper)sender;
             var alias = gpw.PropertyType.Alias;
             
-            gpw.GenricPropertyControl.PropertyType.delete();
             //We have to ensure that the property type is removed from the underlying IContentType object
-            cType.ContentTypeItem.RemovePropertyType(alias);
-            cType.Save();
+            if (cType.ContentTypeItem != null)
+            {
+                cType.ContentTypeItem.RemovePropertyType(alias);
+                cType.Save();
+            }
+
+            gpw.GenricPropertyControl.PropertyType.delete();
 
             cType = ContentType.GetContentType(cType.Id);
             this.bindDataGenericProperties(true);
