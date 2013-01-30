@@ -42,8 +42,7 @@ namespace Umbraco.Web
         /// <param name="routesCache"> </param>
         internal UmbracoContext(
 			HttpContextBase httpContext, 
-			ApplicationContext applicationContext,
-			IRoutesCache routesCache)
+			ApplicationContext applicationContext)
         {
             if (httpContext == null) throw new ArgumentNullException("httpContext");
             if (applicationContext == null) throw new ArgumentNullException("applicationContext");
@@ -53,7 +52,6 @@ namespace Umbraco.Web
 
             HttpContext = httpContext;            
             Application = applicationContext;
-        	RoutesCache = routesCache;
 
 			// set the urls...
 			//original request url
@@ -120,11 +118,6 @@ namespace Umbraco.Web
         /// </summary>
         public ApplicationContext Application { get; private set; }       
 
-        /// <summary>
-        /// Gets the <see cref="IRoutesCache"/>
-        /// </summary>
-		internal IRoutesCache RoutesCache { get; private set; }
-		
 	    /// <summary>
 	    /// Gets the uri that is handled by ASP.NET after server-side rewriting took place.
 	    /// </summary>

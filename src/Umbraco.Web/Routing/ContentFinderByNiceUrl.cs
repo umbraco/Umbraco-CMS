@@ -45,7 +45,7 @@ namespace Umbraco.Web.Routing
 			// first ask the cache for a node
 			// return '0' if in preview mode
         	var nodeId = !docreq.RoutingContext.UmbracoContext.InPreviewMode
-							? docreq.RoutingContext.UmbracoContext.RoutesCache.GetNodeId(route)
+							? docreq.RoutingContext.UmbracoContext.RoutingContext.RoutesCache.GetNodeId(route)
         	             	: 0;
 
 			// if a node was found, get it by id and ensure it exists
@@ -64,7 +64,7 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-                    docreq.RoutingContext.UmbracoContext.RoutesCache.ClearNode(nodeId);
+                    docreq.RoutingContext.RoutesCache.ClearNode(nodeId);
                 }
             }
 
@@ -87,7 +87,7 @@ namespace Umbraco.Web.Routing
 
 					// do not store if previewing or if non-canonical
 					if (!docreq.RoutingContext.UmbracoContext.InPreviewMode && iscanon)
-						docreq.RoutingContext.UmbracoContext.RoutesCache.Store(docreq.PublishedContent.Id, route);
+						docreq.RoutingContext.RoutesCache.Store(docreq.PublishedContent.Id, route);
                     
                 }
                 else

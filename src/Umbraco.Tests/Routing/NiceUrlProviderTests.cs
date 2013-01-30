@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Routing
 				Assert.AreEqual(randomSample.Value, result);
 			}
 
-			var cachedRoutes = ((DefaultRoutesCache)routingContext.UmbracoContext.RoutesCache).GetCachedRoutes();
+			var cachedRoutes = ((DefaultRoutesCache)routingContext.RoutesCache).GetCachedRoutes();
 			Assert.AreEqual(8, cachedRoutes.Count);
 
 			foreach (var sample in samples)
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Routing
 				Assert.AreEqual(sample.Value, cachedRoutes[sample.Key]);
 			}
 
-			var cachedIds = ((DefaultRoutesCache)routingContext.UmbracoContext.RoutesCache).GetCachedIds();
+			var cachedIds = ((DefaultRoutesCache)routingContext.RoutesCache).GetCachedIds();
 			Assert.AreEqual(8, cachedIds.Count);
 
 			foreach (var sample in samples)

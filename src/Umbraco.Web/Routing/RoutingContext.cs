@@ -22,13 +22,15 @@ namespace Umbraco.Web.Routing
 			IEnumerable<IContentFinder> contentFinders,
 			IContentFinder contentLastChanceFinder,
             IPublishedContentStore publishedContentStore,
-			NiceUrlProvider niceUrlResolver)
+            NiceUrlProvider niceUrlResolver,
+            IRoutesCache routesCache)
         {
 			this.UmbracoContext = umbracoContext;
 			this.PublishedContentFinders = contentFinders;
 			this.PublishedContentLastChanceFinder = contentLastChanceFinder;
 			this.PublishedContentStore = publishedContentStore;
         	this.NiceUrlProvider = niceUrlResolver;
+            this.RoutesCache = routesCache;
         }
 
 		/// <summary>
@@ -55,5 +57,10 @@ namespace Umbraco.Web.Routing
 		/// Gets the nice urls provider.
 		/// </summary>
 		internal NiceUrlProvider NiceUrlProvider { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="IRoutesCache"/>
+        /// </summary>
+        internal IRoutesCache RoutesCache { get; private set; }
     }
 }

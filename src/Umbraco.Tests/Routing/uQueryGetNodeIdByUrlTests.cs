@@ -48,7 +48,8 @@ namespace Umbraco.Tests.Routing
 				lookups,
 				new FakeLastChanceFinder(),
 				contentStore,
-				niceUrls);
+				niceUrls,
+                GetRoutesCache());
 
 			//assign the routing context back to the umbraco context
 			umbracoContext.RoutingContext = routingContext;

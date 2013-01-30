@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Routing
 			Assert.AreEqual("http://domain2.com/1001-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100111, true));
 
 			// check that the proper route has been cached
-			var cachedRoutes = ((DefaultRoutesCache)routingContext.UmbracoContext.RoutesCache).GetCachedRoutes();
+			var cachedRoutes = ((DefaultRoutesCache)routingContext.RoutesCache).GetCachedRoutes();
 			Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]);
 
 			// route a rogue url
@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Routing
 			Assert.AreEqual(100111, pcr.PublishedContent.Id);
 
 			// has the cache been polluted?
-			cachedRoutes = ((DefaultRoutesCache)routingContext.UmbracoContext.RoutesCache).GetCachedRoutes();
+			cachedRoutes = ((DefaultRoutesCache)routingContext.RoutesCache).GetCachedRoutes();
 			Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]); // no
 			//Assert.AreEqual("1001/1001-1/1001-1-1", cachedRoutes[100111]); // yes
 

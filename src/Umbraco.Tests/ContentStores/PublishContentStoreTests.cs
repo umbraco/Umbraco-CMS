@@ -69,8 +69,7 @@ namespace Umbraco.Tests.ContentStores
 			StateHelper.HttpContext = _httpContextFactory.HttpContext;
 			
 			_umbracoContext = new UmbracoContext(_httpContextFactory.HttpContext, 
-				new ApplicationContext(), 
-				new DefaultRoutesCache(false));
+				new ApplicationContext());
 
 			_umbracoContext.GetXmlDelegate = () =>
 				{

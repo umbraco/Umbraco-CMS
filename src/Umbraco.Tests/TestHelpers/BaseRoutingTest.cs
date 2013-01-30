@@ -45,7 +45,8 @@ namespace Umbraco.Tests.TestHelpers
 				Enumerable.Empty<IContentFinder>(),
 				new FakeLastChanceFinder(),
 				contentStore,
-				niceUrls);
+				niceUrls,
+                GetRoutesCache());
 
 			//assign the routing context back to the umbraco context
 			umbracoContext.RoutingContext = routingContext;

@@ -124,8 +124,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             var ctx = new UmbracoContext(
                 GetHttpContextFactory(url, routeData).HttpContext,
-                ApplicationContext,
-                GetRoutesCache());
+                ApplicationContext);
             SetupUmbracoContextForTest(ctx, templateId);
             return ctx;
         }

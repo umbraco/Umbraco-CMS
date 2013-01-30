@@ -82,7 +82,7 @@ namespace Umbraco.Web.Routing
 			// do not read cache if previewing
         	var route = _umbracoContext.InPreviewMode
 				? null
-				: _umbracoContext.RoutesCache.GetRoute(nodeId);
+				: _umbracoContext.RoutingContext.RoutesCache.GetRoute(nodeId);
 
             if (!string.IsNullOrEmpty(route))
             {
@@ -132,7 +132,7 @@ namespace Umbraco.Web.Routing
 
 				// do not store if previewing
 				if (!_umbracoContext.InPreviewMode)
-					_umbracoContext.RoutesCache.Store(nodeId, route);
+					_umbracoContext.RoutingContext.RoutesCache.Store(nodeId, route);
 			}
 
 			// assemble the url from domainUri (maybe null) and path
@@ -166,7 +166,7 @@ namespace Umbraco.Web.Routing
 			// will not read cache if previewing!
 			var route = _umbracoContext.InPreviewMode
 				? null
-				: _umbracoContext.RoutesCache.GetRoute(nodeId);
+				: _umbracoContext.RoutingContext.RoutesCache.GetRoute(nodeId);
 
 			if (!string.IsNullOrEmpty(route))
 			{
@@ -216,7 +216,7 @@ namespace Umbraco.Web.Routing
 
 				// do not store if previewing
 				if (!_umbracoContext.InPreviewMode)
-					_umbracoContext.RoutesCache.Store(nodeId, route);
+					_umbracoContext.RoutingContext.RoutesCache.Store(nodeId, route);
 			}
 
 			// assemble the alternate urls from domainUris (maybe empty) and path
