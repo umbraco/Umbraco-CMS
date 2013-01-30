@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Configuration;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
@@ -52,13 +54,30 @@ namespace umbraco.presentation.preview
             // clone xml
             XmlContent = (XmlDocument)content.Instance.XmlContent.Clone();
 
-            // inject current document xml
-            int parentId = documentObject.Level == 1 ? -1 : documentObject.Parent.Id;
-            XmlContent = content.AppendDocumentXml(documentObject.Id, documentObject.Level, parentId, documentObject.ToPreviewXml(XmlContent), XmlContent);
+            var previewNodes = new List<Document>();
+
+            var parentId = documentObject.Level == 1 ? -1 : documentObject.Parent.Id;
+
+            while (parentId > 0 && XmlContent.GetElementById(parentId.ToString(CultureInfo.InvariantCulture)) == null)
+            {
+                var document = new Document(parentId);
+                previewNodes.Insert(0, document);
+                parentId = document.ParentId;
+            }
+
+            previewNodes.Add(documentObject);
+
+            foreach (var document in previewNodes)
+            {
+                //Inject preview xml
+                parentId = document.Level == 1 ? -1 : document.Parent.Id;
+                var previewXml = document.ToPreviewXml(XmlContent);
+                content.AppendDocumentXml(document.Id, document.Level, parentId, previewXml, XmlContent);
+            }
 
             if (includeSubs)
             {
-                foreach (CMSPreviewNode prevNode in documentObject.GetNodesForPreview(true))
+                foreach (var prevNode in documentObject.GetNodesForPreview(true))
                 {
                     XmlContent = content.AppendDocumentXml(prevNode.NodeId, prevNode.Level, prevNode.ParentId, XmlContent.ReadNode(XmlReader.Create(new StringReader(prevNode.Xml))), XmlContent);
                 }
