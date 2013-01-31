@@ -34,13 +34,13 @@ namespace Umbraco.Tests.Routing
 
 			var umbracoContext = GetUmbracoContext(url, t.Id);
 			var contentStore = new DefaultPublishedContentStore();
-			var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
+            var urlProvider = new UrlProvider(umbracoContext, contentStore, new IUrlProvider[] { new DefaultUrlProvider() });
 			var routingContext = new RoutingContext(
 				umbracoContext,
 				lookups,
 				new FakeLastChanceFinder(),
 				contentStore,
-				niceUrls,
+                urlProvider,
                 GetRoutesCache());
 
 			//assign the routing context back to the umbraco context

@@ -416,8 +416,8 @@ namespace Umbraco.Web
 		/// <returns>String with a friendly url from a node</returns>
 		public string NiceUrl(int nodeId)
 		{
-			var niceUrlsProvider = UmbracoContext.Current.NiceUrlProvider;
-			return niceUrlsProvider.GetNiceUrl(nodeId);
+			var urlProvider = UmbracoContext.Current.UrlProvider;
+			return urlProvider.GetUrl(nodeId);
 		}
 
 		/// <summary>
@@ -427,8 +427,8 @@ namespace Umbraco.Web
 		/// <returns>String with a friendly url with full domain from a node</returns>
 		public string NiceUrlWithDomain(int nodeId)
 		{
-			var niceUrlsProvider = UmbracoContext.Current.NiceUrlProvider;
-			return niceUrlsProvider.GetNiceUrl(nodeId, true);
+			var urlProvider = UmbracoContext.Current.UrlProvider;
+			return urlProvider.GetUrl(nodeId, true);
 		}
 
 		#endregion

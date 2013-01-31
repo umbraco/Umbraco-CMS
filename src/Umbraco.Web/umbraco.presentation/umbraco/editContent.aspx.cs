@@ -390,8 +390,8 @@ namespace umbraco.cms.presentation
                 return;
             }
 
-            var niceUrlProvider = Umbraco.Web.UmbracoContext.Current.RoutingContext.NiceUrlProvider;
-            var url = niceUrlProvider.GetNiceUrl(_document.Id);
+            var urlProvider = Umbraco.Web.UmbracoContext.Current.RoutingContext.UrlProvider;
+            var url = urlProvider.GetUrl(_document.Id);
             string niceUrlText = null;
             var altUrlsText = new System.Text.StringBuilder();
 
@@ -415,8 +415,8 @@ namespace umbraco.cms.presentation
             {
                 niceUrlText = string.Format("<a href=\"{0}\" target=\"_blank\">{0}</a>", url);
 
-                foreach (var altUrl in niceUrlProvider.GetAllAbsoluteNiceUrls(_document.Id).Where(u => u != url))
-                    altUrlsText.AppendFormat("<a href=\"{0}\" target=\"_blank\">{0}</a><br />", altUrl);
+                foreach (var otherUrl in urlProvider.GetOtherUrls(_document.Id))
+                    altUrlsText.AppendFormat("<a href=\"{0}\" target=\"_blank\">{0}</a><br />", otherUrl);
             }
 
             UpdateNiceUrlProperties(niceUrlText, altUrlsText.ToString());

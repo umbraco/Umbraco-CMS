@@ -270,13 +270,13 @@ namespace Umbraco.Web
 		/// <remarks>
 		/// If the RoutingContext is null, this will throw an exception.
 		/// </remarks>
-    	internal NiceUrlProvider NiceUrlProvider
+    	internal UrlProvider UrlProvider
     	{
     		get
     		{
     			if (RoutingContext == null)
-					throw new InvalidOperationException("Cannot access the NiceUrlProvider when the UmbracoContext's RoutingContext is null");
-    			return RoutingContext.NiceUrlProvider;
+					throw new InvalidOperationException("Cannot access the UrlProvider when the UmbracoContext's RoutingContext is null");
+    			return RoutingContext.UrlProvider;
     		}
     	}
 

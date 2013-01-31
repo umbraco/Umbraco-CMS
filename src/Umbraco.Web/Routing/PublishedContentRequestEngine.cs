@@ -166,7 +166,7 @@ namespace Umbraco.Web.Routing
 			LogHelper.Debug<PublishedContentRequestEngine>("{0}Uri=\"{1}\"", () => tracePrefix, () => _pcr.Uri);
 
 			// try to find a domain matching the current request
-			var domainAndUri = DomainHelper.DomainMatch(Domain.GetDomains().ToArray(), _pcr.Uri, false);
+			var domainAndUri = DomainHelper.DomainMatch(Domain.GetDomains().ToArray(), _pcr.Uri);
 
 			// handle domain
 			if (domainAndUri != null)
@@ -622,7 +622,7 @@ namespace Umbraco.Web.Routing
 		    var redirectId = _pcr.PublishedContent.GetPropertyValue("umbracoRedirect", -1);				
 		    var redirectUrl = "#";
 		    if (redirectId > 0)
-				redirectUrl = _routingContext.NiceUrlProvider.GetNiceUrl(redirectId);
+				redirectUrl = _routingContext.UrlProvider.GetUrl(redirectId);
 		    if (redirectUrl != "#")
 		        _pcr.SetRedirect(redirectUrl);
 		}

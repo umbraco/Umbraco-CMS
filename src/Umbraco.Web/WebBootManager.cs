@@ -275,22 +275,25 @@ namespace Umbraco.Web
             PublishedMediaStoreResolver.Current = new PublishedMediaStoreResolver(new DefaultPublishedMediaStore());
 
             FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
-                //add all known factories, devs can then modify this list on application startup either by binding to events
-                //or in their own global.asax
+                // add all known factories, devs can then modify this list on application
+                // startup either by binding to events or in their own global.asax
                 new[]
 					{
 						typeof (RenderControllerFactory)
 					});
+
+            UrlProviderResolver.Current = new UrlProviderResolver(
+                    typeof(AliasUrlProvider),
+                    typeof(DefaultUrlProvider)
+                );
 
             // the legacy 404 will run from within ContentFinderByNotFoundHandlers below
             // so for the time being there is no last chance finder
 			ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver();
 
 			ContentFinderResolver.Current = new ContentFinderResolver(
-				//add all known resolvers in the correct order, devs can then modify this list on application startup either by binding to events
-				//or in their own global.asax
-				new[]
-					{
+				// add all known resolvers in the correct order, devs can then modify this list
+                // on application startup either by binding to events or in their own global.asax
 						typeof (ContentFinderByPageIdQuery),
 						typeof (ContentFinderByNiceUrl),
 						typeof (ContentFinderByIdPath),
@@ -300,7 +303,7 @@ namespace Umbraco.Web
 						//typeof (ContentFinderByProfile),
 						//typeof (ContentFinderByUrlAlias),
                         typeof (ContentFinderByNotFoundHandlers)
-					});
+					);
 
             RoutesCacheResolver.Current = new RoutesCacheResolver(new DefaultRoutesCache(_isForTesting == false));
 
