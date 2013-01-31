@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using umbraco.cms.businesslogic.installer;
 using umbraco.IO;
-using umbraco.DataLayer.Utility.Installer;
-using umbraco.DataLayer;
 
 namespace umbraco.presentation.install.steps.Definitions
 {
@@ -18,7 +15,7 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override string Name
         {
-          get { return "Database"; }
+            get { return "Database"; }
         }
 
         public override string UserControl
@@ -26,7 +23,7 @@ namespace umbraco.presentation.install.steps.Definitions
             get { return SystemDirectories.Install + "/steps/database.ascx"; }
         }
 
-        
+
         public override bool MoveToNextStepAutomaticly
         {
             get
@@ -38,20 +35,22 @@ namespace umbraco.presentation.install.steps.Definitions
         //here we determine if the installer should skip this step...
         public override bool Completed()
         {
-            bool retval = false;
-            try
+            // Fresh installs don't have a version number so this step cannot be complete yet
+            if (string.IsNullOrEmpty(Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus))
             {
-                IInstallerUtility m_Installer = BusinessLogic.Application.SqlHelper.Utility.CreateInstaller();
-                retval = m_Installer.IsLatestVersion;
-                m_Installer = null;
-            } catch {
-                // this step might fail due to missing connectionstring
-                return false;
+                //Even though the ConfigurationStatus is blank we try to determine the version if we can connect to the database
+                var result = ApplicationContext.Current.DatabaseContext.ValidateDatabaseSchema();
+                var determinedVersion = result.DetermineInstalledVersion();
+                if (determinedVersion.Equals(new Version(0, 0, 0)))
+                    return false;
+
+                return UmbracoVersion.Current < determinedVersion;
             }
 
-            return retval;
+            var configuredVersion = new Version(Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus);
+            var targetVersion = UmbracoVersion.Current;
+            
+            return targetVersion < configuredVersion;
         }
-
-        
     }
 }

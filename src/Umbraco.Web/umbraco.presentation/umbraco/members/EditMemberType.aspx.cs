@@ -51,7 +51,7 @@ namespace umbraco.cms.presentation.members
 					saveExtras();
 				
                     ClientTools
-                        .ShowSpeechBubble(speechBubbleIcon.save, "Memebertype saved", "")
+                        .ShowSpeechBubble(speechBubbleIcon.save, "Membertype saved", "")
                         .SyncTree(dt.Id.ToString(), true);					
                     
 				} 

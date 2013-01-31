@@ -12,9 +12,11 @@
 
     <umb1:PageTitle runat="server" />
 
-    <link media="all" rel="stylesheet" href="../umbraco_client/installer/css/jquery-ui-1.8.6.custom.css">
+    <link rel="icon" type="image/png" href="<%=umbraco.GlobalSettings.Path + "/images/pinnedIcons/umb.ico" %>" />
+
+    <link media="all" rel="stylesheet" href="../umbraco_client/installer/css/jquery-ui-1.8.6.custom.css" />
     <link media="all" type="text/css" rel="stylesheet" href="../umbraco_client/installer/css/reset.css" />
-    <link media="all" rel="stylesheet" href="../umbraco_client/installer/css/all.css">
+    <link media="all" rel="stylesheet" href="../umbraco_client/installer/css/all.css" />
     <link media="all" type="text/css" rel="stylesheet" href="../umbraco_client/installer/css/form.css" />
 
     <script src="../umbraco_client/Application/NamespaceManager.js" type="text/javascript"></script>
@@ -38,7 +40,11 @@
 
 
     <form runat="server">
-        <asp:ScriptManager ID="ScriptManager1" EnablePageMethods="true" runat="server" />
+        <asp:ScriptManager ID="ScriptManager1" EnablePageMethods="true" runat="server">
+            <Services>
+                <asp:ServiceReference Path="../umbraco/webservices/CheckForUpgrade.asmx" />
+            </Services>
+        </asp:ScriptManager>
         <!-- all page -->
 
         <section id="wrapper">

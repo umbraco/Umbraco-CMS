@@ -1,26 +1,16 @@
 using System;
-using System.Collections;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using System.Reflection;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Caching;
+using Umbraco.Core.Services;
 using umbraco.BusinessLogic.Actions;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.helpers;
 using umbraco.IO;
 using umbraco.uicontrols.DatePicker;
 using umbraco.BusinessLogic;
-using umbraco.presentation.preview;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation;
-using umbraco.cms.businesslogic.skinning;
-using System.Collections.Generic;
 using System.Linq;
 using Image = System.Web.UI.WebControls.Image;
 
@@ -86,7 +76,19 @@ namespace umbraco.cms.presentation
 
             // Check publishing permissions
             if (!base.getUser().GetPermissions(_document.Path).Contains(ActionPublish.Instance.Letter.ToString()))
-                _canPublish = controls.ContentControl.publishModes.SendToPublish;
+            {
+                // Check to see if the user has send to publish permissions
+                if (!base.getUser().GetPermissions(_document.Path).Contains(ActionToPublish.Instance.Letter.ToString()))
+                {
+					//If no send to publish permission then revert to NoPublish mode
+                    _canPublish = controls.ContentControl.publishModes.NoPublish;
+                }
+                else
+                {
+                    _canPublish = controls.ContentControl.publishModes.SendToPublish;
+                }
+            }
+
             cControl = new controls.ContentControl(_document, _canPublish, "TabView1");
 
             cControl.ID = "TabView1";
@@ -278,8 +280,14 @@ namespace umbraco.cms.presentation
                 }
             }
 
-
-
+            //The value of the properties has been set on IData through IDataEditor in the ContentControl
+            //so we need to 'retrieve' that value and set it on the property of the new IContent object.
+            //NOTE This is a workaround for the legacy approach to saving values through the DataType instead of the Property 
+            //- (The DataType shouldn't be responsible for saving the value - especically directly to the db).
+            foreach (var item in cControl.DataTypes)
+            {
+                _document.getProperty(item.Key).Value = item.Value.Data.Value;
+            }
 
             // Run Handler				
             BusinessLogic.Actions.Action.RunActionHandlers(_document, ActionUpdate.Instance);
@@ -307,25 +315,38 @@ namespace umbraco.cms.presentation
         {
             if (Page.IsValid)
             {
-                if (_document.Level == 1 || new cms.businesslogic.web.Document(_document.Parent.Id).PathPublished)
+                if (_document.Level == 1 || _document.PathPublished)
                 {
+                    var previouslyPublished = _document.HasPublishedVersion();
+
                     Trace.Warn("before d.publish");
 
                     if (_document.PublishWithResult(base.getUser()))
                     {
-
+                        library.UpdateDocumentCache(_document.Id);
                         ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));
-                        library.UpdateDocumentCache(_document);
 
-                        littPublishStatus.Text = ui.Text("content", "lastPublished", base.getUser()) + ": " + _document.VersionDate.ToString() + "<br/>";
+                        littPublishStatus.Text = string.Format("{0}: {1}<br/>", ui.Text("content", "lastPublished", base.getUser()), _document.VersionDate.ToString());
 
                         if (base.getUser().GetPermissions(_document.Path).IndexOf("U") > -1)
                             UnPublish.Visible = true;
 
                         _documentHasPublishedVersion = _document.HasPublishedVersion();
 
-                        foreach (var descendant in _document.GetDescendants().Cast<Document>().Where(descendant => descendant.HasPublishedVersion()))
-                            library.UpdateDocumentCache(descendant.Id);
+                        if (previouslyPublished == false)
+                        {
+                            var descendants = ((ContentService) ApplicationContext.Current.Services.ContentService)
+                                .GetPublishedDescendants(_document.Content).ToList();
+
+                            if (descendants.Any())
+                            {
+                                foreach (var descendant in descendants)
+                                {
+                                    library.UpdateDocumentCache(descendant.Id);
+                                }
+                                library.RefreshContent();
+                            }
+                        }
                     }
                     else
                     {
@@ -333,13 +354,10 @@ namespace umbraco.cms.presentation
                     }
                 }
                 else
+                {
                     ClientTools.ShowSpeechBubble(speechBubbleIcon.warning, ui.Text("publish"), ui.Text("speechBubbles", "editContentPublishedFailedByParent"));
-
-                // page cache disabled...
-                //			cms.businesslogic.cache.Cache.ClearCacheObjectTypes("umbraco.page");
-
-
-                // Update links
+                    
+                }
             }
         }
 
@@ -378,7 +396,7 @@ namespace umbraco.cms.presentation
 
         void UpdateNiceUrls()
         {
-            if (!_documentHasPublishedVersion)
+            if (_documentHasPublishedVersion == false)
             {
                 UpdateNiceUrlProperties("<i>" + ui.Text("content", "itemNotPublished", base.getUser()) + "</i>", null);
                 return;
@@ -401,7 +419,7 @@ namespace umbraco.cms.presentation
                 while (parent != null && parent.Published);
 
                 if (parent == null) // oops - internal error
-                    niceUrlText = "<i>" + ui.Text("content", "parentNotPublished", "???", base.getUser()) + "</i>";
+                    niceUrlText = "<i>" + ui.Text("content", "parentNotPublishedAnomaly", base.getUser()) + "</i>";
                 else
                     niceUrlText = "<i>" + ui.Text("content", "parentNotPublished", parent.Text, base.getUser()) + "</i>";
             }
@@ -423,7 +441,7 @@ namespace umbraco.cms.presentation
         private void ShowUserValidationError(string message)
         {
             this.Controls.Clear();
-            this.Controls.Add(new LiteralControl(String.Format("<h1>{0}</h1>", message)));
+            this.Controls.Add(new LiteralControl(String.Format("<link rel='stylesheet' type='text/css' href='../../umbraco_client/ui/default.css'><link rel='stylesheet' type='text/css' href='../../umbraco_client/tabview/style.css'><link rel='stylesheet' type='text/css' href='../../umbraco_client/propertypane/style.css'><div id='body_dashboardTabs' style='height: auto; width: auto;'><div class='header'><ul><li id='body_dashboardTabs_tab01' class='tabOn'><a id='body_dashboardTabs_tab01a' href='#' onclick='setActiveTab('body_dashboardTabs','body_dashboardTabs_tab01',body_dashboardTabs_tabs); return false;'><span><nobr>Access denied</nobr></span></a></li></ul></div><div id='' class='tabpagecontainer'><div id='body_dashboardTabs_tab01layer' class='tabpage' style='display: block;'><div class='menubar'></div><div class='tabpagescrollinglayer' id='body_dashboardTabs_tab01layer_contentlayer' style='width: auto; height: auto;'><div class='tabpageContent' style='padding:0 10px;'><div class='propertypane' style=''><div><div class='propertyItem' style=''><div class='dashboardWrapper'><h2>Access denied</h2><img src='./dashboard/images/access-denied.png' alt='Access denied' class='dashboardIcon'>{0}</div></div></div></div></div></div></div></div><div class='footer'><div class='status'><h2></h2></div></div></div>", message)));
         }
 
         /// <summary>
@@ -435,18 +453,19 @@ namespace umbraco.cms.presentation
             // Validate permissions
             if (!base.ValidateUserApp("content"))
             {
-                ShowUserValidationError("The current user doesn't have access to this application. Please contact the system administrator.");
+                ShowUserValidationError("<h3>The current user doesn't have access to this application</h3><p>Please contact the system administrator if you think that you should have access.</p>");
                 return false;
             }
             if (!base.ValidateUserNodeTreePermissions(_document.Path, ActionBrowse.Instance.Letter.ToString()))
             {
-                ShowUserValidationError("The current user doesn't have permissions to browse this document. Please contact the system administrator.");
+                ShowUserValidationError(
+                    "<h3>The current user doesn't have permissions to browse this document</h3><p>Please contact the system administrator if you think that you should have access.</p>");
                 return false;
             }
             //TODO: Change this, when we add view capabilities, the user will be able to view but not edit!
             if (!base.ValidateUserNodeTreePermissions(_document.Path, ActionUpdate.Instance.Letter.ToString()))
             {
-                ShowUserValidationError("The current user doesn't have permissions to edit this document. Please contact the system administrator.");
+                ShowUserValidationError("<h3>The current user doesn't have permissions to edit this document</h3><p>Please contact the system administrator if you think that you should have access.</p>");
                 return false;
             }
             return true;
@@ -454,8 +473,24 @@ namespace umbraco.cms.presentation
 
         private void addPreviewButton(uicontrols.ScrollingMenu menu, int id)
         {
-            menu.InsertSplitter(2);
-            uicontrols.MenuIconI menuItem = menu.NewIcon(3);
+            uicontrols.MenuIconI menuItem;
+
+            // Find the first splitter in the Menu - Should be the rte toolbar's splitter
+            var startIndex = menu.FindSplitter(1);
+            
+            if (startIndex == -1)
+            {
+                // No Splitter found - rte toolbar isn't loaded
+            menu.InsertSplitter();
+                menuItem = menu.NewIcon();
+            } 
+            else
+            {
+                // Rte toolbar is loaded, inject after it's Splitter
+                menuItem = menu.NewIcon(startIndex + 1);
+                menu.InsertSplitter(startIndex + 2);
+            }
+            
             menuItem.ImageURL = SystemDirectories.Umbraco + "/images/editor/vis.gif";
             // Fix for U4-682, if there's no template, disable the preview button
             if (_document.Template != -1)

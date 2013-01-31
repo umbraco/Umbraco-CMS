@@ -42,8 +42,16 @@ namespace umbraco
 
         public bool Save()
         {
-            int id = cms.businesslogic.media.MediaType.MakeNew(BusinessLogic.User.GetUser(_userID), Alias.Replace("'", "''")).Id;
-            m_returnUrl = string.Format("settings/editMediaType.aspx?id={0}", id);
+            var mediaType = cms.businesslogic.media.MediaType.MakeNew(User.GetUser(_userID), Alias.Replace("'", "''"),
+                                                                      ParentID);
+
+            if (ParentID != -1)
+            {
+                mediaType.MasterContentType = ParentID;
+                mediaType.Save();
+            }
+
+            m_returnUrl = string.Format("settings/editMediaType.aspx?id={0}", mediaType.Id);
             return true;
         }
 

@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<TestRunConfiguration id="85F80678-5ACF-4267-A4F8-E5BF47BD5E87" name="IntegrationTests" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2006">
-	<Description>This test run configuration uses the VS IDE host type in the test run.</Description>
-	<Hosts type="VS IDE">
-		<VSSDKTestHostRunConfig name="VS IDE" HiveName="9.0Exp" IsRANU="true" xmlns="http://microsoft.com/schemas/VisualStudio/SDK/Tools/IdeHostAdapter/2006/06" />
-	</Hosts>
-</TestRunConfiguration>

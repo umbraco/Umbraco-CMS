@@ -1,9 +1,0 @@
-<configuration>
-  <system.web>
-    <pages>
-      <namespaces>
-        <add namespace="ClientDependency.Core.Mvc"/>
-      </namespaces>
-    </pages>
-  </system.web>
-</configuration>

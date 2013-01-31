@@ -73,7 +73,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 				stylesheetproperty.StyleSheet().saveCssToFile();
 			} 
 			catch {}
-			this.speechBubble(speechBubbleIcon.save,ui.Text("speechBubbles", "editStylesheetPropertySaved", base.getUser()),"");
+            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editStylesheetPropertySaved", base.getUser()), "");
 			setupPreView();
 
             stylesheetproperty.Save();

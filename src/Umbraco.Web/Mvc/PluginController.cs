@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Mvc
 {
@@ -49,6 +50,22 @@ namespace Umbraco.Web.Mvc
 		public ApplicationContext ApplicationContext
 		{
 			get { return UmbracoContext.Application; }
+		}
+
+		/// <summary>
+		/// Returns a ServiceContext
+		/// </summary>
+		public ServiceContext Services
+		{
+			get { return ApplicationContext.Services; }
+		}
+
+		/// <summary>
+		/// Returns a DatabaseContext
+		/// </summary>
+		public DatabaseContext DatabaseContext
+		{
+			get { return ApplicationContext.DatabaseContext; }
 		}
 
 		/// <summary>

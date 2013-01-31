@@ -5,6 +5,7 @@ using System.Text;
 using System.Web;
 using System.Web.Security;
 using System.Configuration;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using System.Security.Cryptography;
 using System.Web.Util;
@@ -60,10 +61,7 @@ namespace umbraco.presentation.nodeFactory {
                 try {
                     AddNode(m_root, null);
                 } catch (Exception ex) {
-                    BusinessLogic.Log.Add(
-                        LogTypes.Error,
-                        -1,
-                        String.Format("Error adding to SiteMapProvider: {0}", ex));
+                    LogHelper.Error<UmbracoSiteMapProvider>("Error adding to SiteMapProvider", ex);
                 }
 
                 loadNodes(m_root.Key, m_root);
@@ -89,10 +87,7 @@ namespace umbraco.presentation.nodeFactory {
                     try {
                         AddNode(n, m_nodes[parentNode]);
                     } catch (Exception ex) {
-                        BusinessLogic.Log.Add(
-                            LogTypes.Error,
-                            -1,
-                            String.Format("Error adding node with url '{0}' to SiteMapProvider: {1}", node.Name, ex));
+                        LogHelper.Error<UmbracoSiteMapProvider>(String.Format("Error adding node with url '{0}' and Id {1} to SiteMapProvider", node.Name, node.Id), ex);
                     }
                 } else {
                     n = m_nodes[node.Id.ToString()];
@@ -127,10 +122,7 @@ namespace umbraco.presentation.nodeFactory {
                     try {
                         AddNode(childNode, parentNode);
                     } catch (Exception ex) {
-                        BusinessLogic.Log.Add(
-                            LogTypes.Error,
-                            child.Id,
-                            String.Format("Error adding to SiteMapProvider in loadNodes(): {0}", ex));
+                        LogHelper.Error<UmbracoSiteMapProvider>(string.Format("Error adding node {0} to SiteMapProvider in loadNodes()", child.Id), ex);
                     }
                     loadNodes(child.Id.ToString(), childNode);
                 }

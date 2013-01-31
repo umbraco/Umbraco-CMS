@@ -10,7 +10,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
-
+using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.macro;
@@ -459,6 +459,13 @@ namespace umbraco.presentation.developer.packages
                         DocumentType s = new DocumentType(nId);
                         if (s != null)
                         {
+                            // check for master doctypes
+                            if (s.IsMaster())
+                            {
+                                foreach(var ct in s.GetChildTypes())
+                                    ct.RemoveParentContentType(s.Id);
+                            }
+
                             s.delete();
                             pack.Data.Documenttypes.Remove(nId.ToString());
 
@@ -516,26 +523,34 @@ namespace umbraco.presentation.developer.packages
             }
             else
             {
-                BusinessLogic.Log.Add(global::umbraco.BusinessLogic.LogTypes.Debug, -1, "executing undo actions");
+	            LogHelper.Debug<installedPackage>("executing undo actions");
 
                 // uninstall actions
-                try {
-                    System.Xml.XmlDocument actionsXml = new System.Xml.XmlDocument();
-                    actionsXml.LoadXml("<Actions>" +  pack.Data.Actions + "</Actions>");
+				try
+				{
+					var actionsXml = new System.Xml.XmlDocument();
+					actionsXml.LoadXml("<Actions>" + pack.Data.Actions + "</Actions>");
 
-                    BusinessLogic.Log.Add(global::umbraco.BusinessLogic.LogTypes.Debug, -1, actionsXml.OuterXml);
-                    foreach (XmlNode n in actionsXml.DocumentElement.SelectNodes("//Action")) {
-                        try {
-                            cms.businesslogic.packager.PackageAction.UndoPackageAction(pack.Data.Name, n.Attributes["alias"].Value, n);
-                        } catch (Exception ex) {
-                            BusinessLogic.Log.Add(global::umbraco.BusinessLogic.LogTypes.Debug, -1, ex.ToString());
-                        }
-                    }
-                } catch (Exception ex) {
-                    BusinessLogic.Log.Add(global::umbraco.BusinessLogic.LogTypes.Debug, -1, ex.ToString());
-                }
+					LogHelper.Debug<installedPackage>(actionsXml.OuterXml);
 
-                //moved remove of files here so custom package actions can still undo
+					foreach (XmlNode n in actionsXml.DocumentElement.SelectNodes("//Action"))
+					{
+						try
+						{
+							cms.businesslogic.packager.PackageAction.UndoPackageAction(pack.Data.Name, n.Attributes["alias"].Value, n);
+						}
+						catch (Exception ex)
+						{
+							LogHelper.Error<installedPackage>("An error occurred in UndoPackageAction", ex);
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					LogHelper.Error<installedPackage>("An error occurred", ex);
+				}
+
+	            //moved remove of files here so custom package actions can still undo
                 //Remove files
                 foreach (ListItem li in files.Items)
                 {

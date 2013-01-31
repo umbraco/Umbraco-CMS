@@ -1,28 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.IO;
+using System.Globalization;
 using System.Text;
-using System.Web;
-using System.Xml;
-using System.Configuration;
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
+using Umbraco.Core.Services;
 using umbraco.businesslogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.contentitem;
-using umbraco.cms.businesslogic.datatype;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.media;
-using umbraco.cms.businesslogic.member;
-using umbraco.cms.businesslogic.property;
-using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
-using umbraco.DataLayer;
 using umbraco.BusinessLogic.Actions;
-using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
 
 
@@ -74,23 +57,22 @@ function openNodeType(id) {
 
         public override void Render(ref XmlTree tree)
         {
-            List<DocumentType> docTypes;
-            if (base.m_id == -1)
-                docTypes = DocumentType.GetAllAsList().FindAll(delegate(DocumentType dt) { return dt.MasterContentType == 0; });
-            else
-                docTypes = DocumentType.GetAllAsList().FindAll(delegate(DocumentType dt) { return dt.MasterContentType == base.m_id; });
+            var docTypes = Service.GetContentTypeChildren(base.m_id);
 
-            foreach (DocumentType dt in docTypes)
+            foreach (var docType in docTypes)
             {
+                var hasChildren = Service.HasChildren(docType.Id);
+
                 XmlTreeNode xNode = XmlTreeNode.Create(this);
-                xNode.NodeID = dt.Id.ToString();
-                xNode.Text = dt.Text;
-                xNode.Action = "javascript:openNodeType(" + dt.Id + ");";
+                xNode.NodeID = docType.Id.ToString(CultureInfo.InvariantCulture);
+                xNode.Text = docType.Name;
+                xNode.Action = "javascript:openNodeType(" + docType.Id + ");";
                 xNode.Icon = "settingDataType.gif";
                 xNode.OpenIcon = "settingDataType.gif";
-				xNode.Source = GetTreeServiceUrl(dt.Id);
-				xNode.HasChildren = dt.HasChildren;
-                if (dt.HasChildren) {                    
+                xNode.Source = GetTreeServiceUrl(docType.Id);
+                xNode.HasChildren = hasChildren;
+                if (hasChildren)
+                {
                     xNode.Icon = "settingMasterDataType.gif";
                     xNode.OpenIcon = "settingMasterDataType.gif";
                 }
@@ -101,9 +83,12 @@ function openNodeType(id) {
                     tree.Add(xNode);
                     OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
                 }
-                
             }
         }
 
+        private IContentTypeService Service
+        {
+            get { return Services.ContentTypeService; }
+        }
     }
 }

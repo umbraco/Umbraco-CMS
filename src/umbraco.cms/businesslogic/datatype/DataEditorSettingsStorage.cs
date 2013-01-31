@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using umbraco.DataLayer;
@@ -12,11 +13,15 @@ namespace umbraco.cms.businesslogic.datatype
 
         public DataEditorSettingsStorage()
         {
-                init( DataLayerHelper.CreateSqlHelper(umbraco.GlobalSettings.DbDSN));
+            var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false);
+
+            init(DataLayerHelper.CreateSqlHelper(dataHelper.ConnectionString, false));
         }
 
-        private void init(ISqlHelper connection) {
-                sqlHelper = connection;
+        private void init(ISqlHelper connection)
+        {
+            sqlHelper = connection;
         }
 
         public List<Setting<string, string>> GetSettings(int dataTypeNodeID)
@@ -68,13 +73,13 @@ namespace umbraco.cms.businesslogic.datatype
 
         public void InsertSetting(int dataTypeNodeID, string key, string value, int sortOrder)
         {
-            
-                string sql = "insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@datatypenodeid,@value,@sortorder,@alias)";
-                sqlHelper.ExecuteNonQuery(sql,
-                    sqlHelper.CreateParameter("@datatypenodeid", dataTypeNodeID),
-                    sqlHelper.CreateParameter("@alias", key),
-                    sqlHelper.CreateParameter("@value", value),
-                    sqlHelper.CreateParameter("@sortorder", sortOrder));
+
+            string sql = "insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@datatypenodeid,@value,@sortorder,@alias)";
+            sqlHelper.ExecuteNonQuery(sql,
+                sqlHelper.CreateParameter("@datatypenodeid", dataTypeNodeID),
+                sqlHelper.CreateParameter("@alias", key),
+                sqlHelper.CreateParameter("@value", value),
+                sqlHelper.CreateParameter("@sortorder", sortOrder));
 
         }
 

@@ -1,9 +1,13 @@
 <%@ Page Title="Edit XSLT File" MasterPageFile="../../masterpages/umbracoPage.Master"
     ValidateRequest="false" Language="c#" CodeBehind="editXslt.aspx.cs" AutoEventWireup="True"
     Inherits="umbraco.cms.presentation.developer.editXslt" %>
-
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+
+<asp:Content ID="DocTypeContent" ContentPlaceHolderID="DocType" runat="server">
+    <!DOCTYPE html>
+</asp:Content>
+
 <asp:Content ContentPlaceHolderID="head" runat="server" ID="cp2">
     <style type="text/css">
         #errorDiv

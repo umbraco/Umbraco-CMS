@@ -128,6 +128,8 @@ namespace umbraco.settings
                     else
                         dt.RemoveDefaultTemplate();
 
+                    dt.Save();
+
                     bindTemplates();
                 }
                 else

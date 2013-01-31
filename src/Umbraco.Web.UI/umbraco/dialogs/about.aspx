@@ -11,8 +11,7 @@
         <img src="../images/umbracoSplash.png" />
           
         <p style="padding-right: 5px; padding-left: 5px; padding-bottom: 0px; margin: 0px; padding-top: 5px">
-          umbraco v
-          <asp:Literal ID="version" runat="server"></asp:Literal><br />
+          Umbraco v<asp:Literal ID="version" runat="server"></asp:Literal><br />
           <br />
           Copyright © 2001 - 
           <asp:Literal ID="thisYear" runat="server"></asp:Literal>

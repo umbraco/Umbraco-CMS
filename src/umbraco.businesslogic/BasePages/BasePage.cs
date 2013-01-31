@@ -2,6 +2,8 @@ using System;
 using System.Data;
 using System.Web;
 using System.Linq;
+using System.Web.Mvc;
+using System.Web.Routing;
 using System.Web.Security;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
@@ -69,6 +71,18 @@ namespace umbraco.BasePages
                 return HttpContext.Current.CurrentHandler as BasePage;
             }
         }
+
+	    private UrlHelper _url;
+		/// <summary>
+		/// Returns a UrlHelper
+		/// </summary>
+		/// <remarks>
+		/// This URL helper is created without any route data and an empty request context
+		/// </remarks>
+	    public UrlHelper Url
+	    {
+		    get { return _url ?? (_url = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData()))); }
+	    }
 
         /// <summary>
         /// Returns a refernce of an instance of ClientTools for access to the pages client API
@@ -174,8 +188,8 @@ namespace umbraco.BasePages
                 {
                     return true;
                 }
-
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.Logout, BusinessLogic.User.GetUser(uid), -1, "");
+	            var user = BusinessLogic.User.GetUser(uid);
+				LogHelper.Info<BasePage>("User {0} (Id:{1}) logged out", () => user.Name, () => user.Id);
             }
             return false;
         }
@@ -297,9 +311,18 @@ namespace umbraco.BasePages
 
         private void DeleteLogin()
         {
-            SqlHelper.ExecuteNonQuery(
+            // Added try-catch in case login doesn't exist in the database
+            // Either due to old cookie or running multiple sessions on localhost with different port number
+            try
+            {
+                SqlHelper.ExecuteNonQuery(
                 "DELETE FROM umbracoUserLogins WHERE contextId = @contextId",
                 SqlHelper.CreateParameter("@contextId", umbracoUserContextID));
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<BasePage>(string.Format("Login with contextId {0} didn't exist in the database", umbracoUserContextID), ex);
+            }
         }
 
         private void UpdateLogin()
@@ -334,7 +357,9 @@ namespace umbraco.BasePages
                                       "') ",
                                       SqlHelper.CreateParameter("@contextId", retVal));
             umbracoUserContextID = retVal.ToString();
-            BusinessLogic.Log.Add(BusinessLogic.LogTypes.Login, u, -1, "");
+
+			LogHelper.Info<BasePage>("User {0} (Id: {1}) logged in", () => u.Name, () => u.Id);
+
         }
 
 

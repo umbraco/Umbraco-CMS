@@ -8,6 +8,7 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Text.RegularExpressions;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.media;
@@ -373,14 +374,11 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                         }
                         catch (Exception ee)
                         {
-                            Log.Add(LogTypes.Error, User.GetUser(0), -1,
-                                    "Error reading size data from media: " + imageMedia.Id.ToString() + ", " +
-                                    ee.ToString());
+							LogHelper.Error<TinyMCEWebControl>("Error reading size data from media: " + imageMedia.Id.ToString() + ", ", ee);
                         }
                     }
                     else
-                        Log.Add(LogTypes.Error, User.GetUser(0), -1,
-                                "Error reading size data from media (not found): " + orgSrc);
+						LogHelper.Warn<TinyMCEWebControl>("Error reading size data from media (not found): " + orgSrc);
                 }
             return html;
         }
@@ -496,7 +494,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                 }
                 catch (Exception ee)
                 {
-                    Log.Add(LogTypes.Error, this._nodeId, "Macro Parsing Error: " + ee.ToString());
+					LogHelper.Error<TinyMCEWebControl>("Macro Parsing Error", ee);
                     string div = "<div class=\"umbMacroHolder mceNonEditable\"><p style=\"color: red\"><strong>umbraco was unable to parse a macro tag, which means that parts of this content might be corrupt.</strong> <br /><br />Best solution is to rollback to a previous version by right clicking the node in the tree and then try to insert the macro again. <br/><br/>Please report this to your system administrator as well - this error has been logged.</p></div>";
                     content = content.Replace(tag.Groups[1].Value, div);
                 }

@@ -11,7 +11,7 @@ namespace umbraco.editorControls.datepicker
 
 		public override System.Xml.XmlNode ToXMl(System.Xml.XmlDocument d)
 		{
-			if (Value.ToString() != "")
+			if (Value != null && Value.ToString() != "")
 				return d.CreateTextNode(((DateTime) Value).ToString("s"));
 			else
 				return d.CreateTextNode("");

@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Web;
 using Umbraco.Core.Logging;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
@@ -161,7 +162,7 @@ namespace umbraco.cms.businesslogic.media
             else
             {
                 // Log error
-                Log.Add(LogTypes.Error, UmbracoEnsuredPage.CurrentUser, -1, "Multiple file upload: Can't find appropriate codec");
+				LogHelper.Warn<UmbracoImageMediaFactory>("Multiple file upload: Can't find appropriate codec");
             }
 
             bp.Dispose();

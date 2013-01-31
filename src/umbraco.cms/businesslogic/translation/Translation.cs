@@ -2,6 +2,7 @@ using System;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
 using System.Web;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.property;
@@ -65,13 +66,14 @@ namespace umbraco.cms.businesslogic.translation
                     }
                     catch (Exception ex)
                     {
-                        Log.Add(LogTypes.Error, User, Node.Id,
-                                string.Format("Error sending translation e-mail:{0}", ex.ToString()));
+						LogHelper.Error<Translation>("Error sending translation e-mail", ex);
                     }
                 }
                 else
-                    Log.Add(LogTypes.Error, User, Node.Id,
-                            "Could not send translation e-mail because either user or translator lacks e-mail in settings");
+                {
+					LogHelper.Warn<Translation>("Could not send translation e-mail because either user or translator lacks e-mail in settings");					
+                }
+                    
             }
 
             if (IncludeSubpages)
@@ -90,7 +92,7 @@ namespace umbraco.cms.businesslogic.translation
             Document d = new Document(DocumentId);
 
             int words = CountWordsInString(d.Text);
-            var props = d.getProperties;
+            var props = d.GenericProperties;
             foreach (Property p in props)
             {
                 if (p.Value.GetType() == "".GetType())

@@ -76,14 +76,23 @@
   </cc2:Pane>
 </asp:Panel>
 
+
 <asp:Panel ID="pnlStructure" runat="server">
+    <cc2:Pane ID="Pane6" runat="server">
+        <cc2:PropertyPanel ID="pp_Root" runat="server" Text="Allow at root">
+            <asp:CheckBox runat="server" ID="allowAtRoot" Text="Yes" /><br />
+            Only Content Types with this checked can be created at the root level of Content and Media trees
+        </cc2:PropertyPanel>     
+    </cc2:Pane>
   <cc2:Pane ID="Pane5" runat="server">
+ 
     <cc2:PropertyPanel ID="pp_allowedChildren" runat="server" Text="Allowed Child nodetypes">
        <asp:CheckBoxList ID="lstAllowedContentTypes" runat="server" EnableViewState="True"/>
        <asp:PlaceHolder ID="PlaceHolderAllowedContentTypes" runat="server"/>
     </cc2:PropertyPanel>
   </cc2:Pane>
 </asp:Panel>
+
 
 <asp:Panel ID="pnlProperties" runat="server">
   <cc2:Pane ID="PanePropertiesInherited" runat="server" Visible="false">

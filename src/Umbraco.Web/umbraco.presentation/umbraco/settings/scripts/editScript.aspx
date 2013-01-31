@@ -3,6 +3,11 @@
     ValidateRequest="False" %>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+
+<asp:Content ID="DocTypeContent" ContentPlaceHolderID="DocType" runat="server">
+    <!DOCTYPE html>
+</asp:Content>
+
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <script language="javascript" type="text/javascript">
 

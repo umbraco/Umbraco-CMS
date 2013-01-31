@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Web.Routing;
 using umbraco;
 using umbraco.IO;
@@ -33,13 +34,13 @@ namespace Umbraco.Web
         /// </summary>
         private static UmbracoContext _umbracoContext;
 
-    	/// <summary>
-    	/// Creates a new Umbraco context.
-    	/// </summary>
-    	/// <param name="httpContext"></param>
-    	/// <param name="applicationContext"> </param>
-    	/// <param name="routesCache"> </param>
-    	internal UmbracoContext(
+        /// <summary>
+        /// Creates a new Umbraco context.
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <param name="applicationContext"> </param>
+        /// <param name="routesCache"> </param>
+        internal UmbracoContext(
 			HttpContextBase httpContext, 
 			ApplicationContext applicationContext,
 			IRoutesCache routesCache)
@@ -48,6 +49,7 @@ namespace Umbraco.Web
             if (applicationContext == null) throw new ArgumentNullException("applicationContext");
 
     		ObjectCreated = DateTime.Now;
+	        UmbracoRequestId = Guid.NewGuid();
 
             HttpContext = httpContext;            
             Application = applicationContext;
@@ -78,7 +80,7 @@ namespace Umbraco.Web
                 return _umbracoContext;
             }
 
-            set
+            internal set
             {
                 lock (Locker)
                 {
@@ -108,11 +110,19 @@ namespace Umbraco.Web
 		/// </summary>
 		internal DateTime ObjectCreated { get; private set; }
 
+		/// <summary>
+		/// This is used internally for debugging and also used to define anything required to distinguish this request from another.
+		/// </summary>
+		internal Guid UmbracoRequestId { get; private set; }
+
         /// <summary>
         /// Gets the current ApplicationContext
         /// </summary>
-        public ApplicationContext Application { get; private set; }
+        public ApplicationContext Application { get; private set; }       
 
+        /// <summary>
+        /// Gets the <see cref="IRoutesCache"/>
+        /// </summary>
 		internal IRoutesCache RoutesCache { get; private set; }
 		
 	    /// <summary>

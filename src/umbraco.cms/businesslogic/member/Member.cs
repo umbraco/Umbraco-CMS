@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Web;
 using System.Xml;
+using Umbraco.Core;
+using Umbraco.Core.Models.Rdbms;
 using umbraco.cms.businesslogic.cache;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -571,6 +573,58 @@ namespace umbraco.cms.businesslogic.member
 
             if (!e.Cancel)
             {
+                var db = ApplicationContext.Current.DatabaseContext.Database;
+                using (var transaction = db.GetTransaction())
+                {
+                    foreach (var property in GenericProperties)
+                    {
+                        var poco = new PropertyDataDto
+                                       {
+                                           Id = property.Id,
+                                           PropertyTypeId = property.PropertyType.Id,
+                                           NodeId = Id,
+                                           VersionId = property.VersionId
+                                       };
+                        if (property.Value != null)
+                        {
+                            string dbType = property.PropertyType.DataTypeDefinition.DbType;
+                            if (dbType.Equals("Int"))
+                            {
+                                int value = 0;
+                                if (int.TryParse(property.Value.ToString(), out value))
+                                {
+                                    poco.Integer = value;
+                                }
+                            }
+                            else if (dbType.Equals("Date"))
+                            {
+                                DateTime date;
+
+                                if(DateTime.TryParse(property.Value.ToString(), out date))
+                                    poco.Date = date;
+                            }
+                            else if (dbType.Equals("Nvarchar"))
+                            {
+                                poco.VarChar = property.Value.ToString();
+                            }
+                            else
+                            {
+                                poco.Text = property.Value.ToString();
+                            }
+                        }
+                        bool isNew = db.IsNew(poco);
+                        if (isNew)
+                        {
+                            db.Insert(poco);
+                        }
+                        else
+                        {
+                            db.Update(poco);
+                        }
+                    }
+                    transaction.Complete();
+                }
+
                 // re-generate xml
                 XmlDocument xd = new XmlDocument();
                 XmlGenerate(xd);
@@ -997,7 +1051,7 @@ namespace umbraco.cms.businesslogic.member
         /// Can be used in the public website
         /// </summary>
         /// <param name="m">Member to remove</param>
-        [Obsolete("Deprecated, use the RemoveMemberFromCache(int NodeId) instead", false)]
+        [Obsolete("Obsolete, use the RemoveMemberFromCache(int NodeId) instead", false)]
         public static void RemoveMemberFromCache(Member m)
         {
             RemoveMemberFromCache(m.Id);
@@ -1020,7 +1074,7 @@ namespace umbraco.cms.businesslogic.member
         /// Can be used in the public website
         /// </summary>
         /// <param name="m">Member</param>
-        [Obsolete("Deprecated, use the ClearMemberFromClient(int NodeId) instead", false)]
+        [Obsolete("Obsolete, use the ClearMemberFromClient(int NodeId) instead", false)]
         public static void ClearMemberFromClient(Member m)
         {
 

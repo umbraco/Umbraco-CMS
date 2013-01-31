@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 namespace Umbraco.Core.Models
 {
 	/// <summary>
-	/// Defines a PublishedContent in Umbraco
+	/// Defines a published item in Umbraco
 	/// </summary>
 	/// <remarks>
 	/// A replacement for INode which needs to occur since INode doesn't contain the document type alias
@@ -13,7 +13,6 @@ namespace Umbraco.Core.Models
 	/// </remarks>
 	public interface IPublishedContent
 	{
-		IPublishedContent Parent { get; }
 		int Id { get; }
 		int TemplateId { get; }
 		int SortOrder { get; }
@@ -30,8 +29,19 @@ namespace Umbraco.Core.Models
 		DateTime UpdateDate { get; }
 		Guid Version { get; }
 		int Level { get; }
-		Collection<IPublishedContentProperty> Properties { get; }
+		string Url { get; }
+		PublishedItemType ItemType { get; }
+		IPublishedContent Parent { get; }
 		IEnumerable<IPublishedContent> Children { get; }
+
+		ICollection<IPublishedContentProperty> Properties { get; }
+
+		/// <summary>
+		/// Returns the property value for the property alias specified
+		/// </summary>
+		/// <param name="propertyAlias"></param>
+		/// <returns></returns>
+		object this[string propertyAlias] { get; }
 
 		/// <summary>
 		/// Returns a property on the object based on an alias

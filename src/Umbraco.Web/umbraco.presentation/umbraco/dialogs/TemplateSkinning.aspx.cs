@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.skinning;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic;
@@ -79,7 +80,7 @@ namespace umbraco.presentation.umbraco.dialogs
                     }
                     catch (Exception ex)
                     {
-                        BusinessLogic.Log.Add(BusinessLogic.LogTypes.Debug, -1, ex.ToString());
+						LogHelper.Error<TemplateSkinning>("An error occurred", ex);
 
                         //ShowConnectionError();
                     }

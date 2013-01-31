@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic.Actions;
 
@@ -64,8 +64,8 @@ namespace umbraco.ActionHandlers
                 if (currentName != documentObject.Text)
                 {
                     // add name change to the log
-                    umbraco.BusinessLogic.Log.Add(umbraco.BusinessLogic.LogTypes.Debug, umbraco.BusinessLogic.User.GetUser(0), documentObject.Id, "Title changed from '" + documentObject.Text + "' to '" + currentName + "'");
-
+					LogHelper.Debug<umbEnsureUniqueName>("Title changed from '" + documentObject.Text + "' to '" + currentName + "' for document  id" + documentObject.Id);
+                    
                     documentObject.Text = currentName;
 
                     return true;

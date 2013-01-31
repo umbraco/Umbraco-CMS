@@ -12,6 +12,7 @@ using Umbraco.Core.PropertyEditors;
 using System.Reflection;
 using System.Xml.Linq;
 using umbraco.cms.businesslogic;
+using ContentType = umbraco.cms.businesslogic.ContentType;
 
 namespace Umbraco.Web.Models
 {
@@ -301,6 +302,8 @@ namespace Umbraco.Web.Models
 				var parent = ((IPublishedContent) context).Parent;
 				if (parent == null) break;
 				prop = context.GetPropertyInternal(alias, context.PublishedContent);
+				//update context, fixes issue: http://issues.umbraco.org/issue/U4-1451
+				context = parent.AsDynamicPublishedContent();
 			}
 			return prop;
 		}
@@ -528,9 +531,24 @@ namespace Umbraco.Web.Models
 			get { return PublishedContent.Level; }
 		}
 
+		public string Url
+		{
+			get { return PublishedContent.Url; }
+		}
+
+		public PublishedItemType ItemType
+		{
+			get { return PublishedContent.ItemType; }
+		}
+
 		public IEnumerable<IPublishedContentProperty> Properties
 		{
 			get { return PublishedContent.Properties; }
+		}
+
+		public object this[string propertyAlias]
+		{
+			get { return PublishedContent[propertyAlias]; }
 		}
 
 		public DynamicPublishedContentList Children
@@ -738,7 +756,7 @@ namespace Umbraco.Web.Models
 			get { return PublishedContent.Level; }
 		}
 
-		System.Collections.ObjectModel.Collection<IPublishedContentProperty> IPublishedContent.Properties
+		ICollection<IPublishedContentProperty> IPublishedContent.Properties
 		{
 			get { return PublishedContent.Properties; }
 		}

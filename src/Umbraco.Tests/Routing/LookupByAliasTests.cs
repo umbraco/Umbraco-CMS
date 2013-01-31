@@ -1,8 +1,6 @@
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Tests.Routing
 {
@@ -12,10 +10,10 @@ namespace Umbraco.Tests.Routing
 		public override void Initialize()
 		{
 			base.Initialize();
-			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
+			Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
 		}
-
-		/// <summary>
+        
+        /// <summary>
 		/// We don't need a db for this test, will run faster without one
 		/// </summary>
 		protected override bool RequiresDbSetup

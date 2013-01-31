@@ -15,6 +15,7 @@ namespace umbraco.BusinessLogic.Utils
     /// The typeresolver is a collection of utillities for finding and determining types and classes with reflection.
     /// </summary>
     [Serializable]
+	[Obsolete("This class is not longer used and will be removed in future versions")]
     public class TypeResolver : MarshalByRefObject
     {
         /// <summary>
@@ -119,30 +120,6 @@ namespace umbraco.BusinessLogic.Utils
                     Debug.WriteLine(string.Format("Error loading assembly: {0}\n{1}", fileName, e));
                 }
             }
-
-            /*
-            try{
-                System.Collections.IList list = System.Web.Compilation.BuildManager.CodeAssemblies;
-                if (list != null && list.Count > 0) {
-                    Assembly asm;
-                    foreach (object o in list) {
-                        asm = o as Assembly;
-
-                        Log.Add(LogTypes.Debug, -1, "assembly " + asm.ToString()  );
-                        if (asm != null) {
-                            foreach (Type t in asm.GetExportedTypes()) {
-                                if (!t.IsInterface && assignTypeFrom.IsAssignableFrom(t))
-                                    result.Add(t.AssemblyQualifiedName);
-                            }
-                        }
-                    }
-                } else {
-                    Log.Add(LogTypes.Debug, -1, "No assemblies");
-                }
-            } catch(Exception ee) {
-                Log.Add(LogTypes.Debug, -1, ee.ToString());
-            }
-            */
 
             return result.ToArray();
         }

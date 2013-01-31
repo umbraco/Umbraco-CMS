@@ -1,10 +1,11 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
-using umbraco.IO;
 using umbraco.cms.businesslogic.member;
 
 namespace umbraco
@@ -18,20 +19,20 @@ namespace umbraco
     {
 
         private string _alias;
-        private int _parentID;
-        private int _typeID;
-        private int _userID;
+        private int _parentId;
+        private int _typeId;
+        private int _userId;
 
         public int UserId
         {
-            set { _userID = value; }
+            set { _userId = value; }
         }
 
 
         public int TypeID
         {
-            set { _typeID = value; }
-            get { return _typeID; }
+            set { _typeId = value; }
+            get { return _typeId; }
         }
 
 
@@ -43,8 +44,8 @@ namespace umbraco
 
         public int ParentID
         {
-            set { _parentID = value; }
-            get { return _parentID; }
+            set { _parentId = value; }
+            get { return _parentId; }
         }
 
         public bool Save()
@@ -93,7 +94,7 @@ namespace umbraco
 				}
 			}
 
-            m_returnUrl = string.Format(SystemDirectories.Umbraco + "/developer/xslt/editXslt.aspx?file={0}.xslt", fileName);
+            _returnUrl = string.Format(SystemDirectories.Umbraco + "/developer/xslt/editXslt.aspx?file={0}.xslt", fileName);
 
             return true;
         }
@@ -113,7 +114,7 @@ namespace umbraco
             }
             catch (Exception ex)
             {
-                Log.Add(LogTypes.Error, UmbracoEnsuredPage.CurrentUser, -1, "Could not remove XSLT file " + Alias + ". ERROR: " + ex.Message);
+                LogHelper.Error<XsltTasks>(string.Format("Could not remove XSLT file {0} - User {1}", Alias, UmbracoEnsuredPage.CurrentUser.Id), ex);
             }
             return true;
         }
@@ -126,10 +127,10 @@ namespace umbraco
         }
 
         #region ITaskReturnUrl Members
-        private string m_returnUrl = "";
+        private string _returnUrl = "";
         public string ReturnUrl
         {
-            get { return m_returnUrl; }
+            get { return _returnUrl; }
         }
 
         #endregion

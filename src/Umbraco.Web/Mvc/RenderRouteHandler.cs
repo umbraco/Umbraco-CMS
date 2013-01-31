@@ -10,12 +10,20 @@ using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.template;
+using System.Collections.Generic;
 
 namespace Umbraco.Web.Mvc
 {
 	public class RenderRouteHandler : IRouteHandler
 	{
-		
+		// Define reserved dictionary keys for controller, action and area specified in route additional values data
+		private static class ReservedAdditionalKeys
+		{
+			internal const string Controller = "c";
+			internal const string Action = "a";
+			internal const string Area = "ar";
+		}
+
 		public RenderRouteHandler(IControllerFactory controllerFactory)
 		{
 			if (controllerFactory == null) throw new ArgumentNullException("controllerFactory");			
@@ -108,19 +116,25 @@ namespace Umbraco.Web.Mvc
 
 			var encodedVal = requestContext.HttpContext.Request["uformpostroutevals"];
 			var decodedString = Encoding.UTF8.GetString(Convert.FromBase64String(encodedVal));
-			//the value is formatted as query strings
-			var decodedParts = decodedString.Split('&').Select(x => new { Key = x.Split('=')[0], Value = x.Split('=')[1] }).ToArray();
+			var parsedQueryString = HttpUtility.ParseQueryString(decodedString);
+
+			var decodedParts = new Dictionary<string, string>();
+
+			foreach (var key in parsedQueryString.AllKeys)
+			{
+				decodedParts[key] = parsedQueryString[key];
+			}
 
 			//validate all required keys exist
 
 			//the controller
-			if (!decodedParts.Any(x => x.Key == "c"))
+			if (!decodedParts.Any(x => x.Key == ReservedAdditionalKeys.Controller))
 				return null;
 			//the action
-			if (!decodedParts.Any(x => x.Key == "a"))
+			if (!decodedParts.Any(x => x.Key == ReservedAdditionalKeys.Action))
 				return null;
 			//the area
-			if (!decodedParts.Any(x => x.Key == "ar"))
+			if (!decodedParts.Any(x => x.Key == ReservedAdditionalKeys.Area))
 				return null;
 
 			////the controller type, if it contains this then it is a plugin controller, not locally declared.
@@ -135,14 +149,22 @@ namespace Umbraco.Web.Mvc
 			//    };				
 			//}
 
+			foreach (var item in decodedParts.Where(x => !new string[] { 
+				ReservedAdditionalKeys.Controller, 
+				ReservedAdditionalKeys.Action, 
+				ReservedAdditionalKeys.Area }.Contains(x.Key)))
+			{
+				// Populate route with additional values which aren't reserved values so they eventually to action parameters
+				requestContext.RouteData.Values.Add(item.Key, item.Value);
+			}
+
 			//return the proxy info without the surface id... could be a local controller.
 			return new PostedDataProxyInfo
 			{
-				ControllerName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "c").Value),
-				ActionName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "a").Value),
-				Area = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "ar").Value),
+				ControllerName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == ReservedAdditionalKeys.Controller).Value),
+				ActionName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == ReservedAdditionalKeys.Action).Value),
+				Area = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == ReservedAdditionalKeys.Area).Value),
 			};
-
 		}
 
 		/// <summary>
@@ -249,9 +271,10 @@ namespace Umbraco.Web.Mvc
 				// to the index Action
 				if (publishedContentRequest.HasTemplate)
 				{
-					//check if the custom controller has an action with the same name as the template name (we convert ToUmbracoAlias since the template name might have invalid chars).
-					//NOTE: This also means that all custom actions MUST be PascalCase.. but that should be standard.
-					var templateName = publishedContentRequest.Template.Alias.Split('.')[0].ToUmbracoAlias(StringAliasCaseType.PascalCase);
+					//the template Alias should always be already saved with a safe name.
+                    //if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
+                    // with the action name attribute.
+                    var templateName = global::umbraco.cms.helpers.Casing.SafeAlias(publishedContentRequest.Template.Alias.Split('.')[0]);
 					def.ActionName = templateName;
 				}
 	

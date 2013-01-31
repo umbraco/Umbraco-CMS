@@ -1,16 +1,7 @@
 using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-
 using System.Xml;
-using umbraco.cms.helpers;
 using umbraco.cms.businesslogic.datatype.controls;
 using System.Collections.Generic;
 using System.Linq;
@@ -120,6 +111,16 @@ namespace umbraco.cms.presentation
                     tp.ErrorControl.Visible = false;
                 }
             }
+
+            //The value of the properties has been set on IData through IDataEditor in the ContentControl
+            //so we need to 'retrieve' that value and set it on the property of the new IContent object.
+            //NOTE This is a workaround for the legacy approach to saving values through the DataType instead of the Property 
+            //- (The DataType shouldn't be responsible for saving the value - especically directly to the db).
+            foreach (var item in tmp.DataTypes)
+            {
+                _media.getProperty(item.Key).Value = item.Value.Data.Value;
+            }
+
             _media.Save();
 
             this.updateDateLiteral.Text = _media.VersionDate.ToShortDateString() + " " + _media.VersionDate.ToShortTimeString();

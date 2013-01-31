@@ -220,30 +220,21 @@ namespace umbraco.presentation.install.steps {
         protected global::System.Web.UI.WebControls.PlaceHolder installing;
         
         /// <summary>
-        /// confirms control.
+        /// installProgress control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel confirms;
+        protected global::System.Web.UI.WebControls.PlaceHolder installProgress;
         
         /// <summary>
-        /// installConfirm control.
+        /// upgradeProgress control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder installConfirm;
-        
-        /// <summary>
-        /// upgradeConfirm control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder upgradeConfirm;
+        protected global::System.Web.UI.WebControls.PlaceHolder upgradeProgress;
     }
 }

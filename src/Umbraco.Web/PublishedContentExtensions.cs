@@ -9,11 +9,14 @@ using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Templates;
 using umbraco;
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
 using umbraco.cms.businesslogic.template;
 using umbraco.interfaces;
+using ContentType = umbraco.cms.businesslogic.ContentType;
+using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace Umbraco.Web
 {
@@ -43,10 +46,32 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="doc"></param>
 		/// <returns></returns>
+		[Obsolete("NiceUrl() is obsolete, use the Url() method instead")]
 		public static string NiceUrl(this IPublishedContent doc)
 		{
-			var umbHelper = new UmbracoHelper(UmbracoContext.Current);
-			return umbHelper.NiceUrl(doc.Id);
+			return doc.Url();
+		}
+
+		/// <summary>
+		/// Gets the Url for the content item
+		/// </summary>
+		/// <param name="doc"></param>
+		/// <returns></returns>
+		public static string Url(this IPublishedContent doc)
+		{
+			switch (doc.ItemType)
+			{
+				case PublishedItemType.Content:
+					var umbHelper = new UmbracoHelper(UmbracoContext.Current);
+					return umbHelper.NiceUrl(doc.Id);
+				case PublishedItemType.Media:
+					var prop = doc.GetProperty("umbracoFile");
+					if (prop == null)
+						throw new NotSupportedException("Cannot retreive a Url for a media item if there is no 'umbracoFile' property defined");
+					return prop.Value.ToString();
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
 		}
 
 		/// <summary>
@@ -54,10 +79,29 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="doc"></param>
 		/// <returns></returns>
+		[Obsolete("NiceUrlWithDomain() is obsolete, use the UrlWithDomain() method instead")]
 		public static string NiceUrlWithDomain(this IPublishedContent doc)
 		{
-			var umbHelper = new UmbracoHelper(UmbracoContext.Current);
-			return umbHelper.NiceUrlWithDomain(doc.Id);
+			return doc.UrlWithDomain();
+		}
+
+		/// <summary>
+		/// Gets the UrlWithDomain for the content item
+		/// </summary>
+		/// <param name="doc"></param>
+		/// <returns></returns>
+		public static string UrlWithDomain(this IPublishedContent doc)
+		{
+			switch (doc.ItemType)
+			{
+				case PublishedItemType.Content:
+					var umbHelper = new UmbracoHelper(UmbracoContext.Current);
+					return umbHelper.NiceUrlWithDomain(doc.Id);
+				case PublishedItemType.Media:
+					throw new NotSupportedException("NiceUrlWithDomain is not supported for media types");
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
 		}
 
 		/// <summary>
@@ -68,8 +112,116 @@ namespace Umbraco.Web
 		public static string GetTemplateAlias(this IPublishedContent doc)
 		{
 			var template = Template.GetTemplate(doc.TemplateId);
-			return template.Alias;			
+			return template.Alias;
 		}
+
+		#region GetPropertyValue
+
+		/// <summary>
+		/// if the val is a string, ensures all internal local links are parsed
+		/// </summary>
+		/// <param name="val"></param>
+		/// <returns></returns>
+		internal static object GetValueWithParsedLinks(object val)
+		{
+			//if it is a string send it through the url parser
+			var text = val as string;
+			if (text != null)
+			{
+				return TemplateUtilities.ResolveUrlsFromTextString(
+					TemplateUtilities.ParseInternalLinks(text));
+			}
+			//its not a string
+			return val;
+		}
+
+		public static object GetPropertyValue(this IPublishedContent doc, string alias)
+		{
+			return doc.GetPropertyValue(alias, false);
+		}
+		public static object GetPropertyValue(this IPublishedContent doc, string alias, string fallback)
+		{
+			var prop = doc.GetPropertyValue(alias);
+			return (prop != null && !Convert.ToString(prop).IsNullOrWhiteSpace()) ? prop : fallback;
+		}
+		public static object GetPropertyValue(this IPublishedContent doc, string alias, bool recursive)
+		{
+			var p = doc.GetProperty(alias, recursive);
+			if (p == null) return null;
+
+			//Here we need to put the value through the IPropertyEditorValueConverter's
+			//get the data type id for the current property
+			var dataType = PublishedContentHelper.GetDataType(doc.DocumentTypeAlias, alias);
+			//convert the string value to a known type
+			var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, dataType, doc.DocumentTypeAlias, alias);
+			return converted.Success
+					   ? GetValueWithParsedLinks(converted.Result)
+					   : GetValueWithParsedLinks(p.Value);
+		}
+		public static object GetPropertyValue(this IPublishedContent doc, string alias, bool recursive, string fallback)
+		{
+			var prop = doc.GetPropertyValue(alias, recursive);
+			return (prop != null && !Convert.ToString(prop).IsNullOrWhiteSpace()) ? prop : fallback;
+		}
+
+		/// <summary>
+		/// Returns the property as the specified type, if the property is not found or does not convert
+		/// then the default value of type T is returned.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="doc"></param>
+		/// <param name="alias"></param>
+		/// <returns></returns>
+		public static T GetPropertyValue<T>(this IPublishedContent doc, string alias)
+		{
+			return doc.GetPropertyValue<T>(alias, default(T));
+		}
+
+		public static T GetPropertyValue<T>(this IPublishedContent prop, string alias, bool recursive, T ifCannotConvert)
+		{
+			var p = prop.GetProperty(alias, recursive);
+			if (p == null)
+				return ifCannotConvert;
+
+			//before we try to convert it manually, lets see if the PropertyEditorValueConverter does this for us
+			//Here we need to put the value through the IPropertyEditorValueConverter's
+			//get the data type id for the current property
+			var dataType = PublishedContentHelper.GetDataType(prop.DocumentTypeAlias, alias);
+			//convert the value to a known type
+			var converted = PublishedContentHelper.ConvertPropertyValue(p.Value, dataType, prop.DocumentTypeAlias, alias);
+			object parsedLinksVal;
+			if (converted.Success)
+			{
+				parsedLinksVal = GetValueWithParsedLinks(converted.Result);
+
+				//if its successful, check if its the correct type and return it
+				if (parsedLinksVal is T)
+				{
+					return (T)parsedLinksVal;
+				}
+				//if that's not correct, try converting the converted type
+				var reConverted = converted.Result.TryConvertTo<T>();
+				if (reConverted.Success)
+				{
+					return reConverted.Result;
+				}
+			}
+
+			//first, parse links if possible
+			parsedLinksVal = GetValueWithParsedLinks(p.Value);
+			//last, if all the above has failed, we'll just try converting the raw value straight to 'T'
+			var manualConverted = parsedLinksVal.TryConvertTo<T>();
+			if (manualConverted.Success)
+				return manualConverted.Result;
+			return ifCannotConvert;
+		}
+
+		public static T GetPropertyValue<T>(this IPublishedContent prop, string alias, T ifCannotConvert)
+		{
+			return prop.GetPropertyValue<T>(alias, false, ifCannotConvert);
+		}
+
+		#endregion
 
 		#region Search
 		public static IEnumerable<IPublishedContent> Search(this IPublishedContent d, string term, bool useWildCards = true, string searchProvider = null)
@@ -117,7 +269,7 @@ namespace Umbraco.Web
 
 			var results = s.Search(criteria);
 			return results.ConvertSearchResultToPublishedContent(PublishedContentStoreResolver.Current.PublishedContentStore);
-		} 
+		}
 		#endregion
 
 		#region List Extensions
@@ -223,7 +375,7 @@ namespace Umbraco.Web
 			{
 				throw new IndexOutOfRangeException(string.Format("Node {0} belongs to a DynamicDocumentList but could not retrieve the index for it's position in the list", content.Id));
 			}
-		} 
+		}
 		#endregion
 
 		#region Is Helpers
@@ -438,42 +590,42 @@ namespace Umbraco.Web
 			var ancestors = content.AncestorsOrSelf();
 			return content.IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.Id == other.Id) != null);
 		}
-		public static HtmlString IsDescendantOrSelf(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue)
+		public static HtmlString IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
 		{
 			var ancestors = content.AncestorsOrSelf();
 			return content.IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.Id == other.Id) != null, valueIfTrue);
 		}
-		public static HtmlString IsDescendantOrSelf(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue, string valueIfFalse)
+		public static HtmlString IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
 		{
 			var ancestors = content.AncestorsOrSelf();
 			return content.IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.Id == other.Id) != null, valueIfTrue, valueIfFalse);
 		}
-		public static bool IsAncestor(this IPublishedContent content, DynamicPublishedContent other)
+		public static bool IsAncestor(this IPublishedContent content, IPublishedContent other)
 		{
 			var descendants = content.Descendants();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null);
 		}
-		public static HtmlString IsAncestor(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue)
+		public static HtmlString IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
 		{
 			var descendants = content.Descendants();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null, valueIfTrue);
 		}
-		public static HtmlString IsAncestor(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue, string valueIfFalse)
+		public static HtmlString IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
 		{
 			var descendants = content.Descendants();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null, valueIfTrue, valueIfFalse);
 		}
-		public static bool IsAncestorOrSelf(this IPublishedContent content, DynamicPublishedContent other)
+		public static bool IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other)
 		{
 			var descendants = content.DescendantsOrSelf();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null);
 		}
-		public static HtmlString IsAncestorOrSelf(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue)
+		public static HtmlString IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
 		{
 			var descendants = content.DescendantsOrSelf();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null, valueIfTrue);
 		}
-		public static HtmlString IsAncestorOrSelf(this IPublishedContent content, DynamicPublishedContent other, string valueIfTrue, string valueIfFalse)
+		public static HtmlString IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse)
 		{
 			var descendants = content.DescendantsOrSelf();
 			return content.IsHelper(n => descendants.FirstOrDefault(descendant => descendant.Id == other.Id) != null, valueIfTrue, valueIfFalse);
@@ -721,8 +873,8 @@ namespace Umbraco.Web
 		{
 			//get the root docs if parent is null
 			var ownersList = content.Parent == null
-				                 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-				                 : content.Parent.Children;
+								 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
+								 : content.Parent.Children;
 
 			var container = ownersList.ToList();
 			var currentIndex = container.FindIndex(n => n.Id == content.Id);
@@ -737,16 +889,16 @@ namespace Umbraco.Web
 		{
 			//get the root docs if parent is null
 			var ownersList = content.Parent == null
-				                 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-				                 : content.Parent.Children;
+								 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
+								 : content.Parent.Children;
 
 			var container = ownersList.ToList();
 			var currentIndex = container.FindIndex(n => n.Id == content.Id);
 			if (currentIndex != -1)
 			{
 				var newIndex = container.FindIndex(currentIndex, n => n.DocumentTypeAlias == nodeTypeAlias);
-				return newIndex != -1 
-					? container.ElementAt(newIndex) 
+				return newIndex != -1
+					? container.ElementAt(newIndex)
 					: null;
 			}
 			throw new IndexOutOfRangeException(string.Format("Node {0} belongs to a DynamicNodeList but could not retrieve the index for it's position in the list", content.Id));
@@ -774,8 +926,8 @@ namespace Umbraco.Web
 		{
 			//get the root docs if parent is null
 			var ownersList = content.Parent == null
-				                 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-				                 : content.Parent.Children;
+								 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
+								 : content.Parent.Children;
 
 			var container = ownersList.ToList();
 			int currentIndex = container.FindIndex(n => n.Id == content.Id);
@@ -810,8 +962,8 @@ namespace Umbraco.Web
 		{
 			//get the root docs if parent is null
 			var ownersList = content.Parent == null
-				                 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-				                 : content.Parent.Children;
+								 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
+								 : content.Parent.Children;
 
 			var container = ownersList.ToList();
 			var currentIndex = container.FindIndex(n => n.Id == content.Id);
@@ -848,7 +1000,7 @@ namespace Umbraco.Web
 		public static IEnumerable<IPublishedContent> Children(this IPublishedContent p)
 		{
 			return p.Children;
-		} 
+		}
 
 		/// <summary>
 		/// Returns a DataTable object for the IPublishedContent
@@ -870,10 +1022,10 @@ namespace Umbraco.Web
 		private static DataTable GenerateDataTable(IPublishedContent node, string nodeTypeAliasFilter = "")
 		{
 			var firstNode = nodeTypeAliasFilter.IsNullOrWhiteSpace()
-			                	? node.Children.Any()
-			                	  	? node.Children.ElementAt(0)
-			                	  	: null
-			                	: node.Children.FirstOrDefault(x => x.DocumentTypeAlias == nodeTypeAliasFilter);
+								? node.Children.Any()
+									? node.Children.ElementAt(0)
+									: null
+								: node.Children.FirstOrDefault(x => x.DocumentTypeAlias == nodeTypeAliasFilter);
 			if (firstNode == null)
 				return new DataTable(); //no children found 
 
@@ -887,19 +1039,19 @@ namespace Umbraco.Web
 				alias => GetPropertyAliasesAndNames(alias),
 				//pass in a callback to populate the datatable, yup its a bit ugly but it's already legacy and we just want to maintain code in one place.
 				() =>
+				{
+					//create all row data
+					var tableData = Umbraco.Core.DataTableExtensions.CreateTableData();
+					//loop through each child and create row data for it
+					foreach (var n in node.Children)
 					{
-						//create all row data
-						var tableData = Umbraco.Core.DataTableExtensions.CreateTableData();
-						//loop through each child and create row data for it
-						foreach (var n in node.Children)
+						if (!nodeTypeAliasFilter.IsNullOrWhiteSpace())
 						{
-							if (!nodeTypeAliasFilter.IsNullOrWhiteSpace())
-							{
-								if (n.DocumentTypeAlias != nodeTypeAliasFilter)
-									continue; //skip this one, it doesn't match the filter
-							}
+							if (n.DocumentTypeAlias != nodeTypeAliasFilter)
+								continue; //skip this one, it doesn't match the filter
+						}
 
-							var standardVals = new Dictionary<string, object>()
+						var standardVals = new Dictionary<string, object>()
 								{
 									{"Id", n.Id},
 									{"NodeName", n.Name},
@@ -910,22 +1062,22 @@ namespace Umbraco.Web
 									{"WriterName", n.WriterName},
 									{"Url", urlProvider.GetNiceUrl(n.Id)}
 								};
-							var userVals = new Dictionary<string, object>();
-							foreach (var p in from IPublishedContentProperty p in n.Properties where p.Value != null select p)
-							{
-								userVals[p.Alias] = p.Value;
-							}
-							//add the row data
-							Umbraco.Core.DataTableExtensions.AddRowData(tableData, standardVals, userVals);
+						var userVals = new Dictionary<string, object>();
+						foreach (var p in from IPublishedContentProperty p in n.Properties where p.Value != null select p)
+						{
+							userVals[p.Alias] = p.Value;
 						}
-						return tableData;
+						//add the row data
+						Umbraco.Core.DataTableExtensions.AddRowData(tableData, standardVals, userVals);
 					}
+					return tableData;
+				}
 				);
 			return dt;
 		}
 
 		private static Func<string, Dictionary<string, string>> _getPropertyAliasesAndNames;
-		
+
 		/// <summary>
 		/// This is used only for unit tests to set the delegate to look up aliases/names dictionary of a content type
 		/// </summary>

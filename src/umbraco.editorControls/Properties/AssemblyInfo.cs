@@ -7,8 +7,8 @@ using System.Runtime.CompilerServices;
 // associated with an assembly.
 //
 [assembly: AssemblyTitle("umbraco.editorControls")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Core assembly containing the Editor Controls")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("")]
+[assembly: AssemblyProduct("Umbraco CMS")]
 
 [assembly: InternalsVisibleTo("Umbraco.Tests")]

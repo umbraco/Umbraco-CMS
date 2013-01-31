@@ -1,0 +1,38 @@
+﻿using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models.Rdbms;
+
+namespace Umbraco.Core.Persistence.Factories
+{
+    internal class UserTypeFactory : IEntityFactory<IUserType, UserTypeDto>
+    {
+        #region Implementation of IEntityFactory<IUserType,UserTypeDto>
+
+        public IUserType BuildEntity(UserTypeDto dto)
+        {
+            return new UserType
+                       {
+                           Alias = dto.Alias,
+                           Id = dto.Id,
+                           Name = dto.Name,
+                           Permissions = dto.DefaultPermissions
+                       };
+        }
+
+        public UserTypeDto BuildDto(IUserType entity)
+        {
+            var userType = new UserTypeDto
+                               {
+                                   Alias = entity.Alias,
+                                   DefaultPermissions = entity.Permissions,
+                                   Name = entity.Name
+                               };
+
+            if(entity.HasIdentity)
+                userType.Id = short.Parse(entity.Id.ToString());
+
+            return userType;
+        }
+
+        #endregion
+    }
+}

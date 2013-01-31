@@ -1,6 +1,9 @@
 using System;
-using System.Data;
-
+using System.Linq;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using umbraco.interfaces;
@@ -13,15 +16,25 @@ namespace umbraco.cms.businesslogic.datatype
     /// </summary>
     public class DefaultData : IData, IDataWithPreview
 	{
-		private int m_PropertyId;
-		private object m_Value;
+		private int _propertyId;
+		private object _value;
 		protected BaseDataType _dataType;
-        private bool m_PreviewMode;
-        private bool m_ValueLoaded = false;
+        private bool _previewMode;
+        private bool _valueLoaded = false;
+		private Guid? _version = null;
+		private int? _nodeId = null;
 
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
+        }
+
+        //TODO Refactor this class to use the Database object instead of the SqlHelper
+        //NOTE DatabaseContext.Current.Database should eventually be replaced with that from the Repository-Resolver refactor branch. 
+        internal static Database Database
+        {
+            get { return ApplicationContext.Current.DatabaseContext.Database; }
         }
 
         /// <summary>
@@ -40,8 +53,8 @@ namespace umbraco.cms.businesslogic.datatype
         /// <param name="InitPropertyId">The init property id.</param>
         public virtual void Initialize(object InitValue, int InitPropertyId)
         {
-            m_PropertyId = InitPropertyId;
-            m_Value = InitValue;
+            _propertyId = InitPropertyId;
+            _value = InitValue;
         }
 
         /// <summary>
@@ -49,33 +62,29 @@ namespace umbraco.cms.businesslogic.datatype
         /// </summary>
         protected virtual void LoadValueFromDatabase()
         {
+            var sql = new Sql();
+            sql.Select("*")
+               .From<PropertyDataDto>()
+               .InnerJoin<PropertyTypeDto>()
+               .On<PropertyTypeDto, PropertyDataDto>(x => x.Id, y => y.PropertyTypeId)
+               .InnerJoin<DataTypeDto>()
+               .On<DataTypeDto, PropertyTypeDto>(x => x.DataTypeId, y => y.DataTypeId)
+               .Where("cmsPropertyData.id = @Id", new {Id = _propertyId});
+            var dto = Database.Fetch<PropertyDataDto, PropertyTypeDto, DataTypeDto>(sql).FirstOrDefault();
 
-            //this is an optimized version of this query. In one call it will return the data type
-            //and the values, this will then set the underlying db type and value of the BaseDataType object
-            //instead of having it query the database itself.
-            var sql = @"
-                SELECT dataInt, dataDate, dataNvarchar, dataNtext, dbType FROM cmsPropertyData 
-                INNER JOIN cmsPropertyType ON cmsPropertyType.id = cmsPropertyData.propertytypeid
-                INNER JOIN cmsDataType ON cmsDataType.nodeId = cmsPropertyType.dataTypeId
-                WHERE cmsPropertyData.id = " + m_PropertyId;
-
-            using (var r = SqlHelper.ExecuteReader(sql))
+            if (dto != null)
             {
-                if (r.Read())
-                {
-                    //the type stored in the cmsDataType table
-                    var strDbType = r.GetString("dbType"); 
-                    //get the enum of the data type
-                    var dbType = BaseDataType.GetDBType(strDbType); 
-                    //get the column name in the cmsPropertyData table that stores the correct information for the data type
-                    var fieldName = BaseDataType.GetDataFieldName(dbType);
-                    //get the value for the data type, if null, set it to an empty string
-                    m_Value = r.GetObject(fieldName) ?? string.Empty;
-
-                    //now that we've set our value, we can update our BaseDataType object with the correct values from the db
-                    //instead of making it query for itself. This is a peformance optimization enhancement.
-                    _dataType.SetDataTypeProperties(fieldName, dbType);
-                }                
+                //the type stored in the cmsDataType table
+                var strDbType = dto.PropertyTypeDto.DataTypeDto.DbType;
+                //get the enum of the data type
+                var dbType = BaseDataType.GetDBType(strDbType);
+                //get the column name in the cmsPropertyData table that stores the correct information for the data type
+                var fieldName = BaseDataType.GetDataFieldName(dbType);
+                //get the value for the data type, if null, set it to an empty string
+                _value = dto.GetValue;
+                //now that we've set our value, we can update our BaseDataType object with the correct values from the db
+                //instead of making it query for itself. This is a peformance optimization enhancement.
+                _dataType.SetDataTypeProperties(fieldName, dbType);
             }
         }
 
@@ -83,7 +92,7 @@ namespace umbraco.cms.businesslogic.datatype
         {
             get
             {
-                return this._dataType.DBType;
+                return _dataType.DBType;
             }
         }
 
@@ -95,7 +104,6 @@ namespace umbraco.cms.businesslogic.datatype
             }
         }
 
-
 		#region IData Members
 
         /// <summary>
@@ -106,7 +114,7 @@ namespace umbraco.cms.businesslogic.datatype
 		public virtual XmlNode ToXMl(XmlDocument data)
 		{
             string sValue = Value!=null ? Value.ToString() : String.Empty;
-			if (this._dataType.DBType == DBTypes.Ntext)
+			if (_dataType.DBType == DBTypes.Ntext)
                 return data.CreateCDataSection(sValue);
             return data.CreateTextNode(sValue);
 		}
@@ -120,47 +128,17 @@ namespace umbraco.cms.businesslogic.datatype
 			get 
 			{
                 //Lazy load the value when it is required.
-                if (!m_ValueLoaded)
+                if (!_valueLoaded)
                 {
                     LoadValueFromDatabase();
-                    m_ValueLoaded = true;
+                    _valueLoaded = true;
                 } 
-				return m_Value;
+				return _value;
 			}
 			set 
 			{
-                if (!PreviewMode)
-                {
-                    // Try to set null values if possible
-                    try
-                    {
-                        //CHANGE:by Allan Laustsen to fix copy nodes
-                        //if (value == null)
-                        if (value == null ||
-                            (string.IsNullOrEmpty(value.ToString()) &&
-                             (this._dataType.DBType == DBTypes.Integer || this._dataType.DBType == DBTypes.Date)))
-                            SqlHelper.ExecuteNonQuery("update cmsPropertyData set " + _dataType.DataFieldName +
-                                                      " = NULL where id = " + m_PropertyId);
-                        else
-                        {
-                            // we need to be sure that the value doesn't contain malformatted xml
-                            if (_dataType.DBType == DBTypes.Ntext || _dataType.DBType == DBTypes.Nvarchar)
-                            {
-                                value = cms.helpers.xhtml.RemoveIllegalXmlCharacters(value.ToString());
-                            }
-                            SqlHelper.ExecuteNonQuery(
-                                "update cmsPropertyData set " + _dataType.DataFieldName + " = @value where id = " +
-                                m_PropertyId, SqlHelper.CreateParameter("@value", value));
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        umbraco.BusinessLogic.Log.Add(umbraco.BusinessLogic.LogTypes.Debug, umbraco.BusinessLogic.User.GetUser(0), -1, "Error updating item: " + e.ToString());
-                        if (value == null) value = "";
-                        SqlHelper.ExecuteNonQuery("update cmsPropertyData set " + _dataType.DataFieldName + " = @value where id = " + m_PropertyId, SqlHelper.CreateParameter("@value", value));
-                    }
-                }
-                m_Value = value;
+                _value = value;
+                _valueLoaded = true;
 			}
 		}
 
@@ -192,26 +170,27 @@ namespace umbraco.cms.businesslogic.datatype
 		{
 			get
             {
-				return m_PropertyId;
+				return _propertyId;
 			}
 			set
 			{
-				m_PropertyId = value;
+				_propertyId = value;
                 //LoadValueFromDatabase();
 			}
 		}
-
+		
 		// TODO: clean up Legacy - these are needed by the wysiwyeditor, in order to feed the richtextholder with version and nodeid
 		// solution, create a new version of the richtextholder, which does not depend on these.
         public virtual Guid Version
         {
 			get
-            {
-                using (IRecordsReader dr = SqlHelper.ExecuteReader("SELECT versionId FROM cmsPropertyData WHERE id = " + PropertyId))
-                {
-                    dr.Read();
-                    return dr.GetGuid("versionId");
-                }
+			{
+				if (_version == null)
+				{
+					var dto = Database.FirstOrDefault<PropertyDataDto>("WHERE id = @Id", new { Id = PropertyId });
+					_version = dto.VersionId.HasValue ? dto.VersionId.Value : Guid.Empty;	
+				}
+				return _version.Value;
 			}
 		}
 
@@ -222,8 +201,12 @@ namespace umbraco.cms.businesslogic.datatype
         public virtual int NodeId
         {
 			get
-            {
-				return SqlHelper.ExecuteScalar<int>("Select contentNodeid from cmsPropertyData where id = " + PropertyId);
+			{
+				if (_nodeId == null)
+				{
+					_nodeId = Database.ExecuteScalar<int>("Select contentNodeid from cmsPropertyData where id = @Id", new { Id = PropertyId });	
+				}
+				return _nodeId.Value;
 			}
 		}
 
@@ -242,16 +225,16 @@ namespace umbraco.cms.businesslogic.datatype
         {
             get
             {
-                return m_PreviewMode;
+                return _previewMode;
             }
             set
             {
-                if (m_PreviewMode != value)
+                if (_previewMode != value)
                 {
                     // if preview mode is switched off, reload the value from persistent storage
                     if (!value)
                         LoadValueFromDatabase();
-                    m_PreviewMode = value;
+                    _previewMode = value;
                 }
             }
         }

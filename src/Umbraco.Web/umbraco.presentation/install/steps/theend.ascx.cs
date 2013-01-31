@@ -1,4 +1,5 @@
 using System.IO;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.BusinessLogic;
 using System;
@@ -23,14 +24,18 @@ namespace umbraco.presentation.install.steps
             // Update configurationStatus
             try
             {
-                
-                GlobalSettings.ConfigurationStatus = GlobalSettings.CurrentVersion;
+
+                GlobalSettings.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
                 Application["umbracoNeedConfiguration"] = false;
             }
             catch (Exception)
             {
                 //errorLiteral.Text = ex.ToString();
             }
+
+            // Update ClientDependency version
+            var clientDependencyConfig = new ClientDependencyConfiguration();
+            var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
 
             if (!cms.businesslogic.skinning.Skinning.IsStarterKitInstalled())
                 customizeSite.Visible = false;

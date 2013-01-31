@@ -174,6 +174,13 @@ namespace umbraco.editorControls.Slider
                 (hasMultipleValues ? "{ allow: ',' }" : string.Empty));
             var javascript = string.Concat("<script type='text/javascript'>jQuery(window).load(function(){", javascriptMethod, "});</script>");
             writer.WriteLine(javascript);
+
+            if (this.Options.EnableRange || !string.IsNullOrEmpty(this.Options.RangeValue))
+            {
+                // add CSS to override the default style for '.ui-slider-range' (which is used for the DateTime Picker)
+                var css = string.Format("<style type='text/css'>#{0} .ui-slider-range {{background-image: none;}}</style>", this.ClientID);
+                writer.WriteLine(css);
+            }
         }
     }
 }

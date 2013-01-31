@@ -240,7 +240,13 @@ namespace Umbraco.Core
 					"umbraco.webservices",
                     "Lucene.",
                     "Examine,",
-                    "Examine."
+                    "Examine.",
+                    "ServiceStack.",
+                    "MySql.",
+                    "HtmlAgilityPack.",
+                    "TidyNet.",
+                    "ICSharpCode.",
+                    "CookComputing."
                 };
 
 		public static IEnumerable<Type> FindClassesOfTypeWithAttribute<T, TAttribute>()
@@ -401,6 +407,10 @@ namespace Umbraco.Core
 
 		private static IEnumerable<Type> GetTypesWithFormattedException(Assembly a)
 		{
+			//if the assembly is dynamic, do not try to scan it
+			if (a.IsDynamic)
+				return Enumerable.Empty<Type>();
+
 			try
 			{
 				return a.GetExportedTypes();

@@ -1,28 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.IO;
+using System.Globalization;
 using System.Text;
-using System.Web;
-using System.Xml;
-using System.Configuration;
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
+using Umbraco.Core.Services;
+using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.contentitem;
-using umbraco.cms.businesslogic.datatype;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.media;
-using umbraco.cms.businesslogic.member;
-using umbraco.cms.businesslogic.property;
-using umbraco.cms.businesslogic.web;
-using umbraco.interfaces;
-using umbraco.DataLayer;
-using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
+using umbraco.interfaces;
 
 namespace umbraco
 {
@@ -37,6 +21,14 @@ namespace umbraco
             rootNode.NodeID = "init";
         }
 
+        protected override void CreateAllowedActions(ref List<IAction> actions)
+        {
+            actions.Clear();
+            actions.Add(ActionNew.Instance);
+            actions.Add(ContextMenuSeperator.Instance);
+            actions.Add(ActionDelete.Instance);
+        }
+
         public override void RenderJS(ref StringBuilder Javascript)
         {
             Javascript.Append(
@@ -49,14 +41,25 @@ function openMediaType(id) {
 
         public override void Render(ref XmlTree tree)
         {
-            foreach (MediaType dt in MediaType.GetAll)
+            var mediaTypes = Service.GetMediaTypeChildren(base.m_id);
+
+            foreach (var mediaType in mediaTypes)
             {
+                var hasChildren = Service.MediaTypeHasChildren(mediaType.Id);
+
                 XmlTreeNode xNode = XmlTreeNode.Create(this);
-                xNode.NodeID = dt.Id.ToString();
-                xNode.Text = dt.Text;
-                xNode.Action = string.Format("javascript:openMediaType({0});", dt.Id);
+                xNode.NodeID = mediaType.Id.ToString(CultureInfo.InvariantCulture);
+                xNode.Text = mediaType.Name;
+                xNode.Action = string.Format("javascript:openMediaType({0});", mediaType.Id);
                 xNode.Icon = "settingDataType.gif";
                 xNode.OpenIcon = "settingDataType.gif";
+                xNode.Source = GetTreeServiceUrl(mediaType.Id);
+                xNode.HasChildren = hasChildren;
+                if (hasChildren)
+                {
+                    xNode.Icon = "settingMasterDataType.gif";
+                    xNode.OpenIcon = "settingMasterDataType.gif";
+                }
 
                 OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
                 if (xNode != null)
@@ -68,6 +71,9 @@ function openMediaType(id) {
             }
         }
 
+        private IContentTypeService Service
+        {
+            get { return Services.ContentTypeService; }
+        }
     }
-
 }

@@ -42,7 +42,7 @@ namespace umbraco
 
         public bool Save()
         {
-            cms.businesslogic.web.DocumentType dt = cms.businesslogic.web.DocumentType.MakeNew(BusinessLogic.User.GetUser(_userID), Alias.Replace("'", "''"));
+            var dt = cms.businesslogic.web.DocumentType.MakeNew(BusinessLogic.User.GetUser(_userID), Alias.Replace("'", "''"));
             dt.IconUrl = "folder.gif";
 
             // Create template?
@@ -58,6 +58,8 @@ namespace umbraco
             {
                 dt.MasterContentType = TypeID;
             }
+
+            dt.Save();
 
             m_returnUrl = "settings/editNodeTypeNew.aspx?id=" + dt.Id.ToString();
 

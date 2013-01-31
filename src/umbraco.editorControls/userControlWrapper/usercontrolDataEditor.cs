@@ -1,18 +1,9 @@
 using System;
-using System.Data;
-using System.Configuration;
-using System.Web;
-using System.Web.Security;
 using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.property;
-using umbraco.interfaces;
-using umbraco.editorControls;
 using umbraco.cms.businesslogic.datatype;
 using System.Collections.Generic;
-using umbraco.IO;
 
 namespace umbraco.editorControls.userControlGrapper
 {
@@ -33,7 +24,7 @@ namespace umbraco.editorControls.userControlGrapper
         public usercontrolDataEditor(umbraco.interfaces.IData Data, string UsercontrolPath)
         {
 			_data = Data;
-            _usercontrolPath = UsercontrolPath;
+            _usercontrolPath = IOHelper.FindFile(UsercontrolPath);
 		}
 
 		public virtual bool TreatAsRichTextEditor 
@@ -60,13 +51,6 @@ namespace umbraco.editorControls.userControlGrapper
 		{
 			base.OnInit (e);
 
-            if (!_usercontrolPath.StartsWith("~"))
-            {
-                if (_usercontrolPath.StartsWith("/"))
-                    _usercontrolPath = "~" + _usercontrolPath;
-                else
-                    _usercontrolPath = "~/" + _usercontrolPath;
-            }
             Control oControl = new System.Web.UI.UserControl().LoadControl(_usercontrolPath);
 
             if (HasSettings(oControl.GetType()))

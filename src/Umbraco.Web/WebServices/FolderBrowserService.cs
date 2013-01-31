@@ -15,6 +15,8 @@ using Umbraco.Web.BaseRest;
 
 namespace Umbraco.Web.WebServices
 {
+	//TODO: Can we convert this to MVC please instead of /base?
+
     [RestExtension("FolderBrowserService")]
     public class FolderBrowserService
     {

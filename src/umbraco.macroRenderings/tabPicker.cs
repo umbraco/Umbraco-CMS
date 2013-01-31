@@ -83,11 +83,11 @@ namespace umbraco.macroRenderings
 				this.SelectionMode = System.Web.UI.WebControls.ListSelectionMode.Single;
 			}
 
-			//SqlDataReader dr = SqlHelper.ExecuteReader(GlobalSettings.DbDSN, CommandType.Text, "select distinct text from cmsTab order by text");
+			//SqlDataReader dr = SqlHelper.ExecuteReader(GlobalSettings.DbDSN, CommandType.Text, "select distinct text from cmsPropertyTypeGroup order by text");
 
 
 
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select distinct text from cmsTab order by text")) {
+            using (IRecordsReader dr = SqlHelper.ExecuteReader("select distinct text from cmsPropertyTypeGroup order by text")) {
                 while (dr.Read()) {
 
                     System.Web.UI.WebControls.ListItem li = new System.Web.UI.WebControls.ListItem(dr.GetString("text"), dr.GetString("text").ToLower());

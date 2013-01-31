@@ -659,6 +659,10 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="fileSavedHeader"><![CDATA[File salvato]]></key>
     <key alias="fileSavedText"><![CDATA[File salvato con successo]]></key>
     <key alias="languageSaved"><![CDATA[Lingua salvata]]></key>
+    <key alias="partialViewSavedHeader">Partial view salvata</key>    
+    <key alias="partialViewSavedText">Partial view salvata senza errori!</key>    
+    <key alias="partialViewErrorHeader">Partial view non salvata</key>   
+    <key alias="partialViewErrorText">Errore durante il salvataggio del file.</key>
     <key alias="pythonErrorHeader"><![CDATA[Script Python non salvato]]></key>
     <key alias="pythonErrorText"><![CDATA[A causa di un errore lo script Python non può essere salvato]]></key>
     <key alias="pythonSavedHeader"><![CDATA[Script Python salvato]]></key>

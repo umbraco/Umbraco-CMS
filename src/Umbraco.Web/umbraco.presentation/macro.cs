@@ -311,7 +311,7 @@ namespace umbraco
 
             Model.CacheIdentifier = GetCacheIdentifier(Model, pageElements, pageId);
 
-            if (Model.CacheDuration > 0)
+            if (!UmbracoContext.Current.InPreviewMode && Model.CacheDuration > 0)
             {
                 if (cacheMacroAsString(Model))
                 {
@@ -422,6 +422,11 @@ namespace umbraco
                         try
                         {
 							TraceInfo("umbracoMacro","Usercontrol added (" + Model.TypeName + ")");
+                            
+                            // Add tilde for v4 defined macros
+                            if (string.IsNullOrEmpty(Model.TypeName) == false && Model.TypeName.StartsWith("~") == false)
+                                Model.TypeName = "~/" + Model.TypeName;
+
                             macroControl = loadUserControl(ScriptType, Model, pageElements);
                             break;
                         }
@@ -1494,15 +1499,7 @@ namespace umbraco
 
             try
             {
-                string userControlPath = fileName;
-
-                if (!userControlPath.StartsWith("~"))
-                {
-                    if (userControlPath.StartsWith("/"))
-                        userControlPath = "~" + userControlPath;
-                    else
-                        userControlPath = "~/" + userControlPath;
-                }
+                string userControlPath = IOHelper.FindFile(fileName);
 
                 if (!File.Exists(IOHelper.MapPath(userControlPath)))
                     return new LiteralControl(string.Format("UserControl {0} does not exist.", fileName));

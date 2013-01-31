@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>UmbracoCms</id>
-        <version>$version$</version>
+        <version>6.0.0-alpha</version>
         <title>Umbraco Cms</title>
         <authors>Morten Christensen</authors>
         <owners>Umbraco HQ</owners>
@@ -19,15 +19,17 @@
         </dependencies>
     </metadata>
   <files>
-    <file src="..\_BuildOutput\WebApp\config\*.config" target="Content\config" />
+	<file src="..\_BuildOutput\WebApp\bin\amd64\**" target="Content\bin\amd64" />
+	<file src="..\_BuildOutput\WebApp\bin\x86\**" target="Content\bin\x86" />
+	<file src="..\_BuildOutput\WebApp\config\*.config" target="Content\config" />
 	<file src="..\_BuildOutput\WebApp\css\**" target="Content\css" />
 	<file src="..\_BuildOutput\WebApp\macroScripts\**" target="Content\macroScripts" />
 	<file src="..\_BuildOutput\WebApp\masterpages\**" target="Content\masterpages" />
 	<file src="..\_BuildOutput\WebApp\media\**" target="Content\media" />
 	<file src="..\_BuildOutput\WebApp\scripts\**" target="Content\scripts" />
 	<file src="..\_BuildOutput\WebApp\usercontrols\**" target="Content\usercontrols" />
-	<file src="..\_BuildOutput\WebApp\xslt\**" target="Content\xslt" />
 	<file src="..\_BuildOutput\WebApp\Views\**" target="Content\Views" />
+	<file src="..\_BuildOutput\WebApp\xslt\**" target="Content\xslt" />
 	<file src="..\_BuildOutput\WebApp\default.aspx" target="Content\default.aspx" />
 	<file src="..\_BuildOutput\WebApp\Web.config" target="Content\Web.config" />
 	<file src="..\_BuildOutput\WebApp\App_Browsers\**" target="UmbracoFiles\App_Browsers" />
@@ -38,8 +40,8 @@
 	<file src="..\_BuildOutput\WebApp\install\**" target="UmbracoFiles\install" />
 	<file src="..\_BuildOutput\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
 	<file src="..\_BuildOutput\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
-	<file src="..\_BuildOutput\WebApp\Web.config" target="UmbracoFiles\Web.config" />
 	<file src="..\_BuildOutput\WebApp\Global.asax" target="UmbracoFiles\Global.asax" />
+	<file src="..\_BuildOutput\WebApp\Web.config" target="UmbracoFiles\Web.config" />
     <file src="tools\install.ps1" target="tools\install.ps1" />
     <file src="tools\Readme.txt" target="tools\Readme.txt" />
   </files>

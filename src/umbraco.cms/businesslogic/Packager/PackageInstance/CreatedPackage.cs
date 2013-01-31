@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Web;
-
+using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.macro;
@@ -92,187 +92,212 @@ namespace umbraco.cms.businesslogic.packager {
 
             CreatedPackage package = this;
             PackageInstance pack = package.Data;
-                        
-            try {
 
-                PublishEventArgs e = new PublishEventArgs();
-                package.FireBeforePublish(e);
+			try
+			{
 
-                if (!e.Cancel) {
-                    int outInt = 0;
+				PublishEventArgs e = new PublishEventArgs();
+				package.FireBeforePublish(e);
 
-                    //Path checking...
-                    string localPath = IOHelper.MapPath(IO.SystemDirectories.Media + "/" + pack.Folder);
+				if (!e.Cancel)
+				{
+					int outInt = 0;
 
-                    if (!System.IO.Directory.Exists(localPath))
-                        System.IO.Directory.CreateDirectory(localPath);
+					//Path checking...
+					string localPath = IOHelper.MapPath(IO.SystemDirectories.Media + "/" + pack.Folder);
 
-                    //Init package file...
-                    createPackageManifest();
-                    //Info section..
-                    appendElement(utill.PackageInfo(pack, _packageManifest));
+					if (!System.IO.Directory.Exists(localPath))
+						System.IO.Directory.CreateDirectory(localPath);
 
-                    //Documents...
-                    int _contentNodeID = 0;
-                    if (!String.IsNullOrEmpty(pack.ContentNodeId) && int.TryParse(pack.ContentNodeId, out _contentNodeID)) {
-                        XmlNode documents = _packageManifest.CreateElement("Documents");
+					//Init package file...
+					createPackageManifest();
+					//Info section..
+					appendElement(utill.PackageInfo(pack, _packageManifest));
 
-                        XmlNode documentSet = _packageManifest.CreateElement("DocumentSet");
-                        XmlAttribute importMode = _packageManifest.CreateAttribute("importMode", "");
-                        importMode.Value = "root";
-                        documentSet.Attributes.Append(importMode);
-                        documents.AppendChild(documentSet);
+					//Documents...
+					int _contentNodeID = 0;
+					if (!String.IsNullOrEmpty(pack.ContentNodeId) && int.TryParse(pack.ContentNodeId, out _contentNodeID))
+					{
+						XmlNode documents = _packageManifest.CreateElement("Documents");
 
-                        //load content from umbraco.
-                        cms.businesslogic.web.Document umbDocument = new Document(_contentNodeID);
-                        documentSet.AppendChild(umbDocument.ToXml(_packageManifest, pack.ContentLoadChildNodes));
+						XmlNode documentSet = _packageManifest.CreateElement("DocumentSet");
+						XmlAttribute importMode = _packageManifest.CreateAttribute("importMode", "");
+						importMode.Value = "root";
+						documentSet.Attributes.Append(importMode);
+						documents.AppendChild(documentSet);
 
-                        appendElement(documents);
-                    }
+						//load content from umbraco.
+						cms.businesslogic.web.Document umbDocument = new Document(_contentNodeID);
+						documentSet.AppendChild(umbDocument.ToXml(_packageManifest, pack.ContentLoadChildNodes));
 
-                    //Document types..
-                    List<DocumentType> dtl = new List<DocumentType>();
-                    XmlNode docTypes = _packageManifest.CreateElement("DocumentTypes");
-                    foreach (string dtId in pack.Documenttypes) {
-                        if (int.TryParse(dtId, out outInt)) {
-                            DocumentType docT = new DocumentType(outInt);
+						appendElement(documents);
+					}
 
-                            AddDocumentType(docT, ref dtl);
+					//Document types..
+					List<DocumentType> dtl = new List<DocumentType>();
+					XmlNode docTypes = _packageManifest.CreateElement("DocumentTypes");
+					foreach (string dtId in pack.Documenttypes)
+					{
+						if (int.TryParse(dtId, out outInt))
+						{
+							DocumentType docT = new DocumentType(outInt);
 
-                        }
-                    }
-                    foreach (DocumentType d in dtl)
-                    {
-                        docTypes.AppendChild(d.ToXml(_packageManifest));
-                    }
+							AddDocumentType(docT, ref dtl);
 
-                    appendElement(docTypes);
+						}
+					}
+					foreach (DocumentType d in dtl)
+					{
+						docTypes.AppendChild(d.ToXml(_packageManifest));
+					}
 
-                    //Templates
-                    XmlNode templates = _packageManifest.CreateElement("Templates");
-                    foreach (string templateId in pack.Templates) {
-                        if (int.TryParse(templateId, out outInt)) {
-                            Template t = new Template(outInt);
-                            templates.AppendChild(t.ToXml(_packageManifest));
-                        }
-                    }
-                    appendElement(templates);
+					appendElement(docTypes);
 
-                    //Stylesheets
-                    XmlNode stylesheets = _packageManifest.CreateElement("Stylesheets");
-                    foreach (string ssId in pack.Stylesheets) {
-                        if (int.TryParse(ssId, out outInt)) {
-                            StyleSheet s = new StyleSheet(outInt);
-                            stylesheets.AppendChild(s.ToXml(_packageManifest));
-                        }
-                    }
-                    appendElement(stylesheets);
+					//Templates
+					XmlNode templates = _packageManifest.CreateElement("Templates");
+					foreach (string templateId in pack.Templates)
+					{
+						if (int.TryParse(templateId, out outInt))
+						{
+							Template t = new Template(outInt);
+							templates.AppendChild(t.ToXml(_packageManifest));
+						}
+					}
+					appendElement(templates);
 
-                    //Macros
-                    XmlNode macros = _packageManifest.CreateElement("Macros");
-                    foreach (string macroId in pack.Macros) {
-                        if (int.TryParse(macroId, out outInt)) {
-                            macros.AppendChild(utill.Macro(int.Parse(macroId), true, localPath, _packageManifest));
-                        }
-                    }
-                    appendElement(macros);
+					//Stylesheets
+					XmlNode stylesheets = _packageManifest.CreateElement("Stylesheets");
+					foreach (string ssId in pack.Stylesheets)
+					{
+						if (int.TryParse(ssId, out outInt))
+						{
+							StyleSheet s = new StyleSheet(outInt);
+							stylesheets.AppendChild(s.ToXml(_packageManifest));
+						}
+					}
+					appendElement(stylesheets);
 
-                    //Dictionary Items
-                    XmlNode dictionaryItems = _packageManifest.CreateElement("DictionaryItems");
-                    foreach (string dictionaryId in pack.DictionaryItems) {
-                        if (int.TryParse(dictionaryId, out outInt)) {
-                            Dictionary.DictionaryItem di = new Dictionary.DictionaryItem(outInt);
-                            dictionaryItems.AppendChild(di.ToXml(_packageManifest));
-                        }
-                    }
-                    appendElement(dictionaryItems);
+					//Macros
+					XmlNode macros = _packageManifest.CreateElement("Macros");
+					foreach (string macroId in pack.Macros)
+					{
+						if (int.TryParse(macroId, out outInt))
+						{
+							macros.AppendChild(utill.Macro(int.Parse(macroId), true, localPath, _packageManifest));
+						}
+					}
+					appendElement(macros);
 
-                    //Languages
-                    XmlNode languages = _packageManifest.CreateElement("Languages");
-                    foreach (string langId in pack.Languages) {
-                        if (int.TryParse(langId, out outInt)) {
-                            language.Language lang = new umbraco.cms.businesslogic.language.Language(outInt);
+					//Dictionary Items
+					XmlNode dictionaryItems = _packageManifest.CreateElement("DictionaryItems");
+					foreach (string dictionaryId in pack.DictionaryItems)
+					{
+						if (int.TryParse(dictionaryId, out outInt))
+						{
+							Dictionary.DictionaryItem di = new Dictionary.DictionaryItem(outInt);
+							dictionaryItems.AppendChild(di.ToXml(_packageManifest));
+						}
+					}
+					appendElement(dictionaryItems);
 
-                            languages.AppendChild(lang.ToXml(_packageManifest));
-                        }
-                    }
-                    appendElement(languages);
+					//Languages
+					XmlNode languages = _packageManifest.CreateElement("Languages");
+					foreach (string langId in pack.Languages)
+					{
+						if (int.TryParse(langId, out outInt))
+						{
+							language.Language lang = new umbraco.cms.businesslogic.language.Language(outInt);
 
-                    //Datatypes
-                    XmlNode dataTypes = _packageManifest.CreateElement("DataTypes");
-                    foreach (string dtId in pack.DataTypes) {
-                        if (int.TryParse(dtId, out outInt)) {
-                            cms.businesslogic.datatype.DataTypeDefinition dtd = new umbraco.cms.businesslogic.datatype.DataTypeDefinition(outInt);
-                            dataTypes.AppendChild(dtd.ToXml(_packageManifest));
-                        }
-                    }
-                    appendElement(dataTypes);
+							languages.AppendChild(lang.ToXml(_packageManifest));
+						}
+					}
+					appendElement(languages);
 
-                    //Files
-                    foreach (string fileName in pack.Files) {
-                        utill.AppendFileToManifest(fileName, localPath, _packageManifest);
-                    }
+					//Datatypes
+					XmlNode dataTypes = _packageManifest.CreateElement("DataTypes");
+					foreach (string dtId in pack.DataTypes)
+					{
+						if (int.TryParse(dtId, out outInt))
+						{
+							cms.businesslogic.datatype.DataTypeDefinition dtd = new umbraco.cms.businesslogic.datatype.DataTypeDefinition(outInt);
+							dataTypes.AppendChild(dtd.ToXml(_packageManifest));
+						}
+					}
+					appendElement(dataTypes);
 
-                    //Load control on install...
-                    if (!string.IsNullOrEmpty(pack.LoadControl)) {
-                        XmlNode control = _packageManifest.CreateElement("control");
-                        control.InnerText = pack.LoadControl;
-                        utill.AppendFileToManifest(pack.LoadControl, localPath, _packageManifest);
-                        appendElement(control);
-                    }
+					//Files
+					foreach (string fileName in pack.Files)
+					{
+						utill.AppendFileToManifest(fileName, localPath, _packageManifest);
+					}
 
-                    //Actions
-                    if (!string.IsNullOrEmpty(pack.Actions)) {
-                        try {
-                            XmlDocument xd_actions = new XmlDocument();
-                            xd_actions.LoadXml("<Actions>" + pack.Actions + "</Actions>");
-                            XmlNode actions = xd_actions.DocumentElement.SelectSingleNode(".");
+					//Load control on install...
+					if (!string.IsNullOrEmpty(pack.LoadControl))
+					{
+						XmlNode control = _packageManifest.CreateElement("control");
+						control.InnerText = pack.LoadControl;
+						utill.AppendFileToManifest(pack.LoadControl, localPath, _packageManifest);
+						appendElement(control);
+					}
 
-
-                            if (actions != null) {
-                                actions = _packageManifest.ImportNode(actions, true).Clone();
-                                appendElement(actions);
-                            }
-                        } catch { }
-                    }
-
-                    string manifestFileName = localPath + "/package.xml";
-
-                    if (System.IO.File.Exists(manifestFileName))
-                        System.IO.File.Delete(manifestFileName);
-
-                    _packageManifest.Save(manifestFileName);
-                    _packageManifest = null;
-
-
-                    //string packPath = Settings.PackagerRoot.Replace(System.IO.Path.DirectorySeparatorChar.ToString(), "/") + "/" + pack.Name.Replace(' ', '_') + "_" + pack.Version.Replace(' ', '_') + "." + Settings.PackageFileExtension;
-
-                    // check if there's a packages directory below media
-                    string packagesDirectory = IO.SystemDirectories.Media + "/created-packages";
-                    if (!System.IO.Directory.Exists(IOHelper.MapPath(packagesDirectory)))
-                        System.IO.Directory.CreateDirectory(IOHelper.MapPath(packagesDirectory));
+					//Actions
+					if (!string.IsNullOrEmpty(pack.Actions))
+					{
+						try
+						{
+							XmlDocument xd_actions = new XmlDocument();
+							xd_actions.LoadXml("<Actions>" + pack.Actions + "</Actions>");
+							XmlNode actions = xd_actions.DocumentElement.SelectSingleNode(".");
 
 
-                    string packPath = packagesDirectory + "/" + (pack.Name + "_" + pack.Version).Replace(' ', '_') + "." + Settings.PackageFileExtension;
-                    utill.ZipPackage(localPath, IOHelper.MapPath(packPath));
+							if (actions != null)
+							{
+								actions = _packageManifest.ImportNode(actions, true).Clone();
+								appendElement(actions);
+							}
+						}
+						catch { }
+					}
 
-                    pack.PackagePath = packPath;
+					string manifestFileName = localPath + "/package.xml";
 
-                    if (pack.PackageGuid.Trim() == "")
-                        pack.PackageGuid = Guid.NewGuid().ToString();
+					if (System.IO.File.Exists(manifestFileName))
+						System.IO.File.Delete(manifestFileName);
 
-                    package.Save();
+					_packageManifest.Save(manifestFileName);
+					_packageManifest = null;
 
-                    //Clean up..
-                    System.IO.File.Delete(localPath + "/package.xml");
-                    System.IO.Directory.Delete(localPath, true);
 
-                    package.FireAfterPublish(e);
-                }
+					//string packPath = Settings.PackagerRoot.Replace(System.IO.Path.DirectorySeparatorChar.ToString(), "/") + "/" + pack.Name.Replace(' ', '_') + "_" + pack.Version.Replace(' ', '_') + "." + Settings.PackageFileExtension;
 
-            } catch (Exception ex) {
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, new BusinessLogic.User(0), -1, "CreatedPackage.cs " + ex.ToString());
-            }
+					// check if there's a packages directory below media
+					string packagesDirectory = IO.SystemDirectories.Media + "/created-packages";
+					if (!System.IO.Directory.Exists(IOHelper.MapPath(packagesDirectory)))
+						System.IO.Directory.CreateDirectory(IOHelper.MapPath(packagesDirectory));
+
+
+					string packPath = packagesDirectory + "/" + (pack.Name + "_" + pack.Version).Replace(' ', '_') + "." + Settings.PackageFileExtension;
+					utill.ZipPackage(localPath, IOHelper.MapPath(packPath));
+
+					pack.PackagePath = packPath;
+
+					if (pack.PackageGuid.Trim() == "")
+						pack.PackageGuid = Guid.NewGuid().ToString();
+
+					package.Save();
+
+					//Clean up..
+					System.IO.File.Delete(localPath + "/package.xml");
+					System.IO.Directory.Delete(localPath, true);
+
+					package.FireAfterPublish(e);
+				}
+
+			}
+			catch (Exception ex)
+			{
+				LogHelper.Error<CreatedPackage>("An error occurred", ex);
+			}
         }
 
         private void AddDocumentType(DocumentType dt, ref List<DocumentType> dtl)

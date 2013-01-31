@@ -2,6 +2,7 @@ using System.Configuration;
 using System.Linq;
 using System.Web.Routing;
 using NUnit.Framework;
+using Umbraco.Core.Configuration;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -20,7 +21,7 @@ namespace Umbraco.Tests.TestHelpers
 		public override void TearDown()
 		{			
 			base.TearDown();
-
+            
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "");					
 		}
 

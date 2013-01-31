@@ -1,3 +1,4 @@
+using System.IO;
 using System.Web.Mvc;
 
 namespace Umbraco.Web.Mvc
@@ -30,5 +31,23 @@ namespace Umbraco.Web.Mvc
 					Writer = vc.Writer
 				};
 		}
+
+		//public static ViewContext CloneWithWriter(this ViewContext vc, TextWriter writer)
+		//{
+		//	return new ViewContext
+		//	{
+		//		Controller = vc.Controller,
+		//		HttpContext = vc.HttpContext,
+		//		RequestContext = vc.RequestContext,
+		//		RouteData = vc.RouteData,
+		//		TempData = vc.TempData,
+		//		View = vc.View,
+		//		ViewData = vc.ViewData,
+		//		FormContext = vc.FormContext,
+		//		ClientValidationEnabled = vc.ClientValidationEnabled,
+		//		UnobtrusiveJavaScriptEnabled = vc.UnobtrusiveJavaScriptEnabled,
+		//		Writer = writer
+		//	};
+		//}
 	}
 }

@@ -10,6 +10,7 @@ using System.Web.UI;
 using System.Xml;
 using System.Xml.XPath;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
@@ -286,55 +287,6 @@ namespace umbraco
             content.Instance.RefreshContentFromDatabaseAsync();
         }
 
-        //private static Hashtable parents = new Hashtable();
-        //private static Hashtable nodes = new Hashtable();
-        //private static int nodeRepublishCounter = 0;
-        //public static void RePublishNodesDotNet(int nodeID)
-        //{
-        //    RePublishNodesDotNet(nodeID, true);
-        //}
-        // Esben Carlsen: Commented out, is not referenced anywhere
-        //public static void _RePublishNodesDotNet(int nodeID, bool SaveToDisk)
-        //{
-        //    content.isInitializing = true;
-        //    content.Instance.XmlContent = null;
-        //    BusinessLogic.Log.Add(BusinessLogic.LogTypes.Debug, BusinessLogic.User.GetUser(0), -1, "Republishing starting");
-        //    cms.businesslogic.cache.Cache.ClearAllCache();
-        //    XmlDocument xmlDoc = new XmlDocument();
-        //    // Create id -1 attribute
-        //    xmlDoc.LoadXml("<root id=\"-1\"/>");
-        //    XmlNode n = xmlDoc.DocumentElement;
-        //    buildNodes(ref xmlDoc, ref n, -1);
-        //    content.Instance.XmlContent.Load(n.OuterXml);
-        //    // reload xml
-        //    n = null;
-        //    xmlDoc = null;
-        //    if (SaveToDisk)
-        //        content.SaveCacheToDisk(false);
-        //    // Reload content
-        //    requestHandler.ClearProcessedRequests();
-        //    content.clearContentCache();
-        //    BusinessLogic.Log.Add(BusinessLogic.LogTypes.Debug, BusinessLogic.User.GetUser(0), -1, "Republishing done");
-        //    content.isInitializing = false;
-        //}
-        //        private static void buildNodes(ref XmlDocument Xd, ref XmlNode CurrentElement, int ParentId)
-        //        {
-        //            string sql =
-        //                @"select umbracoNode.id, umbracoNode.sortOrder, cmsContentXml.xml from umbracoNode 
-        //            inner join cmsContentXml on cmsContentXml.nodeId = umbracoNode.id and umbracoNode.nodeObjectType = 'C66BA18E-EAF3-4CFF-8A22-41B16D66A972'
-        //            and umbracoNode.parentId = @parentId 
-        //            order by umbracoNode.sortOrder";
-        //            IRecordsReader dr =
-        //                SqlHelper.ExecuteReader(sql, SqlHelper.CreateParameter("@parentId", ParentId));
-        //            while(dr.Read())
-        //            {
-        //                int currentId = int.Parse(dr["id"].ToString());
-        //                XmlNode n = xmlHelper.ImportXmlNodeFromText(dr["xml"].ToString(), ref Xd);
-        //                CurrentElement.AppendChild(n);
-        //                buildNodes(ref Xd, ref n, currentId);
-        //            }
-        //            dr.Close();
-        //        }
         /// <summary>
         /// Refreshes the runtime xml index. 
         /// Note: This *doesn't* mark any non-published document objects as published
@@ -1698,7 +1650,7 @@ namespace umbraco
             }
             catch (Exception ee)
             {
-                Log.Add(LogTypes.Error, -1, string.Format("umbraco.library.SendMail: Error sending mail. Exception: {0}", ee));
+                LogHelper.Error<library>("umbraco.library.SendMail: Error sending mail.", ee);
             }
         }
 

@@ -1,0 +1,25 @@
+@inherits umbraco.MacroEngines.DynamicNodeContext
+
+@*
+	Macro to list nodes from a Multinode tree picker, using the pickers default settings.
+	Content Values stored as xml.
+
+	To get it working with any site's data structure, simply set the selection equal to the property which has the 
+	multinode treepicker.
+*@
+
+@{
+	var selection = Model.PropertyWithPicker;
+}
+
+
+@* Lists each selected value from the picker as a link *@
+<ul>
+	@foreach(var id in selection){
+
+		@*For each link, get the node, and display its name and url*@
+		var node = Library.NodeById(id.InnerText);
+
+		<li><a href="@node.Url">@node.Name</a></li>	
+	}
+</ul>

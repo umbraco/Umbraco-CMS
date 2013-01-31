@@ -102,6 +102,7 @@
     <key alias="nodeName">Page Title</key>
     <key alias="otherElements">Properties</key>
     <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
+    <key alias="parentNotPublishedAnomaly">Oops: this document is published but is not in the cache (internal error)</key>
     <key alias="publish">Publish</key>
     <key alias="publishStatus">Publication Status</key>
     <key alias="releaseDate">Publish at</key>

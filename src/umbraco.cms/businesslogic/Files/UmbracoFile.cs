@@ -13,13 +13,13 @@ namespace umbraco.cms.businesslogic.Files
 {
     public class UmbracoFile : IFile
     {
-        private string _path;
+        private readonly string _path;
         private string _fileName;
         private string _extension;
         private string _url;
         private long _length;
 
-        private MediaFileSystem _fs;
+        private readonly MediaFileSystem _fs;
 
         #region Constructors
 
@@ -34,7 +34,7 @@ namespace umbraco.cms.businesslogic.Files
 
             _path = path;
 
-            initialize();
+            Initialize();
         }
         
         #endregion
@@ -81,12 +81,12 @@ namespace umbraco.cms.businesslogic.Files
 
         #endregion
 
-        private void initialize()
+        private void Initialize()
         {
-            _fileName = System.IO.Path.GetFileName(_path);
+            _fileName = _fs.GetFileName(_path);
             _length = _fs.GetSize(_path);
-            _extension = System.IO.Path.GetExtension(_path) != null
-                ? System.IO.Path.GetExtension(_path).Substring(1).ToLowerInvariant()
+            _extension = _fs.GetExtension(_path) != null
+                ? _fs.GetExtension(_path).Substring(1).ToLowerInvariant()
                 : "";
             _url = _fs.GetUrl(_path);
         }

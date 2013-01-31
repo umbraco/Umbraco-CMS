@@ -16,5 +16,17 @@ namespace Umbraco.Core
 				action(i);
 			}
 		}
+
+        /// <summary>
+        /// Creates a Guid based on an integer value
+        /// </summary>
+        /// <param name="value"><see cref="int"/> value to convert</param>
+        /// <returns><see cref="Guid"/></returns>
+        public static Guid ToGuid(this int value)
+        {
+            byte[] bytes = new byte[16];
+            BitConverter.GetBytes(value).CopyTo(bytes, 0);
+            return new Guid(bytes);
+        }
 	}
 }

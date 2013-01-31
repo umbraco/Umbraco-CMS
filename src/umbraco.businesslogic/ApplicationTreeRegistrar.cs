@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Core;
-using umbraco.BusinessLogic.Utils;
-using umbraco.DataLayer;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence;
 using umbraco.businesslogic;
 using umbraco.interfaces;
 
@@ -11,27 +11,12 @@ namespace umbraco.BusinessLogic
 {
     public class ApplicationTreeRegistrar : IApplicationStartupHandler
     {
-        private ISqlHelper _sqlHelper;
-        protected ISqlHelper SqlHelper
-        {
-            get
-            {
-                if (_sqlHelper == null)
-                {
-                    try
-                    {
-                        _sqlHelper = DataLayerHelper.CreateSqlHelper(GlobalSettings.DbDSN);
-                    }
-                    catch { }
-                }
-                return _sqlHelper;
-            }
-        }
-
         public ApplicationTreeRegistrar()
         {
-			//don't do anything if the application is not configured!
-			if (ApplicationContext.Current == null || !ApplicationContext.Current.IsConfigured)
+			//don't do anything if the application or database is not configured!
+			if (ApplicationContext.Current == null 
+                || !ApplicationContext.Current.IsConfigured 
+                || !ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured)
 				return;
 
             // Load all Trees by attribute and add them to the XML config
@@ -51,10 +36,8 @@ namespace umbraco.BusinessLogic
                 {
                     var type = tuple.Item1;
                     var attr = tuple.Item2;
-
-                    var typeParts = type.AssemblyQualifiedName.Split(',');
-                    var assemblyName = typeParts[1].Trim();
-                    var typeName = typeParts[0].Substring(assemblyName.Length + 1).Trim();
+					
+					//Add the new tree that doesn't exist in the config that was found by type finding
 
                     doc.Root.Add(new XElement("add",
                                               new XAttribute("silent", attr.Silent),
@@ -65,33 +48,42 @@ namespace umbraco.BusinessLogic
                                               new XAttribute("title", attr.Title),
                                               new XAttribute("iconClosed", attr.IconClosed),
                                               new XAttribute("iconOpen", attr.IconOpen),
-                                              new XAttribute("assembly", assemblyName),
-                                              new XAttribute("type", typeName),
+											  // don't add the assembly, we don't need this:
+											  //	http://issues.umbraco.org/issue/U4-1360
+                                              //new XAttribute("assembly", assemblyName),
+                                              //new XAttribute("type", typeName),
+											  // instead, store the assembly type name
+											  new XAttribute("type", type.GetFullNameWithAssembly()),
                                               new XAttribute("action", attr.Action)));
                 }
 
-                var dbTrees = SqlHelper.ExecuteReader("SELECT * FROM umbracoAppTree WHERE treeAlias NOT IN (" + inString + ")");
-                while (dbTrees.Read())
-                {
-                    var action = dbTrees.GetString("action");
+				//add any trees that were found in the database that don't exist in the config
 
-                    doc.Root.Add(new XElement("add",
-                                              new XAttribute("silent", dbTrees.GetBoolean("treeSilent")),
-                                              new XAttribute("initialize", dbTrees.GetBoolean("treeInitialize")),
-                                              new XAttribute("sortOrder", dbTrees.GetByte("treeSortOrder")),
-                                              new XAttribute("alias", dbTrees.GetString("treeAlias")),
-                                              new XAttribute("application", dbTrees.GetString("appAlias")),
-                                              new XAttribute("title", dbTrees.GetString("treeTitle")),
-                                              new XAttribute("iconClosed", dbTrees.GetString("treeIconClosed")),
-                                              new XAttribute("iconOpen", dbTrees.GetString("treeIconOpen")),
-                                              new XAttribute("assembly", dbTrees.GetString("treeHandlerAssembly")),
-                                              new XAttribute("type", dbTrees.GetString("treeHandlerType")),
-                                              new XAttribute("action", string.IsNullOrEmpty(action) ? "" : action)));
+                var db = ApplicationContext.Current.DatabaseContext.Database;
+                var exist = db.TableExist("umbracoAppTree");
+                if (exist)
+                {
+                    var appTrees = db.Fetch<AppTreeDto>("WHERE treeAlias NOT IN (" + inString + ")");
+                    foreach (var appTree in appTrees)
+                    {
+                        var action = appTree.Action;
+
+                        doc.Root.Add(new XElement("add",
+                                                  new XAttribute("silent", appTree.Silent),
+                                                  new XAttribute("initialize", appTree.Initialize),
+                                                  new XAttribute("sortOrder", appTree.SortOrder),
+                                                  new XAttribute("alias", appTree.Alias),
+                                                  new XAttribute("application", appTree.AppAlias),
+                                                  new XAttribute("title", appTree.Title),
+                                                  new XAttribute("iconClosed", appTree.IconClosed),
+                                                  new XAttribute("iconOpen", appTree.IconOpen),
+                                                  new XAttribute("assembly", appTree.HandlerAssembly),
+                                                  new XAttribute("type", appTree.HandlerType),
+                                                  new XAttribute("action", string.IsNullOrEmpty(action) ? "" : action)));
+                    }
                 }
 
             }, true);
-
-            //SqlHelper.ExecuteNonQuery("DELETE FROM umbracoAppTree");
         }
     }
 }

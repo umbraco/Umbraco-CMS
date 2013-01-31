@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Configuration;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
@@ -11,6 +13,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Xml.Linq;
 using System.Xml;
 using System.IO;
+using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
@@ -52,13 +55,30 @@ namespace umbraco.presentation.preview
             // clone xml
             XmlContent = (XmlDocument)content.Instance.XmlContent.Clone();
 
-            // inject current document xml
-            int parentId = documentObject.Level == 1 ? -1 : documentObject.Parent.Id;
-            XmlContent = content.AppendDocumentXml(documentObject.Id, documentObject.Level, parentId, documentObject.ToPreviewXml(XmlContent), XmlContent);
+            var previewNodes = new List<Document>();
+
+            var parentId = documentObject.Level == 1 ? -1 : documentObject.Parent.Id;
+
+            while (parentId > 0 && XmlContent.GetElementById(parentId.ToString(CultureInfo.InvariantCulture)) == null)
+            {
+                var document = new Document(parentId);
+                previewNodes.Insert(0, document);
+                parentId = document.ParentId;
+            }
+
+            previewNodes.Add(documentObject);
+
+            foreach (var document in previewNodes)
+            {
+                //Inject preview xml
+                parentId = document.Level == 1 ? -1 : document.Parent.Id;
+                var previewXml = document.ToPreviewXml(XmlContent);
+                content.AppendDocumentXml(document.Id, document.Level, parentId, previewXml, XmlContent);
+            }
 
             if (includeSubs)
             {
-                foreach (CMSPreviewNode prevNode in documentObject.GetNodesForPreview(true))
+                foreach (var prevNode in documentObject.GetNodesForPreview(true))
                 {
                     XmlContent = content.AppendDocumentXml(prevNode.NodeId, prevNode.Level, prevNode.ParentId, XmlContent.ReadNode(XmlReader.Create(new StringReader(prevNode.Xml))), XmlContent);
                 }
@@ -79,7 +99,8 @@ namespace umbraco.presentation.preview
             if (validate && !ValidatePreviewPath())
             {
                 // preview cookie failed so we'll log the error and clear the cookie
-                Log.Add(LogTypes.Error, User.GetUser(_userId), -1, string.Format("Preview failed for preview set {0}", previewSet));
+                LogHelper.Debug<PreviewContent>(string.Format("Preview failed for preview set {0} for user {1}", previewSet, _userId));
+
                 PreviewSet = Guid.Empty;
                 PreviewsetPath = String.Empty;
 
@@ -152,9 +173,9 @@ namespace umbraco.presentation.preview
             {
                 file.Delete();
             }
-            catch
+            catch (Exception ex)
             {
-                Log.Add(LogTypes.Error, User.GetUser(userId), -1, String.Format("Couldn't delete preview set: {0}", file.Name));
+                LogHelper.Error<PreviewContent>(string.Format("Couldn't delete preview set: {0} - User {1}", file.Name, userId), ex);
             }
         }
 

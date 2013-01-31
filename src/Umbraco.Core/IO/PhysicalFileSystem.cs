@@ -6,19 +6,23 @@ using System.Linq;
 using System.Web;
 using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Publishing;
 
 namespace Umbraco.Core.IO
 {
-	[UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1156", "Will be declared public after 4.10")]
-    internal class PhysicalFileSystem : IFileSystem
+    public class PhysicalFileSystem : IFileSystem
     {
-        private readonly string _rootPath;
+		internal string RootPath { get; private set; }
         private readonly string _rootUrl;
 
         public PhysicalFileSystem(string virtualRoot)
         {
-            _rootPath = System.Web.Hosting.HostingEnvironment.MapPath(virtualRoot);
-            _rootUrl = VirtualPathUtility.ToAbsolute(virtualRoot);
+	        if (virtualRoot == null) throw new ArgumentNullException("virtualRoot");
+			if (!virtualRoot.StartsWith("~/"))
+				throw new ArgumentException("The virtualRoot argument must be a virtual path and start with '~/'");
+
+	        RootPath = IOHelper.MapPath(virtualRoot);
+            _rootUrl = IOHelper.ResolveUrl(virtualRoot);
         }
 
         public PhysicalFileSystem(string rootPath, string rootUrl)
@@ -29,7 +33,10 @@ namespace Umbraco.Core.IO
             if (string.IsNullOrEmpty(rootUrl))
                 throw new ArgumentException("The argument 'rootUrl' cannot be null or empty.");
 
-            _rootPath = rootPath;
+			if (rootPath.StartsWith("~/"))
+				throw new ArgumentException("The rootPath argument cannot be a virtual path and cannot start with '~/'");
+
+            RootPath = rootPath;
             _rootUrl = rootUrl;
         }
 
@@ -125,7 +132,8 @@ namespace Umbraco.Core.IO
 
         public Stream OpenFile(string path)
         {
-            return File.OpenRead(GetFullPath(path));
+            var fullPath = GetFullPath(path);
+            return File.OpenRead(fullPath);
         }
 
         public void DeleteFile(string path)
@@ -139,7 +147,7 @@ namespace Umbraco.Core.IO
             }
             catch (FileNotFoundException ex)
             {
-                LogHelper.Error<PhysicalFileSystem>("File not found", ex);
+                LogHelper.Info<PhysicalFileSystem>(string.Format("DeleteFile failed with FileNotFoundException: {0}", ex.InnerException));
             }
         }
 
@@ -153,7 +161,7 @@ namespace Umbraco.Core.IO
             var relativePath = fullPathOrUrl
                 .TrimStart(_rootUrl)
                 .Replace('/', Path.DirectorySeparatorChar)
-                .TrimStart(_rootPath)
+                .TrimStart(RootPath)
                 .TrimStart(Path.DirectorySeparatorChar);
 
             return relativePath;
@@ -161,8 +169,8 @@ namespace Umbraco.Core.IO
 
         public string GetFullPath(string path)
         {
-            return !path.StartsWith(_rootPath) 
-                ? Path.Combine(_rootPath, path)
+            return !path.StartsWith(RootPath) 
+                ? Path.Combine(RootPath, path)
                 : path;
         }
 

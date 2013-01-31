@@ -32,6 +32,7 @@
     <key alias="sort">Сортировать</key>
     <key alias="toPublish">Направить на публикацию</key>
     <key alias="translate">Перевести</key>
+    <key alias="unpublish">Скрыть</key>
     <key alias="update">Обновить</key>
   </area>
   <area alias="assignDomain">
@@ -682,6 +683,7 @@
     <key alias="contentTypeTabCreated">Вкладка создана</key>
     <key alias="contentTypeTabDeleted">Вкладка удалена</key>
     <key alias="contentTypeTabDeletedText">Вкладка с идентификатором (id): %0% удалена</key>
+    <key alias="contentUnpublished">Документ скрыт (публикация отменена)</key>
     <key alias="cssErrorHeader">Стиль CSS не сохранен</key>
     <key alias="cssSavedHeader">Стиль CSS сохранен</key>
     <key alias="cssSavedText">Стиль CSS сохранен без ошибок</key>
@@ -706,6 +708,10 @@
     <key alias="fileSavedHeader">Файл сохранен</key>
     <key alias="fileSavedText">Файл сохранен без ошибок</key>
     <key alias="languageSaved">Язык сохранен</key>
+    <key alias="partialViewErrorHeader">Представление не сохранено</key>
+    <key alias="partialViewErrorText">Произошла ошибка при сохранении файла</key>
+    <key alias="partialViewSavedHeader">Представление сохранено</key>
+    <key alias="partialViewSavedText">Представление сохранено без ошибок</key>
     <key alias="pythonErrorHeader">Cкрипт Python не сохранен</key>
     <key alias="pythonErrorText">Cкрипт Python не может быть сохранен в связи с ошибками</key>
     <key alias="pythonSavedHeader">Cкрипт Python сохранен</key>
@@ -869,7 +875,7 @@
     <key alias="loginname">Имя входа (логин)</key>
     <key alias="mediastartnode">Начальный узел в Медиа-библиотеке</key>
     <key alias="modules">Разделы</key>
-    <key alias="newPassword">Сменить пароль</key>
+    <key alias="newPassword">Новый пароль</key>
     <key alias="noConsole">Отключить доступ к административной панели Umbraco</key>
     <key alias="password">Пароль</key>
     <key alias="passwordChanged">Ваш пароль доступа изменен!</key>

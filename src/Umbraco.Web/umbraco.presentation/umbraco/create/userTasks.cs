@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -69,8 +70,7 @@ namespace umbraco
             }
             catch (Exception ex)
             {
-                Log.Add(LogTypes.Error, ParentID, String.Format("Failed to create the user. Error from provider: {0}", status.ToString()));
-                Log.Add(LogTypes.Debug, ParentID, ex.Message);
+				LogHelper.Error<userTasks>(String.Format("Failed to create the user. Error from provider: {0}", status.ToString()), ex);
                 return false;
             }
         }

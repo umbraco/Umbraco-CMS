@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -41,9 +42,7 @@ namespace umbraco
 
         public bool Save()
         {
-
-            umbraco.BusinessLogic.User myUser = new umbraco.BusinessLogic.User(0);
-            umbraco.BusinessLogic.Log.Add(umbraco.BusinessLogic.LogTypes.Delete, myUser, 0, "Xml save started");
+            LogHelper.Info<CreatedPackageTasks>("Xml save started");
             int id = cms.businesslogic.packager.CreatedPackage.MakeNew(Alias).Data.Id;
             m_returnUrl = string.Format("developer/packages/editPackage.aspx?id={0}", id);
             return true;

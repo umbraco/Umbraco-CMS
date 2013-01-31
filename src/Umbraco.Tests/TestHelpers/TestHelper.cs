@@ -3,6 +3,8 @@ using System.Configuration;
 using System.IO;
 using System.Reflection;
 using SqlCE4Umbraco;
+using Umbraco.Core;
+using Umbraco.Core.IO;
 using log4net.Config;
 using umbraco.DataLayer;
 using GlobalSettings = umbraco.GlobalSettings;
@@ -20,9 +22,12 @@ namespace Umbraco.Tests.TestHelpers
 		/// </summary>
 		public static void ClearDatabase()
 		{
-			var dataHelper = DataLayerHelper.CreateSqlHelper(GlobalSettings.DbDSN) as SqlCEHelper;
+            var databaseSettings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false) as SqlCEHelper;
+			
 			if (dataHelper == null)
 				throw new InvalidOperationException("The sql helper for unit tests must be of type SqlCEHelper, check the ensure the connection string used for this test is set to use SQLCE");
+
 			dataHelper.ClearDatabase();
 		}
 
@@ -31,11 +36,13 @@ namespace Umbraco.Tests.TestHelpers
 		/// </summary>
 		public static void InitializeDatabase()
 		{
-			ConfigurationManager.AppSettings.Set("umbracoDbDSN", @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf");
+            ConfigurationManager.AppSettings.Set(Core.Configuration.GlobalSettings.UmbracoConnectionName, @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf");
 
 			ClearDatabase();
+            
+            var databaseSettings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false);
 
-			var dataHelper = DataLayerHelper.CreateSqlHelper(GlobalSettings.DbDSN);
 			var installer = dataHelper.Utility.CreateInstaller();
 			if (installer.CanConnect)
 			{
@@ -75,5 +82,35 @@ namespace Umbraco.Tests.TestHelpers
 		{
 			XmlConfigurator.Configure(new FileInfo(MapPathForTest("~/unit-test-log4net.config")));
 		}
+
+        public static void InitializeContentDirectories()
+        {
+            CreateDirectories(new[] { SystemDirectories.Masterpages, SystemDirectories.MvcViews, SystemDirectories.Media });
+        }
+
+	    public static void CleanContentDirectories()
+	    {
+	        CleanDirectories(new[] { SystemDirectories.Masterpages, SystemDirectories.MvcViews, SystemDirectories.Media });
+	    }
+
+	    public static void CreateDirectories(string[] directories)
+        {
+            foreach (var directory in directories)
+            {
+                var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
+                if (directoryInfo.Exists == false)
+                    Directory.CreateDirectory(IOHelper.MapPath(directory));
+            }
+        }
+
+	    public static void CleanDirectories(string[] directories)
+        {
+            foreach (var directory in directories)
+            {
+                var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
+                if (directoryInfo.Exists)
+                    directoryInfo.GetFiles().ForEach(x => x.Delete());
+            }
+        }
 	}
 }

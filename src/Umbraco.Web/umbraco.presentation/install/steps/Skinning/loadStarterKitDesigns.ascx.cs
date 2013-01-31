@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 
 namespace umbraco.presentation.install.steps.Skinning
@@ -59,7 +61,7 @@ namespace umbraco.presentation.install.steps.Skinning
 				}
 				catch (Exception ex)
 				{
-					Log.Add(LogTypes.Debug, -1, ex.ToString());
+					LogHelper.Error<loadStarterKitDesigns>("An error occurred initializing", ex);
 
 					ShowConnectionError();
 				}
@@ -130,7 +132,7 @@ namespace umbraco.presentation.install.steps.Skinning
 
 						if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus))
 						{
-							GlobalSettings.ConfigurationStatus = GlobalSettings.CurrentVersion;
+                            GlobalSettings.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
 							Application["umbracoNeedConfiguration"] = false;
 						}
 					}

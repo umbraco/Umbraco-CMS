@@ -246,21 +246,16 @@ function openContent(id) {
         }
         protected void SetSourcesAttributes(ref XmlTreeNode treeElement, Document dd)
         {
-			treeElement.HasChildren = dd.HasChildren;
-			if (!IsDialog)
-				treeElement.Source = GetTreeServiceUrl(dd.Id);
-			else
-				treeElement.Source = GetTreeDialogUrl(dd.Id);
+            treeElement.HasChildren = dd.ContentType.IsContainerContentType == false && dd.HasChildren;
+            treeElement.Source = IsDialog == false ? GetTreeServiceUrl(dd.Id) : GetTreeDialogUrl(dd.Id);
         }
+
         protected void SetMenuAttribute(ref XmlTreeNode treeElement, List<IAction> allowedUserActions)
         {
             //clear menu if we're to hide it
-            if (!this.ShowContextMenu)
-                treeElement.Menu = null;
-            else
-                treeElement.Menu = RemoveDuplicateMenuDividers(GetUserAllowedActions(AllowedActions, allowedUserActions));
-
+            treeElement.Menu = this.ShowContextMenu == false ? null : RemoveDuplicateMenuDividers(GetUserAllowedActions(AllowedActions, allowedUserActions));
         }
+
         #endregion
 
         /// <summary>

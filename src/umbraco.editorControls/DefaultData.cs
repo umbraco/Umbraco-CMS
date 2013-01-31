@@ -1,5 +1,5 @@
 using System;
-
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 
@@ -49,7 +49,8 @@ namespace umbraco.editorControls
 				} 
 				catch (Exception e)
 				{
-					umbraco.BusinessLogic.Log.Add(umbraco.BusinessLogic.LogTypes.Debug, umbraco.BusinessLogic.User.GetUser(0), -1, "Error updating item: " + e.ToString());
+					LogHelper.Error(typeof(DefaultData), "Error updating item: " + e.ToString(), e);
+					
 					if (value==null) value ="";
 					SqlHelper.ExecuteNonQuery("update cmsPropertyData set "+ _dataType.DataFieldName +" = @value where id = " + _propertyId, SqlHelper.CreateParameter("@value", value) );
 					_value = value;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -44,6 +45,9 @@ namespace umbraco.MacroEngines
         private readonly Guid DATATYPE_DATEPICKER_GUID = new Guid("23e93522-3200-44e2-9f29-e61a6fcbb79a");
         //private readonly Guid DATATYPE_INTEGER_GUID = new Guid("1413afcb-d19a-4173-8e9a-68288d2a73b8");
         #endregion
+
+		private DynamicNodeList _cachedChildren;
+		private readonly ConcurrentDictionary<string, object> _cachedMemberOutput = new ConcurrentDictionary<string, object>();
 
         internal readonly DynamicBackingItem n;
 
@@ -154,13 +158,20 @@ namespace umbraco.MacroEngines
         {
             get
             {
-                List<DynamicBackingItem> children = n.ChildrenAsList;
-                //testing
-                if (children.Count == 0 && n.Id == 0)
-                {
-                    return new DynamicNodeList(new List<DynamicBackingItem> { this.n });
-                }
-                return new DynamicNodeList(n.ChildrenAsList);
+	            if (_cachedChildren == null)
+	            {
+					List<DynamicBackingItem> children = n.ChildrenAsList;
+					//testing
+					if (children.Count == 0 && n.Id == 0)
+					{
+						_cachedChildren = new DynamicNodeList(new List<DynamicBackingItem> {this.n});
+					}
+					else
+					{
+						_cachedChildren = new DynamicNodeList(n.ChildrenAsList);	
+					}
+	            }
+				return _cachedChildren;
             }
         }
         public DynamicNodeList XPath(string xPath)
@@ -406,44 +417,6 @@ namespace umbraco.MacroEngines
             }
             return result;
         }
-        private List<string> GetAncestorOrSelfNodeTypeAlias(DynamicBackingItem node)
-        {
-            List<string> list = new List<string>();
-            if (node != null)
-            {
-                if (node.Type == DynamicBackingItemType.Content)
-                {
-                    //find the doctype node, so we can walk it's parent's tree- not the working.parent content tree
-                    CMSNode working = ContentType.GetByAlias(node.NodeTypeAlias);
-                    while (working != null)
-                    {
-						//NOTE: I'm not sure if anyone has ever tested this but if you get working.Parent it will return a CMSNode and
-						// it will never be castable to a 'ContentType' object
-						// pretty sure the only reason why this method works for the one place that it is used is that it returns
-						// the current node's alias which is all that is actually requried, this is just added overhead for no 
-						// reason
-
-                        if ((working as ContentType) != null)
-                        {
-                            list.Add((working as ContentType).Alias);
-                        }
-                        try
-                        {
-                            working = working.Parent;
-                        }
-                        catch (ArgumentException)
-                        {
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            return list;
-        }
 
     	private static Dictionary<System.Tuple<Guid, int>, Type> _razorDataTypeModelTypes = null;
     	private static readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
@@ -485,14 +458,6 @@ namespace umbraco.MacroEngines
 									}
 								});
 
-							//NOTE: We really dont need to log this?
-							//var i = 1;
-							//foreach (var item in foundTypes)
-							//{
-							//    HttpContext.Current.Trace.Write(string.Format("{0}/{1}: {2}@{4} => {3}", i, foundTypes.Count, item.Key.Item1, item.Value.FullName, item.Key.Item2));
-							//    i++;
-							//}
-
 							//there is no error, so set the collection
 							_razorDataTypeModelTypes = foundTypes;
 
@@ -516,13 +481,21 @@ namespace umbraco.MacroEngines
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
+			var name = binder.Name;
 
-            var name = binder.Name;
+			//check the cache first!
+			if (_cachedMemberOutput.TryGetValue(name, out result))
+			{
+				return true;
+			}
+
             result = null; //this will never be returned
 
             if (name == "ChildrenAsList" || name == "Children")
             {
                 result = GetChildrenAsList;
+				//cache the result so we don't have to re-process the whole thing
+				_cachedMemberOutput.TryAdd(name, result);
                 return true;
             }
             bool propertyExists = false;
@@ -570,6 +543,8 @@ namespace umbraco.MacroEngines
                             if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, data.Value, out instance))
                             {
                                 result = instance;
+								//cache the result so we don't have to re-process the whole thing
+								_cachedMemberOutput.TryAdd(name, result);
                                 return true;
                             }
                             else
@@ -593,6 +568,8 @@ namespace umbraco.MacroEngines
                             if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, data.Value, out instance))
                             {
                                 result = instance;
+								//cache the result so we don't have to re-process the whole thing
+								_cachedMemberOutput.TryAdd(name, result);
                                 return true;
                             }
                             else
@@ -605,23 +582,12 @@ namespace umbraco.MacroEngines
 							LogHelper.Warn<DynamicNode>(string.Format("Could not get the dataTypeType for the RazorDataTypeModel"));                            
                         }
                     }
-                    else
-                    {
-						//NOTE: Do we really want to log this? I'm not sure.
-						//if (RazorDataTypeModelTypes == null)
-						//{
-						//    HttpContext.Current.Trace.Write(string.Format("RazorDataTypeModelTypes is null, probably an exception while building the cache, falling back to ConvertPropertyValueByDataType", dataType));
-						//}
-						//else
-						//{
-						//    HttpContext.Current.Trace.Write(string.Format("GUID {0} does not have a DataTypeModel, falling back to ConvertPropertyValueByDataType", dataType));
-						//}
-
-                    }
-
-                    //convert the string value to a known type
-                    return ConvertPropertyValueByDataType(ref result, name, dataType);
-
+                    
+					//convert the string value to a known type
+                    var returnVal = ConvertPropertyValueByDataType(ref result, name, dataType);
+					//cache the result so we don't have to re-process the whole thing
+					_cachedMemberOutput.TryAdd(name, result);
+	                return returnVal;
                 }
 
                 //check if the alias is that of a child type
@@ -629,18 +595,15 @@ namespace umbraco.MacroEngines
                 var typeChildren = n.ChildrenAsList;
                 if (typeChildren != null)
                 {
-                    var filteredTypeChildren = typeChildren.Where(x =>
-                    {
-                        List<string> ancestorAliases = GetAncestorOrSelfNodeTypeAlias(x);
-                        if (ancestorAliases == null)
-                        {
-                            return false;
-                        }
-                        return ancestorAliases.Any(alias => alias == name || MakePluralName(alias) == name);
-                    });
+
+	                var filteredTypeChildren = typeChildren
+		                .Where(x => x.NodeTypeAlias.InvariantEquals(name) || x.NodeTypeAlias.MakePluralName().InvariantEquals(binder.Name))
+		                .ToArray();
                     if (filteredTypeChildren.Any())
                     {
                         result = new DynamicNodeList(filteredTypeChildren);
+						//cache the result so we don't have to re-process the whole thing
+						_cachedMemberOutput.TryAdd(name, result);
                         return true;
                     }
 
@@ -655,6 +618,8 @@ namespace umbraco.MacroEngines
                                                       null,
                                                       n,
                                                       null);
+					//cache the result so we don't have to re-process the whole thing
+					_cachedMemberOutput.TryAdd(name, result);
                     return true;
                 }
                 catch

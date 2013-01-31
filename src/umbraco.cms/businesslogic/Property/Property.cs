@@ -1,11 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Runtime.CompilerServices;
 using System.Xml;
-
+using Umbraco.Core;
+using Umbraco.Core.Persistence;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
+using umbraco.cms.businesslogic.datatype;
+using umbraco.cms.businesslogic.propertytype;
 
 namespace umbraco.cms.businesslogic.property
 {
@@ -15,14 +16,20 @@ namespace umbraco.cms.businesslogic.property
     /// </summary>
     public class Property
     {
-        private static string _connstring = GlobalSettings.DbDSN;
-        propertytype.PropertyType _pt;
-        interfaces.IData _data;
+        private Umbraco.Core.Models.PropertyType _propertyType;
+        private Umbraco.Core.Models.Property _property;
+        private PropertyType _pt;
+        private interfaces.IData _data;
         private int _id;
 
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
+        }
+
+        internal static Database Database
+        {
+            get { return ApplicationContext.Current.DatabaseContext.Database; }
         }
 
         public Property(int Id, propertytype.PropertyType pt)
@@ -37,8 +44,21 @@ namespace umbraco.cms.businesslogic.property
         public Property(int Id)
         {
             _id = Id;
-            _pt = umbraco.cms.businesslogic.propertytype.PropertyType.GetPropertyType(
-                SqlHelper.ExecuteScalar<int>("select propertytypeid from cmsPropertyData where id = @id", SqlHelper.CreateParameter("@id", Id)));
+            _pt = PropertyType.GetPropertyType(
+                SqlHelper.ExecuteScalar<int>("select propertytypeid from cmsPropertyData where id = @id",
+                                             SqlHelper.CreateParameter("@id", Id)));
+            _data = _pt.DataTypeDefinition.DataType.Data;
+            _data.PropertyId = Id;
+        }
+
+        internal Property(Umbraco.Core.Models.Property property)
+        {
+            _id = property.Id;
+            _property = property;
+            _propertyType = property.PropertyType;
+
+            //Just to ensure that there is a PropertyType available
+            _pt = PropertyType.GetPropertyType(property.PropertyTypeId);
             _data = _pt.DataTypeDefinition.DataType.Data;
             _data.PropertyId = Id;
         }
@@ -60,7 +80,13 @@ namespace umbraco.cms.businesslogic.property
         }
         public propertytype.PropertyType PropertyType
         {
-            get { return _pt; }
+            get
+            {
+                /*if (_propertyType != null)
+                    return new PropertyType(_propertyType);*/
+
+                return _pt;
+            }
         }
 
         public object Value

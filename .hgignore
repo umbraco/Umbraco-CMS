@@ -1,8 +1,9 @@
-# use glob syntax
-syntax: glob
+syntax: regexp
+^src/packages/(?!repositories.config$)
+web.Template.[a-zA-Z0-9]*.Debug.config
 
+syntax: glob
 *.obj
-*.exe
 *.pdb
 *.user
 *.aps
@@ -13,6 +14,11 @@ syntax: glob
 obj/
 [Rr]elease*/
 _ReSharper*/
+_NCrunch_*/
+*.ncrunchsolution
+*.ncrunchsolution.user
+*.ncrunchproject
+*.crunchsolution.cache
 [Tt]est[Rr]esult*
 [Bb]uild[Ll]og.*
 *.[Pp]ublish.xml
@@ -28,24 +34,24 @@ umbraco\presentation\scripts\*
 umbraco\presentation\fonts\*
 umbraco\presentation\css\*
 
-src\Umbraco.Web.UI\css\*
+src\Umbraco.Web.UI\[Cc]ss\*
 src\Umbraco.Web.UI\App_Code\*
 src\Umbraco.Web.UI\App_Data\*
 src\Umbraco.Tests\App_Data\*
-src\Umbraco.Web.UI\media\*
-src\Umbraco.Web.UI\masterpages\*
-src\Umbraco.Web.UI\macroScripts\*
-src\Umbraco.Web.UI\xslt\*
-src\Umbraco.Web.UI\images\*
-src\Umbraco.Web.UI\scripts\*
+src\Umbraco.Web.UI\[Mm]edia\*
+src\Umbraco.Web.UI\[Mm]aster[Pp]ages\*
+src\Umbraco.Web.UI\[Mm]acro[Ss]cripts\*
+src\Umbraco.Web.UI\[Xx]slt\*
+src\Umbraco.Web.UI\[Ii]mages\*
+src\Umbraco.Web.UI\[Ss]cripts\*
 
 umbraco\presentation\umbraco\plugins\uComponents\uComponentsInstaller.ascx
 umbraco\presentation\packages\uComponents\MultiNodePicker\CustomTreeService.asmx
 _BuildOutput/*
 *.ncrunchsolution
-build/UmbracoCms.AllBinaries.zip
-build/UmbracoCms.WebPI.zip
-build/UmbracoCms.zip
+build/UmbracoCms.AllBinaries*zip
+build/UmbracoCms.WebPI*zip
+build/UmbracoCms*zip
 build/*.nupkg
 src/Umbraco.Tests/config/applications.config
 src/Umbraco.Tests/config/trees.config
@@ -57,5 +63,7 @@ src/Umbraco.Web.UI/Views/*.vbhtml
 src/Umbraco.Tests/config/umbracoSettings.config
 src/Umbraco.Web.UI/App_Plugins/*
 src/Umbraco.Web.UI/Views/*
+src/packages/
 
 src\Umbraco.Web.UI\[W]eb.config
+*.transformed

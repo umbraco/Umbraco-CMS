@@ -115,7 +115,7 @@ namespace umbraco.cms.presentation.developer
 				else
 					macro.GetMacro(macroID).removeFromCache();
 
-				base.speechBubble(speechBubbleIcon.save, "Macro saved", "");
+                ClientTools.ShowSpeechBubble(speechBubbleIcon.save, "Macro saved", "");
 
 
 				// Check for assemblyBrowser

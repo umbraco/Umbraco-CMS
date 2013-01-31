@@ -1,12 +1,12 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Web;
 using System.Xml.Linq;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
 using umbraco.DataLayer;
 using umbraco.IO;
 using System.Runtime.CompilerServices;
@@ -79,12 +79,29 @@ namespace umbraco.BusinessLogic
             {
                 if (_sqlHelper == null)
                 {
+                    var connectionString = string.Empty;
+
                     try
                     {
-                        _sqlHelper = DataLayerHelper.CreateSqlHelper(GlobalSettings.DbDSN);
+                        const string umbracoDsn = Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName;
+                    
+                        var databaseSettings = ConfigurationManager.ConnectionStrings[umbracoDsn];
+                        if (databaseSettings != null)
+                            connectionString = databaseSettings.ConnectionString;
+
+                        // During upgrades we might still have the old appSettings connectionstring, and not the new one, so get that one instead
+                        if (string.IsNullOrWhiteSpace(connectionString) &&
+                            ConfigurationManager.AppSettings.ContainsKey(umbracoDsn))
+                            connectionString = ConfigurationManager.AppSettings[umbracoDsn];
+
+                        _sqlHelper = DataLayerHelper.CreateSqlHelper(connectionString, false);
                     }
-                    catch { }
+                    catch(Exception ex)
+                    {
+                        LogHelper.Error<Application>(string.Format("Can't instantiate SQLHelper with connectionstring \"{0}\"", connectionString), ex);
+                    }
                 }
+
                 return _sqlHelper;
             }
         }
@@ -195,15 +212,6 @@ namespace umbraco.BusinessLogic
 
             if (!exist)
             {
-                //                SqlHelper.ExecuteNonQuery(@"
-                //				insert into umbracoApp 
-                //				(appAlias,appIcon,appName, sortOrder) 
-                //				values (@alias,@icon,@name,@sortOrder)",
-                //                SqlHelper.CreateParameter("@alias", alias),
-                //                SqlHelper.CreateParameter("@icon", icon),
-                //                SqlHelper.CreateParameter("@name", name),
-                //                SqlHelper.CreateParameter("@sortOrder", sortOrder));
-
                 LoadXml(doc =>
                 {
                     doc.Root.Add(new XElement("add",
@@ -214,16 +222,6 @@ namespace umbraco.BusinessLogic
                 }, true);
             }
         }
-
-        //public static void MakeNew(IApplication Iapp, bool installAppTrees) {
-
-        //    MakeNew(Iapp.Name, Iapp.Alias, Iapp.Icon);
-
-        //    if (installAppTrees) {
-
-        //    }
-        //}
-
 
         /// <summary>
         /// Gets the application by its alias.
@@ -249,9 +247,6 @@ namespace umbraco.BusinessLogic
             {
                 t.Delete();
             }
-
-            //SqlHelper.ExecuteNonQuery("delete from umbracoApp where appAlias = @appAlias",
-            //    SqlHelper.CreateParameter("@appAlias", this._alias));
 
             LoadXml(doc =>
             {
@@ -298,15 +293,6 @@ namespace umbraco.BusinessLogic
             try
             {
                 var tmp = new List<Application>();
-
-                //using (IRecordsReader dr =
-                //    SqlHelper.ExecuteReader("Select appAlias, appIcon, appName from umbracoApp"))
-                //{
-                //    while (dr.Read())
-                //    {
-                //        tmp.Add(new Application(dr.GetString("appName"), dr.GetString("appAlias"), dr.GetString("appIcon")));
-                //    }
-                //}
 
                 LoadXml(doc =>
                 {

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -57,7 +58,7 @@ namespace Umbraco.Tests.Routing
 			//create the module
 			_module = new UmbracoModule();
 
-			ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", Umbraco.Core.Configuration.GlobalSettings.CurrentVersion);
+			ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", UmbracoVersion.Current.ToString(3));
 			ConfigurationManager.AppSettings.Set("umbracoReservedPaths", "~/umbraco,~/install/");
 			ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd");
 

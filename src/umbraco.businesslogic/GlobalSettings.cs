@@ -6,7 +6,9 @@ using System.Web.Hosting;
 using System.Web.Configuration;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using umbraco.BusinessLogic;
+using umbraco.DataLayer;
 using umbraco.IO;
 
 namespace umbraco
@@ -77,6 +79,7 @@ namespace umbraco
         /// Gets the database connection string
         /// </summary>
         /// <value>The database connection string.</value>
+        [Obsolete("Use System.ConfigurationManager.ConnectionStrings to get the connection with the key Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName instead")]
         public static string DbDSN
         {
 			get { return Umbraco.Core.Configuration.GlobalSettings.DbDsn; }
@@ -293,45 +296,50 @@ namespace umbraco
         /// Gets the current version.
         /// </summary>
         /// <value>The current version.</value>
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static string CurrentVersion
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.CurrentVersion; }
+			get { return UmbracoVersion.Current.ToString(3); }
         }
 
         /// <summary>
         /// Gets the major version number.
         /// </summary>
         /// <value>The major version number.</value>
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static int VersionMajor
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.VersionMajor; }
+			get { return UmbracoVersion.Current.Major; }
         }
 
         /// <summary>
         /// Gets the minor version number.
         /// </summary>
         /// <value>The minor version number.</value>
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static int VersionMinor
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.VersionMinor; }
+			get { return UmbracoVersion.Current.Minor; }
         }
 
         /// <summary>
         /// Gets the patch version number.
         /// </summary>
         /// <value>The patch version number.</value>
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static int VersionPatch
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.VersionPatch; }
+			get { return UmbracoVersion.Current.Build; }
         }
 
         /// <summary>
         /// Gets the version comment (like beta or RC).
         /// </summary>
         /// <value>The version comment.</value>
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static string VersionComment
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.VersionComment; }
+			get { return Umbraco.Core.Configuration.UmbracoVersion.CurrentComment; }
         }
 
 
@@ -378,10 +386,13 @@ namespace umbraco
         {
 			get
 			{
+                var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
+                var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false);
+
 				if (HttpContext.Current != null)
 				{
 					HttpContext.Current.Response.Write("ContentXML :" + ContentXML + "\n");
-					HttpContext.Current.Response.Write("DbDSN :" + DbDSN + "\n");
+					HttpContext.Current.Response.Write("DbDSN :" + dataHelper.ConnectionString + "\n");
 					HttpContext.Current.Response.Write("DebugMode :" + DebugMode + "\n");
 					HttpContext.Current.Response.Write("DefaultUILanguage :" + DefaultUILanguage + "\n");
 					HttpContext.Current.Response.Write("VersionCheckPeriod :" + VersionCheckPeriod + "\n");

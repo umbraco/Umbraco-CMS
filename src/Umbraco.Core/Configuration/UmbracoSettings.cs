@@ -35,6 +35,7 @@ namespace Umbraco.Core.Configuration
 			_useLegacySchema = null;
 			_useDomainPrefixes = null;
 			_umbracoLibraryCacheDuration = null;
+		    SettingsFilePath = null;
 		}
 
 		internal const string TempFriendlyXmlChildContainerNodename = ""; // "children";

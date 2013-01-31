@@ -41,7 +41,7 @@ namespace umbraco.presentation.dialogs
                     lt_notice.Text = ui.Text("rollback", "htmlHelp");
 
 
-                var props = rollback.getProperties;
+                var props = rollback.GenericProperties;
                 foreach (Property p in props) {
                     try {
 

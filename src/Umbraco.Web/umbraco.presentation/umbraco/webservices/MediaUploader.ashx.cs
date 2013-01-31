@@ -185,12 +185,12 @@ namespace umbraco.presentation.umbraco.webservices
                     scripts.SyncTree(parentNode.Path, true);
 
                     // log succes
-                    LogHelper.Info<MediaUploader>(string.Format("Successful upload to parent ID: {0}", parentNodeId));
+                    LogHelper.Info<MediaUploader>(string.Format("Success uploading to parent {0}", parentNodeId));
                 }
                 catch (Exception e)
                 {
                     // log error
-                    LogHelper.Error<MediaUploader>(string.Format("Error uploading to parent ID {0}", parentNodeId), e);
+                    LogHelper.Error<MediaUploader>(string.Format("Error uploading to parent {0}", parentNodeId), e);
                 }
             }
             else
