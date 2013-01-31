@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="ja" intName="Japanese" localName="日本語" lcid="17" culture="ja-JP">
   <creator>
     <name>umbraco</name>
@@ -15,8 +15,6 @@
     <key alias="disable">無効</key>
     <key alias="emptyTrashcan">ごみ箱を空にする</key>
     <key alias="exportDocumentType">ドキュメントタイプの書出</key>
-    <key alias="exportDocumentTypeAsCode">.NETの書き出し</key>
-    <key alias="exportDocumentTypeAsCode-Full">.NETの書き出し</key>
     <key alias="importDocumentType">ドキュメントタイプの読込</key>
     <key alias="importPackage">パッケージの読み込み</key>
     <key alias="liveEdit">ライブ編集</key>
@@ -25,6 +23,7 @@
     <key alias="notify">メール通知</key>
     <key alias="protect">一般公開</key>
     <key alias="publish">公開</key>
+    <key alias="unpublish">公開を止める</key>
     <key alias="refreshNode">最新の情報に更新</key>
     <key alias="republish">サイトのリフレッシュ</key>
     <key alias="rights">アクセス権</key>
@@ -38,6 +37,7 @@
   </area>
   <area alias="assignDomain">
     <key alias="addNew">ドメインの割り当て</key>
+    <key alias="invalidDomain">適当でないホスト名</key>
     <key alias="domain">ドメイン</key>
     <key alias="domainCreated">ドメイン '%0%' が新たに割り当てられました</key>
     <key alias="domainDeleted">ドメイン '%0%' は削除されました</key>
@@ -71,6 +71,7 @@
     <key alias="saveAndPublish">保存及び公開</key>
     <key alias="saveToPublish">保存して承認に送る</key>
     <key alias="showPage">プレビュー</key>
+    <key alias="showPageDisabled">テンプレートが指定されていないのでプレビューは無効になっています</key>
     <key alias="styleChoose">スタイルの選択</key>
     <key alias="styleShow">スタイルの表示</key>
     <key alias="tableInsert">表の挿入</key>
@@ -90,6 +91,7 @@
     <key alias="itemNotPublished">このページは公開されていません</key>
     <key alias="lastPublished">公開日時</key>
     <key alias="mediatype">メディアタイプ</key>
+    <key alias="mediaLinks">メディアの項目へのリンク</key>
     <key alias="membergroup">メンバーグループ</key>
     <key alias="memberrole">役割</key>
     <key alias="membertype">メンバータイプ</key>
@@ -324,6 +326,7 @@
     <key alias="welcome">ようこそ...</key>
     <key alias="width">幅</key>
     <key alias="yes">はい</key>
+    <key alias="folder">フォルダー</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">背景色</key>
@@ -482,6 +485,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="notAllowedByContentType">現在のノードは、ドキュメントタイプの設定により選択されたノードの子になることはできません。</key>
     <key alias="notAllowedByPath">ノードは、自分のサブページには移動できません</key>
     <key alias="notValid">子ドキュメントで権限がないので、その操作はできません。</key>
+    <key alias="relateToOriginal">コピーしたものを元と関係づける</key>
   </area>
   <area alias="notifications">
     <key alias="editNotifications">%0% への通知を編集</key>
@@ -586,8 +590,13 @@ Runwayをインストールして作られた新しいウェブサイトがど�
   </area>
   <area alias="publish">
     <key alias="contentPublishedFailedByEvent"><![CDATA[
-      サードパーティのエクステンションがキャンセルされたので、%0% は発行できませんでした。
+      サードパーティのエクステンションがキャンセルされたので、%0% は公開できませんでした。
     ]]></key>
+    <key alias="contentPublishedFailedByParent">
+      <![CDATA[
+      親ページが公開されていないので、%0% は公開できませんでした。
+    ]]>
+    </key>
     <key alias="includeUnpublished">非公開の子ページも含めます</key>
     <key alias="inProgress">公開を進めています - 少々お待ちください...</key>
     <key alias="inProgressCounter">%1% ページ中 %0% ページが公開されました...</key>
@@ -648,6 +657,9 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="tab">タブ</key>
     <key alias="tabname">タブの名前</key>
     <key alias="tabs">タブ</key>
+    <key alias="contentTypeEnabled">マスターコンテンツタイプが有効</key>
+    <key alias="contentTypeUses">このコンテンツタイプの使用</key>
+    <key alias="asAContentMasterType">マスターコンテンツタイプについては、マスターコンテンツタイプからのタブは表示されず、マスターコンテンツタイプでのみ編集することができます。</key>
   </area>
   <area alias="sort">
     <key alias="sortDone">ソートが完了しました。</key>
@@ -682,6 +694,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="editTemplateSaved">テンプレートを保存しました</key>
     <key alias="editUserError">ユーザーの保存時にエラーが発生しました (ログを確認してください)</key>
     <key alias="editUserSaved">ユーザーを保存しました</key>
+    <key alias="editUserTypeSaved">ユーザータイプを保存しました</key>
     <key alias="fileErrorHeader">ファイルは未保存です</key>
     <key alias="fileErrorText">ファイルを保存できません。アクセス権を確認してください。</key>
     <key alias="fileSavedHeader">ファイルを保存しました</key>
@@ -700,6 +713,11 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="xsltPermissionErrorText">XSLTを保存できません。アクセス権を確認してください。</key>
     <key alias="xsltSavedHeader">XSLTを保存しました</key>
     <key alias="xsltSavedText">XSLTにエラーはありません</key>
+    <key alias="contentUnpublished">コンテンツは公開されていません</key>
+    <key alias="partialViewSavedHeader">部分ビュー保存しました</key>
+    <key alias="partialViewSavedText">部分ビューをエラーなしで保存しました!</key>
+    <key alias="partialViewErrorHeader">部分ビューは保存されていません</key>
+    <key alias="partialViewErrorText">ファイルを保存するときにエラーが発生しました。</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">CSSシンタックスを使用 例: h1, .redHeader, .blueTex</key>
@@ -727,6 +745,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="chooseField">フィールドの選択</key>
     <key alias="convertLineBreaks">改行コードの変換</key>
     <key alias="convertLineBreaksHelp">改行コードをhtmlタグ &amp;lt;br&amp;gt; に変換する</key>
+    <key alias="customFields">カスタムフィールド</key>
     <key alias="dateOnly">日付のみ表示</key>
     <key alias="formatAsDate">日付の形式</key>
     <key alias="htmlEncode">HTMLエンコード</key>
@@ -740,6 +759,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="recursive">再帰的</key>
     <key alias="removeParagraph">段落タグの消去</key>
     <key alias="removeParagraphHelp">段落タグ &amp;lt;P&amp;gt; を消去します</key>
+    <key alias="standardFields">標準フィールド</key>
     <key alias="uppercase">大文字変換</key>
     <key alias="urlEncode">URLエンコード</key>
     <key alias="urlEncodeHelp">文字列をURLで使用可能な文字列に変換する</key>
@@ -833,6 +853,8 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="administrators">管理者</key>
     <key alias="categoryField">フィールドのカテゴリー</key>
     <key alias="changePassword">パスワードの変更</key>
+    <key alias="newPassword">新パスワード</key>
+    <key alias="confirmNewPassword">新パスワードの確認</key>
     <key alias="changePasswordDescription">Umbracoの管理画面にアクセスするためのパスワードを変更するには、以下のフォームに新しいパスワード入力して「パスワードの変更」ボタンをクリックしてください。</key>
     <key alias="contentChannel">コンテントチャンネル</key>
     <key alias="defaultToLiveEditing">ログオン後ライブ編集にリダイレクト</key>
@@ -851,6 +873,8 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="passwordConfirm">新しいパスワードの確認</key>
     <key alias="passwordEnterNew">新しいパスワードの入力</key>
     <key alias="passwordIsBlank">パスワードは空白にできません!</key>
+    <key alias="passwordCurrent">現在のパスワード</key>
+    <key alias="passwordInvalid">現在のパスワードが正しくない</key>
     <key alias="passwordIsDifferent">新しいパスワードと確認のパスワードが一致しません。再度入力してください!</key>
     <key alias="passwordMismatch">確認のパスワードは新しいパスワードと一致しません!</key>
     <key alias="permissionReplaceChildren">子ノードのアクセス権を置き換える</key>
