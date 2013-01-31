@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 				};
 
             DataTypesResolver.Current = new DataTypesResolver(
-                PluginManager.Current.ResolveDataTypes());
+                () => PluginManager.Current.ResolveDataTypes());
 
             base.Initialize();
 
