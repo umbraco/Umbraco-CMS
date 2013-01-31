@@ -61,10 +61,12 @@ namespace Umbraco.Core.Persistence.Migrations
                 if (isUpgrade)
                 {
                     migration.GetUpExpressions(context);
+                    LogHelper.Info<MigrationRunner>(string.Format("Added UPGRADE migration '{0}' to context", migration.GetType().Name));
                 }
                 else
                 {
                     migration.GetDownExpressions(context);
+                    LogHelper.Info<MigrationRunner>(string.Format("Added DOWNGRADE migration '{0}' to context", migration.GetType().Name));
                 }
             }
 
