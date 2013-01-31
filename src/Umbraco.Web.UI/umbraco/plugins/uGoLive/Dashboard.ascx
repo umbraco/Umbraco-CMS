@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="Dashboard.ascx.cs" Inherits="Our.Umbraco.uGoLive.Web.Umbraco.Plugins.uGoLive.Dashboard" %>
+<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="Dashboard.ascx.cs" Inherits="Our.Umbraco.uGoLive.Web.Umbraco.Plugins.uGoLive.Dashboard" %>
 <%@ Import Namespace="umbraco.IO" %>
 <%@ Import Namespace="Our.Umbraco.uGoLive.Web" %>
 <link href="../umbraco_client/propertypane/style.css" rel="stylesheet" />
@@ -24,7 +24,7 @@
 
 </script>
 
-<div class="uGoLive">
+<div class="uGoLive" id="uGoLive">
     <div class="propertypane">
         <div>
             <div class="propertyItem">
