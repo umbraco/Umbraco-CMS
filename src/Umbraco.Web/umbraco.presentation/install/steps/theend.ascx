@@ -12,6 +12,9 @@ jQuery(document).ready(function () {
       function (data) {
           jQuery("#ajax-developervids").html(data);
       });
+    
+      umbraco.presentation.webservices.CheckForUpgrade.InstallStatus(true, navigator.userAgent, "");
+
 });
 
 </script>

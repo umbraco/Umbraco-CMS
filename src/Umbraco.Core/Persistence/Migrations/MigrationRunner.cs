@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.Migrations
         /// <returns><c>True</c> if migrations were applied, otherwise <c>False</c></returns>
         public bool Execute(Database database, DatabaseProviders databaseProvider, bool isUpgrade = true)
         {
-            LogHelper.Info<MigrationRunner>("Initializing database migration");
+            LogHelper.Info<MigrationRunner>("Initializing database migrations");
 
 	        var foundMigrations = MigrationResolver.Current.Migrations;
 
@@ -61,10 +61,12 @@ namespace Umbraco.Core.Persistence.Migrations
                 if (isUpgrade)
                 {
                     migration.GetUpExpressions(context);
+                    LogHelper.Info<MigrationRunner>(string.Format("Added UPGRADE migration '{0}' to context", migration.GetType().Name));
                 }
                 else
                 {
                     migration.GetDownExpressions(context);
+                    LogHelper.Info<MigrationRunner>(string.Format("Added DOWNGRADE migration '{0}' to context", migration.GetType().Name));
                 }
             }
 

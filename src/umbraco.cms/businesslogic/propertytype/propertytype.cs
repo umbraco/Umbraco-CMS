@@ -378,10 +378,6 @@ namespace umbraco.cms.businesslogic.propertytype
             // flush cache
             FlushCache();
 
-            // clean all properties on inherited document types (if this propertytype is removed from a master)
-            CleanPropertiesOnDeletion(_contenttypeid);
-            //            DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == _contenttypeid).ForEach(dt => cleanPropertiesOnDeletion(dt.Id));
-
             // Delete all properties of propertytype
             CleanPropertiesOnDeletion(_contenttypeid);
 
@@ -413,15 +409,15 @@ namespace umbraco.cms.businesslogic.propertytype
             DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentTypes.Contains(contentTypeId)).ForEach(
                 dt => CleanPropertiesOnDeletion(dt.Id));
 
-            // then remove from the current doc type
-            Content[] objs = Content.getContentOfContentType(new ContentType(contentTypeId));
-            foreach (Content c in objs.ToList())
+            //Initially Content.getContentOfContentType() was called, but because this doesn't include members we resort to sql lookups and deletes
+            var tmp = new List<int>();
+            IRecordsReader dr = SqlHelper.ExecuteReader("SELECT nodeId FROM cmsContent INNER JOIN umbracoNode ON cmsContent.nodeId = umbracoNode.id WHERE ContentType = " + contentTypeId + " ORDER BY umbracoNode.text ");
+            while (dr.Read()) tmp.Add(dr.GetInt("nodeId"));
+            dr.Close();
+
+            foreach (var contentId in tmp)
             {
-                Property prop = c.getProperty(this);
-                if (prop != null)
-                {
-                    prop.delete();
-                }
+                SqlHelper.ExecuteNonQuery("DELETE FROM cmsPropertyData WHERE PropertyTypeId =" + this.Id + " AND contentNodeId = " + contentId);
             }
 
             // invalidate content type cache
