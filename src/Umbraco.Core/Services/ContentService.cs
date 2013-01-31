@@ -1316,7 +1316,15 @@ namespace Umbraco.Core.Services
                         uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
                                                                    new {Id = content.Id, Version = content.Version}) != 0;
                     int previewResult = previewExists
-                                            ? uow.Database.Update(previewPoco)
+                                            ? uow.Database.Update<PreviewXmlDto>(
+                                                "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
+                                                new
+                                                    {
+                                                        Xml = previewPoco.Xml,
+                                                        Timestamp = previewPoco.Timestamp,
+                                                        Id = previewPoco.NodeId,
+                                                        Version = previewPoco.VersionId
+                                                    })
                                             : Convert.ToInt32(uow.Database.Insert(previewPoco));
 
                 }
@@ -1382,7 +1390,15 @@ namespace Umbraco.Core.Services
                     uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
                                                                new { Id = content.Id, Version = content.Version }) != 0;
                 int previewResult = previewExists
-                                        ? uow.Database.Update(previewPoco)
+                                        ? uow.Database.Update<PreviewXmlDto>(
+                                            "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
+                                            new
+                                                {
+                                                    Xml = previewPoco.Xml,
+                                                    Timestamp = previewPoco.Timestamp,
+                                                    Id = previewPoco.NodeId,
+                                                    Version = previewPoco.VersionId
+                                                })
                                         : Convert.ToInt32(uow.Database.Insert(previewPoco));
             }
 
