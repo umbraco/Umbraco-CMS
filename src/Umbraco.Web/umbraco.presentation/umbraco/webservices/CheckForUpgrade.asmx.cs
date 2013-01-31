@@ -61,6 +61,10 @@ namespace umbraco.presentation.webservices
             }
             installCookie.SetValue(installId.ToString());
 
+            string dbProvider = String.Empty;
+            if (!String.IsNullOrEmpty(Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus))
+            dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
+
             org.umbraco.update.CheckForUpgrade check = new global::umbraco.presentation.org.umbraco.update.CheckForUpgrade();
             check.Install(installId,
                 isUpgrade,
@@ -72,7 +76,7 @@ namespace umbraco.presentation.webservices
                 UmbracoVersion.CurrentComment,
                 errorMsg,
                 userAgent,
-                ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString());
+                dbProvider);
         }
     }
 
