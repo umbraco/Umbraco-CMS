@@ -105,7 +105,9 @@
 
   <!-- Prompts for the database password and fills it into the database scripts.
 	The SQL tag indicates it is a parameter required for SQL, the DbUserPassword tag indicates this is a Db password -->
-  <parameter name="Database Password" description="Password for the Database Username." tags="New, Password, SQL, DbUserPassword">
+  <parameter name="Database Password" description="Enter Password for the Database Username. Passwords will contain at least 1 upper case letter, at least 1 lower case letter, at least 1 number or special character, and be least 8 characters in length. " 
+             tags="New, Password, SQL, DbUserPassword">
+    <parameterValidation type = "RegularExpression" validationString = "(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" /> 
     <parameterEntry type="TextFile" scope="installSQL1.sql" match="PlaceHolderForPassword" />
     <parameterEntry type="TextFile" scope="installSQL2.sql" match="PlaceHolderForPassword" />
   </parameter>
