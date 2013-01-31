@@ -40,7 +40,11 @@
 
 
     <form runat="server">
-
+        <asp:ScriptManager ID="ScriptManager1" EnablePageMethods="true" runat="server">
+            <Services>
+                <asp:ServiceReference Path="../umbraco/webservices/CheckForUpgrade.asmx" />
+            </Services>
+        </asp:ScriptManager>
         <!-- all page -->
 
         <section id="wrapper">
@@ -151,12 +155,7 @@
         </div>
 
         <input type="hidden" runat="server" value="welcome" id="step" />
-        
-        <asp:ScriptManager ID="ScriptManager1" EnablePageMethods="true" runat="server">
-            <Services>
-                <asp:ServiceReference Path="../umbraco/webservices/CheckForUpgrade.asmx" />
-            </Services>
-        </asp:ScriptManager>
+
     </form>
 </body>
 
