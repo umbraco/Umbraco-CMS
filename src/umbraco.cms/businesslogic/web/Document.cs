@@ -892,9 +892,6 @@ namespace umbraco.cms.businesslogic.web
 
             foreach (var property in GenericProperties)
             {
-                if (property.Value == null)
-                    continue;
-
                 Content.SetValue(property.PropertyType.Alias, property.Value);
             }
 
@@ -905,8 +902,6 @@ namespace umbraco.cms.businesslogic.web
                 ApplicationContext.Current.Services.ContentService.Save(Content, userId);
 
                 base.Save();
-                // update preview xml
-                SaveXmlPreview(new XmlDocument());
 
                 FireAfterSave(e);
             }
@@ -935,8 +930,6 @@ namespace umbraco.cms.businesslogic.web
                 var result = ((ContentService)ApplicationContext.Current.Services.ContentService).SaveAndPublish(Content, true, u.Id);
 
                 base.Save();
-                // update preview xml
-                SaveXmlPreview(new XmlDocument());
 
                 FireAfterSave(e);
 

@@ -598,7 +598,10 @@ namespace umbraco.cms.businesslogic.member
                             }
                             else if (dbType.Equals("Date"))
                             {
-                                poco.Date = DateTime.Parse(property.Value.ToString());
+                                DateTime date;
+
+                                if(DateTime.TryParse(property.Value.ToString(), out date))
+                                    poco.Date = date;
                             }
                             else if (dbType.Equals("Nvarchar"))
                             {

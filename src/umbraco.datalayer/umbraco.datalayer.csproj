@@ -124,6 +124,7 @@
     <Compile Include="Utility\BaseUtility.cs" />
     <Compile Include="Utility\Installer\DatabaseVersion.cs" />
     <Compile Include="Utility\Installer\DefaultInstallerUtility.cs" />
+    <Compile Include="Utility\Installer\VersionSpecs.cs" />
     <Compile Include="Utility\Table\DefaultField.cs" />
     <Compile Include="Utility\Table\DefaultTable.cs" />
     <Compile Include="Utility\Table\FieldProperties.cs" />

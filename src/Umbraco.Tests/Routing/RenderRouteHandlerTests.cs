@@ -69,7 +69,11 @@ namespace Umbraco.Tests.Routing
 		}
 
 		//test all template name styles to match the ActionName
-		[TestCase("home-page")]
+        [TestCase("home-\\234^^*32page")]
+        [TestCase("home-page")]
+        [TestCase("home-\\234^^*32page")]
+        [TestCase("home-page")]
+        [TestCase("home-page")]
 		[TestCase("Home-Page")]
 		[TestCase("HomePage")]
 		[TestCase("homePage")]
@@ -90,7 +94,9 @@ namespace Umbraco.Tests.Routing
 
 			handler.GetHandlerForRoute(routingContext.UmbracoContext.HttpContext.Request.RequestContext, docRequest);
 			Assert.AreEqual("CustomDocument", routeData.Values["controller"].ToString());
-			Assert.AreEqual("HomePage", routeData.Values["action"].ToString());
+		    Assert.AreEqual(
+		        global::umbraco.cms.helpers.Casing.SafeAlias(templateName),
+		        routeData.Values["action"].ToString());
 		}
 
 

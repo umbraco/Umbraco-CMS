@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.installer;
 
 namespace umbraco.presentation.install.steps.Definitions
@@ -20,7 +21,7 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override string UserControl
         {
-            get { return IO.SystemDirectories.Install + "/steps/validatepermissions.ascx"; }
+            get { return SystemDirectories.Install + "/steps/validatepermissions.ascx"; }
         }
 
         public override bool HideFromNavigation {

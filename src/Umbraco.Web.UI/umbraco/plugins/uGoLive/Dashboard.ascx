@@ -1,11 +1,13 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="Dashboard.ascx.cs" Inherits="Our.Umbraco.uGoLive.Web.Umbraco.Plugins.uGoLive.Dashboard" %>
+<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="Dashboard.ascx.cs" Inherits="Our.Umbraco.uGoLive.Web.Umbraco.Plugins.uGoLive.Dashboard" %>
 <%@ Import Namespace="umbraco.IO" %>
 <%@ Import Namespace="Our.Umbraco.uGoLive.Web" %>
-<link href="../umbraco_client/propertypane/style.css" rel="stylesheet" />
-<link href="plugins/uGoLive/Dashboard.css" rel="stylesheet" />
-<script type="text/javascript" src="plugins/uGoLive/jquery.tmpl.js"></script>
-<script type="text/javascript" src="plugins/uGoLive/knockout-1.2.1.js"></script>
-<script type="text/javascript" src="plugins/uGoLive/Dashboard.js"></script>
+<%@ Register Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" TagPrefix="cdf" %>
+
+<cdf:CssInclude ID="CssInclude1" runat="server" FilePath="propertypane/style.css" PathNameAlias="UmbracoClient"  />
+<cdf:CssInclude ID="CssInclude2" runat="server" FilePath="plugins/uGoLive/Dashboard.css" PathNameAlias="UmbracoRoot"  />
+<cdf:JsInclude ID="JsInclude2" runat="server" FilePath="UI/knockout.js" Priority="3" PathNameAlias="UmbracoClient" />
+<cdf:JsInclude ID="JsInclude1" runat="server" FilePath="plugins/uGoLive/Dashboard.js" PathNameAlias="UmbracoRoot" />
+
 <script type="text/javascript">
 
     (function ($) {
@@ -24,7 +26,7 @@
 
 </script>
 
-<div class="uGoLive">
+<div class="uGoLive" id="uGoLive">
     <div class="propertypane">
         <div>
             <div class="propertyItem">

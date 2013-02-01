@@ -1054,6 +1054,22 @@ namespace Umbraco.Core.Services
             return SaveAndPublishDo(content, omitCacheRefresh, userId, raiseEvents);
         }
 
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> descendants by the first Parent.
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> item to retrieve Descendants from</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        internal IEnumerable<IContent> GetPublishedDescendants(IContent content)
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IContent>.Builder.Where(x => x.Id != content.Id && x.Path.StartsWith(content.Path) && x.Published == true && x.Trashed == false);
+                var contents = repository.GetByQuery(query);
+
+                return contents;
+            }
+        }
+
         #endregion
 
         #region Private Methods
@@ -1243,6 +1259,9 @@ namespace Umbraco.Core.Services
                 return false;
             }
 
+            //Has this content item previously been published? If so, we don't need to refresh the children
+	        var previouslyPublished = HasPublishedVersion(content.Id);
+
             //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
             if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
             {
@@ -1279,11 +1298,35 @@ namespace Umbraco.Core.Services
                 if (published)
                 {
                     var xml = content.ToXml();
-                    var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
-                    var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = content.Id }) != null;
-                    int result = exists
-                                     ? uow.Database.Update(poco)
-                                     : Convert.ToInt32(uow.Database.Insert(poco));
+                    //Content Xml
+                    var contentPoco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
+                    var contentExists = uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = content.Id }) != 0;
+                    int contentResult = contentExists
+                                            ? uow.Database.Update(contentPoco)
+                                            : Convert.ToInt32(uow.Database.Insert(contentPoco));
+                    //Preview Xml
+                    var previewPoco = new PreviewXmlDto
+                                          {
+                                              NodeId = content.Id,
+                                              Timestamp = DateTime.Now,
+                                              VersionId = content.Version,
+                                              Xml = xml.ToString(SaveOptions.None)
+                                          };
+                    var previewExists =
+                        uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
+                                                                   new {Id = content.Id, Version = content.Version}) != 0;
+                    int previewResult = previewExists
+                                            ? uow.Database.Update<PreviewXmlDto>(
+                                                "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
+                                                new
+                                                    {
+                                                        Xml = previewPoco.Xml,
+                                                        Timestamp = previewPoco.Timestamp,
+                                                        Id = previewPoco.NodeId,
+                                                        Version = previewPoco.VersionId
+                                                    })
+                                            : Convert.ToInt32(uow.Database.Insert(previewPoco));
+
                 }
             }
 
@@ -1294,13 +1337,12 @@ namespace Umbraco.Core.Services
             if (omitCacheRefresh == false)
                 _publishingStrategy.PublishingFinalized(content);
 
-            //We need to check if children and their publish state to ensure that we republish content that was previously published
-            if (omitCacheRefresh == false && HasChildren(content.Id))
+            //We need to check if children and their publish state to ensure that we 'republish' content that was previously published
+            if (omitCacheRefresh == false && previouslyPublished == false && HasChildren(content.Id))
             {
-                var children = GetDescendants(content);
-                var shouldBeRepublished = children.Where(child => HasPublishedVersion(child.Id));
+                var descendants = GetPublishedDescendants(content);
 
-                _publishingStrategy.PublishingFinalized(shouldBeRepublished, false);
+                _publishingStrategy.PublishingFinalized(descendants, false);
             }
 
             Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId, content.Id);
@@ -1334,6 +1376,30 @@ namespace Umbraco.Core.Services
 
                 repository.AddOrUpdate(content);
                 uow.Commit();
+
+                //Preview Xml
+                var xml = content.ToXml();
+                var previewPoco = new PreviewXmlDto
+                                      {
+                                          NodeId = content.Id,
+                                          Timestamp = DateTime.Now,
+                                          VersionId = content.Version,
+                                          Xml = xml.ToString(SaveOptions.None)
+                                      };
+                var previewExists =
+                    uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
+                                                               new { Id = content.Id, Version = content.Version }) != 0;
+                int previewResult = previewExists
+                                        ? uow.Database.Update<PreviewXmlDto>(
+                                            "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
+                                            new
+                                                {
+                                                    Xml = previewPoco.Xml,
+                                                    Timestamp = previewPoco.Timestamp,
+                                                    Id = previewPoco.NodeId,
+                                                    Version = previewPoco.VersionId
+                                                })
+                                        : Convert.ToInt32(uow.Database.Insert(previewPoco));
             }
 
             if(raiseEvents)

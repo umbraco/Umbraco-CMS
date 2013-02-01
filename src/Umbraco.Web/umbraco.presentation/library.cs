@@ -188,15 +188,28 @@ namespace umbraco
         /// </summary>
         /// <param name="DocumentId">The Id of the Document to be unpublished</param>
         public static void UnPublishSingleNode(int DocumentId)
-        {
-
-            //PPH Added dispatcher support
+        {            
             if (UmbracoSettings.UseDistributedCalls)
                 dispatcher.Remove(
                     new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"),
                     DocumentId);
             else
                 content.Instance.ClearDocumentCache(DocumentId);
+        }
+
+        /// <summary>
+        /// Unpublish a node, by removing it from the runtime xml index. Note, prior to this the Document should be 
+        /// marked unpublished by setting the publish property on the document object to false
+        /// </summary>
+        /// <param name="document">The Document to be unpublished</param>
+        internal static void UnPublishSingleNode(Document document)
+        {
+            if (UmbracoSettings.UseDistributedCalls)
+                dispatcher.Remove(
+                    new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"),
+                    document.Id);
+            else
+                content.Instance.ClearDocumentCache(document);
         }
 
         /// <summary>

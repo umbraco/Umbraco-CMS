@@ -1915,7 +1915,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx" />
-    <Content Include="umbraco.presentation\install\steps\license.ascx" />
+    <Content Include="umbraco.presentation\install\steps\license.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\actions\delete.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\editContent.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\preview.aspx" />
@@ -2042,7 +2044,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dashboard.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\LatestEdits.ascx" />
+    <Content Include="umbraco.presentation\umbraco\dashboard\LatestEdits.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\Default.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Macros\assemblyBrowser.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\autoDoc.aspx" />

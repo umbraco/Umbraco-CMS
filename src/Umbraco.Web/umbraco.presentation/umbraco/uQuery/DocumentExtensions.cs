@@ -250,7 +250,7 @@ namespace umbraco
 				}
 			}
 
-			library.UpdateDocumentCache(document.Id);
+			library.UpdateDocumentCache(document);
 
 			return document;
 		}
