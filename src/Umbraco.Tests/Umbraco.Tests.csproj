@@ -63,7 +63,6 @@
   <ItemGroup>
     <Compile Include="BusinessLogic\DictionaryTest.cs" />
     <Compile Include="ContentStores\PublishMediaStoreTests.cs" />
-    <Compile Include="Install\UpgradeScriptsTests.cs" />
     <Compile Include="PublishedContent\DynamicXmlTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
     <Compile Include="PublishedContent\PublishedContentTests.cs" />

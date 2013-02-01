@@ -4,7 +4,6 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Umbraco.Web.Install.UpgradeScripts;
 using umbraco.DataLayer.Utility.Installer;
 using umbraco.DataLayer;
 

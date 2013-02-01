@@ -136,7 +136,6 @@ namespace umbraco.presentation.install
 			ics.Add(new install.steps.Definitions.Welcome());
 			ics.Add(new install.steps.Definitions.License());
 			ics.Add(new install.steps.Definitions.FilePermissions());
-            ics.Add(new install.steps.Definitions.UpgradeScripts());
 			ics.Add(new install.steps.Definitions.Database());
 			ics.Add(new install.steps.Definitions.DefaultUser());
 			ics.Add(new install.steps.Definitions.Skinning());

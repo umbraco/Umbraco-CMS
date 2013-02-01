@@ -252,11 +252,6 @@
     <Compile Include="Dynamics\Grouping.cs" />
     <Compile Include="Install\InstallPackageController.cs" />
     <Compile Include="Install\UmbracoInstallAuthorizeAttribute.cs" />
-    <Compile Include="Install\UpgradeScripts\ContentPathFix.cs" />
-    <Compile Include="Install\UpgradeScripts\IUpgradeScript.cs" />
-    <Compile Include="Install\UpgradeScripts\UpgradeScriptRegistrar.cs" />
-    <Compile Include="Install\UpgradeScripts\UpgradeScriptManager.cs" />
-    <Compile Include="Install\UpgradeScripts\VersionRange.cs" />
     <Compile Include="Macros\PartialViewMacroController.cs" />
     <Compile Include="Macros\PartialViewMacroEngine.cs" />
     <Compile Include="Macros\PartialViewMacroPage.cs" />
@@ -334,7 +329,6 @@
     <Compile Include="umbraco.presentation\install\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\install\steps\Definitions\UpgradeScripts.cs" />
     <Compile Include="umbraco.presentation\install\steps\Skinning\loadStarterKitDesigns.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -2028,7 +2022,9 @@
       <SubType>UserControl</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dashboard.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\LatestEdits.ascx" />
+    <Content Include="umbraco.presentation\umbraco\dashboard\LatestEdits.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\Default.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Macros\assemblyBrowser.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\autoDoc.aspx" />
