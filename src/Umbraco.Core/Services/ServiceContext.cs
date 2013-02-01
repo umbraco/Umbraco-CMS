@@ -28,7 +28,7 @@ namespace Umbraco.Core.Services
 		/// <param name="fileUnitOfWorkProvider"></param>
 		/// <param name="publishingStrategy"></param>
 		internal ServiceContext(IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, IUnitOfWorkProvider fileUnitOfWorkProvider, IPublishingStrategy publishingStrategy)
-		{
+		{   
 			BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy, 
 				//this needs to be lazy because when we create the service context it's generally before the
 				//resolvers have been initialized!

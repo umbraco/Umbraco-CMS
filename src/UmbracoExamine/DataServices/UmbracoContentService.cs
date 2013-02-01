@@ -6,6 +6,8 @@ using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
 using umbraco;
 using System.Xml.Linq;
@@ -25,17 +27,19 @@ namespace UmbracoExamine.DataServices
     public class UmbracoContentService : IContentService
     {
 
-		private readonly ServiceContext _services;
+        private readonly ApplicationContext _applicationContext;
 
+        [SecuritySafeCritical]
 		public UmbracoContentService()
-			: this(ApplicationContext.Current.Services)
+			: this(ApplicationContext.Current)
 		{
 
 		}
 
-		public UmbracoContentService(ServiceContext services)
+        [SecuritySafeCritical]
+        public UmbracoContentService(ApplicationContext applicationContext)
 		{
-			_services = services;
+            _applicationContext = applicationContext;
 		}
 
         /// <summary>
@@ -74,7 +78,7 @@ namespace UmbracoExamine.DataServices
 		public XDocument GetLatestContentByXPath(string xpath)
         {
             var xmlContent = XDocument.Parse("<content></content>");
-			foreach (var c in _services.ContentService.GetRootContent())
+            foreach (var c in _applicationContext.Services.ContentService.GetRootContent())
             {
 				xmlContent.Root.Add(c.ToXml());				
             }
@@ -115,39 +119,18 @@ namespace UmbracoExamine.DataServices
         /// <returns></returns>
 		[SecuritySafeCritical]
 		public IEnumerable<string> GetAllUserPropertyNames()
-        {
-            //TODO: this is how umb codebase 4.0 does this... convert to new data layer
-
-            var aliases = new List<string>();
-            var fieldSql = "select distinct alias from cmsPropertyType order by alias";
+	    {
             try
             {
-                using (var dr = Application.SqlHelper.ExecuteReader(fieldSql))
-                {
-                    while (dr.Read())
-                    {
-                        aliases.Add(dr.GetString("alias"));
-                    }
-                }
+                var result = _applicationContext.DatabaseContext.Database.Fetch<dynamic>("select distinct alias from cmsPropertyType order by alias");
+                return result.Select(r => r.Alias.ToString()).Cast<string>().ToList();
             }
             catch (Exception ex)
             {
-                if (ex is SqlHelperException || ex is SqlException)
-                {
-                    //if this happens, it could be due to wrong connection string, or something else.
-                    //we don't want to crash the app because of this so we'll actually swallow this
-                    //exception... Unfortunately logging probably won't work in this situation either :(
-
-                    LogHelper.Error<UmbracoContentService>("EXCEPTION OCCURRED reading GetAllUserPropertyNames", ex);
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return aliases;
-        }
+                LogHelper.Error<UmbracoContentService>("EXCEPTION OCCURRED reading GetAllUserPropertyNames", ex);
+                return Enumerable.Empty<string>();
+            }      
+	    }
 
         /// <summary>
         /// Returns a list of all system field names in Umbraco
