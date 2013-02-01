@@ -8,6 +8,7 @@ using System.Threading;
 using System.Web;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
+using Umbraco.Core;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using UmbracoExamine.DataServices;
@@ -92,6 +93,14 @@ namespace UmbracoExamine
         /// <param name="config"></param>
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
+
+            //We need to check if we actually can initialize, if not then don't continue
+            if (!CanInitialized())
+            {
+                return;
+            }
+
+
             if (config["dataService"] != null && !string.IsNullOrEmpty(config["dataService"]))
             {
                 //this should be a fully qualified type
@@ -159,6 +168,22 @@ namespace UmbracoExamine
         //}
 
         #region Protected
+
+        /// <summary>
+        /// Returns true if the Umbraco application is in a state that we can initialize the examine indexes
+        /// </summary>
+        /// <returns></returns>
+        protected bool CanInitialized()
+        {
+            //We need to check if we actually can initialize, if not then don't continue
+            if (ApplicationContext.Current == null
+                || !ApplicationContext.Current.IsConfigured
+                || !ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured)
+            {
+                return false;
+            }
+            return true;
+        }
 
         /////<summary>
         ///// Calls a web request in a worker thread to rebuild the indexes

@@ -5,6 +5,7 @@ using System.Security;
 using Examine;
 using Examine.Providers;
 using Examine.SearchCriteria;
+using Umbraco.Core;
 using UmbracoExamine.Config;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
@@ -30,6 +31,17 @@ namespace UmbracoExamine
         {
         }
 
+        public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
+        {
+            //We need to check if we actually can initialize, if not then don't continue
+            if (!CanInitialized())
+            {
+                return;
+            }
+
+            base.Initialize(name, config);
+        }
+
         /// <summary>
         /// Constructor to allow for creating an indexer at runtime
         /// </summary>
@@ -53,6 +65,22 @@ namespace UmbracoExamine
 		}
 
 		#endregion
+
+        /// <summary>
+        /// Returns true if the Umbraco application is in a state that we can initialize the examine indexes
+        /// </summary>
+        /// <returns></returns>
+        protected bool CanInitialized()
+        {
+            //We need to check if we actually can initialize, if not then don't continue
+            if (ApplicationContext.Current == null
+                || !ApplicationContext.Current.IsConfigured
+                || !ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured)
+            {
+                return false;
+            }
+            return true;
+        }
 
         /// <summary>
         /// Override in order to set the nodeTypeAlias field name of the underlying SearchCriteria to __NodeTypeAlias

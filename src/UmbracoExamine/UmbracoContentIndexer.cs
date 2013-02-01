@@ -120,6 +120,12 @@ namespace UmbracoExamine
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
 
+            //We need to check if we actually can initialize, if not then don't continue
+            if (!CanInitialized())
+            {
+                return;
+            }
+
             //check if there's a flag specifying to support unpublished content,
             //if not, set to false;
             bool supportUnpublished;

@@ -8,12 +8,15 @@ using Examine.LuceneEngine;
 using Lucene.Net.Documents;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using UmbracoExamine;
 using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.member;
 using umbraco.interfaces;
+using Content = umbraco.cms.businesslogic.Content;
 using Document = umbraco.cms.businesslogic.web.Document;
 
 namespace Umbraco.Web.Search
@@ -42,6 +45,18 @@ namespace Umbraco.Web.Search
 		[SecuritySafeCritical]
 		public void OnApplicationStarted(UmbracoApplicationBase httpApplication, ApplicationContext applicationContext)
 		{
+            //do not initialize if the application is not configured
+            //We need to check if we actually can initialize, if not then don't continue
+            if (ApplicationContext.Current == null
+                || !ApplicationContext.Current.IsConfigured
+                || !ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured)
+            {
+                LogHelper.Info<ExamineEvents>("Not initializing Examine because the application and/or database is not configured");
+                return;
+            }
+
+            LogHelper.Info<ExamineEvents>("Initializing Examine and binding to business logic events");
+
 			var registeredProviders = ExamineManager.Instance.IndexProviderCollection
 				.OfType<BaseUmbracoIndexer>().Count(x => x.EnableDefaultEventHandler);
 
@@ -51,17 +66,16 @@ namespace Umbraco.Web.Search
 			if (registeredProviders == 0)
 				return;
 
-			global::umbraco.cms.businesslogic.media.Media.AfterSave += MediaAfterSave;
-			global::umbraco.cms.businesslogic.media.Media.AfterDelete += MediaAfterDelete;
-			CMSNode.AfterMove += MediaAfterMove;
+            MediaService.Saved += MediaServiceSaved;
+            MediaService.Deleted += MediaServiceDeleted;
+            MediaService.Moved += MediaServiceMoved;
+            ContentService.Saved += ContentServiceSaved;
+            ContentService.Deleted += ContentService_Deleted;
+            ContentService.Moved += ContentService_Moved;
 
 			//These should only fire for providers that DONT have SupportUnpublishedContent set to true
 			content.AfterUpdateDocumentCache += ContentAfterUpdateDocumentCache;
 			content.AfterClearDocumentCache += ContentAfterClearDocumentCache;
-
-			//These should only fire for providers that have SupportUnpublishedContent set to true
-			Document.AfterSave += DocumentAfterSave;
-			Document.AfterDelete += DocumentAfterDelete;
 
 			Member.AfterSave += MemberAfterSave;
 			Member.AfterDelete += MemberAfterDelete;
@@ -77,6 +91,50 @@ namespace Umbraco.Web.Search
 				memberIndexer.DocumentWriting += IndexerDocumentWriting;
 			}
 		}
+
+        [SecuritySafeCritical]
+        void ContentService_Moved(IContentService sender, Umbraco.Core.Events.MoveEventArgs<IContent> e)
+        {
+            IndexConent(e.Entity);
+        }
+
+        [SecuritySafeCritical]
+        void ContentService_Deleted(IContentService sender, Umbraco.Core.Events.DeleteEventArgs<IContent> e)
+        {
+            e.DeletedEntities.ForEach(
+                content =>
+                ExamineManager.Instance.DeleteFromIndex(
+                    content.Id.ToString(),
+                    ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler)));
+        }
+
+        [SecuritySafeCritical]
+        void ContentServiceSaved(IContentService sender, Umbraco.Core.Events.SaveEventArgs<IContent> e)
+        {
+            e.SavedEntities.ForEach(IndexConent);
+        }
+
+        [SecuritySafeCritical]
+        void MediaServiceMoved(IMediaService sender, Umbraco.Core.Events.MoveEventArgs<IMedia> e)
+        {
+            IndexMedia(e.Entity);
+        }
+
+        [SecuritySafeCritical]
+        void MediaServiceDeleted(IMediaService sender, Umbraco.Core.Events.DeleteEventArgs<IMedia> e)
+        {
+            e.DeletedEntities.ForEach(
+                media =>
+                ExamineManager.Instance.DeleteFromIndex(
+                    media.Id.ToString(),
+                    ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler)));
+        }
+
+        [SecuritySafeCritical]
+        void MediaServiceSaved(IMediaService sender, Umbraco.Core.Events.SaveEventArgs<IMedia> e)
+        {
+            e.SavedEntities.ForEach(IndexMedia);
+        }
 
 		[SecuritySafeCritical]
 		private static void MemberAfterSave(Member sender, SaveEventArgs e)
@@ -97,113 +155,6 @@ namespace Umbraco.Web.Search
 			ExamineManager.Instance.DeleteFromIndex(nodeId,
 				ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
 					.Where(x => x.EnableDefaultEventHandler));
-		}
-
-		/// <summary>
-		/// Only index using providers that SupportUnpublishedContent
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		[SecuritySafeCritical]
-		private static void DocumentAfterSave(Document sender, SaveEventArgs e)
-		{
-			//ensure that only the providers that have unpublishing support enabled     
-			//that are also flagged to listen
-
-			//there's a bug in 4.0.x that fires the Document saving event handler for media when media is moved,
-			//therefore, we need to try to figure out if this is media or content. Currently one way to do this
-			//is by checking the creator ID property as it will be null if it is media. We then need to try to 
-			//create the media object, see if it exists, and pass it to the media save event handler... yeah i know, 
-			//pretty horrible but has to be done.
-
-			try
-			{
-				var creator = sender.Creator;
-				if (creator != null)
-				{
-					//it's def a Document
-					ExamineManager.Instance.ReIndexNode(ToXDocument(sender, false).Root, IndexTypes.Content,
-						ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
-							.Where(x => x.SupportUnpublishedContent
-								&& x.EnableDefaultEventHandler));
-
-					return; //exit, we've indexed the content
-				}
-			}
-			catch (Exception)
-			{
-				//if we get this exception, it means it's most likely media, so well do our check next.   
-
-				//TODO: Update this logic for 6.0 as we're not dealing with 4.0x
-
-				//this is most likely media, not sure what kind of exception might get thrown in 4.0.x or 4.1 if accessing a null
-				//creator, so we catch everything.
-			}
-
-
-
-			var m = new global::umbraco.cms.businesslogic.media.Media(sender.Id);
-			if (string.IsNullOrEmpty(m.Path)) return;
-			//this is a media item, no exception occurred on access to path and it's not empty which means it was found
-			MediaAfterSave(m, e);
-		}
-
-		/// <summary>
-		/// Only remove indexes using providers that SupportUnpublishedContent
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		[SecuritySafeCritical]
-		private static void DocumentAfterDelete(Document sender, DeleteEventArgs e)
-		{
-			var nodeId = sender.Id.ToString();
-
-			//ensure that only the providers that have unpublishing support enabled      
-			//that are also flagged to listen
-			ExamineManager.Instance.DeleteFromIndex(nodeId,
-				ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
-					.Where(x => x.SupportUnpublishedContent
-						&& x.EnableDefaultEventHandler));
-		}
-
-		[SecuritySafeCritical]
-		private static void MediaAfterDelete(global::umbraco.cms.businesslogic.media.Media sender, DeleteEventArgs e)
-		{
-			var nodeId = sender.Id.ToString();
-
-			//ensure that only the providers are flagged to listen execute
-			ExamineManager.Instance.DeleteFromIndex(nodeId,
-				ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
-					.Where(x => x.EnableDefaultEventHandler));
-		}
-
-		[SecuritySafeCritical]
-		private static void MediaAfterSave(global::umbraco.cms.businesslogic.media.Media sender, SaveEventArgs e)
-		{
-			//ensure that only the providers are flagged to listen execute
-			IndexMedia(sender);
-		}
-
-		[SecuritySafeCritical]
-		private static void IndexMedia(global::umbraco.cms.businesslogic.media.Media sender)
-		{
-			ExamineManager.Instance.ReIndexNode(ToXDocument(sender, true).Root, IndexTypes.Media,
-												ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
-													.Where(x => x.EnableDefaultEventHandler));
-		}
-
-		/// <summary>
-		/// When media is moved, re-index
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		[SecuritySafeCritical]
-		private static void MediaAfterMove(object sender, MoveEventArgs e)
-		{
-			var media = sender as global::umbraco.cms.businesslogic.media.Media;
-			if (media == null) return;
-			global::umbraco.cms.businesslogic.media.Media m = media;
-			IndexMedia(m);
 		}
 
 		/// <summary>
@@ -260,6 +211,20 @@ namespace Umbraco.Web.Search
 			}
 		}
 
+
+        private void IndexMedia(IMedia sender)
+        {
+            ExamineManager.Instance.ReIndexNode(
+                sender.ToXml(), "media",
+                ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler));
+        }
+
+        private void IndexConent(IContent sender)
+        {
+            ExamineManager.Instance.ReIndexNode(
+                sender.ToXml(), "content",
+                ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler));
+        }
 
 		/// <summary>
 		/// Converts a content node to XDocument
