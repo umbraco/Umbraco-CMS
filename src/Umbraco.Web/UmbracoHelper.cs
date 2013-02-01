@@ -480,7 +480,7 @@ namespace Umbraco.Web
 			return TypedContent(ids.ToArray());
 		}
 
-        public IEnumerable<IPublishedContent> TypedContentsAtRoot()
+        public IEnumerable<IPublishedContent> TypedContentAtRoot()
         {
             return TypedDocumentsAtRoot(PublishedContentStoreResolver.Current.PublishedContentStore);
         }
@@ -594,7 +594,7 @@ namespace Umbraco.Web
 			return TypedMedia(ids.ToArray());
 		}
 
-        public IEnumerable<IPublishedContent> TypedMediasAtRoot()
+        public IEnumerable<IPublishedContent> TypedMediaAtRoot()
         {
             return TypedDocumentsAtRoot(PublishedMediaStoreResolver.Current.PublishedMediaStore);
         }
