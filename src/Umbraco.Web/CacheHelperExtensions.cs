@@ -22,9 +22,9 @@ namespace Umbraco.Web
 		/// <remarks>
 		/// This would be better left internal, however
 		/// </remarks>
-		public sealed class CacheHelperApplicationEventListener : IApplicationEventHandler
+		public sealed class CacheHelperApplicationEventListener : ApplicationEventHandler
 		{
-            public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+            protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
 			{
                 if (applicationContext != null)
 				{
@@ -44,13 +44,6 @@ namespace Umbraco.Web
 				}
 			}
 
-            public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-			{
-			}
-
-            public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-			{
-			}
 		}
 
 		public const string PartialViewCacheKey = "Umbraco.Web.PartialViewCacheKey";

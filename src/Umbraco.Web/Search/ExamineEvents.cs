@@ -24,7 +24,7 @@ namespace Umbraco.Web.Search
 	/// <summary>
 	/// Used to wire up events for Examine
 	/// </summary>
-	public class ExamineEvents : ApplicationEventHandler
+	public sealed class ExamineEvents : ApplicationEventHandler
 	{
 		
 		/// <summary>

@@ -10,7 +10,7 @@ namespace Umbraco.Core
     /// if you need these methods to execute even if either of these are not configured you can override the properties: 
     /// ExecuteWhenApplicationNotConfigured and ExecuteWhenDatabaseNotConfigured
     /// </remarks>
-    public class ApplicationEventHandler : IApplicationEventHandler
+    public abstract class ApplicationEventHandler : IApplicationEventHandler
     {
         public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
