@@ -124,7 +124,7 @@
       <Private>True</Private>
       <HintPath>..\packages\CodeSharp.Package.AspNetWebPage.1.0\lib\net40\NuGet.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Our.Umbraco.uGoLive">
+    <Reference Include="Our.Umbraco.uGoLive">      
       <HintPath>..\packages\uGoLive.1.4.0\lib\Our.Umbraco.uGoLive.dll</HintPath>
     </Reference>
     <Reference Include="Our.Umbraco.uGoLive.47x">
