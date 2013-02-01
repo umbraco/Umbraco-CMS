@@ -407,7 +407,7 @@ namespace Umbraco.Core.Models
                 //Check for umbracoUrlName convention
                 if (property.Alias == "umbracoUrlName" && property.Value != null && 
                         property.Value.ToString().Trim() != string.Empty)
-                    xml.SetAttributeValue("urlName", property.Value);
+                    xml.SetAttributeValue("urlName", property.Value.ToString().FormatUrl().ToLower());
             }
 
             return xml;
