@@ -1468,6 +1468,7 @@ where published = 1 And nodeId = @nodeId And trashed = 0", SqlHelper.CreateParam
                     {
                         //copy file if it's an upload property (so it doesn't get removed when original doc get's deleted)
 
+                        IDataType tagsField = new Factory().GetNewObject(new Guid("4023e540-92f5-11dd-ad8b-0800200c9a66"));
                         IDataType uploadField = new Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
 
                         if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id
@@ -1490,6 +1491,16 @@ where published = 1 And nodeId = @nodeId And trashed = 0", SqlHelper.CreateParam
                                 fs.CopyFile(thumbPath, newThumbPath);
                             }
 
+                        }
+                        else if (p.PropertyType.DataTypeDefinition.DataType.Id == tagsField.Id &&
+                                 p.Value.ToString() != "")
+                        {
+                            //Find tags from the original and add them to the new document
+                            var tags = Tags.Tag.GetTags(this.Id);
+                            foreach (var tag in tags)
+                            {
+                                Tags.Tag.AddTagsToNode(newDoc.Id, tag.TagCaption, tag.Group);
+                            }
                         }
                         else
                         {
