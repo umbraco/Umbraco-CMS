@@ -1044,6 +1044,17 @@ namespace umbraco.cms.businesslogic.web
                 // Make the new document
                 var content = ApplicationContext.Current.Services.ContentService.Copy(Content, CopyTo, RelateToOrignal, u.Id);
                 newDoc = new Document(content);
+                        IDataType tagsField = new Factory().GetNewObject(new Guid("4023e540-92f5-11dd-ad8b-0800200c9a66"));
+                        }
+                        else if (p.PropertyType.DataTypeDefinition.DataType.Id == tagsField.Id &&
+                                 p.Value.ToString() != "")
+                        {
+                            //Find tags from the original and add them to the new document
+                            var tags = Tags.Tag.GetTags(this.Id);
+                            foreach (var tag in tags)
+                            {
+                                Tags.Tag.AddTagsToNode(newDoc.Id, tag.TagCaption, tag.Group);
+                            }
                 
                 // Have to run the ActionNew handler to do umbEnsureUniqueName (for example)
                 BusinessLogic.Actions.Action.RunActionHandlers(newDoc, ActionNew.Instance);
