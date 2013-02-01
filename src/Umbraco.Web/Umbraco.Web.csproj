@@ -257,6 +257,11 @@
     <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="Install\InstallPackageController.cs" />
     <Compile Include="Install\UmbracoInstallAuthorizeAttribute.cs" />
+    <Compile Include="Install\UpgradeScripts\ContentPathFix.cs" />
+    <Compile Include="Install\UpgradeScripts\IUpgradeScript.cs" />
+    <Compile Include="Install\UpgradeScripts\UpgradeScriptRegistrar.cs" />
+    <Compile Include="Install\UpgradeScripts\UpgradeScriptManager.cs" />
+    <Compile Include="Install\UpgradeScripts\VersionRange.cs" />
     <Compile Include="Macros\PartialViewMacroController.cs" />
     <Compile Include="Macros\PartialViewMacroEngine.cs" />
     <Compile Include="Macros\PartialViewMacroPage.cs" />
@@ -346,6 +351,7 @@
     <Compile Include="umbraco.presentation\install\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\install\steps\Definitions\UpgradeScripts.cs" />
     <Compile Include="umbraco.presentation\install\steps\Skinning\loadStarterKitDesigns.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1913,7 +1919,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx" />
-    <Content Include="umbraco.presentation\install\steps\license.ascx" />
+    <Content Include="umbraco.presentation\install\steps\license.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\actions\delete.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\editContent.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\preview.aspx" />

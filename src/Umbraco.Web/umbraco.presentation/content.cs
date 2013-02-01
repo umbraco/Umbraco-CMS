@@ -580,40 +580,42 @@ namespace umbraco
             ThreadPool.QueueUserWorkItem(delegate { UpdateDocumentCache(documentId); });
         }
 
-
-        [Obsolete("Method obsolete in version 4.1 and later, please use ClearDocumentCache", true)]
         /// <summary>
         /// Clears the document cache async.
         /// </summary>
         /// <param name="documentId">The document id.</param>
+        [Obsolete("Method obsolete in version 4.1 and later, please use ClearDocumentCache", true)]
         public virtual void ClearDocumentCacheAsync(int documentId)
         {
             ThreadPool.QueueUserWorkItem(delegate { ClearDocumentCache(documentId); });
         }
 
+        public virtual void ClearDocumentCache(int documentId)
+        {
+            // Get the document
+            var d = new Document(documentId);
+            ClearDocumentCache(d);
+        }
 
         /// <summary>
         /// Clears the document cache and removes the document from the xml db cache.
         /// This means the node gets unpublished from the website.
         /// </summary>
-        /// <param name="documentId">The document id.</param>
-        public virtual void ClearDocumentCache(int documentId)
+        /// <param name="doc">The document</param>
+        internal void ClearDocumentCache(Document doc)
         {
-            // Get the document
-            var d = new Document(documentId);
-
             var e = new DocumentCacheEventArgs();
-            FireBeforeClearDocumentCache(d, e);
+            FireBeforeClearDocumentCache(doc, e);
 
             if (!e.Cancel)
             {
                 XmlNode x;
 
                 // remove from xml db cache 
-                d.XmlRemoveFromDB();
+                doc.XmlRemoveFromDB();
 
                 // Check if node present, before cloning
-                x = XmlContentInternal.GetElementById(d.Id.ToString());
+                x = XmlContentInternal.GetElementById(doc.Id.ToString());
                 if (x == null)
                     return;
 
@@ -626,7 +628,7 @@ namespace umbraco
                     XmlDocument xmlContentCopy = CloneXmlDoc(XmlContentInternal);
 
                     // Find the document in the xml cache
-                    x = xmlContentCopy.GetElementById(d.Id.ToString());
+                    x = xmlContentCopy.GetElementById(doc.Id.ToString());
                     if (x != null)
                     {
                         // The document already exists in cache, so repopulate it
@@ -639,17 +641,17 @@ namespace umbraco
                 if (x != null)
                 {
                     // Run Handler				
-                    Action.RunActionHandlers(d, ActionUnPublish.Instance);
+                    Action.RunActionHandlers(doc, ActionUnPublish.Instance);
                 }
 
                 // update sitemapprovider
                 if (SiteMap.Provider is UmbracoSiteMapProvider)
                 {
                     var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
-                    prov.RemoveNode(d.Id);
+                    prov.RemoveNode(doc.Id);
                 }
 
-                FireAfterClearDocumentCache(d, e);
+                FireAfterClearDocumentCache(doc, e);
             }
         }
 

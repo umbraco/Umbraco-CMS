@@ -10,6 +10,7 @@ using Umbraco.Core.Dynamics;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Dictionary;
+using Umbraco.Web.Install.UpgradeScripts;
 using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Models;
@@ -70,6 +71,7 @@ namespace Umbraco.Web
             //set model binder
             ModelBinders.Binders.Add(new KeyValuePair<Type, IModelBinder>(typeof(RenderModel), new RenderModelBinder()));
 
+            ApplicationEventsResolver.Current.AddType<UpgradeScriptRegistrar>();
             return this;
         }
 

@@ -1,8 +1,8 @@
-﻿using System;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.installer;
-using umbraco.IO;
+
 
 namespace umbraco.presentation.install.steps.Definitions
 {
@@ -42,6 +42,7 @@ namespace umbraco.presentation.install.steps.Definitions
                 var result = ApplicationContext.Current.DatabaseContext.ValidateDatabaseSchema();
                 var determinedVersion = result.DetermineInstalledVersion();
                 if (determinedVersion.Equals(new Version(0, 0, 0)))
+            {
                     return false;
 
                 return UmbracoVersion.Current < determinedVersion;

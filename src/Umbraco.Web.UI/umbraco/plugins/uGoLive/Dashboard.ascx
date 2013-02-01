@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="Dashboard.ascx.cs" Inherits="Our.Umbraco.uGoLive.Web.Umbraco.Plugins.uGoLive.Dashboard" %>
+<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="Dashboard.ascx.cs" Inherits="Our.Umbraco.uGoLive.Web.Umbraco.Plugins.uGoLive.Dashboard" %>
 <%@ Import Namespace="umbraco.IO" %>
 <%@ Import Namespace="Our.Umbraco.uGoLive.Web" %>
 <%@ Register Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" TagPrefix="cdf" %>

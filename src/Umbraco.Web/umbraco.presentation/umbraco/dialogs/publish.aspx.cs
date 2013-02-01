@@ -93,7 +93,7 @@ namespace umbraco.dialogs
                     {
                         if (doc.Published)
                         {
-                            library.UpdateDocumentCache(doc.Id);
+                            library.UpdateDocumentCache(doc);
                         }
                     }
 
@@ -117,7 +117,7 @@ namespace umbraco.dialogs
                 {
                     if (d.PublishWithResult(base.getUser()))
                     {
-                        library.UpdateDocumentCache(d.Id);
+                        library.UpdateDocumentCache(d);
                         feedbackMsg.type = umbraco.uicontrols.Feedback.feedbacktype.success;
 						feedbackMsg.Text = ui.Text("publish", "nodePublish", d.Text, base.getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";						
                     }
@@ -142,7 +142,7 @@ namespace umbraco.dialogs
                 {
                     // Needed for supporting distributed calls
                     if (UmbracoSettings.UseDistributedCalls)
-                        library.UpdateDocumentCache(d.Id);
+                        library.UpdateDocumentCache(d);
                     else
                         documents.Add(d);
 
