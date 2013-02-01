@@ -480,6 +480,11 @@ namespace Umbraco.Web
 			return TypedContent(ids.ToArray());
 		}
 
+        public IEnumerable<IPublishedContent> TypedContentsAtRoot()
+        {
+            return TypedDocumentsAtRoot(PublishedContentStoreResolver.Current.PublishedContentStore);
+        }
+
 		public dynamic Content(object id)
 		{
 			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore, new DynamicNull());
@@ -524,6 +529,11 @@ namespace Umbraco.Web
 		{
 			return Content(ids.ToArray());
 		}
+
+        public dynamic ContentAtRoot()
+        {
+            return DocumentsAtRoot(PublishedContentStoreResolver.Current.PublishedContentStore);
+        }
 
 		#endregion
 
@@ -584,6 +594,11 @@ namespace Umbraco.Web
 			return TypedMedia(ids.ToArray());
 		}
 
+        public IEnumerable<IPublishedContent> TypedMediasAtRoot()
+        {
+            return TypedDocumentsAtRoot(PublishedMediaStoreResolver.Current.PublishedMediaStore);
+        }
+
 		public dynamic Media(object id)
 		{
 			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore, new DynamicNull());
@@ -628,6 +643,11 @@ namespace Umbraco.Web
 		{
 			return Media(ids.ToArray());
 		}
+
+        public dynamic MediaAtRoot()
+        {
+            return DocumentsAtRoot(PublishedMediaStoreResolver.Current.PublishedMediaStore);
+        }
 
 		#endregion
 
@@ -693,6 +713,11 @@ namespace Umbraco.Web
 			return ids.Select(eachId => TypedDocumentById(eachId, store));
 		}
 
+        private IEnumerable<IPublishedContent> TypedDocumentsAtRoot(IPublishedStore store)
+        {
+            return store.GetRootDocuments(_umbracoContext);
+        }
+
 		/// <summary>
 		/// Overloaded method accepting an 'object' type
 		/// </summary>
@@ -729,6 +754,14 @@ namespace Umbraco.Web
 				? DocumentById(docId, store, ifNotFound)
 				: ifNotFound;
 		}
+
+        private dynamic DocumentsAtRoot(IPublishedStore store)
+        {
+            return new DynamicPublishedContentList(
+                store.GetRootDocuments(_umbracoContext)
+                    .Select(publishedContent => new DynamicPublishedContent(publishedContent))
+            );
+        }
 
 		/// <summary>
 		/// Overloaded method accepting an 'object' type
