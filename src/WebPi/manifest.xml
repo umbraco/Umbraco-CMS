@@ -28,6 +28,8 @@
      setAclAccess="Read" />
   <setAcl path="umbraco/usercontrols"
      setAclAccess="Read" />
+  <setAcl path="umbraco/views"
+   setAclAccess="Read, Write, Modify" />
   <setAcl path="umbraco/xslt"
      setAclAccess="Read, Write, Modify" />
   <setAcl path="umbraco/web.config"
