@@ -1,4 +1,5 @@
-﻿using Umbraco.Core;
+﻿using System;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.installer;
@@ -26,10 +27,7 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override bool MoveToNextStepAutomaticly
         {
-            get
-            {
-                return true;
-            }
+            get { return true; }
         }
 
         //here we determine if the installer should skip this step...
@@ -42,7 +40,6 @@ namespace umbraco.presentation.install.steps.Definitions
                 var result = ApplicationContext.Current.DatabaseContext.ValidateDatabaseSchema();
                 var determinedVersion = result.DetermineInstalledVersion();
                 if (determinedVersion.Equals(new Version(0, 0, 0)))
-            {
                     return false;
 
                 return UmbracoVersion.Current < determinedVersion;
@@ -50,7 +47,7 @@ namespace umbraco.presentation.install.steps.Definitions
 
             var configuredVersion = new Version(Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus);
             var targetVersion = UmbracoVersion.Current;
-            
+
             return targetVersion < configuredVersion;
         }
     }

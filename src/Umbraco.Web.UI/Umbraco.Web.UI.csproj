@@ -275,13 +275,6 @@
     <Compile Include="Install\Steps\Skinning\LoadStarterKits.ascx.designer.cs">
       <DependentUpon>loadStarterKits.ascx</DependentUpon>
     </Compile>
-    <Compile Include="install\steps\UpgradeScripts.ascx.cs">
-      <DependentUpon>UpgradeScripts.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="install\steps\UpgradeScripts.ascx.designer.cs">
-      <DependentUpon>UpgradeScripts.ascx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Umbraco\Create\PartialViewMacro.ascx.cs">
       <DependentUpon>PartialViewMacro.ascx</DependentUpon>
