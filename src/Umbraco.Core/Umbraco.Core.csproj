@@ -96,6 +96,7 @@
     </Compile>
     <Compile Include="ActivatorHelper.cs" />
     <Compile Include="ApplicationContext.cs" />
+    <Compile Include="ApplicationEventHandler.cs" />
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Attempt.cs" />
     <Compile Include="Auditing\AuditTrail.cs" />

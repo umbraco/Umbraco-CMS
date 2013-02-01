@@ -24,16 +24,9 @@ namespace Umbraco.Web.Search
 	/// <summary>
 	/// Used to wire up events for Examine
 	/// </summary>
-	public class ExamineEvents : IApplicationEventHandler
+	public class ExamineEvents : ApplicationEventHandler
 	{
-		public void OnApplicationInitialized(UmbracoApplicationBase httpApplication, ApplicationContext applicationContext)
-		{			
-		}
-
-		public void OnApplicationStarting(UmbracoApplicationBase httpApplication, ApplicationContext applicationContext)
-		{			
-		}
-
+		
 		/// <summary>
 		/// Once the application has started we should bind to all events and initialize the providers.
 		/// </summary>
@@ -43,7 +36,7 @@ namespace Umbraco.Web.Search
 		/// We need to do this on the Started event as to guarantee that all resolvers are setup properly.
 		/// </remarks>
 		[SecuritySafeCritical]
-		public void OnApplicationStarted(UmbracoApplicationBase httpApplication, ApplicationContext applicationContext)
+		protected override void ApplicationStarted(UmbracoApplicationBase httpApplication, ApplicationContext applicationContext)
 		{
             //do not initialize if the application is not configured
             //We need to check if we actually can initialize, if not then don't continue
