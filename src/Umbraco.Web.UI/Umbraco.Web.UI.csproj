@@ -259,18 +259,92 @@
     <Compile Include="Install\Default.aspx.designer.cs">
       <DependentUpon>default.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Install\Steps\Skinning\loadStarterKitDesigns.ascx.cs">
-      <DependentUpon>loadStarterKitDesigns.ascx</DependentUpon>
+    <Compile Include="Install\InstallerRestService.aspx.cs">
+      <DependentUpon>InstallerRestService.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Install\InstallerRestService.aspx.designer.cs">
+      <DependentUpon>InstallerRestService.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Install\Steps\Database.ascx.cs">
+      <DependentUpon>database.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Install\Steps\Database.ascx.designer.cs">
+      <DependentUpon>database.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Install\Steps\DefaultUser.ascx.cs">
+      <DependentUpon>defaultUser.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Install\Steps\DefaultUser.ascx.designer.cs">
+      <DependentUpon>defaultUser.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Install\Steps\License.ascx.cs">
+      <DependentUpon>license.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Install\Steps\License.ascx.designer.cs">
+      <DependentUpon>license.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Install\Steps\Renaming.ascx.cs">
+      <DependentUpon>renaming.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Install\Steps\Renaming.ascx.designer.cs">
+      <DependentUpon>renaming.ascx</DependentUpon>
     </Compile>
     <Compile Include="Install\Steps\Skinning\loadStarterKitDesigns.ascx.designer.cs">
       <DependentUpon>loadStarterKitDesigns.ascx</DependentUpon>
     </Compile>
     <Compile Include="Install\Steps\Skinning\LoadStarterKits.ascx.cs">
+      <DependentUpon>loadStarterKits.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Install\Steps\Skinning\LoadStarterKits.ascx.designer.cs">
       <DependentUpon>loadStarterKits.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Install\Steps\StarterKits.ascx.cs">
+      <DependentUpon>StarterKits.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Install\Steps\StarterKits.ascx.designer.cs">
+      <DependentUpon>StarterKits.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Install\Steps\Skinning\loadStarterKitDesigns.ascx.cs">
+      <DependentUpon>loadStarterKitDesigns.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Install\Steps\StepUserControl.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Install\Steps\TheEnd.ascx.cs">
+      <DependentUpon>theend.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Install\Steps\TheEnd.ascx.designer.cs">
+      <DependentUpon>theend.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Install\Steps\ValidatePermissions.ascx.cs">
+      <DependentUpon>validatePermissions.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Install\Steps\ValidatePermissions.ascx.designer.cs">
+      <DependentUpon>validatePermissions.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Install\Steps\Welcome.ascx.cs">
+      <DependentUpon>welcome.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Install\Steps\Welcome.ascx.designer.cs">
+      <DependentUpon>welcome.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Install\Title.ascx.cs">
+      <DependentUpon>Title.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Install\Title.ascx.designer.cs">
+      <DependentUpon>Title.ascx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Umbraco\Create\PartialViewMacro.ascx.cs">
@@ -1402,11 +1476,11 @@
     <Content Include="Umbraco_Client\Installer\Js\jquery.ui.selectmenu.js" />
     <Content Include="Install\Steps\database.ascx" />
     <Content Include="Install\Steps\renaming.ascx" />
-    <Content Include="Install\Steps\skinning.ascx" />
+    <Content Include="Install\Steps\StarterKits.ascx" />
     <Content Include="Install\Steps\Skinning\loadStarterKitDesigns.ascx" />
     <Content Include="Install\Steps\Skinning\loadStarterKits.ascx" />
     <Content Include="Install\Title.ascx" />
-    <Content Include="Install\Utills\p.aspx" />
+    <Content Include="Install\InstallerRestService.aspx" />
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\ChangePassword.ascx" />
     <Content Include="Umbraco\Dashboard\DeveloperDashboardIntro.ascx" />

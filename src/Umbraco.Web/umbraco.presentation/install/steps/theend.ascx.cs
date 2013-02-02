@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.BusinessLogic;
@@ -11,11 +11,12 @@ using System.Web.UI.HtmlControls;
 
 namespace umbraco.presentation.install.steps
 {
-    
+
 
     /// <summary>
     ///		Summary description for theend.
     /// </summary>
+    [Obsolete("This class is no longer used and will be removed from the codebase in the future. The UserControl that supercedes this is Umbraco.Web.UI.Install.Steps.TheEnd")]
     public partial class theend : System.Web.UI.UserControl
     {
 
@@ -60,5 +61,14 @@ namespace umbraco.presentation.install.steps
         {
         }
         #endregion
+
+        /// <summary>
+        /// customizeSite control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl customizeSite;
     }
 }

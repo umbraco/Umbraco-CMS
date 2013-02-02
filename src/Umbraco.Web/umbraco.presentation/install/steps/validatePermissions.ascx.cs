@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Web.UI;
 using umbraco.IO;
@@ -8,11 +8,12 @@ namespace umbraco.presentation.install.steps
     /// <summary>
     ///		Summary description for validatePermissions.
     /// </summary>
+    [Obsolete("This class is no longer used and will be removed from the codebase in the future. The UserControl that supercedes this is Umbraco.Web.UI.Install.Steps.ValidatePermissions")]
     public partial class validatePermissions : UserControl
     {
-        private string[] permissionDirs = {SystemDirectories.Css, SystemDirectories.Config, SystemDirectories.Data, SystemDirectories.Media, SystemDirectories.Masterpages, SystemDirectories.MacroScripts, SystemDirectories.Xslt, SystemDirectories.Usercontrols, SystemDirectories.Preview};
+        private string[] permissionDirs = { SystemDirectories.Css, SystemDirectories.Config, SystemDirectories.Data, SystemDirectories.Media, SystemDirectories.Masterpages, SystemDirectories.MacroScripts, SystemDirectories.Xslt, SystemDirectories.Usercontrols, SystemDirectories.Preview };
         private string[] permissionFiles = { };
-        private string[] packagesPermissionsDirs = {SystemDirectories.Bin, SystemDirectories.Umbraco, SystemDirectories.Usercontrols, SystemDirectories.Packages};
+        private string[] packagesPermissionsDirs = { SystemDirectories.Bin, SystemDirectories.Umbraco, SystemDirectories.Usercontrols, SystemDirectories.Packages };
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -25,8 +26,8 @@ namespace umbraco.presentation.install.steps
             // Test default dir permissions
             foreach (string dir in permissionDirs)
             {
-                bool result = SaveAndDeleteFile( IOHelper.MapPath( dir + "/configWizardPermissionTest.txt") );
-                
+                bool result = SaveAndDeleteFile(IOHelper.MapPath(dir + "/configWizardPermissionTest.txt"));
+
                 if (!result)
                 {
                     permissionsOK = false;
@@ -40,7 +41,7 @@ namespace umbraco.presentation.install.steps
             // Test default file permissions
             foreach (string file in permissionFiles)
             {
-                bool result = OpenFileForWrite( IOHelper.MapPath(file) );
+                bool result = OpenFileForWrite(IOHelper.MapPath(file));
                 if (!result)
                 {
                     permissionsOK = false;
@@ -57,7 +58,7 @@ namespace umbraco.presentation.install.steps
             foreach (string dir in packagesPermissionsDirs)
             {
                 bool result =
-                    SaveAndDeleteFile( IOHelper.MapPath(dir + "/configWizardPermissionTest.txt"));
+                    SaveAndDeleteFile(IOHelper.MapPath(dir + "/configWizardPermissionTest.txt"));
                 if (!result)
                 {
                     packageOK = false;
@@ -90,7 +91,7 @@ namespace umbraco.presentation.install.steps
             // Test creation of folders
             try
             {
-                string tempDir = IOHelper.MapPath( SystemDirectories.Media + "/testCreatedByConfigWizard" );
+                string tempDir = IOHelper.MapPath(SystemDirectories.Media + "/testCreatedByConfigWizard");
                 Directory.CreateDirectory(tempDir);
                 Directory.Delete(tempDir);
                 foldersResult.Text = "Success!";
@@ -105,15 +106,17 @@ namespace umbraco.presentation.install.steps
             if (permissionsOK)
             {
                 foreach (
-                    FileInfo configFile in  new DirectoryInfo( IOHelper.MapPath( SystemDirectories.Config )).GetFiles("*.xml"))
+                    FileInfo configFile in new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Config)).GetFiles("*.xml"))
                 {
-                    try {
+                    try
+                    {
                         if (File.Exists(configFile.FullName.Replace(".xml", ".config")))
                             File.Delete(configFile.FullName.Replace(".xml", ".config"));
 
                         configFile.MoveTo(configFile.FullName.Replace(".xml", ".config"));
-                    }catch{}
-                    
+                    }
+                    catch { }
+
                 }
             }
 
@@ -175,7 +178,7 @@ namespace umbraco.presentation.install.steps
         {
             try
             {
-                File.AppendText(file).Close(); 
+                File.AppendText(file).Close();
             }
             catch
             {
@@ -209,5 +212,122 @@ namespace umbraco.presentation.install.steps
         }
 
         #endregion
+
+        /// <summary>
+        /// perfect control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal perfect;
+
+        /// <summary>
+        /// noPackages control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal noPackages;
+
+        /// <summary>
+        /// noFolders control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal noFolders;
+
+        /// <summary>
+        /// error control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal error;
+
+        /// <summary>
+        /// howtoResolve control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel howtoResolve;
+
+        /// <summary>
+        /// grant control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel grant;
+
+        /// <summary>
+        /// permSummary control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal permSummary;
+
+        /// <summary>
+        /// folderWoes control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel folderWoes;
+
+        /// <summary>
+        /// permissionResults control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal permissionResults;
+
+        /// <summary>
+        /// packageResults control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal packageResults;
+
+        /// <summary>
+        /// xmlResult control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal xmlResult;
+
+        /// <summary>
+        /// foldersResult control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal foldersResult;
+
+        /// <summary>
+        /// btnNext control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton btnNext;
     }
 }

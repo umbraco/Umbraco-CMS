@@ -10,6 +10,8 @@ using umbraco.IO;
 
 namespace umbraco.presentation.install.steps
 {
+
+    [Obsolete("This class is no longer used and will be removed from the codebase in the future. The UserControl that supercedes this is Umbraco.Web.UI.Install.Steps.Renaming")]
     public partial class renaming : System.Web.UI.UserControl
     {
         private string _oldAccessFilePath = IO.IOHelper.MapPath(IO.SystemDirectories.Data + "/access.xml");
@@ -169,5 +171,68 @@ namespace umbraco.presentation.install.steps
 
             return xsltExt.SelectNodes("//" + elementName);
         }
+
+        /// <summary>
+        /// init control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel init;
+
+        /// <summary>
+        /// noChangedNeeded control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel noChangedNeeded;
+
+        /// <summary>
+        /// changesNeeded control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel changesNeeded;
+
+        /// <summary>
+        /// identifyResult control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal identifyResult;
+
+        /// <summary>
+        /// updateChanges control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button updateChanges;
+
+        /// <summary>
+        /// result control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel result;
+
+        /// <summary>
+        /// resultText control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal resultText;
     }
 }

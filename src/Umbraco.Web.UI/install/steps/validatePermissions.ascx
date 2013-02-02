@@ -1,4 +1,4 @@
-<%@ Control Language="c#" AutoEventWireup="True" Codebehind="validatePermissions.ascx.cs" Inherits="umbraco.presentation.install.steps.validatePermissions" TargetSchema="http://schemas.microsoft.com/intellisense/ie5"%>
+<%@ Control Language="c#" AutoEventWireup="True" Codebehind="ValidatePermissions.ascx.cs" Inherits="Umbraco.Web.UI.Install.Steps.ValidatePermissions" TargetSchema="http://schemas.microsoft.com/intellisense/ie5"%>
 <h1>Step 3/5: Validating File Permissions</h1>
 <p>
 umbraco needs write/modify access to certain directories in order to store files like pictures and PDF's. 
@@ -97,5 +97,5 @@ In order to run umbraco, you'll need to update your permission settings.
 
 <footer class="btn-box">
 		<div class="t">&nbsp;</div>
-        <asp:LinkButton ID="btnNext" CssClass="btn btn-accept" runat="server" OnClick="gotoNextStep"><span>Continue anyway</span></asp:LinkButton>
+        <asp:LinkButton ID="btnNext" CssClass="btn btn-accept" runat="server" OnClick="GotoNextStep"><span>Continue anyway</span></asp:LinkButton>
 	</footer>

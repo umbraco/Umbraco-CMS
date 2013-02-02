@@ -1,16 +1,16 @@
-using System;
+﻿using System;
 using Umbraco.Core;
 
 namespace umbraco.presentation.install
 {
-	/// <summary>
-	///		Summary description for welcome.
-	/// </summary>
-	public partial class welcome : System.Web.UI.UserControl
-	{
+    /// <summary>
+    ///		Summary description for welcome.
+    /// </summary>
+    public partial class welcome : System.Web.UI.UserControl
+    {
 
-		protected void Page_Load(object sender, System.EventArgs e)
-		{
+        protected void Page_Load(object sender, System.EventArgs e)
+        {
             var result = ApplicationContext.Current.DatabaseContext.ValidateDatabaseSchema();
             var determinedVersion = result.DetermineInstalledVersion();
 
@@ -20,7 +20,7 @@ namespace umbraco.presentation.install
                 ph_install.Visible = false;
                 ph_upgrade.Visible = true;
             }
-            
+
             // Check for config!
             if (GlobalSettings.Configured)
             {
@@ -29,31 +29,59 @@ namespace umbraco.presentation.install
                 Application.UnLock();
                 Response.Redirect(Request.QueryString["url"] ?? "/", true);
             }
-		}
+        }
 
-    protected void gotoNextStep(object sender, EventArgs e) {
-      Helper.RedirectToNextStep(this.Page);
+        protected void gotoNextStep(object sender, EventArgs e)
+        {
+            Helper.RedirectToNextStep(this.Page);
+        }
+
+        #region Web Form Designer generated code
+        override protected void OnInit(EventArgs e)
+        {
+            //
+            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
+            //
+            InitializeComponent();
+            base.OnInit(e);
+        }
+
+        /// <summary>
+        ///		Required method for Designer support - do not modify
+        ///		the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+        }
+        #endregion
+
+        /// <summary>
+        /// ph_install control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder ph_install;
+
+        /// <summary>
+        /// ph_upgrade control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder ph_upgrade;
+
+        /// <summary>
+        /// btnNext control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton btnNext;
     }
-
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-		
-		/// <summary>
-		///		Required method for Designer support - do not modify
-		///		the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
-		}
-		#endregion
-	}
 
 
 }

@@ -11,9 +11,11 @@ using System.IO;
 
 namespace umbraco.presentation.install.steps.Skinning
 {
+    [Obsolete("This delegate is no longer used and will be removed from the codebase in future versions. This has been superceded by Umbraco.Web.UI.Install.Steps.Skinning.StarterKitInstalledEventHandler")]
 	public delegate void StarterKitInstalledEventHandler();
 
-	public partial class loadStarterKits : System.Web.UI.UserControl
+    [Obsolete("This class is no longer used and will be removed from the codebase in the future. The UserControl Umbraco.Web.UI.Install.Steps.Skinning.LoadStarterKits has superceded this.")]
+	public class loadStarterKits : System.Web.UI.UserControl
 	{
 
 		/// <summary>

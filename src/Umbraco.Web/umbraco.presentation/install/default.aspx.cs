@@ -18,7 +18,8 @@ namespace umbraco.presentation.install
 	/// <summary>
 	/// Summary description for _default.
 	/// </summary>
-	public partial class _default : BasePages.BasePage
+    [Obsolete("This file is no longer used and will be removed in future versions. The Umbraco.Web.UI.Install.Default page has superceded this.")]
+	public class _default : BasePages.BasePage
 	{
 
 		private string _installStep = "";
@@ -68,13 +69,13 @@ namespace umbraco.presentation.install
 
 		public void GotoNextStep(string currentStep)
 		{
-			InstallerStep _s = InstallerSteps().GotoNextStep(currentStep);
+			var _s = InstallerSteps().GotoNextStep(currentStep);
 			Response.Redirect("?installStep=" + _s.Alias);
 		}
 
 		public void GotoLastStep()
 		{
-			InstallerStep _s = InstallerSteps().Get("theend");
+			var _s = InstallerSteps().Get("theend");
 			Response.Redirect("?installStep=" + _s.Alias);
 		}
 

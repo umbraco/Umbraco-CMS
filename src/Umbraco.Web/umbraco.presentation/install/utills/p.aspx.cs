@@ -8,11 +8,12 @@ using Umbraco.Core.Logging;
 
 namespace umbraco.presentation.install.utills
 {
+    [Obsolete("This class is no longer used and will be removed in future version. The page Umbraco.Web.UI.Install.DatabaseRestService supercedes this.")]
     public partial class p : System.Web.UI.Page
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            LogHelper.Info<p>(string.Format("Hitting Page_Load on p.aspx for the requested '{0}' feed", Request.QueryString["feed"]));
+            LogHelper.Info<p>(string.Format("Hitting Page_Load on InstallerRestService.aspx for the requested '{0}' feed", Request.QueryString["feed"]));
 
             // Stop Caching in IE
             Response.Cache.SetCacheability(System.Web.HttpCacheability.NoCache);
@@ -60,7 +61,7 @@ namespace umbraco.presentation.install.utills
             LogHelper.Info<p>("Running 'installOrUpgrade' service");
 
             var result = ApplicationContext.Current.DatabaseContext.CreateDatabaseSchemaAndDataOrUpgrade();
-            
+
             // Remove legacy umbracoDbDsn configuration setting if it exists and connectionstring also exists
             if (ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName] != null)
             {

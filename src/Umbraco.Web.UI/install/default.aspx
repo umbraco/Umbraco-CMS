@@ -36,7 +36,7 @@
     <!--[if lt IE 7]><script type="text/javascript" src="../umbraco_client/installer/js/ie-png.js"></script><![endif]-->
 </head>
 
-<body class="<%= currentStepClass %>">
+<body class="<%= CurrentStepClass %>">
 
 
     <form runat="server">
@@ -71,7 +71,7 @@
 
                     <nav class="tabset">
 
-                        <asp:Repeater ID="rp_steps" runat="server" OnItemDataBound="bindStep">
+                        <asp:Repeater ID="rp_steps" runat="server" OnItemDataBound="BindStep">
                             <HeaderTemplate>
                                 <ul>
                             </HeaderTemplate>

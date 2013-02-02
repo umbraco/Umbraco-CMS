@@ -1,4 +1,4 @@
-#region namespace
+﻿#region namespace
 using System;
 using System.Data;
 using System.Drawing;
@@ -8,44 +8,45 @@ using System.Web.UI.HtmlControls;
 using System.Web.Security;
 using umbraco.BusinessLogic;
 using umbraco.providers;
-using System.Collections.Specialized; 
+using System.Collections.Specialized;
 #endregion
 
 namespace umbraco.presentation.install.steps
 {
-	/// <summary>
-	///		Summary description for defaultUser.
-	/// </summary>
-	public partial class defaultUser : System.Web.UI.UserControl
-	{
+    /// <summary>
+    ///		Summary description for defaultUser.
+    /// </summary>
+    [Obsolete("This class is no longer used and will be removed from the codebase in the future. The UserControl that supercedes this is Umbraco.Web.UI.Install.Steps.DefaultUser")]
+    public partial class defaultUser : System.Web.UI.UserControl
+    {
 
-		protected void Page_Load(object sender, System.EventArgs e)
-		{
-			
-		}
+        protected void Page_Load(object sender, System.EventArgs e)
+        {
 
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-		
-		/// <summary>
-		///		Required method for Designer support - do not modify
-		///		the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
+        }
 
-		}
-		#endregion
+        #region Web Form Designer generated code
+        override protected void OnInit(EventArgs e)
+        {
+            //
+            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
+            //
+            InitializeComponent();
+            base.OnInit(e);
+        }
 
-		protected void changePassword_Click(object sender, System.EventArgs e)
-		{
+        /// <summary>
+        ///		Required method for Designer support - do not modify
+        ///		the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+
+        }
+        #endregion
+
+        protected void changePassword_Click(object sender, System.EventArgs e)
+        {
             Page.Validate();
 
             if (Page.IsValid)
@@ -95,9 +96,9 @@ namespace umbraco.presentation.install.steps
                 if (String.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus))
                     BasePages.UmbracoEnsuredPage.doLogin(u);
 
-                Helper.RedirectToNextStep(this.Page);                
+                Helper.RedirectToNextStep(this.Page);
             }
-		}
+        }
 
         private void SubscribeToNewsLetter(string name, string email)
         {
@@ -113,5 +114,68 @@ namespace umbraco.presentation.install.steps
             }
             catch { /* fail in silence */ }
         }
-	}
+
+        /// <summary>
+        /// identify control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder identify;
+
+        /// <summary>
+        /// tb_name control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox tb_name;
+
+        /// <summary>
+        /// tb_email control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox tb_email;
+
+        /// <summary>
+        /// tb_login control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox tb_login;
+
+        /// <summary>
+        /// tb_password control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox tb_password;
+
+        /// <summary>
+        /// tb_password_confirm control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox tb_password_confirm;
+
+        /// <summary>
+        /// cb_newsletter control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox cb_newsletter;
+    }
 }

@@ -11,5 +11,32 @@ namespace Umbraco.Web.UI.Install.Steps.Skinning {
     
     
     public partial class LoadStarterKitDesigns {
+        
+        /// <summary>
+        /// pl_loadStarterKitDesigns control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder pl_loadStarterKitDesigns;
+        
+        /// <summary>
+        /// pl_CustomizeSkin control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pl_CustomizeSkin;
+        
+        /// <summary>
+        /// rep_starterKitDesigns control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater rep_starterKitDesigns;
     }
 }

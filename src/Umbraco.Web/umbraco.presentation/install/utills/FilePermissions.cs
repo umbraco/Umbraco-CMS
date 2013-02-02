@@ -2,22 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using umbraco.IO;
 using System.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.presentation.install.utills
 {
-   
-
+    [Obsolete("This is no longer used and will be removed from the codebase in the future. Has been superceded by Umbraco.Web.Install.FilePermissionHelper but this is marked internal it is not to be used in external code.")]
     public class FilePermissions
     {
-        public static string[] permissionDirs = { SystemDirectories.Css, SystemDirectories.Config, SystemDirectories.Data, SystemDirectories.Media, SystemDirectories.Masterpages, SystemDirectories.Xslt, SystemDirectories.Usercontrols, SystemDirectories.Preview };
+        public static string[] permissionDirs = { SystemDirectories.Css, SystemDirectories.Config, SystemDirectories.Data, SystemDirectories.Media, SystemDirectories.Masterpages, SystemDirectories.Xslt, SystemDirectories.UserControls, SystemDirectories.Preview };
         public static string[] permissionFiles = { };
-        public static string[] packagesPermissionsDirs = { SystemDirectories.Bin, SystemDirectories.Umbraco, SystemDirectories.Usercontrols, SystemDirectories.Packages };
+        public static string[] packagesPermissionsDirs = { SystemDirectories.Bin, SystemDirectories.Umbraco, SystemDirectories.UserControls, SystemDirectories.Packages };
 
         public static bool RunFilePermissionTestSuite()
         {
-            Dictionary<string, string> newReport = new Dictionary<string, string>();
+            var newReport = new Dictionary<string, string>();
 
             if (!TestDirectories(permissionDirs, ref newReport))
                 return false;
@@ -105,14 +104,6 @@ namespace umbraco.presentation.install.utills
                     errorReport.Add(SystemFiles.ContentCacheXml, "Could not persist content cache");
                 return false;    
             }
-        }
-
-        private static string successOrFailure(bool result)
-        {
-            if (result)
-                return "Success";
-            else
-                return "Failure";
         }
 
         private static bool SaveAndDeleteFile(string file)

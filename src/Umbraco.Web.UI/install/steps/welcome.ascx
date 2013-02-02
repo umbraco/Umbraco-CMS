@@ -1,4 +1,4 @@
-<%@ Control Language="c#" AutoEventWireup="True" CodeBehind="welcome.ascx.cs" Inherits="umbraco.presentation.install.welcome"
+<%@ Control Language="c#" AutoEventWireup="True" CodeBehind="Welcome.ascx.cs" Inherits="Umbraco.Web.UI.Install.Steps.Welcome"
 	TargetSchema="http://schemas.microsoft.com/intellisense/ie5" %>
 <%@ Import Namespace="Umbraco.Core.Configuration" %>
 <!-- welcome box -->
@@ -44,7 +44,7 @@
 	<!-- btn box -->
 	<footer class="btn-box">
         <div class="t">&nbsp;</div>
-        <asp:LinkButton ID="btnNext" CssClass="btn btn-get" runat="server" OnClick="gotoNextStep"><span>Let's get started!</span></asp:LinkButton>
+        <asp:LinkButton ID="btnNext" CssClass="btn btn-get" runat="server" OnClick="GotoNextStep"><span>Let's get started!</span></asp:LinkButton>
     </footer>
 
 </div>

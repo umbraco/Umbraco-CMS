@@ -10,9 +10,11 @@ using umbraco.BusinessLogic;
 
 namespace umbraco.presentation.install.steps.Skinning
 {
+    [Obsolete("This delegate is no longer used and will be removed from the codebase in future versions. This has been superceded by Umbraco.Web.UI.Install.Steps.Skinning.StarterKitDesignInstalledEventHandler")]
 	public delegate void StarterKitDesignInstalledEventHandler();
 
-	public partial class loadStarterKitDesigns : System.Web.UI.UserControl
+    [Obsolete("This class is no longer used and will be removed from the codebase in the future. The UserControl Umbraco.Web.UI.Install.Steps.Skinning.LoadStarterKitDesigns has superceded this.")]
+	public class loadStarterKitDesigns : System.Web.UI.UserControl
 	{
 
 		public event StarterKitDesignInstalledEventHandler StarterKitDesignInstalled;

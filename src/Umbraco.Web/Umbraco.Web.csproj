@@ -128,7 +128,7 @@
       <Private>True</Private>
       <HintPath>..\packages\CodeSharp.Package.AspNetWebPage.1.0\lib\net40\NuGet.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Our.Umbraco.uGoLive">      
+    <Reference Include="Our.Umbraco.uGoLive">
       <HintPath>..\packages\uGoLive.1.4.0\lib\Our.Umbraco.uGoLive.dll</HintPath>
     </Reference>
     <Reference Include="Our.Umbraco.uGoLive.47x">
@@ -190,6 +190,7 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
@@ -252,7 +253,20 @@
     <Compile Include="Dynamics\ExtensionMethods.cs" />
     <Compile Include="Dynamics\Grouping.cs" />
     <Compile Include="HttpRequestExtensions.cs" />
+    <Compile Include="Install\FilePermissionHelper.cs" />
+    <Compile Include="Install\InstallerStep.cs" />
+    <Compile Include="Install\InstallHelper.cs" />
     <Compile Include="Install\InstallPackageController.cs" />
+    <Compile Include="Install\InstallStepCollection.cs" />
+    <Compile Include="Install\ProgressResult.cs" />
+    <Compile Include="Install\Steps\Database.cs" />
+    <Compile Include="Install\Steps\DefaultUser.cs" />
+    <Compile Include="Install\Steps\FilePermissions.cs" />
+    <Compile Include="Install\Steps\License.cs" />
+    <Compile Include="Install\Steps\Skinning.cs" />
+    <Compile Include="Install\Steps\TheEnd.cs" />
+    <Compile Include="Install\Steps\WebPi.cs" />
+    <Compile Include="Install\Steps\Welcome.cs" />
     <Compile Include="Install\UmbracoInstallAuthorizeAttribute.cs" />
     <Compile Include="Macros\PartialViewMacroController.cs" />
     <Compile Include="Macros\PartialViewMacroEngine.cs" />
@@ -330,6 +344,7 @@
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
     <Compile Include="Routing\PublishedContentRequestEngine.cs" />
     <Compile Include="Search\ExamineEvents.cs" />
+    <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="Strategies\DataTypes\LegacyUploadFieldWorkaround.cs" />
     <Compile Include="Strategies\Migrations\PublishAfterUpgradeToVersionSixth.cs" />
     <Compile Include="Strategies\Publishing\UpdateCacheAfterPublish.cs" />
@@ -341,11 +356,46 @@
     <Compile Include="Trees\PartialViewsTree.cs" />
     <Compile Include="UI\Controls\InsertMacroSplitButton.cs" />
     <Compile Include="UI\Controls\UmbracoControl.cs" />
+    <Compile Include="UI\Pages\BasePage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\Pages\ClientTools.cs" />
+    <Compile Include="UI\Pages\UmbracoEnsuredPage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UI\SpeechBubbleIcon.cs" />
     <Compile Include="umbraco.presentation\AttributeCollectionAdapter.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\DLRMacroResult.cs" />
+    <Compile Include="umbraco.presentation\install\steps\welcome.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\install\steps\validatePermissions.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\install\steps\theend.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\install\steps\skinning.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\install\steps\renaming.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\install\steps\license.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\install\steps\defaultUser.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\install\steps\database.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\install\Title.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\install\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -353,6 +403,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\install\steps\Skinning\loadStarterKits.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\install\utills\p.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\LibraryCacheRefresher.cs" />
@@ -450,13 +503,6 @@
     <Compile Include="Routing\RoutesCacheResolver.cs" />
     <Compile Include="Routing\RoutingContext.cs" />
     <Compile Include="umbraco.presentation\EnsureSystemPathsApplicationStartupHandler.cs" />
-    <Compile Include="umbraco.presentation\install\steps\database.ascx.cs">
-      <DependentUpon>database.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\database.ascx.designer.cs">
-      <DependentUpon>database.ascx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\install\steps\Definitions\Database.cs" />
     <Compile Include="umbraco.presentation\install\steps\Definitions\DefaultUser.cs" />
     <Compile Include="umbraco.presentation\install\steps\Definitions\FilePermissions.cs" />
@@ -468,22 +514,8 @@
     <Compile Include="umbraco.presentation\install\steps\Definitions\TheEnd.cs" />
     <Compile Include="umbraco.presentation\install\steps\Definitions\WebPi.cs" />
     <Compile Include="umbraco.presentation\install\steps\Definitions\Welcome.cs" />
-    <Compile Include="umbraco.presentation\install\steps\skinning.ascx.cs">
-      <DependentUpon>skinning.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\skinning.ascx.designer.cs">
-      <DependentUpon>skinning.ascx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\install\utills\FilePermissions.cs" />
     <Compile Include="umbraco.presentation\install\utills\Helper.cs" />
-    <Compile Include="umbraco.presentation\install\utills\p.aspx.cs">
-      <DependentUpon>p.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\utills\p.aspx.designer.cs">
-      <DependentUpon>p.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -493,55 +525,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\helper.cs">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\defaultUser.ascx.cs">
-      <DependentUpon>defaultUser.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\defaultUser.ascx.designer.cs">
-      <DependentUpon>defaultUser.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\license.ascx.cs">
-      <DependentUpon>license.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\license.ascx.designer.cs">
-      <DependentUpon>license.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\renaming.ascx.cs">
-      <DependentUpon>renaming.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\renaming.ascx.designer.cs">
-      <DependentUpon>renaming.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\theend.ascx.cs">
-      <DependentUpon>theend.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\theend.ascx.designer.cs">
-      <DependentUpon>theend.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\validatePermissions.ascx.cs">
-      <DependentUpon>validatePermissions.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\validatePermissions.ascx.designer.cs">
-      <DependentUpon>validatePermissions.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\welcome.ascx.cs">
-      <DependentUpon>welcome.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\welcome.ascx.designer.cs">
-      <DependentUpon>welcome.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\Title.ascx.cs">
-      <DependentUpon>Title.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\Title.ascx.designer.cs">
-      <DependentUpon>Title.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\item.cs">
       <SubType>Code</SubType>
@@ -1859,17 +1842,6 @@
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\RelationTypesWebService.asmx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\DesktopMediaUploader.ascx" />
-    <Content Include="umbraco.presentation\install\steps\database.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\install\steps\renaming.ascx" />
-    <Content Include="umbraco.presentation\install\steps\skinning.ascx" />
-    <Content Include="umbraco.presentation\install\Title.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\install\utills\p.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\dashboard\ChangePassword.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\DeveloperDashboardIntro.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\DeveloperDashboardVideos.ascx" />
@@ -1912,9 +1884,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx" />
-    <Content Include="umbraco.presentation\install\steps\license.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\actions\delete.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\editContent.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\preview.aspx" />
@@ -1970,18 +1939,6 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\uploadImage.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx" />
-    <Content Include="umbraco.presentation\install\steps\defaultUser.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\install\steps\theend.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\install\steps\validatePermissions.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\install\steps\welcome.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\cacheBrowser.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx">
       <SubType>ASPXCodeBehind</SubType>
@@ -2141,26 +2098,6 @@
     <EmbeddedResource Include="Mvc\Strings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco.presentation\install\steps\database.ascx.resx">
-      <DependentUpon>database.ascx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco.presentation\install\steps\defaultUser.ascx.resx">
-      <DependentUpon>defaultUser.ascx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco.presentation\install\steps\theend.ascx.resx">
-      <DependentUpon>theend.ascx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco.presentation\install\steps\validatePermissions.ascx.resx">
-      <DependentUpon>validatePermissions.ascx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco.presentation\install\steps\welcome.ascx.resx">
-      <DependentUpon>welcome.ascx.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="umbraco.presentation\umbraco\js\language.aspx.resx">
       <DependentUpon>language.aspx.cs</DependentUpon>
