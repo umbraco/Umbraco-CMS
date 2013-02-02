@@ -196,11 +196,12 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="alias">The alias of the template.</param>
         /// <returns>A value indicating whether a valid template with the specified alias was found.</returns>
-        /// <remarks>Setting the template refreshes <c>RenderingEngine</c>.</remarks>
+        /// <remarks>
+        /// <para>Successfully setting the template resets <c>RenderingEngine</c> to <c>Unknown</c>.</para>
+        /// <para>If setting the template fails, then the previous template (if any) remains in place.</para>
+        /// </remarks>
         public bool TrySetTemplate(string alias)
         {
-            this.RenderingEngine = Core.RenderingEngine.Unknown; // reset
-
             if (string.IsNullOrWhiteSpace(alias))
             {
                 this.TemplateModel = null;
@@ -214,7 +215,6 @@ namespace Umbraco.Web.Routing
                 var model = ApplicationContext.Current.Services.FileService.GetTemplate(alias);
                 if (model == null)
                 {
-                    this.TemplateModel = null;
                     return false;
                 }
                 else
