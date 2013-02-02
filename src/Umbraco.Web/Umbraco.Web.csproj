@@ -369,43 +369,13 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\DLRMacroResult.cs" />
-    <Compile Include="umbraco.presentation\install\steps\welcome.ascx.cs">
+    <Compile Include="umbraco.presentation\install\steps\LegacyClasses.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\install\steps\validatePermissions.ascx.cs">
+    <Compile Include="umbraco.presentation\install\LegacyClasses.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\install\steps\theend.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\skinning.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\renaming.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\license.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\defaultUser.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\database.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\Title.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\Default.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\Skinning\loadStarterKitDesigns.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\steps\Skinning\loadStarterKits.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\install\utills\p.aspx.cs">
+    <Compile Include="umbraco.presentation\install\steps\Skinning\LegacyClasses.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\LibraryCacheRefresher.cs" />
@@ -503,19 +473,12 @@
     <Compile Include="Routing\RoutesCacheResolver.cs" />
     <Compile Include="Routing\RoutingContext.cs" />
     <Compile Include="umbraco.presentation\EnsureSystemPathsApplicationStartupHandler.cs" />
-    <Compile Include="umbraco.presentation\install\steps\Definitions\Database.cs" />
-    <Compile Include="umbraco.presentation\install\steps\Definitions\DefaultUser.cs" />
-    <Compile Include="umbraco.presentation\install\steps\Definitions\FilePermissions.cs" />
-    <Compile Include="umbraco.presentation\install\steps\Definitions\InstallerControl.cs">
+    <Compile Include="umbraco.presentation\install\steps\Definitions\LegacyClasses.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\install\steps\Definitions\License.cs" />
-    <Compile Include="umbraco.presentation\install\steps\Definitions\Skinning.cs" />
-    <Compile Include="umbraco.presentation\install\steps\Definitions\TheEnd.cs" />
-    <Compile Include="umbraco.presentation\install\steps\Definitions\WebPi.cs" />
-    <Compile Include="umbraco.presentation\install\steps\Definitions\Welcome.cs" />
-    <Compile Include="umbraco.presentation\install\utills\FilePermissions.cs" />
-    <Compile Include="umbraco.presentation\install\utills\Helper.cs" />
+    <Compile Include="umbraco.presentation\install\utills\LegacyClasses.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
