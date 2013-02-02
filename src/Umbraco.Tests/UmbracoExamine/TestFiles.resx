@@ -121,10 +121,7 @@
   <data name="media" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>testfiles\media.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-  <!-- FIXME following was added by Shannon but the corresponding file is missing in Mercurial? -->
-  <!--
   <data name="umbraco" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>testfiles\umbraco.config;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-  -->
 </root>

@@ -20,8 +20,7 @@ namespace Umbraco.Tests.UmbracoExamine
 		public TestContentService()
 		{
             // TestFiles.umbraco was created by Shannon but the file is missing in Mercurial?
-            //_xDoc = XDocument.Parse(TestFiles.umbraco);
-            _xDoc = null;
+            _xDoc = XDocument.Parse(TestFiles.umbraco);
 		}
 
 		#region IContentService Members

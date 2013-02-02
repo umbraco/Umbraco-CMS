@@ -39,7 +39,6 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="httpContext"></param>
         /// <param name="applicationContext"> </param>
-        /// <param name="routesCache"> </param>
         internal UmbracoContext(
 			HttpContextBase httpContext, 
 			ApplicationContext applicationContext)

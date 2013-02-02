@@ -169,11 +169,7 @@ namespace Umbraco.Web
         protected override void InitializeResolvers()
         {
             base.InitializeResolvers();
-
-            //TODO: This needs to be removed in future versions (i.e. 6.0 when the PublishedContentHelper can access the business logic)
-            // see the TODO noted in the PublishedContentHelper.
-            PublishedContentHelper.GetDataTypeCallback = ContentType.GetDataType;
-
+            
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
                 PluginManager.Current.ResolveSurfaceControllers());
 

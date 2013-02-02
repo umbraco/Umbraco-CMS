@@ -18,10 +18,15 @@ namespace Umbraco.Tests.ContentStores
 	{
 		public override void Initialize()
 		{
-			base.Initialize();
-			//we're going to use the same initialization as the PublishedMediaTests
-			PublishedMediaTests.DoInitialization(GetUmbracoContext("/test", 1234));			
+			base.Initialize();				
 		}
+
+        protected override void OnFreezing()
+        {
+            base.OnFreezing();
+            //we're going to use the same initialization as the PublishedMediaTests
+            PublishedMediaTests.DoInitialization(GetUmbracoContext("/test", 1234));		
+        }
 
 		public override void TearDown()
 		{

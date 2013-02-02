@@ -65,7 +65,6 @@ namespace Umbraco.Tests.TestHelpers
 				engine.CreateDatabase();
 	        }
 
-			Resolution.Freeze();
 			ApplicationContext.Current = new ApplicationContext(
 				//assign the db context
 				new DatabaseContext(new DefaultDatabaseFactory()),
@@ -79,11 +78,20 @@ namespace Umbraco.Tests.TestHelpers
 				//Create the umbraco database and its base data
 				DatabaseContext.Database.CreateDatabaseSchema();	
 			}
-			
+
+            //called so that inheritors can do stuff before freezing.
+            OnFreezing();
+
+            Resolution.Freeze();
 
 			//if (RequiresDbSetup)
 			//	TestHelper.InitializeDatabase();
 			
+        }
+
+        protected virtual void OnFreezing()
+        {
+            
         }
 
         [TearDown]

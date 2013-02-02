@@ -1,27 +1,86 @@
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core
 {
-	internal class PublishedContentHelper
-	{
-		/// <summary>
-		/// This callback is used only so we can set it dynamically because in the "Core" project currently we don't have
-		/// access to the business logic layer. 
-		/// TODO: Once 6.0 is released we need to change this to use the new business logic layer that we can access from 
-		///  this proejct. Until then this will return a Guid.Empty but the callback will need to be set in the WebBootManager
-		///  to work in the website. if people use this in a non-web aspect without the WebBootManager, the the IPropertyEditorValueConverters
-		///  will not be executed.
-		/// </summary>
-		internal static Func<string, string, Guid> GetDataTypeCallback = (docTypeAlias, propertyAlias) => Guid.Empty;
 
-		internal static Guid GetDataType(string docTypeAlias, string propertyAlias)
-		{
-			return GetDataTypeCallback(docTypeAlias, propertyAlias);
+    /// <summary>
+    /// Utility class for dealing with data types and value conversions
+    /// </summary>
+    /// <remarks>
+    /// TODO: The logic for the GetDataType + cache should probably be moved to a service, no ? 
+    /// 
+    /// We inherit from ApplicationEventHandler so we can bind to the ContentTypeService events to ensure that our local cache
+    /// object gets cleared when content types change.
+    /// </remarks>
+    internal class PublishedContentHelper : ApplicationEventHandler
+	{
+
+        #region event handlers to ensure that the cache is cleared when content types change
+        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            ContentTypeService.SavedContentType += ContentTypeServiceSavedContentType;
+            ContentTypeService.SavedMediaType += ContentTypeServiceSavedMediaType;
+            ContentTypeService.DeletedContentType += ContentTypeServiceDeletedContentType;
+            ContentTypeService.DeletedMediaType += ContentTypeServiceDeletedMediaType;
+        }
+
+        static void ContentTypeServiceDeletedMediaType(IContentTypeService sender, Events.DeleteEventArgs<Models.IMediaType> e)
+        {
+            PropertyTypeCache.Clear();
+        }
+
+        static void ContentTypeServiceDeletedContentType(IContentTypeService sender, Events.DeleteEventArgs<Models.IContentType> e)
+        {
+            PropertyTypeCache.Clear();
+        }
+
+        static void ContentTypeServiceSavedMediaType(IContentTypeService sender, Events.SaveEventArgs<Models.IMediaType> e)
+        {
+            PropertyTypeCache.Clear();
+        }
+
+        static void ContentTypeServiceSavedContentType(IContentTypeService sender, Events.SaveEventArgs<Models.IContentType> e)
+        {
+            PropertyTypeCache.Clear();
+        } 
+        #endregion
+
+        /// <summary>
+        /// This callback is used only for unit tests which enables us to return any data we want and not rely on having the data in a database
+        /// </summary>
+        internal static Func<string, string, Guid> GetDataTypeCallback = null;
+
+        private static readonly ConcurrentDictionary<Tuple<string, string>, Guid> PropertyTypeCache = new ConcurrentDictionary<Tuple<string, string>, Guid>();
+
+        /// <summary>
+        /// Return the GUID Id for the data type assigned to the document type with the property alias
+        /// </summary>
+        /// <param name="applicationContext"></param>
+        /// <param name="docTypeAlias"></param>
+        /// <param name="propertyAlias"></param>
+        /// <returns></returns>
+		internal static Guid GetDataType(ApplicationContext applicationContext, string docTypeAlias, string propertyAlias)
+        {
+            if (GetDataTypeCallback != null)
+                return GetDataTypeCallback(docTypeAlias, propertyAlias);
+
+            var key = new Tuple<string, string>(docTypeAlias, propertyAlias);
+            return PropertyTypeCache.GetOrAdd(key, tuple =>
+                {
+                    var result = applicationContext.Services.ContentTypeService.GetContentType(docTypeAlias);
+                    if (result == null) return Guid.Empty;
+                    var property = result.PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyAlias));
+                    if (property == null) return Guid.Empty;
+                    return property.DataTypeId;
+                });
 		}
 
 		/// <summary>
