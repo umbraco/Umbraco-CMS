@@ -101,9 +101,7 @@ namespace UmbracoExamine.PDF
 
         /// <summary>
         /// Set up all properties for the indexer based on configuration information specified. This will ensure that
-        /// all of the folders required by the indexer are created and exist. This will also create an instruction
-        /// file declaring the computer name that is part taking in the indexing. This file will then be used to
-        /// determine the master indexer machine in a load balanced environment (if one exists).
+        /// all of the folders required by the indexer are created and exist. 
         /// </summary>
         /// <param name="name"></param>
         /// <param name="config"></param>
