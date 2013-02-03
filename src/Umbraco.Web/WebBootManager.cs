@@ -221,7 +221,9 @@ namespace Umbraco.Web
 						typeof (RenderControllerFactory)
 					});
 
-            LastChanceLookupResolver.Current = new LastChanceLookupResolver(new DefaultLastChanceLookup());
+            // the legacy 404 will run from within LookupByNotFoundHandlers below
+            // so for the time being there is no last chance lookup
+			LastChanceLookupResolver.Current = new LastChanceLookupResolver();
 
             DocumentLookupsResolver.Current = new DocumentLookupsResolver(
                 //add all known resolvers in the correct order, devs can then modify this list on application startup either by binding to events
@@ -231,9 +233,12 @@ namespace Umbraco.Web
 						typeof (LookupByPageIdQuery),
 						typeof (LookupByNiceUrl),
 						typeof (LookupByIdPath),
-						typeof (LookupByNiceUrlAndTemplate),
-						typeof (LookupByProfile),
-						typeof (LookupByAlias)
+                        // these will be handled by LookupByNotFoundHandlers
+                        // so they can be enabled/disabled even though resolvers are not public yet
+						//typeof (LookupByNiceUrlAndTemplate),
+						//typeof (LookupByProfile),
+						//typeof (LookupByAlias),
+                        typeof (LookupByNotFoundHandlers)
 					});
 
             RoutesCacheResolver.Current = new RoutesCacheResolver(new DefaultRoutesCache(_isForTesting == false));
