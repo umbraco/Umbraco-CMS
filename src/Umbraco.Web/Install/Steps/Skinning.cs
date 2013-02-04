@@ -25,7 +25,7 @@ namespace Umbraco.Web.Install.Steps
      
         public override string UserControl
         {
-            get { return SystemDirectories.Install + "/steps/skinning.ascx"; }
+            get { return SystemDirectories.Install + "/steps/StarterKits.ascx"; }
         }
 
         public override bool Completed()
