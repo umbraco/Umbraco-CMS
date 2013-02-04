@@ -16,7 +16,7 @@ namespace Umbraco.Tests.PublishedContent
         ///         http://issues.umbraco.org/issue/U4-1636
         /// </summary>
         [Test]
-        public void Deals_With_Hyphenated_values()
+        public void Deals_With_Hyphenated_Values()
         {
             var xml = @"<banner1Link>
   <url-picker some-attribute='Content'>
