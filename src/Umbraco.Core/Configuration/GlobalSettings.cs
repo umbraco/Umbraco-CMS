@@ -28,7 +28,7 @@ namespace Umbraco.Core.Configuration
         #region Private static fields
         
 		// CURRENT UMBRACO VERSION ID
-    	private const string CurrentUmbracoVersion = "4.11.4";
+    	private const string CurrentUmbracoVersion = "4.11.5";
 
     	private static string _reservedUrlsCache;
         private static string _reservedPathsCache;
