@@ -334,8 +334,11 @@ namespace Umbraco.Web.Mvc
 					requestContext.HttpContext.Response.Redirect(publishedContentRequest.RedirectUrl, true);
 					return null;
 				}
-				if (publishedContentRequest.Is404) // should always be the case
-					requestContext.HttpContext.Response.StatusCode = 404;
+                if (publishedContentRequest.Is404) // should always be the case
+                {
+                    requestContext.HttpContext.Response.StatusCode = 404;
+                    requestContext.HttpContext.Response.TrySkipIisCustomErrors = true;
+                }
 				var handler = GetHandlerOnMissingTemplate(publishedContentRequest);
 
 				// if it's not null it can be either the PublishedContentNotFoundHandler (no document was
