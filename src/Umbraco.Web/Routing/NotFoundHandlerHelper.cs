@@ -110,10 +110,7 @@ namespace Umbraco.Web.Routing
                 Type type = null;
                 try
                 {
-                    //TODO: This isn't a good way to load the assembly, its already in the Domain so we should be getting the type
-                    // this loads the assembly into the wrong assembly load context!!
-
-                    var assembly = Assembly.LoadFrom(Umbraco.Core.IO.IOHelper.MapPath(Umbraco.Core.IO.SystemDirectories.Bin + "/" + assemblyName + ".dll"));
+                    var assembly = Assembly.Load(new AssemblyName(assemblyName));
                     type = assembly.GetType(ns + "." + typeName);
                 }
                 catch (Exception e)
