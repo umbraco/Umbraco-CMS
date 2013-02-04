@@ -47,6 +47,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Data.Entity" />
     <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SqlServerCE.4.0.0.0\lib\System.Data.SqlServerCe.dll</HintPath>
@@ -202,6 +203,18 @@
     <Compile Include="Persistence\Caching\IRepositoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\NullCacheProvider.cs" />
     <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
+    <Compile Include="Persistence\FaultHandling\ITransientErrorDetectionStrategy.cs" />
+    <Compile Include="Persistence\FaultHandling\RetryingEventArgs.cs" />
+    <Compile Include="Persistence\FaultHandling\RetryLimitExceededException.cs" />
+    <Compile Include="Persistence\FaultHandling\RetryPolicy.cs" />
+    <Compile Include="Persistence\FaultHandling\RetryPolicyFactory.cs" />
+    <Compile Include="Persistence\FaultHandling\RetryStrategy.cs" />
+    <Compile Include="Persistence\FaultHandling\Strategies\ExponentialBackoff.cs" />
+    <Compile Include="Persistence\FaultHandling\Strategies\FixedInterval.cs" />
+    <Compile Include="Persistence\FaultHandling\Strategies\Incremental.cs" />
+    <Compile Include="Persistence\FaultHandling\Strategies\NetworkConnectivityErrorDetectionStrategy.cs" />
+    <Compile Include="Persistence\FaultHandling\Strategies\SqlAzureTransientErrorDetectionStrategy.cs" />
+    <Compile Include="Persistence\FaultHandling\ThrottlingCondition.cs" />
     <Compile Include="Persistence\Mappers\PetaPocoMapper.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ConstraintAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\SpecialDbTypeAttribute.cs" />
@@ -393,6 +406,7 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\UpdateCmsContentVersionTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\UpdateCmsPropertyTypeGroupTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\RenameCmsTabTable.cs" />
+    <Compile Include="Persistence\PetaPocoConnectionExtensions.cs" />
     <Compile Include="Persistence\PetaPocoExtensions.cs" />
     <Compile Include="Persistence\PetaPocoSqlExtensions.cs" />
     <Compile Include="Persistence\Querying\PocoToSqlExpressionHelper.cs" />

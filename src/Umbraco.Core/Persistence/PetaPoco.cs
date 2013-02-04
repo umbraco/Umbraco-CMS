@@ -234,7 +234,7 @@ namespace Umbraco.Core.Persistence
 			{
 				_sharedConnection = _factory.CreateConnection();
 				_sharedConnection.ConnectionString = _connectionString;
-				_sharedConnection.Open();
+                _sharedConnection.OpenWithRetry();//Changed .Open() => .OpenWithRetry() extension method
 
 				_sharedConnection = OnConnectionOpened(_sharedConnection);
 
@@ -424,7 +424,8 @@ namespace Umbraco.Core.Persistence
 				}
 				else if (t == typeof(string))
 				{
-                    // out of memory exception occurs if trying to save more than 4000 characters to SQL Server CE NText column. Set before attempting to set Size, or Size will always max out at 4000
+                    // out of memory exception occurs if trying to save more than 4000 characters to SQL Server CE NText column. 
+                    //Set before attempting to set Size, or Size will always max out at 4000
                     if ((item as string).Length + 1 > 4000 && p.GetType().Name == "SqlCeParameter")
                         p.GetType().GetProperty("SqlDbType").SetValue(p, SqlDbType.NText, null); 
 
