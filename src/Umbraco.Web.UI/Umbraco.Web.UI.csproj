@@ -121,17 +121,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MySql.Data.6.6.4\lib\net40\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Our.Umbraco.uGoLive, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\uGoLive.1.3.0\lib\Our.Umbraco.uGoLive.dll</HintPath>
+    <Reference Include="Our.Umbraco.uGoLive">
+      <HintPath>..\packages\uGoLive.1.4.0\lib\Our.Umbraco.uGoLive.dll</HintPath>
     </Reference>
-    <Reference Include="Our.Umbraco.uGoLive.47x, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\uGoLive.1.3.0\lib\Our.Umbraco.uGoLive.47x.dll</HintPath>
+    <Reference Include="Our.Umbraco.uGoLive.47x">
+      <HintPath>..\packages\uGoLive.1.4.0\lib\Our.Umbraco.uGoLive.47x.dll</HintPath>
     </Reference>
-    <Reference Include="Our.Umbraco.uGoLive.Checks, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\uGoLive.1.3.0\lib\Our.Umbraco.uGoLive.Checks.dll</HintPath>
+    <Reference Include="Our.Umbraco.uGoLive.Checks">
+      <HintPath>..\packages\uGoLive.1.4.0\lib\Our.Umbraco.uGoLive.Checks.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -1834,23 +1831,23 @@
       <DependentUpon>applications.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Umbraco\scripting\templates\cshtml\EmptyTemplate.cshtml">
+    <Content Include="Umbraco\Scripting\templates\cshtml\EmptyTemplate.cshtml">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="Umbraco\scripting\templates\cshtml\Gallery.cshtml" />
-    <Content Include="Umbraco\scripting\templates\cshtml\ListAncestorsFromCurrentPage.cshtml" />
-    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesFromChangeableSource.cshtml" />
-    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesFromCurrentPage.cshtml" />
-    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesOrderedByDate.cshtml" />
-    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesOrderedByName.cshtml" />
-    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesOrderedByProperty.cshtml" />
-    <Content Include="Umbraco\scripting\templates\cshtml\ListChildPagesWithDoctype.cshtml" />
-    <Content Include="Umbraco\scripting\templates\cshtml\ListDescendantsFromCurrentPage.cshtml" />
-    <Content Include="Umbraco\scripting\templates\cshtml\ListImagesFromMediaFolder.cshtml">
+    <Content Include="Umbraco\Scripting\templates\cshtml\Gallery.cshtml" />
+    <Content Include="Umbraco\Scripting\templates\cshtml\ListAncestorsFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesFromChangeableSource.cshtml" />
+    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesOrderedByDate.cshtml" />
+    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesOrderedByName.cshtml" />
+    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesOrderedByProperty.cshtml" />
+    <Content Include="Umbraco\Scripting\templates\cshtml\ListChildPagesWithDoctype.cshtml" />
+    <Content Include="Umbraco\Scripting\templates\cshtml\ListDescendantsFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\Scripting\templates\cshtml\ListImagesFromMediaFolder.cshtml">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="Umbraco\scripting\templates\cshtml\MultinodeTree-picker.cshtml" />
-    <Content Include="Umbraco\scripting\templates\cshtml\TwitterFeed.cshtml" />
+    <Content Include="Umbraco\Scripting\templates\cshtml\MultinodeTree-picker.cshtml" />
+    <Content Include="Umbraco\Scripting\templates\cshtml\TwitterFeed.cshtml" />
     <None Include="umbraco_client\CodeMirror\js\mode\coffeescript\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\pascal\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\perl\LICENSE" />
@@ -1860,7 +1857,9 @@
     <Content Include="umbraco_client\CodeMirror\js\mode\sieve\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\xquery\LICENSE" />
     <Content Include="Views\Web.config" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
