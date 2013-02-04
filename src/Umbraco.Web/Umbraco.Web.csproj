@@ -1555,13 +1555,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\test.aspx.cs">
-      <DependentUpon>test.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\test.aspx.designer.cs">
-      <DependentUpon>test.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\timerModule.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -2017,7 +2010,6 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\sort.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\test.aspx" />
     <Content Include="umbraco.presentation\umbraco\tree.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

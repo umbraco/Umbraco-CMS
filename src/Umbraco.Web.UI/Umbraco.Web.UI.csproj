@@ -2235,7 +2235,6 @@
     <Content Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx" />
     <Content Include="Umbraco\Settings\Stylesheet\Property\EditStyleSheetProperty.aspx" />
     <Content Include="Umbraco\Dialogs\sort.aspx" />
-    <Content Include="Umbraco\test.aspx" />
     <Content Include="Umbraco\tree.aspx" />
     <Content Include="Umbraco\treeInit.aspx" />
     <Content Include="Umbraco\umbraco.aspx" />
