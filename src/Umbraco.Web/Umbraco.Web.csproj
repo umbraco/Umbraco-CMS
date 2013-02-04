@@ -356,7 +356,9 @@
     <Compile Include="Trees\PartialViewsTree.cs" />
     <Compile Include="UI\Controls\InsertMacroSplitButton.cs" />
     <Compile Include="UI\Controls\UmbracoControl.cs" />
-    <Compile Include="UI\Controls\UmbracoUserControl.cs" />
+    <Compile Include="UI\Controls\UmbracoUserControl.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="UI\Pages\BasePage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
