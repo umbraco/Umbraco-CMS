@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 using Umbraco.Core;
 using umbraco;
-using umbraco.presentation.install.utills;
+
 
 namespace Umbraco.Web.Install
 {
-	/// <summary>
+    /// <summary>
 	/// An MVC controller for the installation process regarding packages
 	/// </summary>
 	/// <remarks>

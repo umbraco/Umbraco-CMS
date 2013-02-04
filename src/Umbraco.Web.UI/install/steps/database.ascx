@@ -1,4 +1,4 @@
-﻿<%@ Control Language="c#" AutoEventWireup="True" CodeBehind="database.ascx.cs" Inherits="umbraco.presentation.install.steps.detect"
+﻿<%@ Control Language="c#" AutoEventWireup="True" CodeBehind="database.ascx.cs" Inherits="Umbraco.Web.UI.Install.Steps.Database"
     TargetSchema="http://schemas.microsoft.com/intellisense/ie5" %>
 <%@ Import Namespace="Umbraco.Core.Configuration" %>
 <asp:PlaceHolder ID="settings" runat="server" Visible="true">
@@ -197,7 +197,7 @@
 
                         <footer class="btn-box installbtn">
                             <div class="t">&nbsp;</div>
-                            <asp:LinkButton runat="server" class="single-tab submit btn-install" OnClick="saveDBConfig"><span>install</span>    </asp:LinkButton>
+                            <asp:LinkButton runat="server" class="single-tab submit btn-install" OnClick="SaveDbConfig"><span>install</span>    </asp:LinkButton>
                         </footer>
 
                     </div>
@@ -317,8 +317,8 @@
         <!-- btn box -->
         <footer class="btn-box" style="display: none;">
             <div class="t">&nbsp;</div>
-            <asp:LinkButton class="btn-step btn btn-continue" runat="server" OnClick="gotoNextStep"><span>Continue</span></asp:LinkButton>
-            <asp:LinkButton class="btn-step btn btn-back" Style="display: none;" runat="server" OnClick="gotoSettings"><span>Back</span></asp:LinkButton>
+            <asp:LinkButton class="btn-step btn btn-continue" runat="server" OnClick="GotoNextStep"><span>Continue</span></asp:LinkButton>
+            <asp:LinkButton class="btn-step btn btn-back" Style="display: none;" runat="server" OnClick="GotoSettings"><span>Back</span></asp:LinkButton>
         </footer>
     </div>
 
@@ -332,7 +332,7 @@
                 contentType: 'application/json; charset=utf-8',
                 data: '{}',
                 dataType: 'json',
-                url: 'utills/p.aspx/installOrUpgrade',
+                url: 'InstallerRestService.aspx/InstallOrUpgrade',
                 success: function(data) {
                     var json = JSON.parse(data.d);
 

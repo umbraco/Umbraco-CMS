@@ -9,6 +9,7 @@ using umbraco.IO;
 
 namespace umbraco.presentation.umbraco.developer.Packages
 {
+    [Obsolete("This class is no longer used and will be removed in future version. The page that supercedes this is Umbraco.Web.UI.Umbraco.Developer.Packages.StarterKits")]
 	public partial class StarterKits : UmbracoEnsuredPage
 	{
 		protected void Page_Load(object sender, EventArgs e)

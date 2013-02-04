@@ -72,12 +72,12 @@
 <script type="text/javascript">
     jQuery(document).ready(function () {
 
-        $.post("../../install/utills/p.aspx?feed=sitebuildervids",
+        $.post("../../install/InstallerRestService.aspx?feed=sitebuildervids",
       function (data) {
           jQuery("#ajax-sitebuildervids").html(data);
       });
 
-      $.post("../../install/utills/p.aspx?feed=developervids",
+        $.post("../../install/InstallerRestService.aspx?feed=developervids",
       function (data) {
           jQuery("#ajax-developervids").html(data);
       });

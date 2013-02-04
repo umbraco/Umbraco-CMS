@@ -143,6 +143,7 @@ namespace umbraco.BasePages
         /// </summary>
         /// <param name="umbracoUserContextID">The umbraco user context ID.</param>
         /// <returns></returns>
+        [Obsolete("Use Umbraco.Web.Security.WebSecurity.GetUserId instead")]
         public static int GetUserId(string umbracoUserContextID)
         {
             try
@@ -175,8 +176,9 @@ namespace umbraco.BasePages
         /// <summary>
         /// Validates the user context ID.
         /// </summary>
-        /// <param name="umbracoUserContextID">The umbraco user context ID.</param>
+        /// <param name="currentUmbracoUserContextID">The umbraco user context ID.</param>
         /// <returns></returns>
+        [Obsolete("Use Umbraco.Web.Security.WebSecurity.ValidateUserContextId instead")]
         public static bool ValidateUserContextID(string currentUmbracoUserContextID)
         {
             if ((currentUmbracoUserContextID != ""))
@@ -215,12 +217,13 @@ namespace umbraco.BasePages
 
         }
 
-        public static long GetTimeout(bool byPassCache)
+        [Obsolete("Use Umbraco.Web.Security.WebSecurity.GetTimeout instead")]
+        public static long GetTimeout(bool bypassCache)
         {
             if (UmbracoSettings.KeepUserLoggedIn)
                 RenewLoginTimeout();
 
-            if (byPassCache)
+            if (bypassCache)
             {
                 return SqlHelper.ExecuteScalar<long>("select timeout from umbracoUserLogins where contextId=@contextId",
                                                           SqlHelper.CreateParameter("@contextId", new Guid(umbracoUserContextID))
@@ -235,6 +238,7 @@ namespace umbraco.BasePages
         /// Gets or sets the umbraco user context ID.
         /// </summary>
         /// <value>The umbraco user context ID.</value>
+        [Obsolete("Use Umbraco.Web.Security.WebSecurity.UmbracoUserContextId instead")]
         public static string umbracoUserContextID
         {
             get
@@ -335,6 +339,7 @@ namespace umbraco.BasePages
                     SqlHelper.CreateParameter("@contextId", umbracoUserContextID));
         }
 
+        [Obsolete("Use Umbraco.Web.Security.WebSecurity.RenewLoginTimeout instead")]
         public static void RenewLoginTimeout()
         {
             // only call update if more than 1/10 of the timeout has passed
@@ -348,6 +353,7 @@ namespace umbraco.BasePages
         /// Logs a user in.
         /// </summary>
         /// <param name="u">The user</param>
+        [Obsolete("Use Umbraco.Web.Security.WebSecurity.PerformLogin instead")]
         public static void doLogin(User u)
         {
             Guid retVal = Guid.NewGuid();
@@ -359,7 +365,6 @@ namespace umbraco.BasePages
             umbracoUserContextID = retVal.ToString();
 
 			LogHelper.Info<BasePage>("User {0} (Id: {1}) logged in", () => u.Name, () => u.Id);
-
         }
 
 
@@ -396,6 +401,7 @@ namespace umbraco.BasePages
         /// <summary>
         /// a collection of available speechbubble icons
         /// </summary>
+        [Obsolete("This is no longer in use, it has been superceded by Umbraco.Web.UI.SpeechBubbleIcon")]
         public enum speechBubbleIcon
         {
             /// <summary>

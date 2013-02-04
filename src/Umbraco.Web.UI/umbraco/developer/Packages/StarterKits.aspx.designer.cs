@@ -10,6 +10,78 @@
 namespace Umbraco.Web.UI.Umbraco.Developer.Packages {
     
     
-    public partial class StarterKits {
+    public partial class StarterKits 
+    {
+        /// <summary>
+        /// JsInclude1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude1;
+
+        /// <summary>
+        /// Panel1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.UmbracoPanel Panel1;
+
+        /// <summary>
+        /// fb control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Feedback fb;
+
+        /// <summary>
+        /// StarterKitInstalled control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane StarterKitInstalled;
+
+        /// <summary>
+        /// ph_skins control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder ph_skins;
+
+        /// <summary>
+        /// StarterKitNotInstalled control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane StarterKitNotInstalled;
+
+        /// <summary>
+        /// ph_starterkits control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder ph_starterkits;
+
+        /// <summary>
+        /// installationCompleted control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane installationCompleted;
     }
 }
