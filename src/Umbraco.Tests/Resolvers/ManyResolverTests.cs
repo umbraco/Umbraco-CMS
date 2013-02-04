@@ -20,14 +20,12 @@ namespace Umbraco.Tests.Resolvers
         {
             TestHelper.SetupLog4NetForTests();
 
-            Resolution.Reset();
             ManyResolver.Reset();
         }
 
         [TearDown]
         public void TearDown()
         {
-            Resolution.Reset();
             ManyResolver.Reset();
         }
 

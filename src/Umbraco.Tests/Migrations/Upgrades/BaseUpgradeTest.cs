@@ -95,7 +95,6 @@ namespace Umbraco.Tests.Migrations.Upgrades
             PluginManager.Current = null;
             SyntaxConfig.SqlSyntaxProvider = null;
 			MigrationResolver.Reset();
-			Resolution.Reset();
 
             TestHelper.CleanContentDirectories();
 

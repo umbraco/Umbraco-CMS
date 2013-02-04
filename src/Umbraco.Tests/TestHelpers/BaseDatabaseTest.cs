@@ -83,7 +83,6 @@ namespace Umbraco.Tests.TestHelpers
 
             //reset the app context
             ApplicationContext.Current = null;
-			Resolution.Reset();
 
             RepositoryResolver.Reset();
         }

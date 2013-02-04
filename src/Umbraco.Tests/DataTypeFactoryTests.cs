@@ -37,7 +37,6 @@ namespace Umbraco.Tests
 		public void TearDown()
 		{
 			DataTypesResolver.Reset();
-			Resolution.Reset();
 		}
 
 		[Test]

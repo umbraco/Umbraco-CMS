@@ -35,7 +35,6 @@ namespace Umbraco.Tests
 		public void TearDown()
 		{
 			CacheRefreshersResolver.Reset();
-			Resolution.Reset();
 		}
 
 		[Test]

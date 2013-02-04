@@ -18,7 +18,6 @@ namespace Umbraco.Tests.Resolvers
 		{
             TestHelper.SetupLog4NetForTests();
 
-            Resolution.Reset();
             MacroFieldEditorsResolver.Reset();
 
 
@@ -35,7 +34,6 @@ namespace Umbraco.Tests.Resolvers
 		[TearDown]
 		public void TearDown()
 		{
-            Resolution.Reset();
             MacroFieldEditorsResolver.Reset();
 			PluginManager.Current.AssembliesToScan = null;
 		}

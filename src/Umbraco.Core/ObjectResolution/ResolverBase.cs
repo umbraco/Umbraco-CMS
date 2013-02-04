@@ -77,8 +77,17 @@ namespace Umbraco.Core.ObjectResolution
 		/// Resets the resolver singleton instance to null.
 		/// </summary>
 		/// <remarks>To be used in unit tests.</remarks>
-		internal static void Reset()
+		/// <param name="resetResolution">By default this is true because we always need to reset resolution before we reset a resolver, however in some insanely rare cases like unit testing you might not want to do this.</param>
+		internal static void Reset(bool resetResolution = true)
 		{
+
+            //In order to reset a resolver, we always must reset the resolution
+            if (resetResolution)
+            {                
+                Resolution.Reset();    
+            }
+            
+
             using (Resolution.Configuration)
 			using (new WriteLock(ResolversLock))
 			{

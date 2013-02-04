@@ -111,7 +111,6 @@ namespace Umbraco.Tests.TestHelpers
 	        
 
 			ApplicationContext.Current = null;
-			Resolution.Reset();
 			RepositoryResolver.Reset();
 
 			TestHelper.CleanContentDirectories();

@@ -16,7 +16,6 @@ namespace Umbraco.Tests.Resolvers
 		{
             TestHelper.SetupLog4NetForTests();
 
-            Resolution.Reset();
             ActionsResolver.Reset();
 
 			// this ensures it's reset
@@ -32,7 +31,6 @@ namespace Umbraco.Tests.Resolvers
 		[TearDown]
 		public void TearDown()
 		{
-            Resolution.Reset();
             ActionsResolver.Reset();
             PluginManager.Current.AssembliesToScan = null;
         }
