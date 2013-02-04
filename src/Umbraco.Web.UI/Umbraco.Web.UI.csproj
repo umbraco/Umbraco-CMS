@@ -419,7 +419,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Umbraco\Umbraco.aspx.designer.cs">
-      <DependentUpon>Umbraco.aspx</DependentUpon>
+      <DependentUpon>umbraco.aspx</DependentUpon>
     </Compile>
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />

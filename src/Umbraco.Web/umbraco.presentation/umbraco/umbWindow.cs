@@ -8,8 +8,8 @@ namespace  umbraco
 	/// <summary>
 	/// Summary description for umbWindow.
 	/// </summary>
-	[DefaultProperty("Text"), 
-		ToolboxData("<{0}:umbWindow runat=server></{0}:umbWindow>")]
+	[DefaultProperty("Text"), ToolboxData("<{0}:umbWindow runat=server></{0}:umbWindow>")]
+    [Obsolete("This class is no longer used and will be removed from the codebase in future versions")]
 	public class umbWindow : System.Web.UI.WebControls.PlaceHolder
 	{
 		private string content;

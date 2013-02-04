@@ -24,6 +24,7 @@ namespace umbraco.cms.presentation
     /// </summary>
     public partial class login : BasePages.BasePage
     {
+        [Obsolete("This property is no longer used")]
         protected umbWindow treeWindow;
 
         protected override void OnLoad(EventArgs e)

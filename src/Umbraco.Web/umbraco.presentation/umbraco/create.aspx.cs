@@ -20,6 +20,7 @@ namespace umbraco.cms.presentation
     /// </summary>
     public partial class Create : BasePages.UmbracoEnsuredPage
     {
+        [Obsolete("This property is no longer used")]
         protected umbWindow createWindow;
         protected System.Web.UI.WebControls.Label helpText;
         protected System.Web.UI.WebControls.TextBox rename;
