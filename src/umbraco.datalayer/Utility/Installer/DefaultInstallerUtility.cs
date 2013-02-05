@@ -196,8 +196,7 @@ namespace umbraco.DataLayer.Utility.Installer
                 {
                     if(v.ExpectedRows > -1)
                     {
-                        // execute and don't write to the log!
-                        using (var reader = SqlHelper.ExecuteReader("#" + v.Sql))
+                        using (var reader = SqlHelper.ExecuteReader(v.Sql))
                         {
                             var rowCount = 0;
                             while (reader.Read())
@@ -209,8 +208,7 @@ namespace umbraco.DataLayer.Utility.Installer
                     }
                     else
                     {
-                        // execute and don't write to the log!
-                        SqlHelper.ExecuteNonQuery("#" + v.Sql);
+                        SqlHelper.ExecuteNonQuery(v.Sql);
                     }
 
                     //if (!String.IsNullOrEmpty(v.Table) && !String.IsNullOrEmpty(v.Field) && !String.IsNullOrEmpty(v.Value))
