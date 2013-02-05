@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.FaultHandling.Strategies;
 
 namespace Umbraco.Core.Persistence.FaultHandling
@@ -198,6 +199,9 @@ namespace Umbraco.Core.Persistence.FaultHandling
         {
             if (this.Retrying != null)
             {
+                LogHelper.Info<RetryPolicy>(string.Format("Retrying - Count: {0}, Delay: {1}, Exception: {2}",
+                                                          retryCount, delay.TotalMilliseconds, lastError.Message));
+
                 this.Retrying(this, new RetryingEventArgs(retryCount, delay, lastError));
             }
         }

@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using Umbraco.Core.Persistence.FaultHandling;
-using Umbraco.Core.Persistence.FaultHandling.Strategies;
 
 namespace Umbraco.Core.Persistence
 {
@@ -17,11 +16,7 @@ namespace Umbraco.Core.Persistence
         public static void OpenWithRetry(this IDbConnection connection)
         {
             var connectionString = connection.ConnectionString ?? string.Empty;
-            var retryStrategy = new ExponentialBackoff();
-            //Is this really the best way to determine if the database is an Azure database?
-            RetryPolicy retryPolicy = connectionString.Contains("database.windows.net")
-                                          ? new RetryPolicy(new SqlAzureTransientErrorDetectionStrategy(), retryStrategy)
-                                          : new RetryPolicy(new NetworkConnectivityErrorDetectionStrategy(), retryStrategy);
+            var retryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(connectionString);
             OpenWithRetry(connection, retryPolicy);
         }
 
