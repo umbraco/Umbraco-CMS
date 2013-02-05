@@ -12,7 +12,7 @@ namespace umbraco.MacroEngines
 		{
 			if (result is Umbraco.Core.Dynamics.DynamicXml)
 			{
-				result = new DynamicXml(((Umbraco.Core.Dynamics.DynamicXml)result).BaseElement);
+                result = new DynamicXml(((Umbraco.Core.Dynamics.DynamicXml)result).StrippedXmlElement);
 			}
 			else if (result is Umbraco.Core.Dynamics.DynamicNull)
 			{
