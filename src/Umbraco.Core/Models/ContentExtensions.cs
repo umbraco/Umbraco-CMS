@@ -347,7 +347,6 @@ namespace Umbraco.Core.Models
 
             var x = content.ToXml(nodeName);
             x.Add(new XAttribute("nodeType", content.ContentType.Id));
-            //TODO see below, do we have the same issues with GetXxxProfile threading problems?
             x.Add(new XAttribute("creatorName", content.GetCreatorProfile().Name));
             x.Add(new XAttribute("writerName", content.GetWriterProfile().Name));
             x.Add(new XAttribute("writerID", content.WriterId));
@@ -372,9 +371,7 @@ namespace Umbraco.Core.Models
 
             var x = media.ToXml(nodeName);
             x.Add(new XAttribute("nodeType", media.ContentType.Id));
-            //TODO Using the GetCreatorProfile extension method seems to be causing threading/connection problems because of the way the repo is used
-            //x.Add(new XAttribute("writerName", media.GetCreatorProfile().Name));
-            x.Add(new XAttribute("writerName", string.Empty));
+            x.Add(new XAttribute("writerName", media.GetCreatorProfile().Name));
             x.Add(new XAttribute("writerID", media.CreatorId));
             x.Add(new XAttribute("version", media.Version));
             x.Add(new XAttribute("template", 0));
