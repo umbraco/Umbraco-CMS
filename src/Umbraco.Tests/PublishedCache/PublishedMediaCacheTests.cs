@@ -9,9 +9,10 @@ using Umbraco.Core.Models;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 using umbraco.BusinessLogic;
 
-namespace Umbraco.Tests.ContentStores
+namespace Umbraco.Tests.PublishedCache
 {
 	[TestFixture]
     public class PublishMediaStoreTests : PublishedContentTestBase
@@ -40,8 +41,8 @@ namespace Umbraco.Tests.ContentStores
 			var mChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child2", mType, user, mRoot2.Id);
 			
 			var ctx = GetUmbracoContext("/test", 1234);
-			var mediaStore = new DefaultPublishedMediaStore();
-			var roots = mediaStore.GetRootDocuments(ctx);
+			var mediaStore = new PublishedMediaCache();
+			var roots = mediaStore.GetAtRoot(ctx);
 			Assert.AreEqual(2, roots.Count());
 			Assert.IsTrue(roots.Select(x => x.Id).ContainsAll(new[] {mRoot1.Id, mRoot2.Id}));
 
@@ -147,7 +148,7 @@ namespace Umbraco.Tests.ContentStores
 			result.Fields.Add("updateDate", "2012-07-16T10:34:09");
 			result.Fields.Add("writerName", "Shannon");
 
-			var store = new DefaultPublishedMediaStore();
+			var store = new PublishedMediaCache();
 			var doc = store.ConvertFromSearchResult(result);
 
 			DoAssert(doc, 1234, 0, 0, "", "Image", 0, "Shannon", "", 0, 0, "-1,1234", default(DateTime), DateTime.Parse("2012-07-16T10:34:09"), 2);
@@ -159,8 +160,8 @@ namespace Umbraco.Tests.ContentStores
 		{
 			var xmlDoc = GetMediaXml();
 			var navigator = xmlDoc.SelectSingleNode("/root/Image").CreateNavigator();
-			var store = new DefaultPublishedMediaStore();
-			var doc = store.ConvertFromXPathNavigator(navigator);
+            var cache = new PublishedMediaCache();
+			var doc = cache.ConvertFromXPathNavigator(navigator);
 
 			DoAssert(doc, 2000, 0, 2, "image1", "Image", 2044, "Shannon", "Shannon2", 22, 33, "-1,2000", DateTime.Parse("2012-06-12T14:13:17"), DateTime.Parse("2012-07-20T18:50:43"), 1);
 			Assert.AreEqual(null, doc.Parent);
@@ -225,7 +226,7 @@ namespace Umbraco.Tests.ContentStores
 				};
 		}
 		
-		private DefaultPublishedMediaStore.DictionaryPublishedContent GetDictionaryDocument(
+		private PublishedMediaCache.DictionaryPublishedContent GetDictionaryDocument(
 			string idKey = "id",
 			string templateKey = "template",
 			string nodeNameKey = "nodeName",
@@ -237,11 +238,11 @@ namespace Umbraco.Tests.ContentStores
 		{
 			if (children == null)
 				children = new List<IPublishedContent>();
-			var dicDoc = new DefaultPublishedMediaStore.DictionaryPublishedContent(
+            var dicDoc = new PublishedMediaCache.DictionaryPublishedContent(
 				//the dictionary
 				GetDictionary(idVal, parentIdVal, idKey, templateKey, nodeNameKey, nodeTypeAliasKey, pathKey),
 				//callback to get the parent
-				d => new DefaultPublishedMediaStore.DictionaryPublishedContent(
+                d => new PublishedMediaCache.DictionaryPublishedContent(
 						GetDictionary(parentIdVal, -1, idKey, templateKey, nodeNameKey, nodeTypeAliasKey, pathKey),
 					//there is no parent
 						a => null,
@@ -257,7 +258,7 @@ namespace Umbraco.Tests.ContentStores
 		}
 
 		private void DoAssert(
-			DefaultPublishedMediaStore.DictionaryPublishedContent dicDoc,
+			PublishedMediaCache.DictionaryPublishedContent dicDoc,
 			int idVal = 1234,
 			int templateIdVal = 333,
 			int sortOrderVal = 44,

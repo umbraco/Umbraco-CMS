@@ -12,13 +12,14 @@ using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Xml;
 using Umbraco.Web.Models;
 using UmbracoExamine;
 using umbraco;
 using umbraco.cms.businesslogic;
 using ContentType = umbraco.cms.businesslogic.ContentType;
 
-namespace Umbraco.Web
+namespace Umbraco.Web.PublishedCache.LegacyXmlCache
 {
 	/// <summary>
 	/// An IPublishedMediaStore that first checks for the media in Examine, and then reverts to the database
@@ -26,10 +27,10 @@ namespace Umbraco.Web
 	/// <remarks>
 	/// NOTE: In the future if we want to properly cache all media this class can be extended or replaced when these classes/interfaces are exposed publicly.
 	/// </remarks>
-	internal class DefaultPublishedMediaStore : IPublishedMediaStore
+	internal class PublishedMediaCache : IPublishedMediaCache
 	{
 
-		public DefaultPublishedMediaStore()
+		public PublishedMediaCache()
 		{			
 		}
 
@@ -38,7 +39,7 @@ namespace Umbraco.Web
 	    /// </summary>
 	    /// <param name="searchProvider"></param>
 	    /// <param name="indexProvider"></param>
-	    internal DefaultPublishedMediaStore(BaseSearchProvider searchProvider, BaseIndexProvider indexProvider)
+        internal PublishedMediaCache(BaseSearchProvider searchProvider, BaseIndexProvider indexProvider)
 		{
 		    _searchProvider = searchProvider;
 		    _indexProvider = indexProvider;
@@ -47,12 +48,12 @@ namespace Umbraco.Web
 	    private readonly BaseSearchProvider _searchProvider;
         private readonly BaseIndexProvider _indexProvider;
 
-		public virtual IPublishedContent GetDocumentById(UmbracoContext umbracoContext, int nodeId)
+		public virtual IPublishedContent GetById(UmbracoContext umbracoContext, int nodeId)
 		{
 			return GetUmbracoMedia(nodeId);
 		}
 
-		public IEnumerable<IPublishedContent> GetRootDocuments(UmbracoContext umbracoContext)
+		public IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext)
 		{
 			var rootMedia = global::umbraco.cms.businesslogic.media.Media.GetRootMedias();
 			var result = new List<IPublishedContent>();
@@ -67,7 +68,17 @@ namespace Umbraco.Web
 			return result;
 		}
 
-		private ExamineManager GetExamineManagerSafe()
+        public IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, string xpath, XPathVariable[] vars)
+        {
+            throw new NotImplementedException("PublishedMediaCache does not support XPath queries.");
+        }
+
+        public IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, string xpath, XPathVariable[] vars)
+        {
+            throw new NotImplementedException("PublishedMediaCache does not support XPath queries.");
+        }
+        
+        private ExamineManager GetExamineManagerSafe()
 		{
 			try
 			{
@@ -94,7 +105,7 @@ namespace Umbraco.Web
                 }
                 catch (Exception ex)
                 {                
-                    LogHelper.Error<DefaultPublishedMediaStore>("Could not retreive the InternalIndexer", ex);
+                    LogHelper.Error<PublishedMediaCache>("Could not retreive the InternalIndexer", ex);
                     //something didn't work, continue returning null.
                 }
             }

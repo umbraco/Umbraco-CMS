@@ -6,6 +6,8 @@ using System.Text;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 using umbraco;
 
 namespace Umbraco.Tests
@@ -38,9 +40,9 @@ namespace Umbraco.Tests
 
         protected override void FreezeResolution()
         {
-            //set the current umbraco context and a published content store
-            PublishedContentStoreResolver.Current = new PublishedContentStoreResolver(
-                new DefaultPublishedContentStore());
+            //set the current umbraco context and a published content cache
+            PublishedContentCacheResolver.Current = new PublishedContentCacheResolver(
+                new PublishedContentCache());
 
             base.FreezeResolution();
         }

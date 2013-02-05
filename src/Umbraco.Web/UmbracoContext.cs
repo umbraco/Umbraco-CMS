@@ -3,6 +3,7 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.CodeAnnotations;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using umbraco;
 using umbraco.IO;
@@ -87,7 +88,7 @@ namespace Umbraco.Web
             // there's one per request because there are some behavior parameters that can be changed
             var urlProvider = new UrlProvider(
                 umbracoContext,
-                PublishedContentStoreResolver.Current.PublishedContentStore,
+                PublishedContentCacheResolver.Current.PublishedContentCache,
                 UrlProviderResolver.Current.Providers);
 
             // create the RoutingContext, and assign
@@ -95,7 +96,7 @@ namespace Umbraco.Web
                 umbracoContext,
                 ContentFinderResolver.Current.Finders,
                 ContentLastChanceFinderResolver.Current.Finder,
-                PublishedContentStoreResolver.Current.PublishedContentStore,
+                PublishedContentCacheResolver.Current.PublishedContentCache,
                 urlProvider,
                 RoutesCacheResolver.Current.RoutesCache);
 

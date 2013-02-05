@@ -5,6 +5,8 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -45,8 +47,8 @@ namespace Umbraco.Tests.PublishedContent
                         typeof(YesNoPropertyEditorValueConverter)
                     });    
 
-            PublishedContentStoreResolver.Current = new PublishedContentStoreResolver(new DefaultPublishedContentStore());
-            PublishedMediaStoreResolver.Current = new PublishedMediaStoreResolver(new DefaultPublishedMediaStore());
+            PublishedContentCacheResolver.Current = new PublishedContentCacheResolver(new PublishedContentCache());
+            PublishedMediaCacheResolver.Current = new PublishedMediaCacheResolver(new PublishedMediaCache());
 
             base.FreezeResolution();
         }

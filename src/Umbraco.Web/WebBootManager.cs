@@ -19,6 +19,8 @@ using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
@@ -275,8 +277,8 @@ namespace Umbraco.Web
             PropertyEditorValueConvertersResolver.Current.RemoveType<TinyMcePropertyEditorValueConverter>();
             PropertyEditorValueConvertersResolver.Current.AddType<RteMacroRenderingPropertyEditorValueConverter>();
 
-            PublishedContentStoreResolver.Current = new PublishedContentStoreResolver(new DefaultPublishedContentStore());
-            PublishedMediaStoreResolver.Current = new PublishedMediaStoreResolver(new DefaultPublishedMediaStore());
+            PublishedContentCacheResolver.Current = new PublishedContentCacheResolver(new PublishedContentCache());
+            PublishedMediaCacheResolver.Current = new PublishedMediaCacheResolver(new PublishedMediaCache());
 
             FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
                 // add all known factories, devs can then modify this list on application

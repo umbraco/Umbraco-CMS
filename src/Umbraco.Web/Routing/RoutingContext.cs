@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Routing
 {
@@ -14,21 +15,21 @@ namespace Umbraco.Web.Routing
 	    /// <param name="umbracoContext"> </param>
 	    /// <param name="contentFinders">The document lookups resolver.</param>
 	    /// <param name="contentLastChanceFinder"> </param>
-	    /// <param name="publishedContentStore">The content store.</param>
+	    /// <param name="contentCache">The content store.</param>
 	    /// <param name="urlProvider">The nice urls provider.</param>
 	    /// <param name="routesCache">The routes cache.</param>
 	    internal RoutingContext(
 			UmbracoContext umbracoContext,
 			IEnumerable<IContentFinder> contentFinders,
 			IContentFinder contentLastChanceFinder,
-            IPublishedContentStore publishedContentStore,
+            IPublishedContentCache contentCache,
             UrlProvider urlProvider,
             IRoutesCache routesCache)
         {
 			UmbracoContext = umbracoContext;
 			PublishedContentFinders = contentFinders;
 			PublishedContentLastChanceFinder = contentLastChanceFinder;
-			PublishedContentStore = publishedContentStore;
+			PublishedContentCache = contentCache;
         	UrlProvider = urlProvider;
             RoutesCache = routesCache;
         }
@@ -49,9 +50,9 @@ namespace Umbraco.Web.Routing
 		internal IContentFinder PublishedContentLastChanceFinder { get; private set; }
 
 		/// <summary>
-		/// Gets the content store.
+		/// Gets the published content cache.
 		/// </summary>
-		internal IPublishedContentStore PublishedContentStore { get; private set; }
+		internal IPublishedContentCache PublishedContentCache { get; private set; }
 
 		/// <summary>
 		/// Gets the urls provider.

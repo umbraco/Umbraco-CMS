@@ -320,7 +320,7 @@
     <Compile Include="BaseRest\RestExtensionAttribute.cs" />
     <Compile Include="BaseRest\RestExtensionMethodAttribute.cs" />
     <Compile Include="BaseRest\RestExtensionMethodInfo.cs" />
-    <Compile Include="DefaultPublishedMediaStore.cs" />
+    <Compile Include="PublishedCache\LegacyXmlCache\PublishedMediaCache.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
     <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
@@ -348,14 +348,17 @@
     <Compile Include="Mvc\UmbracoControllerFactory.cs" />
     <Compile Include="Mvc\UmbracoMvcHandler.cs" />
     <Compile Include="Mvc\UmbracoViewPage.cs" />
+    <Compile Include="PublishedCache\IPublishedCache.cs" />
+    <Compile Include="PublishedCache\IPublishedContentCache.cs" />
+    <Compile Include="PublishedCache\IPublishedMediaCache.cs" />
+    <Compile Include="PublishedCache\PublishedContentCacheResolver.cs" />
+    <Compile Include="PublishedCache\PublishedMediaCacheResolver.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="ExamineExtensions.cs" />
     <Compile Include="FormlessPage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="HtmlHelperRenderExtensions.cs" />
-    <Compile Include="IPublishedStore.cs" />
-    <Compile Include="IPublishedMediaStore.cs" />
     <Compile Include="LegacyScheduledTasks.cs" />
     <Compile Include="Media\EmbedProviders\AbstractOEmbedProvider.cs" />
     <Compile Include="Media\EmbedProviders\AbstractProvider.cs" />
@@ -386,7 +389,6 @@
     <Compile Include="Mvc\PluginControllerMetadata.cs" />
     <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="PropertyEditors\RteMacroRenderingPropertyEditorValueConverter.cs" />
-    <Compile Include="PublishedMediaStoreResolver.cs" />
     <Compile Include="RenderFieldCaseType.cs" />
     <Compile Include="RenderFieldEncodingType.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
@@ -542,10 +544,8 @@
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="Mvc\ViewContextExtensions.cs" />
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
-    <Compile Include="DefaultPublishedContentStore.cs" />
-    <Compile Include="PublishedContentStoreResolver.cs" />
+    <Compile Include="PublishedCache\LegacyXmlCache\PublishedContentCache.cs" />
     <Compile Include="Routing\PublishedContentNotFoundHandler.cs" />
-    <Compile Include="IPublishedContentStore.cs" />
     <Compile Include="Models\XmlPublishedContent.cs" />
     <Compile Include="Models\XmlPublishedContentProperty.cs" />
     <Compile Include="Mvc\Constants.cs" />

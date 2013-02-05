@@ -14,6 +14,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
@@ -326,7 +327,7 @@ namespace umbraco
         /// <returns>Returns a string with the data from the given element of a node</returns>
         public static string GetItem(int nodeID, String alias)
         {
-	        var doc = PublishedContentStoreResolver.Current.PublishedContentStore.GetDocumentById(
+	        var doc = PublishedContentCacheResolver.Current.PublishedContentCache.GetById(
 		        Umbraco.Web.UmbracoContext.Current,
 		        nodeID);
 

@@ -6,6 +6,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 using umbraco.MacroEngines;
 using umbraco.NodeFactory;
 using System.Linq;
@@ -82,7 +83,7 @@ namespace Umbraco.Tests.PublishedContent
             //var template = Template.MakeNew("test", new User(0));
             //var ctx = GetUmbracoContext("/test", template.Id);
             var ctx = GetUmbracoContext("/test", 1234);
-            var contentStore = new DefaultPublishedContentStore();
+            var cache = new PublishedContentCache();
             var node = new DynamicNode(
                 new DynamicBackingItem(
                     new Node(ctx.GetXml().SelectSingleNode("//*[@id='" + id + "' and @isDoc]"))));

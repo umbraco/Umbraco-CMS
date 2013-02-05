@@ -9,6 +9,7 @@ using System.Web.UI;
 using System.Xml;
 using Umbraco.Core.Macros;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 using umbraco.cms.businesslogic;
@@ -102,7 +103,7 @@ namespace umbraco.presentation.templateControls
                     //moved the following from the catch block up as this will allow fallback options alt text etc to work
 
 					//get the publishedcontent item
-					var publishedContent = PublishedContentStoreResolver.Current.PublishedContentStore.GetDocumentById(
+					var publishedContent = PublishedContentCacheResolver.Current.PublishedContentCache.GetById(
 						Umbraco.Web.UmbracoContext.Current,
 						tempNodeId.Value);
 

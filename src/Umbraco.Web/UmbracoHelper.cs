@@ -14,6 +14,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Templates;
 using umbraco;
 using System.Collections.Generic;
@@ -437,32 +438,32 @@ namespace Umbraco.Web
 
 		public IPublishedContent TypedContent(object id)
 		{
-			return TypedDocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
+			return TypedDocumentById(id, PublishedContentCacheResolver.Current.PublishedContentCache);
 		}
 
 		public IPublishedContent TypedContent(int id)
 		{
-			return TypedDocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
+			return TypedDocumentById(id, PublishedContentCacheResolver.Current.PublishedContentCache);
 		}
 
 		public IPublishedContent TypedContent(string id)
 		{
-			return TypedDocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
+			return TypedDocumentById(id, PublishedContentCacheResolver.Current.PublishedContentCache);
 		}
 
 		public IEnumerable<IPublishedContent> TypedContent(params object[] ids)
 		{
-			return TypedDocumentsbyIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
+			return TypedDocumentsbyIds(PublishedContentCacheResolver.Current.PublishedContentCache, ids);
 		}
 
 		public IEnumerable<IPublishedContent> TypedContent(params int[] ids)
 		{
-			return TypedDocumentsbyIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
+			return TypedDocumentsbyIds(PublishedContentCacheResolver.Current.PublishedContentCache, ids);
 		}
 
 		public IEnumerable<IPublishedContent> TypedContent(params string[] ids)
 		{
-			return TypedDocumentsbyIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
+			return TypedDocumentsbyIds(PublishedContentCacheResolver.Current.PublishedContentCache, ids);
 		}
 
 		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<object> ids)
@@ -482,37 +483,37 @@ namespace Umbraco.Web
 
         public IEnumerable<IPublishedContent> TypedContentAtRoot()
         {
-            return TypedDocumentsAtRoot(PublishedContentStoreResolver.Current.PublishedContentStore);
+            return TypedDocumentsAtRoot(PublishedContentCacheResolver.Current.PublishedContentCache);
         }
 
 		public dynamic Content(object id)
 		{
-			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore, new DynamicNull());
+			return DocumentById(id, PublishedContentCacheResolver.Current.PublishedContentCache, new DynamicNull());
 		}
 
 		public dynamic Content(int id)
 		{
-			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore, new DynamicNull());
+			return DocumentById(id, PublishedContentCacheResolver.Current.PublishedContentCache, new DynamicNull());
 		}
 
 		public dynamic Content(string id)
 		{
-			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore, new DynamicNull());
+			return DocumentById(id, PublishedContentCacheResolver.Current.PublishedContentCache, new DynamicNull());
 		}
 
 		public dynamic Content(params object[] ids)
 		{
-			return DocumentByIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
+			return DocumentByIds(PublishedContentCacheResolver.Current.PublishedContentCache, ids);
 		}
 
 		public dynamic Content(params int[] ids)
 		{
-			return DocumentByIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
+			return DocumentByIds(PublishedContentCacheResolver.Current.PublishedContentCache, ids);
 		}
 
 		public dynamic Content(params string[] ids)
 		{
-			return DocumentByIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
+			return DocumentByIds(PublishedContentCacheResolver.Current.PublishedContentCache, ids);
 		}
 
 		public dynamic Content(IEnumerable<object> ids)
@@ -532,7 +533,7 @@ namespace Umbraco.Web
 
         public dynamic ContentAtRoot()
         {
-            return DocumentsAtRoot(PublishedContentStoreResolver.Current.PublishedContentStore);
+            return DocumentsAtRoot(PublishedContentCacheResolver.Current.PublishedContentCache);
         }
 
 		#endregion
@@ -551,32 +552,32 @@ namespace Umbraco.Web
 		/// </remarks>
 		public IPublishedContent TypedMedia(object id)
 		{
-			return TypedDocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
+			return TypedDocumentById(id, PublishedMediaCacheResolver.Current.PublishedMediaCache);
 		}
 
 		public IPublishedContent TypedMedia(int id)
 		{
-			return TypedDocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
+			return TypedDocumentById(id, PublishedMediaCacheResolver.Current.PublishedMediaCache);
 		}
 
 		public IPublishedContent TypedMedia(string id)
 		{
-			return TypedDocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
+			return TypedDocumentById(id, PublishedMediaCacheResolver.Current.PublishedMediaCache);
 		}
 
 		public IEnumerable<IPublishedContent> TypedMedia(params object[] ids)
 		{
-			return TypedDocumentsbyIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
+			return TypedDocumentsbyIds(PublishedMediaCacheResolver.Current.PublishedMediaCache, ids);
 		}
 
 		public IEnumerable<IPublishedContent> TypedMedia(params int[] ids)
 		{
-			return TypedDocumentsbyIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
+			return TypedDocumentsbyIds(PublishedMediaCacheResolver.Current.PublishedMediaCache, ids);
 		}
 
 		public IEnumerable<IPublishedContent> TypedMedia(params string[] ids)
 		{
-			return TypedDocumentsbyIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
+			return TypedDocumentsbyIds(PublishedMediaCacheResolver.Current.PublishedMediaCache, ids);
 		}
 
 		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<object> ids)
@@ -596,37 +597,37 @@ namespace Umbraco.Web
 
         public IEnumerable<IPublishedContent> TypedMediaAtRoot()
         {
-            return TypedDocumentsAtRoot(PublishedMediaStoreResolver.Current.PublishedMediaStore);
+            return TypedDocumentsAtRoot(PublishedMediaCacheResolver.Current.PublishedMediaCache);
         }
 
 		public dynamic Media(object id)
 		{
-			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore, new DynamicNull());
+			return DocumentById(id, PublishedMediaCacheResolver.Current.PublishedMediaCache, new DynamicNull());
 		}
 
 		public dynamic Media(int id)
 		{
-			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore, new DynamicNull());
+			return DocumentById(id, PublishedMediaCacheResolver.Current.PublishedMediaCache, new DynamicNull());
 		}
 
 		public dynamic Media(string id)
 		{
-			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore, new DynamicNull());
+			return DocumentById(id, PublishedMediaCacheResolver.Current.PublishedMediaCache, new DynamicNull());
 		}
 
 		public dynamic Media(params object[] ids)
 		{
-			return DocumentByIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
+			return DocumentByIds(PublishedMediaCacheResolver.Current.PublishedMediaCache, ids);
 		}
 
 		public dynamic Media(params int[] ids)
 		{
-			return DocumentByIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
+			return DocumentByIds(PublishedMediaCacheResolver.Current.PublishedMediaCache, ids);
 		}
 
 		public dynamic Media(params string[] ids)
 		{
-			return DocumentByIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
+			return DocumentByIds(PublishedMediaCacheResolver.Current.PublishedMediaCache, ids);
 		}
 
 		public dynamic Media(IEnumerable<object> ids)
@@ -646,7 +647,7 @@ namespace Umbraco.Web
 
         public dynamic MediaAtRoot()
         {
-            return DocumentsAtRoot(PublishedMediaStoreResolver.Current.PublishedMediaStore);
+            return DocumentsAtRoot(PublishedMediaCacheResolver.Current.PublishedMediaCache);
         }
 
 		#endregion
@@ -657,33 +658,33 @@ namespace Umbraco.Web
 		/// Overloaded method accepting an 'object' type
 		/// </summary>
 		/// <param name="id"></param>
-		/// <param name="store"> </param>
+		/// <param name="cache"> </param>
 		/// <returns></returns>
 		/// <remarks>
 		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass 
 		/// this result in to this method.
 		/// This method will throw an exception if the value is not of type int or string.
 		/// </remarks>
-		private IPublishedContent TypedDocumentById(object id, IPublishedStore store)
+		private IPublishedContent TypedDocumentById(object id, IPublishedCache cache)
 		{
 			if (id is string)
-				return TypedDocumentById((string)id, store);
+				return TypedDocumentById((string)id, cache);
 			if (id is int)
-				return TypedDocumentById((int)id, store);
+				return TypedDocumentById((int)id, cache);
 			throw new InvalidOperationException("The value of parameter 'id' must be either a string or an integer");
 		}
 
-		private IPublishedContent TypedDocumentById(int id, IPublishedStore store)
+		private IPublishedContent TypedDocumentById(int id, IPublishedCache cache)
 		{
-			var doc = store.GetDocumentById(UmbracoContext.Current, id);
+            var doc = cache.GetById(UmbracoContext.Current, id);
 			return doc;
 		}
 
-		private IPublishedContent TypedDocumentById(string id, IPublishedStore store)
+		private IPublishedContent TypedDocumentById(string id, IPublishedCache cache)
 		{
 			int docId;
 			return int.TryParse(id, out docId)
-				       ? DocumentById(docId, store, null)
+				       ? DocumentById(docId, cache, null)
 				       : null;
 		}
 
@@ -691,38 +692,38 @@ namespace Umbraco.Web
 		/// Overloaded method accepting an 'object' type
 		/// </summary>
 		/// <param name="ids"></param>
-		/// <param name="store"> </param>
+		/// <param name="cache"> </param>
 		/// <returns></returns>
 		/// <remarks>
 		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass 
 		/// this result in to this method.
 		/// This method will throw an exception if the value is not of type int or string.
 		/// </remarks>
-		private IEnumerable<IPublishedContent> TypedDocumentsbyIds(IPublishedStore store, params object[] ids)
+		private IEnumerable<IPublishedContent> TypedDocumentsbyIds(IPublishedCache cache, params object[] ids)
 		{
-			return ids.Select(eachId => TypedDocumentById(eachId, store));
+			return ids.Select(eachId => TypedDocumentById(eachId, cache));
 		}
 
-		private IEnumerable<IPublishedContent> TypedDocumentsbyIds(IPublishedStore store, params int[] ids)
+		private IEnumerable<IPublishedContent> TypedDocumentsbyIds(IPublishedCache cache, params int[] ids)
 		{
-			return ids.Select(eachId => TypedDocumentById(eachId, store));
+			return ids.Select(eachId => TypedDocumentById(eachId, cache));
 		}
 
-		private IEnumerable<IPublishedContent> TypedDocumentsbyIds(IPublishedStore store, params string[] ids)
+		private IEnumerable<IPublishedContent> TypedDocumentsbyIds(IPublishedCache cache, params string[] ids)
 		{
-			return ids.Select(eachId => TypedDocumentById(eachId, store));
+			return ids.Select(eachId => TypedDocumentById(eachId, cache));
 		}
 
-        private IEnumerable<IPublishedContent> TypedDocumentsAtRoot(IPublishedStore store)
+        private IEnumerable<IPublishedContent> TypedDocumentsAtRoot(IPublishedCache cache)
         {
-            return store.GetRootDocuments(_umbracoContext);
+            return cache.GetAtRoot(_umbracoContext);
         }
 
 		/// <summary>
 		/// Overloaded method accepting an 'object' type
 		/// </summary>
 		/// <param name="id"></param>
-		/// <param name="store"> </param>
+		/// <param name="cache"> </param>
 		/// <param name="ifNotFound"> </param>
 		/// <returns></returns>
 		/// <remarks>
@@ -730,35 +731,35 @@ namespace Umbraco.Web
 		/// this result in to this method.
 		/// This method will throw an exception if the value is not of type int or string.
 		/// </remarks>
-		private dynamic DocumentById(object id, IPublishedStore store, object ifNotFound)
+		private dynamic DocumentById(object id, IPublishedCache cache, object ifNotFound)
 		{
 			if (id is string)
-				return DocumentById((string)id, store, ifNotFound);
+				return DocumentById((string)id, cache, ifNotFound);
 			if (id is int)
-				return DocumentById((int)id, store, ifNotFound);
+				return DocumentById((int)id, cache, ifNotFound);
 			throw new InvalidOperationException("The value of parameter 'id' must be either a string or an integer");
 		}
 
-		private dynamic DocumentById(int id, IPublishedStore store, object ifNotFound)
+		private dynamic DocumentById(int id, IPublishedCache cache, object ifNotFound)
 		{
-			var doc = store.GetDocumentById(UmbracoContext.Current, id);
+            var doc = cache.GetById(UmbracoContext.Current, id);
 			return doc == null
 					? ifNotFound
 					: new DynamicPublishedContent(doc).AsDynamic();
 		}
 
-		private dynamic DocumentById(string id, IPublishedStore store, object ifNotFound)
+		private dynamic DocumentById(string id, IPublishedCache cache, object ifNotFound)
 		{
 			int docId;
 			return int.TryParse(id, out docId)
-				? DocumentById(docId, store, ifNotFound)
+				? DocumentById(docId, cache, ifNotFound)
 				: ifNotFound;
 		}
 
-        private dynamic DocumentsAtRoot(IPublishedStore store)
+        private dynamic DocumentsAtRoot(IPublishedCache cache)
         {
             return new DynamicPublishedContentList(
-                store.GetRootDocuments(_umbracoContext)
+                cache.GetAtRoot(_umbracoContext)
                     .Select(publishedContent => new DynamicPublishedContent(publishedContent))
             );
         }
@@ -767,35 +768,35 @@ namespace Umbraco.Web
 		/// Overloaded method accepting an 'object' type
 		/// </summary>
 		/// <param name="ids"></param>
-		/// <param name="store"> </param>
+		/// <param name="cache"> </param>
 		/// <returns></returns>
 		/// <remarks>
 		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass 
 		/// this result in to this method.
 		/// This method will throw an exception if the value is not of type int or string.
 		/// </remarks>
-		private dynamic DocumentByIds(IPublishedStore store, params object[] ids)
+		private dynamic DocumentByIds(IPublishedCache cache, params object[] ids)
 		{
 			var dNull = new DynamicNull();
-			var nodes = ids.Select(eachId => DocumentById(eachId, store, dNull))
+			var nodes = ids.Select(eachId => DocumentById(eachId, cache, dNull))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
 				.Cast<DynamicPublishedContent>();
 			return new DynamicPublishedContentList(nodes);
 		}
 
-		private dynamic DocumentByIds(IPublishedStore store, params int[] ids)
+		private dynamic DocumentByIds(IPublishedCache cache, params int[] ids)
 		{
 			var dNull = new DynamicNull();
-			var nodes = ids.Select(eachId => DocumentById(eachId, store, dNull))
+			var nodes = ids.Select(eachId => DocumentById(eachId, cache, dNull))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
 				.Cast<DynamicPublishedContent>();
 			return new DynamicPublishedContentList(nodes);
 		}
 
-		private dynamic DocumentByIds(IPublishedStore store, params string[] ids)
+		private dynamic DocumentByIds(IPublishedCache cache, params string[] ids)
 		{
 			var dNull = new DynamicNull();
-			var nodes = ids.Select(eachId => DocumentById(eachId, store, dNull))
+			var nodes = ids.Select(eachId => DocumentById(eachId, cache, dNull))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
 				.Cast<DynamicPublishedContent>();
 			return new DynamicPublishedContentList(nodes);
@@ -844,7 +845,7 @@ namespace Umbraco.Web
 				searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
 
 			var results = searcher.Search(term, useWildCards);
-			return results.ConvertSearchResultToPublishedContent(PublishedContentStoreResolver.Current.PublishedContentStore);
+			return results.ConvertSearchResultToPublishedContent(PublishedContentCacheResolver.Current.PublishedContentCache);
 		}
 
 		/// <summary>
@@ -860,7 +861,7 @@ namespace Umbraco.Web
 				s = searchProvider;
 
 			var results = s.Search(criteria);
-			return results.ConvertSearchResultToPublishedContent(PublishedContentStoreResolver.Current.PublishedContentStore);
+			return results.ConvertSearchResultToPublishedContent(PublishedContentCacheResolver.Current.PublishedContentCache);
 		}
 
 		#endregion

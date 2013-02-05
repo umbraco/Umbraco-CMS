@@ -9,6 +9,7 @@ using Examine.LuceneEngine.SearchCriteria;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 using umbraco;
@@ -269,7 +270,7 @@ namespace Umbraco.Web
 				s = searchProvider;
 
 			var results = s.Search(criteria);
-			return results.ConvertSearchResultToPublishedContent(PublishedContentStoreResolver.Current.PublishedContentStore);
+			return results.ConvertSearchResultToPublishedContent(PublishedContentCacheResolver.Current.PublishedContentCache);
 		}
 		#endregion
 
@@ -1127,7 +1128,7 @@ namespace Umbraco.Web
         {
             //get the root docs if parent is null
             return content.Parent == null
-                       ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
+                       ? PublishedContentCacheResolver.Current.PublishedContentCache.GetAtRoot(UmbracoContext.Current)
                        : content.Parent.Children;
         } 
 

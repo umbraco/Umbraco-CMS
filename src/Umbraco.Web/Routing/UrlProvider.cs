@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Routing
 {
@@ -18,7 +19,7 @@ namespace Umbraco.Web.Routing
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="contentCache">The content cache.</param>
         /// <param name="urlProviders">The list of url providers.</param>
-        public UrlProvider(UmbracoContext umbracoContext, IPublishedContentStore contentCache, 
+        public UrlProvider(UmbracoContext umbracoContext, IPublishedContentCache contentCache, 
             IEnumerable<IUrlProvider> urlProviders)
         {
             _umbracoContext = umbracoContext;
@@ -28,7 +29,7 @@ namespace Umbraco.Web.Routing
         }
 
         private readonly UmbracoContext _umbracoContext;
-        private readonly IPublishedContentStore _contentCache;
+        private readonly IPublishedContentCache _contentCache;
         private readonly IEnumerable<IUrlProvider> _urlProviders;
 
         /// <summary>

@@ -30,7 +30,7 @@ namespace Umbraco.Web.Routing
 			{
 				LogHelper.Debug<ContentFinderByNotFoundHandler<THandler>>("Handler '{0}' returned id={1}.", () => type.FullName, () => handler.redirectID);
 
-				var content = pcr.RoutingContext.PublishedContentStore.GetDocumentById(
+                var content = pcr.RoutingContext.PublishedContentCache.GetById(
 						pcr.RoutingContext.UmbracoContext,
 						handler.redirectID);
 

@@ -5,17 +5,18 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 
-namespace Umbraco.Tests.ContentStores
+namespace Umbraco.Tests.PublishedCache
 {
 	[TestFixture]
 	public class PublishContentStoreTests
 	{
 		private FakeHttpContextFactory _httpContextFactory;
 		private UmbracoContext _umbracoContext;
-		private DefaultPublishedContentStore _publishedContentStore;
+		private PublishedContentCache _cache;
 
 		private string GetLegacyXml()
 		{
@@ -85,7 +86,7 @@ namespace Umbraco.Tests.ContentStores
 					return xDoc;
 				};
 
-			_publishedContentStore = new DefaultPublishedContentStore();			
+			_cache = new PublishedContentCache();			
 		}
 
 		private void SetupForLegacy()
@@ -118,7 +119,7 @@ namespace Umbraco.Tests.ContentStores
 		[Test]
 		public void Has_Content()
 		{
-			Assert.IsTrue(_publishedContentStore.HasContent(_umbracoContext));
+			Assert.IsTrue(_cache.HasContent(_umbracoContext));
 		}
 
 		[Test]
@@ -131,7 +132,7 @@ namespace Umbraco.Tests.ContentStores
 		[Test]
 		public void Get_Root_Docs()
 		{
-			var result = _publishedContentStore.GetRootDocuments(_umbracoContext);
+			var result = _cache.GetAtRoot(_umbracoContext);
 			Assert.AreEqual(2, result.Count());
 			Assert.AreEqual(1046, result.ElementAt(0).Id);
 			Assert.AreEqual(1172, result.ElementAt(1).Id);
@@ -158,7 +159,7 @@ namespace Umbraco.Tests.ContentStores
 		[TestCase("/home/Sub'Apostrophe", 1177)]
 		public void Get_Node_By_Route(string route, int nodeId)
 		{
-			var result = _publishedContentStore.GetDocumentByRoute(_umbracoContext, route, false);
+			var result = _cache.GetByRoute(_umbracoContext, route, false);
 			Assert.IsNotNull(result);
 			Assert.AreEqual(nodeId, result.Id);
 		}
@@ -177,7 +178,7 @@ namespace Umbraco.Tests.ContentStores
 		[TestCase("/Sub1", 1173)]
 		public void Get_Node_By_Route_Hiding_Top_Level_Nodes(string route, int nodeId)
 		{
-			var result = _publishedContentStore.GetDocumentByRoute(_umbracoContext, route, true);
+			var result = _cache.GetByRoute(_umbracoContext, route, true);
 			Assert.IsNotNull(result);
 			Assert.AreEqual(nodeId, result.Id);
 		}

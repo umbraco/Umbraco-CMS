@@ -317,7 +317,7 @@ namespace Umbraco.Web
 		// if yes, return true
 	    private static bool EnsureHasContent(UmbracoContext context, HttpContextBase httpContext)
 		{
-			var store = context.RoutingContext.PublishedContentStore;
+			var store = context.RoutingContext.PublishedContentCache;
 		    if (store.HasContent(context))
 		        return true;
 
