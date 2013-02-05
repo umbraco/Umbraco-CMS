@@ -274,7 +274,7 @@ namespace Umbraco.Web.Mvc
 					//the template Alias should always be already saved with a safe name.
                     //if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
                     // with the action name attribute.
-                    var templateName = global::umbraco.cms.helpers.Casing.SafeAlias(publishedContentRequest.Template.Split('.')[0]);
+                    var templateName = global::umbraco.cms.helpers.Casing.SafeAlias(publishedContentRequest.TemplateAlias.Split('.')[0]);
 					def.ActionName = templateName;
 				}
 	
@@ -334,8 +334,11 @@ namespace Umbraco.Web.Mvc
 					requestContext.HttpContext.Response.Redirect(publishedContentRequest.RedirectUrl, true);
 					return null;
 				}
-				if (publishedContentRequest.Is404) // should always be the case
-					requestContext.HttpContext.Response.StatusCode = 404;
+                if (publishedContentRequest.Is404) // should always be the case
+                {
+                    requestContext.HttpContext.Response.StatusCode = 404;
+                    requestContext.HttpContext.Response.TrySkipIisCustomErrors = true;
+                }
 				var handler = GetHandlerOnMissingTemplate(publishedContentRequest);
 
 				// if it's not null it can be either the PublishedContentNotFoundHandler (no document was

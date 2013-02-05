@@ -61,8 +61,8 @@ namespace Umbraco.Web
 			// create the RoutingContext, and assign
 			var routingContext = new RoutingContext(
 				umbracoContext,
-				IContentFinderResolver.Current.Finders,
-				IContentLastChanceFinderResolver.Current.Finder,
+				ContentFinderResolver.Current.Finders,
+				ContentLastChanceFinderResolver.Current.Finder,
 				PublishedContentStoreResolver.Current.PublishedContentStore,
                 niceUrls,
                 RoutesCacheResolver.Current.RoutesCache);
@@ -115,8 +115,11 @@ namespace Umbraco.Web
 				httpContext.Response.Redirect(pcr.RedirectUrl, true);
 				return;
 			}
-			if (pcr.Is404)
-				httpContext.Response.StatusCode = 404;
+            if (pcr.Is404)
+            {
+                httpContext.Response.StatusCode = 404;
+                httpContext.Response.TrySkipIisCustomErrors = true;
+            }
 			if (!pcr.HasPublishedContent)
 				httpContext.RemapHandler(new PublishedContentNotFoundHandler());
 			else

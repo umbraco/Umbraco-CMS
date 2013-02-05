@@ -181,9 +181,9 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Gets the template to use to display the requested content.
+        /// Gets the alias of the template to use to display the requested content.
         /// </summary>
-        public string Template
+        public string TemplateAlias
         {
             get 
             { 
@@ -194,14 +194,14 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Tries to set the template to use to display the requested content.
         /// </summary>
-        /// <param name="value">The name of the template.</param>
-        /// <returns>A value indicating whether a valid template with the specified name was found.</returns>
-        /// <remarks>Setting the template resets <c>RenderingEngine</c> to <c>Unknown</c>.</remarks>
-        public bool TrySetTemplate(string name)
+        /// <param name="alias">The alias of the template.</param>
+        /// <returns>A value indicating whether a valid template with the specified alias was found.</returns>
+        /// <remarks>Setting the template refreshes <c>RenderingEngine</c>.</remarks>
+        public bool TrySetTemplate(string alias)
         {
             this.RenderingEngine = Core.RenderingEngine.Unknown; // reset
 
-            if (string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(alias))
             {
                 this.TemplateModel = null;
                 return true;
@@ -209,9 +209,9 @@ namespace Umbraco.Web.Routing
             else
             {
                 // NOTE - can we stil get it with whitespaces in it due to old legacy bugs?
-                name = name.Replace(" ", "");
+                alias = alias.Replace(" ", "");
 
-                var model = ApplicationContext.Current.Services.FileService.GetTemplate(name);
+                var model = ApplicationContext.Current.Services.FileService.GetTemplate(alias);
                 if (model == null)
                 {
                     this.TemplateModel = null;

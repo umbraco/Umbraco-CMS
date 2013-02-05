@@ -63,6 +63,14 @@ namespace Umbraco.Tests.Routing
 			//Assert.AreEqual("http://domain1.com/1001-1/1001-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100111, true)); // bad
 		}
 
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            // ensure we can create them although the content is not in the database
+            TestHelper.DropForeignKeys("umbracoDomains");
+        }
+
 		public override void TearDown()
 		{
 			base.TearDown();

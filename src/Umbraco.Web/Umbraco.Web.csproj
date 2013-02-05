@@ -456,7 +456,7 @@
     <Compile Include="WebBootManager.cs" />
     <Compile Include="Routing\LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
-    <Compile Include="Routing\IContentLastChanceFinderResolver.cs" />
+    <Compile Include="Routing\ContentLastChanceFinderResolver.cs" />
     <Compile Include="Routing\ContentFinderByUrlAlias.cs" />
     <Compile Include="Media\ThumbnailProviders\AbstractThumbnailProvider.cs" />
     <Compile Include="Media\ThumbnailProviders\MediaTypeIconThumbnailProvider.cs" />
@@ -471,7 +471,7 @@
     <Compile Include="Routing\NiceUrlProvider.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="Routing\DomainHelper.cs" />
-    <Compile Include="Routing\IContentFinderResolver.cs" />
+    <Compile Include="Routing\ContentFinderResolver.cs" />
     <Compile Include="Routing\PublishedContentRequest.cs" />
     <Compile Include="Routing\IContentFinder.cs" />
     <Compile Include="Routing\IRoutesCache.cs" />

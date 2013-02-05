@@ -210,6 +210,13 @@ namespace Umbraco.Tests.Resolvers
         }
 
         [Test]
+        public void ManyResolverCanInsertInEmptyList()
+        {
+            var resolver = new ManyResolver();
+            resolver.InsertType<Resolved2>();
+        }
+
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void ManyResolverCannotInsertInvalidType()
         {

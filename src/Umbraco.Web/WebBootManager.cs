@@ -189,9 +189,11 @@ namespace Umbraco.Web
 						typeof (RenderControllerFactory)
 					});
 
-			IContentLastChanceFinderResolver.Current = new IContentLastChanceFinderResolver(new ContentFinderByLegacy404());
+            // the legacy 404 will run from within ContentFinderByNotFoundHandlers below
+            // so for the time being there is no last chance finder
+			ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver();
 
-			IContentFinderResolver.Current = new IContentFinderResolver(
+			ContentFinderResolver.Current = new ContentFinderResolver(
 				//add all known resolvers in the correct order, devs can then modify this list on application startup either by binding to events
 				//or in their own global.asax
 				new[]
@@ -199,9 +201,11 @@ namespace Umbraco.Web
 						typeof (ContentFinderByPageIdQuery),
 						typeof (ContentFinderByNiceUrl),
 						typeof (ContentFinderByIdPath),
-						typeof (ContentFinderByNiceUrlAndTemplate),
-						typeof (ContentFinderByProfile),
-						typeof (ContentFinderByUrlAlias),
+                        // these will be handled by ContentFinderByNotFoundHandlers
+                        // so they can be enabled/disabled even though resolvers are not public yet
+						//typeof (ContentFinderByNiceUrlAndTemplate),
+						//typeof (ContentFinderByProfile),
+						//typeof (ContentFinderByUrlAlias),
                         typeof (ContentFinderByNotFoundHandlers)
 					});
 

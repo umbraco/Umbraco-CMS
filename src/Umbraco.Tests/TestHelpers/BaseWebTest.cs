@@ -32,6 +32,8 @@ namespace Umbraco.Tests.TestHelpers
         public virtual void Initialize()
         {
 			TestHelper.SetupLog4NetForTests();
+            Resolution.Reset();
+            RepositoryResolver.Reset();
 			TestHelper.InitializeContentDirectories();
 
 			string path = TestHelper.CurrentAssemblyDirectory;
