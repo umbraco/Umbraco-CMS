@@ -1,2 +1,2 @@
-<%@ Page language="c#" Codebehind="ping.aspx.cs" AutoEventWireup="True" Inherits="umbraco.presentation.ping" %>
+<%@ Page language="c#" AutoEventWireup="True"  %>
 I'm alive!
