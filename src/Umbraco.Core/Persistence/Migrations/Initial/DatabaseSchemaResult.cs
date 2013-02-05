@@ -42,8 +42,10 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             if(ValidTables.Count == 0)
                 return new Version(0, 0, 0);
 
-            //If Errors is empty then we're at current version
-            if (Errors.Any() == false)
+            //If Errors is empty or if TableDefinitions tables + columns correspond to valid tables + columns then we're at current version
+            if (Errors.Any() == false || 
+                TableDefinitions.Any(x => ValidTables.Contains(x.Name) == false) == false && 
+                TableDefinitions.SelectMany(definition => definition.Columns).Any(x => ValidColumns.Contains(x.Name) == false) == false)
                 return UmbracoVersion.Current;
 
             //If Errors contains umbracoApp or umbracoAppTree its pre-6.0.0 -> new Version(4, 10, 0);
@@ -64,7 +66,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 return new Version(4, 9, 0);
             }
 
-            return new Version(0, 0, 0);
+            return UmbracoVersion.Current;
         }
 
         /// <summary>
