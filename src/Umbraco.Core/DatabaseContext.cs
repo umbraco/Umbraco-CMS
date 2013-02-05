@@ -218,7 +218,7 @@ namespace Umbraco.Core
 
             xml.Save(fileName, SaveOptions.DisableFormatting);
 
-            LogHelper.Info<DatabaseContext>("Configured new ConnectionString: " + connectionString);
+            LogHelper.Info<DatabaseContext>("Configured a new ConnectionString using the '" + providerName + "' provider.");
         }
 
         /// <summary>
