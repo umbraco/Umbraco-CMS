@@ -100,7 +100,7 @@ namespace Umbraco.Core.Dynamics
 			//XElement
 			if (TypeHelper.IsTypeAssignableFrom<XElement>(destinationType))
 			{
-				return dxml.StrippedXmlElement;
+				return dxml.BaseElement;
 			}
 			//XmlElement
 			if (TypeHelper.IsTypeAssignableFrom<XmlElement>(destinationType))
