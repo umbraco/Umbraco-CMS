@@ -18,11 +18,11 @@ namespace Umbraco.Tests
 	{
 		public override void Initialize()
 		{
-			base.Initialize();
+            //set the current umbraco context and a published content store
+            PublishedContentStoreResolver.Current = new PublishedContentStoreResolver(
+                new DefaultPublishedContentStore());
 
-			//set the current umbraco context and a published content store
-			PublishedContentStoreResolver.Current = new PublishedContentStoreResolver(
-				new DefaultPublishedContentStore());
+			base.Initialize();
 
 			var routingContext = GetRoutingContext("/test", 1234);
 			UmbracoContext.Current = routingContext.UmbracoContext;

@@ -25,7 +25,7 @@ namespace Umbraco.Tests.BootManagers
         public void TearDown()
         {
             _testApp = null;
-            Resolution.Reset();
+            
             ApplicationEventsResolver.Reset();
         }
 

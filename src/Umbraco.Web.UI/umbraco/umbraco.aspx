@@ -1,5 +1,5 @@
 <%@ Page Trace="false" Language="c#" CodeBehind="umbraco.aspx.cs" AutoEventWireup="True"
-    Inherits="Umbraco.Web.UI.Umbraco.Umbraco" %>
+    Inherits="Umbraco.Web.UI.Umbraco.UmbracoMainPage" %>
 
 <%@ Import Namespace="System.Web.Script.Serialization" %>
 
@@ -90,12 +90,12 @@
             <div class="topBarButtons">
                 <button onclick="UmbClientMgr.appActions().launchAbout();" class="topBarButton">
                     <img src="images/aboutNew.png" alt="about" /><span><%=umbraco.ui.Text("general", "about")%></span></button>
-                <button onclick="UmbClientMgr.appActions().launchHelp('<%=this.getUser().Language%>', '<%=this.getUser().UserType.Name%>');"
+                <button onclick="UmbClientMgr.appActions().launchHelp('<%=GetUser().Language%>', '<%=GetUser().UserType.Name%>');"
                     class="topBarButton">
                     <img src="images/help.png" alt="Help" /><span><%=umbraco.ui.Text("general", "help")%></span></button>
                 <button onclick="UmbClientMgr.appActions().logout();" class="topBarButton">
                     <img src="images/logout.png" alt="Log out" /><span><%=umbraco.ui.Text("general", "logout")%>:
-                        <%=this.getUser().Name%></span></button>
+                        <%=GetUser().Name%></span></button>
             </div>
         </div>
     </div>
@@ -299,13 +299,13 @@
             if (password != "") {
 
                 var data = {
-                    username: <%= new JavaScriptSerializer().Serialize(this.getUser().LoginName) %>, 
+                    username: <%= new JavaScriptSerializer().Serialize(GetUser().LoginName) %>, 
                     password: password
                 };
 
                 jQuery.ajax({
                     type: "POST",
-                    url: "<%=umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/webservices/legacyAjaxCalls.asmx/ValidateUser",
+                    url: "<%=Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) %>/webservices/legacyAjaxCalls.asmx/ValidateUser",
                     data: JSON.stringify(data),
                     processData: false, 
                     success: function (result) {

@@ -19,6 +19,7 @@ namespace umbraco.BasePages
     /// Restrict access to the page itself.
     /// The keep the page secure, the umbracoEnsuredPage class should be used instead
     /// </summary>
+    [Obsolete("This class has been superceded by Umbraco.Web.UI.Pages.BasePage")]
     public class BasePage : System.Web.UI.Page
     {
         private User _user;

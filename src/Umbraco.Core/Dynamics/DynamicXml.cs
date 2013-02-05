@@ -16,6 +16,23 @@ namespace Umbraco.Core.Dynamics
 	public class DynamicXml : DynamicObject, IEnumerable<DynamicXml>, IEnumerable<XElement>
     {
         public XElement BaseElement { get; set; }
+	    private XElement _cleanedBaseElement;
+
+        /// <summary>
+        /// Returns a cleaned Xml element which is purely used for matching against names for elements and attributes
+        /// when the normal names don't match, for example when the original names contain hyphens.
+        /// </summary>
+        /// <returns></returns>
+	    private XElement GetCleanedBaseElement()
+	    {
+	        if (_cleanedBaseElement == null)
+	        {
+                if (BaseElement == null)
+                    throw new InvalidOperationException("Cannot return a cleaned XML element when the BaseElement is null");
+	            _cleanedBaseElement = XElement.Parse(XmlHelper.StripDashesInElementOrAttributeNames(BaseElement.ToString()));
+	        }
+	        return _cleanedBaseElement;
+	    }
 
         public DynamicXml(XElement baseElement)
         {
@@ -128,50 +145,112 @@ namespace Umbraco.Core.Dynamics
                 result = null;
                 return false;
             }
-            //Go ahead and try to fetch all of the elements matching the member name, and wrap them
-            var elements = BaseElement.Elements(binder.Name);
-            if (!elements.Any() && BaseElement.Name == "root" && BaseElement.Elements().Count() == 1)
-            {
-                //no elements matched, lets try first child
-                elements = BaseElement.Elements().ElementAt(0).Elements(binder.Name);
-            }
-            if (HandleIEnumerableXElement(elements, out result))
-            {
-                return true;
-            }
-            else
-            {
 
-                //Ok, so no elements matched, so lets try attributes
-                IEnumerable<string> attributes = BaseElement.Attributes(binder.Name).Select(attr => attr.Value);
-                int count = attributes.Count();
-
-                if (count > 0)
+            //First check for matching name including the 'cleaned' name (i.e. removal of hyphens, etc... )
+            var elementByNameAttempt = CheckNodeNameMatch(binder.Name, BaseElement, true);
+            if (elementByNameAttempt.Success)
+            {
+                if (HandleIEnumerableXElement(elementByNameAttempt.Result, out result))
                 {
-                    if (count > 1)
-                        result = attributes; //more than one attribute matched, lets return the collection
-                    else
-                        result = attributes.FirstOrDefault(); //only one attribute matched, lets just return it
-
-                    return true; // return true because we matched
+                    return true;
+                }
+            }
+            
+            //Ok, so no elements matched, so lets try attributes
+            var attributeByNameAttempt = CheckAttributeNameMatch(binder.Name, BaseElement, true);
+            if (attributeByNameAttempt.Success)
+            {
+                if (attributeByNameAttempt.Result.Count() > 1)
+                {
+                    //more than one attribute matched, lets return the collection
+                    result = attributeByNameAttempt.Result;
                 }
                 else
                 {
-                    //no attributes matched, lets try first child
-                    if (BaseElement.Name == "root" && BaseElement.Elements().Count() == 1)
-                    {
-                        attributes = BaseElement.Elements().ElementAt(0).Attributes(binder.Name).Select(attr => attr.Value);
-                        count = attributes.Count();
-                        if (count > 1)
-                            result = attributes; //more than one attribute matched, lets return the collection
-                        else
-                            result = attributes.FirstOrDefault(); //only one attribute matched, lets just return it
+                    //only one attribute matched, lets just return it
+                    result = attributeByNameAttempt.Result.FirstOrDefault(); 
+                }
+                return true; 
+            }
+           
 
-                        return true; // return true because we matched
-                    }
+            return base.TryGetMember(binder, out result);
+        }
+
+        private Attempt<IEnumerable<string>> CheckAttributeNameMatch(string name, XElement xmlElement, bool checkCleanedName)
+        {
+            var attributes = xmlElement.Attributes(name).Select(attr => attr.Value).ToArray();
+            if (attributes.Any())
+            {
+                return new Attempt<IEnumerable<string>>(true, attributes);
+            }
+
+            //NOTE: this seems strange we're checking for the term 'root', this is legacy code so we'll keep it i guess
+            if (!attributes.Any() && xmlElement.Name == "root" && xmlElement.Elements().Count() == 1)
+            {
+                //no elements matched and this node is called 'root' and only has one child... lets see if it matches.
+                var childElements = xmlElement.Elements().ElementAt(0).Attributes(name).Select(attr => attr.Value).ToArray();
+                if (childElements.Any())
+                {
+                    //we've found a match by the first child of an element called 'root' (strange, but sure)
+                    return new Attempt<IEnumerable<string>>(true, childElements);
                 }
             }
-            return base.TryGetMember(binder, out result);
+
+            if (checkCleanedName)
+            {
+                //still no match, we'll try to match with a 'cleaned' name
+                var cleanedXml = GetCleanedBaseElement();
+
+                //pass false in to this as we don't want an infinite loop and clean the already cleaned xml
+                return CheckAttributeNameMatch(name, cleanedXml, false);  
+            }
+
+            //no deal
+            return Attempt<IEnumerable<string>>.False;
+	    }
+
+	    /// <summary>
+        /// Checks if the 'name' matches any elements of xmlElement
+        /// </summary>
+        /// <param name="name">The name to match</param>
+        /// <param name="xmlElement">The xml element to check against</param>
+        /// <param name="checkCleanedName">If there are no matches, we'll clean the xml (i.e. remove hyphens, etc..) and then retry</param>
+        /// <returns></returns>
+        private Attempt<IEnumerable<XElement>> CheckNodeNameMatch(string name, XElement xmlElement, bool checkCleanedName)
+        {
+            //Go ahead and try to fetch all of the elements matching the member name, and wrap them
+            var elements = xmlElement.Elements(name).ToArray();
+
+            //Check if we've got any matches, if so then return true
+            if (elements.Any())
+            {
+                return new Attempt<IEnumerable<XElement>>(true, elements);
+            }
+
+            //NOTE: this seems strange we're checking for the term 'root', this is legacy code so we'll keep it i guess
+            if (!elements.Any() && xmlElement.Name == "root" && xmlElement.Elements().Count() == 1)
+            {
+                //no elements matched and this node is called 'root' and only has one child... lets see if it matches.
+                var childElements = xmlElement.Elements().ElementAt(0).Elements(name).ToArray();
+                if (childElements.Any())
+                {
+                    //we've found a match by the first child of an element called 'root' (strange, but sure)
+                    return new Attempt<IEnumerable<XElement>>(true, childElements);
+                }
+            }
+            
+            if (checkCleanedName)
+            {
+                //still no match, we'll try to match with a 'cleaned' name
+                var cleanedXml = GetCleanedBaseElement();
+
+                //pass false in to this as we don't want an infinite loop and clean the already cleaned xml
+                return CheckNodeNameMatch(name, cleanedXml, false);                        
+            }
+
+            //no deal
+            return Attempt<IEnumerable<XElement>>.False;
         }
 
         private bool HandleIEnumerableXElement(IEnumerable<XElement> elements, out object result)
@@ -193,7 +272,7 @@ namespace Umbraco.Core.Dynamics
                     //We have more than one matching element, so let's return the collection
                     //elements is IEnumerable<DynamicXml>
                     //but we want to be able to re-enter this code
-                    XElement root = new XElement(XName.Get("root"));
+                    var root = new XElement(XName.Get("root"));
                     root.Add(elements);
                     result = new DynamicXml(root);
 
@@ -205,6 +284,7 @@ namespace Umbraco.Core.Dynamics
             result = null;
             return false;
         }
+
         public DynamicXml XPath(string expression)
         {
             var matched = this.BaseElement.XPathSelectElements(expression);
@@ -689,57 +769,10 @@ namespace Umbraco.Core.Dynamics
             return test(this) ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
         }
 
+        [Obsolete("Use XmlHelper.StripDashesInElementOrAttributeNames instead")]
         public static string StripDashesInElementOrAttributeNames(string xml)
         {
-            using (MemoryStream outputms = new MemoryStream())
-            {
-                using (TextWriter outputtw = new StreamWriter(outputms))
-                {
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        using (TextWriter tw = new StreamWriter(ms))
-                        {
-                            tw.Write(xml);
-                            tw.Flush();
-                            ms.Position = 0;
-                            using (TextReader tr = new StreamReader(ms))
-                            {
-                                bool IsInsideElement = false, IsInsideQuotes = false;
-                                int ic = 0;
-                                while ((ic = tr.Read()) != -1)
-                                {
-                                    if (ic == (int)'<' && !IsInsideQuotes)
-                                    {
-                                        if (tr.Peek() != (int)'!')
-                                        {
-                                            IsInsideElement = true;
-                                        }
-                                    }
-                                    if (ic == (int)'>' && !IsInsideQuotes)
-                                    {
-                                        IsInsideElement = false;
-                                    }
-                                    if (ic == (int)'"')
-                                    {
-                                        IsInsideQuotes = !IsInsideQuotes;
-                                    }
-                                    if (!IsInsideElement || ic != (int)'-' || IsInsideQuotes)
-                                    {
-                                        outputtw.Write((char)ic);
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                    outputtw.Flush();
-                    outputms.Position = 0;
-                    using (TextReader outputtr = new StreamReader(outputms))
-                    {
-                        return outputtr.ReadToEnd();
-                    }
-                }
-            }
+            return XmlHelper.StripDashesInElementOrAttributeNames(xml);
         }
 
 	    

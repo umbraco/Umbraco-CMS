@@ -49,11 +49,9 @@ namespace Umbraco.Tests.Publishing
 
             //reset the app context
             DataTypesResolver.Reset();
-            ApplicationContext.Current = null;
-			Resolution.Reset();
-
             RepositoryResolver.Reset();
-
+            ApplicationContext.Current = null;
+            
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
 

@@ -33,6 +33,7 @@ namespace Umbraco.Tests.TestHelpers
         public virtual void Initialize()
         {
             TestHelper.SetupLog4NetForTests();
+            Resolution.Reset();
             TestHelper.InitializeContentDirectories();
 
             string path = TestHelper.CurrentAssemblyDirectory;
@@ -63,13 +64,14 @@ namespace Umbraco.Tests.TestHelpers
             var engine = new SqlCeEngine(settings.ConnectionString);
             engine.CreateDatabase();
 
-            Resolution.Freeze();
             ApplicationContext.Current = new ApplicationContext(
 				//assign the db context
 				new DatabaseContext(new DefaultDatabaseFactory()),
 				//assign the service context
 				new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
-            
+
+            Resolution.Freeze();
+
             //Configure the Database and Sql Syntax based on connection string set in config
             DatabaseContext.Initialize();
             //Create the umbraco database and its base data
@@ -90,7 +92,6 @@ namespace Umbraco.Tests.TestHelpers
 			SqlCeContextGuardian.CloseBackgroundConnection();
 			
 			ApplicationContext.Current = null;
-			Resolution.Reset();
 			RepositoryResolver.Reset();
 
             TestHelper.CleanContentDirectories();

@@ -27,6 +27,7 @@ namespace umbraco.cms.presentation
     /// </summary>
     public class _umbraco : UmbracoEnsuredPage
     {
+        [Obsolete("This property is no longer used")]
         protected umbWindow UmbWindow1;
         protected System.Web.UI.WebControls.PlaceHolder bubbleText;
 

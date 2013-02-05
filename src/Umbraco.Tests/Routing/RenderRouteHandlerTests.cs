@@ -16,7 +16,6 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class RenderRouteHandlerTests : BaseRoutingTest
 	{
-
 		public override void Initialize()
 		{
             //this ensures its reset
@@ -44,14 +43,21 @@ namespace Umbraco.Tests.Routing
 			SurfaceControllerResolver.Reset();
 		}
 
+        Template CreateTemplate(string alias)
+        {
+            var template = new Template(alias, alias, alias);
+            template.Content = ""; // else saving throws with a dirty internal error
+            ApplicationContext.Services.FileService.SaveTemplate(template);
+            return template;
+        }
+
 		/// <summary>
 		/// Will route to the default controller and action since no custom controller is defined for this node route
 		/// </summary>
 		[Test]
 		public void Umbraco_Route_Umbraco_Defined_Controller_Action()
 		{
-            var template = new Template("homePage");
-            ApplicationContext.Current.Services.FileService.SaveTemplate(template);
+            var template = CreateTemplate("homePage");
 			var route = RouteTable.Routes["Umbraco_default"];
 			var routeData = new RouteData() { Route = route };
 			var routingContext = GetRoutingContext("~/dummy-page", template.Id, routeData);
@@ -79,8 +85,7 @@ namespace Umbraco.Tests.Routing
 		[TestCase("homePage")]
 		public void Umbraco_Route_User_Defined_Controller_Action(string templateName)
 		{
-            var template = new Template(templateName);
-            ApplicationContext.Current.Services.FileService.SaveTemplate(template);
+            var template = CreateTemplate(templateName);
             var route = RouteTable.Routes["Umbraco_default"];
 			var routeData = new RouteData() {Route = route};
 			var routingContext = GetRoutingContext("~/dummy-page", template.Id, routeData);

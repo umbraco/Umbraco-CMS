@@ -1,4 +1,8 @@
-﻿using System.Web.UI;
+﻿using System;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Routing;
+using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
@@ -6,26 +10,37 @@ using umbraco.DataLayer;
 
 namespace Umbraco.Web.UI.Controls
 {
-	/// <summary>
+    /// <summary>
 	/// A control that exposes the helpful Umbraco context objects
 	/// </summary>
-	internal class UmbracoControl : Control
+	public abstract class UmbracoControl : Control
 	{
-		public UmbracoControl(UmbracoContext umbracoContext)
-		{
-			_umbracoContext = umbracoContext;
-		}
+		/// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        protected UmbracoControl(UmbracoContext umbracoContext)
+        {
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            UmbracoContext = umbracoContext;
+            Umbraco = new UmbracoHelper(umbracoContext);
+        }
 
-		public UmbracoControl()
-		{
-			
-		}
+        /// <summary>
+        /// Empty constructor, uses Singleton to resolve the UmbracoContext
+        /// </summary>
+        protected UmbracoControl()
+            : this(UmbracoContext.Current)
+        {
+        }
 
-		private UmbracoContext _umbracoContext;
-		protected UmbracoContext UmbracoContext
-		{
-			get { return _umbracoContext ?? (_umbracoContext = UmbracoContext.Current); }
-		}
+        /// <summary>
+        /// Returns an UmbracoHelper object
+        /// </summary>
+        public UmbracoHelper Umbraco { get; private set; }
+
+        public UmbracoContext UmbracoContext { get; private set; }
+
 		protected ApplicationContext ApplicationContext
 		{
 			get { return UmbracoContext.Application; }
@@ -38,6 +53,18 @@ namespace Umbraco.Web.UI.Controls
 		{
 			get { return ApplicationContext.Services; }
 		}
+
+        private UrlHelper _url;
+        /// <summary>
+        /// Returns a UrlHelper
+        /// </summary>
+        /// <remarks>
+        /// This URL helper is created without any route data and an empty request context
+        /// </remarks>
+        public UrlHelper Url
+        {
+            get { return _url ?? (_url = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData()))); }
+        }
 
 		/// <summary>
 		/// Returns the legacy SqlHelper

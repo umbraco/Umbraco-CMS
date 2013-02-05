@@ -70,7 +70,6 @@ namespace Umbraco.Tests.Migrations
         public void TearDown()
         {
             MigrationResolver.Reset();
-			Resolution.Reset();
         }
     }
 }

@@ -20,14 +20,12 @@ namespace Umbraco.Tests.Resolvers
         {
             TestHelper.SetupLog4NetForTests();
 
-            Resolution.Reset();
             ManyResolver.Reset();
         }
 
         [TearDown]
         public void TearDown()
         {
-            Resolution.Reset();
             ManyResolver.Reset();
         }
 
@@ -209,6 +207,13 @@ namespace Umbraco.Tests.Resolvers
         {
             var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
             resolver.InsertType<Resolved2>(0);
+        }
+
+        [Test]
+        public void ManyResolverCanInsertInEmptyList()
+        {
+            var resolver = new ManyResolver();
+            resolver.InsertType<Resolved2>();
         }
 
         [Test]

@@ -15,6 +15,14 @@ namespace Umbraco.Tests.Routing
 			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
 		}
 
+        Template CreateTemplate(string alias)
+        {
+            var template = new Template(alias, alias, alias);
+            template.Content = ""; // else saving throws with a dirty internal error
+            ApplicationContext.Services.FileService.SaveTemplate(template);
+            return template;
+        }
+
 		[TestCase("/blah")]
 		[TestCase("/default.aspx/blah")] //this one is actually rather important since this is the path that comes through when we are running in pre-IIS 7 for the root document '/' !
 		[TestCase("/home/Sub1/blah")]
@@ -22,10 +30,8 @@ namespace Umbraco.Tests.Routing
 		[TestCase("/home/Sub1.aspx/blah")]
 		public void Match_Document_By_Url_With_Template(string urlAsString)
 		{
-			var template = new Template("test");
-            ApplicationContext.Services.FileService.SaveTemplate(template);
-			var altTemplate = new Template("blah");
-            ApplicationContext.Services.FileService.SaveTemplate(altTemplate);
+            var template = CreateTemplate("test");
+            var altTemplate = CreateTemplate("blah");
 			var routingContext = GetRoutingContext(urlAsString, template);
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
 			var docRequest = new PublishedContentRequest(url, routingContext);
@@ -35,8 +41,8 @@ namespace Umbraco.Tests.Routing
 
 			Assert.IsTrue(result);
 			Assert.IsNotNull(docRequest.PublishedContent);
-			Assert.IsNotNull(docRequest.Template);
-			Assert.AreEqual("blah".ToUpperInvariant(), docRequest.Template.ToUpperInvariant());
+			Assert.IsNotNull(docRequest.TemplateAlias);
+			Assert.AreEqual("blah".ToUpperInvariant(), docRequest.TemplateAlias.ToUpperInvariant());
 		}
 	}
 }

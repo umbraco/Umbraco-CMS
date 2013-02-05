@@ -9,6 +9,7 @@ namespace umbraco.BasePages
     /// <summary>
     /// UmbracoEnsuredPage is the standard protected page in the umbraco backend, and forces authentication.
     /// </summary>
+    [Obsolete("This class has been superceded by Umbraco.Web.UI.Pages.UmbracoEnsuredPage")]
     public class UmbracoEnsuredPage : BasePage
     {
         public string CurrentApp { get; set; }

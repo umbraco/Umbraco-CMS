@@ -189,9 +189,9 @@ namespace Umbraco.Web
 						typeof (RenderControllerFactory)
 					});
 
-			IContentLastChanceFinderResolver.Current = new IContentLastChanceFinderResolver(new ContentFinderByLegacy404());
+			ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver(new ContentFinderByLegacy404());
 
-			IContentFinderResolver.Current = new IContentFinderResolver(
+			ContentFinderResolver.Current = new ContentFinderResolver(
 				//add all known resolvers in the correct order, devs can then modify this list on application startup either by binding to events
 				//or in their own global.asax
 				new[]
