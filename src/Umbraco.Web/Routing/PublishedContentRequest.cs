@@ -77,6 +77,7 @@ namespace Umbraco.Web.Routing
 			if (this.Is404)
 			{
 				httpContext.Response.StatusCode = 404;
+                httpContext.Response.TrySkipIisCustomErrors = true;
 
 				if (!this.HasNode)
 				{
@@ -135,6 +136,7 @@ namespace Umbraco.Web.Routing
 
 			// here .Is404 _has_ to be true
 			httpContext.Response.StatusCode = 404;
+            httpContext.Response.TrySkipIisCustomErrors = true;
 
 			if (!this.HasNode)
 			{

@@ -315,8 +315,10 @@
     <Compile Include="RenderFieldCaseType.cs" />
     <Compile Include="RenderFieldEncodingType.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
+    <Compile Include="Routing\LookupByLegacy404.cs" />
     <Compile Include="Routing\LookupByPageIdQuery.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
+    <Compile Include="Routing\NotFoundHandlerHelper.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
@@ -398,7 +400,7 @@
     <Compile Include="WebBootManager.cs" />
     <Compile Include="Routing\LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
-    <Compile Include="Routing\DefaultLastChanceLookup.cs" />
+    <Compile Include="Routing\LookupByNotFoundHandlers.cs" />
     <Compile Include="Routing\IDocumentLastChanceLookup.cs" />
     <Compile Include="Routing\LastChanceLookupResolver.cs" />
     <Compile Include="Routing\LookupByAlias.cs" />
