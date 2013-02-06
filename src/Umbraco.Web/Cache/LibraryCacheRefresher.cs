@@ -20,8 +20,6 @@ namespace Umbraco.Web.Cache
             Member.AfterSave += MemberAfterSave;
             Member.BeforeDelete += MemberBeforeDelete;
 
-            //NOTE: this should not need to be done, the SavedCollection event shouldn't even exist!! :(
-            MediaService.SavedCollection += MediaServiceSavedCollection;
             MediaService.Saved += MediaServiceSaved;
             MediaService.Deleting += MediaServiceDeleting;
             MediaService.Moved += MediaServiceMoved;

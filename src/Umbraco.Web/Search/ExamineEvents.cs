@@ -60,8 +60,6 @@ namespace Umbraco.Web.Search
 				return;
 
             MediaService.Saved += MediaServiceSaved;
-            //NOTE: this should not need to be done, the SavedCollection event shouldn't even exist!! :(
-            MediaService.SavedCollection += MediaServiceSavedCollection;
             MediaService.Deleted += MediaServiceDeleted;
             MediaService.Moved += MediaServiceMoved;
             MediaService.Trashed += MediaServiceTrashed;
@@ -87,16 +85,6 @@ namespace Umbraco.Web.Search
 				memberIndexer.DocumentWriting += IndexerDocumentWriting;
 			}
 		}
-
-        //NOTE: this should not need to be done, the SavedCollection event shouldn't even exist!! :(
-        [SecuritySafeCritical]
-        static void MediaServiceSavedCollection(IMediaService sender, Core.Events.SaveEventArgs<System.Collections.Generic.IEnumerable<IMedia>> e)
-        {
-            foreach (var item in e.SavedEntities.SelectMany(x => x))
-            {
-                IndexMedia(item);
-            }
-        }
 
         [SecuritySafeCritical]
 	    static void MediaServiceTrashed(IMediaService sender, Core.Events.MoveEventArgs<IMedia> e)
