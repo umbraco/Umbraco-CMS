@@ -554,7 +554,7 @@ namespace Umbraco.Core.Services
 	    {
             if(raiseEvents)
 			{
-                if (SavingCollection.IsRaisedEventCancelled(new SaveEventArgs<IEnumerable<IMedia>>(medias), this))
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(medias), this))
 				return;
             }
 
@@ -572,7 +572,7 @@ namespace Umbraco.Core.Services
 			}
 
             if(raiseEvents)
-		        SavedCollection.RaiseEvent(new SaveEventArgs<IEnumerable<IMedia>>(medias, false), this);
+		        Saved.RaiseEvent(new SaveEventArgs<IMedia>(medias, false), this);
 
 			Audit.Add(AuditTypes.Save, "Save Media items performed by user", userId, -1);
 	    }
@@ -634,16 +634,6 @@ namespace Umbraco.Core.Services
 		/// Occurs after Save
 		/// </summary>
 		public static event TypedEventHandler<IMediaService, SaveEventArgs<IMedia>> Saved;
-
-		/// <summary>
-		/// Occurs before saving a collection
-		/// </summary>
-		public static event TypedEventHandler<IMediaService, SaveEventArgs<IEnumerable<IMedia>>> SavingCollection;
-
-		/// <summary>
-		/// Occurs after saving a collection
-		/// </summary>
-		public static event TypedEventHandler<IMediaService, SaveEventArgs<IEnumerable<IMedia>>> SavedCollection;
 
 		/// <summary>
 		/// Occurs before Create
