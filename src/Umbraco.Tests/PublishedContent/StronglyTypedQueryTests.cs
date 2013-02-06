@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -23,17 +20,21 @@ namespace Umbraco.Tests.PublishedContent
 		public override void Initialize()
 		{
 			base.Initialize();
-
-			var routingCtx = GetRoutingContext("/test", 1234);
-			UmbracoContext.Current = routingCtx.UmbracoContext;
-			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(Enumerable.Empty<Type>());
 		}
+
+        protected override void OnFreezing()
+        {
+            var routingCtx = GetRoutingContext("/test", 1234);
+            UmbracoContext.Current = routingCtx.UmbracoContext;
+            PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(Enumerable.Empty<Type>());
+        }
 
 		public override void TearDown()
 		{
-			base.TearDown();
 			UmbracoContext.Current = null;
 			PropertyEditorValueConvertersResolver.Reset();
+
+            base.TearDown();
 		}
 
 		protected override string GetXmlContent(int templateId)
