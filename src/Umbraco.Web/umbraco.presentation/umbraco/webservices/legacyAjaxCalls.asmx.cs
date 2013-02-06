@@ -426,14 +426,9 @@ namespace umbraco.presentation.webservices
 	        tp.MasterTemplate = masterTemplateID;
 	        tp.Design = templateContents;
 
+            tp.Save();
+
 	        retVal = "true";
-
-	        // Clear cache in rutime
-	        if (UmbracoSettings.UseDistributedCalls)
-                DistributedCache.Instance.RefreshTemplateCache(tp.Id);
-	        else
-                ApplicationContext.Current.ApplicationCache.ClearCacheForTemplate(tp.Id);
-
 
 	        return retVal;
         }

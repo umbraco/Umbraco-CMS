@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Web;
+using Umbraco.Web.Cache;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using umbraco.IO;
@@ -561,7 +562,7 @@ namespace umbraco
         [Obsolete("Use ApplicationContext.Current.ApplicationCache.ClearCacheForTemplate instead")]
         public static void ClearCachedTemplate(int templateID)
         {
-            ApplicationContext.Current.ApplicationCache.ClearCacheForTemplate(templateID);
+            DistributedCache.Instance.RefreshTemplateCache(templateID);
         }
 
         public template(String templateContent)

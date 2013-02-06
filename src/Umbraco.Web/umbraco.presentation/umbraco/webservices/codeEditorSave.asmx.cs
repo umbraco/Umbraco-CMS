@@ -448,7 +448,7 @@ namespace umbraco.presentation.webservices
             return "false";
         }
         
-		[Obsolete("This method has been superceded by the REST service /Umbraco/RestServices/SaveFile/SaveTemplate which is powered by the SafeFileController.")]
+		[Obsolete("This method has been superceded by the REST service /Umbraco/RestServices/SaveFile/SaveTemplate which is powered by the SaveFileController.")]
         [WebMethod]
         public string SaveTemplate(string templateName, string templateAlias, string templateContents, int templateID, int masterTemplateID)
         {
@@ -466,13 +466,7 @@ namespace umbraco.presentation.webservices
 
                     _template.Save();
 
-                    retVal = "true";
-
-                    // Clear cache in rutime
-                    if (UmbracoSettings.UseDistributedCalls)
-                        DistributedCache.Instance.RefreshTemplateCache(_template.Id);
-                    else
-                        ApplicationContext.Current.ApplicationCache.ClearCacheForTemplate(_template.Id);
+                    retVal = "true";                    
                 }
                 return retVal;
             }

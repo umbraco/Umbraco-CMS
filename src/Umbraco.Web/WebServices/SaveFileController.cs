@@ -109,12 +109,6 @@ namespace Umbraco.Web.WebServices
 			{
 				t.Save();
 
-				// Clear cache in rutime
-				if (UmbracoSettings.UseDistributedCalls)
-                    DistributedCache.Instance.RefreshTemplateCache(t.Id);
-				else
-                    ApplicationContext.Current.ApplicationCache.ClearCacheForTemplate(t.Id);
-
 				return Success(ui.Text("speechBubbles", "templateSavedText"), ui.Text("speechBubbles", "templateSavedHeader"));
 			}
 			catch (Exception ex)

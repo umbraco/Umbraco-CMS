@@ -46,19 +46,7 @@ namespace Umbraco.Web
 		}
 
 		public const string PartialViewCacheKey = "Umbraco.Web.PartialViewCacheKey";
-        private const string TemplateCacheKey = "template";
-
-	    /// <summary>
-	    /// Clears the cache for a template
-	    /// </summary>
-        /// <param name="cacheHelper"></param>
-	    /// <param name="templateId"></param>
-        public static void ClearCacheForTemplate(this CacheHelper cacheHelper, int templateId)
-        {
-            cacheHelper.ClearCacheByKeySearch(
-                string.Format("{0}{1}", TemplateCacheKey, templateId));            
-        }
-
+        
 	    /// <summary>
 	    /// Clears the library cache for media
 	    /// </summary>

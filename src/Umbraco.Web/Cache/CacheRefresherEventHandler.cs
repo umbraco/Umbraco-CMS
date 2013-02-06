@@ -5,6 +5,7 @@ using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.member;
 using System.Linq;
+using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Web.Cache
 {
@@ -17,9 +18,15 @@ namespace Umbraco.Web.Cache
         {
             if (UmbracoSettings.UmbracoLibraryCacheDuration <= 0) return;
 
+            //Bind to template events
+
+            Template.AfterSave += TemplateAfterSave;
+            Template.AfterDelete += TemplateAfterDelete;
+
             //Bind to macro events
 
             Macro.AfterSave += MacroAfterSave;
+            Macro.AfterDelete += MacroAfterDelete;
 
             //Bind to member events
 
@@ -35,6 +42,36 @@ namespace Umbraco.Web.Cache
             MediaService.Deleting += MediaServiceDeleting;
             MediaService.Moving += MediaServiceMoving;
             MediaService.Trashing += MediaServiceTrashing;
+        }
+
+        /// <summary>
+        /// Removes cache for template
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void TemplateAfterDelete(Template sender, DeleteEventArgs e)
+        {
+            DistributedCache.Instance.RemoveTemplateCache(sender.Id);
+        }
+
+        /// <summary>
+        /// Refresh cache for template
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void TemplateAfterSave(Template sender, SaveEventArgs e)
+        {
+            DistributedCache.Instance.RefreshTemplateCache(sender.Id);
+        }
+
+        /// <summary>
+        /// Flush macro from cache
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void MacroAfterDelete(Macro sender, DeleteEventArgs e)
+        {
+            DistributedCache.Instance.RemoveMacroCache(sender.Id);
         }
 
         /// <summary>

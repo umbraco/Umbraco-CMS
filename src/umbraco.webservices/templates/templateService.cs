@@ -95,7 +95,6 @@ namespace umbraco.webservices.templates
             template.Text = carrier.Name;
             template.Design = carrier.Design;
             template.Save();
-            clearCachedTemplate(template);
             return template.Id;
         }
 
@@ -120,9 +119,6 @@ namespace umbraco.webservices.templates
             template.Text = carrier.Name;
             template.Design = carrier.Design;
             template.Save();
-
-
-            clearCachedTemplate(template);
         }
 
         [WebMethod]
@@ -204,15 +200,6 @@ namespace umbraco.webservices.templates
                 get { return design; }
                 set { design = value; }
             }
-        }
-
-        private void clearCachedTemplate(cms.businesslogic.template.Template cachedTemplate)
-        {
-            // Clear cache in rutime
-            if (UmbracoSettings.UseDistributedCalls)
-                DistributedCache.Instance.RefreshTemplateCache(cachedTemplate.Id);
-            else
-                ApplicationContext.Current.ApplicationCache.ClearCacheForTemplate(cachedTemplate.Id);
         }
 
     }

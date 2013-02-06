@@ -18,6 +18,16 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
+        /// Removes the cache amongst servers for a template
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="templateId"></param>
+        public static void RemoveTemplateCache(this DistributedCache dc, int templateId)
+        {
+            dc.Remove(new Guid(DistributedCache.TemplateRefresherId), templateId);
+        }
+
+        /// <summary>
         /// Refreshes the cache amongst servers for all pages
         /// </summary>
         /// <param name="dc"></param>
@@ -74,6 +84,16 @@ namespace Umbraco.Web.Cache
         public static void RefreshMacroCache(this DistributedCache dc, int macroId)
         {
             dc.Refresh(new Guid(DistributedCache.MacroCacheRefresherId), macroId);
+        }
+
+        /// <summary>
+        /// Removes the cache amongst servers for a macro item
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="macroId"></param>
+        public static void RemoveMacroCache(this DistributedCache dc, int macroId)
+        {
+            dc.Remove(new Guid(DistributedCache.MacroCacheRefresherId), macroId);
         }
     }
 }
