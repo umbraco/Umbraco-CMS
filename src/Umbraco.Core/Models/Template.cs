@@ -101,7 +101,7 @@ namespace Umbraco.Core.Models
             }
             else
             {
-                exts.Add(UmbracoSettings.UseAspNetMasterPages ? "masterpage" : "aspx");
+                exts.Add(UmbracoSettings.UseAspNetMasterPages ? "master" : "aspx");
             }
 
             var dirs = SystemDirectories.Masterpages;
