@@ -37,17 +37,7 @@ namespace Umbraco.Web.Search
 		/// </remarks>
 		[SecuritySafeCritical]
 		protected override void ApplicationStarted(UmbracoApplicationBase httpApplication, ApplicationContext applicationContext)
-		{
-            //do not initialize if the application is not configured
-            //We need to check if we actually can initialize, if not then don't continue
-            if (ApplicationContext.Current == null
-                || !ApplicationContext.Current.IsConfigured
-                || !ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured)
-            {
-                LogHelper.Info<ExamineEvents>("Not initializing Examine because the application and/or database is not configured");
-                return;
-            }
-
+		{            
             LogHelper.Info<ExamineEvents>("Initializing Examine and binding to business logic events");
 
 			var registeredProviders = ExamineManager.Instance.IndexProviderCollection
@@ -66,6 +56,7 @@ namespace Umbraco.Web.Search
             ContentService.Saved += ContentServiceSaved;
             ContentService.Deleted += ContentServiceDeleted;
             ContentService.Moved += ContentServiceMoved;
+            ContentService.Trashed += ContentServiceTrashed;
 
 			//These should only fire for providers that DONT have SupportUnpublishedContent set to true
 			content.AfterUpdateDocumentCache += ContentAfterUpdateDocumentCache;
@@ -85,6 +76,12 @@ namespace Umbraco.Web.Search
 				memberIndexer.DocumentWriting += IndexerDocumentWriting;
 			}
 		}
+
+        [SecuritySafeCritical]
+	    static void ContentServiceTrashed(IContentService sender, Core.Events.MoveEventArgs<IContent> e)
+        {
+            IndexConent(e.Entity);
+        }
 
         [SecuritySafeCritical]
 	    static void MediaServiceTrashed(IMediaService sender, Core.Events.MoveEventArgs<IMedia> e)
