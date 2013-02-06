@@ -8,9 +8,13 @@ namespace Umbraco.Web.Routing
 	/// </summary>
 	internal sealed class LastChanceLookupResolver : SingleObjectResolverBase<LastChanceLookupResolver, IDocumentLastChanceLookup>
 	{
-	
-		internal LastChanceLookupResolver(IDocumentLastChanceLookup lastChanceLookup)
-			: base(lastChanceLookup)
+        internal LastChanceLookupResolver()
+            : base(true)
+        {
+        }
+        
+        internal LastChanceLookupResolver(IDocumentLastChanceLookup lastChanceLookup)
+			: base(lastChanceLookup, true)
 		{
 		} 
 	
