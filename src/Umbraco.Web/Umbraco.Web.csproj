@@ -631,18 +631,8 @@
     <Compile Include="umbraco.presentation\umbraco\actions\publish.aspx.designer.cs">
       <DependentUpon>publish.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\cache\CacheRefresher.cs">
+    <Compile Include="umbraco.presentation\umbraco\cache\LegacyClasses.cs">
       <SubType>code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\cache\dispatcher.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\cache\factory.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\cache\libraryRefreshers.cs" />
-    <Compile Include="umbraco.presentation\umbraco\cache\pageRefresher.cs">
-      <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\channels\Blogger.cs" />
     <Compile Include="umbraco.presentation\umbraco\channels\config.cs" />

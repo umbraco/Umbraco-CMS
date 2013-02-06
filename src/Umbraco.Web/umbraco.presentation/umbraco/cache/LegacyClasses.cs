@@ -1,8 +1,86 @@
 ﻿using System;
+using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Web.Cache;
+using umbraco.interfaces;
 
 namespace umbraco.presentation.cache
 {
+
+    [Obsolete("This class is no longer in use, use Umbraco.Web.Cache.PageCacheRefresher instead")]
+    public class pageRefresher : PageCacheRefresher
+    {
+    }
+
+    [Obsolete("This class is no longer used, use Umbraco.Web.Cache.MediaLibraryRefreshers instead")]
+    public class MediaLibraryRefreshers : Umbraco.Web.Cache.MediaLibraryRefreshers
+    {
+
+    }
+
+    [Obsolete("This class is no longer used, use Umbraco.Web.Cache.MemberLibraryRefreshers instead")]
+    public class MemberLibraryRefreshers : Umbraco.Web.Cache.MemberLibraryRefreshers
+    {
+
+    }
+
+    [Obsolete("Use Umbraco.Core.CacheRefreshersResolver instead")]
+    public class Factory
+    {
+
+        #region Methods
+
+        public ICacheRefresher CacheRefresher(Guid CacheRefresherId)
+        {
+            return GetNewObject(CacheRefresherId);
+        }
+
+        /// <summary>
+        /// Gets the IcacheRefresher object with the specified Guid.
+        /// </summary>
+        /// <param name="CacheRefresherId">The cache refresher guid.</param>
+        /// <returns></returns>
+        public ICacheRefresher GetNewObject(Guid CacheRefresherId)
+        {
+            return CacheRefreshersResolver.Current.GetById(CacheRefresherId);
+        }
+
+        /// <summary>
+        /// Gets all ICacheRefreshers
+        /// </summary>
+        /// <returns></returns>
+        public ICacheRefresher[] GetAll()
+        {
+            return CacheRefreshersResolver.Current.CacheResolvers.ToArray();
+        }
+
+        #endregion
+    }
+
+    [Obsolete("This class is no longer used, use DistrubutedCache.Instance instead")]
+    public class dispatcher
+    {
+        public static void Refresh(Guid factoryGuid, int id)
+        {
+            DistrubutedCache.Instance.Refresh(factoryGuid, id);
+        }
+
+        public static void Refresh(Guid factoryGuid, Guid id)
+        {
+            DistrubutedCache.Instance.Refresh(factoryGuid, id);
+        }
+
+        public static void RefreshAll(Guid factoryGuid)
+        {
+            DistrubutedCache.Instance.RefreshAll(factoryGuid);
+        }
+
+        public static void Remove(Guid factoryGuid, int id)
+        {
+            DistrubutedCache.Instance.Remove(factoryGuid, id);
+        }
+    }
 
     [Obsolete("This class is no longer used, it has been superceded by Umbraco.Web.Cache.CacheRefresherClient, however that is marked internal and these should not be used directly in your code.")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
