@@ -74,9 +74,7 @@ namespace Umbraco.Web
 
             if (allServers && UmbracoSettings.UseDistributedCalls)
             {
-                DistributedCache.Instance.Refresh(
-                    new Guid("B29286DD-2D40-4DDB-B325-681226589FEC"),
-                    mediaId);
+                DistributedCache.Instance.RefreshMediaCache(mediaId);
             }
             else
             {

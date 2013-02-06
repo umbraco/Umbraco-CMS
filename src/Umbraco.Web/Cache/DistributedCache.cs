@@ -63,6 +63,16 @@ namespace Umbraco.Web.Cache
         {
             dc.Refresh(new Guid(DistributedCache.MemberCacheRefresherId), memberId);
         }
+
+        /// <summary>
+        /// Refreshes the cache amongst servers for a media item
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="mediaId"></param>
+        public static void RefreshMediaCache(this DistributedCache dc, int mediaId)
+        {
+            dc.Refresh(new Guid(DistributedCache.MediaCacheRefresherId), mediaId);
+        }
     }
 
     /// <summary>
@@ -86,6 +96,7 @@ namespace Umbraco.Web.Cache
         public const string TemplateRefresherId = "DD12B6A0-14B9-46e8-8800-C154F74047C8";
         public const string PageCacheRefresherId = "27AB3022-3DFA-47b6-9119-5945BC88FD66";
         public const string MemberCacheRefresherId = "E285DF34-ACDC-4226-AE32-C0CB5CF388DA";
+        public const string MediaCacheRefresherId = "B29286DD-2D40-4DDB-B325-681226589FEC";
         
         #endregion
 
