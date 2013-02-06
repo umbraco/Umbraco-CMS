@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
+using System.Data.SqlClient;
 using Umbraco.Core.Persistence.FaultHandling;
 
 namespace Umbraco.Core.Persistence
@@ -60,6 +62,129 @@ namespace Umbraco.Core.Persistence
                         //Connection is closed in PetaPoco, so no need to do it here (?)
                         //command.Connection.Close();
                     }
+                }
+            });
+        }
+        #endregion
+
+        #region ExecuteReaderWithRetry method implementations
+        /// <summary>
+        /// Sends the specified command to the connection and builds a SqlDataReader object containing the results.
+        /// Uses the default retry policy when executing the command.
+        /// </summary>
+        /// <param name="command">The command object that is required as per extension method declaration.</param>
+        /// <returns>A System.Data.IDataReader object.</returns>
+        public static IDataReader ExecuteReaderWithRetry(this IDbCommand command)
+        {
+            var connectionString = command.Connection.ConnectionString ?? string.Empty;
+            return ExecuteReaderWithRetry(command, RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(connectionString));
+        }
+
+        /// <summary>
+        /// Sends the specified command to the connection and builds a SqlDataReader object containing the results.
+        /// Uses the specified retry policy when executing the command.
+        /// </summary>
+        /// <param name="command">The command object that is required as per extension method declaration.</param>
+        /// <param name="retryPolicy">The retry policy defining whether to retry a command if a connection fails while executing the command.</param>
+        /// <returns>A System.Data.IDataReader object.</returns>
+        public static IDataReader ExecuteReaderWithRetry(this IDbCommand command, RetryPolicy retryPolicy)
+        {
+            var connectionString = command.Connection.ConnectionString ?? string.Empty;
+            return ExecuteReaderWithRetry(command, retryPolicy, RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(connectionString));
+        }
+
+        /// <summary>
+        /// Sends the specified command to the connection and builds a SqlDataReader object containing the results.
+        /// Uses the specified retry policy when executing the command. Uses a separate specified retry policy when
+        /// establishing a connection.
+        /// </summary>
+        /// <param name="command">The command object that is required as per extension method declaration.</param>
+        /// <param name="cmdRetryPolicy">The command retry policy defining whether to retry a command if it fails while executing.</param>
+        /// <param name="conRetryPolicy">The connection retry policy defining whether to re-establish a connection if it drops while executing the command.</param>
+        /// <returns>A System.Data.IDataReader object.</returns>
+        public static IDataReader ExecuteReaderWithRetry(this IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy)
+        {
+            //GuardConnectionIsNotNull(command);
+
+            // Check if retry policy was specified, if not, use the default retry policy.
+            return (cmdRetryPolicy ?? RetryPolicy.NoRetry).ExecuteAction(() =>
+            {
+                var hasOpenConnection = EnsureValidConnection(command, conRetryPolicy);
+
+                try
+                {
+                    return command.ExecuteReader();
+                }
+                catch (Exception)
+                {
+                    if (hasOpenConnection && command.Connection != null && command.Connection.State == ConnectionState.Open)
+                    {
+                        //command.Connection.Close();
+                    }
+
+                    throw;
+                }
+            });
+        }
+
+        /// <summary>
+        /// Sends the specified command to the connection and builds a SqlDataReader object using one of the 
+        /// CommandBehavior values. Uses the default retry policy when executing the command.
+        /// </summary>
+        /// <param name="command">The command object that is required as per extension method declaration.</param>
+        /// <param name="behavior">One of the System.Data.CommandBehavior values.</param>
+        /// <returns>A System.Data.IDataReader object.</returns>
+        public static IDataReader ExecuteReaderWithRetry(this IDbCommand command, CommandBehavior behavior)
+        {
+            var connectionString = command.Connection.ConnectionString ?? string.Empty;
+            return ExecuteReaderWithRetry(command, behavior, RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(connectionString));
+        }
+
+        /// <summary>
+        /// Sends the specified command to the connection and builds a SqlDataReader object using one of the
+        /// CommandBehavior values. Uses the specified retry policy when executing the command.
+        /// </summary>
+        /// <param name="command">The command object that is required as per extension method declaration.</param>
+        /// <param name="behavior">One of the System.Data.CommandBehavior values.</param>
+        /// <param name="retryPolicy">The retry policy defining whether to retry a command if a connection fails while executing the command.</param>
+        /// <returns>A System.Data.SqlClient.SqlDataReader object.</returns>
+        public static IDataReader ExecuteReaderWithRetry(this IDbCommand command, CommandBehavior behavior, RetryPolicy retryPolicy)
+        {
+            var connectionString = command.Connection.ConnectionString ?? string.Empty;
+            return ExecuteReaderWithRetry(command, behavior, retryPolicy, RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(connectionString));
+        }
+
+        /// <summary>
+        /// Sends the specified command to the connection and builds a SqlDataReader object using one of the
+        /// CommandBehavior values. Uses the specified retry policy when executing the command.
+        /// Uses a separate specified retry policy when establishing a connection.
+        /// </summary>
+        /// <param name="command">The command object that is required as per extension method declaration.</param>
+        /// <param name="behavior">One of the System.Data.CommandBehavior values.</param>
+        /// <param name="cmdRetryPolicy">The command retry policy defining whether to retry a command if it fails while executing.</param>
+        /// <param name="conRetryPolicy">The connection retry policy defining whether to re-establish a connection if it drops while executing the command.</param>
+        /// <returns>A System.Data.IDataReader object.</returns>
+        public static IDataReader ExecuteReaderWithRetry(this IDbCommand command, CommandBehavior behavior, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy)
+        {
+            //GuardConnectionIsNotNull(command);
+
+            // Check if retry policy was specified, if not, use the default retry policy.
+            return (cmdRetryPolicy ?? RetryPolicy.NoRetry).ExecuteAction(() =>
+            {
+                var hasOpenConnection = EnsureValidConnection(command, conRetryPolicy);
+
+                try
+                {
+                    return command.ExecuteReader(behavior);
+                }
+                catch (Exception)
+                {
+                    if (hasOpenConnection && command.Connection != null && command.Connection.State == ConnectionState.Open)
+                    {
+                        //command.Connection.Close();
+                    }
+
+                    throw;
                 }
             });
         }

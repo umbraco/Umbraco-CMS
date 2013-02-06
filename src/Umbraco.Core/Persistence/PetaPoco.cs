@@ -527,7 +527,7 @@ namespace Umbraco.Core.Persistence
 				{
 					using (var cmd = CreateCommand(_sharedConnection, sql, args))
 					{
-						var retv=cmd.ExecuteNonQuery();
+						var retv=cmd.ExecuteNonQueryWithRetry();
 						OnExecutedCommand(cmd);
 						return retv;
 					}
@@ -559,7 +559,7 @@ namespace Umbraco.Core.Persistence
 				{
 					using (var cmd = CreateCommand(_sharedConnection, sql, args))
 					{
-						object val = cmd.ExecuteScalar();
+						object val = cmd.ExecuteScalarWithRetry();
 						OnExecutedCommand(cmd);
 						return (T)Convert.ChangeType(val, typeof(T));
 					}
@@ -1078,7 +1078,7 @@ namespace Umbraco.Core.Persistence
 					IDataReader r;
 					try
 					{
-						r = cmd.ExecuteReader();
+						r = cmd.ExecuteReaderWithRetry();
 						OnExecutedCommand(cmd);
 					}
 					catch (Exception x)
@@ -1254,7 +1254,7 @@ namespace Umbraco.Core.Persistence
 						if (!autoIncrement)
 						{
 							DoPreExecute(cmd);
-							cmd.ExecuteNonQuery();
+							cmd.ExecuteNonQueryWithRetry();
 							OnExecutedCommand(cmd);
 							return true;
 						}
@@ -1265,14 +1265,14 @@ namespace Umbraco.Core.Persistence
 						{
 							case DBType.SqlServerCE:
 								DoPreExecute(cmd);
-								cmd.ExecuteNonQuery();
+								cmd.ExecuteNonQueryWithRetry();
 								OnExecutedCommand(cmd);
 								id = ExecuteScalar<object>("SELECT @@@IDENTITY AS NewID;");
 								break;
 							case DBType.SqlServer:
 								cmd.CommandText += ";\nSELECT SCOPE_IDENTITY() AS NewID;";
 								DoPreExecute(cmd);
-								id = cmd.ExecuteScalar();
+								id = cmd.ExecuteScalarWithRetry();
 								OnExecutedCommand(cmd);
 								break;
 							case DBType.PostgreSQL:
@@ -1280,13 +1280,13 @@ namespace Umbraco.Core.Persistence
 								{
 									cmd.CommandText += string.Format("returning {0} as NewID", EscapeSqlIdentifier(primaryKeyName));
 									DoPreExecute(cmd);
-									id = cmd.ExecuteScalar();
+									id = cmd.ExecuteScalarWithRetry();
 								}
 								else
 								{
 									id = -1;
 									DoPreExecute(cmd);
-									cmd.ExecuteNonQuery();
+									cmd.ExecuteNonQueryWithRetry();
 								}
 								OnExecutedCommand(cmd);
 								break;
@@ -1301,14 +1301,14 @@ namespace Umbraco.Core.Persistence
 									param.DbType = DbType.Int64;
 									cmd.Parameters.Add(param);
 									DoPreExecute(cmd);
-									cmd.ExecuteNonQuery();
+									cmd.ExecuteNonQueryWithRetry();
 									id = param.Value;
 								}
 								else
 								{
 									id = -1;
 									DoPreExecute(cmd);
-									cmd.ExecuteNonQuery();
+									cmd.ExecuteNonQueryWithRetry();
 								}
 								OnExecutedCommand(cmd);
 								break;
@@ -1317,20 +1317,20 @@ namespace Umbraco.Core.Persistence
                                 {
                                     cmd.CommandText += ";\nSELECT last_insert_rowid();";
                                     DoPreExecute(cmd);
-                                    id = cmd.ExecuteScalar();
+                                    id = cmd.ExecuteScalarWithRetry();
                                 }
                                 else
                                 {
                                     id = -1;
                                     DoPreExecute(cmd);
-                                    cmd.ExecuteNonQuery();
+                                    cmd.ExecuteNonQueryWithRetry();
                                 }
                                 OnExecutedCommand(cmd);
                                 break;
 							default:
 								cmd.CommandText += ";\nSELECT @@IDENTITY AS NewID;";
 								DoPreExecute(cmd);
-								id = cmd.ExecuteScalar();
+								id = cmd.ExecuteScalarWithRetry();
 								OnExecutedCommand(cmd);
 								break;
 						}
@@ -1443,7 +1443,7 @@ namespace Umbraco.Core.Persistence
 						DoPreExecute(cmd);
 
 						// Do it
-						var retv=cmd.ExecuteNonQuery();
+						var retv=cmd.ExecuteNonQueryWithRetry();
 						OnExecutedCommand(cmd);
 						return retv;
 					}
