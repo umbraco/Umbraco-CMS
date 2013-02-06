@@ -119,10 +119,10 @@ namespace Umbraco.Core.Models
             var dirs = SystemDirectories.Css;
 
             //Validate file
-            var validFile = IOHelper.ValidateEditPath(Path, dirs.Split(','));
+            var validFile = IOHelper.VerifyEditPath(Path, dirs.Split(','));
 
             //Validate extension
-            var validExtension = IOHelper.ValidateFileExtension(Path, new List<string> {"css"});
+            var validExtension = IOHelper.VerifyFileExtension(Path, new List<string> {"css"});
 
             return validFile && validExtension;
         }
