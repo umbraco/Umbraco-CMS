@@ -191,9 +191,7 @@ namespace umbraco
         public static void UnPublishSingleNode(int DocumentId)
         {            
             if (UmbracoSettings.UseDistributedCalls)
-                DistributedCache.Instance.Remove(
-                    new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"),
-                    DocumentId);
+                DistributedCache.Instance.RemovePageCache(DocumentId);
             else
                 content.Instance.ClearDocumentCache(DocumentId);
         }
@@ -206,9 +204,7 @@ namespace umbraco
         internal static void UnPublishSingleNode(Document document)
         {
             if (UmbracoSettings.UseDistributedCalls)
-                DistributedCache.Instance.Remove(
-                    new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"),
-                    document.Id);
+                DistributedCache.Instance.RemovePageCache(document.Id);
             else
                 content.Instance.ClearDocumentCache(document);
         }
@@ -237,9 +233,7 @@ namespace umbraco
         internal static void UpdateDocumentCache(Document doc)
         {
             if (UmbracoSettings.UseDistributedCalls)
-                DistributedCache.Instance.Refresh(
-                    new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"),
-                    doc.Id);
+                DistributedCache.Instance.RefreshPageCache(doc.Id);
             else
                 content.Instance.UpdateDocumentCache(doc);
         }
@@ -265,7 +259,7 @@ namespace umbraco
 
             if (UmbracoSettings.UseDistributedCalls)
             {
-                DistributedCache.Instance.RefreshAll(new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"));
+                DistributedCache.Instance.RefreshAllPageCache();
             }
             else
             {
@@ -282,7 +276,7 @@ namespace umbraco
         {
             //PPH - added dispatcher support to this call..
             if (UmbracoSettings.UseDistributedCalls)
-                DistributedCache.Instance.RefreshAll(new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"));
+                DistributedCache.Instance.RefreshAllPageCache();
             else
             {
                 content.Instance.RefreshContentFromDatabaseAsync();

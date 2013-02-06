@@ -60,7 +60,7 @@ namespace Umbraco.Web.Strategies.Publishing
         {
             if (UmbracoSettings.UseDistributedCalls)
             {
-                DistributedCache.Instance.RefreshAll(new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"));
+                DistributedCache.Instance.RefreshAllPageCache();
             }
             else
             {
@@ -77,7 +77,7 @@ namespace Umbraco.Web.Strategies.Publishing
             {
                 foreach (var c in content)
                 {
-                    DistributedCache.Instance.Refresh(new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"), c.Id);
+                    DistributedCache.Instance.RefreshPageCache(c.Id);
                 }
             }
             else
@@ -94,7 +94,7 @@ namespace Umbraco.Web.Strategies.Publishing
         {
             if (UmbracoSettings.UseDistributedCalls)
             {
-                DistributedCache.Instance.Refresh(new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"), content.Id);
+                DistributedCache.Instance.RefreshPageCache(content.Id);
             }
             else
             {

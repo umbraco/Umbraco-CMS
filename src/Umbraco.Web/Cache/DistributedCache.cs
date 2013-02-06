@@ -24,6 +24,35 @@ namespace Umbraco.Web.Cache
         {
             dc.Refresh(new Guid(DistributedCache.TemplateRefresherId), templateId);
         }
+
+        /// <summary>
+        /// Refreshes the cache amongst servers for all pages
+        /// </summary>
+        /// <param name="dc"></param>
+        public static void RefreshAllPageCache(this DistributedCache dc)
+        {
+            dc.RefreshAll(new Guid(DistributedCache.PageCacheRefresherId));
+        }
+
+        /// <summary>
+        /// Refreshes the cache amongst servers for a page
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="pageId"></param>
+        public static void RefreshPageCache(this DistributedCache dc, int pageId)
+        {
+            dc.Refresh(new Guid(DistributedCache.PageCacheRefresherId), pageId);
+        }
+
+        /// <summary>
+        /// Removes the cache amongst servers for a page
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="pageId"></param>
+        public static void RemovePageCache(this DistributedCache dc, int pageId)
+        {
+            dc.Remove(new Guid(DistributedCache.PageCacheRefresherId), pageId);
+        }
     }
 
     /// <summary>
@@ -44,8 +73,8 @@ namespace Umbraco.Web.Cache
 
         #region Public constants/Ids
 
-        public const string TemplateRefresherId = "DD12B6A0-14B9-46e8-8800-C154F74047C8"; 
-        
+        public const string TemplateRefresherId = "DD12B6A0-14B9-46e8-8800-C154F74047C8";
+        public const string PageCacheRefresherId = "27AB3022-3DFA-47b6-9119-5945BC88FD66";
         
         #endregion
 

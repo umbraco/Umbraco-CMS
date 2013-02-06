@@ -53,7 +53,7 @@ namespace Umbraco.Web.Strategies.Publishing
         {
             if (UmbracoSettings.UseDistributedCalls)
             {
-                DistributedCache.Instance.Remove(new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"), content.Id);
+                DistributedCache.Instance.RemovePageCache(content.Id);
             }
             else
             {
