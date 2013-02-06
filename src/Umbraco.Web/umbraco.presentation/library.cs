@@ -1864,13 +1864,13 @@ namespace umbraco
         [Obsolete("Use ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMember instead")]
         public static void ClearLibraryCacheForMember(int mediaId)
         {
-            ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMember(mediaId);
+            DistributedCache.Instance.RefreshMemberCache(mediaId);
         }
 
         [Obsolete("Use ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMember with the allServers flag set to false instead")]
         public static void ClearLibraryCacheForMemberDo(int memberId)
         {
-            ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMember(memberId, false);
+            DistributedCache.Instance.RefreshMemberCache(memberId);
         }
 
         /// <summary>

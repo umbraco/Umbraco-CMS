@@ -4,7 +4,7 @@ using umbraco.interfaces;
 
 namespace Umbraco.Web.Cache
 {
-    public class MemberLibraryRefreshers : ICacheRefresher
+    public class MemberCacheRefresher : ICacheRefresher
     {
 
         public Guid UniqueIdentifier
@@ -23,7 +23,10 @@ namespace Umbraco.Web.Cache
 
         public void Refresh(int id)
         {
-            ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMember(id, false);
+            const string getmemberCacheKey = "GetMember";
+
+            ApplicationContext.Current.ApplicationCache.
+                ClearCacheByKeySearch(string.Format("UL_{0}_{1}", getmemberCacheKey, id));
         }
 
         public void Remove(int id)

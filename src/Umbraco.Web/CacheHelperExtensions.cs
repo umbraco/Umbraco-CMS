@@ -96,32 +96,6 @@ namespace Umbraco.Web
             }
         }
 
-        /// <summary>
-        /// Clears the library cache for members
-        /// </summary>
-        /// <param name="cacheHelper"></param>
-        /// <param name="memberId"></param>
-        /// <param name="allServers">
-        /// If set to false, this will only clear the library cache for the current server, not all servers registered in the 
-        /// server farm. In most cases if you are clearing cache you would probably clear it on all servers.
-        /// </param>
-        public static void ClearLibraryCacheForMember(this CacheHelper cacheHelper, int memberId, bool allServers = true)
-        {
-            const string getmemberCacheKey = "GetMember";
-
-            if (allServers && UmbracoSettings.UseDistributedCalls)
-            {
-                DistributedCache.Instance.RefreshMemberCache(memberId);
-            }
-            else
-            {
-                cacheHelper.ClearCacheByKeySearch(
-                string.Format("UL_{0}_{1}", getmemberCacheKey, memberId));
-            }
-
-            
-        }
-
 		/// <summary>
 		/// Outputs and caches a partial view in MVC
 		/// </summary>

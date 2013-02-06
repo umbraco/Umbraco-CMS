@@ -20,7 +20,7 @@ namespace umbraco.presentation.cache
     }
 
     [Obsolete("This class is no longer used, use Umbraco.Web.Cache.MemberLibraryRefreshers instead")]
-    public class MemberLibraryRefreshers : Umbraco.Web.Cache.MemberLibraryRefreshers
+    public class MemberLibraryRefreshers : Umbraco.Web.Cache.MemberCacheRefresher
     {
 
     }

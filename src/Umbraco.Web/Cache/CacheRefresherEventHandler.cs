@@ -75,12 +75,12 @@ namespace Umbraco.Web.Cache
 
         static void MemberBeforeDelete(Member sender, DeleteEventArgs e)
         {
-            ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMember(sender.Id);
+            DistributedCache.Instance.RefreshMemberCache(sender.Id);            
         }
 
         static void MemberAfterSave(Member sender, SaveEventArgs e)
         {
-            ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMember(sender.Id);
+            DistributedCache.Instance.RefreshMemberCache(sender.Id);
         }
     }
 }

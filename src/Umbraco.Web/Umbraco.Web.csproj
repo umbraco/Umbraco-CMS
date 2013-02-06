@@ -250,7 +250,7 @@
     <Compile Include="Cache\CacheRefresherEventHandler.cs" />
     <Compile Include="Cache\MacroCacheRefresher.cs" />
     <Compile Include="Cache\MediaLibraryRefreshers.cs" />
-    <Compile Include="Cache\MemberLibraryRefreshers.cs" />
+    <Compile Include="Cache\MemberCacheRefresher.cs" />
     <Compile Include="Cache\PageCacheRefresher.cs" />
     <Compile Include="Cache\TemplateCacheRefresher.cs" />
     <Compile Include="Dynamics\DynamicExpression.cs" />
