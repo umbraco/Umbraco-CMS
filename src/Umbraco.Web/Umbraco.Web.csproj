@@ -244,6 +244,8 @@
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
+    <Compile Include="Cache\CacheRefresherClient.cs" />
+    <Compile Include="Cache\DistrubutedCache.cs" />
     <Compile Include="Cache\LibraryCacheRefresher.cs" />
     <Compile Include="Cache\MacroCacheRefresher.cs" />
     <Compile Include="Cache\MediaLibraryRefreshers.cs" />

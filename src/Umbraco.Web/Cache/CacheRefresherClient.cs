@@ -1,18 +1,19 @@
-﻿using System;
-using Umbraco.Core.IO;
+﻿using Umbraco.Core.IO;
 
-namespace umbraco.presentation.cache
+namespace Umbraco.Web.Cache
 {
-
-    [Obsolete("This class is no longer used, it has been superceded by Umbraco.Web.Cache.CacheRefresherClient, however that is marked internal and these should not be used directly in your code.")]
+    
+    /// <summary>
+    /// The client Soap service for making distrubuted cache calls between servers
+    /// </summary>
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Web.Services.WebServiceBindingAttribute(Name = "CacheRefresherSoap", Namespace = "http://umbraco.org/webservices/")]
-    public class CacheRefresher : System.Web.Services.Protocols.SoapHttpClientProtocol
+    internal class CacheRefresherClient : System.Web.Services.Protocols.SoapHttpClientProtocol
     {
 
         /// <remarks/>
-        public CacheRefresher()
+        public CacheRefresherClient()
         {
             // only set the url if the httpcontext is present, else it's set by the cache dispatcher methods (when using distributed calls)
             if (System.Web.HttpContext.Current != null)
