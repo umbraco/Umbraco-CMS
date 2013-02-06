@@ -99,7 +99,7 @@ namespace Umbraco.Core.ObjectResolution
 
 		private readonly List<Lazy<Type>> _lazyTypeList = new List<Lazy<Type>>();
 		private readonly List<Func<IEnumerable<Type>>> _typeListProducerList = new List<Func<IEnumerable<Type>>>();
-        private readonly List<Type> _typesToRemoveOnResolved = new List<Type>(); 
+        private readonly List<Type> _excludedTypesList = new List<Type>(); 
 
 		private List<Type> _resolvedTypes = null;
 		private readonly ReaderWriterLockSlim _resolvedTypesLock = new ReaderWriterLockSlim();
@@ -142,7 +142,7 @@ namespace Umbraco.Core.ObjectResolution
                         
                         // we need to validate each resolved type now since we could
                         // not do it before evaluating the lazy & producers
-                        foreach (var type in types.Where(x => !_typesToRemoveOnResolved.Contains(x)))
+                        foreach (var type in types.Where(x => !_excludedTypesList.Contains(x)))
                         {
                             AddValidAndNoDuplicate(_resolvedTypes, type);
                         }
@@ -173,16 +173,14 @@ namespace Umbraco.Core.ObjectResolution
         #region Types collection manipulation
 
         /// <summary>
-        /// Once types are resolved any types that have been added with this method will be removed once the types have been lazily resolved.
+        /// Removes types from the list of types, once it has been lazily evaluated, and before actual objects are instanciated.
         /// </summary>
-        /// <remarks>
-        /// The resolver must support removals for this method to work
-        /// </remarks>
+        /// <param name="value">The type to remove.</param>
         public override void RemoveType(Type value)
         {
             EnsureSupportsRemove();
 
-            _typesToRemoveOnResolved.Add(value);
+            _excludedTypesList.Add(value);
         }
 
         /// <summary>
