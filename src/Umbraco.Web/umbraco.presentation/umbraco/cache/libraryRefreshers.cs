@@ -2,78 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Umbraco.Core;
+using Umbraco.Web;
 
 namespace umbraco.presentation.cache
 {
-    public class MediaLibraryRefreshers : interfaces.ICacheRefresher
+    [Obsolete("This class is no longer used, use Umbraco.Web.Cache.MediaLibraryRefreshers instead")]
+    public class MediaLibraryRefreshers : Umbraco.Web.Cache.MediaLibraryRefreshers
     {
-        public MediaLibraryRefreshers()
-        {
-
-        }
-
-        public Guid UniqueIdentifier
-        {
-            get { return new Guid("B29286DD-2D40-4DDB-B325-681226589FEC"); }
-        }
-
-        public string Name
-        {
-            get { return "Clears Media Cache from umbraco.library"; }
-        }
-
-        public void RefreshAll()
-        {
-        }
-
-        public void Refresh(int Id)
-        {
-            library.ClearLibraryCacheForMediaDo(Id);
-        }
-
-        public void Remove(int Id)
-        {
-        }
-
-        public void Refresh(Guid Id)
-        {
-        }
-
+              
     }
 
-    public class MemberLibraryRefreshers : interfaces.ICacheRefresher
+    [Obsolete("This class is no longer used, use Umbraco.Web.Cache.MemberLibraryRefreshers instead")]
+    public class MemberLibraryRefreshers : Umbraco.Web.Cache.MemberLibraryRefreshers
     {
-        public MemberLibraryRefreshers()
-        {
-
-        }
-
-        public Guid UniqueIdentifier
-        {
-            get { return new Guid("E285DF34-ACDC-4226-AE32-C0CB5CF388DA"); }
-        }
-
-        public string Name
-        {
-            get { return "Clears Member Cache from umbraco.library"; }
-        }
-
-        public void RefreshAll()
-        {
-        }
-
-        public void Refresh(int Id)
-        {
-            library.ClearLibraryCacheForMemberDo(Id);
-        }
-
-        public void Remove(int Id)
-        {
-        }
-
-        public void Refresh(Guid Id)
-        {
-        }
-
+        
     }
 }

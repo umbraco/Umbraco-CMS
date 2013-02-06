@@ -4,8 +4,10 @@ using System.Web.Caching;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
+using umbraco.presentation.cache;
 
 namespace Umbraco.Web
 {
@@ -15,14 +17,10 @@ namespace Umbraco.Web
 	/// </summary>
 	internal static class CacheHelperExtensions
 	{
-
 		/// <summary>
 		/// Application event handler to bind to events to clear the cache for the cache helper extensions
-		/// </summary>
-		/// <remarks>
-		/// This would be better left internal, however
-		/// </remarks>
-		public sealed class CacheHelperApplicationEventListener : ApplicationEventHandler
+		/// </summary>		
+		internal sealed class CacheHelperApplicationEventListener : ApplicationEventHandler
 		{
             protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
 			{
@@ -47,6 +45,85 @@ namespace Umbraco.Web
 		}
 
 		public const string PartialViewCacheKey = "Umbraco.Web.PartialViewCacheKey";
+        private const string TemplateCacheKey = "template";
+
+	    /// <summary>
+	    /// Clears the cache for a template
+	    /// </summary>
+        /// <param name="cacheHelper"></param>
+	    /// <param name="templateId"></param>
+        public static void ClearCacheForTemplate(this CacheHelper cacheHelper, int templateId)
+        {
+            cacheHelper.ClearCacheByKeySearch(
+                string.Format("{0}{1}", TemplateCacheKey, templateId));            
+        }
+
+	    /// <summary>
+	    /// Clears the library cache for media
+	    /// </summary>
+	    /// <param name="cacheHelper"></param>
+	    /// <param name="mediaId"></param>
+	    /// <param name="allServers">
+	    /// If set to false, this will only clear the library cache for the current server, not all servers registered in the 
+	    /// server farm. In most cases if you are clearing cache you would probably clear it on all servers.
+	    /// </param>
+	    public static void ClearLibraryCacheForMedia(this CacheHelper cacheHelper, int mediaId, bool allServers = true)
+        {
+            const string getmediaCacheKey = "GetMedia";
+
+            if (allServers && UmbracoSettings.UseDistributedCalls)
+            {
+                dispatcher.Refresh(
+                    new Guid("B29286DD-2D40-4DDB-B325-681226589FEC"),
+                    mediaId);
+            }
+            else
+            {
+                var m = new global::umbraco.cms.businesslogic.media.Media(mediaId);
+                if (m.nodeObjectType == global::umbraco.cms.businesslogic.media.Media._objectType)
+                {
+                    foreach (string id in m.Path.Split(','))
+                    {
+                        cacheHelper.ClearCacheByKeySearch(
+                            string.Format("UL_{0}_{1}_True", getmediaCacheKey, id));
+
+                        // Also clear calls that only query this specific item!
+                        if (id == m.Id.ToString())
+                            cacheHelper.ClearCacheByKeySearch(
+                                string.Format("UL_{0}_{1}", getmediaCacheKey, id));
+
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Clears the library cache for members
+        /// </summary>
+        /// <param name="cacheHelper"></param>
+        /// <param name="memberId"></param>
+        /// <param name="allServers">
+        /// If set to false, this will only clear the library cache for the current server, not all servers registered in the 
+        /// server farm. In most cases if you are clearing cache you would probably clear it on all servers.
+        /// </param>
+        public static void ClearLibraryCacheForMember(this CacheHelper cacheHelper, int memberId, bool allServers = true)
+        {
+            const string getmemberCacheKey = "GetMember";
+
+            if (allServers && UmbracoSettings.UseDistributedCalls)
+            {
+                dispatcher.Refresh(
+                    new Guid("E285DF34-ACDC-4226-AE32-C0CB5CF388DA"),
+                    memberId);
+            }
+            else
+            {
+                cacheHelper.ClearCacheByKeySearch(
+                string.Format("UL_{0}_{1}", getmemberCacheKey, memberId));
+            }
+
+            
+        }
 
 		/// <summary>
 		/// Outputs and caches a partial view in MVC

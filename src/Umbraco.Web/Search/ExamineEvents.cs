@@ -60,11 +60,14 @@ namespace Umbraco.Web.Search
 				return;
 
             MediaService.Saved += MediaServiceSaved;
+            //NOTE: this should not need to be done, the SavedCollection event shouldn't even exist!! :(
+            MediaService.SavedCollection += MediaServiceSavedCollection;
             MediaService.Deleted += MediaServiceDeleted;
             MediaService.Moved += MediaServiceMoved;
+            MediaService.Trashed += MediaServiceTrashed;
             ContentService.Saved += ContentServiceSaved;
-            ContentService.Deleted += ContentService_Deleted;
-            ContentService.Moved += ContentService_Moved;
+            ContentService.Deleted += ContentServiceDeleted;
+            ContentService.Moved += ContentServiceMoved;
 
 			//These should only fire for providers that DONT have SupportUnpublishedContent set to true
 			content.AfterUpdateDocumentCache += ContentAfterUpdateDocumentCache;
@@ -85,14 +88,30 @@ namespace Umbraco.Web.Search
 			}
 		}
 
+        //NOTE: this should not need to be done, the SavedCollection event shouldn't even exist!! :(
         [SecuritySafeCritical]
-        void ContentService_Moved(IContentService sender, Umbraco.Core.Events.MoveEventArgs<IContent> e)
+        static void MediaServiceSavedCollection(IMediaService sender, Core.Events.SaveEventArgs<System.Collections.Generic.IEnumerable<IMedia>> e)
+        {
+            foreach (var item in e.SavedEntities.SelectMany(x => x))
+            {
+                IndexMedia(item);
+            }
+        }
+
+        [SecuritySafeCritical]
+	    static void MediaServiceTrashed(IMediaService sender, Core.Events.MoveEventArgs<IMedia> e)
+        {
+            IndexMedia(e.Entity);
+        }
+
+        [SecuritySafeCritical]
+        static void ContentServiceMoved(IContentService sender, Umbraco.Core.Events.MoveEventArgs<IContent> e)
         {
             IndexConent(e.Entity);
         }
 
         [SecuritySafeCritical]
-        void ContentService_Deleted(IContentService sender, Umbraco.Core.Events.DeleteEventArgs<IContent> e)
+        static void ContentServiceDeleted(IContentService sender, Umbraco.Core.Events.DeleteEventArgs<IContent> e)
         {
             e.DeletedEntities.ForEach(
                 content =>
@@ -102,19 +121,19 @@ namespace Umbraco.Web.Search
         }
 
         [SecuritySafeCritical]
-        void ContentServiceSaved(IContentService sender, Umbraco.Core.Events.SaveEventArgs<IContent> e)
+        static void ContentServiceSaved(IContentService sender, Umbraco.Core.Events.SaveEventArgs<IContent> e)
         {
             e.SavedEntities.ForEach(IndexConent);
         }
 
         [SecuritySafeCritical]
-        void MediaServiceMoved(IMediaService sender, Umbraco.Core.Events.MoveEventArgs<IMedia> e)
+        static void MediaServiceMoved(IMediaService sender, Umbraco.Core.Events.MoveEventArgs<IMedia> e)
         {
             IndexMedia(e.Entity);
         }
 
         [SecuritySafeCritical]
-        void MediaServiceDeleted(IMediaService sender, Umbraco.Core.Events.DeleteEventArgs<IMedia> e)
+        static void MediaServiceDeleted(IMediaService sender, Umbraco.Core.Events.DeleteEventArgs<IMedia> e)
         {
             e.DeletedEntities.ForEach(
                 media =>
@@ -124,7 +143,7 @@ namespace Umbraco.Web.Search
         }
 
         [SecuritySafeCritical]
-        void MediaServiceSaved(IMediaService sender, Umbraco.Core.Events.SaveEventArgs<IMedia> e)
+        static void MediaServiceSaved(IMediaService sender, Umbraco.Core.Events.SaveEventArgs<IMedia> e)
         {
             e.SavedEntities.ForEach(IndexMedia);
         }
@@ -205,14 +224,14 @@ namespace Umbraco.Web.Search
 		}
 
 
-        private void IndexMedia(IMedia sender)
+        private static void IndexMedia(IMedia sender)
         {
             ExamineManager.Instance.ReIndexNode(
                 sender.ToXml(), "media",
                 ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler));
         }
 
-        private void IndexConent(IContent sender)
+        private static void IndexConent(IContent sender)
         {
             ExamineManager.Instance.ReIndexNode(
                 sender.ToXml(), "content",

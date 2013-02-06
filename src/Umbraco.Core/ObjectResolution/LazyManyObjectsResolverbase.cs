@@ -99,6 +99,7 @@ namespace Umbraco.Core.ObjectResolution
 
 		private readonly List<Lazy<Type>> _lazyTypeList = new List<Lazy<Type>>();
 		private readonly List<Func<IEnumerable<Type>>> _typeListProducerList = new List<Func<IEnumerable<Type>>>();
+        private readonly List<Type> _typesToRemoveOnResolved = new List<Type>(); 
 
 		private List<Type> _resolvedTypes = null;
 		private readonly ReaderWriterLockSlim _resolvedTypesLock = new ReaderWriterLockSlim();
@@ -130,19 +131,21 @@ namespace Umbraco.Core.ObjectResolution
 				{
 					if (_resolvedTypes == null)
 					{
+                        lck.UpgradeToWriteLock();
+
+                        _resolvedTypes = new List<Type>();
+
                         // get the types by evaluating the lazy & producers
                         var types = new List<Type>();
                         types.AddRange(_lazyTypeList.Select(x => x.Value));
                         types.AddRange(_typeListProducerList.SelectMany(x => x()));
                         
-                        lck.UpgradeToWriteLock();
-
-						_resolvedTypes = new List<Type>();
-
                         // we need to validate each resolved type now since we could
                         // not do it before evaluating the lazy & producers
-                        foreach (var type in types)
-							AddValidAndNoDuplicate(_resolvedTypes, type);
+                        foreach (var type in types.Where(x => !_typesToRemoveOnResolved.Contains(x)))
+                        {
+                            AddValidAndNoDuplicate(_resolvedTypes, type);
+                        }
 					}
 
 					return _resolvedTypes;	
@@ -150,8 +153,12 @@ namespace Umbraco.Core.ObjectResolution
 			}
 		}
 
-        // ensures that type is valid and not a duplicate
-        // then appends the type to the end of the list
+        /// <summary>
+        /// Ensures that type is valid and not a duplicate
+        /// then appends the type to the end of the list
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="type"></param>
         private void AddValidAndNoDuplicate(List<Type> list, Type type)
 		{
             EnsureCorrectType(type);
@@ -164,6 +171,19 @@ namespace Umbraco.Core.ObjectResolution
 		}
 
         #region Types collection manipulation
+
+        /// <summary>
+        /// Once types are resolved any types that have been added with this method will be removed once the types have been lazily resolved.
+        /// </summary>
+        /// <remarks>
+        /// The resolver must support removals for this method to work
+        /// </remarks>
+        public override void RemoveType(Type value)
+        {
+            EnsureSupportsRemove();
+
+            _typesToRemoveOnResolved.Add(value);
+        }
 
         /// <summary>
         /// Lazily adds types from lazy types.
@@ -216,7 +236,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// <summary>
         /// Lazily adds a type from an actual type.
 		/// </summary>
-        /// <param name="types">The actual type, to add.</param>
+        /// <param name="value">The actual type, to add.</param>
         /// <remarks>The type is converted to a lazy type.</remarks>
 		public override void AddType(Type value)
 		{
@@ -240,14 +260,6 @@ namespace Umbraco.Core.ObjectResolution
         #endregion
 
         #region Types collection manipulation support
-
-        /// <summary>
-        /// Gets a <c>false</c> value indicating that the resolver does NOT support removing types.
-		/// </summary>
-		protected override bool SupportsRemove
-		{
-			get { return false; }
-		}
 
 		/// <summary>
         /// Gets a <c>false</c> value indicating that the resolver does NOT support inserting types.

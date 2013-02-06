@@ -16,7 +16,9 @@ using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.Net;
 using System.Web.UI;
+using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Web;
 using umbraco.businesslogic.Exceptions;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.media;
@@ -431,7 +433,7 @@ namespace umbraco.presentation.webservices
 			        new Guid("dd12b6a0-14b9-46e8-8800-c154f74047c8"),
 			        tp.Id);
 	        else
-		        template.ClearCachedTemplate(tp.Id);
+                ApplicationContext.Current.ApplicationCache.ClearCacheForTemplate(tp.Id);
 
 
 	        return retVal;

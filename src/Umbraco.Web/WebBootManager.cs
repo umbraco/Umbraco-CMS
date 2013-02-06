@@ -18,6 +18,7 @@ using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Routing;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
+using umbraco.presentation.cache;
 
 
 namespace Umbraco.Web
@@ -81,6 +82,8 @@ namespace Umbraco.Web
             base.InitializeApplicationEventsResolver();
             ApplicationEventsResolver.Current.AddType<CacheHelperExtensions.CacheHelperApplicationEventListener>();
             ApplicationEventsResolver.Current.AddType<LegacyScheduledTasks>();
+            //We need to remove these types because we've obsoleted them and we don't want them executing:
+            ApplicationEventsResolver.Current.RemoveType<global::umbraco.LibraryCacheRefresher>();
         }
 
         /// <summary>
@@ -169,6 +172,14 @@ namespace Umbraco.Web
         protected override void InitializeResolvers()
         {
             base.InitializeResolvers();
+
+            //We are going to manually remove a few cache refreshers here because we've obsoleted them and we don't want them
+            // to be registered more than once
+            CacheRefreshersResolver.Current.RemoveType<pageRefresher>();
+            CacheRefreshersResolver.Current.RemoveType<global::umbraco.presentation.cache.MediaLibraryRefreshers>();
+            CacheRefreshersResolver.Current.RemoveType<global::umbraco.presentation.cache.MemberLibraryRefreshers>();
+            CacheRefreshersResolver.Current.RemoveType<global::umbraco.templateCacheRefresh>();
+            CacheRefreshersResolver.Current.RemoveType<global::umbraco.macroCacheRefresh>();
             
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
                 PluginManager.Current.ResolveSurfaceControllers());

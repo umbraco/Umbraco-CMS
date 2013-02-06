@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Threading;
+using System.Web.Services.Protocols;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.interfaces;
-using umbraco.IO;
 
 namespace umbraco.presentation.cache
 {
@@ -26,14 +27,14 @@ namespace umbraco.presentation.cache
     /// </summary>
     public class dispatcher
     {
-        private static readonly string _login = User.GetUser(UmbracoSettings.DistributedCallUser).LoginName;
-        private static readonly string _password = User.GetUser(UmbracoSettings.DistributedCallUser).GetPassword();
-        private static readonly string _webServicesUrl;
+        private static readonly string Login = User.GetUser(UmbracoSettings.DistributedCallUser).LoginName;
+        private static readonly string Password = User.GetUser(UmbracoSettings.DistributedCallUser).GetPassword();
+        private static readonly string WebServicesUrl;
 
 
         static dispatcher()
         {
-            _webServicesUrl = IOHelper.ResolveUrl(SystemDirectories.Webservices);
+            WebServicesUrl = IOHelper.ResolveUrl(SystemDirectories.WebServices);
         }
 
         /// <summary>
@@ -41,10 +42,10 @@ namespace umbraco.presentation.cache
         /// using the specified ICacheRefresher with the guid factoryGuid.
         /// </summary>
         /// <param name="factoryGuid">The unique identifier of the ICacheRefresher used to refresh the node.</param>
-        /// <param name="Id">The id of the node.</param>
-        public static void Refresh(Guid factoryGuid, int Id)
+        /// <param name="id">The id of the node.</param>
+        public static void Refresh(Guid factoryGuid, int id)
         {
-            InvokeDispatchMethod(DispatchType.RefreshByNumericId, factoryGuid, Id, Guid.Empty);
+            InvokeDispatchMethod(DispatchType.RefreshByNumericId, factoryGuid, id, Guid.Empty);
         }
 
         /// <summary>
@@ -52,10 +53,10 @@ namespace umbraco.presentation.cache
         /// using the specified ICacheRefresher with the guid factoryGuid.
         /// </summary>
         /// <param name="factoryGuid">The unique identifier of the ICacheRefresher used to refresh the node.</param>
-        /// <param name="Id">The guid of the node.</param>
-        public static void Refresh(Guid factoryGuid, Guid Id)
+        /// <param name="id">The guid of the node.</param>
+        public static void Refresh(Guid factoryGuid, Guid id)
         {
-            InvokeDispatchMethod(DispatchType.RefreshByGuid, factoryGuid, 0, Id);
+            InvokeDispatchMethod(DispatchType.RefreshByGuid, factoryGuid, 0, id);
         }
 
         /// <summary>
@@ -73,10 +74,10 @@ namespace umbraco.presentation.cache
         /// using the specified ICacheRefresher with the guid factoryGuid.
         /// </summary>
         /// <param name="factoryGuid">The unique identifier.</param>
-        /// <param name="Id">The id.</param>
-        public static void Remove(Guid factoryGuid, int Id)
+        /// <param name="id">The id.</param>
+        public static void Remove(Guid factoryGuid, int id)
         {
-            InvokeDispatchMethod(DispatchType.RemoveById, factoryGuid, Id, Guid.Empty);
+            InvokeDispatchMethod(DispatchType.RemoveById, factoryGuid, id, Guid.Empty);
         }
 
         /// <summary>
@@ -107,20 +108,20 @@ namespace umbraco.presentation.cache
                         switch (dispatchType)
                         {
                             case DispatchType.RefreshAll:
-                                asyncResultsList.Add(cacheRefresher.BeginRefreshAll(factoryGuid, _login, _password, null,
+                                asyncResultsList.Add(cacheRefresher.BeginRefreshAll(factoryGuid, Login, Password, null,
                                                                                     null));
                                 break;
                             case DispatchType.RefreshByGuid:
-                                asyncResultsList.Add(cacheRefresher.BeginRefreshByGuid(factoryGuid, guidId, _login,
-                                                                                       _password, null, null));
+                                asyncResultsList.Add(cacheRefresher.BeginRefreshByGuid(factoryGuid, guidId, Login,
+                                                                                       Password, null, null));
                                 break;
                             case DispatchType.RefreshByNumericId:
-                                asyncResultsList.Add(cacheRefresher.BeginRefreshById(factoryGuid, numericId, _login,
-                                                                                     _password, null, null));
+                                asyncResultsList.Add(cacheRefresher.BeginRefreshById(factoryGuid, numericId, Login,
+                                                                                     Password, null, null));
                                 break;
                             case DispatchType.RemoveById:
-                                asyncResultsList.Add(cacheRefresher.BeginRemoveById(factoryGuid, numericId, _login,
-                                                                                    _password, null, null));
+                                asyncResultsList.Add(cacheRefresher.BeginRemoveById(factoryGuid, numericId, Login,
+                                                                                    Password, null, null));
                                 break;
                         }
                     }
@@ -205,16 +206,16 @@ namespace umbraco.presentation.cache
         /// </summary>
         /// <param name="cr">The CacheRefresher.</param>
         /// <param name="n">The XmlNode.</param>
-        private static void SetWebServiceUrlFromNode(CacheRefresher cr, XmlNode n)
+        private static void SetWebServiceUrlFromNode(WebClientProtocol cr, XmlNode n)
         {
             string protocol = GlobalSettings.UseSSL ? "https" : "http";
             if (n.Attributes.GetNamedItem("forceProtocol") != null && !String.IsNullOrEmpty(n.Attributes.GetNamedItem("forceProtocol").Value))
                 protocol = n.Attributes.GetNamedItem("forceProtocol").Value;
-            string domain = xmlHelper.GetNodeValue(n);
+            string domain = XmlHelper.GetNodeValue(n);
             if (n.Attributes.GetNamedItem("forcePortnumber") != null && !String.IsNullOrEmpty(n.Attributes.GetNamedItem("forcePortnumber").Value))
                 domain += string.Format(":{0}", n.Attributes.GetNamedItem("forcePortnumber").Value);
 
-            cr.Url = string.Format("{0}://{1}{2}/cacheRefresher.asmx", protocol, domain, _webServicesUrl);
+            cr.Url = string.Format("{0}://{1}{2}/cacheRefresher.asmx", protocol, domain, WebServicesUrl);
         }
 
         private static string GetFactoryObjectName(Guid uniqueIdentifier)
