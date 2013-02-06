@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Authentication;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core;
 using umbraco.DataLayer.Utility.Installer;
 using umbraco.DataLayer;
 
@@ -57,6 +59,12 @@ namespace umbraco.presentation.install.utills
         [System.Web.Script.Services.ScriptMethod]
         public static string installOrUpgrade()
         {
+            //if its not configured then we can continue
+            if (ApplicationContext.Current == null || ApplicationContext.Current.IsConfigured)
+            {
+                throw new AuthenticationException("The application is already configured");
+            }
+
             Helper.setProgress(5, "Opening database connection...", "");
 
             IInstallerUtility installer;
