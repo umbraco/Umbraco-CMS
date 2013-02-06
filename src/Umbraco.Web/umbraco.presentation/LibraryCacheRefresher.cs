@@ -15,43 +15,42 @@ namespace umbraco
 		{
 			if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
 			{
-				Member.AfterSave += new Member.SaveEventHandler(Member_AfterSave);
-				Member.BeforeDelete += new Member.DeleteEventHandler(Member_BeforeDelete);
-				Media.AfterSave += new Media.SaveEventHandler(Media_AfterSave);
-				Media.BeforeDelete += new Media.DeleteEventHandler(Media_BeforeDelete);
+				Member.AfterSave += MemberAfterSave;
+				Member.BeforeDelete += MemberBeforeDelete;
+				Media.AfterSave += MediaAfterSave;
+				Media.BeforeDelete += MediaBeforeDelete;
+                //we need to do this before the move so that we still have the item's current path
+                //in order to invalidate the media cache. Pretty sure this was why the BeforeDelete was
+                //occuring as well which must have been before we had a recycle bin for media.
+                //see : http://issues.umbraco.org/issue/U4-1653
+                CMSNode.BeforeMove += MediaBeforeMove;
 			}
-
-			// now handled directly by the IRoutesCache implementation
-			//content.AfterUpdateDocumentCache += new content.DocumentCacheEventHandler(content_AfterUpdateDocumentCache);
-			//content.AfterRefreshContent += new content.RefreshContentEventHandler(content_AfterRefreshContent);
 		}
 
-		//void content_AfterRefreshContent(Document sender, RefreshContentEventArgs e)
-		//{
-		//    library.ClearNiceUrlCache();
-		//}
+	    static void MediaBeforeMove(object sender, MoveEventArgs e)
+        {
+            if (!(sender is Media))
+                return;
 
-		//void content_AfterUpdateDocumentCache(Document sender, DocumentCacheEventArgs e)
-		//{
-		//    library.ClearNiceUrlCache();
-		//}
+            library.ClearLibraryCacheForMedia(((Media) sender).Id);
+        }
 
-		void Member_BeforeDelete(Member sender, DeleteEventArgs e)
+	    static void MemberBeforeDelete(Member sender, DeleteEventArgs e)
 		{
 			library.ClearLibraryCacheForMember(sender.Id);
 		}
 
-		void Media_BeforeDelete(Media sender, DeleteEventArgs e)
+	    static void MediaBeforeDelete(Media sender, DeleteEventArgs e)
 		{
 			library.ClearLibraryCacheForMedia(sender.Id);
 		}
 
-		void Media_AfterSave(Media sender, SaveEventArgs e)
+	    static void MediaAfterSave(Media sender, SaveEventArgs e)
 		{
 			library.ClearLibraryCacheForMedia(sender.Id);
 		}
 
-		void Member_AfterSave(Member sender, SaveEventArgs e)
+	    static void MemberAfterSave(Member sender, SaveEventArgs e)
 		{
 			library.ClearLibraryCacheForMember(sender.Id);
 		}
