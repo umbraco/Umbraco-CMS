@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Publishing;
@@ -9,6 +10,7 @@ using umbraco;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using umbraco.presentation.cache;
+using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.Strategies.Publishing
 {
@@ -22,13 +24,13 @@ namespace Umbraco.Web.Strategies.Publishing
     /// and PublishingStrategy.
     /// This event subscriber will only be relevant as long as there is an xml cache.
     /// </remarks>
-    public class UpdateCacheAfterPublish : IApplicationStartupHandler
+    public class UpdateCacheAfterPublish : ApplicationEventHandler
     {
-        public UpdateCacheAfterPublish()
+        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             PublishingStrategy.Published += PublishingStrategy_Published;
         }
-
+        
         void PublishingStrategy_Published(IPublishingStrategy sender, PublishEventArgs<IContent> e)
         {
             if (e.PublishedEntities.Any())

@@ -210,9 +210,7 @@ namespace umbraco.webservices.templates
         {
             // Clear cache in rutime
             if (UmbracoSettings.UseDistributedCalls)
-                DistributedCache.Instance.Refresh(
-                    new Guid("dd12b6a0-14b9-46e8-8800-c154f74047c8"),
-                    cachedTemplate.Id);
+                DistributedCache.Instance.RefreshTemplateCache(cachedTemplate.Id);
             else
                 ApplicationContext.Current.ApplicationCache.ClearCacheForTemplate(cachedTemplate.Id);
         }

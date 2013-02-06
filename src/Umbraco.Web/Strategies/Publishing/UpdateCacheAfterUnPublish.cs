@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Publishing;
 using Umbraco.Web.Cache;
-using umbraco;
-using umbraco.interfaces;
-using umbraco.presentation.cache;
+
 
 namespace Umbraco.Web.Strategies.Publishing
 {
@@ -20,13 +20,13 @@ namespace Umbraco.Web.Strategies.Publishing
     /// and PublishingStrategy.
     /// This event subscriber will only be relevant as long as there is an xml cache.
     /// </remarks>
-    public class UpdateCacheAfterUnPublish : IApplicationStartupHandler
+    public class UpdateCacheAfterUnPublish : ApplicationEventHandler
     {
-        public UpdateCacheAfterUnPublish()
+        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             PublishingStrategy.UnPublished += PublishingStrategy_UnPublished;
         }
-
+        
         void PublishingStrategy_UnPublished(IPublishingStrategy sender, PublishEventArgs<IContent> e)
         {
             if (e.PublishedEntities.Any())

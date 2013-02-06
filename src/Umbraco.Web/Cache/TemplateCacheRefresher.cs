@@ -19,7 +19,7 @@ namespace Umbraco.Web.Cache
         {
             get
             {
-                return new Guid("DD12B6A0-14B9-46e8-8800-C154F74047C8");
+                return new Guid(DistributedCache.TemplateRefresherId);
             }
         }
 

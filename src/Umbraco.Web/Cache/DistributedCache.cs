@@ -13,6 +13,19 @@ using umbraco.BusinessLogic;
 
 namespace Umbraco.Web.Cache
 {
+    public static class DistributedCacheExtensions
+    {
+        /// <summary>
+        /// Refreshes the cache amongst servers for a template
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="templateId"></param>
+        public static void RefreshTemplateCache(this DistributedCache dc, int templateId)
+        {
+            dc.Refresh(new Guid(DistributedCache.TemplateRefresherId), templateId);
+        }
+    }
+
     /// <summary>
     /// DistrubutedCacheDispatcher is used to handle Umbraco's load balancing.    
     /// </summary>
@@ -28,6 +41,14 @@ namespace Umbraco.Web.Cache
     /// </remarks>
     public class DistributedCache
     {
+
+        #region Public constants/Ids
+
+        public const string TemplateRefresherId = "DD12B6A0-14B9-46e8-8800-C154F74047C8"; 
+        
+        
+        #endregion
+
         private readonly string _login;
         private readonly string _password;
         private readonly string _webServicesUrl;
