@@ -113,9 +113,7 @@ namespace Umbraco.Web
 
             if (allServers && UmbracoSettings.UseDistributedCalls)
             {
-                DistributedCache.Instance.Refresh(
-                    new Guid("E285DF34-ACDC-4226-AE32-C0CB5CF388DA"),
-                    memberId);
+                DistributedCache.Instance.RefreshMemberCache(memberId);
             }
             else
             {

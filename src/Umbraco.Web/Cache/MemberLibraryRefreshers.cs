@@ -9,7 +9,7 @@ namespace Umbraco.Web.Cache
 
         public Guid UniqueIdentifier
         {
-            get { return new Guid("E285DF34-ACDC-4226-AE32-C0CB5CF388DA"); }
+            get { return new Guid(DistributedCache.MemberCacheRefresherId); }
         }
 
         public string Name

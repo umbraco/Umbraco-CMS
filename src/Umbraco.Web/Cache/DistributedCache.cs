@@ -53,6 +53,16 @@ namespace Umbraco.Web.Cache
         {
             dc.Remove(new Guid(DistributedCache.PageCacheRefresherId), pageId);
         }
+
+        /// <summary>
+        /// Refreshes the cache amongst servers for a member
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="memberId"></param>
+        public static void RefreshMemberCache(this DistributedCache dc, int memberId)
+        {
+            dc.Refresh(new Guid(DistributedCache.MemberCacheRefresherId), memberId);
+        }
     }
 
     /// <summary>
@@ -75,6 +85,7 @@ namespace Umbraco.Web.Cache
 
         public const string TemplateRefresherId = "DD12B6A0-14B9-46e8-8800-C154F74047C8";
         public const string PageCacheRefresherId = "27AB3022-3DFA-47b6-9119-5945BC88FD66";
+        public const string MemberCacheRefresherId = "E285DF34-ACDC-4226-AE32-C0CB5CF388DA";
         
         #endregion
 
