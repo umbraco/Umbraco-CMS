@@ -110,9 +110,7 @@ namespace umbraco.cms.presentation.developer
 				}
 				// Flush macro from cache!
 				if (UmbracoSettings.UseDistributedCalls)
-                    DistributedCache.Instance.Refresh(
-						new Guid("7B1E683C-5F34-43dd-803D-9699EA1E98CA"),
-						macroID);
+                    DistributedCache.Instance.RefreshMacroCache(macroID);
 				else
 					macro.GetMacro(macroID).removeFromCache();
 

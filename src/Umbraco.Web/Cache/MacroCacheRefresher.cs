@@ -18,7 +18,7 @@ namespace Umbraco.Web.Cache
         {
             get
             {
-                return new Guid("7B1E683C-5F34-43dd-803D-9699EA1E98CA");
+                return new Guid(DistributedCache.MacroCacheRefresherId);
             }
         }
 
