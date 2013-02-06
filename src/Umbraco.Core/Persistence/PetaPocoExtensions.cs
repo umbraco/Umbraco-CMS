@@ -143,6 +143,8 @@ namespace Umbraco.Core.Persistence
             var creation = new DatabaseSchemaCreation(db);
             creation.InitializeDatabaseSchema();
 
+            LogHelper.Info<Database>("Finalized database schema creation");
+
             NewTable -= PetaPocoExtensions_NewTable;
         }
 

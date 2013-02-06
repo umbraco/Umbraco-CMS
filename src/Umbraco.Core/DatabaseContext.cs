@@ -218,7 +218,7 @@ namespace Umbraco.Core
 
             xml.Save(fileName, SaveOptions.DisableFormatting);
 
-            LogHelper.Info<DatabaseContext>("Configured new ConnectionString: " + connectionString);
+            LogHelper.Info<DatabaseContext>("Configured a new ConnectionString using the '" + providerName + "' provider.");
         }
 
         /// <summary>
@@ -337,6 +337,8 @@ namespace Umbraco.Core
 
             try
             {
+                LogHelper.Info<DatabaseContext>("Database configuration status: Started");
+
                 var database = new UmbracoDatabase(_connectionString, ProviderName);
                 var schemaResult = ValidateDatabaseSchema();
                 var installedVersion = schemaResult.DetermineInstalledVersion();
@@ -358,6 +360,8 @@ namespace Umbraco.Core
                     var upgraded = runner.Execute(database, true);
                     message = "Upgrade completed!";
                 }
+
+                LogHelper.Info<DatabaseContext>("Database configuration status: " + message);
 
                 return new Result { Message = message, Success = true, Percentage = "100" };
             }

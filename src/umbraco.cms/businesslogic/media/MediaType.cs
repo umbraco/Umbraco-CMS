@@ -150,10 +150,13 @@ namespace umbraco.cms.businesslogic.media
 
             if (!e.Cancel)
             {
-                // delete all documents of this type
-                Media.DeleteFromType(this);
-                // Delete contentType
-                base.delete();
+                // check that no media types uses me as a master
+                if (GetAllAsList().Any(dt => dt.MasterContentTypes.Contains(this.Id)))
+                {
+                    throw new ArgumentException("Can't delete a Media Type used as a Master Content Type. Please remove all references first!");
+                }
+
+                ApplicationContext.Current.Services.ContentTypeService.Delete(_mediaType);
 
                 FireAfterDelete(e);
             }

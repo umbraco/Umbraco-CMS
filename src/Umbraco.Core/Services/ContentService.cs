@@ -352,7 +352,7 @@ namespace Umbraco.Core.Services
 		{
 			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 			{
-				var query = Query<IContent>.Builder.Where(x => x.ParentId == -20);
+				var query = Query<IContent>.Builder.Where(x => x.Path.Contains("-20"));
 				var contents = repository.GetByQuery(query);
 
 				return contents;
@@ -1261,6 +1261,7 @@ namespace Umbraco.Core.Services
 
             //Has this content item previously been published? If so, we don't need to refresh the children
 	        var previouslyPublished = HasPublishedVersion(content.Id);
+	        var validForPublishing = true;
 
             //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
             if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
@@ -1269,7 +1270,7 @@ namespace Umbraco.Core.Services
                     string.Format(
                         "Content '{0}' with Id '{1}' could not be published because its parent is not published.",
                         content.Name, content.Id));
-                return false;
+                validForPublishing = false;
             }
 
             //Content contains invalid property values and can therefore not be published - fire event?
@@ -1279,11 +1280,11 @@ namespace Umbraco.Core.Services
                     string.Format(
                         "Content '{0}' with Id '{1}' could not be published because of invalid properties.",
                         content.Name, content.Id));
-                return false;
+                validForPublishing = false;
             }
 
             //Publish and then update the database with new status
-            bool published = _publishingStrategy.Publish(content, userId);
+	        bool published = validForPublishing && _publishingStrategy.Publish(content, userId);
 
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateContentRepository(uow))
@@ -1295,37 +1296,38 @@ namespace Umbraco.Core.Services
 
                 uow.Commit();
 
+                var xml = content.ToXml();
+                //Preview Xml
+                var previewPoco = new PreviewXmlDto
+                {
+                    NodeId = content.Id,
+                    Timestamp = DateTime.Now,
+                    VersionId = content.Version,
+                    Xml = xml.ToString(SaveOptions.None)
+                };
+                var previewExists =
+                    uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
+                                                               new { Id = content.Id, Version = content.Version }) != 0;
+                int previewResult = previewExists
+                                        ? uow.Database.Update<PreviewXmlDto>(
+                                            "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
+                                            new
+                                                {
+                                                    Xml = previewPoco.Xml,
+                                                    Timestamp = previewPoco.Timestamp,
+                                                    Id = previewPoco.NodeId,
+                                                    Version = previewPoco.VersionId
+                                                })
+                                        : Convert.ToInt32(uow.Database.Insert(previewPoco));
+
                 if (published)
                 {
-                    var xml = content.ToXml();
                     //Content Xml
                     var contentPoco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
                     var contentExists = uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = content.Id }) != 0;
                     int contentResult = contentExists
                                             ? uow.Database.Update(contentPoco)
                                             : Convert.ToInt32(uow.Database.Insert(contentPoco));
-                    //Preview Xml
-                    var previewPoco = new PreviewXmlDto
-                                          {
-                                              NodeId = content.Id,
-                                              Timestamp = DateTime.Now,
-                                              VersionId = content.Version,
-                                              Xml = xml.ToString(SaveOptions.None)
-                                          };
-                    var previewExists =
-                        uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
-                                                                   new {Id = content.Id, Version = content.Version}) != 0;
-                    int previewResult = previewExists
-                                            ? uow.Database.Update<PreviewXmlDto>(
-                                                "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
-                                                new
-                                                    {
-                                                        Xml = previewPoco.Xml,
-                                                        Timestamp = previewPoco.Timestamp,
-                                                        Id = previewPoco.NodeId,
-                                                        Version = previewPoco.VersionId
-                                                    })
-                                            : Convert.ToInt32(uow.Database.Insert(previewPoco));
 
                 }
             }
@@ -1334,11 +1336,11 @@ namespace Umbraco.Core.Services
                 Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
 
             //Save xml to db and call following method to fire event through PublishingStrategy to update cache
-            if (omitCacheRefresh == false)
+            if (published && omitCacheRefresh == false)
                 _publishingStrategy.PublishingFinalized(content);
 
             //We need to check if children and their publish state to ensure that we 'republish' content that was previously published
-            if (omitCacheRefresh == false && previouslyPublished == false && HasChildren(content.Id))
+            if (published && omitCacheRefresh == false && previouslyPublished == false && HasChildren(content.Id))
             {
                 var descendants = GetPublishedDescendants(content);
 

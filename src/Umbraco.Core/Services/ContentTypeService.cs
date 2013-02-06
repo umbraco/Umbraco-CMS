@@ -358,7 +358,7 @@ namespace Umbraco.Core.Services
 	        if (DeletingMediaType.IsRaisedEventCancelled(new DeleteEventArgs<IMediaType>(mediaType), this)) 
 				return;
 	        
-			_mediaService.DeleteMediaOfType(mediaType.Id);
+			_mediaService.DeleteMediaOfType(mediaType.Id, userId);
 
 	        var uow = _uowProvider.GetUnitOfWork();
 	        using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
