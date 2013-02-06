@@ -12,6 +12,7 @@ using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
+using Umbraco.Web.Cache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
@@ -190,7 +191,7 @@ namespace umbraco
         public static void UnPublishSingleNode(int DocumentId)
         {            
             if (UmbracoSettings.UseDistributedCalls)
-                dispatcher.Remove(
+                DistributedCache.Instance.Remove(
                     new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"),
                     DocumentId);
             else
@@ -205,7 +206,7 @@ namespace umbraco
         internal static void UnPublishSingleNode(Document document)
         {
             if (UmbracoSettings.UseDistributedCalls)
-                dispatcher.Remove(
+                DistributedCache.Instance.Remove(
                     new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"),
                     document.Id);
             else
@@ -236,7 +237,7 @@ namespace umbraco
         internal static void UpdateDocumentCache(Document doc)
         {
             if (UmbracoSettings.UseDistributedCalls)
-                dispatcher.Refresh(
+                DistributedCache.Instance.Refresh(
                     new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"),
                     doc.Id);
             else
@@ -264,7 +265,7 @@ namespace umbraco
 
             if (UmbracoSettings.UseDistributedCalls)
             {
-                dispatcher.RefreshAll(new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"));
+                DistributedCache.Instance.RefreshAll(new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"));
             }
             else
             {
@@ -281,7 +282,7 @@ namespace umbraco
         {
             //PPH - added dispatcher support to this call..
             if (UmbracoSettings.UseDistributedCalls)
-                dispatcher.RefreshAll(new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"));
+                DistributedCache.Instance.RefreshAll(new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"));
             else
             {
                 content.Instance.RefreshContentFromDatabaseAsync();

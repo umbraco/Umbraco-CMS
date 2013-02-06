@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.IO;
 using Umbraco.Core.IO;
+using Umbraco.Web.Cache;
 using umbraco.BasePages;
 using umbraco.presentation.cache;
 using umbraco.uicontrols;
@@ -109,7 +110,7 @@ namespace umbraco.cms.presentation.developer
 				}
 				// Flush macro from cache!
 				if (UmbracoSettings.UseDistributedCalls)
-					dispatcher.Refresh(
+                    DistributedCache.Instance.Refresh(
 						new Guid("7B1E683C-5F34-43dd-803D-9699EA1E98CA"),
 						macroID);
 				else

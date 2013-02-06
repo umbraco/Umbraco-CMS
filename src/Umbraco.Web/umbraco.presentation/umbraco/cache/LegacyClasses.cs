@@ -63,22 +63,22 @@ namespace umbraco.presentation.cache
     {
         public static void Refresh(Guid factoryGuid, int id)
         {
-            DistrubutedCache.Instance.Refresh(factoryGuid, id);
+            DistributedCache.Instance.Refresh(factoryGuid, id);
         }
 
         public static void Refresh(Guid factoryGuid, Guid id)
         {
-            DistrubutedCache.Instance.Refresh(factoryGuid, id);
+            DistributedCache.Instance.Refresh(factoryGuid, id);
         }
 
         public static void RefreshAll(Guid factoryGuid)
         {
-            DistrubutedCache.Instance.RefreshAll(factoryGuid);
+            DistributedCache.Instance.RefreshAll(factoryGuid);
         }
 
         public static void Remove(Guid factoryGuid, int id)
         {
-            DistrubutedCache.Instance.Remove(factoryGuid, id);
+            DistributedCache.Instance.Remove(factoryGuid, id);
         }
     }
 

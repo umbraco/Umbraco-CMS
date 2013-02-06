@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Web.Services;
 using Umbraco.Core;
 using Umbraco.Web;
+using Umbraco.Web.Cache;
 
 namespace umbraco.webservices.templates
 {
@@ -209,7 +210,7 @@ namespace umbraco.webservices.templates
         {
             // Clear cache in rutime
             if (UmbracoSettings.UseDistributedCalls)
-                umbraco.presentation.cache.dispatcher.Refresh(
+                DistributedCache.Instance.Refresh(
                     new Guid("dd12b6a0-14b9-46e8-8800-c154f74047c8"),
                     cachedTemplate.Id);
             else

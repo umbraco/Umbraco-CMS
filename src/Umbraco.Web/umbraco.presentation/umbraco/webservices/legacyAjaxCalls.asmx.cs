@@ -19,6 +19,7 @@ using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web;
+using Umbraco.Web.Cache;
 using umbraco.businesslogic.Exceptions;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.media;
@@ -429,7 +430,7 @@ namespace umbraco.presentation.webservices
 
 	        // Clear cache in rutime
 	        if (UmbracoSettings.UseDistributedCalls)
-		        cache.dispatcher.Refresh(
+                DistributedCache.Instance.Refresh(
 			        new Guid("dd12b6a0-14b9-46e8-8800-c154f74047c8"),
 			        tp.Id);
 	        else

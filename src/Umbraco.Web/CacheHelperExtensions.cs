@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Web.Cache;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.cache;
@@ -73,7 +74,7 @@ namespace Umbraco.Web
 
             if (allServers && UmbracoSettings.UseDistributedCalls)
             {
-                dispatcher.Refresh(
+                DistributedCache.Instance.Refresh(
                     new Guid("B29286DD-2D40-4DDB-B325-681226589FEC"),
                     mediaId);
             }
@@ -112,7 +113,7 @@ namespace Umbraco.Web
 
             if (allServers && UmbracoSettings.UseDistributedCalls)
             {
-                dispatcher.Refresh(
+                DistributedCache.Instance.Refresh(
                     new Guid("E285DF34-ACDC-4226-AE32-C0CB5CF388DA"),
                     memberId);
             }

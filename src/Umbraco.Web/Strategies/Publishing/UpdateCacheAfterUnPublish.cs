@@ -3,6 +3,7 @@ using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Publishing;
+using Umbraco.Web.Cache;
 using umbraco;
 using umbraco.interfaces;
 using umbraco.presentation.cache;
@@ -52,7 +53,7 @@ namespace Umbraco.Web.Strategies.Publishing
         {
             if (UmbracoSettings.UseDistributedCalls)
             {
-                dispatcher.Remove(new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"), content.Id);
+                DistributedCache.Instance.Remove(new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"), content.Id);
             }
             else
             {

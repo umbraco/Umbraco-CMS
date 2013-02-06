@@ -14,6 +14,7 @@ using System.Xml.Xsl;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web;
+using Umbraco.Web.Cache;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.template;
@@ -469,7 +470,7 @@ namespace umbraco.presentation.webservices
 
                     // Clear cache in rutime
                     if (UmbracoSettings.UseDistributedCalls)
-                        dispatcher.Refresh(new Guid("dd12b6a0-14b9-46e8-8800-c154f74047c8"), _template.Id);
+                        DistributedCache.Instance.Refresh(new Guid("dd12b6a0-14b9-46e8-8800-c154f74047c8"), _template.Id);
                     else
                         ApplicationContext.Current.ApplicationCache.ClearCacheForTemplate(_template.Id);
                 }

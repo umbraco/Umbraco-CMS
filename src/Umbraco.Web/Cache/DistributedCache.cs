@@ -26,17 +26,17 @@ namespace Umbraco.Web.Cache
     /// UPDATE 2010 02 - Alex Norcliffe - Refactored Dispatcher to support parallel dispatch threads, and preventing failure of whole dispatch
     /// if one node fails. Still needs more work to get it to Enterprise level though but this is for 4.1
     /// </remarks>
-    public class DistrubutedCache
+    public class DistributedCache
     {
         private readonly string _login;
         private readonly string _password;
         private readonly string _webServicesUrl;
-        private static readonly DistrubutedCache InstanceObject = new DistrubutedCache();
+        private static readonly DistributedCache InstanceObject = new DistributedCache();
 
         /// <summary>
         /// Constructor
         /// </summary>
-        private DistrubutedCache()
+        private DistributedCache()
         {
             _login = User.GetUser(UmbracoSettings.DistributedCallUser).LoginName;
             _password = User.GetUser(UmbracoSettings.DistributedCallUser).GetPassword();
@@ -47,7 +47,7 @@ namespace Umbraco.Web.Cache
         /// Singleton
         /// </summary>
         /// <returns></returns>
-        public static DistrubutedCache Instance
+        public static DistributedCache Instance
         {
             get
             {
@@ -201,23 +201,23 @@ namespace Umbraco.Web.Cache
 
         private void LogDispatchBatchError(Exception ee)
         {
-            LogHelper.Error<DistrubutedCache>("Error refreshing distributed list", ee);
+            LogHelper.Error<DistributedCache>("Error refreshing distributed list", ee);
         }
 
         private void LogDispatchBatchResult(int errorCount)
         {
-            LogHelper.Debug<DistrubutedCache>(string.Format("Distributed server push completed with {0} nodes reporting an error", errorCount == 0 ? "no" : errorCount.ToString(CultureInfo.InvariantCulture)));
+            LogHelper.Debug<DistributedCache>(string.Format("Distributed server push completed with {0} nodes reporting an error", errorCount == 0 ? "no" : errorCount.ToString(CultureInfo.InvariantCulture)));
         }
 
         private void LogDispatchNodeError(Exception ex)
         {
-            LogHelper.Error<DistrubutedCache>("Error refreshing a node in the distributed list", ex);
+            LogHelper.Error<DistributedCache>("Error refreshing a node in the distributed list", ex);
         }
 
         private void LogDispatchNodeError(WebException ex)
         {
             string url = (ex.Response != null) ? ex.Response.ResponseUri.ToString() : "invalid url (responseUri null)";
-            LogHelper.Error<DistrubutedCache>("Error refreshing a node in the distributed list, URI attempted: " + url, ex);
+            LogHelper.Error<DistributedCache>("Error refreshing a node in the distributed list, URI attempted: " + url, ex);
         }
 
         /// <summary>
@@ -246,7 +246,7 @@ namespace Umbraco.Web.Cache
 
         private void LogStartDispatch()
         {
-            LogHelper.Info<DistrubutedCache>("Submitting calls to distributed servers");
+            LogHelper.Info<DistributedCache>("Submitting calls to distributed servers");
         }
 
         /// <summary>
