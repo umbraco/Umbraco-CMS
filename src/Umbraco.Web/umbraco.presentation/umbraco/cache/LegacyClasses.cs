@@ -14,7 +14,7 @@ namespace umbraco.presentation.cache
     }
 
     [Obsolete("This class is no longer used, use Umbraco.Web.Cache.MediaLibraryRefreshers instead")]
-    public class MediaLibraryRefreshers : Umbraco.Web.Cache.MediaLibraryRefreshers
+    public class MediaLibraryRefreshers : Umbraco.Web.Cache.MediaCacheRefresher
     {
 
     }

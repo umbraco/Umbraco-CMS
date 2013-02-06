@@ -1852,13 +1852,13 @@ namespace umbraco
         [Obsolete("Use ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMedia instead")]
         public static void ClearLibraryCacheForMedia(int mediaId)
         {
-            ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMedia(mediaId);          
+            DistributedCache.Instance.RemoveMediaCache(mediaId);      
         }
 
         [Obsolete("Use ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMedia with the allServers flag set to false instead")]
         public static void ClearLibraryCacheForMediaDo(int mediaId)
         {
-            ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMedia(mediaId, false);            
+            DistributedCache.Instance.RemoveMediaCache(mediaId);
         }
 
         [Obsolete("Use ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMember instead")]

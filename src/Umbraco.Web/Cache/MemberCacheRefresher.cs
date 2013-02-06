@@ -23,18 +23,25 @@ namespace Umbraco.Web.Cache
 
         public void Refresh(int id)
         {
-            const string getmemberCacheKey = "GetMember";
-
-            ApplicationContext.Current.ApplicationCache.
-                ClearCacheByKeySearch(string.Format("UL_{0}_{1}", getmemberCacheKey, id));
+            ClearCache(id);
         }
 
         public void Remove(int id)
         {
+            ClearCache(id);
         }
 
         public void Refresh(Guid id)
         {
+            
+        }
+
+        private void ClearCache(int id)
+        {
+            const string getmemberCacheKey = "GetMember";
+
+            ApplicationContext.Current.ApplicationCache.
+                ClearCacheByKeySearch(string.Format("UL_{0}_{1}", getmemberCacheKey, id));
         }
 
     }

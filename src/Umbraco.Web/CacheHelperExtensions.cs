@@ -46,44 +46,7 @@ namespace Umbraco.Web
 		}
 
 		public const string PartialViewCacheKey = "Umbraco.Web.PartialViewCacheKey";
-        
-	    /// <summary>
-	    /// Clears the library cache for media
-	    /// </summary>
-	    /// <param name="cacheHelper"></param>
-	    /// <param name="mediaId"></param>
-	    /// <param name="allServers">
-	    /// If set to false, this will only clear the library cache for the current server, not all servers registered in the 
-	    /// server farm. In most cases if you are clearing cache you would probably clear it on all servers.
-	    /// </param>
-	    public static void ClearLibraryCacheForMedia(this CacheHelper cacheHelper, int mediaId, bool allServers = true)
-        {
-            const string getmediaCacheKey = "GetMedia";
-
-            if (allServers && UmbracoSettings.UseDistributedCalls)
-            {
-                DistributedCache.Instance.RefreshMediaCache(mediaId);
-            }
-            else
-            {
-                var m = new global::umbraco.cms.businesslogic.media.Media(mediaId);
-                if (m.nodeObjectType == global::umbraco.cms.businesslogic.media.Media._objectType)
-                {
-                    foreach (string id in m.Path.Split(','))
-                    {
-                        cacheHelper.ClearCacheByKeySearch(
-                            string.Format("UL_{0}_{1}_True", getmediaCacheKey, id));
-
-                        // Also clear calls that only query this specific item!
-                        if (id == m.Id.ToString())
-                            cacheHelper.ClearCacheByKeySearch(
-                                string.Format("UL_{0}_{1}", getmediaCacheKey, id));
-
-                    }
-                }
-            }
-        }
-
+       
 		/// <summary>
 		/// Outputs and caches a partial view in MVC
 		/// </summary>

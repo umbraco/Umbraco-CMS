@@ -67,6 +67,16 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
+        /// Removes the cache amongst servers for a member
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="memberId"></param>
+        public static void RemoveMemberCache(this DistributedCache dc, int memberId)
+        {
+            dc.Remove(new Guid(DistributedCache.MemberCacheRefresherId), memberId);
+        }
+
+        /// <summary>
         /// Refreshes the cache amongst servers for a media item
         /// </summary>
         /// <param name="dc"></param>
@@ -74,6 +84,16 @@ namespace Umbraco.Web.Cache
         public static void RefreshMediaCache(this DistributedCache dc, int mediaId)
         {
             dc.Refresh(new Guid(DistributedCache.MediaCacheRefresherId), mediaId);
+        }
+
+        /// <summary>
+        /// Removes the cache amongst servers for a media item
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="mediaId"></param>
+        public static void RemoveMediaCache(this DistributedCache dc, int mediaId)
+        {
+            dc.Remove(new Guid(DistributedCache.MediaCacheRefresherId), mediaId);
         }
 
         /// <summary>

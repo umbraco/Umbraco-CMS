@@ -249,7 +249,7 @@
     <Compile Include="Cache\DistributedCacheExtensions.cs" />
     <Compile Include="Cache\CacheRefresherEventHandler.cs" />
     <Compile Include="Cache\MacroCacheRefresher.cs" />
-    <Compile Include="Cache\MediaLibraryRefreshers.cs" />
+    <Compile Include="Cache\MediaCacheRefresher.cs" />
     <Compile Include="Cache\MemberCacheRefresher.cs" />
     <Compile Include="Cache\PageCacheRefresher.cs" />
     <Compile Include="Cache\TemplateCacheRefresher.cs" />

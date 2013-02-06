@@ -86,19 +86,19 @@ namespace Umbraco.Web.Cache
 
         static void MediaServiceTrashing(IMediaService sender, Core.Events.MoveEventArgs<Core.Models.IMedia> e)
         {
-            ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMedia(e.Entity.Id);
+            DistributedCache.Instance.RemoveMediaCache(e.Entity.Id);            
         }
 
         static void MediaServiceMoving(IMediaService sender, Core.Events.MoveEventArgs<Core.Models.IMedia> e)
         {
-            ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMedia(e.Entity.Id);            
+            DistributedCache.Instance.RefreshMediaCache(e.Entity.Id);
         }
 
         static void MediaServiceDeleting(IMediaService sender, Core.Events.DeleteEventArgs<Core.Models.IMedia> e)
         {
             foreach (var item in e.DeletedEntities)
             {
-                ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMedia(item.Id);
+                DistributedCache.Instance.RemoveMediaCache(item.Id);
             }
         }
 
@@ -106,13 +106,13 @@ namespace Umbraco.Web.Cache
         {
             foreach (var item in e.SavedEntities)
             {
-                ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMedia(item.Id);
+                DistributedCache.Instance.RefreshMediaCache(item.Id);
             }
         }
 
         static void MemberBeforeDelete(Member sender, DeleteEventArgs e)
         {
-            DistributedCache.Instance.RefreshMemberCache(sender.Id);            
+            DistributedCache.Instance.RemoveMemberCache(sender.Id);            
         }
 
         static void MemberAfterSave(Member sender, SaveEventArgs e)

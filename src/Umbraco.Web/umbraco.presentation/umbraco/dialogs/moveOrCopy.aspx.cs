@@ -269,7 +269,7 @@ namespace umbraco.dialogs
                             media.Move(int.Parse(UmbracoContext.Current.Request["copyTo"]));
                             media = new Media(int.Parse(UmbracoContext.Current.Request["id"]));
                             media.XmlGenerate(new XmlDocument());
-                            library.ClearLibraryCacheForMedia(media.Id);
+                            media.Save();
                         }
 
                         feedback.Text = ui.Text("moveOrCopy", "moveDone", nodes, base.getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
