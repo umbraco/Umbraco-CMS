@@ -112,7 +112,7 @@ namespace Umbraco.Web.WebServices
 				if (UmbracoSettings.UseDistributedCalls)
 					dispatcher.Refresh(new Guid("dd12b6a0-14b9-46e8-8800-c154f74047c8"), t.Id);
 				else
-					template.ClearCachedTemplate(t.Id);
+                    ApplicationContext.Current.ApplicationCache.ClearCacheForTemplate(t.Id);
 
 				return Success(ui.Text("speechBubbles", "templateSavedText"), ui.Text("speechBubbles", "templateSavedHeader"));
 			}

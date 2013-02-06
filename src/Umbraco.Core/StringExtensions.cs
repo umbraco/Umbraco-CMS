@@ -21,6 +21,10 @@ namespace Umbraco.Core
     ///</summary>
     public static class StringExtensions
     {
+
+        public const string UmbracoValidAliasCharacters = "_-abcdefghijklmnopqrstuvwxyz1234567890";
+        public const string UmbracoInvalidFirstCharacters = "01234567890";
+
 		/// <summary>
 		/// Encrypt the string using the MachineKey in medium trust
 		/// </summary>
@@ -830,8 +834,8 @@ namespace Umbraco.Core
         /// <returns>An alias guaranteed not to contain illegal characters</returns>
         public static string ToSafeAlias(this string alias)
         {
-            const string validAliasCharacters = "_-abcdefghijklmnopqrstuvwxyz1234567890";
-            const string invalidFirstCharacters = "01234567890";
+            const string validAliasCharacters = UmbracoValidAliasCharacters;
+            const string invalidFirstCharacters = UmbracoInvalidFirstCharacters;
             var safeString = new StringBuilder();
             int aliasLength = alias.Length;
             for (int i = 0; i < aliasLength; i++)

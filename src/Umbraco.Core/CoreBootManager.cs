@@ -98,7 +98,7 @@ namespace Umbraco.Core
             {
                 CanResolveBeforeFrozen = true
             };
-            //dd custom types here that are internal
+            //add custom types here that are internal
             ApplicationEventsResolver.Current.AddType<PublishedContentHelper>();
         }
 

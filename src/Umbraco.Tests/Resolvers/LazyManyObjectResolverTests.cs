@@ -118,6 +118,22 @@ namespace Umbraco.Tests.Resolvers
                 var values = resolver.Objects;
             });
         }
+
+        [Test]
+        public void LazyResolverSupportsRemove()
+        {
+            Func<IEnumerable<Type>> types = () => new[] { typeof(TransientObject3), typeof(TransientObject2), typeof(TransientObject1) };
+
+            var resolver = new LazyResolver(types);
+
+            resolver.RemoveType(typeof(TransientObject3));
+
+            Resolution.Freeze();
+
+            var values = resolver.Objects;
+            Assert.IsFalse(values.Select(x => x.GetType()).Contains(typeof(TransientObject3)));
+            Assert.IsTrue(values.Select(x => x.GetType()).ContainsAll(new[] { typeof(TransientObject2), typeof(TransientObject1) }));
+        }
         
 		#region Test classes
 

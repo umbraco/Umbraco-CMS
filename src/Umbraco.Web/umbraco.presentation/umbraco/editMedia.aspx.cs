@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml;
@@ -11,33 +11,29 @@ using umbraco.cms.businesslogic.property;
 
 namespace umbraco.cms.presentation
 {
-	/// <summary>
-	/// Summary description for editMedia.
-	/// </summary>
-	public partial class editMedia : BasePages.UmbracoEnsuredPage
-	{
+    /// <summary>
+    /// Summary description for editMedia.
+    /// </summary>
+    public partial class editMedia : BasePages.UmbracoEnsuredPage
+    {
         private uicontrols.Pane mediaPropertiesPane = new uicontrols.Pane();
         private LiteralControl updateDateLiteral = new LiteralControl();
         private LiteralControl mediaFileLinksLiteral = new LiteralControl();
 
-	    public editMedia()
-	    {
-	        CurrentApp = BusinessLogic.DefaultApps.media.ToString();
-	    }
+        public editMedia()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.media.ToString();
+        }
 
-		protected uicontrols.TabView TabView1;
-		protected System.Web.UI.WebControls.TextBox documentName;
-		private cms.businesslogic.media.Media _media;
-		controls.ContentControl tmp;
+        protected uicontrols.TabView TabView1;
+        protected System.Web.UI.WebControls.TextBox documentName;
+        private cms.businesslogic.media.Media _media;
+        controls.ContentControl tmp;
 
-		//protected System.Web.UI.WebControls.Literal SyncPath;
+        //protected System.Web.UI.WebControls.Literal SyncPath;
 
         override protected void OnInit(EventArgs e)
         {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
             base.OnInit(e);
 
             _media = new cms.businesslogic.media.Media(int.Parse(Request.QueryString["id"]));
@@ -66,33 +62,24 @@ namespace umbraco.cms.presentation
             mediaPropertiesPane.addProperty(ui.Text("content", "mediaLinks"), this.mediaFileLinksLiteral);
 
             // add the property pane to the page rendering
-            tmp.tpProp.Controls.AddAt(1, mediaPropertiesPane);                       
+            tmp.tpProp.Controls.AddAt(1, mediaPropertiesPane);
         }
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
+        protected void Page_Load(object sender, System.EventArgs e)
         {
-
+            //if (!IsPostBack) 
+            //{
+            //    SyncPath.Text = _media.Path;
+            //    newName.Text = _media.Text.Replace("'", "\\'");
+            //}
+            if (!IsPostBack)
+            {
+                ClientTools.SyncTree(_media.Path, false);
+            }
         }
 
-		protected void Page_Load(object sender, System.EventArgs e)
-		{
-			//if (!IsPostBack) 
-			//{
-			//    SyncPath.Text = _media.Path;
-			//    newName.Text = _media.Text.Replace("'", "\\'");
-			//}
-			if (!IsPostBack)
-			{
-				ClientTools.SyncTree(_media.Path, false);
-			}			
-		}
-
-		protected void Save(object sender, System.EventArgs e) 
-		{
+        protected void Save(object sender, System.EventArgs e)
+        {
             // error handling test
             if (!Page.IsValid)
             {
@@ -126,9 +113,9 @@ namespace umbraco.cms.presentation
             this.updateDateLiteral.Text = _media.VersionDate.ToShortDateString() + " " + _media.VersionDate.ToShortTimeString();
             this.UpdateMediaFileLinksLiteral();
 
-			_media.XmlGenerate(new XmlDocument());
-			ClientTools.SyncTree(_media.Path, true);
-		}
+            _media.XmlGenerate(new XmlDocument());
+            ClientTools.SyncTree(_media.Path, true);
+        }
 
 
         private void UpdateMediaFileLinksLiteral()
@@ -155,7 +142,7 @@ namespace umbraco.cms.presentation
                     {
                         this.mediaFileLinksLiteral.Text += string.Format("<tr><td>{0}&nbsp;</td><td><a href=\"{1}\" target=\"_blank\">{1}</a></td></tr>", property.PropertyType.Name, property.Value);
                     }
-                    
+
                     this.mediaFileLinksLiteral.Text += "</table>";
                 }
             }
@@ -165,5 +152,32 @@ namespace umbraco.cms.presentation
                 //have deleted it.
             }
         }
-	}
+
+        /// <summary>
+        /// plc control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder plc;
+
+        /// <summary>
+        /// doSave control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden doSave;
+
+        /// <summary>
+        /// doPublish control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden doPublish;
+    }
 }

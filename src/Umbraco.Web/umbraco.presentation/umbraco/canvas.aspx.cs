@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using umbraco.BasePages;
 using umbraco.businesslogic.Exceptions;
 
@@ -8,7 +8,7 @@ namespace umbraco.presentation
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if ((UmbracoSettings.EnableCanvasEditing || !String.IsNullOrEmpty(UmbracoContext.Current.Request["umbSkinning"]) ) && base.getUser() != null)
+            if ((UmbracoSettings.EnableCanvasEditing || !String.IsNullOrEmpty(UmbracoContext.Current.Request["umbSkinning"])) && base.getUser() != null)
             {
                 UmbracoContext.Current.LiveEditingContext.Enabled = true;
 
@@ -29,5 +29,14 @@ namespace umbraco.presentation
                 throw new Exception("User not logged in");
             }
         }
+
+        /// <summary>
+        /// form1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlForm form1;
     }
 }

@@ -1854,49 +1854,28 @@ namespace umbraco
             return new CMSNode(NodeId).Relations;
         }
 
-
-
+        [Obsolete("Use ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMedia instead")]
         public static void ClearLibraryCacheForMedia(int mediaId)
         {
-            if (UmbracoSettings.UseDistributedCalls)
-                dispatcher.Refresh(
-                    new Guid("B29286DD-2D40-4DDB-B325-681226589FEC"),
-                    mediaId);
-            else
-                ClearLibraryCacheForMediaDo(mediaId);
+            ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMedia(mediaId);          
         }
 
+        [Obsolete("Use ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMedia with the allServers flag set to false instead")]
         public static void ClearLibraryCacheForMediaDo(int mediaId)
         {
-            Media m = new Media(mediaId);
-            if (m.nodeObjectType == Media._objectType)
-            {
-                foreach (string id in m.Path.Split(','))
-                {
-                    Cache.ClearCacheByKeySearch(String.Format("UL_{0}_{1}_True", GETMEDIA_CACHE_KEY, id));
-
-                    // Also clear calls that only query this specific item!
-                    if (id == m.Id.ToString())
-                        Cache.ClearCacheByKeySearch(String.Format("UL_{0}_{1}", GETMEDIA_CACHE_KEY, id));
-
-                }
-            }
+            ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMedia(mediaId, false);            
         }
 
+        [Obsolete("Use ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMember instead")]
         public static void ClearLibraryCacheForMember(int mediaId)
         {
-            if (UmbracoSettings.UseDistributedCalls)
-                dispatcher.Refresh(
-                    new Guid("E285DF34-ACDC-4226-AE32-C0CB5CF388DA"),
-                    mediaId);
-            else
-                ClearLibraryCacheForMemberDo(mediaId);
+            ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMember(mediaId);
         }
 
-
+        [Obsolete("Use ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMember with the allServers flag set to false instead")]
         public static void ClearLibraryCacheForMemberDo(int memberId)
         {
-            Cache.ClearCacheByKeySearch(String.Format("UL_{0}_{1}", GETMEMBER_CACHE_KEY, memberId));
+            ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMember(memberId, false);
         }
 
         /// <summary>

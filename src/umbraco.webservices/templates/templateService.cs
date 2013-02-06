@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Web.Services;
+using Umbraco.Core;
+using Umbraco.Web;
 
 namespace umbraco.webservices.templates
 {
@@ -211,7 +213,7 @@ namespace umbraco.webservices.templates
                     new Guid("dd12b6a0-14b9-46e8-8800-c154f74047c8"),
                     cachedTemplate.Id);
             else
-                umbraco.template.ClearCachedTemplate(cachedTemplate.Id);
+                ApplicationContext.Current.ApplicationCache.ClearCacheForTemplate(cachedTemplate.Id);
         }
 
     }

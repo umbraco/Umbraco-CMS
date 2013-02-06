@@ -21,9 +21,6 @@ namespace Umbraco.Web.Routing
 		// at the moment we load the legacy INotFoundHandler
 		// excluding those that have been replaced by proper finders,
 		// and run them.
-		//
-        // code from requestHandler.handle404 has been moved over to
-        // the new ContentFinderByLegacy404 finder.
 
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
@@ -32,34 +29,71 @@ namespace Umbraco.Web.Routing
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		public bool TryFindDocument(PublishedContentRequest docRequest)
         {
-			docRequest.PublishedContent = HandlePageNotFound(docRequest);
+			HandlePageNotFound(docRequest);
             return docRequest.HasPublishedContent;
         }
 
-		#region Copied over from presentation.requestHandler
+		#region Copied over and adapted from presentation.requestHandler
 
 		//FIXME: this is temporary and should be obsoleted
 
-		IPublishedContent HandlePageNotFound(PublishedContentRequest docRequest)
+		void HandlePageNotFound(PublishedContentRequest docRequest)
         {
 			LogHelper.Debug<ContentFinderByNotFoundHandlers>("Running for url='{0}'.", () => docRequest.Uri.AbsolutePath);
 			
-			//XmlNode currentPage = null;
-			IPublishedContent currentPage = null;
 			var url = NotFoundHandlerHelper.GetLegacyUrlForNotFoundHandlers();
 
             foreach (var handler in GetNotFoundHandlers())
             {
+                IContentFinder finder = null;
+
+                LogHelper.Debug<ContentFinderByNotFoundHandlers>("Handler '{0}'.", () => handler.GetType().FullName);
+
+                // replace with our own implementation
+                if (handler is global::umbraco.SearchForAlias)
+                    finder = new ContentFinderByUrlAlias();
+                else if (handler is global::umbraco.SearchForProfile)
+                    finder = new ContentFinderByProfile();
+                else if (handler is global::umbraco.SearchForTemplate)
+                    finder = new ContentFinderByNiceUrlAndTemplate();
+                else if (handler is global::umbraco.handle404)
+                    finder = new ContentFinderByLegacy404();
+
+                if (finder != null)
+                {
+                    LogHelper.Debug<ContentFinderByNotFoundHandlers>("Replace handler '{0}' by new finder '{1}'.", () => handler.GetType().FullName, () => finder.GetType().FullName);
+                    if (finder.TryFindDocument(docRequest))
+                    {
+                        // do NOT set docRequest.PublishedContent again here as 
+                        // it would clear any template that the finder might have set
+                        LogHelper.Debug<ContentFinderByNotFoundHandlers>("Finder '{0}' found node with id={1}.", () => finder.GetType().FullName, () => docRequest.PublishedContent.Id);
+                        if (docRequest.Is404)
+                            LogHelper.Debug<ContentFinderByNotFoundHandlers>("Finder '{0}' set status to 404.", () => finder.GetType().FullName);
+                        return;
+                    }
+                }
+
+                // else it's a legacy handler, run
+
 				if (handler.Execute(url) && handler.redirectID > 0)
                 {
-                    //currentPage = umbracoContent.GetElementById(handler.redirectID.ToString());
-					currentPage = docRequest.RoutingContext.PublishedContentStore.GetDocumentById(
+                    docRequest.PublishedContent = docRequest.RoutingContext.PublishedContentStore.GetDocumentById(
 						docRequest.RoutingContext.UmbracoContext,
 						handler.redirectID);
 
-                    // FIXME - could it be null?
+                    if (!docRequest.HasPublishedContent)
+                    {
+                        LogHelper.Debug<ContentFinderByNotFoundHandlers>("Handler '{0}' found node with id={1} which is not valid.", () => handler.GetType().FullName, () => handler.redirectID);
+                        break;
+                    }
 
-					LogHelper.Debug<ContentFinderByNotFoundHandlers>("Handler '{0}' found node with id={1}.", () => handler.GetType().FullName, () => handler.redirectID);                    
+                    LogHelper.Debug<ContentFinderByNotFoundHandlers>("Handler '{0}' found valid node with id={1}.", () => handler.GetType().FullName, () => handler.redirectID);
+
+                    if (docRequest.RoutingContext.UmbracoContext.HttpContext.Response.StatusCode == 404)
+                    {
+                        LogHelper.Debug<ContentFinderByNotFoundHandlers>("Handler '{0}' set status code to 404.", () => handler.GetType().FullName);
+                        docRequest.Is404 = true;
+                    }
 
                     //// check for caching
                     //if (handler.CacheUrl)
@@ -78,60 +112,6 @@ namespace Umbraco.Web.Routing
                     break;
                 }
             }
-
-            return currentPage;
-        }
-
-        static IEnumerable<Type> _customHandlerTypes = null;
-        static readonly object CustomHandlerTypesLock = new object();
-
-        IEnumerable<Type> InitializeNotFoundHandlers()
-        {
-            // initialize handlers
-            // create the definition cache
-
-			LogHelper.Debug<ContentFinderByNotFoundHandlers>("Registering custom handlers.");                    
-
-            var customHandlerTypes = new List<Type>();
-
-            var customHandlers = new XmlDocument();
-			customHandlers.Load(Umbraco.Core.IO.IOHelper.MapPath(Umbraco.Core.IO.SystemFiles.NotFoundhandlersConfig));
-
-            foreach (XmlNode n in customHandlers.DocumentElement.SelectNodes("notFound"))
-            {
-                var assemblyName = n.Attributes.GetNamedItem("assembly").Value;
-
-                // skip those that are in umbraco.dll because we have replaced them with finders
-                if (assemblyName == "umbraco")
-                    continue;
-
-                var typeName = n.Attributes.GetNamedItem("type").Value;
-                string ns = assemblyName;
-                var nsAttr = n.Attributes.GetNamedItem("namespace");
-                if (nsAttr != null && !string.IsNullOrWhiteSpace(nsAttr.Value))
-                    ns = nsAttr.Value;
-
-				LogHelper.Debug<ContentFinderByNotFoundHandlers>("Registering '{0}.{1},{2}'.", () => ns, () => typeName, () => assemblyName);
-
-				Type type = null;
-				try
-                {
-					//TODO: This isn't a good way to load the assembly, its already in the Domain so we should be getting the type
-					// this loads the assembly into the wrong assembly load context!!
-
-					var assembly = Assembly.LoadFrom(Umbraco.Core.IO.IOHelper.MapPath(Umbraco.Core.IO.SystemDirectories.Bin + "/" + assemblyName + ".dll"));
-                    type = assembly.GetType(ns + "." + typeName);
-                }
-                catch (Exception e)
-                {
-					LogHelper.Error<ContentFinderByNotFoundHandlers>("Error registering handler, ignoring.", e);                       
-                }
-
-                if (type != null)
-					customHandlerTypes.Add(type);
-            }
-
-        	return customHandlerTypes;
         }
 
         IEnumerable<INotFoundHandler> GetNotFoundHandlers()
@@ -139,15 +119,9 @@ namespace Umbraco.Web.Routing
             // instanciate new handlers
             // using definition cache
 
-            lock (CustomHandlerTypesLock)
-            {
-                if (_customHandlerTypes == null)
-                    _customHandlerTypes = InitializeNotFoundHandlers();
-            }
-
             var handlers = new List<INotFoundHandler>();
 
-            foreach (var type in _customHandlerTypes)
+            foreach (var type in NotFoundHandlerHelper.CustomHandlerTypes)
             {
                 try
                 {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
@@ -80,7 +80,7 @@ namespace umbraco.cms.presentation
                 // Check to see if the user has send to publish permissions
                 if (!base.getUser().GetPermissions(_document.Path).Contains(ActionToPublish.Instance.Letter.ToString()))
                 {
-					//If no send to publish permission then revert to NoPublish mode
+                    //If no send to publish permission then revert to NoPublish mode
                     _canPublish = controls.ContentControl.publishModes.NoPublish;
                 }
                 else
@@ -335,7 +335,7 @@ namespace umbraco.cms.presentation
 
                         if (previouslyPublished == false)
                         {
-                            var descendants = ((ContentService) ApplicationContext.Current.Services.ContentService)
+                            var descendants = ((ContentService)ApplicationContext.Current.Services.ContentService)
                                 .GetPublishedDescendants(_document.Content).ToList();
 
                             if (descendants.Any())
@@ -356,7 +356,7 @@ namespace umbraco.cms.presentation
                 else
                 {
                     ClientTools.ShowSpeechBubble(speechBubbleIcon.warning, ui.Text("publish"), ui.Text("speechBubbles", "editContentPublishedFailedByParent"));
-                    
+
                 }
             }
         }
@@ -477,20 +477,20 @@ namespace umbraco.cms.presentation
 
             // Find the first splitter in the Menu - Should be the rte toolbar's splitter
             var startIndex = menu.FindSplitter(1);
-            
+
             if (startIndex == -1)
             {
                 // No Splitter found - rte toolbar isn't loaded
-            menu.InsertSplitter();
+                menu.InsertSplitter();
                 menuItem = menu.NewIcon();
-            } 
+            }
             else
             {
                 // Rte toolbar is loaded, inject after it's Splitter
                 menuItem = menu.NewIcon(startIndex + 1);
                 menu.InsertSplitter(startIndex + 2);
             }
-            
+
             menuItem.ImageURL = SystemDirectories.Umbraco + "/images/editor/vis.gif";
             // Fix for U4-682, if there's no template, disable the preview button
             if (_document.Template != -1)
@@ -505,9 +505,63 @@ namespace umbraco.cms.presentation
                     showPageDisabledText = ui.GetText("buttons", "showPageDisabled", null, "en"); ;
 
                 menuItem.AltText = showPageDisabledText;
-                ((Image) menuItem).Attributes.Add("style", "opacity: 0.5");
+                ((Image)menuItem).Attributes.Add("style", "opacity: 0.5");
             }
         }
+
+        /// <summary>
+        /// JsInclude1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude1;
+
+        /// <summary>
+        /// JsInclude2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude2;
+
+        /// <summary>
+        /// JsInclude3 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude3;
+
+        /// <summary>
+        /// plc control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder plc;
+
+        /// <summary>
+        /// doSave control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden doSave;
+
+        /// <summary>
+        /// doPublish control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden doPublish;
 
     }
 }

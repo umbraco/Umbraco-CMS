@@ -3,13 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
+using System.Xml;
+using System.Reflection;
+
+using Umbraco.Core;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Routing
 {
 	// provides internal access to legacy url -- should get rid of it eventually
-	internal static class NotFoundHandlerHelper
+	internal class NotFoundHandlerHelper
 	{
 		const string ContextKey = "Umbraco.Web.Routing.NotFoundHandlerHelper.Url";
+
+        static NotFoundHandlerHelper()
+        {
+            InitializeNotFoundHandlers();
+        }
 
 		public static string GetLegacyUrlForNotFoundHandlers()
 		{
@@ -70,5 +80,57 @@ namespace Umbraco.Web.Routing
 			httpContext.Items[ContextKey] = tmp;
 			return tmp;
 		}
-	}
+
+        static IEnumerable<Type> _customHandlerTypes = null;
+
+        static void InitializeNotFoundHandlers()
+        {
+            // initialize handlers
+            // create the definition cache
+
+            LogHelper.Debug<NotFoundHandlerHelper>("Registering custom handlers.");
+
+            var customHandlerTypes = new List<Type>();
+
+            var customHandlers = new XmlDocument();
+            customHandlers.Load(Umbraco.Core.IO.IOHelper.MapPath(Umbraco.Core.IO.SystemFiles.NotFoundhandlersConfig));
+
+            foreach (XmlNode n in customHandlers.DocumentElement.SelectNodes("notFound"))
+            {
+                var assemblyName = n.Attributes.GetNamedItem("assembly").Value;
+                var typeName = n.Attributes.GetNamedItem("type").Value;
+
+                string ns = assemblyName;
+                var nsAttr = n.Attributes.GetNamedItem("namespace");
+                if (nsAttr != null && !string.IsNullOrWhiteSpace(nsAttr.Value))
+                    ns = nsAttr.Value;
+
+                LogHelper.Debug<NotFoundHandlerHelper>("Registering '{0}.{1},{2}'.", () => ns, () => typeName, () => assemblyName);
+
+                Type type = null;
+                try
+                {
+                    var assembly = Assembly.Load(new AssemblyName(assemblyName));
+                    type = assembly.GetType(ns + "." + typeName);
+                }
+                catch (Exception e)
+                {
+                    LogHelper.Error<NotFoundHandlerHelper>("Error registering handler, ignoring.", e);
+                }
+
+                if (type != null)
+                    customHandlerTypes.Add(type);
+            }
+
+            _customHandlerTypes = customHandlerTypes;
+        }
+
+        public static IEnumerable<Type> CustomHandlerTypes
+        {
+            get
+            {
+                return _customHandlerTypes;
+            }
+        }
+    }
 }

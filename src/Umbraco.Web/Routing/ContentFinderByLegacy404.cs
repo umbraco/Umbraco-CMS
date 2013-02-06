@@ -7,15 +7,11 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 
-using umbraco;
-using umbraco.interfaces;
-
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
 	/// Provides an implementation of <see cref="IContentFinder"/> that runs the legacy 404 logic.
 	/// </summary>
-	/// <remarks>Should be used as a last chance finder.</remarks>
 	internal class ContentFinderByLegacy404 : IContentFinder
 	{
 		/// <summary>
@@ -25,8 +21,9 @@ namespace Umbraco.Web.Routing
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		public bool TryFindDocument(PublishedContentRequest pcr)
 		{
-			LogHelper.Debug<ContentFinderByLegacy404>("Looking for a page to handler 404.");
+			LogHelper.Debug<ContentFinderByLegacy404>("Looking for a page to handle 404.");
 
+            // TODO - replace the whole logic and stop calling into library!
 			var error404 = global::umbraco.library.GetCurrentNotFoundPageId();
 			var id = int.Parse(error404);
 
@@ -51,6 +48,7 @@ namespace Umbraco.Web.Routing
 			}
 
 			pcr.PublishedContent = content;
+            pcr.SetIs404();
 			return content != null;
 		}
 	}

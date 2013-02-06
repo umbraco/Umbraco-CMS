@@ -10,7 +10,10 @@ namespace umbraco.cms.helpers
 
     public class Casing
     {
+        [Obsolete("Use Umbraco.Core.StringExtensions.UmbracoValidAliasCharacters instead")]
         public const string VALID_ALIAS_CHARACTERS = "_-abcdefghijklmnopqrstuvwxyz1234567890";
+
+        [Obsolete("Use Umbraco.Core.StringExtensions.UmbracoInvalidFirstCharacters instead")]
         public const string INVALID_FIRST_CHARACTERS = "01234567890";
 
         /// <summary>
@@ -20,6 +23,7 @@ namespace umbraco.cms.helpers
         /// </summary>
         /// <param name="alias">The alias.</param>
         /// <returns>An alias guaranteed not to contain illegal characters</returns>
+        [Obsolete("Use Umbraco.Core.StringExtensions.ToSafeAlias instead")]
         public static string SafeAlias(string alias)
         {
             StringBuilder safeString = new StringBuilder();
@@ -51,6 +55,7 @@ namespace umbraco.cms.helpers
             return safeString.ToString();
         }
 
+        [Obsolete("Use Umbraco.Core.StringExtensions.ToSafeAliasWithForcingCheck instead")]
         public static string SafeAliasWithForcingCheck(string alias)
         {
             if (UmbracoSettings.ForceSafeAliases)
@@ -62,6 +67,8 @@ namespace umbraco.cms.helpers
                 return alias;
             }
         }
+
+        //NOTE: Not sure what this actually does but is used a few places, need to figure it out and then move to StringExtensions and obsolete.
 
         public static string SpaceCamelCasing(string text)
         {

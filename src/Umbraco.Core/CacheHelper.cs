@@ -91,7 +91,27 @@ namespace Umbraco.Core
 		        ClearCacheItem((string)c.Key);
 	        }
         }
-		
+
+        /// <summary>
+        /// Gets (and adds if necessary) an item from the cache with all of the default parameters
+        /// </summary>
+        /// <typeparam name="TT"></typeparam>
+        /// <param name="cacheKey"></param>
+        /// <param name="getCacheItem"></param>
+        /// <returns></returns>
+        public TT GetCacheItem<TT>(string cacheKey, Func<TT> getCacheItem)
+        {
+            return GetCacheItem(cacheKey, CacheItemPriority.Normal, null, null, null, getCacheItem, Locker);
+        }
+
+        /// <summary>
+        /// Gets (and adds if necessary) an item from the cache with the specified absolute expiration date (from NOW)
+        /// </summary>
+        /// <typeparam name="TT"></typeparam>
+        /// <param name="cacheKey"></param>
+        /// <param name="timeout"></param>
+        /// <param name="getCacheItem"></param>
+        /// <returns></returns>
         public TT GetCacheItem<TT>(string cacheKey,
             TimeSpan timeout, Func<TT> getCacheItem)
         {
@@ -138,7 +158,7 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		internal TT GetCacheItem<TT>(string cacheKey,
 			CacheItemPriority priority, CacheItemRemovedCallback refreshAction,
-			CacheDependency cacheDependency, TimeSpan timeout, Func<TT> getCacheItem, object syncLock)
+			CacheDependency cacheDependency, TimeSpan? timeout, Func<TT> getCacheItem, object syncLock)
 		{
 			var result = _cache.Get(cacheKey);
 			if (result == null)
@@ -152,7 +172,9 @@ namespace Umbraco.Core
 						if (result != null)
 						{
 							//we use Insert instead of add if for some crazy reason there is now a cache with the cache key in there, it will just overwrite it.
-							_cache.Insert(cacheKey, result, cacheDependency, DateTime.Now.Add(timeout), TimeSpan.Zero, priority, refreshAction);
+							_cache.Insert(cacheKey, result, cacheDependency,
+                                timeout == null ? Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value), 
+                                TimeSpan.Zero, priority, refreshAction);
 						}
 					}
 				}

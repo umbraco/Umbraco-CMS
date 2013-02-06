@@ -115,8 +115,11 @@ namespace Umbraco.Web
 				httpContext.Response.Redirect(pcr.RedirectUrl, true);
 				return;
 			}
-			if (pcr.Is404)
-				httpContext.Response.StatusCode = 404;
+            if (pcr.Is404)
+            {
+                httpContext.Response.StatusCode = 404;
+                httpContext.Response.TrySkipIisCustomErrors = true;
+            }
 			if (!pcr.HasPublishedContent)
 				httpContext.RemapHandler(new PublishedContentNotFoundHandler());
 			else

@@ -39,10 +39,5 @@ namespace Umbraco.Core.ObjectResolution
 			get { return false; }			
 		}
 
-		protected override bool SupportsRemove
-		{
-			get { return false; }
-		}
-
 	}
 }
