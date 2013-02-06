@@ -9,7 +9,7 @@ namespace umbraco
 {
 	
     [Obsolete("This class is no longer used, use Umbraco.Web.Cache.LibraryCacheRefresher instead")]
-    public class LibraryCacheRefresher : Umbraco.Web.Cache.LibraryCacheRefresher
+    public class LibraryCacheRefresher : Umbraco.Web.Cache.CacheRefresherEventHandler
 	{
 		
 	}

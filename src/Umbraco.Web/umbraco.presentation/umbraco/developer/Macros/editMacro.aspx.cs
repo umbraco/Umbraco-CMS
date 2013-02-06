@@ -109,10 +109,6 @@ namespace umbraco.cms.presentation.developer
 
 				}
 
-				// Flush macro from cache!				
-                DistributedCache.Instance.RefreshMacroCache(macroID);
-				
-
                 ClientTools.ShowSpeechBubble(speechBubbleIcon.save, "Macro saved", "");
 
 

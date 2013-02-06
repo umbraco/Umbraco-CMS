@@ -4,6 +4,9 @@ using umbraco.interfaces;
 
 namespace Umbraco.Web.Cache
 {
+    /// <summary>
+    /// Used to invalidate/refresh the cache for macros
+    /// </summary>
     public class MacroCacheRefresher : ICacheRefresher
     {
         public string Name

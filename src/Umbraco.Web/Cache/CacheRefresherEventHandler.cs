@@ -2,23 +2,31 @@
 using Umbraco.Core.Services;
 using umbraco;
 using umbraco.cms.businesslogic;
+using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.member;
 using System.Linq;
 
 namespace Umbraco.Web.Cache
 {
     /// <summary>
-    /// Special class made to listen to save events on objects where umbraco.library caches some of their objects
+    /// Class which listens to events on business level objects in order to invalidate the cache amongst servers when data changes
     /// </summary>
-    public class LibraryCacheRefresher : ApplicationEventHandler
+    public class CacheRefresherEventHandler : ApplicationEventHandler
     {
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             if (UmbracoSettings.UmbracoLibraryCacheDuration <= 0) return;
 
+            //Bind to macro events
+
+            Macro.AfterSave += MacroAfterSave;
+
+            //Bind to member events
 
             Member.AfterSave += MemberAfterSave;
             Member.BeforeDelete += MemberBeforeDelete;
+
+            //Bind to media events
 
             MediaService.Saved += MediaServiceSaved;
             //We need to perform all of the 'before' events here because we need a reference to the
@@ -27,6 +35,16 @@ namespace Umbraco.Web.Cache
             MediaService.Deleting += MediaServiceDeleting;
             MediaService.Moving += MediaServiceMoving;
             MediaService.Trashing += MediaServiceTrashing;
+        }
+
+        /// <summary>
+        /// Flush macro from cache
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void MacroAfterSave(Macro sender, SaveEventArgs e)
+        {				
+            DistributedCache.Instance.RefreshMacroCache(sender.Id);
         }
 
         static void MediaServiceTrashing(IMediaService sender, Core.Events.MoveEventArgs<Core.Models.IMedia> e)
