@@ -10,81 +10,10 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
+using umbraco.interfaces;
 
 namespace Umbraco.Web.Cache
 {
-    public static class DistributedCacheExtensions
-    {
-        /// <summary>
-        /// Refreshes the cache amongst servers for a template
-        /// </summary>
-        /// <param name="dc"></param>
-        /// <param name="templateId"></param>
-        public static void RefreshTemplateCache(this DistributedCache dc, int templateId)
-        {
-            dc.Refresh(new Guid(DistributedCache.TemplateRefresherId), templateId);
-        }
-
-        /// <summary>
-        /// Refreshes the cache amongst servers for all pages
-        /// </summary>
-        /// <param name="dc"></param>
-        public static void RefreshAllPageCache(this DistributedCache dc)
-        {
-            dc.RefreshAll(new Guid(DistributedCache.PageCacheRefresherId));
-        }
-
-        /// <summary>
-        /// Refreshes the cache amongst servers for a page
-        /// </summary>
-        /// <param name="dc"></param>
-        /// <param name="pageId"></param>
-        public static void RefreshPageCache(this DistributedCache dc, int pageId)
-        {
-            dc.Refresh(new Guid(DistributedCache.PageCacheRefresherId), pageId);
-        }
-
-        /// <summary>
-        /// Removes the cache amongst servers for a page
-        /// </summary>
-        /// <param name="dc"></param>
-        /// <param name="pageId"></param>
-        public static void RemovePageCache(this DistributedCache dc, int pageId)
-        {
-            dc.Remove(new Guid(DistributedCache.PageCacheRefresherId), pageId);
-        }
-
-        /// <summary>
-        /// Refreshes the cache amongst servers for a member
-        /// </summary>
-        /// <param name="dc"></param>
-        /// <param name="memberId"></param>
-        public static void RefreshMemberCache(this DistributedCache dc, int memberId)
-        {
-            dc.Refresh(new Guid(DistributedCache.MemberCacheRefresherId), memberId);
-        }
-
-        /// <summary>
-        /// Refreshes the cache amongst servers for a media item
-        /// </summary>
-        /// <param name="dc"></param>
-        /// <param name="mediaId"></param>
-        public static void RefreshMediaCache(this DistributedCache dc, int mediaId)
-        {
-            dc.Refresh(new Guid(DistributedCache.MediaCacheRefresherId), mediaId);
-        }
-
-        /// <summary>
-        /// Refreshes the cache amongst servers for a macro item
-        /// </summary>
-        /// <param name="dc"></param>
-        /// <param name="macroId"></param>
-        public static void RefreshMacroCache(this DistributedCache dc, int macroId)
-        {
-            dc.Refresh(new Guid(DistributedCache.MacroCacheRefresherId), macroId);
-        }
-    }
-
     /// <summary>
     /// DistrubutedCacheDispatcher is used to handle Umbraco's load balancing.    
     /// </summary>
@@ -182,6 +111,33 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
+        /// Used to invoke the method on an ICacheRefresher instance if we are not currently using distributed calls.
+        /// </summary>
+        /// <param name="refresher"></param>
+        /// <param name="dispatchType"></param>
+        /// <param name="numericId"></param>
+        /// <param name="guidId"></param>
+        private void InvokeMethodOnRefresherInstance(ICacheRefresher refresher, DispatchType dispatchType, int numericId, Guid guidId)
+        {
+            //if we are not, then just invoke the call on the cache refresher
+            switch (dispatchType)
+            {
+                case DispatchType.RefreshAll:
+                    refresher.RefreshAll();
+                    break;
+                case DispatchType.RefreshByNumericId:
+                    refresher.Refresh(numericId);
+                    break;
+                case DispatchType.RefreshByGuid:
+                    refresher.Refresh(guidId);
+                    break;
+                case DispatchType.RemoveById:
+                    refresher.Remove(numericId);
+                    break;
+            }
+        }
+
+        /// <summary>
         /// Invokes the relevant dispatch method.
         /// </summary>
         /// <param name="dispatchType">Type of the dispatch.</param>
@@ -190,9 +146,25 @@ namespace Umbraco.Web.Cache
         /// <param name="guidId">The GUID id.</param>
         private void InvokeDispatchMethod(DispatchType dispatchType, Guid factoryGuid, int numericId, Guid guidId)
         {
-            //TODO: THIS IS NOT USED, WHY IS IT HERE??
-            var name = GetFactoryObjectName(factoryGuid);
+            //get the refresher, it must be found or else we cannot continue
+            var refresher = GetRefresherById(factoryGuid);
+            if (refresher == null)
+            {
+                var ex = new InvalidOperationException(
+                    "Could not find an " + typeof(ICacheRefresher).Name + " with the Id " + guidId);
+                LogHelper.Error<DistributedCache>("Could not continue with DistributedCache call", ex);
+                return;
+            }
+                
+            //Now, check if we are using Distrubuted calls
+            if (!UmbracoSettings.UseDistributedCalls)
+            {
+                //if we are not, then just invoke the call on the cache refresher
+                InvokeMethodOnRefresherInstance(refresher, dispatchType, numericId, guidId);
+                return;
+            }
 
+            //We are using distributed calls, so lets make them...
             try
             {
                 using (var cacheRefresher = new CacheRefresherClient())
@@ -320,11 +292,9 @@ namespace Umbraco.Web.Cache
             cr.Url = string.Format("{0}://{1}{2}/cacheRefresher.asmx", protocol, domain, _webServicesUrl);
         }
 
-        private string GetFactoryObjectName(Guid uniqueIdentifier)
-        {            
-        	var cacheRefresher = CacheRefreshersResolver.Current.GetById(uniqueIdentifier);
-
-            return cacheRefresher != null ? cacheRefresher.Name : "<error determining factory type>";
+        private static ICacheRefresher GetRefresherById(Guid uniqueIdentifier)
+        {
+            return CacheRefreshersResolver.Current.GetById(uniqueIdentifier);
         }
 
         private void LogStartDispatch()

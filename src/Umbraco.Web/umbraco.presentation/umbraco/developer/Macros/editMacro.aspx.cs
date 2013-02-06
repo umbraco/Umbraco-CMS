@@ -108,11 +108,10 @@ namespace umbraco.cms.presentation.developer
 					mp.Save();
 
 				}
-				// Flush macro from cache!
-				if (UmbracoSettings.UseDistributedCalls)
-                    DistributedCache.Instance.RefreshMacroCache(macroID);
-				else
-					macro.GetMacro(macroID).removeFromCache();
+
+				// Flush macro from cache!				
+                DistributedCache.Instance.RefreshMacroCache(macroID);
+				
 
                 ClientTools.ShowSpeechBubble(speechBubbleIcon.save, "Macro saved", "");
 
