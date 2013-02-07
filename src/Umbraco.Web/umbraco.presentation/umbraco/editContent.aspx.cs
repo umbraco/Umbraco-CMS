@@ -16,30 +16,30 @@ using Image = System.Web.UI.WebControls.Image;
 
 namespace umbraco.cms.presentation
 {
-    public partial class editContent : BasePages.UmbracoEnsuredPage
+    public class editContent : BasePages.UmbracoEnsuredPage
     {
         protected uicontrols.TabView TabView1;
-        protected System.Web.UI.WebControls.TextBox documentName;
-        private cms.businesslogic.web.Document _document;
+        protected TextBox documentName;
+        private Document _document;
         private bool _documentHasPublishedVersion = false;
-        protected System.Web.UI.WebControls.Literal jsIds;
-        private LiteralControl dp = new LiteralControl();
-        private DateTimePicker dpRelease = new DateTimePicker();
-        private DateTimePicker dpExpire = new DateTimePicker();
+        protected Literal jsIds;
+        private readonly LiteralControl _dp = new LiteralControl();
+        private readonly DateTimePicker _dpRelease = new DateTimePicker();
+        private readonly DateTimePicker _dpExpire = new DateTimePicker();
 
-        controls.ContentControl cControl;
+        private controls.ContentControl _cControl;
 
-        DropDownList ddlDefaultTemplate = new DropDownList();
+        private readonly DropDownList _ddlDefaultTemplate = new DropDownList();
 
-        uicontrols.Pane publishProps = new uicontrols.Pane();
-        uicontrols.Pane linkProps = new uicontrols.Pane();
+        private readonly uicontrols.Pane _publishProps = new uicontrols.Pane();
+        private readonly uicontrols.Pane _linkProps = new uicontrols.Pane();
 
-        Button UnPublish = new Button();
-        private Literal littPublishStatus = new Literal();
+        private readonly Button _unPublish = new Button();
+        private readonly Literal _littPublishStatus = new Literal();
 
         private controls.ContentControl.publishModes _canPublish = controls.ContentControl.publishModes.Publish;
 
-        private int? m_ContentId = null;
+        private int? _contentId = null;
 
         override protected void OnInit(EventArgs e)
         {
@@ -53,10 +53,10 @@ namespace umbraco.cms.presentation
                 this.DisplayFatalError("Invalid query string");
                 return;
             }
-            m_ContentId = id;
+            _contentId = id;
 
 
-            this.UnPublish.Click += new System.EventHandler(this.UnPublishDo);
+            _unPublish.Click += UnPublishDo;
 
             //_document = new cms.businesslogic.web.Document(int.Parse(Request.QueryString["id"]));
             _document = new Document(true, id);
@@ -65,20 +65,20 @@ namespace umbraco.cms.presentation
             if (string.IsNullOrEmpty(_document.Path))
             {
                 //if this is invalid show an error
-                this.DisplayFatalError("No document found with id " + m_ContentId);
+                this.DisplayFatalError("No document found with id " + _contentId);
                 //reset the content id to null so processing doesn't continue on OnLoad
-                m_ContentId = null;
+                _contentId = null;
                 return;
             }
 
             // we need to check if there's a published version of this document
-            _documentHasPublishedVersion = _document.HasPublishedVersion();
+            _documentHasPublishedVersion = _document.Content.HasPublishedVersion();
 
             // Check publishing permissions
-            if (!base.getUser().GetPermissions(_document.Path).Contains(ActionPublish.Instance.Letter.ToString()))
+            if (!UmbracoUser.GetPermissions(_document.Path).Contains(ActionPublish.Instance.Letter.ToString()))
             {
                 // Check to see if the user has send to publish permissions
-                if (!base.getUser().GetPermissions(_document.Path).Contains(ActionToPublish.Instance.Letter.ToString()))
+                if (!UmbracoUser.GetPermissions(_document.Path).Contains(ActionToPublish.Instance.Letter.ToString()))
                 {
                     //If no send to publish permission then revert to NoPublish mode
                     _canPublish = controls.ContentControl.publishModes.NoPublish;
@@ -89,63 +89,63 @@ namespace umbraco.cms.presentation
                 }
             }
 
-            cControl = new controls.ContentControl(_document, _canPublish, "TabView1");
+            _cControl = new controls.ContentControl(_document, _canPublish, "TabView1");
 
-            cControl.ID = "TabView1";
+            _cControl.ID = "TabView1";
 
-            cControl.Width = Unit.Pixel(666);
-            cControl.Height = Unit.Pixel(666);
+            _cControl.Width = Unit.Pixel(666);
+            _cControl.Height = Unit.Pixel(666);
 
             // Add preview button
 
-            foreach (uicontrols.TabPage tp in cControl.GetPanels())
+            foreach (uicontrols.TabPage tp in _cControl.GetPanels())
             {
                 addPreviewButton(tp.Menu, _document.Id);
             }
 
-            plc.Controls.Add(cControl);
+            plc.Controls.Add(_cControl);
 
 
-            System.Web.UI.WebControls.PlaceHolder publishStatus = new PlaceHolder();
+            var publishStatus = new PlaceHolder();
             if (_documentHasPublishedVersion)
             {
-                littPublishStatus.Text = ui.Text("content", "lastPublished", base.getUser()) + ": " + _document.VersionDate.ToShortDateString() + " &nbsp; ";
+                _littPublishStatus.Text = ui.Text("content", "lastPublished", UmbracoUser) + ": " + _document.VersionDate.ToShortDateString() + " &nbsp; ";
 
-                publishStatus.Controls.Add(littPublishStatus);
-                if (base.getUser().GetPermissions(_document.Path).IndexOf("U") > -1)
-                    UnPublish.Visible = true;
+                publishStatus.Controls.Add(_littPublishStatus);
+                if (UmbracoUser.GetPermissions(_document.Path).IndexOf("U") > -1)
+                    _unPublish.Visible = true;
                 else
-                    UnPublish.Visible = false;
+                    _unPublish.Visible = false;
             }
             else
             {
-                littPublishStatus.Text = ui.Text("content", "itemNotPublished", base.getUser());
-                publishStatus.Controls.Add(littPublishStatus);
-                UnPublish.Visible = false;
+                _littPublishStatus.Text = ui.Text("content", "itemNotPublished", UmbracoUser);
+                publishStatus.Controls.Add(_littPublishStatus);
+                _unPublish.Visible = false;
             }
 
-            UnPublish.Text = ui.Text("content", "unPublish", base.getUser());
-            UnPublish.ID = "UnPublishButton";
-            UnPublish.Attributes.Add("onClick", "if (!confirm('" + ui.Text("defaultdialogs", "confirmSure", base.getUser()) + "')) return false; ");
-            publishStatus.Controls.Add(UnPublish);
+            _unPublish.Text = ui.Text("content", "unPublish", UmbracoUser);
+            _unPublish.ID = "UnPublishButton";
+            _unPublish.Attributes.Add("onClick", "if (!confirm('" + ui.Text("defaultdialogs", "confirmSure", UmbracoUser) + "')) return false; ");
+            publishStatus.Controls.Add(_unPublish);
 
-            publishProps.addProperty(ui.Text("content", "publishStatus", base.getUser()), publishStatus);
+            _publishProps.addProperty(ui.Text("content", "publishStatus", UmbracoUser), publishStatus);
 
             // Template
-            PlaceHolder template = new PlaceHolder();
-            cms.businesslogic.web.DocumentType DocumentType = new cms.businesslogic.web.DocumentType(_document.ContentType.Id);
-            cControl.PropertiesPane.addProperty(ui.Text("documentType"), new LiteralControl(DocumentType.Text));
+            var template = new PlaceHolder();
+            var documentType = new DocumentType(_document.ContentType.Id);
+            _cControl.PropertiesPane.addProperty(ui.Text("documentType"), new LiteralControl(documentType.Text));
 
 
             //template picker
-            cControl.PropertiesPane.addProperty(ui.Text("template"), template);
+            _cControl.PropertiesPane.addProperty(ui.Text("template"), template);
             int defaultTemplate;
             if (_document.Template != 0)
                 defaultTemplate = _document.Template;
             else
-                defaultTemplate = DocumentType.DefaultTemplate;
+                defaultTemplate = documentType.DefaultTemplate;
 
-            if (this.getUser().UserType.Name == "writer")
+            if (UmbracoUser.UserType.Name == "writer")
             {
                 if (defaultTemplate != 0)
                     template.Controls.Add(new LiteralControl(cms.businesslogic.template.Template.GetTemplate(defaultTemplate).Text));
@@ -154,51 +154,51 @@ namespace umbraco.cms.presentation
             }
             else
             {
-                ddlDefaultTemplate.Items.Add(new ListItem(ui.Text("choose") + "...", ""));
-                foreach (cms.businesslogic.template.Template t in DocumentType.allowedTemplates)
+                _ddlDefaultTemplate.Items.Add(new ListItem(ui.Text("choose") + "...", ""));
+                foreach (var t in documentType.allowedTemplates)
                 {
 
-                    ListItem tTemp = new ListItem(t.Text, t.Id.ToString());
+                    var tTemp = new ListItem(t.Text, t.Id.ToString());
                     if (t.Id == defaultTemplate)
                         tTemp.Selected = true;
-                    ddlDefaultTemplate.Items.Add(tTemp);
+                    _ddlDefaultTemplate.Items.Add(tTemp);
                 }
-                template.Controls.Add(ddlDefaultTemplate);
+                template.Controls.Add(_ddlDefaultTemplate);
             }
 
 
             // Editable update date, release date and expire date added by NH 13.12.04
-            dp.ID = "updateDate";
-            dp.Text = _document.UpdateDate.ToShortDateString() + " " + _document.UpdateDate.ToShortTimeString();
-            publishProps.addProperty(ui.Text("content", "updateDate", base.getUser()), dp);
+            _dp.ID = "updateDate";
+            _dp.Text = _document.UpdateDate.ToShortDateString() + " " + _document.UpdateDate.ToShortTimeString();
+            _publishProps.addProperty(ui.Text("content", "updateDate", UmbracoUser), _dp);
 
-            dpRelease.ID = "releaseDate";
-            dpRelease.DateTime = _document.ReleaseDate;
-            dpRelease.ShowTime = true;
-            publishProps.addProperty(ui.Text("content", "releaseDate", base.getUser()), dpRelease);
+            _dpRelease.ID = "releaseDate";
+            _dpRelease.DateTime = _document.ReleaseDate;
+            _dpRelease.ShowTime = true;
+            _publishProps.addProperty(ui.Text("content", "releaseDate", UmbracoUser), _dpRelease);
 
-            dpExpire.ID = "expireDate";
-            dpExpire.DateTime = _document.ExpireDate;
-            dpExpire.ShowTime = true;
-            publishProps.addProperty(ui.Text("content", "expireDate", base.getUser()), dpExpire);
+            _dpExpire.ID = "expireDate";
+            _dpExpire.DateTime = _document.ExpireDate;
+            _dpExpire.ShowTime = true;
+            _publishProps.addProperty(ui.Text("content", "expireDate", UmbracoUser), _dpExpire);
 
-            cControl.Save += new System.EventHandler(Save);
-            cControl.SaveAndPublish += new System.EventHandler(Publish);
-            cControl.SaveToPublish += new System.EventHandler(SendToPublish);
+            _cControl.Save += Save;
+            _cControl.SaveAndPublish += Publish;
+            _cControl.SaveToPublish += SendToPublish;
 
             // Add panes to property page...
-            cControl.tpProp.Controls.AddAt(1, publishProps);
-            cControl.tpProp.Controls.AddAt(2, linkProps);
+            _cControl.tpProp.Controls.AddAt(1, _publishProps);
+            _cControl.tpProp.Controls.AddAt(2, _linkProps);
 
             // add preview to properties pane too
-            addPreviewButton(cControl.tpProp.Menu, _document.Id);
+            addPreviewButton(_cControl.tpProp.Menu, _document.Id);
 
 
         }
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
-            if (!m_ContentId.HasValue)
+            if (!_contentId.HasValue)
                 return;
 
             if (!CheckUserValidation())
@@ -211,7 +211,7 @@ namespace umbraco.cms.presentation
             if (!IsPostBack)
             {
 
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.Open, base.getUser(), _document.Id, "");
+                Log.Add(LogTypes.Open, UmbracoUser, _document.Id, "");
                 ClientTools.SyncTree(_document.Path, false);
             }
 
@@ -226,149 +226,136 @@ namespace umbraco.cms.presentation
             UpdateNiceUrls();
         }
 
-        protected void Save(object sender, System.EventArgs e)
+        /// <summary>
+        /// Handles the Save event for the ContentControl.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <remarks>
+        /// This will set the document's properties and persist a new document revision
+        /// </remarks>
+        protected void Save(object sender, EventArgs e)
         {
-            // error handling test
-            if (!Page.IsValid)
+            //NOTE: This is only here because we have to keep backwards compatibility with events in the ContentControl.
+            // see: http://issues.umbraco.org/issue/U4-1660
+            // in this case both Save and SaveAndPublish will fire when we are publishing but we only want to handle that once,
+            // so if this is actually doing a publish, we'll exit and rely on the SaveAndPublish handler to do all the work.
+            if (_cControl.DoesPublish)
             {
-                foreach (uicontrols.TabPage tp in cControl.GetPanels())
-                {
-                    tp.ErrorControl.Visible = true;
-                    tp.ErrorHeader = ui.Text("errorHandling", "errorButDataWasSaved");
-                    tp.CloseCaption = ui.Text("close");
-                }
-            }
-            else if (Page.IsPostBack)
-            {
-                // hide validation summaries
-                foreach (uicontrols.TabPage tp in cControl.GetPanels())
-                {
-                    tp.ErrorControl.Visible = false;
-                }
-            }
-            //Audit trail...
-            BusinessLogic.Log.Add(BusinessLogic.LogTypes.Save, base.getUser(), _document.Id, "");
-
-            // Update name 
-            if (_document.Text != cControl.NameTxt.Text)
-            {
-                //_refreshTree = true;
-                _document.Text = cControl.NameTxt.Text;
-                //newName.Text = _document.Text;
+                return;
             }
 
-
-            if (dpRelease.DateTime > new DateTime(1753, 1, 1) && dpRelease.DateTime < new DateTime(9999, 12, 31))
-                _document.ReleaseDate = dpRelease.DateTime;
-            else
-                _document.ReleaseDate = new DateTime(1, 1, 1, 0, 0, 0);
-            if (dpExpire.DateTime > new DateTime(1753, 1, 1) && dpExpire.DateTime < new DateTime(9999, 12, 31))
-                _document.ExpireDate = dpExpire.DateTime;
-            else
-                _document.ExpireDate = new DateTime(1, 1, 1, 0, 0, 0);
-
-            // Update default template
-            if (ddlDefaultTemplate.SelectedIndex > 0)
-            {
-                _document.Template = int.Parse(ddlDefaultTemplate.SelectedValue);
-            }
-            else
-            {
-                if (new DocumentType(_document.ContentType.Id).allowedTemplates.Length == 0)
-                {
-                    _document.RemoveTemplate();
-                }
-            }
-
-            //The value of the properties has been set on IData through IDataEditor in the ContentControl
-            //so we need to 'retrieve' that value and set it on the property of the new IContent object.
-            //NOTE This is a workaround for the legacy approach to saving values through the DataType instead of the Property 
-            //- (The DataType shouldn't be responsible for saving the value - especically directly to the db).
-            foreach (var item in cControl.DataTypes)
-            {
-                _document.getProperty(item.Key).Value = item.Value.Data.Value;
-            }
+            //update UI and set document properties
+            PerformSaveLogic();
+            
+            //persist the document
+            _document.Save();
 
             // Run Handler				
             BusinessLogic.Actions.Action.RunActionHandlers(_document, ActionUpdate.Instance);
-            _document.Save();
 
-            // Update the update date
-            dp.Text = _document.UpdateDate.ToShortDateString() + " " + _document.UpdateDate.ToShortTimeString();
-
-            if (!cControl.DoesPublish)
-                ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSavedHeader", null), ui.Text("speechBubbles", "editContentSavedText", null));
+            ClientTools.ShowSpeechBubble(
+                speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSavedHeader", null), 
+                ui.Text("speechBubbles", "editContentSavedText", null));
 
             ClientTools.SyncTree(_document.Path, true);
         }
 
-        protected void SendToPublish(object sender, System.EventArgs e)
+        /// <summary>
+        /// Handles the SendToPublish event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void SendToPublish(object sender, EventArgs e)
         {
             if (Page.IsValid)
             {
-                ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSendToPublish", base.getUser()), ui.Text("speechBubbles", "editContentSendToPublishText", base.getUser()));
-                _document.SendToPublication(base.getUser());
+                ClientTools.ShowSpeechBubble(
+                    speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSendToPublish", UmbracoUser),
+                    ui.Text("speechBubbles", "editContentSendToPublishText", UmbracoUser));
+                _document.SendToPublication(UmbracoUser);
             }
         }
 
-        protected void Publish(object sender, System.EventArgs e)
+        /// <summary>
+        /// Handles the SaveAndPublish event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <remarks>
+        /// Sets the document's properties and if the page is valid continues to publish it, otherwise just saves a revision.
+        /// </remarks>
+        protected void Publish(object sender, EventArgs e)
         {
-            if (Page.IsValid)
+            //update UI and set document properties
+            PerformSaveLogic();
+
+            //the page is not valid, we'll still need to save the document and persist it
+            if (!Page.IsValid)
+            {                
+                ClientTools.ShowSpeechBubble(
+                    speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSavedHeader", null),
+                    ui.Text("speechBubbles", "editContentSavedText", null));
+                _document.Save();
+                return;
+            }
+
+            //If the document is at a level deeper than the root but it's ancestor's path is not published, 
+            //it means that we cannot actually publish this document because one of it's parent's is not published.
+            //So, we still need to save the document but we'll show a different notification.
+            if (_document.Level > 1 && !Services.ContentService.IsPublishable(_document.Content))
             {
-                if (_document.Level == 1 || _document.PathPublished)
-                {
-                    var previouslyPublished = _document.HasPublishedVersion();
+                ClientTools.ShowSpeechBubble(
+                    speechBubbleIcon.warning, ui.Text("publish"), 
+                    ui.Text("speechBubbles", "editContentPublishedFailedByParent"));
+                _document.Save();
+                return;
+            }
 
-                    Trace.Warn("before d.publish");
+            //var previouslyPublished = _document.HasPublishedVersion();
 
-                    if (_document.PublishWithResult(base.getUser()))
-                    {
-                        library.UpdateDocumentCache(_document.Id);
-                        ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));
+            if (_document.SaveAndPublish(UmbracoUser))
+            {
+                //library.UpdateDocumentCache(_document.Id);
 
-                        littPublishStatus.Text = string.Format("{0}: {1}<br/>", ui.Text("content", "lastPublished", base.getUser()), _document.VersionDate.ToString());
+                ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));
 
-                        if (base.getUser().GetPermissions(_document.Path).IndexOf("U") > -1)
-                            UnPublish.Visible = true;
+                _littPublishStatus.Text = string.Format("{0}: {1}<br/>", ui.Text("content", "lastPublished", UmbracoUser), _document.VersionDate.ToString());
 
-                        _documentHasPublishedVersion = _document.HasPublishedVersion();
+                if (UmbracoUser.GetPermissions(_document.Path).IndexOf("U") > -1)
+                    _unPublish.Visible = true;
 
-                        if (previouslyPublished == false)
-                        {
-                            var descendants = ((ContentService)ApplicationContext.Current.Services.ContentService)
-                                .GetPublishedDescendants(_document.Content).ToList();
+                _documentHasPublishedVersion = _document.Content.HasPublishedVersion();
 
-                            if (descendants.Any())
-                            {
-                                foreach (var descendant in descendants)
-                                {
-                                    library.UpdateDocumentCache(descendant.Id);
-                                }
-                                library.RefreshContent();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        ClientTools.ShowSpeechBubble(speechBubbleIcon.warning, ui.Text("publish"), ui.Text("speechBubbles", "contentPublishedFailedByEvent"));
-                    }
-                }
-                else
-                {
-                    ClientTools.ShowSpeechBubble(speechBubbleIcon.warning, ui.Text("publish"), ui.Text("speechBubbles", "editContentPublishedFailedByParent"));
+                //if (previouslyPublished == false)
+                //{
+                //    var descendants = ((ContentService)ApplicationContext.Current.Services.ContentService)
+                //        .GetPublishedDescendants(_document.Content).ToList();
 
-                }
+                //    if (descendants.Any())
+                //    {
+                //        foreach (var descendant in descendants)
+                //        {
+                //            library.UpdateDocumentCache(descendant.Id);
+                //        }
+                //        library.RefreshContent();
+                //    }
+                //}
+            }
+            else
+            {
+                ClientTools.ShowSpeechBubble(speechBubbleIcon.warning, ui.Text("publish"), ui.Text("speechBubbles", "contentPublishedFailedByEvent"));
             }
         }
 
         protected void UnPublishDo(object sender, System.EventArgs e)
         {
             _document.UnPublish();
-            littPublishStatus.Text = ui.Text("content", "itemNotPublished", base.getUser());
-            UnPublish.Visible = false;
+            _littPublishStatus.Text = ui.Text("content", "itemNotPublished", UmbracoUser);
+            _unPublish.Visible = false;
             _documentHasPublishedVersion = false;
 
-            library.UnPublishSingleNode(_document.Id);
+            //library.UnPublishSingleNode(_document.Id);
 
             Current.ClientTools.SyncTree(_document.Path, true);
             ClientTools.ShowSpeechBubble(speechBubbleIcon.success, ui.Text("unpublish"), ui.Text("speechBubbles", "contentUnpublished"));
@@ -380,17 +367,17 @@ namespace umbraco.cms.presentation
         {
             Literal lit;
 
-            linkProps.Controls.Clear();
+            _linkProps.Controls.Clear();
 
             lit = new Literal();
             lit.Text = niceUrlText;
-            linkProps.addProperty(ui.Text("content", "urls", base.getUser()), lit);
+            _linkProps.addProperty(ui.Text("content", "urls", UmbracoUser), lit);
 
             if (!string.IsNullOrWhiteSpace(altUrlsText))
             {
                 lit = new Literal();
                 lit.Text = altUrlsText;
-                linkProps.addProperty(ui.Text("content", "alternativeUrls", base.getUser()), lit);
+                _linkProps.addProperty(ui.Text("content", "alternativeUrls", UmbracoUser), lit);
             }
         }
 
@@ -398,7 +385,7 @@ namespace umbraco.cms.presentation
         {
             if (_documentHasPublishedVersion == false)
             {
-                UpdateNiceUrlProperties("<i>" + ui.Text("content", "itemNotPublished", base.getUser()) + "</i>", null);
+                UpdateNiceUrlProperties("<i>" + ui.Text("content", "itemNotPublished", UmbracoUser) + "</i>", null);
                 return;
             }
 
@@ -419,9 +406,9 @@ namespace umbraco.cms.presentation
                 while (parent != null && parent.Published);
 
                 if (parent == null) // oops - internal error
-                    niceUrlText = "<i>" + ui.Text("content", "parentNotPublishedAnomaly", base.getUser()) + "</i>";
+                    niceUrlText = "<i>" + ui.Text("content", "parentNotPublishedAnomaly", UmbracoUser) + "</i>";
                 else
-                    niceUrlText = "<i>" + ui.Text("content", "parentNotPublished", parent.Text, base.getUser()) + "</i>";
+                    niceUrlText = "<i>" + ui.Text("content", "parentNotPublished", parent.Text, UmbracoUser) + "</i>";
             }
             else
             {
@@ -432,6 +419,71 @@ namespace umbraco.cms.presentation
             }
 
             UpdateNiceUrlProperties(niceUrlText, altUrlsText.ToString());
+        }
+
+        /// <summary>
+        /// When a document is saved or published all of this logic must be performed.
+        /// </summary>
+        /// <remarks>
+        /// This updates both UI controls and business logic object properties but does not persist any data to 
+        /// business logic repositories.
+        /// </remarks>
+        private void PerformSaveLogic()
+        {
+            // error handling test
+            if (!Page.IsValid)
+            {
+                foreach (uicontrols.TabPage tp in _cControl.GetPanels())
+                {
+                    tp.ErrorControl.Visible = true;
+                    tp.ErrorHeader = ui.Text("errorHandling", "errorButDataWasSaved");
+                    tp.CloseCaption = ui.Text("close");
+                }
+            }
+            else if (Page.IsPostBack)
+            {
+                // hide validation summaries
+                foreach (uicontrols.TabPage tp in _cControl.GetPanels())
+                {
+                    tp.ErrorControl.Visible = false;
+                }
+            }
+            //Audit trail...
+            Log.Add(LogTypes.Save, UmbracoUser, _document.Id, "");
+
+            if (_dpRelease.DateTime > new DateTime(1753, 1, 1) && _dpRelease.DateTime < new DateTime(9999, 12, 31))
+                _document.ReleaseDate = _dpRelease.DateTime;
+            else
+                _document.ReleaseDate = new DateTime(1, 1, 1, 0, 0, 0);
+            if (_dpExpire.DateTime > new DateTime(1753, 1, 1) && _dpExpire.DateTime < new DateTime(9999, 12, 31))
+                _document.ExpireDate = _dpExpire.DateTime;
+            else
+                _document.ExpireDate = new DateTime(1, 1, 1, 0, 0, 0);
+
+            // Update default template
+            if (_ddlDefaultTemplate.SelectedIndex > 0)
+            {
+                _document.Template = int.Parse(_ddlDefaultTemplate.SelectedValue);
+            }
+            else
+            {
+                if (new DocumentType(_document.ContentType.Id).allowedTemplates.Length == 0)
+                {
+                    _document.RemoveTemplate();
+                }
+            }
+
+            //The value of the properties has been set on IData through IDataEditor in the ContentControl
+            //so we need to 'retrieve' that value and set it on the property of the new IContent object.
+            //NOTE This is a workaround for the legacy approach to saving values through the DataType instead of the Property 
+            //- (The DataType shouldn't be responsible for saving the value - especically directly to the db).
+            foreach (var item in _cControl.DataTypes)
+            {
+                _document.getProperty(item.Key).Value = item.Value.Data.Value;
+            }
+
+            // Update the update date
+            _dp.Text = _document.UpdateDate.ToShortDateString() + " " + _document.UpdateDate.ToShortTimeString();
         }
 
         /// <summary>
@@ -495,12 +547,12 @@ namespace umbraco.cms.presentation
             // Fix for U4-682, if there's no template, disable the preview button
             if (_document.Template != -1)
             {
-                menuItem.AltText = ui.Text("buttons", "showPage", this.getUser());
+                menuItem.AltText = ui.Text("buttons", "showPage", UmbracoUser);
                 menuItem.OnClickCommand = "window.open('dialogs/preview.aspx?id=" + id + "','umbPreview')";
             }
             else
             {
-                string showPageDisabledText = ui.Text("buttons", "showPageDisabled", this.getUser());
+                string showPageDisabledText = ui.Text("buttons", "showPageDisabled", UmbracoUser);
                 if (showPageDisabledText.StartsWith("["))
                     showPageDisabledText = ui.GetText("buttons", "showPageDisabled", null, "en"); ;
 

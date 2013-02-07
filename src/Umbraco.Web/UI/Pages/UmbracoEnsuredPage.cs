@@ -27,7 +27,7 @@ namespace Umbraco.Web.UI.Pages
         /// <returns></returns>
         public bool ValidateUserApp(string app)
         {
-            return GetUser().Applications.Any(uApp => uApp.alias == app);
+            return UmbracoUser.Applications.Any(uApp => uApp.alias == app);
         }
 
         /// <summary>
@@ -38,11 +38,11 @@ namespace Umbraco.Web.UI.Pages
         /// <returns></returns>
         public bool ValidateUserNodeTreePermissions(string path, string action)
         {
-            string permissions = GetUser().GetPermissions(path);
-            if (permissions.IndexOf(action) > -1 && (path.Contains("-20") || ("," + path + ",").Contains("," + GetUser().StartNodeId.ToString() + ",")))
+            string permissions = UmbracoUser.GetPermissions(path);
+            if (permissions.IndexOf(action) > -1 && (path.Contains("-20") || ("," + path + ",").Contains("," + UmbracoUser.StartNodeId.ToString() + ",")))
                 return true;
 
-	        var user = GetUser();
+	        var user = UmbracoUser;
 	        LogHelper.Info<UmbracoEnsuredPage>("User {0} has insufficient permissions in UmbracoEnsuredPage: '{1}', '{2}', '{3}'", () => user.Name, () => path, () => permissions, () => action);
             return false;
         }
@@ -81,7 +81,7 @@ namespace Umbraco.Web.UI.Pages
                     Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl), true);
             }
 
-            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(ui.Culture(this.GetUser()));
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(ui.Culture(this.UmbracoUser));
             System.Threading.Thread.CurrentThread.CurrentUICulture = System.Threading.Thread.CurrentThread.CurrentCulture;
         }
     }

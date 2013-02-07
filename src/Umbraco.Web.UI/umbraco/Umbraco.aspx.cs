@@ -17,7 +17,7 @@ namespace Umbraco.Web.UI.Umbraco
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
-            var apps = GetUser().Applications.ToList();
+            var apps = UmbracoUser.Applications.ToList();
             bool userHasAccesstodefaultApp = apps.Any(x => x.alias == "content");
 
             // Load user module icons ..
@@ -26,7 +26,7 @@ namespace Umbraco.Web.UI.Umbraco
 
                 var jsEvents = new StringBuilder();
 
-                PlaceHolderAppIcons.Text = ui.Text("main", "sections", GetUser());
+                PlaceHolderAppIcons.Text = ui.Text("main", "sections", UmbracoUser);
                 plcIcons.Text = "";
                 foreach (global::umbraco.BusinessLogic.Application a in apps.OrderBy(x => x.sortOrder))
                 {
@@ -37,12 +37,12 @@ namespace Umbraco.Web.UI.Umbraco
                     jsEvents.Append(@"jQuery('." + appClass + "').click(function() { appClick.call(this, '" + a.alias + "'); } );");
                     jsEvents.Append(@"jQuery('." + appClass + "').dblclick(function() { appDblClick.call(this, '" + a.alias + "'); } );");
 
-                    string iconElement = String.Format("<li><a class=\"{0}\" title=\"" + ui.Text("sections", a.alias, GetUser()) + "\" href=\"javascript:void(0);\">", appClass);
+                    string iconElement = String.Format("<li><a class=\"{0}\" title=\"" + ui.Text("sections", a.alias, UmbracoUser) + "\" href=\"javascript:void(0);\">", appClass);
                     if (a.icon.StartsWith("."))
                         iconElement +=
                             "<img src=\"images/nada.gif\" class=\"trayHolder\" alt=\"\" /></a></li>";
                     else
-                        iconElement += "<img src=\"images/tray/" + a.icon + "\" class=\"trayIcon\" alt=\"" + ui.Text("sections", a.alias, GetUser()) + "\"></a></li>";
+                        iconElement += "<img src=\"images/tray/" + a.icon + "\" class=\"trayIcon\" alt=\"" + ui.Text("sections", a.alias, UmbracoUser) + "\"></a></li>";
                     plcIcons.Text += iconElement;
 
                 }
@@ -69,7 +69,7 @@ namespace Umbraco.Web.UI.Umbraco
 
 
             // Load globalized labels
-            treeWindow.Text = ui.Text("main", "tree", GetUser());
+            treeWindow.Text = ui.Text("main", "tree", UmbracoUser);
 
             RenderActionJs();
 
@@ -79,7 +79,7 @@ namespace Umbraco.Web.UI.Umbraco
             var updChkCookie = new global::umbraco.BusinessLogic.StateHelper.Cookies.Cookie("UMB_UPDCHK", GlobalSettings.VersionCheckPeriod); // was "updateCheck"
             string updateCheckCookie = updChkCookie.HasValue ? updChkCookie.GetValue() : "";
 
-            if (GlobalSettings.VersionCheckPeriod > 0 && String.IsNullOrEmpty(updateCheckCookie) && GetUser().UserType.Alias == "admin")
+            if (GlobalSettings.VersionCheckPeriod > 0 && String.IsNullOrEmpty(updateCheckCookie) && UmbracoUser.UserType.Alias == "admin")
             {
 
                 // Add scriptmanager version check
@@ -111,7 +111,7 @@ namespace Umbraco.Web.UI.Umbraco
     IOHelper.ResolveUrl(SystemDirectories.Umbraco + "/images/pinnedIcons/umb.ico"),
     HttpContext.Current.Request.Url.Host.ToLower().Replace("www.", ""));
 
-                var user = GetUser();
+                var user = UmbracoUser;
                 if (user != null && user.Applications != null && user.Applications.Length > 0)
                 {
                     foreach (var app in user.Applications)

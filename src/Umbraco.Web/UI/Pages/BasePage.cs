@@ -5,9 +5,11 @@ using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -59,6 +61,30 @@ namespace Umbraco.Web.UI.Pages
 	    }
 
         /// <summary>
+        /// Returns the current ApplicationContext
+        /// </summary>
+        public ApplicationContext ApplicationContext
+        {
+            get { return ApplicationContext.Current; }
+        }
+
+        /// <summary>
+        /// Returns a ServiceContext
+        /// </summary>
+        public ServiceContext Services
+        {
+            get { return ApplicationContext.Services; }
+        }
+
+        /// <summary>
+        /// Returns a DatabaseContext
+        /// </summary>
+        public DatabaseContext DatabaseContext
+        {
+            get { return ApplicationContext.DatabaseContext; }
+        }
+
+        /// <summary>
         /// Returns a refernce of an instance of ClientTools for access to the pages client API
         /// </summary>
         public ClientTools ClientTools
@@ -96,15 +122,18 @@ namespace Umbraco.Web.UI.Pages
             }
 
         }
-        
+
         /// <summary>
         /// Gets the user.
         /// </summary>
-        /// <returns></returns>
-        public User GetUser()
+        /// <value></value>
+        public User UmbracoUser
         {
-            if (!_userisValidated) ValidateUser();
-            return _user;
+            get
+            {
+                if (!_userisValidated) ValidateUser();
+                return _user;
+            }
         }
 
         /// <summary>

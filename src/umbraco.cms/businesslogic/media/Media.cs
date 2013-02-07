@@ -206,7 +206,21 @@ namespace umbraco.cms.businesslogic.media
                 var children = ApplicationContext.Current.Services.MediaService.GetChildren(Id).OrderBy(c => c.SortOrder);
                 return children.Select(x => new Media(x)).ToArray();
             }
-        } 
+        }
+
+        public override string Text
+        {
+            get
+            {
+                return MediaItem.Name;
+            }
+            set
+            {
+                value = value.Trim();
+                MediaItem.Name = value;
+            }
+        }
+
         #endregion
 
         #region Public methods

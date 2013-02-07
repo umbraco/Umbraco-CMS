@@ -641,17 +641,11 @@ namespace umbraco.cms.businesslogic.web
             get
             {
                 return Content.Name;
-                //return base.Text;
             }
             set
             {
                 value = value.Trim();
-                base.Text = value;
                 Content.Name = value;
-
-                /*SqlHelper.ExecuteNonQuery("update cmsDocument set text = @text where versionId = @versionId",
-                                          SqlHelper.CreateParameter("@text", value),
-                                          SqlHelper.CreateParameter("@versionId", Version));*/
             }
         }
 
@@ -922,18 +916,35 @@ namespace umbraco.cms.businesslogic.web
                 Content.SetValue(property.PropertyType.Alias, property.Value);
             }
 
-            var e = new SaveEventArgs();
-            FireBeforeSave(e);
+            var saveArgs = new SaveEventArgs();
+            FireBeforeSave(saveArgs);
 
-            if (!e.Cancel)
+            if (!saveArgs.Cancel)
             {
-                var result = ((ContentService)ApplicationContext.Current.Services.ContentService).SaveAndPublish(Content, true, u.Id);
+                var publishArgs = new PublishEventArgs();
+                FireBeforePublish(publishArgs);
 
-                base.Save();
+                if (!publishArgs.Cancel)
+                {
+                    //NOTE: The 'false' parameter will cause the PublishingStrategy events to fire which will ensure that the cache is refreshed.
+                    var result = ((ContentService)ApplicationContext.Current.Services.ContentService)
+                        .SaveAndPublish(Content, false, u.Id);
 
-                FireAfterSave(e);
+                    //NOTE: This is just going to call the CMSNode Save which will launch into the CMSNode.BeforeSave and CMSNode.AfterSave evenths
+                    // which actually do dick all and there's no point in even having them there but just in case for some insane reason someone
+                    // has bound to those events, I suppose we'll need to keep this here.
+                    base.Save();
 
-                return result;
+                    //Launch the After Save event since we're doing 2 things in one operation: Saving and publishing.
+                    FireAfterSave(saveArgs);
+
+                    //Now we need to fire the After publish event
+                    FireAfterPublish(publishArgs);
+
+                    return result;
+                }
+                
+                return false;
             }
 
             return false;
@@ -1551,7 +1562,7 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Occurs when [before save].
         /// </summary>
-        public static event SaveEventHandler BeforeSave;
+        public new static event SaveEventHandler BeforeSave;
         /// <summary>
         /// Raises the <see cref="E:BeforeSave"/> event.
         /// </summary>
@@ -1567,12 +1578,12 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Occurs when [after save].
         /// </summary>
-        public static event SaveEventHandler AfterSave;
+        public new static event SaveEventHandler AfterSave;
         /// <summary>
         /// Raises the <see cref="E:AfterSave"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterSave(SaveEventArgs e)
+        protected new virtual void FireAfterSave(SaveEventArgs e)
         {
             if (AfterSave != null)
             {

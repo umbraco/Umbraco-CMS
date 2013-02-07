@@ -90,12 +90,12 @@
             <div class="topBarButtons">
                 <button onclick="UmbClientMgr.appActions().launchAbout();" class="topBarButton">
                     <img src="images/aboutNew.png" alt="about" /><span><%=umbraco.ui.Text("general", "about")%></span></button>
-                <button onclick="UmbClientMgr.appActions().launchHelp('<%=GetUser().Language%>', '<%=GetUser().UserType.Name%>');"
+                <button onclick="UmbClientMgr.appActions().launchHelp('<%=UmbracoUser.Language%>', '<%=UmbracoUser.UserType.Name%>');"
                     class="topBarButton">
                     <img src="images/help.png" alt="Help" /><span><%=umbraco.ui.Text("general", "help")%></span></button>
                 <button onclick="UmbClientMgr.appActions().logout();" class="topBarButton">
                     <img src="images/logout.png" alt="Log out" /><span><%=umbraco.ui.Text("general", "logout")%>:
-                        <%=GetUser().Name%></span></button>
+                        <%=UmbracoUser.Name%></span></button>
             </div>
         </div>
     </div>
@@ -299,7 +299,7 @@
             if (password != "") {
 
                 var data = {
-                    username: <%= new JavaScriptSerializer().Serialize(GetUser().LoginName) %>, 
+                    username: <%= new JavaScriptSerializer().Serialize(UmbracoUser.LoginName) %>, 
                     password: password
                 };
 

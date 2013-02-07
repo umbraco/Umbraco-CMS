@@ -5,7 +5,9 @@ using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.IO;
@@ -51,20 +53,38 @@ namespace umbraco.BasePages
         /// <value>The SQL helper.</value>
         protected static ISqlHelper SqlHelper
         {
-            get { return umbraco.BusinessLogic.Application.SqlHelper; }
+            get { return BusinessLogic.Application.SqlHelper; }
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BasePage"/> class.
+        /// Returns the current ApplicationContext
         /// </summary>
-        public BasePage()
+        public ApplicationContext ApplicationContext
         {
+            get { return ApplicationContext.Current; }
+        }
+
+        /// <summary>
+        /// Returns a ServiceContext
+        /// </summary>
+        public ServiceContext Services
+        {
+            get { return ApplicationContext.Services; }
+        }
+
+        /// <summary>
+        /// Returns a DatabaseContext
+        /// </summary>
+        public DatabaseContext DatabaseContext
+        {
+            get { return ApplicationContext.DatabaseContext; }
         }
 
         /// <summary>
         /// Returns the current BasePage for the current request. 
         /// This assumes that the current page is a BasePage, otherwise, returns null;
         /// </summary>
+        [Obsolete("Should use the Umbraco.Web.UmbracoContext.Current singleton instead to access common methods and properties")]
         public static BasePage Current
         {
             get
@@ -373,10 +393,23 @@ namespace umbraco.BasePages
         /// Gets the user.
         /// </summary>
         /// <returns></returns>
+        [Obsolete("Use UmbracoUser property instead.")]
         public User getUser()
         {
-            if (!_userisValidated) ValidateUser();
-            return _user;
+            return UmbracoUser;
+        }
+
+        /// <summary>
+        /// Gets the user.
+        /// </summary>
+        /// <value></value>
+        public User UmbracoUser
+        {
+            get
+            {
+                if (!_userisValidated) ValidateUser();
+                return _user;
+            }
         }
 
         /// <summary>
@@ -402,7 +435,7 @@ namespace umbraco.BasePages
         /// <summary>
         /// a collection of available speechbubble icons
         /// </summary>
-        [Obsolete("This is no longer in use, it has been superceded by Umbraco.Web.UI.SpeechBubbleIcon")]
+        [Obsolete("This has been superceded by Umbraco.Web.UI.SpeechBubbleIcon but that requires the use of the Umbraco.Web.UI.Pages.BasePage or Umbraco.Web.UI.Pages.EnsuredPage objects")]
         public enum speechBubbleIcon
         {
             /// <summary>

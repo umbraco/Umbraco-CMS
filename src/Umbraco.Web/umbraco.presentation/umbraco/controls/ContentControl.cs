@@ -54,6 +54,7 @@ namespace umbraco.controls
             set { _errorMessage = value; }
         }
 
+        [Obsolete("This event handler should not be used, it will stil fire for when a SaveAndPublish event is raised but this should be handled with the data APIs")]
         protected void standardSaveAndPublishHandler(object sender, EventArgs e)
         {
         }
@@ -82,8 +83,6 @@ namespace umbraco.controls
             Width = 350;
             Height = 350;
 
-            SaveAndPublish += new EventHandler(standardSaveAndPublishHandler);
-            Save += new EventHandler(standardSaveAndPublishHandler);
             _prntpage = (UmbracoEnsuredPage)Page;
 
             // zb-00036 #29889 : load it only once
@@ -231,28 +230,23 @@ namespace umbraco.controls
             FireAfterContentControlLoad(contentcontrolEvent);
         }
 
-
-        private void saveClick(object Sender, ImageClickEventArgs e)
+        /// <summary>
+        /// Sets the name (text) and values on the data types of the document
+        /// </summary>
+        private void SetNameAndDataTypeValues()
         {
-            var doc = this._content as Document;
-            if (doc != null)
-            {
-                var docArgs = new SaveEventArgs();
-                doc.FireBeforeSave(docArgs);
-
-                if (docArgs.Cancel) //TODO: need to have some notification to the user here
-                {
-                    return;
-                }
-            }
+            if (!string.IsNullOrEmpty(NameTxt.Text))
+                _content.Text = NameTxt.Text;
 
             foreach (var property in DataTypes)
             {
                 property.Value.DataEditor.Save();
             }
+        }
 
-            if (!string.IsNullOrEmpty(NameTxt.Text))
-                _content.Text = NameTxt.Text;
+        private void SaveClick(object sender, ImageClickEventArgs e)
+        {
+            SetNameAndDataTypeValues();
 
             Save(this, new EventArgs());
         }
@@ -260,14 +254,19 @@ namespace umbraco.controls
         private void DoSaveAndPublish(object sender, ImageClickEventArgs e)
         {
             DoesPublish = true;
-            saveClick(sender, e);
+
+            SetNameAndDataTypeValues();
+
+            //NOTE: This is only here to keep backwards compatibility.
+            // see: http://issues.umbraco.org/issue/U4-1660
+            Save(this, new EventArgs());
 
             SaveAndPublish(this, new EventArgs());
         }
 
         private void DoSaveToPublish(object sender, ImageClickEventArgs e)
         {
-            saveClick(sender, e);
+            SaveClick(sender, e);
             SaveToPublish(this, new EventArgs());
         }
 
@@ -276,7 +275,7 @@ namespace umbraco.controls
             MenuImageButton menuSave = tp.Menu.NewImageButton();
             menuSave.ID = tp.ID + "_save";
             menuSave.ImageUrl = _UmbracoPath + "/images/editor/save.gif";
-            menuSave.Click += new ImageClickEventHandler(saveClick);
+            menuSave.Click += new ImageClickEventHandler(SaveClick);
             menuSave.OnClickCommand = "invokeSaveHandlers();";
             menuSave.AltText = ui.Text("buttons", "save", null);
             if (_canPublish == publishModes.Publish)
