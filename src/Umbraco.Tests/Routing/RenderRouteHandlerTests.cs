@@ -45,7 +45,9 @@ namespace Umbraco.Tests.Routing
 
         Template CreateTemplate(string alias)
         {
-            var template = new Template(alias, alias, alias);
+            var path = "template";
+            var name = "Template";
+            var template = new Template(path, name, alias);
             template.Content = ""; // else saving throws with a dirty internal error
             ApplicationContext.Services.FileService.SaveTemplate(template);
             return template;
@@ -80,11 +82,17 @@ namespace Umbraco.Tests.Routing
         [TestCase("home-\\234^^*32page")]
         [TestCase("home-page")]
         [TestCase("home-page")]
-		[TestCase("Home-Page")]
+		[TestCase("Home-Page")] 
 		[TestCase("HomePage")]
 		[TestCase("homePage")]
-		public void Umbraco_Route_User_Defined_Controller_Action(string templateName)
+        [TestCase("site1/template2")]
+        [TestCase("site1\\template2")]
+        public void Umbraco_Route_User_Defined_Controller_Action(string templateName)
 		{
+            // NOTE - here we create templates with crazy aliases... assuming that these
+            // could exist in the database... yet creating templates should sanitize
+            // aliases one way or another...
+
             var template = CreateTemplate(templateName);
             var route = RouteTable.Routes["Umbraco_default"];
 			var routeData = new RouteData() {Route = route};
@@ -100,7 +108,8 @@ namespace Umbraco.Tests.Routing
 			handler.GetHandlerForRoute(routingContext.UmbracoContext.HttpContext.Request.RequestContext, docRequest);
 			Assert.AreEqual("CustomDocument", routeData.Values["controller"].ToString());
 		    Assert.AreEqual(
-		        global::umbraco.cms.helpers.Casing.SafeAlias(templateName),
+                //global::umbraco.cms.helpers.Casing.SafeAlias(template.Alias),
+                template.Alias.ToSafeAlias(),
 		        routeData.Values["action"].ToString());
 		}
 
