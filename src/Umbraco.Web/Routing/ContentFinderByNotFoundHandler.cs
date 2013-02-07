@@ -32,6 +32,7 @@ namespace Umbraco.Web.Routing
 				return false;
 
 			var url = NotFoundHandlerHelper.GetLegacyUrlForNotFoundHandlers();
+            LogHelper.Debug<ContentFinderByNotFoundHandler<Thandler>>("Running for legacy url='{0}'.", () => url);
 
 			if (handler.Execute(url) && handler.redirectID > 0)
 			{
