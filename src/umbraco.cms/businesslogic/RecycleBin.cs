@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Linq;
+using Umbraco.Core;
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.media;
-using System.Threading;
 
 namespace umbraco.cms.businesslogic
 {
@@ -40,7 +38,7 @@ namespace umbraco.cms.businesslogic
         /// Constructor to create a new recycle bin 
         /// </summary>
         /// <param name="nodeObjectType"></param>
-        /// <param name="nodeId"></param>
+        /// <param name="type"></param>
         [Obsolete("Use the simple constructor that has the RecycleBinType only parameter")]
         public RecycleBin(Guid nodeObjectType, RecycleBinType type)
             : base((int)type)
@@ -108,9 +106,7 @@ namespace umbraco.cms.businesslogic
             string sql = String.Format(RecycleBin.m_ChildCountSQL,
                         (int) type);
 
-            return SqlHelper.ExecuteScalar<int>(
-                    sql,
-                    SqlHelper.CreateParameter("@nodeObjectType", objectType));
+            return SqlHelper.ExecuteScalar<int>(sql, SqlHelper.CreateParameter("@nodeObjectType", objectType));
         }
         #endregion
 
@@ -132,26 +128,23 @@ namespace umbraco.cms.businesslogic
         {
             lock (m_Locker)
             {
-                //first, move all nodes underneath the recycle bin directly under the recycle bin node (flatten heirarchy)
-                //then delete them all.
+                var itemsInTheBin = Count(m_BinType);
+                itemDeletedCallback(itemsInTheBin);
 
-                SqlHelper.ExecuteNonQuery("UPDATE umbracoNode SET parentID=@parentID, level=1 WHERE path LIKE '%," + ((int)m_BinType).ToString() + ",%'",
-                    SqlHelper.CreateParameter("@parentID", (int)m_BinType));
-
-                foreach (var c in Children.ToList())
+                if (m_BinType == RecycleBinType.Media)
                 {
-                    switch (m_BinType)
-                    {
-                        case RecycleBinType.Content:
-                            new Document(c.Id).delete(true);
-                            itemDeletedCallback(RecycleBin.Count(m_BinType));
-                            break;
-                        case RecycleBinType.Media:
-                            new Media(c.Id).delete(true);
-                            itemDeletedCallback(RecycleBin.Count(m_BinType));
-                            break;
-                    }
+                    ApplicationContext.Current.Services.MediaService.EmptyRecycleBin();
+                    var trashedMedia = ApplicationContext.Current.Services.MediaService.GetMediaInRecycleBin();
+                    itemsInTheBin = trashedMedia.Count();
                 }
+                else
+                {
+                    ApplicationContext.Current.Services.ContentService.EmptyRecycleBin();
+                    var trashedContent = ApplicationContext.Current.Services.ContentService.GetContentInRecycleBin();
+                    itemsInTheBin = trashedContent.Count();
+                }
+
+                itemDeletedCallback(itemsInTheBin);
             }
         }
 

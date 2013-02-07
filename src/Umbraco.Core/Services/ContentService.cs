@@ -807,8 +807,8 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateContentRepository(uow))
 			{
-				var query = Query<IContent>.Builder.Where(x => x.ParentId == -20);
-				var contents = repository.GetByQuery(query);
+				var query = Query<IContent>.Builder.Where(x => x.Path.Contains("-20"));
+				var contents = repository.GetByQuery(query).OrderByDescending(x => x.ParentId);
 
 				foreach (var content in contents)
 				{
