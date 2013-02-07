@@ -248,23 +248,13 @@ namespace umbraco
         {
             UpdateDocumentCache(DocumentId);
         }
-
-
-
+        
         /// <summary>
         /// Refreshes the xml cache for all nodes
         /// </summary>
         public static void RefreshContent()
         {
-
-            if (UmbracoSettings.UseDistributedCalls)
-            {
-                DistributedCache.Instance.RefreshAllPageCache();
-            }
-            else
-            {
-                content.Instance.RefreshContentFromDatabaseAsync();
-            }
+            DistributedCache.Instance.RefreshAllPageCache();
         }
 
         /// <summary>
@@ -274,13 +264,7 @@ namespace umbraco
         [Obsolete("Please use: umbraco.library.RefreshContent")]
         public static string RePublishNodes(int nodeID)
         {
-            //PPH - added dispatcher support to this call..
-            if (UmbracoSettings.UseDistributedCalls)
-                DistributedCache.Instance.RefreshAllPageCache();
-            else
-            {
-                content.Instance.RefreshContentFromDatabaseAsync();
-            }
+            DistributedCache.Instance.RefreshAllPageCache();
 
             return string.Empty;
         }

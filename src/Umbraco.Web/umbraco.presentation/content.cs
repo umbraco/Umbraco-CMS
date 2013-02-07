@@ -326,8 +326,7 @@ namespace umbraco
                         // queues this up, because this delegate is executing on a different thread and may complete
                         // after the request which invoked it (which would normally persist the file on completion)
                         // So we are responsible for ensuring the content is persisted in this case.
-                        if (!UmbracoSettings.isXmlContentCacheDisabled &&
-                            UmbracoSettings.continouslyUpdateXmlDiskCache)
+                        if (!UmbracoSettings.isXmlContentCacheDisabled && UmbracoSettings.continouslyUpdateXmlDiskCache)
                             PersistXmlToFile(xmlDoc);
                     });
 
@@ -569,15 +568,20 @@ namespace umbraco
                 Action.RunActionHandlers(d, ActionPublish.Instance);
             }
         }
-
-        [Obsolete("Method obsolete in version 4.1 and later, please use UpdateDocumentCache", true)]
+        
         /// <summary>
         /// Updates the document cache async.
         /// </summary>
         /// <param name="documentId">The document id.</param>
+        [Obsolete("Method obsolete in version 4.1 and later, please use UpdateDocumentCache", true)]
         public virtual void UpdateDocumentCacheAsync(int documentId)
         {
-            ThreadPool.QueueUserWorkItem(delegate { UpdateDocumentCache(documentId); });
+            //SD: WE've obsoleted this but then didn't make it call the method it should! So we've just 
+            // left a bug behind...???? ARGH. 
+            //.... changed now.
+            //ThreadPool.QueueUserWorkItem(delegate { UpdateDocumentCache(documentId); });
+
+            UpdateDocumentCache(documentId);
         }
 
         /// <summary>
@@ -587,7 +591,12 @@ namespace umbraco
         [Obsolete("Method obsolete in version 4.1 and later, please use ClearDocumentCache", true)]
         public virtual void ClearDocumentCacheAsync(int documentId)
         {
-            ThreadPool.QueueUserWorkItem(delegate { ClearDocumentCache(documentId); });
+            //SD: WE've obsoleted this but then didn't make it call the method it should! So we've just 
+            // left a bug behind...???? ARGH.
+            //.... changed now.
+            //ThreadPool.QueueUserWorkItem(delegate { ClearDocumentCache(documentId); });
+
+            ClearDocumentCache(documentId);
         }
 
         public virtual void ClearDocumentCache(int documentId)

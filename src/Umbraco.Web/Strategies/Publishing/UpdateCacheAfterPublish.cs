@@ -58,14 +58,7 @@ namespace Umbraco.Web.Strategies.Publishing
         /// </summary>
         private void UpdateEntireCache()
         {
-            if (UmbracoSettings.UseDistributedCalls)
-            {
-                DistributedCache.Instance.RefreshAllPageCache();
-            }
-            else
-            {
-                content.Instance.RefreshContentFromDatabaseAsync();
-            }
+            DistributedCache.Instance.RefreshAllPageCache();
         }
 
         /// <summary>
@@ -73,18 +66,10 @@ namespace Umbraco.Web.Strategies.Publishing
         /// </summary>
         private void UpdateMultipleContentCache(IEnumerable<IContent> content)
         {
-            if (UmbracoSettings.UseDistributedCalls)
+            foreach (var c in content)
             {
-                foreach (var c in content)
-                {
-                    DistributedCache.Instance.RefreshPageCache(c.Id);
-                }
-            }
-            else
-            {
-                var documents = content.Select(x => new Document(x)).ToList();
-                global::umbraco.content.Instance.UpdateDocumentCache(documents);
-            }
+                DistributedCache.Instance.RefreshPageCache(c.Id);
+            }          
         }
 
         /// <summary>
@@ -92,15 +77,7 @@ namespace Umbraco.Web.Strategies.Publishing
         /// </summary>
         private void UpdateSingleContentCache(IContent content)
         {
-            if (UmbracoSettings.UseDistributedCalls)
-            {
-                DistributedCache.Instance.RefreshPageCache(content.Id);
-            }
-            else
-            {
-                var doc = new Document(content);
-                global::umbraco.content.Instance.UpdateDocumentCache(doc);
-            }
+            DistributedCache.Instance.RefreshPageCache(content.Id);
         }
     }
 }
