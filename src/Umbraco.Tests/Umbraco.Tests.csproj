@@ -155,6 +155,11 @@
     <Compile Include="CodeFirst\TypeInheritanceTest.cs" />
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="ContentStores\PublishMediaStoreTests.cs" />
+    <Compile Include="CoreStrings\ShortStringHelperResolverTest.cs" />
+    <Compile Include="CoreStrings\LegacyShortStringHelperTests.cs" />
+    <Compile Include="CoreStrings\DefaultShortStringHelperTests.cs" />
+    <Compile Include="CoreStrings\LegacyStringExtensionsTests.cs" />
+    <Compile Include="CoreStrings\MockShortStringHelper.cs" />
     <Compile Include="LegacyApi\MediaTypeTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
     <Compile Include="Migrations\TargetVersionSixthOneZeroMigrationsTest.cs" />
@@ -328,7 +333,7 @@
     <Compile Include="PartialTrust\PartialTrustTestException.cs" />
     <Compile Include="PartialTrust\TestOnlyInFullTrustAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StringExtensionsTests.cs" />
+    <Compile Include="CoreStrings\StringExtensionsTests.cs" />
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
     <Compile Include="TypeFinderTests.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />

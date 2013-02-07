@@ -691,6 +691,13 @@
     <Compile Include="Sync\ServerMessengerResolver.cs" />
     <Compile Include="Sync\ServerRegistrarResolver.cs" />
     <Compile Include="Sync\ConfigServerRegistrar.cs" />
+    <Compile Include="Strings\Utf8ToAsciiConverter.cs" />
+    <Compile Include="Strings\CleanStringType.cs" />
+    <Compile Include="Strings\ShortStringHelperResolver.cs" />
+    <Compile Include="Strings\IShortStringHelper.cs" />
+    <Compile Include="Strings\LegacyShortStringHelper.cs" />
+    <Compile Include="Strings\StringAliasCaseTypeExtensions.cs" />
+    <Compile Include="Strings\DefaultShortStringHelper.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="ReadLock.cs" />
     <Compile Include="TypeFinder.cs" />
