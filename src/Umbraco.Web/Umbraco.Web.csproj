@@ -287,6 +287,7 @@
     <Compile Include="Models\DynamicPublishedContentList.cs" />
     <Compile Include="Models\PartialViewMacroModel.cs" />
     <Compile Include="Models\PublishedContentBase.cs" />
+    <Compile Include="Mvc\SurfaceAuthorizeAttribute.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
     <Compile Include="BaseRest\Configuration\BaseRestSection.cs" />
     <Compile Include="BaseRest\BaseRestHandler.cs" />
@@ -300,6 +301,7 @@
     <Compile Include="DefaultPublishedMediaStore.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
+    <Compile Include="Mvc\AllowGroupAttribute.cs" />
     <Compile Include="Mvc\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="Mvc\UmbracoAuthorizedController.cs" />
     <Compile Include="Mvc\UmbracoViewPage.cs" />
