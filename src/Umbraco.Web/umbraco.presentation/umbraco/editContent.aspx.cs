@@ -2,8 +2,6 @@ using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic.Actions;
 using umbraco.IO;
@@ -246,8 +244,6 @@ namespace umbraco.cms.presentation
                     tp.ErrorControl.Visible = false;
                 }
             }
-            //Audit trail...
-            BusinessLogic.Log.Add(BusinessLogic.LogTypes.Save, base.getUser(), _document.Id, "");
 
             // Update name 
             if (_document.Text != cControl.NameTxt.Text)
