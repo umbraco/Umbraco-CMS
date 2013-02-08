@@ -73,7 +73,7 @@ namespace Umbraco.Tests.TestHelpers
             //Configure the Database and Sql Syntax based on connection string set in config
             DatabaseContext.Initialize();
             //Create the umbraco database and its base data
-            DatabaseContext.Database.CreateDatabaseSchema();
+            DatabaseContext.Database.CreateDatabaseSchema(false);
         }
 
 

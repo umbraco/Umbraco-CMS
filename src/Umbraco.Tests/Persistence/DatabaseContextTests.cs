@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Persistence
             SyntaxConfig.SqlSyntaxProvider = SqlCeSyntaxProvider.Instance;
 
             //Create the umbraco database
-			_dbContext.Database.CreateDatabaseSchema();
+			_dbContext.Database.CreateDatabaseSchema(false);
 
 			bool umbracoNodeTable = _dbContext.Database.TableExist("umbracoNode");
 			bool umbracoUserTable = _dbContext.Database.TableExist("umbracoUser");
