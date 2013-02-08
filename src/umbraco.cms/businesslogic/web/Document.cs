@@ -918,13 +918,25 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                var result = ((ContentService)ApplicationContext.Current.Services.ContentService).SaveAndPublish(Content, true, u.Id);
+                var publishArgs = new PublishEventArgs();
+                FireBeforePublish(publishArgs);
 
-                base.Save();
+                if (!publishArgs.Cancel)
+                {
+                    var result =
+                        ((ContentService) ApplicationContext.Current.Services.ContentService).SaveAndPublish(Content,
+                                                                                                             true, u.Id);
 
-                FireAfterSave(e);
+                    base.Save();
 
-                return result;
+                    //Launch the After Save event since we're doing 2 things in one operation: Saving and publishing.
+                    FireAfterSave(e);
+
+                    //Now we need to fire the After publish event
+                    FireAfterPublish(publishArgs);
+
+                    return result;
+                }
             }
 
             return false;
