@@ -641,17 +641,11 @@ namespace umbraco.cms.businesslogic.web
             get
             {
                 return Content.Name;
-                //return base.Text;
             }
             set
             {
                 value = value.Trim();
-                base.Text = value;
                 Content.Name = value;
-
-                /*SqlHelper.ExecuteNonQuery("update cmsDocument set text = @text where versionId = @versionId",
-                                          SqlHelper.CreateParameter("@text", value),
-                                          SqlHelper.CreateParameter("@versionId", Version));*/
             }
         }
 
@@ -666,9 +660,6 @@ namespace umbraco.cms.businesslogic.web
             {
                 _updated = value;
                 Content.UpdateDate = value;
-                /*SqlHelper.ExecuteNonQuery("update cmsDocument set updateDate = @value where versionId = @versionId",
-                                          SqlHelper.CreateParameter("@value", value),
-                                          SqlHelper.CreateParameter("@versionId", Version));*/
             }
         }
 
