@@ -104,7 +104,7 @@ namespace Umbraco.Web.UI.Pages
                     _user = global::umbraco.BusinessLogic.User.GetUser(_uid);
 
                     // Check for console access
-                    if (_user.Disabled || (_user.NoConsole && GlobalSettings.RequestIsInUmbracoApplication(HttpContext.Current) && !GlobalSettings.RequestIsLiveEditRedirector(HttpContext.Current)))
+                    if (_user.Disabled || (_user.NoConsole && GlobalSettings.RequestIsInUmbracoApplication(Context) && !GlobalSettings.RequestIsLiveEditRedirector(Context)))
                     {
                         throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
                     }

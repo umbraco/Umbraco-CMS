@@ -36,31 +36,31 @@ namespace umbraco.webservices.documents
             if (carrier.ParentID == 0) throw new Exception("Document needs a parent");
             if (carrier.DocumentTypeID == 0) throw new Exception("Documenttype must be specified");
             if (carrier.Id != 0) throw new Exception("ID cannot be specifed when creating. Must be 0");
-            if (carrier.Name == null || carrier.Name.Length == 0) carrier.Name = "unnamed";
+            if (string.IsNullOrEmpty(carrier.Name)) carrier.Name = "unnamed";
 
-            umbraco.BusinessLogic.User user = GetUser(username, password);
+            var user = GetUser(username, password);
 
             // We get the documenttype
-            umbraco.cms.businesslogic.web.DocumentType docType = new umbraco.cms.businesslogic.web.DocumentType(carrier.DocumentTypeID);
+            var docType = new DocumentType(carrier.DocumentTypeID);
             if (docType == null) throw new Exception("DocumenttypeID " + carrier.DocumentTypeID + " not found");
 
             // We create the document
-            Document newDoc = Document.MakeNew(carrier.Name, docType, user, carrier.ParentID);
+            var newDoc = Document.MakeNew(carrier.Name, docType, user, carrier.ParentID);
             newDoc.ReleaseDate = carrier.ReleaseDate;
             newDoc.ExpireDate = carrier.ExpireDate;
 
             // We iterate the properties in the carrier
             if (carrier.DocumentProperties != null)
             {
-                foreach (documentProperty updatedproperty in carrier.DocumentProperties)
+                foreach (var updatedproperty in carrier.DocumentProperties)
                 {
-                    umbraco.cms.businesslogic.property.Property property = newDoc.getProperty(updatedproperty.Key);
+                    var property = newDoc.getProperty(updatedproperty.Key);
                     if (property == null) throw new Exception("property " + updatedproperty.Key + " was not found");
                     property.Value = updatedproperty.PropertyValue;
                 }
             }
 
-            // We check the publishaction and do the appropiate
+            // We check the publish action and do the appropiate
             handlePublishing(newDoc, carrier, user);
 
             // We return the ID of the document..65
@@ -244,31 +244,21 @@ namespace umbraco.webservices.documents
             switch (carrier.PublishAction)
             {
                 case documentCarrier.EPublishAction.Publish:
-                    if (doc.PublishWithResult(user))
-                    {
-                        umbraco.library.UpdateDocumentCache(doc);
-                    }
+                    doc.SaveAndPublish(user);                    
                     break;
                 case documentCarrier.EPublishAction.Unpublish:
-                    if (doc.PublishWithResult(user))
-                    {
-                        umbraco.library.UnPublishSingleNode(doc);
-                    }
+                    doc.UnPublish();
+                    library.UnPublishSingleNode(doc);
                     break;
                 case documentCarrier.EPublishAction.Ignore:
                     if (doc.Published)
                     {
-                        if (doc.PublishWithResult(user))
-                        {
-                            umbraco.library.UpdateDocumentCache(doc);
-                        }
+                        doc.UnPublish();
+                        library.UnPublishSingleNode(doc);
                     }
                     else
                     {
-                        if (doc.PublishWithResult(user))
-                        {
-                            umbraco.library.UpdateDocumentCache(doc);
-                        }
+                        doc.SaveAndPublish(user);
                     }
                     break;
             }

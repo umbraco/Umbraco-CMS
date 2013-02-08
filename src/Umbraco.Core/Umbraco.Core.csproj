@@ -636,6 +636,8 @@
     <Compile Include="Publishing\BasePublishingStrategy.cs" />
     <Compile Include="Publishing\IPublishingStrategy.cs" />
     <Compile Include="Publishing\PublishingStrategy.cs" />
+    <Compile Include="Publishing\PublishStatus.cs" />
+    <Compile Include="Publishing\PublishStatusType.cs" />
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="Serialization\AbstractSerializationService.cs" />
     <Compile Include="Serialization\Formatter.cs" />

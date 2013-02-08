@@ -448,8 +448,6 @@ namespace umbraco.cms.presentation
                     tp.ErrorControl.Visible = false;
                 }
             }
-            //Audit trail...
-            Log.Add(LogTypes.Save, UmbracoUser, _document.Id, "");
 
             if (_dpRelease.DateTime > new DateTime(1753, 1, 1) && _dpRelease.DateTime < new DateTime(9999, 12, 31))
                 _document.ReleaseDate = _dpRelease.DateTime;

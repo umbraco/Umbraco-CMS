@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -12,6 +13,7 @@ namespace Umbraco.Core.Models.EntityBase
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
+    [DebuggerDisplay("Id: {Id}")]
     public abstract class Entity : IEntity, ICanBeDirty
     {
         private bool _hasIdentity;

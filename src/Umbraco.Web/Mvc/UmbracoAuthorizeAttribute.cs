@@ -2,6 +2,7 @@
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Web.Security;
 using umbraco.BasePages;
 
 namespace Umbraco.Web.Mvc
@@ -43,7 +44,7 @@ namespace Umbraco.Web.Mvc
 				//we need to that the app is configured and that a user is logged in
 				if (!_applicationContext.IsConfigured)
 					return false;
-				var isLoggedIn = BasePage.ValidateUserContextID(BasePage.umbracoUserContextID);
+				var isLoggedIn = WebSecurity.ValidateUserContextId(WebSecurity.UmbracoUserContextId);
 				return isLoggedIn;
 			}
 			catch (Exception)

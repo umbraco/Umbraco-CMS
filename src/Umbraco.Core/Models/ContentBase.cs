@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -13,6 +14,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Represents an abstract class for base Content properties and methods
     /// </summary>
+    [DebuggerDisplay("Id: {Id}, Name: {Name}, ContentType: {ContentTypeBase.Alias}")]
     public abstract class ContentBase : Entity, IContentBase
     {
         protected IContentTypeComposition ContentTypeBase;

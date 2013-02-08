@@ -302,6 +302,7 @@
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
     <Compile Include="Mvc\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="Mvc\UmbracoAuthorizedController.cs" />
+    <Compile Include="Mvc\UmbracoController.cs" />
     <Compile Include="Mvc\UmbracoViewPage.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="ExamineExtensions.cs" />
@@ -404,6 +405,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\dialogs\publish.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\editContent.aspx.cs">
@@ -1230,13 +1234,6 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\protectPage.aspx.designer.cs">
       <DependentUpon>protectPage.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\publish.aspx.cs">
-      <DependentUpon>publish.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\publish.aspx.designer.cs">
-      <DependentUpon>publish.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\RegexWs.aspx.cs">
       <DependentUpon>RegexWs.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1767,7 +1764,9 @@
     <Content Include="umbraco.presentation\umbraco\js\UmbracoCasingRules.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\Preview.aspx" />
     <Content Include="umbraco.presentation\umbraco\controls\passwordChanger.ascx" />
-    <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx" />
+    <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1830,7 +1829,6 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\notifications.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\protectPage.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\publish.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\RegexWs.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx" />

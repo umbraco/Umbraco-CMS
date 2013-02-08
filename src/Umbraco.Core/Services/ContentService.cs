@@ -1017,16 +1017,17 @@ namespace Umbraco.Core.Services
             return SaveAndPublishDo(content, omitCacheRefresh, userId);
         }
 
-        /// <summary>
-        /// Internal method that Publishes a <see cref="IContent"/> object and all its children for legacy purposes.
-        /// </summary>
-        /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will not update the cache.</param>
-        /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <returns>True if publishing succeeded, otherwise False</returns>
-        internal bool PublishWithChildren(IContent content, bool omitCacheRefresh = true, int userId = 0)
+	    /// <summary>
+	    /// Internal method that Publishes a <see cref="IContent"/> object and all its children for legacy purposes.
+	    /// </summary>
+	    /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
+	    /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will not update the cache.</param>
+	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
+	    /// <param name="includeUnpublished">If set to true, this will also publish descendants that are completely unpublished, normally this will only publish children that have previously been published</param>
+	    /// <returns>True if publishing succeeded, otherwise False</returns>
+	    internal bool PublishWithChildren(IContent content, bool omitCacheRefresh = true, int userId = 0, bool includeUnpublished = false)
         {
-            return PublishWithChildrenDo(content, omitCacheRefresh, userId);
+            return PublishWithChildrenDo(content, omitCacheRefresh, userId, includeUnpublished);
         }
 
         /// <summary>
@@ -1142,8 +1143,9 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
         /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="includeUnpublished">If set to true, this will also publish descendants that are completely unpublished, normally this will only publish children that have previously been published</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        private bool PublishWithChildrenDo(IContent content, bool omitCacheRefresh = false, int userId = 0)
+        private bool PublishWithChildrenDo(IContent content, bool omitCacheRefresh = false, int userId = 0, bool includeUnpublished = false)
         {
             //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
             if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)

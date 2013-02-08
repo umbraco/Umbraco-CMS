@@ -232,10 +232,7 @@ namespace umbraco
         /// </remarks>
         internal static void UpdateDocumentCache(Document doc)
         {
-            if (UmbracoSettings.UseDistributedCalls)
-                DistributedCache.Instance.RefreshPageCache(doc.Id);
-            else
-                content.Instance.UpdateDocumentCache(doc);
+            DistributedCache.Instance.RefreshPageCache(doc.Id);
         }
 
 

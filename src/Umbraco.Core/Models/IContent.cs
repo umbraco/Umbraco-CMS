@@ -1,10 +1,11 @@
 using System;
+using System.Diagnostics;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Defines a Content object
-    /// </summary>
+    /// </summary>    
     public interface IContent : IContentBase
     {
         /// <summary>

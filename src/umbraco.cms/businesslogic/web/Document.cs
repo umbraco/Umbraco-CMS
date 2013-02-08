@@ -801,7 +801,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                var result = ((ContentService)ApplicationContext.Current.Services.ContentService).Publish(Content, true, u.Id);
+                var result = ((ContentService)ApplicationContext.Current.Services.ContentService).Publish(Content, false, u.Id);
                 _published = result;
 
                 FireAfterPublish(e);

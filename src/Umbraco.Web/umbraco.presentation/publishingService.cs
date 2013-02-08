@@ -15,31 +15,26 @@ namespace umbraco.presentation
 	/// </summary>
 	public class publishingService
 	{
-		private static Hashtable scheduledTaskTimes = new Hashtable();
-		private static bool isPublishingRunning = false;
+		private static readonly Hashtable ScheduledTaskTimes = new Hashtable();
+		private static bool _isPublishingRunning = false;
 		
 		public static void CheckPublishing(object sender)
 		{
-			if(isPublishingRunning)
+			if(_isPublishingRunning)
 				return;
-			isPublishingRunning = true;
+			_isPublishingRunning = true;
 			try
 			{
 				// DO not run publishing if content is re-loading
 				if(!content.Instance.isInitializing)
 				{
                    
-                    foreach (Document d in Document.GetDocumentsForRelease())
+                    foreach (var d in Document.GetDocumentsForRelease())
 					{
 						try
 						{
-                            //d.HttpContext = (HttpContext)sender;
-
                             d.ReleaseDate = DateTime.MinValue; //new DateTime(1, 1, 1); // Causes release date to be null
-
-							d.Publish(d.User);
-							library.UpdateDocumentCache(d);
-
+                            d.SaveAndPublish(d.User);
 						}
 						catch(Exception ee)
 						{
@@ -48,9 +43,6 @@ namespace umbraco.presentation
 					}
 					foreach(Document d in Document.GetDocumentsForExpiration())
 					{
-						//d.HttpContext = (HttpContext)sender;
-						//d.Published = false;
-
                         try
                         {
                             d.ExpireDate = DateTime.MinValue;
@@ -78,20 +70,20 @@ namespace umbraco.presentation
 							foreach (XmlNode task in tasks)
 							{
 								bool runTask = false;
-								if (!scheduledTaskTimes.ContainsKey(task.Attributes.GetNamedItem("alias").Value))
+								if (!ScheduledTaskTimes.ContainsKey(task.Attributes.GetNamedItem("alias").Value))
 								{
 									runTask = true;
-									scheduledTaskTimes.Add(task.Attributes.GetNamedItem("alias").Value, DateTime.Now);
+									ScheduledTaskTimes.Add(task.Attributes.GetNamedItem("alias").Value, DateTime.Now);
 								}
 									// Add 1 second to timespan to compensate for differencies in timer
 								else if (
 									new TimeSpan(DateTime.Now.Ticks -
-									             ((DateTime) scheduledTaskTimes[task.Attributes.GetNamedItem("alias").Value]).Ticks).TotalSeconds +
+									             ((DateTime) ScheduledTaskTimes[task.Attributes.GetNamedItem("alias").Value]).Ticks).TotalSeconds +
 									1 >=
 									int.Parse(task.Attributes.GetNamedItem("interval").Value))
 								{
 									runTask = true;
-									scheduledTaskTimes[task.Attributes.GetNamedItem("alias").Value] = DateTime.Now;
+									ScheduledTaskTimes[task.Attributes.GetNamedItem("alias").Value] = DateTime.Now;
 								}
 
 								if (runTask)
@@ -115,7 +107,7 @@ namespace umbraco.presentation
 			}
 			finally
 			{
-				isPublishingRunning = false;
+				_isPublishingRunning = false;
 			}
 		}
 

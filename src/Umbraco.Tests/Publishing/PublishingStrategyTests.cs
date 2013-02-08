@@ -7,10 +7,12 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Publishing;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.editorControls.tinyMCE3;
 using umbraco.interfaces;
+using System.Linq;
 
 namespace Umbraco.Tests.Publishing
 {
@@ -58,6 +60,56 @@ namespace Umbraco.Tests.Publishing
             UmbracoSettings.ResetSetters();
         }
 
+        private IContent _homePage;
+
+        [Test]
+        public void Publishes_Many_Ignores_Unpublished_Items()
+        {
+            var strategy = new PublishingStrategy();
+            
+            //publish root and nodes at it's children level
+            var result1 = strategy.Publish(_homePage, 0);
+            Assert.IsTrue(result1);
+            Assert.IsTrue(_homePage.Published);
+            foreach (var c in ServiceContext.ContentService.GetChildren(_homePage.Id))
+            {
+                var r = strategy.Publish(c, 0);    
+                Assert.IsTrue(r);
+                Assert.IsTrue(c.Published);
+            }
+
+            //ok, all are published except the deepest descendant, we will pass in a flag to not include it to 
+            //be published
+            var result = strategy.PublishWithChildrenInternal(
+                ServiceContext.ContentService.GetDescendants(_homePage).Concat(new[] {_homePage}), 0, false);
+            Assert.AreEqual(0, result.Count());
+        }
+
+        [Test]
+        public void Publishes_Many_Does_Not_Ignore_Unpublished_Items()
+        {
+            var strategy = new PublishingStrategy();
+
+            //publish root and nodes at it's children level
+            var result1 = strategy.Publish(_homePage, 0);
+            Assert.IsTrue(result1);
+            Assert.IsTrue(_homePage.Published);
+            foreach (var c in ServiceContext.ContentService.GetChildren(_homePage.Id))
+            {
+                var r = strategy.Publish(c, 0);
+                Assert.IsTrue(r);
+                Assert.IsTrue(c.Published);
+            }
+
+            //ok, all are published except the deepest descendant, we will pass in a flag to include it to 
+            //be published
+            var result = strategy.PublishWithChildrenInternal(
+                ServiceContext.ContentService.GetDescendants(_homePage).Concat(new[] { _homePage }), 0, true);
+            Assert.AreEqual(1, result.Count());
+            Assert.IsTrue(result.First().Success);
+            Assert.IsTrue(result.First().Result.ContentItem.Published);
+        }
+
         [Test]
         public void Can_Publish_And_Update_Xml_Cache()
         {
@@ -73,16 +125,21 @@ namespace Umbraco.Tests.Publishing
             ServiceContext.ContentTypeService.Save(contentType);
 
             //Create and Save Content "Homepage" based on "umbTextpage" -> 1046
-            Content textpage = MockedContent.CreateSimpleContent(contentType);
-            ServiceContext.ContentService.Save(textpage, 0);
+            _homePage = MockedContent.CreateSimpleContent(contentType);
+            ServiceContext.ContentService.Save(_homePage, 0);
 
             //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1047
-            Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
+            Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", _homePage.Id);
             ServiceContext.ContentService.Save(subpage, 0);
 
-            //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1048
-            Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
+            //Create and Save Content "Text Page 2" based on "umbTextpage" -> 1048
+            Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Page 2", _homePage.Id);
             ServiceContext.ContentService.Save(subpage2, 0);
+
+            //Create and Save Content "Text Page 3" based on "umbTextpage" -> 1048
+            Content subpage3 = MockedContent.CreateSimpleContent(contentType, "Text Page 3", subpage2.Id);
+            ServiceContext.ContentService.Save(subpage3, 0);
+
         }
     }
 }

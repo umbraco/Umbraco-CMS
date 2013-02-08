@@ -375,6 +375,13 @@
     <Compile Include="Umbraco\Dialogs\EditMacro.aspx.designer.cs">
       <DependentUpon>EditMacro.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Dialogs\Publish.aspx.cs">
+      <DependentUpon>publish.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Dialogs\Publish.aspx.designer.cs">
+      <DependentUpon>publish.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Masterpages\UmbracoDialog.master.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -712,6 +719,8 @@
     <Content Include="Umbraco_Client\Dialogs\CreateDialog.css" />
     <Content Include="Umbraco_Client\Dialogs\EditMacro.css" />
     <Content Include="Umbraco_Client\Dialogs\EditMacro.js" />
+    <Content Include="Umbraco_Client\Dialogs\PublishDialog.css" />
+    <Content Include="Umbraco_Client\Dialogs\PublishDialog.js" />
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
     <Content Include="Umbraco_Client\Editors\EditMacro.css" />
     <Content Include="Umbraco_Client\Editors\EditView.js" />
