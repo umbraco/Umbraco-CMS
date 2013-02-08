@@ -27,7 +27,7 @@ namespace Umbraco.Core.Services
 		/// <param name="dbUnitOfWorkProvider"></param>
 		/// <param name="fileUnitOfWorkProvider"></param>
 		/// <param name="publishingStrategy"></param>
-		internal ServiceContext(IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, IUnitOfWorkProvider fileUnitOfWorkProvider, IPublishingStrategy publishingStrategy)
+		internal ServiceContext(IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, IUnitOfWorkProvider fileUnitOfWorkProvider, BasePublishingStrategy publishingStrategy)
 		{   
 			BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy, 
 				//this needs to be lazy because when we create the service context it's generally before the
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Services
 		private void BuildServiceCache(
 			IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, 
 			IUnitOfWorkProvider fileUnitOfWorkProvider, 
-			IPublishingStrategy publishingStrategy, 
+			BasePublishingStrategy publishingStrategy, 
 			Lazy<RepositoryFactory> repositoryFactory)
         {
             var provider = dbUnitOfWorkProvider;

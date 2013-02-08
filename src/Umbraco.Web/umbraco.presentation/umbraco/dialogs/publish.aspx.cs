@@ -89,16 +89,6 @@ namespace umbraco.dialogs
 
                     doPublishSubs(d);
 
-                    //PPH added load balancing...
-                    //content.Instance.PublishNode(documents);
-                    foreach (cms.businesslogic.web.Document doc in _documents)
-                    {
-                        if (doc.Published)
-                        {
-                            library.UpdateDocumentCache(doc);
-                        }
-                    }
-
                     Application.Lock();
                     Application["publishTotal" + nodeId.ToString()] = 0;
                     Application.UnLock();
@@ -118,8 +108,7 @@ namespace umbraco.dialogs
                 else
                 {
                     if (d.PublishWithResult(base.getUser()))
-                    {
-                        library.UpdateDocumentCache(d);
+                    {                        
                         feedbackMsg.type = umbraco.uicontrols.Feedback.feedbacktype.success;
 						feedbackMsg.Text = ui.Text("publish", "nodePublish", d.Text, base.getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";						
                     }
@@ -134,7 +123,6 @@ namespace umbraco.dialogs
                 theEnd.Visible = true;
 			}
 		}
-        private readonly List<Document> _documents = new List<Document>();
 
 		private void doPublishSubs(Document d) 
 		{
@@ -142,11 +130,7 @@ namespace umbraco.dialogs
             {
                 if (d.PublishWithResult(UmbracoUser))
                 {
-                    // Needed for supporting distributed calls
-                    if (UmbracoSettings.UseDistributedCalls)
-                        library.UpdateDocumentCache(d);
-                    else
-                        _documents.Add(d);
+                    
 
                     nodesPublished++;
                     Application.Lock();

@@ -13,7 +13,12 @@ namespace Umbraco.Core.Publishing
     /// </summary>
     public class PublishingStrategy : BasePublishingStrategy
     {
-       
+
+        /// <summary>
+        /// Publishes a single piece of Content
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> to publish</param>
+        /// <param name="userId">Id of the User issueing the publish operation</param>        
         protected internal override Attempt<PublishStatus> PublishInternal(IContent content, int userId)
         {
             if (Publishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(content), this))
@@ -77,7 +82,8 @@ namespace Umbraco.Core.Publishing
         /// that have yet to be published.
         /// </param>
         /// <returns></returns>
-        protected internal override IEnumerable<Attempt<PublishStatus>> PublishWithChildrenInternal(IEnumerable<IContent> content, int userId, bool includeUnpublishedDocuments = true)
+        protected internal override IEnumerable<Attempt<PublishStatus>> PublishWithChildrenInternal(
+            IEnumerable<IContent> content, int userId, bool includeUnpublishedDocuments = true)
         {
             var statuses = new List<Attempt<PublishStatus>>();
 
@@ -188,6 +194,12 @@ namespace Umbraco.Core.Publishing
             return true;
         }
 
+        /// <summary>
+        /// Unpublishes a list of Content
+        /// </summary>
+        /// <param name="content">An enumerable list of <see cref="IContent"/></param>
+        /// <param name="userId">Id of the User issueing the unpublish operation</param>
+        /// <returns>A list of publish statuses</returns>
         protected internal override IEnumerable<Attempt<PublishStatus>> UnPublishInternal(IEnumerable<IContent> content, int userId)
         {
             var result = new List<Attempt<PublishStatus>>();

@@ -9,7 +9,12 @@ namespace Umbraco.Core.Publishing
         /// The publishing was successful.
         /// </summary>
         Success,
-        
+
+        /// <summary>
+        /// The content could not be published because it's ancestor path isn't published
+        /// </summary>
+        FailedPathNotPublished,
+
         /// <summary>
         /// The content item was scheduled to be un-published and it has expired so we cannot force it to be
         /// published again as part of a bulk publish operation.

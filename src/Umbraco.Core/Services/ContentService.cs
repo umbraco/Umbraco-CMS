@@ -23,7 +23,7 @@ namespace Umbraco.Core.Services
 	public class ContentService : IContentService
 	{
 		private readonly IDatabaseUnitOfWorkProvider _uowProvider;
-		private readonly IPublishingStrategy _publishingStrategy;
+		private readonly BasePublishingStrategy _publishingStrategy;
         private readonly RepositoryFactory _repositoryFactory;
 
         public ContentService()
@@ -42,12 +42,22 @@ namespace Umbraco.Core.Services
             : this(provider, repositoryFactory, new PublishingStrategy())
         { }
 
+        [Obsolete("This contructor is no longer supported, use the other constructor accepting a BasePublishginStrategy object instead")]
 	    public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy)
 		{
 			_uowProvider = provider;
-			_publishingStrategy = publishingStrategy;
+            _publishingStrategy = publishingStrategy as BasePublishingStrategy;
+            if (_publishingStrategy == null)
+                throw new InvalidOperationException("publishingStrategy must be an instance of " + typeof(BasePublishingStrategy).Name);
             _repositoryFactory = repositoryFactory;
 		}
+
+        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, BasePublishingStrategy publishingStrategy)
+        {
+            _uowProvider = provider;
+            _publishingStrategy = publishingStrategy;
+            _repositoryFactory = repositoryFactory;
+        }
 
 	    /// <summary>
 	    /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
@@ -436,7 +446,11 @@ namespace Umbraco.Core.Services
 	    /// <returns>True if publishing succeeded, otherwise False</returns>
 	    public bool PublishWithChildren(IContent content, int userId = 0)
 	    {
-	        return PublishWithChildrenDo(content, false, userId);
+            var result = PublishWithChildrenDo(content, false, userId);
+            
+            //This used to just return false only when the parent content failed, otherwise would always return true so we'll
+            // do the same thing for the moment
+            return result.Single(x => x.Result.ContentItem.Id == content.Id).Success;
 	    }
 
 	    /// <summary>
@@ -1027,7 +1041,11 @@ namespace Umbraco.Core.Services
 	    /// <returns>True if publishing succeeded, otherwise False</returns>
 	    internal bool PublishWithChildren(IContent content, bool omitCacheRefresh = true, int userId = 0, bool includeUnpublished = false)
         {
-            return PublishWithChildrenDo(content, omitCacheRefresh, userId, includeUnpublished);
+            var result = PublishWithChildrenDo(content, omitCacheRefresh, userId, includeUnpublished);
+
+            //This used to just return false only when the parent content failed, otherwise would always return true so we'll
+            // do the same thing for the moment
+            return result.Single(x => x.Result.ContentItem.Id == content.Id).Success;
         }
 
         /// <summary>
@@ -1144,9 +1162,15 @@ namespace Umbraco.Core.Services
         /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <param name="includeUnpublished">If set to true, this will also publish descendants that are completely unpublished, normally this will only publish children that have previously been published</param>
-        /// <returns>True if publishing succeeded, otherwise False</returns>
-        private bool PublishWithChildrenDo(IContent content, bool omitCacheRefresh = false, int userId = 0, bool includeUnpublished = false)
+        /// <returns>
+        /// A list of publish statues. If the parent document is not valid or cannot be published because it's parent(s) is not published
+        /// then the list will only contain one status item, otherwise it will contain status items for it and all of it's descendants that
+        /// are to be published.
+        /// </returns>
+        private IEnumerable<Attempt<PublishStatus>> PublishWithChildrenDo(IContent content, bool omitCacheRefresh = false, int userId = 0, bool includeUnpublished = false)
         {
+            var result = new List<Attempt<PublishStatus>>();
+
             //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
             if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
             {
@@ -1154,7 +1178,8 @@ namespace Umbraco.Core.Services
                     string.Format(
                         "Content '{0}' with Id '{1}' could not be published because its parent or one of its ancestors is not published.",
                         content.Name, content.Id));
-                return false;
+                result.Add(new Attempt<PublishStatus>(false, new PublishStatus(content, PublishStatusType.FailedPathNotPublished)));
+                return result;
             }
 
             //Content contains invalid property values and can therefore not be published - fire event?
@@ -1163,7 +1188,8 @@ namespace Umbraco.Core.Services
                 LogHelper.Info<ContentService>(
                     string.Format("Content '{0}' with Id '{1}' could not be published because of invalid properties.",
                                   content.Name, content.Id));
-                return false;
+                result.Add(new Attempt<PublishStatus>(false, new PublishStatus(content, PublishStatusType.FailedContentInvalid)));
+                return result;
             }
 
             //Consider creating a Path query instead of recursive method:
@@ -1171,22 +1197,23 @@ namespace Umbraco.Core.Services
 
             var updated = new List<IContent>();
             var list = new List<IContent>();
-            list.Add(content);
+            list.Add(content); //include parent item
             list.AddRange(GetDescendants(content));
 
             //Publish and then update the database with new status
-            var published = _publishingStrategy.PublishWithChildren(list, userId);
-            if (published)
-            {
+            var publishedOutcome = _publishingStrategy.PublishWithChildrenInternal(list, userId).ToArray();
+            //if (published)
+            //{
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentRepository(uow))
                 {
                     //Only loop through content where the Published property has been updated
-                    foreach (var item in list.Where(x => ((ICanBeDirty)x).IsPropertyDirty("Published")))
+                    //foreach (var item in list.Where(x => ((ICanBeDirty)x).IsPropertyDirty("Published")))
+                    foreach (var item in publishedOutcome.Where(x => x.Success))
                     {
-                        item.WriterId = userId;
-                        repository.AddOrUpdate(item);
-                        updated.Add(item);
+                        item.Result.ContentItem.WriterId = userId;
+                        repository.AddOrUpdate(item.Result.ContentItem);
+                        updated.Add(item.Result.ContentItem);
                     }
 
                     uow.Commit();
@@ -1197,9 +1224,9 @@ namespace Umbraco.Core.Services
                         var poco = new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) };
                         var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id }) !=
                                      null;
-                        int result = exists
-                                         ? uow.Database.Update(poco)
-                                         : Convert.ToInt32(uow.Database.Insert(poco));
+                        var r = exists
+                                    ? uow.Database.Update(poco)
+                                    : Convert.ToInt32(uow.Database.Insert(poco));
                     }
                 }
                 //Save xml to db and call following method to fire event:
@@ -1207,9 +1234,9 @@ namespace Umbraco.Core.Services
                     _publishingStrategy.PublishingFinalized(updated, false);
 
                 Audit.Add(AuditTypes.Publish, "Publish with Children performed by user", userId, content.Id);
-            }
+            //}
 
-            return published;
+            return publishedOutcome;
         }
 
         /// <summary>
