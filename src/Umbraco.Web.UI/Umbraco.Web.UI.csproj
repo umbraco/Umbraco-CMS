@@ -453,6 +453,7 @@
     </None>
     <None Include="Config\umbracoSettings.Release.config">
       <DependentUpon>umbracoSettings.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Config\trees.Release.config">
       <DependentUpon>trees.config</DependentUpon>
@@ -2358,7 +2359,9 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Config\tinyMceConfig.config" />
-    <Content Include="Config\umbracoSettings.config" />
+    <Content Include="Config\umbracoSettings.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Config\xsltExtensions.config" />
     <Content Include="Config\UrlRewriting.config" />
     <Content Include="Config\log4net.config" />

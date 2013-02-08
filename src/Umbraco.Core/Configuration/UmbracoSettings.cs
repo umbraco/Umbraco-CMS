@@ -157,11 +157,32 @@ namespace Umbraco.Core.Configuration
 		{
 			EnsureSettingsDocument();
 
+            string attrName = null;
+            var pos = key.IndexOf('@');
+            if (pos > 0)
+            {
+                attrName = key.Substring(pos + 1);
+                key = key.Substring(0, pos - 1);
+            }
+
 			var node = UmbracoSettingsXmlDoc.DocumentElement.SelectSingleNode(key);
-			if (node == null || node.FirstChild == null || node.FirstChild.Value == null)
-				return string.Empty;
-			return node.FirstChild.Value;
-		}
+            if (node == null)
+                return string.Empty;
+
+            if (pos < 0)
+            {
+                if (node.FirstChild == null || node.FirstChild.Value == null)
+                    return string.Empty;
+                return node.FirstChild.Value;
+            }
+            else
+            {
+                var attr = node.Attributes[attrName];
+                if (attr == null)
+                    return string.Empty;
+                return attr.Value;
+            }
+        }
 
 		/// <summary>
 		/// Gets a value indicating whether the media library will create new directories in the /media directory.
@@ -647,7 +668,7 @@ namespace Umbraco.Core.Configuration
             get
             {
                 // default: false
-                return GetKeyWithOverride("/settings/TrySkipIisCustomErrors", false, _trySkipIisCustomErrors);
+                return GetKeyWithOverride("/settings/web.routing/@trySkipIisCustomErrors", false, _trySkipIisCustomErrors);
             }
             internal set
             {
