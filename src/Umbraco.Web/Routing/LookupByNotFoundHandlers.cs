@@ -39,9 +39,8 @@ namespace Umbraco.Web.Routing
 
 		void HandlePageNotFound(PublishedContentRequest docRequest)
         {
-			LogHelper.Debug<LookupByNotFoundHandlers>("Running for url='{0}'.", () => docRequest.Uri.AbsolutePath);
-			
 			var url = NotFoundHandlerHelper.GetLegacyUrlForNotFoundHandlers();
+            LogHelper.Debug<LookupByNotFoundHandlers>("Running for legacy url='{0}'.", () => url);
 
             foreach (var handler in GetNotFoundHandlers())
             {
