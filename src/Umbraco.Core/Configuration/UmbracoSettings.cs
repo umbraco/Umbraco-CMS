@@ -25,7 +25,37 @@ namespace Umbraco.Core.Configuration
 	/// </summary>
 	internal class UmbracoSettings
 	{
-		/// <summary>
+        private static bool GetKeyWithOverride(string key, bool defaultValue, bool? overrideValue)
+        {
+            if (overrideValue.HasValue)
+                return overrideValue.Value;
+
+            bool value;
+            string stringValue = GetKey(key);
+
+            if (string.IsNullOrWhiteSpace(stringValue))
+                return defaultValue;
+            if (bool.TryParse(stringValue, out value))
+                return value;
+            return defaultValue;
+        }
+
+        private static int GetKeyWithOverride(string key, int defaultValue, int? overrideValue)
+        {
+            if (overrideValue.HasValue)
+                return overrideValue.Value;
+
+            int value;
+            string stringValue = GetKey(key);
+
+            if (string.IsNullOrWhiteSpace(stringValue))
+                return defaultValue;
+            if (int.TryParse(stringValue, out value))
+                return value;
+            return defaultValue;
+        }
+
+        /// <summary>
 		/// Used in unit testing to reset all config items that were set with property setters (i.e. did not come from config)
 		/// </summary>
 		internal static void ResetSetters()
@@ -35,6 +65,7 @@ namespace Umbraco.Core.Configuration
 			_useLegacySchema = null;
 			_useDomainPrefixes = null;
 			_umbracoLibraryCacheDuration = null;
+            _trySkipIisCustomErrors = null;
 		    SettingsFilePath = null;
 		}
 
@@ -203,6 +234,7 @@ namespace Umbraco.Core.Configuration
 				return value != null ? value.Attributes["assembly"].Value : "";
 			}
 		}
+
 		/// <summary>
 		/// Gets the type of an external logger that can be used to store log items in 3rd party systems
 		/// </summary>
@@ -351,24 +383,13 @@ namespace Umbraco.Core.Configuration
 		{
 			get
 			{
-				try
-				{
-					if (_useDomainPrefixes.HasValue)
-						return _useDomainPrefixes.Value;
-					bool result;
-					if (bool.TryParse(GetKey("/settings/requestHandler/useDomainPrefixes"), out result))
-						return result;
-					return false;
-				}
-				catch
-				{
-					return false;
-				}
+                // default: false
+                return GetKeyWithOverride("/settings/requestHandler/useDomainPrefixes", false, _useDomainPrefixes);
 			}
-			// for unit tests only
 			internal set
 			{
-				_useDomainPrefixes = value;
+                // for unit tests only
+                _useDomainPrefixes = value;
 			}
 		}
 
@@ -382,31 +403,14 @@ namespace Umbraco.Core.Configuration
 		{
 			get
 			{
-				try
-				{
-					if (GlobalSettings.UseDirectoryUrls)
-					{
-						if (_addTrailingSlash.HasValue)
-							return _addTrailingSlash.Value;
-						bool result;
-						if (bool.TryParse(GetKey("/settings/requestHandler/addTrailingSlash"), out result))
-							return result;
-						return false;
-					}
-					else
-					{
-						return false;
-					}
-				}
-				catch
-				{
-					return false;
-				}
+                // default: false
+                return GlobalSettings.UseDirectoryUrls
+                    && GetKeyWithOverride("/settings/requestHandler/addTrailingSlash", false, _addTrailingSlash);
 			}
-			// for unit tests only
 			internal set
 			{
-				_addTrailingSlash = value;
+                // for unit tests only
+                _addTrailingSlash = value;
 			}
 		}
 
@@ -623,31 +627,34 @@ namespace Umbraco.Core.Configuration
 		{
 			get
 			{
-				if (_forceSafeAliases.HasValue)
-					return _forceSafeAliases.Value;
-
-				string forceSafeAlias = GetKey("/settings/content/ForceSafeAliases");
-				if (String.IsNullOrEmpty(forceSafeAlias))
-					return true;
-				else
-				{
-					try
-					{
-						return bool.Parse(forceSafeAlias);
-					}
-					catch
-					{
-						return true;
-					}
-				}
+                // default: true
+                return GetKeyWithOverride("/settings/content/ForceSafeAliases", true, _forceSafeAliases);
 			}
 			internal set
 			{
-				//used for unit  testing
+				// used for unit  testing
 				_forceSafeAliases = value;
 			}
 		}
 
+        private static bool? _trySkipIisCustomErrors;
+
+        /// <summary>
+        /// Gets or sets a value indicating where to try to skip IIS custom errors.
+        /// </summary>
+        public static bool TrySkipIisCustomErrors
+        {
+            get
+            {
+                // default: false
+                return GetKeyWithOverride("/settings/TrySkipIisCustomErrors", false, _trySkipIisCustomErrors);
+            }
+            internal set
+            {
+                // used for unit  testing
+                _trySkipIisCustomErrors = value;
+            }
+        }
 
 		/// <summary>
 		/// Gets the allowed image file types.
@@ -677,26 +684,14 @@ namespace Umbraco.Core.Configuration
 		{
 			get
 			{
-				if (_umbracoLibraryCacheDuration.HasValue)
-					return _umbracoLibraryCacheDuration.Value;
-				
-				string libraryCacheDuration = GetKey("/settings/content/UmbracoLibraryCacheDuration");
-				if (String.IsNullOrEmpty(libraryCacheDuration))
-					return 1800;
-				else
-				{
-					try
-					{
-						return int.Parse(libraryCacheDuration);
-					}
-					catch
-					{
-						return 1800;
-					}
-				}
-
+                // default: 1800
+                return GetKeyWithOverride("/settings/content/UmbracoLibraryCacheDuration", 1800, _umbracoLibraryCacheDuration);
 			}
-			internal set { _umbracoLibraryCacheDuration = value; }
+			internal set
+            {
+                // for unit tests only
+                _umbracoLibraryCacheDuration = value;
+            }
 		}
 
 		/// <summary>
@@ -1052,27 +1047,12 @@ namespace Umbraco.Core.Configuration
 		{
 			get
 			{
-				try
-				{
-					if (_useLegacySchema.HasValue)
-						return _useLegacySchema.Value;
-
-					string value = GetKey("/settings/content/UseLegacyXmlSchema");
-					bool result;
-					if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out result))
-						return result;
-					return true;
-				}
-				catch (Exception)
-				{
-					//default. TODO: When we change this to a real config section we won't have to worry about parse errors
-					// and should handle defaults with unit tests properly.
-					return false;
-				}
+                // default: true
+                return GetKeyWithOverride("/settings/content/UseLegacyXmlSchema", true, _useLegacySchema);
 			}
 			internal set
 			{
-				//used for unit  testing
+				// used for unit  testing
 				_useLegacySchema = value;
 			}
 		}
