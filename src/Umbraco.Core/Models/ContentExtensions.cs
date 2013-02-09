@@ -19,6 +19,7 @@ namespace Umbraco.Core.Models
 {
     public static class ContentExtensions
     {
+        #region IContent
         /// <summary>
         /// Returns a list of the current contents ancestors, not including the content itself.
         /// </summary>
@@ -58,6 +59,49 @@ namespace Umbraco.Core.Models
         {
             return ApplicationContext.Current.Services.ContentService.GetById(content.ParentId);
         }
+        #endregion
+
+        #region IMedia
+        /// <summary>
+        /// Returns a list of the current medias ancestors, not including the media itself.
+        /// </summary>
+        /// <param name="media">Current media</param>
+        /// <returns>An enumerable list of <see cref="IMedia"/> objects</returns>
+        public static IEnumerable<IMedia> Ancestors(this IMedia media)
+        {
+            return ApplicationContext.Current.Services.MediaService.GetAncestors(media);
+        }
+
+        /// <summary>
+        /// Returns a list of the current medias children.
+        /// </summary>
+        /// <param name="media">Current media</param>
+        /// <returns>An enumerable list of <see cref="IMedia"/> objects</returns>
+        public static IEnumerable<IMedia> Children(this IMedia media)
+        {
+            return ApplicationContext.Current.Services.MediaService.GetChildren(media.Id);
+        }
+
+        /// <summary>
+        /// Returns a list of the current medias descendants, not including the media itself.
+        /// </summary>
+        /// <param name="media">Current media</param>
+        /// <returns>An enumerable list of <see cref="IMedia"/> objects</returns>
+        public static IEnumerable<IMedia> Descendants(this IMedia media)
+        {
+            return ApplicationContext.Current.Services.MediaService.GetDescendants(media);
+        }
+
+        /// <summary>
+        /// Returns the parent of the current media.
+        /// </summary>
+        /// <param name="media">Current media</param>
+        /// <returns>An <see cref="IMedia"/> object</returns>
+        public static IMedia Parent(this IMedia media)
+        {
+            return ApplicationContext.Current.Services.MediaService.GetById(media.ParentId);
+        }
+        #endregion
 
         /// <summary>
         /// Set property values by alias with an annonymous object

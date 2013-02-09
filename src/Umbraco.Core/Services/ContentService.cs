@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Xml.Linq;
@@ -246,7 +247,10 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
 	    public IEnumerable<IContent> GetAncestors(IContent content)
 	    {
-	        var ids = content.Path.Split(',').Where(x => x != "-1" && x != content.Id.ToString()).Select(int.Parse).ToArray();
+	        var ids = content.Path.Split(',').Where(x => x != "-1" && x != content.Id.ToString(CultureInfo.InvariantCulture)).Select(int.Parse).ToArray();
+            if (ids.Any() == false)
+                return new List<IContent>();
+
             using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
             {
                 return repository.GetAll(ids);
@@ -331,6 +335,9 @@ namespace Umbraco.Core.Services
         /// <returns>Parent <see cref="IContent"/> object</returns>
         public IContent GetParent(IContent content)
         {
+            if (content.ParentId == -1 || content.ParentId == -20)
+                return null;
+
             return GetById(content.ParentId);
         }
 
