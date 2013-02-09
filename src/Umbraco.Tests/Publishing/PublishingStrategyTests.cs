@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -40,7 +41,6 @@ namespace Umbraco.Tests.Publishing
 
             base.Initialize();
 
-            CreateTestData();
         }
 
         [TearDown]
@@ -73,6 +73,40 @@ namespace Umbraco.Tests.Publishing
         /// -- text page 2
         /// --- text page 3
         /// 
+        /// For this test, none of them are published, then we bulk publish them all, however one of the nodes will fail publishing
+        /// because it is not valid, then it's children won't be published either because it's never been published.
+        /// </summary>
+        [Test]
+        public void Publishes_Many_Ignores_Invalid_Items_And_Children()
+        {
+            var testData = CreateTestData();
+            //Create some other data which are descendants of Text Page 2
+            var mandatorContent = MockedContent.CreateSimpleContent(
+                ServiceContext.ContentTypeService.GetContentType("umbMandatory"), "Invalid Content", testData.Single(x => x.Name == "Text Page 2").Id);
+            mandatorContent.SetValue("author", string.Empty);
+            ServiceContext.ContentService.Save(mandatorContent, 0);
+            var subContent = MockedContent.CreateSimpleContent(
+                ServiceContext.ContentTypeService.GetContentType("umbTextpage"), "Sub Sub Sub", mandatorContent.Id);
+            ServiceContext.ContentService.Save(subContent, 0);
+            
+            var strategy = new PublishingStrategy();
+
+            //publish root and nodes at it's children level
+            var listToPublish = ServiceContext.ContentService.GetDescendants(_homePage.Id).Concat(new[] { _homePage });
+            var result = strategy.PublishWithChildrenInternal(listToPublish, 0, true, true);
+
+            Assert.AreEqual(listToPublish.Count() - 2, result.Count(x => x.Success));
+            Assert.IsTrue(result.Where(x => x.Success).Select(x => x.Result.ContentItem.Id)
+                                .ContainsAll(listToPublish.Where(x => x.Name != "Invalid Content" && x.Name != "Sub Sub Sub").Select(x => x.Id)));
+        }
+
+        /// <summary>
+        /// in these tests we have a heirarchy of 
+        /// - home
+        /// -- text page 1
+        /// -- text page 2
+        /// --- text page 3
+        /// 
         /// For this test, none of them are published, then we bulk publish them all, however we cancel the publishing for
         /// "text page 2". This internally will ensure that text page 3 doesn't get published either because text page 2 has 
         /// never been published.
@@ -80,6 +114,8 @@ namespace Umbraco.Tests.Publishing
         [Test]
         public void Publishes_Many_Ignores_Cancelled_Items_And_Children()
         {
+            CreateTestData();
+
             var strategy = new PublishingStrategy();
             
 
@@ -96,18 +132,17 @@ namespace Umbraco.Tests.Publishing
 
         static void PublishingStrategyPublishing(IPublishingStrategy sender, PublishEventArgs<IContent> e)
         {
-            foreach (var i in e.PublishedEntities)
+            foreach (var i in e.PublishedEntities.Where(i => i.Name == "Text Page 2"))
             {
-                if (i.Name == "Text Page 2")
-                {
-                    e.Cancel = true;
-                }
+                e.Cancel = true;
             }
         }
 
         [Test]
         public void Publishes_Many_Ignores_Unpublished_Items()
         {
+            CreateTestData();
+
             var strategy = new PublishingStrategy();
             
             //publish root and nodes at it's children level
@@ -131,6 +166,8 @@ namespace Umbraco.Tests.Publishing
         [Test]
         public void Publishes_Many_Does_Not_Ignore_Unpublished_Items()
         {
+            CreateTestData();
+
             var strategy = new PublishingStrategy();
 
             //publish root and nodes at it's children level
@@ -153,19 +190,22 @@ namespace Umbraco.Tests.Publishing
             Assert.IsTrue(result.First().Result.ContentItem.Published);
         }
 
+        [NUnit.Framework.Ignore]
         [Test]
         public void Can_Publish_And_Update_Xml_Cache()
         {
             //TODO Create new test
         }
 
-        public void CreateTestData()
+        public IEnumerable<IContent> CreateTestData()
         {
             //NOTE Maybe not the best way to create/save test data as we are using the services, which are being tested.
 
             //Create and Save ContentType "umbTextpage" -> 1045
             ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
             ServiceContext.ContentTypeService.Save(contentType);
+            var mandatoryType = MockedContentTypes.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type", true);
+            ServiceContext.ContentTypeService.Save(mandatoryType);
 
             //Create and Save Content "Homepage" based on "umbTextpage" -> 1046
             _homePage = MockedContent.CreateSimpleContent(contentType);
@@ -183,6 +223,7 @@ namespace Umbraco.Tests.Publishing
             Content subpage3 = MockedContent.CreateSimpleContent(contentType, "Text Page 3", subpage2.Id);
             ServiceContext.ContentService.Save(subpage3, 0);
 
+            return new[] {_homePage, subpage, subpage2, subpage3};
         }
     }
 }

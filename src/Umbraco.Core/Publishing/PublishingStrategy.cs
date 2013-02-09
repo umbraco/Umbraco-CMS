@@ -155,6 +155,20 @@ namespace Umbraco.Core.Publishing
                         continue;
                     }
 
+                    //Check if the content is valid if the flag is set to check
+                    if (validateContent && !item.IsValid())
+                    {
+                        LogHelper.Info<PublishingStrategy>(
+                            string.Format("Content '{0}' with Id '{1}' will not be published because some of it's content is not passing validation rules.",
+                                          item.Name, item.Id));
+                        statuses.Add(new Attempt<PublishStatus>(false, new PublishStatus(item, PublishStatusType.FailedContentInvalid)));
+
+                        //Does this document apply to our rule to cancel it's children being published?
+                        CheckCancellingOfChildPublishing(item, parentsIdsCancelled, includeUnpublishedDocuments);
+
+                        continue;
+                    }
+
                     //Check if the Content is Expired to verify that it can in fact be published
                     if (item.Status == ContentStatus.Expired)
                     {
