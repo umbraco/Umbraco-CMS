@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -18,6 +19,46 @@ namespace Umbraco.Core.Models
 {
     public static class ContentExtensions
     {
+        /// <summary>
+        /// Returns a list of the current contents ancestors, not including the content itself.
+        /// </summary>
+        /// <param name="content">Current content</param>
+        /// <returns>An enumerable list of <see cref="IContent"/> objects</returns>
+        public static IEnumerable<IContent> Ancestors(this IContent content)
+        {
+            return ApplicationContext.Current.Services.ContentService.GetAncestors(content);
+        }
+
+        /// <summary>
+        /// Returns a list of the current contents children.
+        /// </summary>
+        /// <param name="content">Current content</param>
+        /// <returns>An enumerable list of <see cref="IContent"/> objects</returns>
+        public static IEnumerable<IContent> Children(this IContent content)
+        {
+            return ApplicationContext.Current.Services.ContentService.GetChildren(content.Id);
+        }
+
+        /// <summary>
+        /// Returns a list of the current contents descendants, not including the content itself.
+        /// </summary>
+        /// <param name="content">Current content</param>
+        /// <returns>An enumerable list of <see cref="IContent"/> objects</returns>
+        public static IEnumerable<IContent> Descendants(this IContent content)
+        {
+            return ApplicationContext.Current.Services.ContentService.GetDescendants(content);
+        }
+
+        /// <summary>
+        /// Returns the parent of the current content.
+        /// </summary>
+        /// <param name="content">Current content</param>
+        /// <returns>An <see cref="IContent"/> object</returns>
+        public static IContent Parent(this IContent content)
+        {
+            return ApplicationContext.Current.Services.ContentService.GetById(content.ParentId);
+        }
+
         /// <summary>
         /// Set property values by alias with an annonymous object
         /// </summary>

@@ -228,7 +228,32 @@ namespace Umbraco.Core.Services
             }
         }
 
-		/// <summary>
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects, which are ancestors of the current content.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/> to retrieve ancestors for</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetAncestors(int id)
+        {
+            var content = GetById(id);
+            return GetAncestors(content);
+        }
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects, which are ancestors of the current content.
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> to retrieve ancestors for</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+	    public IEnumerable<IContent> GetAncestors(IContent content)
+	    {
+	        var ids = content.Path.Split(',').Where(x => x != "-1" && x != content.Id.ToString()).Select(int.Parse).ToArray();
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(ids);
+            }
+	    }
+
+	    /// <summary>
 		/// Gets a collection of <see cref="IContent"/> objects by Parent Id
 		/// </summary>
 		/// <param name="id">Id of the Parent to retrieve Children from</param>
@@ -289,6 +314,27 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets the parent of the current content as an <see cref="IContent"/> item.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/> to retrieve the parent from</param>
+        /// <returns>Parent <see cref="IContent"/> object</returns>
+        public IContent GetParent(int id)
+        {
+            var content = GetById(id);
+            return GetParent(content);
+        }
+
+        /// <summary>
+        /// Gets the parent of the current content as an <see cref="IContent"/> item.
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> to retrieve the parent from</param>
+        /// <returns>Parent <see cref="IContent"/> object</returns>
+        public IContent GetParent(IContent content)
+        {
+            return GetById(content.ParentId);
+        }
+
+	    /// <summary>
         /// Gets the published version of an <see cref="IContent"/> item
         /// </summary>
         /// <param name="id">Id of the <see cref="IContent"/> to retrieve version from</param>
