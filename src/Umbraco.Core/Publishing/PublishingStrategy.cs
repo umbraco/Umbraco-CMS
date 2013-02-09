@@ -22,7 +22,12 @@ namespace Umbraco.Core.Publishing
         protected internal override Attempt<PublishStatus> PublishInternal(IContent content, int userId)
         {
             if (Publishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(content), this))
+            {
+                LogHelper.Info<PublishingStrategy>(
+                        string.Format("Content '{0}' with Id '{1}' will not be published, the event was cancelled.", content.Name, content.Id));
                 return new Attempt<PublishStatus>(false, new PublishStatus(content, PublishStatusType.FailedCancelledByEvent));
+            }
+                
 
             //Check if the Content is Expired to verify that it can in fact be published
             if (content.Status == ContentStatus.Expired)
@@ -81,26 +86,74 @@ namespace Umbraco.Core.Publishing
         /// not visible on the front-end. If set to false, this will only publish content that is live on the front-end but has new versions
         /// that have yet to be published.
         /// </param>
+        /// <param name="validateContent">If true this will validate each content item before trying to publish it, if validation fails it will not be published.</param>
         /// <returns></returns>
+        /// <remarks>
+        /// This method becomes complex once we start to be able to cancel events or stop publishing a content item in any way because if a
+        /// content item is not published then it's children shouldn't be published either. This rule will apply for the following conditions:
+        /// * If a document fails to be published, do not proceed to publish it's children if:
+        /// ** The document does not have a publish version
+        /// ** The document does have a published version but the includeUnpublishedDocuments = false
+        /// 
+        /// In order to do this, we will order the content by level and begin by publishing each item at that level, then proceed to the next
+        /// level and so on. If we detect that the above rule applies when the document publishing is cancelled we'll add it to the list of 
+        /// parentsIdsCancelled so that it's children don't get published.
+        /// </remarks>
         protected internal override IEnumerable<Attempt<PublishStatus>> PublishWithChildrenInternal(
-            IEnumerable<IContent> content, int userId, bool includeUnpublishedDocuments = true)
+            IEnumerable<IContent> content, int userId, bool includeUnpublishedDocuments = true, bool validateContent = false)
         {
             var statuses = new List<Attempt<PublishStatus>>();
 
-            /* Only update content thats not already been published - we want to loop through
-             * all unpublished content to write skipped content (expired and awaiting release) to log.
-             */
-            foreach (var item in content.Where(x => x.Published == false))
-            {
-                //Check if this item has never been published
-                if (!includeUnpublishedDocuments && !item.HasPublishedVersion())
-                {
-                    //this item does not have a published version and the flag is set to not include them
-                    continue;
-                }
+            //a list of all document ids that had their publishing cancelled during these iterations.
+            //this helps us apply the rule listed in the notes above by checking if a document's parent id
+            //matches one in this list.
+            var parentsIdsCancelled = new List<int>();
 
-                //Fire Publishing event
-                if (Publishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(item), this))
+            //group by levels and iterate over the sorted ascending level.
+            //TODO: This will cause all queries to execute, they will not be lazy but I'm not really sure being lazy actually made
+            // much difference because we iterate over them all anyways?? Morten?       
+            // Because we're grouping I think this will execute all the queries anyways so need to fetch it all first.
+            var fetchedContent = content.ToArray();
+            var levelGroups = fetchedContent.GroupBy(x => x.Level);
+            foreach (var level in levelGroups.OrderBy(x => x.Key))
+            {
+
+                /* Only update content thats not already been published - we want to loop through
+                 * all unpublished content to write skipped content (expired and awaiting release) to log.
+                 */
+                foreach (var item in level.Where(x => x.Published == false))
+                {
+                    //Check if this item should be excluded because it's parent's publishing has failed/cancelled
+                    if (parentsIdsCancelled.Contains(item.ParentId))
+                    {
+                        LogHelper.Info<PublishingStrategy>(
+                            string.Format("Content '{0}' with Id '{1}' will not be published because it's parent's publishing action failed or was cancelled.", item.Name, item.Id));
+                        //if this cannot be published, ensure that it's children can definitely not either!
+                        parentsIdsCancelled.Add(item.Id);
+                        continue;
+                    }
+
+                    //Check if this item has never been published
+                    if (!includeUnpublishedDocuments && !item.HasPublishedVersion())
+                    {
+                        //this item does not have a published version and the flag is set to not include them
+                        parentsIdsCancelled.Add(item.Id);
+                        continue;
+                    }
+
+                    //Fire Publishing event
+                    if (Publishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(item), this))
+                    {
+                        //the publishing has been cancelled.
+                        LogHelper.Info<PublishingStrategy>(
+                            string.Format("Content '{0}' with Id '{1}' will not be published, the event was cancelled.", item.Name, item.Id));
+                        statuses.Add(new Attempt<PublishStatus>(false, new PublishStatus(item, PublishStatusType.FailedCancelledByEvent)));
+
+                        //Does this document apply to our rule to cancel it's children being published?
+                        CheckCancellingOfChildPublishing(item, parentsIdsCancelled, includeUnpublishedDocuments);
+                        
+                        continue;
+                    }
 
                     //Check if the Content is Expired to verify that it can in fact be published
                     if (item.Status == ContentStatus.Expired)
@@ -109,39 +162,82 @@ namespace Umbraco.Core.Publishing
                             string.Format("Content '{0}' with Id '{1}' has expired and could not be published.",
                                           item.Name, item.Id));
                         statuses.Add(new Attempt<PublishStatus>(false, new PublishStatus(item, PublishStatusType.FailedHasExpired)));
+                        
+                        //Does this document apply to our rule to cancel it's children being published?
+                        CheckCancellingOfChildPublishing(item, parentsIdsCancelled, includeUnpublishedDocuments);
+                        
                         continue;
                     }
 
-                //Check if the Content is Awaiting Release to verify that it can in fact be published
-                if (item.Status == ContentStatus.AwaitingRelease)
-                {
+                    //Check if the Content is Awaiting Release to verify that it can in fact be published
+                    if (item.Status == ContentStatus.AwaitingRelease)
+                    {
+                        LogHelper.Info<PublishingStrategy>(
+                            string.Format("Content '{0}' with Id '{1}' is awaiting release and could not be published.",
+                                          item.Name, item.Id));
+                        statuses.Add(new Attempt<PublishStatus>(false, new PublishStatus(item, PublishStatusType.FailedAwaitingRelease)));
+
+                        //Does this document apply to our rule to cancel it's children being published?
+                        CheckCancellingOfChildPublishing(item, parentsIdsCancelled, includeUnpublishedDocuments);
+
+                        continue;
+                    }
+
+                    //Check if the Content is Trashed to verify that it can in fact be published
+                    if (item.Status == ContentStatus.Trashed)
+                    {
+                        LogHelper.Info<PublishingStrategy>(
+                            string.Format("Content '{0}' with Id '{1}' is trashed and could not be published.",
+                                          item.Name, item.Id));
+                        statuses.Add(new Attempt<PublishStatus>(false, new PublishStatus(item, PublishStatusType.FailedIsTrashed)));
+
+                        //Does this document apply to our rule to cancel it's children being published?
+                        CheckCancellingOfChildPublishing(item, parentsIdsCancelled, includeUnpublishedDocuments);
+
+                        continue;
+                    }
+
+                    item.ChangePublishedState(PublishedState.Published);
+
                     LogHelper.Info<PublishingStrategy>(
-                        string.Format("Content '{0}' with Id '{1}' is awaiting release and could not be published.",
+                        string.Format("Content '{0}' with Id '{1}' has been published.",
                                       item.Name, item.Id));
-                    statuses.Add(new Attempt<PublishStatus>(false, new PublishStatus(item, PublishStatusType.FailedAwaitingRelease)));
-                    continue;
+
+                    statuses.Add(new Attempt<PublishStatus>(true, new PublishStatus(item)));
                 }
-
-                //Check if the Content is Trashed to verify that it can in fact be published
-                if (item.Status == ContentStatus.Trashed)
-                {
-                    LogHelper.Info<PublishingStrategy>(
-                        string.Format("Content '{0}' with Id '{1}' is trashed and could not be published.",
-                                      item.Name, item.Id));
-                    statuses.Add(new Attempt<PublishStatus>(false, new PublishStatus(item, PublishStatusType.FailedIsTrashed)));
-                    continue;
-                }
-
-                item.ChangePublishedState(PublishedState.Published);
-
-                LogHelper.Info<PublishingStrategy>(
-                    string.Format("Content '{0}' with Id '{1}' has been published.",
-                                  item.Name, item.Id));
-
-                statuses.Add(new Attempt<PublishStatus>(true, new PublishStatus(item)));
+    
             }
 
             return statuses;
+        }
+
+        /// <summary>
+        /// Based on the information provider we'll check if we should cancel the publishing of this document's children
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="parentsIdsCancelled"></param>
+        /// <param name="includeUnpublishedDocuments"></param>
+        /// <remarks>
+        /// See remarks on method: PublishWithChildrenInternal
+        /// </remarks> 
+        private void CheckCancellingOfChildPublishing(IContent content, List<int> parentsIdsCancelled, bool includeUnpublishedDocuments)
+        {
+            //Does this document apply to our rule to cancel it's children being published?
+            //TODO: We're going back to the service layer here... not sure how to avoid this? And this will add extra overhead to 
+            // any document that fails to publish...
+            var hasPublishedVersion = ApplicationContext.Current.Services.ContentService.HasPublishedVersion(content.Id);
+            
+            if (hasPublishedVersion && !includeUnpublishedDocuments)
+            {
+                //it has a published version but our flag tells us to not include un-published documents and therefore we should
+                // not be forcing decendant/child documents to be published if their parent fails.
+                parentsIdsCancelled.Add(content.Id);
+            }
+            else if (!hasPublishedVersion)
+            {
+                //it doesn't have a published version so we certainly cannot publish it's children.
+                parentsIdsCancelled.Add(content.Id);                
+            }
         }
 
         /// <summary>
@@ -153,7 +249,7 @@ namespace Umbraco.Core.Publishing
         public override bool PublishWithChildren(IEnumerable<IContent> content, int userId)
         {
             var result = PublishWithChildrenInternal(content, userId);
-            
+
             //NOTE: This previously always returned true so I've left it that way. It returned true because (from Morten)...
             // ... if one item couldn't be published it wouldn't be correct to return false.
             // in retrospect it should have returned a list of with Ids and Publish Status
@@ -172,7 +268,12 @@ namespace Umbraco.Core.Publishing
         public override bool UnPublish(IContent content, int userId)
         {
             if (UnPublishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(content), this))
+            {
+                LogHelper.Info<PublishingStrategy>(
+                        string.Format("Content '{0}' with Id '{1}' will not be un-published, the event was cancelled.", content.Name, content.Id));
                 return false;
+            }
+                
 
             //If Content has a release date set to before now, it should be removed so it doesn't interrupt an unpublish
             //Otherwise it would remain released == published
@@ -185,7 +286,7 @@ namespace Umbraco.Core.Publishing
                         "Content '{0}' with Id '{1}' had its release date removed, because it was unpublished.",
                         content.Name, content.Id));
             }
-            
+
             content.ChangePublishedState(PublishedState.Unpublished);
 
             LogHelper.Info<PublishingStrategy>(
@@ -210,6 +311,8 @@ namespace Umbraco.Core.Publishing
                 //Fire UnPublishing event
                 if (UnPublishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(item), this))
                 {
+                    LogHelper.Info<PublishingStrategy>(
+                        string.Format("Content '{0}' with Id '{1}' will not be published, the event was cancelled.", item.Name, item.Id));
                     result.Add(new Attempt<PublishStatus>(false, new PublishStatus(item, PublishStatusType.FailedCancelledByEvent)));
                     continue;
                 }
@@ -307,7 +410,7 @@ namespace Umbraco.Core.Publishing
         /// Occurs after publish
         /// </summary>
         public static event TypedEventHandler<IPublishingStrategy, PublishEventArgs<IContent>> Published;
-        
+
         /// <summary>
         /// Occurs before unpublish
         /// </summary>

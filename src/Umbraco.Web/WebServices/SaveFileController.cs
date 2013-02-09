@@ -6,6 +6,7 @@ using System.Text;
 using System.Web.Mvc;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Mvc;
@@ -32,8 +33,13 @@ namespace Umbraco.Web.WebServices
         [HttpPost]
         public JsonResult PublishDocument(int documentId, bool publishChildren)
         {
-            //var doc = Services.ContentService.GetById(documentId);
-            //if (Services.ContentService.PublishWithChildren(doc, UmbracoUser.Id))
+            var doc = Services.ContentService.GetById(documentId);
+            var result = ((ContentService)Services.ContentService).PublishWithChildren(doc, true, UmbracoUser.Id);
+            
+            if (Services.ContentService.PublishWithChildren(doc, UmbracoUser.Id))
+            {
+                
+            }
             return null;
         }
     }

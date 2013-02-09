@@ -10,7 +10,7 @@ namespace Umbraco.Core.Publishing
     {
 
         protected internal abstract Attempt<PublishStatus> PublishInternal(IContent content, int userId);
-        
+
         /// <summary>
         /// Publishes a list of content items
         /// </summary>
@@ -21,8 +21,10 @@ namespace Umbraco.Core.Publishing
         /// not visible on the front-end. If set to false, this will only publish content that is live on the front-end but has new versions
         /// that have yet to be published.
         /// </param>
+        /// <param name="validateContent">If true this will validate each content item before trying to publish it, if validation fails it will not be published.</param>
         /// <returns></returns>
-        protected internal abstract IEnumerable<Attempt<PublishStatus>> PublishWithChildrenInternal(IEnumerable<IContent> content, int userId, bool includeUnpublishedDocuments = true);
+        protected internal abstract IEnumerable<Attempt<PublishStatus>> PublishWithChildrenInternal(
+            IEnumerable<IContent> content, int userId, bool includeUnpublishedDocuments = true, bool validateContent = false);
 
         protected internal abstract IEnumerable<Attempt<PublishStatus>> UnPublishInternal(IEnumerable<IContent> content, int userId);
 

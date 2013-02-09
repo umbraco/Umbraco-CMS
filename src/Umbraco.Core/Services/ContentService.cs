@@ -1039,13 +1039,9 @@ namespace Umbraco.Core.Services
 	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
 	    /// <param name="includeUnpublished">If set to true, this will also publish descendants that are completely unpublished, normally this will only publish children that have previously been published</param>
 	    /// <returns>True if publishing succeeded, otherwise False</returns>
-	    internal bool PublishWithChildren(IContent content, bool omitCacheRefresh = true, int userId = 0, bool includeUnpublished = false)
+	    internal IEnumerable<Attempt<PublishStatus>> PublishWithChildren(IContent content, bool omitCacheRefresh = true, int userId = 0, bool includeUnpublished = false)
         {
-            var result = PublishWithChildrenDo(content, omitCacheRefresh, userId, includeUnpublished);
-
-            //This used to just return false only when the parent content failed, otherwise would always return true so we'll
-            // do the same thing for the moment
-            return result.Single(x => x.Result.ContentItem.Id == content.Id).Success;
+            return PublishWithChildrenDo(content, omitCacheRefresh, userId, includeUnpublished);
         }
 
         /// <summary>
@@ -1201,40 +1197,39 @@ namespace Umbraco.Core.Services
             list.AddRange(GetDescendants(content));
 
             //Publish and then update the database with new status
-            var publishedOutcome = _publishingStrategy.PublishWithChildrenInternal(list, userId).ToArray();
-            //if (published)
-            //{
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            var publishedOutcome = _publishingStrategy.PublishWithChildrenInternal(list, userId, includeUnpublished).ToArray();
+            
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                //Only loop through content where the Published property has been updated
+                //foreach (var item in list.Where(x => ((ICanBeDirty)x).IsPropertyDirty("Published")))
+                foreach (var item in publishedOutcome.Where(x => x.Success))
                 {
-                    //Only loop through content where the Published property has been updated
-                    //foreach (var item in list.Where(x => ((ICanBeDirty)x).IsPropertyDirty("Published")))
-                    foreach (var item in publishedOutcome.Where(x => x.Success))
-                    {
-                        item.Result.ContentItem.WriterId = userId;
-                        repository.AddOrUpdate(item.Result.ContentItem);
-                        updated.Add(item.Result.ContentItem);
-                    }
-
-                    uow.Commit();
-
-                    foreach (var c in updated)
-                    {
-                        var xml = c.ToXml();
-                        var poco = new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) };
-                        var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id }) !=
-                                     null;
-                        var r = exists
-                                    ? uow.Database.Update(poco)
-                                    : Convert.ToInt32(uow.Database.Insert(poco));
-                    }
+                    item.Result.ContentItem.WriterId = userId;
+                    repository.AddOrUpdate(item.Result.ContentItem);
+                    updated.Add(item.Result.ContentItem);
                 }
-                //Save xml to db and call following method to fire event:
-                if (omitCacheRefresh == false)
-                    _publishingStrategy.PublishingFinalized(updated, false);
 
-                Audit.Add(AuditTypes.Publish, "Publish with Children performed by user", userId, content.Id);
-            //}
+                uow.Commit();
+
+                foreach (var c in updated)
+                {
+                    var xml = c.ToXml();
+                    var poco = new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) };
+                    var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id }) !=
+                                    null;
+                    var r = exists
+                                ? uow.Database.Update(poco)
+                                : Convert.ToInt32(uow.Database.Insert(poco));
+                }
+            }
+            //Save xml to db and call following method to fire event:
+            if (omitCacheRefresh == false)
+                _publishingStrategy.PublishingFinalized(updated, false);
+
+            Audit.Add(AuditTypes.Publish, "Publish with Children performed by user", userId, content.Id);
+            
 
             return publishedOutcome;
         }

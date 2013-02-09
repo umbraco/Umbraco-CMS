@@ -817,7 +817,10 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
         public bool PublishWithChildrenWithResult(User u)
         {
-            return ((ContentService)ApplicationContext.Current.Services.ContentService).PublishWithChildren(Content, true, u.Id);
+            var result = ((ContentService)ApplicationContext.Current.Services.ContentService).PublishWithChildren(Content, true, u.Id);
+            //This used to just return false only when the parent content failed, otherwise would always return true so we'll
+            // do the same thing for the moment
+            return result.Single(x => x.Result.ContentItem.Id == Id).Success;
         }
 
         /// <summary>
@@ -854,7 +857,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                var published = ((ContentService)ApplicationContext.Current.Services.ContentService).PublishWithChildren(Content, true, u.Id);
+                var publishedResults = ((ContentService)ApplicationContext.Current.Services.ContentService).PublishWithChildren(Content, true, u.Id);
 
                 FireAfterPublish(e);
             }

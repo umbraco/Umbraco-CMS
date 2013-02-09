@@ -3,6 +3,7 @@ using System.IO;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.ObjectResolution;
@@ -47,6 +48,9 @@ namespace Umbraco.Tests.Publishing
         {
 			base.TearDown();
             
+            //ensure event handler is gone
+            PublishingStrategy.Publishing -= PublishingStrategyPublishing;
+
             //TestHelper.ClearDatabase();
 
             //reset the app context
@@ -61,6 +65,45 @@ namespace Umbraco.Tests.Publishing
         }
 
         private IContent _homePage;
+
+        /// <summary>
+        /// in these tests we have a heirarchy of 
+        /// - home
+        /// -- text page 1
+        /// -- text page 2
+        /// --- text page 3
+        /// 
+        /// For this test, none of them are published, then we bulk publish them all, however we cancel the publishing for
+        /// "text page 2". This internally will ensure that text page 3 doesn't get published either because text page 2 has 
+        /// never been published.
+        /// </summary>
+        [Test]
+        public void Publishes_Many_Ignores_Cancelled_Items_And_Children()
+        {
+            var strategy = new PublishingStrategy();
+            
+
+            PublishingStrategy.Publishing +=PublishingStrategyPublishing;
+
+            //publish root and nodes at it's children level
+            var listToPublish = ServiceContext.ContentService.GetDescendants(_homePage.Id).Concat(new[] {_homePage});
+            var result = strategy.PublishWithChildrenInternal(listToPublish, 0);
+            
+            Assert.AreEqual(listToPublish.Count() - 2, result.Count(x => x.Success));
+            Assert.IsTrue(result.Where(x => x.Success).Select(x => x.Result.ContentItem.Id)
+                                .ContainsAll(listToPublish.Where(x => x.Name != "Text Page 2" && x.Name != "Text Page 3").Select(x => x.Id)));
+        }
+
+        static void PublishingStrategyPublishing(IPublishingStrategy sender, PublishEventArgs<IContent> e)
+        {
+            foreach (var i in e.PublishedEntities)
+            {
+                if (i.Name == "Text Page 2")
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
 
         [Test]
         public void Publishes_Many_Ignores_Unpublished_Items()
