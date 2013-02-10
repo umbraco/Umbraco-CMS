@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Core.Auditing;
@@ -189,6 +190,34 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Gets a collection of <see cref="IMedia"/> objects, which are ancestors of the current media.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMedia"/> to retrieve ancestors for</param>
+        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
+        public IEnumerable<IMedia> GetAncestors(int id)
+        {
+            var media = GetById(id);
+            return GetAncestors(media);
+        }
+
+        /// <summary>
+        /// Gets a collection of <see cref="IMedia"/> objects, which are ancestors of the current media.
+        /// </summary>
+        /// <param name="media"><see cref="IMedia"/> to retrieve ancestors for</param>
+        /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
+        public IEnumerable<IMedia> GetAncestors(IMedia media)
+        {
+            var ids = media.Path.Split(',').Where(x => x != "-1" && x != media.Id.ToString(CultureInfo.InvariantCulture)).Select(int.Parse).ToArray();
+            if(ids.Any() == false)
+                return new List<IMedia>();
+
+            using (var repository = _repositoryFactory.CreateMediaRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(ids);
+            }
+        }
+
 		/// <summary>
 		/// Gets a collection of <see cref="IMedia"/> objects by Parent Id
 		/// </summary>
@@ -232,6 +261,30 @@ namespace Umbraco.Core.Services
 
                 return medias;
             }
+        }
+
+        /// <summary>
+        /// Gets the parent of the current media as an <see cref="IMedia"/> item.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMedia"/> to retrieve the parent from</param>
+        /// <returns>Parent <see cref="IMedia"/> object</returns>
+        public IMedia GetParent(int id)
+        {
+            var media = GetById(id);
+            return GetParent(media);
+        }
+
+        /// <summary>
+        /// Gets the parent of the current media as an <see cref="IMedia"/> item.
+        /// </summary>
+        /// <param name="media"><see cref="IMedia"/> to retrieve the parent from</param>
+        /// <returns>Parent <see cref="IMedia"/> object</returns>
+        public IMedia GetParent(IMedia media)
+        {
+            if (media.ParentId == -1 || media.ParentId == -21)
+                return null;
+
+            return GetById(media.ParentId);
         }
 
 		/// <summary>

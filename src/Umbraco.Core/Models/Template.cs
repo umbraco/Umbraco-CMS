@@ -101,7 +101,7 @@ namespace Umbraco.Core.Models
             }
             else
             {
-                exts.Add(UmbracoSettings.UseAspNetMasterPages ? "masterpage" : "aspx");
+                exts.Add(UmbracoSettings.UseAspNetMasterPages ? "master" : "aspx");
             }
 
             var dirs = SystemDirectories.Masterpages;
@@ -109,10 +109,10 @@ namespace Umbraco.Core.Models
                 dirs += "," + SystemDirectories.MvcViews;
 
             //Validate file
-            var validFile = IOHelper.ValidateEditPath(Path, dirs.Split(','));
+            var validFile = IOHelper.VerifyEditPath(Path, dirs.Split(','));
 
             //Validate extension
-            var validExtension = IOHelper.ValidateFileExtension(Path, exts);
+            var validExtension = IOHelper.VerifyFileExtension(Path, exts);
 
             return validFile && validExtension;
         }

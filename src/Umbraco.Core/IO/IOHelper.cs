@@ -136,25 +136,42 @@ namespace Umbraco.Core.IO
         }
 
         /// <summary>
-        /// Validates if the current filepath matches a directory where the user is allowed to edit a file
+        /// Verifies that the current filepath matches a directory where the user is allowed to edit a file.
         /// </summary>
-        /// <param name="filePath">filepath </param>
-        /// <param name="validDir"></param>
-        /// <returns>true if valid, throws a FileSecurityException if not</returns>
-        internal static bool ValidateEditPath(string filePath, string validDir)
+        /// <param name="filePath">The filepath to validate.</param>
+        /// <param name="validDir">The valid directory.</param>
+        /// <returns>A value indicating whether the filepath is valid.</returns>
+        internal static bool VerifyEditPath(string filePath, string validDir)
         {
             if (!filePath.StartsWith(MapPath(SystemDirectories.Root)))
                 filePath = MapPath(filePath);
             if (!validDir.StartsWith(MapPath(SystemDirectories.Root)))
                 validDir = MapPath(validDir);
 
-            if (!filePath.StartsWith(validDir))
-                throw new FileSecurityException(String.Format("The filepath '{0}' is not within an allowed directory for this type of files", filePath.Replace(MapPath(SystemDirectories.Root), "")));
+            return filePath.StartsWith(validDir);
+        }
 
+        /// <summary>
+        /// Validates that the current filepath matches a directory where the user is allowed to edit a file.
+        /// </summary>
+        /// <param name="filePath">The filepath to validate.</param>
+        /// <param name="validDir">The valid directory.</param>
+        /// <returns>True, if the filepath is valid, else an exception is thrown.</returns>
+        /// <exception cref="FileSecurityException">The filepath is invalid.</exception>
+        internal static bool ValidateEditPath(string filePath, string validDir)
+        {
+            if (!VerifyEditPath(filePath, validDir))
+                throw new FileSecurityException(String.Format("The filepath '{0}' is not within an allowed directory for this type of files", filePath.Replace(MapPath(SystemDirectories.Root), "")));
             return true;
         }
 
-        internal static bool ValidateEditPath(string filePath, IEnumerable<string> validDirs)
+        /// <summary>
+        /// Verifies that the current filepath matches one of several directories where the user is allowed to edit a file.
+        /// </summary>
+        /// <param name="filePath">The filepath to validate.</param>
+        /// <param name="validDirs">The valid directories.</param>
+        /// <returns>A value indicating whether the filepath is valid.</returns>
+        internal static bool VerifyEditPath(string filePath, IEnumerable<string> validDirs)
         {
             foreach (var dir in validDirs)
             {
@@ -168,19 +185,49 @@ namespace Umbraco.Core.IO
                     return true;
             }
 
-           throw new FileSecurityException(String.Format("The filepath '{0}' is not within an allowed directory for this type of files", filePath.Replace(MapPath(SystemDirectories.Root), "")));
+            return false;
         }
 
-        internal static bool ValidateFileExtension(string filePath, List<string> validFileExtensions)
+        /// <summary>
+        /// Validates that the current filepath matches one of several directories where the user is allowed to edit a file.
+        /// </summary>
+        /// <param name="filePath">The filepath to validate.</param>
+        /// <param name="validDirs">The valid directories.</param>
+        /// <returns>True, if the filepath is valid, else an exception is thrown.</returns>
+        /// <exception cref="FileSecurityException">The filepath is invalid.</exception>
+        internal static bool ValidateEditPath(string filePath, IEnumerable<string> validDirs)
+        {
+            if (!VerifyEditPath(filePath, validDirs))
+           throw new FileSecurityException(String.Format("The filepath '{0}' is not within an allowed directory for this type of files", filePath.Replace(MapPath(SystemDirectories.Root), "")));
+            return true;
+        }
+
+        /// <summary>
+        /// Verifies that the current filepath has one of several authorized extensions.
+        /// </summary>
+        /// <param name="filePath">The filepath to validate.</param>
+        /// <param name="validFileExtensions">The valid extensions.</param>
+        /// <returns>A value indicating whether the filepath is valid.</returns>
+        internal static bool VerifyFileExtension(string filePath, List<string> validFileExtensions)
         {
             if (!filePath.StartsWith(MapPath(SystemDirectories.Root)))
                 filePath = MapPath(filePath);
             var f = new FileInfo(filePath);
+            
+            return validFileExtensions.Contains(f.Extension.Substring(1));
+        }
 
-
-            if (!validFileExtensions.Contains(f.Extension.Substring(1)))
+        /// <summary>
+        /// Validates that the current filepath has one of several authorized extensions.
+        /// </summary>
+        /// <param name="filePath">The filepath to validate.</param>
+        /// <param name="validFileExtensions">The valid extensions.</param>
+        /// <returns>True, if the filepath is valid, else an exception is thrown.</returns>
+        /// <exception cref="FileSecurityException">The filepath is invalid.</exception>
+        internal static bool ValidateFileExtension(string filePath, List<string> validFileExtensions)
+        {
+            if (!VerifyFileExtension(filePath, validFileExtensions))
                 throw new FileSecurityException(String.Format("The extension for the current file '{0}' is not of an allowed type for this editor. This is typically controlled from either the installed MacroEngines or based on configuration in /config/umbracoSettings.config", filePath.Replace(MapPath(SystemDirectories.Root), "")));
-
             return true;
         }
 

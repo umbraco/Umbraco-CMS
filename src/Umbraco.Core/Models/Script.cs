@@ -45,10 +45,10 @@ namespace Umbraco.Core.Models
                 dirs += "," + SystemDirectories.MvcViews;*/
 
             //Validate file
-            var validFile = IOHelper.ValidateEditPath(Path, dirs.Split(','));
+            var validFile = IOHelper.VerifyEditPath(Path, dirs.Split(','));
 
             //Validate extension
-            var validExtension = IOHelper.ValidateFileExtension(Path, exts);
+            var validExtension = IOHelper.VerifyFileExtension(Path, exts);
 
             return validFile && validExtension;
         }

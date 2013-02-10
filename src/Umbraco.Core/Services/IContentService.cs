@@ -287,5 +287,33 @@ namespace Umbraco.Core.Services
         /// <param name="content"><see cref="IContent"/> to check if anscestors are published</param>
         /// <returns>True if the Content can be published, otherwise False</returns>
         bool IsPublishable(IContent content);
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects, which are ancestors of the current content.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/> to retrieve ancestors for</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetAncestors(int id);
+
+        /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects, which are ancestors of the current content.
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> to retrieve ancestors for</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetAncestors(IContent content);
+
+        /// <summary>
+        /// Gets the parent of the current content as an <see cref="IContent"/> item.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/> to retrieve the parent from</param>
+        /// <returns>Parent <see cref="IContent"/> object</returns>
+        IContent GetParent(int id);
+
+        /// <summary>
+        /// Gets the parent of the current content as an <see cref="IContent"/> item.
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> to retrieve the parent from</param>
+        /// <returns>Parent <see cref="IContent"/> object</returns>
+        IContent GetParent(IContent content);
     }
 }

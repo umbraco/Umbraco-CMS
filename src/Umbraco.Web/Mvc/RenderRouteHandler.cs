@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
@@ -337,7 +338,7 @@ namespace Umbraco.Web.Mvc
                 if (publishedContentRequest.Is404) // should always be the case
                 {
                     requestContext.HttpContext.Response.StatusCode = 404;
-                    requestContext.HttpContext.Response.TrySkipIisCustomErrors = true;
+                    requestContext.HttpContext.Response.TrySkipIisCustomErrors = UmbracoSettings.TrySkipIisCustomErrors;
                 }
 				var handler = GetHandlerOnMissingTemplate(publishedContentRequest);
 
