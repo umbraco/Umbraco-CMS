@@ -34,7 +34,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
                     d.OriginalValue = doc.getProperty(PropertyAlias).Value.ToString();
 
                     doc.getProperty(PropertyAlias).Value = Value;
-                    doc.Publish(new BusinessLogic.User(0));
+                    doc.SaveAndPublish(new BusinessLogic.User(0));
 
                     d.NewValue = Value;
                     d.TaskExecutionStatus = TaskExecutionStatus.Completed;
