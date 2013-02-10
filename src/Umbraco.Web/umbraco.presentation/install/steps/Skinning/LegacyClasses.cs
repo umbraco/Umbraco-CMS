@@ -287,6 +287,7 @@ namespace umbraco.presentation.install.steps.Skinning
 					Helper.setProgress(60, "Finishing skin installation", "");
 					p.InstallCleanUp(pID, tempFile);
 
+                    //NOTE: This seems excessive to have to re-load all content from the database here!?
 					library.RefreshContent();
 
 					Helper.setProgress(80, "Activating skin", "");

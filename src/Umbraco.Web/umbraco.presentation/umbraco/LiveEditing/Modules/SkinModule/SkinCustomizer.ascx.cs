@@ -91,6 +91,7 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
                 sw.Close();
             }
 
+            //NOTE: This seems excessive to have to re-load all content from the database here!?
             library.RefreshContent();
         }
 
@@ -316,6 +317,7 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
                     installer2.InstallFiles(packageId, tempDir);
                     installer2.InstallBusinessLogic(packageId, tempDir);
                     installer2.InstallCleanUp(packageId, tempDir);
+                    //NOTE: This seems excessive to have to re-load all content from the database here!?
                     library.RefreshContent();
                     Skinning.ActivateAsCurrentSkin(Skin.CreateFromName(((Button)sender).CommandName));
                     this.Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())) + "?umbSkinning=true");

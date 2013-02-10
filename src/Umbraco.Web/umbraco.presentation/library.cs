@@ -162,27 +162,7 @@ namespace umbraco
 
         #region Publish Helper Methods
 
-        // Esben Carlsen: Commented out, not referenced anywhere
-        ///// <summary>
-        ///// Updates nodes and eventually subnodes, making the latest version the one to be published.
-        ///// Should always be used with library.rePublishNodes(), to ensure that the xml source is
-        ///// updated
-        ///// </summary>
-        ///// <param name="publishChildren">Publish childnodes as well</param>
-        ///// <returns></returns>
-        //public static void PublishDocument(Guid nodeID, bool publishChildren, User u)
-        //{
-        //    Document d = new Document(nodeID, true);
-        //    d.Publish(u);
-        //    NodesPublished++;
-
-        //    if(publishChildren)
-        //        foreach(Document dc in d.Children)
-        //        {
-        //            PublishDocument(dc.UniqueId, true, u);
-        //        }
-        //}
-
+        
         /// <summary>
         /// Unpublish a node, by removing it from the runtime xml index. Note, prior to this the Document should be 
         /// marked unpublished by setting the publish property on the document object to false
@@ -216,25 +196,8 @@ namespace umbraco
         /// <param name="documentId">The Id of the Document to be published</param>
         public static void UpdateDocumentCache(int documentId)
         {
-            var d = new Document(documentId);
-            UpdateDocumentCache(d);
+            DistributedCache.Instance.RefreshPageCache(documentId);
         }
-
-        /// <summary>
-        /// Publishes a Document by adding it to the runtime xml index. Note, prior to this the Document should be 
-        /// marked published by calling Publish(User u) on the document object.
-        /// </summary>
-        /// <param name="doc"></param>
-        /// <remarks>
-        /// NOTE: This method was created because before it was always calling the method with the documentId as a parameter 
-        /// which means we have to re-look up the document in the db again when we already have it, this should save on a few 
-        /// dozen sql calls when publishing.
-        /// </remarks>
-        internal static void UpdateDocumentCache(Document doc)
-        {
-            DistributedCache.Instance.RefreshPageCache(doc.Id);
-        }
-
 
         /// <summary>
         /// Publishes the single node, this method is obsolete
@@ -273,7 +236,7 @@ namespace umbraco
         [Obsolete("Please use: umbraco.library.RefreshContent")]
         public static void RePublishNodesDotNet(int nodeID)
         {
-            content.Instance.RefreshContentFromDatabaseAsync();
+            DistributedCache.Instance.RefreshAllPageCache();
         }
 
         /// <summary>
@@ -285,7 +248,7 @@ namespace umbraco
         [Obsolete("Please use: content.Instance.RefreshContentFromDatabaseAsync")]
         public static void RePublishNodesDotNet(int nodeID, bool SaveToDisk)
         {
-            content.Instance.RefreshContentFromDatabaseAsync();
+            DistributedCache.Instance.RefreshAllPageCache();
         }
 
         #endregion

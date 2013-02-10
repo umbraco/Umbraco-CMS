@@ -127,6 +127,9 @@ namespace umbraco.presentation.webservices
 
 
                             // Load balancing - then refresh entire cache
+                            // NOTE: This seems a bit excessive to do simply for sorting! I'm going to leave this here for now but 
+                            //  the sort order should be updated in distributed calls when an item is Published (and it most likely is)
+                            //  but I guess this was put here for a reason at some point.
                             if (UmbracoSettings.UseDistributedCalls)
                                 library.RefreshContent();
                         }
