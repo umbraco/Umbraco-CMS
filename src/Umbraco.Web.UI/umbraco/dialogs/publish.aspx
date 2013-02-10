@@ -76,8 +76,15 @@
         </div>
 
         <div id="feedbackMsg" data-bind="visible: processStatus() == 'complete'">
-            <div data-bind="css: { success: isSuccessful(), error: !isSuccessful() }">asdfasdfasf</div>
-             <p><a href='#'><%=umbraco.ui.Text("closeThisWindow") %></a></p>
+            <div data-bind="css: { success: isSuccessful(), error: !isSuccessful() }">
+                <span data-bind="text: resultMessage, visible: resultMessages().length == 0"></span>
+                <ul data-bind="foreach: resultMessages, visible: resultMessages().length > 1">
+                    <li data-bind="text: message"></li>
+                </ul>
+            </div>
+             <p>
+                 <a href='#' data-bind="click: closeDialog"><%=umbraco.ui.Text("closeThisWindow") %></a>
+             </p>
         </div> 
        
 

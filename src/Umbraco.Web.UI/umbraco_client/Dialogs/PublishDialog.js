@@ -6,6 +6,7 @@
         
         //private methods/variables
         _opts: null,
+        _koViewModel: null,
         
         // Constructor
         constructor: function () {
@@ -24,11 +25,13 @@
             var self = this;
 
             //The knockout js view model for the selected item
-            var koViewModel = {
+            self._koViewModel = {
                 publishAll: ko.observable(false),
                 includeUnpublished: ko.observable(false),
                 processStatus: ko.observable("init"),
                 isSuccessful: ko.observable(false),
+                resultMessages: ko.observableArray(),
+                resultMessage: ko.observable(""), //if there's only one result message
                 closeDialog: function () {
                     UmbClientMgr.closeModalWindow();
                 },
@@ -37,25 +40,34 @@
                     
                     $.post(self._opts.restServiceLocation + "PublishDocument",
                     JSON.stringify({
-                        documentId: self._opts.documentId
+                        documentId: self._opts.documentId,
+                        publishDescendants: self._koViewModel.publishAll(),
+                        includeUnpublished: self._koViewModel.includeUnpublished()
                     }),
                     function (e) {
-                        if (e.success) {
-                            self.submitSuccess(e.message, e.header);
-                        } else {
-                            self.submitFailure(e.message, e.header);
+                        self._koViewModel.processStatus("complete");
+                        self._koViewModel.isSuccessful(e.success);
+                        var msgs = e.message.trim().split("\r\n");
+                        if (msgs.length > 1) {
+                            for (var m in msgs) {
+                                self._koViewModel.resultMessages.push({ message: msgs[m] });
+                            }
                         }
+                        else {
+                            self._koViewModel.resultMessage(msgs[0]);
+                        }
+                        
                     });
                 }
             };
             //ensure includeUnpublished is always false if publishAll is ever false
-            koViewModel.publishAll.subscribe(function (newValue) {
+            self._koViewModel.publishAll.subscribe(function (newValue) {
                 if (newValue === false) {
-                    koViewModel.includeUnpublished(false);
+                    self._koViewModel.includeUnpublished(false);
                 }
             });
 
-            ko.applyBindings(koViewModel);
+            ko.applyBindings(self._koViewModel);
         }
 
         

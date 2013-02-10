@@ -802,11 +802,11 @@ namespace umbraco.cms.businesslogic.web
             if (!e.Cancel)
             {
                 var result = ((ContentService)ApplicationContext.Current.Services.ContentService).Publish(Content, false, u.Id);
-                _published = result;
+                _published = result.Success;
 
                 FireAfterPublish(e);
 
-                return result;
+                return result.Success;
             }
             else
             {
@@ -944,7 +944,7 @@ namespace umbraco.cms.businesslogic.web
                     //Now we need to fire the After publish event
                     FireAfterPublish(publishArgs);
 
-                    return result;
+                    return result.Success;
                 }
                 
                 return false;

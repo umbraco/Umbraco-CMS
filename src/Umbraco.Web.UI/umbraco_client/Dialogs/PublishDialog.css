@@ -21,3 +21,8 @@
 #feedbackMsg > div {
     padding: 5px;
 }
+
+#feedbackMsg ul {
+    margin: 0;
+    padding-left: 15px;
+}

@@ -1,49 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Web.Mvc;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Services;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Mvc;
 using umbraco;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.macro;
-using umbraco.cms.businesslogic.template;
 using umbraco.presentation.cache;
 using Umbraco.Core;
+using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace Umbraco.Web.WebServices
 {
-
-    /// <summary>
-    /// A REST controller used for the publish dialog in order to publish bulk items at once
-    /// </summary>
-    public class BulkPublishController : UmbracoAuthorizedController
-    {
-        /// <summary>
-        /// Publishes an document
-        /// </summary>
-        /// <param name="documentId"></param>
-        /// <returns>A Json array containing objects with the child id's of the document and it's current published status</returns>
-        [HttpPost]
-        public JsonResult PublishDocument(int documentId, bool publishChildren)
-        {
-            var doc = Services.ContentService.GetById(documentId);
-            var result = ((ContentService)Services.ContentService).PublishWithChildren(doc, true, UmbracoUser.Id);
-            
-            if (Services.ContentService.PublishWithChildren(doc, UmbracoUser.Id))
-            {
-                
-            }
-            return null;
-        }
-    }
-
     /// <summary>
 	/// A REST controller used to save files such as templates, partial views, macro files, etc...
 	/// </summary>

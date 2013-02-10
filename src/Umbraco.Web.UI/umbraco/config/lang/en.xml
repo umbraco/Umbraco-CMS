@@ -653,6 +653,11 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="paSimpleHelp">If you just want to setup simple protection using a single login and password</key>
   </area>
   <area alias="publish">
+    <key alias="contentPublishedFailedInvalid">
+      <![CDATA[
+      %0% could not be published because some of it's data did not pass validation rules.
+    ]]>
+    </key>
     <key alias="contentPublishedFailedByEvent">
       <![CDATA[
       %0% could not be published, due to a 3rd party extension cancelling the action.

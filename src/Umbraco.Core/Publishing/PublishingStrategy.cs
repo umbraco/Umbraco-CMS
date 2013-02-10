@@ -19,7 +19,7 @@ namespace Umbraco.Core.Publishing
         /// </summary>
         /// <param name="content"><see cref="IContent"/> to publish</param>
         /// <param name="userId">Id of the User issueing the publish operation</param>        
-        protected internal override Attempt<PublishStatus> PublishInternal(IContent content, int userId)
+        internal override Attempt<PublishStatus> PublishInternal(IContent content, int userId)
         {
             if (Publishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(content), this))
             {
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Publishing
         /// level and so on. If we detect that the above rule applies when the document publishing is cancelled we'll add it to the list of 
         /// parentsIdsCancelled so that it's children don't get published.
         /// </remarks>
-        protected internal override IEnumerable<Attempt<PublishStatus>> PublishWithChildrenInternal(
+        internal override IEnumerable<Attempt<PublishStatus>> PublishWithChildrenInternal(
             IEnumerable<IContent> content, int userId, bool includeUnpublishedDocuments = true, bool validateContent = false)
         {
             var statuses = new List<Attempt<PublishStatus>>();
@@ -114,6 +114,13 @@ namespace Umbraco.Core.Publishing
             // much difference because we iterate over them all anyways?? Morten?       
             // Because we're grouping I think this will execute all the queries anyways so need to fetch it all first.
             var fetchedContent = content.ToArray();
+            
+            //We're going to populate the statuses with all content that is already published because below we are only going to iterate over
+            // content that is not published. We'll set the status to "AlreadyPublished"
+            statuses.AddRange(fetchedContent.Where(x => x.Published)
+                .Select(x => new Attempt<PublishStatus>(true, new PublishStatus(x, PublishStatusType.SuccessAlreadyPublished))));
+            
+            //group by level and iterate over each level (sorted ascending)
             var levelGroups = fetchedContent.GroupBy(x => x.Level);
             foreach (var level in levelGroups.OrderBy(x => x.Key))
             {
@@ -315,7 +322,7 @@ namespace Umbraco.Core.Publishing
         /// <param name="content">An enumerable list of <see cref="IContent"/></param>
         /// <param name="userId">Id of the User issueing the unpublish operation</param>
         /// <returns>A list of publish statuses</returns>
-        protected internal override IEnumerable<Attempt<PublishStatus>> UnPublishInternal(IEnumerable<IContent> content, int userId)
+        internal override IEnumerable<Attempt<PublishStatus>> UnPublishInternal(IEnumerable<IContent> content, int userId)
         {
             var result = new List<Attempt<PublishStatus>>();
 

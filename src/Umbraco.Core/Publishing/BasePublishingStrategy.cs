@@ -9,7 +9,7 @@ namespace Umbraco.Core.Publishing
     public abstract class BasePublishingStrategy : IPublishingStrategy
     {
 
-        protected internal abstract Attempt<PublishStatus> PublishInternal(IContent content, int userId);
+        internal abstract Attempt<PublishStatus> PublishInternal(IContent content, int userId);
 
         /// <summary>
         /// Publishes a list of content items
@@ -23,10 +23,10 @@ namespace Umbraco.Core.Publishing
         /// </param>
         /// <param name="validateContent">If true this will validate each content item before trying to publish it, if validation fails it will not be published.</param>
         /// <returns></returns>
-        protected internal abstract IEnumerable<Attempt<PublishStatus>> PublishWithChildrenInternal(
+        internal abstract IEnumerable<Attempt<PublishStatus>> PublishWithChildrenInternal(
             IEnumerable<IContent> content, int userId, bool includeUnpublishedDocuments = true, bool validateContent = false);
 
-        protected internal abstract IEnumerable<Attempt<PublishStatus>> UnPublishInternal(IEnumerable<IContent> content, int userId);
+        internal abstract IEnumerable<Attempt<PublishStatus>> UnPublishInternal(IEnumerable<IContent> content, int userId);
 
         public abstract bool Publish(IContent content, int userId);
         public abstract bool PublishWithChildren(IEnumerable<IContent> content, int userId);
