@@ -221,20 +221,7 @@ namespace umbraco.cms.businesslogic.media
                 return children.Select(x => new Media(x)).ToArray();
             }
         }
-
-        public override string Text
-        {
-            get
-            {
-                return MediaItem.Name;
-            }
-            set
-            {
-                value = value.Trim();
-                MediaItem.Name = value;
-            }
-        }
-
+        
         #endregion
 
         #region Public methods
