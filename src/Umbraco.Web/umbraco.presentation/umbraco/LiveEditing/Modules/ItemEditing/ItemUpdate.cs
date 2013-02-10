@@ -97,8 +97,7 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
             {
                 Document document = new Document(NodeId.Value);
                 document.Publish(UmbracoEnsuredPage.CurrentUser);
-                library.UpdateDocumentCache(NodeId.Value);
-
+                
                 publishedDocuments.Add(NodeId.Value);
             }
         }

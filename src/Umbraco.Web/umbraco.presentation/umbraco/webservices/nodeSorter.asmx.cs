@@ -6,6 +6,7 @@ using System.Web.Services;
 using System.Xml;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Caching;
+using Umbraco.Web;
 using umbraco.BasePages;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
@@ -81,8 +82,8 @@ namespace umbraco.presentation.webservices
                     {
                         var tmp = SortOrder.Split(',');
 
-                        var isContent = helper.Request("app") == "content" | helper.Request("app") == "";
-                        var isMedia = helper.Request("app") == "media";
+                        var isContent = Context.Request.GetItemAsString("app") == "content" | helper.Request("app") == "";
+                        var isMedia = Context.Request.GetItemAsString("app") == "media";
 
                         for (var i = 0; i < tmp.Length; i++)
                         {
@@ -99,7 +100,6 @@ namespace umbraco.presentation.webservices
                                     {
                                         document.Publish(BusinessLogic.User.GetCurrent());
                                         document.refreshXmlSortOrder();
-                                        library.UpdateDocumentCache(int.Parse(tmp[i]));
                                     }
                                 }
                                 // to update the sortorder of the media node in the XML, re-save the node....

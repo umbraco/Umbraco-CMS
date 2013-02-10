@@ -39,8 +39,7 @@ namespace umbraco.presentation.actions
 
             confirm.Visible = false;
             d.Publish(getUser());
-            library.UpdateDocumentCache(d);
-
+            
             deleted.Text = ui.Text("editContentPublishedHeader") + " ('" + d.Text + "') " + ui.Text("editContentPublishedText") + "</p><p><a href=\"" + library.NiceUrl(d.Id) + "\"> " + ui.Text("view") + " " + d.Text + "</a>";
         }
     }

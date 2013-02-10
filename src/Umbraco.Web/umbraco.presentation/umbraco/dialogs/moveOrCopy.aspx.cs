@@ -118,21 +118,7 @@ namespace umbraco.dialogs
             }
             return true;
         }
-        //PPH moving multiple nodes and publishing them aswell.
-        private void handleChildNodes(cms.businesslogic.web.Document document)
-        {
-            //store children array here because iterating over an Array object is very inneficient.
-            var children = document.Children;
-            foreach (Document child in children.Where(child => child.Published))
-            {
-                child.Publish(new BusinessLogic.User(0));
-
-                //using library.publish to support load balancing.
-                library.UpdateDocumentCache(child.Id);
-                if (child.HasChildren)
-                    handleChildNodes(child);
-            }
-        }
+        
 
         //PPH Handle doctype copies..
         private void HandleDocumentTypeCopy()
