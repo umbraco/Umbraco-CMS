@@ -247,14 +247,12 @@ namespace umbraco.webservices.documents
                     doc.SaveAndPublish(user);                    
                     break;
                 case documentCarrier.EPublishAction.Unpublish:
-                    doc.UnPublish();
-                    library.UnPublishSingleNode(doc);
+                    doc.UnPublish();                    
                     break;
                 case documentCarrier.EPublishAction.Ignore:
                     if (doc.Published)
                     {
                         doc.UnPublish();
-                        library.UnPublishSingleNode(doc);
                     }
                     else
                     {

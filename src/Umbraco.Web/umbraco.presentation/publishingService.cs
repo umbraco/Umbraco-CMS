@@ -48,7 +48,6 @@ namespace umbraco.presentation
                             d.ExpireDate = DateTime.MinValue;
 
                             d.UnPublish();
-                            library.UnPublishSingleNode(d.Id);
                         }
                         catch (Exception ee)
                         {

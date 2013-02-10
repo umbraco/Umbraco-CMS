@@ -872,7 +872,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                _published = ((ContentService)ApplicationContext.Current.Services.ContentService).UnPublish(Content, true, 0);
+                _published = ((ContentService)ApplicationContext.Current.Services.ContentService).UnPublish(Content, false, 0);
                 
                 FireAfterUnPublish(e);
             }

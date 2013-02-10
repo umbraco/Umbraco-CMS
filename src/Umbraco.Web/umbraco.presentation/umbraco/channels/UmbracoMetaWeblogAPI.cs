@@ -47,8 +47,8 @@ namespace umbraco.presentation.channels
             if (validateUser(username, password))
             {
                 Channel userChannel = new Channel(username);
-                new Document(int.Parse(postid)).delete();
-                library.UnPublishSingleNode(int.Parse(postid));
+                new Document(int.Parse(postid))
+                    .delete();
                 return true;
             }
             return false;

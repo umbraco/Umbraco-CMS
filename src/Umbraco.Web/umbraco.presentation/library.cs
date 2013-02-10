@@ -168,25 +168,10 @@ namespace umbraco
         /// marked unpublished by setting the publish property on the document object to false
         /// </summary>
         /// <param name="DocumentId">The Id of the Document to be unpublished</param>
+        [Obsolete("This method is no longer used, a document's cache will be removed automatically when the document is deleted or unpublished")]
         public static void UnPublishSingleNode(int DocumentId)
-        {            
-            if (UmbracoSettings.UseDistributedCalls)
-                DistributedCache.Instance.RemovePageCache(DocumentId);
-            else
-                content.Instance.ClearDocumentCache(DocumentId);
-        }
-
-        /// <summary>
-        /// Unpublish a node, by removing it from the runtime xml index. Note, prior to this the Document should be 
-        /// marked unpublished by setting the publish property on the document object to false
-        /// </summary>
-        /// <param name="document">The Document to be unpublished</param>
-        internal static void UnPublishSingleNode(Document document)
         {
-            if (UmbracoSettings.UseDistributedCalls)
-                DistributedCache.Instance.RemovePageCache(document.Id);
-            else
-                content.Instance.ClearDocumentCache(document);
+            DistributedCache.Instance.RemovePageCache(DocumentId);
         }
 
         /// <summary>
@@ -194,6 +179,7 @@ namespace umbraco
         /// marked published by calling Publish(User u) on the document object.
         /// </summary>
         /// <param name="documentId">The Id of the Document to be published</param>
+        [Obsolete("This method is no longer used, a document's cache will be updated automatically when the document is published")]
         public static void UpdateDocumentCache(int documentId)
         {
             DistributedCache.Instance.RefreshPageCache(documentId);
@@ -1350,25 +1336,6 @@ namespace umbraco
         }
 
         /// <summary>
-        /// Returns the ID of the current language.
-        /// </summary>
-        /// <returns>The ID of the current language, or 0 if it could not be determined.</returns>
-        private static int GetCurrentLanguageId()
-        {
-            int languageId = 0;
-
-            string pageId = HttpContext.Current.Items["pageID"] as string;
-            if (pageId != null)
-            {
-                Domain[] domains = GetCurrentDomains(int.Parse(pageId));
-                if (domains != null && domains.Length >= 0)
-                    languageId = domains[0].Language.id;
-            }
-
-            return languageId;
-        }
-
-        /// <summary>
         /// Gets the current page.
         /// </summary>
         /// <returns>An XpathNodeIterator containing the current page as Xml.</returns>
@@ -1793,25 +1760,25 @@ namespace umbraco
             return new CMSNode(NodeId).Relations;
         }
 
-        [Obsolete("Use ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMedia instead")]
+        [Obsolete("Use DistributedCache.Instance.RemoveMediaCache instead")]
         public static void ClearLibraryCacheForMedia(int mediaId)
         {
             DistributedCache.Instance.RemoveMediaCache(mediaId);      
         }
 
-        [Obsolete("Use ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMedia with the allServers flag set to false instead")]
+        [Obsolete("Use DistributedCache.Instance.RemoveMediaCache instead")]
         public static void ClearLibraryCacheForMediaDo(int mediaId)
         {
             DistributedCache.Instance.RemoveMediaCache(mediaId);
         }
 
-        [Obsolete("Use ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMember instead")]
+        [Obsolete("Use DistributedCache.Instance.RefreshMemberCache instead")]
         public static void ClearLibraryCacheForMember(int mediaId)
         {
             DistributedCache.Instance.RefreshMemberCache(mediaId);
         }
 
-        [Obsolete("Use ApplicationContext.Current.ApplicationCache.ClearLibraryCacheForMember with the allServers flag set to false instead")]
+        [Obsolete("Use DistributedCache.Instance.RefreshMemberCache instead")]
         public static void ClearLibraryCacheForMemberDo(int memberId)
         {
             DistributedCache.Instance.RefreshMemberCache(memberId);

@@ -37,8 +37,7 @@ namespace umbraco.presentation.actions
             deleted.Text =  "'" + d.Text + "' " + ui.Text("deleted");
             deleteMessage.Visible = true;
             confirm.Visible = false;
-            if (d.Published)
-                library.UnPublishSingleNode(d.Id);
+            
             d.delete();
         }
     }

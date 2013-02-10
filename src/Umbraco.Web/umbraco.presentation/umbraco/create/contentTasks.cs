@@ -76,8 +76,6 @@ namespace umbraco
             // Log
             BusinessLogic.Log.Add(BusinessLogic.LogTypes.Delete, User.GetCurrent(), d.Id, "");
 
-            library.UnPublishSingleNode(d.Id);
-
             d.delete();
 
             return true;

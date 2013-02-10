@@ -83,7 +83,6 @@ namespace umbraco.presentation.LiveEditing.Modules.DeleteModule
                         redirectUrl = library.NiceUrl(currentPage.Parent.Id);
                     }
                     catch { }
-                    library.UnPublishSingleNode(currentPage.Id);
                     currentPage.delete();
                     Page.Response.Redirect(redirectUrl);
                     break;
