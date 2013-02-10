@@ -347,6 +347,7 @@
     <Compile Include="RenderFieldEncodingType.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Routing\ContentFinderByLegacy404.cs" />
+    <Compile Include="Routing\LookupByLegacy404.cs" />
     <Compile Include="Routing\ContentFinderByNotFoundHandler.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQuery.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
@@ -513,6 +514,7 @@
     <Compile Include="Routing\LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
     <Compile Include="Routing\ContentLastChanceFinderResolver.cs" />
+    <Compile Include="Routing\LookupByNotFoundHandlers.cs" />
     <Compile Include="Routing\ContentFinderByUrlAlias.cs" />
     <Compile Include="Media\ThumbnailProviders\AbstractThumbnailProvider.cs" />
     <Compile Include="Media\ThumbnailProviders\MediaTypeIconThumbnailProvider.cs" />

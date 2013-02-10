@@ -431,8 +431,8 @@ namespace Umbraco.Core.Services
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
 			{
-				var query = Query<IMedia>.Builder.Where(x => x.ParentId == -21);
-				var contents = repository.GetByQuery(query);
+				var query = Query<IMedia>.Builder.Where(x => x.Path.Contains("-21"));
+				var contents = repository.GetByQuery(query).OrderByDescending(x => x.ParentId);
 
 				foreach (var content in contents)
 				{
