@@ -30,7 +30,7 @@ namespace Umbraco.Web.WebServices
             var contentService = (ContentService) Services.ContentService;
             if (!publishDescendants)
             {
-                var result = contentService.SaveAndPublish(doc, false);
+                var result = contentService.SaveAndPublishInternal(doc);
                 return Json(new
                     {
                         success = result.Success,
@@ -40,7 +40,7 @@ namespace Umbraco.Web.WebServices
             else
             {
                 var result = ((ContentService) Services.ContentService)
-                    .PublishWithChildren(doc, false, UmbracoUser.Id, includeUnpublished, true)
+                    .PublishWithChildrenInternal(doc, UmbracoUser.Id, includeUnpublished)
                     .ToArray();
                 return Json(new
                     {

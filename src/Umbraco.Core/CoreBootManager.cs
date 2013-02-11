@@ -14,6 +14,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Services;
+using Umbraco.Core.Sync;
 using MigrationsVersionFourNineZero = Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero;
 
 namespace Umbraco.Core
@@ -165,6 +166,10 @@ namespace Umbraco.Core
 		/// </summary>
 		protected virtual void InitializeResolvers()
 		{
+
+            ServerRegistrarResolver.Current = new ServerRegistrarResolver(
+                new ConfigServerRegistrar()); //by default we'll use the standard configuration based sync
+
 			RepositoryResolver.Current = new RepositoryResolver(
 				new RepositoryFactory());
 

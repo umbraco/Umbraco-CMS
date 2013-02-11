@@ -801,7 +801,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                var result = ((ContentService)ApplicationContext.Current.Services.ContentService).Publish(Content, false, u.Id);
+                var result = ((ContentService)ApplicationContext.Current.Services.ContentService).PublishInternal(Content, u.Id);
                 _published = result.Success;
 
                 FireAfterPublish(e);
@@ -817,7 +817,8 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
         public bool PublishWithChildrenWithResult(User u)
         {
-            var result = ((ContentService)ApplicationContext.Current.Services.ContentService).PublishWithChildren(Content, false, u.Id);
+            var result = ((ContentService)ApplicationContext.Current.Services.ContentService)
+                .PublishWithChildrenInternal(Content, u.Id);
             //This used to just return false only when the parent content failed, otherwise would always return true so we'll
             // do the same thing for the moment
             return result.Single(x => x.Result.ContentItem.Id == Id).Success;
@@ -857,7 +858,8 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                var publishedResults = ((ContentService)ApplicationContext.Current.Services.ContentService).PublishWithChildren(Content, false, u.Id);
+                var publishedResults = ((ContentService)ApplicationContext.Current.Services.ContentService)
+                    .PublishWithChildrenInternal(Content, u.Id);
 
                 FireAfterPublish(e);
             }
@@ -872,7 +874,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                _published = ((ContentService)ApplicationContext.Current.Services.ContentService).UnPublish(Content, false, 0);
+                _published = ((ContentService)ApplicationContext.Current.Services.ContentService).UnPublish(Content);
                 
                 FireAfterUnPublish(e);
             }
@@ -931,7 +933,7 @@ namespace umbraco.cms.businesslogic.web
                 {
                     //NOTE: The 'false' parameter will cause the PublishingStrategy events to fire which will ensure that the cache is refreshed.
                     var result = ((ContentService)ApplicationContext.Current.Services.ContentService)
-                        .SaveAndPublish(Content, false, u.Id);
+                        .SaveAndPublishInternal(Content, u.Id);
 
                     //NOTE: This is just going to call the CMSNode Save which will launch into the CMSNode.BeforeSave and CMSNode.AfterSave evenths
                     // which actually do dick all and there's no point in even having them there but just in case for some insane reason someone

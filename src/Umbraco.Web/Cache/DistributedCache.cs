@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Sync;
 using umbraco.BusinessLogic;
 using umbraco.interfaces;
 
@@ -173,6 +174,8 @@ namespace Umbraco.Web.Cache
 
                     LogStartDispatch();
 
+                    //var nodes = 
+
                     // Go through each configured node submitting a request asynchronously
                     foreach (XmlNode n in GetDistributedNodes())
                     {
@@ -282,14 +285,15 @@ namespace Umbraco.Web.Cache
         /// <param name="n">The XmlNode.</param>
         private void SetWebServiceUrlFromNode(WebClientProtocol cr, XmlNode n)
         {
-            string protocol = GlobalSettings.UseSSL ? "https" : "http";
-            if (n.Attributes.GetNamedItem("forceProtocol") != null && !String.IsNullOrEmpty(n.Attributes.GetNamedItem("forceProtocol").Value))
-                protocol = n.Attributes.GetNamedItem("forceProtocol").Value;
-            string domain = XmlHelper.GetNodeValue(n);
-            if (n.Attributes.GetNamedItem("forcePortnumber") != null && !String.IsNullOrEmpty(n.Attributes.GetNamedItem("forcePortnumber").Value))
-                domain += string.Format(":{0}", n.Attributes.GetNamedItem("forcePortnumber").Value);
+            //string protocol = GlobalSettings.UseSSL ? "https" : "http";
+            //if (n.Attributes.GetNamedItem("forceProtocol") != null && !String.IsNullOrEmpty(n.Attributes.GetNamedItem("forceProtocol").Value))
+            //    protocol = n.Attributes.GetNamedItem("forceProtocol").Value;
+            //string domain = XmlHelper.GetNodeValue(n);
+            //if (n.Attributes.GetNamedItem("forcePortnumber") != null && !String.IsNullOrEmpty(n.Attributes.GetNamedItem("forcePortnumber").Value))
+            //    domain += string.Format(":{0}", n.Attributes.GetNamedItem("forcePortnumber").Value);
+            //cr.Url = string.Format("{0}://{1}{2}/cacheRefresher.asmx", protocol, domain, _webServicesUrl);
 
-            cr.Url = string.Format("{0}://{1}{2}/cacheRefresher.asmx", protocol, domain, _webServicesUrl);
+            //ServerRegistrarResolver.Current.Registrar.Registrations
         }
 
         private static ICacheRefresher GetRefresherById(Guid uniqueIdentifier)

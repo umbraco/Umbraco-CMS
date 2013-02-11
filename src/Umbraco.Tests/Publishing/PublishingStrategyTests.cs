@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Publishing
 
             //publish root and nodes at it's children level
             var listToPublish = ServiceContext.ContentService.GetDescendants(_homePage.Id).Concat(new[] { _homePage });
-            var result = strategy.PublishWithChildrenInternal(listToPublish, 0, true, true);
+            var result = strategy.PublishWithChildrenInternal(listToPublish, 0, true);
 
             Assert.AreEqual(listToPublish.Count() - 2, result.Count(x => x.Success));
             Assert.IsTrue(result.Where(x => x.Success).Select(x => x.Result.ContentItem.Id)

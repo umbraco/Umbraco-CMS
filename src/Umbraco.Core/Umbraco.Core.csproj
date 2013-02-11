@@ -667,6 +667,7 @@
     <Compile Include="Services\MediaService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Services\UserService.cs" />
+    <Compile Include="Sync\ServerSync.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="ReadLock.cs" />
     <Compile Include="TypeFinder.cs" />

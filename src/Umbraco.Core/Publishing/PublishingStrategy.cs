@@ -19,7 +19,7 @@ namespace Umbraco.Core.Publishing
         /// </summary>
         /// <param name="content"><see cref="IContent"/> to publish</param>
         /// <param name="userId">Id of the User issueing the publish operation</param>        
-        internal override Attempt<PublishStatus> PublishInternal(IContent content, int userId)
+        internal Attempt<PublishStatus> PublishInternal(IContent content, int userId)
         {
             if (Publishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(content), this))
             {
@@ -85,8 +85,7 @@ namespace Umbraco.Core.Publishing
         /// By default this is set to true which means that it will publish any content item in the list that is completely unpublished and
         /// not visible on the front-end. If set to false, this will only publish content that is live on the front-end but has new versions
         /// that have yet to be published.
-        /// </param>
-        /// <param name="validateContent">If true this will validate each content item before trying to publish it, if validation fails it will not be published.</param>
+        /// </param>        
         /// <returns></returns>
         /// <remarks>
         /// This method becomes complex once we start to be able to cancel events or stop publishing a content item in any way because if a
@@ -99,8 +98,8 @@ namespace Umbraco.Core.Publishing
         /// level and so on. If we detect that the above rule applies when the document publishing is cancelled we'll add it to the list of 
         /// parentsIdsCancelled so that it's children don't get published.
         /// </remarks>
-        internal override IEnumerable<Attempt<PublishStatus>> PublishWithChildrenInternal(
-            IEnumerable<IContent> content, int userId, bool includeUnpublishedDocuments = true, bool validateContent = false)
+        internal IEnumerable<Attempt<PublishStatus>> PublishWithChildrenInternal(
+            IEnumerable<IContent> content, int userId, bool includeUnpublishedDocuments = true)
         {
             var statuses = new List<Attempt<PublishStatus>>();
 
@@ -163,7 +162,7 @@ namespace Umbraco.Core.Publishing
                     }
 
                     //Check if the content is valid if the flag is set to check
-                    if (validateContent && !item.IsValid())
+                    if (!item.IsValid())
                     {
                         LogHelper.Info<PublishingStrategy>(
                             string.Format("Content '{0}' with Id '{1}' will not be published because some of it's content is not passing validation rules.",
@@ -322,7 +321,7 @@ namespace Umbraco.Core.Publishing
         /// <param name="content">An enumerable list of <see cref="IContent"/></param>
         /// <param name="userId">Id of the User issueing the unpublish operation</param>
         /// <returns>A list of publish statuses</returns>
-        internal override IEnumerable<Attempt<PublishStatus>> UnPublishInternal(IEnumerable<IContent> content, int userId)
+        internal IEnumerable<Attempt<PublishStatus>> UnPublishInternal(IEnumerable<IContent> content, int userId)
         {
             var result = new List<Attempt<PublishStatus>>();
 
