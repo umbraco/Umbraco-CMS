@@ -19,12 +19,14 @@ namespace UmbracoExamine.DataServices
 	{
 		private readonly ServiceContext _services;
 
+        [SecuritySafeCritical]
 		public UmbracoMediaService()
 			: this(ApplicationContext.Current.Services)
 		{
 
 		}
 
+        [SecuritySafeCritical]
 		public UmbracoMediaService(ServiceContext services)
 		{
 			_services = services;

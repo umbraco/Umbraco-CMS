@@ -166,9 +166,15 @@ namespace Umbraco.Core
 		/// </summary>
 		protected virtual void InitializeResolvers()
 		{
-
+            //by default we'll use the standard configuration based sync
             ServerRegistrarResolver.Current = new ServerRegistrarResolver(
-                new ConfigServerRegistrar()); //by default we'll use the standard configuration based sync
+                new ConfigServerRegistrar()); 
+
+            //by default (outside of the web) we'll use the default server messenger without
+            //supplying a username/password, this will automatically disable distributed calls
+            // .. we'll override this in the WebBootManager
+            ServerMessengerResolver.Current = new ServerMessengerResolver(
+                new DefaultServerMessenger());
 
 			RepositoryResolver.Current = new RepositoryResolver(
 				new RepositoryFactory());
