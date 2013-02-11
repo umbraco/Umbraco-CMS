@@ -63,6 +63,26 @@ namespace Umbraco.Web.Cache
         /// Sends a request to all registered load-balanced servers to refresh node with the specified Id
         /// using the specified ICacheRefresher with the guid factoryGuid.
         /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="factoryGuid"></param>
+        /// <param name="getNumericId">The callback method to retreive the ID from an instance</param>
+        /// <param name="instances">The instances containing Ids</param>
+        /// <remarks>
+        /// This method is much better for performance because it does not need to re-lookup an object instance
+        /// </remarks>
+        public void Refresh<T>(Guid factoryGuid, Func<T, int> getNumericId, params T[] instances)
+        {
+            ServerMessengerResolver.Current.Messenger.PerformRefresh<T>(
+                ServerRegistrarResolver.Current.Registrar.Registrations,
+                GetRefresherById(factoryGuid),
+                getNumericId,
+                instances);
+        }
+
+        /// <summary>
+        /// Sends a request to all registered load-balanced servers to refresh node with the specified Id
+        /// using the specified ICacheRefresher with the guid factoryGuid.
+        /// </summary>
         /// <param name="factoryGuid">The unique identifier of the ICacheRefresher used to refresh the node.</param>
         /// <param name="id">The id of the node.</param>
         public void Refresh(Guid factoryGuid, int id)

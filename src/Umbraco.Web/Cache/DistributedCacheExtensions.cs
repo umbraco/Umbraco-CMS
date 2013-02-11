@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Cache
 {
@@ -54,6 +57,16 @@ namespace Umbraco.Web.Cache
         public static void RefreshPageCache(this DistributedCache dc, int pageId)
         {
             dc.Refresh(new Guid(DistributedCache.PageCacheRefresherId), pageId);
+        }
+
+        /// <summary>
+        /// Refreshes page cache for all instances passed in
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="content"></param>
+        public static void RefreshPageCache(this DistributedCache dc, IEnumerable<IContent> content)
+        {
+            dc.Refresh(new Guid(DistributedCache.PageCacheRefresherId), x => x.Id, content.ToArray());
         }
 
         /// <summary>

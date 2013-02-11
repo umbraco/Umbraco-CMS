@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.ObjectResolution;
@@ -118,17 +119,17 @@ namespace Umbraco.Tests.Sync
 
             public void PerformRefresh<T>(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
             {
-                throw new NotImplementedException();
+                IntIdsRefreshed.AddRange(instances.Select(getNumericId));
             }
 
             public void PerformRefresh<T>(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
             {
-                throw new NotImplementedException();
+                GuidIdsRefreshed.AddRange(instances.Select(getGuidId));
             }
 
             public void PerformRemove<T>(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
             {
-                throw new NotImplementedException();
+                IntIdsRemoved.AddRange(instances.Select(getNumericId));
             }
 
             public void PerformRemove(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, params int[] numericIds)

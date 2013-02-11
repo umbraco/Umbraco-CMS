@@ -43,21 +43,24 @@ namespace Umbraco.Core.Sync
         {
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
-            throw new NotImplementedException();
+
+            instances.ForEach(x => InvokeDispatchMethod(servers, refresher, MessageType.RefreshById, getNumericId(x)));
         }
 
         public void PerformRefresh<T>(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
         {
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
-            throw new NotImplementedException();
+
+            instances.ForEach(x => InvokeDispatchMethod(servers, refresher, MessageType.RefreshById, getGuidId(x)));
         }
 
         public void PerformRemove<T>(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
         {
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
-            throw new NotImplementedException();
+
+            instances.ForEach(x => InvokeDispatchMethod(servers, refresher, MessageType.RemoveById, getNumericId(x)));
         }
 
         public void PerformRemove(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, params int[] numericIds)
@@ -129,7 +132,8 @@ namespace Umbraco.Core.Sync
         {
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
-            
+            if (!(id is int) && (!(id is Guid))) throw new ArgumentException("The id must be either an int or a Guid");
+
             //Now, check if we are using Distrubuted calls. If there are no servers in the list then we
             // can definitely not distribute.
             if (!_useDistributedCalls || !servers.Any())

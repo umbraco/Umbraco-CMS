@@ -23,7 +23,8 @@
             $(document).ready(function () {
                 Umbraco.Dialogs.PublishDialog.getInstance().init({
                     restServiceLocation: "<%= Url.GetBulkPublishServicePath() %>",
-                    documentId: <%= DocumentId %>
+                    documentId: <%= DocumentId %>,
+                    documentPath: '<%= DocumentPath %>'
                 });
             });
         })(jQuery);

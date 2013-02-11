@@ -66,10 +66,7 @@ namespace Umbraco.Web.Strategies.Publishing
         /// </summary>
         private void UpdateMultipleContentCache(IEnumerable<IContent> content)
         {
-            foreach (var c in content)
-            {
-                DistributedCache.Instance.RefreshPageCache(c.Id);
-            }          
+            DistributedCache.Instance.RefreshPageCache(content);          
         }
 
         /// <summary>
