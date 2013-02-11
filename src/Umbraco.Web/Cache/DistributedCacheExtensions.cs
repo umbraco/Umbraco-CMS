@@ -7,6 +7,16 @@ namespace Umbraco.Web.Cache
     /// </summary>
     public static class DistributedCacheExtensions
     {
+        public static void RemoveUserCache(this DistributedCache dc, int userId)
+        {
+            dc.Remove(new Guid(DistributedCache.UserCacheRefresherId), userId);
+        }
+
+        public static void RefreshUserCache(this DistributedCache dc, int userId)
+        {
+            dc.Refresh(new Guid(DistributedCache.UserCacheRefresherId), userId);
+        }
+
         /// <summary>
         /// Refreshes the cache amongst servers for a template
         /// </summary>

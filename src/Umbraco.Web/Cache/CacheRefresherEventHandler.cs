@@ -1,6 +1,7 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Services;
 using umbraco;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.member;
@@ -17,6 +18,11 @@ namespace Umbraco.Web.Cache
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             if (UmbracoSettings.UmbracoLibraryCacheDuration <= 0) return;
+
+            //Bind to user events
+
+            User.Saving += UserSaving;
+            User.Deleting += UserDeleting;
 
             //Bind to template events
 
@@ -42,6 +48,16 @@ namespace Umbraco.Web.Cache
             MediaService.Deleting += MediaServiceDeleting;
             MediaService.Moving += MediaServiceMoving;
             MediaService.Trashing += MediaServiceTrashing;
+        }
+
+        static void UserDeleting(User sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RemoveUserCache(sender.Id);
+        }
+
+        static void UserSaving(User sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RefreshUserCache(sender.Id);
         }
 
         /// <summary>
