@@ -3,7 +3,7 @@ using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero
 {
-    [MigrationAttribute("4.8.0", 0, GlobalSettings.UmbracoMigrationName)]
+    [MigrationAttribute("4.9.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class RemoveUmbracoAppConstraints : MigrationBase
     {
         public override void Up()
