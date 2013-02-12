@@ -37,6 +37,7 @@ namespace Umbraco.Tests
 		public void TearDown()
 		{
 			DataTypesResolver.Reset();
+            PluginManager.Current = null;
 		}
 
 		[Test]

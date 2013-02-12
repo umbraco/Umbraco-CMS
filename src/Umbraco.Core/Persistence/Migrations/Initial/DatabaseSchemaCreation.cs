@@ -60,7 +60,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               },
                                                                               {38, typeof (User2AppDto)},
                                                                               {39, typeof (User2NodeNotifyDto)},
-                                                                              {40, typeof (User2NodePermissionDto)}
+                                                                              {40, typeof (User2NodePermissionDto)},
+                                                                              {41, typeof (ServerRegistrationDto)}
                                                                           };
         #endregion
 
@@ -110,7 +111,9 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             {
                 result.ValidTables.Add(tableName);
             }
-            var invalidTableDifferences = tablesInDatabase.Except(tablesInSchema);
+            var invalidTableDifferences =
+                tablesInDatabase.Except(tablesInSchema)
+                                .Union(tablesInSchema.Except(tablesInDatabase));
             foreach (var tableName in invalidTableDifferences)
             {
                 result.Errors.Add(new Tuple<string, string>("Table", tableName));

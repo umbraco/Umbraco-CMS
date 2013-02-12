@@ -17,7 +17,7 @@ namespace Umbraco.Core.Sync
         /// <param name="refresher"></param>
         /// <param name="getNumericId">A delegate to return the Id for each instance to be used to sync to other servers</param>
         /// <param name="instances"></param>
-        void PerformRefresh<T>(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances);
+        void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances);
         
         /// <summary>
         /// Performs a sync against all instance objects
@@ -27,7 +27,7 @@ namespace Umbraco.Core.Sync
         /// <param name="refresher"></param>
         /// <param name="getGuidId">A delegate to return the Id for each instance to be used to sync to other servers</param>
         /// <param name="instances"></param>
-        void PerformRefresh<T>(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances);
+        void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances);
 
         /// <summary>
         /// Removes the cache for the specified items
@@ -37,7 +37,7 @@ namespace Umbraco.Core.Sync
         /// <param name="refresher"></param>
         /// <param name="getNumericId">A delegate to return the Id for each instance to be used to sync to other servers</param>
         /// <param name="instances"></param>
-        void PerformRemove<T>(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances);
+        void PerformRemove<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances);
 
         /// <summary>
         /// Removes the cache for the specified items
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Sync
         /// <param name="servers"></param>
         /// <param name="refresher"></param>
         /// <param name="numericIds"></param>
-        void PerformRemove(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, params int[] numericIds);
+        void PerformRemove(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params int[] numericIds);
 
         /// <summary>
         /// Performs a sync against all Ids
@@ -53,7 +53,7 @@ namespace Umbraco.Core.Sync
         /// <param name="servers">The servers to sync against</param>
         /// <param name="refresher"></param>
         /// <param name="numericIds"></param>
-        void PerformRefresh(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, params int[] numericIds);
+        void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params int[] numericIds);
         
         /// <summary>
         /// Performs a sync against all Ids
@@ -61,14 +61,14 @@ namespace Umbraco.Core.Sync
         /// <param name="servers">The servers to sync against</param>
         /// <param name="refresher"></param>
         /// <param name="guidIds"></param>
-        void PerformRefresh(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, params Guid[] guidIds);
+        void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params Guid[] guidIds);
 
         /// <summary>
         /// Performs entire cache refresh for a specified refresher
         /// </summary>
         /// <param name="servers"></param>
         /// <param name="refresher"></param>
-        void PerformRefreshAll(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher);
+        void PerformRefreshAll(IEnumerable<IServerAddress> servers, ICacheRefresher refresher);
     }
 
 }

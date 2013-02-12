@@ -197,26 +197,10 @@ namespace Umbraco.Core
             MacroPropertyTypeResolver.Current = new MacroPropertyTypeResolver(
                 PluginManager.Current.ResolveMacroPropertyTypes());
 
-            //TODO: Y U NO WORK?
-            //MigrationResolver.Current = new MigrationResolver(
-            //    PluginManager.Current.ResolveMigrationTypes());
+            //the database migration objects
+            MigrationResolver.Current = new MigrationResolver(
+                () => PluginManager.Current.ResolveMigrationTypes());
             
-			//the database migration objects
-			MigrationResolver.Current = new MigrationResolver(new List<Type>
-				{
-					typeof (MigrationsVersionFourNineZero.RemoveUmbracoAppConstraints),
-					typeof (DeleteAppTables),
-					typeof (EnsureAppsTreesUpdated),
-					typeof (MoveMasterContentTypeData),
-					typeof (NewCmsContentType2ContentTypeTable),
-					typeof (RemoveMasterContentTypeColumn),
-					typeof (RenameCmsTabTable),
-					typeof (RenameTabIdColumn),
-					typeof (UpdateCmsContentTypeAllowedContentTypeTable),
-					typeof (UpdateCmsContentTypeTable),
-					typeof (UpdateCmsContentVersionTable),
-					typeof (UpdateCmsPropertyTypeGroupTable)
-				});
 
 			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
 				PluginManager.Current.ResolvePropertyEditorValueConverters());

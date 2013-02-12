@@ -12,6 +12,7 @@ using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Persistence.Repositories
 {

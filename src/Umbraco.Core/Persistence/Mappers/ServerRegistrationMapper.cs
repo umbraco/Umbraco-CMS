@@ -6,17 +6,13 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
-    /// <summary>
-    /// Represents a <see cref="PropertyGroup"/> to DTO mapper used to translate the properties of the public api 
-    /// implementation to that of the database's DTO as sql: [tableName].[columnName].
-    /// </summary>
-    internal sealed class PropertyGroupMapper : BaseMapper
+    internal sealed class ServerRegistrationMapper : BaseMapper
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache = new ConcurrentDictionary<string, DtoMapModel>();
 
-        internal static readonly PropertyGroupMapper Instance = new PropertyGroupMapper();
+        internal static readonly ServerRegistrationMapper Instance = new ServerRegistrationMapper();
 
-        private PropertyGroupMapper()
+        private ServerRegistrationMapper()
         {
             BuildMap();
         }
@@ -25,10 +21,11 @@ namespace Umbraco.Core.Persistence.Mappers
 
         internal override void BuildMap()
         {
-            CacheMap<PropertyGroup, PropertyTypeGroupDto>(src => src.Id, dto => dto.Id);
-            CacheMap<PropertyGroup, PropertyTypeGroupDto>(src => src.ParentId, dto => dto.ParentGroupId);
-            CacheMap<PropertyGroup, PropertyTypeGroupDto>(src => src.SortOrder, dto => dto.SortOrder);
-            CacheMap<PropertyGroup, PropertyTypeGroupDto>(src => src.Name, dto => dto.Text);
+            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.Id, dto => dto.Id);
+            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.IsActive, dto => dto.IsActive);
+            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.ServerAddress, dto => dto.Address);
+            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.CreateDate, dto => dto.DateRegistered);
+            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.UpdateDate, dto => dto.LastNotified);
         }
 
         internal override string Map(string propertyName)

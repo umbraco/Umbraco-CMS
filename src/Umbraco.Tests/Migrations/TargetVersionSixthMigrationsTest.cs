@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
@@ -21,7 +20,7 @@ namespace Umbraco.Tests.Migrations
         {
             TestHelper.SetupLog4NetForTests();
 
-			MigrationResolver.Current = new MigrationResolver(new List<Type>
+			MigrationResolver.Current = new MigrationResolver(() => new List<Type>
 				{
 					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints),
 					typeof (DeleteAppTables),

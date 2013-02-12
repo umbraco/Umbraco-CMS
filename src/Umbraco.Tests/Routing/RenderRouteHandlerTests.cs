@@ -41,6 +41,7 @@ namespace Umbraco.Tests.Routing
 			RouteTable.Routes.Clear();
 			System.Configuration.ConfigurationManager.AppSettings.Set("umbracoPath", "");
 			SurfaceControllerResolver.Reset();
+            PluginManager.Current = null;
 		}
 
         Template CreateTemplate(string alias)

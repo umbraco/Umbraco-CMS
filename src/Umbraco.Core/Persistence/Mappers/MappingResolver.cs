@@ -8,6 +8,9 @@ namespace Umbraco.Core.Persistence.Mappers
     {
         internal static BaseMapper ResolveMapperByType(Type type)
         {
+            if (type == typeof (ServerRegistration))
+                return ServerRegistrationMapper.Instance;
+
             if (type == typeof (IContent) || type == typeof (Content))
                 return ContentMapper.Instance;
 

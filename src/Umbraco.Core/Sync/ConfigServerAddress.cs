@@ -7,10 +7,10 @@ namespace Umbraco.Core.Sync
     /// <summary>
     /// A server registration based on the legacy umbraco xml configuration in umbracoSettings
     /// </summary>
-    internal class ConfigServerRegistration : IServerRegistration
+    internal class ConfigServerAddress : IServerAddress
     {
 
-        public ConfigServerRegistration(XmlNode n)
+        public ConfigServerAddress(XmlNode n)
         {
             var webServicesUrl = IOHelper.ResolveUrl(SystemDirectories.WebServices);
 

@@ -7,6 +7,6 @@ namespace Umbraco.Core.Sync
     /// </summary>
     internal interface IServerRegistrar
     {
-        IEnumerable<IServerRegistration> Registrations { get; } 
+        IEnumerable<IServerAddress> Registrations { get; } 
     }
 }

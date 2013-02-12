@@ -32,8 +32,8 @@ namespace Umbraco.Tests.Resolvers
 		public void TearDown()
 		{
             ActionsResolver.Reset();
-            PluginManager.Current.AssembliesToScan = null;
-        }
+		    PluginManager.Current = null;
+		}
 
         // NOTE
         // ManyResolverTests ensure that we'll get our actions back and ActionsResolver works,

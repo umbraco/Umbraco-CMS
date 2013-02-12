@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Resolvers
 		public void TearDown()
 		{
             PackageActionsResolver.Reset();
-            PluginManager.Current.AssembliesToScan = null;
+            PluginManager.Current = null;
         }
         
         // NOTE

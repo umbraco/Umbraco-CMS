@@ -18,7 +18,8 @@ namespace Umbraco.Core.ObjectResolution
 		private IEnumerable<TResolved> _applicationInstances = null;
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 		private readonly string _httpContextKey;
-		private readonly List<Type> _instanceTypes = new List<Type>(); 
+		private readonly List<Type> _instanceTypes = new List<Type>();
+	    private IEnumerable<TResolved> _sortedValues = null;
 
 		private int _defaultPluginWeight = 10;
 
@@ -128,12 +129,13 @@ namespace Umbraco.Core.ObjectResolution
 		/// </remarks>
 		protected IEnumerable<TResolved> GetSortedValues()
 		{
-			var values = Values.ToList();
-
-			// FIXME - so we're re-sorting each time?
-
-			values.Sort((f1, f2) => GetObjectWeight(f1).CompareTo(GetObjectWeight(f2)));
-			return values;
+            if (_sortedValues == null)
+            {
+                var values = Values.ToList();
+                values.Sort((f1, f2) => GetObjectWeight(f1).CompareTo(GetObjectWeight(f2)));
+                _sortedValues = values;
+            }
+            return _sortedValues;
 		}
 
 		/// <summary>
@@ -147,7 +149,12 @@ namespace Umbraco.Core.ObjectResolution
 			set { _defaultPluginWeight = value; }
 		}
 
-		int GetObjectWeight(object o)
+        /// <summary>
+        /// Returns the weight of an object for user with GetSortedValues
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+		protected virtual int GetObjectWeight(object o)
 		{
 			var type = o.GetType();
 			var attr = type.GetCustomAttribute<WeightedPluginAttribute>(true);
@@ -427,16 +434,16 @@ namespace Umbraco.Core.ObjectResolution
 		/// <summary>
 		/// Inserts a type before a specified, already existing type.
 		/// </summary>
-		/// <typeparam name="Texisting">The existing type before which to insert.</typeparam>
+		/// <typeparam name="TExisting">The existing type before which to insert.</typeparam>
 		/// <typeparam name="T">The type to insert.</typeparam>
 		/// <exception cref="InvalidOperationException">the resolver does not support inserting types, or 
 		/// one of the types is not a valid type for the resolver, or the existing type is not in the collection,
 		/// or the new type is already in the collection of types.</exception>
-		public void InsertTypeBefore<Texisting, T>()
-            where Texisting : TResolved
+		public void InsertTypeBefore<TExisting, T>()
+            where TExisting : TResolved
             where T : TResolved
 		{
-			InsertTypeBefore(typeof(Texisting), typeof(T));
+			InsertTypeBefore(typeof(TExisting), typeof(T));
 		}
 
 		/// <summary>

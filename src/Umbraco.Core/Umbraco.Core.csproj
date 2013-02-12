@@ -169,6 +169,7 @@
     <Compile Include="Models\IDictionaryTranslation.cs" />
     <Compile Include="Models\IFile.cs" />
     <Compile Include="Models\ILanguage.cs" />
+    <Compile Include="Models\ServerRegistration.cs" />
     <Compile Include="Models\ITemplate.cs" />
     <Compile Include="Models\Language.cs" />
     <Compile Include="Models\Media.cs" />
@@ -193,6 +194,7 @@
     <Compile Include="Models\PublishedState.cs" />
     <Compile Include="Models\Rdbms\ContentType2ContentTypeDto.cs" />
     <Compile Include="Models\Rdbms\PropertyTypeGroupDto.cs" />
+    <Compile Include="Models\Rdbms\ServerRegistrationDto.cs" />
     <Compile Include="Models\Relation.cs" />
     <Compile Include="Models\RelationType.cs" />
     <Compile Include="Models\Script.cs" />
@@ -205,6 +207,7 @@
     <Compile Include="Persistence\Caching\IRepositoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\NullCacheProvider.cs" />
     <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
+    <Compile Include="Persistence\Factories\ServerRegistrationFactory.cs" />
     <Compile Include="Persistence\FaultHandling\ITransientErrorDetectionStrategy.cs" />
     <Compile Include="Persistence\FaultHandling\RetryingEventArgs.cs" />
     <Compile Include="Persistence\FaultHandling\RetryLimitExceededException.cs" />
@@ -277,6 +280,7 @@
     <Compile Include="Persistence\Mappers\PropertyTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\RelationMapper.cs" />
     <Compile Include="Persistence\Mappers\RelationTypeMapper.cs" />
+    <Compile Include="Persistence\Mappers\ServerRegistrationMapper.cs" />
     <Compile Include="Persistence\Mappers\UserMapper.cs" />
     <Compile Include="Persistence\Mappers\UserTypeMapper.cs" />
     <Compile Include="Persistence\Migrations\IMigration.cs" />
@@ -397,6 +401,7 @@
     <Compile Include="Persistence\Migrations\Syntax\Update\UpdateBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Update\UpdateDataBuilder.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourNineZero\RemoveUmbracoAppConstraints.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixOneZero\CreateServerRegistryTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\DeleteAppTables.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\EnsureAppsTreesUpdated.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\MoveMasterContentTypeData.cs" />
@@ -452,6 +457,7 @@
     <Compile Include="Persistence\Repositories\RelationTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\RepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\ScriptRepository.cs" />
+    <Compile Include="Persistence\Repositories\ServerRegistrationRepository.cs" />
     <Compile Include="Persistence\Repositories\StylesheetRepository.cs" />
     <Compile Include="Persistence\Repositories\TemplateRepository.cs" />
     <Compile Include="Persistence\Repositories\UserRepository.cs" />
@@ -674,10 +680,10 @@
     <Compile Include="Sync\ServerSyncWebServiceClient.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Sync\ConfigServerRegistration.cs" />
+    <Compile Include="Sync\ConfigServerAddress.cs" />
     <Compile Include="Sync\IServerMessenger.cs" />
     <Compile Include="Sync\IServerRegistrar.cs" />
-    <Compile Include="Sync\IServerRegistration.cs" />
+    <Compile Include="Sync\IServerAddress.cs" />
     <Compile Include="Sync\MessageType.cs" />
     <Compile Include="Sync\ServerMessengerResolver.cs" />
     <Compile Include="Sync\ServerRegistrarResolver.cs" />

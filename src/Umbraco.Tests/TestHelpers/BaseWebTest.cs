@@ -145,6 +145,8 @@ namespace Umbraco.Tests.TestHelpers
             Cache.ClearAllCache();
 
             UmbracoSettings.ResetSetters();
+
+            PluginManager.Current = null;
         }
 
         protected virtual void CreateDirectories(string[] directories)

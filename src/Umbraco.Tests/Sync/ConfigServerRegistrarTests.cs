@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Sync
             var xDoc = new XmlDocument();
             xDoc.LoadXml(xml);
             var xNode = xDoc.FirstChild;
-            var cReg = new ConfigServerRegistration(xNode);
+            var cReg = new ConfigServerAddress(xNode);
 
             Assert.AreEqual(match + "/umbraco/webservices/cacheRefresher.asmx", cReg.ServerAddress);
         }

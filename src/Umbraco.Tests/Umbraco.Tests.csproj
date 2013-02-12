@@ -157,6 +157,7 @@
     <Compile Include="ContentStores\PublishMediaStoreTests.cs" />
     <Compile Include="LegacyApi\MediaTypeTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
+    <Compile Include="Migrations\TargetVersionSixthOneZeroMigrationsTest.cs" />
     <Compile Include="Migrations\Upgrades\BaseUpgradeTest.cs" />
     <Compile Include="Migrations\FindingMigrationsTest.cs" />
     <Compile Include="Migrations\SqlScripts\SqlResources.Designer.cs">
@@ -182,6 +183,7 @@
     <Compile Include="Persistence\Querying\ExpressionTests.cs" />
     <Compile Include="Persistence\Querying\MediaRepositorySqlClausesTest.cs" />
     <Compile Include="Persistence\Querying\MediaTypeRepositorySqlClausesTest.cs" />
+    <Compile Include="Persistence\Repositories\ServerRegistrationRepositoryTest.cs" />
     <Compile Include="Persistence\SchemaValidationTest.cs" />
     <Compile Include="Persistence\SyntaxProvider\SqlSyntaxProviderTests.cs" />
     <Compile Include="PublishedContent\DynamicXmlConverterTests.cs" />

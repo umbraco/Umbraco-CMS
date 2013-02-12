@@ -27,6 +27,12 @@ namespace Umbraco.Tests
 				};
 		}
 
+        [TearDown]
+        public void TearDown()
+        {
+            PluginManager.Current = null;
+        }
+
 		/// <summary>
 		/// Ensures that the media factory finds the correct number of IMediaFactory
 		/// </summary>

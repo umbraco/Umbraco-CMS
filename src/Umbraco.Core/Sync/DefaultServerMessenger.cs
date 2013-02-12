@@ -40,7 +40,7 @@ namespace Umbraco.Core.Sync
             _password = password;
         }
 
-        public void PerformRefresh<T>(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher,Func<T, int> getNumericId, params T[] instances)
+        public void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher,Func<T, int> getNumericId, params T[] instances)
         {
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
@@ -53,7 +53,7 @@ namespace Umbraco.Core.Sync
                 instances);
         }
 
-        public void PerformRefresh<T>(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
+        public void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
         {
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
@@ -66,7 +66,7 @@ namespace Umbraco.Core.Sync
                 instances);
         }
 
-        public void PerformRemove<T>(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
+        public void PerformRemove<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
         {
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
@@ -79,7 +79,7 @@ namespace Umbraco.Core.Sync
                 instances);
         }
 
-        public void PerformRemove(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, params int[] numericIds)
+        public void PerformRemove(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params int[] numericIds)
         {
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
@@ -87,7 +87,7 @@ namespace Umbraco.Core.Sync
             MessageSeversForManyIds(servers, refresher, MessageType.RemoveById, numericIds.Cast<object>());
         }
 
-        public void PerformRefresh(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, params int[] numericIds)
+        public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params int[] numericIds)
         {
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
@@ -95,7 +95,7 @@ namespace Umbraco.Core.Sync
             MessageSeversForManyIds(servers, refresher, MessageType.RefreshById, numericIds.Cast<object>());
         }
 
-        public void PerformRefresh(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, params Guid[] guidIds)
+        public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params Guid[] guidIds)
         {
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
@@ -103,7 +103,7 @@ namespace Umbraco.Core.Sync
             MessageSeversForManyIds(servers, refresher, MessageType.RefreshById, guidIds.Cast<object>());
         }
 
-        public void PerformRefreshAll(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher)
+        public void PerformRefreshAll(IEnumerable<IServerAddress> servers, ICacheRefresher refresher)
         {
             MessageSeversForManyIds(servers, refresher, MessageType.RefreshAll, Enumerable.Empty<object>().ToArray());
         }
@@ -202,7 +202,7 @@ namespace Umbraco.Core.Sync
         }
 
         private void MessageSeversForManyObjects<T>(
-            IEnumerable<IServerRegistration> servers,
+            IEnumerable<IServerAddress> servers,
             ICacheRefresher refresher,
             MessageType dispatchType,
             Func<T, object> getId,
@@ -225,7 +225,7 @@ namespace Umbraco.Core.Sync
         }
 
         private void MessageSeversForManyIds(
-            IEnumerable<IServerRegistration> servers,
+            IEnumerable<IServerAddress> servers,
             ICacheRefresher refresher,
             MessageType dispatchType,
             IEnumerable<object> ids)

@@ -35,6 +35,7 @@ namespace Umbraco.Tests
 		public void TearDown()
 		{
 			CacheRefreshersResolver.Reset();
+            PluginManager.Current = null;
 		}
 
 		[Test]

@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Resolvers
 		public void TearDown()
 		{
             MacroFieldEditorsResolver.Reset();
-			PluginManager.Current.AssembliesToScan = null;
+            PluginManager.Current = null;
 		}
 
         // NOTE

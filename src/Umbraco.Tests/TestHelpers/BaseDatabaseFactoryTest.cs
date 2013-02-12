@@ -104,6 +104,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 File.Delete(filePath);
             }
+            PluginManager.Current = null;
         }
 
 	    protected ApplicationContext ApplicationContext

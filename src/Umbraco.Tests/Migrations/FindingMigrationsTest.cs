@@ -20,13 +20,12 @@ namespace Umbraco.Tests.Migrations
         {
             TestHelper.SetupLog4NetForTests();
 
-			MigrationResolver.Current = new MigrationResolver(new List<Type>
+			MigrationResolver.Current = new MigrationResolver(() => new List<Type>
 				{
 					typeof (AlterUserTableMigrationStub),
 					typeof(Dummy),
 					typeof (FourNineMigration),					
 					typeof (FourTenMigration),
-					typeof (FourElevenMigration),
 					typeof (FourElevenMigration)
 				});
 

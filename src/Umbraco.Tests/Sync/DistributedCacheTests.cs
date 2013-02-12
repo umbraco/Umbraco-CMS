@@ -135,37 +135,37 @@ namespace Umbraco.Tests.Sync
             public int CountOfFullRefreshes = 0;
             
 
-            public void PerformRefresh<T>(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
+            public void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
             {
                 IntIdsRefreshed.AddRange(instances.Select(getNumericId));
             }
 
-            public void PerformRefresh<T>(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
+            public void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
             {
                 GuidIdsRefreshed.AddRange(instances.Select(getGuidId));
             }
 
-            public void PerformRemove<T>(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
+            public void PerformRemove<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
             {
                 IntIdsRemoved.AddRange(instances.Select(getNumericId));
             }
 
-            public void PerformRemove(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, params int[] numericIds)
+            public void PerformRemove(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params int[] numericIds)
             {
                 IntIdsRemoved.AddRange(numericIds);
             }
 
-            public void PerformRefresh(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, params int[] numericIds)
+            public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params int[] numericIds)
             {
                 IntIdsRefreshed.AddRange(numericIds);
             }
 
-            public void PerformRefresh(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher, params Guid[] guidIds)
+            public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params Guid[] guidIds)
             {
                 GuidIdsRefreshed.AddRange(guidIds);
             }
 
-            public void PerformRefreshAll(IEnumerable<IServerRegistration> servers, ICacheRefresher refresher)
+            public void PerformRefreshAll(IEnumerable<IServerAddress> servers, ICacheRefresher refresher)
             {
                 CountOfFullRefreshes++;
             }
@@ -173,21 +173,21 @@ namespace Umbraco.Tests.Sync
 
         internal class TestServerRegistrar : IServerRegistrar
         {
-            public IEnumerable<IServerRegistration> Registrations
+            public IEnumerable<IServerAddress> Registrations
             {
                 get
                 {
-                    return new List<IServerRegistration>()
+                    return new List<IServerAddress>()
                         {
-                            new TestServerRegistration("localhost")
+                            new TestServerAddress("localhost")
                         };
                 }
             }
         }
 
-        public class TestServerRegistration : IServerRegistration
+        public class TestServerAddress : IServerAddress
         {
-            public TestServerRegistration(string address)
+            public TestServerAddress(string address)
             {
                 ServerAddress = address;
             }
