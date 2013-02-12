@@ -56,7 +56,10 @@
                         else {
                             self._koViewModel.resultMessage(msgs[0]);
                         }
-                        
+
+                        //sync the tree
+                        UmbClientMgr.mainTree().setActiveTreeType('content');
+                        UmbClientMgr.mainTree().syncTree(self._opts.documentPath, true);
                     });
                 }
             };

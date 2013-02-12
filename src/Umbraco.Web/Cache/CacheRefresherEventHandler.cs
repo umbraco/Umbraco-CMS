@@ -1,6 +1,7 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Services;
 using umbraco;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.member;
@@ -17,6 +18,11 @@ namespace Umbraco.Web.Cache
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             if (UmbracoSettings.UmbracoLibraryCacheDuration <= 0) return;
+
+            //Bind to user events
+
+            User.Saving += UserSaving;
+            User.Deleting += UserDeleting;
 
             //Bind to template events
 
@@ -42,6 +48,16 @@ namespace Umbraco.Web.Cache
             MediaService.Deleting += MediaServiceDeleting;
             MediaService.Moving += MediaServiceMoving;
             MediaService.Trashing += MediaServiceTrashing;
+        }
+
+        static void UserDeleting(User sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RemoveUserCache(sender.Id);
+        }
+
+        static void UserSaving(User sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RefreshUserCache(sender.Id);
         }
 
         /// <summary>
@@ -86,28 +102,22 @@ namespace Umbraco.Web.Cache
 
         static void MediaServiceTrashing(IMediaService sender, Core.Events.MoveEventArgs<Core.Models.IMedia> e)
         {
-            DistributedCache.Instance.RemoveMediaCache(e.Entity.Id);            
+            DistributedCache.Instance.RemoveMediaCache(e.Entity);            
         }
 
         static void MediaServiceMoving(IMediaService sender, Core.Events.MoveEventArgs<Core.Models.IMedia> e)
         {
-            DistributedCache.Instance.RefreshMediaCache(e.Entity.Id);
+            DistributedCache.Instance.RefreshMediaCache(e.Entity);
         }
 
         static void MediaServiceDeleting(IMediaService sender, Core.Events.DeleteEventArgs<Core.Models.IMedia> e)
         {
-            foreach (var item in e.DeletedEntities)
-            {
-                DistributedCache.Instance.RemoveMediaCache(item.Id);
-            }
+            DistributedCache.Instance.RemoveMediaCache(e.DeletedEntities.ToArray());
         }
 
         static void MediaServiceSaved(IMediaService sender, Core.Events.SaveEventArgs<Core.Models.IMedia> e)
         {
-            foreach (var item in e.SavedEntities)
-            {
-                DistributedCache.Instance.RefreshMediaCache(item.Id);
-            }
+            DistributedCache.Instance.RefreshMediaCache(e.SavedEntities.ToArray());
         }
 
         static void MemberBeforeDelete(Member sender, DeleteEventArgs e)

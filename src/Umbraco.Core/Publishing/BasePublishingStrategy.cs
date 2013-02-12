@@ -9,25 +9,6 @@ namespace Umbraco.Core.Publishing
     public abstract class BasePublishingStrategy : IPublishingStrategy
     {
 
-        internal abstract Attempt<PublishStatus> PublishInternal(IContent content, int userId);
-
-        /// <summary>
-        /// Publishes a list of content items
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="userId"></param>
-        /// <param name="includeUnpublishedDocuments">
-        /// By default this is set to true which means that it will publish any content item in the list that is completely unpublished and
-        /// not visible on the front-end. If set to false, this will only publish content that is live on the front-end but has new versions
-        /// that have yet to be published.
-        /// </param>
-        /// <param name="validateContent">If true this will validate each content item before trying to publish it, if validation fails it will not be published.</param>
-        /// <returns></returns>
-        internal abstract IEnumerable<Attempt<PublishStatus>> PublishWithChildrenInternal(
-            IEnumerable<IContent> content, int userId, bool includeUnpublishedDocuments = true, bool validateContent = false);
-
-        internal abstract IEnumerable<Attempt<PublishStatus>> UnPublishInternal(IEnumerable<IContent> content, int userId);
-
         public abstract bool Publish(IContent content, int userId);
         public abstract bool PublishWithChildren(IEnumerable<IContent> content, int userId);
         public abstract bool UnPublish(IContent content, int userId);

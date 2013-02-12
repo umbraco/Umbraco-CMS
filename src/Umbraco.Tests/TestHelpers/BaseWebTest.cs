@@ -78,7 +78,7 @@ namespace Umbraco.Tests.TestHelpers
 			if (RequiresDbSetup)
 			{
 				//Create the umbraco database and its base data
-				DatabaseContext.Database.CreateDatabaseSchema();	
+				DatabaseContext.Database.CreateDatabaseSchema(false);	
 			}
 
             //called so that inheritors can do stuff before freezing.

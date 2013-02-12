@@ -261,6 +261,8 @@
     <Compile Include="Services\ContentTypeServiceTests.cs" />
     <Compile Include="Services\ThreadSafetyServiceTest.cs" />
     <Compile Include="Surface\PluginControllerAreaTests.cs" />
+    <Compile Include="Sync\ConfigServerRegistrarTests.cs" />
+    <Compile Include="Sync\DistributedCacheTests.cs" />
     <Compile Include="Templates\MasterPageHelperTests.cs" />
     <Compile Include="TestHelpers\BaseDatabaseFactoryTest.cs" />
     <Compile Include="TestHelpers\BaseRoutingTest.cs" />

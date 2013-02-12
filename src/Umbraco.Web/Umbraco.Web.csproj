@@ -244,7 +244,6 @@
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
-    <Compile Include="Cache\CacheRefresherClient.cs" />
     <Compile Include="Cache\DistributedCache.cs" />
     <Compile Include="Cache\DistributedCacheExtensions.cs" />
     <Compile Include="Cache\CacheRefresherEventHandler.cs" />
@@ -253,6 +252,7 @@
     <Compile Include="Cache\MemberCacheRefresher.cs" />
     <Compile Include="Cache\PageCacheRefresher.cs" />
     <Compile Include="Cache\TemplateCacheRefresher.cs" />
+    <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Dynamics\DynamicExpression.cs" />
     <Compile Include="Dynamics\DynamicGrouping.cs" />
     <Compile Include="Dynamics\DynamicPublishedContentIdEqualityComparer.cs" />

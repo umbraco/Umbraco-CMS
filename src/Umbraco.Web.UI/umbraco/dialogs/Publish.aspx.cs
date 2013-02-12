@@ -11,6 +11,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
      
         protected string PageName { get; private set; }
         protected int DocumentId { get; private set; }
+        protected string DocumentPath { get; private set; }
 
         protected override void OnInit(EventArgs e)
         {
@@ -30,6 +31,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 
             DocumentId = doc.Id;
             PageName = doc.Name;
+            DocumentPath = doc.Path;
 
         }
     }

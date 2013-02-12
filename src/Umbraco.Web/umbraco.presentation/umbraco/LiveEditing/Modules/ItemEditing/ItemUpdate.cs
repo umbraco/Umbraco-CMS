@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Web.Security;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
@@ -96,7 +97,7 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
             if(!publishedDocuments.Contains(NodeId.Value))
             {
                 Document document = new Document(NodeId.Value);
-                document.Publish(UmbracoEnsuredPage.CurrentUser);
+                document.SaveAndPublish(WebSecurity.CurrentUser);
                 
                 publishedDocuments.Add(NodeId.Value);
             }

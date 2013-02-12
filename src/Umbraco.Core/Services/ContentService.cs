@@ -24,7 +24,7 @@ namespace Umbraco.Core.Services
 	public class ContentService : IContentService
 	{
 		private readonly IDatabaseUnitOfWorkProvider _uowProvider;
-		private readonly BasePublishingStrategy _publishingStrategy;
+		private readonly IPublishingStrategy _publishingStrategy;
         private readonly RepositoryFactory _repositoryFactory;
 
         public ContentService()
@@ -43,22 +43,15 @@ namespace Umbraco.Core.Services
             : this(provider, repositoryFactory, new PublishingStrategy())
         { }
 
-        [Obsolete("This contructor is no longer supported, use the other constructor accepting a BasePublishginStrategy object instead")]
 	    public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy)
 		{
-			_uowProvider = provider;
-            _publishingStrategy = publishingStrategy as BasePublishingStrategy;
-            if (_publishingStrategy == null)
-                throw new InvalidOperationException("publishingStrategy must be an instance of " + typeof(BasePublishingStrategy).Name);
+	        if (provider == null) throw new ArgumentNullException("provider");
+	        if (repositoryFactory == null) throw new ArgumentNullException("repositoryFactory");
+	        if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");
+	        _uowProvider = provider;
+	        _publishingStrategy = publishingStrategy;
             _repositoryFactory = repositoryFactory;
 		}
-
-        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, BasePublishingStrategy publishingStrategy)
-        {
-            _uowProvider = provider;
-            _publishingStrategy = publishingStrategy;
-            _repositoryFactory = repositoryFactory;
-        }
 
 	    /// <summary>
 	    /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
@@ -477,7 +470,7 @@ namespace Umbraco.Core.Services
 	    /// <returns>True if publishing succeeded, otherwise False</returns>
 	    public bool RePublishAll(int userId = 0)
 	    {
-	        return RePublishAllDo(false, userId);
+	        return RePublishAllDo(userId);
 	    }
 
 	    /// <summary>
@@ -488,7 +481,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if publishing succeeded, otherwise False</returns>
         public bool Publish(IContent content, int userId = 0)
         {
-            var result = SaveAndPublishDo(content, false, userId);
+            var result = SaveAndPublishDo(content, userId);
 	        return result.Success;
         }
 
@@ -500,7 +493,7 @@ namespace Umbraco.Core.Services
 	    /// <returns>True if publishing succeeded, otherwise False</returns>
 	    public bool PublishWithChildren(IContent content, int userId = 0)
 	    {
-            var result = PublishWithChildrenDo(content, false, userId);
+            var result = PublishWithChildrenDo(content, userId);
             
             //This used to just return false only when the parent content failed, otherwise would always return true so we'll
             // do the same thing for the moment
@@ -527,7 +520,7 @@ namespace Umbraco.Core.Services
 	    /// <returns>True if publishing succeeded, otherwise False</returns>
         public bool SaveAndPublish(IContent content, int userId = 0, bool raiseEvents = true)
 	    {
-            var result = SaveAndPublishDo(content, false, userId, raiseEvents);
+            var result = SaveAndPublishDo(content, userId, raiseEvents);
 	        return result.Success;
 	    }
 
@@ -1063,67 +1056,41 @@ namespace Umbraco.Core.Services
 	    }
 
         #region Internal Methods
-        /// <summary>
-        /// Internal method to Re-Publishes all Content for legacy purposes.
-        /// </summary>
-        /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this RePublish method. By default this method will not update the cache.</param>
-        /// <returns>True if publishing succeeded, otherwise False</returns>
-        internal bool RePublishAll(bool omitCacheRefresh = true, int userId = 0)
-        {
-            return RePublishAllDo(omitCacheRefresh, userId);
-        }
-
+      
         /// <summary>
         /// Internal method that Publishes a single <see cref="IContent"/> object for legacy purposes.
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to publish</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will not update the cache.</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        internal Attempt<PublishStatus> Publish(IContent content, bool omitCacheRefresh = true, int userId = 0)
+        internal Attempt<PublishStatus> PublishInternal(IContent content, int userId = 0)
         {
-            return SaveAndPublishDo(content, omitCacheRefresh, userId);
+            return SaveAndPublishDo(content, userId);
         }
 
 	    /// <summary>
 	    /// Internal method that Publishes a <see cref="IContent"/> object and all its children for legacy purposes.
 	    /// </summary>
 	    /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
-	    /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will not update the cache.</param>
 	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
 	    /// <param name="includeUnpublished">If set to true, this will also publish descendants that are completely unpublished, normally this will only publish children that have previously been published</param>
-	    /// <param name="validateContent">If true this will validate the content before publishing</param>
 	    /// <returns>True if publishing succeeded, otherwise False</returns>
-	    internal IEnumerable<Attempt<PublishStatus>> PublishWithChildren(
-            IContent content, bool omitCacheRefresh = true, int userId = 0, bool includeUnpublished = false, bool validateContent = false)
+	    internal IEnumerable<Attempt<PublishStatus>> PublishWithChildrenInternal(
+            IContent content, int userId = 0, bool includeUnpublished = false)
         {
-            return PublishWithChildrenDo(content, omitCacheRefresh, userId, includeUnpublished, validateContent);
-        }
-
-        /// <summary>
-        /// Internal method that UnPublishes a single <see cref="IContent"/> object for legacy purposes.
-        /// </summary>
-        /// <param name="content">The <see cref="IContent"/> to publish</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Unpublish method. By default this method will not update the cache.</param>
-        /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <returns>True if unpublishing succeeded, otherwise False</returns>
-        internal bool UnPublish(IContent content, bool omitCacheRefresh = true, int userId = 0)
-        {
-            return UnPublishDo(content, omitCacheRefresh, userId);
+            return PublishWithChildrenDo(content, userId, includeUnpublished);
         }
 
 	    /// <summary>
 	    /// Saves and Publishes a single <see cref="IContent"/> object
 	    /// </summary>
 	    /// <param name="content">The <see cref="IContent"/> to save and publish</param>
-	    /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will not update the cache.</param>
 	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
 	    /// <returns>True if publishing succeeded, otherwise False</returns>
-        internal Attempt<PublishStatus> SaveAndPublish(IContent content, bool omitCacheRefresh = true, int userId = 0, bool raiseEvents = true)
+        internal Attempt<PublishStatus> SaveAndPublishInternal(IContent content, int userId = 0, bool raiseEvents = true)
         {
-            return SaveAndPublishDo(content, omitCacheRefresh, userId, raiseEvents);
+            return SaveAndPublishDo(content, userId, raiseEvents);
         }
 
         /// <summary>
@@ -1150,9 +1117,8 @@ namespace Umbraco.Core.Services
         /// Re-Publishes all Content
         /// </summary>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this RePublish method. By default this method will update the cache.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        private bool RePublishAllDo(bool omitCacheRefresh = false, int userId = 0)
+        private bool RePublishAllDo(int userId = 0)
         {
             var list = new List<IContent>();
             var updated = new List<IContent>();
@@ -1198,9 +1164,8 @@ namespace Umbraco.Core.Services
                                          : Convert.ToInt32(uow.Database.Insert(poco));
                     }
                 }
-                //Updating content to published state is finished, so we fire event through PublishingStrategy to have cache updated
-                if (omitCacheRefresh == false)
-                    _publishingStrategy.PublishingFinalized(updated, true);
+                
+                _publishingStrategy.PublishingFinalized(updated, true);
             }
 
             Audit.Add(AuditTypes.Publish, "RePublish All performed by user", userId, -1);
@@ -1212,17 +1177,15 @@ namespace Umbraco.Core.Services
 	    /// Publishes a <see cref="IContent"/> object and all its children
 	    /// </summary>
 	    /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
-	    /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
 	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
-	    /// <param name="includeUnpublished">If set to true, this will also publish descendants that are completely unpublished, normally this will only publish children that have previously been published</param>
-	    /// <param name="validateContent">If set to true will ensure the content is valid before publishing</param>
+	    /// <param name="includeUnpublished">If set to true, this will also publish descendants that are completely unpublished, normally this will only publish children that have previously been published</param>	    
 	    /// <returns>
 	    /// A list of publish statues. If the parent document is not valid or cannot be published because it's parent(s) is not published
 	    /// then the list will only contain one status item, otherwise it will contain status items for it and all of it's descendants that
 	    /// are to be published.
 	    /// </returns>
 	    private IEnumerable<Attempt<PublishStatus>> PublishWithChildrenDo(
-            IContent content, bool omitCacheRefresh = false, int userId = 0, bool includeUnpublished = false, bool validateContent = false)
+            IContent content, int userId = 0, bool includeUnpublished = false)
         {
 	        if (content == null) throw new ArgumentNullException("content");
 
@@ -1257,8 +1220,10 @@ namespace Umbraco.Core.Services
             list.Add(content); //include parent item
             list.AddRange(GetDescendants(content));
 
+            var internalStrategy = (PublishingStrategy)_publishingStrategy;
+
             //Publish and then update the database with new status
-            var publishedOutcome = _publishingStrategy.PublishWithChildrenInternal(list, userId, includeUnpublished, validateContent).ToArray();
+            var publishedOutcome = internalStrategy.PublishWithChildrenInternal(list, userId, includeUnpublished).ToArray();
             
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateContentRepository(uow))
@@ -1288,8 +1253,7 @@ namespace Umbraco.Core.Services
                 }
             }
             //Save xml to db and call following method to fire event:
-            if (omitCacheRefresh == false)
-                _publishingStrategy.PublishingFinalized(updated, false);
+            _publishingStrategy.PublishingFinalized(updated, false);
 
             Audit.Add(AuditTypes.Publish, "Publish with Children performed by user", userId, content.Id);
             
@@ -1334,11 +1298,10 @@ namespace Umbraco.Core.Services
 	    /// Saves and Publishes a single <see cref="IContent"/> object
 	    /// </summary>
 	    /// <param name="content">The <see cref="IContent"/> to save and publish</param>
-	    /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Publish method. By default this method will update the cache.</param>
 	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
 	    /// <returns>True if publishing succeeded, otherwise False</returns>
-	    private Attempt<PublishStatus> SaveAndPublishDo(IContent content, bool omitCacheRefresh = false, int userId = 0, bool raiseEvents = true)
+	    private Attempt<PublishStatus> SaveAndPublishDo(IContent content, int userId = 0, bool raiseEvents = true)
         {
             if(raiseEvents)
             {
@@ -1372,8 +1335,9 @@ namespace Umbraco.Core.Services
                 publishStatus.StatusType = PublishStatusType.FailedContentInvalid;
             }
 
+	        var internalStrategy = (PublishingStrategy) _publishingStrategy;
             //Publish and then update the database with new status
-            var publishResult = _publishingStrategy.PublishInternal(content, userId);
+            var publishResult = internalStrategy.PublishInternal(content, userId);
             //set our publish status to the publish result 
 	        publishStatus.StatusType = publishResult.Result.StatusType;
 	        
@@ -1430,13 +1394,13 @@ namespace Umbraco.Core.Services
                 Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
 
             //Save xml to db and call following method to fire event through PublishingStrategy to update cache
-            if (published && omitCacheRefresh == false)
+            if (published)
             {
                 _publishingStrategy.PublishingFinalized(content);
             }
 
             //We need to check if children and their publish state to ensure that we 'republish' content that was previously published
-            if (published && omitCacheRefresh == false && previouslyPublished == false && HasChildren(content.Id))
+            if (published && previouslyPublished == false && HasChildren(content.Id))
             {
                 var descendants = GetPublishedDescendants(content);
 

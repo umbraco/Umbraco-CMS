@@ -61,6 +61,7 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.Helpers.dll</HintPath>
@@ -73,6 +74,7 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.Razor.2.0.20715.0\lib\net40\System.Web.Razor.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.dll</HintPath>
@@ -667,6 +669,19 @@
     <Compile Include="Services\MediaService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Services\UserService.cs" />
+    <Compile Include="Sync\DefaultServerMessenger.cs" />
+    <Compile Include="Sync\ICacheRefresher.cs" />
+    <Compile Include="Sync\ServerSyncWebServiceClient.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Sync\ConfigServerRegistration.cs" />
+    <Compile Include="Sync\IServerMessenger.cs" />
+    <Compile Include="Sync\IServerRegistrar.cs" />
+    <Compile Include="Sync\IServerRegistration.cs" />
+    <Compile Include="Sync\MessageType.cs" />
+    <Compile Include="Sync\ServerMessengerResolver.cs" />
+    <Compile Include="Sync\ServerRegistrarResolver.cs" />
+    <Compile Include="Sync\ConfigServerRegistrar.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="ReadLock.cs" />
     <Compile Include="TypeFinder.cs" />

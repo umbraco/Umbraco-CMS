@@ -7,6 +7,7 @@ using System.Xml;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Web;
+using Umbraco.Web.Security;
 using umbraco.BasePages;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
@@ -98,7 +99,7 @@ namespace umbraco.presentation.webservices
                                     // refresh the xml for the sorting to work
                                     if (published)
                                     {
-                                        document.Publish(BusinessLogic.User.GetCurrent());
+                                        document.SaveAndPublish(WebSecurity.CurrentUser);
                                         document.refreshXmlSortOrder();
                                     }
                                 }

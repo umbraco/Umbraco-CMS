@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Web;
+using System.Web.Script.Serialization;
 using System.Web.Services;
 using System.Xml;
 using Umbraco.Core;
@@ -81,6 +83,29 @@ namespace umbraco.presentation.webservices
 				
 			}
 		}
+
+        /// <summary>
+        /// Refreshes objects for all Ids matched in the json string
+        /// </summary>
+        /// <param name="uniqueIdentifier"></param>
+        /// <param name="jsonIds">A JSON Serialized string of ids to match</param>
+        /// <param name="Login"></param>
+        /// <param name="Password"></param>
+        [WebMethod]
+        public void RefreshByIds(Guid uniqueIdentifier, string jsonIds, string Login, string Password)
+        {
+            var serializer = new JavaScriptSerializer();
+            var ids = serializer.Deserialize<int[]>(jsonIds);
+
+            if (BusinessLogic.User.validateCredentials(Login, Password))
+            {
+                var cr = CacheRefreshersResolver.Current.GetById(uniqueIdentifier);
+                foreach (var i in ids)
+                {
+                    cr.Refresh(i);   
+                }                
+            }
+        }
 
         [WebMethod]
         public void RemoveById(Guid uniqueIdentifier, int Id, string Login, string Password) {

@@ -7,8 +7,10 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Sync;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
@@ -16,6 +18,7 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Routing;
+using umbraco.BusinessLogic;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.presentation.cache;
@@ -172,6 +175,24 @@ namespace Umbraco.Web
         protected override void InitializeResolvers()
         {
             base.InitializeResolvers();
+
+            //we should not proceed to change this if the app/database is not configured since there will 
+            // be no user, plus we don't need to have server messages sent if this is the case.
+            if (ApplicationContext.IsConfigured && ApplicationContext.DatabaseContext.IsDatabaseConfigured)
+            {
+                var user = User.GetUser(UmbracoSettings.DistributedCallUser);
+                try
+                {
+                    //Override the ServerMessengerResolver to set a username/password for the distributed calls
+                    ServerMessengerResolver.Current.SetServerMessenger(new DefaultServerMessenger(
+                            user.LoginName,
+                            user.GetPassword()));  
+                }
+                catch (Exception e)
+                {
+                    LogHelper.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);   
+                }
+            }
 
             //We are going to manually remove a few cache refreshers here because we've obsoleted them and we don't want them
             // to be registered more than once

@@ -1,5 +1,8 @@
 ﻿using System;
+using Umbraco.Core.Models;
+using Umbraco.Core.Sync;
 using umbraco;
+using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using umbraco.presentation.cache;
 
@@ -12,7 +15,7 @@ namespace Umbraco.Web.Cache
     /// If Load balancing is enabled (by default disabled, is set in umbracoSettings.config) PageCacheRefresher will be called
     /// everytime content is added/updated/removed to ensure that the content cache is identical on all load balanced servers
     /// </remarks>    
-    public class PageCacheRefresher : ICacheRefresher
+    public class PageCacheRefresher : ICacheRefresher<IContent>
     {       
         /// <summary>
         /// Gets the unique identifier of the CacheRefresher.
@@ -68,6 +71,16 @@ namespace Umbraco.Web.Cache
         public void Remove(int id)
         {
             content.Instance.ClearDocumentCache(id);
+        }
+
+        public void Refresh(IContent instance)
+        {
+            content.Instance.UpdateDocumentCache(new Document(instance));
+        }
+
+        public void Remove(IContent instance)
+        {
+            content.Instance.ClearDocumentCache(new Document(instance));
         }
     }
 }

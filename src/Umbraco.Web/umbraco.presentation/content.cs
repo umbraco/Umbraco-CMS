@@ -489,7 +489,6 @@ namespace umbraco
             UpdateDocumentCache(d);
         }
 
-
         /// <summary>
         /// Updates the document cache.
         /// </summary>

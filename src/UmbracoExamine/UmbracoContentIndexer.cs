@@ -121,7 +121,7 @@ namespace UmbracoExamine
         {
 
             //We need to check if we actually can initialize, if not then don't continue
-            if (!CanInitialized())
+            if (!CanInitialize())
             {
                 return;
             }

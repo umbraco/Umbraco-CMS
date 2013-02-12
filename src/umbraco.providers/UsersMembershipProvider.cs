@@ -248,6 +248,7 @@ namespace umbraco.providers
             User user = new User(username);
             string encodedPassword = EncodePassword(newPassword);            
             user.Password = encodedPassword;            
+            user.Save();
             return (user.ValidatePassword(encodedPassword)) ? true : false;
         }
 
@@ -525,6 +526,7 @@ namespace umbraco.providers
             {
                 User user = new User(userName);
                 user.Disabled = false;
+                user.Save();
             }
             catch (Exception)
             {
