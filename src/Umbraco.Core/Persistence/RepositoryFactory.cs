@@ -9,6 +9,13 @@ namespace Umbraco.Core.Persistence
     /// </summary>
     public class RepositoryFactory
     {
+        internal virtual ServerRegistrationRepository CreateServerRegistrationRepository(IDatabaseUnitOfWork uow)
+        {
+            return new ServerRegistrationRepository(
+                uow,
+                NullCacheProvider.Current);
+        }
+
 		internal virtual IUserTypeRepository CreateUserTypeRepository(IDatabaseUnitOfWork uow)
         {
             return new UserTypeRepository(

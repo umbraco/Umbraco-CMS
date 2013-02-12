@@ -673,6 +673,7 @@
     <Compile Include="Services\LocalizationService.cs" />
     <Compile Include="Services\MacroService.cs" />
     <Compile Include="Services\MediaService.cs" />
+    <Compile Include="Services\ServerRegistrationService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Sync\DefaultServerMessenger.cs" />

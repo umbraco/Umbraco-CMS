@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SqlServerCe;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -21,6 +22,42 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Cannot_Add_Duplicate_Computer_Names()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+
+            // Act
+            using (var repository = new ServerRegistrationRepository(unitOfWork))
+            {
+                var server = new ServerRegistration("http://shazwazza.com", "COMPUTER1", DateTime.Now);
+                repository.AddOrUpdate(server);
+
+                Assert.Throws<SqlCeException>(unitOfWork.Commit);
+            }
+
+        }
+
+        [Test]
+        public void Cannot_Update_To_Duplicate_Computer_Names()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+
+            // Act
+            using (var repository = new ServerRegistrationRepository(unitOfWork))
+            {
+                var server = repository.Get(1);
+                server.ComputerName = "COMPUTER2";
+                repository.AddOrUpdate(server);
+                Assert.Throws<SqlCeException>(unitOfWork.Commit);
+            }
+
+        }
+
+        [Test]
         public void Can_Instantiate_Repository()
         {
             // Arrange
@@ -28,10 +65,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            var repository = new ServerRegistrationRepository(unitOfWork);
-
-            // Assert
-            Assert.That(repository, Is.Not.Null);
+            using (var repository = new ServerRegistrationRepository(unitOfWork))
+            {
+                // Assert
+                Assert.That(repository, Is.Not.Null);    
+            }
         }
 
         [Test]
@@ -40,15 +78,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ServerRegistrationRepository(unitOfWork);
+            using (var repository = new ServerRegistrationRepository(unitOfWork))
+            {
+                // Act
+                var server = repository.Get(1);
 
-            // Act
-            var server = repository.Get(1);
+                // Assert
+                Assert.That(server, Is.Not.Null);
+                Assert.That(server.HasIdentity, Is.True);
+                Assert.That(server.ServerAddress, Is.EqualTo("http://localhost"));    
+            }
 
-            // Assert
-            Assert.That(server, Is.Not.Null);
-            Assert.That(server.HasIdentity, Is.True);
-            Assert.That(server.ServerAddress, Is.EqualTo("http://localhost"));            
+            
         }
 
         [Test]
@@ -57,13 +98,15 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ServerRegistrationRepository(unitOfWork);
+            using (var repository = new ServerRegistrationRepository(unitOfWork))
+            {
+                // Act
+                var servers = repository.GetAll();
 
-            // Act
-            var servers = repository.GetAll();
-
-            // Assert
-            Assert.That(servers.Count(), Is.EqualTo(3));
+                // Assert
+                Assert.That(servers.Count(), Is.EqualTo(3));    
+            }
+            
         }
 
         [Test]
@@ -72,14 +115,15 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ServerRegistrationRepository(unitOfWork);
+            using (var repository = new ServerRegistrationRepository(unitOfWork))
+            {
+                // Act
+                var query = Query<ServerRegistration>.Builder.Where(x => x.ComputerName.ToUpper() == "COMPUTER3");
+                var result = repository.GetByQuery(query);
 
-            // Act
-            var query = Query<ServerRegistration>.Builder.Where(x => x.IsActive);
-            var result = repository.GetByQuery(query);
-
-            // Assert
-            Assert.AreEqual(1, result.Count());
+                // Assert
+                Assert.AreEqual(1, result.Count());    
+            }
         }
 
         [Test]
@@ -88,14 +132,15 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ServerRegistrationRepository(unitOfWork);
+            using (var repository = new ServerRegistrationRepository(unitOfWork))
+            {
+                // Act
+                var query = Query<ServerRegistration>.Builder.Where(x => x.ServerAddress.StartsWith("http://"));
+                int count = repository.Count(query);
 
-            // Act
-            var query = Query<ServerRegistration>.Builder.Where(x => x.ServerAddress.StartsWith("http://"));
-            int count = repository.Count(query);
-
-            // Assert
-            Assert.That(count, Is.EqualTo(2));
+                // Assert
+                Assert.That(count, Is.EqualTo(2));    
+            }
         }
 
         [Test]
@@ -104,16 +149,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ServerRegistrationRepository(unitOfWork);
+            using (var repository = new ServerRegistrationRepository(unitOfWork))
+            {
+                // Act
+                var server = new ServerRegistration("http://shazwazza.com", "COMPUTER4", DateTime.Now);
+                repository.AddOrUpdate(server);
+                unitOfWork.Commit();
 
-            // Act
-            var server = new ServerRegistration("http://shazwazza.com", DateTime.Now);
-            repository.AddOrUpdate(server);
-            unitOfWork.Commit();
-
-            // Assert
-            Assert.That(server.HasIdentity, Is.True);
-            Assert.That(server.Id, Is.EqualTo(4));//With 3 existing entries the Id should be 4
+                // Assert
+                Assert.That(server.HasIdentity, Is.True);
+                Assert.That(server.Id, Is.EqualTo(4));//With 3 existing entries the Id should be 4   
+            }            
         }
 
         [Test]
@@ -122,22 +168,23 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ServerRegistrationRepository(unitOfWork);
+            using (var repository = new ServerRegistrationRepository(unitOfWork))
+            {
+                // Act
+                var server = repository.Get(2);
+                server.ServerAddress = "https://umbraco.com";
+                server.IsActive = true;
 
-            // Act
-            var server = repository.Get(2);
-            server.ServerAddress = "https://umbraco.com";
-            server.IsActive = true;
+                repository.AddOrUpdate(server);
+                unitOfWork.Commit();
 
-            repository.AddOrUpdate(server);
-            unitOfWork.Commit();
+                var serverUpdated = repository.Get(2);
 
-            var serverUpdated = repository.Get(2);
-
-            // Assert
-            Assert.That(serverUpdated, Is.Not.Null);
-            Assert.That(serverUpdated.ServerAddress, Is.EqualTo("https://umbraco.com"));
-            Assert.That(serverUpdated.IsActive, Is.EqualTo(true));
+                // Assert
+                Assert.That(serverUpdated, Is.Not.Null);
+                Assert.That(serverUpdated.ServerAddress, Is.EqualTo("https://umbraco.com"));
+                Assert.That(serverUpdated.IsActive, Is.EqualTo(true));   
+            }            
         }
 
         [Test]
@@ -146,18 +193,19 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ServerRegistrationRepository(unitOfWork);
+            using (var repository = new ServerRegistrationRepository(unitOfWork))
+            {
+                // Act
+                var server = repository.Get(3);
+                Assert.IsNotNull(server);
+                repository.Delete(server);
+                unitOfWork.Commit();
 
-            // Act
-            var server = repository.Get(3);
-            Assert.IsNotNull(server);
-            repository.Delete(server);
-            unitOfWork.Commit();
+                var exists = repository.Exists(3);
 
-            var exists = repository.Exists(3);
-
-            // Assert
-            Assert.That(exists, Is.False);
+                // Assert
+                Assert.That(exists, Is.False);   
+            }            
         }
 
         [Test]
@@ -166,15 +214,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ServerRegistrationRepository(unitOfWork);
+            using (var repository = new ServerRegistrationRepository(unitOfWork))
+            {
+                // Act
+                var exists = repository.Exists(3);
+                var doesntExist = repository.Exists(10);
 
-            // Act
-            var exists = repository.Exists(3);
-            var doesntExist = repository.Exists(10);
-
-            // Assert
-            Assert.That(exists, Is.True);
-            Assert.That(doesntExist, Is.False);
+                // Assert
+                Assert.That(exists, Is.True);
+                Assert.That(doesntExist, Is.False);    
+            }
         }
 
         [TearDown]
@@ -185,13 +234,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         public void CreateTestData()
         {
-             var provider = new PetaPocoUnitOfWorkProvider();
-            using(var unitOfWork = provider.GetUnitOfWork())
+            var provider = new PetaPocoUnitOfWorkProvider();
+            using (var unitOfWork = provider.GetUnitOfWork())
             using (var repository = new ServerRegistrationRepository(unitOfWork))
             {
-                repository.AddOrUpdate(new ServerRegistration("http://localhost", DateTime.Now) {IsActive = true});
-                repository.AddOrUpdate(new ServerRegistration("http://www.mydomain.com", DateTime.Now));
-                repository.AddOrUpdate(new ServerRegistration("https://www.another.domain.com", DateTime.Now));
+                repository.AddOrUpdate(new ServerRegistration("http://localhost", "COMPUTER1", DateTime.Now) { IsActive = true });
+                repository.AddOrUpdate(new ServerRegistration("http://www.mydomain.com", "COMPUTER2", DateTime.Now));
+                repository.AddOrUpdate(new ServerRegistration("https://www.another.domain.com", "Computer3", DateTime.Now));
                 unitOfWork.Commit();
             }
 

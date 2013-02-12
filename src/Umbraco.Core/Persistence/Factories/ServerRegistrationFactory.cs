@@ -9,8 +9,8 @@ namespace Umbraco.Core.Persistence.Factories
         #region Implementation of IEntityFactory<Language,LanguageDto>
 
         public ServerRegistration BuildEntity(ServerRegistrationDto dto)
-        {            
-            return new ServerRegistration(dto.Id, dto.Address, dto.DateRegistered, dto.LastNotified);
+        {
+            return new ServerRegistration(dto.Id, dto.ComputerName, dto.Address, dto.DateRegistered, dto.LastNotified);
         }
 
         public ServerRegistrationDto BuildDto(ServerRegistration entity)
@@ -20,7 +20,8 @@ namespace Umbraco.Core.Persistence.Factories
                     Address = entity.ServerAddress,
                     DateRegistered = entity.CreateDate,
                     IsActive = entity.IsActive,
-                    LastNotified = entity.UpdateDate
+                    LastNotified = entity.UpdateDate,
+                    ComputerName = entity.ComputerName
                 };
             if (entity.HasIdentity)
                 dto.Id = short.Parse(entity.Id.ToString(CultureInfo.InvariantCulture));

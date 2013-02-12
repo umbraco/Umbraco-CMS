@@ -16,31 +16,36 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="id"></param>
         /// <param name="serverAddress"></param>
+        /// <param name="computerName"></param>
         /// <param name="createDate"></param>
         /// <param name="updateDate"></param>
-        public ServerRegistration(int id, string serverAddress, DateTime createDate, DateTime updateDate)
+        public ServerRegistration(int id, string serverAddress, string computerName, DateTime createDate, DateTime updateDate)
         {
             UpdateDate = updateDate;
             CreateDate = createDate;
             Key = Id.ToString().EncodeAsGuid();
             Id = id;
             ServerAddress = serverAddress;
+            ComputerName = computerName;
         }
 
         /// <summary>
         /// Creates a new instance for persisting a new item
         /// </summary>
         /// <param name="serverAddress"></param>
+        /// <param name="computerName"></param>
         /// <param name="createDate"></param>
-        public ServerRegistration(string serverAddress, DateTime createDate)
+        public ServerRegistration(string serverAddress, string computerName, DateTime createDate)
         {
             CreateDate = createDate;
             UpdateDate = createDate;
             Key = 0.ToString().EncodeAsGuid();
             ServerAddress = serverAddress;
+            ComputerName = computerName;
         }
 
-        public string ServerAddress { get; set; }        
+        public string ServerAddress { get; set; }
+        public string ComputerName { get; set; }       
         public bool IsActive { get; set; }
     }
 }

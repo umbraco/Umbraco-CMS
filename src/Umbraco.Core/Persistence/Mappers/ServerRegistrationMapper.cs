@@ -26,6 +26,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.ServerAddress, dto => dto.Address);
             CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.CreateDate, dto => dto.DateRegistered);
             CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.UpdateDate, dto => dto.LastNotified);
+            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.ComputerName, dto => dto.ComputerName);
         }
 
         internal override string Map(string propertyName)

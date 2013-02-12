@@ -14,8 +14,16 @@ namespace Umbraco.Core.Models.Rdbms
         public int Id { get; set; }
 
         [Column("address")]
-        [Length(100)]
+        [Length(500)]
         public string Address { get; set; }
+
+        /// <summary>
+        /// A unique column in the database, a computer name must always be unique!
+        /// </summary>
+        [Column("computerName")]
+        [Length(255)]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_computerName")]
+        public string ComputerName { get; set; }
 
         [Column("registeredDate")]
         [Constraint(Default = "getdate()")]
@@ -28,5 +36,7 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("isActive")]
         [Index(IndexTypes.NonClustered)]
         public bool IsActive { get; set; }
+
+
     }
 }
