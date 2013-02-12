@@ -102,28 +102,22 @@ namespace Umbraco.Web.Cache
 
         static void MediaServiceTrashing(IMediaService sender, Core.Events.MoveEventArgs<Core.Models.IMedia> e)
         {
-            DistributedCache.Instance.RemoveMediaCache(e.Entity.Id);            
+            DistributedCache.Instance.RemoveMediaCache(e.Entity);            
         }
 
         static void MediaServiceMoving(IMediaService sender, Core.Events.MoveEventArgs<Core.Models.IMedia> e)
         {
-            DistributedCache.Instance.RefreshMediaCache(e.Entity.Id);
+            DistributedCache.Instance.RefreshMediaCache(e.Entity);
         }
 
         static void MediaServiceDeleting(IMediaService sender, Core.Events.DeleteEventArgs<Core.Models.IMedia> e)
         {
-            foreach (var item in e.DeletedEntities)
-            {
-                DistributedCache.Instance.RemoveMediaCache(item.Id);
-            }
+            DistributedCache.Instance.RemoveMediaCache(e.DeletedEntities.ToArray());
         }
 
         static void MediaServiceSaved(IMediaService sender, Core.Events.SaveEventArgs<Core.Models.IMedia> e)
         {
-            foreach (var item in e.SavedEntities)
-            {
-                DistributedCache.Instance.RefreshMediaCache(item.Id);
-            }
+            DistributedCache.Instance.RefreshMediaCache(e.SavedEntities.ToArray());
         }
 
         static void MemberBeforeDelete(Member sender, DeleteEventArgs e)

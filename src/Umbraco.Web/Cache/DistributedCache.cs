@@ -132,6 +132,23 @@ namespace Umbraco.Web.Cache
                 GetRefresherById(factoryGuid),
                 id);
         }
+        
+        /// <summary>
+        /// Sends a request to all registered load-balanced servers to remove the node specified
+        /// using the specified ICacheRefresher with the guid factoryGuid.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="factoryGuid"></param>
+        /// <param name="getNumericId"></param>
+        /// <param name="instances"></param>
+        public void Remove<T>(Guid factoryGuid, Func<T, int> getNumericId, params T[] instances)
+        {
+            ServerMessengerResolver.Current.Messenger.PerformRemove<T>(
+                ServerRegistrarResolver.Current.Registrar.Registrations,
+                GetRefresherById(factoryGuid),
+                getNumericId,
+                instances);
+        }
 
         private static ICacheRefresher GetRefresherById(Guid uniqueIdentifier)
         {

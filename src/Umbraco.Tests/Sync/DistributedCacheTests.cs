@@ -46,6 +46,19 @@ namespace Umbraco.Tests.Sync
         }
 
         [Test]
+        public void RefreshIntIdFromObject()
+        {
+            for (var i = 0; i < 10; i++)
+            {
+                DistributedCache.Instance.Refresh(
+                    Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"),
+                    x => x.Id,
+                    new TestObjectWithId{Id = i});
+            }
+            Assert.AreEqual(10, ((TestServerMessenger)ServerMessengerResolver.Current.Messenger).IntIdsRefreshed.Count);
+        }
+
+        [Test]
         public void RefreshGuidId()
         {
             for (var i = 0; i < 11; i++)
@@ -76,6 +89,11 @@ namespace Umbraco.Tests.Sync
         }
 
         #region internal test classes
+
+        internal class TestObjectWithId
+        {
+            public int Id { get; set; }
+        }
 
         internal class TestCacheRefresher : ICacheRefresher
         {

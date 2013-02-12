@@ -1,4 +1,5 @@
-﻿using System.Web.Services;
+﻿using System.Collections.Generic;
+using System.Web.Services;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Sync
@@ -73,7 +74,11 @@ namespace Umbraco.Core.Sync
         }
 
         /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://umbraco.org/webservices/RefreshById", RequestNamespace = "http://umbraco.org/webservices/", ResponseNamespace = "http://umbraco.org/webservices/", Use = System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://umbraco.org/webservices/RefreshById", 
+            RequestNamespace = "http://umbraco.org/webservices/", 
+            ResponseNamespace = "http://umbraco.org/webservices/", 
+            Use = System.Web.Services.Description.SoapBindingUse.Literal, 
+            ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
         public void RefreshById(System.Guid uniqueIdentifier, int Id, string Login, string Password)
         {
             this.Invoke("RefreshById", new object[] {
@@ -98,6 +103,40 @@ namespace Umbraco.Core.Sync
         {
             this.EndInvoke(asyncResult);
         }
+
+
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://umbraco.org/webservices/RefreshByIds", 
+            RequestNamespace = "http://umbraco.org/webservices/", 
+            ResponseNamespace = "http://umbraco.org/webservices/", 
+            Use = System.Web.Services.Description.SoapBindingUse.Literal, 
+            ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public void RefreshByIds(System.Guid uniqueIdentifier, string jsonIds, string Login, string Password)
+        {
+            this.Invoke("RefreshByIds", new object[] {
+														uniqueIdentifier,
+														jsonIds,
+														Login,
+														Password});
+        }
+
+        /// <remarks/>
+        public System.IAsyncResult BeginRefreshByIds(System.Guid uniqueIdentifier, string jsonIds, string Login, string Password, System.AsyncCallback callback, object asyncState)
+        {
+            return this.BeginInvoke("RefreshByIds", new object[] {
+																	uniqueIdentifier,
+																	jsonIds,
+																	Login,
+																	Password}, callback, asyncState);
+        }
+
+        /// <remarks/>
+        public void EndRefreshByIds(System.IAsyncResult asyncResult)
+        {
+            this.EndInvoke(asyncResult);
+        }
+
+
 
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://umbraco.org/webservices/RemoveById", RequestNamespace = "http://umbraco.org/webservices/", ResponseNamespace = "http://umbraco.org/webservices/", Use = System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]

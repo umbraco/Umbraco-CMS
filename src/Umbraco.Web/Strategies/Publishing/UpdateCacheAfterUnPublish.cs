@@ -51,7 +51,7 @@ namespace Umbraco.Web.Strategies.Publishing
         /// </summary>
         private void UnPublishSingle(IContent content)
         {
-            DistributedCache.Instance.RemovePageCache(content.Id);
+            DistributedCache.Instance.RemovePageCache(content);
         }
     }
 }
