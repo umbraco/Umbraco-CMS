@@ -20,6 +20,7 @@ namespace Umbraco.Core.Services
         private Lazy<DataTypeService> _dataTypeService;
         private Lazy<FileService> _fileService;
         private Lazy<LocalizationService> _localizationService;
+        private Lazy<ServerRegistrationService> _serverRegistrationService;
 
 		/// <summary>
 		/// Constructor
@@ -47,6 +48,9 @@ namespace Umbraco.Core.Services
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
 
+            if (_serverRegistrationService == null)
+                _serverRegistrationService = new Lazy<ServerRegistrationService>(() => new ServerRegistrationService(provider, repositoryFactory.Value));
+
 			if (_userService == null)
 				_userService = new Lazy<UserService>(() => new UserService(provider, repositoryFactory.Value));
 
@@ -70,6 +74,14 @@ namespace Umbraco.Core.Services
 
             if(_localizationService == null)
 				_localizationService = new Lazy<LocalizationService>(() => new LocalizationService(provider, repositoryFactory.Value));
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ServerRegistrationService"/>
+        /// </summary>
+        internal ServerRegistrationService ServerRegistrationService
+        {
+            get { return _serverRegistrationService.Value; }
         }
 
         /// <summary>

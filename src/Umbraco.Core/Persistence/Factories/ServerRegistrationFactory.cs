@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public ServerRegistration BuildEntity(ServerRegistrationDto dto)
         {
-            return new ServerRegistration(dto.Id, dto.ComputerName, dto.Address, dto.DateRegistered, dto.LastNotified);
+            return new ServerRegistration(dto.Id, dto.Address, dto.ComputerName, dto.DateRegistered, dto.LastNotified);
         }
 
         public ServerRegistrationDto BuildDto(ServerRegistration entity)

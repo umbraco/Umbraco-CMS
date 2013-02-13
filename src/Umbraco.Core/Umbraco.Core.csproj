@@ -676,6 +676,7 @@
     <Compile Include="Services\ServerRegistrationService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Services\UserService.cs" />
+    <Compile Include="Sync\DatabaseServerRegistrar.cs" />
     <Compile Include="Sync\DefaultServerMessenger.cs" />
     <Compile Include="Sync\ICacheRefresher.cs" />
     <Compile Include="Sync\ServerSyncWebServiceClient.cs">

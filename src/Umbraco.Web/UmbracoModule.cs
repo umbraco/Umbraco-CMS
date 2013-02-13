@@ -94,8 +94,14 @@ namespace Umbraco.Web
 			}
 
 			// do not process if this request is not a front-end routable page
-			if (!EnsureUmbracoRoutablePage(umbracoContext, httpContext))
-				return;
+		    var isRoutableAttempt = EnsureUmbracoRoutablePage(umbracoContext, httpContext);
+            //raise event here
+            OnRouteAttempt(new RoutableAttemptEventArgs(isRoutableAttempt.Result, umbracoContext, httpContext));
+            if (!isRoutableAttempt.Success)
+			{
+                return;
+			}
+				
 
 			httpContext.Trace.Write("UmbracoModule", "Umbraco request confirmed");
 
@@ -148,7 +154,7 @@ namespace Umbraco.Web
 		#region Route helper methods
 
 		/// <summary>
-		/// This is a performance tweak to check if this is a .css, .js or .ico file request since
+		/// This is a performance tweak to check if this is a .css, .js or .ico, .jpg, .jpeg, .png, .gif file request since
 		/// .Net will pass these requests through to the module when in integrated mode.
 		/// We want to ignore all of these requests immediately.
 		/// </summary>
@@ -156,7 +162,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		internal bool IsClientSideRequest(Uri url)
 		{
-			var toIgnore = new[] { ".js", ".css", ".ico" };
+			var toIgnore = new[] { ".js", ".css", ".ico", ".png", ".jpg", ".jpeg", ".gif" };
 			return toIgnore.Any(x => Path.GetExtension(url.LocalPath).InvariantEquals(x));
 		}
 
@@ -166,24 +172,34 @@ namespace Umbraco.Web
 		/// <param name="context"></param>
 		/// <param name="httpContext"></param>
 		/// <returns></returns>
-		internal bool EnsureUmbracoRoutablePage(UmbracoContext context, HttpContextBase httpContext)
+        internal Attempt<EnsureRoutableOutcome> EnsureUmbracoRoutablePage(UmbracoContext context, HttpContextBase httpContext)
 		{
 			var uri = context.OriginalRequestUrl;
 
+		    var reason = EnsureRoutableOutcome.IsRoutable;;
+
 			// ensure this is a document request
 			if (!EnsureDocumentRequest(httpContext, uri))
-				return false;
+			{
+			    reason = EnsureRoutableOutcome.NotDocumentRequest;
+			}
 			// ensure Umbraco is ready to serve documents
-			if (!EnsureIsReady(httpContext, uri))
-				return false;
+			else if (!EnsureIsReady(httpContext, uri))
+			{
+			    reason = EnsureRoutableOutcome.NotReady;
+			}                
 			// ensure Umbraco is properly configured to serve documents
-			if (!EnsureIsConfigured(httpContext, uri))
-				return false;
+			else if (!EnsureIsConfigured(httpContext, uri))
+            {
+                reason = EnsureRoutableOutcome.NotConfigured;
+            }                
             // ensure Umbraco has documents to serve
-            if (!EnsureHasContent(context, httpContext))
-                return false;
+            else if (!EnsureHasContent(context, httpContext))
+            {
+                reason = EnsureRoutableOutcome.NoContent;
+            }
 
-			return true;
+            return new Attempt<EnsureRoutableOutcome>(reason == EnsureRoutableOutcome.IsRoutable, reason);
 		}
 
 		/// <summary>
@@ -318,8 +334,7 @@ namespace Umbraco.Web
 		/// Rewrites to the correct Umbraco handler, either WebForms or Mvc
 		/// </summary>		
 		/// <param name="context"></param>
-		/// <param name="currentQuery"></param>
-		/// <param name="engine"> </param>
+        /// <param name="pcr"> </param>
 		private void RewriteToUmbracoHandler(HttpContextBase context, PublishedContentRequest pcr)
 		{
 			// NOTE: we do not want to use TransferRequest even though many docs say it is better with IIS7, turns out this is
@@ -432,5 +447,14 @@ namespace Umbraco.Web
 				i.DisposeIfDisposable();
 			}
 		}
+
+        #region Events
+        internal static event EventHandler<RoutableAttemptEventArgs> RouteAttempt;
+        private void OnRouteAttempt(RoutableAttemptEventArgs args)
+        {
+            if (RouteAttempt != null)
+                RouteAttempt(this, args);
+        } 
+        #endregion
 	}
 }

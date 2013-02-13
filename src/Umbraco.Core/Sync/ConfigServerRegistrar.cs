@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Sync
 {

@@ -351,7 +351,9 @@
     <Compile Include="Routing\ContentFinderByPageIdQuery.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
     <Compile Include="Routing\ContentFinderByNotFoundHandlers.cs" />
+    <Compile Include="Routing\RoutableAttemptEventArgs.cs" />
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
+    <Compile Include="Routing\EnsureRoutableOutcome.cs" />
     <Compile Include="Routing\PublishedContentRequestEngine.cs" />
     <Compile Include="Search\ExamineEvents.cs" />
     <Compile Include="Security\WebSecurity.cs" />
@@ -360,6 +362,7 @@
     <Compile Include="Strategies\Publishing\UpdateCacheAfterPublish.cs" />
     <Compile Include="Strategies\Publishing\UpdateCacheAfterUnPublish.cs" />
     <Compile Include="Strategies\Migrations\EnsureAppsTreesUpdatedOnUpgrade.cs" />
+    <Compile Include="Strategies\ServerRegistrationEventHandler.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="Trees\PartialViewMacrosTree.cs" />
@@ -506,6 +509,7 @@
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\Node.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\Nodes.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\Property.cs" />
+    <Compile Include="Routing\UmbracoRequestEventArgs.cs" />
     <Compile Include="UmbracoUserControl.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
