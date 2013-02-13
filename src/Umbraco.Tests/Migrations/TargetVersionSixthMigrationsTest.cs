@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Migrations
 					typeof (UpdateCmsContentTypeTable),
 					typeof (UpdateCmsContentVersionTable),
 					typeof (UpdateCmsPropertyTypeGroupTable)
-				});
+				}.OrderByDescending(x => x.Name));
 
 			Resolution.Freeze();
 
@@ -44,12 +44,12 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void Can_Find_Targetted_Migrations()
         {
-            var configuredVersion = new Version("4.11.0");
+            var configuredVersion = new Version("4.8.0");
             var targetVersion = new Version("6.0.0");
 	        var foundMigrations = MigrationResolver.Current.Migrations;
 
             var migrationRunner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
-            var migrations = migrationRunner.OrderedUpgradeMigrations(foundMigrations);
+            var migrations = migrationRunner.OrderedUpgradeMigrations(foundMigrations).ToList();
 
             var context = new MigrationContext(DatabaseProviders.SqlServerCE, null);
             foreach (MigrationBase migration in migrations)
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Migrations
                 Console.WriteLine(expression.ToString());
             }
 
-            Assert.That(migrations.Count(), Is.EqualTo(11));
+            Assert.That(migrations.Count(), Is.EqualTo(12));
         }
 
         [TearDown]
