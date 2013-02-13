@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<User, UserDto>(src => src.IsApproved, dto => dto.Disabled);
             CacheMap<User, UserDto>(src => src.NoConsole, dto => dto.NoConsole);
             CacheMap<User, UserDto>(src => src.UserType, dto => dto.Type);
-            CacheMap<User, UserDto>(src => src.Lanuguage, dto => dto.UserLanguage);
+            CacheMap<User, UserDto>(src => src.Language, dto => dto.UserLanguage);
         }
 
         internal override string Map(string propertyName)

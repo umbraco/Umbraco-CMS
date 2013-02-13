@@ -89,7 +89,7 @@ namespace Umbraco.Core.Models
         /// <returns>True if ContentType was removed, otherwise returns False</returns>
         public bool RemoveContentType(string alias)
         {
-            if (!ContentTypeCompositionExists(alias))
+            if (ContentTypeCompositionExists(alias))
             {
                 var contentTypeComposition = ContentTypeComposition.First(x => x.Alias == alias);
                 return _contentTypeComposition.Remove(contentTypeComposition);

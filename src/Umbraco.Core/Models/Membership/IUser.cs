@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models.Membership
         int SessionTimeout { get; set; }
         int StartContentId { get; set; }
         int StartMediaId { get; set; }
-        string Lanuguage { get; set; }
+        string Language { get; set; }
         bool DefaultToLiveEditing { get; set; }
         IEnumerable<string> Applications { get; set; }
         bool NoConsole { get; set; }

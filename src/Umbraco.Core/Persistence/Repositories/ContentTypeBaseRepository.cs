@@ -157,6 +157,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Insert(new ContentType2ContentTypeDto { ParentId = composition.Id, ChildId = entity.Id });
             }
 
+            //TODO U4-1690 - test what happens with property types and groups from content type compositions when a content type is removed
+            //1. Find content based on the current content type: entity.Id
+            //2. Find all property types (and groups?) on the content type that was removed - tracked id
+            //3. Remove properties based on property types from the removed content type where the content ids correspond to those found in step one
+
             //Delete the allowed content type entries before adding the updated collection
             Database.Delete<ContentTypeAllowedContentTypeDto>("WHERE Id = @Id", new { Id = entity.Id });
             //Insert collection of allowed content types
