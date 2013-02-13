@@ -93,6 +93,7 @@ namespace Umbraco.Web.Strategies
         {
             try
             {
+                //var asdf = GetBindings(httpContext);
                 var address = httpContext.Request.Url.GetLeftPart(UriPartial.Authority);
                 applicationContext.Services.ServerRegistrationService.EnsureActive(address);
             }
@@ -101,5 +102,40 @@ namespace Umbraco.Web.Strategies
                 LogHelper.Error<ServerRegistrationEventHandler>("Failed to update server record in database.", e);
             }
         }
+
+        //private static IEnumerable<KeyValuePair<string, string>> GetBindings(HttpContextBase context)
+        //{
+        //    // Get the Site name  
+        //    string siteName = System.Web.Hosting.HostingEnvironment.SiteName;
+
+        //    // Get the sites section from the AppPool.config 
+        //    Microsoft.Web.Administration.ConfigurationSection sitesSection =
+        //        Microsoft.Web.Administration.WebConfigurationManager.GetSection(null, null, "system.applicationHost/sites");
+
+        //    foreach (Microsoft.Web.Administration.ConfigurationElement site in sitesSection.GetCollection())
+        //    {
+        //        // Find the right Site 
+        //        if (String.Equals((string)site["name"], siteName, StringComparison.OrdinalIgnoreCase))
+        //        {
+
+        //            // For each binding see if they are http based and return the port and protocol 
+        //            foreach (Microsoft.Web.Administration.ConfigurationElement binding in site.GetCollection("bindings"))
+        //            {
+        //                string protocol = (string)binding["protocol"];
+        //                string bindingInfo = (string)binding["bindingInformation"];
+
+        //                if (protocol.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+        //                {
+        //                    string[] parts = bindingInfo.Split(':');
+        //                    if (parts.Length == 3)
+        //                    {
+        //                        string port = parts[1];
+        //                        yield return new KeyValuePair<string, string>(protocol, port);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
     }
 }
