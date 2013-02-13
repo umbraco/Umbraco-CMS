@@ -88,7 +88,7 @@ namespace Umbraco.Core.Models.Membership
         #region Implementation of IUser
 
         [DataMember]
-        public string Lanuguage { get; set; }
+        public string Language { get; set; }
         [DataMember]
         public string Permissions { get; set; }
         [DataMember]

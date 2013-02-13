@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Factories
                            IsLockedOut = dto.Disabled,
                            IsApproved = dto.Disabled == false,
                            Email = dto.Email,
-                           Lanuguage = dto.UserLanguage,
+                           Language = dto.UserLanguage,
                            DefaultToLiveEditing = dto.DefaultToLiveEditing,
                            NoConsole = dto.NoConsole,
                            Permissions = dto.DefaultPermissions
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Persistence.Factories
                               Login = entity.Username,
                               NoConsole = entity.NoConsole,
                               Password = entity.Password,
-                              UserLanguage = entity.Lanuguage,
+                              UserLanguage = entity.Language,
                               UserName = entity.Name,
                               Type = short.Parse(entity.UserType.Id.ToString()),
                               DefaultPermissions = entity.Permissions
