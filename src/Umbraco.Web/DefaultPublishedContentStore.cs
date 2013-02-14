@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Xml;
 using Umbraco.Web.Routing;
 using umbraco;
 using umbraco.NodeFactory;
@@ -119,19 +120,20 @@ namespace Umbraco.Web
 			int pos = route.IndexOf('/');
 			string path = pos == 0 ? route : route.Substring(pos);
 			int startNodeId = pos == 0 ? 0 : int.Parse(route.Substring(0, pos));
+            IEnumerable<XPathVariable> vars;
 
-            var xpath = CreateXpathQuery(startNodeId, path, hideTopLevelNode.Value);
+            var xpath = CreateXpathQuery(startNodeId, path, hideTopLevelNode.Value, out vars);
 
 			//check if we can find the node in our xml cache
-			var found = GetXml(umbracoContext).SelectSingleNode(xpath);
+			var found = GetXml(umbracoContext).SelectSingleNode(xpath, vars);
 
 			// if hideTopLevelNodePath is true then for url /foo we looked for /*/foo
 			// but maybe that was the url of a non-default top-level node, so we also
 			// have to look for /foo (see note in NiceUrlProvider).
 			if (found == null && hideTopLevelNode.Value && path.Length > 1 && path.IndexOf('/', 1) < 0)
 			{
-				xpath = CreateXpathQuery(startNodeId, path, false);
-				found = GetXml(umbracoContext).SelectSingleNode(xpath);
+				xpath = CreateXpathQuery(startNodeId, path, false, out vars);
+				found = GetXml(umbracoContext).SelectSingleNode(xpath, vars);
 			}
 
         	return ConvertToDocument(found);
@@ -152,11 +154,17 @@ namespace Umbraco.Web
 
 			if (rootNodeId > 0)
 				xpathBuilder.AppendFormat(XPathStrings.DescendantDocumentById, rootNodeId);
+            XPathVariable var = null;
+            if (alias.Contains('\'') || alias.Contains('"'))
+            {
+                var = new XPathVariable("alias", alias);
+                alias = "$alias";
+            }
 			xpathBuilder.AppendFormat(XPathStrings.DescendantDocumentByAlias, alias);
 
 			var xpath = xpathBuilder.ToString();
 
-			return ConvertToDocument(GetXml(umbracoContext).SelectSingleNode(xpath));
+			return ConvertToDocument(GetXml(umbracoContext).SelectSingleNode(xpath, var));
         }
 
         public bool HasContent(UmbracoContext umbracoContext)
@@ -177,9 +185,10 @@ namespace Umbraco.Web
 
 		static readonly char[] SlashChar = new char[] { '/' };
 
-        protected string CreateXpathQuery(int startNodeId, string path, bool hideTopLevelNodeFromPath)
+        protected string CreateXpathQuery(int startNodeId, string path, bool hideTopLevelNodeFromPath, out IEnumerable<XPathVariable> vars)
         {
             string xpath;
+            vars = null;
 
             if (path == string.Empty || path == "/")
             {
@@ -213,6 +222,7 @@ namespace Umbraco.Web
                 var urlParts = path.Split(SlashChar, StringSplitOptions.RemoveEmptyEntries);
                 var xpathBuilder = new StringBuilder();
                 int partsIndex = 0;
+                List<XPathVariable> varsList = null;
 
                 if (startNodeId == 0)
                 {
@@ -229,7 +239,15 @@ namespace Umbraco.Web
 
                 while (partsIndex < urlParts.Length)
                 {
-					xpathBuilder.AppendFormat(XPathStrings.ChildDocumentByUrlName, urlParts[partsIndex++]);
+                    var part = urlParts[partsIndex++];
+                    if (part.Contains('\'') || part.Contains('"'))
+                    {
+                        varsList = varsList ?? new List<XPathVariable>();
+                        var varName = string.Format("var{0}", partsIndex);
+                        varsList.Add(new XPathVariable(varName, part));
+                        part = "$" + varName;
+                    }
+                     xpathBuilder.AppendFormat(XPathStrings.ChildDocumentByUrlName, part);
                 }
 
                 xpath = xpathBuilder.ToString();
