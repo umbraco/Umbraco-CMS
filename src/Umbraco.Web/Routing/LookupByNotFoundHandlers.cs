@@ -68,8 +68,8 @@ namespace Umbraco.Web.Routing
                         LogHelper.Debug<LookupByNotFoundHandlers>("Lookup '{0}' found node with id={1}.", () => lookup.GetType().FullName, () => docRequest.PublishedContent.Id);
                         if (docRequest.Is404)
                             LogHelper.Debug<LookupByNotFoundHandlers>("Lookup '{0}' set status to 404.", () => lookup.GetType().FullName);
-                        return;
                     }
+                    break;
                 }
 
                 // else it's a legacy handler, run
