@@ -17,10 +17,13 @@ namespace Umbraco.Tests.UmbracoExamine
 	{
 		public const int ProtectedNode = 1142;
 
-		public TestContentService()
+		public TestContentService(string xml = null)
 		{
-            // TestFiles.umbraco was created by Shannon but the file is missing in Mercurial?
-            _xDoc = XDocument.Parse(TestFiles.umbraco);
+            if (xml == null)
+            {
+                xml = TestFiles.umbraco;
+            }
+            _xDoc = XDocument.Parse(xml);
 		}
 
 		#region IContentService Members
@@ -78,7 +81,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
 		public IEnumerable<string> GetAllSystemPropertyNames()
 		{
-			return UmbracoContentIndexer.IndexFieldPolicies.Select(x => x.Key);
+			return UmbracoContentIndexer.IndexFieldPolicies.Select(x => x.Name);
 		}
 
 		#endregion

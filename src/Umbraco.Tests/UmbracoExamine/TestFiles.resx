@@ -124,4 +124,7 @@
   <data name="umbraco" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>testfiles\umbraco.config;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="umbraco_sort" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>testfiles\umbraco-sort.config;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

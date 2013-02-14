@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Examine;
+using Examine.LuceneEngine;
 using UmbracoExamine.DataServices;
 using Examine.LuceneEngine.Config;
 
@@ -16,15 +17,8 @@ namespace UmbracoExamine.Config
 
         private static readonly object Locker = new object();
 
-        /// <summary>
-        /// Convert the indexset to indexerdata.
-        /// This detects if there are no user/system fields specified and if not, uses the data service to look them 
-        /// up and update the in memory IndexSet.
-        /// </summary>
-        /// <param name="set"></param>
-        /// <param name="svc"></param>
-        /// <returns></returns>
-        public static IIndexCriteria ToIndexCriteria(this IndexSet set, IDataService svc)
+        internal static IIndexCriteria ToIndexCriteria(this IndexSet set, IDataService svc,
+            IEnumerable<StaticField> indexFieldPolicies)
         {
             if (set.IndexUserFields.Count == 0)
             {
@@ -34,8 +28,15 @@ namespace UmbracoExamine.Config
                     var userFields = svc.ContentService.GetAllUserPropertyNames();
                     foreach (var u in userFields)
                     {
-                        set.IndexUserFields.Add(new IndexField() { Name = u });
-                    } 
+                        var field = new IndexField() {Name = u};
+                        var policy = indexFieldPolicies.FirstOrDefault(x => x.Name == u);
+                        if (policy != null)
+                        {
+                            field.Type = policy.Type;
+                            field.EnableSorting = policy.EnableSorting;
+                        }
+                        set.IndexUserFields.Add(field);
+                    }
                 }
             }
 
@@ -47,8 +48,15 @@ namespace UmbracoExamine.Config
                     var sysFields = svc.ContentService.GetAllSystemPropertyNames();
                     foreach (var s in sysFields)
                     {
+                        var field = new IndexField() { Name = s };
+                        var policy = indexFieldPolicies.FirstOrDefault(x => x.Name == s);
+                        if (policy != null)
+                        {
+                            field.Type = policy.Type;
+                            field.EnableSorting = policy.EnableSorting;
+                        }
                         set.IndexAttributeFields.Add(new IndexField() { Name = s });
-                    } 
+                    }
                 }
             }
 
@@ -58,6 +66,19 @@ namespace UmbracoExamine.Config
                 set.IncludeNodeTypes.ToList().Select(x => x.Name).ToArray(),
                 set.ExcludeNodeTypes.ToList().Select(x => x.Name).ToArray(),
                 set.IndexParentId);
+        }
+
+        /// <summary>
+        /// Convert the indexset to indexerdata.
+        /// This detects if there are no user/system fields specified and if not, uses the data service to look them 
+        /// up and update the in memory IndexSet.
+        /// </summary>
+        /// <param name="set"></param>
+        /// <param name="svc"></param>
+        /// <returns></returns>
+        public static IIndexCriteria ToIndexCriteria(this IndexSet set, IDataService svc)
+        {
+            return set.ToIndexCriteria(svc, Enumerable.Empty<StaticField>());
         }      
       
     }

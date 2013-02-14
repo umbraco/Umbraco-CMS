@@ -5,6 +5,7 @@ using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using UmbracoExamine;
+using UmbracoExamine.DataServices;
 using UmbracoExamine.PDF;
 
 namespace Umbraco.Tests.UmbracoExamine
@@ -16,33 +17,39 @@ namespace Umbraco.Tests.UmbracoExamine
 	{
 		public static UmbracoContentIndexer GetUmbracoIndexer(
             Lucene.Net.Store.Directory luceneDir, 
-            Analyzer analyzer = null)
+            Analyzer analyzer = null,
+            IDataService dataService = null)
 		{
+            if (dataService == null)
+            {
+                dataService = new TestDataService();
+            }
 
             if (analyzer == null)
             {
                 analyzer = new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29);
             }
 
-			var i = new UmbracoContentIndexer(new IndexCriteria(
-				                                  new[]
-					                                  {
-						                                  new TestIndexField {Name = "id", EnableSorting = true, Type = "Number"},
-						                                  new TestIndexField {Name = "nodeName", EnableSorting = true},
-						                                  new TestIndexField {Name = "updateDate", EnableSorting = true, Type = "DateTime"},
-						                                  new TestIndexField {Name = "writerName"},
-						                                  new TestIndexField {Name = "path"},
-						                                  new TestIndexField {Name = "nodeTypeAlias"},
-						                                  new TestIndexField {Name = "parentID"}
-					                                  },
-				                                  Enumerable.Empty<IIndexField>(),
-				                                  Enumerable.Empty<string>(),
-				                                  new string[] {},
-				                                  -1),
-			                                  luceneDir, //custom lucene directory
-			                                  new TestDataService(),
-                                              analyzer,
-			                                  false);
+		    var i = new UmbracoContentIndexer(new IndexCriteria(
+		                                          //new[]
+		                                          //                                      {
+		                                          //                                          new TestIndexField {Name = "id", EnableSorting = true, Type = "Number"},
+		                                          //                                          new TestIndexField {Name = "nodeName", EnableSorting = true},
+		                                          //                                          new TestIndexField {Name = "updateDate", EnableSorting = true, Type = "DateTime"},
+		                                          //                                          new TestIndexField {Name = "writerName"},
+		                                          //                                          new TestIndexField {Name = "path"},
+		                                          //                                          new TestIndexField {Name = "nodeTypeAlias"},
+		                                          //                                          new TestIndexField {Name = "parentID"}
+		                                          //                                      },                                  
+		                                          Enumerable.Empty<IIndexField>(),
+		                                          Enumerable.Empty<IIndexField>(),
+		                                          Enumerable.Empty<string>(),
+		                                          new string[] {},
+		                                          -1),
+		                                      luceneDir, //custom lucene directory
+                                              dataService,
+		                                      analyzer,
+		                                      false);
 
 			//i.IndexSecondsInterval = 1;
 

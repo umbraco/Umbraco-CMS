@@ -95,5 +95,28 @@ namespace Umbraco.Tests.UmbracoExamine {
                 return ResourceManager.GetString("umbraco", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;!DOCTYPE root[ 
+        ///&lt;!ELEMENT CWS_Contact ANY&gt;
+        ///&lt;!ATTLIST CWS_Contact id ID #REQUIRED&gt;
+        ///&lt;!ELEMENT CWS_EmailAFriend ANY&gt;
+        ///&lt;!ATTLIST CWS_EmailAFriend id ID #REQUIRED&gt;
+        ///&lt;!ELEMENT CWS_EventItem ANY&gt;
+        ///&lt;!ATTLIST CWS_EventItem id ID #REQUIRED&gt;
+        ///&lt;!ELEMENT CWS_Galleries ANY&gt;
+        ///&lt;!ATTLIST CWS_Galleries id ID #REQUIRED&gt;
+        ///&lt;!ELEMENT CWS_Gallery ANY&gt;
+        ///&lt;!ATTLIST CWS_Gallery id ID #REQUIRED&gt;
+        ///&lt;!ELEMENT CWS_Home ANY&gt;
+        ///&lt;!ATTLIST CWS_Home id ID #REQUIRED&gt;
+        ///&lt;!ELEMENT CWS_NewsEventsList ANY&gt;        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string umbraco_sort {
+            get {
+                return ResourceManager.GetString("umbraco_sort", resourceCulture);
+            }
+        }
     }
 }

@@ -16,11 +16,11 @@ namespace Umbraco.Tests.UmbracoExamine
 
 		#region IDataService Members
 
-		public IContentService ContentService { get; private set; }
+		public IContentService ContentService { get; internal set; }
 
-		public ILogService LogService { get; private set; }
+        public ILogService LogService { get; internal set; }
 
-		public IMediaService MediaService { get; private set; }
+        public IMediaService MediaService { get; internal set; }
 
 		public string MapPath(string virtualPath)
 		{
