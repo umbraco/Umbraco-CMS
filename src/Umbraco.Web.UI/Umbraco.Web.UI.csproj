@@ -488,6 +488,7 @@
     </None>
     <None Include="Config\ExamineIndex.Release.config">
       <DependentUpon>ExamineIndex.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Config\Dashboard.Release.config">
       <DependentUpon>Dashboard.config</DependentUpon>
@@ -1904,7 +1905,9 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Config\ExamineSettings.config" />
-    <Content Include="Config\ExamineIndex.config" />
+    <Content Include="Config\ExamineIndex.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Config\scripting.config" />
     <Content Include="Config\Skinning.config" />
     <Content Include="Config\feedProxy.config" />
