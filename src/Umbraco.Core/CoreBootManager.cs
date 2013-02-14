@@ -114,14 +114,14 @@ namespace Umbraco.Core
 			if (_isStarted)
 				throw new InvalidOperationException("The boot manager has already been initialized");
 
-			if (afterStartup != null)
-			{
-				afterStartup(ApplicationContext.Current);	
-			}
-
             //call OnApplicationStarting of each application events handler
             ApplicationEventsResolver.Current.ApplicationEventHandlers
                 .ForEach(x => x.OnApplicationStarting(UmbracoApplication, ApplicationContext));
+
+            if (afterStartup != null)
+            {
+                afterStartup(ApplicationContext.Current);
+            }
 
 			_isStarted = true;
 
@@ -144,14 +144,17 @@ namespace Umbraco.Core
 			//stop the timer and log the output
 			_timer.Dispose();
 
-			if (afterComplete != null)
-			{
-				afterComplete(ApplicationContext.Current);	
-			}
-
             //call OnApplicationStarting of each application events handler
             ApplicationEventsResolver.Current.ApplicationEventHandlers
                 .ForEach(x => x.OnApplicationStarted(UmbracoApplication, ApplicationContext));
+
+            //Now, startup all of our legacy startup handler
+            ApplicationEventsResolver.Current.InstantiateLegacyStartupHanlders();
+
+            if (afterComplete != null)
+            {
+                afterComplete(ApplicationContext.Current);
+            }
 
 			_isComplete = true;
 
