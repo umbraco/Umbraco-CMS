@@ -2,6 +2,7 @@
 using System.Linq;
 using Examine;
 using Examine.LuceneEngine.Providers;
+using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using UmbracoExamine;
 using UmbracoExamine.PDF;
@@ -13,8 +14,15 @@ namespace Umbraco.Tests.UmbracoExamine
 	/// </summary>
 	internal static class IndexInitializer
 	{
-		public static UmbracoContentIndexer GetUmbracoIndexer(Lucene.Net.Store.Directory luceneDir)
+		public static UmbracoContentIndexer GetUmbracoIndexer(
+            Lucene.Net.Store.Directory luceneDir, 
+            Analyzer analyzer = null)
 		{
+
+            if (analyzer == null)
+            {
+                analyzer = new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29);
+            }
 
 			var i = new UmbracoContentIndexer(new IndexCriteria(
 				                                  new[]
@@ -33,7 +41,7 @@ namespace Umbraco.Tests.UmbracoExamine
 				                                  -1),
 			                                  luceneDir, //custom lucene directory
 			                                  new TestDataService(),
-			                                  new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29),
+                                              analyzer,
 			                                  false);
 
 			//i.IndexSecondsInterval = 1;
@@ -42,10 +50,13 @@ namespace Umbraco.Tests.UmbracoExamine
 
 			return i;
 		}
-		public static UmbracoExamineSearcher GetUmbracoSearcher(Lucene.Net.Store.Directory luceneDir)
+        public static UmbracoExamineSearcher GetUmbracoSearcher(Lucene.Net.Store.Directory luceneDir, Analyzer analyzer = null)
 		{
-
-			return new UmbracoExamineSearcher(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29));
+            if (analyzer == null)
+            {
+                analyzer = new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29);
+            }
+            return new UmbracoExamineSearcher(luceneDir, analyzer);
 		}
 		//public static SimpleDataIndexer GetSimpleIndexer(Lucene.Net.Store.Directory luceneDir)
 		//{

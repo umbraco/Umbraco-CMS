@@ -149,8 +149,10 @@ namespace Umbraco.Web
 
 		internal IPublishedContent ConvertFromSearchResult(SearchResult searchResult)
 		{
-			//TODO: Some fields will not be included, that just the way it is unfortunatley until this is fixed:
-			// http://examine.codeplex.com/workitem/10350
+			//NOTE: Some fields will not be included if the config section for the internal index has been 
+            //mucked around with. It should index everything and so the index definition should simply be:
+            // <IndexSet SetName="InternalIndexSet" IndexPath="~/App_Data/TEMP/ExamineIndexes/Internal/" />
+			
 
 			var values = new Dictionary<string, string>(searchResult.Fields);
 			//we need to ensure some fields exist, because of the above issue
