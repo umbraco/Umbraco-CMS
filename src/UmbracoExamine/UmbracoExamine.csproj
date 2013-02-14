@@ -117,6 +117,7 @@
     <Compile Include="DataServices\UmbracoContentService.cs" />
     <Compile Include="DataServices\UmbracoMediaService.cs" />
     <Compile Include="IndexTypes.cs" />
+    <Compile Include="LegacyClasses.cs" />
     <Compile Include="LegacyLibrary.cs" />
     <Compile Include="LoggingLevel.cs" />
     <Compile Include="UmbracoEventManager.cs" />
