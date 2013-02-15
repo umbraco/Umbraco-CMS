@@ -17,8 +17,6 @@ namespace Umbraco.Tests.Models
         [SetUp]
         public override void Initialize()
         {
-            Resolution.Reset();
-
             //this ensures its reset
             PluginManager.Current = new PluginManager();
 
@@ -29,7 +27,6 @@ namespace Umbraco.Tests.Models
                     typeof(tinyMCE3dataType).Assembly
 				};
 
-            DataTypesResolver.Reset();
             DataTypesResolver.Current = new DataTypesResolver(
                 () => PluginManager.Current.ResolveDataTypes());
 

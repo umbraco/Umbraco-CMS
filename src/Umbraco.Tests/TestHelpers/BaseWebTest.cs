@@ -32,8 +32,7 @@ namespace Umbraco.Tests.TestHelpers
         public virtual void Initialize()
         {
 			TestHelper.SetupLog4NetForTests();
-            Resolution.Reset();
-            RepositoryResolver.Reset();
+            
 			TestHelper.InitializeContentDirectories();
 
 			string path = TestHelper.CurrentAssemblyDirectory;
@@ -84,11 +83,7 @@ namespace Umbraco.Tests.TestHelpers
             //called so that inheritors can do stuff before freezing.
             OnFreezing();
 
-            Resolution.Freeze();
-
-			//if (RequiresDbSetup)
-			//	TestHelper.InitializeDatabase();
-			
+            Resolution.Freeze();			
         }
 
         protected virtual void OnFreezing()
@@ -111,7 +106,6 @@ namespace Umbraco.Tests.TestHelpers
 				SqlCeContextGuardian.CloseBackgroundConnection();
 	        }
 	        
-
 			ApplicationContext.Current = null;
 			RepositoryResolver.Reset();
 

@@ -75,8 +75,6 @@ namespace Umbraco.Tests.PublishedContent
 
 			UmbracoContext.Current = umbContext;
 			PublishedMediaStoreResolver.Current = new PublishedMediaStoreResolver(new DefaultPublishedMediaStore());
-
-			UmbracoSettings.ForceSafeAliases = true;
 		}
 
 		public override void TearDown()
