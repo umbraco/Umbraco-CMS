@@ -130,6 +130,9 @@ namespace Umbraco.Web
             ApplicationEventsResolver.Current.ApplicationEventHandlers
                 .ForEach(x => x.OnApplicationStarted(_umbracoApplication, ApplicationContext));
 
+            //Now, startup all of our legacy startup handler
+            ApplicationEventsResolver.Current.InstantiateLegacyStartupHanlders();
+
             // we're ready to serve content!
             ApplicationContext.IsReady = true;
 
