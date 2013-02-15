@@ -68,8 +68,8 @@ namespace Umbraco.Web.Routing
                         LogHelper.Debug<ContentFinderByNotFoundHandlers>("Finder '{0}' found node with id={1}.", () => finder.GetType().FullName, () => docRequest.PublishedContent.Id);
                         if (docRequest.Is404)
                             LogHelper.Debug<ContentFinderByNotFoundHandlers>("Finder '{0}' set status to 404.", () => finder.GetType().FullName);
-                        return;
                     }
+                    break;
                 }
 
                 // else it's a legacy handler, run
