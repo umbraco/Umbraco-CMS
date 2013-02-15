@@ -232,7 +232,7 @@ namespace Umbraco.Web.Mvc
 			var def = new RouteDefinition
 				{
 					ControllerName = defaultControllerName,
-					Controller = new RenderMvcController(),
+					Controller = new RenderMvcController(UmbracoContext),
 					PublishedContentRequest = publishedContentRequest,
 					ActionName = ((Route)requestContext.RouteData.Route).Defaults["action"].ToString(),
 					HasHijackedRoute = false

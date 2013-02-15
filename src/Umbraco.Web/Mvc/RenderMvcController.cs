@@ -22,6 +22,12 @@ namespace Umbraco.Web.Mvc
 		{
 			ActionInvoker = new RenderActionInvoker();
 		}
+
+        public RenderMvcController(UmbracoContext umbracoContext)
+            : base(umbracoContext)
+        {
+            
+        }
 		
 		private PublishedContentRequest _publishedContentRequest;
 

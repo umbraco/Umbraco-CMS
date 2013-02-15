@@ -38,6 +38,7 @@ namespace Umbraco.Tests.Routing
 		public override void TearDown()
 		{
 			base.TearDown();
+		    UmbracoContext.Current = null;
 			RouteTable.Routes.Clear();
 			System.Configuration.ConfigurationManager.AppSettings.Set("umbracoPath", "");
 			SurfaceControllerResolver.Reset();
@@ -97,7 +98,7 @@ namespace Umbraco.Tests.Routing
             var template = CreateTemplate(templateName);
             var route = RouteTable.Routes["Umbraco_default"];
 			var routeData = new RouteData() {Route = route};
-			var routingContext = GetRoutingContext("~/dummy-page", template.Id, routeData);
+			var routingContext = GetRoutingContext("~/dummy-page", template.Id, routeData, true);
 			var docRequest = new PublishedContentRequest(routingContext.UmbracoContext.CleanedUmbracoUrl, routingContext)
 				{
 					PublishedContent = routingContext.PublishedContentStore.GetDocumentById(routingContext.UmbracoContext, 1172), 
