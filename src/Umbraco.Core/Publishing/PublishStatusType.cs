@@ -3,6 +3,9 @@ namespace Umbraco.Core.Publishing
     /// <summary>
     /// A status type of the result of publishing a content item
     /// </summary>
+    /// <remarks>
+    /// Anything less than 10 = Success!
+    /// </remarks>
     internal enum PublishStatusType
     {
         /// <summary>

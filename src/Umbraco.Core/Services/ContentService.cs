@@ -493,11 +493,14 @@ namespace Umbraco.Core.Services
 	    /// <returns>True if publishing succeeded, otherwise False</returns>
 	    public bool PublishWithChildren(IContent content, int userId = 0)
 	    {
-            var result = PublishWithChildrenDo(content, userId);
+            var result = PublishWithChildrenDo(content, userId, true);
             
             //This used to just return false only when the parent content failed, otherwise would always return true so we'll
             // do the same thing for the moment
-            return result.Single(x => x.Result.ContentItem.Id == content.Id).Success;
+	        if (!result.Any(x => x.Result.ContentItem.Id == content.Id))
+	            return false;
+
+	        return result.Single(x => x.Result.ContentItem.Id == content.Id).Success;	        
 	    }
 
 	    /// <summary>
@@ -1335,15 +1338,19 @@ namespace Umbraco.Core.Services
                 publishStatus.StatusType = PublishStatusType.FailedContentInvalid;
             }
 
-	        var internalStrategy = (PublishingStrategy) _publishingStrategy;
-            //Publish and then update the database with new status
-            var publishResult = internalStrategy.PublishInternal(content, userId);
-            //set our publish status to the publish result 
-	        publishStatus.StatusType = publishResult.Result.StatusType;
-	        
-            //we are successfully published if the flag is success (and for good measure we'll check the publish result)
-	        bool published = publishStatus.StatusType == PublishStatusType.Success && publishResult.Success;
-
+            //if we're still successful, then publish using the strategy
+            if (publishStatus.StatusType == PublishStatusType.Success)
+            {
+                var internalStrategy = (PublishingStrategy)_publishingStrategy;
+                //Publish and then update the database with new status
+                var publishResult = internalStrategy.PublishInternal(content, userId);
+                //set the status type to the publish result
+                publishStatus.StatusType = publishResult.Result.StatusType;
+            }
+            
+            //we are successfully published if our publishStatus is still Successful
+	        bool published = publishStatus.StatusType == PublishStatusType.Success;
+            
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateContentRepository(uow))
             {

@@ -88,6 +88,7 @@ namespace Umbraco.Core.Publishing
         /// </param>        
         /// <returns></returns>
         /// <remarks>
+        /// 
         /// This method becomes complex once we start to be able to cancel events or stop publishing a content item in any way because if a
         /// content item is not published then it's children shouldn't be published either. This rule will apply for the following conditions:
         /// * If a document fails to be published, do not proceed to publish it's children if:
@@ -97,6 +98,13 @@ namespace Umbraco.Core.Publishing
         /// In order to do this, we will order the content by level and begin by publishing each item at that level, then proceed to the next
         /// level and so on. If we detect that the above rule applies when the document publishing is cancelled we'll add it to the list of 
         /// parentsIdsCancelled so that it's children don't get published.
+        /// 
+        /// Its important to note that all 'root' documents included in the list *will* be published regardless of the rules mentioned
+        /// above (unless it is invalid)!! By 'root' documents we are referring to documents in the list with the minimum value for their 'level'. 
+        /// In most cases the 'root' documents will only be one document since under normal circumstance we only publish one document and 
+        /// its children. The reason we have to do this is because if a user is publishing a document and it's children, it is implied that
+        /// the user definitely wants to publish it even if it has never been published before.
+        /// 
         /// </remarks>
         internal IEnumerable<Attempt<PublishStatus>> PublishWithChildrenInternal(
             IEnumerable<IContent> content, int userId, bool includeUnpublishedDocuments = true)
@@ -118,11 +126,19 @@ namespace Umbraco.Core.Publishing
             // content that is not published. We'll set the status to "AlreadyPublished"
             statuses.AddRange(fetchedContent.Where(x => x.Published)
                 .Select(x => new Attempt<PublishStatus>(true, new PublishStatus(x, PublishStatusType.SuccessAlreadyPublished))));
-            
+
+            int? firstLevel = null;
+
             //group by level and iterate over each level (sorted ascending)
             var levelGroups = fetchedContent.GroupBy(x => x.Level);
             foreach (var level in levelGroups.OrderBy(x => x.Key))
             {
+                //set the first level flag, used to ensure that all documents at the first level will 
+                //be published regardless of the rules mentioned in the remarks.
+                if (!firstLevel.HasValue)
+                {
+                    firstLevel = level.Key;    
+                }
 
                 /* Only update content thats not already been published - we want to loop through
                  * all unpublished content to write skipped content (expired and awaiting release) to log.
@@ -139,8 +155,8 @@ namespace Umbraco.Core.Publishing
                         continue;
                     }
 
-                    //Check if this item has never been published
-                    if (!includeUnpublishedDocuments && !item.HasPublishedVersion())
+                    //Check if this item has never been published (and that it is not at the root level)
+                    if (item.Level != firstLevel && !includeUnpublishedDocuments && !item.HasPublishedVersion())
                     {
                         //this item does not have a published version and the flag is set to not include them
                         parentsIdsCancelled.Add(item.Id);

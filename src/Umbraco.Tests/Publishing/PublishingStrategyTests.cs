@@ -160,7 +160,9 @@ namespace Umbraco.Tests.Publishing
             //be published
             var result = strategy.PublishWithChildrenInternal(
                 ServiceContext.ContentService.GetDescendants(_homePage).Concat(new[] {_homePage}), 0, false);
-            Assert.AreEqual(0, result.Count());
+            //all of them will be SuccessAlreadyPublished unless the unpublished one gets included, in that case
+            //we'll have a 'Success' result which we don't want.
+            Assert.AreEqual(0, result.Count(x => x.Result.StatusType == PublishStatusType.Success));
         }
 
         [Test]
@@ -185,9 +187,11 @@ namespace Umbraco.Tests.Publishing
             //be published
             var result = strategy.PublishWithChildrenInternal(
                 ServiceContext.ContentService.GetDescendants(_homePage).Concat(new[] { _homePage }), 0, true);
-            Assert.AreEqual(1, result.Count());
-            Assert.IsTrue(result.First().Success);
-            Assert.IsTrue(result.First().Result.ContentItem.Published);
+            //there will be 4 here but only one "Success" the rest will be "SuccessAlreadyPublished"
+            Assert.AreEqual(1, result.Count(x => x.Result.StatusType == PublishStatusType.Success));
+            Assert.AreEqual(3, result.Count(x => x.Result.StatusType == PublishStatusType.SuccessAlreadyPublished));
+            Assert.IsTrue(result.Single(x => x.Result.StatusType == PublishStatusType.Success).Success);
+            Assert.IsTrue(result.Single(x => x.Result.StatusType == PublishStatusType.Success).Result.ContentItem.Published);
         }
 
         [NUnit.Framework.Ignore]
