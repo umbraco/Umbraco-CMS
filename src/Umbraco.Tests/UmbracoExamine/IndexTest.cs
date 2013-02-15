@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Examine;
 using Examine.LuceneEngine;
@@ -161,7 +162,12 @@ namespace Umbraco.Tests.UmbracoExamine
 			collector = new AllHitsCollector(false, true);
 			s = (IndexSearcher)_searcher.GetSearcher(); //make sure the searcher is up do date.
 			s.Search(query, collector);
-			Assert.AreEqual(9, collector.Count);
+            //var ids = new List<string>();
+            //for (var i = 0; i < collector.Count;i++)
+            //{
+            //    ids.Add(s.Doc(collector.GetDocId(i)).GetValues("__NodeId")[0]);
+            //}
+			Assert.AreEqual(20, collector.Count);
 		}
 
 		/// <summary>

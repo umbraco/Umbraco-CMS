@@ -5,6 +5,7 @@ using System.Security;
 using System.Text;
 using System.IO;
 using Examine;
+using Examine.LuceneEngine.Config;
 using UmbracoExamine;
 using Lucene.Net.Analysis;
 using Examine.SearchCriteria;
