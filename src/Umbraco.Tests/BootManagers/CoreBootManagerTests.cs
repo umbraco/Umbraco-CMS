@@ -6,6 +6,7 @@ using System.Web;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.ObjectResolution;
+using umbraco.interfaces;
 
 namespace Umbraco.Tests.BootManagers
 {
@@ -53,17 +54,32 @@ namespace Umbraco.Tests.BootManagers
             protected override void InitializeApplicationEventsResolver()
             {
                 //create an empty resolver so we can add our own custom ones (don't type find)
-                ApplicationEventsResolver.Current = new ApplicationEventsResolver(
-                    Enumerable.Empty<Type>())
+                ApplicationEventsResolver.Current = new ApplicationEventsResolver(new Type[]
+                    {
+                        typeof(LegacyStartupHandler),
+                        typeof(TestApplicationEventHandler)
+                    })
                     {
                         CanResolveBeforeFrozen = true
                     };
-                ApplicationEventsResolver.Current.AddType<TestApplicationEventHandler>();
             }
 
             protected override void InitializeResolvers()
             {
                 //Do nothing as we don't want to initialize all resolvers in this test
+            }
+        }
+
+        /// <summary>
+        /// Test legacy startup handler
+        /// </summary>
+        public class LegacyStartupHandler : IApplicationStartupHandler
+        {
+            public static bool Initialized = false;
+
+            public LegacyStartupHandler()
+            {
+                Initialized = true;
             }
         }
 
@@ -100,6 +116,30 @@ namespace Umbraco.Tests.BootManagers
             Assert.IsTrue(TestApplicationEventHandler.Initialized);
             Assert.IsTrue(TestApplicationEventHandler.Starting);
             Assert.IsTrue(TestApplicationEventHandler.Started);
+        }
+
+        [Test]
+        public void Ensure_Legacy_Startup_Handlers_Not_Started_Until_Complete()
+        {
+            EventHandler starting = (sender, args) =>
+                {
+                    Assert.IsTrue(TestApplicationEventHandler.Initialized);
+                    Assert.IsTrue(TestApplicationEventHandler.Starting);
+                    Assert.IsFalse(LegacyStartupHandler.Initialized);
+                };
+            EventHandler started = (sender, args) =>
+                {
+                    Assert.IsTrue(TestApplicationEventHandler.Started);
+                    Assert.IsTrue(LegacyStartupHandler.Initialized);
+                };
+            TestApp.ApplicationStarting += starting;
+            TestApp.ApplicationStarted += started;
+
+            _testApp.StartApplication(_testApp, new EventArgs());
+
+            TestApp.ApplicationStarting -= starting;
+            TestApp.ApplicationStarting -= started;
+
         }
 
     }
