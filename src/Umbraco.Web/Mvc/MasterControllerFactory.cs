@@ -45,6 +45,23 @@ namespace Umbraco.Web.Mvc
 			       	: base.CreateController(requestContext, controllerName);
 		}
 
+        /// <summary>
+        /// Retrieves the controller type for the specified name and request context.
+        /// </summary>
+        /// 
+        /// <returns>
+        /// The controller type.
+        /// </returns>
+        /// <param name="requestContext">The context of the HTTP request, which includes the HTTP context and route data.</param>
+        /// <param name="controllerName">The name of the controller.</param>
+        internal Type GetControllerTypeInternal(RequestContext requestContext, string controllerName)
+        {
+            var factory = _slaveFactories.Factories.FirstOrDefault(x => x.CanHandle(requestContext));
+            return factory != null
+                    ? factory.GetControllerType(requestContext, controllerName)
+                    : base.GetControllerType(requestContext, controllerName);
+        }
+
 		/// <summary>
 		/// Releases the specified controller.
 		/// </summary>

@@ -42,7 +42,7 @@ namespace Umbraco.Web.Mvc
 		/// <param name="requestContext"></param>
 		/// <param name="controllerName"></param>
 		/// <returns></returns>
-		protected Type GetControllerType(RequestContext requestContext, string controllerName)
+		public Type GetControllerType(RequestContext requestContext, string controllerName)
 		{
 			return _innerFactory.GetControllerType(requestContext, controllerName);
 		}

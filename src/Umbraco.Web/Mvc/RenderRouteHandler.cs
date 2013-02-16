@@ -4,6 +4,7 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.SessionState;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Configuration;
@@ -184,7 +185,7 @@ namespace Umbraco.Web.Mvc
 			requestContext.RouteData.Values["action"] = postedInfo.ActionName;
 			requestContext.RouteData.DataTokens["area"] = postedInfo.Area;
 
-			IHttpHandler handler = new MvcHandler(requestContext);
+            IHttpHandler handler = new UmbracoMvcHandler(requestContext);
 
 			//ensure the controllerType is set if found, meaning it is a plugin, not locally declared
 			if (postedInfo.Area != standardArea)
@@ -232,57 +233,53 @@ namespace Umbraco.Web.Mvc
 			var def = new RouteDefinition
 				{
 					ControllerName = defaultControllerName,
-					Controller = new RenderMvcController(UmbracoContext),
+					ControllerType = typeof(RenderMvcController),
 					PublishedContentRequest = publishedContentRequest,
 					ActionName = ((Route)requestContext.RouteData.Route).Defaults["action"].ToString(),
 					HasHijackedRoute = false
 				};
 
+            //check that a template is defined), if it doesn't and there is a hijacked route it will just route
+            // to the index Action
+            if (publishedContentRequest.HasTemplate)
+            {
+                //the template Alias should always be already saved with a safe name.
+                //if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
+                // with the action name attribute.
+                var templateName = publishedContentRequest.TemplateAlias.Split('.')[0].ToSafeAlias();
+                def.ActionName = templateName;
+            }
+
 			//check if there's a custom controller assigned, base on the document type alias.
-			var controller = _controllerFactory.CreateController(requestContext, publishedContentRequest.PublishedContent.DocumentTypeAlias);
-
-
+            var controllerType = ((MasterControllerFactory)_controllerFactory).GetControllerTypeInternal(requestContext, publishedContentRequest.PublishedContent.DocumentTypeAlias);
+            
 			//check if that controller exists
-			if (controller != null)
-			{
+		    if (controllerType != null)
+		    {
+                //ensure the controller is of type 'RenderMvcController'
+		        if (controllerType.IsSubclassOf(typeof (RenderMvcController)))
+		        {
+		            //set the controller and name to the custom one
+		            def.ControllerType = controllerType;
+		            def.ControllerName = ControllerExtensions.GetControllerName(controllerType);
+		            if (def.ControllerName != defaultControllerName)
+		            {
+		                def.HasHijackedRoute = true;
+		            }
+		        }
+		        else
+		        {
+		            LogHelper.Warn<RenderRouteHandler>(
+		                "The current Document Type {0} matches a locally declared controller of type {1}. Custom Controllers for Umbraco routing must inherit from '{2}'.",
+		                () => publishedContentRequest.PublishedContent.DocumentTypeAlias,
+		                () => controllerType.FullName,
+		                () => typeof (RenderMvcController).FullName);
+		            //exit as we cannnot route to the custom controller, just route to the standard one.
+		            return def;
+		        }
+		    }
 
-				//ensure the controller is of type 'RenderMvcController'
-				if (controller is RenderMvcController)
-				{
-					//set the controller and name to the custom one
-					def.Controller = (ControllerBase)controller;
-					def.ControllerName = ControllerExtensions.GetControllerName(controller.GetType());
-					if (def.ControllerName != defaultControllerName)
-					{
-						def.HasHijackedRoute = true;	
-					}
-				}
-				else
-				{
-					LogHelper.Warn<RenderRouteHandler>(
-						"The current Document Type {0} matches a locally declared controller of type {1}. Custom Controllers for Umbraco routing must inherit from '{2}'.",
-						() => publishedContentRequest.PublishedContent.DocumentTypeAlias,
-						() => controller.GetType().FullName,
-						() => typeof(RenderMvcController).FullName);
-					//exit as we cannnot route to the custom controller, just route to the standard one.
-					return def;
-				}
-
-				//check that a template is defined), if it doesn't and there is a hijacked route it will just route
-				// to the index Action
-				if (publishedContentRequest.HasTemplate)
-				{
-					//the template Alias should always be already saved with a safe name.
-                    //if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
-                    // with the action name attribute.
-				    var templateName = publishedContentRequest.TemplateAlias.Split('.')[0].ToSafeAlias();
-					def.ActionName = templateName;
-				}
-	
-			}
-			
-
-			return def;
+		    return def;
 		}
 
 		internal IHttpHandler GetHandlerOnMissingTemplate(PublishedContentRequest pcr)
@@ -365,11 +362,19 @@ namespace Umbraco.Web.Mvc
 				requestContext.RouteData.Values["action"] = routeDef.ActionName;
 			}
 
+            // Set the session state requirements
+            requestContext.HttpContext.SetSessionStateBehavior(GetSessionStateBehavior(requestContext, routeDef.ControllerName));
+
 			// reset the friendly path so in the controllers and anything occuring after this point in time,
 			//the URL is reset back to the original request.
 			requestContext.HttpContext.RewritePath(UmbracoContext.OriginalRequestUrl.PathAndQuery);
 
-			return new MvcHandler(requestContext);
+            return new UmbracoMvcHandler(requestContext);
 		}
+
+        private SessionStateBehavior GetSessionStateBehavior(RequestContext requestContext, string controllerName)
+        {
+            return _controllerFactory.GetControllerSessionBehavior(requestContext, controllerName);
+        }
 	}
 }

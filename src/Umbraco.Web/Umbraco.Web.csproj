@@ -303,6 +303,7 @@
     <Compile Include="Mvc\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="Mvc\UmbracoAuthorizedController.cs" />
     <Compile Include="Mvc\UmbracoController.cs" />
+    <Compile Include="Mvc\UmbracoMvcHandler.cs" />
     <Compile Include="Mvc\UmbracoViewPage.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="ExamineExtensions.cs" />
