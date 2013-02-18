@@ -10,6 +10,7 @@ using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -109,9 +110,10 @@ namespace Umbraco.Core.Models
                 return;
 
             bool supportsResizing = false;
+            var numberedFolder = MediaSubFolders.Current.Increment();
             string fileName = UmbracoSettings.UploadAllowDirectories
-                                              ? Path.Combine(property.Id.ToString(), name)
-                                              : property.Id + "-" + name;
+                                              ? Path.Combine(numberedFolder.ToString(CultureInfo.InvariantCulture), name)
+                                              : numberedFolder + "-" + name;
             string extension = Path.GetExtension(name);
 
             var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();

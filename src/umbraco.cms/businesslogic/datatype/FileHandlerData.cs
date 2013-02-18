@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Web;
 using System.Xml;
 using Umbraco.Core.IO;
+using Umbraco.Core.Media;
 using umbraco.cms.businesslogic.Files;
 using umbraco.cms.businesslogic.property;
 
@@ -55,9 +57,10 @@ namespace umbraco.cms.businesslogic.datatype
                     // handle upload
                     if (name != String.Empty)
                     {
+                        var numberedFolder = MediaSubFolders.Current.Increment();
                         string fileName = UmbracoSettings.UploadAllowDirectories
-                                              ? Path.Combine(PropertyId.ToString(), name)
-                                              : PropertyId + "-" + name;
+                                              ? Path.Combine(numberedFolder.ToString(CultureInfo.InvariantCulture), name)
+                                              : numberedFolder + "-" + name;
 
                         //fileName = Path.Combine(SystemDirectories.Media, fileName);
                         UmbracoFile um = UmbracoFile.Save(fileStream, fileName);

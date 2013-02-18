@@ -139,6 +139,7 @@
     <Compile Include="Events\SendToPublishEventArgs.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="MacroPropertyTypeResolver.cs" />
+    <Compile Include="Media\MediaSubFolders.cs" />
     <Compile Include="Models\ContentBase.cs" />
     <Compile Include="Models\ContentExtensions.cs" />
     <Compile Include="Enum.cs" />
