@@ -133,7 +133,7 @@ namespace Umbraco.Web
             //Create the REST/web/script service routes
             var webServiceRoutes = RouteTable.Routes.MapRoute(
                 "Umbraco_web_services",
-                "Umbraco/RestServices/{controller}/{action}/{id}",
+                umbracoPath + "/RestServices/{controller}/{action}/{id}",
                 new { controller = "SaveFileController", action = "Index", id = UrlParameter.Optional },
                 //look in this namespace for controllers
                 new string[] { "Umbraco.Web.WebServices" }
