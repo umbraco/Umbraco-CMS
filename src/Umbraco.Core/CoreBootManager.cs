@@ -215,6 +215,8 @@ namespace Umbraco.Core
 
 		    ShortStringHelperResolver.Current = new ShortStringHelperResolver(
 		        new LegacyShortStringHelper());
+		    UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(
+		        typeof (DefaultUrlSegmentProvider));
 		}
 	}
 }
