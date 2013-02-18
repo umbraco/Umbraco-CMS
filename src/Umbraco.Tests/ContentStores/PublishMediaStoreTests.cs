@@ -22,7 +22,7 @@ namespace Umbraco.Tests.ContentStores
 			base.Initialize();
             
             var currDir = new DirectoryInfo(TestHelper.CurrentAssemblyDirectory);
-            File.Copy(
+            System.IO.File.Copy(
                 currDir.Parent.Parent.Parent.GetDirectories("Umbraco.Web.UI")
                     .First()
                     .GetDirectories("config").First()
