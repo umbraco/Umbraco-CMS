@@ -224,8 +224,8 @@ namespace umbraco
 
         private static readonly object _xsltExtensionsSyncLock = new object();
 
-        private static readonly Lazy<CacheDependency> _xsltExtensionsDependency =
-            new Lazy<CacheDependency>(() => new CacheDependency(_xsltExtensionsConfig));
+        private static readonly Func<CacheDependency> _xsltExtensionsDependency =
+            () => new CacheDependency(_xsltExtensionsConfig);
 
         /// <summary>
         /// Creates an empty macro object.
@@ -925,7 +925,7 @@ namespace umbraco
                 _xsltExtensionsCacheKey, _xsltExtensionsSyncLock,
                 CacheItemPriority.NotRemovable, // NH 4.7.1, Changing to NotRemovable
                 null, // no refresh action
-                _xsltExtensionsDependency.Value, // depends on the .config file
+                _xsltExtensionsDependency(), // depends on the .config file
                 TimeSpan.FromDays(1), // expires in 1 day (?)
                 GetXsltExtensionsImpl);
         }
