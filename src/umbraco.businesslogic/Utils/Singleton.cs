@@ -20,6 +20,7 @@ namespace umbraco.BusinessLogic.Utils
     ///	}
     /// </summary>
     /// <typeparam name="T">Any class that implements default constructor</typeparam>
+    [Obsolete("Creating singletons should be done manually using the many different techiques available in .Net")]
     public static class Singleton<T> where T : new()
     {
     	public static T Instance
