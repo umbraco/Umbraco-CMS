@@ -308,16 +308,18 @@ namespace Umbraco.Web
 			Mandate.ParameterNotNull(surfaceType, "surfaceType");
 
 			var area = Umbraco.Core.Configuration.GlobalSettings.UmbracoMvcArea;
-			var surfaceController = SurfaceControllerResolver.Current.SurfaceControllers
-				.SingleOrDefault(x => x.Metadata.ControllerType == surfaceType);
+			
+            var surfaceController = SurfaceControllerResolver.Current.RegisteredSurfaceControllers
+				.SingleOrDefault(x => x == surfaceType);
 			if (surfaceController == null)
 				throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
-			if (!surfaceController.Metadata.AreaName.IsNullOrWhiteSpace())
+		    var metaData = PluginController.GetMetadata(surfaceController);
+            if (!metaData.AreaName.IsNullOrWhiteSpace())
 			{
 				//set the area to the plugin area
-				area = surfaceController.Metadata.AreaName;
+                area = metaData.AreaName;
 			}
-			return html.BeginUmbracoForm(action, surfaceController.Metadata.ControllerName, area, additionalRouteVals, htmlAttributes);
+            return html.BeginUmbracoForm(action, metaData.ControllerName, area, additionalRouteVals, htmlAttributes);
 		}
 
 		/// <summary>
