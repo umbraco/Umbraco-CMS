@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Models;
+using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.editorControls.tinyMCE3;
@@ -33,6 +34,9 @@ namespace Umbraco.Tests.Models
             DataTypesResolver.Current = new DataTypesResolver(
                 () => PluginManager.Current.ResolveDataTypes());
 
+            UrlSegmentProviderResolver.Reset();
+            UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(typeof(DefaultUrlSegmentProvider));
+
             base.Initialize();
         }
 
@@ -43,6 +47,7 @@ namespace Umbraco.Tests.Models
 
             //reset the app context
             DataTypesResolver.Reset();
+			UrlSegmentProviderResolver.Reset();
         }
         [Test]
         public void Can_Generate_Xml_Representation_Of_Media()
@@ -55,6 +60,7 @@ namespace Umbraco.Tests.Models
             ServiceContext.MediaService.Save(media, 0);
 
             var nodeName = media.ContentType.Alias.ToSafeAliasWithForcingCheck();
+            var urlName = media.GetUrlSegment();
 
             // Act
             XElement element = media.ToXml();
@@ -69,7 +75,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(media.CreateDate.ToString("s"), (string)element.Attribute("createDate"));
             Assert.AreEqual(media.UpdateDate.ToString("s"), (string)element.Attribute("updateDate"));
             Assert.AreEqual(media.Name, (string)element.Attribute("nodeName"));
-            Assert.AreEqual(media.Name.FormatUrl().ToLower(), (string)element.Attribute("urlName"));
+            Assert.AreEqual(urlName, (string)element.Attribute("urlName"));
             Assert.AreEqual(media.Path, (string)element.Attribute("path"));
             Assert.AreEqual("", (string)element.Attribute("isDoc"));
             Assert.AreEqual(media.ContentType.Id.ToString(), (string)element.Attribute("nodeType"));
