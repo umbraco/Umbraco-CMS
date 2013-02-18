@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
@@ -26,6 +27,17 @@ namespace Umbraco.Tests
 
 			var routingContext = GetRoutingContext("/test", 1234);
 			UmbracoContext.Current = routingContext.UmbracoContext;
+
+            var currDir = new DirectoryInfo(TestHelper.CurrentAssemblyDirectory);
+            File.Copy(
+                currDir.Parent.Parent.Parent.GetDirectories("Umbraco.Web.UI")
+                    .First()
+                    .GetDirectories("config").First()
+                    .GetFiles("umbracoSettings.Release.config").First().FullName,
+                Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
+                true);
+
+            Core.Configuration.UmbracoSettings.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
 		}
 
 		public override void TearDown()
