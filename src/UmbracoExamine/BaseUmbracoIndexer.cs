@@ -92,15 +92,7 @@ namespace UmbracoExamine
         /// <param name="name"></param>
         /// <param name="config"></param>
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
-        {
-
-            //We need to check if we actually can initialize, if not then don't continue
-            if (!CanInitialize())
-            {
-                return;
-            }
-
-
+        {           
             if (config["dataService"] != null && !string.IsNullOrEmpty(config["dataService"]))
             {
                 //this should be a fully qualified type
@@ -146,26 +138,72 @@ namespace UmbracoExamine
 
         #endregion
 
-        //public override void RebuildIndex()
+
+        ///// <summary>
+        ///// Override to check if we can actually initialize.
+        ///// </summary>
+        ///// <returns></returns>
+        ///// <remarks>
+        ///// This check is required since the base examine lib will try to check this method on app startup. If the app
+        ///// is not ready then we need to deal with it otherwise the base class will throw exceptions since we've bypassed initialization.
+        ///// </remarks>
+        //public override bool IndexExists()
         //{
-        //    //we can make the indexing rebuilding operation happen asynchronously in a web context by calling an http handler.
-        //    //we should only do this when async='true', the current request is running in a web context and the current user is authenticated.
-        //    if (RunAsync && HttpContext.Current != null)
-        //    {
-        //        if (UmbracoEnsuredPage.CurrentUser != null)
-        //        {
-        //            RebuildIndexAsync();    
-        //        }
-        //        else
-        //        {
-        //            //don't rebuild, user is not authenticated and if async is set then we shouldn't be generating the index files non-async either
-        //        }
-        //    }
-        //    else
-        //    {
-        //        base.RebuildIndex();
-        //    }
+        //    return base.IndexExists();
         //}
+
+        /// <summary>
+        /// override to check if we can actually initialize. 
+        /// </summary>
+        /// <remarks>
+        /// This check is required since the base examine lib will try to rebuild on startup
+        /// </remarks>
+        public override void RebuildIndex()
+        {
+            if (CanInitialize())
+            {
+                base.RebuildIndex();
+            }
+        }
+
+        /// <summary>
+        /// override to check if we can actually initialize. 
+        /// </summary>
+        /// <remarks>
+        /// This check is required since the base examine lib will try to rebuild on startup
+        /// </remarks>
+        public override void IndexAll(string type)
+        {
+            if (CanInitialize())
+            {
+                base.IndexAll(type);
+            }
+        }
+
+        public override void ReIndexNode(XElement node, string type)
+        {
+            if (CanInitialize())
+            {
+                if (!SupportedTypes.Contains(type))
+                    return;
+
+                base.ReIndexNode(node, type);
+            }
+        }
+
+        /// <summary>
+        /// override to check if we can actually initialize. 
+        /// </summary>
+        /// <remarks>
+        /// This check is required since the base examine lib will try to rebuild on startup
+        /// </remarks>
+        public override void DeleteFromIndex(string nodeId)
+        {
+            if (CanInitialize())
+            {
+                base.DeleteFromIndex(nodeId);
+            }            
+        }
 
         #region Protected
 
@@ -185,49 +223,6 @@ namespace UmbracoExamine
             }
             return true;
         }
-
-        /////<summary>
-        ///// Calls a web request in a worker thread to rebuild the indexes
-        /////</summary>
-        //protected void RebuildIndexAsync()
-        //{
-        //    if (HttpContext.Current != null && UmbracoEnsuredPage.CurrentUser != null)
-        //    {
-        //        var handler = VirtualPathUtility.ToAbsolute(ExamineHandlerPath);
-        //        var fullPath = HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority) + handler + "?index=" + Name;
-        //        var userContext = BasePage.umbracoUserContextID;
-        //        var userContextCookie = HttpContext.Current.Request.Cookies["UserContext"];
-        //        var thread = new Thread(() =>
-        //        {
-        //            var request = (HttpWebRequest)WebRequest.Create(fullPath);
-        //            request.CookieContainer = new CookieContainer();
-        //            request.CookieContainer.Add(new Cookie("UserContext", userContext, userContextCookie.Path,
-        //                                                   string.IsNullOrEmpty(userContextCookie.Domain) ? "localhost" : userContextCookie.Domain));
-        //            request.Timeout = Timeout.Infinite;
-        //            request.UseDefaultCredentials = true;
-        //            request.Method = "GET";
-        //            request.Proxy = null;
-
-        //            HttpWebResponse response;
-        //            try
-        //            {
-        //                response = (HttpWebResponse)request.GetResponse();
-
-        //                if (response.StatusCode != HttpStatusCode.OK)
-        //                {
-        //                    Log.Add(LogTypes.Custom, -1, "[UmbracoExamine] ExamineHandler request ended with an error: " + response.StatusDescription);
-        //                }
-        //            }
-        //            catch (WebException ex)
-        //            {
-        //                Log.Add(LogTypes.Custom, -1, "[UmbracoExamine] ExamineHandler request threw an exception: " + ex.Message);
-        //            }
-
-        //        }) { IsBackground = true, Name = "ExamineAsyncHandler" };
-
-        //        thread.Start();
-        //    }
-        //}
 
         /// <summary>
         /// Ensures that the node being indexed is of a correct type and is a descendent of the parent id specified.
@@ -254,15 +249,7 @@ namespace UmbracoExamine
                 IndexAll(t);
             }
         }
-
-        public override void ReIndexNode(XElement node, string type)
-        {
-            if (!SupportedTypes.Contains(type))
-                return;
-
-            base.ReIndexNode(node, type);
-        }
-
+        
         /// <summary>
         /// Builds an xpath statement to query against Umbraco data for the index type specified, then
         /// initiates the re-indexing of the data matched.

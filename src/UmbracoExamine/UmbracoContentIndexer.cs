@@ -119,13 +119,7 @@ namespace UmbracoExamine
         /// </exception>
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
-
-            //We need to check if we actually can initialize, if not then don't continue
-            if (!CanInitialize())
-            {
-                return;
-            }
-
+           
             //check if there's a flag specifying to support unpublished content,
             //if not, set to false;
             bool supportUnpublished;
@@ -340,9 +334,20 @@ namespace UmbracoExamine
         /// </summary>
         /// <param name="indexSet"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// If we cannot initialize we will pass back empty indexer data since we cannot read from the database
+        /// </remarks>
         protected override IIndexCriteria GetIndexerData(IndexSet indexSet)
         {
-            return indexSet.ToIndexCriteria(DataService);
+            if (CanInitialize())
+            {
+                return indexSet.ToIndexCriteria(DataService);
+            }
+            else
+            {
+                return base.GetIndexerData(indexSet);
+            }
+            
         }
 
         /// <summary>

@@ -31,8 +31,27 @@ namespace UmbracoExamine
         {
         }
 
+        private string _name;
+
+        /// <summary>
+        /// we override name because we need to manually set it if !CanInitialize() 
+        /// since we cannot call base.Initialize in that case.
+        /// </summary>
+        public override string Name
+        {
+            get
+            {
+                return _name;
+            }
+        }
+
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
+            if (name == null) throw new ArgumentNullException("name");
+
+            //ensure name is set
+            _name = name;
+
             //We need to check if we actually can initialize, if not then don't continue
             if (!CanInitialize())
             {
