@@ -1,6 +1,8 @@
 using System;
 using System.Configuration;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
@@ -13,6 +15,19 @@ namespace Umbraco.Tests.Routing
 		public override void Initialize()
 		{
 			base.Initialize();
+
+            var currDir = new DirectoryInfo(TestHelper.CurrentAssemblyDirectory);
+            File.Copy(
+                currDir.Parent.Parent.Parent.GetDirectories("Umbraco.Web.UI")
+                    .First()
+                    .GetDirectories("config").First()
+                    .GetFiles("umbracoSettings.Release.config").First().FullName,
+                Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
+                true);
+
+            Core.Configuration.UmbracoSettings.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
+		
+
 			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
 		}
 
@@ -42,13 +57,13 @@ namespace Umbraco.Tests.Routing
 
 			var samples = new Dictionary<int, string> {
 				{ 1046, "/home" },
-				{ 1173, "/home/sub1" },
-				{ 1174, "/home/sub1/sub2" },
-				{ 1176, "/home/sub1/sub-3" },
-				{ 1177, "/home/sub1/custom-sub-1" },
-				{ 1178, "/home/sub1/custom-sub-2" },
-				{ 1175, "/home/sub-2" },
-				{ 1172, "/test-page" }
+				{ 1173, "/home/sub1/" },
+				{ 1174, "/home/sub1/sub2/" },
+				{ 1176, "/home/sub1/sub-3/" },
+				{ 1177, "/home/sub1/custom-sub-1/" },
+				{ 1178, "/home/sub1/custom-sub-2/" },
+				{ 1175, "/home/sub-2/" },
+				{ 1172, "/test-page/" }
 			};
 
 			foreach (var sample in samples)
@@ -57,7 +72,7 @@ namespace Umbraco.Tests.Routing
 				Assert.AreEqual(sample.Value, result);
 			}
 
-			var randomSample = new KeyValuePair<int, string>(1177, "/home/sub1/custom-sub-1");
+			var randomSample = new KeyValuePair<int, string>(1177, "/home/sub1/custom-sub-1/");
 			for (int i = 0; i < 5; i++)
 			{
 				var result = routingContext.NiceUrlProvider.GetNiceUrl(randomSample.Key);
