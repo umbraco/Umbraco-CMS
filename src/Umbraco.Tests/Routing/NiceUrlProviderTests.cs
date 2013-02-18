@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Routing
 				Assert.AreEqual(sample.Value, result);
 			}
 
-			var randomSample = new KeyValuePair<int, string>(1177, "/home/sub1/custom-sub-1");
+			var randomSample = new KeyValuePair<int, string>(1177, "/home/sub1/custom-sub-1/");
 			for (int i = 0; i < 5; i++)
 			{
 				var result = routingContext.NiceUrlProvider.GetNiceUrl(randomSample.Key);
