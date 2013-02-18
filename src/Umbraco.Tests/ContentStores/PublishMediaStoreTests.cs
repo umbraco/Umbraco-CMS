@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml;
 using Examine;
@@ -19,7 +20,19 @@ namespace Umbraco.Tests.ContentStores
 		public override void Initialize()
 		{
 			base.Initialize();
-			//we're going to use the same initialization as the PublishedMediaTests
+            
+            var currDir = new DirectoryInfo(TestHelper.CurrentAssemblyDirectory);
+            File.Copy(
+                currDir.Parent.Parent.Parent.GetDirectories("Umbraco.Web.UI")
+                    .First()
+                    .GetDirectories("config").First()
+                    .GetFiles("umbracoSettings.Release.config").First().FullName,
+                Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
+                true);
+
+            Core.Configuration.UmbracoSettings.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
+		
+            //we're going to use the same initialization as the PublishedMediaTests
 			PublishedMediaTests.DoInitialization(GetUmbracoContext("/test", 1234));			
 		}
 
