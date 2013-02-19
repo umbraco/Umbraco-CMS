@@ -16,9 +16,9 @@ namespace Umbraco.Core.Strings
         void Freeze();
 
         /// <summary>
-        /// Gets the JavaScript code defining functions safeAlias(alias) and isSafeAlias(alias).
+        /// Gets the JavaScript code defining client-side short string services.
         /// </summary>
-        string CleanStringForSafeAliasJavaScriptCode { get; }
+        string GetShortStringServicesJavaScript(string controllerPath);
 
         /// <summary>
         /// Cleans a string to produce a string that can safely be used in an alias.

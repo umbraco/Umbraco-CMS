@@ -34,5 +34,15 @@ namespace Umbraco.Core
             return result.TrimEnd("PublishDocument");
         }
 
+        /// <summary>
+        /// Returns the base path (not including the 'action') of the MVC controller "CoreStringsController"
+        /// </summary>
+        /// <param name="url">The url helper.</param>
+        /// <returns>The base path of the controller.</returns>
+        public static string GetCoreStringsControllerPath(this UrlHelper url)
+        {
+            var result = url.Action("ToSafeAlias", "CoreStrings", new { area = GlobalSettings.UmbracoMvcArea });
+            return result.TrimEnd("ToSafeAlias");
+        }
 	}
 }

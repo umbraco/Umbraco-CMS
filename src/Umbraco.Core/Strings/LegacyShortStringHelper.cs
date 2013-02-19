@@ -35,12 +35,12 @@ namespace Umbraco.Core.Strings
 
         #endregion
 
-        #region JavaScript
+        #region Short string services JavaScript
 
-        const string CsfaJsValidCharacters = "_-abcdefghijklmnopqrstuvwxyz1234567890";
-        const string CsfaJsInvalidFirstCharacters = "01234567890";
+        const string SssjsValidCharacters = "_-abcdefghijklmnopqrstuvwxyz1234567890";
+        const string SssjsInvalidFirstCharacters = "01234567890";
 
-        private const string CsfsaJsFormat = @"
+        private const string SssjsFormat = @"
 var UMBRACO_FORCE_SAFE_ALIAS = {0};
 var UMBRACO_FORCE_SAFE_ALIAS_VALIDCHARS = '{1}';
 var UMBRACO_FORCE_SAFE_ALIAS_INVALID_FIRST_CHARS = '{2}';
@@ -88,15 +88,12 @@ function isValidAlias(alias) {{
 ";
 
         /// <summary>
-        /// Gets the JavaScript code defining functions safeAlias(alias) and isSafeAlias(alias).
+        /// Gets the JavaScript code defining client-side short string services.
         /// </summary>
-        public string CleanStringForSafeAliasJavaScriptCode
+        public string GetShortStringServicesJavaScript(string controllerPath)
         {
-            get
-            {
-                return string.Format(CsfsaJsFormat,
-                    UmbracoSettings.ForceSafeAliases ? "true" : "false", CsfaJsValidCharacters, CsfaJsInvalidFirstCharacters);
-            }
+            return string.Format(SssjsFormat,
+                UmbracoSettings.ForceSafeAliases ? "true" : "false", SssjsValidCharacters, SssjsInvalidFirstCharacters);
         }
 
         #endregion

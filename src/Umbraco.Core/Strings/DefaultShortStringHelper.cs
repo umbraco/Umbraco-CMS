@@ -140,61 +140,50 @@ namespace Umbraco.Core.Strings
 
         #region JavaScript
 
-        const string CsfaJsValidCharacters = "_abcdefghijklmnopqrstuvwxyz1234567890";
-        const string CsfaJsInvalidFirstCharacters = "01234567890_";
-
-        private const string CsfsaJsFormat = @"
+        private const string SssjsFormat = @"
 var UMBRACO_FORCE_SAFE_ALIAS = {0};
-var UMBRACO_FORCE_SAFE_ALIAS_VALIDCHARS = '{1}';
-var UMBRACO_FORCE_SAFE_ALIAS_INVALID_FIRST_CHARS = '{2}';
+var UMBRACO_FORCE_SAFE_ALIAS_URL = '{1}';
+var UMBRACO_FORCE_SAFE_ALIAS_TIMEOUT = 666;
+var UMBRACO_FORCE_SAFE_ALIAS_TIMEOUTS = {{ }};
 
-function safeAlias(alias) {{
-    if (UMBRACO_FORCE_SAFE_ALIAS) {{
-        var safeAlias = '';
-        var aliasLength = alias.length;
-        for (var i = 0; i < aliasLength; i++) {{
-            currentChar = alias.substring(i, i + 1);
-            if (UMBRACO_FORCE_SAFE_ALIAS_VALIDCHARS.indexOf(currentChar.toLowerCase()) > -1) {{
-                // check for camel (if previous character is a space, we'll upper case the current one
-                if (safeAlias == '' && UMBRACO_FORCE_SAFE_ALIAS_INVALID_FIRST_CHARS.indexOf(currentChar.toLowerCase()) > 0) {{ 
-                    currentChar = '';
-                }} else {{
-                    // first char should always be lowercase (camel style)
-                    if (safeAlias.length == 0)
-                        currentChar = currentChar.toLowerCase();
-
-                    if (i < aliasLength - 1 && safeAlias != '' && alias.substring(i - 1, i) == ' ')
-                        currentChar = currentChar.toUpperCase();
-
-                    safeAlias += currentChar;
-                }}
-            }}
-        }}
-
-        alias = safeAlias;
-    }}
-    return alias;
+function getSafeAliasFromServer(value, callback) {{
+    $.getJSON(UMBRACO_FORCE_SAFE_ALIAS_URL + 'ToSafeAlias?value=' + encodeURIComponent(value), function(json) {{
+        if (json.alias) {{ callback(json.alias); }}
+    }});
 }}
 
 function getSafeAlias(id, value, immediate, callback) {{
-    callback(safeAlias(value));
+    if (!UMBRACO_FORCE_SAFE_ALIAS) {{
+        callback(value);
+        return;
+    }}
+    if (UMBRACO_FORCE_SAFE_ALIAS_TIMEOUTS[id]) clearTimeout(UMBRACO_FORCE_SAFE_ALIAS_TIMEOUTS[id]);
+    UMBRACO_FORCE_SAFE_ALIAS_TIMEOUTS[id] = setTimeout(function() {{
+        UMBRACO_FORCE_SAFE_ALIAS_TIMEOUTS[id] = null;
+        getSafeAliasFromServer(value, function(alias) {{ callback(alias); }});
+    }}, UMBRACO_FORCE_SAFE_ALIAS_TIMEOUT);
 }}
 
 function validateSafeAlias(id, value, immediate, callback) {{
-    callback(value == safeAlias(value));
+    if (!UMBRACO_FORCE_SAFE_ALIAS) {{
+        callback(true);
+        return;
+    }}
+    if (UMBRACO_FORCE_SAFE_ALIAS_TIMEOUTS[id]) clearTimeout(UMBRACO_FORCE_SAFE_ALIAS_TIMEOUTS[id]);
+    UMBRACO_FORCE_SAFE_ALIAS_TIMEOUTS[id] = setTimeout(function() {{
+        UMBRACO_FORCE_SAFE_ALIAS_TIMEOUTS[id] = null;
+        getSafeAliasFromServer(value, function(alias) {{ callback(value.toLowerCase() == alias.toLowerCase()); }});
+    }}, UMBRACO_FORCE_SAFE_ALIAS_TIMEOUT);
 }}
 ";
 
         /// <summary>
-        /// Gets the JavaScript code defining functions safeAlias(alias) and isSafeAlias(alias).
+        /// Gets the JavaScript code defining client-side short string services.
         /// </summary>
-        public string CleanStringForSafeAliasJavaScriptCode
+        public string GetShortStringServicesJavaScript(string controllerPath)
         {
-            get
-            {
-                return string.Format(CsfsaJsFormat,
-                    UmbracoSettings.ForceSafeAliases ? "true" : "false", CsfaJsValidCharacters, CsfaJsInvalidFirstCharacters);
-            }
+                return string.Format(SssjsFormat,
+                    UmbracoSettings.ForceSafeAliases ? "true" : "false", controllerPath);
         }
 
         #endregion

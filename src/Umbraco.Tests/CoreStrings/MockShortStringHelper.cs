@@ -12,7 +12,7 @@ namespace Umbraco.Tests.CoreStrings
 
         public bool IsFrozen { get; private set; }
 
-        public string CleanStringForSafeAliasJavaScriptCode { get { return "CSFSAJS"; } }
+        public string GetShortStringServicesJavaScript(string controllerPath) { return "SSSJS"; }
 
         public string CleanStringForSafeAlias(string text)
         {

@@ -36,7 +36,8 @@ function checkAlias(aliasId) {
     input.blur(function(event) {
         var value = $(this).val();
         getSafeAlias(aliasId, value, true, function (alias) {
-            input.val(alias);
+            if (value.toLowerCase() != alias.toLowerCase())
+                input.val(alias);
             input.removeClass('aliasValidationError');
         });
     });

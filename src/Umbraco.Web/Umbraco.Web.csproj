@@ -868,13 +868,6 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\TemplateSkinning.aspx.designer.cs">
       <DependentUpon>TemplateSkinning.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\js\UmbracoCasingRules.aspx.cs">
-      <DependentUpon>UmbracoCasingRules.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\js\UmbracoCasingRules.aspx.designer.cs">
-      <DependentUpon>UmbracoCasingRules.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\CanvasClientDependencyProvider.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -1740,6 +1733,7 @@
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
     <Compile Include="WebServices\BulkPublishController.cs" />
+    <Compile Include="WebServices\CoreStringsController.cs" />
     <Compile Include="WebServices\FolderBrowserService.cs" />
     <Compile Include="WebServices\SaveFileController.cs" />
     <Content Include="umbraco.presentation\umbracobase\readme.txt" />
@@ -1771,7 +1765,6 @@
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx" />
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx" />
     <Content Include="umbraco.presentation\umbraco\members\MemberSearch.ascx" />
-    <Content Include="umbraco.presentation\umbraco\js\UmbracoCasingRules.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\Preview.aspx" />
     <Content Include="umbraco.presentation\umbraco\controls\passwordChanger.ascx" />
     <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx">
