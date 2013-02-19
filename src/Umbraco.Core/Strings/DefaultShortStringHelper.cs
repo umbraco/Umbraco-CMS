@@ -43,9 +43,6 @@ namespace Umbraco.Core.Strings
         //    ValidStringCharacters = ValidStringCharactersSource.ToCharArray();
         //}
 
-        public DefaultShortStringHelper()
-        { }
-
         #endregion
 
         #region Configuration

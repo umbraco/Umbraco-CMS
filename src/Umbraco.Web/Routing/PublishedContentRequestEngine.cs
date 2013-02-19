@@ -168,7 +168,7 @@ namespace Umbraco.Web.Routing
 			LogHelper.Debug<PublishedContentRequestEngine>("{0}Uri=\"{1}\"", () => tracePrefix, () => _pcr.Uri);
 
 			// try to find a domain matching the current request
-			var domainAndUri = DomainHelper.DomainMatch(Domain.GetDomains(), _pcr.Uri, false);
+			var domainAndUri = DomainHelper.DomainMatch(Domain.GetDomains().ToArray(), _pcr.Uri, false);
 
 			// handle domain
 			if (domainAndUri != null)
@@ -218,7 +218,7 @@ namespace Umbraco.Web.Routing
 			var nodePath = _pcr.PublishedContent.Path;
 			LogHelper.Debug<PublishedContentRequestEngine>("{0}Path=\"{1}\"", () => tracePrefix, () => nodePath);
 			var rootNodeId = _pcr.HasDomain ? _pcr.Domain.RootNodeId : (int?)null;
-			var domain = DomainHelper.LookForWildcardDomain(Domain.GetDomains(), nodePath, rootNodeId);
+			var domain = DomainHelper.LookForWildcardDomain(Domain.GetDomains().ToArray(), nodePath, rootNodeId);
 
 			if (domain != null)
 			{

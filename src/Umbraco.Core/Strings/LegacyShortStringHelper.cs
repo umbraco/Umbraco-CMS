@@ -118,7 +118,7 @@ function isSafeAlias(alias) {{
                     // check for camel (if previous character is a space, we'll upper case the current one
                     if (safeString.Length == 0 && invalidFirstCharacters.Contains(currentChar.ToLower()))
                     {
-                        currentChar = "";
+                        //currentChar = "";
                     }
                     else
                     {

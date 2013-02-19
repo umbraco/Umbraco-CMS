@@ -1,9 +1,6 @@
 ﻿﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Umbraco.Core.ObjectResolution;
+﻿using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Strings
 {
@@ -35,7 +32,7 @@ namespace Umbraco.Core.Strings
         /// </summary>
         public IEnumerable<IUrlSegmentProvider> Providers
         {
-            get { return this.Values; }
+            get { return Values; }
         }
     }
 }
