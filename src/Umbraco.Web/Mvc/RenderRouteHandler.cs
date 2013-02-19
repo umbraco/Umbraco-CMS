@@ -176,8 +176,6 @@ namespace Umbraco.Web.Mvc
 		/// <param name="routeDefinition">The original route definition that would normally be used to route if it were not a POST</param>
 		private IHttpHandler HandlePostedValues(RequestContext requestContext, PostedDataProxyInfo postedInfo, RouteDefinition routeDefinition)
 		{
-			var standardArea = Umbraco.Core.Configuration.GlobalSettings.UmbracoMvcArea;
-
 			//set the standard route values/tokens
 			requestContext.RouteData.Values["controller"] = postedInfo.ControllerName;
 			requestContext.RouteData.Values["action"] = postedInfo.ActionName;
@@ -185,7 +183,7 @@ namespace Umbraco.Web.Mvc
 			IHttpHandler handler = new MvcHandler(requestContext);
 
 			//ensure the controllerType is set if found, meaning it is a plugin, not locally declared
-			if (!postedInfo.Area.InvariantEquals(standardArea))
+			if (!postedInfo.Area.IsNullOrWhiteSpace())
 			{
 				//requestContext.RouteData.Values["controllerType"] = postedInfo.ControllerType;
 				//find the other data tokens for this route and merge... things like Namespace will be included here
