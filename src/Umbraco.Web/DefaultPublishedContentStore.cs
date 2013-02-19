@@ -29,7 +29,8 @@ namespace Umbraco.Web
 			public string DescendantDocumentById { get; private set; }
 			public string DescendantDocumentByAlias { get; private set; }
 			public string ChildDocumentByUrlName { get; private set; }
-			public string RootDocumentWithLowestSortOrder { get; private set; }
+            public string ChildDocumentByUrlNameVar { get; private set; }
+            public string RootDocumentWithLowestSortOrder { get; private set; }
 
 			public XPathStringsDefinition(int version)
 			{
@@ -46,6 +47,7 @@ namespace Umbraco.Web
 							+ " or contains(concat(',',translate(data [@alias='umbracoUrlAlias'], ' ', ''),','),',/{0},')"
 							+ ")]";
 						ChildDocumentByUrlName = "/node [@urlName='{0}']";
+						ChildDocumentByUrlNameVar = "/node [@urlName=${0}]";
 						RootDocumentWithLowestSortOrder = "/root/node [not(@sortOrder > ../node/@sortOrder)][1]";
 						break;
 
@@ -58,6 +60,7 @@ namespace Umbraco.Web
 							+ " or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',/{0},')"
 							+ ")]";
 						ChildDocumentByUrlName = "/* [@isDoc and @urlName='{0}']";
+						ChildDocumentByUrlNameVar = "/* [@isDoc and @urlName=${0}]";
 						RootDocumentWithLowestSortOrder = "/root/* [@isDoc and not(@sortOrder > ../* [@isDoc]/@sortOrder)][1]";
 						break;
 
@@ -245,12 +248,18 @@ namespace Umbraco.Web
                         varsList = varsList ?? new List<XPathVariable>();
                         var varName = string.Format("var{0}", partsIndex);
                         varsList.Add(new XPathVariable(varName, part));
-                        part = "$" + varName;
+                        xpathBuilder.AppendFormat(XPathStrings.ChildDocumentByUrlNameVar, varName);
                     }
-                     xpathBuilder.AppendFormat(XPathStrings.ChildDocumentByUrlName, part);
+                    else
+                    {
+                        xpathBuilder.AppendFormat(XPathStrings.ChildDocumentByUrlName, part);
+                        
+                    }
                 }
 
                 xpath = xpathBuilder.ToString();
+                if (varsList != null)
+                    vars = varsList.ToArray();
             }
 
             return xpath;
