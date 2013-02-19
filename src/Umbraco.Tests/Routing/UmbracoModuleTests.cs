@@ -57,9 +57,9 @@ namespace Umbraco.Tests.Routing
 			//create the module
 			_module = new UmbracoModule();
 
-			ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", Umbraco.Core.Configuration.GlobalSettings.CurrentVersion);
-			ConfigurationManager.AppSettings.Set("umbracoReservedPaths", "~/umbraco,~/install/");
-			ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd");
+		    SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
+		    SettingsForTests.ReservedPaths = "~/umbraco,~/install/";
+            SettingsForTests.ReservedUrls = "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd";
 
 			//create the not found handlers config
 			using (var sw = File.CreateText(Umbraco.Core.IO.IOHelper.MapPath(Umbraco.Core.IO.SystemFiles.NotFoundhandlersConfig, false)))
@@ -78,11 +78,6 @@ namespace Umbraco.Tests.Routing
 			base.TearDown();
 
 			_module.DisposeIfDisposable();
-			
-			//reset the app config
-			ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", "");
-			ConfigurationManager.AppSettings.Set("umbracoReservedPaths", "");
-			ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "");		
 		}
 
 		// do not test for /base here as it's handled before EnsureUmbracoRoutablePage is called

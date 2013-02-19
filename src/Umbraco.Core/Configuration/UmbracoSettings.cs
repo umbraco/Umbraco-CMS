@@ -25,11 +25,8 @@ namespace Umbraco.Core.Configuration
 	/// </summary>
 	internal class UmbracoSettings
 	{
-        private static bool GetKeyWithOverride(string key, bool defaultValue, bool? overrideValue)
+        private static bool GetKeyValue(string key, bool defaultValue)
         {
-            if (overrideValue.HasValue)
-                return overrideValue.Value;
-
             bool value;
             string stringValue = GetKey(key);
 
@@ -40,11 +37,8 @@ namespace Umbraco.Core.Configuration
             return defaultValue;
         }
 
-        private static int GetKeyWithOverride(string key, int defaultValue, int? overrideValue)
+        private static int GetKeyValue(string key, int defaultValue)
         {
-            if (overrideValue.HasValue)
-                return overrideValue.Value;
-
             int value;
             string stringValue = GetKey(key);
 
@@ -404,7 +398,7 @@ namespace Umbraco.Core.Configuration
 			get
 			{
                 // default: false
-                return GetKeyWithOverride("/settings/requestHandler/useDomainPrefixes", false, _useDomainPrefixes);
+                return _useDomainPrefixes ?? GetKeyValue("/settings/requestHandler/useDomainPrefixes", false);
 			}
 			internal set
 			{
@@ -425,7 +419,7 @@ namespace Umbraco.Core.Configuration
 			{
                 // default: false
                 return GlobalSettings.UseDirectoryUrls
-                    && GetKeyWithOverride("/settings/requestHandler/addTrailingSlash", false, _addTrailingSlash);
+                    && (_addTrailingSlash ?? GetKeyValue("/settings/requestHandler/addTrailingSlash", false));
 			}
 			internal set
 			{
@@ -648,7 +642,7 @@ namespace Umbraco.Core.Configuration
 			get
 			{
                 // default: true
-                return GetKeyWithOverride("/settings/content/ForceSafeAliases", true, _forceSafeAliases);
+                return _forceSafeAliases ?? GetKeyValue("/settings/content/ForceSafeAliases", true);
 			}
 			internal set
 			{
@@ -667,7 +661,7 @@ namespace Umbraco.Core.Configuration
             get
             {
                 // default: false
-                return GetKeyWithOverride("/settings/web.routing/@trySkipIisCustomErrors", false, _trySkipIisCustomErrors);
+                return _trySkipIisCustomErrors ?? GetKeyValue("/settings/web.routing/@trySkipIisCustomErrors", false);
             }
             internal set
             {
@@ -705,7 +699,7 @@ namespace Umbraco.Core.Configuration
 			get
 			{
                 // default: 1800
-                return GetKeyWithOverride("/settings/content/UmbracoLibraryCacheDuration", 1800, _umbracoLibraryCacheDuration);
+                return _umbracoLibraryCacheDuration ?? GetKeyValue("/settings/content/UmbracoLibraryCacheDuration", 1800);
 			}
 			internal set
             {
@@ -1068,11 +1062,11 @@ namespace Umbraco.Core.Configuration
 			get
 			{
                 // default: true
-                return GetKeyWithOverride("/settings/content/UseLegacyXmlSchema", true, _useLegacySchema);
+                return _useLegacySchema ?? GetKeyValue("/settings/content/UseLegacyXmlSchema", true);
 			}
 			internal set
 			{
-				// used for unit  testing
+				// used for unit testing
 				_useLegacySchema = value;
 			}
 		}

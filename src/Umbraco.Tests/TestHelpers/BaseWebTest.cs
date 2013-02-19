@@ -23,7 +23,9 @@ namespace Umbraco.Tests.TestHelpers
 		[SetUp]
 		public virtual void Initialize()
 		{
-			TestHelper.SetupLog4NetForTests();
+            SettingsForTests.Reset();
+
+			TestHelper.SetupLog4NetForTests();   
 
 			AppDomain.CurrentDomain.SetData("DataDirectory", TestHelper.CurrentAssemblyDirectory);
 
@@ -52,7 +54,7 @@ namespace Umbraco.Tests.TestHelpers
 
 			Cache.ClearAllCache();
 
-			UmbracoSettings.ResetSetters();
+			SettingsForTests.Reset();
 		}	
 
 		/// <summary>

@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Routing
 		public override void Initialize()
 		{
 			base.Initialize();
-			System.Configuration.ConfigurationManager.AppSettings.Set("umbracoPath", "~/umbraco");
+			SettingsForTests.UmbracoPath = "~/umbraco";
 
 			SurfaceControllerResolver.Current = new SurfaceControllerResolver(
 				PluginManager.Current.ResolveSurfaceControllers());
@@ -36,7 +36,6 @@ namespace Umbraco.Tests.Routing
 		{
 			base.TearDown();
 			RouteTable.Routes.Clear();
-			System.Configuration.ConfigurationManager.AppSettings.Set("umbracoPath", "");
 			SurfaceControllerResolver.Reset();
 		}
 
