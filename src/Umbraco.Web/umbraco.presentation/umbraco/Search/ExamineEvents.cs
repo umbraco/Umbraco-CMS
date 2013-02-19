@@ -62,12 +62,12 @@ namespace umbraco.presentation.umbraco.Search
 
         void ContentService_Trashed(IContentService sender, Umbraco.Core.Events.MoveEventArgs<IContent> e)
         {
-            IndexContent(e.Entity);
+            DeleteContent(e.Entity);
         }
 
         void MediaService_Trashed(IMediaService sender, Umbraco.Core.Events.MoveEventArgs<IMedia> e)
         {
-            IndexMedia(e.Entity);
+            DeleteMedia(e.Entity);
         }
 
         void ContentService_Moved(IContentService sender, Umbraco.Core.Events.MoveEventArgs<IContent> e)
@@ -77,16 +77,13 @@ namespace umbraco.presentation.umbraco.Search
 
         void ContentService_Deleted(IContentService sender, Umbraco.Core.Events.DeleteEventArgs<IContent> e)
         {
-            e.DeletedEntities.ForEach(
-                content =>
-                ExamineManager.Instance.DeleteFromIndex(
-                    content.Id.ToString(),
-                    ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler)));
+            e.DeletedEntities.ForEach(DeleteContent);
         }
 
         void ContentService_Saved(IContentService sender, Umbraco.Core.Events.SaveEventArgs<IContent> e)
         {
-            e.SavedEntities.ForEach(IndexContent);
+            //ensure we do not re-index it if it is in the bin            
+            e.SavedEntities.Where(x => !x.Trashed).ForEach(IndexContent);
         }
 
         void MediaService_Moved(IMediaService sender, Umbraco.Core.Events.MoveEventArgs<IMedia> e)
@@ -96,22 +93,33 @@ namespace umbraco.presentation.umbraco.Search
 
         void MediaService_Deleted(IMediaService sender, Umbraco.Core.Events.DeleteEventArgs<IMedia> e)
         {
-            e.DeletedEntities.ForEach(
-                media =>
-                ExamineManager.Instance.DeleteFromIndex(
-                    media.Id.ToString(),
-                    ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler)));
+            e.DeletedEntities.ForEach(DeleteMedia);
         }
 
         void MediaService_Saved(IMediaService sender, Umbraco.Core.Events.SaveEventArgs<IMedia> e)
         {
-            e.SavedEntities.ForEach(IndexMedia);
+            //ensure we do not re-index it if it is in the bin            
+            e.SavedEntities.Where(x => !x.Trashed).ForEach(IndexMedia);
         }
 
         private void IndexMedia(IMedia sender)
         {
             ExamineManager.Instance.ReIndexNode(
                 sender.ToXml(), "media",
+                ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler));
+        }
+
+        private void DeleteContent(IContent sender)
+        {
+            ExamineManager.Instance.DeleteFromIndex(
+                sender.Id.ToString(),
+                ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler));
+        }
+
+        private void DeleteMedia(IMedia sender)
+        {
+            ExamineManager.Instance.DeleteFromIndex(
+                sender.Id.ToString(),
                 ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler));
         }
 
