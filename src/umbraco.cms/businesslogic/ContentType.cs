@@ -1146,16 +1146,13 @@ namespace umbraco.cms.businesslogic
             //Should this include "ct.nodeObjectType == media.MediaType._objectType" ?
             if (ct.nodeObjectType == DocumentType._objectType)
             {
+                //NOTE Changed from "DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == id)" to loading master contenttypes directly from the db.
+                //Related to http://issues.umbraco.org/issue/U4-1714
                 var dtos = ApplicationContext.Current.DatabaseContext.Database.Fetch<ContentType2ContentTypeDto>("WHERE parentContentTypeId = @Id", new { Id = id });
                 foreach (var dto in dtos)
                 {
                     FlushFromCache(dto.ChildId);
                 }
-
-                /*List<DocumentType> cacheToFlush = DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == id);
-                foreach (DocumentType dt in cacheToFlush)
-                    FlushFromCache(dt.Id);*/
-
             }
         }
 
