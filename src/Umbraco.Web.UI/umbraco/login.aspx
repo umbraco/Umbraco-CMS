@@ -110,11 +110,11 @@
     <asp:HiddenField ID="hf_width" runat="server" />
     </form>
     <asp:PlaceHolder ID="loginJavascript" runat="server">
-    <script type="text/javascript">
-        jQuery("#<%= lname.ClientID %>").focus();
-        jQuery('#<%= hf_height.ClientID %>').value = getViewportHeight();
-        jQuery('#<%= hf_width.ClientID %>').value = getViewportWidth();    
-    </script>
+        <script type="text/javascript">
+            jQuery("#<%= lname.ClientID %>").focus();
+            jQuery('#<%= hf_height.ClientID %>').value = getViewportHeight();
+            jQuery('#<%= hf_width.ClientID %>').value = getViewportWidth();    
+        </script>
     </asp:PlaceHolder>
     <asp:PlaceHolder Visible="false" ID="loginError" runat="server">
         <script type="text/javascript">

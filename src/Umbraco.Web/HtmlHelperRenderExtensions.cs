@@ -6,6 +6,7 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
+using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using Umbraco.Web.Mvc;
@@ -82,6 +83,48 @@ namespace Umbraco.Web
 			var filteredHtmlHelper = new HtmlHelper(htmlHelper.ViewContext, htmlHelper.ViewDataContainer.FilterContainer(prefix));
 			return filteredHtmlHelper.ValidationSummary(excludePropertyErrors, message, htmlAttributes);
 		}
+
+	    /// <summary>
+	    /// Returns the result of a child action of a strongly typed SurfaceController
+	    /// </summary>
+	    /// <typeparam name="T"></typeparam>
+	    /// <param name="htmlHelper"></param>
+	    /// <param name="actionName"></param>
+	    /// <returns></returns>
+	    public static IHtmlString Action<T>(this HtmlHelper htmlHelper, string actionName)
+            where T : SurfaceController
+        {
+            return htmlHelper.Action(actionName, typeof(T));
+        }
+
+        /// <summary>
+        /// Returns the result of a child action of a SurfaceController
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="htmlHelper"></param>
+        /// <param name="actionName"></param>
+        /// <param name="surfaceType"></param>
+        /// <returns></returns>
+        public static IHtmlString Action(this HtmlHelper htmlHelper, string actionName, Type surfaceType)
+        {
+            Mandate.ParameterNotNull(surfaceType, "surfaceType");
+            Mandate.ParameterNotNullOrEmpty(actionName, "actionName");
+
+            var routeVals = new RouteValueDictionary(new {area = ""});
+
+            var surfaceController = SurfaceControllerResolver.Current.RegisteredSurfaceControllers
+                .SingleOrDefault(x => x == surfaceType);
+            if (surfaceController == null)
+                throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
+            var metaData = PluginController.GetMetadata(surfaceController);
+            if (!metaData.AreaName.IsNullOrWhiteSpace())
+            {
+                //set the area to the plugin area
+                routeVals.Add("area", metaData.AreaName);
+            }
+
+            return htmlHelper.Action(actionName, metaData.ControllerName, routeVals);
+        }
 
 		#region BeginUmbracoForm
 
@@ -307,17 +350,19 @@ namespace Umbraco.Web
 			Mandate.ParameterNotNullOrEmpty(action, "action");
 			Mandate.ParameterNotNull(surfaceType, "surfaceType");
 
-			var area = Umbraco.Core.Configuration.GlobalSettings.UmbracoMvcArea;
-			var surfaceController = SurfaceControllerResolver.Current.SurfaceControllers
-				.SingleOrDefault(x => x.Metadata.ControllerType == surfaceType);
+		    var area = "";
+			
+            var surfaceController = SurfaceControllerResolver.Current.RegisteredSurfaceControllers
+				.SingleOrDefault(x => x == surfaceType);
 			if (surfaceController == null)
 				throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
-			if (!surfaceController.Metadata.AreaName.IsNullOrWhiteSpace())
+		    var metaData = PluginController.GetMetadata(surfaceController);
+            if (!metaData.AreaName.IsNullOrWhiteSpace())
 			{
 				//set the area to the plugin area
-				area = surfaceController.Metadata.AreaName;
+                area = metaData.AreaName;
 			}
-			return html.BeginUmbracoForm(action, surfaceController.Metadata.ControllerName, area, additionalRouteVals, htmlAttributes);
+            return html.BeginUmbracoForm(action, metaData.ControllerName, area, additionalRouteVals, htmlAttributes);
 		}
 
 		/// <summary>
@@ -364,7 +409,6 @@ namespace Umbraco.Web
 											   object additionalRouteVals,
 											   IDictionary<string, object> htmlAttributes)
 		{
-			Mandate.ParameterNotNullOrEmpty(area, "area");
 			Mandate.ParameterNotNullOrEmpty(action, "action");
 			Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
 
