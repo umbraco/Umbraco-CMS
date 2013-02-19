@@ -30,16 +30,16 @@ namespace Umbraco.Tests.CoreStrings
                 .WithConfig(CleanStringType.Alias, StripQuotes)
                 .WithConfig(new CultureInfo("fr-FR"), CleanStringType.Alias, WhiteQuotes);
 
-            ShortStringHelperResolver.Reset();
-            ShortStringHelperResolver.Current = new ShortStringHelperResolver(_helper);
-            Resolution.Freeze();
+            //ShortStringHelperResolver.Reset();
+            //ShortStringHelperResolver.Current = new ShortStringHelperResolver(_helper);
+            //Resolution.Freeze();
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-            ShortStringHelperResolver.Reset();
-        }
+        //[TearDown]
+        //public void TearDown()
+        //{
+        //    ShortStringHelperResolver.Reset();
+        //}
 
         static readonly Regex FrenchElisionsRegex = new Regex("\\b(c|d|j|l|m|n|qu|s|t)('|\u8217)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
@@ -92,6 +92,30 @@ namespace Umbraco.Tests.CoreStrings
         public void CleanStringForSafeAlias(string input, string expected)
         {
             var output = _helper.CleanStringForSafeAlias(input);
+            Assert.AreEqual(expected, output);
+        }
+
+        #region Cases
+        [TestCase("This is my_little_house so cute.", "thisIsMyLittleHouseSoCute", false)]
+        [TestCase("This is my_little_house so cute.", "thisIsMy_little_houseSoCute", true)]
+        [TestCase("This is my_Little_House so cute.", "thisIsMyLittleHouseSoCute", false)]
+        [TestCase("This is my_Little_House so cute.", "thisIsMy_Little_HouseSoCute", true)]
+        [TestCase("An UPPER_CASE_TEST to check", "anUpperCaseTestToCheck", false)]
+        [TestCase("An UPPER_CASE_TEST to check", "anUpper_case_testToCheck", true)]
+        [TestCase("Trailing_", "trailing", false)]
+        [TestCase("Trailing_", "trailing_", true)]
+        [TestCase("_Leading", "leading", false)]
+        [TestCase("_Leading", "leading", true)]
+        [TestCase("Repeat___Repeat", "repeatRepeat", false)]
+        [TestCase("Repeat___Repeat", "repeat___Repeat", true)]
+        [TestCase("Repeat___repeat", "repeatRepeat", false)]
+        [TestCase("Repeat___repeat", "repeat___repeat", true)]
+        #endregion
+        public void CleanStringWithUnderscore(string input, string expected, bool allowUnderscoreInTerm)
+        {
+            var helper = new DefaultShortStringHelper()
+                .WithConfig(allowUnderscoreInTerm: allowUnderscoreInTerm);
+            var output = helper.CleanString(input, CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.CamelCase);
             Assert.AreEqual(expected, output);
         }
 

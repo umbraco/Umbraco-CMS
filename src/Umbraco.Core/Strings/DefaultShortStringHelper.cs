@@ -64,24 +64,29 @@ namespace Umbraco.Core.Strings
         }
 
         public DefaultShortStringHelper WithConfig(
-            Func<string, string> preFilter = null, bool breakTermsOnUpper = true, bool allowLeadingDigits = false)
+            Func<string, string> preFilter = null, 
+            bool breakTermsOnUpper = true, bool allowLeadingDigits = false, bool allowUnderscoreInTerm = false)
         {
-            return WithConfig(_defaultCulture, CleanStringType.RoleMask, preFilter, breakTermsOnUpper, allowLeadingDigits);
+            return WithConfig(_defaultCulture, CleanStringType.RoleMask,
+                preFilter, breakTermsOnUpper, allowLeadingDigits, allowUnderscoreInTerm);
         }
 
         public DefaultShortStringHelper WithConfig(CleanStringType stringRole,
-            Func<string, string> preFilter = null, bool breakTermsOnUpper = true, bool allowLeadingDigits = false)
+            Func<string, string> preFilter = null,
+            bool breakTermsOnUpper = true, bool allowLeadingDigits = false, bool allowUnderscoreInTerm = false)
         {
-            return WithConfig(_defaultCulture, stringRole, preFilter, breakTermsOnUpper, allowLeadingDigits);
+            return WithConfig(_defaultCulture, stringRole,
+                preFilter, breakTermsOnUpper, allowLeadingDigits, allowUnderscoreInTerm);
         }
 
         public DefaultShortStringHelper WithConfig(CultureInfo culture, CleanStringType stringRole,
-            Func<string, string> preFilter = null, bool breakTermsOnUpper = true, bool allowLeadingDigits = false)
+            Func<string, string> preFilter = null,
+            bool breakTermsOnUpper = true, bool allowLeadingDigits = false, bool allowUnderscoreInTerm = false)
         {
             EnsureNotFrozen();
             if (!_configs.ContainsKey(culture))
                 _configs[culture] = new Dictionary<CleanStringType, HelperConfig>();
-            _configs[culture][stringRole] = new HelperConfig(preFilter, breakTermsOnUpper, allowLeadingDigits);
+            _configs[culture][stringRole] = new HelperConfig(preFilter, breakTermsOnUpper, allowLeadingDigits, allowUnderscoreInTerm);
             return this;
         }
 
@@ -94,17 +99,19 @@ namespace Umbraco.Core.Strings
                 AllowLeadingDigits = false;
             }
 
-            public HelperConfig(Func<string, string> preFilter, bool breakTermsOnUpper, bool allowLeadingDigits)
+            public HelperConfig(Func<string, string> preFilter, bool breakTermsOnUpper, bool allowLeadingDigits, bool allowUnderscoreInTerm)
                 : this()
             {
                 PreFilter = preFilter;
                 BreakTermsOnUpper = breakTermsOnUpper;
                 AllowLeadingDigits = allowLeadingDigits;
+                AllowUnderscoreInTerm = allowUnderscoreInTerm;
             }
 
             public Func<string, string> PreFilter { get; private set; }
             public bool BreakTermsOnUpper { get; private set; }
             public bool AllowLeadingDigits { get; private set; }
+            public bool AllowUnderscoreInTerm { get; private set; }
 
             public static readonly HelperConfig Empty = new HelperConfig();
         }
@@ -604,12 +611,13 @@ function isSafeAlias(alias) {{
                 var isDigit = char.IsDigit(c);
                 var isUpper = char.IsUpper(c); // false for digits, symbols...
                 var isLower = char.IsLower(c); // false for digits, symbols...
-                var isTerm = char.IsLetterOrDigit(c); // || (config.TermExtraCharacters != null && config.TermExtraCharacters.Contains(c));
+                var isUnder = config.AllowUnderscoreInTerm && c == '_';
+                var isTerm = char.IsLetterOrDigit(c) || isUnder;
 
                 switch (state)
                 {
                     case StateBreak:
-                        if (isTerm && (opos > 0 || config.AllowLeadingDigits || !isDigit))
+                        if (isTerm && (opos > 0 || (!isUnder && (config.AllowLeadingDigits || !isDigit))))
                         {
                             ipos = i;
                             if (opos > 0 && separator != char.MinValue)

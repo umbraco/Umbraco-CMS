@@ -11,7 +11,13 @@ namespace Umbraco.Tests.CoreStrings
     [TestFixture]
     public class LegacyShortStringHelperTests
     {
-        readonly LegacyShortStringHelper _helper = new LegacyShortStringHelper();
+        private LegacyShortStringHelper _helper;
+
+        [SetUp]
+        public void Setup()
+        {
+            _helper = new LegacyShortStringHelper();
+        }
 
         #region Cases
         [TestCase("foo", "foo")]
