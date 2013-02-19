@@ -26,7 +26,7 @@ namespace Umbraco.Web.Mvc
 		/// <param name="umbracoTokenValue">The DataToken value to set for the 'umbraco' key, this defaults to 'backoffice' </param>
 		/// <remarks>
 		/// </remarks>
-		internal static void RouteControllerPlugin(this AreaRegistration area, string controllerName, Type controllerType, RouteCollection routes,
+		internal static Route RouteControllerPlugin(this AreaRegistration area, string controllerName, Type controllerType, RouteCollection routes,
 		                                           string controllerSuffixName, string defaultAction, object defaultId,
 		                                           string umbracoTokenValue = "backoffice")
 		{
@@ -72,6 +72,7 @@ namespace Umbraco.Web.Mvc
 			controllerPluginRoute.DataTokens.Add("area", area.AreaName);
 			controllerPluginRoute.DataTokens.Add("umbraco", umbracoTokenValue); //ensure the umbraco token is set
 
+		    return controllerPluginRoute;
 		}
 	}
 }

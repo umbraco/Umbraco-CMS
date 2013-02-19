@@ -185,34 +185,44 @@ namespace Umbraco.Web.Mvc
 			requestContext.RouteData.Values["action"] = postedInfo.ActionName;
 			requestContext.RouteData.DataTokens["area"] = postedInfo.Area;
 
-            IHttpHandler handler = new UmbracoMvcHandler(requestContext);
+            IHttpHandler handler;
+            
+            //get the route from the defined routes
+		    using (RouteTable.Routes.GetReadLock())
+		    {
+		        Route surfaceRoute;
+		        if (postedInfo.Area == standardArea)
+		        {
+                    //find the controller in the route table without an area
+		            surfaceRoute = RouteTable.Routes.OfType<Route>()
+		                                         .SingleOrDefault(x => x.Defaults != null &&
+		                                                               x.Defaults.ContainsKey("controller") &&
+		                                                               x.Defaults["controller"].ToString() == postedInfo.ControllerName &&
+		                                                               !x.DataTokens.ContainsKey("area"));                    
+		        }
+                else
+		        {
+                    //find the controller in the route table with the specified area
+		            surfaceRoute = RouteTable.Routes.OfType<Route>()
+		                                         .SingleOrDefault(x => x.Defaults != null &&
+		                                                               x.Defaults.ContainsKey("controller") &&
+		                                                               x.Defaults["controller"].ToString() == postedInfo.ControllerName &&
+		                                                               x.DataTokens.ContainsKey("area") &&
+		                                                               x.DataTokens["area"].ToString() == postedInfo.Area);		            
+		        }
 
-			//ensure the controllerType is set if found, meaning it is a plugin, not locally declared
-			if (postedInfo.Area != standardArea)
-			{
-				//requestContext.RouteData.Values["controllerType"] = postedInfo.ControllerType;
-				//find the other data tokens for this route and merge... things like Namespace will be included here
-				using (RouteTable.Routes.GetReadLock())
-				{
-					var surfaceRoute = RouteTable.Routes.OfType<Route>()
-						.SingleOrDefault(x => x.Defaults != null &&
-						                      x.Defaults.ContainsKey("controller") &&
-						                      x.Defaults["controller"].ToString() == postedInfo.ControllerName &&
-						                      x.DataTokens.ContainsKey("area") &&
-						                      x.DataTokens["area"].ToString() == postedInfo.Area);
-					if (surfaceRoute == null)
-						throw new InvalidOperationException("Could not find a Surface controller route in the RouteTable for controller name " + postedInfo.ControllerName + " and within the area of " + postedInfo.Area);
-					//set the 'Namespaces' token so the controller factory knows where to look to construct it
-					if (surfaceRoute.DataTokens.ContainsKey("Namespaces"))
-					{
-						requestContext.RouteData.DataTokens["Namespaces"] = surfaceRoute.DataTokens["Namespaces"];
-					}
-					handler = surfaceRoute.RouteHandler.GetHttpHandler(requestContext);
-				}
+                if (surfaceRoute == null)
+                    throw new InvalidOperationException("Could not find a Surface controller route in the RouteTable for controller name " + postedInfo.ControllerName);
+                //set the 'Namespaces' token so the controller factory knows where to look to construct it
+                if (surfaceRoute.DataTokens.ContainsKey("Namespaces"))
+                {
+                    requestContext.RouteData.DataTokens["Namespaces"] = surfaceRoute.DataTokens["Namespaces"];
+                }
+                handler = surfaceRoute.RouteHandler.GetHttpHandler(requestContext);
 
-			}
+		    }
 
-			//store the original URL this came in on
+		    //store the original URL this came in on
 			requestContext.RouteData.DataTokens["umbraco-item-url"] = requestContext.HttpContext.Request.Url.AbsolutePath;
 			//store the original route definition
 			requestContext.RouteData.DataTokens["umbraco-route-def"] = routeDefinition;

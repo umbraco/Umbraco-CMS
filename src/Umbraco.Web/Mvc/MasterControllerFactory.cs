@@ -57,9 +57,23 @@ namespace Umbraco.Web.Mvc
         internal Type GetControllerTypeInternal(RequestContext requestContext, string controllerName)
         {
             var factory = _slaveFactories.Factories.FirstOrDefault(x => x.CanHandle(requestContext));
-            return factory != null
-                    ? factory.GetControllerType(requestContext, controllerName)
-                    : base.GetControllerType(requestContext, controllerName);
+            if (factory != null)
+            {
+                //check to see if the factory is of type UmbracoControllerFactory which exposes the GetControllerType method so we don't have to create
+                // an instance of the controller to figure out what it is. This is a work around for not having a breaking change for:
+                // http://issues.umbraco.org/issue/U4-1726
+
+                var umbFactory = factory as UmbracoControllerFactory;
+                if (umbFactory != null)
+                {
+                    return umbFactory.GetControllerType(requestContext, controllerName);
+                }
+                //we have no choice but to instantiate the controller
+                var instance = factory.CreateController(requestContext, controllerName);
+                return instance.GetType();
+            }
+
+            return base.GetControllerType(requestContext, controllerName);
         }
 
 		/// <summary>

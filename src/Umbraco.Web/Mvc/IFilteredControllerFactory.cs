@@ -5,6 +5,7 @@ using System.Web.Routing;
 
 namespace Umbraco.Web.Mvc
 {
+
 	public interface IFilteredControllerFactory : IControllerFactory
 	{
 		/// <summary>
@@ -15,12 +16,5 @@ namespace Umbraco.Web.Mvc
 		/// <remarks></remarks>
 		bool CanHandle(RequestContext request);
 
-        /// <summary>
-        /// Returns the controller type for the controller name otherwise null if not found
-        /// </summary>
-        /// <param name="requestContext"></param>
-        /// <param name="controllerName"></param>
-        /// <returns></returns>
-        Type GetControllerType(RequestContext requestContext, string controllerName);
 	}
 }
