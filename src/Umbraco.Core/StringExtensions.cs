@@ -23,7 +23,9 @@ namespace Umbraco.Core
     ///</summary>
     public static class StringExtensions
     {
+        [UmbracoWillObsolete("Do not use this constants. See IShortStringHelper.CleanStringForSafeAliasJavaScriptCode.")]
         public const string UmbracoValidAliasCharacters = "_-abcdefghijklmnopqrstuvwxyz1234567890";
+        [UmbracoWillObsolete("Do not use this constants. See IShortStringHelper.CleanStringForSafeAliasJavaScriptCode.")]
         public const string UmbracoInvalidFirstCharacters = "01234567890";
 
 		/// <summary>

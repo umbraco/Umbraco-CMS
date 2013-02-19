@@ -35,6 +35,65 @@ namespace Umbraco.Core.Strings
 
         #endregion
 
+        #region JavaScript
+
+        const string CsfaJsValidCharacters = "_-abcdefghijklmnopqrstuvwxyz1234567890";
+        const string CsfaJsInvalidFirstCharacters = "01234567890";
+
+        private const string CsfsaJsFormat = @"
+var UMBRACO_FORCE_SAFE_ALIAS = {0};
+var UMBRACO_FORCE_SAFE_ALIAS_VALIDCHARS = '{1}';
+var UMBRACO_FORCE_SAFE_ALIAS_INVALID_FIRST_CHARS = '{2}';
+
+function safeAlias(alias) {{
+    if (UMBRACO_FORCE_SAFE_ALIAS) {{
+        var safeAlias = '';
+        var aliasLength = alias.length;
+        for (var i = 0; i < aliasLength; i++) {{
+            currentChar = alias.substring(i, i + 1);
+            if (UMBRACO_FORCE_SAFE_ALIAS_VALIDCHARS.indexOf(currentChar.toLowerCase()) > -1) {{
+                // check for camel (if previous character is a space, we'll upper case the current one
+                if (safeAlias == '' && UMBRACO_FORCE_SAFE_ALIAS_INVALID_FIRST_CHARS.indexOf(currentChar.toLowerCase()) > 0) {{ 
+                    currentChar = '';
+                }} else {{
+                    // first char should always be lowercase (camel style)
+                    if (safeAlias.length == 0)
+                        currentChar = currentChar.toLowerCase();
+
+                    if (i < aliasLength - 1 && safeAlias != '' && alias.substring(i - 1, i) == ' ')
+                        currentChar = currentChar.toUpperCase();
+
+                    safeAlias += currentChar;
+                }}
+            }}
+        }}
+
+        return safeAlias;
+
+    }} else {{
+        return alias;
+    }}
+}}
+
+function isSafeAlias(alias) {{
+    return alias == safeAlias(alias);
+}}
+";
+
+        /// <summary>
+        /// Gets the JavaScript code defining functions safeAlias(alias) and isSafeAlias(alias).
+        /// </summary>
+        public string CleanStringForSafeAliasJavaScriptCode
+        {
+            get
+            {
+                return string.Format(CsfsaJsFormat,
+                    UmbracoSettings.ForceSafeAliases ? "true" : "false", CsfaJsValidCharacters, CsfaJsInvalidFirstCharacters);
+            }
+        }
+
+        #endregion
+
         #region IShortStringHelper CleanFor...
 
         /// <summary>

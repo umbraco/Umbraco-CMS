@@ -16,11 +16,19 @@ namespace Umbraco.Core.Strings
         void Freeze();
 
         /// <summary>
+        /// Gets the JavaScript code defining functions safeAlias(alias) and isSafeAlias(alias).
+        /// </summary>
+        string CleanStringForSafeAliasJavaScriptCode { get; }
+
+        /// <summary>
         /// Cleans a string to produce a string that can safely be used in an alias.
         /// </summary>
         /// <param name="text">The text to filter.</param>
         /// <returns>The safe alias.</returns>
-        /// <remarks>The string will be cleaned in the context of the IShortStringHelper default culture.</remarks>
+        /// <remarks>
+        /// <para>The string will be cleaned in the context of the IShortStringHelper default culture.</para>
+        /// <para>A safe alias is [a-z][a-zA-Z0-9_]* although legacy will also accept '-', and '_' at the beginning.</para>
+        /// </remarks>
         string CleanStringForSafeAlias(string text);
 
         /// <summary>

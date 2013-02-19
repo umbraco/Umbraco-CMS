@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
+using Umbraco.Core.Strings;
 using umbraco.cms.helpers;
 
 namespace umbraco.presentation.js
@@ -14,14 +15,8 @@ namespace umbraco.presentation.js
         protected void Page_Load(object sender, EventArgs e)
         {
             Response.ContentType = "text/javascript";
-            Response.Write(String.Format(@"
-var UMBRACO_FORCE_SAFE_ALIAS = {0};
-var UMBRACO_FORCE_SAFE_ALIAS_VALIDCHARS = '{1}';
-var UMBRACO_FORCE_SAFE_ALIAS_INVALID_FIRST_CHARS = '{2}';
-", UmbracoSettings.ForceSafeAliases.ToString().ToLower(), StringExtensions.UmbracoValidAliasCharacters, StringExtensions.UmbracoInvalidFirstCharacters));
-
+            // defines the constants _and_ provides code for safeAlias(alias) and isSafeAlias(alias)
+            Response.Write(ShortStringHelperResolver.Current.Helper.CleanStringForSafeAliasJavaScriptCode);
         }
-
-       
     }
 }

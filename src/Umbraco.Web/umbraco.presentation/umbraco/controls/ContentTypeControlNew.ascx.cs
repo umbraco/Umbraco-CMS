@@ -113,7 +113,7 @@ namespace umbraco.controls
                 PanePropertiesInherited.Visible = true;
             }
 
-            theClientId.Text = this.ClientID;
+            checkTxtAliasJs.Text = string.Format("checkAlias('{0}');", txtAlias.ClientID);
         }
 
         protected void save_click(object sender, System.Web.UI.ImageClickEventArgs e)
