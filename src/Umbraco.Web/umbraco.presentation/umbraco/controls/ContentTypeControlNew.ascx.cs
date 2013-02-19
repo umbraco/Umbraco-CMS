@@ -126,11 +126,11 @@ namespace umbraco.controls
             var originalDocTypeAlias = cType.Alias;
             var originalDocTypeName = cType.Text;
 
-            cType.Text = txtName.Text;
-            cType.Alias = txtAlias.Text;
-            cType.IconUrl = ddlIcons.SelectedValue;
-            cType.Description = description.Text;
-            cType.Thumbnail = ddlThumbnails.SelectedValue;
+            // Check if the doctype alias has changed as a result of either the user input or
+            // the alias checking performed upon saving
+            var docTypeAliasChanged = (string.Compare(originalDocTypeAlias, txtAlias.Text, true) != 0);
+            var docTypeNameChanged = (string.Compare(originalDocTypeName, txtName.Text, true) != 0);
+
             SaveClickEventArgs ea = new SaveClickEventArgs("Saved");
             ea.IconType = umbraco.BasePages.BasePage.speechBubbleIcon.success;
 
@@ -140,22 +140,47 @@ namespace umbraco.controls
 
             SaveAllowedChildTypes();
 
+            //NOTE The saving of the 5 properties (Name, Alias, Icon, Description and Thumbnail) are divided
+            //to avoid the multiple cache flushing when each property is set using the legacy ContentType class,
+            //which has been reduced to the else-clause.
+            //For IContentType and IMediaType the cache will only be flushed upon saving.
             if (cType.ContentTypeItem is IContentType)
             {
+                cType.ContentTypeItem.Name = txtName.Text;
+                cType.ContentTypeItem.Alias = txtAlias.Text;
+                cType.ContentTypeItem.Icon = ddlIcons.SelectedValue;
+                cType.ContentTypeItem.Description = description.Text;
+                cType.ContentTypeItem.Thumbnail = ddlThumbnails.SelectedValue;
+
                 ((DocumentType)cType).Save();
             }
             else if (cType.ContentTypeItem is IMediaType)
             {
+                cType.ContentTypeItem.Name = txtName.Text;
+                cType.ContentTypeItem.Alias = txtAlias.Text;
+                cType.ContentTypeItem.Icon = ddlIcons.SelectedValue;
+                cType.ContentTypeItem.Description = description.Text;
+                cType.ContentTypeItem.Thumbnail = ddlThumbnails.SelectedValue;
+
                 ((umbraco.cms.businesslogic.media.MediaType)cType).Save();
+            }
+            else
+            {
+                if (docTypeNameChanged)
+                    cType.Text = txtName.Text;
+
+                if (docTypeAliasChanged)
+                    cType.Alias = txtAlias.Text;
+
+                cType.IconUrl = ddlIcons.SelectedValue;
+                cType.Description = description.Text;
+                cType.Thumbnail = ddlThumbnails.SelectedValue;
+
+                cType.Save();
             }
 
             // reload content type (due to caching)
             cType = new ContentType(cType.Id);
-
-            // Check if the doctype alias has changed as a result of either the user input or
-            // the alias checking performed upon saving
-            var docTypeAliasChanged = (string.Compare(originalDocTypeAlias, cType.Alias, true) != 0);
-            var docTypeNameChanged = (string.Compare(originalDocTypeName, cType.Text, true) != 0);
 
             // Only if the doctype alias changed, cause a regeneration of the xml cache file since
             // the xml element names will need to be updated to reflect the new alias
