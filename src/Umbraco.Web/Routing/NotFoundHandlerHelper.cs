@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Web;
 using System.Xml;
 using System.Reflection;
-
-using Umbraco.Core;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Routing
@@ -47,7 +43,7 @@ namespace Umbraco.Web.Routing
 			// auth. Paul Sterling confirmed in jan. 2013 that we can get rid of it.
 
 			// code from requestHandler.cleanUrl
-			string root = Umbraco.Core.IO.SystemDirectories.Root.ToLower();
+			string root = Core.IO.SystemDirectories.Root.ToLower();
 			if (!string.IsNullOrEmpty(root) && tmp.StartsWith(root))
 				tmp = tmp.Substring(root.Length);
 			tmp = tmp.TrimEnd('/');
@@ -81,7 +77,7 @@ namespace Umbraco.Web.Routing
 			return tmp;
 		}
 
-        static IEnumerable<Type> _customHandlerTypes = null;
+        static IEnumerable<Type> _customHandlerTypes;
 
         static void InitializeNotFoundHandlers()
         {
@@ -93,7 +89,7 @@ namespace Umbraco.Web.Routing
             var customHandlerTypes = new List<Type>();
 
             var customHandlers = new XmlDocument();
-            customHandlers.Load(Umbraco.Core.IO.IOHelper.MapPath(Umbraco.Core.IO.SystemFiles.NotFoundhandlersConfig));
+            customHandlers.Load(Core.IO.IOHelper.MapPath(Core.IO.SystemFiles.NotFoundhandlersConfig));
 
             foreach (XmlNode n in customHandlers.DocumentElement.SelectNodes("notFound"))
             {

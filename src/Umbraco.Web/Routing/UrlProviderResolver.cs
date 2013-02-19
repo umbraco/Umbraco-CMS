@@ -35,7 +35,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public IEnumerable<IUrlProvider> Providers
         {
-            get { return this.Values; }
+            get { return Values; }
         }
     }
 }

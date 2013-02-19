@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Web;
-using System.Web.Compilation;
-using System.Web.Mvc;
 using System.Web.Routing;
-using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
@@ -205,7 +199,7 @@ namespace Umbraco.Web
 		{
 			var uri = context.OriginalRequestUrl;
 
-		    var reason = EnsureRoutableOutcome.IsRoutable;;
+		    var reason = EnsureRoutableOutcome.IsRoutable;
 
 			// ensure this is a document request
 			if (!EnsureDocumentRequest(httpContext, uri))
@@ -244,9 +238,9 @@ namespace Umbraco.Web
 
 			// handle directory-urls used for asmx
 			// legacy - what's the point really?
-			if (maybeDoc && GlobalSettings.UseDirectoryUrls)
+			if (/*maybeDoc &&*/ GlobalSettings.UseDirectoryUrls)
 			{
-				int asmxPos = lpath.IndexOf(".asmx/");
+				int asmxPos = lpath.IndexOf(".asmx/", StringComparison.OrdinalIgnoreCase);
 				if (asmxPos >= 0)
 				{
 					// use uri.AbsolutePath, not path, 'cos path has been lowercased
@@ -320,41 +314,36 @@ namespace Umbraco.Web
 		// ensures Umbraco has at least one published node
 		// if not, rewrites to splash and return false
 		// if yes, return true
-		bool EnsureHasContent(UmbracoContext context, HttpContextBase httpContext)
+	    private static bool EnsureHasContent(UmbracoContext context, HttpContextBase httpContext)
 		{
 			var store = context.RoutingContext.PublishedContentStore;
-			if (!store.HasContent(context))
-			{
-				LogHelper.Warn<UmbracoModule>("Umbraco has no content");
+		    if (store.HasContent(context))
+		        return true;
 
-				httpContext.Response.StatusCode = 503;
+            LogHelper.Warn<UmbracoModule>("Umbraco has no content");
 
-				var noContentUrl = "~/config/splashes/noNodes.aspx";
-				httpContext.RewritePath(UriUtility.ToAbsolute(noContentUrl));
+			httpContext.Response.StatusCode = 503;
 
-				return false;
-			}
-			else
-			{
-				return true;
-			}
+			const string noContentUrl = "~/config/splashes/noNodes.aspx";
+			httpContext.RewritePath(UriUtility.ToAbsolute(noContentUrl));
+
+			return false;
 		}
 
 		// ensures Umbraco is configured
 		// if not, redirect to install and return false
 		// if yes, return true
-		bool EnsureIsConfigured(HttpContextBase httpContext, Uri uri)
-		{
-			if (!ApplicationContext.Current.IsConfigured)
-			{
-				LogHelper.Warn<UmbracoModule>("Umbraco is not configured");
+	    private static bool EnsureIsConfigured(HttpContextBase httpContext, Uri uri)
+	    {
+	        if (ApplicationContext.Current.IsConfigured)
+	            return true;
 
-				string installPath = UriUtility.ToAbsolute(SystemDirectories.Install);
-				string installUrl = string.Format("{0}/default.aspx?redir=true&url={1}", installPath, HttpUtility.UrlEncode(uri.ToString()));
-				httpContext.Response.Redirect(installUrl, true);
-				return false;
-			}
-			return true;
+            LogHelper.Warn<UmbracoModule>("Umbraco is not configured");
+
+			var installPath = UriUtility.ToAbsolute(Core.IO.SystemDirectories.Install);
+			var installUrl = string.Format("{0}/default.aspx?redir=true&url={1}", installPath, HttpUtility.UrlEncode(uri.ToString()));
+			httpContext.Response.Redirect(installUrl, true);
+			return false;
 		}
 
 		#endregion
@@ -433,7 +422,7 @@ namespace Umbraco.Web
                     BeginRequest(new HttpContextWrapper(httpContext));
 				};
 
-			app.PostResolveRequestCache += (sender, e) =>
+            app.PostResolveRequestCache += (sender, e) =>
 				{
 					var httpContext = ((HttpApplication)sender).Context;
 					ProcessRequest(new HttpContextWrapper(httpContext));

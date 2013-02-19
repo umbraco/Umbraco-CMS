@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Umbraco.Core;
-using Umbraco.Core.Logging;
+﻿using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Routing
@@ -37,10 +31,9 @@ namespace Umbraco.Web.Routing
 						pcr.RoutingContext.UmbracoContext,
 						id);
 
-				if (content == null)
-					LogHelper.Debug<ContentFinderByLegacy404>("Could not find content with that id.");
-				else
-					LogHelper.Debug<ContentFinderByLegacy404>("Found corresponding content.");
+			    LogHelper.Debug<ContentFinderByLegacy404>(content == null
+			        ? "Could not find content with that id."
+			        : "Found corresponding content.");
 			}
 			else
 			{

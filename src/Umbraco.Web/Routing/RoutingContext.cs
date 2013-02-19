@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Umbraco.Web.Routing
 {
@@ -9,15 +8,16 @@ namespace Umbraco.Web.Routing
 	/// </summary>
     public class RoutingContext
     {
-		/// <summary>
-		/// Initializes a new instance of the <see cref="RoutingContext"/> class.
-		/// </summary>
-		/// <param name="umbracoContext"> </param>
-		/// <param name="contentFinders">The document lookups resolver.</param>
-		/// <param name="contentLastChanceFinder"> </param>
-		/// <param name="publishedContentStore">The content store.</param>
-		/// <param name="urlProvider">The nice urls provider.</param>
-		internal RoutingContext(
+	    /// <summary>
+	    /// Initializes a new instance of the <see cref="RoutingContext"/> class.
+	    /// </summary>
+	    /// <param name="umbracoContext"> </param>
+	    /// <param name="contentFinders">The document lookups resolver.</param>
+	    /// <param name="contentLastChanceFinder"> </param>
+	    /// <param name="publishedContentStore">The content store.</param>
+	    /// <param name="urlProvider">The nice urls provider.</param>
+	    /// <param name="routesCache">The routes cache.</param>
+	    internal RoutingContext(
 			UmbracoContext umbracoContext,
 			IEnumerable<IContentFinder> contentFinders,
 			IContentFinder contentLastChanceFinder,
@@ -25,12 +25,12 @@ namespace Umbraco.Web.Routing
             UrlProvider urlProvider,
             IRoutesCache routesCache)
         {
-			this.UmbracoContext = umbracoContext;
-			this.PublishedContentFinders = contentFinders;
-			this.PublishedContentLastChanceFinder = contentLastChanceFinder;
-			this.PublishedContentStore = publishedContentStore;
-        	this.UrlProvider = urlProvider;
-            this.RoutesCache = routesCache;
+			UmbracoContext = umbracoContext;
+			PublishedContentFinders = contentFinders;
+			PublishedContentLastChanceFinder = contentLastChanceFinder;
+			PublishedContentStore = publishedContentStore;
+        	UrlProvider = urlProvider;
+            RoutesCache = routesCache;
         }
 
 		/// <summary>

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Web.Routing
@@ -23,8 +19,8 @@ namespace Umbraco.Web.Routing
         /// <param name="uri">The Uri.</param>
         public DomainAndUri(Domain domain, Uri uri)
         {
-            this.Domain = domain;
-            this.Uri = uri;
+            Domain = domain;
+            Uri = uri;
         }
 
         /// <summary>

@@ -1,8 +1,5 @@
-using System.Diagnostics;
-using System.Xml;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using umbraco.interfaces;
 using Umbraco.Core;
 
 namespace Umbraco.Web.Routing
