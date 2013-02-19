@@ -185,11 +185,10 @@ namespace Umbraco.Web.Mvc
             IHttpHandler handler;
             
             //get the route from the defined routes
-			if (!postedInfo.Area.IsNullOrWhiteSpace())
 		    using (RouteTable.Routes.GetReadLock())
 		    {
 		        Route surfaceRoute;
-		        if (postedInfo.Area == standardArea)
+		        if (postedInfo.Area.IsNullOrWhiteSpace())
 		        {
                     //find the controller in the route table without an area
 		            surfaceRoute = RouteTable.Routes.OfType<Route>()
@@ -206,14 +205,18 @@ namespace Umbraco.Web.Mvc
 		                                                               x.Defaults.ContainsKey("controller") &&
 						                      x.Defaults["controller"].ToString().InvariantEquals(postedInfo.ControllerName) &&
 		                                                               x.DataTokens.ContainsKey("area") &&
-						                      x.DataTokens["area"].ToString().InvariantEquals(postedInfo.Area));
+						                      x.DataTokens["area"].ToString().InvariantEquals(postedInfo.Area));                    
 		        }
 
                 if (surfaceRoute == null)
                     throw new InvalidOperationException("Could not find a Surface controller route in the RouteTable for controller name " + postedInfo.ControllerName);
-                    
+                
+                //set the area if one is there.
+                if (surfaceRoute.DataTokens.ContainsKey("area"))
+                {
                     requestContext.RouteData.DataTokens["area"] = surfaceRoute.DataTokens["area"];
-                    
+                }
+
                 //set the 'Namespaces' token so the controller factory knows where to look to construct it
                 if (surfaceRoute.DataTokens.ContainsKey("Namespaces"))
                 {
