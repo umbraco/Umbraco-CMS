@@ -334,6 +334,12 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <returns>The clean string.</returns>
         private string CleanString(string text, CleanStringType stringType, char separator, CultureInfo culture, HelperConfig config)
         {
+            // be safe
+            if (text == null)
+                throw new ArgumentNullException("text");
+            if (culture == null)
+                throw new ArgumentNullException("culture");
+
             // apply defaults
             if ((stringType & CleanStringType.CaseMask) == CleanStringType.None)
                 stringType |= CleanStringType.CamelCase;
@@ -748,6 +754,10 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <remarks>Supports Utf8 and Ascii strings, not Unicode strings.</remarks>
         public string SplitPascalCasing(string text, char separator)
         {
+            // be safe
+            if (text == null)
+                throw new ArgumentNullException("text");
+
             var input = text.ToCharArray();
             var output = new char[input.Length * 2];
             var opos = 0;
@@ -798,6 +808,10 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// removed. If it is <c>Ascii</c> we try to do some intelligent replacement of accents, etc.</remarks>
         public string Recode(string text, CleanStringType stringType)
         {
+            // be safe
+            if (text == null)
+                throw new ArgumentNullException("text");
+
             var codeType = stringType & CleanStringType.CodeMask;
 
             // unicode to utf8 or ascii: just remove the unicode chars
@@ -841,6 +855,12 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <returns>The filtered string.</returns>
         public string ReplaceMany(string text, IDictionary<string, string> replacements)
         {
+            // be safe
+            if (text == null)
+                throw new ArgumentNullException("text");
+            if (replacements == null)
+                throw new ArgumentNullException("replacements");
+
             // Have done various tests, implementing my own "super fast" state machine to handle 
             // replacement of many items, or via regexes, but on short strings and not too
             // many replacements (which prob. is going to be our case) nothing can beat this...
