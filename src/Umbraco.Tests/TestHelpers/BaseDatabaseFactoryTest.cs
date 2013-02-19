@@ -64,20 +64,23 @@ namespace Umbraco.Tests.TestHelpers
             var engine = new SqlCeEngine(settings.ConnectionString);
             engine.CreateDatabase();
 
+            Resolution.Freeze();
             ApplicationContext.Current = new ApplicationContext(
 				//assign the db context
 				new DatabaseContext(new DefaultDatabaseFactory()),
 				//assign the service context
 				new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
 
-            Resolution.Freeze();
+            InitializeDatabase();
+        }
 
+        protected virtual void InitializeDatabase()
+        {
             //Configure the Database and Sql Syntax based on connection string set in config
             DatabaseContext.Initialize();
             //Create the umbraco database and its base data
             DatabaseContext.Database.CreateDatabaseSchema(false);
         }
-
 
         [TearDown]
         public virtual void TearDown()
@@ -92,6 +95,7 @@ namespace Umbraco.Tests.TestHelpers
 			SqlCeContextGuardian.CloseBackgroundConnection();
 			
 			ApplicationContext.Current = null;
+			Resolution.IsFrozen = false;
 			RepositoryResolver.Reset();
 
             TestHelper.CleanContentDirectories();
@@ -105,6 +109,7 @@ namespace Umbraco.Tests.TestHelpers
                 File.Delete(filePath);
             }
             PluginManager.Current = null;
+            UmbracoSettings.ResetSetters();
         }
 
 	    protected ApplicationContext ApplicationContext

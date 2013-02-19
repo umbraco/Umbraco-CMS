@@ -5,12 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Xml.XPath;
 using Examine;
+using Examine.LuceneEngine.SearchCriteria;
 using Examine.Providers;
 using Lucene.Net.Documents;
 using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
+using UmbracoExamine;
 using umbraco;
 using umbraco.cms.businesslogic;
 using ContentType = umbraco.cms.businesslogic.ContentType;
@@ -107,7 +109,11 @@ namespace Umbraco.Web
 				{
 					//first check in Examine as this is WAY faster
 					var criteria = searchProvider.CreateSearchCriteria("media");
-					var filter = criteria.Id(id);
+				    
+                    var filter = criteria.Id(id).Not().Field(UmbracoContentIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
+                    //the above filter will create a query like this, NOTE: That since the use of the wildcard, it automatically escapes it in Lucene.
+                    //+(+__NodeId:3113 -__Path:-1,-21,*) +__IndexType:media
+                    
 					var results = searchProvider.Search(filter.Compile());
 					if (results.Any())
 					{
