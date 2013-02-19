@@ -67,7 +67,9 @@ namespace Umbraco.Web.Mvc
 		{
 			foreach (var s in surfaceControllers)
 			{
-				this.RouteControllerPlugin(s.ControllerName, s.ControllerType, routes, "Surface", "Index", UrlParameter.Optional, "surface");
+				var route = this.RouteControllerPlugin(s.ControllerName, s.ControllerType, routes, "Surface", "Index", UrlParameter.Optional, "surface");
+                //set the route handler to our SurfaceRouteHandler
+                route.RouteHandler = new SurfaceRouteHandler();
 			}
 		}
 	}

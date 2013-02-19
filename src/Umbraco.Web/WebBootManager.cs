@@ -153,7 +153,9 @@ namespace Umbraco.Web
                     umbracoPath + "/Surface/" + meta.ControllerName + "/{action}/{id}",//url to match
                     new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
                     new[] { meta.ControllerNamespace }); //only match this namespace
-                route.DataTokens.Add("umbraco", "surface"); //ensure the umbraco token is set
+                route.DataTokens.Add("umbraco", "surface"); //ensure the umbraco token is set                
+                //make it use our custom/special SurfaceMvcHandler
+                route.RouteHandler = new SurfaceRouteHandler();
             }
 
             //need to get the plugin controllers that are unique to each area (group by)
