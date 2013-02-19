@@ -149,7 +149,7 @@ namespace Umbraco.Web
             //Create the front-end route
             var defaultRoute = RouteTable.Routes.MapRoute(
                 "Umbraco_default",
-                "Umbraco/RenderMvc/{action}/{id}",
+                umbracoPath + "/RenderMvc/{action}/{id}",
                 new { controller = "RenderMvc", action = "Index", id = UrlParameter.Optional }
                 );
             defaultRoute.RouteHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory());
