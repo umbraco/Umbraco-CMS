@@ -208,11 +208,9 @@ namespace Umbraco.Tests.CoreStrings
         #endregion
         public void CleanStringToAscii(string input, string expected)
         {
-            Assert.Throws<NotImplementedException>(() =>
-                {
-                    var output = _helper.CleanString(input, CleanStringType.Ascii | CleanStringType.CamelCase);
-                    Assert.AreEqual(expected, output);
-                });
+            var output = _helper.CleanString(input, CleanStringType.Ascii | CleanStringType.CamelCase);
+            // legacy does nothing
+            Assert.AreEqual(input, output);
         }
 
         #region Cases
@@ -267,11 +265,9 @@ namespace Umbraco.Tests.CoreStrings
         #endregion
         public void CleanStringToAsciiWithCase(string input, string expected, CleanStringType caseType)
         {
-            Assert.Throws<NotImplementedException>(() =>
-                {
-                    var output = _helper.CleanString(input, caseType | CleanStringType.Ascii);
-                    Assert.AreEqual(expected, output);
-                });
+            var output = _helper.CleanString(input, caseType | CleanStringType.Ascii);
+            // legacy does nothing
+            Assert.AreEqual(input, output);
         }
 
         #region Cases
@@ -296,11 +292,9 @@ namespace Umbraco.Tests.CoreStrings
         #endregion
         public void CleanStringToAsciiWithCaseAndSeparator(string input, string expected, char separator, CleanStringType caseType)
         {
-            Assert.Throws<NotImplementedException>(() =>
-                {
-                    var output = _helper.CleanString(input, caseType | CleanStringType.Ascii, separator);
-                    Assert.AreEqual(expected, output);
-                });
+            var output = _helper.CleanString(input, caseType | CleanStringType.Ascii, separator);
+            // legacy does nothing
+            Assert.AreEqual(input, output);
         }
     }
 }

@@ -30,16 +30,16 @@ namespace Umbraco.Tests.CoreStrings
                 .WithConfig(CleanStringType.Alias, StripQuotes)
                 .WithConfig(new CultureInfo("fr-FR"), CleanStringType.Alias, WhiteQuotes);
 
-            //ShortStringHelperResolver.Reset();
-            //ShortStringHelperResolver.Current = new ShortStringHelperResolver(_helper);
-            //Resolution.Freeze();
+            ShortStringHelperResolver.Reset();
+            ShortStringHelperResolver.Current = new ShortStringHelperResolver(_helper);
+            Resolution.Freeze();
         }
 
-        //[TearDown]
-        //public void TearDown()
-        //{
-        //    ShortStringHelperResolver.Reset();
-        //}
+        [TearDown]
+        public void TearDown()
+        {
+            ShortStringHelperResolver.Reset();
+        }
 
         static readonly Regex FrenchElisionsRegex = new Regex("\\b(c|d|j|l|m|n|qu|s|t)('|\u8217)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
