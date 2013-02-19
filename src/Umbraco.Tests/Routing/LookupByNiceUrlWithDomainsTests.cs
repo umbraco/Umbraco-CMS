@@ -18,15 +18,7 @@ namespace Umbraco.Tests.Routing
 		{
 			base.Initialize();
 			InitializeLanguagesAndDomains();
-			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
 		}
-
-		public override void TearDown()
-		{
-			base.TearDown();
-			
-		}
-
 
 		void InitializeLanguagesAndDomains()
 		{
@@ -154,7 +146,7 @@ namespace Umbraco.Tests.Routing
 		{
 			SetDomains3();
 
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
+			SettingsForTests.HideTopLevelNodeFromPath = true;
 
 			var routingContext = GetRoutingContext(url);
 			var uri = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
@@ -193,7 +185,7 @@ namespace Umbraco.Tests.Routing
 		{
 			SetDomains4();
 
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
+			SettingsForTests.HideTopLevelNodeFromPath = true;
 
 			var routingContext = GetRoutingContext(url);
 			var uri = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
