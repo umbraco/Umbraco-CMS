@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using Microsoft.CSharp.RuntimeBinder;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using System.Linq;
 
@@ -27,7 +28,9 @@ namespace Umbraco.Tests.PublishedContent
   </url-picker>
 </banner1Link>";
 
-            var typedXml = new DynamicXml(xml);
+            var typedXml = new DynamicXml(
+                XmlHelper.StripDashesInElementOrAttributeNames(xml),
+                xml);
             dynamic dynamicXml = typedXml;
 
             var typedElement = typedXml.RawXmlElement.Element("url-picker");
@@ -65,7 +68,7 @@ namespace Umbraco.Tests.PublishedContent
 			//we haven't explicitly defined ElementAt so this will dynamically invoke this method
 			var element = dynamicXml.ElementAt(0);
 
-            Assert.AreEqual("1057", Enumerable.First(element.StrippedXmlElement.Elements()).Attribute("id").Value);
+            Assert.AreEqual("1057", Enumerable.First(element.BaseElement.Elements()).Attribute("id").Value);
 		}
 
 		[Test]
@@ -96,8 +99,8 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.AreEqual(1, typedTaken.Count());
 			Assert.AreEqual(1, Enumerable.Count(dynamicTaken));
 
-			Assert.AreEqual("1057", typedTaken.ElementAt(0).StrippedXmlElement.Elements().First().Attribute("id").Value);
-            Assert.AreEqual("1057", Enumerable.First(Enumerable.ElementAt(dynamicTaken, 0).StrippedXmlElement.Elements()).Attribute("id").Value);
+            Assert.AreEqual("1057", typedTaken.ElementAt(0).BaseElement.Elements().First().Attribute("id").Value);
+            Assert.AreEqual("1057", Enumerable.First(Enumerable.ElementAt(dynamicTaken, 0).BaseElement.Elements()).Attribute("id").Value);
 		}
 
 		[Test]
