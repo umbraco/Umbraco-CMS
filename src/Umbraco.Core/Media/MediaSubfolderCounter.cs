@@ -12,34 +12,32 @@ namespace Umbraco.Core.Media
     /// which will be the start point for the naming of the next subfolders. If no subfolders exists
     /// then the starting point will be 1000, ie. /media/1000/koala.jpg
     /// </summary>
-    internal class MediaSubFolders
+    internal class MediaSubfolderCounter
     {
         #region Singleton
 
         private long _numberedFolder = 1000;//Default starting point
         private static readonly ReaderWriterLockSlim ClearLock = new ReaderWriterLockSlim();
-        private static readonly Lazy<MediaSubFolders> Lazy = new Lazy<MediaSubFolders>(() => new MediaSubFolders());
+        private static readonly Lazy<MediaSubfolderCounter> Lazy = new Lazy<MediaSubfolderCounter>(() => new MediaSubfolderCounter());
 
-        public static MediaSubFolders Current { get { return Lazy.Value; } }
+        public static MediaSubfolderCounter Current { get { return Lazy.Value; } }
 
-        private MediaSubFolders()
+        private MediaSubfolderCounter()
         {
             var folders = new List<long>();
             var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            var directories = fs.GetDirectories("/");
-            if (directories.Any())
+            var directories = fs.GetDirectories("");
+            foreach (var directory in directories)
             {
-                foreach (var directory in directories)
+                long dirNum;
+                if (long.TryParse(directory, out dirNum))
                 {
-                    long dirNum;
-                    if (long.TryParse(directory, out dirNum))
-                    {
-                        folders.Add(dirNum);
-                    }
+                    folders.Add(dirNum);
                 }
-                long last = folders.OrderBy(x => x).Last();
-                _numberedFolder = last;
             }
+            var last = folders.OrderBy(x => x).LastOrDefault();
+            if(last != default(long))
+                _numberedFolder = last;
         }
 
         #endregion
@@ -52,7 +50,7 @@ namespace Umbraco.Core.Media
         {
             using (new ReadLock(ClearLock))
             {
-                _numberedFolder++;
+                _numberedFolder = _numberedFolder + 1;
                 return _numberedFolder;
             }
         }

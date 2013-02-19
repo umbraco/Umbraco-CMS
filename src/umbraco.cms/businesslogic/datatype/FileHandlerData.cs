@@ -57,7 +57,7 @@ namespace umbraco.cms.businesslogic.datatype
                     // handle upload
                     if (name != String.Empty)
                     {
-                        var numberedFolder = MediaSubFolders.Current.Increment();
+                        var numberedFolder = MediaSubfolderCounter.Current.Increment();
                         string fileName = UmbracoSettings.UploadAllowDirectories
                                               ? Path.Combine(numberedFolder.ToString(CultureInfo.InvariantCulture), name)
                                               : numberedFolder + "-" + name;
