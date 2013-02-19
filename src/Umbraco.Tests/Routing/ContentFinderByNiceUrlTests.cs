@@ -10,12 +10,6 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class ContentFinderByNiceUrlTests : BaseRoutingTest
 	{
-		public override void Initialize()
-		{
-			base.Initialize();
-			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
-		}
-
 		/// <summary>
 		/// We don't need a db for this test, will run faster without one
 		/// </summary>
@@ -41,7 +35,7 @@ namespace Umbraco.Tests.Routing
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
 			var docreq = new PublishedContentRequest(url, routingContext);
 			var lookup = new ContentFinderByNiceUrl();
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
+		    SettingsForTests.HideTopLevelNodeFromPath = true;
 
 			var result = lookup.TryFindDocument(docreq);
 
@@ -68,7 +62,7 @@ namespace Umbraco.Tests.Routing
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl;	//very important to use the cleaned up umbraco url		
 			var docreq = new PublishedContentRequest(url, routingContext);			
 			var lookup = new ContentFinderByNiceUrl();
-            ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false");
+            SettingsForTests.HideTopLevelNodeFromPath = false;
 
 			var result = lookup.TryFindDocument(docreq);
 

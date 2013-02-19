@@ -7,12 +7,6 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class ContentFinderByAliasTests : BaseRoutingTest
 	{
-		public override void Initialize()
-		{
-			base.Initialize();
-			Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
-		}
-        
         /// <summary>
 		/// We don't need a db for this test, will run faster without one
 		/// </summary>

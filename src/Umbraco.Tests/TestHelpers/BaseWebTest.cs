@@ -31,14 +31,13 @@ namespace Umbraco.Tests.TestHelpers
         [SetUp]
         public virtual void Initialize()
         {
-			TestHelper.SetupLog4NetForTests();
-            
+            SettingsForTests.Reset();
+
+			TestHelper.SetupLog4NetForTests();            
 			TestHelper.InitializeContentDirectories();
 
 			string path = TestHelper.CurrentAssemblyDirectory;
 			AppDomain.CurrentDomain.SetData("DataDirectory", path);
-
-			UmbracoSettings.UseLegacyXmlSchema = false;
 
 			RepositoryResolver.Current = new RepositoryResolver(
 				new RepositoryFactory());
@@ -138,7 +137,7 @@ namespace Umbraco.Tests.TestHelpers
 
             Cache.ClearAllCache();
 
-            UmbracoSettings.ResetSetters();
+            SettingsForTests.Reset();
 
             PluginManager.Current = null;
         }

@@ -25,18 +25,7 @@ namespace Umbraco.Tests.Routing
                 Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
                 true);
 
-            Core.Configuration.UmbracoSettings.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
-		
-
-			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
-		}
-
-		public override void TearDown()
-		{
-			base.TearDown();
-
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "");
+            SettingsForTests.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
 		}
 
 		internal override IRoutesCache GetRoutesCache()
@@ -52,18 +41,19 @@ namespace Umbraco.Tests.Routing
 		public void Ensure_Cache_Is_Correct()
 		{
 			var routingContext = GetRoutingContext("/test", 1111);
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-            Umbraco.Core.Configuration.UmbracoSettings.AddTrailingSlash = false;
+		    SettingsForTests.UseDirectoryUrls = true;
+		    SettingsForTests.HideTopLevelNodeFromPath = false;
+            SettingsForTests.AddTrailingSlash = false; // (cached routes have none)
 
 			var samples = new Dictionary<int, string> {
 				{ 1046, "/home" },
-				{ 1173, "/home/sub1/" },
-				{ 1174, "/home/sub1/sub2/" },
-				{ 1176, "/home/sub1/sub-3/" },
-				{ 1177, "/home/sub1/custom-sub-1/" },
-				{ 1178, "/home/sub1/custom-sub-2/" },
-				{ 1175, "/home/sub-2/" },
-				{ 1172, "/test-page/" }
+				{ 1173, "/home/sub1" },
+				{ 1174, "/home/sub1/sub2" },
+				{ 1176, "/home/sub1/sub-3" },
+				{ 1177, "/home/sub1/custom-sub-1" },
+				{ 1178, "/home/sub1/custom-sub-2" },
+				{ 1175, "/home/sub-2" },
+				{ 1172, "/test-page" }
 			};
 
 			foreach (var sample in samples)
@@ -72,7 +62,7 @@ namespace Umbraco.Tests.Routing
 				Assert.AreEqual(sample.Value, result);
 			}
 
-			var randomSample = new KeyValuePair<int, string>(1177, "/home/sub1/custom-sub-1/");
+			var randomSample = new KeyValuePair<int, string>(1177, "/home/sub1/custom-sub-1");
 			for (int i = 0; i < 5; i++)
 			{
 				var result = routingContext.NiceUrlProvider.GetNiceUrl(randomSample.Key);
@@ -112,9 +102,9 @@ namespace Umbraco.Tests.Routing
 		{
 			var routingContext = GetRoutingContext("/test", 1111);
 
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false");
-			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
+		    SettingsForTests.UseDirectoryUrls = true;
+		    SettingsForTests.HideTopLevelNodeFromPath = false;
+		    SettingsForTests.UseDomainPrefixes = false;
 
 			var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId);
 			Assert.AreEqual(niceUrlMatch, result);
@@ -135,9 +125,9 @@ namespace Umbraco.Tests.Routing
 		{
 			var routingContext = GetRoutingContext("/test", 1111);
 
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
-			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
+            SettingsForTests.UseDirectoryUrls = true;
+            SettingsForTests.HideTopLevelNodeFromPath = true;
+            SettingsForTests.UseDomainPrefixes = false;
 
 			var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId);
 			Assert.AreEqual(niceUrlMatch, result);
@@ -148,16 +138,16 @@ namespace Umbraco.Tests.Routing
 		{
 			var routingContext = GetRoutingContext("http://example.com/test", 1111);
 
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false");
+            SettingsForTests.UseDirectoryUrls = true;
+            SettingsForTests.HideTopLevelNodeFromPath = false;
 
-			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
+            SettingsForTests.UseDomainPrefixes = false;
 			Assert.AreEqual("/home/sub1/custom-sub-1/", routingContext.NiceUrlProvider.GetNiceUrl(1177));
 
-			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = true;
+            SettingsForTests.UseDomainPrefixes = true;
 			Assert.AreEqual("http://example.com/home/sub1/custom-sub-1/", routingContext.NiceUrlProvider.GetNiceUrl(1177));
 
-			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
+            SettingsForTests.UseDomainPrefixes = false;
 			routingContext.NiceUrlProvider.EnforceAbsoluteUrls = true;
 			Assert.AreEqual("http://example.com/home/sub1/custom-sub-1/", routingContext.NiceUrlProvider.GetNiceUrl(1177));
 		}
@@ -167,14 +157,14 @@ namespace Umbraco.Tests.Routing
 		{
 			var routingContext = GetRoutingContext("http://example.com/test", 1111);
 
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false");
+            SettingsForTests.UseDirectoryUrls = true;
+            SettingsForTests.HideTopLevelNodeFromPath = false;
 
-			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
+            SettingsForTests.UseDomainPrefixes = false;
 			Assert.AreEqual("#", routingContext.NiceUrlProvider.GetNiceUrl(999999));
-			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = true;
+            SettingsForTests.UseDomainPrefixes = true;
 			Assert.AreEqual("#", routingContext.NiceUrlProvider.GetNiceUrl(999999));
-			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
+            SettingsForTests.UseDomainPrefixes = false;
 			routingContext.NiceUrlProvider.EnforceAbsoluteUrls = true;
 			Assert.AreEqual("#", routingContext.NiceUrlProvider.GetNiceUrl(999999));
 		}

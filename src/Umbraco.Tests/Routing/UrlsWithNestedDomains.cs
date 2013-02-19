@@ -22,9 +22,9 @@ namespace Umbraco.Tests.Routing
 		[Test]
 		public void DoNotPolluteCache()
 		{
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false"); // ignored w/domains
-			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
+            SettingsForTests.UseDirectoryUrls = true;
+            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
+            SettingsForTests.UseDomainPrefixes = false;
 
 			InitializeLanguagesAndDomains();
 			SetDomains1();
@@ -70,15 +70,6 @@ namespace Umbraco.Tests.Routing
             // ensure we can create them although the content is not in the database
             TestHelper.DropForeignKeys("umbracoDomains");
         }
-
-		public override void TearDown()
-		{
-			base.TearDown();
-
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "");
-
-		}
 
 		internal override IRoutesCache GetRoutesCache()
 		{

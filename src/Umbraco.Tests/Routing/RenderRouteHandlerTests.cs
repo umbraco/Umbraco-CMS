@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Routing
 
 			base.Initialize();
 
-			System.Configuration.ConfigurationManager.AppSettings.Set("umbracoPath", "~/umbraco");
+		    SettingsForTests.UmbracoPath = "~/umbraco";
             
 			var webBoot = new WebBootManager(new UmbracoApplication(), true);
 			//webBoot.Initialize();
@@ -40,7 +40,6 @@ namespace Umbraco.Tests.Routing
 			base.TearDown();
 		    UmbracoContext.Current = null;
 			RouteTable.Routes.Clear();
-			System.Configuration.ConfigurationManager.AppSettings.Set("umbracoPath", "");
 			SurfaceControllerResolver.Reset();
             PluginManager.Current = null;
 		}

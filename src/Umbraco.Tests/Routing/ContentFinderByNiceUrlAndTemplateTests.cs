@@ -9,12 +9,6 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class ContentFinderByNiceUrlAndTemplateTests : BaseRoutingTest
 	{
-		public override void Initialize()
-		{
-			base.Initialize();
-			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
-		}
-
         Template CreateTemplate(string alias)
         {
             var template = new Template(alias, alias, alias);
