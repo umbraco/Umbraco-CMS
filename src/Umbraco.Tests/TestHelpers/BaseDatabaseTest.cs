@@ -30,20 +30,30 @@ namespace Umbraco.Tests.TestHelpers
             TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
 
-            UmbracoSettings.UseLegacyXmlSchema = false;
-
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
             //If the Database Provider is Sql Ce we need to ensure the database
             if (ProviderName.Contains("SqlServerCe"))
             {
-                //Delete database file before continueing
-                string filePath = string.Concat(path, "\\test.sdf");
-                if (File.Exists(filePath))
+                try
                 {
-                    File.Delete(filePath);
+                    //Delete database file before continueing
+                    string filePath = string.Concat(path, "\\test.sdf");
+                    if (File.Exists(filePath))
+                    {
+                        File.Delete(filePath);
+                    }
                 }
+                catch (Exception)
+                {
+                    //if this doesn't work we have to make sure everything is reset! otherwise
+                    // well run into issues because we've already set some things up
+                    TearDown();
+                    throw;
+                }
+
+                UmbracoSettings.UseLegacyXmlSchema = false;
 
                 //Create the Sql CE database
                 var engine = new SqlCeEngine(ConnectionString);
