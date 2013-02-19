@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
+using UmbracoExamine;
 using umbraco;
 using umbraco.cms.businesslogic;
 using ContentType = umbraco.cms.businesslogic.ContentType;
@@ -107,7 +108,7 @@ namespace Umbraco.Web
 				{
 					//first check in Examine as this is WAY faster
 					var criteria = searchProvider.CreateSearchCriteria("media");
-					var filter = criteria.Id(id);
+				    var filter = criteria.Id(id).Not().Field(UmbracoContentIndexer.IndexPathFieldName, "-21");
 					var results = searchProvider.Search(filter.Compile());
 					if (results.Any())
 					{

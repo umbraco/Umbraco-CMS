@@ -200,7 +200,6 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.IsTrue(ancestors.Select(x => x.Id).ContainsAll(new[] { 3113, 2112, 2222, 1111 }));
 		}
 
-        [Ignore]
 		[Test]
 		public void Children_Without_Examine()
 		{
@@ -225,7 +224,6 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.IsTrue(subChildren.Select(x => x.Id).ContainsAll(new[] { mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
 		}
         
-        [Ignore]
 		[Test]
 		public void Descendants_Without_Examine()
 		{
@@ -250,7 +248,6 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.IsTrue(subDescendants.Select(x => x.Id).ContainsAll(new[] { mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
 		}
 
-        [Ignore]
 		[Test]
 		public void DescendantsOrSelf_Without_Examine()
 		{
@@ -277,7 +274,6 @@ namespace Umbraco.Tests.PublishedContent
 				new[] { mChild1.Id, mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
 		}
 
-        [Ignore]
 		[Test]
 		public void Parent_Without_Examine()
 		{
@@ -303,7 +299,6 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.AreEqual(mChild1.Id, publishedSubChild1.Parent.Id);
 		}
 
-        [Ignore]
 		[Test]
 		public void Ancestors_Without_Examine()
 		{
@@ -323,7 +318,6 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.IsTrue(publishedSubChild1.Ancestors().Select(x => x.Id).ContainsAll(new[] {mChild1.Id, mRoot.Id}));
 		}
 
-        [Ignore]
 		[Test]
 		public void AncestorsOrSelf_Without_Examine()
 		{

@@ -69,13 +69,17 @@ namespace Umbraco.Tests.TestHelpers
 				new DatabaseContext(new DefaultDatabaseFactory()),
 				//assign the service context
 				new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
-            
+
+            InitializeDatabase();
+        }
+
+        protected virtual void InitializeDatabase()
+        {
             //Configure the Database and Sql Syntax based on connection string set in config
             DatabaseContext.Initialize();
             //Create the umbraco database and its base data
             DatabaseContext.Database.CreateDatabaseSchema(false);
         }
-
 
         [TearDown]
         public virtual void TearDown()
@@ -103,6 +107,8 @@ namespace Umbraco.Tests.TestHelpers
             {
                 File.Delete(filePath);
             }
+
+            UmbracoSettings.ResetSetters();
         }
 
 	    protected ApplicationContext ApplicationContext
