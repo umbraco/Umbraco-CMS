@@ -10,7 +10,7 @@ using Umbraco.Core.ObjectResolution;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Resolver for IPublishedContentFinder objects.
+    /// Resolves IPublishedContentFinder objects.
 	/// </summary>
 	internal sealed class ContentFinderResolver : ManyObjectsResolverBase<ContentFinderResolver, IContentFinder>
 	{
@@ -22,6 +22,15 @@ namespace Umbraco.Web.Routing
 		internal ContentFinderResolver(IEnumerable<Type> finders)
 			: base(finders)
 		{ }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentFinderResolver"/> class with an initial list of finder types.
+        /// </summary>
+        /// <param name="finders">The list of finder types</param>
+        /// <remarks>The resolver is created by the <c>WebBootManager</c> and thus the constructor remains internal.</remarks>
+        internal ContentFinderResolver(params Type[] finders)
+            : base(finders)
+        { }
 		
 		/// <summary>
 		/// Gets the finders.
