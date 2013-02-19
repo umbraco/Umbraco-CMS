@@ -21,11 +21,12 @@ namespace Umbraco.Tests.ContentStores
 			base.Initialize();				
 		}
 
-        protected override void OnFreezing()
+        protected override void FreezeResolution()
         {
-            base.OnFreezing();
             //we're going to use the same initialization as the PublishedMediaTests
             PublishedMediaTests.DoInitialization(GetUmbracoContext("/test", 1234));		
+            
+            base.FreezeResolution();            
         }
 
 		public override void TearDown()

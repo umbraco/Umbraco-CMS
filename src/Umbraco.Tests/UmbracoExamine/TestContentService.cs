@@ -17,13 +17,18 @@ namespace Umbraco.Tests.UmbracoExamine
 	{
 		public const int ProtectedNode = 1142;
 
-		public TestContentService(string xml = null)
+		public TestContentService(string contentXml = null, string mediaXml = null)
 		{
-            if (xml == null)
+            if (contentXml == null)
             {
-                xml = TestFiles.umbraco;
+                contentXml = TestFiles.umbraco;
             }
-            _xDoc = XDocument.Parse(xml);
+            if (mediaXml == null)
+            {
+                mediaXml = TestFiles.media;
+            }
+            _xContent = XDocument.Parse(contentXml);
+		    _xMedia = XDocument.Parse(mediaXml);
 		}
 
 		#region IContentService Members
@@ -39,7 +44,7 @@ namespace Umbraco.Tests.UmbracoExamine
 		public XDocument GetLatestContentByXPath(string xpath)
 		{
 			var xdoc = XDocument.Parse("<content></content>");
-			xdoc.Root.Add(_xDoc.XPathSelectElements(xpath));
+			xdoc.Root.Add(_xContent.XPathSelectElements(xpath));
 
 			return xdoc;
 		}
@@ -51,11 +56,16 @@ namespace Umbraco.Tests.UmbracoExamine
 		/// <returns></returns>
 		public XDocument GetPublishedContentByXPath(string xpath)
 		{
-			var xdoc = XDocument.Parse("<content></content>");
-			xdoc.Root.Add(_xDoc.XPathSelectElements(xpath));
-
-			return xdoc;
+		    return GetContentByXPath(xpath, _xContent);			
 		}
+
+        private XDocument GetContentByXPath(string xpath, XDocument content)
+        {
+            var xdoc = XDocument.Parse("<content></content>");
+            xdoc.Root.Add(content.XPathSelectElements(xpath));
+
+            return xdoc;
+        }
 
 		public string StripHtml(string value)
 		{
@@ -70,24 +80,42 @@ namespace Umbraco.Tests.UmbracoExamine
 			return nodeId == ProtectedNode;
 		}
 
+        private List<string> _userPropNames; 
 		public IEnumerable<string> GetAllUserPropertyNames()
 		{
-			return GetPublishedContentByXPath("//*[count(@id)>0]")
-				.Root
-				.Elements()
-				.Select(x => x.Name.LocalName)
-				.ToList();
+            if (_userPropNames == null)
+            {
+                var xpath = "//*[count(@id)>0 and @id != -1]";
+                _userPropNames = GetPublishedContentByXPath(xpath)
+                    .Root
+                    .Elements() //each page
+                    .SelectMany(x => x.Elements().Where(e => e.Attribute("id") == null)) //each page property (no @id)         
+                    .Select(x => x.Name.LocalName) //the name of the property
+                    .Distinct()
+                    .Union(GetContentByXPath(xpath, _xMedia)
+                               .Root
+                               .Elements() //each page
+                               .SelectMany(x => x.Elements().Where(e => e.Attribute("id") == null)) //each page property (no @id)         
+                               .Select(x => (string)x.Attribute("alias")) //the name of the property NOTE: We are using the legacy XML here.
+                               .Distinct()).ToList();
+            }
+		    return _userPropNames;
 		}
 
+        private List<string> _sysPropNames; 
 		public IEnumerable<string> GetAllSystemPropertyNames()
 		{
-			return UmbracoContentIndexer.IndexFieldPolicies.Select(x => x.Name);
+            if (_sysPropNames == null)
+            {
+                _sysPropNames = UmbracoContentIndexer.IndexFieldPolicies.Select(x => x.Name).ToList();
+            }
+		    return _sysPropNames;
 		}
 
 		#endregion
 
-		private readonly XDocument _xDoc;
-
+		private readonly XDocument _xContent;
+        private readonly XDocument _xMedia;
 
 
 

@@ -85,10 +85,8 @@ namespace Umbraco.Tests.PublishedContent
         /// <summary>
         /// Setup any resolvers before freezing
         /// </summary>
-        protected override void OnFreezing()
+        protected override void FreezeResolution()
         {
-            base.OnFreezing();
-
             PublishedContentStoreResolver.Current = new PublishedContentStoreResolver(new DefaultPublishedContentStore());
 
             PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
@@ -98,6 +96,8 @@ namespace Umbraco.Tests.PublishedContent
 						typeof(TinyMcePropertyEditorValueConverter),
 						typeof(YesNoPropertyEditorValueConverter)
 					});
+
+            base.FreezeResolution();
         }
 
 		public override void TearDown()

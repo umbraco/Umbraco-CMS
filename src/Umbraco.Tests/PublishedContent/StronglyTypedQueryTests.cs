@@ -22,11 +22,12 @@ namespace Umbraco.Tests.PublishedContent
 			base.Initialize();
 		}
 
-        protected override void OnFreezing()
-        {
+        protected override void FreezeResolution()
+        {            
             var routingCtx = GetRoutingContext("/test", 1234);
             UmbracoContext.Current = routingCtx.UmbracoContext;
             PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(Enumerable.Empty<Type>());
+            base.FreezeResolution();
         }
 
 		public override void TearDown()

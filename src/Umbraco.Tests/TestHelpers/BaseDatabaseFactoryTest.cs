@@ -63,15 +63,21 @@ namespace Umbraco.Tests.TestHelpers
             //Create the Sql CE database
             var engine = new SqlCeEngine(settings.ConnectionString);
             engine.CreateDatabase();
-
-            Resolution.Freeze();
+            
             ApplicationContext.Current = new ApplicationContext(
 				//assign the db context
 				new DatabaseContext(new DefaultDatabaseFactory()),
 				//assign the service context
 				new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
 
+            FreezeResolution();
+
             InitializeDatabase();
+        }
+
+        protected virtual void FreezeResolution()
+        {
+            Resolution.Freeze();
         }
 
         protected virtual void InitializeDatabase()
@@ -95,8 +101,9 @@ namespace Umbraco.Tests.TestHelpers
 			SqlCeContextGuardian.CloseBackgroundConnection();
 			
 			ApplicationContext.Current = null;
-			Resolution.IsFrozen = false;
+			
 			RepositoryResolver.Reset();
+            Resolution.Reset();
 
             TestHelper.CleanContentDirectories();
 			

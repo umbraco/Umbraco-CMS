@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
 using Examine;
+using Examine.LuceneEngine.Config;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using UmbracoExamine;
+using UmbracoExamine.Config;
 using UmbracoExamine.DataServices;
 using UmbracoExamine.PDF;
 
@@ -30,22 +32,10 @@ namespace Umbraco.Tests.UmbracoExamine
                 analyzer = new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29);
             }
 
-		    var i = new UmbracoContentIndexer(new IndexCriteria(
-		                                          //new[]
-		                                          //                                      {
-		                                          //                                          new TestIndexField {Name = "id", EnableSorting = true, Type = "Number"},
-		                                          //                                          new TestIndexField {Name = "nodeName", EnableSorting = true},
-		                                          //                                          new TestIndexField {Name = "updateDate", EnableSorting = true, Type = "DateTime"},
-		                                          //                                          new TestIndexField {Name = "writerName"},
-		                                          //                                          new TestIndexField {Name = "path"},
-		                                          //                                          new TestIndexField {Name = "nodeTypeAlias"},
-		                                          //                                          new TestIndexField {Name = "parentID"}
-		                                          //                                      },                                  
-		                                          Enumerable.Empty<IIndexField>(),
-		                                          Enumerable.Empty<IIndexField>(),
-		                                          Enumerable.Empty<string>(),
-		                                          new string[] {},
-		                                          -1),
+		    var indexSet = new IndexSet();
+		    var indexCriteria = indexSet.ToIndexCriteria(dataService);
+
+		    var i = new UmbracoContentIndexer(indexCriteria,
 		                                      luceneDir, //custom lucene directory
                                               dataService,
 		                                      analyzer,

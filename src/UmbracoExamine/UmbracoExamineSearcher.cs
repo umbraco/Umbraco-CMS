@@ -86,19 +86,28 @@ namespace UmbracoExamine
 		#endregion
 
         /// <summary>
+        /// Used for unit tests
+        /// </summary>
+        internal static bool? DisableInitializationCheck = null;
+
+        /// <summary>
         /// Returns true if the Umbraco application is in a state that we can initialize the examine indexes
         /// </summary>
         /// <returns></returns>
         [SecuritySafeCritical]
         protected bool CanInitialize()
         {
-            //We need to check if we actually can initialize, if not then don't continue
-            if (ApplicationContext.Current == null
-                || !ApplicationContext.Current.IsConfigured
-                || !ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured)
+            //check the DisableInitializationCheck and ensure that it is not set to true
+            if (!DisableInitializationCheck.HasValue || !DisableInitializationCheck.Value)
             {
-                return false;
-            }
+                //We need to check if we actually can initialize, if not then don't continue
+                if (ApplicationContext.Current == null
+                    || !ApplicationContext.Current.IsConfigured
+                    || !ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured)
+                {
+                    return false;
+                }
+            }            
             return true;
         }
 
