@@ -5,7 +5,7 @@ namespace Umbraco.Core.Strings
 	/// <summary>
     /// Resolves the IShortStringHelper object
 	/// </summary>
-    internal sealed class ShortStringHelperResolver : SingleObjectResolverBase<ShortStringHelperResolver, IShortStringHelper>
+    public sealed class ShortStringHelperResolver : SingleObjectResolverBase<ShortStringHelperResolver, IShortStringHelper>
 	{
         /// <summary>
         /// Initializes a new instance of the <see cref="ShortStringHelperResolver"/> class with an instance of a helper.

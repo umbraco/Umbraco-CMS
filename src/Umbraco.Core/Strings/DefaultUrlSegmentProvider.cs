@@ -6,7 +6,7 @@ namespace Umbraco.Core.Strings
     /// <summary>
     /// Default implementation of IUrlSegmentProvider.
     /// </summary>
-    internal class DefaultUrlSegmentProvider : IUrlSegmentProvider
+    public class DefaultUrlSegmentProvider : IUrlSegmentProvider
     {
         /// <summary>
         /// Gets the default url segment for a specified content.

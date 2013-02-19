@@ -7,7 +7,7 @@ namespace Umbraco.Core.Strings
     /// Provides url segments for content.
     /// </summary>
     /// <remarks>Url segments should comply with IETF RFCs regarding content, encoding, etc.</remarks>
-    internal interface IUrlSegmentProvider
+    public interface IUrlSegmentProvider
     {
         /// <summary>
         /// Gets the default url segment for a specified content.

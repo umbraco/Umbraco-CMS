@@ -7,7 +7,7 @@ namespace Umbraco.Core.Strings
     /// Provides string functions for short strings such as aliases or url segments.
     /// </summary>
     /// <remarks>Not necessarily optimized to work on large bodies of text.</remarks>
-    internal interface IShortStringHelper
+    public interface IShortStringHelper
     {
         /// <summary>
         /// Freezes the helper so it can prevents its configuration from being modified.
