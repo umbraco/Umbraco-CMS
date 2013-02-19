@@ -283,7 +283,7 @@ namespace Umbraco.Web
 					});
 
             UrlProviderResolver.Current = new UrlProviderResolver(
-                    typeof(AliasUrlProvider),
+                    //typeof(AliasUrlProvider), // not enabled by default
                     typeof(DefaultUrlProvider)
                 );
 
@@ -304,6 +304,8 @@ namespace Umbraco.Web
 						//typeof (ContentFinderByUrlAlias),
                         typeof (ContentFinderByNotFoundHandlers)
 					);
+
+            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
 
             RoutesCacheResolver.Current = new RoutesCacheResolver(new DefaultRoutesCache(_isForTesting == false));
 

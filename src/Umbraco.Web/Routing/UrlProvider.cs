@@ -10,6 +10,8 @@ namespace Umbraco.Web.Routing
     /// </summary>
     internal class UrlProvider
     {
+        #region Ctor and configuration
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UrlProvider"/> class with an Umbraco context, a content cache, and a list of url providers.
         /// </summary>
@@ -33,6 +35,10 @@ namespace Umbraco.Web.Routing
         /// Gets or sets a value indicating whether the provider should enforce absolute urls.
         /// </summary>
         public bool EnforceAbsoluteUrls { get; set; }
+
+        #endregion
+
+        #region GetUrl
 
         /// <summary>
         /// Gets the url of a published content.
@@ -85,6 +91,10 @@ namespace Umbraco.Web.Routing
             return url ?? "#"; // legacy wants this
         }
 
+        #endregion
+
+        #region GetOtherUrls
+
         /// <summary>
         /// Gets the other urls of a published content.
         /// </summary>
@@ -117,5 +127,7 @@ namespace Umbraco.Web.Routing
 
             return urls;
         }
+
+        #endregion
     }
 }

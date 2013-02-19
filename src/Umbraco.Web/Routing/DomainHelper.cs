@@ -1,47 +1,108 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Umbraco.Core;
 using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Web.Routing
 {
-	/// <summary>
-	/// Provides utilities to handle domains.
-	/// </summary>
+    /// <summary>
+    /// Provides utilities to handle domains.
+    /// </summary>
 	internal class DomainHelper
 	{
-		private static Domain SanitizeForBackwardCompatibility(Domain d)
-		{
-			// this is a _really_ nasty one that should be removed in 6.x
-			// some people were using hostnames such as "/en" which happened to work pre-4.10
-			// but make _no_ sense at all... and 4.10 throws on them, so here we just try
-			// to find a way so 4.11 does not throw.
-			// but, really.
-			// no.
-			var context = System.Web.HttpContext.Current;
-			if (context != null && d.Name.StartsWith("/"))
-			{
-				// turn /en into http://whatever.com/en so it becomes a parseable uri
-				var authority = context.Request.Url.GetLeftPart(UriPartial.Authority);
-				d.Name = authority + d.Name;
-			}
-			return d;
-		}
+        #region Temp. abstract Umbraco's API
 
         /// <summary>
-        /// Finds the domain that best matches the current uri, into an enumeration of domains.
+        /// Gets all domains defined in the system.
         /// </summary>
-        /// <param name="domains">The enumeration of Umbraco domains.</param>
-        /// <param name="current">The uri of the current request, or null.</param>
+        /// <returns>All domains defined in the system.</returns>
+        /// <remarks>This is to temporarily abstract Umbraco's API.</remarks>
+        internal static Domain[] GetAllDomains()
+        {
+            return Domain.GetDomains().ToArray();
+        }
+
+        /// <summary>
+        /// Gets all domains defined in the system at a specified node.
+        /// </summary>
+        /// <param name="nodeId">The node identifier.</param>
+        /// <returns>All domains defined in the system at the specified node.</returns>
+        /// <remarks>This is to temporarily abstract Umbraco's API.</remarks>
+        internal static Domain[] GetNodeDomains(int nodeId)
+        {
+            return Domain.GetDomainsById(nodeId);
+        }
+
+        #endregion
+
+        #region Domain for Node
+
+        /// <summary>
+        /// Finds the domain for the specified node, if any, that best matches a specified uri.
+        /// </summary>
+        /// <param name="nodeId">The node identifier.</param>
+        /// <param name="current">The uri, or null.</param>
+        /// <returns>The domain and its uri, if any, that best matches the specified uri.</returns>
+        internal static DomainAndUri DomainForNode(int nodeId, Uri current)
+        {
+            // be safe
+            if (nodeId <= 0)
+                return null;
+
+            // get the domains on that node
+            var domains = GetNodeDomains(nodeId);
+
+            // filter those that match
+            var helper = SiteDomainHelperResolver.Current.Helper;
+            var domainAndUri = DomainForUri(domains, current, domainAndUris => helper.MapDomain(current, domainAndUris));
+
+            // return null or the uri
+            return domainAndUri;
+        }
+
+        /// <summary>
+        /// Find the domains for the specified node, if any, that match a specified uri.
+        /// </summary>
+        /// <param name="nodeId">The node identifier.</param>
+        /// <param name="current">The uri, or null.</param>
+        /// <returns>The domains and their uris, that match the specified uri.</returns>
+        internal static IEnumerable<DomainAndUri> DomainsForNode(int nodeId, Uri current)
+        {
+            // be safe
+            if (nodeId <= 0)
+                return null;
+
+            // get the domains on that node
+            var domains = GetNodeDomains(nodeId);
+
+            // filter those that match
+            var domainAndUris = DomainsForUri(domains, current).ToArray();
+
+            // return null or a (maybe empty) enumerable of uris
+            var helper = SiteDomainHelperResolver.Current.Helper;
+            var domainAndUris2 = helper.MapDomains(current, domainAndUris).ToArray();
+            return domainAndUris2.Any() ? domainAndUris2 : null;
+        }
+
+        #endregion
+
+        #region Domain for Uri
+
+        /// <summary>
+        /// Finds the domain that best matches a specified uri, into a group of domains.
+        /// </summary>
+        /// <param name="domains">The group of domains.</param>
+        /// <param name="current">The uri, or null.</param>
         /// <param name="filter">A function to filter the list of domains, if more than one applies, or <c>null</c>.</param>
-        /// <returns>The domain and its normalized uri, that best matches the current uri.</returns>
+        /// <returns>The domain and its normalized uri, that best matches the specified uri.</returns>
         /// <remarks>
         /// <para>If more than one domain matches, then the <paramref name="filter"/> function is used to pick
         /// the right one, unless it is <c>null</c>, in which case the method returns <c>null</c>.</para>
         /// <para>The filter, if any, will be called only with a non-empty argument, and _must_ return something.</para>
         /// </remarks>
-        public static DomainAndUri DomainMatch(Domain[] domains, Uri current, Func<DomainAndUri[], DomainAndUri> filter = null)
+        internal static DomainAndUri DomainForUri(Domain[] domains, Uri current, Func<DomainAndUri[], DomainAndUri> filter = null)
         {
             // sanitize the list to have proper uris for comparison (scheme, path end with /)
             // we need to end with / because example.com/foo cannot match example.com/foobar
@@ -84,73 +145,113 @@ namespace Umbraco.Web.Routing
             return domainAndUri;
         }
 
-		/// <summary>
-		/// Gets an enumeration of <see cref="DomainAndUri"/> matching an enumeration of Umbraco domains.
-		/// </summary>
-		/// <param name="domains">The enumeration of Umbraco domains.</param>
-		/// <param name="current">The uri of the current request, or null.</param>
-		/// <returns>The enumeration of <see cref="DomainAndUri"/> matching the enumeration of Umbraco domains.</returns>
-		public static IEnumerable<DomainAndUri> DomainMatches(Domain[] domains, Uri current)
-		{
+        /// <summary>
+        /// Gets the domains that match a specified uri, into a group of domains.
+        /// </summary>
+        /// <param name="domains">The group of domains.</param>
+        /// <param name="current">The uri, or null.</param>
+        /// <returns>The domains and their normalized uris, that match the specified uri.</returns>
+        internal static IEnumerable<DomainAndUri> DomainsForUri(Domain[] domains, Uri current)
+        {
             var scheme = current == null ? Uri.UriSchemeHttp : current.Scheme;
-			var domainsAndUris = domains
-				.Where(d => !d.IsWildcard)
-				.Select(SanitizeForBackwardCompatibility)
+            return domains
+                .Where(d => !d.IsWildcard)
+                .Select(SanitizeForBackwardCompatibility)
                 .Select(d => new DomainAndUri(d, scheme))
                 .OrderByDescending(d => d.Uri.ToString());
-			return domainsAndUris;
-		}
+        }
 
-		/// <summary>
-		/// Gets a value indicating whether there is another domain defined down in the path to a node under the current domain's root node.
-		/// </summary>
-		/// <param name="current">The current domain.</param>
-		/// <param name="path">The path to a node under the current domain's root node.</param>
-		/// <returns>A value indicating if there is another domain defined down in the path.</returns>
-		public static bool ExistsDomainInPath(Domain current, string path)
-		{
-			var domains = Domain.GetDomains();
-			var stopNodeId = current == null ? -1 : current.RootNodeId;
+        #endregion
 
-			return path.Split(',')
-				.Reverse()
-				.Select(int.Parse)
-				.TakeWhile(id => id != stopNodeId)
-				.Any(id => domains.Any(d => d.RootNodeId == id && !d.IsWildcard));
-		}
+        #region Utilities
 
-		/// <summary>
-		/// Gets the deepest wildcard <see cref="Domain"/> in a node path.
-		/// </summary>
-		/// <param name="domains">The Umbraco domains.</param>
-		/// <param name="path">The node path.</param>
-		/// <param name="rootNodeId">The current domain root node identifier, or null.</param>
-		/// <returns>The deepest wildcard <see cref="Domain"/> in the path, or null.</returns>
-		public static Domain LookForWildcardDomain(Domain[] domains, string path, int? rootNodeId)
-		{
-            // "When you perform comparisons with nullable types, if the value of one of the nullable
-            // types is null and the other is not, all comparisons evaluate to false."
+        /// <summary>
+        /// Sanitize a Domain.
+        /// </summary>
+        /// <param name="domain">The Domain to sanitize.</param>
+        /// <returns>The sanitized domain.</returns>
+        /// <remarks>This is a _really_ nasty one that should be removed at some point. Some people were
+        /// using hostnames such as "/en" which happened to work pre-4.10 but really make no sense at
+        /// all... and 4.10 throws on them, so here we just try to find a way so 4.11 does not throw.
+        /// But really... no.</remarks>
+        private static Domain SanitizeForBackwardCompatibility(Domain domain)
+        {
+            var context = System.Web.HttpContext.Current;
+            if (context != null && domain.Name.StartsWith("/"))
+            {
+                // turn "/en" into "http://whatever.com/en" so it becomes a parseable uri
+                var authority = context.Request.Url.GetLeftPart(UriPartial.Authority);
+                domain.Name = authority + domain.Name;
+            }
+            return domain;
+        }
+ 
+        /// <summary>
+        /// Gets a value indicating whether there is another domain defined down in the path to a node under the current domain's root node.
+        /// </summary>
+        /// <param name="domains">The domains.</param>
+        /// <param name="path">The path to a node under the current domain's root node eg '-1,1234,5678'.</param>
+        /// <param name="rootNodeId">The current domain root node identifier, or null.</param>
+        /// <returns>A value indicating if there is another domain defined down in the path.</returns>
+        /// <remarks>Looks _under_ rootNodeId but not _at_ rootNodeId.</remarks>
+        internal static bool ExistsDomainInPath(Domain[] domains, string path, int? rootNodeId)
+        {
+            return FindDomainInPath(domains, path, rootNodeId) != null;
+        }
 
-            return path
-                .Split(',')
-                .Select(int.Parse)
-                .Skip(1)
-                .Reverse()
-                .TakeWhile(id => !rootNodeId.HasValue || id != rootNodeId)
-                .Select(nodeId => domains.FirstOrDefault(d => d.RootNodeId == nodeId && d.IsWildcard))
-                .FirstOrDefault(domain => domain != null);
-		}
+        /// <summary>
+        /// Gets the deepest non-wildcard Domain, if any, from a group of Domains, in a node path.
+        /// </summary>
+        /// <param name="domains">The domains.</param>
+        /// <param name="path">The node path eg '-1,1234,5678'.</param>
+        /// <param name="rootNodeId">The current domain root node identifier, or null.</param>
+        /// <returns>The deepest non-wildcard Domain in the path, or null.</returns>
+        /// <remarks>Looks _under_ rootNodeId but not _at_ rootNodeId.</remarks>
+        internal static Domain FindDomainInPath(Domain[] domains, string path, int? rootNodeId)
+        {
+            var stopNodeId = rootNodeId ?? -1;
 
-		/// <summary>
-		/// Returns the part of a path relative to the uri of a domain.
-		/// </summary>
-		/// <param name="domainUri">The normalized uri of the domain.</param>
-		/// <param name="path">The full path of the uri.</param>
-		/// <returns>The path part relative to the uri of the domain.</returns>
-		/// <remarks>Eg the relative part of <c>/foo/bar/nil</c> to domain <c>example.com/foo</c> is <c>/bar/nil</c>.</remarks>
-		public static string PathRelativeToDomain(Uri domainUri, string path)
-		{
-			return path.Substring(domainUri.AbsolutePath.Length).EnsureStartsWith('/');
-		}
-	}
+            return path.Split(',')
+                       .Reverse()
+                       .Select(int.Parse)
+                       .TakeWhile(id => id != stopNodeId)
+                       .Select(id => domains.FirstOrDefault(d => d.RootNodeId == id && !d.IsWildcard))
+                       .SkipWhile(domain => domain == null)
+                       .FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Gets the deepest wildcard Domain, if any, from a group of Domains, in a node path.
+        /// </summary>
+        /// <param name="domains">The domains.</param>
+        /// <param name="path">The node path eg '-1,1234,5678'.</param>
+        /// <param name="rootNodeId">The current domain root node identifier, or null.</param>
+        /// <returns>The deepest wildcard Domain in the path, or null.</returns>
+        /// <remarks>Looks _under_ rootNodeId but not _at_ rootNodeId.</remarks>
+        internal static Domain FindWildcardDomainInPath(Domain[] domains, string path, int? rootNodeId)
+        {
+            var stopNodeId = rootNodeId ?? -1;
+
+            return path.Split(',')
+                       .Reverse()
+                       .Select(int.Parse)
+                       .TakeWhile(id => id != stopNodeId)
+                       .Select(id => domains.FirstOrDefault(d => d.RootNodeId == id && d.IsWildcard))
+                       .FirstOrDefault(domain => domain != null);
+        }
+
+        /// <summary>
+        /// Returns the part of a path relative to the uri of a domain.
+        /// </summary>
+        /// <param name="domainUri">The normalized uri of the domain.</param>
+        /// <param name="path">The full path of the uri.</param>
+        /// <returns>The path part relative to the uri of the domain.</returns>
+        /// <remarks>Eg the relative part of <c>/foo/bar/nil</c> to domain <c>example.com/foo</c> is <c>/bar/nil</c>.</remarks>
+        internal static string PathRelativeToDomain(Uri domainUri, string path)
+        {
+            return path.Substring(domainUri.AbsolutePath.Length).EnsureStartsWith('/');
+        }
+
+        #endregion
+    }
 }

@@ -32,7 +32,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public virtual string GetUrl(UmbracoContext umbracoContext, IPublishedContentStore contentCache, int id, Uri current, bool absolute)
         {
-            Uri domainUri;
+            DomainAndUri domainUri;
             string path;
 
             if (!current.IsAbsoluteUri)
@@ -51,7 +51,7 @@ namespace Umbraco.Web.Routing
                 // route is /<path> or <domainRootId>/<path>
                 int pos = route.IndexOf('/');
                 path = pos == 0 ? route : route.Substring(pos);
-                domainUri = pos == 0 ? null : DomainUriAtNode(int.Parse(route.Substring(0, pos)), current);
+                domainUri = pos == 0 ? null : DomainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current);
             }
             else
             {
@@ -70,7 +70,7 @@ namespace Umbraco.Web.Routing
                 // or we reach the content root, collecting urls in the way
                 var pathParts = new List<string>();
                 var n = node;
-                domainUri = DomainUriAtNode(n.Id, current);
+                domainUri = DomainHelper.DomainForNode(n.Id, current);
                 while (domainUri == null && n != null) // n is null at root
                 {
                     // get the url
@@ -79,7 +79,7 @@ namespace Umbraco.Web.Routing
 
                     // move to parent node
                     n = n.Parent;
-                    domainUri = n == null ? null : DomainUriAtNode(n.Id, current);
+                    domainUri = n == null ? null : DomainHelper.DomainForNode(n.Id, current);
                 }
 
                 // no domain, respect HideTopLevelNodeFromPath for legacy purposes
@@ -119,7 +119,7 @@ namespace Umbraco.Web.Routing
         public virtual IEnumerable<string> GetOtherUrls(UmbracoContext umbracoContext, IPublishedContentStore contentCache, int id, Uri current)
         {
             string path;
-            IEnumerable<Uri> domainUris;
+            IEnumerable<DomainAndUri> domainUris;
 
             // will not read cache if previewing!
             var route = umbracoContext.InPreviewMode
@@ -132,7 +132,7 @@ namespace Umbraco.Web.Routing
                 // route is /<path> or <domainRootId>/<path>
                 int pos = route.IndexOf('/');
                 path = pos == 0 ? route : route.Substring(pos);
-                domainUris = pos == 0 ? null : DomainUrisAtNode(int.Parse(route.Substring(0, pos)), current);
+                domainUris = pos == 0 ? null : DomainHelper.DomainsForNode(int.Parse(route.Substring(0, pos)), current);
             }
             else
             {
@@ -151,7 +151,7 @@ namespace Umbraco.Web.Routing
                 // or we reach the content root, collecting urls in the way
                 var pathParts = new List<string>();
                 var n = node;
-                domainUris = DomainUrisAtNode(n.Id, current);
+                domainUris = DomainHelper.DomainsForNode(n.Id, current);
                 while (domainUris == null && n != null) // n is null at root
                 {
                     // get the url
@@ -160,7 +160,7 @@ namespace Umbraco.Web.Routing
 
                     // move to parent node
                     n = n.Parent;
-                    domainUris = n == null ? null : DomainUrisAtNode(n.Id, current);
+                    domainUris = n == null ? null : DomainHelper.DomainsForNode(n.Id, current);
                 }
 
                 // no domain, respect HideTopLevelNodeFromPath for legacy purposes
@@ -185,7 +185,7 @@ namespace Umbraco.Web.Routing
 
         #region Utilities
 
-        Uri AssembleUrl(Uri domainUri, string path, Uri current, bool absolute)
+        Uri AssembleUrl(DomainAndUri domainUri, string path, Uri current, bool absolute)
         {
             Uri uri;
 
@@ -202,10 +202,10 @@ namespace Umbraco.Web.Routing
             {
                 // a domain was found : return an absolute or relative url
                 // ignore vdir at that point
-                if (!absolute && current != null && domainUri.GetLeftPart(UriPartial.Authority) == current.GetLeftPart(UriPartial.Authority))
-                    uri = new Uri(CombinePaths(domainUri.AbsolutePath, path), UriKind.Relative); // relative
+                if (!absolute && current != null && domainUri.Uri.GetLeftPart(UriPartial.Authority) == current.GetLeftPart(UriPartial.Authority))
+                    uri = new Uri(CombinePaths(domainUri.Uri.AbsolutePath, path), UriKind.Relative); // relative
                 else
-                    uri = new Uri(CombinePaths(domainUri.GetLeftPart(UriPartial.Path), path)); // absolute
+                    uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path)); // absolute
             }
 
             // UriFromUmbraco will handle vdir
@@ -220,7 +220,7 @@ namespace Umbraco.Web.Routing
         }
 
         // always build absolute urls unless we really cannot
-        IEnumerable<Uri> AssembleUrls(IEnumerable<Uri> domainUris, string path)
+        IEnumerable<Uri> AssembleUrls(IEnumerable<DomainAndUri> domainUris, string path)
         {
             // no domain == no "other" url
             if (domainUris == null)
@@ -228,62 +228,11 @@ namespace Umbraco.Web.Routing
 
             // if no domain was found and then we have no "other" url
             // else return absolute urls, ignoring vdir at that point
-            var uris = domainUris.Select(domainUri => new Uri(CombinePaths(domainUri.GetLeftPart(UriPartial.Path), path)));
+            var uris = domainUris.Select(domainUri => new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path)));
 
             // UriFromUmbraco will handle vdir
             // meaning it will add vdir into domain urls too!
             return uris.Select(UriUtility.UriFromUmbraco);
-        }
-
-        Uri DomainUriAtNode(int nodeId, Uri current)
-        {
-            // be safe
-            if (nodeId <= 0)
-                return null;
-
-            // get the domains on that node
-            var domains = Domain.GetDomainsById(nodeId);
-
-            // filter those that match
-            var domainAndUri = DomainHelper.DomainMatch(domains, current, domainAndUris => MapDomain(current, domainAndUris));
-
-            return domainAndUri == null ? null : domainAndUri.Uri;
-        }
-
-        /// <summary>
-        /// Filters a list of <c>DomainAndUri</c> to pick one that best matches the current request.
-        /// </summary>
-        /// <param name="domainAndUris">The list of <c>DomainAndUri</c> to filter.</param>
-        /// <param name="current">The Uri of the current request.</param>
-        /// <returns>The selected <c>DomainAndUri</c>.</returns>
-        /// <remarks>
-        /// <para>If the filter is invoked then <paramref name="domainAndUris"/> is _not_ empty and
-        /// <paramref name="current"/> is _not_ null, and <paramref name="current"/> could not be
-        /// matched with anything in <paramref name="domainAndUris"/>.</para>
-        /// <para>The filter _must_ return something else an exception will be thrown.</para>
-        /// </remarks>
-        protected virtual DomainAndUri MapDomain(Uri current, DomainAndUri[] domainAndUris)
-        {
-            // all we can do at the moment
-            return domainAndUris.First();
-        }
-
-        Uri[] DomainUrisAtNode(int nodeId, Uri current)
-        {
-            // be safe
-            if (nodeId <= 0)
-                return null;
-
-            var domainAndUris = DomainHelper.DomainMatches(Domain.GetDomainsById(nodeId), current).ToArray();
-
-            // if any, then filter them (and maybe return empty) else return null
-            return !domainAndUris.Any() ? null : MapDomains(current, domainAndUris).Select(d => d.Uri).ToArray();
-        }
-
-        protected virtual IEnumerable<DomainAndUri> MapDomains(Uri current, DomainAndUri[] domainAndUris)
-        {
-            // all we can do at the moment
-            return domainAndUris;
         }
 
         static void ApplyHideTopLevelNodeFromPath(UmbracoContext umbracoContext, IPublishedContentStore contentCache, Core.Models.IPublishedContent node, IList<string> pathParts)

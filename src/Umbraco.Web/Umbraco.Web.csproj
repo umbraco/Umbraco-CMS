@@ -385,10 +385,13 @@
     <Compile Include="Routing\ContentFinderByPageIdQuery.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
     <Compile Include="Routing\ContentFinderByNotFoundHandlers.cs" />
+    <Compile Include="Routing\ISiteDomainHelper.cs" />
     <Compile Include="Routing\RoutableAttemptEventArgs.cs" />
     <Compile Include="Routing\DefaultUrlProvider.cs" />
     <Compile Include="Routing\DomainAndUri.cs" />
     <Compile Include="Routing\IUrlProvider.cs" />
+    <Compile Include="Routing\SiteDomainHelper.cs" />
+    <Compile Include="Routing\SiteDomainHelperResolver.cs" />
     <Compile Include="Routing\UrlProviderResolver.cs" />
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
     <Compile Include="Routing\EnsureRoutableOutcome.cs" />

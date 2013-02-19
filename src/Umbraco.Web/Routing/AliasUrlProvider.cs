@@ -10,6 +10,12 @@ namespace Umbraco.Web.Routing
     /// </summary>
     internal class AliasUrlProvider : IUrlProvider
     {
+        // note - at the moment we seem to accept pretty much anything as an alias
+        // without any form of validation ... could even prob. kill the XPath ...
+        // ok, this is somewhat experimental and is NOT enabled by default
+
+        #region GetUrl
+
         /// <summary>
         /// Gets the nice url of a published content.
         /// </summary>
@@ -29,18 +35,9 @@ namespace Umbraco.Web.Routing
             return null; // we have nothing to say
         }
 
-        const string UmbracoUrlAlias = "umbracoUrlAlias";
+        #endregion
 
-        private bool FindByUrlAliasEnabled
-        {
-            get
-            {
-                var hasFinder = ContentFinderResolver.Current.ContainsType<ContentFinderByUrlAlias>();
-                var hasHandler = ContentFinderResolver.Current.ContainsType<ContentFinderByNotFoundHandlers>()
-                    && NotFoundHandlerHelper.CustomHandlerTypes.Contains(typeof(global::umbraco.SearchForAlias));
-                return hasFinder || hasHandler;
-            }
-        }
+        #region GetOtherUrls
 
         /// <summary>
         /// Gets the other urls of a published content.
@@ -66,32 +63,51 @@ namespace Umbraco.Web.Routing
             if (string.IsNullOrWhiteSpace(umbracoUrlName))
                 return Enumerable.Empty<string>();
 
-            /*
-            
-            // walk up from that node until we hit a node with a domain,
-            // or we reach the content root, collecting urls in the way
             var n = node;
-            Uri domainUri = DomainUriAtNode(n.Id, current);
-            while (domainUri == null && n != null) // n is null at root
+            var domainUris = DomainHelper.DomainsForNode(n.Id, current);
+            while (domainUris == null && n != null) // n is null at root
             {
-                // get the url
-                var urlName = n.UrlName;
-
                 // move to parent node
                 n = n.Parent;
-                domainUri = n == null ? null : DomainUriAtNode(n.Id, current);
+                domainUris = n == null ? null : DomainHelper.DomainsForNode(n.Id, current);
             }
 
-            if (domainUri == null)
-                return new string[] { "/" + umbracoUrlName };
-            else
-                // fuck - there may be MANY domains actually!!
-                return null;
-             * 
-             */
+            var path = "/" + umbracoUrlName;
 
-            // just for fun
-            return new[] { "/" + umbracoUrlName };
+            if (domainUris == null)
+            {
+                var uri = new Uri(path, UriKind.Relative);
+                return new[] { UriUtility.UriFromUmbraco(uri).ToString() };
+            }
+
+            return domainUris
+                .Select(domainUri => new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path)))
+                .Select(uri => UriUtility.UriFromUmbraco(uri).ToString());
         }
+
+        #endregion
+
+        #region Utilities
+
+        const string UmbracoUrlAlias = "umbracoUrlAlias";
+
+        private bool FindByUrlAliasEnabled
+        {
+            get
+            {
+                var hasFinder = ContentFinderResolver.Current.ContainsType<ContentFinderByUrlAlias>();
+                var hasHandler = ContentFinderResolver.Current.ContainsType<ContentFinderByNotFoundHandlers>()
+                    && NotFoundHandlerHelper.CustomHandlerTypes.Contains(typeof(global::umbraco.SearchForAlias));
+                return hasFinder || hasHandler;
+            }
+        }
+
+        string CombinePaths(string path1, string path2)
+        {
+            string path = path1.TrimEnd('/') + path2;
+            return path == "/" ? path : path.TrimEnd('/');
+        }
+
+        #endregion
     }
 }
