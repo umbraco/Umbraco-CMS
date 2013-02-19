@@ -68,8 +68,13 @@ namespace Umbraco.Web.Routing
                         LogHelper.Debug<LookupByNotFoundHandlers>("Lookup '{0}' found node with id={1}.", () => lookup.GetType().FullName, () => docRequest.PublishedContent.Id);
                         if (docRequest.Is404)
                             LogHelper.Debug<LookupByNotFoundHandlers>("Lookup '{0}' set status to 404.", () => lookup.GetType().FullName);
+
+                        // if we found a document, break, don't look at more handler -- we're done
+                        break;
                     }
-                    break;
+
+                    // if we did not find a document, continue, look at other handlers
+                    continue;
                 }
 
                 // else it's a legacy handler, run
@@ -108,8 +113,11 @@ namespace Umbraco.Web.Routing
                     //        string.Format("Added to cache '{0}', {1}.", url, handler.redirectID));
                     //}
 
+                    // if we found a document, break, don't look at more handler -- we're done
                     break;
                 }
+
+                // if we did not find a document, continue, look at other handlers
             }
         }
 
