@@ -68,14 +68,21 @@ function safeAlias(alias) {{
             }}
         }}
 
-        return safeAlias;
-
-    }} else {{
-        return alias;
+        alias = safeAlias;
     }}
+    return alias;
 }}
 
-function isSafeAlias(alias) {{
+function getSafeAlias(id, value, immediate, callback) {{
+    callback(safeAlias(value));
+}}
+
+function validateSafeAlias(id, value, immediate, callback) {{
+    callback(value == safeAlias(value));
+}}
+
+// legacy backward compatibility requires that one
+function isValidAlias(alias) {{
     return alias == safeAlias(alias);
 }}
 ";

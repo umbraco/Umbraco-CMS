@@ -171,15 +171,17 @@ function safeAlias(alias) {{
             }}
         }}
 
-        return safeAlias;
-
-    }} else {{
-        return alias;
+        alias = safeAlias;
     }}
+    return alias;
 }}
 
-function isSafeAlias(alias) {{
-    return alias == safeAlias(alias);
+function getSafeAlias(id, value, immediate, callback) {{
+    callback(safeAlias(value));
+}}
+
+function validateSafeAlias(id, value, immediate, callback) {{
+    callback(value == safeAlias(value));
 }}
 ";
 

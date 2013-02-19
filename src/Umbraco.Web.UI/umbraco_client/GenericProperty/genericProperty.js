@@ -12,29 +12,34 @@ function expandCollapse(theId) {
         document.getElementById("desc" + theId).style.display = 'block';
     }
 }
-function duplicatePropertyNameAsSafeAlias(theId, theAliasId) {
-    jQuery('#' + theId).keyup(function(event) {
-        var message = jQuery('#' + theId).val();
-        jQuery('#' + theAliasId).val(safeAlias(message));
+function duplicatePropertyNameAsSafeAlias(nameId, aliasId) {
+    var input = $('#' + aliasId);
+
+    $('#' + nameId).keyup(function(event) {
+        var value = $(this).val();
+        getSafeAlias(aliasId, value, false, function (alias) {
+            input.val(alias);
+        });
     });
 }
 
-function checkAlias(theId) {
-    jQuery('#' + theId).keyup(function(event) {
-        var currentAlias = jQuery('#' + theId).val();
-        jQuery('#' + theId).toggleClass('aliasValidationError', !isSafeAlias(currentAlias));
+function checkAlias(aliasId) {
+    var input = $('#' + aliasId);
+    
+    input.keyup(function(event) {
+        var value = $(this).val();
+        validateSafeAlias(aliasId, value, false, function (isSafe) {
+            input.toggleClass('aliasValidationError', !isSafe);
+        });
     });
 
-    jQuery('#' + theId).blur(function(event) {
-        var currentAlias = jQuery('#' + theId).val();
-        jQuery('#' + theId).val(safeAlias(currentAlias));
-        jQuery('#' + theId).removeClass('aliasValidationError');
+    input.blur(function(event) {
+        var value = $(this).val();
+        getSafeAlias(aliasId, value, true, function (alias) {
+            input.val(alias);
+            input.removeClass('aliasValidationError');
+        });
     });
 }
 
-// note: safeAlias(alias) and isSafeAlias(alias) now defined by UmbracoCasingRules.aspx along with constants
-
-// provided for backward-compatibility, should anybody non-core be using it
-function isValidAlias(alias) {
-    return isSafeAlias(alias);
-}
+// validateSafeAlias and getSafeAlias are defined by UmbracoCasingRules.aspx
