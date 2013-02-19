@@ -20,7 +20,7 @@ namespace Umbraco.Tests.UmbracoExamine
 	/// Tests the standard indexing capabilities
 	/// </summary>
 	[TestFixture, RequiresSTA]
-	public class IndexTest : AbstractPartialTrustFixture<IndexTest>
+    public class IndexTest : ExamineBaseTest<IndexTest>
 	{
 
 		///// <summary>
@@ -207,6 +207,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
 		public override void TestTearDown()
 		{
+            base.TestTearDown();
 			_luceneDir.Dispose();
             UmbracoExamineSearcher.DisableInitializationCheck = null;
             BaseUmbracoIndexer.DisableInitializationCheck = null;
@@ -214,8 +215,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
 		public override void TestSetup()
 		{
-            UmbracoExamineSearcher.DisableInitializationCheck = true;
-            BaseUmbracoIndexer.DisableInitializationCheck = true;
+            base.TestSetup();
 			_luceneDir = new RAMDirectory();
 			_indexer = IndexInitializer.GetUmbracoIndexer(_luceneDir);
 			_indexer.RebuildIndex();

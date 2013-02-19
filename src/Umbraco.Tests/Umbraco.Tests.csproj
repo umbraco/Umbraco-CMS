@@ -288,6 +288,7 @@
     <Compile Include="TestHelpers\SettingsForTests.cs" />
     <Compile Include="UmbracoExamine\ContentServiceTest.cs" />
     <Compile Include="UmbracoExamine\EventsTest.cs" />
+    <Compile Include="UmbracoExamine\ExamineBaseTest.cs" />
     <Compile Include="UmbracoExamine\IndexInitializer.cs" />
     <Compile Include="UmbracoExamine\IndexTest.cs" />
     <Compile Include="UmbracoExamine\PdfIndexerTests.cs" />
@@ -334,10 +335,14 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
+    <None Include="UmbracoExamine\TestFiles\Converting_file_to_PDF.pdf" />
+    <None Include="UmbracoExamine\TestFiles\PDFStandards.PDF" />
+    <None Include="UmbracoExamine\TestFiles\SurviorFlipCup.pdf" />
     <None Include="UmbracoExamine\TestFiles\umbraco-sort.config">
       <SubType>Designer</SubType>
     </None>
     <None Include="UmbracoExamine\TestFiles\umbraco.config" />
+    <None Include="UmbracoExamine\TestFiles\windows-vista.pdf" />
     <None Include="unit-test-log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

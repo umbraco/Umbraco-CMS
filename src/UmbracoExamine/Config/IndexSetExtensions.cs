@@ -55,7 +55,7 @@ namespace UmbracoExamine.Config
                             field.Type = policy.Type;
                             field.EnableSorting = policy.EnableSorting;
                         }
-                        set.IndexAttributeFields.Add(new IndexField() { Name = s });
+                        set.IndexAttributeFields.Add(field);
                     }
                 }
             }

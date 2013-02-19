@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Examine;
@@ -11,26 +12,46 @@ using UmbracoExamine.PDF;
 namespace Umbraco.Tests.UmbracoExamine
 {
 	[TestFixture]
-	public class PdfIndexerTests
+    public class PdfIndexerTests  // itextsharp is not med trust safe so can't use hte base class: ExamineBaseTest<PdfIndexerTests>
 	{
 
 		private readonly TestMediaService _mediaService = new TestMediaService();
 		private static PDFIndexer _indexer;
 		private static UmbracoExamineSearcher _searcher;
 		private Lucene.Net.Store.Directory _luceneDir;
-
-		[SetUp]
-		public void Initialize()
+		
+        [SetUp]
+		public void TestSetup()
 		{
-			_luceneDir = new RAMDirectory();
+            UmbracoExamineSearcher.DisableInitializationCheck = true;
+            BaseUmbracoIndexer.DisableInitializationCheck = true;
+            //we'll copy over the pdf files first
+		    var svc = new TestDataService();
+		    var path = svc.MapPath("/App_Data/Converting_file_to_PDF.pdf");
+		    var f = new FileInfo(path);
+		    var dir = f.Directory;
+            var pdfs = new[] { TestFiles.Converting_file_to_PDF, TestFiles.PDFStandards, TestFiles.SurviorFlipCup, TestFiles.windows_vista };
+            var names = new[] { "Converting_file_to_PDF.pdf", "PDFStandards.pdf", "SurviorFlipCup.pdf", "windows_vista.pdf" };
+		    for (int index = 0; index < pdfs.Length; index++)
+		    {
+		        var p = pdfs[index];
+		        using (var writer = File.Create(Path.Combine(dir.FullName, names[index])))
+		        {
+		            writer.Write(p, 0, p.Length);
+		        }
+		    }
+
+		    _luceneDir = new RAMDirectory();
 			_indexer = IndexInitializer.GetPdfIndexer(_luceneDir);
 			_indexer.RebuildIndex();
 			_searcher = IndexInitializer.GetUmbracoSearcher(_luceneDir);
 		}
 
 		[TearDown]
-		public void TearDown()
+		public void TestTearDown()
 		{
+            UmbracoExamineSearcher.DisableInitializationCheck = null;
+            BaseUmbracoIndexer.DisableInitializationCheck = null;
 			_luceneDir.Dispose();
 		}
 
@@ -67,25 +88,25 @@ namespace Umbraco.Tests.UmbracoExamine
 		[Test]
 		public void PDFIndexer_Reindex()
 		{
-			//get searcher and reader to get stats            
-			var r = ((IndexSearcher)_searcher.GetSearcher()).GetIndexReader();
-
-			Trace.Write("Num docs = " + r.NumDocs().ToString());
-
-			Assert.AreEqual(7, r.NumDocs());
-
+			
 			//search the pdf content to ensure it's there
-			Assert.IsTrue(_searcher.Search(_searcher.CreateSearchCriteria().Id(1113).Compile()).Single()
-			                       .Fields[PDFIndexer.TextContentFieldName].Contains("EncapsulateField"));
-			Assert.IsTrue(_searcher.Search(_searcher.CreateSearchCriteria().Id(1114).Compile()).Single()
-			                       .Fields[PDFIndexer.TextContentFieldName].Contains("metaphysical realism"));
+		    var contents = _searcher.Search(_searcher.CreateSearchCriteria().Id(1113).Compile()).Single()
+		                            .Fields[PDFIndexer.TextContentFieldName]; 
+			Assert.IsTrue(contents.Contains("Fonts are automatically embedded in Word 2008"));
 
-			//the contour PDF cannot be read properly, this is to due with the PDF encoding!
-			//Assert.IsTrue(s.Search(s.CreateSearchCriteria().Id(1115).Compile()).Single()
-			//    .Fields[PDFIndexer.TextContentFieldName].Contains("Returns All records from the form with the id"));
+		    contents = _searcher.Search(_searcher.CreateSearchCriteria().Id(1114).Compile()).Single()
+		                        .Fields[PDFIndexer.TextContentFieldName];
+            Assert.IsTrue(contents.Contains("Drink the beer and then flip the cup"));
 
-			Assert.IsTrue(_searcher.Search(_searcher.CreateSearchCriteria().Id(1116).Compile()).Single()
-			                       .Fields[PDFIndexer.TextContentFieldName].Contains("What long-term preservation"));
+            //NOTE: This is one of those PDFs that cannot be read and not sure how to force it too.
+            // Will leave this here as one day we might figure it out.
+            //contents = _searcher.Search(_searcher.CreateSearchCriteria().Id(1115).Compile()).Single()
+            //                       .Fields[PDFIndexer.TextContentFieldName];
+            //Assert.IsTrue(contents.Contains("Activation associates the use of the software"));
+
+		    contents = _searcher.Search(_searcher.CreateSearchCriteria().Id(1116).Compile()).Single()
+		                        .Fields[PDFIndexer.TextContentFieldName];
+            Assert.IsTrue(contents.Contains("This lack of standardization could be chaotic"));
 
 
 		}
