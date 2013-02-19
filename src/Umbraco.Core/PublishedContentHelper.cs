@@ -78,7 +78,7 @@ namespace Umbraco.Core
 			{
 				try
 				{
-					var e = XElement.Parse(DynamicXml.StripDashesInElementOrAttributeNames(sResult), LoadOptions.None);
+                    var e = XElement.Parse(sResult, LoadOptions.None);
 
 					//check that the document element is not one of the disallowed elements
 					//allows RTE to still return as html if it's valid xhtml
