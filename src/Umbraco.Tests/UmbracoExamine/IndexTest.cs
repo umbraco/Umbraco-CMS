@@ -72,11 +72,12 @@ namespace Umbraco.Tests.UmbracoExamine
 			                        .Where(x => (int)x.Attribute("id") == 2112)
 			                        .First();
 
-			var currPath = (string)node.Attribute("path"); //should be : -1,2222,2112
-			Assert.AreEqual("-1,2222,2112", currPath);
+            var currPath = (string)node.Attribute("path"); //should be : -1,1111,2222,2112
+            Assert.AreEqual("-1,1111,2222,2112", currPath);
 
 			//now mimic moving 2112 to 1116
-			node.SetAttributeValue("path", currPath.Replace("2222", "1116"));
+			//node.SetAttributeValue("path", currPath.Replace("2222", "1116"));
+            node.SetAttributeValue("path", "-1,1116,2112");
 			node.SetAttributeValue("parentID", "1116");
 
 			//now reindex the node, this should first delete it and then WILL add it because of the parent id constraint
@@ -103,8 +104,8 @@ namespace Umbraco.Tests.UmbracoExamine
 			                        .Where(x => (int)x.Attribute("id") == 2112)
 			                        .First();
 
-			var currPath = (string)node.Attribute("path"); //should be : -1,2222,2112
-			Assert.AreEqual("-1,2222,2112", currPath);
+            var currPath = (string)node.Attribute("path"); //should be : -1,1111,2222,2112
+            Assert.AreEqual("-1,1111,2222,2112", currPath);
 
 			//ensure it's indexed
 			_indexer.ReIndexNode(node, IndexTypes.Media);
@@ -207,10 +208,14 @@ namespace Umbraco.Tests.UmbracoExamine
 		public override void TestTearDown()
 		{
 			_luceneDir.Dispose();
+            UmbracoExamineSearcher.DisableInitializationCheck = null;
+            BaseUmbracoIndexer.DisableInitializationCheck = null;
 		}
 
 		public override void TestSetup()
 		{
+            UmbracoExamineSearcher.DisableInitializationCheck = true;
+            BaseUmbracoIndexer.DisableInitializationCheck = true;
 			_luceneDir = new RAMDirectory();
 			_indexer = IndexInitializer.GetUmbracoIndexer(_luceneDir);
 			_indexer.RebuildIndex();
