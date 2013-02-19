@@ -173,8 +173,7 @@ namespace Umbraco.Web.Mvc
 		/// </summary>
 		/// <param name="requestContext"></param>
 		/// <param name="postedInfo"></param>
-		/// <param name="routeDefinition">The original route definition that would normally be used to route if it were not a POST</param>
-		private IHttpHandler HandlePostedValues(RequestContext requestContext, PostedDataProxyInfo postedInfo, RouteDefinition routeDefinition)
+		private IHttpHandler HandlePostedValues(RequestContext requestContext, PostedDataProxyInfo postedInfo)
 		{
 			//set the standard route values/tokens
 			requestContext.RouteData.Values["controller"] = postedInfo.ControllerName;
@@ -209,9 +208,6 @@ namespace Umbraco.Web.Mvc
 				}
 
 			}
-
-			//store the original route definition
-			requestContext.RouteData.DataTokens["umbraco-route-def"] = routeDefinition;
 
 			return handler;
 		}
@@ -277,7 +273,9 @@ namespace Umbraco.Web.Mvc
 				}
 	
 			}
-			
+
+            //store the route definition
+            requestContext.RouteData.DataTokens["umbraco-route-def"] = def;
 
 			return def;
 		}
@@ -290,12 +288,12 @@ namespace Umbraco.Web.Mvc
 		internal IHttpHandler GetHandlerForRoute(RequestContext requestContext, PublishedContentRequest publishedContentRequest)
 		{
 			var routeDef = GetUmbracoRouteDefinition(requestContext, publishedContentRequest);
-
+            
 			//Need to check for a special case if there is form data being posted back to an Umbraco URL
 			var postedInfo = GetPostedFormInfo(requestContext);
 			if (postedInfo != null)
 			{
-				return HandlePostedValues(requestContext, postedInfo, routeDef);
+				return HandlePostedValues(requestContext, postedInfo);
 			}
 
 			//here we need to check if there is no hijacked route and no template assigned, if this is the case

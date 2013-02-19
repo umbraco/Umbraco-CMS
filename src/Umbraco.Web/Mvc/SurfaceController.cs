@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Web.Mvc;
+using System.Web.Routing;
 using Umbraco.Core.Models;
 using Umbraco.Core;
 
@@ -76,10 +77,16 @@ namespace Umbraco.Web.Mvc
 		{
 			get
 			{
-				if (!ControllerContext.RouteData.DataTokens.ContainsKey("umbraco-route-def"))
-					throw new InvalidOperationException("Can only use " + typeof(UmbracoPageResult).Name + " in the context of an Http POST when using the BeginUmbracoForm helper");
+                var routeData = ControllerContext.IsChildAction 
+                    ? ControllerContext.ParentActionViewContext.RouteData 
+                    : ControllerContext.RouteData;
 
-				var routeDef = (RouteDefinition)ControllerContext.RouteData.DataTokens["umbraco-route-def"];
+                if (!routeData.DataTokens.ContainsKey("umbraco-route-def"))
+                {
+                    throw new InvalidOperationException("Cannot find the Umbraco route definition in the route values, the request must be made in the context of an Umbraco request");                    
+                }
+
+                var routeDef = (RouteDefinition)routeData.DataTokens["umbraco-route-def"];
 				return routeDef.PublishedContentRequest.PublishedContent;
 			}
 		}
