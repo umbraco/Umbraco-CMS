@@ -10,6 +10,7 @@ using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -57,16 +58,22 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Sets and uploads the file from a HttpPostedFileBase object as the property value
         /// </summary>
-        /// <param name="content"><see cref="IContent"/> to add property value to</param>
+        /// <param name="content"><see cref="IContentBase"/> to add property value to</param>
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="value">The <see cref="HttpPostedFileBase"/> containing the file that will be uploaded</param>
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileBase value)
         {
+            // Ensure we get the filename without the path in IE in intranet mode 
+            // http://stackoverflow.com/questions/382464/httppostedfile-filename-different-from-ie
+            var fileName = value.FileName;
+            if (fileName.LastIndexOf(@"\") > 0)
+                fileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
+
             var name =
                 IOHelper.SafeFileName(
-                    value.FileName.Substring(value.FileName.LastIndexOf(IOHelper.DirSepChar) + 1,
-                                             value.FileName.Length - value.FileName.LastIndexOf(IOHelper.DirSepChar) - 1)
-                         .ToLower());
+                    fileName.Substring(fileName.LastIndexOf(IOHelper.DirSepChar) + 1,
+                                       fileName.Length - fileName.LastIndexOf(IOHelper.DirSepChar) - 1)
+                            .ToLower());
 
             if (string.IsNullOrEmpty(name) == false)
                 SetFileOnContent(content, propertyTypeAlias, name, value.InputStream);
@@ -75,16 +82,22 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Sets and uploads the file from a HttpPostedFile object as the property value
         /// </summary>
-        /// <param name="content"><see cref="IContent"/> to add property value to</param>
+        /// <param name="content"><see cref="IContentBase"/> to add property value to</param>
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="value">The <see cref="HttpPostedFile"/> containing the file that will be uploaded</param>
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFile value)
         {
+            // Ensure we get the filename without the path in IE in intranet mode 
+            // http://stackoverflow.com/questions/382464/httppostedfile-filename-different-from-ie
+            var fileName = value.FileName;
+            if (fileName.LastIndexOf(@"\") > 0)
+                fileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
+
             var name =
                 IOHelper.SafeFileName(
-                    value.FileName.Substring(value.FileName.LastIndexOf(IOHelper.DirSepChar) + 1,
-                                            value.FileName.Length - value.FileName.LastIndexOf(IOHelper.DirSepChar) - 1)
-                        .ToLower());
+                    fileName.Substring(fileName.LastIndexOf(IOHelper.DirSepChar) + 1,
+                                       fileName.Length - fileName.LastIndexOf(IOHelper.DirSepChar) - 1)
+                            .ToLower());
 
             if (string.IsNullOrEmpty(name) == false)
                 SetFileOnContent(content, propertyTypeAlias, name, value.InputStream);
@@ -93,13 +106,33 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Sets and uploads the file from a HttpPostedFileWrapper object as the property value
         /// </summary>
-        /// <param name="content"><see cref="IContent"/> to add property value to</param>
+        /// <param name="content"><see cref="IContentBase"/> to add property value to</param>
         /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
         /// <param name="value">The <see cref="HttpPostedFileWrapper"/> containing the file that will be uploaded</param>
         public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileWrapper value)
         {
-            if (string.IsNullOrEmpty(value.FileName) == false)
-                SetFileOnContent(content, propertyTypeAlias, value.FileName, value.InputStream);
+            // Ensure we get the filename without the path in IE in intranet mode 
+            // http://stackoverflow.com/questions/382464/httppostedfile-filename-different-from-ie
+            var fileName = value.FileName;
+            if (fileName.LastIndexOf(@"\") > 0)
+                fileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
+
+            if (string.IsNullOrEmpty(fileName) == false)
+                SetFileOnContent(content, propertyTypeAlias, fileName, value.InputStream);
+        }
+
+        /// <summary>
+        /// Sets and uploads the file from a <see cref="Stream"/> as the property value
+        /// </summary>
+        /// <param name="content"><see cref="IContentBase"/> to add property value to</param>
+        /// <param name="propertyTypeAlias">Alias of the property to save the value on</param>
+        /// <param name="fileName">Name of the file</param>
+        /// <param name="fileStream"><see cref="Stream"/> to save to disk</param>
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, string fileName,
+                                    Stream fileStream)
+        {
+            if (string.IsNullOrEmpty(fileName) == false && fileStream != null)
+                SetFileOnContent(content, propertyTypeAlias, fileName, fileStream);
         }
 
         private static void SetFileOnContent(IContentBase content, string propertyTypeAlias, string name, Stream fileStream)
@@ -109,10 +142,12 @@ namespace Umbraco.Core.Models
                 return;
 
             bool supportsResizing = false;
+            var numberedFolder = MediaSubfolderCounter.Current.Increment();
             string fileName = UmbracoSettings.UploadAllowDirectories
-                                              ? Path.Combine(property.Id.ToString(), name)
-                                              : property.Id + "-" + name;
-            string extension = Path.GetExtension(name);
+                                              ? Path.Combine(numberedFolder.ToString(CultureInfo.InvariantCulture), name)
+                                              : numberedFolder + "-" + name;
+
+            string extension = Path.GetExtension(name).Substring(1).ToLowerInvariant();
 
             var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
             fs.AddFile(fileName, fileStream);

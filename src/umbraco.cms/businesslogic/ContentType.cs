@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.propertytype;
@@ -1141,12 +1142,19 @@ namespace umbraco.cms.businesslogic
             RemoveFromDataTypeCache(ct.Alias);
 
             // clear anything that uses this as master content type
-            //TODO: Update to load all content types 
+            //TODO: Update to load all content types
+            //Should this include "ct.nodeObjectType == media.MediaType._objectType" ?
             if (ct.nodeObjectType == DocumentType._objectType)
             {
-                List<DocumentType> cacheToFlush = DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == id);
+                var dtos = ApplicationContext.Current.DatabaseContext.Database.Fetch<ContentType2ContentTypeDto>("WHERE parentContentTypeId = @Id", new { Id = id });
+                foreach (var dto in dtos)
+                {
+                    FlushFromCache(dto.ChildId);
+                }
+
+                /*List<DocumentType> cacheToFlush = DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == id);
                 foreach (DocumentType dt in cacheToFlush)
-                    FlushFromCache(dt.Id);
+                    FlushFromCache(dt.Id);*/
 
             }
         }

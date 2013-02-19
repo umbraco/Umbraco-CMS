@@ -165,7 +165,7 @@ namespace umbraco.cms.businesslogic.web
         public static List<DocumentType> GetAllAsList()
         {
             var contentTypes = ApplicationContext.Current.Services.ContentTypeService.GetAllContentTypes();
-            var documentTypes = contentTypes.Select(x => new DocumentType(x.Id));
+            var documentTypes = contentTypes.Select(x => new DocumentType(x));
 
             return documentTypes.OrderBy(x => x.Text).ToList();
         }
