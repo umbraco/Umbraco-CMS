@@ -9,6 +9,9 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Publishing;
+using Umbraco.Core.Services;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -18,79 +21,27 @@ using umbraco.cms.businesslogic.cache;
 namespace Umbraco.Tests.TestHelpers
 {
     [TestFixture, RequiresSTA]
-    public abstract class BaseWebTest
+    public abstract class BaseWebTest : BaseDatabaseFactoryTest
     {
 
         [SetUp]
-        public virtual void Initialize()
+        public override void Initialize()
         {
-            SettingsForTests.Reset();
+            base.Initialize();            
+        }
 
-			TestHelper.SetupLog4NetForTests();   
-            TestHelper.InitializeContentDirectories();
-
-            AppDomain.CurrentDomain.SetData("DataDirectory", TestHelper.CurrentAssemblyDirectory);
-
+        protected override void InitializeDatabase()
+        {
             if (RequiresDbSetup)
-                TestHelper.InitializeDatabase();
-
-            Resolution.Freeze();
-
-			//NOTE: We are not constructing with the service context here because it is not required for these tests (currently)
-			// if we do, this means that we have to initialized the RepositoryResolver too.
-			ApplicationContext.Current = new ApplicationContext
-				{
-					IsReady = true,
-					//assign the db context
-					DatabaseContext = new DatabaseContext(new DefaultDatabaseFactory())
-				};
-			
+                base.InitializeDatabase();
         }
 
         [TearDown]
-        public virtual void TearDown()
+        public override void TearDown()
         {
-            TestHelper.CleanContentDirectories();
-
-            //reset the app context
-            DatabaseContext.Database.Dispose();
-            ApplicationContext.ApplicationCache.ClearAllCache();
-            ApplicationContext.Current = null;
-            Resolution.IsFrozen = false;
-
-            if (RequiresDbSetup)
-            {
-                TestHelper.ClearDatabase();
-                SqlCeContextGuardian.CloseBackgroundConnection();
-            }
-
-            AppDomain.CurrentDomain.SetData("DataDirectory", null);
-
-            Cache.ClearAllCache();
-
-            SettingsForTests.Reset();
-        }
-
-        protected virtual void CreateDirectories(string[] directories)
-        {
-            foreach (var directory in directories)
-            {
-                var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
-                if (directoryInfo.Exists == false)
-                    Directory.CreateDirectory(IOHelper.MapPath(directory));
-            }
+            base.TearDown();
         }
         
-        protected virtual void CleanDirectories(string[] directories)
-        {
-            foreach (var directory in directories)
-            {
-                var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
-                if (directoryInfo.Exists)
-                    directoryInfo.GetFiles().ForEach(x => x.Delete());
-            }
-        }
-
         /// <summary>
         /// By default this unit test will create and initialize an umbraco database
         /// </summary>
@@ -98,46 +49,8 @@ namespace Umbraco.Tests.TestHelpers
         {
             get { return true; }
         }
-
-        protected FakeHttpContextFactory GetHttpContextFactory(string url, RouteData routeData = null)
-        {
-            var factory = routeData != null
-                            ? new FakeHttpContextFactory(url, routeData)
-                            : new FakeHttpContextFactory(url);
-
-
-            //set the state helper
-            StateHelper.HttpContext = factory.HttpContext;
-
-            return factory;
-        }
-
-	    protected ApplicationContext ApplicationContext
-	    {
-		    get { return ApplicationContext.Current; }
-	    }
-
-	    protected DatabaseContext DatabaseContext
-	    {
-		    get { return ApplicationContext.DatabaseContext; }
-	    }
-
-        internal virtual IRoutesCache GetRoutesCache()
-        {
-            return new FakeRoutesCache();
-        }
-
-        protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null)
-        {
-            var ctx = new UmbracoContext(
-                GetHttpContextFactory(url, routeData).HttpContext,
-                ApplicationContext,
-                GetRoutesCache());
-            SetupUmbracoContextForTest(ctx, templateId);
-            return ctx;
-        }
-
-        protected virtual string GetXmlContent(int templateId)
+        
+        protected override string GetXmlContent(int templateId)
         {
             return @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE root[ 
@@ -172,23 +85,5 @@ namespace Umbraco.Tests.TestHelpers
 </root>";
         }
 
-        /// <summary>
-        /// Initlializes the UmbracoContext with specific XML
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        /// <param name="templateId"></param>
-        protected void SetupUmbracoContextForTest(UmbracoContext umbracoContext, int templateId)
-        {
-            umbracoContext.GetXmlDelegate = () =>
-                {
-                    var xDoc = new XmlDocument();
-
-                    //create a custom xml structure to return
-
-                    xDoc.LoadXml(GetXmlContent(templateId));
-                    //return the custom x doc
-                    return xDoc;
-                };
-        }
     }
 }
