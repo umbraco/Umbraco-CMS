@@ -1,3 +1,4 @@
+
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
  <!-- 
@@ -13,7 +14,45 @@
  
  <Import Project="..\tools\UmbracoMSBuildTasks\Umbraco.MSBuild.Tasks.Targets" />
  <Import Project="..\tools\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
+ 
+ <UsingTask TaskName="GenerateHash" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+    <ParameterGroup>
+        <InputFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+        <OutputFile ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+        <Using Namespace="System.IO" />
+        <Using Namespace="System.Linq" />
+        <Using Namespace="System.Security.Cryptography" />
+        <Code Type="Fragment" Language="cs">
+            <![CDATA[
+                using (var ms = new MemoryStream())
+                {
+                    foreach (var item in InputFiles)
+                    {
+                        string path = item.ItemSpec;
 
+                        using (FileStream stream = new FileStream(path, FileMode.Open))
+                        {
+                            using (var cryptoProvider = new SHA1CryptoServiceProvider())
+                            {
+                                
+                                var fileHash = cryptoProvider.ComputeHash(stream);
+                                
+                                using (TextWriter w = new StreamWriter(OutputFile, false))
+                                {
+                                    w.WriteLine(string.Join("", fileHash.Select(b => b.ToString("x2"))));
+                                }
+                            }
+                        }
+                    }
+                }
+            ]]>
+        </Code>
+    </Task>
+ </UsingTask>
+
+ 
  <!-- 
  ****************************************************
  VARIABLES 
@@ -71,8 +110,16 @@
  *****************************************************
  -->
 
- <Target Name="Build" DependsOnTargets="ZipWebPiApp">
+ <Target Name="Build" DependsOnTargets="GenerateWebPiHash">
    <Message Text="Build finished" />
+ </Target>
+ 
+ <Target Name="GenerateWebPiHash" DependsOnTargets="ZipWebPiApp">
+   <ItemGroup>
+      <WebPiFile Include="$(BuildZipFileNameWebPi)" />
+   </ItemGroup>
+   <Message Text="Calculating hash for $(BuildZipFileNameWebPi)" />
+   <GenerateHash InputFiles="@(WebPiFile)" OutputFile="webpihash.txt" />
  </Target>
  
  <Target Name="CleanUp" DependsOnTargets="ZipWebPiApp">
