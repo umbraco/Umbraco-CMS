@@ -73,13 +73,17 @@ namespace umbraco.presentation.install.steps
             if (settings.Visible && !Page.IsPostBack)
             {
                 //If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
-                if (
-                    ConfigurationManager.ConnectionStrings[
-                        Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName] == null
-                    ||
-                    string.IsNullOrEmpty(
-                        ConfigurationManager.ConnectionStrings[
-                            Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName].ConnectionString))
+                var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
+                
+                var dbIsSqlCe = databaseSettings.ProviderName == "System.Data.SqlServerCe.4.0";
+                var sqlCeDatabaseExists = false;
+                if (dbIsSqlCe)
+                    sqlCeDatabaseExists = File.Exists(databaseSettings.ConnectionString.Replace("|DataDirectory|", AppDomain.CurrentDomain.GetData("DataDirectory").ToString()));
+
+                // Either the connection details are not fully specified or it's a SQL CE database that doesn't exist yet
+                if (databaseSettings == null 
+                    || string.IsNullOrWhiteSpace(databaseSettings.ConnectionString) || string.IsNullOrWhiteSpace(databaseSettings.ProviderName) 
+                    || (dbIsSqlCe && sqlCeDatabaseExists == false))
                 {
                     installProgress.Visible = true;
                     upgradeProgress.Visible = false;
@@ -115,20 +119,20 @@ namespace umbraco.presentation.install.steps
         protected void ShowDatabaseSettings()
         {
             // Parse the connection string
-            DbConnectionStringBuilder connectionStringBuilder = new DbConnectionStringBuilder();
+            var connectionStringBuilder = new DbConnectionStringBuilder();
 
             var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
-            if (databaseSettings != null)
+            if (databaseSettings != null && string.IsNullOrWhiteSpace(databaseSettings.ConnectionString) == false)
             {
                 var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false);
                 connectionStringBuilder.ConnectionString = dataHelper.ConnectionString;
 
                 // Prepare data layer type
-                string datalayerType = GetConnectionStringValue(connectionStringBuilder, "datalayer");
+                var datalayerType = GetConnectionStringValue(connectionStringBuilder, "datalayer");
                 if (datalayerType.Length > 0)
                 {
                     foreach (ListItem item in DatabaseType.Items)
-                        if (item.Value != String.Empty && datalayerType.Contains(item.Value))
+                        if (item.Value != string.Empty && datalayerType.Contains(item.Value))
                             DatabaseType.SelectedValue = item.Value;
                 }
                 else if (dataHelper.ConnectionString != "server=.\\SQLEXPRESS;database=DATABASE;user id=USER;password=PASS")
@@ -138,7 +142,7 @@ namespace umbraco.presentation.install.steps
             {
                 DatabaseType.SelectedValue = "SqlServer";
             }
-            
+
             DatabaseType_SelectedIndexChanged(this, new EventArgs());
 
             // Prepare other fields
@@ -154,8 +158,7 @@ namespace umbraco.presentation.install.steps
             toggleVisible(DatabaseUsernameItem, !ManualConnectionString && !IsEmbeddedDatabase);
             toggleVisible(DatabasePasswordItem, !ManualConnectionString && !IsEmbeddedDatabase);
             toggleVisible(DatabaseNameItem, !ManualConnectionString && !IsEmbeddedDatabase);
-
-
+            
             if (IsEmbeddedDatabase)
                 dbinit.Text = "$('#databaseOptionEmbedded').click();$('#databaseOptionEmbedded').change();";
             else if (ManualConnectionString)

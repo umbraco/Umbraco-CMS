@@ -278,7 +278,8 @@ namespace Umbraco.Core
         /// </remarks>
         internal void Initialize()
         {
-            if (ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName] != null)
+            var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
+            if (databaseSettings != null && string.IsNullOrWhiteSpace(databaseSettings.ConnectionString) == false && string.IsNullOrWhiteSpace(databaseSettings.ProviderName) == false)
             {
                 var providerName = "System.Data.SqlClient";
                 if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName))
