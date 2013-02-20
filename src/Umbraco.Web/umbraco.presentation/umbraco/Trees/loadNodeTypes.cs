@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using Umbraco.Core.Services;
 using umbraco.businesslogic;
@@ -57,7 +58,7 @@ function openNodeType(id) {
 
         public override void Render(ref XmlTree tree)
         {
-            var docTypes = Service.GetContentTypeChildren(base.m_id);
+            var docTypes = Service.GetContentTypeChildren(base.m_id).OrderBy(x => x.Name);
 
             foreach (var docType in docTypes)
             {
