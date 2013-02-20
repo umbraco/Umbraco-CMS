@@ -21,7 +21,6 @@ namespace Umbraco.Core
     ///</summary>
     public static class StringExtensions
     {
-
         public const string UmbracoValidAliasCharacters = "_-abcdefghijklmnopqrstuvwxyz1234567890";
         public const string UmbracoInvalidFirstCharacters = "01234567890";
 
@@ -61,7 +60,8 @@ namespace Umbraco.Core
 
 			return encrpytedValue.ToString().TrimEnd();
         }
-		/// <summary>
+
+        /// <summary>
 		/// Decrypt the encrypted string using the Machine key in medium trust
 		/// </summary>
 		/// <param name="value">The string value to be decrypted</param>
@@ -82,6 +82,7 @@ namespace Umbraco.Core
 
 			return decryptedValue.ToString();
         }
+        
         //this is from SqlMetal and just makes it a bit of fun to allow pluralisation
         public static string MakePluralName(this string name)
         {
@@ -299,151 +300,6 @@ namespace Umbraco.Core
         {
             const string pattern = @"<(.|\n)*?>";
             return Regex.Replace(text, pattern, String.Empty);
-        }
-
-        /// <summary>
-        /// Converts string to a URL alias.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <param name="charReplacements">The char replacements.</param>
-        /// <param name="replaceDoubleDashes">if set to <c>true</c> replace double dashes.</param>
-        /// <param name="stripNonAscii">if set to <c>true</c> strip non ASCII.</param>
-        /// <param name="urlEncode">if set to <c>true</c> URL encode.</param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This ensures that ONLY ascii chars are allowed and of those ascii chars, only digits and lowercase chars, all
-        /// punctuation, etc... are stripped out, however this method allows you to pass in string's to replace with the
-        /// specified replacement character before the string is converted to ascii and it has invalid characters stripped out.
-        /// This allows you to replace strings like &amp; , etc.. with your replacement character before the automatic
-        /// reduction.
-        /// </remarks>
-        public static string ToUrlAlias(this string value, IDictionary<string, string> charReplacements, bool replaceDoubleDashes, bool stripNonAscii, bool urlEncode)
-        {
-            //first to lower case
-            value = value.ToLowerInvariant();
-
-            //then replacement chars
-            value = charReplacements.Aggregate(value, (current, kvp) => current.Replace(kvp.Key, kvp.Value));
-
-            //then convert to only ascii, this will remove the rest of any invalid chars
-            if (stripNonAscii)
-            {
-                value = Encoding.ASCII.GetString(
-                    Encoding.Convert(
-                        Encoding.UTF8,
-                        Encoding.GetEncoding(
-                            Encoding.ASCII.EncodingName,
-                            new EncoderReplacementFallback(String.Empty),
-                            new DecoderExceptionFallback()),
-                        Encoding.UTF8.GetBytes(value)));
-
-                //remove all characters that do not fall into the following categories (apart from the replacement val)
-                var validCodeRanges =
-                    //digits
-                    Enumerable.Range(48, 10).Concat(
-                    //lowercase chars
-                        Enumerable.Range(97, 26));
-
-                var sb = new StringBuilder();
-                foreach (var c in value.Where(c => charReplacements.Values.Contains(c.ToString()) || validCodeRanges.Contains(c)))
-                {
-                    sb.Append(c);
-                }
-
-                value = sb.ToString();
-            }
-
-            //trim dashes from end
-            value = value.Trim('-', '_');
-
-            //replace double occurances of - or _
-            value = replaceDoubleDashes ? Regex.Replace(value, @"([-_]){2,}", "$1", RegexOptions.Compiled) : value;
-
-            //url encode result
-            return urlEncode ? HttpUtility.UrlEncode(value) : value;
-        }
-
-        /// <summary>
-        /// Converts a string for use with an entity alias which is camel case and without invalid characters
-        /// </summary>
-        /// <param name="phrase">The phrase.</param>
-        /// <param name="caseType">By default this is camel case</param>
-        /// <param name="removeSpaces">if set to <c>true</c> [remove spaces].</param>
-        /// <returns></returns>
-        public static string ToUmbracoAlias(this string phrase, StringAliasCaseType caseType = StringAliasCaseType.CamelCase, bool removeSpaces = false)
-        {
-            if (string.IsNullOrEmpty(phrase)) return string.Empty;
-
-            //convert case first
-            var tmp = phrase.ConvertCase(caseType);
-
-            //remove non-alphanumeric chars
-            var result = Regex.Replace(tmp, @"[^a-zA-Z0-9\s\.-]+", "", RegexOptions.Compiled);
-
-            if (removeSpaces)
-                result = result.Replace(" ", "");
-
-            return result;
-        }
-
-        /// <summary>
-        /// Splits a Pascal cased string into a phrase seperated by spaces.
-        /// </summary>
-        /// <param name="phrase">String to split</param>
-        /// <returns></returns>
-        public static string SplitPascalCasing(this string phrase)
-        {
-            string result = Regex.Replace(phrase, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
-            return result;
-        }
-
-        /// <summary>
-        /// Converts the phrase to specified convention.
-        /// </summary>
-        /// <param name="phrase"></param>
-        /// <param name="cases">The cases.</param>
-        /// <returns>string</returns>
-        public static string ConvertCase(this string phrase, StringAliasCaseType cases)
-        {
-            var splittedPhrase = Regex.Split(phrase, @"[^a-zA-Z0-9\']", RegexOptions.Compiled);
-
-            if (cases == StringAliasCaseType.Unchanged)
-                return string.Join("", splittedPhrase);
-
-            //var splittedPhrase = phrase.Split(' ', '-', '.');
-            var sb = new StringBuilder();
-
-            foreach (var splittedPhraseChars in splittedPhrase.Select(s => s.ToCharArray()))
-            {
-                if (splittedPhraseChars.Length > 0)
-                {
-                    splittedPhraseChars[0] = ((new String(splittedPhraseChars[0], 1)).ToUpper().ToCharArray())[0];
-                }
-                sb.Append(new String(splittedPhraseChars));
-            }
-
-            var result = sb.ToString();
-
-            if (cases == StringAliasCaseType.CamelCase)
-            {
-                if (result.Length > 1)
-                {
-                    var pattern = new Regex("^([A-Z]*)([A-Z].*)$", RegexOptions.Singleline | RegexOptions.Compiled);
-                    var match = pattern.Match(result);
-                    if (match.Success)
-                    {
-                        result = match.Groups[1].Value.ToLower() + match.Groups[2].Value;
-
-                        return result.Substring(0, 1).ToLower() + result.Substring(1);
-                    }
-
-                    return result;
-                }
-
-                return result.ToLower();
-            }
-
-            return result;
         }
 
         /// <summary>
@@ -803,6 +659,70 @@ namespace Umbraco.Core
                        : alternative;
         }
 
+        // FORMAT STRINGS
+
+        /// <summary>
+        /// Converts string to a URL alias.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <param name="charReplacements">The char replacements.</param>
+        /// <param name="replaceDoubleDashes">if set to <c>true</c> replace double dashes.</param>
+        /// <param name="stripNonAscii">if set to <c>true</c> strip non ASCII.</param>
+        /// <param name="urlEncode">if set to <c>true</c> URL encode.</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This ensures that ONLY ascii chars are allowed and of those ascii chars, only digits and lowercase chars, all
+        /// punctuation, etc... are stripped out, however this method allows you to pass in string's to replace with the
+        /// specified replacement character before the string is converted to ascii and it has invalid characters stripped out.
+        /// This allows you to replace strings like &amp; , etc.. with your replacement character before the automatic
+        /// reduction.
+        /// </remarks>
+        public static string ToUrlAlias(this string value, IDictionary<string, string> charReplacements, bool replaceDoubleDashes, bool stripNonAscii, bool urlEncode)
+        {
+            //first to lower case
+            value = value.ToLowerInvariant();
+
+            //then replacement chars
+            value = charReplacements.Aggregate(value, (current, kvp) => current.Replace(kvp.Key, kvp.Value));
+
+            //then convert to only ascii, this will remove the rest of any invalid chars
+            if (stripNonAscii)
+            {
+                value = Encoding.ASCII.GetString(
+                    Encoding.Convert(
+                        Encoding.UTF8,
+                        Encoding.GetEncoding(
+                            Encoding.ASCII.EncodingName,
+                            new EncoderReplacementFallback(String.Empty),
+                            new DecoderExceptionFallback()),
+                        Encoding.UTF8.GetBytes(value)));
+
+                //remove all characters that do not fall into the following categories (apart from the replacement val)
+                var validCodeRanges =
+                    //digits
+                    Enumerable.Range(48, 10).Concat(
+                    //lowercase chars
+                        Enumerable.Range(97, 26));
+
+                var sb = new StringBuilder();
+                foreach (var c in value.Where(c => charReplacements.Values.Contains(c.ToString()) || validCodeRanges.Contains(c)))
+                {
+                    sb.Append(c);
+                }
+
+                value = sb.ToString();
+            }
+
+            //trim dashes from end
+            value = value.Trim('-', '_');
+
+            //replace double occurances of - or _
+            value = replaceDoubleDashes ? Regex.Replace(value, @"([-_]){2,}", "$1", RegexOptions.Compiled) : value;
+
+            //url encode result
+            return urlEncode ? HttpUtility.UrlEncode(value) : value;
+        }
+
         public static string FormatUrl(this string url)
         {
             string newUrl = url;
@@ -870,5 +790,89 @@ namespace Umbraco.Core
             
             return alias;
         }
+
+        /// <summary>
+        /// Converts a string for use with an entity alias which is camel case and without invalid characters
+        /// </summary>
+        /// <param name="phrase">The phrase.</param>
+        /// <param name="caseType">By default this is camel case</param>
+        /// <param name="removeSpaces">if set to <c>true</c> [remove spaces].</param>
+        /// <returns></returns>
+        public static string ToUmbracoAlias(this string phrase, StringAliasCaseType caseType = StringAliasCaseType.CamelCase, bool removeSpaces = false)
+        {
+            if (string.IsNullOrEmpty(phrase)) return string.Empty;
+
+            //convert case first
+            var tmp = phrase.ConvertCase(caseType);
+
+            //remove non-alphanumeric chars
+            var result = Regex.Replace(tmp, @"[^a-zA-Z0-9\s\.-]+", "", RegexOptions.Compiled);
+
+            if (removeSpaces)
+                result = result.Replace(" ", "");
+
+            return result;
+        }
+
+        /// <summary>
+        /// Converts the phrase to specified convention.
+        /// </summary>
+        /// <param name="phrase"></param>
+        /// <param name="cases">The cases.</param>
+        /// <returns>string</returns>
+        public static string ConvertCase(this string phrase, StringAliasCaseType cases)
+        {
+            var splittedPhrase = Regex.Split(phrase, @"[^a-zA-Z0-9\']", RegexOptions.Compiled);
+
+            if (cases == StringAliasCaseType.Unchanged)
+                return string.Join("", splittedPhrase);
+
+            //var splittedPhrase = phrase.Split(' ', '-', '.');
+            var sb = new StringBuilder();
+
+            foreach (var splittedPhraseChars in splittedPhrase.Select(s => s.ToCharArray()))
+            {
+                if (splittedPhraseChars.Length > 0)
+                {
+                    splittedPhraseChars[0] = ((new String(splittedPhraseChars[0], 1)).ToUpper().ToCharArray())[0];
+                }
+                sb.Append(new String(splittedPhraseChars));
+            }
+
+            var result = sb.ToString();
+
+            if (cases == StringAliasCaseType.CamelCase)
+            {
+                if (result.Length > 1)
+                {
+                    var pattern = new Regex("^([A-Z]*)([A-Z].*)$", RegexOptions.Singleline | RegexOptions.Compiled);
+                    var match = pattern.Match(result);
+                    if (match.Success)
+                    {
+                        result = match.Groups[1].Value.ToLower() + match.Groups[2].Value;
+
+                        return result.Substring(0, 1).ToLower() + result.Substring(1);
+                    }
+
+                    return result;
+                }
+
+                return result.ToLower();
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Splits a Pascal cased string into a phrase seperated by spaces.
+        /// </summary>
+        /// <param name="phrase">String to split</param>
+        /// <returns></returns>
+        public static string SplitPascalCasing(this string phrase)
+        {
+            string result = Regex.Replace(phrase, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
+            return result;
+        }
+
     }
 }
