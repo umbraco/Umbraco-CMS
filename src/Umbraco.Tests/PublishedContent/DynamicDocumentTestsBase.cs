@@ -199,7 +199,7 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.AreEqual(4444, result.Id);
 		}
 
-        [Ignore]
+        [Ignore("We are ignoring this test because currently our ExpressionParser class cannot deal with this... it needs some serious TLC but it is very complex.")]
 		[Test]
 		public void Complex_Linq()
 		{
@@ -229,43 +229,55 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.AreEqual(3, doc.Index());
 		}
 
-        [Ignore]
 		[Test]
-		public void Is_First()
+		public virtual void Is_First_Root_Nodes()
 		{
 			var doc = GetDynamicNode(1046); //test root nodes
 			Assert.IsTrue(doc.IsFirst());
 			doc = GetDynamicNode(1172);
-			Assert.IsFalse(doc.IsFirst());
-			doc = GetDynamicNode(1173); //test normal nodes
-			Assert.IsTrue(doc.IsFirst());
-			doc = GetDynamicNode(1175);
-			Assert.IsFalse(doc.IsFirst());
+		    Assert.IsFalse(doc.IsFirst());
 		}
 
-        [Ignore]
+        [Test]
+        public void Is_First()
+        {
+            var doc = GetDynamicNode(1173); //test normal nodes
+            Assert.IsTrue(doc.IsFirst());
+            doc = GetDynamicNode(1175);
+            Assert.IsFalse(doc.IsFirst());
+        }
+
+        [Test]
+        public virtual void Is_Not_First_Root_Nodes()
+        {
+            var doc = GetDynamicNode(1046); //test root nodes
+            Assert.IsFalse(doc.IsNotFirst());
+            doc = GetDynamicNode(1172);
+            Assert.IsTrue(doc.IsNotFirst());
+        }
+
 		[Test]
 		public void Is_Not_First()
-		{
-			var doc = GetDynamicNode(1046); //test root nodes
-			Assert.IsFalse(doc.IsNotFirst());
-			doc = GetDynamicNode(1172);
-			Assert.IsTrue(doc.IsNotFirst());
-			doc = GetDynamicNode(1173); //test normal nodes
+		{		
+			var doc = GetDynamicNode(1173); //test normal nodes
 			Assert.IsFalse(doc.IsNotFirst());
 			doc = GetDynamicNode(1175);
 			Assert.IsTrue(doc.IsNotFirst());
 		}
 
-        [Ignore]
+        [Test]
+        public virtual void Is_Position_Root_Nodes()
+        {
+            var doc = GetDynamicNode(1046); //test root nodes
+            Assert.IsTrue(doc.IsPosition(0));
+            doc = GetDynamicNode(1172);
+            Assert.IsTrue(doc.IsPosition(1));            
+        }
+
 		[Test]
 		public void Is_Position()
 		{
-			var doc = GetDynamicNode(1046); //test root nodes
-			Assert.IsTrue(doc.IsPosition(0));
-			doc = GetDynamicNode(1172);
-			Assert.IsTrue(doc.IsPosition(1));
-			doc = GetDynamicNode(1173); //test normal nodes
+			var doc = GetDynamicNode(1173); //test normal nodes
 			Assert.IsTrue(doc.IsPosition(0));
 			doc = GetDynamicNode(1175);
 			Assert.IsTrue(doc.IsPosition(1));
@@ -446,7 +458,6 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.AreEqual("Custom data with same property name as the member name", asDynamic.GetPropertyValue("CreatorName"));
 		}
 
-        [Ignore]
 		[Test]
 		public void GetPropertyValue_Reflected()
 		{
@@ -467,7 +478,6 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.AreEqual("admin", asDynamic.CreatorName);
 		}
 
-        [Ignore]
 		[Test]
 		public void Get_Member_Property()
 		{

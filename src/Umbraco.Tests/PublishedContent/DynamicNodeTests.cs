@@ -54,6 +54,27 @@ namespace Umbraco.Tests.PublishedContent
 
         }
 
+        [Test]
+        [Ignore("This test will never work unless DynamicNode is refactored a lot in order to get a list of root nodes since root nodes don't have a parent to look up")]
+        public override void Is_First_Root_Nodes()
+        {
+            base.Is_First_Root_Nodes();
+        }
+
+        [Test]
+        [Ignore("This test will never work unless DynamicNode is refactored a lot in order to get a list of root nodes since root nodes don't have a parent to look up")]
+        public override void Is_Not_First_Root_Nodes()
+        {
+            base.Is_Not_First_Root_Nodes();
+        }
+
+        [Test]
+        [Ignore("This test will never work unless DynamicNode is refactored a lot in order to get a list of root nodes since root nodes don't have a parent to look up")]
+        public override void Is_Position_Root_Nodes()
+        {
+            base.Is_Position_Root_Nodes();
+        }
+
         public override void TearDown()
         {
             base.TearDown();
