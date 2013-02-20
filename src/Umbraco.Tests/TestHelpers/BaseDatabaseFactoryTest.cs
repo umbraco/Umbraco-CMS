@@ -107,7 +107,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 File.Delete(filePath);
             }
-
+            SettingsForTests.Reset();
             UmbracoSettings.ResetSetters();
         }
 
