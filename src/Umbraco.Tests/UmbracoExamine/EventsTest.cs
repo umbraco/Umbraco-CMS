@@ -9,7 +9,7 @@ using UmbracoExamine;
 namespace Umbraco.Tests.UmbracoExamine
 {
 	[TestFixture]
-	public class EventsTest : AbstractPartialTrustFixture<EventsTest>
+	public class EventsTest : ExamineBaseTest<EventsTest>
 	{
 		[Test]
 		public void Events_Ignoring_Node()
@@ -48,6 +48,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
 		public override void TestSetup()
 		{
+            base.TestSetup();
 			_luceneDir = new RAMDirectory();
 			_indexer = IndexInitializer.GetUmbracoIndexer(_luceneDir);
 			_indexer.RebuildIndex();
@@ -56,6 +57,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
 		public override void TestTearDown()
 		{
+		    base.TestTearDown();
 			_luceneDir.Dispose();
 		}
 	}
