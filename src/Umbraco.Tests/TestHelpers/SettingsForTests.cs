@@ -52,8 +52,6 @@ namespace Umbraco.Tests.TestHelpers
             SaveSetting("umbracoReservedPaths");
             SaveSetting("umbracoReservedUrls");
             SaveSetting("umbracoConfigurationStatus");
-
-            SaveSetting(GlobalSettings.UmbracoConnectionName);
         }
 
         public static bool HideTopLevelNodeFromPath
