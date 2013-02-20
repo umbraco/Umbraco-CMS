@@ -31,6 +31,8 @@ namespace Umbraco.Tests.Routing
 			var docRequest = new PublishedContentRequest(url, routingContext);
 			var lookup = new ContentFinderByNiceUrlAndTemplate();
 
+		    SettingsForTests.HideTopLevelNodeFromPath = false;
+
 			var result = lookup.TryFindDocument(docRequest);
 
 			Assert.IsTrue(result);
