@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.SessionState;
 using Umbraco.Core;
 
 namespace Umbraco.Tests.Stubs
@@ -28,12 +29,12 @@ namespace Umbraco.Tests.Stubs
 
 		public System.Web.SessionState.SessionStateBehavior GetControllerSessionBehavior(RequestContext requestContext, string controllerName)
 		{
-			throw new NotImplementedException();
+			return SessionStateBehavior.Disabled;
 		}
 
 		public void ReleaseController(IController controller)
 		{
-			throw new NotImplementedException();
+			controller.DisposeIfDisposable();
 		}
 	}
 }

@@ -9,7 +9,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.Mvc
 {
-	/// <summary>
+    /// <summary>
 	/// A controller factory which uses an internal list of <see cref="IFilteredControllerFactory"/> in order to invoke 
 	/// different controller factories dependent upon their implementation of <see cref="IFilteredControllerFactory.CanHandle"/> for the current
 	/// request. Allows circumvention of MVC3's singly registered IControllerFactory.
@@ -70,7 +70,11 @@ namespace Umbraco.Web.Mvc
                 }
                 //we have no choice but to instantiate the controller
                 var instance = factory.CreateController(requestContext, controllerName);
-                return instance.GetType();
+                if (instance != null)
+                {
+                    return instance.GetType();    
+                }
+                return null;
             }
 
             return base.GetControllerType(requestContext, controllerName);

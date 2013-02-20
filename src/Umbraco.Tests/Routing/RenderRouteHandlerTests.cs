@@ -74,7 +74,9 @@ namespace Umbraco.Tests.Routing
 
 			handler.GetHandlerForRoute(routingContext.UmbracoContext.HttpContext.Request.RequestContext, docRequest);
 			Assert.AreEqual("RenderMvc", routeData.Values["controller"].ToString());
-			Assert.AreEqual("Index", routeData.Values["action"].ToString());
+            //the route action will still be the one we've asked for because our RenderActionInvoker is the thing that decides
+            // if the action matches.
+            Assert.AreEqual("homePage", routeData.Values["action"].ToString());
 		}
 
 		//test all template name styles to match the ActionName

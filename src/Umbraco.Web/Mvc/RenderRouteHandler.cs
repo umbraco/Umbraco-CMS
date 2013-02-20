@@ -259,7 +259,7 @@ namespace Umbraco.Web.Mvc
             }
 
 			//check if there's a custom controller assigned, base on the document type alias.
-            var controllerType = ((MasterControllerFactory)_controllerFactory).GetControllerTypeInternal(requestContext, publishedContentRequest.PublishedContent.DocumentTypeAlias);
+            var controllerType = _controllerFactory.GetControllerTypeInternal(requestContext, publishedContentRequest.PublishedContent.DocumentTypeAlias);
             
 			//check if that controller exists
 		    if (controllerType != null)
