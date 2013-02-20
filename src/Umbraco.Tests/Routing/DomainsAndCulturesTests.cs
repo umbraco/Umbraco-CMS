@@ -63,7 +63,10 @@ namespace Umbraco.Tests.Routing
 
             Domain.MakeNew("*1001", 1001, langDk.id);
             Domain.MakeNew("*10011", 10011, langCz.id);
+            Domain.MakeNew("*100112", 100112, langNl.id);
+            Domain.MakeNew("*1001122", 1001122, langDk.id);
             Domain.MakeNew("*10012", 10012, langNl.id);
+            Domain.MakeNew("*10031", 10031, langNl.id);
         }
 
         protected override string GetXmlContent(int templateId)
@@ -155,6 +158,7 @@ namespace Umbraco.Tests.Routing
 </root>";
         }
 
+        #region Cases
         [TestCase("http://domain1.com/", "de-DE", 1001)]
         [TestCase("http://domain1.com/1001-1", "de-DE", 10011)]
         [TestCase("http://domain1.com/1001-1/1001-1-1", "de-DE", 100111)]
@@ -162,6 +166,7 @@ namespace Umbraco.Tests.Routing
         [TestCase("http://domain1.com/en/1001-1-1", "en-US", 100111)]
         [TestCase("http://domain1.com/fr", "fr-FR", 10012)]
         [TestCase("http://domain1.com/fr/1001-2-1", "fr-FR", 100121)]
+        #endregion
         public void DomainAndCulture(string inputUrl, string expectedCulture, int expectedNode)
         {
             SetDomains1();
@@ -175,6 +180,7 @@ namespace Umbraco.Tests.Routing
 
             Assert.AreEqual(expectedCulture, pcr.Culture.Name);
 
+            SettingsForTests.HideTopLevelNodeFromPath = false; 
             var finder = new ContentFinderByNiceUrl();
             var result = finder.TryFindDocument(pcr);
 
@@ -182,15 +188,29 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual(pcr.PublishedContent.Id, expectedNode);
         }
 
-        [TestCase("http://domain1.com/", "de-DE", 1001)] // domain takes over wildcard FIXME
-        [TestCase("http://domain1.com/1001-1", "cs-CZ", 10011)] // wildcard applies
-        [TestCase("http://domain1.com/1001-1/1001-1-1", "cs-CZ", 100111)] // wildcard applies
-        [TestCase("http://domain1.com/1001-2", "nl-NL", 10012)] // wildcard applies
-        [TestCase("http://domain1.com/1001-2/1001-2-1", "nl-NL", 100121)] // wildcard applies
-        [TestCase("http://domain1.com/en", "en-US", 10011)] // domain takes over wildcard FIXME
-        [TestCase("http://domain1.com/en/1001-1-1", "cs-CZ", 100111)] // wildcard applies
-        [TestCase("http://domain1.com/fr", "fr-FR", 10012)] // domain takes over wildcard FIXME
-        [TestCase("http://domain1.com/fr/1001-2-1", "nl-NL", 100121)] // wildcard applies
+        #region Cases
+        [TestCase("http://domain1.com/", "de-DE", 1001)] // domain takes over local wildcard at 1001
+        [TestCase("http://domain1.com/1001-1", "cs-CZ", 10011)] // wildcard on 10011 applies
+        [TestCase("http://domain1.com/1001-1/1001-1-1", "cs-CZ", 100111)] // wildcard on 10011 applies
+        [TestCase("http://domain1.com/1001-1/1001-1-2", "nl-NL", 100112)] // wildcard on 100112 applies
+        [TestCase("http://domain1.com/1001-1/1001-1-2/1001-1-2-1", "nl-NL", 1001121)] // wildcard on 100112 applies
+        [TestCase("http://domain1.com/1001-1/1001-1-2/1001-1-2-2", "da-DK", 1001122)] // wildcard on 1001122 applies
+
+        [TestCase("http://domain1.com/1001-2", "nl-NL", 10012)] // wildcard on 10012 applies
+        [TestCase("http://domain1.com/1001-2/1001-2-1", "nl-NL", 100121)] // wildcard on 10012 applies
+        [TestCase("http://domain1.com/en", "en-US", 10011)] // domain takes over local wildcard at 10011
+        [TestCase("http://domain1.com/en/1001-1-1", "en-US", 100111)] // domain takes over local wildcard at 10011
+        [TestCase("http://domain1.com/en/1001-1-2", "nl-NL", 100112)] // wildcard on 100112 applies
+        [TestCase("http://domain1.com/en/1001-1-2/1001-1-2-1", "nl-NL", 1001121)] // wildcard on 100112 applies
+        [TestCase("http://domain1.com/en/1001-1-2/1001-1-2-2", "da-DK", 1001122)] // wildcard on 1001122 applies
+
+        [TestCase("http://domain1.com/fr", "fr-FR", 10012)] // domain takes over local wildcard at 10012
+        [TestCase("http://domain1.com/fr/1001-2-1", "fr-FR", 100121)] // domain takes over local wildcard at 10012
+
+        [TestCase("/1003", "en-US", 1003)] // default culture (no domain)
+        [TestCase("/1003/1003-1", "nl-NL", 10031)] // wildcard on 10031 applies
+        [TestCase("/1003/1003-1/1003-1-1", "nl-NL", 100311)] // wildcard on 10031 applies
+        #endregion
         public void DomainAndCultureWithWildcards(string inputUrl, string expectedCulture, int expectedNode)
         {
             SetDomains2();
@@ -203,14 +223,15 @@ namespace Umbraco.Tests.Routing
             pcr.Engine.FindDomain();
 
             // find document
+            SettingsForTests.HideTopLevelNodeFromPath = false;
             var finder = new ContentFinderByNiceUrl();
             var result = finder.TryFindDocument(pcr);
 
             // apply wildcard domain
             pcr.Engine.HandleWildcardDomains();
 
-            Assert.AreEqual(expectedCulture, pcr.Culture.Name);
             Assert.IsTrue(result);
+            Assert.AreEqual(expectedCulture, pcr.Culture.Name);
             Assert.AreEqual(pcr.PublishedContent.Id, expectedNode);
         }
     }

@@ -157,22 +157,17 @@ namespace Umbraco.Web.Routing
 		/// <returns>The deepest wildcard <see cref="Domain"/> in the path, or null.</returns>
 		public static Domain LookForWildcardDomain(IEnumerable<Domain> domains, string path, int? rootNodeId)
 		{
-			var nodeIds = path.Split(',').Select(p => int.Parse(p)).Skip(1).Reverse();
+            // "When you perform comparisons with nullable types, if the value of one of the nullable
+            // types is null and the other is not, all comparisons evaluate to false."
 
-			foreach (var nodeId in nodeIds)
-			{
-				var domain = domains.Where(d => d.RootNodeId == nodeId && IsWildcardDomain(d)).FirstOrDefault();
-				if (domain != null)
-					return domain;
-
-				// stop at current domain root if any
-				// "When you perform comparisons with nullable types, if the value of one of the nullable
-				// types is null and the other is not, all comparisons evaluate to false."
-				if (nodeId == rootNodeId)
-					break;
-			}
-
-			return null;
+            return path
+                .Split(',')
+                .Select(int.Parse)
+                .Skip(1)
+                .Reverse()
+                .TakeWhile(id => !rootNodeId.HasValue || id != rootNodeId)
+                .Select(nodeId => domains.FirstOrDefault(d => d.RootNodeId == nodeId && IsWildcardDomain(d)))
+                .FirstOrDefault(domain => domain != null);
 		}
 
 		/// <summary>
