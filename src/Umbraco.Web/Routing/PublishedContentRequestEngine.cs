@@ -208,7 +208,7 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Looks for wildcard domains in the path and updates <c>Culture</c> accordingly.
 		/// </summary>
-		private void HandleWildcardDomains()
+		internal void HandleWildcardDomains()
 		{
 			const string tracePrefix = "HandleWildcardDomains: ";
 

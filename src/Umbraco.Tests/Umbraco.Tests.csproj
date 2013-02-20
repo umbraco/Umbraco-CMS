@@ -254,6 +254,7 @@
     <Compile Include="Resolvers\SingleResolverTests.cs" />
     <Compile Include="Resolvers\ResolutionTests.cs" />
     <Compile Include="Routing\ContentFinderByNiceUrlWithDomainsTests.cs" />
+    <Compile Include="Routing\DomainsAndCulturesTests.cs" />
     <Compile Include="Routing\NiceUrlsProviderWithDomainsTests.cs" />
     <Compile Include="Routing\uQueryGetNodeIdByUrlTests.cs" />
     <Compile Include="Routing\UrlsWithNestedDomains.cs" />
