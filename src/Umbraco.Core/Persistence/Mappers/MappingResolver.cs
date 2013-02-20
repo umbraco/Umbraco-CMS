@@ -8,8 +8,11 @@ namespace Umbraco.Core.Persistence.Mappers
     {
         internal static BaseMapper ResolveMapperByType(Type type)
         {
-            if (type == typeof (ServerRegistration))
-                return ServerRegistrationMapper.Instance;
+            //NOTE: SD: Commenting out for now until we want to release a distributed cache provider that 
+            // uses internal DNS names for each website to 'call' home intead of the current configuration based approach.
+
+            //if (type == typeof (ServerRegistration))
+            //    return ServerRegistrationMapper.Instance;
 
             if (type == typeof (IContent) || type == typeof (Content))
                 return ContentMapper.Instance;

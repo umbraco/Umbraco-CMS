@@ -20,7 +20,10 @@ namespace Umbraco.Core.Services
         private Lazy<DataTypeService> _dataTypeService;
         private Lazy<FileService> _fileService;
         private Lazy<LocalizationService> _localizationService;
-        private Lazy<ServerRegistrationService> _serverRegistrationService;
+
+        //NOTE: SD: Commenting out for now until we want to release a distributed cache provider that 
+        // uses internal DNS names for each website to 'call' home intead of the current configuration based approach.
+        //private Lazy<ServerRegistrationService> _serverRegistrationService;
 
 		/// <summary>
 		/// Constructor
@@ -48,8 +51,10 @@ namespace Umbraco.Core.Services
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
 
-            if (_serverRegistrationService == null)
-                _serverRegistrationService = new Lazy<ServerRegistrationService>(() => new ServerRegistrationService(provider, repositoryFactory.Value));
+            //NOTE: SD: Commenting out for now until we want to release a distributed cache provider that 
+            // uses internal DNS names for each website to 'call' home intead of the current configuration based approach.
+            //if (_serverRegistrationService == null)
+            //    _serverRegistrationService = new Lazy<ServerRegistrationService>(() => new ServerRegistrationService(provider, repositoryFactory.Value));
 
 			if (_userService == null)
 				_userService = new Lazy<UserService>(() => new UserService(provider, repositoryFactory.Value));
@@ -76,13 +81,16 @@ namespace Umbraco.Core.Services
 				_localizationService = new Lazy<LocalizationService>(() => new LocalizationService(provider, repositoryFactory.Value));
         }
 
-        /// <summary>
-        /// Gets the <see cref="ServerRegistrationService"/>
-        /// </summary>
-        internal ServerRegistrationService ServerRegistrationService
-        {
-            get { return _serverRegistrationService.Value; }
-        }
+        //NOTE: SD: Commenting out for now until we want to release a distributed cache provider that 
+        // uses internal DNS names for each website to 'call' home intead of the current configuration based approach.
+
+        ///// <summary>
+        ///// Gets the <see cref="ServerRegistrationService"/>
+        ///// </summary>
+        //internal ServerRegistrationService ServerRegistrationService
+        //{
+        //    get { return _serverRegistrationService.Value; }
+        //}
 
         /// <summary>
         /// Gets the <see cref="IContentService"/>

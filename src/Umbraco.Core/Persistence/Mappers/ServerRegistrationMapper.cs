@@ -6,45 +6,48 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
-    internal sealed class ServerRegistrationMapper : BaseMapper
-    {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache = new ConcurrentDictionary<string, DtoMapModel>();
+    //NOTE: SD: Commenting out for now until we want to release a distributed cache provider that 
+    // uses internal DNS names for each website to 'call' home intead of the current configuration based approach.
 
-        internal static readonly ServerRegistrationMapper Instance = new ServerRegistrationMapper();
+    //internal sealed class ServerRegistrationMapper : BaseMapper
+    //{
+    //    private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache = new ConcurrentDictionary<string, DtoMapModel>();
 
-        private ServerRegistrationMapper()
-        {
-            BuildMap();
-        }
+    //    internal static readonly ServerRegistrationMapper Instance = new ServerRegistrationMapper();
 
-        #region Overrides of BaseMapper
+    //    private ServerRegistrationMapper()
+    //    {
+    //        BuildMap();
+    //    }
 
-        internal override void BuildMap()
-        {
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.Id, dto => dto.Id);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.IsActive, dto => dto.IsActive);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.ServerAddress, dto => dto.Address);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.CreateDate, dto => dto.DateRegistered);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.UpdateDate, dto => dto.LastNotified);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.ComputerName, dto => dto.ComputerName);
-        }
+    //    #region Overrides of BaseMapper
 
-        internal override string Map(string propertyName)
-        {
-            if (!PropertyInfoCache.ContainsKey(propertyName))
-                return string.Empty;
+    //    internal override void BuildMap()
+    //    {
+    //        CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.Id, dto => dto.Id);
+    //        CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.IsActive, dto => dto.IsActive);
+    //        CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.ServerAddress, dto => dto.Address);
+    //        CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.CreateDate, dto => dto.DateRegistered);
+    //        CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.UpdateDate, dto => dto.LastNotified);
+    //        CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.ComputerName, dto => dto.ComputerName);
+    //    }
 
-            var dtoTypeProperty = PropertyInfoCache[propertyName];
+    //    internal override string Map(string propertyName)
+    //    {
+    //        if (!PropertyInfoCache.ContainsKey(propertyName))
+    //            return string.Empty;
 
-            return base.GetColumnName(dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo);
-        }
+    //        var dtoTypeProperty = PropertyInfoCache[propertyName];
 
-        internal override void CacheMap<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
-        {
-            var property = base.ResolveMapping(sourceMember, destinationMember);
-            PropertyInfoCache.AddOrUpdate(property.SourcePropertyName, property, (x, y) => property);
-        }
+    //        return base.GetColumnName(dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo);
+    //    }
 
-        #endregion
-    }
+    //    internal override void CacheMap<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
+    //    {
+    //        var property = base.ResolveMapping(sourceMember, destinationMember);
+    //        PropertyInfoCache.AddOrUpdate(property.SourcePropertyName, property, (x, y) => property);
+    //    }
+
+    //    #endregion
+    //}
 }

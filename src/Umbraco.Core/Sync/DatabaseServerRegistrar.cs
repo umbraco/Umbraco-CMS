@@ -3,21 +3,24 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Sync
 {
-    /// <summary>
-    /// A registrar that stores registered server nodes in a database
-    /// </summary>
-    internal class DatabaseServerRegistrar : IServerRegistrar
-    {
-        private readonly ServerRegistrationService _registrationService;
+    //NOTE: SD: Commenting out for now until we want to release a distributed cache provider that 
+    // uses internal DNS names for each website to 'call' home intead of the current configuration based approach.
 
-        public DatabaseServerRegistrar(ServerRegistrationService registrationService)
-        {
-            _registrationService = registrationService;
-        }
+    ///// <summary>
+    ///// A registrar that stores registered server nodes in a database
+    ///// </summary>
+    //internal class DatabaseServerRegistrar : IServerRegistrar
+    //{
+    //    private readonly ServerRegistrationService _registrationService;
 
-        public IEnumerable<IServerAddress> Registrations
-        {
-            get { return _registrationService.GetActiveServers(); }
-        }
-    }
+    //    public DatabaseServerRegistrar(ServerRegistrationService registrationService)
+    //    {
+    //        _registrationService = registrationService;
+    //    }
+
+    //    public IEnumerable<IServerAddress> Registrations
+    //    {
+    //        get { return _registrationService.GetActiveServers(); }
+    //    }
+    //}
 }

@@ -11,120 +11,123 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class ServerRegistrationRepository : PetaPocoRepositoryBase<int, ServerRegistration>        
-    {
-        public ServerRegistrationRepository(IDatabaseUnitOfWork work)
-            : base(work)
-        {
-        }
+    //NOTE: SD: Commenting out for now until we want to release a distributed cache provider that 
+    // uses internal DNS names for each website to 'call' home intead of the current configuration based approach.
 
-        public ServerRegistrationRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
-            : base(work, cache)
-        {
-        }
+    //internal class ServerRegistrationRepository : PetaPocoRepositoryBase<int, ServerRegistration>        
+    //{
+    //    public ServerRegistrationRepository(IDatabaseUnitOfWork work)
+    //        : base(work)
+    //    {
+    //    }
 
-        protected override ServerRegistration PerformGet(int id)
-        {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
+    //    public ServerRegistrationRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
+    //        : base(work, cache)
+    //    {
+    //    }
 
-            var serverDto = Database.First<ServerRegistrationDto>(sql);
-            if (serverDto == null)
-                return null;
+    //    protected override ServerRegistration PerformGet(int id)
+    //    {
+    //        var sql = GetBaseQuery(false);
+    //        sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var factory = new ServerRegistrationFactory();
-            var entity = factory.BuildEntity(serverDto);
+    //        var serverDto = Database.First<ServerRegistrationDto>(sql);
+    //        if (serverDto == null)
+    //            return null;
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+    //        var factory = new ServerRegistrationFactory();
+    //        var entity = factory.BuildEntity(serverDto);
 
-            return entity;
-        }
+    //        ((ICanBeDirty)entity).ResetDirtyProperties();
 
-        protected override IEnumerable<ServerRegistration> PerformGetAll(params int[] ids)
-        {
-            if (ids.Any())
-            {
-                foreach (var id in ids)
-                {
-                    yield return Get(id);
-                }
-            }
-            else
-            {
-                var serverDtos = Database.Fetch<ServerRegistrationDto>("WHERE id > 0");
-                foreach (var serverDto in serverDtos)
-                {
-                    yield return Get(serverDto.Id);
-                }
-            }
-        }
+    //        return entity;
+    //    }
 
-        protected override IEnumerable<ServerRegistration> PerformGetByQuery(IQuery<ServerRegistration> query)
-        {
-            var sqlClause = GetBaseQuery(false);
-            var translator = new SqlTranslator<ServerRegistration>(sqlClause, query);
-            var sql = translator.Translate();
+    //    protected override IEnumerable<ServerRegistration> PerformGetAll(params int[] ids)
+    //    {
+    //        if (ids.Any())
+    //        {
+    //            foreach (var id in ids)
+    //            {
+    //                yield return Get(id);
+    //            }
+    //        }
+    //        else
+    //        {
+    //            var serverDtos = Database.Fetch<ServerRegistrationDto>("WHERE id > 0");
+    //            foreach (var serverDto in serverDtos)
+    //            {
+    //                yield return Get(serverDto.Id);
+    //            }
+    //        }
+    //    }
 
-            var dtos = Database.Fetch<ServerRegistration>(sql);
+    //    protected override IEnumerable<ServerRegistration> PerformGetByQuery(IQuery<ServerRegistration> query)
+    //    {
+    //        var sqlClause = GetBaseQuery(false);
+    //        var translator = new SqlTranslator<ServerRegistration>(sqlClause, query);
+    //        var sql = translator.Translate();
 
-            foreach (var dto in dtos)
-            {
-                yield return Get(dto.Id);
-            }
+    //        var dtos = Database.Fetch<ServerRegistration>(sql);
 
-        }
+    //        foreach (var dto in dtos)
+    //        {
+    //            yield return Get(dto.Id);
+    //        }
 
-        protected override Sql GetBaseQuery(bool isCount)
-        {
-            var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<ServerRegistrationDto>();
-            return sql;
-        }
+    //    }
 
-        protected override string GetBaseWhereClause()
-        {
-            return "id = @Id";
-        }
+    //    protected override Sql GetBaseQuery(bool isCount)
+    //    {
+    //        var sql = new Sql();
+    //        sql.Select(isCount ? "COUNT(*)" : "*")
+    //           .From<ServerRegistrationDto>();
+    //        return sql;
+    //    }
 
-        protected override IEnumerable<string> GetDeleteClauses()
-        {
-            var list = new List<string>
-                {
-                    "DELETE FROM umbracoServer WHERE id = @Id"                               
-                };
-            return list;
-        }
+    //    protected override string GetBaseWhereClause()
+    //    {
+    //        return "id = @Id";
+    //    }
 
-        protected override Guid NodeObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
-        }
+    //    protected override IEnumerable<string> GetDeleteClauses()
+    //    {
+    //        var list = new List<string>
+    //            {
+    //                "DELETE FROM umbracoServer WHERE id = @Id"                               
+    //            };
+    //        return list;
+    //    }
 
-        protected override void PersistNewItem(ServerRegistration entity)
-        {
-            ((Entity)entity).AddingEntity();
+    //    protected override Guid NodeObjectTypeId
+    //    {
+    //        get { throw new NotImplementedException(); }
+    //    }
 
-            var factory = new ServerRegistrationFactory();
-            var dto = factory.BuildDto(entity);
+    //    protected override void PersistNewItem(ServerRegistration entity)
+    //    {
+    //        ((Entity)entity).AddingEntity();
 
-            var id = Convert.ToInt32(Database.Insert(dto));
-            entity.Id = id;
+    //        var factory = new ServerRegistrationFactory();
+    //        var dto = factory.BuildDto(entity);
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
-        }
+    //        var id = Convert.ToInt32(Database.Insert(dto));
+    //        entity.Id = id;
 
-        protected override void PersistUpdatedItem(ServerRegistration entity)
-        {
-            ((Entity)entity).UpdatingEntity();
+    //        ((ICanBeDirty)entity).ResetDirtyProperties();
+    //    }
 
-            var factory = new ServerRegistrationFactory();
-            var dto = factory.BuildDto(entity);
+    //    protected override void PersistUpdatedItem(ServerRegistration entity)
+    //    {
+    //        ((Entity)entity).UpdatingEntity();
 
-            Database.Update(dto);
+    //        var factory = new ServerRegistrationFactory();
+    //        var dto = factory.BuildDto(entity);
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();            
-        }
+    //        Database.Update(dto);
 
-    }
+    //        ((ICanBeDirty)entity).ResetDirtyProperties();            
+    //    }
+
+    //}
 }

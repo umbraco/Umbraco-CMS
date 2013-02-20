@@ -9,12 +9,15 @@ namespace Umbraco.Core.Persistence
     /// </summary>
     public class RepositoryFactory
     {
-        internal virtual ServerRegistrationRepository CreateServerRegistrationRepository(IDatabaseUnitOfWork uow)
-        {
-            return new ServerRegistrationRepository(
-                uow,
-                NullCacheProvider.Current);
-        }
+        //NOTE: SD: Commenting out for now until we want to release a distributed cache provider that 
+        // uses internal DNS names for each website to 'call' home intead of the current configuration based approach.
+
+        //internal virtual ServerRegistrationRepository CreateServerRegistrationRepository(IDatabaseUnitOfWork uow)
+        //{
+        //    return new ServerRegistrationRepository(
+        //        uow,
+        //        NullCacheProvider.Current);
+        //}
 
 		internal virtual IUserTypeRepository CreateUserTypeRepository(IDatabaseUnitOfWork uow)
         {
