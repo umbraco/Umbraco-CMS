@@ -300,8 +300,7 @@ namespace Umbraco.Core
                 {
                     ConfigureEmbeddedDatabaseConnection();
                 }
-                else if (legacyConnString.ToLowerInvariant().Contains("database.windows.net") &&
-                         legacyConnString.ToLowerInvariant().Contains("tcp:"))
+                else if (legacyConnString.ToLowerInvariant().Contains("tcp:"))
                 {
                     //Must be sql azure
                     SaveConnectionString(legacyConnString, "System.Data.SqlClient");
