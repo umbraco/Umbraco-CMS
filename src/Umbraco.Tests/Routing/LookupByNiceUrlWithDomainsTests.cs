@@ -17,7 +17,11 @@ namespace Umbraco.Tests.Routing
 		public override void Initialize()
 		{
 			base.Initialize();
-			InitializeLanguagesAndDomains();
+
+            // ensure we can create them although the content is not in the database
+            TestHelper.DropForeignKeys("umbracoDomains");
+            
+            InitializeLanguagesAndDomains();
 		}
 
 		void InitializeLanguagesAndDomains()

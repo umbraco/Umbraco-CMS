@@ -2,6 +2,7 @@
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -16,6 +17,8 @@ namespace Umbraco.Tests.Models
         [SetUp]
         public override void Initialize()
         {
+            Resolution.IsFrozen = false;
+
             //this ensures its reset
             PluginManager.Current = new PluginManager();
 
@@ -26,6 +29,7 @@ namespace Umbraco.Tests.Models
                     typeof(tinyMCE3dataType).Assembly
                 };
 
+            DataTypesResolver.Reset();
             DataTypesResolver.Current = new DataTypesResolver(
                 () => PluginManager.Current.ResolveDataTypes());
 
@@ -35,10 +39,10 @@ namespace Umbraco.Tests.Models
         [TearDown]
         public override void TearDown()
         {
+            base.TearDown();
+
             //reset the app context
             DataTypesResolver.Reset();
-
-            base.TearDown();
         }
         [Test]
         public void Can_Generate_Xml_Representation_Of_Media()

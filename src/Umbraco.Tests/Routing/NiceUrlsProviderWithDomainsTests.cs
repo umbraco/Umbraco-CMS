@@ -14,6 +14,14 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class NiceUrlsProviderWithDomainsTests : BaseRoutingTest
 	{
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            // ensure we can create them although the content is not in the database
+            TestHelper.DropForeignKeys("umbracoDomains");
+        }
+
 		internal override IRoutesCache GetRoutesCache()
 		{
 			return new DefaultRoutesCache(false);
