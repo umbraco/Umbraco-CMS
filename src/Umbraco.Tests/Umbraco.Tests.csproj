@@ -254,6 +254,7 @@
     <Compile Include="Resolvers\ManyResolverTests.cs" />
     <Compile Include="Resolvers\SingleResolverTests.cs" />
     <Compile Include="Resolvers\ResolutionTests.cs" />
+    <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />
     <Compile Include="Routing\ContentFinderByNiceUrlWithDomainsTests.cs" />
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />
     <Compile Include="Routing\NiceUrlsProviderWithDomainsTests.cs" />

@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Routing
 		/// </summary>
 		protected override bool RequiresDbSetup
 		{
-			get { return true; }
+			get { return false; }
 		}
 
 		[TestCase("/", 1046)]
@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Routing
 			var routingContext = GetRoutingContext(urlString);
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
 			var docreq = new PublishedContentRequest(url, routingContext);
-			var lookup = new ContentFinderByNiceUrl();
+			var lookup = new ContentFinderByNiceUrl(false);
 		    SettingsForTests.HideTopLevelNodeFromPath = true;
 
 			var result = lookup.TryFindDocument(docreq);
@@ -61,7 +61,7 @@ namespace Umbraco.Tests.Routing
 			var routingContext = GetRoutingContext(urlString);
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl;	//very important to use the cleaned up umbraco url		
 			var docreq = new PublishedContentRequest(url, routingContext);			
-			var lookup = new ContentFinderByNiceUrl();
+			var lookup = new ContentFinderByNiceUrl(false);
             SettingsForTests.HideTopLevelNodeFromPath = false;
 
 			var result = lookup.TryFindDocument(docreq);

@@ -15,7 +15,23 @@ namespace Umbraco.Web.Routing
 	/// </remarks>
 	internal class ContentFinderByNiceUrl : IContentFinder
     {
-		/// <summary>
+	    private readonly bool _doDomainLookup;
+
+	    public ContentFinderByNiceUrl()
+	    {
+	        _doDomainLookup = true;
+	    }
+
+        /// <summary>
+        /// Contructor with flag to set whether we lookup domains in the repo to match the url or not
+        /// </summary>
+        /// <param name="doDomainLookup"></param>
+	    internal ContentFinderByNiceUrl(bool doDomainLookup)
+	    {
+	        _doDomainLookup = doDomainLookup;
+	    }
+
+	    /// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
 		/// </summary>
 		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
@@ -81,7 +97,7 @@ namespace Umbraco.Web.Routing
                     docreq.PublishedContent = node;
 					LogHelper.Debug<ContentFinderByNiceUrl>("Query matches, id={0}", () => docreq.PublishedContent.Id);
 
-					var iscanon = !DomainHelper.ExistsDomainInPath(docreq.Domain, node.Path);
+					var iscanon = _doDomainLookup && !DomainHelper.ExistsDomainInPath(docreq.Domain, node.Path);
 					if (!iscanon)
 						LogHelper.Debug<ContentFinderByNiceUrl>("Non canonical url");
 
