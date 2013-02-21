@@ -324,6 +324,63 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Checks whether a PropertyType with a given alias already exists
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <returns>Returns <c>True</c> if a PropertyType with the passed in alias exists, otherwise <c>False</c></returns>
+        public abstract bool PropertyTypeExists(string propertyTypeAlias);
+
+        /// <summary>
+        /// Adds a PropertyType to a specific PropertyGroup
+        /// </summary>
+        /// <param name="propertyType"><see cref="PropertyType"/> to add</param>
+        /// <param name="propertyGroupName">Name of the PropertyGroup to add the PropertyType to</param>
+        /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
+        public bool AddPropertyType(PropertyType propertyType, string propertyGroupName)
+        {
+            if (PropertyTypeExists(propertyType.Alias) == false)
+            {
+                if (PropertyGroups.Contains(propertyGroupName))
+                {
+                    propertyType.PropertyGroupId = PropertyGroups[propertyGroupName].Id;
+                    PropertyGroups[propertyGroupName].PropertyTypes.Add(propertyType);
+                }
+                else
+                {
+                    int sortOrder = 0;
+                    if (PropertyGroups.Any())
+                    {
+                        var firstPropertyGroup = PropertyGroups.OrderByDescending(x => x.SortOrder).First();
+                        if (firstPropertyGroup != null)
+                            sortOrder = firstPropertyGroup.SortOrder + 1;
+                    }
+
+                    var propertyTypes = new List<PropertyType>{ propertyType };
+                    var propertyGroup = new PropertyGroup(new PropertyTypeCollection(propertyTypes)) { Name = propertyGroupName, SortOrder = sortOrder};
+                    PropertyGroups.Add(propertyGroup);
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Adds a PropertyType, which does not belong to a PropertyGroup.
+        /// </summary>
+        /// <param name="propertyType"><see cref="PropertyType"/> to add</param>
+        /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
+        public bool AddPropertyType(PropertyType propertyType)
+        {
+            if (PropertyTypeExists(propertyType.Alias) == false)
+            {
+                _propertyTypes.Add(propertyType);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Removes a PropertyType from the current ContentType
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the <see cref="PropertyType"/> to remove</param>
@@ -332,6 +389,11 @@ namespace Umbraco.Core.Models
             foreach (var propertyGroup in PropertyGroups)
             {
                 propertyGroup.PropertyTypes.RemoveItem(propertyTypeAlias);
+            }
+
+            if (_propertyTypes.Any(x => x.Alias == propertyTypeAlias))
+            {
+                _propertyTypes.RemoveItem(propertyTypeAlias);
             }
         }
 

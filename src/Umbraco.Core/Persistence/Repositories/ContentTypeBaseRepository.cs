@@ -205,8 +205,14 @@ namespace Umbraco.Core.Persistence.Repositories
                     int groupPrimaryKey = propertyGroup.HasIdentity
                                               ? Database.Update(tabDto)
                                               : Convert.ToInt32(Database.Insert(tabDto));
-                    if (!propertyGroup.HasIdentity)
+                    if (propertyGroup.HasIdentity == false)
                         propertyGroup.Id = groupPrimaryKey;//Set Id on new PropertyGroup
+
+                    //Ensure that the PropertyGroup's Id is set on the PropertyTypes within a group
+                    foreach (var propertyType in propertyGroup.PropertyTypes)
+                    {
+                        propertyType.PropertyGroupId = propertyGroup.Id;
+                    }
                 }
 
                 //Run through all PropertyTypes to insert or update entries
@@ -216,7 +222,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     int typePrimaryKey = propertyType.HasIdentity
                                              ? Database.Update(propertyTypeDto)
                                              : Convert.ToInt32(Database.Insert(propertyTypeDto));
-                    if (!propertyType.HasIdentity)
+                    if (propertyType.HasIdentity == false)
                         propertyType.Id = typePrimaryKey;//Set Id on new PropertyType
                 }
             }

@@ -14,6 +14,7 @@ namespace Umbraco.Core.Models
     public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentTypeComposition
     {
         private readonly List<IContentTypeComposition> _contentTypeComposition = new List<IContentTypeComposition>();
+        internal static List<int> RemovedContentTypeKeyTracker = new List<int>();
 
         protected ContentTypeCompositionBase(int parentId) : base(parentId)
         {
@@ -92,6 +93,7 @@ namespace Umbraco.Core.Models
             if (ContentTypeCompositionExists(alias))
             {
                 var contentTypeComposition = ContentTypeComposition.First(x => x.Alias == alias);
+                RemovedContentTypeKeyTracker.Add(contentTypeComposition.Id);
                 return _contentTypeComposition.Remove(contentTypeComposition);
             }
             return false;
@@ -111,6 +113,16 @@ namespace Umbraco.Core.Models
                 return true;
 
             return false;
+        }
+
+        /// <summary>
+        /// Checks whether a PropertyType with a given alias already exists
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <returns>Returns <c>True</c> if a PropertyType with the passed in alias exists, otherwise <c>False</c></returns>
+        public override bool PropertyTypeExists(string propertyTypeAlias)
+        {
+            return CompositionPropertyTypes.Any(x => x.Alias == propertyTypeAlias);
         }
 
         /// <summary>
