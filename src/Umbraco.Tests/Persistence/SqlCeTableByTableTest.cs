@@ -41,8 +41,6 @@ namespace Umbraco.Tests.Persistence
             var engine = new SqlCeEngine("Datasource=|DataDirectory|test.sdf");
             engine.CreateDatabase();
 
-            UmbracoSettings.UseLegacyXmlSchema = false;
-
             RepositoryResolver.Current = new RepositoryResolver(
                 new RepositoryFactory());
 
