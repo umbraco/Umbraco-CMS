@@ -191,16 +191,16 @@ namespace Umbraco.Core.Configuration
         {
             var webConfig = new WebConfigurationFileMap();
             var vDirs = webConfig.VirtualDirectories;
-            var vDir = FullpathToRoot;
+            var physicalPathToRoot = FullpathToRoot;
             foreach (VirtualDirectoryMapping v in webConfig.VirtualDirectories)
             {
                 if (v.IsAppRoot)
                 {
-                    vDir = v.PhysicalDirectory;
+                    physicalPathToRoot = v.PhysicalDirectory;
                 }
             }
 
-            string fileName = String.Concat(vDir, "web.config");
+            string fileName = System.IO.Path.Combine(physicalPathToRoot, "web.config");
             var xml = XDocument.Load(fileName);
             var appSettings = xml.Root.Descendants("appSettings").Single();
 
