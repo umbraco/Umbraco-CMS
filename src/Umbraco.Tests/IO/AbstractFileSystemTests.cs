@@ -9,7 +9,7 @@ using Umbraco.Tests.BusinessLogic;
 
 namespace Umbraco.Tests.IO
 {
-    [TestFixture]
+    [TestFixture, RequiresSTA]
     internal abstract class AbstractFileSystemTests 
     {
         protected IFileSystem _fileSystem;
