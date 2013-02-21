@@ -16,7 +16,23 @@ namespace Umbraco.Web.Routing
 	//[ResolutionWeight(10)]
 	internal class LookupByNiceUrl : IPublishedContentLookup
     {
-		/// <summary>
+	    private readonly bool _doDomainLookup;
+
+	    public LookupByNiceUrl()
+	    {
+	        _doDomainLookup = true;
+	    }
+
+        /// <summary>
+        /// Constructor to specify whether we also want to lookup domains stored in the repository
+        /// </summary>
+        /// <param name="doDomainLookup"></param>
+	    internal LookupByNiceUrl(bool doDomainLookup)
+	    {
+	        _doDomainLookup = doDomainLookup;
+	    }
+
+	    /// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
 		/// </summary>
 		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
@@ -82,7 +98,7 @@ namespace Umbraco.Web.Routing
                     docreq.PublishedContent = node;
 					LogHelper.Debug<LookupByNiceUrl>("Query matches, id={0}", () => docreq.DocumentId);
 
-					var iscanon = !DomainHelper.ExistsDomainInPath(docreq.Domain, node.Path);
+					var iscanon = _doDomainLookup && !DomainHelper.ExistsDomainInPath(docreq.Domain, node.Path);
 					if (!iscanon)
 						LogHelper.Debug<LookupByNiceUrl>("Non canonical url");
 

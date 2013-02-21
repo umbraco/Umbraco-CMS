@@ -221,7 +221,7 @@ namespace Umbraco.Core.Configuration
         /// <value>The fullpath to root.</value>
         public static string FullpathToRoot
         {
-            get { return HttpRuntime.AppDomainAppPath; }
+            get { return IOHelper.GetRootDirectorySafe(); }
         }
 
         /// <summary>

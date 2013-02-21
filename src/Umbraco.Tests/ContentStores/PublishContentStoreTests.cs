@@ -2,6 +2,7 @@ using System.Linq;
 using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -65,7 +66,7 @@ namespace Umbraco.Tests.ContentStores
 		public void SetUp()
 		{
 			TestHelper.SetupLog4NetForTests();
-			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
+
 			_httpContextFactory = new FakeHttpContextFactory("~/Home");
 			//ensure the StateHelper is using our custom context
 			StateHelper.HttpContext = _httpContextFactory.HttpContext;
@@ -105,9 +106,7 @@ namespace Umbraco.Tests.ContentStores
 		[TearDown]
 		public void TearDown()
 		{
-			//TODO: need to reset everything!
-
-			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
+			UmbracoSettings.ResetSetters();
 		}
 
 		[Test]

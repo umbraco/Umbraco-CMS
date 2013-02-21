@@ -1062,7 +1062,7 @@ namespace Umbraco.Core.Configuration
 			get
 			{
                 // default: true
-                return _useLegacySchema ?? GetKeyValue("/settings/content/UseLegacyXmlSchema", true);
+                return _useLegacySchema ?? GetKeyValue("/settings/content/UseLegacyXmlSchema", false);
 			}
 			internal set
 			{
