@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
@@ -11,8 +12,20 @@ using Umbraco.Web;
 namespace Umbraco.Tests.PublishedContent
 {
 	[TestFixture]
-	public class StronglyTypedQueryTests : BaseWebTest
+	public class StronglyTypedQueryTests : PublishedContentTestBase
 	{
+        public override void Initialize()
+        {
+            base.Initialize();
+            UmbracoSettings.UseLegacyXmlSchema = false;
+        }
+
+        public override void TearDown()
+        {
+            base.TearDown();
+            UmbracoSettings.ResetSetters();
+        }
+
 		protected override bool RequiresDbSetup
 		{
 			get { return false; }
@@ -69,7 +82,7 @@ namespace Umbraco.Tests.PublishedContent
 			return doc;
 		}
         
-        [Ignore]
+        
 		[Test]
 		public void Type_Test()
 		{
@@ -79,7 +92,7 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.AreEqual("John Smith", result[1].ArticleAuthor);
 		}
 
-        [Ignore]
+        
 		[Test]
 		public void As_Test()
 		{
