@@ -664,6 +664,17 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Gets the short string helper.
+        /// </summary>
+        /// <remarks>This is so that unit tests that do not initialize the resolver do not
+        /// fail and fall back to defaults. When running the whole Umbraco, CoreBootManager
+        /// does initialise the resolver.</remarks>
+        private static IShortStringHelper ShortStringHelper
+        {
+            get { return ShortStringHelperResolver.HasCurrent ?  ShortStringHelperResolver.Current.Helper : new LegacyShortStringHelper(); }
+        }
+
+        /// <summary>
         /// Returns a new string in which all occurences of specified strings are replaced by other specified strings.
         /// </summary>
         /// <param name="text">The string to filter.</param>
@@ -671,7 +682,7 @@ namespace Umbraco.Core
         /// <returns>The filtered string.</returns>
         public static string ReplaceMany(this string text, IDictionary<string, string> replacements)
         {
-            return ShortStringHelperResolver.Current.Helper.ReplaceMany(text, replacements);
+            return ShortStringHelper.ReplaceMany(text, replacements);
         }
 
         // FORMAT STRINGS
@@ -699,7 +710,7 @@ namespace Umbraco.Core
         [UmbracoWillObsolete("This method should be removed. Use ToUrlSegment instead.")]
         public static string ToUrlAlias(this string value, IDictionary<string, string> charReplacements, bool replaceDoubleDashes, bool stripNonAscii, bool urlEncode)
         {
-            var helper = ShortStringHelperResolver.Current.Helper;
+            var helper = ShortStringHelper;
             var legacy = helper as LegacyShortStringHelper;
             return legacy != null 
                 ? legacy.LegacyToUrlAlias(value, charReplacements, replaceDoubleDashes, stripNonAscii, urlEncode) 
@@ -723,7 +734,7 @@ namespace Umbraco.Core
         [UmbracoWillObsolete("This method should be removed. Use ToUrlSegment instead.")]
         public static string FormatUrl(this string url)
         {
-            var helper = ShortStringHelperResolver.Current.Helper;
+            var helper = ShortStringHelper;
             var legacy = helper as LegacyShortStringHelper;
             return legacy != null ? legacy.LegacyFormatUrl(url) : helper.CleanStringForUrlSegment(url);
         }
@@ -738,7 +749,7 @@ namespace Umbraco.Core
         /// <returns>The safe alias.</returns>
         public static string ToSafeAlias(this string alias)
         {
-            return ShortStringHelperResolver.Current.Helper.CleanStringForSafeAlias(alias);
+            return ShortStringHelper.CleanStringForSafeAlias(alias);
         }
 
         /// <summary>
@@ -749,7 +760,7 @@ namespace Umbraco.Core
         /// <returns>The safe alias.</returns>
         public static string ToSafeAlias(this string alias, CultureInfo culture)
         {
-            return ShortStringHelperResolver.Current.Helper.CleanStringForSafeAlias(alias, culture);
+            return ShortStringHelper.CleanStringForSafeAlias(alias, culture);
         }
 
         /// <summary>
@@ -790,7 +801,7 @@ namespace Umbraco.Core
         [UmbracoWillObsolete("This method should be removed. Use ToSafeAlias instead.")]
         public static string ToUmbracoAlias(this string phrase, StringAliasCaseType caseType = StringAliasCaseType.CamelCase, bool removeSpaces = false)
         {
-            var helper = ShortStringHelperResolver.Current.Helper;
+            var helper = ShortStringHelper;
             var legacy = helper as LegacyShortStringHelper;
             return legacy != null ? legacy.LegacyCleanStringForUmbracoAlias(phrase) : helper.CleanStringForSafeAlias(phrase);
         }
@@ -804,7 +815,7 @@ namespace Umbraco.Core
         /// <returns>The safe url segment.</returns>
         public static string ToUrlSegment(this string text)
         {
-            return ShortStringHelperResolver.Current.Helper.CleanStringForUrlSegment(text);
+            return ShortStringHelper.CleanStringForUrlSegment(text);
         }
 
         /// <summary>
@@ -815,7 +826,7 @@ namespace Umbraco.Core
         /// <returns>The safe url segment.</returns>
         public static string ToUrlSegment(this string text, CultureInfo culture)
         {
-            return ShortStringHelperResolver.Current.Helper.CleanStringForUrlSegment(text, culture);
+            return ShortStringHelper.CleanStringForUrlSegment(text, culture);
         }
 
         // note: LegacyShortStringHelper will produce 100% backward-compatible output for ConvertCase.
@@ -835,7 +846,7 @@ namespace Umbraco.Core
         [UmbracoWillObsolete("This method should be removed. Use CleanString instead.")]
         public static string ConvertCase(this string phrase, StringAliasCaseType cases)
         {
-            var helper = ShortStringHelperResolver.Current.Helper;
+            var helper = ShortStringHelper;
             var legacy = helper as LegacyShortStringHelper;
             var cases2 = cases.ToCleanStringType() & CleanStringType.CaseMask;
             return legacy != null
@@ -855,7 +866,7 @@ namespace Umbraco.Core
         /// <remarks>The string is cleaned in the context of the IShortStringHelper default culture.</remarks>
         public static string ToCleanString(string text, CleanStringType stringType)
         {
-            return ShortStringHelperResolver.Current.Helper.CleanString(text, stringType);
+            return ShortStringHelper.CleanString(text, stringType);
         }
 
         /// <summary>
@@ -869,7 +880,7 @@ namespace Umbraco.Core
         /// <remarks>The string is cleaned in the context of the IShortStringHelper default culture.</remarks>
         public static string ToCleanString(string text, CleanStringType stringType, char separator)
         {
-            return ShortStringHelperResolver.Current.Helper.CleanString(text, stringType, separator);
+            return ShortStringHelper.CleanString(text, stringType, separator);
         }
 
         /// <summary>
@@ -882,7 +893,7 @@ namespace Umbraco.Core
         /// <returns>The clean string.</returns>
         public static string ToCleanString(string text, CleanStringType stringType, CultureInfo culture)
         {
-            return ShortStringHelperResolver.Current.Helper.CleanString(text, stringType, culture);
+            return ShortStringHelper.CleanString(text, stringType, culture);
         }
 
         /// <summary>
@@ -896,7 +907,7 @@ namespace Umbraco.Core
         /// <returns>The clean string.</returns>
         public static string ToCleanString(string text, CleanStringType stringType, char separator, CultureInfo culture)
         {
-            return ShortStringHelperResolver.Current.Helper.CleanString(text, stringType, separator, culture);
+            return ShortStringHelper.CleanString(text, stringType, separator, culture);
         }
 
         // note: LegacyShortStringHelper will produce 100% backward-compatible output for SplitPascalCasing.
@@ -909,7 +920,7 @@ namespace Umbraco.Core
         /// <returns>The splitted text.</returns>
         public static string SplitPascalCasing(this string phrase)
         {
-            return ShortStringHelperResolver.Current.Helper.SplitPascalCasing(phrase, ' ');
+            return ShortStringHelper.SplitPascalCasing(phrase, ' ');
         }
     }
 }
