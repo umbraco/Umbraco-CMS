@@ -9,9 +9,11 @@ using Examine.Providers;
 using Lucene.Net.Documents;
 using Umbraco.Core;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using umbraco;
 using umbraco.cms.businesslogic;
+using Examine.LuceneEngine.SearchCriteria;
 
 namespace Umbraco.Web
 {
@@ -28,16 +30,19 @@ namespace Umbraco.Web
 		{			
 		}
 
-		/// <summary>
-		/// Generally used for unit testing to use an explicit examine searcher
-		/// </summary>
-		/// <param name="searchProvider"></param>
-		internal DefaultPublishedMediaStore(BaseSearchProvider searchProvider)
+	    /// <summary>
+	    /// Generally used for unit testing to use an explicit examine searcher
+	    /// </summary>
+	    /// <param name="searchProvider"></param>
+	    /// <param name="indexProvider"></param>
+	    internal DefaultPublishedMediaStore(BaseSearchProvider searchProvider, BaseIndexProvider indexProvider)
 		{
-			_searchProvider = searchProvider;
+		    _searchProvider = searchProvider;
+		    _indexProvider = indexProvider;
 		}
 
-		private readonly BaseSearchProvider _searchProvider;
+	    private readonly BaseSearchProvider _searchProvider;
+        private readonly BaseIndexProvider _indexProvider;
 
 		public virtual IPublishedContent GetDocumentById(UmbracoContext umbracoContext, int nodeId)
 		{
@@ -71,7 +76,29 @@ namespace Umbraco.Web
 			}
 		}
 
-		private BaseSearchProvider GetSearchProviderSafe()
+	    private BaseIndexProvider GetIndexProviderSafe()
+	    {
+            if (_indexProvider != null)
+                return _indexProvider;
+
+            var eMgr = GetExamineManagerSafe();
+            if (eMgr != null)
+            {
+                try
+                {
+                    //by default use the InternalSearcher
+                    return eMgr.IndexProviderCollection["InternalIndexer"];
+                }
+                catch (Exception ex)
+                {                
+                    LogHelper.Error<DefaultPublishedMediaStore>("Could not retreive the InternalIndexer", ex);
+                    //something didn't work, continue returning null.
+                }
+            }
+            return null;
+	    }
+
+	    private BaseSearchProvider GetSearchProviderSafe()
 		{
 			if (_searchProvider != null)
 				return _searchProvider;
@@ -306,11 +333,29 @@ namespace Umbraco.Web
 					{
 						//first check in Examine as this is WAY faster
 						var criteria = searchProvider.CreateSearchCriteria("media");
-						var filter = criteria.ParentId(parentId);
-						var results = searchProvider.Search(filter.Compile());
+                        var filter = criteria.ParentId(parentId);
+					    ISearchResults results;
+
+                        //we want to check if the indexer for this searcher has "sortOrder" flagged as sortable.
+                        //if so, we'll use Lucene to do the sorting, if not we'll have to manually sort it (slower).
+                        var indexer = GetIndexProviderSafe();
+					    var useLuceneSort = indexer != null && indexer.IndexerData.StandardFields.Any(x => x.Name.InvariantEquals("sortOrder") && x.EnableSorting);
+                        if (useLuceneSort)
+                        {
+                            //we have a sortOrder field declared to be sorted, so we'll use Examine
+                            results = searchProvider.Search(
+                                filter.And().OrderBy(new SortableField("sortOrder", SortType.Int)).Compile());
+                        }
+                        else
+                        {
+                            results = searchProvider.Search(filter.Compile());
+                        }
+						
 						if (results.Any())
 						{
-							return results.Select(ConvertFromSearchResult);
+						    return useLuceneSort 
+                                ? results.Select(ConvertFromSearchResult) //will already be sorted by lucene
+                                : results.Select(ConvertFromSearchResult).OrderBy(x => x.SortOrder);
 						}
 					}
 					catch (FileNotFoundException)
