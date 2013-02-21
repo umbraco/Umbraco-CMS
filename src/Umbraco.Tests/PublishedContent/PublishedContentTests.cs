@@ -14,7 +14,7 @@ namespace Umbraco.Tests.PublishedContent
 	/// Tests the methods on IPublishedContent using the DefaultPublishedContentStore
 	/// </summary>
 	[TestFixture]
-	public class PublishedContentTests : BaseWebTest
+    public class PublishedContentTests : PublishedContentTestBase
 	{
 		protected override bool RequiresDbSetup
 		{
@@ -62,38 +62,12 @@ namespace Umbraco.Tests.PublishedContent
 		public override void Initialize()
 		{
 			base.Initialize();
-
-			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
-				new[]
-					{
-						typeof(DatePickerPropertyEditorValueConverter),
-						typeof(TinyMcePropertyEditorValueConverter),
-						typeof(YesNoPropertyEditorValueConverter)
-					});
-
-			//need to specify a custom callback for unit tests
-			PublishedContentHelper.GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
-				{
-					if (propertyAlias == "content")
-					{
-						//return the rte type id
-						return Guid.Parse("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
-					}
-					return Guid.Empty;
-				};
-
-			var umbCtx = GetUmbracoContext("/test", 1234);
-			UmbracoContext.Current = umbCtx;
-			PublishedContentStoreResolver.Current = new PublishedContentStoreResolver(new DefaultPublishedContentStore());
 		}
 
 		public override void TearDown()
 		{
 			base.TearDown();
-
-			PropertyEditorValueConvertersResolver.Reset();
-			PublishedContentStoreResolver.Reset();
-			UmbracoContext.Current = null;
+			
 		}
 
 		internal IPublishedContent GetNode(int id)
