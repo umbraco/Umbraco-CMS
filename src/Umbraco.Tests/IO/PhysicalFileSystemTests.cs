@@ -26,7 +26,13 @@ namespace Umbraco.Tests.IO
         [TearDown]
         public void TearDown()
         {
-            Directory.Delete(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests"));
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests");
+            var files = Directory.GetFiles(path);
+            foreach (var f in files)
+            {
+                File.Delete(f);
+            }
+            Directory.Delete(path, true);
         }
 
         protected override string ConstructUrl(string path)
