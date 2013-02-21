@@ -33,22 +33,6 @@ namespace Umbraco.Tests.PublishedContent
 			get { return false; }
 		}
 
-		public override void Initialize()
-		{
-			base.Initialize();
-
-			var routingCtx = GetRoutingContext("/test", 1234);
-			UmbracoContext.Current = routingCtx.UmbracoContext;
-			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(Enumerable.Empty<Type>());
-		}
-
-		public override void TearDown()
-		{
-			base.TearDown();
-			UmbracoContext.Current = null;
-			PropertyEditorValueConvertersResolver.Reset();
-		}
-
 		protected override string GetXmlContent(int templateId)
 		{
 			return @"<?xml version=""1.0"" encoding=""utf-8""?>
