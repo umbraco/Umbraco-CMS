@@ -15,7 +15,7 @@ using umbraco.BusinessLogic;
 namespace Umbraco.Tests.ContentStores
 {
 	[TestFixture]
-	public class PublishMediaStoreTests : BaseWebTest
+    public class PublishMediaStoreTests : PublishedContentTestBase
 	{
 		public override void Initialize()
 		{
@@ -30,16 +30,11 @@ namespace Umbraco.Tests.ContentStores
                 Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
                 true);
 
-            Core.Configuration.UmbracoSettings.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
-		
-            //we're going to use the same initialization as the PublishedMediaTests
-			PublishedMediaTests.DoInitialization(GetUmbracoContext("/test", 1234));			
 		}
 
 		public override void TearDown()
 		{
 			base.TearDown();
-			PublishedMediaTests.DoTearDown();
 		}
 
         [Ignore]

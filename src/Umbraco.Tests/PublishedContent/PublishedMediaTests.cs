@@ -28,64 +28,20 @@ namespace Umbraco.Tests.PublishedContent
 	/// Tests the typed extension methods on IPublishedContent using the DefaultPublishedMediaStore
 	/// </summary>
 	[TestFixture]
-	public class PublishedMediaTests : BaseWebTest
+    public class PublishedMediaTests : PublishedContentTestBase
 	{
 		
 		public override void Initialize()
 		{
 			base.Initialize();
-			DoInitialization(GetUmbracoContext("/test", 1234));			
+            UmbracoSettings.ForceSafeAliases = true;
+            UmbracoSettings.UmbracoLibraryCacheDuration = 1800;
+            UmbracoSettings.ForceSafeAliases = true;	
 		}
-
-		/// <summary>
-		/// Shared with PublishMediaStoreTests
-		/// </summary>
-		/// <param name="umbContext"></param>
-		internal static void DoInitialization(UmbracoContext umbContext)
-		{
-			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
-				new[]
-					{
-						typeof(DatePickerPropertyEditorValueConverter),
-						typeof(TinyMcePropertyEditorValueConverter),
-						typeof(YesNoPropertyEditorValueConverter)
-					});
-
-			//need to specify a custom callback for unit tests
-			PublishedContentHelper.GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
-			{
-				if (propertyAlias == "content")
-				{
-					//return the rte type id
-					return Guid.Parse("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
-				}
-				return Guid.Empty;
-			};
-
-			UmbracoSettings.ForceSafeAliases = true;
-			UmbracoSettings.UmbracoLibraryCacheDuration = 1800;
-
-			UmbracoContext.Current = umbContext;
-			PublishedMediaStoreResolver.Current = new PublishedMediaStoreResolver(new DefaultPublishedMediaStore());
-
-			UmbracoSettings.ForceSafeAliases = true;
-		}
-
+        
 		public override void TearDown()
 		{
 			base.TearDown();
-
-			DoTearDown();
-		}
-
-		/// <summary>
-		/// Shared with PublishMediaStoreTests
-		/// </summary>
-		internal static void DoTearDown()
-		{
-			PropertyEditorValueConvertersResolver.Reset();
-			UmbracoContext.Current = null;
-			PublishedMediaStoreResolver.Reset();
 		}
 
 		/// <summary>
