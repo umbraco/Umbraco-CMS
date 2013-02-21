@@ -138,8 +138,7 @@ namespace Umbraco.Tests.TestHelpers
 
                 //We will swallow this exception! That's because a sub class might require further teardown logic.
             }
-                
-            }    
+                            
         }
 
 	    protected ApplicationContext ApplicationContext
