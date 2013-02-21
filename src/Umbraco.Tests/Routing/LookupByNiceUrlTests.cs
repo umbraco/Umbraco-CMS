@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Routing
 		/// </summary>
 		protected override bool RequiresDbSetup
 		{
-			get { return true; }
+			get { return false; }
 		}
 
         
