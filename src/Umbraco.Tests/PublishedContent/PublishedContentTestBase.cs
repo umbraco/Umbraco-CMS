@@ -19,14 +19,6 @@ namespace Umbraco.Tests.PublishedContent
 
             UmbracoSettings.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
 
-            PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
-                new[]
-                    {
-                        typeof(DatePickerPropertyEditorValueConverter),
-                        typeof(TinyMcePropertyEditorValueConverter),
-                        typeof(YesNoPropertyEditorValueConverter)
-                    });            
-
             //need to specify a custom callback for unit tests
             PublishedContentHelper.GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
                 {
@@ -40,8 +32,23 @@ namespace Umbraco.Tests.PublishedContent
 
             var rCtx = GetRoutingContext("/test", 1234);
             UmbracoContext.Current = rCtx.UmbracoContext;
+            
+        }
+
+        protected override void FreezeResolution()
+        {
+            PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
+                new[]
+                    {
+                        typeof(DatePickerPropertyEditorValueConverter),
+                        typeof(TinyMcePropertyEditorValueConverter),
+                        typeof(YesNoPropertyEditorValueConverter)
+                    });    
+
             PublishedContentStoreResolver.Current = new PublishedContentStoreResolver(new DefaultPublishedContentStore());
             PublishedMediaStoreResolver.Current = new PublishedMediaStoreResolver(new DefaultPublishedMediaStore());
+
+            base.FreezeResolution();
         }
 
         public override void TearDown()

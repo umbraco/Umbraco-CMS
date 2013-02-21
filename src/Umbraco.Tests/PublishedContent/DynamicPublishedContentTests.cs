@@ -10,9 +10,7 @@ namespace Umbraco.Tests.PublishedContent
 	public class DynamicPublishedContentTests : DynamicDocumentTestsBase<DynamicPublishedContent, DynamicPublishedContentList>
 	{
 		public override void Initialize()
-		{
-            PublishedContentStoreResolver.Current = new PublishedContentStoreResolver(new DefaultPublishedContentStore());
-
+		{            
             base.Initialize();
 
 		}

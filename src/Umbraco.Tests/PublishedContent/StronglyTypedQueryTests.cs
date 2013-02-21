@@ -13,16 +13,13 @@ namespace Umbraco.Tests.PublishedContent
 	[TestFixture]
 	public class StronglyTypedQueryTests : PublishedContentTestBase
 	{
-        public override void Initialize()
-        {
-            base.Initialize();
-            UmbracoSettings.UseLegacyXmlSchema = false;
-        protected override void FreezeResolution()
-        {            
-            base.FreezeResolution();
-        }
+	    public override void Initialize()
+	    {
+	        base.Initialize();
+	        UmbracoSettings.UseLegacyXmlSchema = false;
+	    }
 
-        public override void TearDown()
+	    public override void TearDown()
         {
             base.TearDown();
             UmbracoSettings.ResetSetters();
