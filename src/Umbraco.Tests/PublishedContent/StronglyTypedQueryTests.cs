@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
@@ -10,32 +11,26 @@ using Umbraco.Web;
 namespace Umbraco.Tests.PublishedContent
 {
 	[TestFixture]
-	public class StronglyTypedQueryTests : BaseRoutingTest
+	public class StronglyTypedQueryTests : PublishedContentTestBase
 	{
-		protected override bool RequiresDbSetup
-		{
-			get { return false; }
-		}
-
-		public override void Initialize()
-		{
-			base.Initialize();
-		}
-
+        public override void Initialize()
+        {
+            base.Initialize();
+            UmbracoSettings.UseLegacyXmlSchema = false;
         protected override void FreezeResolution()
         {            
-            var routingCtx = GetRoutingContext("/test", 1234);
-            UmbracoContext.Current = routingCtx.UmbracoContext;
-            PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(Enumerable.Empty<Type>());
             base.FreezeResolution();
         }
 
-		public override void TearDown()
-		{
-			UmbracoContext.Current = null;
-			PropertyEditorValueConvertersResolver.Reset();
-
+        public override void TearDown()
+        {
             base.TearDown();
+            UmbracoSettings.ResetSetters();
+        }
+
+		protected override bool RequiresDbSetup
+		{
+			get { return false; }
 		}
 
 		protected override string GetXmlContent(int templateId)
@@ -89,6 +84,7 @@ namespace Umbraco.Tests.PublishedContent
 			return doc;
 		}
 
+        
 		[Test]
 		public void Type_Test()
 		{
@@ -98,6 +94,7 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.AreEqual("John Smith", result[1].ArticleAuthor);
 		}
 
+        
 		[Test]
 		public void As_Test()
 		{

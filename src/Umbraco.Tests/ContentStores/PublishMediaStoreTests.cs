@@ -14,25 +14,19 @@ using umbraco.BusinessLogic;
 namespace Umbraco.Tests.ContentStores
 {
 	[TestFixture]
-	public class PublishMediaStoreTests : BaseWebTest
+    public class PublishMediaStoreTests : PublishedContentTestBase
 	{
 		public override void Initialize()
 		{
 			base.Initialize();				
 		}
 
-        protected override void FreezeResolution()
-        {
-            //we're going to use the same initialization as the PublishedMediaTests
-            PublishedMediaTests.DoInitialization(GetUmbracoContext("/test", 1234));		
-            
-            base.FreezeResolution();            
-        }
+
+		
 
 		public override void TearDown()
 		{
 			base.TearDown();
-			PublishedMediaTests.DoTearDown();
 		}
 
 		[Test]

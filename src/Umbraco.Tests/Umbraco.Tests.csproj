@@ -189,6 +189,7 @@
     <Compile Include="PublishedContent\DynamicXmlConverterTests.cs" />
     <Compile Include="PublishedContent\DynamicXmlTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
+    <Compile Include="PublishedContent\PublishedContentTestBase.cs" />
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
     <Compile Include="PublishedContent\StronglyTypedQueryTests.cs" />

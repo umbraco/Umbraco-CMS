@@ -11,7 +11,7 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.PublishedContent
 {
 	[TestFixture]
-	public abstract class DynamicDocumentTestsBase<TDocument, TDocumentList> : BaseRoutingTest
+    public abstract class DynamicDocumentTestsBase<TDocument, TDocumentList> : PublishedContentTestBase
 	{
 		public override void Initialize()
 		{
