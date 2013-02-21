@@ -61,8 +61,6 @@ namespace Umbraco.Tests.TestHelpers
                 throw;
             }
 
-            UmbracoSettings.UseLegacyXmlSchema = false;
-
             RepositoryResolver.Current = new RepositoryResolver(
                 new RepositoryFactory());
 

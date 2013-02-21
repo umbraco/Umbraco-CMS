@@ -56,8 +56,6 @@ namespace Umbraco.Tests.Migrations.Upgrades
             Path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", Path);
 
-            UmbracoSettings.UseLegacyXmlSchema = false;
-
             //Delete database file before continueing
             string filePath = string.Concat(Path, "\\UmbracoPetaPocoTests.sdf");
             if (File.Exists(filePath))

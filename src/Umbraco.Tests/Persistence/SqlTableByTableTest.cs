@@ -28,8 +28,6 @@ namespace Umbraco.Tests.Persistence
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            UmbracoSettings.UseLegacyXmlSchema = false;
-
             RepositoryResolver.Current = new RepositoryResolver(
                 new RepositoryFactory());
 

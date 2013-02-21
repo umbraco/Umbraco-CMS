@@ -33,8 +33,7 @@ namespace Umbraco.Tests.TestHelpers
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            try
-            {
+           
                 try
                 {
                     //Delete database file before continueing
@@ -51,18 +50,7 @@ namespace Umbraco.Tests.TestHelpers
                     TearDown();
                     throw;
                 }
-
-                UmbracoSettings.UseLegacyXmlSchema = false;
-            }
-            catch (Exception)
-            {
-                //if this doesn't work we have to make sure everything is reset! otherwise
-                // well run into issues because we've already set some things up
-                TearDown();
-                throw;
-            }
-
-            UmbracoSettings.UseLegacyXmlSchema = false;
+            
 
             RepositoryResolver.Current = new RepositoryResolver(
                 new RepositoryFactory());
