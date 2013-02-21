@@ -121,6 +121,7 @@ namespace Umbraco.Tests.TestHelpers
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
             PluginManager.Current = null;
+            SettingsForTests.Reset();
             UmbracoSettings.ResetSetters();
             
             try
@@ -134,8 +135,10 @@ namespace Umbraco.Tests.TestHelpers
             catch (Exception ex)
             {
                 LogHelper.Error<BaseDatabaseFactoryTest>("Could not remove the old database file", ex);
-                
+
                 //We will swallow this exception! That's because a sub class might require further teardown logic.
+            }
+                
             }    
         }
 

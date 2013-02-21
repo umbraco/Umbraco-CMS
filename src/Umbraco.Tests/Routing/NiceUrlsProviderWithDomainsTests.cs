@@ -27,7 +27,6 @@ namespace Umbraco.Tests.Routing
 			return new DefaultRoutesCache(false);
 		}
 
-
 		void InitializeLanguagesAndDomains()
 		{
 			var domains = Domain.GetDomains();

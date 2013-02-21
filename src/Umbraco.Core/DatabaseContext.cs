@@ -158,7 +158,7 @@ namespace Umbraco.Core
             }
             else if (databaseProvider.ToLower().Contains("azure"))
             {
-                connectionString = string.Format("Server=tcp:{0}.database.windows.net;Database={1};User ID={2}@{0};Password={3}", server, databaseName, user, password);
+                connectionString = BuildAzureConnectionString(server, databaseName, user, password);
             }
             else
             {
@@ -167,6 +167,52 @@ namespace Umbraco.Core
 
             SaveConnectionString(connectionString, providerName);
             Initialize(providerName);
+        }
+
+        internal string BuildAzureConnectionString(string server, string databaseName, string user, string password)
+        {
+            if (server.Contains(".") && ServerStartsWithTcp(server) == false)
+                server = string.Format("tcp:{0}", server);
+            
+            if (server.Contains(".") == false && ServerStartsWithTcp(server))
+            {
+                string serverName = server.Contains(",") 
+                                        ? server.Substring(0, server.IndexOf(",", StringComparison.Ordinal)) 
+                                        : server;
+
+                var portAddition = string.Empty;
+
+                if (server.Contains(","))
+                    portAddition = server.Substring(server.IndexOf(",", StringComparison.Ordinal));
+
+                server = string.Format("{0}.database.windows.net{1}", serverName, portAddition);
+            }
+            
+            if (ServerStartsWithTcp(server) == false)
+                server = string.Format("tcp:{0}.database.windows.net", server);
+            
+            if (server.Contains(",") == false)
+                server = string.Format("{0},1433", server);
+
+            if (user.Contains("@") == false)
+            {
+                var userDomain = server;
+
+                if (ServerStartsWithTcp(server))
+                    userDomain = userDomain.Substring(userDomain.IndexOf(":", StringComparison.Ordinal) + 1);
+
+                if (userDomain.Contains("."))
+                    userDomain = userDomain.Substring(0, userDomain.IndexOf(".", StringComparison.Ordinal));
+
+                user = string.Format("{0}@{1}", user, userDomain);
+            }
+
+            return string.Format("Server={0};Database={1};User ID={2};Password={3}", server, databaseName, user, password);
+        }
+
+        private static bool ServerStartsWithTcp(string server)
+        {
+            return server.ToLower().StartsWith("tcp:".ToLower());
         }
 
         /// <summary>
@@ -232,7 +278,8 @@ namespace Umbraco.Core
         /// </remarks>
         internal void Initialize()
         {
-            if (ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName] != null)
+            var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
+            if (databaseSettings != null && string.IsNullOrWhiteSpace(databaseSettings.ConnectionString) == false && string.IsNullOrWhiteSpace(databaseSettings.ProviderName) == false)
             {
                 var providerName = "System.Data.SqlClient";
                 if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName))
@@ -254,8 +301,7 @@ namespace Umbraco.Core
                 {
                     ConfigureEmbeddedDatabaseConnection();
                 }
-                else if (legacyConnString.ToLowerInvariant().Contains("database.windows.net") &&
-                         legacyConnString.ToLowerInvariant().Contains("tcp:"))
+                else if (legacyConnString.ToLowerInvariant().Contains("tcp:"))
                 {
                     //Must be sql azure
                     SaveConnectionString(legacyConnString, "System.Data.SqlClient");

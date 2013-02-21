@@ -33,8 +33,7 @@ namespace Umbraco.Tests.TestHelpers
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            //If the Database Provider is Sql Ce we need to ensure the database
-            if (ProviderName.Contains("SqlServerCe"))
+            try
             {
                 try
                 {
@@ -54,11 +53,16 @@ namespace Umbraco.Tests.TestHelpers
                 }
 
                 UmbracoSettings.UseLegacyXmlSchema = false;
-
-                //Create the Sql CE database
-                var engine = new SqlCeEngine(ConnectionString);
-                engine.CreateDatabase();
             }
+            catch (Exception)
+            {
+                //if this doesn't work we have to make sure everything is reset! otherwise
+                // well run into issues because we've already set some things up
+                TearDown();
+                throw;
+            }
+
+            UmbracoSettings.UseLegacyXmlSchema = false;
 
             RepositoryResolver.Current = new RepositoryResolver(
                 new RepositoryFactory());

@@ -153,7 +153,7 @@ namespace umbraco.providers.members {
                 if (m.getProperty(spv.Name) != null)
                     m.getProperty(spv.Name).Value = spv.PropertyValue;
             }
-
+            m.Save();
         }
     }
 }

@@ -1,7 +1,9 @@
 using System;
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
@@ -21,6 +23,8 @@ namespace Umbraco.Tests.PublishedContent
 						typeof(TinyMcePropertyEditorValueConverter),
 						typeof(YesNoPropertyEditorValueConverter)
 					});
+
+            UmbracoSettings.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
 
             PublishedContentStoreResolver.Current = new PublishedContentStoreResolver(new DefaultPublishedContentStore());
 
