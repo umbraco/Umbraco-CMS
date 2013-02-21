@@ -19,13 +19,11 @@ namespace Umbraco.Tests.PublishedContent
         public override void Initialize()
         {
             base.Initialize();
-            UmbracoSettings.UseLegacyXmlSchema = false;
         }
 
         public override void TearDown()
         {
             base.TearDown();
-            UmbracoSettings.ResetSetters();
         }
 
 		protected override bool RequiresDbSetup
