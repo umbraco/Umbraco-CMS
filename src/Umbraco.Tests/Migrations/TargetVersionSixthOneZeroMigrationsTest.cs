@@ -1,59 +1,61 @@
-﻿using System;
-using System.Linq;
-using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Migrations;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Tests.TestHelpers;
-using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
+﻿//NOTE: SD: Not needed currently as there are no db migrations for 6.1 now that the server tables, etc... are not being shipped in 6.1
 
-namespace Umbraco.Tests.Migrations
-{
-    [TestFixture]
-    public class TargetVersionSixthOneZeroMigrationsTest : BaseDatabaseFactoryTest
-    {
-        [SetUp]
-        public override void Initialize()
-        {
-            PluginManager.Current = new PluginManager(false);
+//using System;
+//using System.Linq;
+//using NUnit.Framework;
+//using Umbraco.Core;
+//using Umbraco.Core.Persistence;
+//using Umbraco.Core.Persistence.Migrations;
+//using Umbraco.Core.Persistence.SqlSyntax;
+//using Umbraco.Tests.TestHelpers;
+//using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
-            MigrationResolver.Current = new MigrationResolver(
-                () => PluginManager.Current.ResolveMigrationTypes());
+//namespace Umbraco.Tests.Migrations
+//{
+//    [TestFixture]
+//    public class TargetVersionSixthOneZeroMigrationsTest : BaseDatabaseFactoryTest
+//    {
+//        [SetUp]
+//        public override void Initialize()
+//        {
+//            PluginManager.Current = new PluginManager(false);
 
-            base.Initialize();
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
-        }
+//            MigrationResolver.Current = new MigrationResolver(
+//                () => PluginManager.Current.ResolveMigrationTypes());
 
-        [Test]
-        public void Can_Find_Targetted_Migrations()
-        {
-            var configuredVersion = new Version("6.0.0");
-            var targetVersion = new Version("6.1.0");
-            var foundMigrations = MigrationResolver.Current.Migrations;
+//            base.Initialize();
+//            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+//        }
 
-            var migrationRunner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
-            var migrations = migrationRunner.OrderedUpgradeMigrations(foundMigrations);
+//        [Test]
+//        public void Can_Find_Targetted_Migrations()
+//        {
+//            var configuredVersion = new Version("6.0.0");
+//            var targetVersion = new Version("6.1.0");
+//            var foundMigrations = MigrationResolver.Current.Migrations;
 
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE, DatabaseContext.Database);
-            foreach (MigrationBase migration in migrations)
-            {
-                migration.GetUpExpressions(context);
-            }
+//            var migrationRunner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+//            var migrations = migrationRunner.OrderedUpgradeMigrations(foundMigrations);
 
-            foreach (var expression in context.Expressions)
-            {
-                Console.WriteLine(expression.ToString());
-            }
+//            var context = new MigrationContext(DatabaseProviders.SqlServerCE, DatabaseContext.Database);
+//            foreach (MigrationBase migration in migrations)
+//            {
+//                migration.GetUpExpressions(context);
+//            }
 
-            Assert.That(migrations.Count(), Is.EqualTo(1));
-        }
+//            foreach (var expression in context.Expressions)
+//            {
+//                Console.WriteLine(expression.ToString());
+//            }
 
-        [TearDown]
-        public override void TearDown()
-        {
-            MigrationResolver.Reset();
-            PluginManager.Current = null;
-        }
-    }
-}
+//            Assert.That(migrations.Count(), Is.EqualTo(1));
+//        }
+
+//        [TearDown]
+//        public override void TearDown()
+//        {
+//            MigrationResolver.Reset();
+//            PluginManager.Current = null;
+//        }
+//    }
+//}
