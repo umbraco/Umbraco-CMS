@@ -13,6 +13,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Strings;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -511,7 +512,8 @@ namespace Umbraco.Core.Models
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         private static XElement ToXml(this IContentBase contentBase, string nodeName)
         {
-            var niceUrl = contentBase.Name.FormatUrl().ToLower();
+            // note: that one will take care of umbracoUrlName
+            var url = contentBase.GetUrlSegment();
 
 			var xml = new XElement(nodeName,
                                    new XAttribute("id", contentBase.Id),
@@ -522,21 +524,12 @@ namespace Umbraco.Core.Models
                                    new XAttribute("createDate", contentBase.CreateDate.ToString("s")),
                                    new XAttribute("updateDate", contentBase.UpdateDate.ToString("s")),
                                    new XAttribute("nodeName", contentBase.Name),
-                                   new XAttribute("urlName", niceUrl),//Format Url ?								   
+                                   new XAttribute("urlName", url),
                                    new XAttribute("path", contentBase.Path),
                                    new XAttribute("isDoc", ""));
 
-            foreach (var property in contentBase.Properties)
-			{
-				if (property == null) continue;
-
+            foreach (var property in contentBase.Properties.Where(p => p != null))
 				xml.Add(property.ToXml());
-
-				//Check for umbracoUrlName convention
-                if (property.Alias == "umbracoUrlName" && property.Value != null && 
-                        property.Value.ToString().Trim() != string.Empty)
-                    xml.SetAttributeValue("urlName", property.Value.ToString().FormatUrl().ToLower());
-			}
 
 			return xml;
 		}

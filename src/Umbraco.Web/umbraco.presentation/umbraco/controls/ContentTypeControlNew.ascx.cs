@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Routing;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
@@ -28,7 +31,6 @@ namespace umbraco.controls
     [ClientDependency(ClientDependencyType.Css, "Tree/Themes/umbraco/style.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Css, "GenericProperty/genericproperty.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "GenericProperty/genericproperty.js", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Javascript, "js/UmbracoCasingRules.aspx", "UmbracoRoot")]
     public partial class ContentTypeControlNew : System.Web.UI.UserControl
     {
         public uicontrols.TabPage InfoTabPage;
@@ -83,6 +85,10 @@ namespace umbraco.controls
             setupGenericPropertiesPane();
             setupTabPane();
 
+            // [ClientDependency(ClientDependencyType.Javascript, "js/UmbracoCasingRules.aspx", "UmbracoRoot")]
+            var loader = ClientDependency.Core.Controls.ClientDependencyLoader.GetInstance(new HttpContextWrapper(Context));
+            var helper = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData()));
+            loader.RegisterDependency(helper.GetCoreStringsControllerPath() + "ServicesJavaScript", ClientDependencyType.Javascript);
         }
 
         private int getDocTypeId()
@@ -113,7 +119,7 @@ namespace umbraco.controls
                 PanePropertiesInherited.Visible = true;
             }
 
-            theClientId.Text = this.ClientID;
+            checkTxtAliasJs.Text = string.Format("checkAlias('{0}');", txtAlias.ClientID);
         }
 
         protected void save_click(object sender, System.Web.UI.ImageClickEventArgs e)
@@ -691,7 +697,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             foreach (GenericProperties.GenericPropertyWrapper gpw in _genericProperties)
             {
                 cms.businesslogic.propertytype.PropertyType pt = gpw.PropertyType;
-                pt.Alias = gpw.GenricPropertyControl.Alias;
+                pt.Alias = gpw.GenricPropertyControl.Alias; // FIXME so we blindly trust the UI for safe aliases?!
                 pt.Name = gpw.GenricPropertyControl.Name;
                 pt.Description = gpw.GenricPropertyControl.Description;
                 pt.ValidationRegExp = gpw.GenricPropertyControl.Validation;

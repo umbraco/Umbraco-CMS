@@ -14,6 +14,7 @@ using umbraco.BusinessLogic.Actions;
 using umbraco.cms.helpers;
 using umbraco.DataLayer;
 using Property = umbraco.cms.businesslogic.property.Property;
+using Umbraco.Core.Strings;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -1190,15 +1191,9 @@ namespace umbraco.cms.businesslogic.web
         /// <param name="Deep">If true the documents childrens xmlrepresentation will be appended to the Xmlnode recursive</param>
         public override void XmlPopulate(XmlDocument xd, ref XmlNode x, bool Deep)
         {
-            string urlName = this.Text;
-            foreach (Property p in GenericProperties)
-                if (p != null)
-                {
-                    x.AppendChild(p.ToXml(xd));
-                    if (p.PropertyType.Alias == "umbracoUrlName" && p.Value != null 
-                            && p.Value.ToString().Trim() != string.Empty)
-                        urlName = p.Value.ToString();
-                }
+            string urlName = this.Content.GetUrlSegment().ToLower();
+            foreach (Property p in GenericProperties.Where(p => p != null))
+                x.AppendChild(p.ToXml(xd));
 
             // attributes
             x.Attributes.Append(addAttribute(xd, "id", Id.ToString()));
@@ -1217,7 +1212,7 @@ namespace umbraco.cms.businesslogic.web
             x.Attributes.Append(addAttribute(xd, "createDate", CreateDateTime.ToString("s")));
             x.Attributes.Append(addAttribute(xd, "updateDate", VersionDate.ToString("s")));
             x.Attributes.Append(addAttribute(xd, "nodeName", Text));
-            x.Attributes.Append(addAttribute(xd, "urlName", url.FormatUrl(urlName.ToLower())));
+            x.Attributes.Append(addAttribute(xd, "urlName", urlName));
             x.Attributes.Append(addAttribute(xd, "writerName", Writer.Name));
             x.Attributes.Append(addAttribute(xd, "creatorName", Creator.Name.ToString()));
             if (ContentType != null && UmbracoSettings.UseLegacyXmlSchema)

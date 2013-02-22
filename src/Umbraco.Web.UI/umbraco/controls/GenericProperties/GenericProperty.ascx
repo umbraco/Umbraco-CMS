@@ -61,5 +61,8 @@
 		</div>
 </li>
 <script type="text/javascript">
-    $(function() { checkAlias('<%=this.ClientID%>_tbAlias'); });
+    $(function() {
+        checkAlias('<%=tbAlias.ClientID%>');
+        duplicatePropertyNameAsSafeAlias('<%=tbName.ClientID%>', '<%=tbAlias.ClientID%>')
+    });
 </script>

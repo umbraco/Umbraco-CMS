@@ -4,12 +4,27 @@ using System.Security;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Strings;
+using Umbraco.Core.ObjectResolution;
 
-namespace Umbraco.Tests
+namespace Umbraco.Tests.CoreStrings
 {
 	[TestFixture]
-    public class StringExtensionsTests
+    public class LegacyStringExtensionsTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            ShortStringHelperResolver.Reset();
+            ShortStringHelperResolver.Current = new ShortStringHelperResolver(new LegacyShortStringHelper());
+            Resolution.Freeze();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            ShortStringHelperResolver.Reset();
+        }
 
 		[TestCase("This is a string to encrypt")]
 		[TestCase("This is a string to encrypt\nThis is a second line")]
@@ -152,7 +167,7 @@ namespace Umbraco.Tests
             var alias2 = name2.ToUmbracoAlias();
             var alias3 = name3.ToUmbracoAlias();
             var alias4 = name4.ToUmbracoAlias();
-            var alias5 = name5.ToUmbracoAlias(StringAliasCaseType.PascalCase);
+            var alias5 = name5.ToUmbracoAlias(/*StringAliasCaseType.PascalCase*/);
 
             //Assert
 
@@ -160,7 +175,9 @@ namespace Umbraco.Tests
             Assert.AreEqual("homePage", alias2);
             Assert.AreEqual("shannonsDocumentType", alias3);
             Assert.AreEqual("baddlyNamEdDocumentType", alias4);
-            Assert.AreEqual("IWantThisToEndUpInProperCase", alias5);
+            
+            // disable: does not support PascalCase anymore
+            //Assert.AreEqual("IWantThisToEndUpInProperCase", alias5);
         }
 
     }

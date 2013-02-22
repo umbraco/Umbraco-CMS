@@ -106,10 +106,9 @@
       </div>
     </cc2:Pane>
 </asp:Panel>
+<%-- cannot put a <%= block here 'cos it prevents the Controls collection from being modified = use a literal --%>
 <script type="text/javascript">
     $(function () {
-        var mailControlId = '<asp:Literal id="theClientId" runat="server"/>';
-        duplicatePropertyNameAsSafeAlias(mailControlId + '_GenericPropertyNew_control_tbName', mailControlId + '_GenericPropertyNew_control_tbAlias');
-        checkAlias(mailControlId + '_GenericPropertyNew_control_txtAlias');
+        <asp:Literal runat="server" ID="checkTxtAliasJs" />
     });
 </script>

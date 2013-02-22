@@ -10,6 +10,7 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Tests.Routing
 {
@@ -23,6 +24,8 @@ namespace Umbraco.Tests.Routing
 
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
                 PluginManager.Current.ResolveSurfaceControllers());
+
+            ShortStringHelperResolver.Current = new ShortStringHelperResolver(new LegacyShortStringHelper());
 
 			base.Initialize();
 
@@ -41,6 +44,7 @@ namespace Umbraco.Tests.Routing
 		    UmbracoContext.Current = null;
 			RouteTable.Routes.Clear();
 			SurfaceControllerResolver.Reset();
+            ShortStringHelperResolver.Reset();
             PluginManager.Current = null;
 		}
 

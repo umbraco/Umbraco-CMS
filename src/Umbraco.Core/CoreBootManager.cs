@@ -15,6 +15,7 @@ using Umbraco.Core.Publishing;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
+using Umbraco.Core.Strings;
 using MigrationsVersionFourNineZero = Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero;
 
 namespace Umbraco.Core
@@ -211,6 +212,11 @@ namespace Umbraco.Core
 			PropertyEditorValueConvertersResolver.Current.AddType<DatePickerPropertyEditorValueConverter>();
 			PropertyEditorValueConvertersResolver.Current.AddType<TinyMcePropertyEditorValueConverter>();
 			PropertyEditorValueConvertersResolver.Current.AddType<YesNoPropertyEditorValueConverter>();
-        }
+
+		    ShortStringHelperResolver.Current = new ShortStringHelperResolver(
+		        new LegacyShortStringHelper());
+		    UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(
+		        typeof (DefaultUrlSegmentProvider));
+		}
 	}
 }

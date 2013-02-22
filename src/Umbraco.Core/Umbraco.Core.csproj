@@ -677,6 +677,10 @@
     <Compile Include="Services\ServerRegistrationService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Services\UserService.cs" />
+    <Compile Include="Strings\ContentBaseExtensions.cs" />
+    <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
+    <Compile Include="Strings\IUrlSegmentProvider.cs" />
+    <Compile Include="Strings\UrlSegmentProviderResolver.cs" />
     <Compile Include="Sync\DatabaseServerRegistrar.cs" />
     <Compile Include="Sync\DefaultServerMessenger.cs" />
     <Compile Include="Sync\ICacheRefresher.cs" />
@@ -691,6 +695,13 @@
     <Compile Include="Sync\ServerMessengerResolver.cs" />
     <Compile Include="Sync\ServerRegistrarResolver.cs" />
     <Compile Include="Sync\ConfigServerRegistrar.cs" />
+    <Compile Include="Strings\Utf8ToAsciiConverter.cs" />
+    <Compile Include="Strings\CleanStringType.cs" />
+    <Compile Include="Strings\ShortStringHelperResolver.cs" />
+    <Compile Include="Strings\IShortStringHelper.cs" />
+    <Compile Include="Strings\LegacyShortStringHelper.cs" />
+    <Compile Include="Strings\StringAliasCaseTypeExtensions.cs" />
+    <Compile Include="Strings\DefaultShortStringHelper.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="ReadLock.cs" />
     <Compile Include="TypeFinder.cs" />
@@ -740,7 +751,9 @@
       <Name>umbraco.interfaces</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Strings\Notes.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

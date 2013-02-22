@@ -440,7 +440,7 @@ namespace Umbraco.Core.Services
                     var contentTypes = GetAllContentTypes();
                     foreach (ContentType contentType in contentTypes)
                     {
-                        string safeAlias = contentType.Alias.ToUmbracoAlias(StringAliasCaseType.CamelCase, true);
+                        string safeAlias = contentType.Alias.ToUmbracoAlias();
                         if (safeAlias != null)
                         {
                             strictSchemaBuilder.AppendLine(String.Format("<!ELEMENT {0} ANY>", safeAlias));
