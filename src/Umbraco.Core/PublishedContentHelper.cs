@@ -77,6 +77,10 @@ namespace Umbraco.Core
                 {
                     var result = applicationContext.Services.ContentTypeService.GetContentType(docTypeAlias);
                     if (result == null) return Guid.Empty;
+                    if (!result.PropertyTypes.Any(x => x.Alias.InvariantEquals(propertyAlias)))
+                    {
+                        return Guid.Empty;
+                    }
                     var property = result.PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyAlias));
                     if (property == null) return Guid.Empty;
                     return property.DataTypeId;
