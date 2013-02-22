@@ -51,8 +51,12 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the Name of the Group, which corresponds to the Tab-name in the UI
+        /// Gets or sets the Id of the Parent PropertyGroup.
         /// </summary>
+        /// <remarks>
+        /// A Parent PropertyGroup corresponds to an inherited PropertyGroup from a composition.
+        /// If a PropertyType is inserted into an inherited group then a new group will be created with an Id reference to the parent.
+        /// </remarks>
         [DataMember]
         public int? ParentId
         {

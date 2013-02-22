@@ -336,33 +336,7 @@ namespace Umbraco.Core.Models
         /// <param name="propertyType"><see cref="PropertyType"/> to add</param>
         /// <param name="propertyGroupName">Name of the PropertyGroup to add the PropertyType to</param>
         /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
-        public bool AddPropertyType(PropertyType propertyType, string propertyGroupName)
-        {
-            if (PropertyTypeExists(propertyType.Alias) == false)
-            {
-                if (PropertyGroups.Contains(propertyGroupName))
-                {
-                    propertyType.PropertyGroupId = PropertyGroups[propertyGroupName].Id;
-                    PropertyGroups[propertyGroupName].PropertyTypes.Add(propertyType);
-                }
-                else
-                {
-                    int sortOrder = 0;
-                    if (PropertyGroups.Any())
-                    {
-                        var firstPropertyGroup = PropertyGroups.OrderByDescending(x => x.SortOrder).First();
-                        if (firstPropertyGroup != null)
-                            sortOrder = firstPropertyGroup.SortOrder + 1;
-                    }
-
-                    var propertyTypes = new List<PropertyType>{ propertyType };
-                    var propertyGroup = new PropertyGroup(new PropertyTypeCollection(propertyTypes)) { Name = propertyGroupName, SortOrder = sortOrder};
-                    PropertyGroups.Add(propertyGroup);
-                }
-            }
-
-            return false;
-        }
+        public abstract bool AddPropertyType(PropertyType propertyType, string propertyGroupName);
 
         /// <summary>
         /// Adds a PropertyType, which does not belong to a PropertyGroup.

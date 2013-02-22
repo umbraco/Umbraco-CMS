@@ -139,7 +139,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected void PersistUpdatedBaseContentType(ContentTypeDto dto, IContentTypeComposition entity)
         {
-            var propertyFactory = new PropertyGroupFactory(entity.Id);
+            var propertyGroupFactory = new PropertyGroupFactory(entity.Id);
 
             var nodeDto = dto.NodeDto;
             var o = Database.Update(nodeDto);
@@ -201,7 +201,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //Run through all groups to insert or update entries
                 foreach (var propertyGroup in entity.PropertyGroups)
                 {
-                    var tabDto = propertyFactory.BuildGroupDto(propertyGroup);
+                    var tabDto = propertyGroupFactory.BuildGroupDto(propertyGroup);
                     int groupPrimaryKey = propertyGroup.HasIdentity
                                               ? Database.Update(tabDto)
                                               : Convert.ToInt32(Database.Insert(tabDto));
@@ -218,7 +218,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //Run through all PropertyTypes to insert or update entries
                 foreach (var propertyType in entity.PropertyTypes)
                 {
-                    var propertyTypeDto = propertyFactory.BuildPropertyTypeDto(propertyType.PropertyGroupId, propertyType);
+                    var propertyTypeDto = propertyGroupFactory.BuildPropertyTypeDto(propertyType.PropertyGroupId, propertyType);
                     int typePrimaryKey = propertyType.HasIdentity
                                              ? Database.Update(propertyTypeDto)
                                              : Convert.ToInt32(Database.Insert(propertyTypeDto));
@@ -253,8 +253,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
 
-            var propertyFactory = new PropertyGroupFactory(id);
-            var propertyGroups = propertyFactory.BuildEntity(dtos);
+            var propertyGroupFactory = new PropertyGroupFactory(id);
+            var propertyGroups = propertyGroupFactory.BuildEntity(dtos);
             return new PropertyGroupCollection(propertyGroups);
         }
 
