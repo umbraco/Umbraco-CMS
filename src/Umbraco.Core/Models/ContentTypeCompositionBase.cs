@@ -14,6 +14,7 @@ namespace Umbraco.Core.Models
     public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentTypeComposition
     {
         private readonly List<IContentTypeComposition> _contentTypeComposition = new List<IContentTypeComposition>();
+        internal static List<int> RemovedContentTypeKeyTracker = new List<int>();
 
         protected ContentTypeCompositionBase(int parentId) : base(parentId)
         {
@@ -92,6 +93,7 @@ namespace Umbraco.Core.Models
             if (ContentTypeCompositionExists(alias))
             {
                 var contentTypeComposition = ContentTypeComposition.First(x => x.Alias == alias);
+                RemovedContentTypeKeyTracker.Add(contentTypeComposition.Id);
                 return _contentTypeComposition.Remove(contentTypeComposition);
             }
             return false;
@@ -109,6 +111,51 @@ namespace Umbraco.Core.Models
 
             if (ContentTypeComposition.Any(x => x.ContentTypeCompositionExists(alias)))
                 return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks whether a PropertyType with a given alias already exists
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <returns>Returns <c>True</c> if a PropertyType with the passed in alias exists, otherwise <c>False</c></returns>
+        public override bool PropertyTypeExists(string propertyTypeAlias)
+        {
+            return CompositionPropertyTypes.Any(x => x.Alias == propertyTypeAlias);
+        }
+
+        /// <summary>
+        /// Adds a PropertyType to a specific PropertyGroup
+        /// </summary>
+        /// <param name="propertyType"><see cref="PropertyType"/> to add</param>
+        /// <param name="propertyGroupName">Name of the PropertyGroup to add the PropertyType to</param>
+        /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
+        public override bool AddPropertyType(PropertyType propertyType, string propertyGroupName)
+        {
+            if (PropertyTypeExists(propertyType.Alias) == false)
+            {
+                if (PropertyGroups.Contains(propertyGroupName))
+                {
+                    propertyType.PropertyGroupId = PropertyGroups[propertyGroupName].Id;
+                    PropertyGroups[propertyGroupName].PropertyTypes.Add(propertyType);
+                }
+                else
+                {
+                    //If the PropertyGroup doesn't already exist we create a new one 
+                    var propertyTypes = new List<PropertyType> { propertyType };
+                    var propertyGroup = new PropertyGroup(new PropertyTypeCollection(propertyTypes)) { Name = propertyGroupName, SortOrder = 1 };
+                    //and check if its an inherited PropertyGroup, which exists in the composition
+                    if (CompositionPropertyGroups.Any(x => x.Name == propertyGroupName))
+                    {
+                        var parentPropertyGroup = CompositionPropertyGroups.First(x => x.Name == propertyGroupName && x.ParentId.HasValue == false);
+                        propertyGroup.SortOrder = parentPropertyGroup.SortOrder + 1;
+                        propertyGroup.ParentId = parentPropertyGroup.Id;
+                    }
+
+                    PropertyGroups.Add(propertyGroup);
+                }
+            }
 
             return false;
         }

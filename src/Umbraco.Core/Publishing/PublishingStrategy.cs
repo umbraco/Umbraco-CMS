@@ -78,6 +78,7 @@ namespace Umbraco.Core.Publishing
             {
                 //Fire Publishing event
                 if (Publishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(item), this))
+                    return false;
 
                 //Check if the Content is Expired to verify that it can in fact be published
                 if (item.Status == ContentStatus.Expired)

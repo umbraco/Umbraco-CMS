@@ -22,15 +22,27 @@ namespace Umbraco.Core.Persistence.Factories
             foreach (var groupDto in dto)
             {
                 var group = new PropertyGroup();
-                group.Id = groupDto.Id;
+                //Only assign an Id if the PropertyGroup belongs to this ContentType
+                if (groupDto.ContentTypeNodeId == _id)
+                {
+                    group.Id = groupDto.Id;
+
+                    if (groupDto.ParentGroupId.HasValue)
+                        group.ParentId = groupDto.ParentGroupId.Value;
+                }
+                else
+                {
+                    //If the PropertyGroup is inherited, we add a reference to the group as a Parent.
+                    group.ParentId = groupDto.Id;
+                }
+
                 group.Name = groupDto.Text;
-                group.ParentId = groupDto.ParentGroupId;
                 group.SortOrder = groupDto.SortOrder;
                 group.PropertyTypes = new PropertyTypeCollection();
 
                 //Because we are likely to have a group with no PropertyTypes we need to ensure that these are excluded
-                var typeDtos = groupDto.PropertyTypeDtos.Where(x => x.Id > 0);
-                foreach (var typeDto in typeDtos)
+                //var typeDtos = groupDto.PropertyTypeDtos.Where(x => x.Id > 0);
+                foreach (var typeDto in groupDto.PropertyTypeDtos)
                 {
                     group.PropertyTypes.Add(new PropertyType(typeDto.DataTypeDto.ControlId,
                                                              typeDto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
@@ -67,9 +79,11 @@ namespace Umbraco.Core.Persistence.Factories
                              {
                                  ContentTypeNodeId = _id,
                                  SortOrder = propertyGroup.SortOrder,
-                                 Text = propertyGroup.Name,
-                                 ParentGroupId = propertyGroup.ParentId
+                                 Text = propertyGroup.Name
                              };
+
+            if (propertyGroup.ParentId.HasValue)
+                dto.ParentGroupId = propertyGroup.ParentId.Value;
 
             if (propertyGroup.HasIdentity)
                 dto.Id = propertyGroup.Id;

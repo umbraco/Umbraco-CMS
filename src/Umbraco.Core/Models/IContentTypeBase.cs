@@ -69,5 +69,27 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="id">Id of the Parent</param>
         void SetLazyParentId(Lazy<int> id);
+
+        /// <summary>
+        /// Checks whether a PropertyType with a given alias already exists
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <returns>Returns <c>True</c> if a PropertyType with the passed in alias exists, otherwise <c>False</c></returns>
+        bool PropertyTypeExists(string propertyTypeAlias);
+
+        /// <summary>
+        /// Adds a PropertyType to a specific PropertyGroup
+        /// </summary>
+        /// <param name="propertyType"><see cref="PropertyType"/> to add</param>
+        /// <param name="propertyGroupName">Name of the PropertyGroup to add the PropertyType to</param>
+        /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
+        bool AddPropertyType(PropertyType propertyType, string propertyGroupName);
+
+        /// <summary>
+        /// Adds a PropertyType, which does not belong to a PropertyGroup.
+        /// </summary>
+        /// <param name="propertyType"><see cref="PropertyType"/> to add</param>
+        /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
+        bool AddPropertyType(PropertyType propertyType);
     }
 }

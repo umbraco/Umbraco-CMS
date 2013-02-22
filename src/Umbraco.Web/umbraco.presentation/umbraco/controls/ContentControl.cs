@@ -2,10 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic;
@@ -59,7 +61,8 @@ namespace umbraco.controls
         }
 
         // zb-00036 #29889 : load it only once
-        List<ContentType.TabI> _virtualTabs;
+        private List<ContentType.TabI> _virtualTabs;
+        private ContentType _contentType;
 
         /// <summary>
         /// Constructor to set default properties.
@@ -114,6 +117,9 @@ namespace umbraco.controls
             if (_virtualTabs == null)
                 _virtualTabs = _content.ContentType.getVirtualTabs.ToList();
 
+            if(_contentType == null)
+                _contentType = ContentType.GetContentType(_content.ContentType.Id);
+
             foreach (ContentType.TabI tab in _virtualTabs)
             {
                 var tabPage = this.Panels[i] as TabPage;
@@ -121,30 +127,29 @@ namespace umbraco.controls
                 {
                     throw new ArgumentException("Unable to load tab \"" + tab.Caption + "\"");
                 }
-                //TabPage tp = NewTabPage(t.Caption);
-                //addSaveAndPublishButtons(ref tp);
 
                 tabPage.Style.Add("text-align", "center");
 
-
-                // Iterate through the property types and add them to the tab
-                // zb-00036 #29889 : fix property types getter to get the right set of properties
-                // ge : had a bit of a corrupt db and got weird NRE errors so rewrote this to catch the error and rethrow with detail
-                var propertyTypes = tab.GetPropertyTypes(_content.ContentType.Id);
-                foreach (PropertyType propertyType in propertyTypes)
+                var tabId = tab.Id;
+                var propertyGroups = _contentType.ContentTypeItem.CompositionPropertyGroups.Where(x => x.Id == tabId || x.ParentId == tabId);
+                var propertyTypeAliaes = propertyGroups.SelectMany(x => x.PropertyTypes.Select(y => new System.Tuple<int, string>(y.Id, y.Alias)));
+                foreach (var items in propertyTypeAliaes)
                 {
-                    var property = _content.getProperty(propertyType);
-                    if (property != null && tabPage != null)
+                    var property = _content.getProperty(items.Item2);
+                    if (property != null)
                     {
                         AddControlNew(property, tabPage, tab.Caption);
 
-                        // adding this check, as we occasionally get an already in dictionary error, though not sure why
-                        if (!inTab.ContainsKey(propertyType.Id.ToString()))
-                            inTab.Add(propertyType.Id.ToString(), true);
+                        if (!inTab.ContainsKey(items.Item1.ToString(CultureInfo.InvariantCulture)))
+                            inTab.Add(items.Item1.ToString(CultureInfo.InvariantCulture), true);
                     }
                     else
                     {
-                        throw new ArgumentNullException(string.Format("Property {0} ({1}) on Content Type {2} could not be retrieved for Document {3} on Tab Page {4}. To fix this problem, delete the property and recreate it.", propertyType.Alias, propertyType.Id, _content.ContentType.Alias, _content.Id, tab.Caption));
+                        throw new ArgumentNullException(
+                            string.Format(
+                                "Property {0} ({1}) on Content Type {2} could not be retrieved for Document {3} on Tab Page {4}. To fix this problem, delete the property and recreate it.",
+                                items.Item2, items.Item1, _content.ContentType.Alias, _content.Id,
+                                tab.Caption));
                     }
                 }
 
