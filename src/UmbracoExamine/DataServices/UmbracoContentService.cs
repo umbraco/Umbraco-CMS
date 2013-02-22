@@ -123,7 +123,7 @@ namespace UmbracoExamine.DataServices
             try
             {
                 var result = _applicationContext.DatabaseContext.Database.Fetch<dynamic>("select distinct alias from cmsPropertyType order by alias");
-                return result.Select(r => r.Alias.ToString()).Cast<string>().ToList();
+                return result.Select(r => r.alias.ToString()).Cast<string>().ToList();
             }
             catch (Exception ex)
             {
