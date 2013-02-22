@@ -24,10 +24,10 @@ using System.Linq;
 
 namespace Umbraco.Tests.PublishedContent
 {
-	/// <summary>
+    /// <summary>
 	/// Tests the typed extension methods on IPublishedContent using the DefaultPublishedMediaStore
 	/// </summary>
-	[TestFixture]
+	[TestFixture, RequiresSTA]
     public class PublishedMediaTests : PublishedContentTestBase
 	{
 		
@@ -63,7 +63,34 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			return GetNode(id, GetUmbracoContext("/test", 1234));
 		}
+           
+		[Test]
+	    public void Ensure_Children_Sorted_With_Examine()
+	    {
+            var newIndexFolder = new DirectoryInfo(Path.Combine("App_Data\\CWSIndexSetTest", Guid.NewGuid().ToString()));
+            var indexInit = new IndexInitializer();
+            var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);
+            indexer.RebuildIndex();
 
+            var store = new DefaultPublishedMediaStore(
+                indexInit.GetUmbracoSearcher(newIndexFolder),
+                indexInit.GetUmbracoIndexer(newIndexFolder));
+
+            //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
+            var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 1111);
+	        var rootChildren = publishedMedia.Children().ToArray();
+	        var currSort = 0;
+            for (var i = 0; i < rootChildren.Count(); i++)
+            {
+                Assert.GreaterOrEqual(rootChildren[i].SortOrder, currSort);
+                currSort = rootChildren[i].SortOrder;
+            }
+
+                
+
+	    }
+
+		
 	    [Test]
 	    public void Do_Not_Find_In_Recycle_Bin()
 	    {
@@ -109,7 +136,9 @@ namespace Umbraco.Tests.PublishedContent
 			var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);
 			indexer.RebuildIndex();
 
-			var store = new DefaultPublishedMediaStore(indexInit.GetUmbracoSearcher(newIndexFolder));
+            var store = new DefaultPublishedMediaStore(
+                indexInit.GetUmbracoSearcher(newIndexFolder),
+                indexInit.GetUmbracoIndexer(newIndexFolder));
 
 			//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
 			var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 1111);
@@ -129,7 +158,9 @@ namespace Umbraco.Tests.PublishedContent
 			var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);
 			indexer.RebuildIndex();
 
-			var store = new DefaultPublishedMediaStore(indexInit.GetUmbracoSearcher(newIndexFolder));
+            var store = new DefaultPublishedMediaStore(
+                indexInit.GetUmbracoSearcher(newIndexFolder),
+                indexInit.GetUmbracoIndexer(newIndexFolder));
 
 			//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
 			var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 1111);
@@ -149,7 +180,9 @@ namespace Umbraco.Tests.PublishedContent
 			var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);
 			indexer.RebuildIndex();
 
-			var store = new DefaultPublishedMediaStore(indexInit.GetUmbracoSearcher(newIndexFolder));
+            var store = new DefaultPublishedMediaStore(
+                indexInit.GetUmbracoSearcher(newIndexFolder),
+                indexInit.GetUmbracoIndexer(newIndexFolder));
 
 			//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
 			var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 1111);
@@ -169,7 +202,9 @@ namespace Umbraco.Tests.PublishedContent
 			var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);
 			indexer.RebuildIndex();
 
-			var store = new DefaultPublishedMediaStore(indexInit.GetUmbracoSearcher(newIndexFolder));
+            var store = new DefaultPublishedMediaStore(
+                indexInit.GetUmbracoSearcher(newIndexFolder),
+                indexInit.GetUmbracoIndexer(newIndexFolder));
 
 			//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
 			var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 3113);
@@ -185,7 +220,9 @@ namespace Umbraco.Tests.PublishedContent
 			var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);
 			indexer.RebuildIndex();
 
-			var store = new DefaultPublishedMediaStore(indexInit.GetUmbracoSearcher(newIndexFolder));
+            var store = new DefaultPublishedMediaStore(
+                indexInit.GetUmbracoSearcher(newIndexFolder),
+                indexInit.GetUmbracoIndexer(newIndexFolder));
 
 			//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
 			var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 3113);
