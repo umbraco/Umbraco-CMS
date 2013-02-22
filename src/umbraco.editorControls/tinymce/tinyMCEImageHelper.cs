@@ -136,7 +136,7 @@ namespace umbraco.editorControls.tinymce
                     var uf = new UmbracoFile(orgPath);
                     newSrc = uf.Resize(newWidth, newHeight);
                 }
-                }
+            }
 
             finalWidth = newWidth;
             finalHeight = newHeight;
