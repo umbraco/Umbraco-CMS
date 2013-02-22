@@ -58,6 +58,7 @@ namespace umbraco.controls.GenericProperties
 
 		public cms.businesslogic.web.DocumentType.TabI[] Tabs 
 		{
+            get { return _tabs; }
 			set 
 			{
 				_tabs = value;
