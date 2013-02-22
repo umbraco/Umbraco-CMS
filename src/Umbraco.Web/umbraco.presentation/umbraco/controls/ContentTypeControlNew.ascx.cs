@@ -437,6 +437,9 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                     foreach (cms.businesslogic.propertytype.PropertyType pt in propertyTypes)
                     {
+                        //If the PropertyType doesn't belong on this ContentType skip it and continue to the next one
+                        if(pt.ContentTypeId != _contentType.Id) continue;
+
                         var gpw = new GenericPropertyWrapper();
                         gpw.ID = "gpw_" + pt.Id;
                         gpw.PropertyType = pt;
