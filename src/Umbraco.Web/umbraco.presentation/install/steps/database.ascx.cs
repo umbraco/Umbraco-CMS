@@ -74,8 +74,11 @@ namespace umbraco.presentation.install.steps
             {
                 //If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
                 var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
-                
-                var dbIsSqlCe = databaseSettings.ProviderName == "System.Data.SqlServerCe.4.0";
+
+                var dbIsSqlCe = false;
+                if(databaseSettings != null && databaseSettings.ProviderName != null)
+                    dbIsSqlCe = databaseSettings.ProviderName == "System.Data.SqlServerCe.4.0";
+
                 var sqlCeDatabaseExists = false;
                 if (dbIsSqlCe)
                     sqlCeDatabaseExists = File.Exists(databaseSettings.ConnectionString.Replace("|DataDirectory|", AppDomain.CurrentDomain.GetData("DataDirectory").ToString()));
