@@ -760,7 +760,7 @@ namespace Umbraco.Web
 		{
 			return content.AncestorsOrSelf(n => n.DocumentTypeAlias == nodeTypeAlias);
 		}
-		internal static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, int level)
+		public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, int level)
 		{
 			return content.AncestorsOrSelf(n => n.Level <= level);
 		}
