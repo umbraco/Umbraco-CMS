@@ -143,7 +143,7 @@ namespace Umbraco.Core
                 if (_cachedAssembliesHash != -1)
                     return _cachedAssembliesHash;
 
-                var filePath = Path.Combine(_tempFolder, "umbraco-plugins.hash");
+                var filePath = GetPluginHashFilePath();
                 if (!File.Exists(filePath))
                     return 0;
                 var hash = File.ReadAllText(filePath, Encoding.UTF8);
@@ -191,7 +191,7 @@ namespace Umbraco.Core
         /// </summary>
         private void WriteCachePluginsHash()
         {
-            var filePath = Path.Combine(_tempFolder, "umbraco-plugins.hash");
+            var filePath = GetPluginHashFilePath();
             File.WriteAllText(filePath, CurrentAssembliesHash.ToString(), Encoding.UTF8);
         }
 
@@ -285,9 +285,35 @@ namespace Umbraco.Core
             }
         }
 
+        /// <summary>
+        /// Removes cache files and internal cache as well
+        /// </summary>
+        /// <remarks>
+        /// Generally only used for resetting cache, for example during the install process
+        /// </remarks>
+        internal void ClearPluginCache()
+        {
+            var path = GetPluginListFilePath();
+            if (File.Exists(path))
+                File.Delete(path);
+            path = GetPluginHashFilePath();
+            if (File.Exists(path))
+                File.Delete(path);
+
+            if (_appContext != null)
+            {
+               _appContext.ApplicationCache.ClearCacheItem("umbraco-plugins.list");
+            }
+        }
+
         private string GetPluginListFilePath()
         {
             return Path.Combine(_tempFolder, "umbraco-plugins.list");
+        }
+
+        private string GetPluginHashFilePath()
+        {
+            return Path.Combine(_tempFolder, "umbraco-plugins.hash");
         }
 
         /// <summary>

@@ -6,6 +6,17 @@ namespace Umbraco.Web.UI.Install.Steps
 {
     public partial class Welcome : StepUserControl
     {
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            if (!IsPostBack)
+            {
+                //clear the plugin cache when installation starts (just a safety check)
+                PluginManager.Current.ClearPluginCache();    
+            }
+        }
+
         protected void Page_Load(object sender, System.EventArgs e)
         {
             var result = ApplicationContext.Current.DatabaseContext.ValidateDatabaseSchema();
