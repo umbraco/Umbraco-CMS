@@ -99,7 +99,7 @@ namespace Umbraco.Tests.PublishedContent
             var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);	        
             indexer.RebuildIndex();
             var searcher = indexInit.GetUmbracoSearcher(newIndexFolder);
-            var store = new DefaultPublishedMediaStore(searcher);
+            var store = new DefaultPublishedMediaStore(searcher, indexer);
 	        var ctx = GetUmbracoContext("/test", 1234);
 
             //ensure it is found
