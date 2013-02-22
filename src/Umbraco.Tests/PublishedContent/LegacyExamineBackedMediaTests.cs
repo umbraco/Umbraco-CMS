@@ -10,19 +10,19 @@ using umbraco.MacroEngines;
 
 namespace Umbraco.Tests.PublishedContent
 {
-    public class LegacyExamineBackedMediaTests : PublishedContentTestBase
+    public class LegacyExamineBackedMediaTests : ExamineBaseTest<LegacyExamineBackedMediaTests>
     {
-        public override void Initialize()
+        public override void TestSetup()
         {
-            base.Initialize();
+            base.TestSetup();
             UmbracoSettings.ForceSafeAliases = true;
             UmbracoSettings.UmbracoLibraryCacheDuration = 1800;
             UmbracoSettings.ForceSafeAliases = true;
         }
 
-        public override void TearDown()
+        public override void TestTearDown()
         {
-            base.TearDown();
+            base.TestTearDown();
         }
 
         [Test]
