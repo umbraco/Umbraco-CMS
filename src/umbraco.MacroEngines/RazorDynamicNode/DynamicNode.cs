@@ -168,7 +168,7 @@ namespace umbraco.MacroEngines
 					}
 					else
 					{
-						_cachedChildren = new DynamicNodeList(n.ChildrenAsList);	
+                        _cachedChildren = new DynamicNodeList(children);
 					}
 	            }
 				return _cachedChildren;
@@ -294,34 +294,17 @@ namespace umbraco.MacroEngines
             var results = s.Search(criteria);
             return ExamineSearchUtill.ConvertSearchResultToDynamicNode(results);
         }
-
-
         
-
+        
         public bool HasProperty(string name)
         {
             if (n != null)
             {
-                try
-                {
-                    IProperty prop = n.GetProperty(name);
-                    if (prop == null)
-                    {
-                        // check for nicer support of Pascal Casing EVEN if alias is camelCasing:
-                        if (prop == null && name.Substring(0, 1).ToUpper() == name.Substring(0, 1))
-                        {
-                            prop = n.GetProperty(name.Substring(0, 1).ToLower() + name.Substring((1)));
-                        }
-                    }
-                    return (prop != null);
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
+                return GetProperty(name) != null;
             }
             return false;
         }
+
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
             try
@@ -1347,7 +1330,43 @@ namespace umbraco.MacroEngines
         public IProperty GetProperty(string alias)
         {
             if (n == null) return null;
-            return n.GetProperty(alias);
+
+            object result;
+            IProperty prop;
+            //check the cache first!
+            if (_cachedMemberOutput.TryGetValue(alias, out result))
+            {
+                prop = result as IProperty;
+                if (prop != null)
+                    return prop;
+            }
+
+            try
+            {
+                prop = n.GetProperty(alias);
+                if (prop == null)
+                {
+                    // check for nicer support of Pascal Casing EVEN if alias is camelCasing:
+                    if (alias.Substring(0, 1).ToUpper() == alias.Substring(0, 1))
+                    {
+                        //change the alias to the other case to check
+                        alias = alias.Substring(0, 1).ToLower() + alias.Substring((1));
+                        prop = n.GetProperty(alias);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+            if (prop == null)
+                return null;
+
+            //cache it!
+            _cachedMemberOutput.TryAdd(alias, prop);
+
+            return prop;
         }
         public IProperty GetProperty(string alias, bool recursive)
         {
