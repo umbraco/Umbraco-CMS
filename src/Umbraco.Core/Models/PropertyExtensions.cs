@@ -19,6 +19,14 @@ namespace Umbraco.Core.Models
             var xd = new XmlDocument();
             XmlNode xmlNode = xd.CreateNode(XmlNodeType.Element, nodeName, "");
 
+            //Add the property alias to the legacy schema
+            if (UmbracoSettings.UseLegacyXmlSchema)
+            {
+                var alias = xd.CreateAttribute("alias");
+                alias.Value = property.Alias.ToSafeAlias();
+                xmlNode.Attributes.Append(alias);
+            }
+
             //This seems to fail during testing 
             xmlNode.AppendChild(property.PropertyType.DataType(property.Id).Data.ToXMl(xd));
             
