@@ -440,6 +440,9 @@
     <Compile Include="umbraco.presentation\umbraco\macroResultWrapper.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\masterpages\default.Master.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\publishStatus.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1300,13 +1303,6 @@
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Updates\IUpdateList.cs" />
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\MacroModule\TemplateUpdate.cs" />
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Utility.cs" />
-    <Compile Include="umbraco.presentation\umbraco\masterpages\default.Master.cs">
-      <DependentUpon>default.Master</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\masterpages\default.Master.designer.cs">
-      <DependentUpon>default.Master</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\EditMember.aspx.cs">
       <DependentUpon>EditMember.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1946,7 +1942,6 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\webservices\templates.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\trashcan.asmx" />
-    <Content Include="umbraco.presentation\umbraco\masterpages\default.Master" />
     <Content Include="umbraco.presentation\umbraco\webservices\TreeDataService.ashx" />
     <None Include="umbraco.presentation\umbraco\Trees\Trees.cd" />
     <None Include="umbraco.presentation\umbraco\Trees\XmlTree.xsd">

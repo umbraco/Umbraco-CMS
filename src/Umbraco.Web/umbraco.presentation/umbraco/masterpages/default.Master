@@ -1,3 +1,0 @@
-<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="default.master.cs" Inherits="umbraco.presentation.masterpages._default" %>
-<asp:ContentPlaceHolder ID="ContentPlaceHolderDefault" runat="server">
-</asp:ContentPlaceHolder>

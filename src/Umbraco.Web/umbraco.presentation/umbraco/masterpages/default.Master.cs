@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Web.UI;
 using umbraco.presentation.LiveEditing;
@@ -50,13 +50,17 @@ namespace umbraco.presentation.masterpages
             if (m_LiveEditingContext.Enabled)
             {
                 // require an ASP.Net form
-                if (Page.Form == null) {
+                if (Page.Form == null)
+                {
                     //turn live editing off so it won't annoying the hell out of people who doesn't have a form and try to refresh the page... 
                     UmbracoContext.Current.LiveEditingContext.Enabled = false;
                     throw new ApplicationException("Umbraco Canvas requires an ASP.Net form to function properly. Live editing has been turned off.");
-                } else {
+                }
+                else
+                {
                     // add a ScriptManager to the form if not present
-                    if (ScriptManager.GetCurrent(Page) == null) {
+                    if (ScriptManager.GetCurrent(Page) == null)
+                    {
                         Page.Form.Controls.Add(new ScriptManager());
                     }
 
@@ -65,5 +69,14 @@ namespace umbraco.presentation.masterpages
                 }
             }
         }
+
+        /// <summary>
+        /// ContentPlaceHolderDefault control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ContentPlaceHolder ContentPlaceHolderDefault;
     }
 }

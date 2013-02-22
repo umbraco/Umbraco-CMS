@@ -383,6 +383,13 @@
     <Compile Include="Umbraco\Dialogs\Publish.aspx.designer.cs">
       <DependentUpon>publish.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Masterpages\Default.Master.cs">
+      <DependentUpon>default.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Masterpages\Default.Master.designer.cs">
+      <DependentUpon>default.Master</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Masterpages\UmbracoDialog.master.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
