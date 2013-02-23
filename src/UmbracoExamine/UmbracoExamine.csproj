@@ -113,6 +113,7 @@
     <Compile Include="DataServices\IDataService.cs" />
     <Compile Include="DataServices\ILogService.cs" />
     <Compile Include="DataServices\IMediaService.cs" />
+    <Compile Include="DataServices\PropertyAliasDto.cs" />
     <Compile Include="DataServices\UmbracoDataService.cs" />
     <Compile Include="DataServices\UmbracoContentService.cs" />
     <Compile Include="DataServices\UmbracoMediaService.cs" />
