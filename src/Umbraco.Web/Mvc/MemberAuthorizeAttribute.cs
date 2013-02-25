@@ -17,6 +17,9 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Flag for whether to allow all site visitors or just authenticated members
         /// </summary>
+        /// <remarks>
+        /// This is the same as applying the [AllowAnonymous] attribute
+        /// </remarks>
         public bool AllowAll { get; set; }
 
         /// <summary>
