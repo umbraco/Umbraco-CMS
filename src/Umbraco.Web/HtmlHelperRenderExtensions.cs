@@ -244,8 +244,7 @@ namespace Umbraco.Web
 			Mandate.ParameterNotNullOrEmpty(action, "action");
 			Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
 
-			var area = Umbraco.Core.Configuration.GlobalSettings.UmbracoMvcArea;
-			return html.BeginUmbracoForm(action, controllerName, area, additionalRouteVals, htmlAttributes);
+			return html.BeginUmbracoForm(action, controllerName, "", additionalRouteVals, htmlAttributes);
 		}
 
 		/// <summary>
