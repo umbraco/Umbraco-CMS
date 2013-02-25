@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 
 namespace umbraco.cms.helpers
@@ -22,15 +20,15 @@ namespace umbraco.cms.helpers
         /// <returns>An alias guaranteed not to contain illegal characters</returns>
         public static string SafeAlias(string alias)
         {
-            StringBuilder safeString = new StringBuilder();
-            int aliasLength = alias.Length;
-            for (int i = 0; i < aliasLength;i++ )
+            var safeString = new StringBuilder();
+            var aliasLength = alias.Length;
+            for (var i = 0; i < aliasLength;i++ )
             {
-                string currentChar = alias.Substring(i, 1);
-                if (VALID_ALIAS_CHARACTERS.Contains(currentChar.ToLower()))
+                var currentChar = alias.Substring(i, 1);
+                if (VALID_ALIAS_CHARACTERS.Contains(currentChar.ToLowerInvariant()))
                 {
                     // check for camel (if previous character is a space, we'll upper case the current one
-                    if (safeString.Length == 0 && INVALID_FIRST_CHARACTERS.Contains(currentChar.ToLower()))
+                    if (safeString.Length == 0 && INVALID_FIRST_CHARACTERS.Contains(currentChar.ToLowerInvariant()))
                     {
                         currentChar = "";
                     }
@@ -38,10 +36,8 @@ namespace umbraco.cms.helpers
                     {
                         // first char should always be lowercase (camel style)
                         // Skipping this check as it can cause incompatibility issues with 3rd party packages
-//                        if (safeString.Length == 0)
-//                            currentChar = currentChar.ToLower();
                         if (i < aliasLength - 1 && i > 0 && alias.Substring(i - 1, 1) == " ")
-                            currentChar = currentChar.ToUpper();
+                            currentChar = currentChar.ToUpperInvariant();
 
                         safeString.Append(currentChar);
                     }
@@ -53,34 +49,24 @@ namespace umbraco.cms.helpers
 
         public static string SafeAliasWithForcingCheck(string alias)
         {
-            if (UmbracoSettings.ForceSafeAliases)
-            {
-                return SafeAlias(alias);
-            }
-            else
-            {
-                return alias;
-            }
+            return UmbracoSettings.ForceSafeAliases ? SafeAlias(alias) : alias;
         }
 
         public static string SpaceCamelCasing(string text)
         {
-            string s = text;
+            var s = text;
 
             if (2 > s.Length)
-            {
                 return s;
-            }
 
-
-            var sb = new System.Text.StringBuilder();
+            var sb = new StringBuilder();
             var ca = s.ToCharArray();
-            ca[0] = char.ToUpper(ca[0]);
+            ca[0] = char.ToUpperInvariant(ca[0]);
 
             sb.Append(ca[0]);
-            for (int i = 1; i < ca.Length - 1; i++)
+            for (var i = 1; i < ca.Length - 1; i++)
             {
-                char c = ca[i];
+                var c = ca[i];
                 if (char.IsUpper(c) && (char.IsLower(ca[i + 1]) || char.IsLower(ca[i - 1])))
                 {
                     sb.Append(' ');
@@ -89,7 +75,6 @@ namespace umbraco.cms.helpers
             }
             sb.Append(ca[ca.Length - 1]);
             return sb.ToString();
-
         }
     }
 }
