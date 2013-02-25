@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models
     public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentTypeComposition
     {
         private readonly List<IContentTypeComposition> _contentTypeComposition = new List<IContentTypeComposition>();
-        internal static List<int> RemovedContentTypeKeyTracker = new List<int>();
+        internal List<int> RemovedContentTypeKeyTracker = new List<int>();
 
         protected ContentTypeCompositionBase(int parentId) : base(parentId)
         {

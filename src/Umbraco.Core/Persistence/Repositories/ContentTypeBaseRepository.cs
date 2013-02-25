@@ -157,10 +157,49 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Insert(new ContentType2ContentTypeDto { ParentId = composition.Id, ChildId = entity.Id });
             }
 
-            //TODO U4-1690 - test what happens with property types and groups from content type compositions when a content type is removed
-            //1. Find content based on the current content type: entity.Id
-            //2. Find all property types (and groups?) on the content type that was removed - tracked id
+            //Removing a ContentType from a composition (U4-1690)
+            //1. Find content based on the current ContentType: entity.Id
+            //2. Find all PropertyTypes on the ContentType that was removed - tracked id (key)
             //3. Remove properties based on property types from the removed content type where the content ids correspond to those found in step one
+            var compositionBase = entity as ContentTypeCompositionBase;
+            if (compositionBase != null && compositionBase.RemovedContentTypeKeyTracker != null && compositionBase.RemovedContentTypeKeyTracker.Any())
+            {
+                //Find Content based on the current ContentType
+                var sql = new Sql();
+                sql.Select("*")
+                   .From<ContentDto>()
+                   .InnerJoin<NodeDto>()
+                   .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                   .Where<NodeDto>(x => x.NodeObjectType == new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"))
+                   .Where<ContentDto>(x => x.ContentTypeId == entity.Id);
+
+                var contentDtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+                //Loop through all tracked keys, which corresponds to the ContentTypes that has been removed from the composition
+                foreach (var key in compositionBase.RemovedContentTypeKeyTracker)
+                {
+                    //Find PropertyTypes for the removed ContentType
+                    var propertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new {Id = key});
+                    //Loop through the Content that is based on the current ContentType in order to remove the Properties that are 
+                    //based on the PropertyTypes that belong to the removed ContentType.
+                    foreach (var contentDto in contentDtos)
+                    {
+                        foreach (var propertyType in propertyTypes)
+                        {
+                            var nodeId = contentDto.NodeId;
+                            var propertyTypeId = propertyType.Id;
+                            var propertySql = new Sql().Select("*")
+                                .From<PropertyDataDto>()
+                                .InnerJoin<PropertyTypeDto>()
+                                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                                .Where<PropertyDataDto>(x => x.NodeId == nodeId)
+                                .Where<PropertyTypeDto>(x => x.Id == propertyTypeId);
+
+                            //Finally delete the properties that match our criteria for removing a ContentType from the composition
+                            Database.Delete<PropertyDataDto>(propertySql);
+                        }
+                    }
+                }
+            }
 
             //Delete the allowed content type entries before adding the updated collection
             Database.Delete<ContentTypeAllowedContentTypeDto>("WHERE Id = @Id", new { Id = entity.Id });
