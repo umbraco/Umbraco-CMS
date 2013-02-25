@@ -204,22 +204,22 @@ namespace Umbraco.Core
 
         public static string EnsureStartsWith(this string input, char value)
         {
-            return input.StartsWith(value.ToString()) ? input : value + input;
+			return input.StartsWith(value.ToString(CultureInfo.InvariantCulture)) ? input : value + input;
         }
 
         public static string EnsureEndsWith(this string input, char value)
         {
-            return input.EndsWith(value.ToString()) ? input : input + value;
+			return input.EndsWith(value.ToString(CultureInfo.InvariantCulture)) ? input : input + value;
         }
 
         public static bool IsLowerCase(this char ch)
         {
-            return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToLower();
+            return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToLowerInvariant();
         }
 
         public static bool IsUpperCase(this char ch)
         {
-            return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToUpper();
+			return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToUpperInvariant();
         }
 
         /// <summary>Is null or white space.</summary>
@@ -341,7 +341,7 @@ namespace Umbraco.Core
                         Enumerable.Range(97, 26));
 
                 var sb = new StringBuilder();
-                foreach (var c in value.Where(c => charReplacements.Values.Contains(c.ToString()) || validCodeRanges.Contains(c)))
+                foreach (var c in value.Where(c => charReplacements.Values.Contains(c.ToString(CultureInfo.InvariantCulture)) || validCodeRanges.Contains(c)))
                 {
                     sb.Append(c);
                 }
@@ -413,7 +413,7 @@ namespace Umbraco.Core
             {
                 if (splittedPhraseChars.Length > 0)
                 {
-                    splittedPhraseChars[0] = ((new String(splittedPhraseChars[0], 1)).ToUpper().ToCharArray())[0];
+                    splittedPhraseChars[0] = ((new String(splittedPhraseChars[0], 1)).ToUpperInvariant().ToCharArray())[0];
                 }
                 sb.Append(new String(splittedPhraseChars));
             }
@@ -428,15 +428,15 @@ namespace Umbraco.Core
                     var match = pattern.Match(result);
                     if (match.Success)
                     {
-                        result = match.Groups[1].Value.ToLower() + match.Groups[2].Value;
+                        result = match.Groups[1].Value.ToLowerInvariant() + match.Groups[2].Value;
 
-                        return result.Substring(0, 1).ToLower() + result.Substring(1);
+                        return result.Substring(0, 1).ToLowerInvariant() + result.Substring(1);
                     }
 
                     return result;
                 }
 
-                return result.ToLower();
+                return result.ToLowerInvariant();
             }
 
             return result;
@@ -837,17 +837,17 @@ namespace Umbraco.Core
             for (int i = 0; i < aliasLength; i++)
             {
                 string currentChar = alias.Substring(i, 1);
-                if (validAliasCharacters.Contains(currentChar.ToLower()))
+                if (validAliasCharacters.Contains(currentChar.ToLowerInvariant()))
                 {
                     // check for camel (if previous character is a space, we'll upper case the current one
-                    if (safeString.Length == 0 && invalidFirstCharacters.Contains(currentChar.ToLower()))
+                    if (safeString.Length == 0 && invalidFirstCharacters.Contains(currentChar.ToLowerInvariant()))
                     {
                         currentChar = "";
                     }
                     else
                     {
                         if (i < aliasLength - 1 && i > 0 && alias.Substring(i - 1, 1) == " ")
-                            currentChar = currentChar.ToUpper();
+                            currentChar = currentChar.ToUpperInvariant();
 
                         safeString.Append(currentChar);
                     }
