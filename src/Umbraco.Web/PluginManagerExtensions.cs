@@ -20,6 +20,11 @@ namespace Umbraco.Web
 			return resolver.ResolveTypes<SurfaceController>();
 		}
 
+        internal static IEnumerable<Type> ResolveUmbracoApiControllers(this PluginManager resolver)
+        {
+            return resolver.ResolveTypes<UmbracoApiController>();
+        }
+
 		/// <summary>
 		/// Returns all available ITrees in application
 		/// </summary>

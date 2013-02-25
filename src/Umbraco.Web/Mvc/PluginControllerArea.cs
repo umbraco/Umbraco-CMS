@@ -14,6 +14,7 @@ namespace Umbraco.Web.Mvc
 	internal class PluginControllerArea : AreaRegistration
 	{
 		private readonly IEnumerable<PluginControllerMetadata> _surfaceControllers;
+        private readonly IEnumerable<PluginControllerMetadata> _apiControllers;
 		private readonly string _areaName;
 
 		/// <summary>
@@ -23,7 +24,6 @@ namespace Umbraco.Web.Mvc
 		/// <param name="pluginControllers"></param>		
 		public PluginControllerArea(IEnumerable<PluginControllerMetadata> pluginControllers)
 		{
-			//TODO: When we have other future plugin controllers we need to combine them all into one list here to do our validation.
 			var controllers = pluginControllers.ToArray();
 
 			if (controllers.Any(x => x.AreaName.IsNullOrWhiteSpace()))
@@ -39,13 +39,15 @@ namespace Umbraco.Web.Mvc
 				}
 			}
 
-			//get the surface controllers
+			//get the controllers
 			_surfaceControllers = controllers.Where(x => TypeHelper.IsTypeAssignableFrom<SurfaceController>(x.ControllerType));
+            _apiControllers = controllers.Where(x => TypeHelper.IsTypeAssignableFrom<UmbracoApiController>(x.ControllerType));
 		}
 
 		public override void RegisterArea(AreaRegistrationContext context)
 		{
 			MapRouteSurfaceControllers(context.Routes, _surfaceControllers);
+		    MapRouteApiControllers(context.Routes, _apiControllers);
 		}
 
 		public override string AreaName
@@ -72,5 +74,18 @@ namespace Umbraco.Web.Mvc
                 route.RouteHandler = new SurfaceRouteHandler();
 			}
 		}
+
+        /// <summary>
+        /// Registers all api controller routes
+        /// </summary>
+        /// <param name="routes"></param>
+        /// <param name="apiControllers"></param>
+        private void MapRouteApiControllers(RouteCollection routes, IEnumerable<PluginControllerMetadata> apiControllers)
+        {
+            foreach (var s in apiControllers)
+            {
+               this.RouteControllerPlugin(s.ControllerName, s.ControllerType, routes, "Api", "Index", UrlParameter.Optional, "api");
+            }
+        }
 	}
 }

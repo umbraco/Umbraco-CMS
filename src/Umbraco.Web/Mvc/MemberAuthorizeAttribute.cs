@@ -1,10 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
-using Umbraco.Core;
 using umbraco.cms.businesslogic.member;
+using AuthorizeAttribute = System.Web.Mvc.AuthorizeAttribute;
 
 namespace Umbraco.Web.Mvc
 {

@@ -3,7 +3,7 @@ using System;
 namespace Umbraco.Web.Mvc
 {
 	/// <summary>
-	/// Represents some metadata about the surface controller
+	/// Represents some metadata about the controller
 	/// </summary>
 	internal class PluginControllerMetadata
 	{

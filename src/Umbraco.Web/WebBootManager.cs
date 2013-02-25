@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
@@ -140,27 +141,34 @@ namespace Umbraco.Web
                 );
             webServiceRoutes.DataTokens.Add("area", umbracoPath);
 
-            //we need to find the surface controllers and route them
-            var surfaceControllers = SurfaceControllerResolver.Current.RegisteredSurfaceControllers.ToArray();
+            RoutePluginControllers();
+        }
+        
+        private void RoutePluginControllers()
+        {
+            var umbracoPath = GlobalSettings.UmbracoMvcArea;
 
-            //local surface controllers do not contain the attribute 			
-            var localSurfaceControlleres = surfaceControllers.Where(x => PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
-            foreach (var s in localSurfaceControlleres)
+            //we need to find the plugin controllers and route them
+            var pluginControllers =
+                SurfaceControllerResolver.Current.RegisteredSurfaceControllers.Concat(
+                    UmbracoApiControllerResolver.Current.RegisteredUmbracoApiControllers).ToArray();
+
+            //local controllers do not contain the attribute 			
+            var localControllers = pluginControllers.Where(x => PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
+            foreach (var s in localControllers)
             {
-                var meta = PluginController.GetMetadata(s);
-                var route = RouteTable.Routes.MapRoute(
-                    string.Format("umbraco-{0}-{1}", "surface", meta.ControllerName),
-                    umbracoPath + "/Surface/" + meta.ControllerName + "/{action}/{id}",//url to match
-                    new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
-                    new[] { meta.ControllerNamespace }); //only match this namespace
-                route.DataTokens.Add("umbraco", "surface"); //ensure the umbraco token is set                
-                //make it use our custom/special SurfaceMvcHandler
-                route.RouteHandler = new SurfaceRouteHandler();
+                if (TypeHelper.IsTypeAssignableFrom<SurfaceController>(s))
+                {
+                    RouteLocalSurfaceController(s, umbracoPath);
+                }
+                else if (TypeHelper.IsTypeAssignableFrom<UmbracoApiController>(s))
+                {
+                    RouteLocalApiController(s, umbracoPath);
+                }
             }
 
             //need to get the plugin controllers that are unique to each area (group by)
-            //TODO: One day when we have more plugin controllers, we will need to do a group by on ALL of them to pass into the ctor of PluginControllerArea
-            var pluginSurfaceControlleres = surfaceControllers.Where(x => !PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
+            var pluginSurfaceControlleres = pluginControllers.Where(x => !PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
             var groupedAreas = pluginSurfaceControlleres.GroupBy(controller => PluginController.GetMetadata(controller).AreaName);
             //loop through each area defined amongst the controllers
             foreach (var g in groupedAreas)
@@ -172,7 +180,37 @@ namespace Umbraco.Web
             }
         }
 
+        private void RouteLocalApiController(Type controller, string umbracoPath)
+        {
+            var meta = PluginController.GetMetadata(controller);
+            var route = RouteTable.Routes.MapHttpRoute(
+                string.Format("umbraco-{0}-{1}", "api", meta.ControllerName),
+                umbracoPath + "/Api/" + meta.ControllerName + "/{id}",//url to match
+                new { controller = meta.ControllerName, id = UrlParameter.Optional },
+                new { controller = @"(\w+)Api" }); //Must be suffixed with "Api" (i.e. MyApiController)
+            //web api routes don't set the data tokens object
+            if (route.DataTokens == null)
+            {                
+                route.DataTokens = new RouteValueDictionary();
+            }
+            route.DataTokens.Add("Namespaces", meta.ControllerNamespace); //look in this namespace to create the controller
+            route.DataTokens.Add("umbraco", "api"); //ensure the umbraco token is set
+        }
 
+        private void RouteLocalSurfaceController(Type controller, string umbracoPath)
+        {
+            var meta = PluginController.GetMetadata(controller);
+            var route = RouteTable.Routes.MapRoute(
+                string.Format("umbraco-{0}-{1}", "surface", meta.ControllerName),
+                umbracoPath + "/Surface/" + meta.ControllerName + "/{action}/{id}",//url to match
+                new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
+                //NOTE: There SHOULD be a constraint here to only match controllers with a "SurfaceController" suffix but we forgot to include it in the 
+                // 4.10 release so we can't include it now :(
+                new[] { meta.ControllerNamespace }); //look in this namespace to create the controller
+            route.DataTokens.Add("umbraco", "surface"); //ensure the umbraco token is set                
+            //make it use our custom/special SurfaceMvcHandler
+            route.RouteHandler = new SurfaceRouteHandler();
+        }
 
         /// <summary>
         /// Initializes all web based and core resolves 
@@ -209,6 +247,9 @@ namespace Umbraco.Web
             
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
                 PluginManager.Current.ResolveSurfaceControllers());
+
+            UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
+                PluginManager.Current.ResolveUmbracoApiControllers());
 
             //the base creates the PropertyEditorValueConvertersResolver but we want to modify it in the web app and replace
             //the TinyMcePropertyEditorValueConverter with the RteMacroRenderingPropertyEditorValueConverter
