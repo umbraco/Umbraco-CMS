@@ -312,15 +312,21 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public override bool? SupportsCaseInsensitiveQueries(Database db)
         {
-            bool? supportsCaseInsensitiveQueries;
+            bool? supportsCaseInsensitiveQueries = null;
 
             try
             {
                 db.OpenSharedConnection();
-                var lowerCaseFileSystem = db.Fetch<int>("SELECT @@Global.lower_case_file_system");
-                var lowerCaseTableNames = db.Fetch<int>("SELECT @@Global.lower_case_table_names");
-
-                supportsCaseInsensitiveQueries = lowerCaseFileSystem.First() == 1 && lowerCaseTableNames.First() == 0;
+                // Need 4 @ signs as it is regarded as a parameter, @@ escapes it once, @@@@ escapes it twice
+                var lowerCaseFileSystem = db.Fetch<int>("SELECT @@@@Global.lower_case_file_system");
+                var lowerCaseTableNames = db.Fetch<int>("SELECT @@@@Global.lower_case_table_names");
+                
+                if(lowerCaseFileSystem.Any() && lowerCaseTableNames.Any())
+                    supportsCaseInsensitiveQueries = lowerCaseFileSystem.First() == 1 && lowerCaseTableNames.First() == 1;
+            }
+            catch(Exception ex)
+            {
+                Logging.LogHelper.Error<MySqlSyntaxProvider>("Error querying for lower_case support", ex);
             }
             finally
             {
