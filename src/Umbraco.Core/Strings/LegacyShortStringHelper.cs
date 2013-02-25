@@ -277,7 +277,7 @@ function isValidAlias(alias) {{
             {
                 if (splittedPhraseChars.Length > 0)
                 {
-                    splittedPhraseChars[0] = ((new String(splittedPhraseChars[0], 1)).ToUpper().ToCharArray())[0];
+                    splittedPhraseChars[0] = ((new String(splittedPhraseChars[0], 1)).ToUpperInvariant().ToCharArray())[0];
                 }
                 sb.Append(new String(splittedPhraseChars));
             }
@@ -292,15 +292,15 @@ function isValidAlias(alias) {{
                     var match = pattern.Match(result);
                     if (match.Success)
                     {
-                        result = match.Groups[1].Value.ToLower() + match.Groups[2].Value;
+                        result = match.Groups[1].Value.ToLowerInvariant() + match.Groups[2].Value;
 
-                        return result.Substring(0, 1).ToLower() + result.Substring(1);
+                        return result.Substring(0, 1).ToLowerInvariant() + result.Substring(1);
                     }
 
                     return result;
                 }
 
-                return result.ToLower();
+                return result.ToLowerInvariant();
             }
 
             return result;
@@ -361,7 +361,7 @@ function isValidAlias(alias) {{
                         Enumerable.Range(97, 26));
 
                 var sb = new StringBuilder();
-                foreach (var c in value.Where(c => charReplacements.Values.Contains(c.ToString()) || validCodeRanges.Contains(c)))
+                foreach (var c in value.Where(c => charReplacements.Values.Contains(c.ToString(CultureInfo.InvariantCulture)) || validCodeRanges.Contains(c)))
                 {
                     sb.Append(c);
                 }

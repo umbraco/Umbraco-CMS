@@ -213,22 +213,22 @@ namespace Umbraco.Core
 
         public static string EnsureStartsWith(this string input, char value)
         {
-            return input.StartsWith(value.ToString()) ? input : value + input;
+            return input.StartsWith(value.ToString(CultureInfo.InvariantCulture)) ? input : value + input;
         }
 
         public static string EnsureEndsWith(this string input, char value)
         {
-            return input.EndsWith(value.ToString()) ? input : input + value;
+            return input.EndsWith(value.ToString(CultureInfo.InvariantCulture)) ? input : input + value;
         }
 
         public static bool IsLowerCase(this char ch)
         {
-            return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToLower();
+            return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToLowerInvariant();
         }
 
         public static bool IsUpperCase(this char ch)
         {
-            return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToUpper();
+            return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToUpperInvariant();
         }
 
         /// <summary>Is null or white space.</summary>
