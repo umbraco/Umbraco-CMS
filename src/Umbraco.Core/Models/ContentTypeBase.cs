@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models

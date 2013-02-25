@@ -132,8 +132,8 @@ namespace umbraco.controls
 
                 var tabId = tab.Id;
                 var propertyGroups = _contentType.ContentTypeItem.CompositionPropertyGroups.Where(x => x.Id == tabId || x.ParentId == tabId);
-                var propertyTypeAliaes = propertyGroups.SelectMany(x => x.PropertyTypes.Select(y => new System.Tuple<int, string>(y.Id, y.Alias)));
-                foreach (var items in propertyTypeAliaes)
+                var propertyTypeAliases = propertyGroups.SelectMany(x => x.PropertyTypes.OrderBy(y => y.SortOrder).Select(y => new System.Tuple<int, string, int>(y.Id, y.Alias, y.SortOrder)));
+                foreach (var items in propertyTypeAliases)
                 {
                     var property = _content.getProperty(items.Item2);
                     if (property != null)
