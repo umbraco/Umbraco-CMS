@@ -45,7 +45,7 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                var groups = PropertyGroups.Union(ContentTypeComposition.SelectMany(x => x.CompositionPropertyGroups));
+                var groups = ContentTypeComposition.SelectMany(x => x.CompositionPropertyGroups).Union(PropertyGroups);
                 return groups;
             }
         }
@@ -58,8 +58,7 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                var propertyTypes =
-                    PropertyTypes.Union(ContentTypeComposition.SelectMany(x => x.CompositionPropertyTypes));
+                var propertyTypes = ContentTypeComposition.SelectMany(x => x.CompositionPropertyTypes).Union(PropertyTypes);
                 return propertyTypes;
             }
         }

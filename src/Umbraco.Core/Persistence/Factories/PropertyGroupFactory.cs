@@ -41,8 +41,8 @@ namespace Umbraco.Core.Persistence.Factories
                 group.PropertyTypes = new PropertyTypeCollection();
 
                 //Because we are likely to have a group with no PropertyTypes we need to ensure that these are excluded
-                //var typeDtos = groupDto.PropertyTypeDtos.Where(x => x.Id > 0);
-                foreach (var typeDto in groupDto.PropertyTypeDtos)
+                var typeDtos = groupDto.PropertyTypeDtos.Where(x => x.Id > 0);
+                foreach (var typeDto in typeDtos)
                 {
                     group.PropertyTypes.Add(new PropertyType(typeDto.DataTypeDto.ControlId,
                                                              typeDto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true))

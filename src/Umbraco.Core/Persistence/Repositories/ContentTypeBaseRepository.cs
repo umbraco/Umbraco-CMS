@@ -190,12 +190,13 @@ namespace Umbraco.Core.Persistence.Repositories
                     Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND Alias = @Alias", new { Id = entity.Id, Alias = alias });
                 }
                 //Delete Tabs/Groups by excepting entries from db with entries from collections
-                var dbPropertyGroups = Database.Fetch<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id", new { Id = entity.Id }).Select(x => x.Text);
-                var entityPropertyGroups = entity.PropertyGroups.Select(x => x.Name);
+                var dbPropertyGroups = Database.Fetch<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id", new { Id = entity.Id }).Select(x => new Tuple<int, string>(x.Id, x.Text));
+                var entityPropertyGroups = entity.PropertyGroups.Select(x => new Tuple<int, string>(x.Id, x.Name));
                 var tabs = dbPropertyGroups.Except(entityPropertyGroups);
-                foreach (var tabName in tabs)
+                foreach (var tab in tabs)
                 {
-                    Database.Delete<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id AND text = @Name", new { Id = entity.Id, Name = tabName });
+                    Database.Update<PropertyTypeGroupDto>("SET parentGroupId = NULL WHERE parentGroupId = @TabId", new {TabId = tab.Item1});
+                    Database.Delete<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id AND text = @Name", new { Id = entity.Id, Name = tab.Item2 });
                 }
 
                 //Run through all groups to insert or update entries
@@ -248,7 +249,7 @@ namespace Umbraco.Core.Persistence.Repositories
                .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
                .LeftJoin<DataTypeDto>()
                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
-               .Where<PropertyTypeDto>(x => x.ContentTypeId == id)
+               .Where<PropertyTypeGroupDto>(x => x.ContentTypeNodeId == id)
                .OrderBy<PropertyTypeGroupDto>(x => x.Id);
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);

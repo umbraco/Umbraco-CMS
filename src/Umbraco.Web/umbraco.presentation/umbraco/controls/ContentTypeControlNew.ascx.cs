@@ -941,8 +941,8 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                     var propertyGroup = new PropertyGroup { Name = txtNewTab.Text };
                     if (_contentType.ContentTypeItem.PropertyGroups.Any())
                     {
-                        var first = _contentType.ContentTypeItem.PropertyGroups.OrderBy(x => x.SortOrder).First();
-                        propertyGroup.SortOrder = first.SortOrder + 1;
+                        var last = _contentType.ContentTypeItem.PropertyGroups.OrderBy(x => x.SortOrder).Last();
+                        propertyGroup.SortOrder = last.SortOrder + 1;
                     }
                     _contentType.ContentTypeItem.PropertyGroups.Add(propertyGroup);
                     _contentType.Save();
