@@ -385,16 +385,54 @@ namespace Umbraco.Core
             {
                 LogHelper.Info<DatabaseContext>("Database configuration status: Started");
 
+                var message = string.Empty;
+
                 var database = new UmbracoDatabase(_connectionString, ProviderName);
+                var supportsCaseInsensitiveQueries = SyntaxConfig.SqlSyntaxProvider.SupportsCaseInsensitiveQueries(database);
+                if (supportsCaseInsensitiveQueries  == false)
+                {
+                    message = "<p>&nbsp;</p><p>The database you're trying to use does not support case insensitive queries. <br />We currently do not support these types of databases.</p>" +
+                              "<p>You can fix this by changing the following two settings in your my.ini file in your MySQL installation directory:</p>" +
+                              "<pre>lower_case_table_names=1\nlower_case_file_system=1</pre><br />" +
+                              "<p>Note: Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
+                              "<p>For more technical information on case sensitivity in MySQL, have a look at " +
+                              "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
+
+                    return new Result { Message = message, Success = false, Percentage = "15" };
+                }
+                else if (supportsCaseInsensitiveQueries == null)
+                {
+                    message = "<p>&nbsp;</p><p>Warning! Could not check if your database type supports case insensitive queries. <br />We currently do not support these databases that do not support case insensitive queries.</p>" +
+                              "<p>You can check this by looking for the following two settings in your my.ini file in your MySQL installation directory:</p>" +
+                              "<pre>lower_case_table_names=1\nlower_case_file_system=1</pre><br />" +
+                              "<p>Note: Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
+                              "<p>For more technical information on case sensitivity in MySQL, have a look at " +
+                              "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
+                }
+                else
+                {
+                    if (SyntaxConfig.SqlSyntaxProvider == MySqlSyntaxProvider.Instance)
+                    {
+                        message = "<p>&nbsp;</p><p>Congratulations, the database step ran successfully!</p>" +
+                                  "<p>Note: You're using MySQL and the database instance you're connecting to seems to support case insensitive queries.</p>" +
+                                  "<p>However, your hosting provider may not support this option. Umbraco does not currently support MySQL installs that do not support case insensitive queries</p>" +
+                                  "<p>Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
+                                  "<p>They can check this by looking for the following two settings in the my.ini file in their MySQL installation directory:</p>" +
+                                  "<pre>lower_case_table_names=1\nlower_case_file_system=1</pre><br />" +
+                                  "<p>For more technical information on case sensitivity in MySQL, have a look at " +
+                                  "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
+                    }
+                }
+
                 var schemaResult = ValidateDatabaseSchema();
                 var installedVersion = schemaResult.DetermineInstalledVersion();
-                string message;
+                
 
                 //If Configuration Status is empty and the determined version is "empty" its a new install - otherwise upgrade the existing
                 if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) && installedVersion.Equals(new Version(0, 0, 0)))
                 {
                     database.CreateDatabaseSchema();
-                    message = "Installation completed!";
+                    message = message + "<p>Installation completed!</p>";
                 }
                 else
                 {
@@ -404,7 +442,7 @@ namespace Umbraco.Core
                     var targetVersion = UmbracoVersion.Current;
                     var runner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
                     var upgraded = runner.Execute(database, true);
-                    message = "Upgrade completed!";
+                    message = message + "<p>Upgrade completed!</p>";
                 }
 
                 LogHelper.Info<DatabaseContext>("Database configuration status: " + message);
@@ -424,7 +462,7 @@ namespace Umbraco.Core
                            {
                                Message =
                                    "The database configuration failed with the following message: " + ex.Message +
-                                   "\n Please check log file for addtional information (can be found in '/App_Data/Logs/UmbracoTraceLog.txt')",
+                                   "\n Please check log file for additional information (can be found in '/App_Data/Logs/UmbracoTraceLog.txt')",
                                Success = false,
                                Percentage = "90"
                            };
