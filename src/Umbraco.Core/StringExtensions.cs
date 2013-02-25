@@ -837,17 +837,17 @@ namespace Umbraco.Core
             for (int i = 0; i < aliasLength; i++)
             {
                 string currentChar = alias.Substring(i, 1);
-                if (validAliasCharacters.Contains(currentChar.ToLower()))
+                if (validAliasCharacters.Contains(currentChar.ToLowerInvariant()))
                 {
                     // check for camel (if previous character is a space, we'll upper case the current one
-                    if (safeString.Length == 0 && invalidFirstCharacters.Contains(currentChar.ToLower()))
+                    if (safeString.Length == 0 && invalidFirstCharacters.Contains(currentChar.ToLowerInvariant()))
                     {
                         currentChar = "";
                     }
                     else
                     {
                         if (i < aliasLength - 1 && i > 0 && alias.Substring(i - 1, 1) == " ")
-                            currentChar = currentChar.ToUpper();
+                            currentChar = currentChar.ToUpperInvariant();
 
                         safeString.Append(currentChar);
                     }
