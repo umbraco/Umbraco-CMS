@@ -35,6 +35,7 @@ namespace umbraco.controls
         private ContentType _contentType;
         private static string UmbracoPath = SystemDirectories.Umbraco;
         public bool HideStructure { get; set; }
+        public Func<DocumentType, DocumentType> DocumentTypeCallback { get; set; }
 
         // "Tab" tab
         protected uicontrols.Pane Pane8;
@@ -52,9 +53,8 @@ namespace umbraco.controls
         private DataTable _dataTypeTable;
         private ArrayList _genericProperties = new ArrayList();
         private ArrayList _sortLists = new ArrayList();
-        //protected DataGrid dgGeneralTabProperties;
 
-        override protected void OnInit(EventArgs e)
+        protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
 
@@ -144,6 +144,15 @@ namespace umbraco.controls
 
                 SavePropertyType(ref ea, _contentType.ContentTypeItem);
                 UpdatePropertyTypes(_contentType.ContentTypeItem);
+
+                if (DocumentTypeCallback != null)
+                {
+                    var documentType = _contentType as DocumentType;
+                    if (documentType != null)
+                    {
+                        var result = DocumentTypeCallback(documentType);
+                    }
+                }
 
                 _contentType.Save();
             }
