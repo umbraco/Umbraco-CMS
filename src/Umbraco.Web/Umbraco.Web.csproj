@@ -319,11 +319,9 @@
     <Compile Include="DefaultPublishedMediaStore.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
-    <Compile Include="Mvc\SurfaceAuthorizeAttribute.cs">
-      <SubType>Code</SubType>
+    <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
     <Compile Include="Mvc\ControllerFactoryExtensions.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
-    </Compile>
     <Compile Include="Mvc\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="Mvc\UmbracoAuthorizedController.cs" />
     <Compile Include="Mvc\UmbracoController.cs" />

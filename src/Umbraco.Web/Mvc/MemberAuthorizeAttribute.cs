@@ -1,16 +1,18 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
+using Umbraco.Core;
 using umbraco.cms.businesslogic.member;
 
 namespace Umbraco.Web.Mvc
 {
     /// <summary>
-    /// "Base-like" attribute for attributing surface controller actions to restrict them
+    /// Attribute for attributing controller actions to restrict them
     /// to just authenticated members, and optionally of a particular type and/or group
     /// </summary>
-    public class SurfaceAuthorizeAttribute : ActionFilterAttribute
+    public class MemberAuthorizeAttribute : AuthorizeAttribute
     {
         /// <summary>
         /// Flag for whether to allow all site visitors or just authenticated members
@@ -32,10 +34,10 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         public string AllowMembers { get; set; }
 
-        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
             // Allow by default
-            bool allowAction = true;
+            var allowAction = true;
 
             // If not set to allow all, need to check current loggined in member
             if (!AllowAll)
@@ -60,7 +62,7 @@ namespace Umbraco.Web.Mvc
                     if (allowAction && !string.IsNullOrEmpty(AllowGroup))
                     {
                         // Allow only if member's type is in list
-                        var groups = Roles.GetRolesForUser(member.LoginName);
+                        var groups = System.Web.Security.Roles.GetRolesForUser(member.LoginName);
                         allowAction = groups.Select(s => s.ToLower()).Intersect(AllowGroup.ToLower().Split(',')).Any();
                     }
 
@@ -72,12 +74,17 @@ namespace Umbraco.Web.Mvc
                     }
                 }
             }
-
-            // If not allowed, throw 403 exception
-            if (!allowAction)
-            {
-                throw new HttpException(403, "Resource restricted: either member is not logged on or is not of a permitted type or group.");
-            }
+            return allowAction;
         }
+
+        /// <summary>
+        /// Override method to throw exception instead of returning a 401 result
+        /// </summary>
+        /// <param name="filterContext"></param>
+        protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
+        {
+            throw new HttpException(403, "Resource restricted: either member is not logged on or is not of a permitted type or group.");
+        }
+
     }
 }
