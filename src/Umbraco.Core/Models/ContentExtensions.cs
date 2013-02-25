@@ -303,7 +303,7 @@ namespace Umbraco.Core.Models
         private static void SetPropertyValue(IContentBase content, XmlNode uploadFieldConfigNode, string propertyAlias, string propertyValue)
         {
             XmlNode propertyNode = uploadFieldConfigNode.SelectSingleNode(propertyAlias);
-            if (propertyNode != null && string.IsNullOrEmpty(propertyNode.FirstChild.Value) == false)
+            if (propertyNode != null && string.IsNullOrEmpty(propertyNode.FirstChild.Value) == false && content.HasProperty(propertyNode.FirstChild.Value))
             {
                 content.SetValue(propertyNode.FirstChild.Value, propertyValue);
             }

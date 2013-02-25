@@ -48,6 +48,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string FormatTableRename(string oldName, string newName);
         bool SupportsClustered();
         bool SupportsIdentityInsert();
+        bool? SupportsCaseInsensitiveQueries(Database db);
         IEnumerable<string> GetTablesInSchema(Database db);
         IEnumerable<ColumnInfo> GetColumnsInSchema(Database db);
         IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db);

@@ -136,6 +136,7 @@ namespace umbraco.dialogs
             newDocumentType.allowedTemplates = documentType.allowedTemplates;
             newDocumentType.DefaultTemplate = documentType.DefaultTemplate;
             newDocumentType.AllowedChildContentTypeIDs = documentType.AllowedChildContentTypeIDs;
+            newDocumentType.AllowAtRoot = documentType.AllowAtRoot;
 
             newDocumentType.MasterContentType = int.Parse(masterType.SelectedValue);
 

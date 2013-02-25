@@ -37,6 +37,7 @@ namespace umbraco.controls
         private ContentType _contentType;
         private static string UmbracoPath = SystemDirectories.Umbraco;
         public bool HideStructure { get; set; }
+        public Func<DocumentType, DocumentType> DocumentTypeCallback { get; set; }
 
         // "Tab" tab
         protected uicontrols.Pane Pane8;
@@ -54,9 +55,8 @@ namespace umbraco.controls
         private DataTable _dataTypeTable;
         private ArrayList _genericProperties = new ArrayList();
         private ArrayList _sortLists = new ArrayList();
-        //protected DataGrid dgGeneralTabProperties;
 
-        override protected void OnInit(EventArgs e)
+        protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
 
@@ -150,6 +150,15 @@ namespace umbraco.controls
 
                 SavePropertyType(ref ea, _contentType.ContentTypeItem);
                 UpdatePropertyTypes(_contentType.ContentTypeItem);
+
+                if (DocumentTypeCallback != null)
+                {
+                    var documentType = _contentType as DocumentType;
+                    if (documentType != null)
+                    {
+                        var result = DocumentTypeCallback(documentType);
+                    }
+                }
 
                 _contentType.Save();
             }
@@ -947,8 +956,8 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                     var propertyGroup = new PropertyGroup { Name = txtNewTab.Text };
                     if (_contentType.ContentTypeItem.PropertyGroups.Any())
                     {
-                        var first = _contentType.ContentTypeItem.PropertyGroups.OrderBy(x => x.SortOrder).First();
-                        propertyGroup.SortOrder = first.SortOrder + 1;
+                        var last = _contentType.ContentTypeItem.PropertyGroups.OrderBy(x => x.SortOrder).Last();
+                        propertyGroup.SortOrder = last.SortOrder + 1;
                     }
                     _contentType.ContentTypeItem.PropertyGroups.Add(propertyGroup);
                     _contentType.Save();
