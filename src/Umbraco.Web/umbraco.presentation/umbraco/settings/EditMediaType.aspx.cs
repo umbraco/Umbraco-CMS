@@ -1,13 +1,4 @@
 using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
 
 namespace umbraco.cms.presentation.settings
@@ -17,13 +8,12 @@ namespace umbraco.cms.presentation.settings
     /// </summary>
     public partial class EditMediaType : BasePages.UmbracoEnsuredPage
     {
-
         public EditMediaType()
         {
             CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
-
         }
-        protected void Page_Load(object sender, System.EventArgs e)
+
+        protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
@@ -32,27 +22,16 @@ namespace umbraco.cms.presentation.settings
                     .SyncTree("-1,init," + helper.Request("id"), false);
             }
         }
-        protected void tmp_OnSave(object sender, System.EventArgs e)
-        {
-
-        }
 
         protected override bool OnBubbleEvent(object source, EventArgs e)
         {
-
             if (e is controls.SaveClickEventArgs)
             {
-                controls.SaveClickEventArgs sce = (controls.SaveClickEventArgs)e;
+                var sce = (controls.SaveClickEventArgs)e;
 
                 if (sce.Message == "Saved")
                 {
-                    int mtid = 0;
-
                     ClientTools.ShowSpeechBubble(speechBubbleIcon.save, "Mediatype saved", "Mediatype was successfully saved");
-
-                    if (int.TryParse(Request.QueryString["id"], out mtid))
-                        new cms.businesslogic.media.MediaType(mtid).Save();
-
                 }
                 else if (sce.Message.Contains("Tab"))
                 {
@@ -65,11 +44,8 @@ namespace umbraco.cms.presentation.settings
 
                 return true;
             }
-            else
-            {
-                return false;
-            }
 
+            return false;
         }
 
         #region Web Form Designer generated code
