@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Web;
 using System.Web.Http;
+using Umbraco.Web.Security;
 using umbraco.cms.businesslogic.member;
 
 namespace Umbraco.Web.WebApi
@@ -36,45 +38,20 @@ namespace Umbraco.Web.WebApi
 
         protected override bool IsAuthorized(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
-            // Allow by default
-            var allowAction = true;
-
-            // If not set to allow all, need to check current loggined in member
-            if (!AllowAll)
+            var members = new List<int>();
+            foreach (var s in AllowMembers.Split(','))
             {
-                // Get member details
-                var member = Member.GetCurrentMember();
-                if (member == null)
+                int id;
+                if (int.TryParse(s, out id))
                 {
-                    // If not logged on, not allowed
-                    allowAction = false;
-                }
-                else
-                {
-                    // If types defined, check member is of one of those types
-                    if (!string.IsNullOrEmpty(AllowType))
-                    {
-                        // Allow only if member's type is in list
-                        allowAction = AllowType.ToLower().Split(',').Contains(member.ContentType.Alias.ToLower());
-                    }
-
-                    // If groups defined, check member is of one of those groups
-                    if (allowAction && !string.IsNullOrEmpty(AllowGroup))
-                    {
-                        // Allow only if member's type is in list
-                        var groups = System.Web.Security.Roles.GetRolesForUser(member.LoginName);
-                        allowAction = groups.Select(s => s.ToLower()).Intersect(AllowGroup.ToLower().Split(',')).Any();
-                    }
-
-                    // If specific members defined, check member is of one of those
-                    if (allowAction && !string.IsNullOrEmpty(AllowMembers))
-                    {
-                        // Allow only if member's type is in list
-                        allowAction = AllowMembers.ToLower().Split(',').Contains(member.Id.ToString());
-                    }
+                    members.Add(id);
                 }
             }
-            return allowAction;
+
+            return WebSecurity.IsMemberAuthorized(AllowAll,
+                                                  AllowType.Split(','),
+                                                  AllowGroup.Split(','),
+                                                  members);
         }
 
     }

@@ -9,26 +9,28 @@ namespace Umbraco.Web.Mvc
 {
 	internal static class AreaRegistrationExtensions
 	{
-		/// <summary>
-		/// Creates a custom individual route for the specified controller plugin. Individual routes
-		/// are required by controller plugins to map to a unique URL based on ID.
-		/// </summary>
-		/// <param name="controllerName"></param>
-		/// <param name="controllerType"></param>
-		/// <param name="routes">An existing route collection</param>
-		/// <param name="controllerSuffixName">
-		/// The suffix name that the controller name must end in before the "Controller" string for example:
-		/// ContentTreeController has a controllerSuffixName of "Tree", this is used for route constraints.
-		/// </param>
-		/// <param name="defaultAction"></param>
-		/// <param name="defaultId"></param>
-		/// <param name="area"></param>
-		/// <param name="umbracoTokenValue">The DataToken value to set for the 'umbraco' key, this defaults to 'backoffice' </param>
-		/// <remarks>
-		/// </remarks>
-		internal static Route RouteControllerPlugin(this AreaRegistration area, string controllerName, Type controllerType, RouteCollection routes,
+	    /// <summary>
+	    /// Creates a custom individual route for the specified controller plugin. Individual routes
+	    /// are required by controller plugins to map to a unique URL based on ID.
+	    /// </summary>
+	    /// <param name="controllerName"></param>
+	    /// <param name="controllerType"></param>
+	    /// <param name="routes">An existing route collection</param>
+	    /// <param name="controllerSuffixName">
+	    /// The suffix name that the controller name must end in before the "Controller" string for example:
+	    /// ContentTreeController has a controllerSuffixName of "Tree", this is used for route constraints.
+	    /// </param>
+	    /// <param name="defaultAction"></param>
+	    /// <param name="defaultId"></param>
+	    /// <param name="area"></param>
+	    /// <param name="umbracoTokenValue">The DataToken value to set for the 'umbraco' key, this defaults to 'backoffice' </param>
+        /// <param name="routeTokens">By default this value is just {action}/{id} but can be modified for things like web api routes</param>
+	    /// <remarks>
+	    /// </remarks>
+	    internal static Route RouteControllerPlugin(this AreaRegistration area, string controllerName, Type controllerType, RouteCollection routes,
 		                                           string controllerSuffixName, string defaultAction, object defaultId,
-		                                           string umbracoTokenValue = "backoffice")
+		                                           string umbracoTokenValue = "backoffice",
+                                                    string routeTokens = "{action}/{id}")
 		{
 			Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
 			Mandate.ParameterNotNullOrEmpty(controllerSuffixName, "controllerSuffixName");
@@ -40,7 +42,7 @@ namespace Umbraco.Web.Mvc
 			var umbracoArea = GlobalSettings.UmbracoMvcArea;
 
 			//routes are explicitly name with controller names and IDs
-			var url = umbracoArea + "/" + area.AreaName + "/" + controllerName + "/{action}/{id}"; 
+            var url = umbracoArea + "/" + area.AreaName + "/" + controllerName + "/" + routeTokens; 
 
 			//create a new route with custom name, specified url, and the namespace of the controller plugin
 			var controllerPluginRoute = routes.MapRoute(

@@ -10,6 +10,7 @@ using Umbraco.Web.UI.Pages;
 using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
+using umbraco.cms.businesslogic.member;
 
 namespace Umbraco.Web.Security
 {
@@ -19,6 +20,67 @@ namespace Umbraco.Web.Security
     /// </summary>
     public static class WebSecurity
     {
+        /// <summary>
+        /// Returns true or false if the currently logged in member is authorized based on the parameters provided
+        /// </summary>
+        /// <param name="allowAll"></param>
+        /// <param name="allowTypes"></param>
+        /// <param name="allowGroups"></param>
+        /// <param name="allowMembers"></param>
+        /// <returns></returns>
+        public static bool IsMemberAuthorized(
+            bool allowAll = false,
+            IEnumerable<string> allowTypes = null,
+            IEnumerable<string> allowGroups = null,
+            IEnumerable<int> allowMembers = null)
+        {
+            if (allowTypes == null)
+                allowTypes = Enumerable.Empty<string>();
+            if (allowGroups == null)
+                allowGroups = Enumerable.Empty<string>();
+            if (allowMembers == null)
+                allowMembers = Enumerable.Empty<int>();
+
+            // Allow by default
+            var allowAction = true;
+
+            // If not set to allow all, need to check current loggined in member
+            if (!allowAll)
+            {
+                // Get member details
+                var member = Member.GetCurrentMember();
+                if (member == null)
+                {
+                    // If not logged on, not allowed
+                    allowAction = false;
+                }
+                else
+                {
+                    // If types defined, check member is of one of those types
+                    if (allowTypes.Any())
+                    {
+                        // Allow only if member's type is in list
+                        allowAction = allowTypes.Select(x => x.ToLowerInvariant()).Contains(member.ContentType.Alias.ToLowerInvariant());
+                    }
+
+                    // If groups defined, check member is of one of those groups
+                    if (allowAction && allowGroups.Any())
+                    {
+                        // Allow only if member's type is in list
+                        var groups = System.Web.Security.Roles.GetRolesForUser(member.LoginName);
+                        allowAction = groups.Select(s => s.ToLower()).Intersect(allowGroups).Any();
+                    }
+
+                    // If specific members defined, check member is of one of those
+                    if (allowAction && allowMembers.Any())
+                    {
+                        // Allow only if member's type is in list
+                        allowAction = allowMembers.Contains(member.Id);
+                    }
+                }
+            }
+            return allowAction;
+        }
 
         /// <summary>
         /// Gets the SQL helper.
