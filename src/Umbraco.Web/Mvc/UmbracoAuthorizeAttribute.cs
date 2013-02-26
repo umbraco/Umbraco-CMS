@@ -7,11 +7,10 @@ using umbraco.BasePages;
 
 namespace Umbraco.Web.Mvc
 {
-	/// <summary>
-	/// Ensures authorization occurs for the installer if it has already completed. If install has not yet occured
-	/// then the authorization is successful
+	/// <summary>	
+	/// Ensures authorization is successful for a back office user
 	/// </summary>
-	internal class UmbracoAuthorizeAttribute : AuthorizeAttribute
+	public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute
 	{
 		private readonly ApplicationContext _applicationContext;
 
