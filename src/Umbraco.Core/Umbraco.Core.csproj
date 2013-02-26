@@ -112,10 +112,14 @@
     <Compile Include="CodeAnnotations\UmbracoWillObsoleteAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoExperimentalFeatureAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoProposedPublicAttribute.cs" />
+    <Compile Include="Configuration\CaseInsensitiveEnumConfigConverter.cs" />
     <Compile Include="Configuration\ClientDependencyConfiguration.cs" />
+    <Compile Include="Configuration\ConfigurationKeyAttribute.cs" />
+    <Compile Include="Configuration\ConfigurationKeyType.cs" />
     <Compile Include="Configuration\FileSystemProviderElement.cs" />
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
+    <Compile Include="Configuration\UmbracoConfigurationSection.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
     <Compile Include="CoreBootManager.cs" />
     <Compile Include="DatabaseContext.cs" />
