@@ -116,21 +116,65 @@ namespace Umbraco.Web
 			var pcr = new PublishedContentRequest(umbracoContext.CleanedUmbracoUrl, umbracoContext.RoutingContext);
 			umbracoContext.PublishedContentRequest = pcr;
 			pcr.Prepare();
-			if (pcr.IsRedirect)
-			{
-				httpContext.Response.Redirect(pcr.RedirectUrl, true);
-				return;
-			}
-            if (pcr.Is404)
-            {
-                httpContext.Response.StatusCode = 404;
-                httpContext.Response.TrySkipIisCustomErrors = UmbracoSettings.TrySkipIisCustomErrors;
-            }
-			if (!pcr.HasPublishedContent)
+
+            // HandleHttpResponseStatus returns a value indicating that the request should
+            // not be processed any further, eg because it has been redirect. then, exit.
+            if (HandleHttpResponseStatus(httpContext, pcr))
+		        return;
+
+            if (!pcr.HasPublishedContent)
 				httpContext.RemapHandler(new PublishedContentNotFoundHandler());
 			else
 				RewriteToUmbracoHandler(httpContext, pcr);
 		}
+
+        // returns a value indicating whether redirection took place and the request has
+        // been completed - because we don't want to Response.End() here to terminate
+        // everything properly.
+        internal static bool HandleHttpResponseStatus(HttpContextBase context, PublishedContentRequest pcr)
+        {
+            var end = false;
+            var response = context.Response;
+
+            LogHelper.Debug<UmbracoModule>("Response status: Redirect={0}, Is404={1}, StatusCode={2}",
+                () => pcr.IsRedirect ? (pcr.IsRedirectPermanent ? "permanent" : "redirect") : "none",
+                () => pcr.Is404 ? "true" : "false", () => pcr.ResponseStatusCode);
+
+            if (pcr.IsRedirect)
+            {
+                if (pcr.IsRedirectPermanent)
+                    response.Redirect(pcr.RedirectUrl, false); // do not end response
+                else
+                    response.RedirectPermanent(pcr.RedirectUrl, false); // do not end response
+                end = true;
+            }
+            else if (pcr.Is404)
+            {
+                response.StatusCode = 404;
+                response.TrySkipIisCustomErrors = UmbracoSettings.TrySkipIisCustomErrors;
+            }
+
+            if (pcr.ResponseStatusCode > 0)
+            {
+                // set status code -- even for redirects
+                response.StatusCode = pcr.ResponseStatusCode;
+                response.StatusDescription = pcr.ResponseStatusDescription;
+            }
+            //if (pcr.IsRedirect)
+            //    response.End(); // end response -- kills the thread and does not return!
+
+            if (pcr.IsRedirect)
+            {
+                response.Flush();
+                // bypass everything and directly execute EndRequest event -- but returns
+                context.ApplicationInstance.CompleteRequest();
+                // though some say that .CompleteRequest() does not properly shutdown the response
+                // and the request will hang until the whole code has run... would need to test?
+                LogHelper.Debug<UmbracoModule>("Response status: redirecting, complete request now.");
+            }
+
+            return end;
+        }
 
 		/// <summary>
 		/// Checks if the xml cache file needs to be updated/persisted
@@ -398,8 +442,10 @@ namespace Umbraco.Web
 		{
 			app.BeginRequest += (sender, e) =>
 				{
-					var httpContext = ((HttpApplication)sender).Context;					
-					BeginRequest(new HttpContextWrapper(httpContext));
+					var httpContext = ((HttpApplication)sender).Context;
+                    httpContext.Trace.Write("UmbracoModule", "Umbraco request begins");
+				    LogHelper.Debug<UmbracoModule>("Begin request: {0}.", () => httpContext.Request.Url);
+                    BeginRequest(new HttpContextWrapper(httpContext));
 				};
 
 			app.PostResolveRequestCache += (sender, e) =>

@@ -74,6 +74,7 @@ namespace Umbraco.Web.Routing
 			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
 
 			// trigger the Prepared event - at that point it is still possible to change about anything
+            // even though the request might be flagged for redirection - we'll redirect _after_ the event
 			_pcr.OnPrepared();
 
             // we don't take care of anything xcept finding the rendering engine again
@@ -296,6 +297,12 @@ namespace Umbraco.Web.Routing
 
 			// run the document finders
 			FindPublishedContent();
+
+            // if request has been flagged to redirect then return
+            // whoever called us is in charge of actually redirecting
+            // -- do not process anything any further --
+            if (_pcr.IsRedirect)
+	            return true;
 
 			// not handling umbracoRedirect here but after LookupDocument2
 			// so internal redirect, 404, etc has precedence over redirect
@@ -612,16 +619,14 @@ namespace Umbraco.Web.Routing
 		/// <remarks>As per legacy, if the redirect does not work, we just ignore it.</remarks>
 		private void FollowExternalRedirect()
 		{
-			if (_pcr.HasPublishedContent)
-			{
-				var redirectId = _pcr.PublishedContent.GetPropertyValue<int>("umbracoRedirect", -1);
-				
-				string redirectUrl = "#";
-				if (redirectId > 0)
-					redirectUrl = _routingContext.NiceUrlProvider.GetNiceUrl(redirectId);
-				if (redirectUrl != "#")
-					_pcr.RedirectUrl = redirectUrl;
-			}
+		    if (!_pcr.HasPublishedContent) return;
+
+		    var redirectId = _pcr.PublishedContent.GetPropertyValue("umbracoRedirect", -1);				
+		    var redirectUrl = "#";
+		    if (redirectId > 0)
+				redirectUrl = _routingContext.NiceUrlProvider.GetNiceUrl(redirectId);
+		    if (redirectUrl != "#")
+		        _pcr.SetRedirect(redirectUrl);
 		}
 	
 		#endregion

@@ -322,15 +322,92 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Gets a value indicating whether the content request triggers a redirect.
+        /// Gets a value indicating whether the content request triggers a redirect (permanent or not).
         /// </summary>
         public bool IsRedirect { get { return !string.IsNullOrWhiteSpace(this.RedirectUrl); } }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the redirect is permanent.
+        /// </summary>
+        public bool IsRedirectPermanent { get; private set; }
+
+        /// <summary>
         /// Gets or sets the url to redirect to, when the content request triggers a redirect.
         /// </summary>
-        public string RedirectUrl { get; set; }
+        public string RedirectUrl { get; private set; }
 
+        /// <summary>
+        /// Indicates that the content request should trigger a redirect (302).
+        /// </summary>
+        /// <param name="url">The url to redirect to.</param>
+        /// <remarks>Does not actually perform a redirect, only registers that the response should
+        /// redirect. Redirect will or will not take place in due time.</remarks>
+        public void SetRedirect(string url)
+        {
+            RedirectUrl = url;
+            IsRedirectPermanent = false;
+        }
+
+        /// <summary>
+        /// Indicates that the content request should trigger a permanent redirect (301).
+        /// </summary>
+        /// <param name="url">The url to redirect to.</param>
+        /// <remarks>Does not actually perform a redirect, only registers that the response should
+        /// redirect. Redirect will or will not take place in due time.</remarks>
+        public void SetRedirectPermanent(string url)
+        {
+            RedirectUrl = url;
+            IsRedirectPermanent = true;
+        }
+
+        /// <summary>
+        /// Indicates that the content requet should trigger a redirect, with a specified status code.
+        /// </summary>
+        /// <param name="url">The url to redirect to.</param>
+        /// <param name="status">The status code (300-308).</param>
+        /// <remarks>Does not actually perform a redirect, only registers that the response should
+        /// redirect. Redirect will or will not take place in due time.</remarks>
+        public void SetRedirect(string url, int status)
+        {
+            if (status < 300 || status > 308)
+                throw new ArgumentOutOfRangeException("status", "Valid redirection status codes 300-308.");
+
+            RedirectUrl = url;
+            IsRedirectPermanent = (status == 301 || status == 308);
+            if (status != 301 && status != 302) // default redirect statuses
+                ResponseStatusCode = status;
+        }
+
+        /// <summary>
+        /// Gets or sets the content request http response status code.
+        /// </summary>
+        /// <remarks>Does not actually set the http response status code, only registers that the response
+        /// should use the specified code. The code will or will not be used, in due time.</remarks>
+        public int ResponseStatusCode { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the content request http response status description.
+        /// </summary>
+        /// <remarks>Does not actually set the http response status description, only registers that the response
+        /// should use the specified description. The description will or will not be used, in due time.</remarks>
+        public string ResponseStatusDescription { get; private set; }
+
+        /// <summary>
+        /// Sets the http response status code, along with an optional associated description.
+        /// </summary>
+        /// <param name="code">The http status code.</param>
+        /// <param name="description">The description.</param>
+        /// <remarks>Does not actually set the http response status code and description, only registers that
+        /// the response should use the specified code and description. The code and description will or will
+        /// not be used, in due time.</remarks>
+        public void SetResponseStatus(int code, string description = null)
+        {
+            // .Status is deprecated
+            // .SubStatusCode is IIS 7+ internal, ignore
+            ResponseStatusCode = code;
+            ResponseStatusDescription = description;
+        }
+		
         #endregion		
     }
 }
