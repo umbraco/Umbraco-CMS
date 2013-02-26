@@ -258,7 +258,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //unless the PropertyGroupId has already been changed.
                 foreach (var propertyType in propertyGroup.PropertyTypes)
                 {
-                    if(propertyType.IsPropertyDirty("PropertyGroupId") == false)
+                    if ((propertyType.IsPropertyDirty("PropertyGroupId") && propertyType.PropertyGroupId == 0) == false)
                         propertyType.PropertyGroupId = propertyGroup.Id;
                 }
             }

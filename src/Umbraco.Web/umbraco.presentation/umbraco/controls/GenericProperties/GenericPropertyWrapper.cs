@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using umbraco.IO;
+using umbraco.cms.businesslogic.propertytype;
 
 namespace umbraco.controls.GenericProperties
 {
@@ -15,8 +17,9 @@ namespace umbraco.controls.GenericProperties
 		private cms.businesslogic.datatype.DataTypeDefinition[] _dtds;
 		private int _tabId;
 		private string _fullId = "";
+	    private List<PropertyTypeGroup> _propertyGroups;
 
-		public event System.EventHandler Delete;
+	    public event System.EventHandler Delete;
 
 		public cms.businesslogic.propertytype.PropertyType PropertyType 
 		{
@@ -59,7 +62,12 @@ namespace umbraco.controls.GenericProperties
 			}
 		}
 
-		public GenericPropertyWrapper()
+	    public List<PropertyTypeGroup> PropertyGroups
+	    {
+	        set { _propertyGroups = value; }
+	    }
+
+	    public GenericPropertyWrapper()
 		{
 			//
 			// TODO: Add constructor logic here
@@ -76,6 +84,7 @@ namespace umbraco.controls.GenericProperties
 				_gp.PropertyType = _pt;
 				_gp.DataTypeDefinitions = _dtds;
 				_gp.Tabs = _tabs;
+			    _gp.PropertyGroups = _propertyGroups;
 				_gp.TabId = _tabId;
 				_gp.FullId = _fullId;
 			}
