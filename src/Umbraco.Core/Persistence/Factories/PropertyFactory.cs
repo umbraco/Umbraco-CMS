@@ -33,16 +33,17 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var properties = new List<Property>();
 
-            foreach (var dto in dtos)
+            foreach (var propertyType in _contentType.CompositionPropertyTypes)
             {
-                if (_contentType.CompositionPropertyTypes.Any(x => x.Id == dto.PropertyTypeId))
-                {
-                    var propertyType = _contentType.CompositionPropertyTypes.First(x => x.Id == dto.PropertyTypeId);
-                    var property = propertyType.CreatePropertyFromRawValue(dto.GetValue, dto.VersionId.Value, dto.Id);
+                var propertyDataDto = dtos.LastOrDefault(x => x.PropertyTypeId == propertyType.Id);
+                var property = propertyDataDto == null
+                                   ? propertyType.CreatePropertyFromValue(null)
+                                   : propertyType.CreatePropertyFromRawValue(propertyDataDto.GetValue,
+                                                                             propertyDataDto.VersionId.Value,
+                                                                             propertyDataDto.Id);
 
-                    property.ResetDirtyProperties();
-                    properties.Add(property);
-                }
+                property.ResetDirtyProperties();
+                properties.Add(property);
             }
 
             return properties;
