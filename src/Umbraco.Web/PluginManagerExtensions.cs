@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Media;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
+using Umbraco.Web.WebApi;
 using umbraco;
 using umbraco.interfaces;
 

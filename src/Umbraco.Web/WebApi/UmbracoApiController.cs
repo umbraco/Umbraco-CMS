@@ -3,7 +3,7 @@ using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Web.Mvc
+namespace Umbraco.Web.WebApi
 {
     public abstract class UmbracoApiController : ApiController
     {

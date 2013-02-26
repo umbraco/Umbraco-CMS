@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Umbraco.Core.ObjectResolution;
 
-namespace Umbraco.Web.Mvc
+namespace Umbraco.Web.WebApi
 {
     internal sealed class UmbracoApiControllerResolver : ManyObjectsResolverBase<UmbracoApiControllerResolver, UmbracoApiController>
     {

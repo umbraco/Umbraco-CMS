@@ -19,6 +19,7 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Routing;
+using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic;

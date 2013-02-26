@@ -1,11 +1,9 @@
 ﻿using System.Linq;
 using System.Web;
-using System.Web.Mvc;
-using System.Web.Security;
+using System.Web.Http;
 using umbraco.cms.businesslogic.member;
-using AuthorizeAttribute = System.Web.Mvc.AuthorizeAttribute;
 
-namespace Umbraco.Web.Mvc
+namespace Umbraco.Web.WebApi
 {
     /// <summary>
     /// Attribute for attributing controller actions to restrict them
@@ -36,7 +34,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         public string AllowMembers { get; set; }
 
-        protected override bool AuthorizeCore(HttpContextBase httpContext)
+        protected override bool IsAuthorized(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
             // Allow by default
             var allowAction = true;
@@ -77,15 +75,6 @@ namespace Umbraco.Web.Mvc
                 }
             }
             return allowAction;
-        }
-
-        /// <summary>
-        /// Override method to throw exception instead of returning a 401 result
-        /// </summary>
-        /// <param name="filterContext"></param>
-        protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
-        {
-            throw new HttpException(403, "Resource restricted: either member is not logged on or is not of a permitted type or group.");
         }
 
     }
