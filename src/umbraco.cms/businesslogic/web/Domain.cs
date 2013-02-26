@@ -259,5 +259,23 @@ namespace umbraco.cms.businesslogic.web
             if (AfterDelete != null)
                 AfterDelete(this, e);
         }
+
+        #region Pipeline Refactoring
+
+        // NOTE: the wildcard name thing should be managed by the Domain class
+        // internally but that would break too much backward compatibility, so
+        // we don't do it now. Will do it when the Domain class migrates to the
+        // new Core.Models API.
+
+        /// <summary>
+        /// Gets a value indicating whether the domain is a wildcard domain.
+        /// </summary>
+        /// <returns>A value indicating whether the domain is a wildcard domain.</returns>
+        public bool IsWildcard
+        {
+            get { return string.IsNullOrWhiteSpace(Name) || Name.StartsWith("*"); }
+        }
+
+        #endregion
     }
 }

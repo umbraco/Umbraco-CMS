@@ -11,13 +11,6 @@ namespace Umbraco.Web.Routing
 	/// </summary>
 	internal class DomainHelper
 	{
-		private static bool IsWildcardDomain(Domain d)
-		{
-			// supporting null or whitespace for backward compatibility, 
-			// although we should not allow ppl to create them anymore
-			return string.IsNullOrWhiteSpace(d.Name) || d.Name.StartsWith("*");
-		}
-
 		private static Domain SanitizeForBackwardCompatibility(Domain d)
 		{
 			// this is a _really_ nasty one that should be removed in 6.x
@@ -55,7 +48,7 @@ namespace Umbraco.Web.Routing
             // we need to order so example.com/foo matches before example.com/
             var scheme = current == null ? Uri.UriSchemeHttp : current.Scheme;
             var domainsAndUris = domains
-                .Where(d => !IsWildcardDomain(d))
+                .Where(d => !d.IsWildcard)
                 .Select(SanitizeForBackwardCompatibility)
                 .Select(d => new { Domain = d, UriString = UriUtility.EndPathWithSlash(UriUtility.StartWithScheme(d.Name, scheme)) })
                 .OrderByDescending(t => t.UriString)
@@ -104,7 +97,7 @@ namespace Umbraco.Web.Routing
 		{
             var scheme = current == null ? Uri.UriSchemeHttp : current.Scheme;
 			var domainsAndUris = domains
-				.Where(d => !IsWildcardDomain(d))
+				.Where(d => !d.IsWildcard)
 				.Select(SanitizeForBackwardCompatibility)
 				.Select(d => new { Domain = d, UriString = UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(d.Name, scheme)) })
 				.OrderByDescending(t => t.UriString)
@@ -127,7 +120,7 @@ namespace Umbraco.Web.Routing
 				.Reverse()
 				.Select(int.Parse)
 				.TakeWhile(id => id != stopNodeId)
-				.Any(id => domains.Any(d => d.RootNodeId == id && !IsWildcardDomain(d)));
+				.Any(id => domains.Any(d => d.RootNodeId == id && !d.IsWildcard));
 		}
 
 		/// <summary>
@@ -148,7 +141,7 @@ namespace Umbraco.Web.Routing
                 .Skip(1)
                 .Reverse()
                 .TakeWhile(id => !rootNodeId.HasValue || id != rootNodeId)
-                .Select(nodeId => domains.FirstOrDefault(d => d.RootNodeId == nodeId && IsWildcardDomain(d)))
+                .Select(nodeId => domains.FirstOrDefault(d => d.RootNodeId == nodeId && d.IsWildcard))
                 .FirstOrDefault(domain => domain != null);
 		}
 
