@@ -50,9 +50,8 @@ namespace Umbraco.Web.Routing
             var domainsAndUris = domains
                 .Where(d => !d.IsWildcard)
                 .Select(SanitizeForBackwardCompatibility)
-                .Select(d => new { Domain = d, UriString = UriUtility.EndPathWithSlash(UriUtility.StartWithScheme(d.Name, scheme)) })
-                .OrderByDescending(t => t.UriString)
-                .Select(t => new DomainAndUri(t.Domain, new Uri(t.UriString)))
+                .Select(d => new DomainAndUri(d, scheme))
+                .OrderByDescending(d => d.Uri.ToString())
                 .ToArray();
 
             if (!domainsAndUris.Any())
@@ -70,7 +69,7 @@ namespace Umbraco.Web.Routing
                 // assume only one can match the hint (is that OK?)
                 var hintWithSlash = current.EndPathWithSlash();
                 domainAndUri = domainsAndUris
-                    .FirstOrDefault(t => t.Uri.IsBaseOf(hintWithSlash));
+                    .FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(hintWithSlash));
                 // if none matches, then try to run the filter to sort them out
                 if (domainAndUri == null && filter != null)
                 {
@@ -82,8 +81,6 @@ namespace Umbraco.Web.Routing
                 }
             }
 
-            if (domainAndUri != null)
-                domainAndUri.Uri = domainAndUri.Uri.TrimPathEndSlash();
             return domainAndUri;
         }
 
@@ -99,9 +96,8 @@ namespace Umbraco.Web.Routing
 			var domainsAndUris = domains
 				.Where(d => !d.IsWildcard)
 				.Select(SanitizeForBackwardCompatibility)
-				.Select(d => new { Domain = d, UriString = UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(d.Name, scheme)) })
-				.OrderByDescending(t => t.UriString)
-				.Select(t => new DomainAndUri(t.Domain, new Uri(t.UriString)));
+                .Select(d => new DomainAndUri(d, scheme))
+                .OrderByDescending(d => d.Uri.ToString());
 			return domainsAndUris;
 		}
 

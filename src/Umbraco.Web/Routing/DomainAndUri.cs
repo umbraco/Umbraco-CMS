@@ -13,25 +13,25 @@ namespace Umbraco.Web.Routing
     internal class DomainAndUri
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DomainAndUri"/> class with a Domain and a Uri.
+        /// Initializes a new instance of the <see cref="DomainAndUri"/> class with a Domain and a uri scheme.
         /// </summary>
-        /// <param name="domain">The Domain.</param>
-        /// <param name="uri">The Uri.</param>
-        public DomainAndUri(Domain domain, Uri uri)
+        /// <param name="domain">The domain.</param>
+        /// <param name="scheme">The uri scheme.</param>
+        public DomainAndUri(Domain domain, string scheme)
         {
             Domain = domain;
-            Uri = uri;
+            Uri = new Uri(UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(domain.Name, scheme)));
         }
 
         /// <summary>
         /// Gets or sets the Umbraco domain.
         /// </summary>
-        public Domain Domain { get; internal set; }
+        public Domain Domain { get; private set; }
 
         /// <summary>
         /// Gets or sets the normalized uri of the domain.
         /// </summary>
-        public Uri Uri { get; internal set; }
+        public Uri Uri { get; private set; }
 
         /// <summary>
         /// Gets a string that represents the <see cref="DomainAndUri"/> instance.
