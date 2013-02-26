@@ -57,6 +57,10 @@ namespace Umbraco.Web.Strategies.DataTypes
 			if (uploadFieldConfigNode != null)
 			{
 				var fileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+                //Ensure that the Property has a Value before continuing
+                if(property.Value == null)
+                    return;
+
 				var path = fileSystem.GetRelativePath(property.Value.ToString());
 
 				if (string.IsNullOrWhiteSpace(path) == false && fileSystem.FileExists(path))
