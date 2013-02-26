@@ -411,6 +411,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 gp = new GenericPropertyWrapper();
                 gp.ID = "GenericPropertyNew";
                 gp.Tabs = tabs;
+                gp.PropertyGroups = propertyTypeGroups;
                 gp.DataTypeDefinitions = dtds;
                 PropertyTypeNew.Controls.Add(gp);
                 PropertyTypeNew.Controls.Add(new LiteralControl("</ul>"));
@@ -420,6 +421,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 gp = (GenericPropertyWrapper)PropertyTypeNew.Controls[1];
                 gp.ID = "GenericPropertyNew";
                 gp.Tabs = tabs;
+                gp.PropertyGroups = propertyTypeGroups;
                 gp.DataTypeDefinitions = dtds;
                 gp.UpdateEditControl();
                 gp.GenricPropertyControl.UpdateInterface();
@@ -441,14 +443,18 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                                         ? tab.GetPropertyTypes(_contentType.Id, false)
                                         : propertyGroup.GetPropertyTypes();
 
+                var propertyGroupId = tab.Id;
+                if (propertyGroup != null && propertyGroup.ParentId > 0)
+                    propertyGroupId = propertyGroup.Id;
+
                 if (propertyTypes.Any())
                 {
                     var propSort = new HtmlInputHidden();
-                    propSort.ID = "propSort_" + tab.Id.ToString() + "_Content";
+                    propSort.ID = "propSort_" + propertyGroupId.ToString() + "_Content";
                     PropertyTypes.Controls.Add(propSort);
                     _sortLists.Add(propSort);
 
-                    PropertyTypes.Controls.Add(new LiteralControl("<ul class='genericPropertyList' id=\"t_" + tab.Id.ToString() + "_Contents\">"));
+                    PropertyTypes.Controls.Add(new LiteralControl("<ul class='genericPropertyList' id=\"t_" + propertyGroupId.ToString() + "_Contents\">"));
 
                     foreach (cms.businesslogic.propertytype.PropertyType pt in propertyTypes)
                     {
@@ -459,10 +465,11 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                         gpw.ID = "gpw_" + pt.Id;
                         gpw.PropertyType = pt;
                         gpw.Tabs = tabs;
-                        gpw.TabId = tab.Id;
+                        gp.PropertyGroups = propertyTypeGroups;
+                        gpw.TabId = propertyGroupId;
                         gpw.DataTypeDefinitions = dtds;
                         gpw.Delete += new EventHandler(gpw_Delete);
-                        gpw.FullId = "t_" + tab.Id.ToString() + "_Contents_" + +pt.Id;
+                        gpw.FullId = "t_" + propertyGroupId.ToString() + "_Contents_" + +pt.Id;
 
                         PropertyTypes.Controls.Add(gpw);
                         _genericProperties.Add(gpw);
@@ -534,6 +541,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                     gpw.PropertyType = pt;
                     gpw.Tabs = tabs;
+                    gpw.PropertyGroups = propertyTypeGroups;
                     gpw.DataTypeDefinitions = dtds;
                     gpw.Delete += new EventHandler(gpw_Delete);
                     gpw.FullId = "t_general_Contents_" + pt.Id;
@@ -652,6 +660,12 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 propertyType.DataTypeDatabaseType = dataTypeDefinition.DatabaseType;
                 propertyType.DataTypeDefinitionId = dataTypeDefinition.Id;
                 propertyType.DataTypeId = dataTypeDefinition.ControlId;
+
+                //Is only called to flush cache since gpw.PropertyType.Save() isn't called
+                // clear local cache
+                cms.businesslogic.cache.Cache.ClearCacheItem("UmbracoPropertyTypeCache" + gpw.PropertyType.Id);
+                // clear cache in ContentType
+                cms.businesslogic.cache.Cache.ClearCacheItem("ContentType_PropertyTypes_Content:" + contentTypeItem.Id);
             }
 
             //Update the SortOrder of the PropertyTypes

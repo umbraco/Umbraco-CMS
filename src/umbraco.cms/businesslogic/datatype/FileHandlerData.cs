@@ -123,6 +123,9 @@ namespace umbraco.cms.businesslogic.datatype
 
         private void ClearRelatedValues()
         {
+            if(PropertyId == default(int))
+                return;
+
             string propertyTypeAlias = new Property(PropertyId).PropertyType.Alias;
             if (UmbracoSettings.ImageAutoFillImageProperties != null)
             {

@@ -2,11 +2,15 @@ using System;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using Umbraco.Core;
 using umbraco.BasePages;
 using umbraco.IO;
+using umbraco.cms.businesslogic.propertytype;
 
 namespace umbraco.controls.GenericProperties
 {
@@ -104,7 +108,9 @@ namespace umbraco.controls.GenericProperties
 		}
 
         private int _id;
-        public int Id {
+	    private List<PropertyTypeGroup> _propertyGroups;
+
+	    public int Id {
             set {
                 _id = value;
             }get{
@@ -117,7 +123,13 @@ namespace umbraco.controls.GenericProperties
 			get {return int.Parse(ddlTypes.SelectedValue);}
 		}
 
-		public void Clear() 
+	    public List<PropertyTypeGroup> PropertyGroups
+	    {
+	        get { return _propertyGroups; }
+	        set { _propertyGroups = value; }
+	    }
+
+	    public void Clear() 
 		{
 			tbName.Text = "";
 			tbAlias.Text = "";
@@ -132,10 +144,8 @@ namespace umbraco.controls.GenericProperties
 		{
 			if (!IsPostBack) 
 			{
-
 				UpdateInterface();
 			}
-
 		}
 
 		public void UpdateInterface() 
@@ -185,7 +195,18 @@ namespace umbraco.controls.GenericProperties
 			}
 
 			// tabs
-			if (_tabs != null) 
+            if (_propertyGroups != null)
+            {
+                ddlTab.Items.Clear();
+                foreach (var propertyGroup in _propertyGroups.OrderBy(x => x.SortOrder))
+                {
+                    var li = new ListItem(propertyGroup.Name, propertyGroup.Id.ToString(CultureInfo.InvariantCulture));
+                    if (propertyGroup.Id == _tabId)
+                        li.Selected = true;
+                    ddlTab.Items.Add(li);
+                }
+            }
+			else if (_tabs != null) 
 			{
 				ddlTab.Items.Clear();
 				for (int i=0;i<_tabs.Length;i++) 

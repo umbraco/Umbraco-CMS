@@ -108,7 +108,13 @@ namespace Umbraco.Core.Persistence.Factories
                                       };
 
             if (tabId != default(int))
+            {
                 propertyTypeDto.PropertyTypeGroupId = tabId;
+            }
+            else
+            {
+                propertyTypeDto.PropertyTypeGroupId = null;
+            }
 
             if (propertyType.HasIdentity)
                 propertyTypeDto.Id = propertyType.Id;

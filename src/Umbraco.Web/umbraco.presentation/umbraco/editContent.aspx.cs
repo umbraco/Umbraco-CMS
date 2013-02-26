@@ -58,8 +58,9 @@ namespace umbraco.cms.presentation
 
             _unPublish.Click += UnPublishDo;
 
-            //_document = new cms.businesslogic.web.Document(int.Parse(Request.QueryString["id"]));
-            _document = new Document(true, id);
+            //Loading Content via new public service to ensure that the Properties are loaded correct
+            var content = ApplicationContext.Current.Services.ContentService.GetById(id);
+            _document = new Document(content);
 
             //check if the doc exists
             if (string.IsNullOrEmpty(_document.Path))
