@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Web;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Encoder = System.Text.Encoder;
 
@@ -139,7 +140,7 @@ namespace umbraco.cms.businesslogic.Files
 
         public string GetFriendlyName()
         {
-            return helpers.Casing.SpaceCamelCasing(_fileName);
+            return _fileName.SplitPascalCasing().ToFirstUpperInvariant();
         }
 
         public System.Tuple<int, int> GetDimensions()

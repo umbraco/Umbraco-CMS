@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
@@ -87,9 +88,10 @@ namespace umbraco
 				// Create macro?
 				if (ParentID == 1)
 				{
+				    var name = _alias.Substring(_alias.IndexOf("|||") + 3, _alias.Length - _alias.IndexOf("|||") - 3)
+				                     .SplitPascalCasing().ToFirstUpperInvariant();
 					cms.businesslogic.macro.Macro m =
-						cms.businesslogic.macro.Macro.MakeNew(
-						helper.SpaceCamelCasing(_alias.Substring(_alias.IndexOf("|||") + 3, _alias.Length - _alias.IndexOf("|||") - 3)));
+						cms.businesslogic.macro.Macro.MakeNew(name);
 					m.Xslt = fileName + ".xslt";
 				}
 			}

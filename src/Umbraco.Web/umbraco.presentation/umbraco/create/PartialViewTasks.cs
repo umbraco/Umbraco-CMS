@@ -79,8 +79,10 @@ namespace umbraco
 			// Create macro?
 			if (ParentID == 1)
 			{
-				var m = cms.businesslogic.macro.Macro.MakeNew(
-					helper.SpaceCamelCasing(fileName.Substring(0, (fileName.LastIndexOf('.') + 1)).Trim('.')));
+                var name = fileName
+                    .Substring(0, (fileName.LastIndexOf('.') + 1)).Trim('.')
+                    .SplitPascalCasing().ToFirstUpperInvariant();
+			    var m = cms.businesslogic.macro.Macro.MakeNew(name);
 				m.ScriptingFile = BasePath + fileName;
 			}
 			

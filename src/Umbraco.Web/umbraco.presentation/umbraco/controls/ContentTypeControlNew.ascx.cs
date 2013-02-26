@@ -274,7 +274,12 @@ namespace umbraco.controls
             // nh css file update, add support for css sprites
             foreach (string iconClass in cms.businesslogic.CMSNode.DefaultIconClasses)
             {
-                ListItem li = new ListItem(helper.SpaceCamelCasing((iconClass.Substring(1, iconClass.Length - 1))).Replace("Spr Tree", "").Trim(), iconClass);
+                var liText = iconClass
+                    .Substring(1)
+                    .SplitPascalCasing().ToFirstUpperInvariant()
+                    .Replace("Spr Tree", "")
+                    .Trim();
+                ListItem li = new ListItem(liText, iconClass);
                 li.Attributes.Add("class", "spriteBackground sprTree " + iconClass.Trim('.'));
                 li.Attributes.Add("style", "padding-left:20px !important; background-repeat:no-repeat;");
 
