@@ -4,6 +4,7 @@ using System.Web;
 using System.Web.Http;
 using Umbraco.Web.Security;
 using umbraco.cms.businesslogic.member;
+using Umbraco.Core;
 
 namespace Umbraco.Web.WebApi
 {
@@ -38,6 +39,13 @@ namespace Umbraco.Web.WebApi
 
         protected override bool IsAuthorized(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
+            if (AllowMembers.IsNullOrWhiteSpace())
+                AllowMembers = "";
+            if (AllowGroup.IsNullOrWhiteSpace())
+                AllowGroup = "";
+            if (AllowType.IsNullOrWhiteSpace())
+                AllowType = "";
+
             var members = new List<int>();
             foreach (var s in AllowMembers.Split(','))
             {

@@ -6,6 +6,7 @@ using System.Web.Security;
 using Umbraco.Web.Security;
 using umbraco.cms.businesslogic.member;
 using AuthorizeAttribute = System.Web.Mvc.AuthorizeAttribute;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Mvc
 {
@@ -40,6 +41,13 @@ namespace Umbraco.Web.Mvc
 
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
+            if (AllowMembers.IsNullOrWhiteSpace())
+                AllowMembers = "";
+            if (AllowGroup.IsNullOrWhiteSpace())
+                AllowGroup = "";
+            if (AllowType.IsNullOrWhiteSpace())
+                AllowType = "";
+
             var members = new List<int>();
             foreach (var s in AllowMembers.Split(','))
             {
