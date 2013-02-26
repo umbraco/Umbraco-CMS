@@ -3,22 +3,25 @@ using System.Data;
 using System.Configuration;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Globalization;
+using System.Linq;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
-using umbraco.cms.businesslogic.template;
+using Umbraco.Core.Models;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.businesslogic.macro;
 using runtimeMacro = umbraco.macro;
 using System.Xml;
 using umbraco.IO;
 using umbraco.cms.presentation.Trees;
 using BizLogicAction = umbraco.BusinessLogic.Actions.Action;
+using Macro = umbraco.cms.businesslogic.macro.Macro;
+using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace umbraco.presentation.developer.packages
 {
@@ -447,7 +450,9 @@ namespace umbraco.presentation.developer.packages
 
            
 
-            //Remove Document types
+            //Remove Document Types
+            var contentTypes = new List<IContentType>();
+            var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             foreach (ListItem li in documentTypes.Items)
             {
                 if (li.Selected)
@@ -456,24 +461,27 @@ namespace umbraco.presentation.developer.packages
 
                     if (int.TryParse(li.Value, out nId))
                     {
-                        DocumentType s = new DocumentType(nId);
-                        if (s != null)
+                        var contentType = contentTypeService.GetContentType(nId);
+                        if (contentType != null)
                         {
-                            // check for master doctypes
-                            if (s.IsMaster())
-                            {
-                                foreach(var ct in s.GetChildTypes())
-                                    ct.RemoveParentContentType(s.Id);
-                            }
-
-                            s.delete();
-                            pack.Data.Documenttypes.Remove(nId.ToString());
-
+                            contentTypes.Add(contentType);
+                            pack.Data.Documenttypes.Remove(nId.ToString(CultureInfo.InvariantCulture));
                             // refresh content cache when document types are removed
                             refreshCache = true;
-
                         }
                     }
+                }
+            }
+            //Order the DocumentTypes before removing them
+            if (contentTypes.Any())
+            {
+                var orderedTypes = (from contentType in contentTypes
+                                    orderby contentType.ParentId descending, contentType.Id descending 
+                                    select contentType);
+
+                foreach (var contentType in orderedTypes)
+                {
+                    contentTypeService.Delete(contentType);
                 }
             }
 

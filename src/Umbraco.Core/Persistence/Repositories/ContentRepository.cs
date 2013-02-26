@@ -368,7 +368,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Loop through properties to check if the content contains images/files that should be deleted
             foreach (var property in entity.Properties)
             {
-                if (property.PropertyType.DataTypeId == uploadFieldId &&
+                if (property.PropertyType.DataTypeId == uploadFieldId && property.Value != null &&
                     string.IsNullOrEmpty(property.Value.ToString()) == false
                     && fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
                 {
