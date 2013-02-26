@@ -664,6 +664,80 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Returns a copy of the string with the first character converted to uppercase.
+        /// </summary>
+        /// <param name="input">The string.</param>
+        /// <returns>The converted string.</returns>
+        public static string ToFirstUpper(this string input)
+        {
+            return string.IsNullOrWhiteSpace(input)
+                ? input
+                : input.Substring(0, 1).ToUpper() + input.Substring(1);
+        }
+
+        /// <summary>
+        /// Returns a copy of the string with the first character converted to lowercase.
+        /// </summary>
+        /// <param name="input">The string.</param>
+        /// <returns>The converted string.</returns>
+        public static string ToFirstLower(this string input)
+        {
+            return string.IsNullOrWhiteSpace(input)
+                ? input
+                : input.Substring(0, 1).ToLower() + input.Substring(1);
+        }
+
+        /// <summary>
+        /// Returns a copy of the string with the first character converted to uppercase using the casing rules of the specified culture.
+        /// </summary>
+        /// <param name="input">The string.</param>
+        /// <param name="culture">The culture.</param>
+        /// <returns>The converted string.</returns>
+        public static string ToFirstUpper(this string input, CultureInfo culture)
+        {
+            return string.IsNullOrWhiteSpace(input)
+                ? input
+                : input.Substring(0, 1).ToUpper(culture) + input.Substring(1);
+        }
+
+        /// <summary>
+        /// Returns a copy of the string with the first character converted to lowercase using the casing rules of the specified culture.
+        /// </summary>
+        /// <param name="input">The string.</param>
+        /// <param name="culture">The culture.</param>
+        /// <returns>The converted string.</returns>
+        public static string ToFirstLower(this string input, CultureInfo culture)
+        {
+            return string.IsNullOrWhiteSpace(input)
+                ? input
+                : input.Substring(0, 1).ToLower(culture) + input.Substring(1);
+        }
+
+        /// <summary>
+        /// Returns a copy of the string with the first character converted to uppercase using the casing rules of the invariant culture.
+        /// </summary>
+        /// <param name="input">The string.</param>
+        /// <returns>The converted string.</returns>
+        public static string ToFirstUpperInvariant(this string input)
+        {
+            return string.IsNullOrWhiteSpace(input)
+                ? input
+                : input.Substring(0, 1).ToUpperInvariant() + input.Substring(1);
+        }
+
+        /// <summary>
+        /// Returns a copy of the string with the first character converted to lowercase using the casing rules of the invariant culture.
+        /// </summary>
+        /// <param name="input">The string.</param>
+        /// <returns>The converted string.</returns>
+        public static string ToFirstLowerInvariant(this string input)
+        {
+            return string.IsNullOrWhiteSpace(input)
+                ? input
+                : input.Substring(0, 1).ToLowerInvariant() + input.Substring(1);
+        }
+
+        /// <summary>
         /// Gets the short string helper.
         /// </summary>
         /// <remarks>This is so that unit tests that do not initialize the resolver do not

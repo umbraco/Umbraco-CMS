@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -101,8 +102,10 @@ namespace umbraco
 
 				if (ParentID == 1)
 				{
-					cms.businesslogic.macro.Macro m = cms.businesslogic.macro.Macro.MakeNew(
-						helper.SpaceCamelCasing(fileName.Substring(0, (fileName.LastIndexOf('.') + 1)).Trim('.')));
+                    var name = fileName
+                        .Substring(0, (fileName.LastIndexOf('.') + 1)).Trim('.')
+                        .SplitPascalCasing().ToFirstUpperInvariant();
+					cms.businesslogic.macro.Macro m = cms.businesslogic.macro.Macro.MakeNew(name);
 					m.ScriptingFile = fileName;
 				}
 			}

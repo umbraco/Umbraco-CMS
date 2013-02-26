@@ -4,7 +4,7 @@ namespace Umbraco.Web.Routing
 {
 
 	/// <summary>
-	/// Resolver for the last chance IPublishedContentFinder object.
+    /// Resolves the last chance IPublishedContentFinder object.
 	/// </summary>
 	internal sealed class ContentLastChanceFinderResolver : SingleObjectResolverBase<ContentLastChanceFinderResolver, IContentFinder>
 	{
@@ -19,7 +19,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentLastChanceFinderResolver"/> class with an instance of a finder.
         /// </summary>
-        /// <param name="finder">A instance of a finder.</param>
+        /// <param name="finder">An instance of a finder.</param>
         /// <remarks>The resolver is created by the <c>WebBootManager</c> and thus the constructor remains internal.</remarks>
         internal ContentLastChanceFinderResolver(IContentFinder finder)
             : base(finder, true)

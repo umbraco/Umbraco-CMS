@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.IO;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
@@ -27,8 +28,10 @@ namespace umbraco.presentation.create
             {
                 FileInfo fi = new FileInfo(fileName);
                 if (fi.Name != "Clean.xslt")
-                    xsltTemplate.Items.Add(new ListItem(helper.SpaceCamelCasing(fi.Name.Replace(".xslt", "")), fi.Name));
-
+                {
+                    var liText = fi.Name.Replace(".xslt", "").SplitPascalCasing().ToFirstUpperInvariant();
+                    xsltTemplate.Items.Add(new ListItem(liText, fi.Name));                    
+                }
             }
 
         }

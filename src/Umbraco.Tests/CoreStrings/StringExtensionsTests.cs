@@ -80,6 +80,28 @@ namespace Umbraco.Tests.CoreStrings
             Assert.AreEqual(shouldBe, trimmed);
         }
 
+        [TestCase(null, null)]
+        [TestCase("", "")]
+        [TestCase("x", "X")]
+        [TestCase("xyzT", "XyzT")]
+        [TestCase("XyzT", "XyzT")]
+        public void ToFirstUpper(string input, string expected)
+        {
+            var output = input.ToFirstUpper();
+            Assert.AreEqual(expected, output);
+        }
+
+        [TestCase(null, null)]
+        [TestCase("", "")]
+        [TestCase("X", "x")]
+        [TestCase("XyZ", "xyZ")]
+        [TestCase("xyZ", "xyZ")]
+        public void ToFirstLower(string input, string expected)
+        {
+            var output = input.ToFirstLower();
+            Assert.AreEqual(expected, output);
+        }
+
         // FORMAT STRINGS
 
         // note: here we just ensure that the proper helper gets called properly

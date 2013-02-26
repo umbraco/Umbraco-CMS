@@ -10,6 +10,7 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Xml.Linq;
+using Umbraco.Core;
 using umbraco.cms.businesslogic.macro;
 using umbraco.scripting;
 using umbraco.BasePages;
@@ -75,7 +76,8 @@ namespace umbraco.presentation.create
                 {
                     string filename = System.IO.Path.GetFileName(fi.FullName);
 
-                    list.Items.Add(new ListItem(helper.SpaceCamelCasing(filename.Replace(extension, "")), scriptType + "/" + filename));
+                    var liText = filename.Replace(extension, "").SplitPascalCasing().ToFirstUpperInvariant();
+                    list.Items.Add(new ListItem(liText, scriptType + "/" + filename));
                 }
             }
         }
