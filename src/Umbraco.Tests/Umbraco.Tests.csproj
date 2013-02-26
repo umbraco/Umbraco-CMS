@@ -313,6 +313,7 @@
     <Compile Include="UmbracoExamine\TestLogService.cs" />
     <Compile Include="UmbracoExamine\TestMediaService.cs" />
     <Compile Include="UmbracoExamine\TestContentService.cs" />
+    <Compile Include="UriExtensionsTests.cs" />
     <Compile Include="UriUtilityTests.cs" />
     <Compile Include="Resolvers\MacroFieldEditorsResolverTests.cs" />
     <Compile Include="MacroEngineFactoryTests.cs" />
