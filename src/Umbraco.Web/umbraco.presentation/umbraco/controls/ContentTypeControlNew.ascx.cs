@@ -646,6 +646,12 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 propertyType.DataTypeDatabaseType = dataTypeDefinition.DatabaseType;
                 propertyType.DataTypeDefinitionId = dataTypeDefinition.Id;
                 propertyType.DataTypeId = dataTypeDefinition.ControlId;
+
+                //Is only called to flush cache since gpw.PropertyType.Save() isn't called
+                // clear local cache
+                cms.businesslogic.cache.Cache.ClearCacheItem("UmbracoPropertyTypeCache" + gpw.PropertyType.Id);
+                // clear cache in ContentType
+                cms.businesslogic.cache.Cache.ClearCacheItem("ContentType_PropertyTypes_Content:" + contentTypeItem.Id);
             }
 
             //Update the SortOrder of the PropertyTypes
