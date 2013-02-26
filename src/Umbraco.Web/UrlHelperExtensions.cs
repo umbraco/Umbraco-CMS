@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
+using Umbraco.Web.WebServices;
 
 namespace Umbraco.Web
 {
@@ -12,6 +13,17 @@ namespace Umbraco.Web
     /// </summary>
     public static class UrlHelperExtensions
     {
+        /// <summary>
+        /// Returns the base path (not including the 'action') of the MVC controller "ExamineManagementController"
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public static string GetExamineManagementServicePath(this UrlHelper url)
+        {
+            var result = url.GetUmbracoApiService<ExamineManagementApiController>("GetIndexerDetails");
+            return result.TrimEnd("GetIndexerDetails").EnsureEndsWith('/');
+        }
+
         /// <summary>
         /// Return the Url for a Web Api service
         /// </summary>

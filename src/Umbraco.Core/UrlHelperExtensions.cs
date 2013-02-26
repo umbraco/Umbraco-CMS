@@ -13,17 +13,6 @@ namespace Umbraco.Core
 	public static class UrlHelperExtensions
 	{
 
-        /// <summary>
-        /// Returns the base path (not including the 'action') of the MVC controller "ExamineManagementController"
-        /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
-        public static string GetExamineManagementServicePath(this UrlHelper url)
-        {
-            var result = url.Action("Index", "ExamineManagement", new { area = GlobalSettings.UmbracoMvcArea });
-            return result.TrimEnd("Index").EnsureEndsWith('/');
-        }
-
 		/// <summary>
 		/// Returns the base path (not including the 'action') of the MVC controller "SaveFileController"
 		/// </summary>

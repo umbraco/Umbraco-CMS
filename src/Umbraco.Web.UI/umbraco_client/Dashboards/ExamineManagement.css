@@ -1,1 +1,23 @@
-﻿
+﻿#examineManagement .indexer {
+    padding-top: 3px;
+}
+
+#examineManagement .propertyPane {
+    padding: 5px;
+}
+
+#examineManagement table th
+{
+    font-weight: bold;
+    width: 200px;
+}
+#examineManagement table td {
+    color: #999;
+}
+
+#examineManagement .propertyPane strong
+{
+    color: #f26e20;
+    padding: 3px;
+    display: block;
+}

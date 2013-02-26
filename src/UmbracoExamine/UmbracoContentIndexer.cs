@@ -341,7 +341,7 @@ namespace UmbracoExamine
         {
             if (CanInitialize())
             {
-                return indexSet.ToIndexCriteria(DataService);
+                return indexSet.ToIndexCriteria(DataService, IndexFieldPolicies);
             }
             else
             {

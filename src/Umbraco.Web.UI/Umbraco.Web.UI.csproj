@@ -1975,8 +1975,6 @@
     </Content>
     <Content Include="Umbraco\Scripting\templates\cshtml\MultinodeTree-picker.cshtml" />
     <Content Include="Umbraco\Scripting\templates\cshtml\TwitterFeed.cshtml" />
-    <Content Include="Umbraco\Views\ExamineManagement\ExamineDetails.cshtml" />
-    <Content Include="Umbraco\Views\Web.config" />
     <None Include="umbraco_client\CodeMirror\js\mode\coffeescript\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\pascal\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\perl\LICENSE" />
