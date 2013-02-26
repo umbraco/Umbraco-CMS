@@ -255,9 +255,11 @@ namespace Umbraco.Core.Persistence.Repositories
                     propertyGroup.Id = groupPrimaryKey; //Set Id on new PropertyGroup
 
                 //Ensure that the PropertyGroup's Id is set on the PropertyTypes within a group
+                //unless the PropertyGroupId has already been changed.
                 foreach (var propertyType in propertyGroup.PropertyTypes)
                 {
-                    propertyType.PropertyGroupId = propertyGroup.Id;
+                    if(propertyType.IsPropertyDirty("PropertyGroupId") == false)
+                        propertyType.PropertyGroupId = propertyGroup.Id;
                 }
             }
 
