@@ -127,9 +127,8 @@ namespace Umbraco.Core.Persistence.Factories
 
         private NodeDto BuildNodeDto(IContent entity)
         {
-            //TODO: Change this once the Language property is public on IContent
-            var content = entity as Content;
-            var nodeName = content != null && string.IsNullOrEmpty(content.NodeName) == false ? content.NodeName : entity.Name;
+            //TODO: Change this once the Language property is public on IContent            
+            var nodeName = entity.Name;
 
             var nodeDto = new NodeDto
             {
