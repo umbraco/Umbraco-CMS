@@ -37,6 +37,14 @@ namespace Umbraco.Core.Configuration
         #endregion
 
         /// <summary>
+        /// used for unit tests
+        /// </summary>
+        internal static void ResetCache()
+        {
+            _reservedUrlsCache = null;
+        }
+
+    	/// <summary>
         /// Gets the reserved urls from web.config.
         /// </summary>
         /// <value>The reserved urls.</value>
@@ -67,7 +75,8 @@ namespace Umbraco.Core.Configuration
                 var staticReservedPaths = "~/app_plugins/,~/install/,";
 
                 //always add the umbraco path to the list
-                if (ConfigurationManager.AppSettings.ContainsKey("umbracoPath"))
+                if (ConfigurationManager.AppSettings.ContainsKey("umbracoPath") 
+                    && !ConfigurationManager.AppSettings["umbracoPath"].IsNullOrWhiteSpace())
                 {
                     staticReservedPaths += ConfigurationManager.AppSettings["umbracoPath"].EnsureEndsWith(',');
                 }

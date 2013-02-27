@@ -24,10 +24,12 @@ namespace Umbraco.Tests
 
 		public override void TearDown()
 		{
+            //reset the app config		
+            ConfigurationManager.AppSettings.Set("umbracoReservedPaths", "");
+            ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "");
+            Umbraco.Core.Configuration.GlobalSettings.ResetCache();
 			base.TearDown();
-			//reset the app config		
-			ConfigurationManager.AppSettings.Set("umbracoReservedPaths", "");
-			ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "");
+			
 		}
 
         [Ignore]
