@@ -6,17 +6,20 @@ using Examine;
 
 namespace Umbraco.Web.Search
 {
-    public class ExamineIndexerModel
+    public class ExamineIndexerModel : ExamineSearcherModel
     {
-        public ExamineIndexerModel()
+        public IIndexCriteria IndexCriteria { get; set; }
+    }
+
+    public class ExamineSearcherModel
+    {
+        public ExamineSearcherModel()
         {
-            IndexerProperties = new Dictionary<string, string>();
+            ProviderProperties = new Dictionary<string, string>();
         }
 
         public string Name { get; set; }        
-        public IIndexCriteria IndexCriteria { get; set; }
-
-        public IDictionary<string, string> IndexerProperties { get; private set; }
+        public IDictionary<string, string> ProviderProperties { get; private set; }
     }
 
 }

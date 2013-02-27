@@ -97,7 +97,7 @@
                             </table>
                         </div>
 
-                        <table class="propertyPane" data-bind="foreach: IndexerProperties, visible: showProperties">
+                        <table class="propertyPane" data-bind="foreach: ProviderProperties, visible: showProperties">
                             <tr>
                                 <th data-bind="text: key"></th>
                                 <td data-bind="text: value"></td>
@@ -106,6 +106,10 @@
 
                     </div>
                 </div>
+                
+                <h3>Searchers</h3>
+                
+
 
             </div>
         </div>

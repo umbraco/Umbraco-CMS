@@ -15,6 +15,10 @@
     color: #999;
 }
 
+#examineManagement table td.highlight {
+    font-style: italic;
+}
+
 #examineManagement .propertyPane strong
 {
     color: #f26e20;

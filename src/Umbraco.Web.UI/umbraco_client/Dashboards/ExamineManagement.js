@@ -8,6 +8,17 @@
         _opts: null,
         _koViewModel: null,
 
+        _updateProviderProperties : function(provider) {
+            //need to re-map the dictionary to an array so we can bind to it
+            provider.ProviderProperties = this._mapDictionaryToArray(provider.ProviderProperties);
+            //add a showProperties property to the object
+            provider.showProperties = ko.observable(false);
+            //add a toggleProperties method
+            provider.toggleProperties = function () {
+                this.showProperties(!this.showProperties());
+            };
+        },
+
         _mapDictionaryToArray: function (dictionary) {
             var result = [];
             for (var key in dictionary) {
@@ -33,13 +44,9 @@
 
             //The knockout js view model for the selected item
             self._koViewModel = {
-                indexerDetails: ko.observable(""),
-                loading: ko.observable(false),
-                expandIndex: function () {
-
-                }
-                //publishAll: ko.observable(false),
-                //includeUnpublished: ko.observable(false)
+                indexerDetails: ko.observable(null),
+                searcherDetails: ko.observable(null),
+                loading: ko.observable(false)
             };
 
             ko.applyBindings(self._koViewModel, self._opts.container.get(0));
@@ -51,19 +58,16 @@
             var self = this;
             self._koViewModel.loading(true);
 
+            var loadingCount = 2;
+
             $.get(self._opts.restServiceLocation + "GetIndexerDetails",
                 function (e) {
-                    self._koViewModel.loading(false);
+                    if (--loadingCount == 0) {
+                        self._koViewModel.loading(false);
+                    }
 
                     for (var item in e) {
-                        //need to re-map the dictionary to an array so we can bind to it
-                        e[item].IndexerProperties = self._mapDictionaryToArray(e[item].IndexerProperties);
-                        //add a showProperties property to the object
-                        e[item].showProperties = ko.observable(false);
-                        //add a toggleProperties method
-                        e[item].toggleProperties = function () {
-                            this.showProperties(!this.showProperties());
-                        };
+                        self._updateProviderProperties(e[item]);
                         //change the include/exclude node types to say something different if they are empty
                         e[item].IndexCriteria.IncludeNodeTypes = e[item].IndexCriteria.IncludeNodeTypes.join();
                         e[item].IndexCriteria.ExcludeNodeTypes = e[item].IndexCriteria.ExcludeNodeTypes.join();
@@ -71,41 +75,29 @@
                             e[item].IndexCriteria.IncludeNodeTypes = "Include all";
                         if (e[item].IndexCriteria.ExcludeNodeTypes == "")
                             e[item].IndexCriteria.ExcludeNodeTypes = "Exclude none";
-                        //change the Standard and user fields to be an array so we can bind it
-                        //e[item].IndexCriteria.StandardFields = self._mapDictionaryToArray(e[item].IndexerProperties);
                     }
                     
                     self._koViewModel.indexerDetails(e);
                 }).fail(function (a, b, c) {
                     alert("error: " + b);
                 });
+            
+            $.get(self._opts.restServiceLocation + "GetSearcherDetails",
+                function (e) {
+                    if (--loadingCount == 0) {
+                        self._koViewModel.loading(false);
+                    }
+
+                    for (var item in e) {
+                        self._updateProviderProperties(e[item]);
+                    }
+
+                    self._koViewModel.searcherDetails(e);
+                }).fail(function (a, b, c) {
+                    alert("error: " + b);
+                });
         }
 
-        //doSubmit: function () {
-        //    /// <summary>Submits the data to the server for saving</summary>
-        //    var codeVal = UmbClientMgr.contentFrame().UmbEditor.GetCode();
-        //    var self = this;
-
-        //    if (this._opts.editorType == "Template") {
-        //        //saving a template view
-
-        //        $.post(self._opts.restServiceLocation + "SaveTemplate",
-        //            JSON.stringify({
-        //                templateName: this._opts.nameTxtBox.val(),
-        //                templateAlias: this._opts.aliasTxtBox.val(),
-        //                templateContents: codeVal,
-        //                templateId: this._opts.templateId,
-        //                masterTemplateId: this._opts.masterPageDropDown.val()
-        //            }),
-        //            function (e) {
-        //                if (e.success) {
-        //                    self.submitSuccess(e.message, e.header);
-        //                } else {
-        //                    self.submitFailure(e.message, e.header);
-        //                }
-        //            });
-        //    }
-        //},
     });
 
 
