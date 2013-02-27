@@ -13,6 +13,7 @@ using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
 using umbraco.controls.GenericProperties;
@@ -20,6 +21,7 @@ using umbraco.IO;
 using umbraco.presentation;
 using umbraco.BasePages;
 using ContentType = umbraco.cms.businesslogic.ContentType;
+using PropertyType = Umbraco.Core.Models.PropertyType;
 
 namespace umbraco.controls
 {
@@ -416,7 +418,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 gp = new GenericPropertyWrapper();
                 gp.ID = "GenericPropertyNew";
                 gp.Tabs = tabs;
-                gp.PropertyGroups = propertyTypeGroups;
                 gp.DataTypeDefinitions = dtds;
                 PropertyTypeNew.Controls.Add(gp);
                 PropertyTypeNew.Controls.Add(new LiteralControl("</ul>"));
@@ -426,7 +427,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 gp = (GenericPropertyWrapper)PropertyTypeNew.Controls[1];
                 gp.ID = "GenericPropertyNew";
                 gp.Tabs = tabs;
-                gp.PropertyGroups = propertyTypeGroups;
                 gp.DataTypeDefinitions = dtds;
                 gp.UpdateEditControl();
                 gp.GenricPropertyControl.UpdateInterface();
@@ -443,7 +443,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 string tabCaption = tab.ContentType == _contentType.Id ? tab.GetRawCaption() : tab.GetRawCaption() + " (inherited from " + new ContentType(tab.ContentType).Text + ")";
                 PropertyTypes.Controls.Add(new LiteralControl("<div class='genericPropertyListBox'><h2 class=\"propertypaneTitel\">Tab: " + tabCaption + "</h2>"));
 
-                var propertyGroup = propertyTypeGroups.SingleOrDefault(x => x.Id == tab.Id || x.ParentId == tab.Id);
+                var propertyGroup = propertyTypeGroups.SingleOrDefault(x => x.ParentId == tab.Id);
                 var propertyTypes = propertyGroup == null
                                         ? tab.GetPropertyTypes(_contentType.Id, false)
                                         : propertyGroup.GetPropertyTypes();
@@ -452,7 +452,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 if (propertyGroup != null && propertyGroup.ParentId > 0)
                     propertyGroupId = propertyGroup.Id;
 
-                if (propertyTypes.Any())
+                if (propertyTypes.Any(x => x.ContentTypeId == _contentType.Id))
                 {
                     var propSort = new HtmlInputHidden();
                     propSort.ID = "propSort_" + propertyGroupId.ToString() + "_Content";
@@ -470,7 +470,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                         gpw.ID = "gpw_" + pt.Id;
                         gpw.PropertyType = pt;
                         gpw.Tabs = tabs;
-                        gp.PropertyGroups = propertyTypeGroups;
                         gpw.TabId = propertyGroupId;
                         gpw.DataTypeDefinitions = dtds;
                         gpw.Delete += new EventHandler(gpw_Delete);
@@ -546,7 +545,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                     gpw.PropertyType = pt;
                     gpw.Tabs = tabs;
-                    gpw.PropertyGroups = propertyTypeGroups;
                     gpw.DataTypeDefinitions = dtds;
                     gpw.Delete += new EventHandler(gpw_Delete);
                     gpw.FullId = "t_general_Contents_" + pt.Id;
@@ -661,10 +659,42 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 propertyType.Description = gpw.GenricPropertyControl.Description;
                 propertyType.ValidationRegExp = gpw.GenricPropertyControl.Validation;
                 propertyType.Mandatory = gpw.GenricPropertyControl.Mandatory;
-                propertyType.PropertyGroupId = gpw.GenricPropertyControl.Tab;
                 propertyType.DataTypeDatabaseType = dataTypeDefinition.DatabaseType;
                 propertyType.DataTypeDefinitionId = dataTypeDefinition.Id;
                 propertyType.DataTypeId = dataTypeDefinition.ControlId;
+
+                if (propertyType.PropertyGroupId != gpw.GenricPropertyControl.Tab)
+                {
+                    if (gpw.GenricPropertyControl.Tab == 0)
+                    {
+                        propertyType.PropertyGroupId = 0;
+                    }
+                    else if (contentTypeItem.PropertyGroups.Any(x => x.Id == gpw.GenricPropertyControl.Tab))
+                    {
+                        propertyType.PropertyGroupId = gpw.GenricPropertyControl.Tab;
+                    }
+                    else if (contentTypeItem.PropertyGroups.Any(x => x.ParentId == gpw.GenricPropertyControl.Tab))
+                    {
+                        var propertyGroup = contentTypeItem.PropertyGroups.First(x => x.ParentId == gpw.GenricPropertyControl.Tab);
+                        propertyType.PropertyGroupId = propertyGroup.Id;
+                    }
+                    else
+                    {
+                        if (
+                            contentTypeItem.CompositionPropertyGroups.Any(
+                                x => x.ParentId == gpw.GenricPropertyControl.Tab))
+                        {
+                            var propertyGroups = contentTypeItem.CompositionPropertyGroups.Where(x => x.ParentId == gpw.GenricPropertyControl.Tab);
+                            var propertyGroup = propertyGroups.First();
+                            propertyType.PropertyGroupId = propertyGroup.Id;
+                        }
+                        else
+                        {
+                            var propertyGroup = contentTypeItem.CompositionPropertyGroups.First(x => x.Id == gpw.GenricPropertyControl.Tab);
+                            contentTypeItem.AddPropertyGroup(propertyGroup.Name);
+                        }
+                    }
+                }
 
                 //Is only called to flush cache since gpw.PropertyType.Save() isn't called
                 // clear local cache
@@ -972,13 +1002,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             {
                 if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
                 {
-                    var propertyGroup = new PropertyGroup { Name = txtNewTab.Text };
-                    if (_contentType.ContentTypeItem.PropertyGroups.Any())
-                    {
-                        var last = _contentType.ContentTypeItem.PropertyGroups.OrderBy(x => x.SortOrder).Last();
-                        propertyGroup.SortOrder = last.SortOrder + 1;
-                    }
-                    _contentType.ContentTypeItem.PropertyGroups.Add(propertyGroup);
+                    _contentType.ContentTypeItem.AddPropertyGroup(txtNewTab.Text);
                     _contentType.Save();
                 }
                 else

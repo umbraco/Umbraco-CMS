@@ -32,8 +32,8 @@ namespace Umbraco.Tests.Routing
 			_module = new UmbracoModule();
 
 		    SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
-		    SettingsForTests.ReservedPaths = "~/umbraco,~/install/";
-            SettingsForTests.ReservedUrls = "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd";
+            //SettingsForTests.ReservedPaths = "~/umbraco,~/install/";
+            //SettingsForTests.ReservedUrls = "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd";
 
 			//create the not found handlers config
 			using (var sw = File.CreateText(Umbraco.Core.IO.IOHelper.MapPath(Umbraco.Core.IO.SystemFiles.NotFoundhandlersConfig, false)))

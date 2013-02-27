@@ -259,14 +259,6 @@ namespace Umbraco.Core.Persistence.Repositories
                                           : Convert.ToInt32(Database.Insert(tabDto));
                 if (propertyGroup.HasIdentity == false)
                     propertyGroup.Id = groupPrimaryKey; //Set Id on new PropertyGroup
-
-                //Ensure that the PropertyGroup's Id is set on the PropertyTypes within a group
-                //unless the PropertyGroupId has already been changed.
-                foreach (var propertyType in propertyGroup.PropertyTypes)
-                {
-                    if ((propertyType.IsPropertyDirty("PropertyGroupId") && propertyType.PropertyGroupId == 0) == false)
-                        propertyType.PropertyGroupId = propertyGroup.Id;
-                }
             }
 
             //Run through all PropertyTypes to insert or update entries
@@ -337,7 +329,8 @@ namespace Umbraco.Core.Persistence.Repositories
                                     Name = dto.Name,
                                     HelpText = dto.HelpText,
                                     Mandatory = dto.Mandatory,
-                                    SortOrder = dto.SortOrder
+                                    SortOrder = dto.SortOrder,
+                                    ValidationRegExp = dto.ValidationRegExp
                                 }).ToList();
 
             //Reset dirty properties

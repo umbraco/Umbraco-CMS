@@ -17,7 +17,6 @@ namespace umbraco.controls.GenericProperties
 		private cms.businesslogic.datatype.DataTypeDefinition[] _dtds;
 		private int _tabId;
 		private string _fullId = "";
-	    private List<PropertyTypeGroup> _propertyGroups;
 
 	    public event System.EventHandler Delete;
 
@@ -62,11 +61,6 @@ namespace umbraco.controls.GenericProperties
 			}
 		}
 
-	    public List<PropertyTypeGroup> PropertyGroups
-	    {
-	        set { _propertyGroups = value; }
-	    }
-
 	    public GenericPropertyWrapper()
 		{
 			//
@@ -84,7 +78,6 @@ namespace umbraco.controls.GenericProperties
 				_gp.PropertyType = _pt;
 				_gp.DataTypeDefinitions = _dtds;
 				_gp.Tabs = _tabs;
-			    _gp.PropertyGroups = _propertyGroups;
 				_gp.TabId = _tabId;
 				_gp.FullId = _fullId;
 			}

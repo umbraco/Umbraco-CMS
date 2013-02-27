@@ -91,5 +91,13 @@ namespace Umbraco.Core.Models
         /// <param name="propertyType"><see cref="PropertyType"/> to add</param>
         /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
         bool AddPropertyType(PropertyType propertyType);
+
+        /// <summary>
+        /// Adds a PropertyGroup.
+        /// This method will also check if a group already exists with the same name and link it to the parent.
+        /// </summary>
+        /// <param name="groupName">Name of the PropertyGroup to add</param>
+        /// <returns>Returns <c>True</c> if a PropertyGroup with the passed in name was added, otherwise <c>False</c></returns>
+        bool AddPropertyGroup(string groupName);
     }
 }

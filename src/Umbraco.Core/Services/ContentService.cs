@@ -802,9 +802,18 @@ namespace Umbraco.Core.Services
 	            return;
 
 	        content.WriterId = userId;
-	        var parent = GetById(parentId);
-	        content.Path = string.Concat(parent.Path, ",", content.Id);
-	        content.Level = parent.Level + 1;
+            if (parentId == -1)
+            {
+                content.Path = string.Concat("-1,", content.Id);
+                content.Level = 1;                
+            }
+            else
+            {
+                var parent = GetById(parentId);
+                content.Path = string.Concat(parent.Path, ",", content.Id);
+                content.Level = parent.Level + 1;
+            }
+	        
 
 	        //If Content is being moved away from Recycle Bin, its state should be un-trashed
 	        if (content.Trashed && parentId != -20)
