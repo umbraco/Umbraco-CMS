@@ -19,9 +19,8 @@
     font-style: italic;
 }
 
-#examineManagement .propertyPane strong
-{
-    color: #f26e20;
+#examineManagement .propertyPane > a
+{    
     padding: 3px;
     display: block;
 }

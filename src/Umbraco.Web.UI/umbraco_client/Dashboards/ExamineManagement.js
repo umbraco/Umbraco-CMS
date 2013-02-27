@@ -11,11 +11,26 @@
         _updateProviderProperties : function(provider) {
             //need to re-map the dictionary to an array so we can bind to it
             provider.ProviderProperties = this._mapDictionaryToArray(provider.ProviderProperties);
-            //add a showProperties property to the object
+            //add toggle and show properties
             provider.showProperties = ko.observable(false);
-            //add a toggleProperties method
             provider.toggleProperties = function () {
                 this.showProperties(!this.showProperties());
+            };
+            provider.showSystemFields = ko.observable(false);
+            provider.toggleSystemFields = function () {
+                this.showSystemFields(!this.showSystemFields());
+            };
+            provider.showUserFields = ko.observable(false);
+            provider.toggleUserFields = function () {
+                this.showUserFields(!this.showUserFields());
+            };
+            provider.showNodeTypes = ko.observable(false);
+            provider.toggleNodeTypes = function () {
+                this.showNodeTypes(!this.showNodeTypes());
+            };
+            provider.showProviderProperties = ko.observable(false);
+            provider.toggleProviderProperties = function () {
+                this.showProviderProperties(!this.showProviderProperties());
             };
         },
 

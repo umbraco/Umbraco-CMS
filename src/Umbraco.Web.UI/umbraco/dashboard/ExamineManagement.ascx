@@ -42,24 +42,26 @@
                     <div class="provider">
                         <a href="#" data-bind="text: Name, click: toggleProperties"></a>
                         
-                        <table class="propertyPane" data-bind="visible: showProperties">
-                            <tr>
-                                <th>Include node types</th>
-                                <td data-bind="text: IndexCriteria.IncludeNodeTypes"></td>
-                            </tr>
-                            <tr>
-                                <th>Exclude node types</th>
-                                <td data-bind="text: IndexCriteria.ExcludeNodeTypes"></td>
-                            </tr>
-                            <tr data-bind="visible: IndexCriteria.ParentNodeId != null">
-                                <th>Parent node id</th>
-                                <td data-bind="text: IndexCriteria.ParentNodeId"></td>
-                            </tr>
-                        </table>
+                        <div class="propertyPane" data-bind="visible: showProperties">
+                            <table class="propertyPane" data-bind="visible: showProperties">
+                                <tr>
+                                    <th>Include node types</th>
+                                    <td data-bind="text: IndexCriteria.IncludeNodeTypes"></td>
+                                </tr>
+                                <tr>
+                                    <th>Exclude node types</th>
+                                    <td data-bind="text: IndexCriteria.ExcludeNodeTypes"></td>
+                                </tr>
+                                <tr data-bind="visible: IndexCriteria.ParentNodeId != null">
+                                    <th>Parent node id</th>
+                                    <td data-bind="text: IndexCriteria.ParentNodeId"></td>
+                                </tr>
+                            </table>
+                        </div>                        
                         
                         <div class="propertyPane" data-bind="visible: showProperties">                                                   
-                            <strong>System fields</strong>
-                            <table>
+                            <a href="#" data-bind="click: toggleSystemFields">System fields</a>
+                            <table data-bind="visible: showSystemFields">
                                 <thead>
                                     <tr>
                                         <th>Name</th>
@@ -78,8 +80,8 @@
                         </div>
                         
                         <div class="propertyPane" data-bind="visible: showProperties">                                                   
-                            <strong>User fields</strong>
-                            <table>
+                            <a href="#" data-bind="click: toggleUserFields">User fields</a>
+                            <table data-bind="visible: showUserFields">
                                 <thead>
                                     <tr>
                                         <th>Name</th>
@@ -122,7 +124,7 @@
 
                     </div>
                 </div>
-
+                
             </div>
         </div>
     </div>
