@@ -210,6 +210,7 @@ namespace umbraco.cms.businesslogic.datatype
 				}
 				return _nodeId.Value;
 			}
+            internal set { _nodeId = value; }
 		}
 
 		#endregion

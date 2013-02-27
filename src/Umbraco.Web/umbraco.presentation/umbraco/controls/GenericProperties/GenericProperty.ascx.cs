@@ -105,7 +105,6 @@ namespace umbraco.controls.GenericProperties
 		}
 
         private int _id;
-	    private List<PropertyTypeGroup> _propertyGroups;
 
 	    public int Id {
             set {
@@ -119,12 +118,6 @@ namespace umbraco.controls.GenericProperties
 		{
 			get {return int.Parse(ddlTypes.SelectedValue);}
 		}
-
-	    public List<PropertyTypeGroup> PropertyGroups
-	    {
-	        get { return _propertyGroups; }
-	        set { _propertyGroups = value; }
-	    }
 
 	    public void Clear() 
 		{
@@ -192,18 +185,7 @@ namespace umbraco.controls.GenericProperties
 			}
 
 			// tabs
-            if (_propertyGroups != null)
-            {
-                ddlTab.Items.Clear();
-                foreach (var propertyGroup in _propertyGroups.OrderBy(x => x.SortOrder))
-                {
-                    var li = new ListItem(propertyGroup.Name, propertyGroup.Id.ToString(CultureInfo.InvariantCulture));
-                    if (propertyGroup.Id == _tabId)
-                        li.Selected = true;
-                    ddlTab.Items.Add(li);
-                }
-            }
-			else if (_tabs != null) 
+            if (_tabs != null) 
 			{
 				ddlTab.Items.Clear();
 				for (int i=0;i<_tabs.Length;i++) 

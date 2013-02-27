@@ -55,6 +55,7 @@ namespace Umbraco.Core.Persistence.Factories
                                                     HelpText = typeDto.HelpText,
                                                     Mandatory = typeDto.Mandatory,
                                                     SortOrder = typeDto.SortOrder,
+                                                    ValidationRegExp = typeDto.ValidationRegExp,
                                                     PropertyGroupId = groupDto.Id
                                                 };
                     
@@ -106,7 +107,8 @@ namespace Umbraco.Core.Persistence.Factories
                                           HelpText = propertyType.HelpText,
                                           Mandatory = propertyType.Mandatory,
                                           Name = propertyType.Name,
-                                          SortOrder = propertyType.SortOrder
+                                          SortOrder = propertyType.SortOrder,
+                                          ValidationRegExp = propertyType.ValidationRegExp
                                       };
 
             if (tabId != default(int))
