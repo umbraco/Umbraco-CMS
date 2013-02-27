@@ -396,15 +396,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         {
             var tabs = _contentType.getVirtualTabs;
             var propertyTypeGroups = _contentType.PropertyTypeGroups.ToList();
-            /*if (_contentType.ContentTypeItem != null)
-            {
-                var compositionIds = _contentType.ContentTypeItem.CompositionIds();
-                foreach (var compositionId in compositionIds)
-                {
-                    var groupsFromContentType = PropertyTypeGroup.GetPropertyTypeGroupsFromContentType(compositionId);
-                    propertyTypeGroups.AddRange(groupsFromContentType);
-                }
-            }*/
             var dtds = cms.businesslogic.datatype.DataTypeDefinition.GetAll();
 
             PropertyTypes.Controls.Clear();
@@ -416,7 +407,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 gp = new GenericPropertyWrapper();
                 gp.ID = "GenericPropertyNew";
                 gp.Tabs = tabs;
-                //gp.PropertyGroups = propertyTypeGroups;
                 gp.DataTypeDefinitions = dtds;
                 PropertyTypeNew.Controls.Add(gp);
                 PropertyTypeNew.Controls.Add(new LiteralControl("</ul>"));
@@ -426,7 +416,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 gp = (GenericPropertyWrapper)PropertyTypeNew.Controls[1];
                 gp.ID = "GenericPropertyNew";
                 gp.Tabs = tabs;
-                //gp.PropertyGroups = propertyTypeGroups;
                 gp.DataTypeDefinitions = dtds;
                 gp.UpdateEditControl();
                 gp.GenricPropertyControl.UpdateInterface();
@@ -464,13 +453,12 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                     foreach (cms.businesslogic.propertytype.PropertyType pt in propertyTypes)
                     {
                         //If the PropertyType doesn't belong on this ContentType skip it and continue to the next one
-                        //if(pt.ContentTypeId != _contentType.Id) continue;
+                        if(pt.ContentTypeId != _contentType.Id) continue;
 
                         var gpw = new GenericPropertyWrapper();
                         gpw.ID = "gpw_" + pt.Id;
                         gpw.PropertyType = pt;
                         gpw.Tabs = tabs;
-                        //gpw.PropertyGroups = propertyTypeGroups;
                         gpw.TabId = propertyGroupId;
                         gpw.DataTypeDefinitions = dtds;
                         gpw.Delete += new EventHandler(gpw_Delete);
@@ -546,7 +534,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                     gpw.PropertyType = pt;
                     gpw.Tabs = tabs;
-                    //gpw.PropertyGroups = propertyTypeGroups;
                     gpw.DataTypeDefinitions = dtds;
                     gpw.Delete += new EventHandler(gpw_Delete);
                     gpw.FullId = "t_general_Contents_" + pt.Id;
