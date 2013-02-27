@@ -39,7 +39,7 @@
                 <h3>Indexers</h3>
 
                 <div data-bind="foreach: indexerDetails">
-                    <div class="indexer">
+                    <div class="provider">
                         <a href="#" data-bind="text: Name, click: toggleProperties"></a>
                         
                         <table class="propertyPane" data-bind="visible: showProperties">
@@ -109,7 +109,19 @@
                 
                 <h3>Searchers</h3>
                 
+                <div data-bind="foreach: searcherDetails">
+                    <div class="provider">
+                        <a href="#" data-bind="text: Name, click: toggleProperties"></a>
+                       
+                        <table class="propertyPane" data-bind="foreach: ProviderProperties, visible: showProperties">
+                            <tr>
+                                <th data-bind="text: key"></th>
+                                <td data-bind="text: value"></td>
+                            </tr>
+                        </table>
 
+                    </div>
+                </div>
 
             </div>
         </div>

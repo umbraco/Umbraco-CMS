@@ -32,8 +32,8 @@ namespace Umbraco.Web.WebServices
                             };
                         var props = TypeHelper.CachedDiscoverableProperties(indexer.GetType(), mustWrite: false)
                             //ignore these properties
-                            .Where(x => !new[] { "IndexerData", "Description", "WorkingFolder" }.InvariantContains(x.Name))
-                            .OrderBy(x => x.Name);
+                                              .Where(x => !new[] {"IndexerData", "Description", "WorkingFolder"}.InvariantContains(x.Name))
+                                              .OrderBy(x => x.Name);
                         foreach (var p in props)
                         {
                             indexerModel.ProviderProperties.Add(p.Name, p.GetValue(indexer, null).ToString());
@@ -57,6 +57,8 @@ namespace Umbraco.Web.WebServices
                         Name = searcher.Name
                     };
                     var props = TypeHelper.CachedDiscoverableProperties(searcher.GetType(), mustWrite: false)
+                        //ignore these properties
+                                          .Where(x => !new[] {"Description"}.InvariantContains(x.Name))
                                           .OrderBy(x => x.Name);
                     foreach (var p in props)
                     {
