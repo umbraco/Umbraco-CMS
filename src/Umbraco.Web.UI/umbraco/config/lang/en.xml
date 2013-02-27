@@ -204,8 +204,8 @@
   <area alias="editdatatype">
     <key alias="addPrevalue">Add prevalue</key>
     <key alias="dataBaseDatatype">Database datatype</key>
-    <key alias="guid">Data Editor GUID</key>
-    <key alias="renderControl">Render control</key>
+    <key alias="guid">Property editor GUID</key>
+    <key alias="renderControl">Property editor</key>
     <key alias="rteButtons">Buttons</key>
     <key alias="rteEnableAdvancedSettings">Enable advanced settings for</key>
     <key alias="rteEnableContextMenu">Enable context menu</key>
@@ -735,7 +735,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="sortPleaseWait"><![CDATA[ Please wait. Items are being sorted, this can take a while.<br/> <br/> Do not close this window during sorting]]></key>
   </area>
   <area alias="speechBubbles">
-    <key alias="contentPublishedFailedByEvent">Publising was cancelled by a 3rd party add-in</key>
+    <key alias="contentPublishedFailedByEvent">Publishing was cancelled by a 3rd party add-in</key>
     <key alias="contentTypeDublicatePropertyType">Property type already exists</key>
     <key alias="contentTypePropertyTypeCreated">Property type created</key>
     <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Name: %0% <br /> DataType: %1%]]></key>
@@ -749,13 +749,15 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="cssSavedText">Stylesheet saved without any errors</key>
     <key alias="dataTypeSaved">Datatype saved</key>
     <key alias="dictionaryItemSaved">Dictionary item saved</key>
-    <key alias="editContentPublishedFailedByParent">Publising failed because the parent page isn't published</key>
+    <key alias="editContentPublishedFailedByParent">Publishing failed because the parent page isn't published</key>
     <key alias="editContentPublishedHeader">Content published</key>
     <key alias="editContentPublishedText">and visible at the website</key>
     <key alias="editContentSavedHeader">Content saved</key>
     <key alias="editContentSavedText">Remember to publish to make changes visible</key>
     <key alias="editContentSendToPublish">Sent For Approval</key>
     <key alias="editContentSendToPublishText">Changes have been sent for approval</key>
+    <key alias="editMediaSaved">Media saved</key>
+    <key alias="editMediaSavedText"></key>
     <key alias="editMemberSaved">Member saved</key>
     <key alias="editStylesheetPropertySaved">Stylesheet Property Saved</key>
     <key alias="editStylesheetSaved">Stylesheet saved</key>

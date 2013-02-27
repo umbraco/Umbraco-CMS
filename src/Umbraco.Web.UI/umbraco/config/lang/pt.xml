@@ -187,8 +187,8 @@
   <area alias="editdatatype">
     <key alias="addPrevalue">Adicionar valor prévio</key>
     <key alias="dataBaseDatatype">Tipo de Dados do Banco de Dados</key>
-    <key alias="guid">GUID do Editor de Dados</key>
-    <key alias="renderControl">Mostrar controle</key>
+    <key alias="guid">GUID do Editor de Propriedades</key>
+    <key alias="renderControl">Editor de Propriedades</key>
     <key alias="rteButtons">Botões</key>
     <key alias="rteEnableAdvancedSettings">Habilitar configurações avançadas para</key>
     <key alias="rteEnableContextMenu">Habilitar menu de contexto</key>
