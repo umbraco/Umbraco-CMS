@@ -330,6 +330,14 @@ namespace Umbraco.Core.Models
         public abstract bool PropertyTypeExists(string propertyTypeAlias);
 
         /// <summary>
+        /// Adds a PropertyGroup.
+        /// This method will also check if a group already exists with the same name and link it to the parent.
+        /// </summary>
+        /// <param name="groupName">Name of the PropertyGroup to add</param>
+        /// <returns>Returns <c>True</c> if a PropertyGroup with the passed in name was added, otherwise <c>False</c></returns>
+        public abstract bool AddPropertyGroup(string groupName);
+
+        /// <summary>
         /// Adds a PropertyType to a specific PropertyGroup
         /// </summary>
         /// <param name="propertyType"><see cref="PropertyType"/> to add</param>

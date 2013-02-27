@@ -126,6 +126,35 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Adds a PropertyGroup.
+        /// This method will also check if a group already exists with the same name and link it to the parent.
+        /// </summary>
+        /// <param name="groupName">Name of the PropertyGroup to add</param>
+        /// <returns>Returns <c>True</c> if a PropertyGroup with the passed in name was added, otherwise <c>False</c></returns>
+        public override bool AddPropertyGroup(string groupName)
+        {
+            if (PropertyGroups.Any(x => x.Name == groupName))
+                return false;
+
+            var propertyGroup = new PropertyGroup {Name = groupName, SortOrder = 0};
+
+            if (CompositionPropertyGroups.Any(x => x.Name == groupName))
+            {
+                var first = CompositionPropertyGroups.First(x => x.Name == groupName && x.ParentId.HasValue == false);
+                propertyGroup.ParentId = first.Id;
+            }
+
+            if (PropertyGroups.Any())
+            {
+                var last = PropertyGroups.Last();
+                propertyGroup.SortOrder = last.SortOrder + 1;
+            }
+
+            PropertyGroups.Add(propertyGroup);
+            return true;
+        }
+
+        /// <summary>
         /// Adds a PropertyType to a specific PropertyGroup
         /// </summary>
         /// <param name="propertyType"><see cref="PropertyType"/> to add</param>

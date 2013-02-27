@@ -314,6 +314,7 @@ namespace umbraco.controls
                 if (defaultData != null)
                 {
                     defaultData.PropertyTypeAlias = property.Key;
+                    defaultData.NodeId = _content.Id;
                 }
                 property.Value.DataEditor.Save();
             }
