@@ -28,7 +28,9 @@ namespace Umbraco.Core.Configuration
         #region Private static fields
 
         private static Version _version;
-        private static string _reservedUrlsCache;
+        private static readonly object Locker = new object();
+        //make this volatile so that we can ensure thread safety with a double check lock
+    	private static volatile string _reservedUrlsCache;
         private static string _reservedPathsCache;
         private static StartsWithContainer _reservedList = new StartsWithContainer();
 
@@ -42,9 +44,14 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoReservedUrls")
-                    ? ConfigurationManager.AppSettings["umbracoReservedUrls"]
-                    : string.Empty;
+                //ensure the built on (non-changeable) reserved paths are there at all times
+                const string staticReservedUrls = "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd,";
+
+                var urls = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedUrls")
+                               ? ConfigurationManager.AppSettings["umbracoReservedUrls"]
+                               : string.Empty;
+
+                return staticReservedUrls + urls;
             }
         }
 
@@ -56,9 +63,20 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths")
-                           ? ConfigurationManager.AppSettings["umbracoReservedPaths"]
-                           : string.Empty;
+                //ensure the built on (non-changeable) reserved paths are there at all times
+                var staticReservedPaths = "~/app_plugins/,~/install/,";
+
+                //always add the umbraco path to the list
+                if (ConfigurationManager.AppSettings.ContainsKey("umbracoPath"))
+                {
+                    staticReservedPaths += ConfigurationManager.AppSettings["umbracoPath"].EnsureEndsWith(',');
+                }
+
+                var paths = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths")
+                                ? ConfigurationManager.AppSettings["umbracoReservedPaths"]
+                                : string.Empty;
+
+                return staticReservedPaths + paths;
             }
         }
 
@@ -633,38 +651,42 @@ namespace Umbraco.Core.Configuration
         /// </returns>
         public static bool IsReservedPathOrUrl(string url)
         {
-            // check if GlobalSettings.ReservedPaths and GlobalSettings.ReservedUrls are unchanged
-            if (!object.ReferenceEquals(_reservedPathsCache, GlobalSettings.ReservedPaths)
-                || !object.ReferenceEquals(_reservedUrlsCache, GlobalSettings.ReservedUrls))
+            if (_reservedUrlsCache == null)
             {
-                // store references to strings to determine changes
-                _reservedPathsCache = GlobalSettings.ReservedPaths;
-                _reservedUrlsCache = GlobalSettings.ReservedUrls;
-
-                string _root = SystemDirectories.Root.Trim().ToLower();
-
-                // add URLs and paths to a new list
-                StartsWithContainer _newReservedList = new StartsWithContainer();
-                foreach (string reservedUrl in _reservedUrlsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+                lock (Locker)
                 {
-                    //resolves the url to support tilde chars
-                    string reservedUrlTrimmed = IOHelper.ResolveUrl(reservedUrl).Trim().ToLower();
-                    if (reservedUrlTrimmed.Length > 0)
-                        _newReservedList.Add(reservedUrlTrimmed);
+                    if (_reservedUrlsCache == null)
+                    {
+                        // store references to strings to determine changes
+                        _reservedPathsCache = GlobalSettings.ReservedPaths;
+                        _reservedUrlsCache = GlobalSettings.ReservedUrls;
+
+                        string _root = SystemDirectories.Root.Trim().ToLower();
+
+                        // add URLs and paths to a new list
+                        StartsWithContainer _newReservedList = new StartsWithContainer();
+                        foreach (string reservedUrl in _reservedUrlsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            //resolves the url to support tilde chars
+                            string reservedUrlTrimmed = IOHelper.ResolveUrl(reservedUrl).Trim().ToLower();
+                            if (reservedUrlTrimmed.Length > 0)
+                                _newReservedList.Add(reservedUrlTrimmed);
+                        }
+
+                        foreach (string reservedPath in _reservedPathsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            bool trimEnd = !reservedPath.EndsWith("/");
+                            //resolves the url to support tilde chars
+                            string reservedPathTrimmed = IOHelper.ResolveUrl(reservedPath).Trim().ToLower();
+
+                            if (reservedPathTrimmed.Length > 0)
+                                _newReservedList.Add(reservedPathTrimmed + (reservedPathTrimmed.EndsWith("/") ? "" : "/"));
+                        }
+
+                        // use the new list from now on
+                        _reservedList = _newReservedList;
+                    }
                 }
-
-                foreach (string reservedPath in _reservedPathsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    bool trimEnd = !reservedPath.EndsWith("/");
-                    //resolves the url to support tilde chars
-                    string reservedPathTrimmed = IOHelper.ResolveUrl(reservedPath).Trim().ToLower();
-
-                    if (reservedPathTrimmed.Length > 0)
-                        _newReservedList.Add(reservedPathTrimmed + (reservedPathTrimmed.EndsWith("/") ? "" : "/"));
-                }
-
-                // use the new list from now on
-                _reservedList = _newReservedList;
             }
 
             //The url should be cleaned up before checking:

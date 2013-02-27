@@ -44,7 +44,7 @@ namespace Umbraco.Core.Persistence.Factories
                 var typeDtos = groupDto.PropertyTypeDtos.Where(x => x.Id > 0);
                 foreach (var typeDto in typeDtos)
                 {
-                    group.PropertyTypes.Add(new PropertyType(typeDto.DataTypeDto.ControlId,
+                    var propertyType = new PropertyType(typeDto.DataTypeDto.ControlId,
                                                              typeDto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
                                                 {
                                                     Alias = typeDto.Alias,
@@ -56,8 +56,10 @@ namespace Umbraco.Core.Persistence.Factories
                                                     Mandatory = typeDto.Mandatory,
                                                     SortOrder = typeDto.SortOrder,
                                                     PropertyGroupId = groupDto.Id
-                                                });
-
+                                                };
+                    
+                    propertyType.ResetDirtyProperties();
+                    group.PropertyTypes.Add(propertyType);
                 }
                 group.ResetDirtyProperties();
                 propertyGroups.Add(group);

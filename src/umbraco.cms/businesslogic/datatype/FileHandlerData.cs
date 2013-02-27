@@ -6,7 +6,6 @@ using System.Xml;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
 using umbraco.cms.businesslogic.Files;
-using umbraco.cms.businesslogic.property;
 
 namespace umbraco.cms.businesslogic.datatype
 {
@@ -89,11 +88,9 @@ namespace umbraco.cms.businesslogic.datatype
                         // check for auto fill of other properties (width, height, extension and filesize)
                         if (UmbracoSettings.ImageAutoFillImageProperties != null)
                         {
-                            string propertyTypeAlias = new Property(PropertyId).PropertyType.Alias;
-
                             XmlNode uploadFieldConfigNode =
                                 UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
-                                    string.Format("uploadField [@alias = \"{0}\"]", propertyTypeAlias));
+                                    string.Format("uploadField [@alias = \"{0}\"]", PropertyTypeAlias));
 
                             if (uploadFieldConfigNode != null)
                             {
@@ -126,12 +123,11 @@ namespace umbraco.cms.businesslogic.datatype
             if(PropertyId == default(int))
                 return;
 
-            string propertyTypeAlias = new Property(PropertyId).PropertyType.Alias;
             if (UmbracoSettings.ImageAutoFillImageProperties != null)
             {
                 XmlNode uploadFieldConfigNode =
                     UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
-                        string.Format("uploadField [@alias = \"{0}\"]", propertyTypeAlias));
+                        string.Format("uploadField [@alias = \"{0}\"]", PropertyTypeAlias));
                 if (uploadFieldConfigNode != null)
                 {
                     // get the current document

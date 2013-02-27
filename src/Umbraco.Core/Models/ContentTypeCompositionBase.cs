@@ -93,6 +93,7 @@ namespace Umbraco.Core.Models
             {
                 var contentTypeComposition = ContentTypeComposition.First(x => x.Alias == alias);
                 RemovedContentTypeKeyTracker.Add(contentTypeComposition.Id);
+                OnPropertyChanged(ContentTypeCompositionSelector);
                 return _contentTypeComposition.Remove(contentTypeComposition);
             }
             return false;
@@ -154,6 +155,8 @@ namespace Umbraco.Core.Models
 
                     PropertyGroups.Add(propertyGroup);
                 }
+
+                return true;
             }
 
             return false;
