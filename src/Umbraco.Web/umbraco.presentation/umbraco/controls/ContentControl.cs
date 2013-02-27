@@ -12,6 +12,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic;
+using umbraco.cms.businesslogic.datatype;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
@@ -309,6 +310,11 @@ namespace umbraco.controls
 
             foreach (var property in DataTypes)
             {
+                var defaultData = property.Value.Data as DefaultData;
+                if (defaultData != null)
+                {
+                    defaultData.PropertyTypeAlias = property.Key;
+                }
                 property.Value.DataEditor.Save();
             }
 
