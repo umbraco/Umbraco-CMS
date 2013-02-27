@@ -33,6 +33,11 @@ namespace Umbraco.Core.Configuration
     	private static volatile string _reservedUrlsCache;
         private static string _reservedPathsCache;
         private static StartsWithContainer _reservedList = new StartsWithContainer();
+        private static string _reservedPaths;
+        private static string _reservedUrls;
+        //ensure the built on (non-changeable) reserved paths are there at all times
+        private const string StaticReservedPaths = "~/app_plugins/,~/install/,";
+        private const string StaticReservedUrls = "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd,";
 
         #endregion
 
@@ -42,6 +47,8 @@ namespace Umbraco.Core.Configuration
         internal static void ResetCache()
         {
             _reservedUrlsCache = null;
+            _reservedPaths = null;
+            _reservedUrls = null;
         }
 
     	/// <summary>
@@ -51,16 +58,19 @@ namespace Umbraco.Core.Configuration
         public static string ReservedUrls
         {
             get
-            {
-                //ensure the built on (non-changeable) reserved paths are there at all times
-                const string staticReservedUrls = "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd,";
+            {                
+                if (_reservedUrls == null)
+                {
+                    var urls = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedUrls")
+                                   ? ConfigurationManager.AppSettings["umbracoReservedUrls"]
+                                   : string.Empty;
 
-                var urls = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedUrls")
-                               ? ConfigurationManager.AppSettings["umbracoReservedUrls"]
-                               : string.Empty;
-
-                return staticReservedUrls + urls;
+                    //ensure the built on (non-changeable) reserved paths are there at all times
+                    _reservedUrls = StaticReservedUrls + urls;    
+                }
+                return _reservedUrls;
             }
+            internal set { _reservedUrls = value; }
         }
 
         /// <summary>
@@ -71,22 +81,25 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                //ensure the built on (non-changeable) reserved paths are there at all times
-                var staticReservedPaths = "~/app_plugins/,~/install/,";
-
-                //always add the umbraco path to the list
-                if (ConfigurationManager.AppSettings.ContainsKey("umbracoPath") 
-                    && !ConfigurationManager.AppSettings["umbracoPath"].IsNullOrWhiteSpace())
+                if (_reservedPaths == null)
                 {
-                    staticReservedPaths += ConfigurationManager.AppSettings["umbracoPath"].EnsureEndsWith(',');
+                    var reservedPaths = StaticReservedPaths;
+                    //always add the umbraco path to the list
+                    if (ConfigurationManager.AppSettings.ContainsKey("umbracoPath")
+                        && !ConfigurationManager.AppSettings["umbracoPath"].IsNullOrWhiteSpace())
+                    {
+                        reservedPaths += ConfigurationManager.AppSettings["umbracoPath"].EnsureEndsWith(',');
+                    }
+
+                    var allPaths = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths")
+                                    ? ConfigurationManager.AppSettings["umbracoReservedPaths"]
+                                    : string.Empty;
+
+                    _reservedPaths = reservedPaths + allPaths;
                 }
-
-                var paths = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths")
-                                ? ConfigurationManager.AppSettings["umbracoReservedPaths"]
-                                : string.Empty;
-
-                return staticReservedPaths + paths;
+                return _reservedPaths;
             }
+            internal set { _reservedPaths = value; }
         }
 
         /// <summary>
