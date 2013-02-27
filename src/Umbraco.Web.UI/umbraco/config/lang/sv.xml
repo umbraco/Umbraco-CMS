@@ -32,16 +32,18 @@
     <key alias="sort">Sortera</key>
     <key alias="toPublish">Skicka för publicering</key>
     <key alias="translate">Översätt</key>
+    <key alias="unpublish">Avpublicera</key>
     <key alias="update">Uppdatera</key>
   </area>
   <area alias="assignDomain">
     <key alias="addNew">Lägg till nytt domännamn</key>
     <key alias="domain">Domännamn</key>
-    <key alias="domainCreated">Har skapat domännamnet '%0%'</key>
-    <key alias="domainDeleted">Har tagit bort domännamnet '%0%'</key>
-    <key alias="domainExists">Domänen %0% är redan tillagd</key>
+    <key alias="domainCreated">Har skapat domännamnet '{0}'</key>
+    <key alias="domainDeleted">Har tagit bort domännamnet '{0}'</key>
+    <key alias="domainExists">Domänen {0} är redan tillagd</key>
     <key alias="domainHelp">t.ex.: dittdomannamn.se, www.dittdomannamn.se</key>
-    <key alias="domainUpdated">Domännamnet '%0%' har uppdaterats</key>
+    <key alias="domainUpdated">Domännamnet '{0}' har uppdaterats</key>
+    <key alias="invalidDomain">Ogiltigt domännamn</key>
     <key alias="orEdit">Redigera domännamn</key>
   </area>
   <area alias="auditTrails">
@@ -69,6 +71,7 @@
     <key alias="saveAndPublish">Spara och publicera</key>
     <key alias="saveToPublish">Spara och skicka för godkännande</key>
     <key alias="showPage">Förhandsgranska</key>
+    <key alias="showPageDisabled">Förhandsgranskning är avstängt på grund av att det inte finns någon mall tilldelad</key>
     <key alias="styleChoose">Välj stil</key>
     <key alias="styleShow">Visa stil</key>
     <key alias="tableInsert">Infoga tabell</key>
@@ -87,15 +90,16 @@
     <key alias="itemChanged">Detta objekt har ändrats efter publicering</key>
     <key alias="itemNotPublished">Detta objekt är inte publicerat</key>
     <key alias="lastPublished">Senast publicerat</key>
+    <key alias="mediaLinks">Länk till medieobjekt</key>
     <key alias="mediatype">Mediatyp</key>
-	<key alias="mediaLinks">Länk till medieobjekt</key>
     <key alias="membergroup">Medlemsgrupp</key>
     <key alias="memberrole">Roll</key>
     <key alias="membertype">Medlemstyp</key>
     <key alias="noDate">Inget datum valt</key>
     <key alias="nodeName">Sidnamn</key>
     <key alias="otherElements">Egenskaper</key>
-    <key alias="parentNotPublished">Detta dokument är publicerat men syns inte eftersom den överordnade sidan '%0%' inte är publicerad</key>
+    <key alias="parentNotPublished">Detta dokument är publicerat men syns inte eftersom den överordnade sidan '{0}' inte är publicerad</key>
+    <key alias="parentNotPublishedAnomaly">Oops: detta dokument är publicerat men finns inte i cacheminnet (internt fel)</key>
     <key alias="publish">Publicera</key>
     <key alias="publishStatus">Publiceringsstatus</key>
     <key alias="releaseDate">Publiceringsdatum</key>
@@ -111,7 +115,7 @@
     <key alias="urls">Länk till dokument</key>
   </area>
   <area alias="create">
-    <key alias="chooseNode">Var vill du skapa den nya %0%</key>
+    <key alias="chooseNode">Var vill du skapa den nya {0}</key>
     <key alias="createUnder">Skapa här</key>
     <key alias="updateData">Välj typ och rubrik</key>
   </area>
@@ -121,8 +125,8 @@
     <key alias="nothinghappens">Om Umbraco inte öppnas kan det bero på att du måste tillåta poppuppfönster att öppnas från denna webbplats</key>
     <key alias="openinnew">har öppnats i ett nytt fönster</key>
     <key alias="restart">Starta om</key>
-    <key alias="visit">Besök</key>
     <key alias="welcome">Välkommen</key>
+    <key alias="visit">Besök</key>
   </area>
   <area alias="defaultdialogs">
     <key alias="anchorInsert">Namn</key>
@@ -130,7 +134,7 @@
     <key alias="closeThisWindow">Stäng fönstret</key>
     <key alias="confirmdelete">Är du säker på att du vill ta bort</key>
     <key alias="confirmdisable">Är du säker på att du vill avaktivera</key>
-    <key alias="confirmEmptyTrashcan">Kryssa i denna ruta för att bekräfta att %0% objekt tas bort</key>
+    <key alias="confirmEmptyTrashcan">Kryssa i denna ruta för att bekräfta att {0} objekt tas bort</key>
     <key alias="confirmlogout">Är du säker?</key>
     <key alias="confirmSure">Är du säker?</key>
     <key alias="cut">Klipp ut</key>
@@ -171,7 +175,7 @@
     <key alias="viewCacheItem">Se cachat objekt</key>
   </area>
   <area alias="dictionaryItem">
-    <key alias="description">Redigera de olika översättningarna för ordboksinlägget '%0%' nedan. Du kan lägga till ytterligare språk under 'språk' i menyn till vänster.</key>
+    <key alias="description">Redigera de olika översättningarna för ordboksinlägget '{0}' nedan. Du kan lägga till ytterligare språk under 'språk' i menyn till vänster.</key>
     <key alias="displayName">Språknamn</key>
   </area>
   <area alias="editcontenttype">
@@ -199,15 +203,15 @@
   <area alias="errorHandling">
     <key alias="errorButDataWasSaved">Informationen har sparats, men innan du kan publicera denna sida måste du åtgärda följande fel:</key>
     <key alias="errorChangingProviderPassword">Det går inte att byta lösenord i den medlemshanterare du har valt (EnablePasswordRetrieval måste vara satt till 'true').</key>
-    <key alias="errorExistsWithoutTab">%0% redan finns</key>
+    <key alias="errorExistsWithoutTab">{0} redan finns</key>
     <key alias="errorHeader">Följande fel inträffade:</key>
     <key alias="errorHeaderWithoutTab">Följande fel inträffade:</key>
-    <key alias="errorInPasswordFormat">Lösenordet måste bestå av minst %0% tecken varav minst %1% är icke-alfanumeriska tecken (t.ex. %, #, !, @).</key>
-    <key alias="errorIntegerWithoutTab">%0% måste vara ett heltal</key>
-    <key alias="errorMandatory">%0% under %1% är ett obligatoriskt fält</key>
-    <key alias="errorMandatoryWithoutTab">%0% är ett obligatoriskt fält</key>
-    <key alias="errorRegExp">%0% under %1% har ett felaktigt format</key>
-    <key alias="errorRegExpWithoutTab">%0% har ett felaktigt format</key>
+    <key alias="errorInPasswordFormat">Lösenordet måste bestå av minst {0} tecken varav minst {1} är icke-alfanumeriska tecken (t.ex. %, #, !, @).</key>
+    <key alias="errorIntegerWithoutTab">{0} måste vara ett heltal</key>
+    <key alias="errorMandatory">{0} under {1} är ett obligatoriskt fält</key>
+    <key alias="errorMandatoryWithoutTab">{0} är ett obligatoriskt fält</key>
+    <key alias="errorRegExp">{0} under {1} har ett felaktigt format</key>
+    <key alias="errorRegExpWithoutTab">{0} har ett felaktigt format</key>
   </area>
   <area alias="errors">
     <key alias="codemirroriewarning">Även om CodeMirror är aktiverad i konfigurationen, så är den avaktiverad i Internet Explorer på grund av att den inte är tillräckligt stabil</key>
@@ -261,6 +265,7 @@
     <key alias="email">E-post</key>
     <key alias="error">Fel</key>
     <key alias="findDocument">Hitta</key>
+    <key alias="folder">Mapp</key>
     <key alias="height">Höjd</key>
     <key alias="help">Hjälp</key>
     <key alias="icon">Ikon</key>
@@ -315,9 +320,9 @@
     <key alias="user">Användare</key>
     <key alias="username">Användarnamn</key>
     <key alias="value">Värde</key>
-    <key alias="view">Titta på</key>
     <key alias="welcome">Välkommen...</key>
     <key alias="width">Bredd</key>
+    <key alias="view">Titta på</key>
     <key alias="yes">Ja</key>
   </area>
   <area alias="graphicheadline">
@@ -335,12 +340,12 @@
     <key alias="databaseErrorWebConfig">Kunde inte spara filen web.config. Vänligen ändra databasanslutnings-inställningarna manuellt.</key>
     <key alias="databaseFound">Din databas har lokaliserats och är identifierad som</key>
     <key alias="databaseHeader">Databaskonfiguration</key>
-    <key alias="databaseInstall"><![CDATA[För att installera Umbraco %0% databasen, tryck på knappen <strong>installera</strong>]]></key>
-    <key alias="databaseInstallDone"><![CDATA[Nu har Umbraco %0% kopierats till din databas. Tryck <strong>Nästa</strong> för att fortsätta.]]></key>
+    <key alias="databaseInstall"><![CDATA[För att installera Umbraco {0} databasen, tryck på knappen <strong>installera</strong>]]></key>
+    <key alias="databaseInstallDone"><![CDATA[Nu har Umbraco {0} kopierats till din databas. Tryck <strong>Nästa</strong> för att fortsätta.]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>Databasen kunde inte hittas! Kontrollera att informationen i databasanslutnings-inställningarna i filen "web.config" är rätt.</p> <p>För att fortsätta måste du redigera filen "web.config" (du kan använda Visual Studio eller din favorit text-redigerare), bläddra till slutet, lägg till databasanslutnings-inställningarna för din databas i fältet som heter "umbracoDbDSN" och spara filen. </p> <p> Klicka på <strong>Försök igen</strong> knappen när du är klar.<br />><a href="http://umbraco.org/redir/installWebConfig" target="_blank"> Mer information om att redigera web.config hittar du här.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[För att avsluta det här steget måste du veta lite information om din databasserver ("connection string").<br /> Eventuellt kan du behöva kontakta ditt webb-hotell. Om du installerar på en lokal maskin eller server kan du få informationen från din systemadministratör.]]></key>
-    <key alias="databaseUpgrade"><![CDATA[<p> Tryck <strong>Uppgradera</strong> knappen för att uppgradera din databas till Umbraco %0%</p> <p> Du behöver inte vara orolig. Inget innehåll kommer att raderas och efteråt kommer allt att fungera som vanligt! </p>]]></key>
-    <key alias="databaseUpgradeDone"><![CDATA[Din databas har nu uppgraderats till den senaste versionen %0%.<br />Tryck <strong>Nästa</strong> för att fortsätta.]]></key>
+    <key alias="databaseUpgrade"><![CDATA[<p> Tryck <strong>Uppgradera</strong> knappen för att uppgradera din databas till Umbraco {0}</p> <p> Du behöver inte vara orolig. Inget innehåll kommer att raderas och efteråt kommer allt att fungera som vanligt! </p>]]></key>
+    <key alias="databaseUpgradeDone"><![CDATA[Din databas har nu uppgraderats till den senaste versionen {0}.<br />Tryck <strong>Nästa</strong> för att fortsätta.]]></key>
     <key alias="databaseUpToDate"><![CDATA[Din nuvarande databas behöver inte uppgraderas! Klicka <strong>Nästa</strong> för att fortsätta med konfigurationsguiden]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>Lösenordet på standardanvändaren måste bytas!</strong>]]></key>
     <key alias="defaultUserDisabled"><![CDATA[<strong>Standardanvändaren har avaktiverats eller har inte åtkomst till umbraco!</strong></p><p>Du behöver inte göra något ytterligare här. Klicka <b>Next</b> för att fortsätta.]]></key>
@@ -354,7 +359,7 @@
     <key alias="permissionsAffectedFoldersMoreInfo">Här hittar du mer information om att sätta rättigheter för umbraco</key>
     <key alias="permissionsAffectedFoldersText">Du måste ge ASP.NET ändra rättigheter till följande filer/mappar</key>
     <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Dina rättighetsinställningar är nästa perfekta!</strong>
-	<br /><br /> Du kan köra umbraco utan problem, men du kommer inte att kunna installera paket vilket är rekommenderat för att kunna utnyttja umbraco fullt ut.]]></key>
+    <br /><br /> Du kan köra umbraco utan problem, men du kommer inte att kunna installera paket vilket är rekommenderat för att kunna utnyttja umbraco fullt ut.]]></key>
     <key alias="permissionsHowtoResolve">Hur skall man lösa</key>
     <key alias="permissionsHowtoResolveLink">Klicka här för att läsa text-versionen</key>
     <key alias="permissionsHowtoResolveText"><![CDATA[Titta på vår <strong>video-självstudiekurs</strong> om hur du konfigurerar mapp-rättigheter för umbraco eller läs text-versionen.]]></key>
@@ -382,15 +387,15 @@
     <key alias="thankYou">Tack för att du valde umbraco</key>
     <key alias="theEndBrowseSite"><![CDATA[<h3>Besök din nya webbplats</h3> Du installerade Runway, så varför inte se hur din nya webbplats ser ut.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Ytterligare hjälp och information</h3> Få hjälp från våra prisbelönta community, bläddra i dokumentationen eller titta på några gratis videor om hur man bygger en enkel webbplats, hur du använder paket eller en snabbguide till umbracos terminologi]]></key>
-    <key alias="theEndHeader">Umbraco %0% är installerat och klart för användning</key>
-    <key alias="theEndInstallFailed"><![CDATA[För att avsluta installationen måste du manuellt redigera <strong>/web.config</strong> filen och ändra AppSettingsnyckeln <strong>umbracoConfigurationStatus</strong> på slutet till <strong>'%0%'</strong>]]></key>
+    <key alias="theEndHeader">Umbraco {0} är installerat och klart för användning</key>
+    <key alias="theEndInstallFailed"><![CDATA[För att avsluta installationen måste du manuellt redigera <strong>/web.config</strong> filen och ändra AppSettingsnyckeln <strong>umbracoConfigurationStatus</strong> på slutet till <strong>'{0}'</strong>]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Du kan <strong>börja omedelbart</strong> genom att klicka på "Starta Umbraco"-knappen nedan. <br />Om du är en <strong>ny umbraco användare</strong>kan du hitta massor av resurser på våra kom igång sidor.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Starta Umbraco</h3> För att administrera din webbplats öppnar du bara umbraco back office och börjar lägga till innehåll, uppdatera mallar och stilmallar eller lägga till nya funktioner.]]></key>
     <key alias="Unavailable">Anslutningen till databasen misslyckades.</key>
+    <key alias="watch">Se</key>
+    <key alias="welcomeIntro"><![CDATA[Den här guiden kommer att guida dig genom processen med att konfigurera <strong>umbraco {0}</strong> antingen för en ny installation eller en uppgradering från version 3.0. <br /><br /> Tryck på <strong>"next"</strong> för att börja.]]></key>
     <key alias="Version3">Umbraco Version 3</key>
     <key alias="Version4">Umbraco Version 4</key>
-    <key alias="watch">Se</key>
-    <key alias="welcomeIntro"><![CDATA[Den här guiden kommer att guida dig genom processen med att konfigurera <strong>umbraco %0%</strong> antingen för en ny installation eller en uppgradering från version 3.0. <br /><br /> Tryck på <strong>"next"</strong> för att börja.]]></key>
   </area>
   <area alias="language">
     <key alias="cultureCode">Språkkod</key>
@@ -401,7 +406,7 @@
     <key alias="renewSession">Förnya nu för att spara ditt arbete</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - {0} <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
     <key alias="topText">Välkommen till umbraco, skriv ditt användarnamn och lösenord i textfälten nedan:</key>
   </area>
   <area alias="main">
@@ -411,22 +416,22 @@
   </area>
   <area alias="moveOrCopy">
     <key alias="choose">Välj sida ovan...</key>
-    <key alias="copyDone">%0% har kopierats till %1%</key>
-    <key alias="copyTo">Ange mål att kopiera sidan %0% till nedan</key>
-    <key alias="moveDone">%0% har flyttats till %1%</key>
-    <key alias="moveTo">Ange vart sidan %0% skall flyttas till nedan</key>
+    <key alias="copyDone">{0} har kopierats till {1}</key>
+    <key alias="copyTo">Ange mål att kopiera sidan {0} till nedan</key>
+    <key alias="moveDone">{0} har flyttats till {1}</key>
+    <key alias="moveTo">Ange vart sidan {0} skall flyttas till nedan</key>
     <key alias="nodeSelected">är nu roten för ditt nya innehåll. Klicka 'ok' nedan.</key>
     <key alias="noNodeSelected">Du har inte valt någon sida än. Välj en sida i listan ovan och klicka sedan 'fortsätt'.</key>
     <key alias="notAllowedByContentType">Den aktuella sidan får inte vara undersida till den valda sidan eftersom den har fel dokumenttyp.</key>
     <key alias="notAllowedByPath">Den aktuella sidan kan inte flyttas till en av sina egna undersidor.</key>
     <key alias="notValid">Händelsen är inte tillåten på grund av att du inte har tillräckliga rättigheter till 1 eller flera underliggande sidor</key>
-	<key alias="relateToOriginal">Relatera kopierat objekt till orginalet</key>	
+    <key alias="relateToOriginal">Relatera kopierat objekt till orginalet</key>
   </area>
   <area alias="notifications">
-    <key alias="editNotifications">Inställningar för notifieringar gällande %0%</key>
-    <key alias="mailBody">Hej %0% Detta mail skickas till dig automatiskt för att meddela att '%1%' har utförts på sidan '%2%' av användaren '%3%' Gå till http://%4%/actions/editContent.aspx?id=%5% för att redigera.</key>
-    <key alias="mailBodyHtml"><![CDATA[<p>Hej %0%</p> <p>Detta mail skickas till dig automatiskt för att meddela att <strong>'%1%'</strong> har utförts på sidan <a href="%7%"><strong>'%2%'</strong></a> av användaren <strong>'%3%'</strong> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLICERA&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;TA BORT&nbsp;&nbsp;&nbsp;&nbsp;</a> <br /> </div> <p> <h3>Sammanfattning av uppdateringen:</h3> <table style="width: 100%;"> %6% </table> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLICERA&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;REDIGERA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;TA BORT&nbsp;&nbsp;&nbsp;&nbsp;</a> <br /> </div>]]></key>
-    <key alias="mailSubject">[%0%] Meddelande för att informera om att %1% har utförts på %2%</key>
+    <key alias="editNotifications">Inställningar för notifieringar gällande {0}</key>
+    <key alias="mailBody">Hej {0} Detta mail skickas till dig automatiskt för att meddela att '{1}' har utförts på sidan '{2}' av användaren '{3}' Gå till http://{4}/actions/editContent.aspx?id={5} för att redigera.</key>
+    <key alias="mailBodyHtml"><![CDATA[<p>Hej {0}</p> <p>Detta mail skickas till dig automatiskt för att meddela att <strong>'{1}'</strong> har utförts på sidan <a href="{7}"><strong>'{2}'</strong></a> av användaren <strong>'{3}'</strong> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://{4}/actions/publish.aspx?id={5}">&nbsp;&nbsp;PUBLICERA&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://{4}/actions/editContent.aspx?id={5}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://{4}/actions/delete.aspx?id={5}">&nbsp;&nbsp;&nbsp;&nbsp;TA BORT&nbsp;&nbsp;&nbsp;&nbsp;</a> <br /> </div> <p> <h3>Sammanfattning av uppdateringen:</h3> <table style="width: 100%;"> {6} </table> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://{4}/actions/publish.aspx?id={5}">&nbsp;&nbsp;PUBLICERA&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://{4}/actions/editContent.aspx?id={5}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;REDIGERA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://{4}/actions/delete.aspx?id={5}">&nbsp;&nbsp;&nbsp;&nbsp;TA BORT&nbsp;&nbsp;&nbsp;&nbsp;</a> <br /> </div>]]></key>
+    <key alias="mailSubject">[{0}] Meddelande för att informera om att {1} har utförts på {2}</key>
     <key alias="notifications">Notifieringar</key>
   </area>
   <area alias="packager">
@@ -467,8 +472,8 @@
     <key alias="paErrorPage">Sida med felmeddelande</key>
     <key alias="paErrorPageHelp">Används när en användare är inloggad, men saknar rättigheter att se sidan</key>
     <key alias="paHowWould">Välj hur du vill lösenordsskydda sidan</key>
-    <key alias="paIsProtected">%0% är nu lösenordsskyddad</key>
-    <key alias="paIsRemoved">Lösenordsskyddet är nu borttaget på %0%</key>
+    <key alias="paIsProtected">{0} är nu lösenordsskyddad</key>
+    <key alias="paIsRemoved">Lösenordsskyddet är nu borttaget på {0}</key>
     <key alias="paLoginPage">Inloggningssida</key>
     <key alias="paLoginPageHelp">Välj sidan med inloggningsformuläret</key>
     <key alias="paRemoveProtection">Ta bort lösenordsskydd</key>
@@ -479,14 +484,15 @@
     <key alias="paSimpleHelp">Välj detta alternativ om du vill skydda sidan med ett enkelt användarnamn och lösenord. Alla loggar då in med samma inloggningsuppgifter.</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedByEvent">%0% kunde inte publiceras på grund av att ett tredjepartstillägg avbröt publiceringen.</key>
+    <key alias="contentPublishedFailedByEvent">{0} kunde inte publiceras på grund av att ett tredjepartstillägg avbröt publiceringen.</key>
+    <key alias="contentPublishedFailedByParent"><![CDATA[{0} kan inte publiceras, på grund av att överordnad nod inte är publicerad.]]></key>
     <key alias="includeUnpublished">Inkludera opublicerade undersidor</key>
     <key alias="inProgress">Publicering pågår - vänligen vänta...</key>
-    <key alias="inProgressCounter">%0% av %1% sidor har publicerats...</key>
-    <key alias="nodePublish">%0% har publicerats</key>
-    <key alias="nodePublishAll">%0% och underliggande sidor har publicerats</key>
-    <key alias="publishAll">Publicera %0% och alla dess underordnade sidor</key>
-    <key alias="publishHelp"><![CDATA[Klicka på <em>ok</em> för att publicera <strong>%0%</strong>. Därmed blir innehållet publikt.<br/><br /> Du kan publicera denna sida och alla dess undersidor genom att kryssa i <em>publicera alla undersidor</em>. ]]></key>
+    <key alias="inProgressCounter">{0} av {1} sidor har publicerats...</key>
+    <key alias="nodePublish">{0} har publicerats</key>
+    <key alias="nodePublishAll">{0} och underliggande sidor har publicerats</key>
+    <key alias="publishAll">Publicera {0} och alla dess underordnade sidor</key>
+    <key alias="publishHelp"><![CDATA[Klicka på <em>ok</em> för att publicera <strong>{0}</strong>. Därmed blir innehållet publikt.<br/><br /> Du kan publicera denna sida och alla dess undersidor genom att kryssa i <em>publicera alla undersidor</em>. ]]></key>
   </area>
   <area alias="relatedlinks">
     <key alias="addExternal">Lägg till extern länk</key>
@@ -527,6 +533,9 @@
     <key alias="users">Användare</key>
   </area>
   <area alias="settings">
+    <key alias="asAContentMasterType">som huvudinnehållstyp. Tabbar från huvudinnehållstyper visas inte och kan endast redigeras på själva huvudinnehållstypen.</key>
+    <key alias="contentTypeEnabled">Huvudinnehållstyp påslagen</key>
+    <key alias="contentTypeUses">Denna huvudinnehållstyp använder</key>
     <key alias="defaulttemplate">Defaultmall</key>
     <key alias="dictionary editor egenskab">Ordboksnyckel</key>
     <key alias="importDocumentTypeHelp">För att importera en dokumenttyp, leta upp ".udt"-filen på din hårddisk genom att klicka på "Browse"-knappen och sedan på "Importera" (du får bekräfta ditt val i nästa steg).</key>
@@ -548,12 +557,13 @@
     <key alias="contentPublishedFailedByEvent">Publiceringen avbröts av ett tredjepartstillägg</key>
     <key alias="contentTypeDublicatePropertyType">Egenskapstyp finns redan</key>
     <key alias="contentTypePropertyTypeCreated">Egenskapstyp skapad</key>
-    <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Namn: %0% <br /> Datatyp: %1%]]></key>
+    <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Namn: {0} <br /> Datatyp: {1}]]></key>
     <key alias="contentTypePropertyTypeDeleted">Egenskapstypen har tagits bort</key>
     <key alias="contentTypeSavedHeader">Innehållstypen har sparats</key>
     <key alias="contentTypeTabCreated">Ny flik skapad</key>
     <key alias="contentTypeTabDeleted">Fliken har tagits bort</key>
-    <key alias="contentTypeTabDeletedText">Fliken med id: %0% har tagits bort</key>
+    <key alias="contentTypeTabDeletedText">Fliken med id: {0} har tagits bort</key>
+    <key alias="contentUnpublished">Innehållet är avpublicerat</key>
     <key alias="cssErrorHeader">Stilmallen kunde inte sparas</key>
     <key alias="cssSavedHeader">Stilmallen sparades</key>
     <key alias="cssSavedText">Stilmallen sparades utan fel</key>
@@ -572,12 +582,16 @@
     <key alias="editTemplateSaved">Sidmallen har sparats</key>
     <key alias="editUserError">Ett fel inträffade när användaren sparades (läs logg-filen)</key>
     <key alias="editUserSaved">Användaren har sparats</key>
-	<key alias="editUserTypeSaved">Användartypen har sparats</key>	
+    <key alias="editUserTypeSaved">Användartypen har sparats</key>
     <key alias="fileErrorHeader">Filen sparades inte</key>
     <key alias="fileErrorText">filen kunde inte sparas. Kontrollera filrättigheterna</key>
     <key alias="fileSavedHeader">Filen har sparats</key>
     <key alias="fileSavedText">Filen sparades utan fel</key>
     <key alias="languageSaved">Språket har sparats</key>
+    <key alias="partialViewErrorHeader">TRANSLATE ME: 'Partial view not saved'</key>
+    <key alias="partialViewErrorText">Ett fel uppstod när filen sparades</key>
+    <key alias="partialViewSavedHeader">TRANSLATE ME: 'Partial view saved'</key>
+    <key alias="partialViewSavedText">TRANSLATE ME: 'Partial view saved without any errors!'</key>
     <key alias="pythonErrorHeader">Pythonscriptet har inte sparats</key>
     <key alias="pythonErrorText">Pythonscriptet kunde inte sparas på grund av ett fel</key>
     <key alias="pythonSavedHeader">Pythonscriptet har sparats</key>
@@ -618,7 +632,7 @@
     <key alias="chooseField">Välj fält</key>
     <key alias="convertLineBreaks">Konvertera radbrytningar</key>
     <key alias="convertLineBreaksHelp">Byter radbrytningar mot html-taggen &amp;lt;br&amp;gt;</key>
-	<key alias="customFields">Anpassade fält</key>
+    <key alias="customFields">Anpassade fält</key>
     <key alias="dateOnly">Ja, endast datum</key>
     <key alias="formatAsDate">Formatera som datum</key>
     <key alias="htmlEncode">HTML-omkodning</key>
@@ -632,7 +646,7 @@
     <key alias="recursive">Rekursiv</key>
     <key alias="removeParagraph">Avlägsna stycke-taggar</key>
     <key alias="removeParagraphHelp">Kommer att avlägsna alla &amp;lt;P&amp;gt; i början och slutet av texten</key>
-	<key alias="standardFields">Standardfält</key>
+    <key alias="standardFields">Standardfält</key>
     <key alias="uppercase">Versaler</key>
     <key alias="urlEncode">URL-koda</key>
     <key alias="urlEncodeHelp">Om fältets innehåll skall sändas till en url, skall detta slås på så att specialtecken kodas</key>
@@ -650,13 +664,13 @@
     <key alias="DownloadXmlDTD">Ladda hem DTD för XML</key>
     <key alias="fields">Fält</key>
     <key alias="includeSubpages">Inkludera undersidor</key>
-    <key alias="mailBody">Hej %0%. Detta är ett automatisk mail skickat for att informera dig om att det finns en översättningsförfrågan på dokument '%1' till '%5%' skickad av %2%. För att redigere, besök http://%3%/translation/details.aspx?id=%4%. För att få en översikt över dina översättningsuppgigter loggar du in i umbraco på: http://%3%/umbraco.aspx</key>
-    <key alias="mailSubject">[%0%] Översättningsuppgit för %1%</key>
+    <key alias="mailBody">Hej {0}. Detta är ett automatisk mail skickat for att informera dig om att det finns en översättningsförfrågan på dokument '%1' till '{5}' skickad av {2}. För att redigere, besök http://{3}/translation/details.aspx?id={4}. För att få en översikt över dina översättningsuppgigter loggar du in i umbraco på: http://{3}/umbraco.aspx</key>
+    <key alias="mailSubject">[{0}] Översättningsuppgit för {1}</key>
     <key alias="noTranslators">Hittade inga användare som är översättare. Vänligen skapa en användare som är översättare innan du börjar skicka innehåll för översättning</key>
     <key alias="ownedTasks">Arbetsuppgifter som du har skapat</key>
     <key alias="ownedTasksHelp"><![CDATA[Listan nedan visar sidor <strong>som du har skapat</strong>. För att se en detaljvy med kommentarer, klicka på "Detaljer" eller på sidans namn. Du kan också ladda ned sidan i XML-format genom att klicka på länken "Ladda ned XML".<br/> För att markera ett översättningsjobb som avslutat, gå till detaljvyn och klicka på knappen "Stäng".]]></key>
-    <key alias="pageHasBeenSendToTranslation">Sidan '%0%' har skickats för översättning</key>
-    <key alias="sendToTranslate">Skicka sidan '%0%' för översättning</key>
+    <key alias="pageHasBeenSendToTranslation">Sidan '{0}' har skickats för översättning</key>
+    <key alias="sendToTranslate">Skicka sidan '{0}' för översättning</key>
     <key alias="taskAssignedBy">Tilldelat av</key>
     <key alias="taskOpened">Arbetsuppgift öppnad</key>
     <key alias="totalWords">Totalt antal ord</key>
@@ -700,7 +714,7 @@
   </area>
   <area alias="update">
     <key alias="updateAvailable">Ny uppdatering tillgänglig</key>
-    <key alias="updateDownloadText">%0% är klart, klicka här för att ladda ner</key>
+    <key alias="updateDownloadText">{0} är klart, klicka här för att ladda ner</key>
     <key alias="updateNoServer">Ingen kontakt med server</key>
     <key alias="updateNoServerError">Fel vid kontroll av uppdatering. Se trace-stack för mer information.</key>
   </area>
@@ -709,6 +723,7 @@
     <key alias="categoryField">Kategorifält</key>
     <key alias="changePassword">Ändra lösenord</key>
     <key alias="changePasswordDescription">Du kan byta ditt lösenord för Umbraco Back Office genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".</key>
+    <key alias="confirmNewPassword">Bekräfta det nya lösenordet</key>
     <key alias="contentChannel">Innehållskanal</key>
     <key alias="defaultToLiveEditing">Gå direkt till Canvas efter inloggning</key>
     <key alias="descriptionField">Fält för beskrivning</key>
@@ -720,14 +735,15 @@
     <key alias="loginname">Login</key>
     <key alias="mediastartnode">Startnod i mediabiblioteket</key>
     <key alias="modules">Sektioner</key>
+    <key alias="newPassword">Byt ditt lösenord</key>
     <key alias="noConsole">Inaktivera tillgång till Umbraco</key>
     <key alias="password">Lösenord</key>
     <key alias="passwordChanged">Ditt lösenord är nu ändrat!</key>
     <key alias="passwordConfirm">Vänligen bekräfta ditt nya lösenord</key>
+    <key alias="passwordCurrent">Nuvarande lösenord</key>
     <key alias="passwordEnterNew">Vänligen fyll i ditt nya lösenord</key>
+    <key alias="passwordInvalid">Nuvarande lösenord är ogiltigt</key>
     <key alias="passwordIsBlank">Ditt nya lösenord kan inte vara tomt!</key>
-	<key alias="passwordCurrent">Nuvarande lösenord</key>
-	<key alias="passwordInvalid">Nuvarande lösenord är ogiltigt</key>	
     <key alias="passwordIsDifferent">Lösenorden matchar inte. Vänligen försök igen!</key>
     <key alias="passwordMismatch">Det bekräftade lösenordet matchar inte det nya lösenordet!</key>
     <key alias="permissionReplaceChildren">Ersätt rättigheterna på underliggande noder</key>
