@@ -42,9 +42,13 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoReservedUrls")
-                    ? ConfigurationManager.AppSettings["umbracoReservedUrls"]
-                    : string.Empty;
+                const string staticReservedUrls = "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd,";
+
+                var urls = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedUrls")
+                               ? ConfigurationManager.AppSettings["umbracoReservedUrls"]
+                               : string.Empty;
+
+                return staticReservedUrls + urls;
             }
         }
 
@@ -56,9 +60,14 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths")
+                //ensure the built on (non-changeable) reserved paths are there at all times
+                const string staticReservedPaths = "~/app_plugins/,~/install/,";
+
+                var paths = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths")
                            ? ConfigurationManager.AppSettings["umbracoReservedPaths"]
                            : string.Empty;
+
+                return staticReservedPaths + paths;
             }
         }
 
