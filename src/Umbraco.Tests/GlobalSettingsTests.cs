@@ -16,14 +16,14 @@ namespace Umbraco.Tests
 		}
 
 		public override void Initialize()
-		{
+		{            
 			base.Initialize();
+            SettingsForTests.UmbracoPath = "~/umbraco";
 		}
 
 		public override void TearDown()
 		{
             //reset the app config		            
-            Umbraco.Core.Configuration.GlobalSettings.ResetCache();
 			base.TearDown();
 			
 		}
