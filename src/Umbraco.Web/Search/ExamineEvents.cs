@@ -217,10 +217,18 @@ namespace Umbraco.Web.Search
         }
 
         private static void IndexConent(IContent sender)
-        {
+        {            
+            //only index this content if the indexer supports unpublished content. that is because the 
+            // content.AfterUpdateDocumentCache will handle anything being published and will only index against indexers
+            // that only support published content. 
+            // NOTE: The events for publishing have changed slightly from 6.0 to 6.1 and are streamlined in 6.1. Before
+            // this event would fire before publishing, then again after publishing. Now the save event fires once before
+            // publishing and that is all. 
+            
             ExamineManager.Instance.ReIndexNode(
                 sender.ToXml(), "content",
-                ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler));
+                ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
+                    .Where(x => x.SupportUnpublishedContent && x.EnableDefaultEventHandler));
         }
 
 		/// <summary>
