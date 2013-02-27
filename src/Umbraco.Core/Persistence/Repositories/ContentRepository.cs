@@ -78,7 +78,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContent>(sqlClause, query);
-            var sql = translator.Translate();
+            var sql = translator.Translate()
+                                .Where<DocumentDto>(x => x.Newest)
+                                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
             //NOTE: This doesn't allow properties to be part of the query
             var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
