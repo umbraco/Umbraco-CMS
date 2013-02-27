@@ -75,13 +75,13 @@ namespace Umbraco.Tests.TestHelpers
         public static string ReservedPaths
         {
             get { return GlobalSettings.ReservedPaths; }
-            set { ConfigurationManager.AppSettings.Set("umbracoReservedPaths", value); }
+            set { GlobalSettings.ReservedPaths = value; }
         }
 
         public static string ReservedUrls
         {
             get { return GlobalSettings.ReservedUrls; }
-            set { ConfigurationManager.AppSettings.Set("umbracoReservedUrls", value); }
+            set { GlobalSettings.ReservedUrls = value; }
         }
 
         public static string ConfigurationStatus
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.TestHelpers
         public static void Reset()
         {
             UmbracoSettings.ResetSetters();
-
+            GlobalSettings.ResetCache();
             foreach (var kvp in SavedAppSettings)
                 ConfigurationManager.AppSettings.Set(kvp.Key, kvp.Value);
 
