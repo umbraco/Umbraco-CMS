@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -216,32 +217,37 @@ namespace Umbraco.Core.Persistence.Repositories
                                     });
             }
 
-            //Delete PropertyTypes by excepting entries from db with entries from collections
-            var dbPropertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new {Id = entity.Id});
-            var dbPropertyTypeAlias = dbPropertyTypes.Select(x => x.Id);
-            var entityPropertyTypes = entity.PropertyTypes.Where(x => x.HasIdentity).Select(x => x.Id);
-            var items = dbPropertyTypeAlias.Except(entityPropertyTypes);
-            foreach (var item in items)
+            if (((ICanBeDirty) entity).IsPropertyDirty("PropertyTypes") || entity.PropertyTypes.Any(x => x.IsDirty()))
             {
-                //Before a PropertyType can be deleted, all Properties based on that PropertyType should be deleted.
-                Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new {Id = item});
-
-                Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND id = @PropertyTypeId",
-                                                 new {Id = entity.Id, PropertyTypeId = item});
+                //Delete PropertyTypes by excepting entries from db with entries from collections
+                var dbPropertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new {Id = entity.Id});
+                var dbPropertyTypeAlias = dbPropertyTypes.Select(x => x.Id);
+                var entityPropertyTypes = entity.PropertyTypes.Where(x => x.HasIdentity).Select(x => x.Id);
+                var items = dbPropertyTypeAlias.Except(entityPropertyTypes);
+                foreach (var item in items)
+                {
+                    //Before a PropertyType can be deleted, all Properties based on that PropertyType should be deleted.
+                    Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new {Id = item});
+                    Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND id = @PropertyTypeId",
+                                                     new {Id = entity.Id, PropertyTypeId = item});
+                }
             }
 
-            //Delete Tabs/Groups by excepting entries from db with entries from collections
-            var dbPropertyGroups =
-                Database.Fetch<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id", new {Id = entity.Id})
-                        .Select(x => new Tuple<int, string>(x.Id, x.Text));
-            var entityPropertyGroups = entity.PropertyGroups.Select(x => new Tuple<int, string>(x.Id, x.Name));
-            var tabs = dbPropertyGroups.Except(entityPropertyGroups);
-            foreach (var tab in tabs)
+            if (((ICanBeDirty) entity).IsPropertyDirty("PropertyGroups") || entity.PropertyGroups.Any(x => x.IsDirty()))
             {
-                Database.Update<PropertyTypeGroupDto>("SET parentGroupId = NULL WHERE parentGroupId = @TabId",
-                                                      new {TabId = tab.Item1});
-                Database.Delete<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id AND text = @Name",
-                                                      new {Id = entity.Id, Name = tab.Item2});
+                //Delete Tabs/Groups by excepting entries from db with entries from collections
+                var dbPropertyGroups =
+                    Database.Fetch<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id", new {Id = entity.Id})
+                            .Select(x => new Tuple<int, string>(x.Id, x.Text));
+                var entityPropertyGroups = entity.PropertyGroups.Select(x => new Tuple<int, string>(x.Id, x.Name));
+                var tabs = dbPropertyGroups.Except(entityPropertyGroups);
+                foreach (var tab in tabs)
+                {
+                    Database.Update<PropertyTypeGroupDto>("SET parentGroupId = NULL WHERE parentGroupId = @TabId",
+                                                          new {TabId = tab.Item1});
+                    Database.Delete<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id AND text = @Name",
+                                                          new {Id = entity.Id, Name = tab.Item2});
+                }
             }
 
             //Run through all groups to insert or update entries
@@ -332,8 +338,11 @@ namespace Umbraco.Core.Persistence.Repositories
                                     HelpText = dto.HelpText,
                                     Mandatory = dto.Mandatory,
                                     SortOrder = dto.SortOrder
-                                });
-            
+                                }).ToList();
+
+            //Reset dirty properties
+            Parallel.ForEach(list, currentFile => currentFile.ResetDirtyProperties());
+
             return new PropertyTypeCollection(list);
         }
     }

@@ -347,6 +347,7 @@ namespace Umbraco.Core.Models
             if (PropertyTypeExists(propertyType.Alias) == false)
             {
                 _propertyTypes.Add(propertyType);
+                _propertyTypes.CollectionChanged += PropertyTypesChanged;
                 return true;
             }
 
@@ -378,9 +379,5 @@ namespace Umbraco.Core.Models
         {
             _parentId = id;
         }
-
-        //TODO Implement moving PropertyType between groups.
-        /*public bool MovePropertyTypeToGroup(string propertyTypeAlias, string groupName)
-        {}*/
     }
 }
