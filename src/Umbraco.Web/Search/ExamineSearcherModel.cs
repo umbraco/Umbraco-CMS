@@ -2,15 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Examine;
 
 namespace Umbraco.Web.Search
 {
-    public class ExamineIndexerModel : ExamineSearcherModel
-    {
-        public IIndexCriteria IndexCriteria { get; set; }
-    }
-
     public class ExamineSearcherModel
     {
         public ExamineSearcherModel()

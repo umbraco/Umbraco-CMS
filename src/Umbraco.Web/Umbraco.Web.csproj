@@ -100,9 +100,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\xmlrpcnet.2.5.0\lib\net20\CookComputing.XmlRpcV2.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.48.2941, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Examine, Version=0.1.50.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.48.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.50.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.5.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -322,6 +322,8 @@
     <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
     <Compile Include="Mvc\ControllerFactoryExtensions.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
+    <Compile Include="Search\ExamineIndexerModel.cs" />
+    <Compile Include="Search\LuceneIndexerExtensions.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
@@ -384,7 +386,7 @@
     <Compile Include="Routing\EnsureRoutableOutcome.cs" />
     <Compile Include="Routing\PublishedContentRequestEngine.cs" />
     <Compile Include="Routing\WebServicesRouteConstraint.cs" />
-    <Compile Include="Search\ExamineDetailsModel.cs" />
+    <Compile Include="Search\ExamineSearcherModel.cs" />
     <Compile Include="Search\ExamineEvents.cs" />
     <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="Strategies\DataTypes\LegacyUploadFieldWorkaround.cs" />
