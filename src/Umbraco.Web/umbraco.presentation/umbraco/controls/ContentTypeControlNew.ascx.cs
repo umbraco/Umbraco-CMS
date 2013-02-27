@@ -521,9 +521,9 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             foreach (cms.businesslogic.propertytype.PropertyType pt in _contentType.PropertyTypes)
             {
                 //This use to be:
-                //if (pt.ContentTypeId == cType.Id && !inTab.ContainsKey(pt.Id.ToString())
+                if (pt.ContentTypeId == _contentType.Id && !inTab.ContainsKey(pt.Id.ToString()))
                 //But seriously, if it's not on a tab the tabId is 0, it's a lot easier to read IMO
-                if (pt.ContentTypeId == _contentType.Id && pt.TabId == 0)
+                //if (pt.ContentTypeId == _contentType.Id && pt.TabId == 0)
                 {
                     var gpw = new GenericPropertyWrapper();
 
@@ -1038,10 +1038,10 @@ Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
                         _contentType.Save();
                     }
                 }
-                else
-                {
-                    _contentType.DeleteVirtualTab(propertyGroupId);
-                }
+
+                _contentType.DeleteVirtualTab(propertyGroupId);
+
+                LoadContentType();
 
                 var ea = new SaveClickEventArgs(ui.Text("contentTypeTabDeleted"));
                 ea.IconType = BasePage.speechBubbleIcon.success;

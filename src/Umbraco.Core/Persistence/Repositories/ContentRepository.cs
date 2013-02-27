@@ -452,6 +452,17 @@ namespace Umbraco.Core.Persistence.Repositories
             var propertyDataDtos = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql);
             var propertyFactory = new PropertyFactory(contentType, versionId, id);
             var properties = propertyFactory.BuildEntity(propertyDataDtos);
+
+            var newProperties = properties.Where(x => x.HasIdentity == false);
+            foreach (var property in newProperties)
+            {
+                var propertyDataDto = new PropertyDataDto{ NodeId = id, PropertyTypeId = property.PropertyTypeId, VersionId = versionId };
+                int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
+
+                property.Version = versionId;
+                property.Id = primaryKey;
+            }
+
             return new PropertyCollection(properties);
         }
     }

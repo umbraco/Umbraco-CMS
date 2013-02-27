@@ -243,6 +243,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 var tabs = dbPropertyGroups.Except(entityPropertyGroups);
                 foreach (var tab in tabs)
                 {
+                    Database.Update<PropertyTypeDto>("SET propertyTypeGroupId = NULL WHERE propertyTypeGroupId = @PropertyGroupId",
+                                                    new {PropertyGroupId = tab.Item1});
                     Database.Update<PropertyTypeGroupDto>("SET parentGroupId = NULL WHERE parentGroupId = @TabId",
                                                           new {TabId = tab.Item1});
                     Database.Delete<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id AND text = @Name",
@@ -259,6 +261,14 @@ namespace Umbraco.Core.Persistence.Repositories
                                           : Convert.ToInt32(Database.Insert(tabDto));
                 if (propertyGroup.HasIdentity == false)
                     propertyGroup.Id = groupPrimaryKey; //Set Id on new PropertyGroup
+
+                //Ensure that the PropertyGroup's Id is set on the PropertyTypes within a group
+                //unless the PropertyGroupId has already been changed.
+                foreach (var propertyType in propertyGroup.PropertyTypes)
+                {
+                    if (propertyType.IsPropertyDirty("PropertyGroupId") == false)
+                        propertyType.PropertyGroupId = propertyGroup.Id;
+                }
             }
 
             //Run through all PropertyTypes to insert or update entries
