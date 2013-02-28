@@ -348,6 +348,7 @@
     <Compile Include="Persistence\Migrations\Syntax\Delete\Index\IDeleteIndexOnColumnSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Delete\Table\DeleteTableBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Execute\ExecuteBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Execute\Expressions\ExecuteCodeStatementExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Execute\Expressions\ExecuteSqlStatementExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Execute\IExecuteBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\ExpressionBuilder.cs" />

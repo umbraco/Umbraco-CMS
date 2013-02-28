@@ -10,17 +10,27 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
     {
         public override void Up()
         {
-            if (base.Context != null && base.Context.Database != null)
+            Execute.Code(UpdatePropertyTypesAndGroupsDo);
+        }
+
+        public override void Down()
+        {
+            
+        }
+
+        public static string UpdatePropertyTypesAndGroupsDo(Database database)
+        {
+            if (database != null)
             {
-                var propertyTypes = base.Context.Database.Fetch<PropertyTypeDto>("WHERE propertyTypeGroupId > 0");
-                var propertyGroups = base.Context.Database.Fetch<PropertyTypeGroupDto>("WHERE id > 0");
+                var propertyTypes = database.Fetch<PropertyTypeDto>("WHERE propertyTypeGroupId > 0");
+                var propertyGroups = database.Fetch<PropertyTypeGroupDto>("WHERE id > 0");
 
                 foreach (var propertyType in propertyTypes)
                 {
                     var parentPropertyTypeGroup = propertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyTypeGroupId);
                     if (parentPropertyTypeGroup != null)
                     {
-                        if(parentPropertyTypeGroup.ContentTypeNodeId == propertyType.ContentTypeId) continue;
+                        if (parentPropertyTypeGroup.ContentTypeNodeId == propertyType.ContentTypeId) continue;
 
                         var propertyGroup = new PropertyTypeGroupDto
                                                 {
@@ -30,17 +40,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
                                                     SortOrder = parentPropertyTypeGroup.SortOrder
                                                 };
 
-                        int id = Convert.ToInt16(base.Context.Database.Insert(propertyGroup));
+                        int id = Convert.ToInt16(database.Insert(propertyGroup));
                         propertyType.PropertyTypeGroupId = id;
-                        base.Context.Database.Update(propertyType);
+                        database.Update(propertyType);
                     }
                 }
             }
-        }
 
-        public override void Down()
-        {
-            
+            return string.Empty;
         }
     }
 }
