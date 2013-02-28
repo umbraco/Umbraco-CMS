@@ -105,7 +105,7 @@ namespace Umbraco.Core.Persistence.Migrations
                                   migrationAttribute.TargetVersion > _configuredVersion &&
                                   migrationAttribute.TargetVersion <= _targetVersion &&
                                   migrationAttribute.ProductName == _productName
-                              orderby migrationAttribute.SortOrder ascending 
+                              orderby migrationAttribute.TargetVersion, migrationAttribute.SortOrder ascending 
                               select migration);
             return migrations;
         }
@@ -119,7 +119,8 @@ namespace Umbraco.Core.Persistence.Migrations
                                   migrationAttribute.TargetVersion > _configuredVersion &&
                                   migrationAttribute.TargetVersion <= _targetVersion &&
                                   migrationAttribute.ProductName == _productName
-                              orderby migrationAttribute.SortOrder descending 
+                              orderby migrationAttribute.TargetVersion, migrationAttribute.SortOrder descending 
+
                               select migration);
             return migrations;
         }
