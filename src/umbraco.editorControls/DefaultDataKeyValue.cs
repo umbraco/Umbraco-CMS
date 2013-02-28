@@ -20,17 +20,22 @@ namespace umbraco.editorControls
 		{
 			// Get the value from 
 			string v = "";
-			try 
+			try
 			{
-                IRecordsReader dr = SqlHelper.ExecuteReader("Select [value] from cmsDataTypeprevalues where id in (" + SqlHelper.EscapeString(Value.ToString()) + ")");
+                // Don't query if there's nothing to query for..
+                if (string.IsNullOrWhiteSpace(Value.ToString()) == false)
+                {
+                    IRecordsReader dr = SqlHelper.ExecuteReader("Select [value] from cmsDataTypeprevalues where id in (@id)", SqlHelper.CreateParameter("id", Value.ToString()));
 
-				while (dr.Read()) {
-					if (v.Length == 0)
-						v += dr.GetString("value");
-					else
-						v += "," + dr.GetString("value");
-				}
-				dr.Close();
+                    while (dr.Read())
+                    {
+                        if (v.Length == 0)
+                            v += dr.GetString("value");
+                        else
+                            v += "," + dr.GetString("value");
+                    }
+                    dr.Close();
+                }
 			} 
 			catch {}
 			return d.CreateCDataSection(v);
