@@ -99,5 +99,13 @@ namespace Umbraco.Core.Models
         /// <param name="groupName">Name of the PropertyGroup to add</param>
         /// <returns>Returns <c>True</c> if a PropertyGroup with the passed in name was added, otherwise <c>False</c></returns>
         bool AddPropertyGroup(string groupName);
+
+        /// <summary>
+        /// Moves a PropertyType to a specified PropertyGroup
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType to move</param>
+        /// <param name="propertyGroupName">Name of the PropertyGroup to move the PropertyType to</param>
+        /// <returns></returns>
+        bool MovePropertyType(string propertyTypeAlias, string propertyGroupName);
     }
 }

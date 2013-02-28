@@ -363,6 +363,34 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Moves a PropertyType to a specified PropertyGroup
+        /// </summary>
+        /// <param name="propertyTypeAlias">Alias of the PropertyType to move</param>
+        /// <param name="propertyGroupName">Name of the PropertyGroup to move the PropertyType to</param>
+        /// <returns></returns>
+        public bool MovePropertyType(string propertyTypeAlias, string propertyGroupName)
+        {
+            if (PropertyTypes.Any(x => x.Alias == propertyTypeAlias) == false || PropertyGroups.Any(x => x.Name == propertyGroupName) == false)
+                return false;
+
+            var propertyType = PropertyTypes.First(x => x.Alias == propertyTypeAlias);
+            //The PropertyType already belongs to a PropertyGroup, so we have to remove the PropertyType from that group
+            if (PropertyGroups.Any(x => x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias)))
+            {
+                var oldPropertyGroup = PropertyGroups.First(x => x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias));
+                oldPropertyGroup.PropertyTypes.RemoveItem(propertyTypeAlias);
+            }
+
+            propertyType.PropertyGroupId = default(int);
+            propertyType.ResetDirtyProperties();
+
+            var propertyGroup = PropertyGroups.First(x => x.Name == propertyGroupName);
+            propertyGroup.PropertyTypes.Add(propertyType);
+
+            return true;
+        }
+
+        /// <summary>
         /// Removes a PropertyType from the current ContentType
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the <see cref="PropertyType"/> to remove</param>
