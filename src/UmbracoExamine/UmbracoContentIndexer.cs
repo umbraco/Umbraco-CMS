@@ -208,8 +208,16 @@ namespace UmbracoExamine
             if (!SupportedTypes.Contains(type))
                 return;
 
-            DataService.LogService.AddVerboseLog((int)node.Attribute("id"), string.Format("ReIndexNode with type: {0}", type));
-            base.ReIndexNode(node, type);
+            if (node.Attribute("id") != null)
+            {
+                DataService.LogService.AddVerboseLog((int) node.Attribute("id"), string.Format("ReIndexNode with type: {0}", type));
+                base.ReIndexNode(node, type);
+            }
+            else
+            {
+                DataService.LogService.AddErrorLog(-1, string.Format("ReIndexNode cannot proceed, the format of the XElement is invalid, the xml has no 'id' attribute. {0}", node));
+            }
+            
         }
 
         /// <summary>

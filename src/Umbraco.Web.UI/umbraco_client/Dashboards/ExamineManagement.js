@@ -8,7 +8,40 @@
         _opts: null,
         _koViewModel: null,
 
-        _mapSearcherModelProperties : function(indexerModel) {
+        _mapSearcherModelProperties: function (indexerModel) {
+            var self = this;
+            
+            var viewModel = self._mapBaseProviderModelProperties(indexerModel);
+
+            //add custom searcher props
+            viewModel.searchText = ko.observable("");
+            viewModel.searchType = ko.observable("text");
+            viewModel.isSearching = ko.observable(false);
+            viewModel.closeSearch = function() {
+                this.isSearching(false);
+            };
+            //add flag properties to determine if either button has been pressed
+            viewModel.isProcessing = ko.observable(false);
+            //don't need an observable array since it does not change, just need an observable to hold an array.
+            viewModel.searchResults = ko.observable([]);
+            viewModel.search = function () {
+                //NOTE: 'this' is the ko view model
+                this.isSearching(true);
+                self._doSearch(this);
+            };
+            viewModel.handleEnter = function(vm, event) {
+                var keyCode = (event.which ? event.which : event.keyCode);
+                if (keyCode === 13) {
+                    vm.search();
+                    return false;
+                }
+                return true;
+            };
+
+            return viewModel;
+        },
+
+        _mapBaseProviderModelProperties : function(indexerModel) {
             var self = this;
             
             //do the ko auto-mapping
@@ -24,6 +57,14 @@
             viewModel.toggleProperties = function () {
                 this.showProperties(!this.showProperties());
             };
+            viewModel.showProviderProperties = ko.observable(false);
+            viewModel.toggleProviderProperties = function () {
+                this.showProviderProperties(!this.showProviderProperties());
+            };
+            viewModel.showTools = ko.observable(false);
+            viewModel.toggleTools = function () {
+                this.showTools(!this.showTools());
+            };
 
             return viewModel;
         },
@@ -37,8 +78,10 @@
             if (!isUpdate) {
                 //do the ko auto-mapping to the new object and create additional properties
                 
-                viewModel = self._mapSearcherModelProperties(indexerModel);
+                viewModel = self._mapBaseProviderModelProperties(indexerModel);
                 
+                //property to track how many attempts have been made to check if the index is optimized or rebuilt
+                viewModel.processingAttempts = ko.observable(0);
                 //add a hasDeletions prop
                 viewModel.hasDeletions = ko.observable(indexerModel.DeletionCount > 0);
                 //add toggle and show properties 
@@ -54,15 +97,7 @@
                 viewModel.showNodeTypes = ko.observable(false);
                 viewModel.toggleNodeTypes = function () {
                     this.showNodeTypes(!this.showNodeTypes());
-                };
-                viewModel.showProviderProperties = ko.observable(false);
-                viewModel.toggleProviderProperties = function () {
-                    this.showProviderProperties(!this.showProviderProperties());
-                };
-                viewModel.showIndexTools = ko.observable(false);
-                viewModel.toggleIndexTools = function () {
-                    this.showIndexTools(!this.showIndexTools());
-                };
+                };                                
                 //add flag properties to determine if either button has been pressed
                 viewModel.isProcessing = ko.observable(false);
                 //add the button methods
@@ -71,7 +106,8 @@
                         "Depending on how much content there is in your site this could take a while. " +
                         "It is not recommended to rebuild an index during times of high website traffic " +
                         "or when editors are editing content.")) {
-
+                        //NOTE: 'this' is the knockoutjs model that is bound
+                        self._doProcessing(this.Name(), this, "PostRebuildIndex", "PostCheckRebuildIndex");
                     }
                 };
                 viewModel.optimizeIndex = function () {
@@ -79,7 +115,7 @@
                         "It is not recommended to optimize an index during times of high website traffic " +
                         "or when editors are editing content.")) {
                         //NOTE: 'this' is the knockoutjs model that is bound
-                        self._optimizeIndex(indexerModel.Name, this);
+                        self._doProcessing(this.Name(), this, "PostOptimizeIndex", "PostCheckOptimizeIndex");
                     }
                 };
             }
@@ -100,18 +136,34 @@
 
             return viewModel;
         },
+        
+        _doSearch: function(viewModel) {
+            var self = this;
+            viewModel.isProcessing(true);
+            $.get(self._opts.restServiceLocation + "GetSearchResults?searcherName=" + viewModel.Name() + "&query=" + viewModel.searchText() + "&queryType=" + viewModel.searchType(),
+                function(searchResults) {
+                    viewModel.isProcessing(false);
+                    //re-map the fields dictionary to array
+                    for (var s in searchResults) {
+                        searchResults[s].Fields = self._mapDictionaryToArray(searchResults[s].Fields);
+                    }                    
+                    viewModel.searchResults(searchResults);
+                }).fail(function(a, b, c) {
+                    alert(b + ": " + a.responseText);
+                });
+        },
 
-        _optimizeIndex: function (name, viewModel) {
+        _doProcessing: function (name, viewModel, processingActionName, pollActionName) {
             var self = this;
             viewModel.isProcessing(true); //set the model processing
 
-            $.post(self._opts.restServiceLocation + "PostOptimizeIndex?indexerName=" + name,
+            $.post(self._opts.restServiceLocation + processingActionName + "?indexerName=" + name,
                 function (data) {
                     
                     //optimization has started, nothing is returned accept a 200 status code.
                     //lets poll to see if it is done.
                     setTimeout(function() {
-                        self._checkOptimizeIndex(name, viewModel);
+                        self._checkProcessing(name, viewModel, pollActionName);
                     }, 1000);
 
                 }).fail(function (a, b, c) {
@@ -119,10 +171,10 @@
                 });
         },
         
-        _checkOptimizeIndex: function (name, viewModel) {
+        _checkProcessing: function (name, viewModel, actionName) {
             var self = this;
 
-            $.post(self._opts.restServiceLocation + "PostCheckOptimizeIndex?indexerName=" + name,
+            $.post(self._opts.restServiceLocation + actionName + "?indexerName=" + name,
                 function (data) {
                     if (data) {
                         //success! now, we need to re-update the whole indexer model
@@ -130,8 +182,20 @@
                         viewModel.isProcessing(false);
                     }
                     else {
+                        //copy local from closure
+                        var vm = viewModel;
+                        var an = actionName;
                         setTimeout(function () {
-                            self._checkOptimizeIndex(name);
+                            //don't continue if we've tried 100 times
+                            if (vm.processingAttempts() < 100) {
+                                self._checkProcessing(name, vm, an);
+                                //add an attempt
+                                vm.processingAttempts(vm.processingAttempts() + 1);
+                            }
+                            else {
+                                //we've exceeded 100 attempts, stop processing
+                                viewModel.isProcessing(false);
+                            }
                         }, 1000);
                     }
                 }).fail(function (a, b, c) {

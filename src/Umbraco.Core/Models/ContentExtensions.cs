@@ -457,6 +457,41 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Creates the full xml representation for the <see cref="IContent"/> object and all of it's descendants
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> to generate xml for</param>
+        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        internal static XElement ToDeepXml(this IContent content)
+        {
+            var xml = content.ToXml();
+            
+            var descendants = content.Descendants().ToArray();
+            var currentChildren = descendants.Where(x => x.ParentId == content.Id);
+            AddChildXml(descendants, currentChildren, xml);      
+
+            return xml;
+        }
+
+        private static void AddChildXml(
+            IContent[] originalDescendants, 
+            IEnumerable<IContent> currentChildren, 
+            XElement currentXml)
+        {
+            foreach (var child in currentChildren)
+            {
+                //add the child's xml
+                var childXml = child.ToXml();
+                currentXml.Add(childXml);
+                //copy local (out of closure)
+                var c = child;
+                //get this item's children                
+                var children = originalDescendants.Where(x => x.ParentId == c.Id);
+                //recurse and add it's children to the child xml element
+                AddChildXml(originalDescendants, children, childXml);
+            }
+        }
+
+        /// <summary>
         /// Creates the xml representation for the <see cref="IContent"/> object
         /// </summary>
         /// <param name="content"><see cref="IContent"/> to generate xml for</param>

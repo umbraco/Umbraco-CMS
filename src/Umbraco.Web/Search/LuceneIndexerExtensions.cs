@@ -62,6 +62,20 @@ namespace Umbraco.Web.Search
         }
 
         /// <summary>
+        /// Check if the index is locked
+        /// </summary>
+        /// <param name="indexer"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// If the index does not exist we'll consider it locked
+        /// </remarks>
+        public static bool IsIndexLocked(this LuceneIndexer indexer)
+        {
+            return !indexer.IndexExists()
+                   || IndexWriter.IsLocked(indexer.GetSearcherForIndexer().GetIndexReaderForSearcher().Directory());
+        }
+
+        /// <summary>
         /// The number of documents deleted in the index
         /// </summary>
         /// <param name="indexer"></param>

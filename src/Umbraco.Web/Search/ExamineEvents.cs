@@ -237,25 +237,10 @@ namespace Umbraco.Web.Search
 		/// <param name="node"></param>
 		/// <param name="cacheOnly">true if data is going to be returned from cache</param>
 		/// <returns></returns>
-		/// <remarks>
-		/// If the type of node is not a Document, the cacheOnly has no effect, it will use the API to return
-		/// the xml. 
-		/// </remarks>
 		[SecuritySafeCritical]
+        [Obsolete("This method is no longer used and will be removed from the core in future versions, the cacheOnly parameter has no effect. Use the other ToXDocument overload instead")]
 		public static XDocument ToXDocument(Content node, bool cacheOnly)
-		{
-			if (cacheOnly && node.GetType().Equals(typeof(Document)))
-			{
-				var umbXml = library.GetXmlNodeById(node.Id.ToString());
-				if (umbXml != null)
-				{
-					return umbXml.ToXDocument();
-				}
-			}
-
-			//this will also occur if umbraco hasn't cached content yet....
-
-			//if it's not a using cache and it's not cacheOnly, then retrieve the Xml using the API
+		{			
 			return ToXDocument(node);
 		}
 
@@ -267,6 +252,16 @@ namespace Umbraco.Web.Search
 		[SecuritySafeCritical]
 		private static XDocument ToXDocument(Content node)
 		{
+            if (TypeHelper.IsTypeAssignableFrom<Document>(node))
+            {
+                return new XDocument(((Document) node).Content.ToXml());
+            }
+
+            if (TypeHelper.IsTypeAssignableFrom<global::umbraco.cms.businesslogic.media.Media>(node))
+            {
+                return new XDocument(((global::umbraco.cms.businesslogic.media.Media) node).MediaItem.ToXml());
+            }
+
 			var xDoc = new XmlDocument();
 			var xNode = xDoc.CreateNode(XmlNodeType.Element, "node", "");
 			node.XmlPopulate(xDoc, ref xNode, false);

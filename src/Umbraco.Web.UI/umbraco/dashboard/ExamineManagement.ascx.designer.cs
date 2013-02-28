@@ -47,5 +47,14 @@ namespace Umbraco.Web.UI.Umbraco.Dashboard {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Umbraco.Web.UI.Controls.ProgressBar ProgressBar1;
+        
+        /// <summary>
+        /// ProgressBar2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Umbraco.Web.UI.Controls.ProgressBar ProgressBar2;
     }
 }

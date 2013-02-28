@@ -80,7 +80,7 @@ namespace UmbracoExamine.DataServices
             var xmlContent = XDocument.Parse("<content></content>");
             foreach (var c in _applicationContext.Services.ContentService.GetRootContent())
             {
-				xmlContent.Root.Add(c.ToXml());				
+				xmlContent.Root.Add(c.ToDeepXml());				
             }
             var result = ((IEnumerable)xmlContent.XPathEvaluate(xpath)).Cast<XElement>();
             return result.ToXDocument();
