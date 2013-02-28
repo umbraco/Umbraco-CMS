@@ -382,6 +382,7 @@
     <Compile Include="Persistence\Migrations\Syntax\Update\UpdateBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Update\UpdateDataBuilder.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourNineZero\RemoveUmbracoAppConstraints.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixZeroOne\UpdatePropertyTypesAndGroups.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\DeleteAppTables.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\EnsureAppsTreesUpdated.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\MoveMasterContentTypeData.cs" />

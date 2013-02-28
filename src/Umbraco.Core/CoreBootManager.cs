@@ -9,6 +9,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
+using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
@@ -204,7 +205,8 @@ namespace Umbraco.Core
 					typeof (UpdateCmsContentTypeAllowedContentTypeTable),
 					typeof (UpdateCmsContentTypeTable),
 					typeof (UpdateCmsContentVersionTable),
-					typeof (UpdateCmsPropertyTypeGroupTable)
+					typeof (UpdateCmsPropertyTypeGroupTable),
+                    typeof (UpdatePropertyTypesAndGroups)
 				});
 
 			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
