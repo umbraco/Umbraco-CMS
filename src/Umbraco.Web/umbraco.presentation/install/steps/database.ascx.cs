@@ -81,7 +81,11 @@ namespace umbraco.presentation.install.steps
 
                 var sqlCeDatabaseExists = false;
                 if (dbIsSqlCe)
-                    sqlCeDatabaseExists = File.Exists(databaseSettings.ConnectionString.Replace("|DataDirectory|", AppDomain.CurrentDomain.GetData("DataDirectory").ToString()));
+                {
+                    var datasource = databaseSettings.ConnectionString.Replace("|DataDirectory|", AppDomain.CurrentDomain.GetData("DataDirectory").ToString() + Path.DirectorySeparatorChar);
+                    var filePath = datasource.Replace("Datasource=", string.Empty);
+                    sqlCeDatabaseExists = File.Exists(filePath);
+                }
 
                 // Either the connection details are not fully specified or it's a SQL CE database that doesn't exist yet
                 if (databaseSettings == null 
