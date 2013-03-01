@@ -505,7 +505,7 @@ namespace Umbraco.Core.Configuration
 		private static IEnumerable<RazorDataTypeModelStaticMappingItem> _razorDataTypeModelStaticMapping;
 		private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
 
-		public static IEnumerable<RazorDataTypeModelStaticMappingItem> RazorDataTypeModelStaticMapping
+		internal static IEnumerable<RazorDataTypeModelStaticMappingItem> RazorDataTypeModelStaticMapping
 		{
 			get
 			{
