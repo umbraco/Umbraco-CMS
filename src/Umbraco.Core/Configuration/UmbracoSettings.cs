@@ -662,6 +662,15 @@ namespace Umbraco.Core.Configuration
             get { return GetKeyValue("/settings/web.routing/@trySkipIisCustomErrors", false); }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether internal redirect preserves the template.
+        /// </summary>
+        [UmbracoWillObsolete("Use UmbracoSettings.For<WebRouting>.InternalRedirectPerservesTemplate instead.")]
+        internal static bool InternalRedirectPreservesTemplate
+	    {
+            get { return GetKeyValue("/settings/web.routing/@internalRedirectPreservesTemplate", false); }
+        }
+
 		/// <summary>
 		/// Gets the allowed image file types.
 		/// </summary>

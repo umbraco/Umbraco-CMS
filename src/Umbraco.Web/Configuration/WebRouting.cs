@@ -12,9 +12,11 @@ namespace Umbraco.Web.Configuration
     {
         private const string KeyTrySkipIisCustomErrors = "trySkipIisCustomErrors";
         private const string KeyUrlProviderMode = "urlProviderMode";
+        private const string KeyInternalRedirectPreservesTemplate = "internalRedirectPreservesTemplate";
 		
         private bool? _trySkipIisCustomErrors;
         private Routing.UrlProviderMode? _urlProviderMode;
+        private bool? _internalRedirectPreservesTemplate;
     
         internal protected override void ResetSection()
         {
@@ -22,6 +24,7 @@ namespace Umbraco.Web.Configuration
 
             _trySkipIisCustomErrors = null;
 			_urlProviderMode = null;
+            _internalRedirectPreservesTemplate = null;
         }
 
         /// <summary>
@@ -53,6 +56,21 @@ namespace Umbraco.Web.Configuration
                     : Routing.UrlProviderMode.Auto);
             }
             internal set { _urlProviderMode = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether internal redirect preserves the template.
+        /// </summary>
+        [ConfigurationProperty(KeyInternalRedirectPreservesTemplate, DefaultValue = false, IsRequired = false)]
+        public bool InternalRedirectPreservesTemplate
+        {
+            get
+            {
+                return _internalRedirectPreservesTemplate ?? (IsPresent
+                    ? (bool)this[KeyInternalRedirectPreservesTemplate]
+                    : UmbracoSettings.InternalRedirectPreservesTemplate);
+            }
+            internal set { _internalRedirectPreservesTemplate = value; }
         }
     }
 }
