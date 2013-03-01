@@ -23,14 +23,14 @@ namespace Umbraco.Web.Routing
         /// <param name="contentCache">The content cache.</param>
         /// <param name="id">The published content id.</param>
         /// <param name="current">The current absolute url.</param>
-        /// <param name="absolute">A value indicating whether the url should be absolute in any case.</param>
+        /// <param name="mode">The url mode.</param>
         /// <returns>The url for the published content.</returns>
         /// <remarks>
         /// <para>The url is absolute or relative depending on url indicated by <c>current</c> and settings, unless
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// <para>If the provider is unable to provide a url, it should return <c>null</c>.</para>
         /// </remarks>
-        public string GetUrl(UmbracoContext umbracoContext, IPublishedContentStore contentCache, int id, Uri current, bool absolute)
+        public string GetUrl(UmbracoContext umbracoContext, IPublishedContentStore contentCache, int id, Uri current, UrlProviderMode mode)
         {
             return null; // we have nothing to say
         }

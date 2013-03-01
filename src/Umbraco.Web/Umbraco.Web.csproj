@@ -325,6 +325,7 @@
     <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
     <Compile Include="Mvc\ControllerFactoryExtensions.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
+    <Compile Include="Routing\UrlProviderMode.cs" />
     <Compile Include="Search\ExamineIndexerModel.cs" />
     <Compile Include="Search\LuceneIndexerExtensions.cs" />
     <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.cs">

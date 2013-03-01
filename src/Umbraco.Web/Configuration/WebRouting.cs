@@ -11,14 +11,17 @@ namespace Umbraco.Web.Configuration
     internal class WebRouting : UmbracoConfigurationSection
     {
         private const string KeyTrySkipIisCustomErrors = "trySkipIisCustomErrors";
+        private const string KeyUrlProviderMode = "urlProviderMode";
 		
         private bool? _trySkipIisCustomErrors;
+        private Routing.UrlProviderMode? _urlProviderMode;
     
         internal protected override void ResetSection()
         {
             base.ResetSection();
 
             _trySkipIisCustomErrors = null;
+			_urlProviderMode = null;
         }
 
         /// <summary>
@@ -34,6 +37,22 @@ namespace Umbraco.Web.Configuration
                     : UmbracoSettings.TrySkipIisCustomErrors);
             }
             internal set { _trySkipIisCustomErrors = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the url provider mode.
+        /// </summary>
+        [ConfigurationProperty(KeyUrlProviderMode, DefaultValue = Routing.UrlProviderMode.AutoLegacy, IsRequired = false)]
+        [TypeConverter(typeof(CaseInsensitiveEnumConfigConverter<Routing.UrlProviderMode>))]
+        public Routing.UrlProviderMode UrlProviderMode
+        {
+            get
+            {
+                return _urlProviderMode ?? (IsPresent
+                    ? (Routing.UrlProviderMode)this[KeyUrlProviderMode]
+                    : Routing.UrlProviderMode.Auto);
+            }
+            internal set { _urlProviderMode = value; }
         }
     }
 }
