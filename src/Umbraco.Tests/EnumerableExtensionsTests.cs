@@ -29,6 +29,10 @@ namespace Umbraco.Tests
 	                                                        new TestItem()
 	                                                            {
 	                                                                Children = new List<TestItem>()
+	                                                                    {
+	                                                                        new TestItem(),
+                                                                            new TestItem()
+	                                                                    }
 	                                                            }
 	                                                    }
 	                                            }
@@ -65,11 +69,15 @@ namespace Umbraco.Tests
 
 	        var flattened = hierarchy.Children.FlattenList(x => x.Children);
 
-            Assert.AreEqual(8, flattened);
+            Assert.AreEqual(10, flattened.Count());
 	    }
 
         private class TestItem
         {
+            public TestItem()
+            {
+                Children = Enumerable.Empty<TestItem>();
+            }
             public IEnumerable<TestItem> Children { get; set; } 
         }
 

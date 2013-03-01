@@ -322,6 +322,7 @@
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
     <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
     <Compile Include="Mvc\ControllerFactoryExtensions.cs" />
+    <Compile Include="Mvc\NotChildAction.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
     <Compile Include="Search\ExamineIndexerModel.cs" />
     <Compile Include="Search\LuceneIndexerExtensions.cs" />

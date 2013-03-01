@@ -7,7 +7,7 @@ using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Mvc
 {
-	internal static class AreaRegistrationExtensions
+    internal static class AreaRegistrationExtensions
 	{
 	    /// <summary>
 	    /// Creates a custom individual route for the specified controller plugin. Individual routes
