@@ -178,7 +178,7 @@ namespace Umbraco.Core.Models
                     if (CompositionPropertyGroups.Any(x => x.Name == propertyGroupName))
                     {
                         var parentPropertyGroup = CompositionPropertyGroups.First(x => x.Name == propertyGroupName && x.ParentId.HasValue == false);
-                        propertyGroup.SortOrder = parentPropertyGroup.SortOrder + 1;
+                        propertyGroup.SortOrder = parentPropertyGroup.SortOrder;
                         propertyGroup.ParentId = parentPropertyGroup.Id;
                     }
 

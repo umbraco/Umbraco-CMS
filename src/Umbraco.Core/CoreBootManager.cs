@@ -9,6 +9,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
+using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
@@ -205,6 +206,7 @@ namespace Umbraco.Core
             MigrationResolver.Current = new MigrationResolver(
                 () => PluginManager.Current.ResolveMigrationTypes());
             
+
 
 			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
 				PluginManager.Current.ResolvePropertyEditorValueConverters());

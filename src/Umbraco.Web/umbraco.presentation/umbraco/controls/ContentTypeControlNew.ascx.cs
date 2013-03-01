@@ -449,8 +449,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                                         : propertyGroup.GetPropertyTypes();
 
                 var propertyGroupId = tab.Id;
-                if (propertyGroup != null && propertyGroup.ParentId > 0)
-                    propertyGroupId = propertyGroup.Id;
 
                 if (propertyTypes.Any(x => x.ContentTypeId == _contentType.Id))
                 {
@@ -532,9 +530,9 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             foreach (cms.businesslogic.propertytype.PropertyType pt in _contentType.PropertyTypes)
             {
                 //This use to be:
-                //if (pt.ContentTypeId == cType.Id && !inTab.ContainsKey(pt.Id.ToString())
+                if (pt.ContentTypeId == _contentType.Id && inTab.ContainsKey(pt.Id.ToString()) == false)
                 //But seriously, if it's not on a tab the tabId is 0, it's a lot easier to read IMO
-                if (pt.ContentTypeId == _contentType.Id && pt.TabId == 0)
+                //if (pt.ContentTypeId == _contentType.Id && pt.TabId == 0)
                 {
                     var gpw = new GenericPropertyWrapper();
 
@@ -649,7 +647,8 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             {
                 if(gpw.PropertyType == null) continue;
 
-                var propertyType = contentTypeItem.PropertyTypes.FirstOrDefault(x => x.Alias == gpw.PropertyType.Alias);
+                if(contentTypeItem.PropertyTypes == null || contentTypeItem.PropertyTypes.Any(x => x.Alias == gpw.PropertyType.Alias) == false) continue;
+                var propertyType = contentTypeItem.PropertyTypes.First(x => x.Alias == gpw.PropertyType.Alias);
                 if (propertyType == null) continue;
 
                 var dataTypeDefinition = ApplicationContext.Current.Services.DataTypeService.GetDataTypeDefinitionById(gpw.GenricPropertyControl.Type);
@@ -680,19 +679,23 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                     }
                     else
                     {
-                        if (
-                            contentTypeItem.CompositionPropertyGroups.Any(
-                                x => x.ParentId == gpw.GenricPropertyControl.Tab))
-                        {
-                            var propertyGroups = contentTypeItem.CompositionPropertyGroups.Where(x => x.ParentId == gpw.GenricPropertyControl.Tab);
-                            var propertyGroup = propertyGroups.First();
-                            propertyType.PropertyGroupId = propertyGroup.Id;
-                        }
-                        else
-                        {
-                            var propertyGroup = contentTypeItem.CompositionPropertyGroups.First(x => x.Id == gpw.GenricPropertyControl.Tab);
-                            contentTypeItem.AddPropertyGroup(propertyGroup.Name);
-                        }
+                        var propertyGroup = contentTypeItem.CompositionPropertyGroups.First(x => x.Id == gpw.GenricPropertyControl.Tab);
+                        contentTypeItem.AddPropertyGroup(propertyGroup.Name);
+                        contentTypeItem.MovePropertyType(propertyType.Alias, propertyGroup.Name);
+
+                        //if (
+                        //    contentTypeItem.CompositionPropertyGroups.Any(
+                        //        x => x.ParentId == gpw.GenricPropertyControl.Tab))
+                        //{
+                        //    var propertyGroups = contentTypeItem.CompositionPropertyGroups.Where(x => x.ParentId == gpw.GenricPropertyControl.Tab);
+                        //    var propertyGroup = propertyGroups.First();
+                        //    propertyType.PropertyGroupId = propertyGroup.Id;
+                        //}
+                        //else
+                        //{
+                        //    var propertyGroup = contentTypeItem.CompositionPropertyGroups.First(x => x.Id == gpw.GenricPropertyControl.Tab);
+                        //    contentTypeItem.AddPropertyGroup(propertyGroup.Name);
+                        //}
                     }
                 }
 
@@ -701,6 +704,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 cms.businesslogic.cache.Cache.ClearCacheItem("UmbracoPropertyTypeCache" + gpw.PropertyType.Id);
                 // clear cache in ContentType
                 cms.businesslogic.cache.Cache.ClearCacheItem("ContentType_PropertyTypes_Content:" + contentTypeItem.Id);
+                _contentType.ClearVirtualTabs();
             }
 
             //Update the SortOrder of the PropertyTypes
@@ -720,9 +724,12 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                         string propSO = tempSO[i].Substring(propSOPosition);
 
                         int propertyTypeId = int.Parse(propSO);
-                        var propertyType = contentTypeItem.PropertyTypes.FirstOrDefault(x => x.Id == propertyTypeId);
-                        if (propertyType == null) continue;
-                        propertyType.SortOrder = i;
+                        if (contentTypeItem.PropertyTypes != null &&
+                            contentTypeItem.PropertyTypes.Any(x => x.Id == propertyTypeId))
+                        {
+                            var propertyType = contentTypeItem.PropertyTypes.First(x => x.Id == propertyTypeId);
+                            propertyType.SortOrder = i;
+                        }
                     }
                 }
             }
@@ -1049,10 +1056,10 @@ Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
                         _contentType.Save();
                     }
                 }
-                else
-                {
-                    _contentType.DeleteVirtualTab(propertyGroupId);
-                }
+
+                _contentType.DeleteVirtualTab(propertyGroupId);
+
+                LoadContentType();
 
                 var ea = new SaveClickEventArgs(ui.Text("contentTypeTabDeleted"));
                 ea.IconType = BasePage.speechBubbleIcon.success;

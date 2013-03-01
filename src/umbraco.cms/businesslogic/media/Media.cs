@@ -252,7 +252,9 @@ namespace umbraco.cms.businesslogic.media
             
             if (!e.Cancel)
             {
-                ApplicationContext.Current.Services.MediaService.Save(MediaItem);
+                var current = User.GetCurrent();
+                int userId = current == null ? 0 : current.Id;
+                ApplicationContext.Current.Services.MediaService.Save(MediaItem, userId);
 
                 base.Save();
 

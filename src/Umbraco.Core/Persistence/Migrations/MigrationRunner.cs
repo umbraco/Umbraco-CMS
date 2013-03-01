@@ -120,6 +120,7 @@ namespace Umbraco.Core.Persistence.Migrations
                                   migrationAttribute.TargetVersion <= _targetVersion &&
                                   migrationAttribute.ProductName == _productName
                               orderby migrationAttribute.TargetVersion, migrationAttribute.SortOrder descending 
+
                               select migration);
             return migrations;
         }

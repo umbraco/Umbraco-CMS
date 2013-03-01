@@ -368,6 +368,7 @@
     <Compile Include="Persistence\Migrations\Syntax\Delete\Index\IDeleteIndexOnColumnSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Delete\Table\DeleteTableBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Execute\ExecuteBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Execute\Expressions\ExecuteCodeStatementExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Execute\Expressions\ExecuteSqlStatementExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Execute\IExecuteBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\ExpressionBuilder.cs" />
@@ -403,6 +404,7 @@
     <Compile Include="Persistence\Migrations\Syntax\Update\UpdateDataBuilder.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourNineZero\RemoveUmbracoAppConstraints.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixOneZero\CreateServerRegistryTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixZeroOne\UpdatePropertyTypesAndGroups.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\DeleteAppTables.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\EnsureAppsTreesUpdated.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\MoveMasterContentTypeData.cs" />
