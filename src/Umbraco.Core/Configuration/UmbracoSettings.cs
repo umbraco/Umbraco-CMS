@@ -61,7 +61,6 @@ namespace Umbraco.Core.Configuration
 			_useLegacySchema = null;
 			_useDomainPrefixes = null;
 			_umbracoLibraryCacheDuration = null;
-            _trySkipIisCustomErrors = null;
             SettingsFilePath = null;
 		}
 
@@ -654,23 +653,13 @@ namespace Umbraco.Core.Configuration
 			}
 		}
 
-        private static bool? _trySkipIisCustomErrors;
-
         /// <summary>
-        /// Gets or sets a value indicating where to try to skip IIS custom errors.
+        /// Gets a value indicating whether to try to skip IIS custom errors.
         /// </summary>
-        public static bool TrySkipIisCustomErrors
+        [UmbracoWillObsolete("Use UmbracoSettings.For<WebRouting>.TrySkipIisCustomErrors instead.")]
+        internal static bool TrySkipIisCustomErrors
         {
-            get
-            {
-                // default: false
-                return _trySkipIisCustomErrors ?? GetKeyValue("/settings/web.routing/@trySkipIisCustomErrors", false);
-            }
-            internal set
-            {
-                // used for unit  testing
-                _trySkipIisCustomErrors = value;
-            }
+            get { return GetKeyValue("/settings/web.routing/@trySkipIisCustomErrors", false); }
         }
 
 		/// <summary>

@@ -10,6 +10,7 @@ using umbraco;
 using umbraco.IO;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Web.Configuration;
 
 namespace Umbraco.Web
 {
@@ -130,7 +131,7 @@ namespace Umbraco.Web
             else if (pcr.Is404)
             {
                 response.StatusCode = 404;
-                response.TrySkipIisCustomErrors = UmbracoSettings.TrySkipIisCustomErrors;
+                response.TrySkipIisCustomErrors = UmbracoSettings.For<WebRouting>().TrySkipIisCustomErrors;
             }
 
             if (pcr.ResponseStatusCode > 0)
