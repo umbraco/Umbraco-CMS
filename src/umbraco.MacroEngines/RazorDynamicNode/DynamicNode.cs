@@ -1024,8 +1024,9 @@ namespace umbraco.MacroEngines
         }
         public DynamicNodeList Descendants(Func<DynamicBackingItem, bool> func)
         {
-            var flattenedNodes = this.n.ChildrenAsList.Map(func, (DynamicBackingItem n) => { return n.ChildrenAsList; });
-            return new DynamicNodeList(flattenedNodes.ToList().ConvertAll(DynamicBackingItem => new DynamicNode(DynamicBackingItem)));
+            //var flattenedNodes = this.n.ChildrenAsList.Map(func, (DynamicBackingItem n) => { return n.ChildrenAsList; });
+            var flattenedNodes = this.n.ChildrenAsList.FlattenList(item => item.ChildrenAsList).Where(func);
+            return new DynamicNodeList(flattenedNodes.Select(dynamicBackingItem => new DynamicNode(dynamicBackingItem)));
         }
         public DynamicNodeList DescendantsOrSelf(int level)
         {
@@ -1048,8 +1049,9 @@ namespace umbraco.MacroEngines
                 {
                     thisNode.Add(this.n);
                 }
-                var flattenedNodes = this.n.ChildrenAsList.Map(func, (DynamicBackingItem n) => { return n.ChildrenAsList; });
-                return new DynamicNodeList(thisNode.Concat(flattenedNodes).ToList().ConvertAll(DynamicBackingItem => new DynamicNode(DynamicBackingItem)));
+                //var flattenedNodes = this.n.ChildrenAsList.Map(func, (DynamicBackingItem n) => { return n.ChildrenAsList; });
+                var flattenedNodes = this.n.ChildrenAsList.FlattenList(item => item.ChildrenAsList).Where(func);
+                return new DynamicNodeList(thisNode.Concat(flattenedNodes).Select(dynamicBackingItem => new DynamicNode(dynamicBackingItem)));
             }
             return new DynamicNodeList(new List<DynamicBackingItem>());
         }
