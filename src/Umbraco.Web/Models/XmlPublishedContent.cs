@@ -72,7 +72,7 @@ namespace Umbraco.Web.Models
 			{
 				if (!_initialized)
 					Initialize();
-				return _children;
+				return _children.OrderBy(x => x.SortOrder);
 			}
 		}
 

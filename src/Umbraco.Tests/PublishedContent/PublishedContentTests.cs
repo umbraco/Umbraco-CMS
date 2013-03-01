@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using NUnit.Framework;
@@ -36,25 +37,26 @@ namespace Umbraco.Tests.PublishedContent
 		<umbracoUrlAlias><![CDATA[this/is/my/alias, anotheralias]]></umbracoUrlAlias>
 		<umbracoNaviHide>1</umbracoNaviHide>
 		<testRecursive><![CDATA[This is the recursive val]]></testRecursive>
-		<Home id=""1173"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""sub1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173"" isDoc="""">
+		<Home id=""1173"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""sub1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173"" isDoc="""">
 			<content><![CDATA[<div>This is some content</div>]]></content>
 			<umbracoUrlAlias><![CDATA[page2/alias, 2ndpagealias]]></umbracoUrlAlias>			
 			<testRecursive><![CDATA[]]></testRecursive>
-			<Home id=""1174"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-20T18:07:54"" updateDate=""2012-07-20T19:10:27"" nodeName=""Sub2"" urlName=""sub2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1174"" isDoc="""">
+			<Home id=""1174"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-07-20T18:07:54"" updateDate=""2012-07-20T19:10:27"" nodeName=""Sub2"" urlName=""sub2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1174"" isDoc="""">
 				<content><![CDATA[]]></content>
 				<umbracoUrlAlias><![CDATA[only/one/alias]]></umbracoUrlAlias>
 				<creatorName><![CDATA[Custom data with same property name as the member name]]></creatorName>
 				<testRecursive><![CDATA[]]></testRecursive>
-			</Home>
-			<Home id=""1176"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-20T18:08:08"" updateDate=""2012-07-20T19:10:52"" nodeName=""Sub 3"" urlName=""sub-3"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1176"" isDoc="""">
+			</Home>			
+			<CustomDocument id=""1177"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""custom sub 1"" urlName=""custom-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1177"" isDoc="""" />
+			<CustomDocument id=""1178"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-16T14:23:35"" nodeName=""custom sub 2"" urlName=""custom-sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1178"" isDoc="""" />
+            <Home id=""1176"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-20T18:08:08"" updateDate=""2012-07-20T19:10:52"" nodeName=""Sub 3"" urlName=""sub-3"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1176"" isDoc="""">
 				<content><![CDATA[]]></content>
+                <umbracoNaviHide>1</umbracoNaviHide>
 			</Home>
-			<CustomDocument id=""1177"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""custom sub 1"" urlName=""custom-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1177"" isDoc="""" />
-			<CustomDocument id=""1178"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-16T14:23:35"" nodeName=""custom sub 2"" urlName=""custom-sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1178"" isDoc="""" />
 		</Home>
-		<Home id=""1175"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-20T18:08:01"" updateDate=""2012-07-20T18:49:32"" nodeName=""Sub 2"" urlName=""sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1175"" isDoc=""""><content><![CDATA[]]></content>
+		<Home id=""1175"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-20T18:08:01"" updateDate=""2012-07-20T18:49:32"" nodeName=""Sub 2"" urlName=""sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1175"" isDoc=""""><content><![CDATA[]]></content>
 		</Home>
-		<CustomDocument id=""4444"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,4444"" isDoc="""">
+		<CustomDocument id=""4444"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,4444"" isDoc="""">
 			<selectedNodes><![CDATA[1172,1176,1173]]></selectedNodes>
 		</CustomDocument>
 	</Home>
@@ -85,7 +87,123 @@ namespace Umbraco.Tests.PublishedContent
 			return doc;
 		}
 
-		[Test]
+        [Test]
+        public void Is_Last_From_Where_Filter_Dynamic_Linq()
+        {
+            var doc = GetNode(1173);
+
+            foreach (var d in doc.Children.Where("Visible"))
+            {
+                if (d.Id != 1178)
+                {
+                    Assert.IsFalse(d.IsLast());
+                }
+                else
+                {
+                    Assert.IsTrue(d.IsLast());
+                }
+            }
+        }
+
+        [Test]
+        public void Is_Last_From_Where_Filter()
+        {
+            var doc = GetNode(1173);
+
+            foreach (var d in doc.Children.Where(x => x.IsVisible()))
+            {
+                if (d.Id != 1178)
+                {
+                    Assert.IsFalse(d.IsLast());
+                }
+                else
+                {
+                    Assert.IsTrue(d.IsLast());
+                }
+            }
+        }
+
+        [Test]
+        public void Is_Last_From_Take()
+        {
+            var doc = GetNode(1173);
+
+            foreach (var d in doc.Children.Take(3))
+            {
+                if (d.Id != 1178)
+                {
+                    Assert.IsFalse(d.IsLast());
+                }
+                else
+                {
+                    Assert.IsTrue(d.IsLast());
+                }
+            }
+        }
+
+        [Test]
+        public void Is_Last_From_Skip()
+        {
+            var doc = GetNode(1173);
+
+            foreach (var d in doc.Children.Skip(1))
+            {
+                if (d.Id != 1176)
+                {
+                    Assert.IsFalse(d.IsLast());
+                }
+                else
+                {
+                    Assert.IsTrue(d.IsLast());
+                }
+            }
+        }
+
+        [Test]
+        public void Is_Last_From_Concat()
+        {
+            var doc = GetNode(1173);
+
+
+            foreach (var d in doc.Children.Concat(new[] { GetNode(1175), GetNode(4444) }))
+            {
+                if (d.Id != 4444)
+                {
+                    Assert.IsFalse(d.IsLast());
+                }
+                else
+                {
+                    Assert.IsTrue(d.IsLast());
+                }
+            }
+        }
+
+	    [Test]
+	    public void Descendants_Ordered_Properly()
+	    {
+            var doc = GetNode(1046);
+
+	        var currentLevel = 0;
+	        var lastSortOrder = 0;
+            var levelChangesAt = new[] { 1046, 1173, 1174 };
+
+            foreach (var d in doc.DescendantsOrSelf())
+            {
+                if (levelChangesAt.Contains(d.Id))
+                {
+                    Assert.Greater(d.Level, currentLevel);
+                    currentLevel = d.Level;                    
+                }
+                else
+                {
+                    Assert.AreEqual(currentLevel, d.Level);
+                    Assert.Greater(d.SortOrder, lastSortOrder);                    
+                }
+                lastSortOrder = d.SortOrder;
+            }
+	    }
+
+	    [Test]
 		public void Test_Get_Recursive_Val()
 		{
 			var doc = GetNode(1174);
@@ -128,11 +246,11 @@ namespace Umbraco.Tests.PublishedContent
 			var doc = GetNode(1173);
 			Assert.AreEqual(0, doc.Index());
 			doc = GetNode(1176);
-			Assert.AreEqual(1, doc.Index());
-			doc = GetNode(1177);
-			Assert.AreEqual(2, doc.Index());
-			doc = GetNode(1178);
 			Assert.AreEqual(3, doc.Index());
+			doc = GetNode(1177);
+			Assert.AreEqual(1, doc.Index());
+			doc = GetNode(1178);
+			Assert.AreEqual(2, doc.Index());
 		}
 
 		[Test]
@@ -363,7 +481,7 @@ namespace Umbraco.Tests.PublishedContent
 		[Test]
 		public void Next_Without_Sibling()
 		{
-			var doc = GetNode(1178);
+            var doc = GetNode(1176);
 
 			Assert.IsNull(doc.Next());
 		}
@@ -385,7 +503,7 @@ namespace Umbraco.Tests.PublishedContent
 
 			Assert.IsNotNull(result);
 
-			Assert.AreEqual((int)1174, (int)result.Id);
+			Assert.AreEqual((int)1178, (int)result.Id);
 		}
 	}
 }

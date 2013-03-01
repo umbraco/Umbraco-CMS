@@ -472,6 +472,12 @@ namespace Umbraco.Core.Models
             return xml;
         }
 
+        /// <summary>
+        /// Used by ToDeepXml to recursively add children
+        /// </summary>
+        /// <param name="originalDescendants"></param>
+        /// <param name="currentChildren"></param>
+        /// <param name="currentXml"></param>
         private static void AddChildXml(
             IContent[] originalDescendants, 
             IEnumerable<IContent> currentChildren, 
