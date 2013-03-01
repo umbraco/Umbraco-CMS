@@ -9,17 +9,42 @@ using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.Models
 {
-
-	/// <summary>
+    /// <summary>
 	/// An abstract base class to use for IPublishedContent which ensures that the Url and Indexed property return values
 	/// are consistently returned.
 	/// </summary>
-	public abstract class PublishedContentBase : IPublishedContent
+	/// <remarks>
+	/// This also ensures that we have an OwnersCollection property so that the IsFirst/IsLast/Index helper methods work 
+    /// when referenced inside the result of a collection. http://issues.umbraco.org/issue/U4-1797
+	/// </remarks>
+    public abstract class PublishedContentBase : IPublishedContent, IOwnerCollectionAware<IPublishedContent>
 	{
 		private string _url;
 		private readonly Dictionary<string, object> _resolvePropertyValues = new Dictionary<string, object>();
+        private IEnumerable<IPublishedContent> _ownersCollection;
 
-		/// <summary>
+        /// <summary>
+        /// Need to get/set the owner collection when an item is returned from the result set of a query
+        /// </summary>
+        /// <remarks>
+        /// Based on this issue here: http://issues.umbraco.org/issue/U4-1797
+        /// </remarks>
+        IEnumerable<IPublishedContent> IOwnerCollectionAware<IPublishedContent>.OwnersCollection
+        {
+            get
+            {
+                //if the owners collection is null, we'll default to it's siblings
+                if (_ownersCollection == null)
+                {
+                    //get the root docs if parent is null
+                    _ownersCollection = this.Siblings();
+                }
+                return _ownersCollection;
+            }
+            set { _ownersCollection = value; }
+        }
+
+	    /// <summary>
 		/// Returns the Url for this content item
 		/// </summary>
 		/// <remarks>
@@ -98,5 +123,6 @@ namespace Umbraco.Web.Models
 		public abstract IPublishedContentProperty GetProperty(string alias);
 		public abstract IPublishedContent Parent { get; }
 		public abstract IEnumerable<IPublishedContent> Children { get; }
-	}
+
+    }
 }

@@ -262,6 +262,7 @@
     <Compile Include="Media\ImageUrlProviders\ImageUrlProvider.cs" />
     <Compile Include="Models\DynamicPublishedContent.cs" />
     <Compile Include="Models\DynamicPublishedContentList.cs" />
+    <Compile Include="Models\IOwnerCollectionAware.cs" />
     <Compile Include="Models\PartialViewMacroModel.cs" />
     <Compile Include="Models\PublishedContentBase.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />

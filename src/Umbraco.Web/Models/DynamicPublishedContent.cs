@@ -20,9 +20,9 @@ namespace Umbraco.Web.Models
 	/// <summary>
 	/// The base dynamic model for views
 	/// </summary>
-	public class DynamicPublishedContent : DynamicObject, IPublishedContent
+    public class DynamicPublishedContent : DynamicObject, IPublishedContent, IOwnerCollectionAware<IPublishedContent>
 	{
-		protected IPublishedContent PublishedContent { get; private set; }
+		protected internal IPublishedContent PublishedContent { get; private set; }
 		private DynamicPublishedContentList _cachedChildren;
 		private readonly ConcurrentDictionary<string, object> _cachedMemberOutput = new ConcurrentDictionary<string, object>();
 		
@@ -35,6 +35,46 @@ namespace Umbraco.Web.Models
 		}		
 		
 		#endregion
+
+        private IEnumerable<IPublishedContent> _ownersCollection;
+
+        /// <summary>
+        /// Need to get/set the owner collection when an item is returned from the result set of a query
+        /// </summary>
+        /// <remarks>
+        /// Based on this issue here: http://issues.umbraco.org/issue/U4-1797
+        /// </remarks>
+        IEnumerable<IPublishedContent> IOwnerCollectionAware<IPublishedContent>.OwnersCollection
+        {
+            get
+            {
+                var publishedContentBase = PublishedContent as IOwnerCollectionAware<IPublishedContent>;
+                if (publishedContentBase != null)
+                {
+                    return publishedContentBase.OwnersCollection;
+                }
+
+                //if the owners collection is null, we'll default to it's siblings
+                if (_ownersCollection == null)
+                {
+                    //get the root docs if parent is null
+                    _ownersCollection = this.Siblings();
+                }
+                return _ownersCollection;
+            }
+            set
+            {
+                var publishedContentBase = PublishedContent as IOwnerCollectionAware<IPublishedContent>;
+                if (publishedContentBase != null)
+                {
+                    publishedContentBase.OwnersCollection = value;
+                }
+                else
+                {
+                    _ownersCollection = value;    
+                }
+            }
+        }
 
 		public dynamic AsDynamic()
 		{
