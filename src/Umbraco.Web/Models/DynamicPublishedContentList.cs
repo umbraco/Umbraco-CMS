@@ -11,10 +11,19 @@ using Umbraco.Web.Dynamics;
 
 namespace Umbraco.Web.Models
 {
-    public class DynamicPublishedContentList : DynamicObject, IEnumerable<DynamicPublishedContent>
+    /// <summary>
+    /// A collection of DynamicPublishedContent items
+    /// </summary>
+    /// <remarks>
+    /// Implements many of the dynamic methods required for execution against this list. It also ensures
+    /// that the correct OwnersCollection properties is assigned to the underlying PublishedContentBase object
+    /// of the DynamicPublishedContent item (so long as the IPublishedContent item is actually PublishedContentBase).
+    /// All relates to this issue here: http://issues.umbraco.org/issue/U4-1797
+    /// </remarks>
+    public class DynamicPublishedContentList : DynamicObject, IEnumerable<DynamicPublishedContent>, IEnumerable<IPublishedContent>
     {
 		internal List<DynamicPublishedContent> Items { get; set; }
-        
+
         public DynamicPublishedContentList()
         {
             Items = new List<DynamicPublishedContent>();
@@ -22,14 +31,28 @@ namespace Umbraco.Web.Models
         public DynamicPublishedContentList(IEnumerable<DynamicPublishedContent> items)
         {
             var list = items.ToList();
+            //set the owners list for each item
+            list.ForEach(x => SetOwnersList(x, this));
             Items = list;
         }
 
         public DynamicPublishedContentList(IEnumerable<IPublishedContent> items)
         {
             var list = items.Select(x => new DynamicPublishedContent(x)).ToList();
+            //set the owners list for each item
+            list.ForEach(x => SetOwnersList(x, this));
             Items = list;
         }
+
+        private static void SetOwnersList(IPublishedContent content, IEnumerable<DynamicPublishedContent> list)
+        {
+            var publishedContentBase = content as IOwnerCollectionAware<IPublishedContent>;
+            if (publishedContentBase != null)
+            {
+                publishedContentBase.OwnersCollection = list;
+            }            
+        }
+
         public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
         {
             int index = (int)indexes[0];
@@ -134,12 +157,12 @@ namespace Umbraco.Web.Models
             }
 			if (name == "Take")
 			{
-				result = new DynamicPublishedContentList(this.Take((int)firstArg));
+				result = new DynamicPublishedContentList(this.Take<DynamicPublishedContent>((int)firstArg));
 				return true;
 			}
 			if (name == "Skip")
 			{
-				result = new DynamicPublishedContentList(this.Skip((int)firstArg));
+                result = new DynamicPublishedContentList(this.Skip<DynamicPublishedContent>((int)firstArg));
 				return true;
 			}
         	if (name == "InGroupsOf")
@@ -483,14 +506,26 @@ namespace Umbraco.Web.Models
 	        return DynamicQueryable.Select(Items.AsQueryable(), predicate, values);
         }
 
+        /// <summary>
+        /// Allows the adding of an item from the collection
+        /// </summary>
+        /// <param name="publishedContent"></param>
         public void Add(DynamicPublishedContent publishedContent)
         {
+            SetOwnersList(publishedContent, this);
             this.Items.Add(publishedContent);
         }
+
+        /// <summary>
+        /// Allows the removal of an item from the collection
+        /// </summary>
+        /// <param name="publishedContent"></param>
         public void Remove(DynamicPublishedContent publishedContent)
         {
             if (this.Items.Contains(publishedContent))
             {
+                //set owners list to null
+                SetOwnersList(publishedContent, null);
                 this.Items.Remove(publishedContent);
             }
         }
@@ -503,7 +538,12 @@ namespace Umbraco.Web.Models
             return true;
         }
 
-    	public IEnumerator<DynamicPublishedContent> GetEnumerator()
+        IEnumerator<IPublishedContent> IEnumerable<IPublishedContent>.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public IEnumerator<DynamicPublishedContent> GetEnumerator()
     	{
     		return Items.GetEnumerator();
     	}
