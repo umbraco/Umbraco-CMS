@@ -782,29 +782,6 @@ namespace Umbraco.Web
 			return test(content) ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
 		}
 
-        /// <summary>
-        /// Return the owners collection of the current content item. 
-        /// </summary>
-        /// <param name="content"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// If the content item is of type PublishedContentBase we will have a property called OwnersCollection which will 
-        /// be the collection of a resultant set (i.e. from a where clause, a call to Children(), etc...) otherwise it will
-        /// be the item's siblings. All relates to this issue: http://issues.umbraco.org/issue/U4-1797
-        /// </remarks>
-        private static IEnumerable<IPublishedContent> GetOwnersList(this IPublishedContent content)
-        {
-            //Here we need to type check, we need to see if we have a real OwnersCollection list based on the result set
-            // of a query, otherwise we can only lookup among the item's siblings. All related to this issue here:
-            // http://issues.umbraco.org/issue/U4-1797
-
-            var publishedContentBase = content as IOwnerCollectionAware<IPublishedContent>;
-            var ownersList = publishedContentBase != null
-                                 ? publishedContentBase.OwnersCollection
-                                 : content.Siblings();
-            return ownersList;
-        } 
-
 		#endregion
 
 		#region Ancestors

@@ -44,29 +44,6 @@ namespace Umbraco.Web.Models
 				Initialize();
 		}
 
-        private IEnumerable<IPublishedContent> _ownersCollection;
-
-        /// <summary>
-        /// Need to get/set the owner collection when an item is returned from the result set of a query
-        /// </summary>
-        /// <remarks>
-        /// Based on this issue here: http://issues.umbraco.org/issue/U4-1797
-        /// </remarks>
-        IEnumerable<IPublishedContent> IOwnerCollectionAware<IPublishedContent>.OwnersCollection
-        {
-            get
-            {
-                //if the owners collection is null, we'll default to it's siblings
-                if (_ownersCollection == null)
-                {
-                    //get the root docs if parent is null
-                    _ownersCollection = this.Siblings();
-                }
-                return _ownersCollection;
-            }
-            set { _ownersCollection = value; }
-        }
-
 		private bool _initialized = false;
 		private readonly ICollection<IPublishedContent> _children = new Collection<IPublishedContent>();
 		private IPublishedContent _parent = null;
