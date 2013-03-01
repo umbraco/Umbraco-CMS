@@ -31,7 +31,7 @@ function updateProgressBar(percent) {
 
 function updateStatusMessage(message, error) {
     if (message != null && message != undefined) {
-        jQuery(".loader > strong").text(message);
+        jQuery(".loader > strong").html(message);
     }
     
     if (error != undefined) {

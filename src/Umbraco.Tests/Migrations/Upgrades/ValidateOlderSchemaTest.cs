@@ -56,8 +56,6 @@ namespace Umbraco.Tests.Migrations.Upgrades
             Path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", Path);
 
-            UmbracoSettings.UseLegacyXmlSchema = false;
-
             Resolution.Freeze();
 
             //Delete database file before continueing

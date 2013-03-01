@@ -158,7 +158,7 @@ namespace Umbraco.Core
             }
             else if (databaseProvider.ToLower().Contains("azure"))
             {
-                connectionString = string.Format("Server=tcp:{0}.database.windows.net;Database={1};User ID={2}@{0};Password={3}", server, databaseName, user, password);
+                connectionString = BuildAzureConnectionString(server, databaseName, user, password);
             }
             else
             {
@@ -167,6 +167,52 @@ namespace Umbraco.Core
 
             SaveConnectionString(connectionString, providerName);
             Initialize(providerName);
+        }
+
+        internal string BuildAzureConnectionString(string server, string databaseName, string user, string password)
+        {
+            if (server.Contains(".") && ServerStartsWithTcp(server) == false)
+                server = string.Format("tcp:{0}", server);
+            
+            if (server.Contains(".") == false && ServerStartsWithTcp(server))
+            {
+                string serverName = server.Contains(",") 
+                                        ? server.Substring(0, server.IndexOf(",", StringComparison.Ordinal)) 
+                                        : server;
+
+                var portAddition = string.Empty;
+
+                if (server.Contains(","))
+                    portAddition = server.Substring(server.IndexOf(",", StringComparison.Ordinal));
+
+                server = string.Format("{0}.database.windows.net{1}", serverName, portAddition);
+            }
+            
+            if (ServerStartsWithTcp(server) == false)
+                server = string.Format("tcp:{0}.database.windows.net", server);
+            
+            if (server.Contains(",") == false)
+                server = string.Format("{0},1433", server);
+
+            if (user.Contains("@") == false)
+            {
+                var userDomain = server;
+
+                if (ServerStartsWithTcp(server))
+                    userDomain = userDomain.Substring(userDomain.IndexOf(":", StringComparison.Ordinal) + 1);
+
+                if (userDomain.Contains("."))
+                    userDomain = userDomain.Substring(0, userDomain.IndexOf(".", StringComparison.Ordinal));
+
+                user = string.Format("{0}@{1}", user, userDomain);
+            }
+
+            return string.Format("Server={0};Database={1};User ID={2};Password={3}", server, databaseName, user, password);
+        }
+
+        private static bool ServerStartsWithTcp(string server)
+        {
+            return server.ToLower().StartsWith("tcp:".ToLower());
         }
 
         /// <summary>
@@ -218,7 +264,7 @@ namespace Umbraco.Core
 
             xml.Save(fileName, SaveOptions.DisableFormatting);
 
-            LogHelper.Info<DatabaseContext>("Configured new ConnectionString: " + connectionString);
+            LogHelper.Info<DatabaseContext>("Configured a new ConnectionString using the '" + providerName + "' provider.");
         }
 
         /// <summary>
@@ -232,7 +278,8 @@ namespace Umbraco.Core
         /// </remarks>
         internal void Initialize()
         {
-            if (ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName] != null)
+            var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
+            if (databaseSettings != null && string.IsNullOrWhiteSpace(databaseSettings.ConnectionString) == false && string.IsNullOrWhiteSpace(databaseSettings.ProviderName) == false)
             {
                 var providerName = "System.Data.SqlClient";
                 if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName))
@@ -254,8 +301,7 @@ namespace Umbraco.Core
                 {
                     ConfigureEmbeddedDatabaseConnection();
                 }
-                else if (legacyConnString.ToLowerInvariant().Contains("database.windows.net") &&
-                         legacyConnString.ToLowerInvariant().Contains("tcp:"))
+                else if (legacyConnString.ToLowerInvariant().Contains("tcp:"))
                 {
                     //Must be sql azure
                     SaveConnectionString(legacyConnString, "System.Data.SqlClient");
@@ -337,16 +383,56 @@ namespace Umbraco.Core
 
             try
             {
+                LogHelper.Info<DatabaseContext>("Database configuration status: Started");
+
+                var message = string.Empty;
+
                 var database = new UmbracoDatabase(_connectionString, ProviderName);
+                var supportsCaseInsensitiveQueries = SyntaxConfig.SqlSyntaxProvider.SupportsCaseInsensitiveQueries(database);
+                if (supportsCaseInsensitiveQueries  == false)
+                {
+                    message = "<p>&nbsp;</p><p>The database you're trying to use does not support case insensitive queries. <br />We currently do not support these types of databases.</p>" +
+                              "<p>You can fix this by changing the following two settings in your my.ini file in your MySQL installation directory:</p>" +
+                              "<pre>lower_case_table_names=1\nlower_case_file_system=1</pre><br />" +
+                              "<p>Note: Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
+                              "<p>For more technical information on case sensitivity in MySQL, have a look at " +
+                              "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
+
+                    return new Result { Message = message, Success = false, Percentage = "15" };
+                }
+                else if (supportsCaseInsensitiveQueries == null)
+                {
+                    message = "<p>&nbsp;</p><p>Warning! Could not check if your database type supports case insensitive queries. <br />We currently do not support these databases that do not support case insensitive queries.</p>" +
+                              "<p>You can check this by looking for the following two settings in your my.ini file in your MySQL installation directory:</p>" +
+                              "<pre>lower_case_table_names=1\nlower_case_file_system=1</pre><br />" +
+                              "<p>Note: Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
+                              "<p>For more technical information on case sensitivity in MySQL, have a look at " +
+                              "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
+                }
+                else
+                {
+                    if (SyntaxConfig.SqlSyntaxProvider == MySqlSyntaxProvider.Instance)
+                    {
+                        message = "<p>&nbsp;</p><p>Congratulations, the database step ran successfully!</p>" +
+                                  "<p>Note: You're using MySQL and the database instance you're connecting to seems to support case insensitive queries.</p>" +
+                                  "<p>However, your hosting provider may not support this option. Umbraco does not currently support MySQL installs that do not support case insensitive queries</p>" +
+                                  "<p>Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
+                                  "<p>They can check this by looking for the following two settings in the my.ini file in their MySQL installation directory:</p>" +
+                                  "<pre>lower_case_table_names=1\nlower_case_file_system=1</pre><br />" +
+                                  "<p>For more technical information on case sensitivity in MySQL, have a look at " +
+                                  "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
+                    }
+                }
+
                 var schemaResult = ValidateDatabaseSchema();
                 var installedVersion = schemaResult.DetermineInstalledVersion();
-                string message;
+                
 
                 //If Configuration Status is empty and the determined version is "empty" its a new install - otherwise upgrade the existing
                 if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) && installedVersion.Equals(new Version(0, 0, 0)))
                 {
                     database.CreateDatabaseSchema();
-                    message = "Installation completed!";
+                    message = message + "<p>Installation completed!</p>";
                 }
                 else
                 {
@@ -356,8 +442,10 @@ namespace Umbraco.Core
                     var targetVersion = UmbracoVersion.Current;
                     var runner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
                     var upgraded = runner.Execute(database, true);
-                    message = "Upgrade completed!";
+                    message = message + "<p>Upgrade completed!</p>";
                 }
+
+                LogHelper.Info<DatabaseContext>("Database configuration status: " + message);
 
                 return new Result { Message = message, Success = true, Percentage = "100" };
             }
@@ -374,7 +462,7 @@ namespace Umbraco.Core
                            {
                                Message =
                                    "The database configuration failed with the following message: " + ex.Message +
-                                   "\n Please check log file for addtional information (can be found in '/App_Data/Logs/UmbracoTraceLog.txt')",
+                                   "\n Please check log file for additional information (can be found in '/App_Data/Logs/UmbracoTraceLog.txt')",
                                Success = false,
                                Percentage = "90"
                            };

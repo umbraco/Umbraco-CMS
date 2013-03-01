@@ -139,6 +139,7 @@
     <Compile Include="Events\SendToPublishEventArgs.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="MacroPropertyTypeResolver.cs" />
+    <Compile Include="Media\MediaSubfolderCounter.cs" />
     <Compile Include="Models\ContentBase.cs" />
     <Compile Include="Models\ContentExtensions.cs" />
     <Compile Include="Enum.cs" />
@@ -347,6 +348,7 @@
     <Compile Include="Persistence\Migrations\Syntax\Delete\Index\IDeleteIndexOnColumnSyntax.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Delete\Table\DeleteTableBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Execute\ExecuteBuilder.cs" />
+    <Compile Include="Persistence\Migrations\Syntax\Execute\Expressions\ExecuteCodeStatementExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Execute\Expressions\ExecuteSqlStatementExpression.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Execute\IExecuteBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\ExpressionBuilder.cs" />
@@ -381,6 +383,7 @@
     <Compile Include="Persistence\Migrations\Syntax\Update\UpdateBuilder.cs" />
     <Compile Include="Persistence\Migrations\Syntax\Update\UpdateDataBuilder.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourNineZero\RemoveUmbracoAppConstraints.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixZeroOne\UpdatePropertyTypesAndGroups.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\DeleteAppTables.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\EnsureAppsTreesUpdated.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\MoveMasterContentTypeData.cs" />
@@ -440,6 +443,7 @@
     <Compile Include="Persistence\Repositories\UserTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\VersionableRepositoryBase.cs" />
     <Compile Include="Persistence\RepositoryFactory.cs" />
+    <Compile Include="ObjectResolution\LazyManyObjectsResolverbase.cs" />
     <Compile Include="Persistence\RepositoryResolver.cs" />
     <Compile Include="Persistence\SqlSyntax\ColumnInfo.cs" />
     <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />
@@ -682,6 +686,11 @@
     <Compile Include="WriteLock.cs" />
     <Compile Include="XmlExtensions.cs" />
     <Compile Include="XmlHelper.cs" />
+    <Compile Include="Xml\DynamicContext.cs" />
+    <Compile Include="Xml\XmlNamespaces.cs" />
+    <Compile Include="Xml\XmlNodeListFactory.cs" />
+    <Compile Include="Xml\XmlNodeExtensions.cs" />
+    <Compile Include="Xml\XPathVariable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

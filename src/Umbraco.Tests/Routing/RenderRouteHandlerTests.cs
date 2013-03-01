@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Routing
 
 			base.Initialize();
 
-			System.Configuration.ConfigurationManager.AppSettings.Set("umbracoPath", "~/umbraco");
+		    SettingsForTests.UmbracoPath = "~/umbraco";
             
 			var webBoot = new WebBootManager(new UmbracoApplication(), true);
 			//webBoot.Initialize();
@@ -40,7 +40,6 @@ namespace Umbraco.Tests.Routing
 		{
 			base.TearDown();
 			RouteTable.Routes.Clear();
-			System.Configuration.ConfigurationManager.AppSettings.Set("umbracoPath", "");
 			SurfaceControllerResolver.Reset();
 		}
 
@@ -68,7 +67,8 @@ namespace Umbraco.Tests.Routing
 		}
 
 		//test all template name styles to match the ActionName
-		[TestCase("home-page")]
+        [TestCase("home-\\234^^*32page")]
+        [TestCase("home-page")]
         [TestCase("home-\\234^^*32page")]
         [TestCase("home-page")]
         [TestCase("home-page")]

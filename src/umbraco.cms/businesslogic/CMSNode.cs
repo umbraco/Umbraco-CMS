@@ -518,14 +518,16 @@ order by level,sortOrder";
                         SqlHelper.CreateParameter("@parentId", newParent.Id));
 
                     this.Parent = newParent;
-                    this.sortOrder = maxSortOrder + 1;
+                    this.sortOrder = maxSortOrder + 1;                    
+                }
+                
+                //detect if we have moved, then update the level and path
+                // issue: http://issues.umbraco.org/issue/U4-1579
+                if (this.Path != newParent.Path + "," + this.Id.ToString())
+                {
                     this.Level = newParent.Level + 1;
                     this.Path = newParent.Path + "," + this.Id.ToString();
                 }
-
-                //this.Parent = newParent;
-                //this.Level = newParent.Level + 1;
-                //this.Path = newParent.Path + "," + this.Id.ToString();
 
                 //this code block should not be here but since the class structure is very poor and doesn't use 
                 //overrides (instead using shadows/new) for the Children property, when iterating over the children

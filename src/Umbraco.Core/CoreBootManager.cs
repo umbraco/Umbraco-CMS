@@ -9,6 +9,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
+using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
@@ -110,14 +111,14 @@ namespace Umbraco.Core
 			if (_isStarted)
 				throw new InvalidOperationException("The boot manager has already been initialized");
 
-			if (afterStartup != null)
-			{
-				afterStartup(ApplicationContext.Current);	
-			}
-
             //call OnApplicationStarting of each application events handler
             ApplicationEventsResolver.Current.ApplicationEventHandlers
                 .ForEach(x => x.OnApplicationStarting(UmbracoApplication, ApplicationContext));
+
+            if (afterStartup != null)
+            {
+                afterStartup(ApplicationContext.Current);
+            }
 
 			_isStarted = true;
 
@@ -140,14 +141,17 @@ namespace Umbraco.Core
 			//stop the timer and log the output
 			_timer.Dispose();
 
-			if (afterComplete != null)
-			{
-				afterComplete(ApplicationContext.Current);	
-			}
-
             //call OnApplicationStarting of each application events handler
             ApplicationEventsResolver.Current.ApplicationEventHandlers
                 .ForEach(x => x.OnApplicationStarted(UmbracoApplication, ApplicationContext));
+
+            //Now, startup all of our legacy startup handler
+            ApplicationEventsResolver.Current.InstantiateLegacyStartupHanlders();
+
+            if (afterComplete != null)
+            {
+                afterComplete(ApplicationContext.Current);
+            }
 
 			_isComplete = true;
 
@@ -166,19 +170,19 @@ namespace Umbraco.Core
 				new RepositoryFactory());
 
 			CacheRefreshersResolver.Current = new CacheRefreshersResolver(
-				PluginManager.Current.ResolveCacheRefreshers());
+				() => PluginManager.Current.ResolveCacheRefreshers());
 
 			DataTypesResolver.Current = new DataTypesResolver(
-				PluginManager.Current.ResolveDataTypes());
+				() => PluginManager.Current.ResolveDataTypes());
 
 			MacroFieldEditorsResolver.Current = new MacroFieldEditorsResolver(
-				PluginManager.Current.ResolveMacroRenderings());
+				() => PluginManager.Current.ResolveMacroRenderings());
 
 			PackageActionsResolver.Current = new PackageActionsResolver(
-				PluginManager.Current.ResolvePackageActions());
+				() => PluginManager.Current.ResolvePackageActions());
 
 			ActionsResolver.Current = new ActionsResolver(
-				PluginManager.Current.ResolveActions());
+				() => PluginManager.Current.ResolveActions());
 
             MacroPropertyTypeResolver.Current = new MacroPropertyTypeResolver(
                 PluginManager.Current.ResolveMacroPropertyTypes());
@@ -201,7 +205,8 @@ namespace Umbraco.Core
 					typeof (UpdateCmsContentTypeAllowedContentTypeTable),
 					typeof (UpdateCmsContentTypeTable),
 					typeof (UpdateCmsContentVersionTable),
-					typeof (UpdateCmsPropertyTypeGroupTable)
+					typeof (UpdateCmsPropertyTypeGroupTable),
+                    typeof (UpdatePropertyTypesAndGroups)
 				});
 
 			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(

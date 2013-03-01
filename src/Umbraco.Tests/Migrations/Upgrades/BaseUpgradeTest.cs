@@ -28,8 +28,6 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
             Path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", Path);
-
-            UmbracoSettings.UseLegacyXmlSchema = false;
            
 			MigrationResolver.Current = new MigrationResolver(new List<Type>
 				{

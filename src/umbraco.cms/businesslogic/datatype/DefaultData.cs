@@ -69,7 +69,7 @@ namespace umbraco.cms.businesslogic.datatype
                .On<PropertyTypeDto, PropertyDataDto>(x => x.Id, y => y.PropertyTypeId)
                .InnerJoin<DataTypeDto>()
                .On<DataTypeDto, PropertyTypeDto>(x => x.DataTypeId, y => y.DataTypeId)
-               .Where("cmsPropertyData.id = @Id", new {Id = _propertyId});
+               .Where<PropertyDataDto>(x => x.Id == _propertyId);
             var dto = Database.Fetch<PropertyDataDto, PropertyTypeDto, DataTypeDto>(sql).FirstOrDefault();
 
             if (dto != null)
@@ -87,6 +87,8 @@ namespace umbraco.cms.businesslogic.datatype
                 _dataType.SetDataTypeProperties(fieldName, dbType);
             }
         }
+
+        internal string PropertyTypeAlias { get; set; }
 
         public DBTypes DatabaseType
         {
@@ -208,6 +210,7 @@ namespace umbraco.cms.businesslogic.datatype
 				}
 				return _nodeId.Value;
 			}
+            internal set { _nodeId = value; }
 		}
 
 		#endregion

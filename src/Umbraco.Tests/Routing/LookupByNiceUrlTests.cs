@@ -1,5 +1,6 @@
 using System.Configuration;
 using NUnit.Framework;
+using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
@@ -10,20 +11,25 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class LookupByNiceUrlTests : BaseRoutingTest
 	{
-		public override void Initialize()
-		{
-			base.Initialize();
-			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
-		}
+        public override void Initialize()
+        {
+            base.Initialize();            
+        }
+
+        public override void TearDown()
+        {
+            base.TearDown();
+        }
 
 		/// <summary>
 		/// We don't need a db for this test, will run faster without one
 		/// </summary>
 		protected override bool RequiresDbSetup
 		{
-			get { return true; }
+			get { return false; }
 		}
 
+        
 		[TestCase("/", 1046)]
 		[TestCase("/default.aspx", 1046)] //this one is actually rather important since this is the path that comes through when we are running in pre-IIS 7 for the root document '/' !
 		[TestCase("/Sub1", 1173)]
@@ -40,8 +46,8 @@ namespace Umbraco.Tests.Routing
 			var routingContext = GetRoutingContext(urlString);
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
 			var docreq = new PublishedContentRequest(url, routingContext);
-			var lookup = new LookupByNiceUrl();
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
+			var lookup = new LookupByNiceUrl(false);
+            SettingsForTests.HideTopLevelNodeFromPath = true;
 
 			var result = lookup.TrySetDocument(docreq);
 
@@ -56,6 +62,7 @@ namespace Umbraco.Tests.Routing
 			}
 		}
 
+        
 		[TestCase("/", 1046)]
 		[TestCase("/default.aspx", 1046)] //this one is actually rather important since this is the path that comes through when we are running in pre-IIS 7 for the root document '/' !
 		[TestCase("/home", 1046)]
@@ -67,8 +74,9 @@ namespace Umbraco.Tests.Routing
 			var routingContext = GetRoutingContext(urlString);
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl;	//very important to use the cleaned up umbraco url		
 			var docreq = new PublishedContentRequest(url, routingContext);			
-			var lookup = new LookupByNiceUrl();
-
+			var lookup = new LookupByNiceUrl(false);
+            SettingsForTests.HideTopLevelNodeFromPath = false;
+			
 			var result = lookup.TrySetDocument(docreq);
 
 			Assert.IsTrue(result);

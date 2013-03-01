@@ -40,9 +40,12 @@ namespace umbraco.presentation.umbraco.Search
             MediaService.Saved += MediaService_Saved;
             MediaService.Deleted += MediaService_Deleted;
             MediaService.Moved += MediaService_Moved;
+            MediaService.Trashed += MediaService_Trashed;
+
             ContentService.Saved += ContentService_Saved;
             ContentService.Deleted += ContentService_Deleted;
             ContentService.Moved += ContentService_Moved;
+            ContentService.Trashed += ContentService_Trashed;
 
             //bind to examine events
             var contentIndexer = ExamineManager.Instance.IndexProviderCollection["InternalIndexer"] as UmbracoContentIndexer;
@@ -57,23 +60,30 @@ namespace umbraco.presentation.umbraco.Search
             }
         }
 
+        void ContentService_Trashed(IContentService sender, Umbraco.Core.Events.MoveEventArgs<IContent> e)
+        {
+            DeleteContent(e.Entity);
+        }
+
+        void MediaService_Trashed(IMediaService sender, Umbraco.Core.Events.MoveEventArgs<IMedia> e)
+        {
+            DeleteMedia(e.Entity);
+        }
+
         void ContentService_Moved(IContentService sender, Umbraco.Core.Events.MoveEventArgs<IContent> e)
         {
-            IndexConent(e.Entity);
+            IndexContent(e.Entity);
         }
 
         void ContentService_Deleted(IContentService sender, Umbraco.Core.Events.DeleteEventArgs<IContent> e)
         {
-            e.DeletedEntities.ForEach(
-                content =>
-                ExamineManager.Instance.DeleteFromIndex(
-                    content.Id.ToString(),
-                    ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler)));
+            e.DeletedEntities.ForEach(DeleteContent);
         }
 
         void ContentService_Saved(IContentService sender, Umbraco.Core.Events.SaveEventArgs<IContent> e)
         {
-            e.SavedEntities.ForEach(IndexConent);
+            //ensure we do not re-index it if it is in the bin            
+            e.SavedEntities.Where(x => !x.Trashed).ForEach(IndexContent);
         }
 
         void MediaService_Moved(IMediaService sender, Umbraco.Core.Events.MoveEventArgs<IMedia> e)
@@ -83,16 +93,13 @@ namespace umbraco.presentation.umbraco.Search
 
         void MediaService_Deleted(IMediaService sender, Umbraco.Core.Events.DeleteEventArgs<IMedia> e)
         {
-            e.DeletedEntities.ForEach(
-                media =>
-                ExamineManager.Instance.DeleteFromIndex(
-                    media.Id.ToString(),
-                    ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler)));
+            e.DeletedEntities.ForEach(DeleteMedia);
         }
 
         void MediaService_Saved(IMediaService sender, Umbraco.Core.Events.SaveEventArgs<IMedia> e)
         {
-            e.SavedEntities.ForEach(IndexMedia);
+            //ensure we do not re-index it if it is in the bin            
+            e.SavedEntities.Where(x => !x.Trashed).ForEach(IndexMedia);
         }
 
         private void IndexMedia(IMedia sender)
@@ -102,11 +109,35 @@ namespace umbraco.presentation.umbraco.Search
                 ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler));
         }
 
-        private void IndexConent(IContent sender)
+        private void DeleteContent(IContent sender)
         {
+            ExamineManager.Instance.DeleteFromIndex(
+                sender.Id.ToString(),
+                ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler));
+        }
+
+        private void DeleteMedia(IMedia sender)
+        {
+            ExamineManager.Instance.DeleteFromIndex(
+                sender.Id.ToString(),
+                ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler));
+        }
+
+        private void IndexContent(IContent sender)
+        {
+            //we do not need to index this item if it is published, this is because the item will get indexed 
+            // by the UmbracoExamine.UmbracoEventManager when listening to content.AfterUpdateDocumentCache
+
+            if (sender.Published)
+                return;
+
+            //otherwise, we need to check for SupportUnpublishedContent because if we are indexing anything and it is 
+            // not published the indexer will need to support unpublished items.
+
             ExamineManager.Instance.ReIndexNode(
                 sender.ToXml(), "content",
-                ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler));
+                ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
+                              .Where(x => x.SupportUnpublishedContent && x.EnableDefaultEventHandler));
         }
 
         /// <summary>

@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Publishing
 				};
 
             DataTypesResolver.Current = new DataTypesResolver(
-                PluginManager.Current.ResolveDataTypes());
+                () => PluginManager.Current.ResolveDataTypes());
 
             base.Initialize();
 

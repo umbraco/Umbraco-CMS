@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Models
 				};
 
             DataTypesResolver.Current = new DataTypesResolver(
-                PluginManager.Current.ResolveDataTypes());
+                () => PluginManager.Current.ResolveDataTypes());
 
             base.Initialize();
         }
@@ -35,10 +35,10 @@ namespace Umbraco.Tests.Models
         [TearDown]
         public override void TearDown()
         {
+            base.TearDown();
+
             //reset the app context
             DataTypesResolver.Reset();
-            
-            base.TearDown();
         }
         [Test]
         public void Can_Generate_Xml_Representation_Of_Content()

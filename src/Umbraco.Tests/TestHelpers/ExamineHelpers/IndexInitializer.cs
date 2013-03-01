@@ -48,37 +48,35 @@ namespace Umbraco.Tests.TestHelpers.ExamineHelpers
 														 new[]
                                                              {
                                                                  new TestIndexField { Name = "id", EnableSorting = true, Type = "Number" }, 
-                                                                 new TestIndexField { Name = "nodeName", EnableSorting = true },
+                                                                 new TestIndexField { Name = "version" }, 
+                                                                 new TestIndexField { Name = "parentID" },
+                                                                 new TestIndexField { Name = "level" },
+                                                                 new TestIndexField { Name = "writerID" },
+                                                                 new TestIndexField { Name = "creatorID" },
+                                                                 new TestIndexField { Name = "nodeType" },
+                                                                 new TestIndexField { Name = "template" },
+                                                                 new TestIndexField { Name = "sortOrder", EnableSorting = true, Type = "Number"},
+                                                                 new TestIndexField { Name = "createDate", EnableSorting = true, Type = "DateTime" }, 
                                                                  new TestIndexField { Name = "updateDate", EnableSorting = true, Type = "DateTime" }, 
+                                                                 new TestIndexField { Name = "nodeName", EnableSorting = true },                                                                 
+                                                                 new TestIndexField { Name = "urlName" }, 
                                                                  new TestIndexField { Name = "writerName" }, 
-                                                                 new TestIndexField { Name = "path" }, 
+                                                                 new TestIndexField { Name = "creatorName" }, 
                                                                  new TestIndexField { Name = "nodeTypeAlias" }, 
-                                                                 new TestIndexField { Name = "parentID" }
+                                                                 new TestIndexField { Name = "path" }                                                                 
                                                              },
-															 Enumerable.Empty<IIndexField>(),
-														 //new[]
-														 //	{
-														 //		new TestIndexField { Name = "headerText" }, 
-														 //		new TestIndexField { Name = "bodyText" },
-														 //		new TestIndexField { Name = "metaDescription" }, 
-														 //		new TestIndexField { Name = "metaKeywords" }, 
-														 //		new TestIndexField { Name = "bodyTextColOne" }, 
-														 //		new TestIndexField { Name = "bodyTextColTwo" }, 
-														 //		new TestIndexField { Name = "xmlStorageTest" }
-														 //	},
-															 Enumerable.Empty<string>(),
-														 //new[]
-														 //	{
-														 //		"CWS_Home", 
-														 //		"CWS_Textpage",
-														 //		"CWS_TextpageTwoCol", 
-														 //		"CWS_NewsEventsList", 
-														 //		"CWS_NewsItem", 
-														 //		"CWS_Gallery", 
-														 //		"CWS_EventItem", 
-														 //		"Image", 
-														 //	},
-														 new string[] { },
+                                                         new[]
+														 	{
+														 		new TestIndexField { Name = "headerText" }, 
+														 		new TestIndexField { Name = "bodyText" },
+														 		new TestIndexField { Name = "metaDescription" }, 
+														 		new TestIndexField { Name = "metaKeywords" }, 
+														 		new TestIndexField { Name = "bodyTextColOne" }, 
+														 		new TestIndexField { Name = "bodyTextColTwo" }, 
+														 		new TestIndexField { Name = "xmlStorageTest" }
+														 	},
+														    Enumerable.Empty<string>(),
+                                                            Enumerable.Empty<string>(),
 														 -1),
 														 d,
 														 new TestDataService(),
@@ -95,53 +93,12 @@ namespace Umbraco.Tests.TestHelpers.ExamineHelpers
 		{
 			return new UmbracoExamineSearcher(d, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29));
 		}
-		//public SimpleDataIndexer GetSimpleIndexer(DirectoryInfo d)
-		//{
-		//	var i = new SimpleDataIndexer(new IndexCriteria(
-		//												 new IIndexField[] { },
-		//												 new[]
-		//													 {
-		//														 new TestIndexField { Name = "Author" }, 
-		//														 new TestIndexField { Name = "DateCreated", EnableSorting = true, Type = "DateTime"  },
-		//														 new TestIndexField { Name = "Title" }, 
-		//														 new TestIndexField { Name = "Photographer" }, 
-		//														 new TestIndexField { Name = "YearCreated", Type = "Date.Year" }, 
-		//														 new TestIndexField { Name = "MonthCreated", Type = "Date.Month" }, 
-		//														 new TestIndexField { Name = "DayCreated", Type = "Date.Day" },
-		//														 new TestIndexField { Name = "HourCreated", Type = "Date.Hour" },
-		//														 new TestIndexField { Name = "MinuteCreated", Type = "Date.Minute" },
-		//														 new TestIndexField { Name = "SomeNumber", Type = "Number" },
-		//														 new TestIndexField { Name = "SomeFloat", Type = "Float" },
-		//														 new TestIndexField { Name = "SomeDouble", Type = "Double" },
-		//														 new TestIndexField { Name = "SomeLong", Type = "Long" }
-		//													 },
-		//												 new string[] { },
-		//												 new string[] { },
-		//												 -1),
-		//												 d,
-		//												 new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29),
-		//												 new TestSimpleDataProvider(),
-		//												 new[] { "Documents", "Pictures" },
-		//												 false);
-		//	i.IndexingError += IndexingError;
-
-		//	return i;
-		//}
+		
 		public LuceneSearcher GetLuceneSearcher(DirectoryInfo d)
 		{
 			return new LuceneSearcher(d, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29));
 		}
-		//public PDFIndexer GetPdfIndexer(DirectoryInfo d)
-		//{
-		//	var i = new PDFIndexer(d,
-		//							  new TestDataService(),
-		//							  new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29),
-		//							  false);
-
-		//	i.IndexingError += IndexingError;
-
-		//	return i;
-		//}
+		
 		public MultiIndexSearcher GetMultiSearcher(DirectoryInfo pdfDir, DirectoryInfo simpleDir, DirectoryInfo conventionDir, DirectoryInfo cwsDir)
 		{
 			var i = new MultiIndexSearcher(new[] { pdfDir, simpleDir, conventionDir, cwsDir }, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29));

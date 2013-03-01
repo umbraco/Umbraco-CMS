@@ -24,68 +24,24 @@ using System.Linq;
 
 namespace Umbraco.Tests.PublishedContent
 {
-	/// <summary>
+    /// <summary>
 	/// Tests the typed extension methods on IPublishedContent using the DefaultPublishedMediaStore
 	/// </summary>
-	[TestFixture]
-	public class PublishedMediaTests : BaseWebTest
+	[TestFixture, RequiresSTA]
+    public class PublishedMediaTests : PublishedContentTestBase
 	{
 		
 		public override void Initialize()
 		{
 			base.Initialize();
-			DoInitialization(GetUmbracoContext("/test", 1234));			
+            UmbracoSettings.ForceSafeAliases = true;
+            UmbracoSettings.UmbracoLibraryCacheDuration = 1800;
+            UmbracoSettings.ForceSafeAliases = true;	
 		}
-
-		/// <summary>
-		/// Shared with PublishMediaStoreTests
-		/// </summary>
-		/// <param name="umbContext"></param>
-		internal static void DoInitialization(UmbracoContext umbContext)
-		{
-			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
-				new[]
-					{
-						typeof(DatePickerPropertyEditorValueConverter),
-						typeof(TinyMcePropertyEditorValueConverter),
-						typeof(YesNoPropertyEditorValueConverter)
-					});
-
-			//need to specify a custom callback for unit tests
-			PublishedContentHelper.GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
-			{
-				if (propertyAlias == "content")
-				{
-					//return the rte type id
-					return Guid.Parse("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
-				}
-				return Guid.Empty;
-			};
-
-			UmbracoSettings.ForceSafeAliases = true;
-			UmbracoSettings.UmbracoLibraryCacheDuration = 1800;
-
-			UmbracoContext.Current = umbContext;
-			PublishedMediaStoreResolver.Current = new PublishedMediaStoreResolver(new DefaultPublishedMediaStore());
-
-			UmbracoSettings.ForceSafeAliases = true;
-		}
-
+        
 		public override void TearDown()
 		{
 			base.TearDown();
-
-			DoTearDown();
-		}
-
-		/// <summary>
-		/// Shared with PublishMediaStoreTests
-		/// </summary>
-		internal static void DoTearDown()
-		{
-			PropertyEditorValueConvertersResolver.Reset();
-			UmbracoContext.Current = null;
-			PublishedMediaStoreResolver.Reset();
 		}
 
 		/// <summary>
@@ -107,8 +63,72 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			return GetNode(id, GetUmbracoContext("/test", 1234));
 		}
-
+           
 		[Test]
+	    public void Ensure_Children_Sorted_With_Examine()
+	    {
+            var newIndexFolder = new DirectoryInfo(Path.Combine("App_Data\\CWSIndexSetTest", Guid.NewGuid().ToString()));
+            var indexInit = new IndexInitializer();
+            var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);
+            indexer.RebuildIndex();
+
+            var store = new DefaultPublishedMediaStore(
+                indexInit.GetUmbracoSearcher(newIndexFolder),
+                indexInit.GetUmbracoIndexer(newIndexFolder));
+
+            //we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
+            var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 1111);
+	        var rootChildren = publishedMedia.Children().ToArray();
+	        var currSort = 0;
+            for (var i = 0; i < rootChildren.Count(); i++)
+            {
+                Assert.GreaterOrEqual(rootChildren[i].SortOrder, currSort);
+                currSort = rootChildren[i].SortOrder;
+            }
+
+                
+
+	    }
+
+		
+	    [Test]
+	    public void Do_Not_Find_In_Recycle_Bin()
+	    {
+            var newIndexFolder = new DirectoryInfo(Path.Combine("App_Data\\CWSIndexSetTest", Guid.NewGuid().ToString()));
+            var indexInit = new IndexInitializer();
+            var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);	        
+            indexer.RebuildIndex();
+            var searcher = indexInit.GetUmbracoSearcher(newIndexFolder);
+            var store = new DefaultPublishedMediaStore(searcher, indexer);
+	        var ctx = GetUmbracoContext("/test", 1234);
+
+            //ensure it is found
+            var publishedMedia = store.GetDocumentById(ctx, 3113);
+	        Assert.IsNotNull(publishedMedia);
+
+            //move item to recycle bin
+            var newXml = XElement.Parse(@"<node id='3113' version='5b3e46ab-3e37-4cfa-ab70-014234b5bd33' parentID='-21' level='1' writerID='0' nodeType='1032' template='0' sortOrder='2' createDate='2010-05-19T17:32:46' updateDate='2010-05-19T17:32:46' nodeName='Another Umbraco Image' urlName='acnestressscrub' writerName='Administrator' nodeTypeAlias='Image' path='-1,-21,3113'>
+					<data alias='umbracoFile'><![CDATA[/media/1234/blah.pdf]]></data>
+					<data alias='umbracoWidth'>115</data>
+					<data alias='umbracoHeight'>268</data>
+					<data alias='umbracoBytes'>10726</data>
+					<data alias='umbracoExtension'>jpg</data>
+				</node>");
+            indexer.ReIndexNode(newXml, "media");
+
+            //ensure it still exists in the index (raw examine search)
+            var criteria = searcher.CreateSearchCriteria();
+            var filter = criteria.Id(3113);
+            var found = searcher.Search(filter.Compile());
+            Assert.IsNotNull(found);
+            Assert.AreEqual(1, found.TotalItemCount);
+
+            //ensure it does not show up in the published media store
+            var recycledMedia = store.GetDocumentById(ctx, 3113);
+            Assert.IsNull(recycledMedia);
+	    }
+
+	    [Test]
 		public void Children_With_Examine()
 		{
 			var newIndexFolder = new DirectoryInfo(Path.Combine("App_Data\\CWSIndexSetTest", Guid.NewGuid().ToString()));
@@ -116,7 +136,9 @@ namespace Umbraco.Tests.PublishedContent
 			var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);
 			indexer.RebuildIndex();
 
-			var store = new DefaultPublishedMediaStore(indexInit.GetUmbracoSearcher(newIndexFolder));
+            var store = new DefaultPublishedMediaStore(
+                indexInit.GetUmbracoSearcher(newIndexFolder),
+                indexInit.GetUmbracoIndexer(newIndexFolder));
 
 			//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
 			var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 1111);
@@ -136,7 +158,9 @@ namespace Umbraco.Tests.PublishedContent
 			var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);
 			indexer.RebuildIndex();
 
-			var store = new DefaultPublishedMediaStore(indexInit.GetUmbracoSearcher(newIndexFolder));
+            var store = new DefaultPublishedMediaStore(
+                indexInit.GetUmbracoSearcher(newIndexFolder),
+                indexInit.GetUmbracoIndexer(newIndexFolder));
 
 			//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
 			var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 1111);
@@ -156,7 +180,9 @@ namespace Umbraco.Tests.PublishedContent
 			var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);
 			indexer.RebuildIndex();
 
-			var store = new DefaultPublishedMediaStore(indexInit.GetUmbracoSearcher(newIndexFolder));
+            var store = new DefaultPublishedMediaStore(
+                indexInit.GetUmbracoSearcher(newIndexFolder),
+                indexInit.GetUmbracoIndexer(newIndexFolder));
 
 			//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
 			var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 1111);
@@ -176,7 +202,9 @@ namespace Umbraco.Tests.PublishedContent
 			var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);
 			indexer.RebuildIndex();
 
-			var store = new DefaultPublishedMediaStore(indexInit.GetUmbracoSearcher(newIndexFolder));
+            var store = new DefaultPublishedMediaStore(
+                indexInit.GetUmbracoSearcher(newIndexFolder),
+                indexInit.GetUmbracoIndexer(newIndexFolder));
 
 			//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
 			var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 3113);
@@ -192,7 +220,9 @@ namespace Umbraco.Tests.PublishedContent
 			var indexer = indexInit.GetUmbracoIndexer(newIndexFolder);
 			indexer.RebuildIndex();
 
-			var store = new DefaultPublishedMediaStore(indexInit.GetUmbracoSearcher(newIndexFolder));
+            var store = new DefaultPublishedMediaStore(
+                indexInit.GetUmbracoSearcher(newIndexFolder),
+                indexInit.GetUmbracoIndexer(newIndexFolder));
 
 			//we are using the media.xml media to test the examine results implementation, see the media.xml file in the ExamineHelpers namespace
 			var publishedMedia = store.GetDocumentById(GetUmbracoContext("/test", 1234), 3113);
@@ -200,7 +230,6 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.IsTrue(ancestors.Select(x => x.Id).ContainsAll(new[] { 3113, 2112, 2222, 1111 }));
 		}
 
-        [Ignore]
 		[Test]
 		public void Children_Without_Examine()
 		{
@@ -225,7 +254,6 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.IsTrue(subChildren.Select(x => x.Id).ContainsAll(new[] { mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
 		}
         
-        [Ignore]
 		[Test]
 		public void Descendants_Without_Examine()
 		{
@@ -250,7 +278,6 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.IsTrue(subDescendants.Select(x => x.Id).ContainsAll(new[] { mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
 		}
 
-        [Ignore]
 		[Test]
 		public void DescendantsOrSelf_Without_Examine()
 		{
@@ -277,7 +304,6 @@ namespace Umbraco.Tests.PublishedContent
 				new[] { mChild1.Id, mSubChild1.Id, mSubChild2.Id, mSubChild3.Id }));
 		}
 
-        [Ignore]
 		[Test]
 		public void Parent_Without_Examine()
 		{
@@ -303,7 +329,6 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.AreEqual(mChild1.Id, publishedSubChild1.Parent.Id);
 		}
 
-        [Ignore]
 		[Test]
 		public void Ancestors_Without_Examine()
 		{
@@ -323,7 +348,6 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.IsTrue(publishedSubChild1.Ancestors().Select(x => x.Id).ContainsAll(new[] {mChild1.Id, mRoot.Id}));
 		}
 
-        [Ignore]
 		[Test]
 		public void AncestorsOrSelf_Without_Examine()
 		{

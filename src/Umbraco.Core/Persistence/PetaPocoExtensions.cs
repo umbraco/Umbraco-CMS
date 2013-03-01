@@ -136,12 +136,22 @@ namespace Umbraco.Core.Persistence
 
         public static void CreateDatabaseSchema(this Database db)
         {
+            CreateDatabaseSchema(db, true);
+        }
+
+        internal static void CreateDatabaseSchema(this Database db, bool guardConfiguration)
+        {
+            if (guardConfiguration && ApplicationContext.Current.IsConfigured)
+                throw new Exception("Umbraco is already configured!");
+
             NewTable += PetaPocoExtensions_NewTable;
 
             LogHelper.Info<Database>("Initializing database schema creation");
 
             var creation = new DatabaseSchemaCreation(db);
             creation.InitializeDatabaseSchema();
+
+            LogHelper.Info<Database>("Finalized database schema creation");
 
             NewTable -= PetaPocoExtensions_NewTable;
         }

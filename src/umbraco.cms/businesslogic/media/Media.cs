@@ -192,6 +192,20 @@ namespace umbraco.cms.businesslogic.media
             }
         }
 
+        [Obsolete("Obsolete, Use Name property on Umbraco.Core.Models.Content", false)]
+        public override string Text
+        {
+            get
+            {
+                return MediaItem.Name;
+            }
+            set
+            {
+                value = value.Trim();
+                MediaItem.Name = value;
+            }
+        }
+
         /// <summary>
         /// Retrieve a list of all medias underneath the current
         /// </summary>
@@ -237,7 +251,9 @@ namespace umbraco.cms.businesslogic.media
             
             if (!e.Cancel)
             {
-                ApplicationContext.Current.Services.MediaService.Save(MediaItem);
+                var current = User.GetCurrent();
+                int userId = current == null ? 0 : current.Id;
+                ApplicationContext.Current.Services.MediaService.Save(MediaItem, userId);
 
                 base.Save();
 

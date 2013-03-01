@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Caching;
 using System.Linq;
+using umbraco.BusinessLogic;
 
 namespace umbraco.cms.businesslogic.media
 {
@@ -128,7 +129,9 @@ namespace umbraco.cms.businesslogic.media
                     _mediaType.AddContentType(contentType);
                 }
 
-                ApplicationContext.Current.Services.ContentTypeService.Save(_mediaType);
+                var current = User.GetCurrent();
+                int userId = current == null ? 0 : current.Id;
+                ApplicationContext.Current.Services.ContentTypeService.Save(_mediaType, userId);
 
                 //Ensure that MediaTypes are reloaded from db by clearing cache
                 InMemoryCacheProvider.Current.Clear();
@@ -150,10 +153,13 @@ namespace umbraco.cms.businesslogic.media
 
             if (!e.Cancel)
             {
-                // delete all documents of this type
-                Media.DeleteFromType(this);
-                // Delete contentType
-                base.delete();
+                // check that no media types uses me as a master
+                if (GetAllAsList().Any(dt => dt.MasterContentTypes.Contains(this.Id)))
+                {
+                    throw new ArgumentException("Can't delete a Media Type used as a Master Content Type. Please remove all references first!");
+                }
+
+                ApplicationContext.Current.Services.ContentTypeService.Delete(_mediaType);
 
                 FireAfterDelete(e);
             }

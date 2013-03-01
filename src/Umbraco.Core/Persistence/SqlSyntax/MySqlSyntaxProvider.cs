@@ -309,5 +309,33 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}"; } }
 
         public override string RenameColumn { get { return "ALTER TABLE {0} CHANGE {1} {2}"; } }
+
+        public override bool? SupportsCaseInsensitiveQueries(Database db)
+        {
+            bool? supportsCaseInsensitiveQueries = null;
+
+            try
+            {
+                db.OpenSharedConnection();
+                // Need 4 @ signs as it is regarded as a parameter, @@ escapes it once, @@@@ escapes it twice
+                var lowerCaseFileSystem = db.Fetch<int>("SELECT @@@@Global.lower_case_file_system");
+                var lowerCaseTableNames = db.Fetch<int>("SELECT @@@@Global.lower_case_table_names");
+                
+                if(lowerCaseFileSystem.Any() && lowerCaseTableNames.Any())
+                    supportsCaseInsensitiveQueries = lowerCaseFileSystem.First() == 1 && lowerCaseTableNames.First() == 1;
+            }
+            catch(Exception ex)
+            {
+                Logging.LogHelper.Error<MySqlSyntaxProvider>("Error querying for lower_case support", ex);
+            }
+            finally
+            {
+                db.CloseSharedConnection();
+            }
+
+            // Could return null, which means testing failed, 
+            // add message to check with their hosting provider
+            return supportsCaseInsensitiveQueries;
+        }
     }
 }

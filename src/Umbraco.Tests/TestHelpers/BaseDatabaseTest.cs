@@ -30,13 +30,10 @@ namespace Umbraco.Tests.TestHelpers
             TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
 
-            UmbracoSettings.UseLegacyXmlSchema = false;
-
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            //If the Database Provider is Sql Ce we need to ensure the database
-            if (ProviderName.Contains("SqlServerCe"))
+            try
             {
                 //Delete database file before continueing
                 string filePath = string.Concat(path, "\\test.sdf");
@@ -44,12 +41,15 @@ namespace Umbraco.Tests.TestHelpers
                 {
                     File.Delete(filePath);
                 }
-
-                //Create the Sql CE database
-                var engine = new SqlCeEngine(ConnectionString);
-                engine.CreateDatabase();
             }
-
+            catch (Exception)
+            {
+                //if this doesn't work we have to make sure everything is reset! otherwise
+                // well run into issues because we've already set some things up
+                TearDown();
+                throw;
+            }
+            
             RepositoryResolver.Current = new RepositoryResolver(
                 new RepositoryFactory());
 
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.TestHelpers
 
             //Create the umbraco database
             _database = new Database(ConnectionString, ProviderName);
-            _database.CreateDatabaseSchema();
+            _database.CreateDatabaseSchema(false);
         }
 
         public abstract string ConnectionString { get; }

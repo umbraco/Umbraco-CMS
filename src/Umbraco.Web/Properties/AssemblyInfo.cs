@@ -31,3 +31,5 @@ using System.Security;
 [assembly: InternalsVisibleTo("umbraco.MacroEngines")]
 [assembly: InternalsVisibleTo("Umbraco.Web.UI")]
 [assembly: InternalsVisibleTo("Umbraco.Courier.Persistence")]
+[assembly: InternalsVisibleTo("umbraco.webservices")]
+

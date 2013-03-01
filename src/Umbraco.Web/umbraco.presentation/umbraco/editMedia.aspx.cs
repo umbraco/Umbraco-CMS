@@ -127,6 +127,7 @@ namespace umbraco.cms.presentation
             this.UpdateMediaFileLinksLiteral();
 
 			_media.XmlGenerate(new XmlDocument());
+            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editMediaSaved"), ui.Text("editMediaSavedText"));
 			ClientTools.SyncTree(_media.Path, true);
 		}
 

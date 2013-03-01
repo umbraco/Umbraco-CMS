@@ -673,12 +673,12 @@ namespace umbraco.cms.businesslogic
                     continue;
 
                 //get the propertyId
-                var property = propData.SingleOrDefault(x => x.PropertyTypeId == pt.Id);
+                var property = propData.LastOrDefault(x => x.PropertyTypeId == pt.Id);
                 if (property == null)
                 {
-                    //continue;
-                    var prop = Property.MakeNew(pt, this, Version);
-                    property = new {Id = prop.Id, PropertyTypeId = pt.Id};
+                    continue;
+                    //var prop = Property.MakeNew(pt, this, Version);
+                    //property = new {Id = prop.Id, PropertyTypeId = pt.Id};
                 }
                 var propertyId = property.Id;
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -139,81 +140,147 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected void PersistUpdatedBaseContentType(ContentTypeDto dto, IContentTypeComposition entity)
         {
-            var propertyFactory = new PropertyGroupFactory(entity.Id);
+            var propertyGroupFactory = new PropertyGroupFactory(entity.Id);
 
             var nodeDto = dto.NodeDto;
             var o = Database.Update(nodeDto);
 
             //Look up ContentType entry to get PrimaryKey for updating the DTO
-            var dtoPk = Database.First<ContentTypeDto>("WHERE nodeId = @Id", new { Id = entity.Id });
+            var dtoPk = Database.First<ContentTypeDto>("WHERE nodeId = @Id", new {Id = entity.Id});
             dto.PrimaryKey = dtoPk.PrimaryKey;
             Database.Update(dto);
 
             //Delete the ContentType composition entries before adding the updated collection
-            Database.Delete<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id", new { Id = entity.Id });
+            Database.Delete<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id", new {Id = entity.Id});
             //Update ContentType composition in new table
             foreach (var composition in entity.ContentTypeComposition)
             {
-                Database.Insert(new ContentType2ContentTypeDto { ParentId = composition.Id, ChildId = entity.Id });
+                Database.Insert(new ContentType2ContentTypeDto {ParentId = composition.Id, ChildId = entity.Id});
+            }
+
+            //Removing a ContentType from a composition (U4-1690)
+            //1. Find content based on the current ContentType: entity.Id
+            //2. Find all PropertyTypes on the ContentType that was removed - tracked id (key)
+            //3. Remove properties based on property types from the removed content type where the content ids correspond to those found in step one
+            var compositionBase = entity as ContentTypeCompositionBase;
+            if (compositionBase != null && compositionBase.RemovedContentTypeKeyTracker != null &&
+                compositionBase.RemovedContentTypeKeyTracker.Any())
+            {
+                //Find Content based on the current ContentType
+                var sql = new Sql();
+                sql.Select("*")
+                   .From<ContentDto>()
+                   .InnerJoin<NodeDto>()
+                   .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                   .Where<NodeDto>(x => x.NodeObjectType == new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"))
+                   .Where<ContentDto>(x => x.ContentTypeId == entity.Id);
+
+                var contentDtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+                //Loop through all tracked keys, which corresponds to the ContentTypes that has been removed from the composition
+                foreach (var key in compositionBase.RemovedContentTypeKeyTracker)
+                {
+                    //Find PropertyTypes for the removed ContentType
+                    var propertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new {Id = key});
+                    //Loop through the Content that is based on the current ContentType in order to remove the Properties that are 
+                    //based on the PropertyTypes that belong to the removed ContentType.
+                    foreach (var contentDto in contentDtos)
+                    {
+                        foreach (var propertyType in propertyTypes)
+                        {
+                            var nodeId = contentDto.NodeId;
+                            var propertyTypeId = propertyType.Id;
+                            var propertySql = new Sql().Select("*")
+                                                       .From<PropertyDataDto>()
+                                                       .InnerJoin<PropertyTypeDto>()
+                                                       .On<PropertyDataDto, PropertyTypeDto>(
+                                                           left => left.PropertyTypeId, right => right.Id)
+                                                       .Where<PropertyDataDto>(x => x.NodeId == nodeId)
+                                                       .Where<PropertyTypeDto>(x => x.Id == propertyTypeId);
+
+                            //Finally delete the properties that match our criteria for removing a ContentType from the composition
+                            Database.Delete<PropertyDataDto>(propertySql);
+                        }
+                    }
+                }
             }
 
             //Delete the allowed content type entries before adding the updated collection
-            Database.Delete<ContentTypeAllowedContentTypeDto>("WHERE Id = @Id", new { Id = entity.Id });
+            Database.Delete<ContentTypeAllowedContentTypeDto>("WHERE Id = @Id", new {Id = entity.Id});
             //Insert collection of allowed content types
             foreach (var allowedContentType in entity.AllowedContentTypes)
             {
-                Database.Insert(new ContentTypeAllowedContentTypeDto { Id = entity.Id, AllowedId = allowedContentType.Id.Value, SortOrder = allowedContentType.SortOrder });
+                Database.Insert(new ContentTypeAllowedContentTypeDto
+                                    {
+                                        Id = entity.Id,
+                                        AllowedId = allowedContentType.Id.Value,
+                                        SortOrder = allowedContentType.SortOrder
+                                    });
             }
 
-            //Check Dirty properties for Tabs/Groups and PropertyTypes - insert and delete accordingly
-            if (((ICanBeDirty)entity).IsPropertyDirty("PropertyGroups") || entity.PropertyGroups.Any(x => x.IsDirty()))
+            if (((ICanBeDirty) entity).IsPropertyDirty("PropertyTypes") || entity.PropertyTypes.Any(x => x.IsDirty()))
             {
                 //Delete PropertyTypes by excepting entries from db with entries from collections
-                var dbPropertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new { Id = entity.Id });
-                var dbPropertyTypeAlias = dbPropertyTypes.Select(x => x.Alias.ToLowerInvariant());
-                var entityPropertyTypes = entity.PropertyTypes.Select(x => x.Alias.ToLowerInvariant());
-                var aliases = dbPropertyTypeAlias.Except(entityPropertyTypes);
-                foreach (var alias in aliases)
+                var dbPropertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new {Id = entity.Id});
+                var dbPropertyTypeAlias = dbPropertyTypes.Select(x => x.Id);
+                var entityPropertyTypes = entity.PropertyTypes.Where(x => x.HasIdentity).Select(x => x.Id);
+                var items = dbPropertyTypeAlias.Except(entityPropertyTypes);
+                foreach (var item in items)
                 {
                     //Before a PropertyType can be deleted, all Properties based on that PropertyType should be deleted.
-                    var propertyType = dbPropertyTypes.FirstOrDefault(x => x.Alias.ToLowerInvariant() == alias);
-                    if (propertyType != null)
-                    {
-                        Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new { Id = propertyType.Id });
-                    }
-
-                    Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND Alias = @Alias", new { Id = entity.Id, Alias = alias });
+                    Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new {Id = item});
+                    Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND id = @PropertyTypeId",
+                                                     new {Id = entity.Id, PropertyTypeId = item});
                 }
+            }
+
+            if (((ICanBeDirty) entity).IsPropertyDirty("PropertyGroups") || entity.PropertyGroups.Any(x => x.IsDirty()))
+            {
                 //Delete Tabs/Groups by excepting entries from db with entries from collections
-                var dbPropertyGroups = Database.Fetch<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id", new { Id = entity.Id }).Select(x => x.Text);
-                var entityPropertyGroups = entity.PropertyGroups.Select(x => x.Name);
+                var dbPropertyGroups =
+                    Database.Fetch<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id", new {Id = entity.Id})
+                            .Select(x => new Tuple<int, string>(x.Id, x.Text));
+                var entityPropertyGroups = entity.PropertyGroups.Select(x => new Tuple<int, string>(x.Id, x.Name));
                 var tabs = dbPropertyGroups.Except(entityPropertyGroups);
-                foreach (var tabName in tabs)
+                foreach (var tab in tabs)
                 {
-                    Database.Delete<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id AND text = @Name", new { Id = entity.Id, Name = tabName });
+                    Database.Update<PropertyTypeDto>("SET propertyTypeGroupId = NULL WHERE propertyTypeGroupId = @PropertyGroupId",
+                                                    new {PropertyGroupId = tab.Item1});
+                    Database.Update<PropertyTypeGroupDto>("SET parentGroupId = NULL WHERE parentGroupId = @TabId",
+                                                          new {TabId = tab.Item1});
+                    Database.Delete<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id AND text = @Name",
+                                                          new {Id = entity.Id, Name = tab.Item2});
                 }
+            }
 
-                //Run through all groups to insert or update entries
-                foreach (var propertyGroup in entity.PropertyGroups)
-                {
-                    var tabDto = propertyFactory.BuildGroupDto(propertyGroup);
-                    int groupPrimaryKey = propertyGroup.HasIdentity
-                                              ? Database.Update(tabDto)
-                                              : Convert.ToInt32(Database.Insert(tabDto));
-                    if (!propertyGroup.HasIdentity)
-                        propertyGroup.Id = groupPrimaryKey;//Set Id on new PropertyGroup
-                }
+            //Run through all groups to insert or update entries
+            foreach (var propertyGroup in entity.PropertyGroups)
+            {
+                var tabDto = propertyGroupFactory.BuildGroupDto(propertyGroup);
+                int groupPrimaryKey = propertyGroup.HasIdentity
+                                          ? Database.Update(tabDto)
+                                          : Convert.ToInt32(Database.Insert(tabDto));
+                if (propertyGroup.HasIdentity == false)
+                    propertyGroup.Id = groupPrimaryKey; //Set Id on new PropertyGroup
 
-                //Run through all PropertyTypes to insert or update entries
-                foreach (var propertyType in entity.PropertyTypes)
+                //Ensure that the PropertyGroup's Id is set on the PropertyTypes within a group
+                //unless the PropertyGroupId has already been changed.
+                foreach (var propertyType in propertyGroup.PropertyTypes)
                 {
-                    var propertyTypeDto = propertyFactory.BuildPropertyTypeDto(propertyType.PropertyGroupId, propertyType);
-                    int typePrimaryKey = propertyType.HasIdentity
-                                             ? Database.Update(propertyTypeDto)
-                                             : Convert.ToInt32(Database.Insert(propertyTypeDto));
-                    if (!propertyType.HasIdentity)
-                        propertyType.Id = typePrimaryKey;//Set Id on new PropertyType
+                    if (propertyType.IsPropertyDirty("PropertyGroupId") == false)
+                        propertyType.PropertyGroupId = propertyGroup.Id;
                 }
+            }
+
+            //Run through all PropertyTypes to insert or update entries
+            foreach (var propertyType in entity.PropertyTypes)
+            {
+                var propertyTypeDto = propertyGroupFactory.BuildPropertyTypeDto(propertyType.PropertyGroupId,
+                                                                                propertyType);
+                int typePrimaryKey = propertyType.HasIdentity
+                                         ? Database.Update(propertyTypeDto)
+                                         : Convert.ToInt32(Database.Insert(propertyTypeDto));
+                if (propertyType.HasIdentity == false)
+                    propertyType.Id = typePrimaryKey; //Set Id on new PropertyType
             }
         }
 
@@ -242,8 +309,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
 
-            var propertyFactory = new PropertyGroupFactory(id);
-            var propertyGroups = propertyFactory.BuildEntity(dtos);
+            var propertyGroupFactory = new PropertyGroupFactory(id);
+            var propertyGroups = propertyGroupFactory.BuildEntity(dtos);
             return new PropertyGroupCollection(propertyGroups);
         }
 
@@ -272,9 +339,13 @@ namespace Umbraco.Core.Persistence.Repositories
                                     Name = dto.Name,
                                     HelpText = dto.HelpText,
                                     Mandatory = dto.Mandatory,
-                                    SortOrder = dto.SortOrder
-                                });
-            
+                                    SortOrder = dto.SortOrder,
+                                    ValidationRegExp = dto.ValidationRegExp
+                                }).ToList();
+
+            //Reset dirty properties
+            Parallel.ForEach(list, currentFile => currentFile.ResetDirtyProperties());
+
             return new PropertyTypeCollection(list);
         }
     }

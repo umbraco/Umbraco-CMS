@@ -78,7 +78,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContent>(sqlClause, query);
-            var sql = translator.Translate();
+            var sql = translator.Translate()
+                                .Where<DocumentDto>(x => x.Newest)
+                                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
             //NOTE: This doesn't allow properties to be part of the query
             var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
@@ -368,7 +370,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Loop through properties to check if the content contains images/files that should be deleted
             foreach (var property in entity.Properties)
             {
-                if (property.PropertyType.DataTypeId == uploadFieldId &&
+                if (property.PropertyType.DataTypeId == uploadFieldId && property.Value != null &&
                     string.IsNullOrEmpty(property.Value.ToString()) == false
                     && fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
                 {
@@ -450,6 +452,17 @@ namespace Umbraco.Core.Persistence.Repositories
             var propertyDataDtos = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql);
             var propertyFactory = new PropertyFactory(contentType, versionId, id);
             var properties = propertyFactory.BuildEntity(propertyDataDtos);
+
+            var newProperties = properties.Where(x => x.HasIdentity == false);
+            foreach (var property in newProperties)
+            {
+                var propertyDataDto = new PropertyDataDto{ NodeId = id, PropertyTypeId = property.PropertyTypeId, VersionId = versionId };
+                int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
+
+                property.Version = versionId;
+                property.Id = primaryKey;
+            }
+
             return new PropertyCollection(properties);
         }
     }

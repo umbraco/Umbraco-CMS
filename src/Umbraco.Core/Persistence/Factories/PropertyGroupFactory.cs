@@ -22,9 +22,21 @@ namespace Umbraco.Core.Persistence.Factories
             foreach (var groupDto in dto)
             {
                 var group = new PropertyGroup();
-                group.Id = groupDto.Id;
+                //Only assign an Id if the PropertyGroup belongs to this ContentType
+                if (groupDto.ContentTypeNodeId == _id)
+                {
+                    group.Id = groupDto.Id;
+
+                    if (groupDto.ParentGroupId.HasValue)
+                        group.ParentId = groupDto.ParentGroupId.Value;
+                }
+                else
+                {
+                    //If the PropertyGroup is inherited, we add a reference to the group as a Parent.
+                    group.ParentId = groupDto.Id;
+                }
+
                 group.Name = groupDto.Text;
-                group.ParentId = groupDto.ParentGroupId;
                 group.SortOrder = groupDto.SortOrder;
                 group.PropertyTypes = new PropertyTypeCollection();
 
@@ -32,7 +44,7 @@ namespace Umbraco.Core.Persistence.Factories
                 var typeDtos = groupDto.PropertyTypeDtos.Where(x => x.Id > 0);
                 foreach (var typeDto in typeDtos)
                 {
-                    group.PropertyTypes.Add(new PropertyType(typeDto.DataTypeDto.ControlId,
+                    var propertyType = new PropertyType(typeDto.DataTypeDto.ControlId,
                                                              typeDto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
                                                 {
                                                     Alias = typeDto.Alias,
@@ -43,9 +55,12 @@ namespace Umbraco.Core.Persistence.Factories
                                                     HelpText = typeDto.HelpText,
                                                     Mandatory = typeDto.Mandatory,
                                                     SortOrder = typeDto.SortOrder,
+                                                    ValidationRegExp = typeDto.ValidationRegExp,
                                                     PropertyGroupId = groupDto.Id
-                                                });
-
+                                                };
+                    
+                    propertyType.ResetDirtyProperties();
+                    group.PropertyTypes.Add(propertyType);
                 }
                 group.ResetDirtyProperties();
                 propertyGroups.Add(group);
@@ -67,9 +82,11 @@ namespace Umbraco.Core.Persistence.Factories
                              {
                                  ContentTypeNodeId = _id,
                                  SortOrder = propertyGroup.SortOrder,
-                                 Text = propertyGroup.Name,
-                                 ParentGroupId = propertyGroup.ParentId
+                                 Text = propertyGroup.Name
                              };
+
+            if (propertyGroup.ParentId.HasValue)
+                dto.ParentGroupId = propertyGroup.ParentId.Value;
 
             if (propertyGroup.HasIdentity)
                 dto.Id = propertyGroup.Id;
@@ -90,11 +107,18 @@ namespace Umbraco.Core.Persistence.Factories
                                           HelpText = propertyType.HelpText,
                                           Mandatory = propertyType.Mandatory,
                                           Name = propertyType.Name,
-                                          SortOrder = propertyType.SortOrder
+                                          SortOrder = propertyType.SortOrder,
+                                          ValidationRegExp = propertyType.ValidationRegExp
                                       };
 
             if (tabId != default(int))
+            {
                 propertyTypeDto.PropertyTypeGroupId = tabId;
+            }
+            else
+            {
+                propertyTypeDto.PropertyTypeGroupId = null;
+            }
 
             if (propertyType.HasIdentity)
                 propertyTypeDto.Id = propertyType.Id;

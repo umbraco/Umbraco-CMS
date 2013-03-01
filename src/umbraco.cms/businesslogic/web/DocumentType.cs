@@ -165,7 +165,7 @@ namespace umbraco.cms.businesslogic.web
         public static List<DocumentType> GetAllAsList()
         {
             var contentTypes = ApplicationContext.Current.Services.ContentTypeService.GetAllContentTypes();
-            var documentTypes = contentTypes.Select(x => new DocumentType(x.Id));
+            var documentTypes = contentTypes.Select(x => new DocumentType(x));
 
             return documentTypes.OrderBy(x => x.Text).ToList();
         }
@@ -439,7 +439,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.Save()", false)]
         public override void Save()
         {
-            SaveEventArgs e = new SaveEventArgs();
+            var e = new SaveEventArgs();
             FireBeforeSave(e);
 
             if (!e.Cancel)
@@ -453,7 +453,9 @@ namespace umbraco.cms.businesslogic.web
                     _contentType.AddContentType(contentType);
                 }
 
-                ApplicationContext.Current.Services.ContentTypeService.Save(_contentType);
+                var current = User.GetCurrent();
+                int userId = current == null ? 0 : current.Id;
+                ApplicationContext.Current.Services.ContentTypeService.Save(_contentType, userId);
 
                 //Ensure that DocumentTypes are reloaded from db by clearing cache.
                 //NOTE Would be nice if we could clear cache by type instead of emptying the entire cache.

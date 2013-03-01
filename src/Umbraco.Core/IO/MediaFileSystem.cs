@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.IO
@@ -26,6 +24,15 @@ namespace Umbraco.Core.IO
 
 			return propertyId.ToString() + seperator + fileName;
 		}
+
+        public string GetRelativePath(string subfolder, string fileName)
+        {
+            var seperator = UmbracoSettings.UploadAllowDirectories
+                ? Path.DirectorySeparatorChar
+                : '-';
+
+            return subfolder + seperator + fileName;
+        }
 
 		public IEnumerable<string> GetThumbnails(string path)
 		{

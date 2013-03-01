@@ -24,7 +24,6 @@ namespace Umbraco.Web.Routing
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		public bool TrySetDocument(PublishedContentRequest docRequest)
 		{
-			
 			IPublishedContent node = null;
 
 			if (docRequest.Uri.AbsolutePath != "/") // no alias if "/"

@@ -297,14 +297,17 @@ namespace Umbraco.Web.Models
 			}
 			var context = this;
 			var prop = GetPropertyInternal(alias, PublishedContent);
+
 			while (prop == null || !prop.HasValue())
 			{
 				var parent = ((IPublishedContent) context).Parent;
 				if (parent == null) break;
+
+                // Update the context before attempting to retrieve the property again.
+                context = parent.AsDynamicPublishedContent();
 				prop = context.GetPropertyInternal(alias, context.PublishedContent);
-				//update context, fixes issue: http://issues.umbraco.org/issue/U4-1451
-				context = parent.AsDynamicPublishedContent();
 			}
+
 			return prop;
 		}
 

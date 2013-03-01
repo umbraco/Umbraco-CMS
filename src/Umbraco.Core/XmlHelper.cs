@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -13,6 +14,59 @@ namespace Umbraco.Core
     /// </summary>
     public class XmlHelper
     {
+
+        public static string StripDashesInElementOrAttributeNames(string xml)
+        {
+            using (var outputms = new MemoryStream())
+            {
+                using (TextWriter outputtw = new StreamWriter(outputms))
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        using (var tw = new StreamWriter(ms))
+                        {
+                            tw.Write(xml);
+                            tw.Flush();
+                            ms.Position = 0;
+                            using (var tr = new StreamReader(ms))
+                            {
+                                bool IsInsideElement = false, IsInsideQuotes = false;
+                                int ic = 0;
+                                while ((ic = tr.Read()) != -1)
+                                {
+                                    if (ic == (int)'<' && !IsInsideQuotes)
+                                    {
+                                        if (tr.Peek() != (int)'!')
+                                        {
+                                            IsInsideElement = true;
+                                        }
+                                    }
+                                    if (ic == (int)'>' && !IsInsideQuotes)
+                                    {
+                                        IsInsideElement = false;
+                                    }
+                                    if (ic == (int)'"')
+                                    {
+                                        IsInsideQuotes = !IsInsideQuotes;
+                                    }
+                                    if (!IsInsideElement || ic != (int)'-' || IsInsideQuotes)
+                                    {
+                                        outputtw.Write((char)ic);
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                    outputtw.Flush();
+                    outputms.Position = 0;
+                    using (TextReader outputtr = new StreamReader(outputms))
+                    {
+                        return outputtr.ReadToEnd();
+                    }
+                }
+            }
+        }
 
 		/// <summary>
         /// Imports a XML node from text.

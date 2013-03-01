@@ -9,35 +9,106 @@ using System.Xml.XPath;
 using System.Collections;
 using System.IO;
 using System.Web;
+using Umbraco.Core;
 
 namespace Umbraco.Core.Dynamics
 {
 	[TypeConverter(typeof(DynamicXmlConverter))]
 	public class DynamicXml : DynamicObject, IEnumerable<DynamicXml>, IEnumerable<XElement>
     {
+        /// <summary>
+        /// Returns the XElement used to create the DynamicXml structure
+        /// </summary>
         public XElement BaseElement { get; set; }
 
+	    /// <summary>
+        /// Returns the raw XElement used to create the DynamicXml structure if one was specified otherwise returns the 
+        /// same value as BaseElement.
+        /// </summary>
+        /// <remarks>
+        /// This is purely used for when an instance of DynamicXml is created with the overload that supports
+        /// passing in both a raw xml version and a dash-stripped xml version. Otherwise this value is exactly the 
+        /// same as BaseElement.
+        /// </remarks>
+        public XElement RawXmlElement { get; internal set; }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="baseElement"></param>
         public DynamicXml(XElement baseElement)
         {
-            this.BaseElement = baseElement;
+            if (baseElement == null) return;
+
+            //same
+            RawXmlElement = baseElement;
+            BaseElement = baseElement;
         }
-        public DynamicXml(string xml)
+
+        /// <summary>
+        /// When this constructor is used the BaseElement becomes equivalent to the strippedXml structure
+        /// </summary>
+        /// <param name="strippedXml"></param>
+        /// <param name="rawXml"></param>
+        internal DynamicXml(XElement strippedXml, XElement rawXml)
         {
-            var baseElement = XElement.Parse(xml);
-            this.BaseElement = baseElement;
+            if (rawXml == null) return;
+            if (strippedXml == null) return;
+
+            RawXmlElement = rawXml;
+            BaseElement = strippedXml;
         }
+
+        /// <summary>
+        /// When this constructor is used the BaseElement becomes equivalent to the strippedXml structure
+        /// </summary>
+        /// <param name="strippedXml"></param>
+        /// <param name="rawXml"></param>
+        internal DynamicXml(string strippedXml, string rawXml)
+        {
+            if (rawXml == null) return;
+            if (strippedXml == null) return;
+
+            RawXmlElement = XElement.Parse(rawXml);
+            BaseElement = XElement.Parse(strippedXml);
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="xml"></param>
+	    public DynamicXml(string xml)
+        {
+            if (xml.IsNullOrWhiteSpace()) return;
+
+            var baseElement = XElement.Parse(xml);
+            
+            //same
+            RawXmlElement = baseElement;
+            BaseElement = baseElement;
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="xpni"></param>
         public DynamicXml(XPathNodeIterator xpni)
         {
-            if (xpni != null)
-            {
-                if (xpni.Current != null)
-                {
-                    var xml = xpni.Current.OuterXml;
-                    var baseElement = XElement.Parse(xml);
-                    this.BaseElement = baseElement;
-                }
-            }
+            if (xpni == null) return;
+            if (xpni.Current == null) return;
+
+            //TODO: OuterXml is really bad for performance! Should actually use the XPathNodeIterator api
+            var xml = xpni.Current.OuterXml;                    
+            var baseElement = XElement.Parse(xml);
+            
+            //same
+            RawXmlElement = baseElement;
+            BaseElement = baseElement;
         }
+
+	    /// <summary>
+        /// Returns the InnertText based on the BaseElement object
+        /// </summary>
         public string InnerText
         {
             get
@@ -45,17 +116,34 @@ namespace Umbraco.Core.Dynamics
                 return BaseElement.Value;
             }
         }
+
+        /// <summary>
+        /// Returns the string representation of the BaseElement object
+        /// </summary>
+        /// <returns></returns>
         public string ToXml()
         {
             return BaseElement.ToString(SaveOptions.DisableFormatting);
         }
+
+        /// <summary>
+        /// Returns the string representation of the RawXmlElement object
+        /// </summary>
+        /// <returns></returns>
+        public string ToRawXml()
+        {
+            return RawXmlElement.ToString(SaveOptions.DisableFormatting);
+        }
+
         public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
         {
             int index = 0;
             if (indexes.Length > 0)
             {
                 index = (int)indexes[0];
-                result = new DynamicXml(this.BaseElement.Elements().ToList()[index]);
+                result = new DynamicXml(
+                    RawXmlElement.Elements().ElementAt(index),
+                    BaseElement.Elements().ElementAt(index));
                 return true;
             }
             return base.TryGetIndex(binder, indexes, out result);
@@ -64,12 +152,12 @@ namespace Umbraco.Core.Dynamics
         {
             if (args.Length == 0 && binder.Name == "ToXml")
             {
-                result = this.BaseElement.ToString();
+                result = BaseElement.ToString();
                 return true;
             }
             if (args.Length == 1 && binder.Name == "XPath")
             {
-                var elements = this.BaseElement.XPathSelectElements(args[0].ToString());
+                var elements = BaseElement.XPathSelectElements(args[0].ToString());
                 HandleIEnumerableXElement(elements, out result);
                 return true; //anyway
             }
@@ -102,7 +190,9 @@ namespace Umbraco.Core.Dynamics
 						}
 						else if (attempt.Result.ObjectResult is IEnumerable<DynamicXml>)
 						{
-							result = ((IEnumerable<DynamicXml>)attempt.Result.ObjectResult).Select(x => new DynamicXml(x.BaseElement));
+						    result = ((IEnumerable<DynamicXml>) attempt.Result.ObjectResult).Select(x => new DynamicXml(
+						                                                                                     x.RawXmlElement,
+						                                                                                     x.BaseElement));
 						}
 					}
 				}
@@ -123,55 +213,102 @@ namespace Umbraco.Core.Dynamics
         }
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            if (BaseElement == null || binder == null)
+            if (RawXmlElement == null || binder == null)
             {
                 result = null;
                 return false;
             }
-            //Go ahead and try to fetch all of the elements matching the member name, and wrap them
-            var elements = BaseElement.Elements(binder.Name);
-            if (!elements.Any() && BaseElement.Name == "root" && BaseElement.Elements().Count() == 1)
-            {
-                //no elements matched, lets try first child
-                elements = BaseElement.Elements().ElementAt(0).Elements(binder.Name);
-            }
-            if (HandleIEnumerableXElement(elements, out result))
-            {
-                return true;
-            }
-            else
-            {
 
-                //Ok, so no elements matched, so lets try attributes
-                IEnumerable<string> attributes = BaseElement.Attributes(binder.Name).Select(attr => attr.Value);
-                int count = attributes.Count();
-
-                if (count > 0)
+            //Check if the name matches a node based on the BaseElement (which if the correct ctor is used, will be dash stripped)
+            var elementByNameAttempt = CheckNodeNameMatch(binder.Name, BaseElement);
+            if (elementByNameAttempt.Success)
+            {
+                if (HandleIEnumerableXElement(elementByNameAttempt.Result, out result))
                 {
-                    if (count > 1)
-                        result = attributes; //more than one attribute matched, lets return the collection
-                    else
-                        result = attributes.FirstOrDefault(); //only one attribute matched, lets just return it
+                    return true;
+                }
+            }
 
-                    return true; // return true because we matched
+            //Check if the name matches a node based on the BaseElement (which if the correct ctor is used, will be dash stripped)
+            var attributeByNameAttempt = CheckAttributeNameMatch(binder.Name, BaseElement);
+            if (attributeByNameAttempt.Success)
+            {
+                if (attributeByNameAttempt.Result.Count() > 1)
+                {
+                    //more than one attribute matched, lets return the collection
+                    result = attributeByNameAttempt.Result;
                 }
                 else
                 {
-                    //no attributes matched, lets try first child
-                    if (BaseElement.Name == "root" && BaseElement.Elements().Count() == 1)
-                    {
-                        attributes = BaseElement.Elements().ElementAt(0).Attributes(binder.Name).Select(attr => attr.Value);
-                        count = attributes.Count();
-                        if (count > 1)
-                            result = attributes; //more than one attribute matched, lets return the collection
-                        else
-                            result = attributes.FirstOrDefault(); //only one attribute matched, lets just return it
+                    //only one attribute matched, lets just return it
+                    result = attributeByNameAttempt.Result.FirstOrDefault(); 
+                }
+                return true; 
+            }
+           
 
-                        return true; // return true because we matched
-                    }
+            return base.TryGetMember(binder, out result);
+        }
+
+        /// <summary>
+        /// Checks if the 'name' matches any attributes of xmlElement
+        /// </summary>
+        /// <param name="name">The name to match</param>
+        /// <param name="xmlElement">The xml element to check against</param>
+        /// <returns></returns>
+        private static Attempt<IEnumerable<string>> CheckAttributeNameMatch(string name, XElement xmlElement)
+        {
+            var attributes = xmlElement.Attributes(name).Select(attr => attr.Value).ToArray();
+            if (attributes.Any())
+            {
+                return new Attempt<IEnumerable<string>>(true, attributes);
+            }
+
+            if (!attributes.Any() && xmlElement.Name == "root" && xmlElement.Elements().Count() == 1)
+            {
+                //no elements matched and this node is called 'root' and only has one child... lets see if it matches.
+                var childElements = xmlElement.Elements().ElementAt(0).Attributes(name).Select(attr => attr.Value).ToArray();
+                if (childElements.Any())
+                {
+                    //we've found a match by the first child of an element called 'root' (strange, but sure)
+                    return new Attempt<IEnumerable<string>>(true, childElements);
+                }
+            }            
+
+            //no deal
+            return Attempt<IEnumerable<string>>.False;
+	    }
+
+	    /// <summary>
+        /// Checks if the 'name' matches any elements of xmlElement
+        /// </summary>
+        /// <param name="name">The name to match</param>
+        /// <param name="xmlElement">The xml element to check against</param>
+        /// <returns></returns>
+        private Attempt<IEnumerable<XElement>> CheckNodeNameMatch(string name, XElement xmlElement)
+        {
+            //Go ahead and try to fetch all of the elements matching the member name, and wrap them
+            var elements = xmlElement.Elements(name).ToArray();
+
+            //Check if we've got any matches, if so then return true
+            if (elements.Any())
+            {
+                return new Attempt<IEnumerable<XElement>>(true, elements);
+            }
+
+            if (!elements.Any() && xmlElement.Name == "root" && xmlElement.Elements().Count() == 1)
+            {
+                //no elements matched and this node is called 'root' and only has one child... lets see if it matches.
+                var childElements = xmlElement.Elements().ElementAt(0).Elements(name).ToArray();
+                if (childElements.Any())
+                {
+                    //we've found a match by the first child of an element called 'root' (strange, but sure)
+                    return new Attempt<IEnumerable<XElement>>(true, childElements);
                 }
             }
-            return base.TryGetMember(binder, out result);
+            
+            //no deal
+            return Attempt<IEnumerable<XElement>>.False;
         }
 
         private bool HandleIEnumerableXElement(IEnumerable<XElement> elements, out object result)
@@ -193,7 +330,7 @@ namespace Umbraco.Core.Dynamics
                     //We have more than one matching element, so let's return the collection
                     //elements is IEnumerable<DynamicXml>
                     //but we want to be able to re-enter this code
-                    XElement root = new XElement(XName.Get("root"));
+                    var root = new XElement(XName.Get("root"));
                     root.Add(elements);
                     result = new DynamicXml(root);
 
@@ -205,10 +342,16 @@ namespace Umbraco.Core.Dynamics
             result = null;
             return false;
         }
+
+        /// <summary>
+        /// Executes an XPath expression over the BaseElement object
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
         public DynamicXml XPath(string expression)
         {
-            var matched = this.BaseElement.XPathSelectElements(expression);
-            DynamicXml root = new DynamicXml("<results/>");
+            var matched = BaseElement.XPathSelectElements(expression);
+            var root = new DynamicXml("<results/>");
             foreach (var element in matched)
             {
                 root.BaseElement.Add(element);
@@ -217,7 +360,7 @@ namespace Umbraco.Core.Dynamics
         }
 
 		/// <summary>
-		/// Return the string version of Xml
+        /// Return the string version of the BaseElement object
 		/// </summary>
 		/// <returns></returns>
 		public override string ToString()
@@ -231,23 +374,23 @@ namespace Umbraco.Core.Dynamics
         }
         public DynamicXml Find(string expression)
         {
-            return new DynamicXml(this.BaseElement.XPathSelectElements(expression).FirstOrDefault());
+            return new DynamicXml(BaseElement.XPathSelectElements(expression).FirstOrDefault());
         }
 
         public DynamicXml Find(string attributeName, object value)
         {
             string expression = string.Format("//*[{0}='{1}']", attributeName, value);
-            return new DynamicXml(this.BaseElement.XPathSelectElements(expression).FirstOrDefault());
+            return new DynamicXml(BaseElement.XPathSelectElements(expression).FirstOrDefault());
         }
 
 	    IEnumerator<XElement> IEnumerable<XElement>.GetEnumerator()
 	    {
-			return this.BaseElement.Elements().GetEnumerator();
+            return BaseElement.Elements().GetEnumerator();
 	    }
 
 	    public IEnumerator<DynamicXml> GetEnumerator()
 	    {
-			return this.BaseElement.Elements().Select(e => new DynamicXml(e)).GetEnumerator();
+            return BaseElement.Elements().Select(e => new DynamicXml(e)).GetEnumerator();
 	    }
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -310,7 +453,7 @@ namespace Umbraco.Core.Dynamics
         }
         public bool IsPosition(int index)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
+            if (BaseElement == null || BaseElement.Parent == null)
             {
                 return false;
             }
@@ -318,7 +461,7 @@ namespace Umbraco.Core.Dynamics
         }
         public HtmlString IsPosition(int index, string valueIfTrue)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
+            if (BaseElement == null || BaseElement.Parent == null)
             {
                 return new HtmlString(string.Empty);
             }
@@ -326,7 +469,7 @@ namespace Umbraco.Core.Dynamics
         }
         public HtmlString IsPosition(int index, string valueIfTrue, string valueIfFalse)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
+            if (BaseElement == null || BaseElement.Parent == null)
             {
                 return new HtmlString(valueIfFalse);
             }
@@ -334,7 +477,7 @@ namespace Umbraco.Core.Dynamics
         }
         public bool IsModZero(int modulus)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
+            if (BaseElement == null || BaseElement.Parent == null)
             {
                 return false;
             }
@@ -342,7 +485,7 @@ namespace Umbraco.Core.Dynamics
         }
         public HtmlString IsModZero(int modulus, string valueIfTrue)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
+            if (BaseElement == null || BaseElement.Parent == null)
             {
                 return new HtmlString(string.Empty);
             }
@@ -350,7 +493,7 @@ namespace Umbraco.Core.Dynamics
         }
         public HtmlString IsModZero(int modulus, string valueIfTrue, string valueIfFalse)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
+            if (BaseElement == null || BaseElement.Parent == null)
             {
                 return new HtmlString(valueIfFalse);
             }
@@ -359,7 +502,7 @@ namespace Umbraco.Core.Dynamics
 
         public bool IsNotModZero(int modulus)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
+            if (BaseElement == null || BaseElement.Parent == null)
             {
                 return false;
             }
@@ -367,7 +510,7 @@ namespace Umbraco.Core.Dynamics
         }
         public HtmlString IsNotModZero(int modulus, string valueIfTrue)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
+            if (BaseElement == null || this.BaseElement.Parent == null)
             {
                 return new HtmlString(string.Empty);
             }
@@ -573,7 +716,7 @@ namespace Umbraco.Core.Dynamics
         }
 		public IEnumerable<DynamicXml> Descendants(Func<XElement, bool> func)
         {
-            var flattenedNodes = this.BaseElement.Elements().Map(func, (XElement n) => { return n.Elements(); });
+            var flattenedNodes = this.BaseElement.Elements().Map(func, n => n.Elements());
             return flattenedNodes.ToList().ConvertAll(n => new DynamicXml(n));
         }
 		public IEnumerable<DynamicXml> DescendantsOrSelf()
@@ -582,7 +725,7 @@ namespace Umbraco.Core.Dynamics
         }
 		public IEnumerable<DynamicXml> DescendantsOrSelf(Func<XElement, bool> func)
         {
-            var flattenedNodes = this.BaseElement.Elements().Map(func, (XElement n) => { return n.Elements(); });
+            var flattenedNodes = this.BaseElement.Elements().Map(func, n => n.Elements());
             var list = new List<DynamicXml>();
             list.Add(this);
             list.AddRange(flattenedNodes.ToList().ConvertAll(n => new DynamicXml(n)));
@@ -689,57 +832,10 @@ namespace Umbraco.Core.Dynamics
             return test(this) ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
         }
 
+        [Obsolete("Use XmlHelper.StripDashesInElementOrAttributeNames instead")]
         public static string StripDashesInElementOrAttributeNames(string xml)
         {
-            using (MemoryStream outputms = new MemoryStream())
-            {
-                using (TextWriter outputtw = new StreamWriter(outputms))
-                {
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        using (TextWriter tw = new StreamWriter(ms))
-                        {
-                            tw.Write(xml);
-                            tw.Flush();
-                            ms.Position = 0;
-                            using (TextReader tr = new StreamReader(ms))
-                            {
-                                bool IsInsideElement = false, IsInsideQuotes = false;
-                                int ic = 0;
-                                while ((ic = tr.Read()) != -1)
-                                {
-                                    if (ic == (int)'<' && !IsInsideQuotes)
-                                    {
-                                        if (tr.Peek() != (int)'!')
-                                        {
-                                            IsInsideElement = true;
-                                        }
-                                    }
-                                    if (ic == (int)'>' && !IsInsideQuotes)
-                                    {
-                                        IsInsideElement = false;
-                                    }
-                                    if (ic == (int)'"')
-                                    {
-                                        IsInsideQuotes = !IsInsideQuotes;
-                                    }
-                                    if (!IsInsideElement || ic != (int)'-' || IsInsideQuotes)
-                                    {
-                                        outputtw.Write((char)ic);
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                    outputtw.Flush();
-                    outputms.Position = 0;
-                    using (TextReader outputtr = new StreamReader(outputms))
-                    {
-                        return outputtr.ReadToEnd();
-                    }
-                }
-            }
+            return XmlHelper.StripDashesInElementOrAttributeNames(xml);
         }
 
 	    

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Security.Authentication;
 using System.Web.Script.Serialization;
 using System.Web.Script.Services;
 using System.Web.Services;
@@ -57,6 +58,12 @@ namespace umbraco.presentation.install.utills
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public static string installOrUpgrade()
         {
+            //if its not configured then we can continue
+            if (ApplicationContext.Current == null || ApplicationContext.Current.IsConfigured)
+            {
+                throw new AuthenticationException("The application is already configured");
+            }
+
             LogHelper.Info<p>("Running 'installOrUpgrade' service");
 
             var result = ApplicationContext.Current.DatabaseContext.CreateDatabaseSchemaAndDataOrUpgrade();

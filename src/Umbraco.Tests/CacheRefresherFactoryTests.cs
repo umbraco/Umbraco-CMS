@@ -26,7 +26,7 @@ namespace Umbraco.Tests
 				};
 
 			CacheRefreshersResolver.Current = new CacheRefreshersResolver(
-				PluginManager.Current.ResolveCacheRefreshers());
+				() => PluginManager.Current.ResolveCacheRefreshers());
 
 			Resolution.Freeze();
 		}

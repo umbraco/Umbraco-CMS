@@ -325,6 +325,7 @@ namespace umbraco.cms.businesslogic.web
             return isDoc;
         }
 
+        
         /// <summary>
         /// Used to get the firstlevel/root documents of the hierachy
         /// </summary>
@@ -640,17 +641,11 @@ namespace umbraco.cms.businesslogic.web
             get
             {
                 return Content.Name;
-                //return base.Text;
             }
             set
             {
                 value = value.Trim();
-                base.Text = value;
                 Content.Name = value;
-
-                /*SqlHelper.ExecuteNonQuery("update cmsDocument set text = @text where versionId = @versionId",
-                                          SqlHelper.CreateParameter("@text", value),
-                                          SqlHelper.CreateParameter("@versionId", Version));*/
             }
         }
 
@@ -665,9 +660,6 @@ namespace umbraco.cms.businesslogic.web
             {
                 _updated = value;
                 Content.UpdateDate = value;
-                /*SqlHelper.ExecuteNonQuery("update cmsDocument set updateDate = @value where versionId = @versionId",
-                                          SqlHelper.CreateParameter("@value", value),
-                                          SqlHelper.CreateParameter("@versionId", Version));*/
             }
         }
 
@@ -793,6 +785,10 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         /// <param name="u">The usercontext under which the action are performed</param>
         /// <returns>True if the publishing succeed. Possible causes for not publishing is if an event aborts the publishing</returns>
+        /// <remarks>        
+        /// This method needs to be marked with [MethodImpl(MethodImplOptions.Synchronized)]
+        /// because we execute multiple queries affecting the same data, if two thread are to do this at the same time for the same node we may have problems
+        /// </remarks>
         [MethodImpl(MethodImplOptions.Synchronized)]
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
         public bool PublishWithResult(User u)
@@ -922,13 +918,25 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                var result = ((ContentService)ApplicationContext.Current.Services.ContentService).SaveAndPublish(Content, true, u.Id);
+                var publishArgs = new PublishEventArgs();
+                FireBeforePublish(publishArgs);
 
-                base.Save();
+                if (!publishArgs.Cancel)
+                {
+                    var result =
+                        ((ContentService) ApplicationContext.Current.Services.ContentService).SaveAndPublish(Content,
+                                                                                                             true, u.Id);
 
-                FireAfterSave(e);
+                    base.Save();
 
-                return result;
+                    //Launch the After Save event since we're doing 2 things in one operation: Saving and publishing.
+                    FireAfterSave(e);
+
+                    //Now we need to fire the After publish event
+                    FireAfterPublish(publishArgs);
+
+                    return result;
+                }
             }
 
             return false;
@@ -1359,24 +1367,21 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete", false)]
         protected void PopulateDocumentFromReader(IRecordsReader dr)
         {
-            bool _hc = false;
-
-            if (dr.GetInt("children") > 0)
-                _hc = true;
+            var hc = dr.GetInt("children") > 0;
 
             SetupDocumentForTree(dr.GetGuid("uniqueId")
                 , dr.GetShort("level")
                 , dr.GetInt("parentId")
                 , dr.GetInt("nodeUser")
                 , dr.GetInt("documentUser")
-                , (dr.GetInt("isPublished") == 1)
+                , !dr.GetBoolean("trashed") && (dr.GetInt("isPublished") == 1) //set published... double check trashed property
                 , dr.GetString("path")
                 , dr.GetString("text")
                 , dr.GetDateTime("createDate")
                 , dr.GetDateTime("updateDate")
                 , dr.GetDateTime("versionDate")
                 , dr.GetString("icon")
-                , _hc
+                , hc
                 , dr.GetString("alias")
                 , dr.GetString("thumbnail")
                 , dr.GetString("description")
@@ -1549,7 +1554,7 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Occurs when [before save].
         /// </summary>
-        public static event SaveEventHandler BeforeSave;
+        public new static event SaveEventHandler BeforeSave;
         /// <summary>
         /// Raises the <see cref="E:BeforeSave"/> event.
         /// </summary>
@@ -1565,12 +1570,12 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Occurs when [after save].
         /// </summary>
-        public static event SaveEventHandler AfterSave;
+        public new static event SaveEventHandler AfterSave;
         /// <summary>
         /// Raises the <see cref="E:AfterSave"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterSave(SaveEventArgs e)
+        protected new virtual void FireAfterSave(SaveEventArgs e)
         {
             if (AfterSave != null)
             {

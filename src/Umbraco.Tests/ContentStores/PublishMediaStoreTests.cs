@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml;
 using Examine;
@@ -14,19 +15,26 @@ using umbraco.BusinessLogic;
 namespace Umbraco.Tests.ContentStores
 {
 	[TestFixture]
-	public class PublishMediaStoreTests : BaseWebTest
+    public class PublishMediaStoreTests : PublishedContentTestBase
 	{
 		public override void Initialize()
 		{
 			base.Initialize();
-			//we're going to use the same initialization as the PublishedMediaTests
-			PublishedMediaTests.DoInitialization(GetUmbracoContext("/test", 1234));			
+            
+            var currDir = new DirectoryInfo(TestHelper.CurrentAssemblyDirectory);
+            System.IO.File.Copy(
+                currDir.Parent.Parent.Parent.GetDirectories("Umbraco.Web.UI")
+                    .First()
+                    .GetDirectories("config").First()
+                    .GetFiles("umbracoSettings.Release.config").First().FullName,
+                Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
+                true);
+
 		}
 
 		public override void TearDown()
 		{
 			base.TearDown();
-			PublishedMediaTests.DoTearDown();
 		}
 
         [Ignore]

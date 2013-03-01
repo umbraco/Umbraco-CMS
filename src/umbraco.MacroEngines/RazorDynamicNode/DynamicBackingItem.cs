@@ -88,7 +88,7 @@ namespace umbraco.MacroEngines
                     var children = media.ChildrenAsList.Value;
                     if (children != null)
                     {
-                        return children.ToList().ConvertAll(m => new DynamicBackingItem(m));
+                        return children.ConvertAll(m => new DynamicBackingItem(m));
                     }
                 }
                 return new List<DynamicBackingItem>();

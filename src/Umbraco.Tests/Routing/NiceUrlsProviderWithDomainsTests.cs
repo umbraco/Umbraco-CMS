@@ -14,19 +14,18 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class NiceUrlsProviderWithDomainsTests : BaseRoutingTest
 	{
-		public override void TearDown()
-		{
-			base.TearDown();
+        public override void Initialize()
+        {
+            base.Initialize();
 
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "");
-		}
+            // ensure we can create them although the content is not in the database
+            TestHelper.DropForeignKeys("umbracoDomains");
+        }
 
 		internal override IRoutesCache GetRoutesCache()
 		{
 			return new DefaultRoutesCache(false);
 		}
-
 
 		void InitializeLanguagesAndDomains()
 		{
@@ -195,9 +194,9 @@ namespace Umbraco.Tests.Routing
 		{
 			var routingContext = GetRoutingContext("/test", 1111);
 
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false"); // ignored w/domains
-			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
+		    SettingsForTests.UseDirectoryUrls = true;
+		    SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
+		    SettingsForTests.UseDomainPrefixes = false;
 
 			InitializeLanguagesAndDomains();
 			SetDomains1();
@@ -224,9 +223,9 @@ namespace Umbraco.Tests.Routing
 		{
 			var routingContext = GetRoutingContext("/test", 1111);
 
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false"); // ignored w/domains
-			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
+            SettingsForTests.UseDirectoryUrls = true;
+            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
+            SettingsForTests.UseDomainPrefixes = false;
 
 			InitializeLanguagesAndDomains();
 			SetDomains2();
@@ -245,9 +244,9 @@ namespace Umbraco.Tests.Routing
 		{
 			var routingContext = GetRoutingContext("/test", 1111);
 
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false"); // ignored w/domains
-			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
+            SettingsForTests.UseDirectoryUrls = true;
+            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
+            SettingsForTests.UseDomainPrefixes = false;
 
 			InitializeLanguagesAndDomains();
 			SetDomains3();
@@ -271,11 +270,11 @@ namespace Umbraco.Tests.Routing
 		public void Get_Nice_Url_NestedDomains(int nodeId, string currentUrl, bool absolute, string expected)
 		{
 			var routingContext = GetRoutingContext("/test", 1111);
-			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
 
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false"); // ignored w/domains
-
+            SettingsForTests.UseDirectoryUrls = true;
+            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
+            SettingsForTests.UseDomainPrefixes = false;
+            
 			InitializeLanguagesAndDomains();
 			SetDomains4();
 
@@ -289,9 +288,9 @@ namespace Umbraco.Tests.Routing
 		{
 			var routingContext = GetRoutingContext("/test", 1111);
 
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false"); // ignored w/domains
-			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
+            SettingsForTests.UseDirectoryUrls = true;
+            SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains
+            SettingsForTests.UseDomainPrefixes = false;
 
 			InitializeLanguagesAndDomains();
 			SetDomains4();
@@ -348,22 +347,22 @@ namespace Umbraco.Tests.Routing
 		{
 			var routingContext = GetRoutingContext("http://domain1.com/test", 1111);
 
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false");
+            SettingsForTests.UseDirectoryUrls = true;
+            SettingsForTests.HideTopLevelNodeFromPath = false;
 
 			InitializeLanguagesAndDomains();
 			SetDomains4();
 
-			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
-			Assert.AreEqual("/en/1001-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100111));
+            SettingsForTests.UseDomainPrefixes = false;
+            Assert.AreEqual("/en/1001-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100111));
 			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100311));
 
-			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = true;
-			Assert.AreEqual("http://domain1.com/en/1001-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100111));
+            SettingsForTests.UseDomainPrefixes = true;
+            Assert.AreEqual("http://domain1.com/en/1001-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100111));
 			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100311));
 
-			Umbraco.Core.Configuration.UmbracoSettings.UseDomainPrefixes = false;
-			routingContext.NiceUrlProvider.EnforceAbsoluteUrls = true;
+            SettingsForTests.UseDomainPrefixes = false;
+            routingContext.NiceUrlProvider.EnforceAbsoluteUrls = true;
 			Assert.AreEqual("http://domain1.com/en/1001-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100111));
 			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100311));
 		}
@@ -373,8 +372,8 @@ namespace Umbraco.Tests.Routing
 		{
 			var routingContext = GetRoutingContext("http://domain1.com/test", 1111);
 
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false");
+            SettingsForTests.UseDirectoryUrls = true;
+            SettingsForTests.HideTopLevelNodeFromPath = false;
 
 			InitializeLanguagesAndDomains();
 			SetDomains5();
