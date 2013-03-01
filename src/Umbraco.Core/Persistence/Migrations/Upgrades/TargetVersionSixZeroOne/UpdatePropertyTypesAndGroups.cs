@@ -5,7 +5,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
 {
-    [Migration("6.0.1", 0, GlobalSettings.UmbracoMigrationName)]
+    [Migration("6.0.2", 0, GlobalSettings.UmbracoMigrationName)]
     public class UpdatePropertyTypesAndGroups : MigrationBase
     {
         public override void Up()
@@ -41,6 +41,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
                                                 };
 
                         int id = Convert.ToInt16(database.Insert(propertyGroup));
+                        propertyGroup.Id = id;
+                        propertyGroups.Add(propertyGroup);
+
                         propertyType.PropertyTypeGroupId = id;
                         database.Update(propertyType);
                     }

@@ -10,6 +10,11 @@ namespace umbraco.editorControls.XPathDropDownList
     class XPathDropDownListPreValueEditor : AbstractJsonPrevalueEditor
     {
         /// <summary>
+        /// Radio buttons to select type of node to pick from: Content / Media / Members
+        /// </summary>
+        private RadioButtonList typeRadioButtonList = new RadioButtonList();
+
+        /// <summary>
         /// TextBox control to get the XPath expression
         /// </summary>
         private TextBox xPathTextBox = new TextBox();
@@ -20,7 +25,7 @@ namespace umbraco.editorControls.XPathDropDownList
         private RequiredFieldValidator xPathRequiredFieldValidator = new RequiredFieldValidator();
 
         /// <summary>
-        /// Server side validation of XPath expression, to ensure some nodes are returned
+        /// Server side validation of XPath expression
         /// </summary>
         private CustomValidator xPathCustomValidator = new CustomValidator();
 
@@ -71,6 +76,11 @@ namespace umbraco.editorControls.XPathDropDownList
         /// </summary>
         protected override void CreateChildControls()
         {
+            //radio buttons to select type of nodes that can be picked (Document, Media or Member)
+            this.typeRadioButtonList.Items.Add(new ListItem(uQuery.UmbracoObjectType.Document.GetFriendlyName(), uQuery.UmbracoObjectType.Document.GetGuid().ToString()));
+            this.typeRadioButtonList.Items.Add(new ListItem(uQuery.UmbracoObjectType.Media.GetFriendlyName(), uQuery.UmbracoObjectType.Media.GetGuid().ToString()));
+            this.typeRadioButtonList.Items.Add(new ListItem(uQuery.UmbracoObjectType.Member.GetFriendlyName(), uQuery.UmbracoObjectType.Member.GetGuid().ToString()));
+
             this.xPathTextBox.ID = "xPathTextBox";
             this.xPathTextBox.CssClass = "umbEditorTextField";
 
@@ -80,16 +90,18 @@ namespace umbraco.editorControls.XPathDropDownList
 
             this.xPathCustomValidator.ControlToValidate = this.xPathTextBox.ID;
             this.xPathCustomValidator.Display = ValidatorDisplay.Dynamic;
-            this.xPathCustomValidator.ServerValidate += new ServerValidateEventHandler(XPathCustomValidator_ServerValidate);
+            this.xPathCustomValidator.ServerValidate += new ServerValidateEventHandler(this.XPathCustomValidator_ServerValidate);
 
             this.valueTypeDropDownList.ID = "valueTypeDropDownList";
             this.valueTypeDropDownList.Items.Add(new ListItem("Node Id", bool.TrueString));
             this.valueTypeDropDownList.Items.Add(new ListItem("Node Name", bool.FalseString));
 
-            this.Controls.Add(this.xPathTextBox);
-            this.Controls.Add(this.xPathRequiredFieldValidator);
-            this.Controls.Add(this.xPathCustomValidator);
-            this.Controls.Add(this.valueTypeDropDownList);
+            this.Controls.AddPrevalueControls(
+                this.typeRadioButtonList,
+                this.xPathTextBox,
+                this.xPathRequiredFieldValidator,
+                this.xPathCustomValidator,
+                this.valueTypeDropDownList);
         }
 
         /// <summary>
@@ -100,16 +112,14 @@ namespace umbraco.editorControls.XPathDropDownList
         {
             base.OnLoad(e);
 
-            //if (!this.Page.IsPostBack)
-            //{
             // Read in stored configuration values
+            this.typeRadioButtonList.SelectedValue = this.Options.Type;
             this.xPathTextBox.Text = this.Options.XPath;
             this.valueTypeDropDownList.SelectedValue = this.Options.UseId.ToString();
-            //}
         }
 
         /// <summary>
-        /// Will run the entered XPath expression to ensure it returns at least 1 node
+        /// Will run the entered XPath expression to ensure it returns a collection
         /// </summary>
         /// <param name="source">xPathCustomValidator</param>
         /// <param name="args"></param>
@@ -120,10 +130,32 @@ namespace umbraco.editorControls.XPathDropDownList
 
             try
             {
-                if (uQuery.GetNodesByXPath(xPath).Count() >= 0)
+                switch (this.options.UmbracoObjectType)
                 {
-                    isValid = true;
-                }
+                    case uQuery.UmbracoObjectType.Document:
+                        if (uQuery.GetNodesByXPath(xPath).Count() >= 0)
+                        {
+                            isValid = true;
+                        }
+
+                        break;
+
+                    case uQuery.UmbracoObjectType.Media:
+                        if (uQuery.GetMediaByXPath(xPath).Count() >= 0)
+                        {
+                            isValid = true;
+                        }
+
+                        break;
+
+                    case uQuery.UmbracoObjectType.Member:
+                        if (uQuery.GetMembersByXPath(xPath).Count() >= 0)
+                        {
+                            isValid = true;
+                        }
+
+                        break;
+                }                
             }
             catch (XPathException)
             {
@@ -140,6 +172,7 @@ namespace umbraco.editorControls.XPathDropDownList
         {
             if (this.Page.IsValid)
             {
+                this.Options.Type = this.typeRadioButtonList.SelectedValue;
                 this.Options.XPath = this.xPathTextBox.Text;
                 this.Options.UseId = bool.Parse(this.valueTypeDropDownList.SelectedValue);
 
@@ -153,11 +186,22 @@ namespace umbraco.editorControls.XPathDropDownList
         /// <param name="writer"></param>
         protected override void RenderContents(HtmlTextWriter writer)
         {
-            writer.AddPrevalueRow("XPath Expression", @"can use the tokens <strong>$ancestorOrSelf</strong>, <strong>$parentPage</strong> and <strong>$currentPage</strong>, eg.<br />
-                                                        <br />                                            
-                                                        all siblings: $parentPage//*[@id != $currentPage/@id] <br />                                                        
-                                                        ", this.xPathTextBox, this.xPathRequiredFieldValidator, this.xPathCustomValidator);
-            writer.AddPrevalueRow("Value", this.valueTypeDropDownList);
+            writer.AddPrevalueRow(
+                        "Type", 
+                        "the xml schema to query", 
+                        this.typeRadioButtonList);
+
+            writer.AddPrevalueRow(
+                        "XPath Expression", 
+                        "can use the tokens <strong>$ancestorOrSelf</strong>, <strong>$parentPage</strong> and <strong>$currentPage</strong>",                                                        
+                        this.xPathTextBox, 
+                        this.xPathRequiredFieldValidator, 
+                        this.xPathCustomValidator);
+            
+            writer.AddPrevalueRow(
+                        "Value", 
+                        "store the node id or the name",
+                        this.valueTypeDropDownList);
         }
 
     }
