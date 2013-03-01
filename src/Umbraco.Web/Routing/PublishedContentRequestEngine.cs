@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Globalization;
 using System.IO;
@@ -13,15 +11,14 @@ using Umbraco.Core.Logging;
 using umbraco;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.member;
 
 namespace Umbraco.Web.Routing
 {
 	internal class PublishedContentRequestEngine
 	{
-		private PublishedContentRequest _pcr;
-		private RoutingContext _routingContext;
+		private readonly PublishedContentRequest _pcr;
+		private readonly RoutingContext _routingContext;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PublishedContentRequestEngine"/> class with a content request.
@@ -74,6 +71,7 @@ namespace Umbraco.Web.Routing
 			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
 
 			// trigger the Prepared event - at that point it is still possible to change about anything
+            // even though the request might be flagged for redirection - we'll redirect _after_ the event
 			_pcr.OnPrepared();
 
             // we don't take care of anything xcept finding the rendering engine again
@@ -297,6 +295,12 @@ namespace Umbraco.Web.Routing
 			// run the document finders
 			FindPublishedContent();
 
+            // if request has been flagged to redirect then return
+            // whoever called us is in charge of actually redirecting
+            // -- do not process anything any further --
+            if (_pcr.IsRedirect)
+	            return true;
+
 			// not handling umbracoRedirect here but after LookupDocument2
 			// so internal redirect, 404, etc has precedence over redirect
 
@@ -335,7 +339,7 @@ namespace Umbraco.Web.Routing
 
 			// indicate that the published content (if any) we have at the moment is the
 			// one that was found by the standard finders before anything else took place.
-			_pcr.IsInitialPublishedContent = true;
+		    _pcr.SetIsInitialPublishedContent();
 		}
 
 		/// <summary>
@@ -375,8 +379,9 @@ namespace Umbraco.Web.Routing
 
 				// follow internal redirects as long as it's not running out of control ie infinite loop of some sort
 				j = 0;
-				while (FollowInternalRedirects() && j++ < maxLoop) ;
-				if (j == maxLoop) // we're running out of control
+				while (FollowInternalRedirects() && j++ < maxLoop)
+				{ }
+			    if (j == maxLoop) // we're running out of control
 					break;
 
 				// ensure access
@@ -440,8 +445,8 @@ namespace Umbraco.Web.Routing
 					// redirect to another page
 					var node = _routingContext.PublishedContentStore.GetDocumentById(_routingContext.UmbracoContext, internalRedirectId);
 
-					_pcr.PublishedContent = node;
-					if (node != null)
+                    _pcr.PublishedContent = node; 
+                    if (node != null)
 					{
 						redirect = true;
 						LogHelper.Debug<PublishedContentRequestEngine>("{0}Redirecting to id={1}", () => tracePrefix, () => internalRedirectId);
@@ -528,8 +533,8 @@ namespace Umbraco.Web.Routing
 			// read the alternate template alias, from querystring, form, cookie or server vars,
 			// only if the published content is the initial once, else the alternate template
 			// does not apply
-			string altTemplate = _pcr.IsInitialPublishedContent 
-				? _routingContext.UmbracoContext.HttpContext.Request["altTemplate"] 
+            string altTemplate = _pcr.IsInitialPublishedContent 
+                ? _routingContext.UmbracoContext.HttpContext.Request["altTemplate"] 
 				: null;
 
 			if (string.IsNullOrWhiteSpace(altTemplate))
@@ -612,16 +617,14 @@ namespace Umbraco.Web.Routing
 		/// <remarks>As per legacy, if the redirect does not work, we just ignore it.</remarks>
 		private void FollowExternalRedirect()
 		{
-			if (_pcr.HasPublishedContent)
-			{
-				var redirectId = _pcr.PublishedContent.GetPropertyValue<int>("umbracoRedirect", -1);
-				
-				string redirectUrl = "#";
-				if (redirectId > 0)
-					redirectUrl = _routingContext.NiceUrlProvider.GetNiceUrl(redirectId);
-				if (redirectUrl != "#")
-					_pcr.RedirectUrl = redirectUrl;
-			}
+		    if (!_pcr.HasPublishedContent) return;
+
+		    var redirectId = _pcr.PublishedContent.GetPropertyValue("umbracoRedirect", -1);				
+		    var redirectUrl = "#";
+		    if (redirectId > 0)
+				redirectUrl = _routingContext.NiceUrlProvider.GetNiceUrl(redirectId);
+		    if (redirectUrl != "#")
+		        _pcr.SetRedirect(redirectUrl);
 		}
 	
 		#endregion

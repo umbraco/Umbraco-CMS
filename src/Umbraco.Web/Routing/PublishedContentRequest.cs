@@ -1,22 +1,9 @@
 using System;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Web;
-using System.Xml;
 using System.Globalization;
-using System.Diagnostics;
-
-// legacy
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using umbraco;
-using umbraco.BusinessLogic;
-using umbraco.NodeFactory;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.businesslogic.member;
-using umbraco.interfaces;
 
 namespace Umbraco.Web.Routing
 {
@@ -37,7 +24,7 @@ namespace Umbraco.Web.Routing
 		// the engine that does all the processing
 		// because in order to keep things clean and separated,
 		// the content request is just a data holder
-		private PublishedContentRequestEngine _engine;
+		private readonly PublishedContentRequestEngine _engine;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PublishedContentRequest"/> class with a specific Uri and routing context.
@@ -49,12 +36,12 @@ namespace Umbraco.Web.Routing
 			if (uri == null) throw new ArgumentNullException("uri");
 			if (routingContext == null) throw new ArgumentNullException("routingContext");
 
-			this.Uri = uri;
-			this.RoutingContext = routingContext;
+			Uri = uri;
+			RoutingContext = routingContext;
 
 			_engine = new PublishedContentRequestEngine(this);
 
-            this.RenderingEngine = RenderingEngine.Unknown;
+            RenderingEngine = RenderingEngine.Unknown;
 		}
 
 		/// <summary>
@@ -96,21 +83,16 @@ namespace Umbraco.Web.Routing
 		#region PublishedContent
 
 		/// <summary>
-		/// The identifier of the requested IPublishedContent, if any, else zero.
-		/// </summary>
-		private int _publishedContentId = 0;
-
-		/// <summary>
 		/// The requested IPublishedContent, if any, else <c>null</c>.
 		/// </summary>
-		private IPublishedContent _publishedContent = null;
+		private IPublishedContent _publishedContent;
 
 		/// <summary>
 		/// The initial requested IPublishedContent, if any, else <c>null</c>.
 		/// </summary>
 		/// <remarks>The initial requested content is the content that was found by the finders,
 		/// before anything such as 404, redirect... took place.</remarks>
-		private IPublishedContent _initialPublishedContent = null;
+		private IPublishedContent _initialPublishedContent;
 
 		/// <summary>
 		/// Gets or sets the requested content.
@@ -122,8 +104,7 @@ namespace Umbraco.Web.Routing
 			set
 			{
 				_publishedContent = value;
-				this.TemplateModel = null;
-				_publishedContentId = _publishedContent != null ? _publishedContent.Id : 0;
+				TemplateModel = null;
 			}
 		}
 
@@ -135,20 +116,31 @@ namespace Umbraco.Web.Routing
 		public IPublishedContent InitialPublishedContent { get { return _initialPublishedContent; } }
 
 		/// <summary>
-		/// Gets or sets a value indicating whether the current published content is the initial one.
+		/// Gets value indicating whether the current published content is the initial one.
 		/// </summary>
 		public bool IsInitialPublishedContent 
 		{
-			get { return _initialPublishedContent != null && _initialPublishedContent == _publishedContent; }
-			set { _initialPublishedContent = _publishedContent; }
+			get
+			{
+			    return _initialPublishedContent != null && _initialPublishedContent == _publishedContent;
+			}
 		}
+
+        /// <summary>
+        /// Indicates that the current PublishedContent is the initial one.
+        /// </summary>
+        public void SetIsInitialPublishedContent()
+        {
+            // note: it can very well be null if the initial content was not found
+            _initialPublishedContent = _publishedContent;
+        }
 
         /// <summary>
         /// Gets a value indicating whether the content request has a content.
         /// </summary>
         public bool HasPublishedContent
         {
-            get { return this.PublishedContent != null; }
+            get { return PublishedContent != null; }
         }
 
 		#endregion
@@ -173,10 +165,10 @@ namespace Umbraco.Web.Routing
             set
             {
                 _template = value;
-                this.RenderingEngine = RenderingEngine.Unknown; // reset
+                RenderingEngine = RenderingEngine.Unknown; // reset
 
                 if (_template != null)
-                    this.RenderingEngine = _engine.FindTemplateRenderingEngine(_template.Alias);
+                    RenderingEngine = _engine.FindTemplateRenderingEngine(_template.Alias);
             }
         }
 
@@ -204,25 +196,19 @@ namespace Umbraco.Web.Routing
         {
             if (string.IsNullOrWhiteSpace(alias))
             {
-                this.TemplateModel = null;
+                TemplateModel = null;
                 return true;
             }
-            else
-            {
-                // NOTE - can we stil get it with whitespaces in it due to old legacy bugs?
-                alias = alias.Replace(" ", "");
 
-                var model = ApplicationContext.Current.Services.FileService.GetTemplate(alias);
-                if (model == null)
-                {
-                    return false;
-                }
-                else
-                {
-                    this.TemplateModel = model;                    
-                    return true;
-                }
-            }
+            // NOTE - can we stil get it with whitespaces in it due to old legacy bugs?
+            alias = alias.Replace(" ", "");
+
+            var model = ApplicationContext.Current.Services.FileService.GetTemplate(alias);
+            if (model == null)
+                return false;
+
+            TemplateModel = model;                    
+            return true;
         }
 
         /// <summary>
@@ -253,7 +239,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		public bool HasDomain
 		{
-			get { return this.Domain != null; }
+			get { return Domain != null; }
 		}
 
 		/// <summary>
@@ -261,8 +247,8 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		public CultureInfo Culture { get; set; }
 
-		// TODO: fixme - do we want to have an ordered list of alternate cultures,
-        //         to allow for fallbacks when doing dictionnary lookup and such?
+		// note: do we want to have an ordered list of alternate cultures,
+        // to allow for fallbacks when doing dictionnary lookup and such?
 
 		#endregion
 
@@ -318,19 +304,96 @@ namespace Umbraco.Web.Routing
         /// where we want to allow developers to indicate a request is 404 but not to cancel it.</remarks>
         public void SetIs404()
         {
-            this.Is404 = true;
+            Is404 = true;
         }
 
         /// <summary>
-        /// Gets a value indicating whether the content request triggers a redirect.
+        /// Gets a value indicating whether the content request triggers a redirect (permanent or not).
         /// </summary>
-        public bool IsRedirect { get { return !string.IsNullOrWhiteSpace(this.RedirectUrl); } }
+        public bool IsRedirect { get { return !string.IsNullOrWhiteSpace(RedirectUrl); } }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the redirect is permanent.
+        /// </summary>
+        public bool IsRedirectPermanent { get; private set; }
 
         /// <summary>
         /// Gets or sets the url to redirect to, when the content request triggers a redirect.
         /// </summary>
-        public string RedirectUrl { get; set; }
+        public string RedirectUrl { get; private set; }
 
+        /// <summary>
+        /// Indicates that the content request should trigger a redirect (302).
+        /// </summary>
+        /// <param name="url">The url to redirect to.</param>
+        /// <remarks>Does not actually perform a redirect, only registers that the response should
+        /// redirect. Redirect will or will not take place in due time.</remarks>
+        public void SetRedirect(string url)
+        {
+            RedirectUrl = url;
+            IsRedirectPermanent = false;
+        }
+
+        /// <summary>
+        /// Indicates that the content request should trigger a permanent redirect (301).
+        /// </summary>
+        /// <param name="url">The url to redirect to.</param>
+        /// <remarks>Does not actually perform a redirect, only registers that the response should
+        /// redirect. Redirect will or will not take place in due time.</remarks>
+        public void SetRedirectPermanent(string url)
+        {
+            RedirectUrl = url;
+            IsRedirectPermanent = true;
+        }
+
+        /// <summary>
+        /// Indicates that the content requet should trigger a redirect, with a specified status code.
+        /// </summary>
+        /// <param name="url">The url to redirect to.</param>
+        /// <param name="status">The status code (300-308).</param>
+        /// <remarks>Does not actually perform a redirect, only registers that the response should
+        /// redirect. Redirect will or will not take place in due time.</remarks>
+        public void SetRedirect(string url, int status)
+        {
+            if (status < 300 || status > 308)
+                throw new ArgumentOutOfRangeException("status", "Valid redirection status codes 300-308.");
+
+            RedirectUrl = url;
+            IsRedirectPermanent = (status == 301 || status == 308);
+            if (status != 301 && status != 302) // default redirect statuses
+                ResponseStatusCode = status;
+        }
+
+        /// <summary>
+        /// Gets or sets the content request http response status code.
+        /// </summary>
+        /// <remarks>Does not actually set the http response status code, only registers that the response
+        /// should use the specified code. The code will or will not be used, in due time.</remarks>
+        public int ResponseStatusCode { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the content request http response status description.
+        /// </summary>
+        /// <remarks>Does not actually set the http response status description, only registers that the response
+        /// should use the specified description. The description will or will not be used, in due time.</remarks>
+        public string ResponseStatusDescription { get; private set; }
+
+        /// <summary>
+        /// Sets the http response status code, along with an optional associated description.
+        /// </summary>
+        /// <param name="code">The http status code.</param>
+        /// <param name="description">The description.</param>
+        /// <remarks>Does not actually set the http response status code and description, only registers that
+        /// the response should use the specified code and description. The code and description will or will
+        /// not be used, in due time.</remarks>
+        public void SetResponseStatus(int code, string description = null)
+        {
+            // .Status is deprecated
+            // .SubStatusCode is IIS 7+ internal, ignore
+            ResponseStatusCode = code;
+            ResponseStatusDescription = description;
+        }
+		
         #endregion		
     }
 }

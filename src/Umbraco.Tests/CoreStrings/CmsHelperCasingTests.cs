@@ -17,7 +17,7 @@ namespace Umbraco.Tests.CoreStrings
         [TestCase("t", "t")]
         [TestCase("thisis", "Thisis")]
         [TestCase("ThisIsTheEnd", "This Is The End")]
-        [TestCase("WhoIsNumber6InTheVillage", "Who Is Number6 In The Village")]
+        [TestCase("WhoIsNumber6InTheVillage", "Who Is Number6In The Village")] // note the issue with Number6In
         public void SpaceCamelCasing(string input, string expected)
         {
             var output = umbraco.cms.helpers.Casing.SpaceCamelCasing(input);
@@ -29,7 +29,7 @@ namespace Umbraco.Tests.CoreStrings
         [TestCase("t", "t")]
         [TestCase("thisis", "Thisis")]
         [TestCase("ThisIsTheEnd", "This Is The End")]
-        [TestCase("WhoIsNumber6InTheVillage", "Who Is Number6 In The Village", IgnoreReason = "Legacy has issues with numbers.")]
+        [TestCase("WhoIsNumber6InTheVillage", "Who Is Number6In The Village")] // we're happy to reproduce the issue
         public void CompatibleLegacyReplacement(string input, string expected)
         {
             var helper = new LegacyShortStringHelper();
@@ -42,7 +42,7 @@ namespace Umbraco.Tests.CoreStrings
         [TestCase("t", "t")]
         [TestCase("thisis", "Thisis")]
         [TestCase("ThisIsTheEnd", "This Is The End")]
-        [TestCase("WhoIsNumber6InTheVillage", "Who Is Number6 In The Village")]
+        [TestCase("WhoIsNumber6InTheVillage", "Who Is Number6 In The Village")] // issue is fixed
         public void CompatibleDefaultReplacement(string input, string expected)
         {
             var helper = new DefaultShortStringHelper();
