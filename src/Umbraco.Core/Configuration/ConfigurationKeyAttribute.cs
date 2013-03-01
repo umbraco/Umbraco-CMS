@@ -9,7 +9,7 @@ namespace Umbraco.Core.Configuration
 	/// Indicates the configuration key for a section or a group.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-	internal sealed class ConfigurationKeyAttribute : Attribute
+	public sealed class ConfigurationKeyAttribute : Attribute
 	{
 	    /// <summary>
 	    /// Initializes a new instance of the <see cref="ConfigurationKeyAttribute"/> class with a configuration key.

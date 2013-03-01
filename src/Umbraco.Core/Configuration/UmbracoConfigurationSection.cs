@@ -16,7 +16,7 @@ namespace Umbraco.Core.Configuration
     /// <para>The <c>UmbracoSettings.For{T}</c> method will return a section, either one that
     /// is in the configuration file, or a section that was created with default values.</para>
     /// </remarks>
-    internal abstract class UmbracoConfigurationSection : ConfigurationSection
+    public abstract class UmbracoConfigurationSection : ConfigurationSection
     {
         /// <summary>
         /// Gets a value indicating whether the section actually is in the configuration file.
