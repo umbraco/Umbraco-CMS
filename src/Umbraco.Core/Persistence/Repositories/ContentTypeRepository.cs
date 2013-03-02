@@ -93,7 +93,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContentType>(sqlClause, query);
-            var sql = translator.Translate();
+            var sql = translator.Translate()
+                .OrderBy<NodeDto>(x => x.Text);
 
             var dtos = Database.Fetch<DocumentTypeDto, ContentTypeDto, NodeDto>(sql);
 
