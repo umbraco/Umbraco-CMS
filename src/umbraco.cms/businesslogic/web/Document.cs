@@ -333,7 +333,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetRootContent()", false)]
         public static Document[] GetRootDocuments()
         {
-            var content = ApplicationContext.Current.Services.ContentService.GetRootContent();
+            var content = ApplicationContext.Current.Services.ContentService.GetRootContent().OrderBy(x => x.SortOrder);
             return content.Select(c => new Document(c)).ToArray();
         }
 
