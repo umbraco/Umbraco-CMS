@@ -230,9 +230,17 @@ namespace umbraco.cms.businesslogic.media
         /// </summary>
         public override void Move(int newParentId)
         {
-            var current = User.GetCurrent();
-            int userId = current == null ? 0 : current.Id;
-            ApplicationContext.Current.Services.MediaService.Move(MediaItem, newParentId, userId);
+            MoveEventArgs e = new MoveEventArgs();
+            base.FireBeforeMove(e);
+
+            if (!e.Cancel)
+            {
+                var current = User.GetCurrent();
+                int userId = current == null ? 0 : current.Id;
+                ApplicationContext.Current.Services.MediaService.Move(MediaItem, newParentId, userId);
+            }
+
+            base.FireAfterMove(e);
         }
 
         /// <summary>
