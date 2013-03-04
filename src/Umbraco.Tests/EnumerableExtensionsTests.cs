@@ -10,6 +10,77 @@ namespace Umbraco.Tests
 	[TestFixture]
     public class EnumerableExtensionsTests
     {
+
+	    [Test]
+	    public void Flatten_List()
+	    {
+	        var hierarchy = new TestItem()
+	            {
+	                Children = new List<TestItem>()
+	                    {
+	                        new TestItem()
+	                            {
+	                                Children = new List<TestItem>()
+	                                    {
+	                                        new TestItem()
+	                                            {
+	                                                Children = new List<TestItem>()
+	                                                    {
+	                                                        new TestItem()
+	                                                            {
+	                                                                Children = new List<TestItem>()
+	                                                                    {
+	                                                                        new TestItem(),
+                                                                            new TestItem()
+	                                                                    }
+	                                                            }
+	                                                    }
+	                                            }
+	                                    }
+	                            },
+	                        new TestItem()
+	                            {
+	                                Children = new List<TestItem>()
+	                                    {
+	                                        new TestItem()
+	                                            {
+	                                                Children = new List<TestItem>()
+	                                                    {
+	                                                        new TestItem()
+	                                                            {
+	                                                                Children = new List<TestItem>()
+	                                                            }
+	                                                    }
+	                                            },
+	                                        new TestItem()
+	                                            {
+	                                                Children = new List<TestItem>()
+	                                                    {
+	                                                        new TestItem()
+	                                                            {
+	                                                                Children = new List<TestItem>()
+	                                                            }
+	                                                    }
+	                                            }
+	                                    }
+	                            },
+	                    }
+	            };
+
+	        var flattened = hierarchy.Children.FlattenList(x => x.Children);
+
+            Assert.AreEqual(10, flattened.Count());
+	    }
+
+        private class TestItem
+        {
+            public TestItem()
+            {
+                Children = Enumerable.Empty<TestItem>();
+            }
+            public IEnumerable<TestItem> Children { get; set; } 
+        }
+
         [Test]
         public void InGroupsOf_ReturnsAllElements()
         {
