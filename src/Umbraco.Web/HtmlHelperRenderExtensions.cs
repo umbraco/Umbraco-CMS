@@ -9,6 +9,7 @@ using System.Web.Mvc.Html;
 using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.IO;
 using Umbraco.Web.Mvc;
 using umbraco;
 using umbraco.cms.businesslogic.member;
@@ -20,6 +21,30 @@ namespace Umbraco.Web
 	/// </summary>
 	public static class HtmlHelperRenderExtensions
 	{
+        /// <summary>
+        /// Will render the preview badge when in preview mode which is not required ever unless the MVC page you are
+        /// using does not inherit from UmbracoTemplatePage
+        /// </summary>
+        /// <param name="helper"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// See: http://issues.umbraco.org/issue/U4-1614
+        /// </remarks>
+        public static MvcHtmlString PreviewBadge(this HtmlHelper helper)
+        {
+            if (UmbracoContext.Current.InPreviewMode)
+            {
+                var htmlBadge =
+                    String.Format(UmbracoSettings.PreviewBadge,
+                                  IOHelper.ResolveUrl(SystemDirectories.Umbraco),
+                                  IOHelper.ResolveUrl(SystemDirectories.UmbracoClient),
+                                  UmbracoContext.Current.HttpContext.Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));
+                return new MvcHtmlString(htmlBadge);
+            }
+            return new MvcHtmlString("");
+
+        }
+
 		public static IHtmlString CachedPartial(
 			this HtmlHelper htmlHelper, 
 			string partialViewName, 
