@@ -1,5 +1,10 @@
+using System;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 
@@ -59,6 +64,34 @@ namespace Umbraco.Web.Mvc
 		{
 			get { return _helper ?? (_helper = new UmbracoHelper(UmbracoContext, Model.Content)); }
 		}
+
+        /// <summary>
+        /// This will detect the end /body tag and insert the preview badge if in preview mode
+        /// </summary>
+        /// <param name="value"></param>
+        public override void WriteLiteral(object value)
+        {
+            // filter / add preview banner
+            if (Response.ContentType.InvariantEquals("text/html") && UmbracoContext.Current.InPreviewMode) // ASP.NET default value
+            {
+                var text = value.ToString().ToLowerInvariant();
+                int pos = text.IndexOf("</body>");
+                if (pos > -1)
+                {
+                    var htmlBadge =
+                        String.Format(UmbracoSettings.PreviewBadge,
+                            IOHelper.ResolveUrl(SystemDirectories.Umbraco),
+                            IOHelper.ResolveUrl(SystemDirectories.UmbracoClient),
+                            Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));
+
+                    text = text.Substring(0, pos) + htmlBadge + text.Substring(pos, text.Length - pos);
+                    base.WriteLiteral(text);
+                    return;
+                }
+            }
+
+            base.WriteLiteral(value);
+        }
 
 	}
 }
