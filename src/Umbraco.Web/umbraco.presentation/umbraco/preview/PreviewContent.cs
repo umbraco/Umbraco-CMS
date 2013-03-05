@@ -13,6 +13,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Xml.Linq;
 using System.Xml;
 using System.IO;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic;
@@ -39,12 +40,12 @@ namespace umbraco.presentation.preview
 
         public PreviewContent(Guid previewSet)
         {
-            ValidPreviewSet = updatePreviewPaths(previewSet, true);
+            ValidPreviewSet = UpdatePreviewPaths(previewSet, true);
         }
         public PreviewContent(User user, Guid previewSet, bool validate)
         {
             _userId = user.Id;
-            ValidPreviewSet = updatePreviewPaths(previewSet, validate);
+            ValidPreviewSet = UpdatePreviewPaths(previewSet, validate);
         }
 
 
@@ -86,7 +87,7 @@ namespace umbraco.presentation.preview
 
         }
 
-        private bool updatePreviewPaths(Guid previewSet, bool validate)
+        private bool UpdatePreviewPaths(Guid previewSet, bool validate)
         {
             if (_userId == -1)
             {
@@ -114,8 +115,8 @@ namespace umbraco.presentation.preview
 
         private static string GetPreviewsetPath(int userId, Guid previewSet)
         {
-            return IO.IOHelper.MapPath(
-                Path.Combine(IO.SystemDirectories.Preview, userId + "_" + previewSet + ".config"));
+            return IOHelper.MapPath(
+                Path.Combine(SystemDirectories.Preview, userId + "_" + previewSet + ".config"));
         }
 
         /// <summary>
@@ -141,7 +142,7 @@ namespace umbraco.presentation.preview
         public void SavePreviewSet()
         {
             //make sure the preview folder exists first
-            var dir = new DirectoryInfo(IO.IOHelper.MapPath(IO.SystemDirectories.Preview));
+            var dir = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Preview));
             if (!dir.Exists)
             {
                 dir.Create();
@@ -157,17 +158,17 @@ namespace umbraco.presentation.preview
         {
             foreach (FileInfo file in dir.GetFiles(userId + "_*.config"))
             {
-                deletePreviewFile(userId, file);
+                DeletePreviewFile(userId, file);
             }
             // also delete any files accessed more than one hour ago
             foreach (FileInfo file in dir.GetFiles("*.config"))
             {
                 if ((DateTime.Now - file.LastAccessTime).TotalMinutes > 1)
-                    deletePreviewFile(userId, file);
+                    DeletePreviewFile(userId, file);
             }
         }
 
-        private static void deletePreviewFile(int userId, FileInfo file)
+        private static void DeletePreviewFile(int userId, FileInfo file)
         {
             try
             {
@@ -193,7 +194,7 @@ namespace umbraco.presentation.preview
                 if (StateHelper.Cookies.Preview.HasValue)
                 {
 
-                    deletePreviewFile(
+                    DeletePreviewFile(
                         UmbracoContext.Current.UmbracoUser.Id,
                         new FileInfo(GetPreviewsetPath(
                             UmbracoContext.Current.UmbracoUser.Id,
