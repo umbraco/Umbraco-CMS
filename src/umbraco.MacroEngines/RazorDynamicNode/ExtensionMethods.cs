@@ -3,18 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
+using Umbraco.Core;
 
 namespace umbraco.MacroEngines
 {
     public static class ExtensionMethods
     {
-		[Obsolete("This has been superceded by Umbraco.Core.Dynamics.ExtensionMethods.Map method")]
+        [Obsolete("This has been superceded by Umbraco.Core.EnumerableExtensions.FlattenList method")]
         public static IEnumerable<TSource> Map<TSource>(
             this IEnumerable<TSource> source,
             Func<TSource, bool> selectorFunction,
             Func<TSource, IEnumerable<TSource>> getChildrenFunction)
         {
-        	return Umbraco.Core.Dynamics.ExtensionMethods.Map<TSource>(source, selectorFunction, getChildrenFunction);
+        	//return Umbraco.Core.Dynamics.ExtensionMethods.Map<TSource>(source, selectorFunction, getChildrenFunction);
+		    return source.FlattenList(getChildrenFunction).Where(selectorFunction);
         }
 		
         public static DynamicNodeList Random(this DynamicNodeList all, int Min, int Max)

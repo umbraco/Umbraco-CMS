@@ -8,6 +8,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -215,7 +216,7 @@ namespace Umbraco.Tests.PublishedContent
 		}
 	}
 
-	public class PublishedContentWrapper : IPublishedContent
+    public class PublishedContentWrapper : IPublishedContent, IOwnerCollectionAware<IPublishedContent>
 	{
 		protected IPublishedContent WrappedContent { get; private set; }
 
@@ -305,6 +306,46 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			return WrappedContent.GetProperty(alias);
 		}
+
+        private IEnumerable<IPublishedContent> _ownersCollection;
+
+        /// <summary>
+        /// Need to get/set the owner collection when an item is returned from the result set of a query
+        /// </summary>
+        /// <remarks>
+        /// Based on this issue here: http://issues.umbraco.org/issue/U4-1797
+        /// </remarks>
+        IEnumerable<IPublishedContent> IOwnerCollectionAware<IPublishedContent>.OwnersCollection
+        {
+            get
+            {
+                var publishedContentBase = WrappedContent as IOwnerCollectionAware<IPublishedContent>;
+                if (publishedContentBase != null)
+                {
+                    return publishedContentBase.OwnersCollection;
+                }
+
+                //if the owners collection is null, we'll default to it's siblings
+                if (_ownersCollection == null)
+                {
+                    //get the root docs if parent is null
+                    _ownersCollection = this.Siblings();
+                }
+                return _ownersCollection;
+            }
+            set
+            {
+                var publishedContentBase = WrappedContent as IOwnerCollectionAware<IPublishedContent>;
+                if (publishedContentBase != null)
+                {
+                    publishedContentBase.OwnersCollection = value;
+                }
+                else
+                {
+                    _ownersCollection = value;
+                }
+            }
+        }
 	}
 
 	public partial class HomeContentItem : ContentPageContentItem

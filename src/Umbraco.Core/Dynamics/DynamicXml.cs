@@ -561,7 +561,8 @@ namespace Umbraco.Core.Dynamics
         }
         public IEnumerable<DynamicXml> Descendants(Func<XElement, bool> func)
         {
-            var flattenedNodes = this.BaseElement.Elements().Map(func, (XElement n) => { return n.Elements(); });
+            //var flattenedNodes = this.BaseElement.Elements().Map(func, n => n.Elements());
+            var flattenedNodes = this.BaseElement.Elements().SelectMany(n => n.Elements()).Where(func);
             return flattenedNodes.ToList().ConvertAll(n => new DynamicXml(n));
         }
         public IEnumerable<DynamicXml> DescendantsOrSelf()
@@ -570,7 +571,8 @@ namespace Umbraco.Core.Dynamics
         }
         public IEnumerable<DynamicXml> DescendantsOrSelf(Func<XElement, bool> func)
         {
-            var flattenedNodes = this.BaseElement.Elements().Map(func, (XElement n) => { return n.Elements(); });
+            //var flattenedNodes = this.BaseElement.Elements().Map(func, n => n.Elements());
+            var flattenedNodes = this.BaseElement.Elements().SelectMany(n => n.Elements()).Where(func);
             var list = new List<DynamicXml>();
             list.Add(this);
             list.AddRange(flattenedNodes.ToList().ConvertAll(n => new DynamicXml(n)));

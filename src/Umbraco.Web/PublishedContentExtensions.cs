@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -120,9 +121,138 @@ namespace Umbraco.Web
 		} 
 		#endregion
 
-		#region List Extensions
+       
+        #region Linq Wrapping Extensions
 
-		public static IQueryable<IPublishedContent> OrderBy(this IEnumerable<IPublishedContent> list, string predicate)
+        //NOTE: These are all purely required to fix this issue: http://issues.umbraco.org/issue/U4-1797 which requires that any 
+        // content item knows about it's containing collection. 
+
+        public static IEnumerable<IPublishedContent> Where(this IEnumerable<IPublishedContent> source, Func<IPublishedContent, bool> predicate)
+        {
+            var internalResult = Enumerable.Where(source, predicate);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        public static IEnumerable<IPublishedContent> Where(this IEnumerable<IPublishedContent> source, Func<IPublishedContent, int, bool> predicate)
+        {
+            var internalResult = Enumerable.Where(source, predicate);
+            return new DynamicPublishedContentList(internalResult);
+        }
+        
+        public static IEnumerable<IPublishedContent> Take(this IEnumerable<IPublishedContent> source, int count)
+        {
+            var internalResult = Enumerable.Take(source, count);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        public static IEnumerable<IPublishedContent> TakeWhile(this IEnumerable<IPublishedContent> source, Func<IPublishedContent, bool> predicate)
+        {
+            var internalResult = Enumerable.TakeWhile(source, predicate);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        public static IEnumerable<IPublishedContent> TakeWhile(this IEnumerable<IPublishedContent> source, Func<IPublishedContent, int, bool> predicate)
+        {
+            var internalResult = Enumerable.TakeWhile(source, predicate);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        public static IEnumerable<IPublishedContent> Skip(this IEnumerable<IPublishedContent> source, int count)
+        {
+            var internalResult = Enumerable.Skip(source, count);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        public static IEnumerable<IPublishedContent> SkipWhile(this IEnumerable<IPublishedContent> source, Func<IPublishedContent, bool> predicate)
+        {
+            var internalResult = Enumerable.SkipWhile(source, predicate);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        public static IEnumerable<IPublishedContent> SkipWhile(this IEnumerable<IPublishedContent> source, Func<IPublishedContent, int, bool> predicate)
+        {
+            var internalResult = Enumerable.SkipWhile(source, predicate);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        public static IEnumerable<IPublishedContent> Concat(this IEnumerable<IPublishedContent> first, IEnumerable<IPublishedContent> second)
+        {
+            var internalResult = Enumerable.Concat(first, second);
+            return new DynamicPublishedContentList(internalResult);
+        }
+        
+        public static IEnumerable<IPublishedContent> Distinct(this IEnumerable<IPublishedContent> source)
+        {
+            var internalResult = Enumerable.Distinct(source);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        public static IEnumerable<IPublishedContent> Distinct(this IEnumerable<IPublishedContent> source, IEqualityComparer<IPublishedContent> comparer)
+        {
+            var internalResult = Enumerable.Distinct(source, comparer);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        public static IEnumerable<IPublishedContent> Union(this IEnumerable<IPublishedContent> first, IEnumerable<IPublishedContent> second)
+        {
+            var internalResult = Enumerable.Union(first, second);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        public static IEnumerable<IPublishedContent> Union(this IEnumerable<IPublishedContent> first, IEnumerable<IPublishedContent> second, IEqualityComparer<IPublishedContent> comparer)
+        {
+            var internalResult = Enumerable.Union(first, second, comparer);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        public static IEnumerable<IPublishedContent> Intersect(this IEnumerable<IPublishedContent> first, IEnumerable<IPublishedContent> second)
+        {
+            var internalResult = Enumerable.Intersect(first, second);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        public static IEnumerable<IPublishedContent> Intersect(this IEnumerable<IPublishedContent> first, IEnumerable<IPublishedContent> second, IEqualityComparer<IPublishedContent> comparer)
+        {
+            var internalResult = Enumerable.Intersect(first, second, comparer);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        public static IEnumerable<IPublishedContent> Except(this IEnumerable<IPublishedContent> first, IEnumerable<IPublishedContent> second)
+        {
+            var internalResult = Enumerable.Except(first, second);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        public static IEnumerable<IPublishedContent> Except(this IEnumerable<IPublishedContent> first, IEnumerable<IPublishedContent> second, IEqualityComparer<IPublishedContent> comparer)
+        {
+            var internalResult = Enumerable.Except(first, second, comparer);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        public static IEnumerable<IPublishedContent> Reverse(this IEnumerable<IPublishedContent> source)
+        {
+            var internalResult = Enumerable.Reverse(source);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        public static IEnumerable<IPublishedContent> DefaultIfEmpty(this IEnumerable<IPublishedContent> source)
+        {
+            var internalResult = Enumerable.DefaultIfEmpty(source);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        public static IEnumerable<IPublishedContent> DefaultIfEmpty(this IEnumerable<IPublishedContent> source, IPublishedContent defaultValue)
+        {
+            var internalResult = Enumerable.DefaultIfEmpty(source, defaultValue);
+            return new DynamicPublishedContentList(internalResult);
+        }
+
+        #endregion
+
+
+        #region Dynamic Linq Extensions
+
+        public static IQueryable<IPublishedContent> OrderBy(this IEnumerable<IPublishedContent> list, string predicate)
 		{
 			var dList = new DynamicPublishedContentList(list);
 			return dList.OrderBy<DynamicPublishedContent>(predicate);
@@ -131,7 +261,11 @@ namespace Umbraco.Web
 		public static IQueryable<IPublishedContent> Where(this IEnumerable<IPublishedContent> list, string predicate)
 		{
 			var dList = new DynamicPublishedContentList(list);
-			return dList.Where<DynamicPublishedContent>(predicate);
+            //we have to wrap the result in another DynamicPublishedContentList so that the OwnersList get's set on 
+            //the individual items. See: http://issues.umbraco.org/issue/U4-1797
+		    return new DynamicPublishedContentList(
+		        dList.Where<DynamicPublishedContent>(predicate))
+		        .AsQueryable<IPublishedContent>();
 		}
 
 		public static IEnumerable<IGrouping<object, IPublishedContent>> GroupBy(this IEnumerable<IPublishedContent> list, string predicate)
@@ -184,14 +318,14 @@ namespace Umbraco.Web
 			}
 			return new HtmlString(valueIfFalse);
 		}
-		public static bool Where(this IPublishedContent doc, string predicate)
+		
+        public static bool Where(this IPublishedContent doc, string predicate)
 		{
 			if (doc == null) throw new ArgumentNullException("doc");
-			//Totally gonna cheat here
 			var dynamicDocumentList = new DynamicPublishedContentList();
 			dynamicDocumentList.Add(doc.AsDynamicPublishedContent());
 			var filtered = dynamicDocumentList.Where<DynamicPublishedContent>(predicate);
-			if (Queryable.Count(filtered) == 1)
+			if (filtered.Count() == 1)
 			{
 				//this node matches the predicate
 				return true;
@@ -207,13 +341,8 @@ namespace Umbraco.Web
 			return content.Index();
 		}
 		public static int Index(this IPublishedContent content)
-		{
-			//get the root docs if parent is null
-			var ownersList = content.Parent == null
-								 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-								 : content.Parent.Children;
-
-			var container = ownersList.ToList();
+		{            
+            var container = content.GetOwnersList().ToList();
 			int currentIndex = container.FindIndex(n => n.Id == content.Id);
 			if (currentIndex != -1)
 			{
@@ -242,159 +371,145 @@ namespace Umbraco.Web
 		public static bool IsNull(this IPublishedContent content, string alias)
 		{
 			return content.IsNull(alias, false);
-		}
-		public static bool IsFirst(this IPublishedContent content)
-		{
-			return content.IsHelper(n => n.Index() == 0);
-		}
-		public static HtmlString IsFirst(this IPublishedContent content, string valueIfTrue)
-		{
-			return content.IsHelper(n => n.Index() == 0, valueIfTrue);
-		}
-		public static HtmlString IsFirst(this IPublishedContent content, string valueIfTrue, string valueIfFalse)
-		{
-			return content.IsHelper(n => n.Index() == 0, valueIfTrue, valueIfFalse);
-		}
-		public static bool IsNotFirst(this IPublishedContent content)
-		{
-			return !content.IsHelper(n => n.Index() == 0);
-		}
-		public static HtmlString IsNotFirst(this IPublishedContent content, string valueIfTrue)
-		{
-			return content.IsHelper(n => n.Index() != 0, valueIfTrue);
-		}
-		public static HtmlString IsNotFirst(this IPublishedContent content, string valueIfTrue, string valueIfFalse)
-		{
-			return content.IsHelper(n => n.Index() != 0, valueIfTrue, valueIfFalse);
-		}
-		public static bool IsPosition(this IPublishedContent content, int index)
-		{
-			return content.IsHelper(n => n.Index() == index);
-		}
-		public static HtmlString IsPosition(this IPublishedContent content, int index, string valueIfTrue)
-		{
-			return content.IsHelper(n => n.Index() == index, valueIfTrue);
-		}
-		public static HtmlString IsPosition(this IPublishedContent content, int index, string valueIfTrue, string valueIfFalse)
-		{
-			return content.IsHelper(n => n.Index() == index, valueIfTrue, valueIfFalse);
-		}
-		public static bool IsModZero(this IPublishedContent content, int modulus)
-		{
-			return content.IsHelper(n => n.Index() % modulus == 0);
-		}
-		public static HtmlString IsModZero(this IPublishedContent content, int modulus, string valueIfTrue)
-		{
-			return content.IsHelper(n => n.Index() % modulus == 0, valueIfTrue);
-		}
-		public static HtmlString IsModZero(this IPublishedContent content, int modulus, string valueIfTrue, string valueIfFalse)
-		{
-			return content.IsHelper(n => n.Index() % modulus == 0, valueIfTrue, valueIfFalse);
-		}
+		}		
 
-		public static bool IsNotModZero(this IPublishedContent content, int modulus)
-		{
-			return content.IsHelper(n => n.Index() % modulus != 0);
-		}
-		public static HtmlString IsNotModZero(this IPublishedContent content, int modulus, string valueIfTrue)
-		{
-			return content.IsHelper(n => n.Index() % modulus != 0, valueIfTrue);
-		}
-		public static HtmlString IsNotModZero(this IPublishedContent content, int modulus, string valueIfTrue, string valueIfFalse)
-		{
-			return content.IsHelper(n => n.Index() % modulus != 0, valueIfTrue, valueIfFalse);
-		}
-		public static bool IsNotPosition(this IPublishedContent content, int index)
-		{
-			return !content.IsHelper(n => n.Index() == index);
-		}
-		public static HtmlString IsNotPosition(this IPublishedContent content, int index, string valueIfTrue)
-		{
-			return content.IsHelper(n => n.Index() != index, valueIfTrue);
-		}
-		public static HtmlString IsNotPosition(this IPublishedContent content, int index, string valueIfTrue, string valueIfFalse)
-		{
-			return content.IsHelper(n => n.Index() != index, valueIfTrue, valueIfFalse);
-		}
-		public static bool IsLast(this IPublishedContent content)
-		{
-			//get the root docs if parent is null
-			var ownersList = content.Parent == null
-								 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-								 : content.Parent.Children;
-			var count = ownersList.Count();
-			return content.IsHelper(n => n.Index() == count - 1);
-		}
-		public static HtmlString IsLast(this IPublishedContent content, string valueIfTrue)
-		{
-			//get the root docs if parent is null
-			var ownersList = content.Parent == null
-								 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-								 : content.Parent.Children;
-			var count = ownersList.Count();
-			return content.IsHelper(n => n.Index() == count - 1, valueIfTrue);
-		}
-		public static HtmlString IsLast(this IPublishedContent content, string valueIfTrue, string valueIfFalse)
-		{
-			//get the root docs if parent is null
-			var ownersList = content.Parent == null
-								 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-								 : content.Parent.Children;
-			var count = ownersList.Count();
-			return content.IsHelper(n => n.Index() == count - 1, valueIfTrue, valueIfFalse);
-		}
-		public static bool IsNotLast(this IPublishedContent content)
-		{
-			//get the root docs if parent is null
-			var ownersList = content.Parent == null
-								 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-								 : content.Parent.Children;
-			var count = ownersList.Count();
-			return !content.IsHelper(n => n.Index() == count - 1);
-		}
-		public static HtmlString IsNotLast(this IPublishedContent content, string valueIfTrue)
-		{
-			//get the root docs if parent is null
-			var ownersList = content.Parent == null
-								 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-								 : content.Parent.Children;
-			var count = ownersList.Count();
-			return content.IsHelper(n => n.Index() != count - 1, valueIfTrue);
-		}
-		public static HtmlString IsNotLast(this IPublishedContent content, string valueIfTrue, string valueIfFalse)
-		{
-			//get the root docs if parent is null
-			var ownersList = content.Parent == null
-								 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-								 : content.Parent.Children;
-			var count = ownersList.Count();
-			return content.IsHelper(n => n.Index() != count - 1, valueIfTrue, valueIfFalse);
-		}
-		public static bool IsEven(this IPublishedContent content)
-		{
-			return content.IsHelper(n => n.Index() % 2 == 0);
-		}
-		public static HtmlString IsEven(this IPublishedContent content, string valueIfTrue)
-		{
-			return content.IsHelper(n => n.Index() % 2 == 0, valueIfTrue);
-		}
-		public static HtmlString IsEven(this IPublishedContent content, string valueIfTrue, string valueIfFalse)
-		{
-			return content.IsHelper(n => n.Index() % 2 == 0, valueIfTrue, valueIfFalse);
-		}
-		public static bool IsOdd(this IPublishedContent content)
-		{
-			return content.IsHelper(n => n.Index() % 2 == 1);
-		}
-		public static HtmlString IsOdd(this IPublishedContent content, string valueIfTrue)
-		{
-			return content.IsHelper(n => n.Index() % 2 == 1, valueIfTrue);
-		}
-		public static HtmlString IsOdd(this IPublishedContent content, string valueIfTrue, string valueIfFalse)
-		{
-			return content.IsHelper(n => n.Index() % 2 == 1, valueIfTrue, valueIfFalse);
-		}
-		public static bool IsEqual(this IPublishedContent content, IPublishedContent other)
+        #region Position in list
+
+        public static bool IsFirst(this IPublishedContent content)
+        {
+            return content.IsHelper(n => n.Index() == 0);
+        }
+        public static HtmlString IsFirst(this IPublishedContent content, string valueIfTrue)
+        {
+            return content.IsHelper(n => n.Index() == 0, valueIfTrue);
+        }
+        public static HtmlString IsFirst(this IPublishedContent content, string valueIfTrue, string valueIfFalse)
+        {
+            return content.IsHelper(n => n.Index() == 0, valueIfTrue, valueIfFalse);
+        }
+        public static bool IsNotFirst(this IPublishedContent content)
+        {
+            return !content.IsHelper(n => n.Index() == 0);
+        }
+        public static HtmlString IsNotFirst(this IPublishedContent content, string valueIfTrue)
+        {
+            return content.IsHelper(n => n.Index() != 0, valueIfTrue);
+        }
+        public static HtmlString IsNotFirst(this IPublishedContent content, string valueIfTrue, string valueIfFalse)
+        {
+            return content.IsHelper(n => n.Index() != 0, valueIfTrue, valueIfFalse);
+        }
+        public static bool IsPosition(this IPublishedContent content, int index)
+        {
+            return content.IsHelper(n => n.Index() == index);
+        }
+        public static HtmlString IsPosition(this IPublishedContent content, int index, string valueIfTrue)
+        {
+            return content.IsHelper(n => n.Index() == index, valueIfTrue);
+        }
+        public static HtmlString IsPosition(this IPublishedContent content, int index, string valueIfTrue, string valueIfFalse)
+        {
+            return content.IsHelper(n => n.Index() == index, valueIfTrue, valueIfFalse);
+        }
+        public static bool IsModZero(this IPublishedContent content, int modulus)
+        {
+            return content.IsHelper(n => n.Index() % modulus == 0);
+        }
+        public static HtmlString IsModZero(this IPublishedContent content, int modulus, string valueIfTrue)
+        {
+            return content.IsHelper(n => n.Index() % modulus == 0, valueIfTrue);
+        }
+        public static HtmlString IsModZero(this IPublishedContent content, int modulus, string valueIfTrue, string valueIfFalse)
+        {
+            return content.IsHelper(n => n.Index() % modulus == 0, valueIfTrue, valueIfFalse);
+        }
+        public static bool IsNotModZero(this IPublishedContent content, int modulus)
+        {
+            return content.IsHelper(n => n.Index() % modulus != 0);
+        }
+        public static HtmlString IsNotModZero(this IPublishedContent content, int modulus, string valueIfTrue)
+        {
+            return content.IsHelper(n => n.Index() % modulus != 0, valueIfTrue);
+        }
+        public static HtmlString IsNotModZero(this IPublishedContent content, int modulus, string valueIfTrue, string valueIfFalse)
+        {
+            return content.IsHelper(n => n.Index() % modulus != 0, valueIfTrue, valueIfFalse);
+        }
+        public static bool IsNotPosition(this IPublishedContent content, int index)
+        {
+            return !content.IsHelper(n => n.Index() == index);
+        }
+        public static HtmlString IsNotPosition(this IPublishedContent content, int index, string valueIfTrue)
+        {
+            return content.IsHelper(n => n.Index() != index, valueIfTrue);
+        }
+        public static HtmlString IsNotPosition(this IPublishedContent content, int index, string valueIfTrue, string valueIfFalse)
+        {
+            return content.IsHelper(n => n.Index() != index, valueIfTrue, valueIfFalse);
+        }
+        public static bool IsLast(this IPublishedContent content)
+        {
+            var ownersList = content.GetOwnersList();
+            var count = ownersList.Count();
+            return content.IsHelper(n => n.Index() == count - 1);
+        }
+        public static HtmlString IsLast(this IPublishedContent content, string valueIfTrue)
+        {
+            var ownersList = content.GetOwnersList();
+            var count = ownersList.Count();
+            return content.IsHelper(n => n.Index() == count - 1, valueIfTrue);
+        }
+        public static HtmlString IsLast(this IPublishedContent content, string valueIfTrue, string valueIfFalse)
+        {
+            var ownersList = content.GetOwnersList();
+            var count = ownersList.Count();
+            return content.IsHelper(n => n.Index() == count - 1, valueIfTrue, valueIfFalse);
+        }
+        public static bool IsNotLast(this IPublishedContent content)
+        {
+            var ownersList = content.GetOwnersList();
+            var count = ownersList.Count();
+            return !content.IsHelper(n => n.Index() == count - 1);
+        }
+        public static HtmlString IsNotLast(this IPublishedContent content, string valueIfTrue)
+        {
+            var ownersList = content.GetOwnersList();
+            var count = ownersList.Count();
+            return content.IsHelper(n => n.Index() != count - 1, valueIfTrue);
+        }
+        public static HtmlString IsNotLast(this IPublishedContent content, string valueIfTrue, string valueIfFalse)
+        {
+            var ownersList = content.GetOwnersList();
+            var count = ownersList.Count();
+            return content.IsHelper(n => n.Index() != count - 1, valueIfTrue, valueIfFalse);
+        }
+        public static bool IsEven(this IPublishedContent content)
+        {
+            return content.IsHelper(n => n.Index() % 2 == 0);
+        }
+        public static HtmlString IsEven(this IPublishedContent content, string valueIfTrue)
+        {
+            return content.IsHelper(n => n.Index() % 2 == 0, valueIfTrue);
+        }
+        public static HtmlString IsEven(this IPublishedContent content, string valueIfTrue, string valueIfFalse)
+        {
+            return content.IsHelper(n => n.Index() % 2 == 0, valueIfTrue, valueIfFalse);
+        }
+        public static bool IsOdd(this IPublishedContent content)
+        {
+            return content.IsHelper(n => n.Index() % 2 == 1);
+        }
+        public static HtmlString IsOdd(this IPublishedContent content, string valueIfTrue)
+        {
+            return content.IsHelper(n => n.Index() % 2 == 1, valueIfTrue);
+        }
+        public static HtmlString IsOdd(this IPublishedContent content, string valueIfTrue, string valueIfFalse)
+        {
+            return content.IsHelper(n => n.Index() % 2 == 1, valueIfTrue, valueIfFalse);
+        } 
+        #endregion
+		
+        public static bool IsEqual(this IPublishedContent content, IPublishedContent other)
 		{
 			return content.IsHelper(n => n.Id == other.Id);
 		}
@@ -490,6 +605,30 @@ namespace Umbraco.Web
 		{
 			return test(content) ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
 		}
+
+        /// <summary>
+        /// Return the owners collection of the current content item. 
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// If the content item is of type PublishedContentBase we will have a property called OwnersCollection which will 
+        /// be the collection of a resultant set (i.e. from a where clause, a call to Children(), etc...) otherwise it will
+        /// be the item's siblings. All relates to this issue: http://issues.umbraco.org/issue/U4-1797
+        /// </remarks>
+        private static IEnumerable<IPublishedContent> GetOwnersList(this IPublishedContent content)
+        {
+            //Here we need to type check, we need to see if we have a real OwnersCollection list based on the result set
+            // of a query, otherwise we can only lookup among the item's siblings. All related to this issue here:
+            // http://issues.umbraco.org/issue/U4-1797
+
+            var publishedContentBase = content as IOwnerCollectionAware<IPublishedContent>;
+            var ownersList = publishedContentBase != null
+                                 ? publishedContentBase.OwnersCollection
+                                 : content.Siblings();
+            return ownersList;
+        } 
+
 		#endregion
 
 		#region Ancestors
@@ -630,7 +769,10 @@ namespace Umbraco.Web
 		}
 		private static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, Func<IPublishedContent, bool> func)
 		{
-			return content.Children.Map(func, (IPublishedContent n) => n.Children);
+			//return content.Children.Map(func, (IPublishedContent n) => n.Children);
+		    return content.Children.FlattenList(x => x.Children).Where(func)
+		                  .OrderBy(x => x.Level) //ensure its sorted by level and then by sort order
+		                  .ThenBy(x => x.SortOrder);
 		}
 		public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, int level)
 		{
@@ -653,8 +795,13 @@ namespace Umbraco.Web
 				{
 					thisNode.Add(content);
 				}
-				var flattenedNodes = content.Children.Map(func, (IPublishedContent n) => n.Children);
-				return thisNode.Concat(flattenedNodes).ToList().ConvertAll(dynamicBackingItem => new DynamicPublishedContent(dynamicBackingItem));
+				//var flattenedNodes = content.Children.Map(func, (IPublishedContent n) => n.Children);
+                var flattenedNodes = content.Children.FlattenList(n => n.Children).Where(func);
+
+			    return thisNode.Concat(flattenedNodes)
+			                   .Select(dynamicBackingItem => new DynamicPublishedContent(dynamicBackingItem))
+			                   .OrderBy(x => x.Level) //ensure its sorted by level and then by sort order
+			                   .ThenBy(x => x.SortOrder);
 			}
 			return Enumerable.Empty<IPublishedContent>();
 		}
@@ -719,10 +866,7 @@ namespace Umbraco.Web
 		}
 		public static IPublishedContent Next(this IPublishedContent content, int number)
 		{
-			//get the root docs if parent is null
-			var ownersList = content.Parent == null
-				                 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-				                 : content.Parent.Children;
+            var ownersList = content.GetOwnersList();
 
 			var container = ownersList.ToList();
 			var currentIndex = container.FindIndex(n => n.Id == content.Id);
@@ -735,10 +879,7 @@ namespace Umbraco.Web
 
 		public static IPublishedContent Next(this IPublishedContent content, string nodeTypeAlias)
 		{
-			//get the root docs if parent is null
-			var ownersList = content.Parent == null
-				                 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-				                 : content.Parent.Children;
+            var ownersList = content.GetOwnersList();
 
 			var container = ownersList.ToList();
 			var currentIndex = container.FindIndex(n => n.Id == content.Id);
@@ -757,10 +898,7 @@ namespace Umbraco.Web
 		}
 		public static IPublishedContent Previous(this IPublishedContent content, int number)
 		{
-			//get the root docs if parent is null
-			var ownersList = content.Parent == null
-								 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-								 : content.Parent.Children;
+            var ownersList = content.GetOwnersList();
 
 			var container = ownersList.ToList();
 			var currentIndex = container.FindIndex(n => n.Id == content.Id);
@@ -772,10 +910,7 @@ namespace Umbraco.Web
 		}
 		public static IPublishedContent Previous(this IPublishedContent content, string nodeTypeAlias)
 		{
-			//get the root docs if parent is null
-			var ownersList = content.Parent == null
-				                 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-				                 : content.Parent.Children;
+            var ownersList = content.GetOwnersList();
 
 			var container = ownersList.ToList();
 			int currentIndex = container.FindIndex(n => n.Id == content.Id);
@@ -793,12 +928,9 @@ namespace Umbraco.Web
 		}
 		public static IPublishedContent Sibling(this IPublishedContent content, int number)
 		{
-			//get the root docs if parent is null
-			var ownersList = content.Parent == null
-								 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-								 : content.Parent.Children;
+            var siblings = content.Siblings();
 
-			var container = ownersList.ToList();
+            var container = siblings.ToList();
 			var currentIndex = container.FindIndex(n => n.Id == content.Id);
 			if (currentIndex != -1)
 			{
@@ -808,12 +940,9 @@ namespace Umbraco.Web
 		}
 		public static IPublishedContent Sibling(this IPublishedContent content, string nodeTypeAlias)
 		{
-			//get the root docs if parent is null
-			var ownersList = content.Parent == null
-				                 ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
-				                 : content.Parent.Children;
+            var siblings = content.Siblings();
 
-			var container = ownersList.ToList();
+            var container = siblings.ToList();
 			var currentIndex = container.FindIndex(n => n.Id == content.Id);
 			if (currentIndex != -1)
 			{
@@ -835,7 +964,21 @@ namespace Umbraco.Web
 			}
 			throw new IndexOutOfRangeException(string.Format("Node {0} belongs to a DynamicNodeList but could not retrieve the index for it's position in the list", content.Id));
 		}
-		#endregion
+		
+        /// <summary>
+        /// Return the items siblings
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public static IEnumerable<IPublishedContent> Siblings(this IPublishedContent content)
+        {
+            //get the root docs if parent is null
+            return content.Parent == null
+                       ? PublishedContentStoreResolver.Current.PublishedContentStore.GetRootDocuments(UmbracoContext.Current)
+                       : content.Parent.Children;
+        } 
+
+        #endregion
 
 		/// <summary>
 		/// Method to return the Children of the content item

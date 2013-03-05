@@ -46,17 +46,18 @@ namespace Umbraco.Tests.PublishedContent
 		<Home id=""1173"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""sub1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173"" isDoc="""">
 			<content><![CDATA[<div>This is some content</div>]]></content>
 			<umbracoUrlAlias><![CDATA[page2/alias, 2ndpagealias]]></umbracoUrlAlias>			
-			<Home id=""1174"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-20T18:07:54"" updateDate=""2012-07-20T19:10:27"" nodeName=""Sub2"" urlName=""sub2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1174"" isDoc="""">
+			<Home id=""1174"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-07-20T18:07:54"" updateDate=""2012-07-20T19:10:27"" nodeName=""Sub2"" urlName=""sub2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1174"" isDoc="""">
 				<content><![CDATA[]]></content>
 				<umbracoUrlAlias><![CDATA[only/one/alias]]></umbracoUrlAlias>
 				<creatorName><![CDATA[Custom data with same property name as the member name]]></creatorName>
-			</Home>
-			<Home id=""1176"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-20T18:08:08"" updateDate=""2012-07-20T19:10:52"" nodeName=""Sub 3"" urlName=""sub-3"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1176"" isDoc="""">
+			</Home>			
+			<CustomDocument id=""1177"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""custom sub 1"" urlName=""custom-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1177"" isDoc="""" />
+			<CustomDocument id=""1178"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-16T14:23:35"" nodeName=""custom sub 2"" urlName=""custom-sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1178"" isDoc="""" />
+            <Home id=""1176"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-20T18:08:08"" updateDate=""2012-07-20T19:10:52"" nodeName=""Sub 3"" urlName=""sub-3"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1176"" isDoc="""">
 				<content><![CDATA[some content]]></content>
 				<blah><![CDATA[some content]]></blah>
+                <umbracoNaviHide>1</umbracoNaviHide>
 			</Home>
-			<CustomDocument id=""1177"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""custom sub 1"" urlName=""custom-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1177"" isDoc="""" />
-			<CustomDocument id=""1178"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-16T14:23:35"" nodeName=""custom sub 2"" urlName=""custom-sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1178"" isDoc="""" />
 		</Home>
 		<Home id=""1175"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-20T18:08:01"" updateDate=""2012-07-20T18:49:32"" nodeName=""Sub 2"" urlName=""sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1175"" isDoc=""""><content><![CDATA[]]></content>
 		</Home>
@@ -76,6 +77,28 @@ namespace Umbraco.Tests.PublishedContent
         /// <param name="id"></param>
         /// <returns></returns>
         protected abstract dynamic GetDynamicNode(int id);
+
+        /// <summary>
+        /// Tests the IsLast method with the result set from a Where statement
+        /// </summary>
+        [Test]
+        public void Is_Last_From_Where_Filter()
+        {
+            var doc = GetDynamicNode(1173);
+
+            foreach (var d in doc.Children.Where("Visible"))
+            {
+                if (d.Id != 1178)
+                {
+                    Assert.IsFalse(d.IsLast());
+                }
+                else
+                {
+                    Assert.IsTrue(d.IsLast());
+                }
+            }
+
+        }
 
         [Test]
         public void Single()
@@ -222,11 +245,11 @@ namespace Umbraco.Tests.PublishedContent
             var doc = GetDynamicNode(1173);
             Assert.AreEqual(0, doc.Index());
             doc = GetDynamicNode(1176);
-            Assert.AreEqual(1, doc.Index());
-            doc = GetDynamicNode(1177);
-            Assert.AreEqual(2, doc.Index());
-            doc = GetDynamicNode(1178);
             Assert.AreEqual(3, doc.Index());
+            doc = GetDynamicNode(1177);
+            Assert.AreEqual(1, doc.Index());
+            doc = GetDynamicNode(1178);
+            Assert.AreEqual(2, doc.Index());
         }
 
         [Test]
@@ -372,7 +395,7 @@ namespace Umbraco.Tests.PublishedContent
             var casted = (IEnumerable<TDocument>)skip;
 
             Assert.AreEqual(2, casted.Count());
-            Assert.IsTrue(casted.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1177, 1178 }));
+            Assert.IsTrue(casted.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1178, 1176 }));
 
         }
 
@@ -397,7 +420,7 @@ namespace Umbraco.Tests.PublishedContent
             var casted = (IEnumerable<TDocument>)take;
 
             Assert.AreEqual(2, casted.Count());
-            Assert.IsTrue(casted.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1174, 1176 }));
+            Assert.IsTrue(casted.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1174, 1177 }));
         }
 
         [Test]
@@ -615,7 +638,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Next_Without_Sibling()
         {
-            var asDynamic = GetDynamicNode(1178);
+            var asDynamic = GetDynamicNode(1176);
 
             Assert.IsNull(asDynamic.Next());
         }
@@ -637,7 +660,7 @@ namespace Umbraco.Tests.PublishedContent
 
             Assert.IsNotNull(result);
 
-            Assert.AreEqual((int)1174, (int)result.Id);
+            Assert.AreEqual((int)1178, (int)result.Id);
         }
     }
 
