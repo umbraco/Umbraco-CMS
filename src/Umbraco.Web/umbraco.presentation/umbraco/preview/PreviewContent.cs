@@ -18,6 +18,7 @@ using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
+using Umbraco.Core.IO;
 
 namespace umbraco.presentation.preview
 {
