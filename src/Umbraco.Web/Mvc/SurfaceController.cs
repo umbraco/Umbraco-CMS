@@ -77,19 +77,49 @@ namespace Umbraco.Web.Mvc
 		{
 			get
 			{
-                var routeData = ControllerContext.IsChildAction 
-                    ? ControllerContext.ParentActionViewContext.RouteData 
-                    : ControllerContext.RouteData;
-
-                if (!routeData.DataTokens.ContainsKey("umbraco-route-def"))
+			    var routeDefAttempt = TryGetRouteDefinitionFromAncestorViewContexts();
+                if (!routeDefAttempt.Success)
                 {
-                    throw new InvalidOperationException("Cannot find the Umbraco route definition in the route values, the request must be made in the context of an Umbraco request");                    
+                    throw routeDefAttempt.Error;
                 }
 
-                var routeDef = (RouteDefinition)routeData.DataTokens["umbraco-route-def"];
+			    var routeDef = routeDefAttempt.Result;
 				return routeDef.PublishedContentRequest.PublishedContent;
 			}
 		}
+
+        /// <summary>
+        /// we need to recursively find the route definition based on the parent view context
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// We may have Child Actions within Child actions so we need to recursively look this up.
+        /// see: http://issues.umbraco.org/issue/U4-1844
+        /// </remarks>
+        private Attempt<RouteDefinition> TryGetRouteDefinitionFromAncestorViewContexts()
+        {
+            ControllerContext currentContext = ControllerContext;
+            while (currentContext != null)
+            {
+                var currentRouteData = currentContext.RouteData;
+                if (currentRouteData.DataTokens.ContainsKey("umbraco-route-def"))
+                {
+                    return new Attempt<RouteDefinition>(true, (RouteDefinition) currentRouteData.DataTokens["umbraco-route-def"]);
+                }
+                if (currentContext.IsChildAction)
+                {
+                    //assign current context to parent
+                    currentContext = currentContext.ParentActionViewContext;
+                }
+                else
+                {
+                    //exit the loop
+                    currentRouteData = null;
+                }
+            }
+            return new Attempt<RouteDefinition>(
+                new InvalidOperationException("Cannot find the Umbraco route definition in the route values, the request must be made in the context of an Umbraco request"));
+        } 
 
 		
 	}

@@ -30,7 +30,11 @@ namespace Umbraco.Web.Macros
 		[ChildActionOnly]
 		public PartialViewResult Index()
 		{
-			var model = new PartialViewMacroModel(_currentPage.ConvertFromNode(), 
+			var model = new PartialViewMacroModel(
+                _currentPage.ConvertFromNode(), 
+                _macro.Id,
+                _macro.Alias,
+                _macro.Name,
 				_macro.Properties.ToDictionary(x => x.Key, x => (object)x.Value));
 			return PartialView(_macro.ScriptName, model);
 		}
