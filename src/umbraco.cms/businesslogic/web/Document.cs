@@ -289,7 +289,8 @@ namespace umbraco.cms.businesslogic.web
 
             //Create a new IContent object based on the passed in DocumentType's alias, set the name and save it
             IContent content = ApplicationContext.Current.Services.ContentService.CreateContent(Name, ParentId, dct.Alias, u.Id);
-            ApplicationContext.Current.Services.ContentService.Save(content, u.Id);
+            //don't raise events here (false), they will get raised with the d.Save() call.
+            ApplicationContext.Current.Services.ContentService.Save(content, u.Id, false); 
 
             //read the whole object from the db
             Document d = new Document(content);

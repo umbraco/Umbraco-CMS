@@ -64,23 +64,28 @@ namespace Umbraco.Core.Logging
 			{
 				_forceStop = true;
 				var windowsIdentity = WindowsIdentity.GetCurrent();
-				base.Append(new LoggingEvent(new LoggingEventData
-					{
-						Level = Level.Error,
-						Message =
-							"Unable to clear out the AsynchronousRollingFileAppender buffer in the allotted time, forcing a shutdown",
-						TimeStamp = DateTime.UtcNow,
-						Identity = "",
-						ExceptionString = "",
-						UserName = windowsIdentity != null ? windowsIdentity.Name : "",
-						Domain = AppDomain.CurrentDomain.FriendlyName,
-						ThreadName = Thread.CurrentThread.ManagedThreadId.ToString(),
-						LocationInfo =
-							new LocationInfo(this.GetType().Name, "OnClose", "AsynchronousRollingFileAppender.cs", "59"),
-						LoggerName = this.GetType().FullName,
-						Properties = new PropertiesDictionary(),
-					})
-					);
+
+			    var logEvent = new LoggingEvent(new LoggingEventData
+			        {
+			            Level = global::log4net.Core.Level.Error,
+			            Message =
+			                "Unable to clear out the AsynchronousRollingFileAppender buffer in the allotted time, forcing a shutdown",
+			            TimeStamp = DateTime.UtcNow,
+			            Identity = "",
+			            ExceptionString = "",
+			            UserName = windowsIdentity != null ? windowsIdentity.Name : "",
+			            Domain = AppDomain.CurrentDomain.FriendlyName,
+			            ThreadName = Thread.CurrentThread.ManagedThreadId.ToString(),
+			            LocationInfo =
+			                new LocationInfo(this.GetType().Name, "OnClose", "AsynchronousRollingFileAppender.cs", "59"),
+			            LoggerName = this.GetType().FullName,
+			            Properties = new PropertiesDictionary(),
+			        });
+
+			    if (this.DateTimeStrategy != null)
+			    {
+                    base.Append(logEvent);
+			    }			    
 			}
 
 			base.OnClose();
