@@ -1363,6 +1363,12 @@ namespace umbraco.MacroEngines
                         prop = n.GetProperty(alias);
                     }
                 }
+                if (prop == null && alias.StartsWith("_"))
+                {
+                    //if the prop is still null but it starts with an _ then we'll check recursively
+                    var recursiveAlias = alias.Substring(1, alias.Length - 1);
+                    prop = n.GetProperty(recursiveAlias, true);
+                }
             }
             catch (Exception)
             {
