@@ -656,7 +656,14 @@ namespace Umbraco.Web.Models
 
 		public IPublishedContentProperty GetProperty(string alias)
 		{
-			return GetProperty(alias, false);
+            var prop = GetProperty(alias, false);
+			if (prop == null && alias.StartsWith("_"))
+			{
+			    //if it is prefixed and the first result failed, try to get it by recursive
+                var recursiveAlias = alias.Substring(1, alias.Length - 1);
+                return GetProperty(recursiveAlias, true);
+			}
+		    return prop;
 		}
 		public IPublishedContentProperty GetProperty(string alias, bool recursive)
 		{

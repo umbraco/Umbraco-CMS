@@ -81,6 +81,9 @@ namespace Umbraco.Tests.TestHelpers
             FreezeResolution();
 
             InitializeDatabase();
+
+            //ensure the configuration matches the current version for tests
+            SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
         }
 
         protected virtual void FreezeResolution()

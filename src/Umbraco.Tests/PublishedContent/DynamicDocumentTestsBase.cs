@@ -43,6 +43,7 @@ namespace Umbraco.Tests.PublishedContent
 		<content><![CDATA[]]></content>
 		<umbracoUrlAlias><![CDATA[this/is/my/alias, anotheralias]]></umbracoUrlAlias>
 		<umbracoNaviHide>1</umbracoNaviHide>
+        <siteTitle><![CDATA[This is my site]]></siteTitle>
 		<Home id=""1173"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""sub1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173"" isDoc="""">
 			<content><![CDATA[<div>This is some content</div>]]></content>
 			<umbracoUrlAlias><![CDATA[page2/alias, 2ndpagealias]]></umbracoUrlAlias>			
@@ -77,6 +78,38 @@ namespace Umbraco.Tests.PublishedContent
 		/// <param name="id"></param>
 		/// <returns></returns>
 		protected abstract dynamic GetDynamicNode(int id);
+
+        [Test]
+        public void Recursive_Property()
+        {
+            var doc = GetDynamicNode(1174);
+            var prop = doc.GetProperty("siteTitle", true);
+            Assert.IsNotNull(prop);
+            Assert.AreEqual("This is my site", prop.Value);
+            prop = doc.GetProperty("_siteTitle"); //test with underscore prefix
+            Assert.IsNotNull(prop);
+            Assert.AreEqual("This is my site", prop.Value);
+            Assert.AreEqual("This is my site", doc._siteTitle);
+        }
+
+        /// <summary>
+        /// Tests the internal instance level caching of returning properties
+        /// </summary>
+        /// <remarks>
+        /// http://issues.umbraco.org/issue/U4-1824
+        /// http://issues.umbraco.org/issue/U4-1825
+        /// </remarks>
+        [Test]
+        public void Can_Return_Property_And_Value()
+        {
+            var doc = GetDynamicNode(1173);
+
+            Assert.IsTrue(doc.HasProperty("umbracoUrlAlias"));
+            var prop = doc.GetProperty("umbracoUrlAlias");
+            Assert.IsNotNull(prop);
+            Assert.AreEqual("page2/alias, 2ndpagealias", prop.Value);
+            Assert.AreEqual("page2/alias, 2ndpagealias", doc.umbracoUrlAlias);
+        }
 
         /// <summary>
         /// Tests the IsLast method with the result set from a Where statement
