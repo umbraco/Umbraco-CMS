@@ -159,7 +159,7 @@
     <key alias="macroDoesNotHaveProperties">This macro does not contain any properties you can edit</key>
     <key alias="paste">Paste</key>
     <key alias="permissionsEdit">Edit Permissions for</key>
-    <key alias="recycleBinDeleting">The items in the recycle bin is now being deleted. Please do not close this window while this operation takes place</key>
+    <key alias="recycleBinDeleting">The items in the recycle bin are now being deleted. Please do not close this window while this operation takes place</key>
     <key alias="recycleBinIsEmpty">The recycle bin is now empty</key>
     <key alias="recycleBinWarning">When items are deleted from the recycle bin, they will be gone forever</key>
     <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webservice is currently experiencing some problems, which we have no control over. We are very sorry for this inconvenience.]]></key>

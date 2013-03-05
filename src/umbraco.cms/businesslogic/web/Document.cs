@@ -334,7 +334,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetRootContent()", false)]
         public static Document[] GetRootDocuments()
         {
-            var content = ApplicationContext.Current.Services.ContentService.GetRootContent();
+            var content = ApplicationContext.Current.Services.ContentService.GetRootContent().OrderBy(x => x.SortOrder);
             return content.Select(c => new Document(c)).ToArray();
         }
 
@@ -1024,9 +1024,17 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         public override void Move(int newParentId)
         {
-            var current = User.GetCurrent();
-            int userId = current == null ? 0 : current.Id;
-            ApplicationContext.Current.Services.ContentService.Move(Content, newParentId, userId);
+            MoveEventArgs e = new MoveEventArgs();
+            base.FireBeforeMove(e);
+
+            if (!e.Cancel)
+            {
+                var current = User.GetCurrent();
+                int userId = current == null ? 0 : current.Id;
+                ApplicationContext.Current.Services.ContentService.Move(Content, newParentId, userId);
+            }
+
+            base.FireAfterMove(e);
         }
 
         /// <summary>
