@@ -80,6 +80,9 @@ namespace Umbraco.Tests.TestHelpers
 				new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
 
             InitializeDatabase();
+
+            //ensure the configuration matches the current version for tests
+            SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
         }
 
         protected virtual void InitializeDatabase()

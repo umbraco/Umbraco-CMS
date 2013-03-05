@@ -125,14 +125,9 @@ namespace umbraco.presentation.umbraco.Search
 
         private void IndexContent(IContent sender)
         {
-            //we do not need to index this item if it is published, this is because the item will get indexed 
-            // by the UmbracoExamine.UmbracoEventManager when listening to content.AfterUpdateDocumentCache
-
-            if (sender.Published)
-                return;
-
-            //otherwise, we need to check for SupportUnpublishedContent because if we are indexing anything and it is 
-            // not published the indexer will need to support unpublished items.
+            // Only add to indexes that have SupportUnpublishedContent set to true, this is because any indexer
+            // that only supports published content will be notified based on the UmbracoExamineManager.content_AfterUpdateDocumentCache
+            // event handler.
 
             ExamineManager.Instance.ReIndexNode(
                 sender.ToXml(), "content",
