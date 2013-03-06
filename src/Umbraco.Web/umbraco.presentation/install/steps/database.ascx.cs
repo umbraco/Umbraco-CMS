@@ -82,8 +82,8 @@ namespace umbraco.presentation.install.steps
                 var sqlCeDatabaseExists = false;
                 if (dbIsSqlCe)
                 {
-                    var datasource = databaseSettings.ConnectionString.Replace("|DataDirectory|", AppDomain.CurrentDomain.GetData("DataDirectory").ToString() + Path.DirectorySeparatorChar);
-                    var filePath = datasource.Replace("Datasource=", string.Empty);
+                    var datasource = databaseSettings.ConnectionString.Replace("|DataDirectory|", AppDomain.CurrentDomain.GetData("DataDirectory").ToString());
+                    var filePath = datasource.Replace("Data Source=", string.Empty);
                     sqlCeDatabaseExists = File.Exists(filePath);
                 }
 
