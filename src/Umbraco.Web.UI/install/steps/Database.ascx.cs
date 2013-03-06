@@ -82,7 +82,11 @@ namespace Umbraco.Web.UI.Install.Steps
                     dbIsSqlCe = databaseSettings.ProviderName == "System.Data.SqlServerCe.4.0";
                 var sqlCeDatabaseExists = false;
                 if (dbIsSqlCe)
-                    sqlCeDatabaseExists = File.Exists(databaseSettings.ConnectionString.Replace("|DataDirectory|", AppDomain.CurrentDomain.GetData("DataDirectory").ToString()));
+                {
+                    var datasource = databaseSettings.ConnectionString.Replace("|DataDirectory|", AppDomain.CurrentDomain.GetData("DataDirectory").ToString());
+                    var filePath = datasource.Replace("Data Source=", string.Empty);
+                    sqlCeDatabaseExists = File.Exists(filePath);
+                }
 
                 // Either the connection details are not fully specified or it's a SQL CE database that doesn't exist yet
                 if (databaseSettings == null 
