@@ -91,7 +91,7 @@ namespace umbraco.cms.presentation.developer
 
         }
 
-        protected void save_click(object sender, System.Web.UI.ImageClickEventArgs e)
+        protected void save_click(object sender, ImageClickEventArgs e)
         {
             // save prevalues;
             if (_prevalue != null)
@@ -106,7 +106,7 @@ namespace umbraco.cms.presentation.developer
 
             ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.save, ui.Text("speechBubbles", "dataTypeSaved", null), "");
 
-            //Response.Redirect("editDataType.aspx?id=" + _id);
+            ClientTools.SyncTree(dt.Path, true);
         }
 
 

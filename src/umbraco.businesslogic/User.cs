@@ -394,11 +394,17 @@ namespace umbraco.BusinessLogic
         /// <returns>A user or null</returns>
         public static User GetCurrent()
         {
-            if (umbraco.BasePages.BasePage.umbracoUserContextID != "")
-                return BusinessLogic.User.GetUser(umbraco.BasePages.BasePage.GetUserId(umbraco.BasePages.BasePage.umbracoUserContextID));
-            else
+            try
+            {
+                if (umbraco.BasePages.BasePage.umbracoUserContextID != "")
+                    return BusinessLogic.User.GetUser(umbraco.BasePages.BasePage.GetUserId(umbraco.BasePages.BasePage.umbracoUserContextID));
+                else
+                    return null;
+            }
+            catch (Exception)
+            {
                 return null;
-
+            }
         }
 
 		/// <summary>

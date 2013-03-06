@@ -53,11 +53,11 @@ namespace umbraco.DataLayer
 
             if (forceLegacyConnection == false && IsEmbeddedDatabase(connectionString) && connectionString.ToLower().Contains("SQLCE4Umbraco".ToLower()) == false)
             {
-                // Input is : Datasource=|DataDirectory|Umbraco.sdf
-                // Should be: datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf
+                connectionString = connectionString.Replace("Datasource", "Data Source");
 
-                connectionString = connectionString.Replace("Datasource", "data source");
+                if(connectionString.Contains(@"|\") == false)
                 connectionString = connectionString.Insert(connectionString.LastIndexOf('|') + 1, "\\");
+
                 connectionString = string.Format("datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;{0}", connectionString);
             }
 

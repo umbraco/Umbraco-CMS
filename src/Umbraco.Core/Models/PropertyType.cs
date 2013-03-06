@@ -335,8 +335,8 @@ namespace Umbraco.Core.Models
             if (Mandatory && (value == null || string.IsNullOrEmpty(value.ToString())))
                 return false;
 
-            //Check against Regular Expression for Legacy DataTypes
-            if(!string.IsNullOrEmpty(ValidationRegExp))
+            //Check against Regular Expression for Legacy DataTypes - Validation exists and value is not null:
+            if(string.IsNullOrEmpty(ValidationRegExp) == false && (value != null && string.IsNullOrEmpty(value.ToString()) == false))
             {
                 var regexPattern = new Regex(ValidationRegExp);
                 return regexPattern.IsMatch(value.ToString());
