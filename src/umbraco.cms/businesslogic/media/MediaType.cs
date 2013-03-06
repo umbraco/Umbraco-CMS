@@ -139,7 +139,7 @@ namespace umbraco.cms.businesslogic.media
 
                 base.Save();
 
-                FireBeforeSave(e);
+                FireAfterSave(e);
             }
         }
 
