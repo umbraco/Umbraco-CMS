@@ -338,6 +338,9 @@ namespace Umbraco.Core.Models
             //Check against Regular Expression for Legacy DataTypes
             if(!string.IsNullOrEmpty(ValidationRegExp))
             {
+                if (value == null)
+                    return false;
+
                 var regexPattern = new Regex(ValidationRegExp);
                 return regexPattern.IsMatch(value.ToString());
             }
