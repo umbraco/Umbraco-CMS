@@ -22,6 +22,7 @@ namespace Umbraco.Core.Persistence.Mappers
         {
             return MapperCache.GetOrAdd(type, type1 =>
                 {
+                    var mappers = TypeFinder.FindClassesOfTypeWithAttribute<BaseMapper, MapperAttribute>();
 
                     //first check if we can resolve it by attribute
 
