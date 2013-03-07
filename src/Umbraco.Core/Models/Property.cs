@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
@@ -10,6 +11,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
+    [Mapper(typeof(PropertyMapper))]
     public class Property : Entity
     {
         private readonly PropertyType _propertyType;

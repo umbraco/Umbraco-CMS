@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
@@ -14,6 +15,7 @@ namespace Umbraco.Core.Models
     /// </remarks>
     [Serializable]
     [DataContract(IsReference = true)]
+    [Mapper(typeof(DataTypeDefinitionMapper))]
     public class DataTypeDefinition : Entity, IDataTypeDefinition
     {
         private int _parentId;

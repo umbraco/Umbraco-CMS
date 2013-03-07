@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.Serialization;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
@@ -8,6 +9,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
+    [Mapper(typeof(MediaTypeMapper))]
     public class MediaType : ContentTypeCompositionBase, IMediaType
     {
         public MediaType(int parentId) : base(parentId)

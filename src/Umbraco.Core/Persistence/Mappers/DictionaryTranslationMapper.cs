@@ -14,9 +14,9 @@ namespace Umbraco.Core.Persistence.Mappers
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache = new ConcurrentDictionary<string, DtoMapModel>();
 
-        internal static DictionaryTranslationMapper Instance = new DictionaryTranslationMapper();
-
-        private DictionaryTranslationMapper()
+        //NOTE: its an internal class but the ctor must be public since we're using Activator.CreateInstance to create it
+        // otherwise that would fail because there is no public constructor.
+        public DictionaryTranslationMapper()
         {
             BuildMap();
         }

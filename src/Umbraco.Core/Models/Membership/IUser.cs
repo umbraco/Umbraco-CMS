@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models.Membership
 {
@@ -6,6 +7,7 @@ namespace Umbraco.Core.Models.Membership
     /// Defines the interface for a <see cref="User"/>
     /// </summary>
     /// <remarks>Will be left internal until a proper Membership implementation is part of the roadmap</remarks>
+    [Mapper(typeof(UserMapper))]
     internal interface IUser : IMembershipUser
     {
         string Name { get; set; }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models.Membership
 {
@@ -13,6 +14,7 @@ namespace Umbraco.Core.Models.Membership
     /// </remarks>
     [Serializable]
     [DataContract(IsReference = true)]
+    [Mapper(typeof(UserTypeMapper))]
     internal class UserType : Entity, IUserType
     {
         [DataMember]

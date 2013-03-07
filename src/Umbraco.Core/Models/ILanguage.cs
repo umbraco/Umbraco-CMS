@@ -1,9 +1,11 @@
 using System.Globalization;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
+    [Mapper(typeof(LanguageMapper))]
     public interface ILanguage : IAggregateRoot
     {
         /// <summary>

@@ -6,14 +6,13 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
-    
     internal sealed class ServerRegistrationMapper : BaseMapper
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache = new ConcurrentDictionary<string, DtoMapModel>();
 
-        internal static readonly ServerRegistrationMapper Instance = new ServerRegistrationMapper();
-
-        private ServerRegistrationMapper()
+        //NOTE: its an internal class but the ctor must be public since we're using Activator.CreateInstance to create it
+        // otherwise that would fail because there is no public constructor.
+        public ServerRegistrationMapper()
         {
             BuildMap();
         }

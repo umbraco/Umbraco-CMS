@@ -5,7 +5,7 @@ using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Models
 {
-    
+    [Mapper(typeof(ServerRegistrationMapper))]
     internal class ServerRegistration : Entity, IServerAddress, IAggregateRoot
     {
         public ServerRegistration()

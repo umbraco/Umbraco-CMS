@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Core.Models
+﻿using Umbraco.Core.Persistence.Mappers;
+
+namespace Umbraco.Core.Models
 {
+    [Mapper(typeof(MediaMapper))]
     public interface IMedia : IContentBase
     {
         /// <summary>
