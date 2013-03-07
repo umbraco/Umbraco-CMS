@@ -119,22 +119,27 @@ namespace Umbraco.Core.Persistence.Repositories
                 var tabDto = propertyFactory.BuildGroupDto(propertyGroup);
                 var primaryKey = Convert.ToInt32(Database.Insert(tabDto));
                 propertyGroup.Id = primaryKey;//Set Id on PropertyGroup
+
+                //Ensure that the PropertyGroup's Id is set on the PropertyTypes within a group
+                //unless the PropertyGroupId has already been changed.
+                foreach (var propertyType in propertyGroup.PropertyTypes)
+                {
+                    if (propertyType.IsPropertyDirty("PropertyGroupId") == false)
+                        propertyType.PropertyGroupId = propertyGroup.Id;
+                }
             }
 
             //Insert PropertyTypes
-            foreach (var propertyGroup in entity.PropertyGroups)
+            foreach (var propertyType in entity.PropertyTypes)
             {
-                foreach (var propertyType in propertyGroup.PropertyTypes)
-                {
-                    var propertyTypeDto = propertyFactory.BuildPropertyTypeDto(propertyGroup.Id, propertyType);
-                    var primaryKey = Convert.ToInt32(Database.Insert(propertyTypeDto));
-                    propertyType.Id = primaryKey;//Set Id on PropertyType
+                var propertyTypeDto = propertyFactory.BuildPropertyTypeDto(propertyType.PropertyGroupId, propertyType);
+                int typePrimaryKey = Convert.ToInt32(Database.Insert(propertyTypeDto));
+                propertyType.Id = typePrimaryKey; //Set Id on new PropertyType
 
-                    //Update the current PropertyType with correct ControlId and DatabaseType
-                    var dataTypeDto = Database.FirstOrDefault<DataTypeDto>("WHERE nodeId = @Id", new { Id = propertyTypeDto.DataTypeId });
-                    propertyType.DataTypeId = dataTypeDto.ControlId;
-                    propertyType.DataTypeDatabaseType = dataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true);
-                }
+                //Update the current PropertyType with correct ControlId and DatabaseType
+                var dataTypeDto = Database.FirstOrDefault<DataTypeDto>("WHERE nodeId = @Id", new { Id = propertyTypeDto.DataTypeId });
+                propertyType.DataTypeId = dataTypeDto.ControlId;
+                propertyType.DataTypeDatabaseType = dataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true);
             }
         }
 
