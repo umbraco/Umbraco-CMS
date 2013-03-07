@@ -1091,8 +1091,7 @@ namespace umbraco
                     string sql =
                         @"select umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, cmsContentXml.xml from umbracoNode 
 inner join cmsContentXml on cmsContentXml.nodeId = umbracoNode.id and umbracoNode.nodeObjectType = @type
-inner join cmsDocument on cmsDocument.nodeId = umbracoNode.id
-where cmsDocument.published = 1 
+where umbracoNode.id in (select cmsDocument.nodeId from cmsDocument where cmsDocument.published = 1)
 order by umbracoNode.level, umbracoNode.sortOrder";
 
                     lock (DbReadSyncLock)
