@@ -231,13 +231,19 @@ namespace Umbraco.Core.IO
                 filePath = String.Empty;
             }
 
+            //Break up the file in name and extension before applying the UrlReplaceCharacters
+            var fileNamePart = filePath.Substring(0, filePath.LastIndexOf('.'));
+            var ext = filePath.Substring(filePath.LastIndexOf('.'));
+
             //Because the file usually is downloadable as well we check characters against 'UmbracoSettings.UrlReplaceCharacters'
             XmlNode replaceChars = UmbracoSettings.UrlReplaceCharacters;
             foreach (XmlNode n in replaceChars.SelectNodes("char"))
             {
                 if (n.Attributes.GetNamedItem("org") != null && n.Attributes.GetNamedItem("org").Value != "")
-                    filePath = filePath.Replace(n.Attributes.GetNamedItem("org").Value, XmlHelper.GetNodeValue(n));
+                    fileNamePart = fileNamePart.Replace(n.Attributes.GetNamedItem("org").Value, XmlHelper.GetNodeValue(n));
             }
+
+            filePath = string.Concat(fileNamePart, ext);
 
             // Adapted from: http://stackoverflow.com/a/4827510/5018
             // Combined both Reserved Characters and Character Data 
