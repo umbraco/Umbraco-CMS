@@ -1214,6 +1214,12 @@ namespace Umbraco.Core.Configuration
 				}
 				return _defaultRenderingEngine.Value;
 			}
+            //internal set
+            //{
+            //    _defaultRenderingEngine = value;
+            //    var node = UmbracoSettingsXmlDoc.DocumentElement.SelectSingleNode("/settings/templates/defaultRenderingEngine");
+            //    node.InnerText = value.ToString();
+            //}
 		}
 
 

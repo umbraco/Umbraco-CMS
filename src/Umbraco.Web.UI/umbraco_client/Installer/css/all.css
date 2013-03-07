@@ -1166,7 +1166,16 @@ figure{display: block;}
 {
     display:none;
 }
-.custom
-{
-    display:
+
+.database-hold{
+	width:100%;
+	overflow:hidden;
+}
+
+.step.rendering-engine input[type="radio"] {
+    margin: 0px 5px 0px 5px;
+}
+
+.step.rendering-engine > div {
+    line-height: 25px;
 }

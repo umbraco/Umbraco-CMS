@@ -12,7 +12,7 @@ namespace Umbraco.Web.UI.Install.Steps
             return defaultPage.step.Value;
         }
 
-        protected void GotoNextStep(object sender, EventArgs e)
+        protected virtual void GotoNextStep(object sender, EventArgs e)
         {
             InstallHelper.RedirectToNextStep(Page, GetCurrentStep());
         }

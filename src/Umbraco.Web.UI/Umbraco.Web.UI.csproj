@@ -318,6 +318,13 @@
     <Compile Include="Install\Steps\Renaming.ascx.designer.cs">
       <DependentUpon>renaming.ascx</DependentUpon>
     </Compile>
+    <Compile Include="Install\Steps\RenderingEngine.ascx.cs">
+      <DependentUpon>RenderingEngine.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Install\Steps\RenderingEngine.ascx.designer.cs">
+      <DependentUpon>RenderingEngine.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Install\Steps\Skinning\loadStarterKitDesigns.ascx.designer.cs">
       <DependentUpon>loadStarterKitDesigns.ascx</DependentUpon>
     </Compile>
@@ -536,6 +543,7 @@
       <DependentUpon>UI.xml</DependentUpon>
     </None>
     <Content Include="Global.asax" />
+    <Content Include="Install\Steps\RenderingEngine.ascx" />
     <Content Include="Umbraco\Config\Lang\en_us.xml" />
     <Content Include="Umbraco\Config\Lang\he.xml" />
     <Content Include="Umbraco\Config\Lang\ja.xml" />

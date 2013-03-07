@@ -291,6 +291,7 @@
     <Compile Include="Install\Steps\DefaultUser.cs" />
     <Compile Include="Install\Steps\FilePermissions.cs" />
     <Compile Include="Install\Steps\License.cs" />
+    <Compile Include="Install\Steps\RenderingEngine.cs" />
     <Compile Include="Install\Steps\Skinning.cs" />
     <Compile Include="Install\Steps\TheEnd.cs" />
     <Compile Include="Install\Steps\WebPi.cs" />

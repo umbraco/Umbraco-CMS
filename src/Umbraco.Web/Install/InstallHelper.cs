@@ -13,6 +13,7 @@ namespace Umbraco.Web.Install
                 new Steps.FilePermissions(),
                 new Steps.Database(),
                 new Steps.DefaultUser(),
+                //new Steps.RenderingEngine(),
                 new Steps.Skinning(),
                 new Steps.WebPi(),
                 new Steps.TheEnd()
