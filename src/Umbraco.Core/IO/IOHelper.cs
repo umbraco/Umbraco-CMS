@@ -235,7 +235,7 @@ namespace Umbraco.Core.IO
             // from http://en.wikipedia.org/wiki/Percent-encoding
             var stringBuilder = new StringBuilder();
 
-            const string reservedCharacters = "!*'();:@&=+$,/?%#[]-~{}\"<>\\^`| ";
+            const string reservedCharacters = "æøåÆØÅ!*'();:@&=+$,/?%#[]-~{}\"<>\\^`| ";
 
             foreach (var character in filePath)
             {
