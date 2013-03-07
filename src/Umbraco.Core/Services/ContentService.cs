@@ -194,7 +194,7 @@ namespace Umbraco.Core.Services
 		{
 			using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
 			{
-                var query = Query<IContent>.Builder.Where(x => x.Level == level && x.Path.Contains("-20") == false);
+                var query = Query<IContent>.Builder.Where(x => x.Level == level && !x.Path.StartsWith("-20"));
 				var contents = repository.GetByQuery(query);
 
 				return contents;

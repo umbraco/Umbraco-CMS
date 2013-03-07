@@ -155,7 +155,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateMediaRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IMedia>.Builder.Where(x => x.Level == level && x.Path.Contains("-21") == false);
+                var query = Query<IMedia>.Builder.Where(x => x.Level == level && !x.Path.StartsWith("-21"));
                 var contents = repository.GetByQuery(query);
 
                 return contents;
