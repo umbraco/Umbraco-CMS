@@ -8,6 +8,7 @@ using System.IO;
 using System.Configuration;
 using System.Web;
 using System.Text.RegularExpressions;
+using System.Xml;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 
@@ -230,12 +231,20 @@ namespace Umbraco.Core.IO
                 filePath = String.Empty;
             }
 
+            //Because the file usually is downloadable as well we check characters against 'UmbracoSettings.UrlReplaceCharacters'
+            XmlNode replaceChars = UmbracoSettings.UrlReplaceCharacters;
+            foreach (XmlNode n in replaceChars.SelectNodes("char"))
+            {
+                if (n.Attributes.GetNamedItem("org") != null && n.Attributes.GetNamedItem("org").Value != "")
+                    filePath = filePath.Replace(n.Attributes.GetNamedItem("org").Value, XmlHelper.GetNodeValue(n));
+            }
+
             // Adapted from: http://stackoverflow.com/a/4827510/5018
             // Combined both Reserved Characters and Character Data 
             // from http://en.wikipedia.org/wiki/Percent-encoding
             var stringBuilder = new StringBuilder();
 
-            const string reservedCharacters = "æøåÆØÅ!*'();:@&=+$,/?%#[]-~{}\"<>\\^`| ";
+            const string reservedCharacters = "!*'();:@&=+$,/?%#[]-~{}\"<>\\^`| ";
 
             foreach (var character in filePath)
             {
