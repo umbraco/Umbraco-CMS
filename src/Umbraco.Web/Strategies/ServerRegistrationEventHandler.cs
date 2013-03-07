@@ -7,6 +7,7 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Routing;
 
@@ -29,6 +30,14 @@ namespace Umbraco.Web.Strategies
         private static bool _initUpdated = false;
         private static DateTime _lastUpdated = DateTime.MinValue;
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
+
+
+        //protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        //{            
+        //    ServerRegistrarResolver.Current.SetServerRegistrar(
+        //        new DatabaseServerRegistrar(
+        //            new Lazy<ServerRegistrationService>(() => applicationContext.Services.ServerRegistrationService)));
+        //}
 
         /// <summary>
         /// Update the database with this entry and bind to request events
@@ -98,7 +107,6 @@ namespace Umbraco.Web.Strategies
         {
             try
             {
-                //var asdf = GetBindings(httpContext);
                 var address = httpContext.Request.Url.GetLeftPart(UriPartial.Authority);
                 applicationContext.Services.ServerRegistrationService.EnsureActive(address);
             }

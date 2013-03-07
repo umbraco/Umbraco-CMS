@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Sync
@@ -9,16 +10,16 @@ namespace Umbraco.Core.Sync
     /// </summary>
     internal class DatabaseServerRegistrar : IServerRegistrar
     {
-        private readonly ServerRegistrationService _registrationService;
+        private readonly Lazy<ServerRegistrationService> _registrationService;
 
-        public DatabaseServerRegistrar(ServerRegistrationService registrationService)
+        public DatabaseServerRegistrar(Lazy<ServerRegistrationService> registrationService)
         {
             _registrationService = registrationService;
         }
 
         public IEnumerable<IServerAddress> Registrations
         {
-            get { return _registrationService.GetActiveServers(); }
+            get { return _registrationService.Value.GetActiveServers(); }
         }
     }
 }
