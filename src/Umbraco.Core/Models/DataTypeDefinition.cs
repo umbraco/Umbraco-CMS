@@ -172,7 +172,9 @@ namespace Umbraco.Core.Models
         internal override void AddingEntity()
         {
             base.AddingEntity();
-            Key = Guid.NewGuid();
+
+            if(Key == default(Guid))
+                Key = Guid.NewGuid();
         }
     }
 }
