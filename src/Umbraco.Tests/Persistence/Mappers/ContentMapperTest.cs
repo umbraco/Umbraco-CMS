@@ -11,7 +11,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Id_Property()
         {
             // Arrange
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
             string column = ContentMapper.Instance.Map("Id");
@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Trashed_Property()
         {
             // Arrange
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
             string column = ContentMapper.Instance.Map("Trashed");
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Published_Property()
         {
             // Arrange
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
             string column = ContentMapper.Instance.Map("Published");
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Version_Property()
         {
             // Arrange
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
             string column = ContentMapper.Instance.Map("Version");

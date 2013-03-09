@@ -33,10 +33,10 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
                 if (string.IsNullOrEmpty(ForeignKey.Name))
                     ForeignKey.Name = string.Format("{0}_ibfk_1", ForeignKey.ForeignTable.ToLower());
 
-                return string.Format(SyntaxConfig.SqlSyntaxProvider.DeleteConstraint,
-                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(ForeignKey.ForeignTable),
+                return string.Format(SqlSyntaxContext.SqlSyntaxProvider.DeleteConstraint,
+                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(ForeignKey.ForeignTable),
                                  "FOREIGN KEY ",
-                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedName(ForeignKey.Name));
+                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedName(ForeignKey.Name));
             }
 
             if (string.IsNullOrEmpty(ForeignKey.Name))
@@ -44,9 +44,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
                 ForeignKey.Name = string.Format("FK_{0}_{1}", ForeignKey.ForeignTable, ForeignKey.PrimaryTable);
             }
 
-            return string.Format(SyntaxConfig.SqlSyntaxProvider.DeleteConstraint,
-                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(ForeignKey.ForeignTable),
-                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedName(ForeignKey.Name));
+            return string.Format(SqlSyntaxContext.SqlSyntaxProvider.DeleteConstraint,
+                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(ForeignKey.ForeignTable),
+                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedName(ForeignKey.Name));
         }
     }
 }

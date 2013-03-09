@@ -1,28 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
     /// <summary>
-    /// Static class that provides simple access to the Sql CE SqlSyntax Providers singleton
+    /// Static class that provides simple access to the Sql CE SqlSyntax Provider
     /// </summary>
     internal static class SqlCeSyntax
     {
-        public static ISqlSyntaxProvider Provider { get { return SqlCeSyntaxProvider.Instance; } }
+        public static ISqlSyntaxProvider Provider { get { return new SqlCeSyntaxProvider(); } }
     }
 
     /// <summary>
     /// Represents an SqlSyntaxProvider for Sql Ce
     /// </summary>
-    internal class SqlCeSyntaxProvider : SqlSyntaxProviderBase<SqlCeSyntaxProvider>
+    [SqlSyntaxProviderAttribute("System.Data.SqlServerCe.4.0")]
+    public class SqlCeSyntaxProvider : SqlSyntaxProviderBase<SqlCeSyntaxProvider>
     {
-        public static SqlCeSyntaxProvider Instance = new SqlCeSyntaxProvider();
-
-        private SqlCeSyntaxProvider()
+        public SqlCeSyntaxProvider()
         {
             StringLengthColumnDefinitionFormat = StringLengthUnicodeColumnDefinitionFormat;
             StringColumnDefinition = string.Format(StringLengthColumnDefinitionFormat, DefaultStringLength);

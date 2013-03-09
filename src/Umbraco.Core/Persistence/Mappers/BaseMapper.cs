@@ -30,8 +30,8 @@ namespace Umbraco.Core.Persistence.Mappers
             string columnName = columnAttribute.Name;
 
             string columnMap = string.Format("{0}.{1}",
-                                             SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName),
-                                             SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(columnName));
+                                             SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName),
+                                             SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(columnName));
             return columnMap;
         }
     }

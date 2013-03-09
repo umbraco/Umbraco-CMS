@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
@@ -10,6 +8,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
@@ -65,17 +64,16 @@ namespace Umbraco.Core
 			//create the ApplicationContext
 			ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext);
 
-            //initialize the DatabaseContext
-			dbContext.Initialize();
-
             InitializeApplicationEventsResolver();
 
 			InitializeResolvers();
-            
+
+            //initialize the DatabaseContext
+            dbContext.Initialize();
+
             //now we need to call the initialize methods
             ApplicationEventsResolver.Current.ApplicationEventHandlers
                 .ForEach(x => x.OnApplicationInitialized(UmbracoApplication, ApplicationContext));
-
 
 			_isInitialized = true;
 
@@ -168,6 +166,12 @@ namespace Umbraco.Core
 		{
 			RepositoryResolver.Current = new RepositoryResolver(
 				new RepositoryFactory());
+
+		    SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
+		        PluginManager.Current.ResolveSqlSyntaxProviders())
+		        {
+		            CanResolveBeforeFrozen = true
+		        };
 
 			CacheRefreshersResolver.Current = new CacheRefreshersResolver(
 				() => PluginManager.Current.ResolveCacheRefreshers());

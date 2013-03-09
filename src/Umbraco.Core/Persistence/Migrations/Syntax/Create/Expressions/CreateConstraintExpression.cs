@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions
         {
             var constraintType = (Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
 
-            if (Constraint.IsPrimaryKeyConstraint && SyntaxConfig.SqlSyntaxProvider.SupportsClustered())
+            if (Constraint.IsPrimaryKeyConstraint && SqlSyntaxContext.SqlSyntaxProvider.SupportsClustered())
                 constraintType += " CLUSTERED";
 
             if (Constraint.IsNonUniqueConstraint)
@@ -27,12 +27,12 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions
 
             for (int i = 0; i < Constraint.Columns.Count; i++)
             {
-                columns[i] = SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(Constraint.Columns.ElementAt(i));
+                columns[i] = SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(Constraint.Columns.ElementAt(i));
             }
 
-            return string.Format(SyntaxConfig.SqlSyntaxProvider.CreateConstraint,
-                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(Constraint.TableName),
-                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedName(Constraint.ConstraintName),
+            return string.Format(SqlSyntaxContext.SqlSyntaxProvider.CreateConstraint,
+                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(Constraint.TableName),
+                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedName(Constraint.ConstraintName),
                                  constraintType,
                                  string.Join(", ", columns));
         }

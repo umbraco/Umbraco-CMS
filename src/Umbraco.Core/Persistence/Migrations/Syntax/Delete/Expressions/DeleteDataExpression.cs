@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 
             if (IsAllRows)
             {
-                deleteItems.Add(string.Format(SyntaxConfig.SqlSyntaxProvider.DeleteData, SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(TableName), "1 = 1"));
+                deleteItems.Add(string.Format(SqlSyntaxContext.SqlSyntaxProvider.DeleteData, SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(TableName), "1 = 1"));
             }
             else
             {
@@ -42,13 +42,13 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
                     foreach (KeyValuePair<string, object> item in row)
                     {
                         whereClauses.Add(string.Format("{0} {1} {2}",
-                                                       SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(item.Key),
+                                                       SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(item.Key),
                                                        item.Value == null ? "IS" : "=",
-                                                       SyntaxConfig.SqlSyntaxProvider.GetQuotedValue(item.Value.ToString())));
+                                                       SqlSyntaxContext.SqlSyntaxProvider.GetQuotedValue(item.Value.ToString())));
                     }
 
-                    deleteItems.Add(string.Format(SyntaxConfig.SqlSyntaxProvider.DeleteData,
-                                                  SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(TableName),
+                    deleteItems.Add(string.Format(SqlSyntaxContext.SqlSyntaxProvider.DeleteData,
+                                                  SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(TableName),
                                                   String.Join(" AND ", whereClauses.ToArray())));
                 }
             }

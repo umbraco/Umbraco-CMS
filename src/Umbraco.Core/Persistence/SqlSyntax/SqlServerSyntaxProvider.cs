@@ -6,21 +6,20 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
     /// <summary>
-    /// Static class that provides simple access to the Sql Server SqlSyntax Providers singleton
+    /// Static class that provides simple access to the Sql Server SqlSyntax Provider
     /// </summary>
     internal static class SqlServerSyntax
     {
-        public static ISqlSyntaxProvider Provider { get { return SqlServerSyntaxProvider.Instance; } }
+        public static ISqlSyntaxProvider Provider { get { return new SqlServerSyntaxProvider(); } }
     }
 
     /// <summary>
     /// Represents an SqlSyntaxProvider for Sql Server
     /// </summary>
-    internal class SqlServerSyntaxProvider : SqlSyntaxProviderBase<SqlServerSyntaxProvider>
+    [SqlSyntaxProviderAttribute("System.Data.SqlClient")]
+    public class SqlServerSyntaxProvider : SqlSyntaxProviderBase<SqlServerSyntaxProvider>
     {
-        public static SqlServerSyntaxProvider Instance = new SqlServerSyntaxProvider();
-
-        private SqlServerSyntaxProvider()
+        public SqlServerSyntaxProvider()
         {
             StringLengthColumnDefinitionFormat = StringLengthUnicodeColumnDefinitionFormat;
             StringColumnDefinition = string.Format(StringLengthColumnDefinitionFormat, DefaultStringLength);

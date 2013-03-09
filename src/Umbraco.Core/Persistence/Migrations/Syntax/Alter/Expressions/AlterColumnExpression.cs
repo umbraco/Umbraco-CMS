@@ -21,9 +21,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 
         public override string ToString()
         {
-            return string.Format(SyntaxConfig.SqlSyntaxProvider.AlterColumn,
-                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(TableName),
-                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(Column.Name));
+            return string.Format(SqlSyntaxContext.SqlSyntaxProvider.AlterColumn,
+                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(TableName),
+                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(Column.Name));
         }
     }
 }

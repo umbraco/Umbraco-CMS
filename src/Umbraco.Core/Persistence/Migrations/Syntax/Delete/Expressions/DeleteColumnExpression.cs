@@ -31,9 +31,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
             foreach (string columnName in ColumnNames)
             {
                 if (ColumnNames.First() != columnName) sb.AppendLine(";");
-                sb.AppendFormat(SyntaxConfig.SqlSyntaxProvider.DropColumn,
-                                SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(TableName),
-                                SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(columnName));
+                sb.AppendFormat(SqlSyntaxContext.SqlSyntaxProvider.DropColumn,
+                                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(TableName),
+                                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(columnName));
             }
 
             return sb.ToString();

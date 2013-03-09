@@ -72,13 +72,13 @@ namespace Umbraco.Tests.Migrations.Upgrades
             var engine = new SqlCeEngine(settings.ConnectionString);
             engine.CreateDatabase();
 
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
         }
 
         [TearDown]
         public virtual void TearDown()
         {
-            SyntaxConfig.SqlSyntaxProvider = null;
+            SqlSyntaxContext.SqlSyntaxProvider = null;
             Resolution.IsFrozen = false;
 
             TestHelper.CleanContentDirectories();

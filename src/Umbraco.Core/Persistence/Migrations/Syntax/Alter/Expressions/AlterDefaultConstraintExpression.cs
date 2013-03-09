@@ -22,9 +22,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
         {
             //NOTE Should probably investigate if Deleting a Default Constraint is different from deleting a 'regular' constraint
 
-            return string.Format(SyntaxConfig.SqlSyntaxProvider.DeleteConstraint,
-                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(TableName),
-                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedName(ConstraintName));
+            return string.Format(SqlSyntaxContext.SqlSyntaxProvider.DeleteConstraint,
+                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(TableName),
+                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedName(ConstraintName));
         }
     }
 }

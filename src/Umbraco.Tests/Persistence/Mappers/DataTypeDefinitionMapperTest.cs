@@ -11,7 +11,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Id_Property()
         {
             // Arrange
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
             string column = DataTypeDefinitionMapper.Instance.Map("Id");
@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Key_Property()
         {
             // Arrange
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
             string column = DataTypeDefinitionMapper.Instance.Map("Key");
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_DatabaseType_Property()
         {
             // Arrange
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
             string column = DataTypeDefinitionMapper.Instance.Map("DatabaseType");
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_ControlId_Property()
         {
             // Arrange
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
             string column = DataTypeDefinitionMapper.Instance.Map("ControlId");

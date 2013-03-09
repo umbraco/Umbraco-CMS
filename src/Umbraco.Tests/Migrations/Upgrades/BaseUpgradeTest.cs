@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
             DatabaseSpecificSetUp();
 
-            SyntaxConfig.SqlSyntaxProvider = GetSyntaxProvider();
+            SqlSyntaxContext.SqlSyntaxProvider = GetSyntaxProvider();
         }
 
         [Test]
@@ -91,7 +91,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         public virtual void TearDown()
         {
             PluginManager.Current = null;
-            SyntaxConfig.SqlSyntaxProvider = null;
+            SqlSyntaxContext.SqlSyntaxProvider = null;
 			MigrationResolver.Reset();
 	        Resolution.IsFrozen = false;
 

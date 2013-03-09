@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Persistence
                 //assign the service context
                 new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
 
-            SyntaxConfig.SqlSyntaxProvider = SqlServerSyntaxProvider.Instance;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlServerSyntax.Provider;
 
             _database = new Database(@"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco",
                                      "System.Data.SqlClient");
@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Persistence
         {
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
-            SyntaxConfig.SqlSyntaxProvider = null;
+            SqlSyntaxContext.SqlSyntaxProvider = null;
 
             //reset the app context
             ApplicationContext.Current = null;

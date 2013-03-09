@@ -31,8 +31,8 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Update.Expressions
             foreach (var item in Set)
             {
                 updateItems.Add(string.Format("{0} = {1}",
-                                              SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(item.Key),
-                                              SyntaxConfig.SqlSyntaxProvider.GetQuotedValue(item.Value.ToString())));
+                                              SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(item.Key),
+                                              SqlSyntaxContext.SqlSyntaxProvider.GetQuotedValue(item.Value.ToString())));
             }
 
             if (IsAllRows)
@@ -44,13 +44,13 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Update.Expressions
                 foreach (var item in Where)
                 {
                     whereClauses.Add(string.Format("{0} {1} {2}",
-                                                   SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(item.Key),
+                                                   SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(item.Key),
                                                    item.Value == null ? "IS" : "=",
-                                                   SyntaxConfig.SqlSyntaxProvider.GetQuotedValue(item.Value.ToString())));
+                                                   SqlSyntaxContext.SqlSyntaxProvider.GetQuotedValue(item.Value.ToString())));
                 }
             }
-            return string.Format(SyntaxConfig.SqlSyntaxProvider.UpdateData,
-                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(TableName),
+            return string.Format(SqlSyntaxContext.SqlSyntaxProvider.UpdateData,
+                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(TableName),
                                  string.Join(", ", updateItems.ToArray()), 
                                  string.Join(" AND ", whereClauses.ToArray()));
         }

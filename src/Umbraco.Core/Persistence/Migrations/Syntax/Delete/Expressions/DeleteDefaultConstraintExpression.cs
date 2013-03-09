@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
             if (IsExpressionSupported() == false)
                 return string.Empty;
 
-            return string.Format(SyntaxConfig.SqlSyntaxProvider.DeleteDefaultConstraint,
+            return string.Format(SqlSyntaxContext.SqlSyntaxProvider.DeleteDefaultConstraint,
                                  TableName,
                                  ColumnName);
         }

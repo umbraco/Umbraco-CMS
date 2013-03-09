@@ -487,8 +487,8 @@ namespace Umbraco.Core.Persistence.Querying
         {
             var column = pocoData.Columns.FirstOrDefault(x => x.Value.PropertyInfo.Name == name);
             return string.Format("{0}.{1}",
-                SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(pocoData.TableInfo.TableName),
-                SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(column.Value.ColumnName));
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(pocoData.TableInfo.TableName),
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(column.Value.ColumnName));
         }
 
         protected string RemoveQuote(string exp)
