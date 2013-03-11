@@ -296,5 +296,52 @@ namespace Umbraco.Tests.CoreStrings
             // legacy does nothing
             Assert.AreEqual(input, output);
         }
+
+        [Test] // can't do cases with an IDictionary
+        public void ReplaceManyWithCharMap()
+        {
+            const string input = "télévisiön tzvâr ßup &nbsp; pof";
+            const string expected = "television tzvar ssup   pof";
+            IDictionary<string, string> replacements = new Dictionary<string, string>
+                {
+                    { "é", "e" },
+                    { "ö", "o" },
+                    { "â", "a" },
+                    { "ß", "ss" },
+                    { "&nbsp;", " " },
+                };
+            var output = _helper.ReplaceMany(input, replacements);
+            Assert.AreEqual(expected, output);
+        }
+
+        #region Cases
+        [TestCase("val$id!ate|this|str'ing", "$!'", '-', "val-id-ate|this|str-ing")]
+        [TestCase("val$id!ate|this|str'ing", "$!'", '*', "val*id*ate|this|str*ing")]
+        #endregion
+        public void ReplaceManyByOneChar(string input, string toReplace, char replacement, string expected)
+        {
+            var output = _helper.ReplaceMany(input, toReplace.ToArray(), replacement);
+            Assert.AreEqual(expected, output);
+        }
+
+        #region Cases
+        [TestCase("foo.txt", "foo.txt")]
+        [TestCase("foo", "foo", IgnoreReason = "fails when no extension")]
+        [TestCase(".txt", ".txt")]
+        [TestCase("nag*dog/poo:xit.txt", "nag-dog-poo-xit.txt")]
+        [TestCase("the dog is in the house.txt", "the-dog-is-in-the-house.txt")]
+        [TestCase("nil.nil.nil.txt", "nilnilnil.txt")] // because of chars map
+        [TestCase("taradabum", "taradabum", IgnoreReason = "fails when no extension")]
+        [TestCase("tara$$da:b/u<m", "tara-da-b-u-m", IgnoreReason = "fails when no extension")]
+        [TestCase("Straße Zvöskî.yop", "Strasse-Zvoeskî.yop")] // because of chars map + does not lowercase
+        [TestCase("yop.Straße Zvöskî", "yop.Straße-Zvöskî")] // also note that neither î nor ß are removed, not in the map
+        [TestCase("yop.Straße Zvös--kî", "yop.Straße-Zvös-kî")] // and finaly, not the same rule for ext eg ö...
+        [TestCase("ma--ma---ma.ma-----ma", "ma-ma-ma.ma-ma")]
+        #endregion
+        public void CleanStringForSafeFileName(string input, string expected)
+        {
+            var output = _helper.CleanStringForSafeFileName(input);
+            Assert.AreEqual(expected, output);
+        }
     }
 }

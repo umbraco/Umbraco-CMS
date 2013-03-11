@@ -56,6 +56,25 @@ namespace Umbraco.Core.Strings
         string CleanStringForUrlSegment(string text, CultureInfo culture);
 
         /// <summary>
+        /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
+        /// both internally (on disk) and externally (as a url).
+        /// </summary>
+        /// <param name="text">The text to filter.</param>
+        /// <returns>The safe filename.</returns>
+        /// <remarks>Legacy says this was used to "overcome an issue when Umbraco is used in IE in an intranet environment" but that issue is not documented.</remarks>
+        string CleanStringForSafeFileName(string text);
+
+        /// <summary>
+        /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used as a filename,
+        /// both internally (on disk) and externally (as a url).
+        /// </summary>
+        /// <param name="text">The text to filter.</param>
+        /// <param name="culture">The culture.</param>
+        /// <returns>The safe filename.</returns>
+        /// <remarks>Legacy says this was used to "overcome an issue when Umbraco is used in IE in an intranet environment" but that issue is not documented.</remarks>
+        string CleanStringForSafeFileName(string text, CultureInfo culture);
+
+        /// <summary>
         /// Splits a pascal-cased string by inserting a separator in between each term.
         /// </summary>
         /// <param name="text">The text to split.</param>
@@ -71,6 +90,15 @@ namespace Umbraco.Core.Strings
         /// <param name="replacements">The replacements definition.</param>
         /// <returns>The filtered string.</returns>
         string ReplaceMany(string text, IDictionary<string, string> replacements);
+
+        /// <summary>
+        /// Returns a new string in which all occurences of specified characters are replaced by a specified character.
+        /// </summary>
+        /// <param name="text">The string to filter.</param>
+        /// <param name="chars">The characters to replace.</param>
+        /// <param name="replacement">The replacement character.</param>
+        /// <returns>The filtered string.</returns>
+        string ReplaceMany(string text, char[] chars, char replacement);
 
         /// <summary>
         /// Cleans a string.

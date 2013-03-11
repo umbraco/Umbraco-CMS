@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -169,6 +170,83 @@ function isValidAlias(alias) {{
         public string CleanStringForUrlSegment(string text, CultureInfo culture)
         {
             return CleanStringForUrlSegment(text);
+        }
+
+        /// <summary>
+        /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
+        /// both internally (on disk) and externally (as a url).
+        /// </summary>
+        /// <param name="text">The text to filter.</param>
+        /// <returns>The safe filename.</returns>
+        /// <remarks>Legacy says this was used to "overcome an issue when Umbraco is used in IE in an intranet environment" but that issue is not documented.</remarks>
+        public string CleanStringForSafeFileName(string text)
+        {
+            var filePath = text;
+
+            // ported from Core.IO.IOHelper.SafeFileName()
+
+            if (String.IsNullOrEmpty(filePath))
+                return String.Empty;
+
+            if (!String.IsNullOrWhiteSpace(filePath))
+            {
+                foreach (var character in Path.GetInvalidFileNameChars())
+                {
+                    filePath = filePath.Replace(character, '-');
+                }
+            }
+            else
+            {
+                filePath = String.Empty;
+            }
+
+            //Break up the file in name and extension before applying the UrlReplaceCharacters
+            var fileNamePart = filePath.Substring(0, filePath.LastIndexOf('.'));
+            var ext = filePath.Substring(filePath.LastIndexOf('.'));
+
+            //Because the file usually is downloadable as well we check characters against 'UmbracoSettings.UrlReplaceCharacters'
+            XmlNode replaceChars = UmbracoSettings.UrlReplaceCharacters;
+            foreach (XmlNode n in replaceChars.SelectNodes("char"))
+            {
+                if (n.Attributes.GetNamedItem("org") != null && n.Attributes.GetNamedItem("org").Value != "")
+                    fileNamePart = fileNamePart.Replace(n.Attributes.GetNamedItem("org").Value, XmlHelper.GetNodeValue(n));
+            }
+
+            filePath = string.Concat(fileNamePart, ext);
+
+            // Adapted from: http://stackoverflow.com/a/4827510/5018
+            // Combined both Reserved Characters and Character Data 
+            // from http://en.wikipedia.org/wiki/Percent-encoding
+            var stringBuilder = new StringBuilder();
+
+            const string reservedCharacters = "!*'();:@&=+$,/?%#[]-~{}\"<>\\^`| ";
+
+            foreach (var character in filePath)
+            {
+                if (reservedCharacters.IndexOf(character) == -1)
+                    stringBuilder.Append(character);
+                else
+                    stringBuilder.Append("-");
+            }
+
+            // Remove repeating dashes
+            // From: http://stackoverflow.com/questions/5111967/regex-to-remove-a-specific-repeated-character
+            var reducedString = Regex.Replace(stringBuilder.ToString(), "-+", "-");
+
+            return reducedString;
+        }
+
+        /// <summary>
+        /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
+        /// both internally (on disk) and externally (as a url).
+        /// </summary>
+        /// <param name="text">The text to filter.</param>
+        /// <param name="culture">The culture.</param>
+        /// <returns>The safe filename.</returns>
+        /// <remarks>Legacy does not support culture contexts.</remarks>
+        public string CleanStringForSafeFileName(string text, CultureInfo culture)
+        {
+            return CleanStringForSafeFileName(text);
         }
 
         #endregion
@@ -428,6 +506,26 @@ function isValidAlias(alias) {{
             // in turn by another replacement (ie the order of replacements is important)
 
             return replacements.Aggregate(text, (current, kvp) => current.Replace(kvp.Key, kvp.Value));
+        }
+
+        /// <summary>
+        /// Returns a new string in which all occurences of specified characters are replaced by a specified character.
+        /// </summary>
+        /// <param name="text">The string to filter.</param>
+        /// <param name="chars">The characters to replace.</param>
+        /// <param name="replacement">The replacement character.</param>
+        /// <returns>The filtered string.</returns>
+        public string ReplaceMany(string text, char[] chars, char replacement)
+        {
+            // be safe
+            if (text == null)
+                throw new ArgumentNullException("text");
+            if (chars == null)
+                throw new ArgumentNullException("chars");
+
+            // see note above
+
+            return chars.Aggregate(text, (current, c) => current.Replace(c, replacement));
         }
 
         #endregion

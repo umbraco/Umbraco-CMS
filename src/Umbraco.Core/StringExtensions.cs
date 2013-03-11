@@ -759,6 +759,18 @@ namespace Umbraco.Core
             return ShortStringHelper.ReplaceMany(text, replacements);
         }
 
+        /// <summary>
+        /// Returns a new string in which all occurences of specified characters are replaced by a specified character.
+        /// </summary>
+        /// <param name="text">The string to filter.</param>
+        /// <param name="chars">The characters to replace.</param>
+        /// <param name="replacement">The replacement character.</param>
+        /// <returns>The filtered string.</returns>
+        public static string ReplaceMany(this string text, char[] chars, char replacement)
+        {
+            return ShortStringHelper.ReplaceMany(text, chars, replacement);
+        }
+
         // FORMAT STRINGS
 
         // note: LegacyShortStringHelper will produce a 100% backward-compatible output for ToUrlAlias.
@@ -995,6 +1007,29 @@ namespace Umbraco.Core
         public static string SplitPascalCasing(this string phrase)
         {
             return ShortStringHelper.SplitPascalCasing(phrase, ' ');
+        }
+
+        /// <summary>
+        /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
+        /// both internally (on disk) and externally (as a url).
+        /// </summary>
+        /// <param name="text">The text to filter.</param>
+        /// <returns>The safe filename.</returns>
+        public static string ToSafeFileName(this string text)
+        {
+            return ShortStringHelper.CleanStringForSafeFileName(text);
+        }
+
+        /// <summary>
+        /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
+        /// both internally (on disk) and externally (as a url).
+        /// </summary>
+        /// <param name="text">The text to filter.</param>
+        /// <param name="culture">The culture.</param>
+        /// <returns>The safe filename.</returns>
+        public static string ToSafeFileName(this string text, CultureInfo culture)
+        {
+            return ShortStringHelper.CleanStringForSafeFileName(text, culture);
         }
     }
 }

@@ -34,6 +34,16 @@ namespace Umbraco.Tests.CoreStrings
             return "URL-SEGMENT-CULTURE::" + text;
         }
 
+        public string CleanStringForSafeFileName(string text)
+        {
+            return "SAFE-FILE-NAME::" + text;
+        }
+
+        public string CleanStringForSafeFileName(string text, System.Globalization.CultureInfo culture)
+        {
+            return "SAFE-FILE-NAME-CULTURE::" + text;
+        }
+
         public string SplitPascalCasing(string text, char separator)
         {
             return "SPLIT-PASCAL-CASING::" + text;
@@ -41,7 +51,12 @@ namespace Umbraco.Tests.CoreStrings
 
         public string ReplaceMany(string text, IDictionary<string, string> replacements)
         {
-            return "REPLACE-MANY::" + text;
+            return "REPLACE-MANY-A::" + text;
+        }
+
+        public string ReplaceMany(string text, char[] chars, char replacement)
+        {
+            return "REPLACE-MANY-B::" + text;
         }
 
         public string CleanString(string text, CleanStringType stringType)
