@@ -16,8 +16,10 @@ using System.Web.UI.WebControls;
 using System.Xml;
 using System.Xml.Xsl;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Web;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
@@ -1848,20 +1850,15 @@ namespace umbraco
         #region Events
 
         /// <summary>
-        /// The macro error event handler.
-        /// </summary>
-        public delegate void ErrorEventHandler(object sender, MacroErrorEventArgs e);
-
-        /// <summary>
         /// Occurs when a macro error is raised.
         /// </summary>
-        public static event ErrorEventHandler Error;
+        public static event EventHandler<MacroErrorEventArgs> Error;
 
         /// <summary>
-        /// Raises the <see cref="E:Error"/> event.
+        /// Raises the <see cref="MacroErrorEventArgs"/> event.
         /// </summary>
         /// <param name="e">The <see cref="MacroErrorEventArgs"/> instance containing the event data.</param>
-        protected virtual void OnError(MacroErrorEventArgs e)
+        protected void OnError(MacroErrorEventArgs e)
         {
             if (Error != null)
             {

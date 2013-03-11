@@ -97,56 +97,58 @@ namespace Umbraco.Web.Mvc
 			}
 		}
 
-		/// <summary>
-		/// Normally in MVC the way that the View object gets assigned to the result is to Execute the ViewResult, this however
-		/// will write to the Response output stream which isn't what we want. Instead, this method will use the same logic inside
-		/// of MVC to assign the View object to the result but without executing it. This also ensures that the ViewData and the TempData
-		/// is assigned from the controller.
-		/// This is only relavent for view results of PartialViewResult or ViewResult.
-		/// </summary>
-		/// <param name="result"></param>
-		/// <param name="controller"></param>
-		internal static void EnsureViewObjectDataOnResult(this ControllerBase controller, ViewResultBase result)
-		{
-			result.ViewData.ModelState.Merge(controller.ViewData.ModelState);
+        /// <summary>
+        /// Normally in MVC the way that the View object gets assigned to the result is to Execute the ViewResult, this however
+        /// will write to the Response output stream which isn't what we want. Instead, this method will use the same logic inside
+        /// of MVC to assign the View object to the result but without executing it. This also ensures that the ViewData and the TempData
+        /// is assigned from the controller.
+        /// This is only relavent for view results of PartialViewResult or ViewResult.
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="controller"></param>
+        internal static void EnsureViewObjectDataOnResult(this ControllerBase controller, ViewResultBase result)
+        {
+            //when merging we'll create a new dictionary, otherwise you might run into an enumeration error
+            // caused from ModelStateDictionary
+            result.ViewData.ModelState.Merge(new ModelStateDictionary(controller.ViewData.ModelState));
 
-			// Temporarily copy the dictionary to avoid enumerator-modification errors
-			var newViewDataDict = new ViewDataDictionary(controller.ViewData);
-			foreach (var d in newViewDataDict)
-				result.ViewData[d.Key] = d.Value;
+            // Temporarily copy the dictionary to avoid enumerator-modification errors
+            var newViewDataDict = new ViewDataDictionary(controller.ViewData);
+            foreach (var d in newViewDataDict)
+                result.ViewData[d.Key] = d.Value;
 
-			result.TempData = controller.TempData;
+            result.TempData = controller.TempData;
 
-			if (result.View != null) return;
+            if (result.View != null) return;
 
-			if (string.IsNullOrEmpty(result.ViewName))
-				result.ViewName = controller.ControllerContext.RouteData.GetRequiredString("action");
+            if (string.IsNullOrEmpty(result.ViewName))
+                result.ViewName = controller.ControllerContext.RouteData.GetRequiredString("action");
 
-			if (result.View != null) return;
+            if (result.View != null) return;
 
-			if (result is PartialViewResult)
-			{
-				var viewEngineResult = ViewEngines.Engines.FindPartialView(controller.ControllerContext, result.ViewName);
+            if (result is PartialViewResult)
+            {
+                var viewEngineResult = ViewEngines.Engines.FindPartialView(controller.ControllerContext, result.ViewName);
 
-				if (viewEngineResult.View == null)
-				{
-					throw new InvalidOperationException("Could not find the view " + result.ViewName + ", the following locations were searched: " + Environment.NewLine + string.Join(Environment.NewLine, viewEngineResult.SearchedLocations));
-				}
+                if (viewEngineResult.View == null)
+                {
+                    throw new InvalidOperationException("Could not find the view " + result.ViewName + ", the following locations were searched: " + Environment.NewLine + string.Join(Environment.NewLine, viewEngineResult.SearchedLocations));
+                }
 
-				result.View = viewEngineResult.View;
-			}
-			else if (result is ViewResult)
-			{
-				var vr = (ViewResult)result;
-				var viewEngineResult = ViewEngines.Engines.FindView(controller.ControllerContext, vr.ViewName, vr.MasterName);
+                result.View = viewEngineResult.View;
+            }
+            else if (result is ViewResult)
+            {
+                var vr = (ViewResult)result;
+                var viewEngineResult = ViewEngines.Engines.FindView(controller.ControllerContext, vr.ViewName, vr.MasterName);
 
-				if (viewEngineResult.View == null)
-				{
-					throw new InvalidOperationException("Could not find the view " + vr.ViewName + ", the following locations were searched: " + Environment.NewLine + string.Join(Environment.NewLine, viewEngineResult.SearchedLocations));
-				}
+                if (viewEngineResult.View == null)
+                {
+                    throw new InvalidOperationException("Could not find the view " + vr.ViewName + ", the following locations were searched: " + Environment.NewLine + string.Join(Environment.NewLine, viewEngineResult.SearchedLocations));
+                }
 
-				result.View = viewEngineResult.View;
-			}
-		}
+                result.View = viewEngineResult.View;
+            }
+        }
     }
 }

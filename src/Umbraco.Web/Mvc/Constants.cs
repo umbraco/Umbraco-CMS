@@ -1,7 +1,12 @@
 namespace Umbraco.Web.Mvc
 {
-	internal static class Constants
-	{
-		public const string ViewLocation = "~/Views";
-	}
+    /// <summary>
+    /// constants
+    /// </summary>
+    internal static class Constants
+    {
+        internal const string ViewLocation = "~/Views";
+
+        internal const string DataTokenCurrentViewContext = "umbraco-current-view-context";
+    }
 }

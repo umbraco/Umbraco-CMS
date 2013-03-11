@@ -69,6 +69,7 @@
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
     <Compile Include="Dynamics\DynamicInstanceHelper.cs" />
     <Compile Include="Enum.cs" />
+    <Compile Include="Events\MacroErrorEventArgs.cs" />
     <Compile Include="HashCodeCombiner.cs" />
     <Compile Include="IO\FileSystemWrapper.cs" />
     <Compile Include="MacroErrorBehaviour.cs" />
