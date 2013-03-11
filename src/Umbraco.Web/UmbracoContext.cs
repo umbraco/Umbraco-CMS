@@ -35,6 +35,47 @@ namespace Umbraco.Web
         private static UmbracoContext _umbracoContext;
 
         /// <summary>
+        /// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
+        /// context is created and assigned.
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <param name="applicationContext"></param>
+        /// <returns>
+        /// The Singleton context object
+        /// </returns>
+        /// <remarks>
+        /// This is created in order to standardize the creation of the singleton. Normally it is created during a request
+        /// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
+        /// during the startup process as well.
+        /// See: http://issues.umbraco.org/issue/U4-1890
+        /// </remarks>
+        internal static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext)
+        {
+            if (UmbracoContext.Current != null) 
+                return UmbracoContext.Current;
+
+            var umbracoContext = new UmbracoContext(httpContext, applicationContext, RoutesCacheResolver.Current.RoutesCache);
+
+            // create the nice urls provider
+            var niceUrls = new NiceUrlProvider(PublishedContentStoreResolver.Current.PublishedContentStore, umbracoContext);
+
+            // create the RoutingContext, and assign
+            var routingContext = new RoutingContext(
+                umbracoContext,
+                DocumentLookupsResolver.Current.DocumentLookups,
+                LastChanceLookupResolver.Current.LastChanceLookup,
+                PublishedContentStoreResolver.Current.PublishedContentStore,
+                niceUrls);
+            
+            //assign the routing context back
+            umbracoContext.RoutingContext = routingContext;
+            
+            //assign the singleton
+            UmbracoContext.Current = umbracoContext;
+            return UmbracoContext.Current;
+        }
+
+        /// <summary>
         /// Creates a new Umbraco context.
         /// </summary>
         /// <param name="httpContext"></param>
@@ -57,7 +98,19 @@ namespace Umbraco.Web
 
 			// set the urls...
 			//original request url
-			this.OriginalRequestUrl = httpContext.Request.Url;
+            //NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
+            // is a work around to being able to access the UmbracoContext during application startup and this will also ensure that people
+            // 'could' still generate URLs during startup BUT any domain driven URL generation will not work because it is NOT possible to get
+            // the current domain during application startup.
+            // see: http://issues.umbraco.org/issue/U4-1890
+
+            var requestUrl = new Uri("http://localhost");
+            var request = GetRequestFromContext();
+            if (request != null)
+            {
+                requestUrl = request.Url;
+            }
+            this.OriginalRequestUrl = requestUrl;
 			//cleaned request url
 			this.CleanedUmbracoUrl = UriUtility.UriToUmbraco(this.OriginalRequestUrl);
 			
@@ -230,7 +283,10 @@ namespace Umbraco.Web
         {
             get
             {
-                return GlobalSettings.DebugMode && (!string.IsNullOrEmpty(HttpContext.Request["umbdebugshowtrace"]) || !string.IsNullOrEmpty(HttpContext.Request["umbdebug"]));
+                var request = GetRequestFromContext();
+                //NOTE: the request can be null during app startup!
+                return GlobalSettings.DebugMode && request != null
+                    && (!string.IsNullOrEmpty(request["umbdebugshowtrace"]) || !string.IsNullOrEmpty(request["umbdebug"]));
             }
         }
 
@@ -273,10 +329,11 @@ namespace Umbraco.Web
         {
             get
             {
-                if (HttpContext.Request == null || HttpContext.Request.Url == null)
+                var request = GetRequestFromContext();
+                if (request == null || request.Url == null)
                     return false;
 
-                var currentUrl = HttpContext.Request.Url.AbsolutePath;
+                var currentUrl = request.Url.AbsolutePath;
                 // zb-00004 #29956 : refactor cookies names & handling
                 return
                     StateHelper.Cookies.Preview.HasValue // has preview cookie
@@ -285,6 +342,18 @@ namespace Umbraco.Web
             }
         }   
         
+        private HttpRequestBase GetRequestFromContext()
+        {
+            try
+            {
+                return HttpContext.Request;
+            }
+            catch (System.Web.HttpException)
+            {
+                return null;
+            }
+        }
+
 
     }
 }
