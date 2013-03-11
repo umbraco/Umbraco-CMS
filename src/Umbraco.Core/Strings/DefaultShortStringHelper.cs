@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Globalization;
 using Umbraco.Core.Configuration;
@@ -244,6 +245,54 @@ function validateSafeAlias(id, value, immediate, callback) {{
         public string CleanStringForUrlSegment(string text, CultureInfo culture)
         {
             return CleanString(text, CleanStringType.Ascii | CleanStringType.LowerCase | CleanStringType.Url, '-', culture);
+        }
+
+        /// <summary>
+        /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
+        /// both internally (on disk) and externally (as a url).
+        /// </summary>
+        /// <param name="text">The text to filter.</param>
+        /// <returns>The safe filename.</returns>
+        /// <remarks>Legacy says this was used to "overcome an issue when Umbraco is used in IE in an intranet environment" but that issue is not documented.</remarks>
+        public virtual string CleanStringForSafeFileName(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return string.Empty;
+
+            text = text.ReplaceMany(Path.GetInvalidFileNameChars(), '-');
+
+            var pos = text.LastIndexOf('.');
+            var name = pos < 0 ? text : text.Substring(0, pos);
+            var ext = pos < 0 ? string.Empty : text.Substring(pos + 1);
+
+            name = CleanString(name, CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.LowerCase, '-');
+            ext = CleanString(ext, CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.LowerCase, '-');
+
+            return pos < 0 ? name : (name + "." + ext);
+        }
+
+        /// <summary>
+        /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
+        /// both internally (on disk) and externally (as a url).
+        /// </summary>
+        /// <param name="text">The text to filter.</param>
+        /// <param name="culture">The culture.</param>
+        /// <returns>The safe filename.</returns>
+        public virtual string CleanStringForSafeFileName(string text, CultureInfo culture)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return string.Empty;
+
+            text = text.ReplaceMany(Path.GetInvalidFileNameChars(), '-');
+
+            var pos = text.LastIndexOf('.');
+            var name = pos < 0 ? text : text.Substring(0, pos);
+            var ext = pos < 0 ? string.Empty : text.Substring(pos + 1);
+
+            name = CleanString(name, CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.LowerCase, '-', culture);
+            ext = CleanString(ext, CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.LowerCase, '-', culture);
+
+            return pos < 0 ? name : (name + "." + ext);
         }
 
         #endregion
@@ -870,6 +919,26 @@ function validateSafeAlias(id, value, immediate, callback) {{
             // in turn by another replacement (ie the order of replacements is important)
 
             return replacements.Aggregate(text, (current, kvp) => current.Replace(kvp.Key, kvp.Value));
+        }
+
+        /// <summary>
+        /// Returns a new string in which all occurences of specified characters are replaced by a specified character.
+        /// </summary>
+        /// <param name="text">The string to filter.</param>
+        /// <param name="chars">The characters to replace.</param>
+        /// <param name="replacement">The replacement character.</param>
+        /// <returns>The filtered string.</returns>
+        public virtual string ReplaceMany(string text, char[] chars, char replacement)
+        {
+            // be safe
+            if (text == null)
+                throw new ArgumentNullException("text");
+            if (chars == null)
+                throw new ArgumentNullException("chars");
+
+            // see note above
+
+            return chars.Aggregate(text, (current, c) => current.Replace(c, replacement));
         }
 
         #endregion

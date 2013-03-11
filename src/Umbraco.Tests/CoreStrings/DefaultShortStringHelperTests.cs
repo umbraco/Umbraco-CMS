@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -43,18 +44,18 @@ namespace Umbraco.Tests.CoreStrings
 
         static readonly Regex FrenchElisionsRegex = new Regex("\\b(c|d|j|l|m|n|qu|s|t)('|\u8217)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        private string FilterFrenchElisions(string s)
+        private static string FilterFrenchElisions(string s)
         {
             return FrenchElisionsRegex.Replace(s, "");
         }
 
-        private string StripQuotes(string s)
+        private static string StripQuotes(string s)
         {
             s = s.ReplaceMany(new Dictionary<string, string> {{"'", ""}, {"\u8217", ""}});
             return s;
         }
 
-        private string WhiteQuotes(string s)
+        private static string WhiteQuotes(string s)
         {
             s = s.ReplaceMany(new Dictionary<string, string> { { "'", " " }, { "\u8217", " " } });
             return s;
@@ -321,6 +322,53 @@ namespace Umbraco.Tests.CoreStrings
         public void CleanStringToAsciiWithTypeAndSeparator(string input, string expected, char separator, CleanStringType caseType)
         {
             var output = _helper.CleanString(input, caseType | CleanStringType.Ascii, separator);
+            Assert.AreEqual(expected, output);
+        }
+
+        [Test] // can't do cases with an IDictionary
+        public void ReplaceManyWithCharMap()
+        {
+            const string input = "télévisiön tzvâr ßup &nbsp; pof";
+            const string expected = "television tzvar ssup   pof";
+            IDictionary<string, string> replacements = new Dictionary<string, string>
+                {
+                    { "é", "e" },
+                    { "ö", "o" },
+                    { "â", "a" },
+                    { "ß", "ss" },
+                    { "&nbsp;", " " },
+                };
+            var output = _helper.ReplaceMany(input, replacements);
+            Assert.AreEqual(expected, output);
+        }
+
+        #region Cases
+        [TestCase("val$id!ate|this|str'ing", "$!'", '-', "val-id-ate|this|str-ing")]
+        [TestCase("val$id!ate|this|str'ing", "$!'", '*', "val*id*ate|this|str*ing")]
+        #endregion
+        public void ReplaceManyByOneChar(string input, string toReplace, char replacement, string expected)
+        {
+            var output = _helper.ReplaceMany(input, toReplace.ToArray(), replacement);
+            Assert.AreEqual(expected, output);
+        }
+
+        #region Cases
+        [TestCase("foo.txt", "foo.txt")]
+        [TestCase("foo", "foo")]
+        [TestCase(".txt", ".txt")]
+        [TestCase("nag*dog/poo:xit.txt", "nag-dog-poo-xit.txt")]
+        [TestCase("the dog is in the house.txt", "the-dog-is-in-the-house.txt")]
+        [TestCase("nil.nil.nil.txt", "nil-nil-nil.txt")]
+        [TestCase("taradabum", "taradabum")]
+        [TestCase("tara$$da:b/u<m", "tara-da-b-u-m")]
+        [TestCase("Straße Zvöskî.yop", "strasse-zvoski.yop")]
+        [TestCase("yop.Straße Zvöskî", "yop.strasse-zvoski")]
+        [TestCase("yop.Straße Zvös--kî", "yop.strasse-zvos-ki")]
+        [TestCase("ma--ma---ma.ma-----ma", "ma-ma-ma.ma-ma")]
+        #endregion
+        public void CleanStringForSafeFileName(string input, string expected)
+        {
+            var output = _helper.CleanStringForSafeFileName(input);
             Assert.AreEqual(expected, output);
         }
     }

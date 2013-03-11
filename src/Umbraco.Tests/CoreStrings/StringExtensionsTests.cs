@@ -157,6 +157,20 @@ namespace Umbraco.Tests.CoreStrings
         }
 
         [Test]
+        public void ToSafeFileName()
+        {
+            var output = "JUST-ANYTHING".ToSafeFileName();
+            Assert.AreEqual("SAFE-FILE-NAME::JUST-ANYTHING", output);
+        }
+
+        [Test]
+        public void ToSafeFileNameWithCulture()
+        {
+            var output = "JUST-ANYTHING".ToSafeFileName(CultureInfo.InvariantCulture);
+            Assert.AreEqual("SAFE-FILE-NAME-CULTURE::JUST-ANYTHING", output);
+        }
+
+        [Test]
         public void ConvertCase()
         {
             var output = "JUST-ANYTHING".ConvertCase(StringAliasCaseType.Unchanged);
@@ -171,10 +185,17 @@ namespace Umbraco.Tests.CoreStrings
         }
 
         [Test]
-        public void ReplaceMany()
+        public void ReplaceManyWithCharMap()
         {
             var output = "JUST-ANYTHING".ReplaceMany(null);
-            Assert.AreEqual("REPLACE-MANY::JUST-ANYTHING", output);
+            Assert.AreEqual("REPLACE-MANY-A::JUST-ANYTHING", output);
+        }
+
+        [Test]
+        public void ReplaceManyByOneChar()
+        {
+            var output = "JUST-ANYTHING".ReplaceMany(new char[] {}, '*');
+            Assert.AreEqual("REPLACE-MANY-B::JUST-ANYTHING", output);
         }
     }
 }

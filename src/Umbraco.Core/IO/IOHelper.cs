@@ -263,55 +263,8 @@ namespace Umbraco.Core.IO
         /// <returns>A safe filename without any path specific chars.</returns>
         internal static string SafeFileName(string filePath)
         {
-            if (String.IsNullOrEmpty(filePath))
-                return String.Empty;
-
-            if (!String.IsNullOrWhiteSpace(filePath))
-            {
-                foreach (var character in Path.GetInvalidFileNameChars())
-                {
-                    filePath = filePath.Replace(character, '-');
-                }
-            }
-            else
-            {
-                filePath = String.Empty;
-            }
-
-            //Break up the file in name and extension before applying the UrlReplaceCharacters
-            var fileNamePart = filePath.Substring(0, filePath.LastIndexOf('.'));
-            var ext = filePath.Substring(filePath.LastIndexOf('.'));
-
-            //Because the file usually is downloadable as well we check characters against 'UmbracoSettings.UrlReplaceCharacters'
-            XmlNode replaceChars = UmbracoSettings.UrlReplaceCharacters;
-            foreach (XmlNode n in replaceChars.SelectNodes("char"))
-            {
-                if (n.Attributes.GetNamedItem("org") != null && n.Attributes.GetNamedItem("org").Value != "")
-                    fileNamePart = fileNamePart.Replace(n.Attributes.GetNamedItem("org").Value, XmlHelper.GetNodeValue(n));
-            }
-
-            filePath = string.Concat(fileNamePart, ext);
-
-            // Adapted from: http://stackoverflow.com/a/4827510/5018
-            // Combined both Reserved Characters and Character Data 
-            // from http://en.wikipedia.org/wiki/Percent-encoding
-            var stringBuilder = new StringBuilder();
-
-            const string reservedCharacters = "!*'();:@&=+$,/?%#[]-~{}\"<>\\^`| ";
-
-            foreach (var character in filePath)
-            {
-                if (reservedCharacters.IndexOf(character) == -1)
-                    stringBuilder.Append(character);
-                else
-                    stringBuilder.Append("-");
-            }
-
-            // Remove repeating dashes
-            // From: http://stackoverflow.com/questions/5111967/regex-to-remove-a-specific-repeated-character
-            var reducedString = Regex.Replace(stringBuilder.ToString(), "-+", "-");
-
-            return reducedString;
+            // use string extensions
+            return filePath.ToSafeFileName();
         }
     }
 }
