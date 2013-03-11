@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
-
 using System.Xml;
-
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Caching;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
@@ -11,11 +11,13 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
 using umbraco.IO;
-using umbraco.cms.businesslogic.media;
 using System.Collections;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.workflow;
 using umbraco.cms.businesslogic.Tags;
+using File = System.IO.File;
+using Media = umbraco.cms.businesslogic.media.Media;
+using Task = umbraco.cms.businesslogic.task.Task;
 
 namespace umbraco.cms.businesslogic
 {
@@ -27,6 +29,7 @@ namespace umbraco.cms.businesslogic
     /// The child classes are required to implement an identifier (Guid) which is used as the objecttype identifier, for 
     /// distinguishing the different types of CMSNodes (ex. Documents/Medias/Stylesheets/documenttypes and so forth).
     /// </summary>
+    [Obsolete("Obsolete, This class will eventually be phased out", false)]
     public class CMSNode : BusinessLogic.console.IconI
     {
         #region Private Members
@@ -34,12 +37,6 @@ namespace umbraco.cms.businesslogic
         private string _text;
         private int _id = 0;
         private Guid _uniqueID;
-
-        /// <summary>
-        /// Private connectionstring
-        /// </summary>
-        protected static readonly string _ConnString = GlobalSettings.DbDSN;
-
         private int _parentid;
         private Guid _nodeObjectType;
         private int _level;
@@ -51,6 +48,7 @@ namespace umbraco.cms.businesslogic
         private bool _hasChildrenInitialized;
         private string m_image = "default.png";
         private bool? _isTrashed = null;
+        private IUmbracoEntity _entity;
 
         #endregion
 
@@ -58,6 +56,7 @@ namespace umbraco.cms.businesslogic
 
         private static readonly string m_DefaultIconCssFile = IOHelper.MapPath(SystemDirectories.Umbraco_client + "/Tree/treeIcons.css");
         private static List<string> m_DefaultIconClasses = new List<string>();
+
         private static void initializeIconClasses()
         {
             StreamReader re = File.OpenText(m_DefaultIconCssFile);
@@ -397,6 +396,12 @@ namespace umbraco.cms.businesslogic
             PopulateCMSNodeFromReader(reader);
         }
 
+        protected internal CMSNode(IUmbracoEntity entity)
+        {
+            _id = entity.Id;
+            _entity = entity;
+        }
+
         #endregion
 
         #region Public Methods
@@ -513,14 +518,16 @@ order by level,sortOrder";
                         SqlHelper.CreateParameter("@parentId", newParent.Id));
 
                     this.Parent = newParent;
-                    this.sortOrder = maxSortOrder + 1;
+                    this.sortOrder = maxSortOrder + 1;                    
+                }
+                
+                //detect if we have moved, then update the level and path
+                // issue: http://issues.umbraco.org/issue/U4-1579
+                if (this.Path != newParent.Path + "," + this.Id.ToString())
+                {
                     this.Level = newParent.Level + 1;
                     this.Path = newParent.Path + "," + this.Id.ToString();
                 }
-
-                //this.Parent = newParent;
-                //this.Level = newParent.Level + 1;
-                //this.Path = newParent.Path + "," + this.Id.ToString();
 
                 //this code block should not be here but since the class structure is very poor and doesn't use 
                 //overrides (instead using shadows/new) for the Children property, when iterating over the children
@@ -541,9 +548,14 @@ order by level,sortOrder";
                 //make sure the node type is a document/media, if it is a recycle bin then this will not be equal
                 if (!IsTrashed && newParent.nodeObjectType == Document._objectType)
                 {
+                    // regenerate the xml of the current document
+                    var movedDocument = new Document(this.Id);
+                    movedDocument.XmlGenerate(new XmlDocument());
+
                     //regenerate the xml for the newParent node
-                    var d = new Document(newParent.Id);
-                    d.XmlGenerate(new XmlDocument());
+                    var parentDocument = new Document(newParent.Id);
+                    parentDocument.XmlGenerate(new XmlDocument());
+                    
                 }
                 else if (!IsTrashed && newParent.nodeObjectType == Media._objectType)
                 {
@@ -558,6 +570,9 @@ order by level,sortOrder";
                     c.Move(this);
                 }
 
+                //TODO: Properly refactor this, we're just clearing the cache so the changes will also be visible in the backoffice
+                InMemoryCacheProvider.Current.Clear();
+
                 FireAfterMove(e);
             }
         }
@@ -566,7 +581,8 @@ order by level,sortOrder";
         /// Moves the CMSNode from the current position in the hierarchy to the target
         /// </summary>
         /// <param name="NewParentId">Target CMSNode id</param>
-        public void Move(int newParentId)
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Move() or Umbraco.Core.Services.MediaService.Move()", false)]
+        public virtual void Move(int newParentId)
         {
             CMSNode parent = new CMSNode(newParentId);
             Move(parent);
@@ -664,7 +680,7 @@ order by level,sortOrder";
         /// Determines if the node is in the recycle bin.
         /// This is only relavent for node types that support a recyle bin (such as Document/Media)
         /// </summary>
-        public bool IsTrashed
+        public virtual bool IsTrashed
         {
             get
             {
@@ -688,13 +704,16 @@ order by level,sortOrder";
         /// Gets or sets the sort order.
         /// </summary>
         /// <value>The sort order.</value>
-        public int sortOrder
+        public virtual int sortOrder
         {
             get { return _sortOrder; }
             set
             {
                 _sortOrder = value;
                 SqlHelper.ExecuteNonQuery("update umbracoNode set sortOrder = '" + value + "' where id = " + this.Id.ToString());
+
+                if (_entity != null)
+                    _entity.SortOrder = value;
             }
         }
 
@@ -702,7 +721,7 @@ order by level,sortOrder";
         /// Gets or sets the create date time.
         /// </summary>
         /// <value>The create date time.</value>
-        public DateTime CreateDateTime
+        public virtual DateTime CreateDateTime
         {
             get { return _createDate; }
             set
@@ -736,7 +755,7 @@ order by level,sortOrder";
         /// <summary>
         /// Get the newParent id of the node
         /// </summary>
-        public int ParentId
+        public virtual int ParentId
         {
             get { return _parentid; }
         }
@@ -756,6 +775,9 @@ order by level,sortOrder";
             {
                 _parentid = value.Id;
                 SqlHelper.ExecuteNonQuery("update umbracoNode set parentId = " + value.Id.ToString() + " where id = " + this.Id.ToString());
+
+                if (_entity != null)
+                    _entity.ParentId = value.Id;
             }
         }
 
@@ -764,13 +786,16 @@ order by level,sortOrder";
         /// that indicates the path from the topmost node to the given node
         /// </summary>
         /// <value>The path.</value>
-        public string Path
+        public virtual string Path
         {
             get { return _path; }
             set
             {
                 _path = value;
                 SqlHelper.ExecuteNonQuery("update umbracoNode set path = '" + _path + "' where id = " + this.Id.ToString());
+
+                if (_entity != null)
+                    _entity.Path = value;
             }
         }
 
@@ -779,13 +804,16 @@ order by level,sortOrder";
         /// tree structure the given node is
         /// </summary>
         /// <value>The level.</value>
-        public int Level
+        public virtual int Level
         {
             get { return _level; }
             set
             {
                 _level = value;
                 SqlHelper.ExecuteNonQuery("update umbracoNode set level = " + _level.ToString() + " where id = " + this.Id.ToString());
+
+                if (_entity != null)
+                    _entity.Level = value;
             }
         }
 
@@ -905,6 +933,8 @@ order by level,sortOrder";
                                           SqlHelper.CreateParameter("@text", value.Trim()),
                                           SqlHelper.CreateParameter("@id", this.Id));
 
+                if (_entity != null)
+                    _entity.Name = value;
             }
         }
 
@@ -956,6 +986,9 @@ order by level,sortOrder";
         protected void SetText(string txt)
         {
             _text = txt;
+
+            if (_entity != null)
+                _entity.Name = txt;
         }
 
         /// <summary>
@@ -1062,6 +1095,36 @@ order by level,sortOrder";
             _userId = dr.GetInt("nodeUser");
             _createDate = dr.GetDateTime("createDate");
             _isTrashed = dr.GetBoolean("trashed");
+        }
+
+        internal protected void PopulateCMSNodeFromContentBase(IContentBase content, Guid objectType)
+        {
+            _uniqueID = content.Key;
+            _nodeObjectType = objectType;
+            _level = content.Level;
+            _path = content.Path;
+            _parentid = content.ParentId;
+            _text = content.Name;
+            _sortOrder = content.SortOrder;
+            _userId = content.CreatorId;
+            _createDate = content.CreateDate;
+            _isTrashed = content.Trashed;
+            _entity = content;
+        }
+
+        internal protected void PopulateCMSNodeFromContentTypeBase(IContentTypeBase contentType, Guid objectType)
+        {
+            _uniqueID = contentType.Key;
+            _nodeObjectType = objectType;
+            _level = contentType.Level;
+            _path = contentType.Path;
+            _parentid = contentType.ParentId;
+            _text = contentType.Name;
+            _sortOrder = contentType.SortOrder;
+            _userId = contentType.CreatorId;
+            _createDate = contentType.CreateDate;
+            _isTrashed = false;
+            _entity = contentType;
         }
 
         #endregion

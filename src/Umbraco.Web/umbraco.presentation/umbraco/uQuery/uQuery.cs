@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Xml;
+using Umbraco.Core.Logging;
+using Umbraco.Web;
 using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -88,7 +90,7 @@ namespace umbraco
 			}
 			catch (Exception ex)
 			{
-				Log.Add(LogTypes.Error, -1, ex.Message);
+                LogHelper.Error<UmbracoHelper>("uQuery error", ex);
 			}
 
 			return null;

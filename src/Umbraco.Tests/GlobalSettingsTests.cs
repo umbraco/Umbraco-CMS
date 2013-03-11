@@ -1,6 +1,7 @@
 using System.Configuration;
 using System.Web.Routing;
 using NUnit.Framework;
+using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using System.Web.Mvc;
 
@@ -15,19 +16,24 @@ namespace Umbraco.Tests
 		}
 
 		public override void Initialize()
-		{
+		{            
 			base.Initialize();
-			ConfigurationManager.AppSettings.Set("umbracoReservedPaths", "~/umbraco,~/install/");
-			ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd");
+            SettingsForTests.UmbracoPath = "~/umbraco";
 		}
 
 		public override void TearDown()
 		{
+            //reset the app config		            
 			base.TearDown();
-			//reset the app config		
-			ConfigurationManager.AppSettings.Set("umbracoReservedPaths", "");
-			ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "");
+			
 		}
+
+        [Ignore]
+        [Test]
+        public void Is_Version_From_Assembly_Correct()
+        {
+            Assert.That(UmbracoVersion.Current.ToString(3), Is.EqualTo("6.0.0"));
+        }
 
 		[TestCase("/umbraco/umbraco.aspx")]
 		[TestCase("/umbraco/editContent.aspx")]
@@ -70,8 +76,8 @@ namespace Umbraco.Tests
 		public void Is_Reserved_By_Route(string url, bool shouldMatch)
 		{
 			//reset the app config, we only want to test routes not the hard coded paths
-			ConfigurationManager.AppSettings.Set("umbracoReservedPaths", "");
-			ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "");
+		    Umbraco.Core.Configuration.GlobalSettings.ReservedPaths = "";
+		    Umbraco.Core.Configuration.GlobalSettings.ReservedUrls = "";
 
 			var routes = new RouteCollection();
 

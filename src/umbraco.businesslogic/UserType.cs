@@ -69,8 +69,7 @@ namespace umbraco.BusinessLogic
         }
 
         private const string CACHE_KEY = "UserTypeCache";
-        private static string _connstring = GlobalSettings.DbDSN;
-
+        
         private int m_id;
         private string m_name;
         private string m_defaultPermissions;

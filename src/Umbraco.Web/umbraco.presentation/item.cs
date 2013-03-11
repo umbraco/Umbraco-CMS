@@ -3,6 +3,7 @@ using System.Collections;
 using System.Web;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 
 namespace umbraco
 {
@@ -12,7 +13,7 @@ namespace umbraco
 	public class item
 	{
 		private String _fieldContent = "";
-		private String _fieldName;
+		private readonly String _fieldName;
 
 		public String FieldContent
 		{
@@ -22,64 +23,108 @@ namespace umbraco
 		public item(string itemValue, IDictionary attributes)
 		{
 			_fieldContent = itemValue;
-			parseItem(attributes);
+			ParseItem(attributes);
 		}
 
 		/// <summary>
-		/// 
+		/// Creates a new Legacy item
 		/// </summary>
-		/// <param name="umbPage"></param>
+		/// <param name="elements"></param>
 		/// <param name="attributes"></param>
-		/// 
         public item(IDictionary elements, IDictionary attributes)
+			: this(null, elements, attributes)
+		{			
+		}
+
+		/// <summary>
+		/// Creates an Item with a publishedContent item in order to properly recurse and return the value.
+		/// </summary>
+		/// <param name="publishedContent"></param>
+		/// <param name="elements"></param>
+		/// <param name="attributes"></param>
+		/// <remarks>
+		/// THIS ENTIRE CLASS WILL BECOME LEGACY, THE FIELD RENDERING NEEDS TO BE REPLACES SO THAT IS WHY THIS
+		/// CTOR IS INTERNAL.
+		/// </remarks>
+		internal item(IPublishedContent publishedContent, IDictionary elements, IDictionary attributes)
 		{
 			_fieldName = helper.FindAttribute(attributes, "field");
 
-			if(_fieldName.StartsWith("#"))
+			if (_fieldName.StartsWith("#"))
 			{
 				_fieldContent = library.GetDictionaryItem(_fieldName.Substring(1, _fieldName.Length - 1));
 			}
 			else
 			{
 				// Loop through XML children we need to find the fields recursive
-				if(helper.FindAttribute(attributes, "recursive") == "true")
+				if (helper.FindAttribute(attributes, "recursive") == "true")
 				{
-
-					XmlDocument umbracoXML = presentation.UmbracoContext.Current.GetXml();
-
-					String[] splitpath = (String[]) elements["splitpath"];
-					for(int i = 0; i < splitpath.Length - 1; i++)
+					if (publishedContent == null)
 					{
-						XmlNode element = umbracoXML.GetElementById(splitpath[splitpath.Length - i - 1].ToString());
-						if (element == null)
-							continue;
-					    string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data [@alias = '{0}']" : "./{0}";
-						XmlNode currentNode = element.SelectSingleNode(string.Format(xpath,
-							_fieldName));
-						if(currentNode != null && currentNode.FirstChild != null &&
-						   !string.IsNullOrEmpty(currentNode.FirstChild.Value) &&
-						   !string.IsNullOrEmpty(currentNode.FirstChild.Value.Trim()))
-						{
-							HttpContext.Current.Trace.Write("item.recursive", "Item loaded from " + splitpath[splitpath.Length - i - 1]);
-							_fieldContent = currentNode.FirstChild.Value;
-							break;
-						}
+						var recursiveVal = GetRecursiveValueLegacy(elements);
+						_fieldContent = recursiveVal.IsNullOrWhiteSpace() ? _fieldContent : recursiveVal;	
+					}
+					else
+					{
+						var recursiveVal = publishedContent.GetRecursiveValue(_fieldName);
+						_fieldContent = recursiveVal.IsNullOrWhiteSpace() ? _fieldContent : recursiveVal;
 					}
 				}
 				else
 				{
-                    if (elements[_fieldName] != null && !string.IsNullOrEmpty(elements[_fieldName].ToString()))
-                        _fieldContent = elements[_fieldName].ToString().Trim();
-					else if(!string.IsNullOrEmpty(helper.FindAttribute(attributes, "useIfEmpty")))
-                        if (elements[helper.FindAttribute(attributes, "useIfEmpty")] != null && !string.IsNullOrEmpty(elements[helper.FindAttribute(attributes, "useIfEmpty")].ToString()))
-                            _fieldContent = elements[helper.FindAttribute(attributes, "useIfEmpty")].ToString().Trim();
+					if (elements[_fieldName] != null && !string.IsNullOrEmpty(elements[_fieldName].ToString()))
+					{
+						_fieldContent = elements[_fieldName].ToString().Trim();
+					}
+					else if (!string.IsNullOrEmpty(helper.FindAttribute(attributes, "useIfEmpty")))
+					{
+						if (elements[helper.FindAttribute(attributes, "useIfEmpty")] != null && !string.IsNullOrEmpty(elements[helper.FindAttribute(attributes, "useIfEmpty")].ToString()))
+						{
+							_fieldContent = elements[helper.FindAttribute(attributes, "useIfEmpty")].ToString().Trim();
+						}
+					}
+
 				}
 			}
 
-			parseItem(attributes);
+			ParseItem(attributes);
+		}	
+
+		/// <summary>
+		/// Returns the recursive value using a legacy strategy of looking at the xml cache and the splitPath in the elements collection
+		/// </summary>
+		/// <param name="elements"></param>
+		/// <returns></returns>
+		private string GetRecursiveValueLegacy(IDictionary elements)
+		{
+			var content = "";
+
+			var umbracoXml = presentation.UmbracoContext.Current.GetXml();
+
+			var splitpath = (String[])elements["splitpath"];
+			for (int i = 0; i < splitpath.Length - 1; i++)
+			{
+				XmlNode element = umbracoXml.GetElementById(splitpath[splitpath.Length - i - 1]);
+
+				if (element == null)
+					continue;
+
+				var xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data [@alias = '{0}']" : "./{0}";
+				var currentNode = element.SelectSingleNode(string.Format(xpath, _fieldName));
+
+				//continue if all is null
+				if (currentNode == null || currentNode.FirstChild == null || string.IsNullOrEmpty(currentNode.FirstChild.Value) || string.IsNullOrEmpty(currentNode.FirstChild.Value.Trim()))
+					continue;
+
+				HttpContext.Current.Trace.Write("item.recursive", "Item loaded from " + splitpath[splitpath.Length - i - 1]);
+				content = currentNode.FirstChild.Value;
+				break;
+			}
+
+			return content;
 		}
 
-        private void parseItem(IDictionary attributes)
+        private void ParseItem(IDictionary attributes)
 		{
 			HttpContext.Current.Trace.Write("item", "Start parsing '" + _fieldName + "'");
 			if(helper.FindAttribute(attributes, "textIfEmpty") != "" && _fieldContent == "")

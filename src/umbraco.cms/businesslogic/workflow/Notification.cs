@@ -4,6 +4,7 @@ using System.Net.Mail;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Web;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.web;
@@ -55,15 +56,13 @@ namespace umbraco.cms.businesslogic.workflow
                 {
                     if (!u.Disabled && u.GetNotifications(Node.Path).IndexOf(Action.Letter.ToString()) > -1)
                     {
-                        Log.Add(LogTypes.Notify, User.GetUser(0), Node.Id,
-                                "Notification about " + ui.Text(Action.Alias, u) + " sent to " + u.Name + " (" + u.Email +
-                                ")");
+                        LogHelper.Debug<Notification>(string.Format("Notification about {0} sent to {1} ({2})", ui.Text(Action.Alias, u), u.Name, u.Email));
                         sendNotification(user, u, (Document)Node, Action);
                     }
                 }
                 catch (Exception notifyExp)
                 {
-                    Log.Add(LogTypes.Error, u, Node.Id, "Error in notification: " + notifyExp);
+					LogHelper.Error<Notification>("Error in notification", notifyExp);
                 }
             }
         }
@@ -79,7 +78,7 @@ namespace umbraco.cms.businesslogic.workflow
 
             // build summary
             var summary = new StringBuilder();
-            Property[] props = documentObject.getProperties;
+            var props = documentObject.GenericProperties;
             foreach (Property p in props)
             {
                 // check if something was changed and display the changes otherwise display the fields

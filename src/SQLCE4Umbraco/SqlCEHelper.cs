@@ -50,35 +50,90 @@ namespace SqlCE4Umbraco
         /// </summary>
         internal void ClearDatabase()
         {
+            // drop constraints before tables to avoid exceptions
+            // looping on try/catching exceptions was not really nice
+
+            // http://stackoverflow.com/questions/536350/drop-all-the-tables-stored-procedures-triggers-constriants-and-all-the-depend
+
             var localConnection = new SqlCeConnection(ConnectionString);
             if (System.IO.File.Exists(ReplaceDataDirectory(localConnection.Database)))
             {
-                var tables = new List<string>();
-                using (var reader = ExecuteReader("select table_name from information_schema.tables where TABLE_TYPE <> 'VIEW'"))
+                List<string> tables;
+
+                // drop foreign keys
+                // SQL may need "where constraint_catalog=DB_NAME() and ..."
+                tables = new List<string>();
+                using (var reader = ExecuteReader("select table_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' order by table_name"))
                 {
-                    while (reader.Read())
+                    while (reader.Read()) tables.Add(reader.GetString("table_name").Trim());
+                }
+
+                foreach (var table in tables)
+                {
+                    var constraints = new List<string>();
+                    using (var reader = ExecuteReader("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' and table_name = '" + table + "' order by constraint_name"))
                     {
-                        tables.Add(reader.GetString("TABLE_NAME"));
+                        while (reader.Read()) constraints.Add(reader.GetString("constraint_name").Trim());
+                    }
+                    foreach (var constraint in constraints)
+                    {
+                        // SQL may need "[dbo].[table]"
+                        ExecuteNonQuery("alter table [" + table + "] drop constraint [" + constraint + "]");
                     }
                 }
 
-                while(tables.Any())
+                // drop primary keys
+                // SQL may need "where constraint_catalog=DB_NAME() and ..."
+                tables = new List<string>();
+                using (var reader = ExecuteReader("select table_name from information_schema.table_constraints where constraint_type = 'PRIMARY KEY' order by table_name"))
                 {
-                    for (var i = 0; i < tables.Count; i++)
-                    {
-                        var dropTable = "DROP TABLE " + tables[i];
+                    while (reader.Read()) tables.Add(reader.GetString("table_name").Trim());
+                }
 
-                        try
-                        {
-                            ExecuteNonQuery(dropTable);
-                            tables.Remove(tables[i]);
-                        }
-                        catch (SqlHelperException ex)
-                        {
-                            //this will occur because there is no cascade option, so we just wanna try the next one       
-                        }
+                foreach (var table in tables)
+                {
+                    var constraints = new List<string>();
+                    using (var reader = ExecuteReader("select constraint_name from information_schema.table_constraints where constraint_type = 'PRIMARY KEY' and table_name = '" + table + "' order by constraint_name"))
+                    {
+                        while (reader.Read()) constraints.Add(reader.GetString("constraint_name").Trim());
+                    }
+                    foreach (var constraint in constraints)
+                    {
+                        // SQL may need "[dbo].[table]"
+                        ExecuteNonQuery("alter table [" + table + "] drop constraint [" + constraint + "]");
                     }
                 }
+
+                // drop tables
+                tables = new List<string>();
+                using (var reader = ExecuteReader("select table_name from information_schema.tables where table_type <> 'VIEW' order by table_name"))
+                {
+                    while (reader.Read()) tables.Add(reader.GetString("table_name").Trim());
+                }
+
+                foreach (var table in tables)
+                {
+                    ExecuteNonQuery("drop table [" + table + "]");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Drops all foreign keys on a table.
+        /// </summary>
+        /// <param name="table">The name of the table.</param>
+        /// <remarks>To be used in unit tests.</remarks>
+        internal void DropForeignKeys(string table)
+        {
+            var constraints = new List<string>();
+            using (var reader = ExecuteReader("select constraint_name from information_schema.table_constraints where constraint_type = 'FOREIGN KEY' and table_name = '" + table + "' order by constraint_name"))
+            {
+                while (reader.Read()) constraints.Add(reader.GetString("constraint_name").Trim());
+            }
+            foreach (var constraint in constraints)
+            {
+                // SQL may need "[dbo].[table]"
+                ExecuteNonQuery("alter table [" + table + "] drop constraint [" + constraint + "]");
             }
         }
 
@@ -94,7 +149,7 @@ namespace SqlCE4Umbraco
                 var dataDirectory = AppDomain.CurrentDomain.GetData("DataDirectory") as string;
                 if (!string.IsNullOrEmpty(dataDirectory))
                 {
-                    path = path.Replace("|DataDirectory|", dataDirectory);
+                    path = path.Replace("|DataDirectory|", dataDirectory + System.IO.Path.DirectorySeparatorChar);
                 }
             }
 

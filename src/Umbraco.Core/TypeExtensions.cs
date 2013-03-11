@@ -205,8 +205,53 @@ namespace Umbraco.Core
 
 		}
 
+        /// <summary>
+        /// Gets all properties in a flat hierarchy
+        /// </summary>
+        /// <remarks>Includes both Public and Non-Public properties</remarks>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static PropertyInfo[] GetAllProperties(this Type type)
+        {
+            if (type.IsInterface)
+            {
+                var propertyInfos = new List<PropertyInfo>();
 
-		/// <summary>
+                var considered = new List<Type>();
+                var queue = new Queue<Type>();
+                considered.Add(type);
+                queue.Enqueue(type);
+                while (queue.Count > 0)
+                {
+                    var subType = queue.Dequeue();
+                    foreach (var subInterface in subType.GetInterfaces())
+                    {
+                        if (considered.Contains(subInterface)) continue;
+
+                        considered.Add(subInterface);
+                        queue.Enqueue(subInterface);
+                    }
+
+                    var typeProperties = subType.GetProperties(
+                        BindingFlags.FlattenHierarchy
+                        | BindingFlags.Public
+                        | BindingFlags.NonPublic
+                        | BindingFlags.Instance);
+
+                    var newPropertyInfos = typeProperties
+                        .Where(x => !propertyInfos.Contains(x));
+
+                    propertyInfos.InsertRange(0, newPropertyInfos);
+                }
+
+                return propertyInfos.ToArray();
+            }
+
+            return type.GetProperties(BindingFlags.FlattenHierarchy
+                | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        }
+
+        /// <summary>
 		/// Determines whether the specified actual type is type.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
@@ -219,27 +264,56 @@ namespace Umbraco.Core
 			return TypeHelper.IsTypeAssignableFrom<T>(actualType);
 		}
 
-		//internal static string GetCacheKeyFromParameters(this MemberInfo info)
-		//{
-		//    var methodInfo = info as MethodInfo;
-		//    if (methodInfo != null)
-		//        return GetCacheKeyFromParameters(methodInfo.GetParameters());
-		//    return string.Empty;
-		//}
+        public static TAttribute FirstAttribute<TAttribute>(this Type type)
+        {
+            return type.FirstAttribute<TAttribute>(true);
+        }
 
-		//internal static string GetCacheKeyFromParameters(IEnumerable<ParameterInfo> parameters)
-		//{
-		//    var sb = new StringBuilder();
-		//    sb.Append("(");
-		//    foreach (var parameter in parameters)
-		//    {
-		//        sb.Append(parameter.ParameterType);
-		//        sb.Append(" ");
-		//        sb.Append(parameter.Name);
-		//        sb.Append(",");
-		//    }
-		//    sb.Append(")");
-		//    return sb.ToString();
-		//}
+        public static TAttribute FirstAttribute<TAttribute>(this Type type, bool inherit)
+        {
+            var attrs = type.GetCustomAttributes(typeof(TAttribute), inherit);
+            return (TAttribute)(attrs.Length > 0 ? attrs[0] : null);
+        }
+
+        public static TAttribute FirstAttribute<TAttribute>(this PropertyInfo propertyInfo)
+        {
+            return propertyInfo.FirstAttribute<TAttribute>(true);
+        }
+
+        public static TAttribute FirstAttribute<TAttribute>(this PropertyInfo propertyInfo, bool inherit)
+        {
+            var attrs = propertyInfo.GetCustomAttributes(typeof(TAttribute), inherit);
+            return (TAttribute)(attrs.Length > 0 ? attrs[0] : null);
+        }
+
+        public static IEnumerable<TAttribute> MultipleAttribute<TAttribute>(this PropertyInfo propertyInfo)
+        {
+            return propertyInfo.MultipleAttribute<TAttribute>(true);
+        }
+
+        public static IEnumerable<TAttribute> MultipleAttribute<TAttribute>(this PropertyInfo propertyInfo, bool inherit)
+        {
+            var attrs = propertyInfo.GetCustomAttributes(typeof(TAttribute), inherit);
+            return (attrs.Length > 0 ? attrs.ToList().ConvertAll(input => (TAttribute)input) : null);
+        }
+
+		/// <summary>
+		/// Returns the full type name with the assembly but without all of the assembly specific version information.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// This method is like an 'inbetween' of Type.FullName and Type.AssemblyQualifiedName which returns the type and the assembly separated
+		/// by a comma.
+		/// </remarks>
+		/// <example>
+		/// The output of this class would be:
+		/// 
+		/// Umbraco.Core.TypeExtensions, Umbraco.Core
+		/// </example>
+		public static string GetFullNameWithAssembly(this Type type)
+		{
+			return string.Concat(type.FullName, ", ", type.Assembly.GetName().Name);
+		}
 	}
 }

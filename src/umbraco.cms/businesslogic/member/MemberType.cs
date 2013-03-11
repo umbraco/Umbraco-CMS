@@ -1,5 +1,4 @@
 using System;
-using System.Data;
 using System.Xml;
 using umbraco.cms.businesslogic.propertytype;
 using System.Linq;
@@ -12,10 +11,16 @@ namespace umbraco.cms.businesslogic.member
 	/// Due to the inheritance of the ContentType class, it enables definition of generic datafields on a Members.
 	/// 
 	public class MemberType : ContentType
-	{
-		private static Guid _objectType = new Guid("9b5416fb-e72f-45a9-a07b-5a9a2709ce43");
+    {
+        #region Private Members
+        
+        private static Guid _objectType = new Guid("9b5416fb-e72f-45a9-a07b-5a9a2709ce43");
+        
+        #endregion
 
-		/// <summary>
+        #region Constructors
+
+        /// <summary>
 		/// Initializes a new instance of the MemberType class.
 		/// </summary>
 		/// <param name="id">MemberType id</param>
@@ -27,56 +32,11 @@ namespace umbraco.cms.businesslogic.member
 		/// <param name="id">MemberType id</param>
         public MemberType(Guid id) : base(id) { }
 
-        /// <summary>
-        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
-        /// </summary>
-        public override void Save()
-        {
-            SaveEventArgs e = new SaveEventArgs();
-            FireBeforeSave(e);
+        #endregion
 
-            if(!e.Cancel){
-                FireAfterSave(e);
-            }
-        }
+        #region Public Methods
         
-		/// <summary>
-		/// Create a new MemberType
-		/// </summary>
-		/// <param name="Text">The name of the MemberType</param>
-		/// <param name="u">Creator of the MemberType</param>
-		public static MemberType MakeNew(User u,string Text) 
-		{		
-			int ParentId= -1;
-			int level = 1;
-			Guid uniqueId = Guid.NewGuid();
-			CMSNode n = CMSNode.MakeNew(ParentId, _objectType, u.Id, level,Text, uniqueId);
-
-			ContentType.Create(n.Id, Text,"");
-	        MemberType mt = new MemberType(n.Id);
-		    mt.IconUrl = "member.gif";
-            NewEventArgs e = new NewEventArgs();
-            mt.OnNew(e);
-
-            return mt; 
-		}
-
-		/// <summary>
-		/// Retrieve a list of all MemberTypes
-		/// </summary>
-        public new static MemberType[] GetAll
-        {
-            get
-            {
-                Guid[] Ids = CMSNode.getAllUniquesFromObjectType(_objectType);
-
-                MemberType[] retVal = new MemberType[Ids.Length];
-                for (int i = 0; i < Ids.Length; i++) retVal[i] = new MemberType(Ids[i]);
-                return retVal;
-            }
-        }
-
-		/// <summary>
+        /// <summary>
 		/// Get an true/false if the Member can edit the given data defined in the propertytype
 		/// </summary>
 		/// <param name="pt">Propertytype to edit</param>
@@ -90,29 +50,7 @@ namespace umbraco.cms.businesslogic.member
             }
             return false;
         }
-
-		/// <summary>
-		/// Get a MemberType by it's alias
-		/// </summary>
-		/// <param name="Alias">The alias of the MemberType</param>
-		/// <returns>The MemberType with the given Alias</returns>
-        public new static MemberType GetByAlias(string Alias)
-        {            
-            try
-            {
-                return
-                    new MemberType(
-                            SqlHelper.ExecuteScalar<int>(@"SELECT nodeid from cmsContentType INNER JOIN umbracoNode on cmsContentType.nodeId = umbracoNode.id WHERE nodeObjectType=@nodeObjectType AND alias=@alias",
-                                SqlHelper.CreateParameter("@nodeObjectType", MemberType._objectType),
-                                SqlHelper.CreateParameter("@alias", Alias)));
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-
+        
 		/// <summary>
 		/// Get an true/false if the given data defined in the propertytype, should be visible on the members profile page
 		/// </summary>
@@ -142,13 +80,7 @@ namespace umbraco.cms.businesslogic.member
                 SqlHelper.ExecuteNonQuery("insert into cmsMemberType (NodeId, propertytypeid, memberCanEdit,viewOnProfile) values (" + this.Id + "," + pt.Id + ", " + tmpval + ",0)");
 
         }
-
-        private bool propertyTypeRegistered(PropertyType pt)
-        {
-            return (SqlHelper.ExecuteScalar<int>("Select count(pk) as tmp from cmsMemberType where NodeId = " + this.Id + " And propertytypeId = " + pt.Id) > 0);
-        }
-
-
+        
 		/// <summary>
 		/// Set if the data should be displayed on members of this type's profilepage
 		/// </summary>
@@ -188,6 +120,20 @@ namespace umbraco.cms.businesslogic.member
                 // Delete contentType
                 base.delete();
                 FireAfterDelete(e);
+            }
+        }
+
+        /// <summary>
+        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
+        /// </summary>
+        public override void Save()
+        {
+            SaveEventArgs e = new SaveEventArgs();
+            FireBeforeSave(e);
+
+            if (!e.Cancel)
+            {
+                FireAfterSave(e);
             }
         }
         
@@ -234,6 +180,76 @@ namespace umbraco.cms.businesslogic.member
             root.AppendChild(tabs);
             return root;
         }
+
+        #endregion
+
+        #region Public Static Methods
+        /// <summary>
+        /// Get a MemberType by it's alias
+        /// </summary>
+        /// <param name="Alias">The alias of the MemberType</param>
+        /// <returns>The MemberType with the given Alias</returns>
+        public new static MemberType GetByAlias(string Alias)
+        {
+            try
+            {
+                return
+                    new MemberType(
+                            SqlHelper.ExecuteScalar<int>(@"SELECT nodeid from cmsContentType INNER JOIN umbracoNode on cmsContentType.nodeId = umbracoNode.id WHERE nodeObjectType=@nodeObjectType AND alias=@alias",
+                                SqlHelper.CreateParameter("@nodeObjectType", MemberType._objectType),
+                                SqlHelper.CreateParameter("@alias", Alias)));
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Create a new MemberType
+        /// </summary>
+        /// <param name="Text">The name of the MemberType</param>
+        /// <param name="u">Creator of the MemberType</param>
+        public static MemberType MakeNew(User u, string Text)
+        {
+            int ParentId = -1;
+            int level = 1;
+            Guid uniqueId = Guid.NewGuid();
+            CMSNode n = CMSNode.MakeNew(ParentId, _objectType, u.Id, level, Text, uniqueId);
+
+            ContentType.Create(n.Id, Text, "");
+            MemberType mt = new MemberType(n.Id);
+            mt.IconUrl = "member.gif";
+            NewEventArgs e = new NewEventArgs();
+            mt.OnNew(e);
+
+            return mt;
+        }
+
+        /// <summary>
+        /// Retrieve a list of all MemberTypes
+        /// </summary>
+        public new static MemberType[] GetAll
+        {
+            get
+            {
+                Guid[] Ids = CMSNode.getAllUniquesFromObjectType(_objectType);
+
+                MemberType[] retVal = new MemberType[Ids.Length];
+                for (int i = 0; i < Ids.Length; i++) retVal[i] = new MemberType(Ids[i]);
+                return retVal;
+            }
+        }
+        #endregion
+
+        #region Private Methods
+
+        private bool propertyTypeRegistered(PropertyType pt)
+        {
+            return (SqlHelper.ExecuteScalar<int>("Select count(pk) as tmp from cmsMemberType where NodeId = " + this.Id + " And propertytypeId = " + pt.Id) > 0);
+        }
+
+        #endregion
 
         #region Events
 

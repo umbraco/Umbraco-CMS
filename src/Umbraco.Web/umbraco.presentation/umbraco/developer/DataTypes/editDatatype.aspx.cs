@@ -1,13 +1,7 @@
 using System;
 using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
 using umbraco.IO;
 
@@ -106,11 +100,11 @@ namespace umbraco.cms.presentation.developer
             dt.Text = txtName.Text;
 
             dt.DataType = f.DataType(new Guid(ddlRenderControl.SelectedValue));
-
+            dt.Save();
 
             System.Web.HttpRuntime.Cache.Remove(string.Format("UmbracoDataTypeDefinition{0}", dt.UniqueId));
 
-            this.speechBubble(BasePages.BasePage.speechBubbleIcon.save, ui.Text("speechBubbles", "dataTypeSaved", null), "");
+            ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.save, ui.Text("speechBubbles", "dataTypeSaved", null), "");
 
             //Response.Redirect("editDataType.aspx?id=" + _id);
         }

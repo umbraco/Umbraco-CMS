@@ -11,7 +11,7 @@ namespace SQLCE4Umbraco
     public static class SqlCeContextGuardian
     {
         private static SqlCeConnection _constantOpenConnection;
-        private static object objLock = new object();
+        private static readonly object Lock = new object();
 
         // Awesome SQL CE 4 speed improvement by Erik Ejskov Jensen - SQL CE 4 MVP
         // It's not an issue with SQL CE 4 that we never close the connection
@@ -29,7 +29,7 @@ namespace SQLCE4Umbraco
             connectionStringBuilder.Remove("datalayer");
 
             // SQL CE 4 performs better when there's always a connection open in the background
-            ensureOpenBackgroundConnection(connectionStringBuilder.ConnectionString);
+            EnsureOpenBackgroundConnection(connectionStringBuilder.ConnectionString);
 
             SqlCeConnection conn = new SqlCeConnection(connectionStringBuilder.ConnectionString);
             conn.Open();
@@ -38,9 +38,18 @@ namespace SQLCE4Umbraco
 
         }
 
-        private static void ensureOpenBackgroundConnection(string connectionString)
+		/// <summary>
+		/// Sometimes we need to ensure this is closed especially in unit tests
+		/// </summary>
+		internal static void CloseBackgroundConnection()
+		{
+			if (_constantOpenConnection != null)
+				_constantOpenConnection.Close();
+		}
+
+        private static void EnsureOpenBackgroundConnection(string connectionString)
         {
-            lock (objLock)
+            lock (Lock)
             {
                 if (_constantOpenConnection == null)
                 {

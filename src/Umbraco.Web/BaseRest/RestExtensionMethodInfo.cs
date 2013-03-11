@@ -199,33 +199,34 @@ namespace Umbraco.Web.BaseRest
 			// which has been properly marked with the attribute, and use the attribute
 			// properties to setup a RestExtensionMethodInfo
 
-			var extensions = PluginManager.Current.ResolveLegacyRestExtensions();
-			var extension = extensions
-				.SingleOrDefault(type => type.GetCustomAttribute<global::umbraco.presentation.umbracobase.RestExtension>(false).GetAlias() == extensionAlias);
+			var extensions = PluginManager.Current.ResolveLegacyRestExtensions()
+				.Where(type => type.GetCustomAttribute<global::umbraco.presentation.umbracobase.RestExtension>(false).GetAlias() == extensionAlias);
 
 			RestExtensionMethodInfo info = null;
 
-			if (extension != null)
+            foreach (var extension in extensions) // foreach classes with extension alias
 			{
 				var method = extension.GetMethod(methodName);
-				if (method != null)
-				{
-					var attribute = method.GetCustomAttributes(typeof(global::umbraco.presentation.umbracobase.RestExtensionMethod), false).Cast<global::umbraco.presentation.umbracobase.RestExtensionMethod>().SingleOrDefault();
-					if (attribute != null)
-					{
-						info = new RestExtensionMethodInfo(attribute.GetAllowAll(),
-							attribute.GetAllowGroup(), attribute.GetAllowType(), attribute.GetAllowMember(),
-							attribute.returnXml,
-							method);
+                if (method == null) continue; // not implementing the method = ignore
 
-						// looks good, cache
-						lock (_cache)
-						{
-							_cache[cacheKey] = info;
-						}
-					}
-				}
-			}
+			    var attribute = method.GetCustomAttributes(typeof(global::umbraco.presentation.umbracobase.RestExtensionMethod), false).Cast<global::umbraco.presentation.umbracobase.RestExtensionMethod>().SingleOrDefault();
+                if (attribute == null) continue; // method has not attribute = ignore
+
+                // got it!
+			    info = new RestExtensionMethodInfo(attribute.GetAllowAll(),
+			                                       attribute.GetAllowGroup(), attribute.GetAllowType(), attribute.GetAllowMember(),
+			                                       attribute.returnXml,
+			                                       method);
+
+			    // cache
+			    lock (_cache)
+			    {
+			        _cache[cacheKey] = info;
+			    }
+            
+                // got it, no need to look any further
+                break;
+            }
 
 			return info;
 		}
@@ -249,34 +250,37 @@ namespace Umbraco.Web.BaseRest
 			// find an extension with that alias, then find a method with that name,
 			// which has been properly marked with the attribute, and use the attribute
 			// properties to setup a RestExtensionMethodInfo
+            //
+            // note: the extension may be implemented by more than one class
 
-			var extensions = PluginManager.Current.ResolveRestExtensions();
-			var extension = extensions
-				.SingleOrDefault(type => type.GetCustomAttribute<RestExtensionAttribute>(false).Alias == extensionAlias);
+			var extensions = PluginManager.Current.ResolveRestExtensions()
+                .Where(type => type.GetCustomAttribute<RestExtensionAttribute>(false).Alias == extensionAlias);
 
 			RestExtensionMethodInfo info = null;
 
-			if (extension != null)
-			{
-				var method = extension.GetMethod(methodName);
-				if (method != null)
-				{
-					var attribute = method.GetCustomAttributes(typeof(RestExtensionMethodAttribute), false).Cast<RestExtensionMethodAttribute>().SingleOrDefault();
-					if (attribute != null)
-					{
-						info = new RestExtensionMethodInfo(attribute.AllowAll,
-							attribute.AllowGroup, attribute.AllowType, attribute.AllowMember,
-							attribute.ReturnXml,
-							method);
+            foreach (var extension in extensions) // foreach classes with extension alias
+            {
+                var method = extension.GetMethod(methodName);
+                if (method == null) continue; // not implementing the method = ignore
 
-						// looks good, cache
-						lock (_cache)
-						{
-							_cache[cacheKey] = info;
-						}
-					}
-				}
-			}
+                var attribute = method.GetCustomAttributes(typeof(RestExtensionMethodAttribute), false).Cast<RestExtensionMethodAttribute>().SingleOrDefault();
+                if (attribute == null) continue; // method has not attribute = ignore
+
+                // got it!
+                info = new RestExtensionMethodInfo(attribute.AllowAll,
+                                                   attribute.AllowGroup, attribute.AllowType, attribute.AllowMember,
+                                                   attribute.ReturnXml,
+                                                   method);
+
+                // cache
+                lock (_cache)
+                {
+                    _cache[cacheKey] = info;
+                }
+
+                // got it, no need to look any further
+                break;
+            }
 
 			return info;
 		}

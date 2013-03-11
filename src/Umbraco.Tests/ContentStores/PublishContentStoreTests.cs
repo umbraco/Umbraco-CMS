@@ -2,6 +2,7 @@ using System.Linq;
 using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -54,6 +55,8 @@ namespace Umbraco.Tests.ContentStores
 		</Home>
 		<Home id=""1175"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""1045"" sortOrder=""2"" createDate=""2012-07-20T18:08:01"" updateDate=""2012-07-20T18:49:32"" nodeName=""Sub 2"" urlName=""sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1175"" isDoc=""""><content><![CDATA[]]></content>
 		</Home>
+		<Home id=""1177"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""1045"" sortOrder=""2"" createDate=""2012-07-20T18:08:01"" updateDate=""2012-07-20T18:49:32"" nodeName=""Sub'Apostrophe"" urlName=""sub'apostrophe"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1177"" isDoc=""""><content><![CDATA[]]></content>
+		</Home>
 	</Home>
 	<Home id=""1172"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""1045"" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test"" writerName=""admin"" creatorName=""admin"" path=""-1,1172"" isDoc="""" />
 </root>";
@@ -63,7 +66,7 @@ namespace Umbraco.Tests.ContentStores
 		public void SetUp()
 		{
 			TestHelper.SetupLog4NetForTests();
-			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
+
 			_httpContextFactory = new FakeHttpContextFactory("~/Home");
 			//ensure the StateHelper is using our custom context
 			StateHelper.HttpContext = _httpContextFactory.HttpContext;
@@ -103,9 +106,7 @@ namespace Umbraco.Tests.ContentStores
 		[TearDown]
 		public void TearDown()
 		{
-			//TODO: need to reset everything!
-
-			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
+			UmbracoSettings.ResetSetters();
 		}
 
 		[Test]
@@ -155,6 +156,7 @@ namespace Umbraco.Tests.ContentStores
 		[TestCase("/home/sub1", 1173)]
 		[TestCase("/Home/sub1", 1173)]
 		[TestCase("/home/Sub1", 1173)] //test different cases
+		[TestCase("/home/Sub'Apostrophe", 1177)]
 		public void Get_Node_By_Route(string route, int nodeId)
 		{
 			var result = _publishedContentStore.GetDocumentByRoute(_umbracoContext, route, false);

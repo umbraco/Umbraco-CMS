@@ -7,9 +7,9 @@ using System.Runtime.CompilerServices;
 // associated with an assembly.
 //
 [assembly: AssemblyTitle("umbraco.businesslogic")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Core assembly containing legacy business logic")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("")]
+[assembly: AssemblyProduct("Umbraco CMS")]
 
 //tg forcing .NET 2.0 security rules, since otherwise it wasn't possible to run in medium trust
 //(got an inheritance security rules violated by type error)

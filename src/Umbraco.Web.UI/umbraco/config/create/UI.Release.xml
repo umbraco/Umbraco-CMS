@@ -134,7 +134,9 @@
   </nodeType>
   <nodeType alias="mediaTypes">
     <header>Medie type</header>
+    <usercontrol>/create/simple.ascx</usercontrol>
     <tasks>
+      <create assembly="umbraco" type="MediaTypeTasks" />
       <delete assembly="umbraco" type="MediaTypeTasks" />
     </tasks>
   </nodeType>
@@ -339,4 +341,22 @@
       <delete assembly="umbraco" type="cms.presentation.user.UserTypeTasks" />
     </tasks>
   </nodeType>
+	
+	<nodeType alias="partialViews">
+		<header>Macro</header>
+		<usercontrol>/create/simple.ascx</usercontrol>
+		<tasks>
+			<create assembly="umbraco" type="PartialViewTasks" />
+			<delete assembly="umbraco" type="PartialViewTasks" />
+		</tasks>
+	</nodeType>
+	<nodeType alias="partialViewMacros">
+		<header>Macro</header>
+		<usercontrol>/Create/PartialViewMacro.ascx</usercontrol>
+		<tasks>
+			<create assembly="umbraco" type="MacroPartialViewTasks" />
+			<delete assembly="umbraco" type="MacroPartialViewTasks" />
+		</tasks>
+	</nodeType>
+	
 </createUI>

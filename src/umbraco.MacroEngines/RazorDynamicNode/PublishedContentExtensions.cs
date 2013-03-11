@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Web;
 using umbraco.NodeFactory;
 using umbraco.interfaces;
+using Property = umbraco.NodeFactory.Property;
 
 namespace umbraco.MacroEngines.Library
 {

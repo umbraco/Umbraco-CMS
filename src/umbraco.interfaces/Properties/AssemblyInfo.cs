@@ -7,6 +7,6 @@ using System.Runtime.CompilerServices;
 // associated with an assembly.
 //
 [assembly: AssemblyTitle("umbraco.interfaces")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Core assembly containing legacy interfaces")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("")]
+[assembly: AssemblyProduct("Umbraco CMS")]

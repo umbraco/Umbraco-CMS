@@ -246,13 +246,13 @@ namespace umbraco.webservices.documents
                 case documentCarrier.EPublishAction.Publish:
                     if (doc.PublishWithResult(user))
                     {
-                        umbraco.library.UpdateDocumentCache(doc.Id);
+                        umbraco.library.UpdateDocumentCache(doc);
                     }
                     break;
                 case documentCarrier.EPublishAction.Unpublish:
                     if (doc.PublishWithResult(user))
                     {
-                        umbraco.library.UnPublishSingleNode(doc.Id);
+                        umbraco.library.UnPublishSingleNode(doc);
                     }
                     break;
                 case documentCarrier.EPublishAction.Ignore:
@@ -260,14 +260,14 @@ namespace umbraco.webservices.documents
                     {
                         if (doc.PublishWithResult(user))
                         {
-                            umbraco.library.UpdateDocumentCache(doc.Id);
+                            umbraco.library.UpdateDocumentCache(doc);
                         }
                     }
                     else
                     {
                         if (doc.PublishWithResult(user))
                         {
-                            umbraco.library.UpdateDocumentCache(doc.Id);
+                            umbraco.library.UpdateDocumentCache(doc);
                         }
                     }
                     break;
@@ -293,7 +293,7 @@ namespace umbraco.webservices.documents
 
             carrier.Published = doc.Published;
             carrier.HasChildren = doc.HasChildren;
-            var props = doc.getProperties;
+            var props = doc.GenericProperties;
             foreach (umbraco.cms.businesslogic.property.Property prop in props)
             {
                 documentProperty carrierprop = new documentProperty();

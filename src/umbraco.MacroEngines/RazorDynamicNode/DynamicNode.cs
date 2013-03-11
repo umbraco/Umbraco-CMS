@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -44,6 +45,9 @@ namespace umbraco.MacroEngines
         private readonly Guid DATATYPE_DATEPICKER_GUID = new Guid("23e93522-3200-44e2-9f29-e61a6fcbb79a");
         //private readonly Guid DATATYPE_INTEGER_GUID = new Guid("1413afcb-d19a-4173-8e9a-68288d2a73b8");
         #endregion
+
+		private DynamicNodeList _cachedChildren;
+		private readonly ConcurrentDictionary<string, object> _cachedMemberOutput = new ConcurrentDictionary<string, object>();
 
         internal readonly DynamicBackingItem n;
 
@@ -154,13 +158,20 @@ namespace umbraco.MacroEngines
         {
             get
             {
-                List<DynamicBackingItem> children = n.ChildrenAsList;
-                //testing
-                if (children.Count == 0 && n.Id == 0)
-                {
-                    return new DynamicNodeList(new List<DynamicBackingItem> { this.n });
-                }
-                return new DynamicNodeList(n.ChildrenAsList);
+	            if (_cachedChildren == null)
+	            {
+					List<DynamicBackingItem> children = n.ChildrenAsList;
+					//testing
+					if (children.Count == 0 && n.Id == 0)
+					{
+						_cachedChildren = new DynamicNodeList(new List<DynamicBackingItem> {this.n});
+					}
+					else
+					{
+                        _cachedChildren = new DynamicNodeList(children);
+					}
+	            }
+				return _cachedChildren;
             }
         }
         public DynamicNodeList XPath(string xPath)
@@ -283,34 +294,17 @@ namespace umbraco.MacroEngines
             var results = s.Search(criteria);
             return ExamineSearchUtill.ConvertSearchResultToDynamicNode(results);
         }
-
-
         
-
+        
         public bool HasProperty(string name)
         {
             if (n != null)
             {
-                try
-                {
-                    IProperty prop = n.GetProperty(name);
-                    if (prop == null)
-                    {
-                        // check for nicer support of Pascal Casing EVEN if alias is camelCasing:
-                        if (prop == null && name.Substring(0, 1).ToUpper() == name.Substring(0, 1))
-                        {
-                            prop = n.GetProperty(name.Substring(0, 1).ToLower() + name.Substring((1)));
-                        }
-                    }
-                    return (prop != null);
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
+                return GetProperty(name) != null;
             }
             return false;
         }
+
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
             try
@@ -406,44 +400,6 @@ namespace umbraco.MacroEngines
             }
             return result;
         }
-        private List<string> GetAncestorOrSelfNodeTypeAlias(DynamicBackingItem node)
-        {
-            List<string> list = new List<string>();
-            if (node != null)
-            {
-                if (node.Type == DynamicBackingItemType.Content)
-                {
-                    //find the doctype node, so we can walk it's parent's tree- not the working.parent content tree
-                    CMSNode working = ContentType.GetByAlias(node.NodeTypeAlias);
-                    while (working != null)
-                    {
-						//NOTE: I'm not sure if anyone has ever tested this but if you get working.Parent it will return a CMSNode and
-						// it will never be castable to a 'ContentType' object
-						// pretty sure the only reason why this method works for the one place that it is used is that it returns
-						// the current node's alias which is all that is actually requried, this is just added overhead for no 
-						// reason
-
-                        if ((working as ContentType) != null)
-                        {
-                            list.Add((working as ContentType).Alias);
-                        }
-                        try
-                        {
-                            working = working.Parent;
-                        }
-                        catch (ArgumentException)
-                        {
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            return list;
-        }
 
     	private static Dictionary<System.Tuple<Guid, int>, Type> _razorDataTypeModelTypes = null;
     	private static readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
@@ -485,14 +441,6 @@ namespace umbraco.MacroEngines
 									}
 								});
 
-							//NOTE: We really dont need to log this?
-							//var i = 1;
-							//foreach (var item in foundTypes)
-							//{
-							//    HttpContext.Current.Trace.Write(string.Format("{0}/{1}: {2}@{4} => {3}", i, foundTypes.Count, item.Key.Item1, item.Value.FullName, item.Key.Item2));
-							//    i++;
-							//}
-
 							//there is no error, so set the collection
 							_razorDataTypeModelTypes = foundTypes;
 
@@ -516,15 +464,35 @@ namespace umbraco.MacroEngines
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
+			var name = binder.Name;
 
-            var name = binder.Name;
+			//check the cache first!
+			if (_cachedMemberOutput.TryGetValue(name, out result))
+			{
+				return true;
+			}
+
             result = null; //this will never be returned
 
-            if (name == "ChildrenAsList" || name == "Children")
+            if (name.InvariantEquals("ChildrenAsList") || name.InvariantEquals("Children"))
             {
                 result = GetChildrenAsList;
+				//cache the result so we don't have to re-process the whole thing
+				_cachedMemberOutput.TryAdd(name, result);
                 return true;
             }
+            if (binder.Name.InvariantEquals("parentId"))
+            {
+                var parent = n.Parent;
+                if (parent == null)
+                {
+                    throw new InvalidOperationException(string.Format("The node {0} does not have a parent", Id));
+                }
+                result = parent.Id;
+                _cachedMemberOutput.TryAdd(name, result);
+                return true;
+            }
+
             bool propertyExists = false;
             if (n != null)
             {
@@ -570,6 +538,8 @@ namespace umbraco.MacroEngines
                             if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, data.Value, out instance))
                             {
                                 result = instance;
+								//cache the result so we don't have to re-process the whole thing
+								_cachedMemberOutput.TryAdd(name, result);
                                 return true;
                             }
                             else
@@ -593,6 +563,8 @@ namespace umbraco.MacroEngines
                             if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, data.Value, out instance))
                             {
                                 result = instance;
+								//cache the result so we don't have to re-process the whole thing
+								_cachedMemberOutput.TryAdd(name, result);
                                 return true;
                             }
                             else
@@ -605,23 +577,12 @@ namespace umbraco.MacroEngines
 							LogHelper.Warn<DynamicNode>(string.Format("Could not get the dataTypeType for the RazorDataTypeModel"));                            
                         }
                     }
-                    else
-                    {
-						//NOTE: Do we really want to log this? I'm not sure.
-						//if (RazorDataTypeModelTypes == null)
-						//{
-						//    HttpContext.Current.Trace.Write(string.Format("RazorDataTypeModelTypes is null, probably an exception while building the cache, falling back to ConvertPropertyValueByDataType", dataType));
-						//}
-						//else
-						//{
-						//    HttpContext.Current.Trace.Write(string.Format("GUID {0} does not have a DataTypeModel, falling back to ConvertPropertyValueByDataType", dataType));
-						//}
-
-                    }
-
-                    //convert the string value to a known type
-                    return ConvertPropertyValueByDataType(ref result, name, dataType);
-
+                    
+					//convert the string value to a known type
+                    var returnVal = ConvertPropertyValueByDataType(ref result, name, dataType);
+					//cache the result so we don't have to re-process the whole thing
+					_cachedMemberOutput.TryAdd(name, result);
+	                return returnVal;
                 }
 
                 //check if the alias is that of a child type
@@ -629,39 +590,30 @@ namespace umbraco.MacroEngines
                 var typeChildren = n.ChildrenAsList;
                 if (typeChildren != null)
                 {
-                    var filteredTypeChildren = typeChildren.Where(x =>
-                    {
-                        List<string> ancestorAliases = GetAncestorOrSelfNodeTypeAlias(x);
-                        if (ancestorAliases == null)
-                        {
-                            return false;
-                        }
-                        return ancestorAliases.Any(alias => alias == name || MakePluralName(alias) == name);
-                    });
+
+	                var filteredTypeChildren = typeChildren
+		                .Where(x => x.NodeTypeAlias.InvariantEquals(name) || x.NodeTypeAlias.MakePluralName().InvariantEquals(binder.Name))
+		                .ToArray();
                     if (filteredTypeChildren.Any())
                     {
                         result = new DynamicNodeList(filteredTypeChildren);
+						//cache the result so we don't have to re-process the whole thing
+						_cachedMemberOutput.TryAdd(name, result);
                         return true;
                     }
 
                 }
 
-                try
+                //lookup the property using reflection
+
+                result = GetReflectedProperty(binder.Name);
+
+                if (result != null)
                 {
-                    result = n.GetType().InvokeMember(binder.Name,
-                                                      System.Reflection.BindingFlags.GetProperty |
-                                                      System.Reflection.BindingFlags.Instance |
-                                                      System.Reflection.BindingFlags.Public,
-                                                      null,
-                                                      n,
-                                                      null);
+                    _cachedMemberOutput.TryAdd(name, result);
                     return true;
                 }
-                catch
-                {
-                    //result = null;
-                    //return false;
-                }
+
             }
 
             //if property access, type lookup and member invoke all failed
@@ -679,6 +631,42 @@ namespace umbraco.MacroEngines
             }
             return true;
         }
+
+        private object GetReflectedProperty(string alias)
+        {
+            Func<string, Attempt<object>> getMember =
+                    memberAlias =>
+                    {
+                        try
+                        {
+                            return new Attempt<object>(true,
+                                                       n.GetType().InvokeMember(memberAlias,
+                                                                                System.Reflection.BindingFlags.GetProperty |
+                                                                                System.Reflection.BindingFlags.Instance |
+                                                                                System.Reflection.BindingFlags.Public,
+                                                                                null,
+                                                                                n,
+                                                                                null));
+                        }
+                        catch (MissingMethodException ex)
+                        {
+                            return new Attempt<object>(ex);
+                        }
+                    };
+
+            //try with the current casing
+            var attempt = getMember(alias);
+            if (!attempt.Success)
+            {
+                //if we cannot get with the current alias, try changing it's case
+                attempt = alias[0].IsUpperCase()
+                    ? getMember(alias.ConvertCase(StringAliasCaseType.CamelCase))
+                    : getMember(alias.ConvertCase(StringAliasCaseType.PascalCase));
+            }
+
+            return attempt.Success ? attempt.Result : null;
+        }
+
         private bool TryCreateInstanceRazorDataTypeModel(Guid dataType, Type dataTypeType, string value, out object result)
         {
             IRazorDataTypeModel razorDataTypeModel = Activator.CreateInstance(dataTypeType, false) as IRazorDataTypeModel;
@@ -1342,7 +1330,43 @@ namespace umbraco.MacroEngines
         public IProperty GetProperty(string alias)
         {
             if (n == null) return null;
-            return n.GetProperty(alias);
+
+            object result;
+            IProperty prop;
+            //check the cache first!
+            if (_cachedMemberOutput.TryGetValue(alias, out result))
+            {
+                prop = result as IProperty;
+                if (prop != null)
+                    return prop;
+            }
+
+            try
+            {
+                prop = n.GetProperty(alias);
+                if (prop == null)
+                {
+                    // check for nicer support of Pascal Casing EVEN if alias is camelCasing:
+                    if (alias.Substring(0, 1).ToUpper() == alias.Substring(0, 1))
+                    {
+                        //change the alias to the other case to check
+                        alias = alias.Substring(0, 1).ToLower() + alias.Substring((1));
+                        prop = n.GetProperty(alias);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+            if (prop == null)
+                return null;
+
+            //cache it!
+            _cachedMemberOutput.TryAdd(alias, prop);
+
+            return prop;
         }
         public IProperty GetProperty(string alias, bool recursive)
         {
@@ -1368,13 +1392,25 @@ namespace umbraco.MacroEngines
         }
         public string GetPropertyValue(string alias, string fallback)
         {
-            var prop = GetProperty(alias);
-            if (prop != null) return prop.Value;
-            return fallback;
+            string prop;
+            if (alias.StartsWith("@"))
+            {
+                var p = GetReflectedProperty(alias.TrimStart('@'));
+                prop = p == null ? null : p.ToString();
+            }
+            else
+            {
+                var p = GetProperty(alias);
+                prop = p != null ? p.Value : null;
+            }
+            return !prop.IsNullOrWhiteSpace() ? prop : fallback;
         }
         public string GetPropertyValue(string alias, bool recursive)
         {
-            return GetPropertyValue(alias, recursive, null);
+            var p = alias.StartsWith("@")
+                    ? GetReflectedProperty(alias.TrimStart('@'))
+                    : GetPropertyValue(alias, recursive, null);
+            return (string) p;
         }
         public string GetPropertyValue(string alias, bool recursive, string fallback)
         {
@@ -1433,14 +1469,24 @@ namespace umbraco.MacroEngines
         {
             return this.Index();
         }
-        public int Index()
+
+        /// <summary>
+        /// Checks if the owner list is null and attempts to create it if there is a parent. 
+        /// </summary>
+        /// <returns>Successful if the owners list is not null, false if the owners list could not be created and remains null</returns>
+        private bool EnsureOwnersList()
         {
             if (this.ownerList == null && this.Parent != null)
             {
                 var list = this.Parent.ChildrenAsList.Select(n => new DynamicNode(n));
-                this.ownerList = new DynamicNodeList(list);
+                this.ownerList = new DynamicNodeList(list);                
             }
-            if (this.ownerList != null)
+            return this.ownerList != null;
+        }
+
+        public int Index()
+        {
+            if (EnsureOwnersList())
             {
                 List<DynamicNode> container = this.ownerList.Items.ToList();
                 int currentIndex = container.FindIndex(n => n.Id == this.Id);
@@ -1448,16 +1494,11 @@ namespace umbraco.MacroEngines
                 {
                     return currentIndex;
                 }
-                else
-                {
-                    throw new IndexOutOfRangeException(string.Format("Node {0} belongs to a DynamicNodeList but could not retrieve the index for it's position in the list", this.Id));
-                }
+                throw new IndexOutOfRangeException(string.Format("Node {0} belongs to a DynamicNodeList but could not retrieve the index for it's position in the list", this.Id));
             }
-            else
-            {
-                throw new ArgumentNullException(string.Format("Node {0} has been orphaned and doesn't belong to a DynamicNodeList", this.Id));
-            }
+            throw new ArgumentNullException(string.Format("Node {0} has been orphaned and doesn't belong to a DynamicNodeList", this.Id));
         }
+
         public bool IsFirst()
         {
             return IsHelper(n => n.Index() == 0);
@@ -1484,7 +1525,7 @@ namespace umbraco.MacroEngines
         }
         public bool IsPosition(int index)
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return false;
             }
@@ -1492,7 +1533,7 @@ namespace umbraco.MacroEngines
         }
         public HtmlString IsPosition(int index, string valueIfTrue)
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return new HtmlString(string.Empty);
             }
@@ -1500,7 +1541,7 @@ namespace umbraco.MacroEngines
         }
         public HtmlString IsPosition(int index, string valueIfTrue, string valueIfFalse)
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return new HtmlString(valueIfFalse);
             }
@@ -1508,7 +1549,7 @@ namespace umbraco.MacroEngines
         }
         public bool IsModZero(int modulus)
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return false;
             }
@@ -1516,7 +1557,7 @@ namespace umbraco.MacroEngines
         }
         public HtmlString IsModZero(int modulus, string valueIfTrue)
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return new HtmlString(string.Empty);
             }
@@ -1524,7 +1565,7 @@ namespace umbraco.MacroEngines
         }
         public HtmlString IsModZero(int modulus, string valueIfTrue, string valueIfFalse)
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return new HtmlString(valueIfFalse);
             }
@@ -1533,7 +1574,7 @@ namespace umbraco.MacroEngines
 
         public bool IsNotModZero(int modulus)
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return false;
             }
@@ -1541,7 +1582,7 @@ namespace umbraco.MacroEngines
         }
         public HtmlString IsNotModZero(int modulus, string valueIfTrue)
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return new HtmlString(string.Empty);
             }
@@ -1549,7 +1590,7 @@ namespace umbraco.MacroEngines
         }
         public HtmlString IsNotModZero(int modulus, string valueIfTrue, string valueIfFalse)
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return new HtmlString(valueIfFalse);
             }
@@ -1557,7 +1598,7 @@ namespace umbraco.MacroEngines
         }
         public bool IsNotPosition(int index)
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return false;
             }
@@ -1565,7 +1606,7 @@ namespace umbraco.MacroEngines
         }
         public HtmlString IsNotPosition(int index, string valueIfTrue)
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return new HtmlString(string.Empty);
             }
@@ -1573,7 +1614,7 @@ namespace umbraco.MacroEngines
         }
         public HtmlString IsNotPosition(int index, string valueIfTrue, string valueIfFalse)
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return new HtmlString(valueIfFalse);
             }
@@ -1581,7 +1622,7 @@ namespace umbraco.MacroEngines
         }
         public bool IsLast()
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return false;
             }
@@ -1590,7 +1631,7 @@ namespace umbraco.MacroEngines
         }
         public HtmlString IsLast(string valueIfTrue)
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return new HtmlString(string.Empty);
             }
@@ -1599,7 +1640,7 @@ namespace umbraco.MacroEngines
         }
         public HtmlString IsLast(string valueIfTrue, string valueIfFalse)
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return new HtmlString(valueIfFalse);
             }
@@ -1608,7 +1649,7 @@ namespace umbraco.MacroEngines
         }
         public bool IsNotLast()
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return false;
             }
@@ -1617,7 +1658,7 @@ namespace umbraco.MacroEngines
         }
         public HtmlString IsNotLast(string valueIfTrue)
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return new HtmlString(string.Empty);
             }
@@ -1626,7 +1667,7 @@ namespace umbraco.MacroEngines
         }
         public HtmlString IsNotLast(string valueIfTrue, string valueIfFalse)
         {
-            if (this.ownerList == null)
+            if (!EnsureOwnersList())
             {
                 return new HtmlString(valueIfFalse);
             }

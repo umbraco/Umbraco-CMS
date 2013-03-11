@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -14,13 +15,66 @@ namespace Umbraco.Core
     public class XmlHelper
     {
 
+        public static string StripDashesInElementOrAttributeNames(string xml)
+        {
+            using (var outputms = new MemoryStream())
+            {
+                using (TextWriter outputtw = new StreamWriter(outputms))
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        using (var tw = new StreamWriter(ms))
+                        {
+                            tw.Write(xml);
+                            tw.Flush();
+                            ms.Position = 0;
+                            using (var tr = new StreamReader(ms))
+                            {
+                                bool IsInsideElement = false, IsInsideQuotes = false;
+                                int ic = 0;
+                                while ((ic = tr.Read()) != -1)
+                                {
+                                    if (ic == (int)'<' && !IsInsideQuotes)
+                                    {
+                                        if (tr.Peek() != (int)'!')
+                                        {
+                                            IsInsideElement = true;
+                                        }
+                                    }
+                                    if (ic == (int)'>' && !IsInsideQuotes)
+                                    {
+                                        IsInsideElement = false;
+                                    }
+                                    if (ic == (int)'"')
+                                    {
+                                        IsInsideQuotes = !IsInsideQuotes;
+                                    }
+                                    if (!IsInsideElement || ic != (int)'-' || IsInsideQuotes)
+                                    {
+                                        outputtw.Write((char)ic);
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                    outputtw.Flush();
+                    outputms.Position = 0;
+                    using (TextReader outputtr = new StreamReader(outputms))
+                    {
+                        return outputtr.ReadToEnd();
+                    }
+                }
+            }
+        }
+
 		/// <summary>
         /// Imports a XML node from text.
         /// </summary>
         /// <param name="text">The text.</param>
         /// <param name="xmlDoc">The XML doc.</param>
         /// <returns></returns>
-        internal static XmlNode ImportXmlNodeFromText(string text, ref XmlDocument xmlDoc)
+		public static XmlNode ImportXmlNodeFromText(string text, ref XmlDocument xmlDoc)
         {
             xmlDoc.LoadXml(text);
             return xmlDoc.FirstChild;
@@ -80,7 +134,7 @@ namespace Umbraco.Core
         /// <param name="name">The node name.</param>
         /// <param name="value">The node value.</param>
         /// <returns>A XmlNode</returns>
-        public static XmlNode AddCDataNode(XmlDocument xd, string name, string value)
+		public static XmlNode AddCDataNode(XmlDocument xd, string name, string value)
         {
             var temp = xd.CreateNode(XmlNodeType.Element, name, "");
             temp.AppendChild(xd.CreateCDataSection(value));
@@ -92,7 +146,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="n">The XmlNode.</param>
         /// <returns>the value as a string</returns>
-		internal static string GetNodeValue(XmlNode n)
+		public static string GetNodeValue(XmlNode n)
         {
             var value = string.Empty;
             if (n == null || n.FirstChild == null)
@@ -108,7 +162,7 @@ namespace Umbraco.Core
         /// <returns>
         /// 	<c>true</c> if the specified string appears to be XML; otherwise, <c>false</c>.
         /// </returns>
-		internal static bool CouldItBeXml(string xml)
+		public static bool CouldItBeXml(string xml)
         {
             if (!string.IsNullOrEmpty(xml))
             {
@@ -131,7 +185,7 @@ namespace Umbraco.Core
         /// <param name="rootName">Name of the root.</param>
         /// <param name="elementName">Name of the element.</param>
         /// <returns>Returns an <c>System.Xml.XmlDocument</c> representation of the delimited string data.</returns>
-		internal static XmlDocument Split(string data, string[] separator, string rootName, string elementName)
+		public static XmlDocument Split(string data, string[] separator, string rootName, string elementName)
         {
             return Split(new XmlDocument(), data, separator, rootName, elementName);
         }
@@ -145,7 +199,7 @@ namespace Umbraco.Core
         /// <param name="rootName">Name of the root node.</param>
         /// <param name="elementName">Name of the element node.</param>
         /// <returns>Returns an <c>System.Xml.XmlDocument</c> representation of the delimited string data.</returns>
-		internal static XmlDocument Split(XmlDocument xml, string data, string[] separator, string rootName, string elementName)
+		public static XmlDocument Split(XmlDocument xml, string data, string[] separator, string rootName, string elementName)
         {
             // load new XML document.
             xml.LoadXml(string.Concat("<", rootName, "/>"));
@@ -174,7 +228,7 @@ namespace Umbraco.Core
 		/// </summary>
 		/// <param name="tag"></param>
 		/// <returns></returns>
-		internal static Dictionary<string, string> GetAttributesFromElement(string tag)
+		public static Dictionary<string, string> GetAttributesFromElement(string tag)
 		{
 			var m =
 				Regex.Matches(tag, "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"",

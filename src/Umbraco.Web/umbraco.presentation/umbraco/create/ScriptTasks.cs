@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -9,7 +10,7 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
-    public class ScriptTasks : interfaces.ITaskReturnUrl
+	public class ScriptTasks : interfaces.ITaskReturnUrl
     {
         private string _alias;
         private int _parentID;
@@ -82,7 +83,8 @@ namespace umbraco
             else if (System.IO.Directory.Exists(path))
                 System.IO.Directory.Delete(path, true);
 
-            BusinessLogic.Log.Add(umbraco.BusinessLogic.LogTypes.Delete, umbraco.BasePages.UmbracoEnsuredPage.CurrentUser, -1, _alias + " Deleted");
+            LogHelper.Info<ScriptTasks>(string.Format("{0} Deleted by user {1}", _alias, UmbracoEnsuredPage.CurrentUser.Id));
+
             return true;
         }
 

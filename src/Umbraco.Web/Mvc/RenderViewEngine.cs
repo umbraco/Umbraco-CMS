@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
+using Microsoft.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web.Models;
@@ -12,11 +13,14 @@ namespace Umbraco.Web.Mvc
 	/// A view engine to look into the template location specified in the config for the front-end/Rendering part of the cms,
 	/// this includes paths to render partial macros and media item templates.
 	/// </summary>
-	public class RenderViewEngine : RazorViewEngine
+	public class RenderViewEngine : FixedRazorViewEngine
 	{
 
 		private readonly IEnumerable<string> _supplementedViewLocations = new[] { "/{0}.cshtml" };
-		private readonly IEnumerable<string> _supplementedPartialViewLocations = new[] { "/{0}.cshtml", "/Partials/{0}.cshtml", "/MacroPartials/{0}.cshtml" };
+		//NOTE: we will make the main view location the last to be searched since if it is the first to be searched and there is both a view and a partial
+		// view in both locations and the main view is rendering a partial view with the same name, we will get a stack overflow exception. 
+		// http://issues.umbraco.org/issue/U4-1287, http://issues.umbraco.org/issue/U4-1215
+		private readonly IEnumerable<string> _supplementedPartialViewLocations = new[] { "/Partials/{0}.cshtml", "/MacroPartials/{0}.cshtml", "/{0}.cshtml" };
 
 		/// <summary>
 		/// Constructor

@@ -1,52 +1,12 @@
 using System;
 using System.Collections.Concurrent;
 using System.Web.Mvc;
+using System.Web.Routing;
 using Umbraco.Core.Models;
 using Umbraco.Core;
 
 namespace Umbraco.Web.Mvc
 {
-	//[PluginController("MyTestSurfaceController")]
-	//public class TestSurfaceController : SurfaceController
-	//{
-	//	public ActionResult Index()
-	//	{
-	//		return View();
-	//		//return Content("<html><body>hello</body></html>");
-	//	}
-
-	//	public ActionResult PostVals(string name)
-	//	{
-	//		ModelState.AddModelError("name", "bad name!");
-	//		return CurrentUmbracoPage();
-	//	}
-
-	//	[ChildActionOnly]
-	//	public ActionResult DoThis(string asdf)
-	//	{
-	//		return PartialView("DoThis", asdf + " DONE!");
-	//	}
-	//}
-
-	//public class LocalSurfaceController : SurfaceController
-	//{
-	//	public ActionResult Index()
-	//	{
-	//		return View();
-	//	}
-
-	//	public ActionResult PostVals([Bind(Prefix = "blah")]string name)
-	//	{
-	//		ModelState.AddModelError("name", "you suck!");
-	//		return this.RedirectToCurrentUmbracoPage();
-	//	}
-
-	//	[ChildActionOnly]
-	//	public ActionResult DoThis(string asdf)
-	//	{
-	//		return PartialView("DoThis", asdf + " DONE Again!");
-	//	}
-	//}
 
 	/// <summary>
 	/// The base controller that all Presentation Add-in controllers should inherit from
@@ -117,10 +77,16 @@ namespace Umbraco.Web.Mvc
 		{
 			get
 			{
-				if (!ControllerContext.RouteData.DataTokens.ContainsKey("umbraco-route-def"))
-					throw new InvalidOperationException("Can only use " + typeof(UmbracoPageResult).Name + " in the context of an Http POST when using the BeginUmbracoForm helper");
+                var routeData = ControllerContext.IsChildAction 
+                    ? ControllerContext.ParentActionViewContext.RouteData 
+                    : ControllerContext.RouteData;
 
-				var routeDef = (RouteDefinition)ControllerContext.RouteData.DataTokens["umbraco-route-def"];
+                if (!routeData.DataTokens.ContainsKey("umbraco-route-def"))
+                {
+                    throw new InvalidOperationException("Cannot find the Umbraco route definition in the route values, the request must be made in the context of an Umbraco request");                    
+                }
+
+                var routeDef = (RouteDefinition)routeData.DataTokens["umbraco-route-def"];
 				return routeDef.PublishedContentRequest.PublishedContent;
 			}
 		}

@@ -6,14 +6,14 @@ using System.Web;
 
 namespace Umbraco.Core.ObjectResolution
 {
-
 	internal abstract class ManyObjectsResolverBase<TResolver, TResolved> : ResolverBase<TResolver>
 		where TResolved : class 
 		where TResolver : class
 	{
 		private List<TResolved> _applicationInstances = null;
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
-		
+		private readonly List<Type> _instanceTypes = new List<Type>(); 
+
 		#region Constructors
 	
 		
@@ -34,7 +34,7 @@ namespace Umbraco.Core.ObjectResolution
 			}
 
 			LifetimeScope = scope;
-			InstanceTypes = new List<Type>();
+			_instanceTypes = new List<Type>();
 		}
 
 		/// <summary>
@@ -48,7 +48,7 @@ namespace Umbraco.Core.ObjectResolution
 			if (httpContext == null) throw new ArgumentNullException("httpContext");
 			LifetimeScope = ObjectLifetimeScope.HttpRequest;
 			CurrentHttpContext = httpContext;
-			InstanceTypes = new List<Type>();
+			_instanceTypes = new List<Type>();
 		}
 
 		/// <summary>
@@ -58,8 +58,8 @@ namespace Umbraco.Core.ObjectResolution
 		/// <param name="scope">If set to true will resolve singleton objects which will be created once for the lifetime of the application</param>
 		protected ManyObjectsResolverBase(IEnumerable<Type> value, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
 			: this(scope)
-		{			
-			InstanceTypes = new List<Type>(value);
+		{
+			_instanceTypes = new List<Type>(value);
 		}
 
 		/// <summary>
@@ -71,7 +71,7 @@ namespace Umbraco.Core.ObjectResolution
 		protected ManyObjectsResolverBase(HttpContextBase httpContext, IEnumerable<Type> value)
 			: this(httpContext)
 		{
-			InstanceTypes = new List<Type>(value);
+			_instanceTypes = new List<Type>(value);
 		} 
 		#endregion
 
@@ -83,7 +83,10 @@ namespace Umbraco.Core.ObjectResolution
 		/// <summary>
 		/// Returns the list of Types registered that instances will be created from
 		/// </summary>
-		protected List<Type> InstanceTypes { get; private set; }
+		protected virtual IEnumerable<Type> InstanceTypes
+		{
+			get { return _instanceTypes; }
+		}
 
 		/// <summary>
 		/// Returns the Current HttpContextBase used to construct this object if one exists. 
@@ -97,11 +100,7 @@ namespace Umbraco.Core.ObjectResolution
 		protected ObjectLifetimeScope LifetimeScope { get; private set; }
 
 		private int _defaultPluginWeight = 10;
-		private bool _supportsAdd = true;
-		private bool _supportsInsert = true;
-		private bool _supportsClear = true;
-		private bool _supportsRemove = true;
-
+		
 		/// <summary>
 		/// Used in conjunction with GetSortedValues and WeightedPluginAttribute, if any of the objects
 		/// being resolved do not contain the WeightedPluginAttribute then this will be the default weight applied
@@ -189,15 +188,16 @@ namespace Umbraco.Core.ObjectResolution
 		/// Removes a type.
 		/// </summary>
 		/// <param name="value">The type to remove.</param>
-		public void RemoveType(Type value)
+		public virtual void RemoveType(Type value)
 		{
-			if (!SupportsRemove)
-				throw new InvalidOperationException("This resolver does not support Removing types");
+			EnsureRemoveSupport();
 
-			using (new WriteLock(_lock))
+			EnsureResolutionNotFrozen();
+
+			using (GetWriteLock())
 			{
 				EnsureCorrectType(value);
-				InstanceTypes.Remove(value);
+				_instanceTypes.Remove(value);
 			}
 		}
 
@@ -215,8 +215,12 @@ namespace Umbraco.Core.ObjectResolution
 		/// </summary>
 		/// <param name="types"></param>
 		protected void AddTypes(IEnumerable<Type> types)
-		{			
-			using (var l = new WriteLock(_lock))
+		{
+			EnsureAddSupport();
+
+			EnsureResolutionNotFrozen();
+
+			using (GetWriteLock())
 			{
 				foreach(var t in types)
 				{
@@ -225,7 +229,7 @@ namespace Umbraco.Core.ObjectResolution
 					{
 						throw new InvalidOperationException("The Type " + t + " already exists in the collection");
 					};
-					InstanceTypes.Add(t);	
+					_instanceTypes.Add(t);	
 				}				
 			}
 		}
@@ -234,19 +238,20 @@ namespace Umbraco.Core.ObjectResolution
 		/// Adds a Type to the end of the list.
 		/// </summary>
 		/// <param name="value">The object to be added.</param>
-		public void AddType(Type value)
+		public virtual void AddType(Type value)
 		{
-			if (!SupportsAdd)
-				throw new InvalidOperationException("This resolver does not support Adding new types");
+			EnsureAddSupport();
 
-			using (var l = new WriteLock(_lock))
+			EnsureResolutionNotFrozen();
+
+			using (GetWriteLock())
 			{
 				EnsureCorrectType(value);
 				if (InstanceTypes.Contains(value))
 				{
 					throw new InvalidOperationException("The Type " + value + " already exists in the collection");
 				};
-				InstanceTypes.Add(value);
+				_instanceTypes.Add(value);
 			}
 		}
 
@@ -262,14 +267,15 @@ namespace Umbraco.Core.ObjectResolution
 		/// <summary>
 		/// Clears the list.
 		/// </summary>
-		public void Clear()
+		public virtual void Clear()
 		{
-			if (!SupportsClear)
-				throw new InvalidOperationException("This resolver does not support Clearing types");
+			EnsureClearSupport();
 
-			using (new WriteLock(_lock))
+			EnsureResolutionNotFrozen();
+
+			using (GetWriteLock())
 			{
-				InstanceTypes.Clear();
+				_instanceTypes.Clear();
 			}
 		}
 
@@ -278,12 +284,13 @@ namespace Umbraco.Core.ObjectResolution
 		/// </summary>
 		/// <param name="index">The zero-based index at which the object should be inserted.</param>
 		/// <param name="value">The object to insert.</param>
-		public void InsertType(int index, Type value)
+		public virtual void InsertType(int index, Type value)
 		{			
-			if (!SupportsInsert)
-				throw new InvalidOperationException("This resolver does not support Inserting new types");
+			EnsureInsertSupport();
 
-			using (var l = new UpgradeableReadLock(_lock))
+			EnsureResolutionNotFrozen();
+
+			using (var l = GetWriteLock())
 			{
 				EnsureCorrectType(value);
 				if (InstanceTypes.Contains(value))
@@ -291,8 +298,7 @@ namespace Umbraco.Core.ObjectResolution
 					throw new InvalidOperationException("The Type " + value + " already exists in the collection");
 				};
 
-				l.UpgradeToWriteLock();
-				InstanceTypes.Insert(index, value);
+				_instanceTypes.Insert(index, value);
 			}
 		}
 
@@ -306,7 +312,65 @@ namespace Umbraco.Core.ObjectResolution
 			InsertType(index, typeof (T));
 		}
 
-		private void EnsureCorrectType(Type t)
+		/// <summary>
+		/// Returns a WriteLock to use when modifying collections
+		/// </summary>
+		/// <returns></returns>
+		protected WriteLock GetWriteLock()
+		{
+			return new WriteLock(_lock);
+		}
+		
+		/// <summary>
+		/// Throws an exception if resolution is frozen
+		/// </summary>
+		protected void EnsureResolutionNotFrozen()
+		{
+			if (Resolution.IsFrozen)
+				throw new InvalidOperationException("The type list cannot be modified after resolution has been frozen");
+		}
+
+		/// <summary>
+		/// Throws an exception if this does not support Remove
+		/// </summary>
+		protected void EnsureRemoveSupport()
+		{
+			if (!SupportsRemove)
+				throw new InvalidOperationException("This resolver does not support Removing types");
+		}
+
+		/// <summary>
+		/// Throws an exception if this does not support Clear
+		/// </summary>
+		protected void EnsureClearSupport()
+		{
+			if (!SupportsClear)
+				throw new InvalidOperationException("This resolver does not support Clearing types");
+		}
+
+		/// <summary>
+		/// Throws an exception if this does not support Add
+		/// </summary>
+		protected void EnsureAddSupport()
+		{
+			if (!SupportsAdd)
+				throw new InvalidOperationException("This resolver does not support Adding new types");
+		}
+
+		/// <summary>
+		/// Throws an exception if this does not support insert
+		/// </summary>
+		protected void EnsureInsertSupport()
+		{
+			if (!SupportsInsert)
+				throw new InvalidOperationException("This resolver does not support Inserting new types");
+		}
+
+		/// <summary>
+		/// Throws an exception if the type is not of the TResolved type
+		/// </summary>
+		/// <param name="t"></param>
+		protected void EnsureCorrectType(Type t)
 		{
 			if (!TypeHelper.IsTypeAssignableFrom<TResolved>(t))
 				throw new InvalidOperationException("The resolver " + this.GetType() + " can only accept types of " + typeof(TResolved) + ". The Type passed in to this method is " + t);
@@ -314,22 +378,22 @@ namespace Umbraco.Core.ObjectResolution
 
 		protected virtual bool SupportsAdd
 		{
-			get { return _supportsAdd; }
+			get { return true; }
 		}
 
 		protected virtual bool SupportsInsert
 		{
-			get { return _supportsInsert; }
+			get { return true; }
 		}
 
 		protected virtual bool SupportsClear
 		{
-			get { return _supportsClear; }
+			get { return true; }
 		}
 
 		protected virtual bool SupportsRemove
 		{
-			get { return _supportsRemove; }
+			get { return true; }
 		}
 	}
 }

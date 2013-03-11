@@ -5,7 +5,7 @@ namespace Umbraco.Core
 	/// <summary>
 	///  A bootstrapper interface for the Umbraco application
 	/// </summary>
-	internal interface IBootManager
+	public interface IBootManager
 	{
 		/// <summary>
 		/// Fires first in the application startup process before any customizations can occur

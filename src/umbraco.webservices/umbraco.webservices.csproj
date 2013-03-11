@@ -58,7 +58,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\umbraco.webservices.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\umbraco.webservices.xml</DocumentationFile>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
@@ -127,7 +127,7 @@
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
-      <Name>umbraco.presentation</Name>
+      <Name>Umbraco.Web</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

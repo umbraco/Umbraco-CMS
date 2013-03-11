@@ -1,0 +1,62 @@
+﻿using NUnit.Framework;
+using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.SqlSyntax;
+
+namespace Umbraco.Tests.Persistence.Mappers
+{
+    [TestFixture]
+    public class ContentTypeMapperTest
+    {
+        [Test]
+        public void Can_Map_Id_Property()
+        {
+            // Arrange
+            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+
+            // Act
+            string column = ContentTypeMapper.Instance.Map("Id");
+
+            // Assert
+            Assert.That(column, Is.EqualTo("[umbracoNode].[id]"));
+        }
+
+        [Test]
+        public void Can_Map_Name_Property()
+        {
+            // Arrange
+            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+
+            // Act
+            string column = ContentTypeMapper.Instance.Map("Name");
+
+            // Assert
+            Assert.That(column, Is.EqualTo("[umbracoNode].[text]"));
+        }
+
+        [Test]
+        public void Can_Map_Thumbnail_Property()
+        {
+            // Arrange
+            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+
+            // Act
+            string column = ContentTypeMapper.Instance.Map("Thumbnail");
+
+            // Assert
+            Assert.That(column, Is.EqualTo("[cmsContentType].[thumbnail]"));
+        }
+
+        [Test]
+        public void Can_Map_Description_Property()
+        {
+            // Arrange
+            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+
+            // Act
+            string column = ContentTypeMapper.Instance.Map("Description");
+
+            // Assert
+            Assert.That(column, Is.EqualTo("[cmsContentType].[description]"));
+        }
+    }
+}

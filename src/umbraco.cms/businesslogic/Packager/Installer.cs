@@ -264,7 +264,7 @@ namespace umbraco.cms.businesslogic.packager
                     }
                     catch (Exception ex)
                     {
-                        Log.Add(LogTypes.Error, -1, "Package install error: " + ex.ToString());
+						LogHelper.Error<Installer>("Package install error", ex);
                     }
                 }
 
@@ -425,7 +425,7 @@ namespace umbraco.cms.businesslogic.packager
                         for (int i = 0; i < allowed.Count; i++)
                             adt[i] = (int)allowed[i];
                         dt.AllowedChildContentTypeIDs = adt;
-
+                        dt.Save();
                         //PPH we log the document type install here.
                         insPack.Data.Documenttypes.Add(dt.Id.ToString());
                         saveNeeded = true;
@@ -458,7 +458,6 @@ namespace umbraco.cms.businesslogic.packager
                     if (n.Attributes["undo"] == null || n.Attributes["undo"].Value == "true")
                     {
                         insPack.Data.Actions += n.OuterXml;
-                        Log.Add(LogTypes.Debug, -1, HttpUtility.HtmlEncode(n.OuterXml));
                     }
 
                     if (n.Attributes["runat"] != null && n.Attributes["runat"].Value == "install")
@@ -483,11 +482,17 @@ namespace umbraco.cms.businesslogic.packager
             }
         }
 
+		/// <summary>
+		/// Remove the temp installation folder
+		/// </summary>
+		/// <param name="packageId"></param>
+		/// <param name="tempDir"></param>
         public void InstallCleanUp(int packageId, string tempDir)
         {
-
-            //this will contain some logic to clean up all those old folders
-
+			if (Directory.Exists(tempDir))
+			{
+				Directory.Delete(tempDir, true);
+			}
         }
 
         /// <summary>
@@ -709,6 +714,15 @@ namespace umbraco.cms.businesslogic.packager
             dt.Thumbnail = xmlHelper.GetNodeValue(n.SelectSingleNode("Info/Thumbnail"));
             dt.Description = xmlHelper.GetNodeValue(n.SelectSingleNode("Info/Description"));
 
+            // Allow at root (check for node due to legacy)
+            bool allowAtRoot = false;
+            string allowAtRootNode = xmlHelper.GetNodeValue(n.SelectSingleNode("Info/AllowAtRoot"));
+            if (!String.IsNullOrEmpty(allowAtRootNode))
+            {
+                bool.TryParse(allowAtRootNode, out allowAtRoot);
+            }
+            dt.AllowAtRoot = allowAtRoot;
+            
             // Templates	
             ArrayList templates = new ArrayList();
             foreach (XmlNode tem in n.SelectNodes("Info/AllowedTemplates/Template"))
@@ -727,7 +741,7 @@ namespace umbraco.cms.businesslogic.packager
             }
             catch (Exception ee)
             {
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, u, dt.Id, "Packager: Error handling allowed templates: " + ee.ToString());
+	            LogHelper.Error<Installer>("Packager: Error handling allowed templates", ee);
             }
 
             // Default template
@@ -738,7 +752,7 @@ namespace umbraco.cms.businesslogic.packager
             }
             catch (Exception ee)
             {
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, u, dt.Id, "Packager: Error assigning default template: " + ee.ToString());
+				LogHelper.Error<Installer>("Packager: Error assigning default template", ee);
             }
 
             // Tabs
@@ -830,7 +844,7 @@ namespace umbraco.cms.businesslogic.packager
                     }
                     catch (Exception ee)
                     {
-                        BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, u, dt.Id, "Packager: Error assigning property to tab: " + ee.ToString());
+						LogHelper.Error<Installer>("Packager: Error assigning property to tab", ee);
                     }
                 }
             }
@@ -857,6 +871,7 @@ namespace umbraco.cms.businesslogic.packager
             foreach (DocumentType.TabI t in dt.getVirtualTabs.ToList())
                 DocumentType.FlushTabCache(t.Id, dt.Id);
 
+            dt.Save();
         }
 
         /// <summary>

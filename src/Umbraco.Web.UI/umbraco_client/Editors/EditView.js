@@ -2,8 +2,9 @@
 
 (function ($) {
 
-
     Umbraco.Editors.EditView = base2.Base.extend({
+        /// <summary>Defines the EditView class to controll the persisting of the view file and UI interaction</summary>
+
         //private methods/variables
         _opts: null,
 
@@ -29,31 +30,72 @@
             });
         },
 
+        insertMacroMarkup: function(alias) {
+            /// <summary>callback used to insert the markup for a macro with no parameters</summary>
+            
+            UmbEditor.Insert("@Umbraco.RenderMacro(\"" + alias + "\")", "", this._opts.codeEditorElementId);
+        },
+        
+        openMacroModal: function (alias) {
+            /// <summary>callback used to display the modal dialog to insert a macro with parameters</summary>
+            var t = "";
+            if (alias != null && alias != "") {
+                t = "&alias=" + alias;
+            }
+            UmbClientMgr.openModalWindow(
+                this._opts.modalUrl + '?renderingEngine=Mvc&objectId=' + this._opts.codeEditorElementId + t,
+                'Insert Macro', true, 470, 530, 0, 0, '', '');
+        },
+
         doSubmit: function () {
+            /// <summary>Submits the data to the server for saving</summary>
             var codeVal = UmbClientMgr.contentFrame().UmbEditor.GetCode();
             var self = this;
 
-            umbraco.presentation.webservices.codeEditorSave.SaveTemplate(
-                this._opts.nameTxtBox.val(),
-                this._opts.aliasTxtBox.val(),
-                codeVal,
-                this._opts.templateId,
-                this._opts.masterPageDropDown.val(),
-                function (t) { self.submitSuccess(t); },
-                function (t) { self.submitFailure(t); });
-        },
-        
-        submitSuccess: function (t) {
-            if (t != 'true') {
-                top.UmbSpeechBubble.ShowMessage('error', this._opts.msgs.templateErrorHeader, this._opts.msgs.templateErrorText);
+            if (this._opts.editorType == "Template") {
+                //saving a template view
+
+                $.post(self._opts.restServiceLocation + "SaveTemplate",
+                    JSON.stringify({
+                        templateName: this._opts.nameTxtBox.val(),
+                        templateAlias: this._opts.aliasTxtBox.val(),
+                        templateContents: codeVal,
+                        templateId: this._opts.templateId,
+                        masterTemplateId: this._opts.masterPageDropDown.val()
+                    }),
+                    function(e) {
+                        if (e.success) {
+                            self.submitSuccess(e.message, e.header);
+                        } else {
+                            self.submitFailure(e.message, e.header);
+                        }
+                    });
             }
             else {
-                top.UmbSpeechBubble.ShowMessage('save', this._opts.msgs.templateSavedHeader, this._opts.msgs.templateSavedText);
+                //saving a partial view    
+
+                $.post(self._opts.restServiceLocation + "SavePartialView",
+                    JSON.stringify({
+                        filename: this._opts.nameTxtBox.val(),
+                        oldName: this._opts.originalFileName,
+                        contents: codeVal
+                    }),
+                    function(e) {
+                        if (e.success) {
+                            self.submitSuccess(e.message, e.header);
+                        } else {
+                            self.submitFailure(e.message, e.header);
+                        }
+                    });
             }
         },
         
-        submitFailure: function (t) {
-            top.UmbSpeechBubble.ShowMessage('error', this._opts.msgs.templateErrorHeader, this._opts.msgs.templateErrorText);
+        submitSuccess: function (err, header) {
+            top.UmbSpeechBubble.ShowMessage('save', header, err);
+        },
+        
+        submitFailure: function (err, header) {
+            top.UmbSpeechBubble.ShowMessage('error', header, err);
         },
         
         changeMasterPageFile: function ( ) {
@@ -87,5 +129,11 @@
     });
 
 
+    //Set defaults for jQuery ajax calls.
+    $.ajaxSetup({
+        dataType: 'json',
+        cache: false,
+        contentType: 'application/json; charset=utf-8'        
+    });
 
 })(jQuery);

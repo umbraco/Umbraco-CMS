@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Xml;
 using System.Xml.XPath;
+using Umbraco.Core.Configuration;
 using umbraco.IO;
 
 namespace umbraco.presentation.developer.packages {
@@ -41,7 +42,17 @@ namespace umbraco.presentation.developer.packages {
             if (!string.IsNullOrEmpty(category))
                 category = "&category=" + category;
 
-            iframeGen.Text = string.Format("<iframe id=\"repoFrame\" frameborder=\"1\" style=\"border: none; display: block\" src=\"{0}?repoGuid={1}{2}&callback={3}:{4}{5}/developer/packages/proxy.htm?/{6}/developer/packages/installer.aspx?repoGuid={7}&version=v45&fullVersion={8}.{9}.{10}&useLegacySchema={11}&dotnetVersion={12}&trustLevel={13}\"></iframe>", url, repoGuid, category, Request.ServerVariables["SERVER_NAME"], Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl( SystemDirectories.Umbraco ), IOHelper.ResolveUrl(SystemDirectories.Umbraco).Trim('/'), repoGuid, GlobalSettings.VersionMajor, GlobalSettings.VersionMinor, GlobalSettings.VersionPatch, UmbracoSettings.UseLegacyXmlSchema.ToString(), Environment.Version, Umbraco.Core.SystemUtilities.GetCurrentTrustLevel() );
+            iframeGen.Text =
+                string.Format(
+                    "<iframe id=\"repoFrame\" frameborder=\"1\" style=\"border: none; display: block\" src=\"{0}?repoGuid={1}{2}&callback={3}:{4}{5}/developer/packages/proxy.htm?/{6}/developer/packages/installer.aspx?repoGuid={7}&version=v45&fullVersion={8}.{9}.{10}&useLegacySchema={11}&dotnetVersion={12}&trustLevel={13}\"></iframe>",
+                    url, repoGuid, category, Request.ServerVariables["SERVER_NAME"],
+                    Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl(SystemDirectories.Umbraco),
+                    IOHelper.ResolveUrl(SystemDirectories.Umbraco).Trim('/'), repoGuid,
+                    UmbracoVersion.Current.Major,
+                    UmbracoVersion.Current.Minor,
+                    UmbracoVersion.Current.Build,
+                    UmbracoSettings.UseLegacyXmlSchema.ToString(), Environment.Version,
+                    Umbraco.Core.SystemUtilities.GetCurrentTrustLevel());
         }
 
         #region Web Form Designer generated code

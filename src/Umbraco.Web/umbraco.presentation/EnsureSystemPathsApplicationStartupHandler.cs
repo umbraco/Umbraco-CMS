@@ -13,8 +13,10 @@ namespace umbraco.presentation
     {
         public EnsureSystemPathsApplicationStartupHandler()
         {
+            EnsurePathExists("~/App_Code");
+            EnsurePathExists("~/App_Data");
+            EnsurePathExists(SystemDirectories.AppPlugins);
             EnsurePathExists(SystemDirectories.Css);
-            EnsurePathExists(SystemDirectories.Data);
             EnsurePathExists(SystemDirectories.MacroScripts);
             EnsurePathExists(SystemDirectories.Masterpages);
             EnsurePathExists(SystemDirectories.Media);

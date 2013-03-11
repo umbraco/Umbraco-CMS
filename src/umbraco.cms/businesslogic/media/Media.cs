@@ -1,14 +1,12 @@
 using System;
-using System.IO;
-using umbraco.BusinessLogic.Actions;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using System.Collections;
 using System.Collections.Generic;
-using umbraco.IO;
 using System.Xml;
 using System.Linq;
-using umbraco.interfaces;
-using umbraco.cms.businesslogic.datatype.controls;
 
 namespace umbraco.cms.businesslogic.media
 {
@@ -17,20 +15,23 @@ namespace umbraco.cms.businesslogic.media
 	///  
 	/// By inheriting the Content class it has a generic datafields which enables custumization
 	/// </summary>
-	public class Media : Content
+    [Obsolete("Obsolete, Use Umbraco.Core.Models.Media", false)]
+    public class Media : Content
 	{
         #region Constants and static members
+
+	    protected internal IMedia MediaItem;
         private const string m_SQLOptimizedMany = @"
 			select 
-				count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate, umbracoNode.nodeUser, umbracoNode.text, 
-				cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId
+				count(children.id) as children, cmsContentType.isContainer, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate, umbracoNode.nodeUser, umbracoNode.text, 
+				cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.nodeId as contentTypeId
 			from umbracoNode 
 			left join umbracoNode children on children.parentId = umbracoNode.id
 			inner join cmsContent on cmsContent.nodeId = umbracoNode.id
 			inner join cmsContentType on cmsContentType.nodeId = cmsContent.contentType
 			where umbracoNode.nodeObjectType = @nodeObjectType AND {0}
-			group by umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate, umbracoNode.nodeUser, umbracoNode.text, 
-				cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId
+			group by cmsContentType.isContainer, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate, umbracoNode.nodeUser, umbracoNode.text, 
+				cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.nodeId
 			order by {1}"; 
         #endregion
 
@@ -51,6 +52,11 @@ namespace umbraco.cms.businesslogic.media
         public Media(int id, bool noSetup) : base(id, noSetup) { }
 
         public Media(Guid id, bool noSetup) : base(id, noSetup) { }
+
+        internal Media(IMedia media) : base(media)
+        {
+            SetupNode(media);
+        }
         
         #endregion
 
@@ -68,16 +74,12 @@ namespace umbraco.cms.businesslogic.media
         /// <param name="u">The user creating the media</param>
         /// <param name="ParentId">The id of the folder under which the media is created</param>
         /// <returns></returns>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.CreateMedia()", false)]
         public static Media MakeNew(string Name, MediaType dct, BusinessLogic.User u, int ParentId)
         {
-            Guid newId = Guid.NewGuid();
-            // Updated to match level from base node
-            CMSNode n = new CMSNode(ParentId);
-            int newLevel = n.Level;
-            newLevel++;
-            CMSNode.MakeNew(ParentId, _objectType, u.Id, newLevel, Name, newId);
-            Media tmp = new Media(newId);
-            tmp.CreateContent(dct);
+            var media = ApplicationContext.Current.Services.MediaService.CreateMedia(Name, ParentId, dct.Alias, u.Id);
+            ApplicationContext.Current.Services.MediaService.Save(media);
+            var tmp = new Media(media);
 
             NewEventArgs e = new NewEventArgs();
             tmp.OnNew(e);
@@ -89,61 +91,25 @@ namespace umbraco.cms.businesslogic.media
         /// Retrieve a list of all toplevel medias and folders
         /// </summary>
         /// <returns></returns>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.GetRootMedia()", false)]
         public static Media[] GetRootMedias()
         {
-            Guid[] topNodeIds = CMSNode.TopMostNodeIds(_objectType);
-
-            Media[] retval = new Media[topNodeIds.Length];
-            for (int i = 0; i < topNodeIds.Length; i++)
-            {
-                Media d = new Media(topNodeIds[i]);
-                retval[i] = d;
-            }
-            return retval;
+            var children = ApplicationContext.Current.Services.MediaService.GetRootMedia();
+            return children.Select(x => new Media(x)).ToArray();
         }
 
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.GetChildren()", false)]
         public static List<Media> GetChildrenForTree(int nodeId)
         {
-
-            List<Media> tmp = new List<Media>();
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(
-                    string.Format(m_SQLOptimizedMany.Trim()
-                        , "umbracoNode.parentID = @parentId"
-                        , "umbracoNode.sortOrder")
-                    , SqlHelper.CreateParameter("@nodeObjectType", _objectType)
-                    , SqlHelper.CreateParameter("@parentId", nodeId)))
-            {
-
-                while (dr.Read())
-                {
-                    Media d = new Media(dr.GetInt("id"), true);
-                    d.PopulateMediaFromReader(dr);                    
-                    tmp.Add(d);
-                }
-
-            }
-            return tmp;
+            var children = ApplicationContext.Current.Services.MediaService.GetChildren(nodeId);
+            return children.Select(x => new Media(x)).ToList();
         }
 
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.GetMediaOfMediaType()", false)]
         public static IEnumerable<Media> GetMediaOfMediaType(int mediaTypeId)
         {
-            var tmp = new List<Media>();
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany.Trim(), "cmsContent.contentType = @contentTypeId", "umbracoNode.sortOrder"),
-                                        SqlHelper.CreateParameter("@nodeObjectType", _objectType),
-                                        SqlHelper.CreateParameter("@contentTypeId", mediaTypeId)))
-            {
-                while (dr.Read())
-                {
-                    Media d = new Media(dr.GetInt("id"), true);
-                    d.PopulateMediaFromReader(dr);
-                    tmp.Add(d);
-                }
-            }
-
-            return tmp.ToArray();
+            var children = ApplicationContext.Current.Services.MediaService.GetMediaOfMediaType(mediaTypeId);
+            return children.Select(x => new Media(x)).ToList();
         }
 
         /// <summary>
@@ -152,61 +118,142 @@ namespace umbraco.cms.businesslogic.media
         /// Use with care.
         /// </summary>
         /// <param name="dt"></param>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.DeleteMediaOfType()", false)]
         public static void DeleteFromType(MediaType dt)
         {
-            //get all document for the document type and order by level (top level first)
-            var medias = Media.GetMediaOfMediaType(dt.Id)
-                .OrderByDescending(x => x.Level);
-
-            foreach (Media media in medias)
-            {
-                //before we delete this document, we need to make sure we don't end up deleting other documents that 
-                //are not of this document type that are children. So we'll move all of it's children to the trash first.
-                foreach (Media m in media.GetDescendants())
-                {
-                    if (m.ContentType.Id != dt.Id)
-                    {
-                        m.MoveToTrash();
-                    }
-                }
-
-                media.DeletePermanently();
-            }
+            ApplicationContext.Current.Services.MediaService.DeleteMediaOfType(dt.Id);
         }
         
         #endregion
 
         #region Public Properties
+        public override int sortOrder
+        {
+            get
+            {
+                return MediaItem == null ? base.sortOrder : MediaItem.SortOrder;
+            }
+            set
+            {
+                if (MediaItem == null)
+                {
+                    base.sortOrder = value;
+                }
+                else
+                {
+                    MediaItem.SortOrder = value;
+                }
+            }
+        }
+
+        public override int Level
+        {
+            get
+            {
+                return MediaItem == null ? base.Level : MediaItem.Level;
+            }
+            set
+            {
+                if (MediaItem == null)
+                {
+                    base.Level = value;
+                }
+                else
+                {
+                    MediaItem.Level = value;
+                }
+            }
+        }
+
+        public override int ParentId
+        {
+            get
+            {
+                return MediaItem == null ? base.ParentId : MediaItem.ParentId;
+            }
+        }
+
+        public override string Path
+        {
+            get
+            {
+                return MediaItem == null ? base.Path : MediaItem.Path;
+            }
+            set
+            {
+                if (MediaItem == null)
+                {
+                    base.Path = value;
+                }
+                else
+                {
+                    MediaItem.Path = value;
+                }
+            }
+        }
+
+        [Obsolete("Obsolete, Use Name property on Umbraco.Core.Models.Content", false)]
+        public override string Text
+        {
+            get
+            {
+                return MediaItem.Name;
+            }
+            set
+            {
+                value = value.Trim();
+                MediaItem.Name = value;
+            }
+        }
+
         /// <summary>
         /// Retrieve a list of all medias underneath the current
         /// </summary>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.GetChildren()", false)]
         public new Media[] Children
         {
             get
-            {                
+            {
                 //return refactored optimized method
-                return Media.GetChildrenForTree(this.Id).ToArray();
+                //return Media.GetChildrenForTree(this.Id).ToArray();
+
+                var children = ApplicationContext.Current.Services.MediaService.GetChildren(Id).OrderBy(c => c.SortOrder);
+                return children.Select(x => new Media(x)).ToArray();
             }
         } 
-
-        
-
-
         #endregion
 
         #region Public methods
 
         /// <summary>
+        /// Overrides the moving of a <see cref="Media"/> object to a new location by changing its parent id.
+        /// </summary>
+        public override void Move(int newParentId)
+        {
+            var current = User.GetCurrent();
+            int userId = current == null ? 0 : current.Id;
+            ApplicationContext.Current.Services.MediaService.Move(MediaItem, newParentId, userId);
+        }
+
+        /// <summary>
         /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
         /// </summary>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.Save()", false)]
         public override void Save()
         {
             SaveEventArgs e = new SaveEventArgs();
             FireBeforeSave(e);
 
+            foreach (var property in GenericProperties)
+            {
+                MediaItem.SetValue(property.PropertyType.Alias, property.Value);
+            }
+            
             if (!e.Cancel)
             {
-                this.VersionDate = DateTime.Now;
+                var current = User.GetCurrent();
+                int userId = current == null ? 0 : current.Id;
+                ApplicationContext.Current.Services.MediaService.Save(MediaItem, userId);
 
                 base.Save();
 
@@ -227,6 +274,7 @@ namespace umbraco.cms.businesslogic.media
         /// <summary>
         /// Moves the media to the trash
         /// </summary>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.MoveToRecycleBin()", false)]
         public override void delete()
         {
             MoveToTrash();
@@ -236,6 +284,7 @@ namespace umbraco.cms.businesslogic.media
         /// With either move the media to the trash or permanently remove it from the database.
         /// </summary>
         /// <param name="deletePermanently">flag to set whether or not to completely remove it from the database or just send to trash</param>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.Delete() or Umbraco.Core.Services.MediaService.MoveToRecycleBin()", false)]
         public void delete(bool deletePermanently)
         {
             if (!deletePermanently)
@@ -248,35 +297,39 @@ namespace umbraco.cms.businesslogic.media
             }
         }
 
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.GetDescendants()", false)]
         public override IEnumerable GetDescendants()
         {
-            var tmp = new List<Media>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany.Trim(), "umbracoNode.path LIKE '%," + this.Id + ",%'", "umbracoNode.level"),
-                                            SqlHelper.CreateParameter("@nodeObjectType", Media._objectType)))
-            {
-                while (dr.Read())
-                {
-                    Media d = new Media(dr.GetInt("id"), true);
-                    d.PopulateMediaFromReader(dr);
-                    tmp.Add(d);
-                }
-            }
-
-            return tmp.ToArray();
+            var descendants = ApplicationContext.Current.Services.MediaService.GetDescendants(Id);
+            return descendants.Select(x => new Media(x));
         }
 
         #endregion
 
         #region Protected methods
+        protected override void setupNode()
+        {
+            if (Id == -1 || Id == -21)
+            {
+                base.setupNode();
+                return;
+            }
+
+            var media = Version == Guid.Empty
+                           ? ApplicationContext.Current.Services.MediaService.GetById(Id)
+                           : ApplicationContext.Current.Services.MediaService.GetByVersion(Version);
+
+            if (media == null)
+                throw new ArgumentException(string.Format("No Media exists with id '{0}'", Id));
+
+            SetupNode(media);
+        }
+        
+        [Obsolete("Obsolete, This method is no longer used")]
         protected void PopulateMediaFromReader(IRecordsReader dr)
         {
-            bool _hc = false;
-            if (dr.GetInt("children") > 0)
-                _hc = true;
-            int? masterContentType = null;
-            if (!dr.IsNull("masterContentType"))
-                masterContentType = dr.GetInt("masterContentType");
+            var hc = dr.GetInt("children") > 0;
+
             SetupMediaForTree(dr.GetGuid("uniqueId")
                 , dr.GetShort("level")
                 , dr.GetInt("parentId")
@@ -285,22 +338,36 @@ namespace umbraco.cms.businesslogic.media
                 , dr.GetString("text")
                 , dr.GetDateTime("createDate")
                 , dr.GetString("icon")
-                , _hc
+                , hc
                 , dr.GetString("alias")
                 , dr.GetString("thumbnail")
                 , dr.GetString("description")
-                , masterContentType
-                , dr.GetInt("contentTypeId"));
+                , null
+                , dr.GetInt("contentTypeId")
+                , dr.GetBoolean("isContainer"));
         } 
         #endregion
 
         #region Private methods
+        private void SetupNode(IMedia media)
+        {
+            MediaItem = media;
+
+            //Setting private properties from IContentBase replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
+            base.PopulateCMSNodeFromContentBase(MediaItem, _objectType);
+
+            //If the version is empty we update with the latest version from the current IContent.
+            if (Version == Guid.Empty)
+                Version = MediaItem.Version;
+        }
+
+        [Obsolete("Obsolete, This method is no longer needed", false)]
         private void SetupMediaForTree(Guid uniqueId, int level, int parentId, int user, string path,
                                           string text, DateTime createDate, string icon, bool hasChildren, string contentTypeAlias, string contentTypeThumb,
-                                            string contentTypeDesc, int? masterContentType, int contentTypeId)
+                                            string contentTypeDesc, int? masterContentType, int contentTypeId, bool isContainer)
         {
             SetupNodeForTree(uniqueId, _objectType, level, parentId, user, path, text, createDate, hasChildren);
-            ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, masterContentType);
+            ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, masterContentType, isContainer);
             ContentTypeIcon = icon;
         }
 
@@ -308,6 +375,7 @@ namespace umbraco.cms.businesslogic.media
         /// Used internally to permanently delete the data from the database
         /// </summary>      
         /// <returns>returns true if deletion isn't cancelled</returns>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.Delete()", false)]
         private bool DeletePermanently()
         {
             DeleteEventArgs e = new DeleteEventArgs();
@@ -316,13 +384,15 @@ namespace umbraco.cms.businesslogic.media
 
             if (!e.Cancel)
             {
-                foreach (Media m in Children.ToList())
+                if (MediaItem != null)
                 {
-                    m.DeletePermanently();
-                }               
-
-                // Remove all files
-                DeleteAssociatedMediaFiles();
+                    ApplicationContext.Current.Services.MediaService.Delete(MediaItem);
+                }
+                else
+                {
+                    var media = ApplicationContext.Current.Services.MediaService.GetById(Id);
+                    ApplicationContext.Current.Services.MediaService.Delete(media);
+                }
 
                 base.delete();
 
@@ -335,6 +405,7 @@ namespace umbraco.cms.businesslogic.media
         /// Used internally to move the node to the recyle bin
         /// </summary>
         /// <returns>Returns true if the move was not cancelled</returns>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.MoveToRecycleBin()", false)]
         private bool MoveToTrash()
         {
             MoveToTrashEventArgs e = new MoveToTrashEventArgs();
@@ -342,7 +413,17 @@ namespace umbraco.cms.businesslogic.media
 
             if (!e.Cancel)
             {
-                Move((int)RecycleBin.RecycleBinType.Media);
+                if (MediaItem != null)
+                {
+                    ApplicationContext.Current.Services.MediaService.MoveToRecycleBin(MediaItem);
+                }
+                else
+                {
+                    var media = ApplicationContext.Current.Services.MediaService.GetById(Id);
+                    ApplicationContext.Current.Services.MediaService.MoveToRecycleBin(media);
+                }
+
+                //Move((int)RecycleBin.RecycleBinType.Media);
 
                 //TODO: Now that we've moved it to trash, we need to move the actual files so they are no longer accessible
                 //from the original URL.

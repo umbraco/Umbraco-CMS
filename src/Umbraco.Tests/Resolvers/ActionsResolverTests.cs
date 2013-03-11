@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Resolvers
 				};
 
 			ActionsResolver.Current = new ActionsResolver(
-				PluginManager.Current.ResolveActions());
+				() => PluginManager.Current.ResolveActions());
 
 			Resolution.Freeze();
 		}

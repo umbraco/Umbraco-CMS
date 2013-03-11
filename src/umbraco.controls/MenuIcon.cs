@@ -5,7 +5,8 @@ using ClientDependency.Core;
 namespace umbraco.uicontrols {
 
 	[ClientDependency(ClientDependencyType.Css, "menuicon/style.css", "UmbracoClient")]
-    internal class MenuIcon : System.Web.UI.WebControls.Image, MenuIconI {
+    internal class MenuIcon : System.Web.UI.WebControls.Image, MenuIconI 
+	{
         private string _OnClickCommand = "";
         private string _AltText = "init";
 

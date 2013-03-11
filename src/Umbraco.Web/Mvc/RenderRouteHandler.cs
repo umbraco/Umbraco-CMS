@@ -10,12 +10,20 @@ using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.template;
+using System.Collections.Generic;
 
 namespace Umbraco.Web.Mvc
 {
 	public class RenderRouteHandler : IRouteHandler
 	{
-		
+		// Define reserved dictionary keys for controller, action and area specified in route additional values data
+		private static class ReservedAdditionalKeys
+		{
+			internal const string Controller = "c";
+			internal const string Action = "a";
+			internal const string Area = "ar";
+		}
+
 		public RenderRouteHandler(IControllerFactory controllerFactory)
 		{
 			if (controllerFactory == null) throw new ArgumentNullException("controllerFactory");			
@@ -107,20 +115,26 @@ namespace Umbraco.Web.Mvc
 				return null;
 
 			var encodedVal = requestContext.HttpContext.Request["uformpostroutevals"];
-			var decodedString = Encoding.UTF8.GetString(Convert.FromBase64String(encodedVal));
-			//the value is formatted as query strings
-			var decodedParts = decodedString.Split('&').Select(x => new { Key = x.Split('=')[0], Value = x.Split('=')[1] }).ToArray();
+			var decryptedString = encodedVal.DecryptWithMachineKey();
+			var parsedQueryString = HttpUtility.ParseQueryString(decryptedString);
+
+			var decodedParts = new Dictionary<string, string>();
+
+			foreach (var key in parsedQueryString.AllKeys)
+			{
+				decodedParts[key] = parsedQueryString[key];
+			}
 
 			//validate all required keys exist
 
 			//the controller
-			if (!decodedParts.Any(x => x.Key == "c"))
+			if (!decodedParts.Any(x => x.Key == ReservedAdditionalKeys.Controller))
 				return null;
 			//the action
-			if (!decodedParts.Any(x => x.Key == "a"))
+			if (!decodedParts.Any(x => x.Key == ReservedAdditionalKeys.Action))
 				return null;
 			//the area
-			if (!decodedParts.Any(x => x.Key == "ar"))
+			if (!decodedParts.Any(x => x.Key == ReservedAdditionalKeys.Area))
 				return null;
 
 			////the controller type, if it contains this then it is a plugin controller, not locally declared.
@@ -135,14 +149,22 @@ namespace Umbraco.Web.Mvc
 			//    };				
 			//}
 
+			foreach (var item in decodedParts.Where(x => !new string[] { 
+				ReservedAdditionalKeys.Controller, 
+				ReservedAdditionalKeys.Action, 
+				ReservedAdditionalKeys.Area }.Contains(x.Key)))
+			{
+				// Populate route with additional values which aren't reserved values so they eventually to action parameters
+				requestContext.RouteData.Values.Add(item.Key, item.Value);
+			}
+
 			//return the proxy info without the surface id... could be a local controller.
 			return new PostedDataProxyInfo
 			{
-				ControllerName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "c").Value),
-				ActionName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "a").Value),
-				Area = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == "ar").Value),
+				ControllerName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == ReservedAdditionalKeys.Controller).Value),
+				ActionName = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == ReservedAdditionalKeys.Action).Value),
+				Area = requestContext.HttpContext.Server.UrlDecode(decodedParts.Single(x => x.Key == ReservedAdditionalKeys.Area).Value),
 			};
-
 		}
 
 		/// <summary>
@@ -151,20 +173,16 @@ namespace Umbraco.Web.Mvc
 		/// </summary>
 		/// <param name="requestContext"></param>
 		/// <param name="postedInfo"></param>
-		/// <param name="routeDefinition">The original route definition that would normally be used to route if it were not a POST</param>
-		private IHttpHandler HandlePostedValues(RequestContext requestContext, PostedDataProxyInfo postedInfo, RouteDefinition routeDefinition)
+		private IHttpHandler HandlePostedValues(RequestContext requestContext, PostedDataProxyInfo postedInfo)
 		{
-			var standardArea = Umbraco.Core.Configuration.GlobalSettings.UmbracoMvcArea;
-
 			//set the standard route values/tokens
 			requestContext.RouteData.Values["controller"] = postedInfo.ControllerName;
 			requestContext.RouteData.Values["action"] = postedInfo.ActionName;
-			requestContext.RouteData.DataTokens["area"] = postedInfo.Area;
 
 			IHttpHandler handler = new MvcHandler(requestContext);
 
 			//ensure the controllerType is set if found, meaning it is a plugin, not locally declared
-			if (postedInfo.Area != standardArea)
+			if (!postedInfo.Area.IsNullOrWhiteSpace())
 			{
 				//requestContext.RouteData.Values["controllerType"] = postedInfo.ControllerType;
 				//find the other data tokens for this route and merge... things like Namespace will be included here
@@ -173,12 +191,15 @@ namespace Umbraco.Web.Mvc
 					var surfaceRoute = RouteTable.Routes.OfType<Route>()
 						.SingleOrDefault(x => x.Defaults != null &&
 						                      x.Defaults.ContainsKey("controller") &&
-						                      x.Defaults["controller"].ToString() == postedInfo.ControllerName &&
+						                      x.Defaults["controller"].ToString().InvariantEquals(postedInfo.ControllerName) &&
 						                      x.DataTokens.ContainsKey("area") &&
-						                      x.DataTokens["area"].ToString() == postedInfo.Area);
+						                      x.DataTokens["area"].ToString().InvariantEquals(postedInfo.Area));
 					if (surfaceRoute == null)
 						throw new InvalidOperationException("Could not find a Surface controller route in the RouteTable for controller name " + postedInfo.ControllerName + " and within the area of " + postedInfo.Area);
-					//set the 'Namespaces' token so the controller factory knows where to look to construct it
+                    
+                    requestContext.RouteData.DataTokens["area"] = surfaceRoute.DataTokens["area"];
+                    
+                    //set the 'Namespaces' token so the controller factory knows where to look to construct it
 					if (surfaceRoute.DataTokens.ContainsKey("Namespaces"))
 					{
 						requestContext.RouteData.DataTokens["Namespaces"] = surfaceRoute.DataTokens["Namespaces"];
@@ -187,11 +208,6 @@ namespace Umbraco.Web.Mvc
 				}
 
 			}
-
-			//store the original URL this came in on
-			requestContext.RouteData.DataTokens["umbraco-item-url"] = requestContext.HttpContext.Request.Url.AbsolutePath;
-			//store the original route definition
-			requestContext.RouteData.DataTokens["umbraco-route-def"] = routeDefinition;
 
 			return handler;
 		}
@@ -249,14 +265,17 @@ namespace Umbraco.Web.Mvc
 				// to the index Action
 				if (publishedContentRequest.HasTemplate)
 				{
-					//check if the custom controller has an action with the same name as the template name (we convert ToUmbracoAlias since the template name might have invalid chars).
-					//NOTE: This also means that all custom actions MUST be PascalCase.. but that should be standard.
-					var templateName = publishedContentRequest.Template.Alias.Split('.')[0].ToUmbracoAlias(StringAliasCaseType.PascalCase);
+					//the template Alias should always be already saved with a safe name.
+                    //if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
+                    // with the action name attribute.
+                    var templateName = global::umbraco.cms.helpers.Casing.SafeAlias(publishedContentRequest.Template.Alias.Split('.')[0]);
 					def.ActionName = templateName;
 				}
 	
 			}
-			
+
+            //store the route definition
+            requestContext.RouteData.DataTokens["umbraco-route-def"] = def;
 
 			return def;
 		}
@@ -269,12 +288,12 @@ namespace Umbraco.Web.Mvc
 		internal IHttpHandler GetHandlerForRoute(RequestContext requestContext, PublishedContentRequest publishedContentRequest)
 		{
 			var routeDef = GetUmbracoRouteDefinition(requestContext, publishedContentRequest);
-
+            
 			//Need to check for a special case if there is form data being posted back to an Umbraco URL
 			var postedInfo = GetPostedFormInfo(requestContext);
 			if (postedInfo != null)
 			{
-				return HandlePostedValues(requestContext, postedInfo, routeDef);
+				return HandlePostedValues(requestContext, postedInfo);
 			}
 
 			//here we need to check if there is no hijacked route and no template assigned, if this is the case

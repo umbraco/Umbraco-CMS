@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml;
 using System.IO;
 using System.Xml.XPath;
+using Umbraco.Core.Logging;
 using umbraco.interfaces.skinning;
 
 namespace umbraco.cms.businesslogic.skinning
@@ -86,12 +87,9 @@ namespace umbraco.cms.businesslogic.skinning
                 }
                 catch (Exception ex)
                 {
-                    umbraco.BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, 0,
-                        "Failed to load dependency type " + (depNode.Attributes["type"] != null ? depNode.Attributes["type"].Value : string.Empty) + ex.Message);
+	                LogHelper.Error<Skin>("Failed to load dependency type " + (depNode.Attributes["type"] != null ? depNode.Attributes["type"].Value : string.Empty), ex);
                 }
             }
-
-           
 
             if (node.SelectSingleNode("/Skin/CSS") != null)
                 s.Css = EmbeddedCss.CreateFromXmlNode(node.SelectSingleNode("/Skin/CSS"));

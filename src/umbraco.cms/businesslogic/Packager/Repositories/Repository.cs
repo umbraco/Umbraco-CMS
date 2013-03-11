@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml;
 using System.IO;
 using System.Net;
+using Umbraco.Core.Logging;
 using umbraco.IO;
 
 namespace umbraco.cms.businesslogic.packager.repositories {
@@ -71,8 +72,10 @@ namespace umbraco.cms.businesslogic.packager.repositories {
                 byte[] thumb = new byte[0]; //todo upload thumbnail... 
 
                 return Webservice.SubmitPackage(m_guid, authorGuid, packageGuid, pack, doc, thumb, packageName, "", "", description);
-            } catch (Exception ex) {
-                umbraco.BusinessLogic.Log.Add(umbraco.BusinessLogic.LogTypes.Debug, -1, ex.ToString());
+            } 
+			catch (Exception ex) 
+			{
+				LogHelper.Error<Repository>("An error occurred in SubmitPackage", ex);
 
                 return SubmitStatus.Error;
             }

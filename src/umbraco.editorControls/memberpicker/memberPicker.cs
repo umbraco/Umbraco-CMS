@@ -62,8 +62,8 @@ namespace umbraco.editorControls
 			base.DataSource = dropdownData;
 			base.DataBind();
 			base.Items.Insert(0, new ListItem(ui.Text("choose") + "...",""));
-            
-            base.SelectedValue = _data.Value.ToString();
+
+            base.SelectedValue = _data.Value != null ? _data.Value.ToString() : "";
 
 			// Iterate on the control items and mark fields by match them with the Text property!
 			//foreach(ListItem li in base.Items) 

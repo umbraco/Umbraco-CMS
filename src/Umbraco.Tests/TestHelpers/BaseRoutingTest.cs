@@ -2,6 +2,7 @@ using System.Configuration;
 using System.Linq;
 using System.Web.Routing;
 using NUnit.Framework;
+using Umbraco.Core.Configuration;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -12,18 +13,6 @@ namespace Umbraco.Tests.TestHelpers
 	[TestFixture, RequiresSTA]
 	public abstract class BaseRoutingTest : BaseWebTest
 	{		
-		public override void Initialize()
-		{					
-			base.Initialize();
-		}
-
-		public override void TearDown()
-		{			
-			base.TearDown();
-
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "");					
-		}
-
 		/// <summary>
 		/// Return a new RoutingContext
 		/// </summary>

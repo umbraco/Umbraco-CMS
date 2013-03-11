@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Web.Mvc;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.Mvc
 {
-	internal class SurfaceControllerResolver : ManyObjectsResolverBase<SurfaceControllerResolver, SurfaceController>
+	internal sealed class SurfaceControllerResolver : ManyObjectsResolverBase<SurfaceControllerResolver, SurfaceController>
 	{
 		public SurfaceControllerResolver(IEnumerable<Type> surfaceControllers)
 			: base(surfaceControllers)
@@ -15,6 +17,7 @@ namespace Umbraco.Web.Mvc
 		/// <summary>
 		/// Gets the surface controllers
 		/// </summary>
+        [Obsolete("This property should not be used in code, controllers are to be instantiated via MVC. To get a list of SurfaceController types use the RegisteredSurfaceControllers property.")]
 		public IEnumerable<SurfaceController> SurfaceControllers
 		{
 			get { return Values; }
@@ -27,5 +30,6 @@ namespace Umbraco.Web.Mvc
 		{
 			get { return InstanceTypes; }
 		}
+        
 	}
 }

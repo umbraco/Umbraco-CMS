@@ -1,0 +1,19 @@
+﻿.umbracoDialog a {
+	color: blue;
+}
+
+.umbracoDialog div {
+	margin-top: 10px;
+}
+
+input[type=text] {
+	width: 350px;
+}
+
+input[type=submit] {
+	width: 90px;
+}
+
+.submit-footer {
+	margin-top: 15px;
+}

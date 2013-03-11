@@ -10,13 +10,11 @@ namespace Umbraco.Core
 	/// </summary>
 	internal sealed class DataTypesResolver : LegacyTransientObjectsResolver<DataTypesResolver, IDataType>
 	{
-
-	
 		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="dataTypes"></param>		
-		internal DataTypesResolver(IEnumerable<Type> dataTypes)
+		internal DataTypesResolver(Func<IEnumerable<Type>> dataTypes)
 			: base(dataTypes)
 		{
 

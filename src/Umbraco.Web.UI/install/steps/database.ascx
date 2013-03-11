@@ -1,5 +1,6 @@
-<%@ Control Language="c#" AutoEventWireup="True" CodeBehind="database.ascx.cs" Inherits="umbraco.presentation.install.steps.detect"
+﻿<%@ Control Language="c#" AutoEventWireup="True" CodeBehind="database.ascx.cs" Inherits="umbraco.presentation.install.steps.detect"
     TargetSchema="http://schemas.microsoft.com/intellisense/ie5" %>
+<%@ Import Namespace="Umbraco.Core.Configuration" %>
 <asp:PlaceHolder ID="settings" runat="server" Visible="true">
     <!-- database box -->
     <div class="tab main-tabinfo">
@@ -209,7 +210,7 @@
     </div>
     <script type="text/javascript">
         var hasEmbeddedDlls = <%= HasEmbeddedDatabaseFiles.ToString().ToLower() %>;
-        var currentVersion = '<%=umbraco.GlobalSettings.CurrentVersion%>';
+        var currentVersion = '<%=UmbracoVersion.Current.ToString(3)%>';
         var configured = <%= IsConfigured.ToString().ToLower() %>;
 
         jQuery(document).ready(function(){
@@ -222,37 +223,37 @@
 
                 switch($(this).val())
                 {
-                    case "blank":
+                case "blank":
 
-                        $(".database-option").hide();
-                        $("#database-blank").show();
-                        $(".installbtn").show();
+                    $(".database-option").hide();
+                    $("#database-blank").show();
+                    $(".installbtn").show();
 	                   
-                        break;
-                    case "embedded":
-                        $(".database-option").hide();
-                        $("#database-embedded").show();
+                    break;
+                case "embedded":
+                    $(".database-option").hide();
+                    $("#database-embedded").show();
 
-                        if (!hasEmbeddedDlls) {
-                            $('.embeddedError').show();
-                            $(".installbtn").hide();
-                        }
-                        else {
-                            $('.embedded').show();
-                            $(".installbtn").show();
-                        }
-	                    
-                        break;
-                    case "advanced":
-                        $(".database-option").hide();
-                        $("#database-advanced").show();
-                        $(".installbtn").show();
-                        break;
-                    case "help":
-                        $(".database-option").hide();
-                        $("#database-help").show();
+                    if (!hasEmbeddedDlls) {
+                        $('.embeddedError').show();
                         $(".installbtn").hide();
-                        break;
+                    }
+                    else {
+                        $('.embedded').show();
+                        $(".installbtn").show();
+                    }
+	                    
+                    break;
+                case "advanced":
+                    $(".database-option").hide();
+                    $("#database-advanced").show();
+                    $(".installbtn").show();
+                    break;
+                case "help":
+                    $(".database-option").hide();
+                    $("#database-help").show();
+                    $(".installbtn").hide();
+                    break;
                 }
 
 
@@ -268,10 +269,42 @@
     <!-- installing umbraco -->
     <div class="tab  install-tab" id="datebase-tab">
         <div class="container">
-            <h1>Installing Umbraco</h1>
-            <p>
-                The Umbraco database is being configured. This process populates your chosen database with a blank Umbraco instance.
-            </p>
+            <asp:PlaceHolder ID="installProgress" runat="server" Visible="True">
+                <div class="progress-status-container">
+                    <h1>Installing Umbraco</h1>
+                    <p>
+                        The Umbraco database is being configured. This process populates your chosen database with a blank Umbraco instance.
+                    </p>
+                </div>
+                <div class="result-status-container" style="display: none;">
+                    <h1>Database installed</h1>
+                    <div class="success">
+                        <p>
+                            Umbraco
+				            <%=UmbracoVersion.Current.ToString(3)%>
+				            has now been copied to your database. Press <b>Continue</b> to proceed.
+                        </p>
+                    </div>
+                </div>
+            </asp:PlaceHolder>
+            <asp:PlaceHolder ID="upgradeProgress" runat="server" Visible="False">
+                <div class="progress-status-container">
+                    <h1>Upgrading Umbraco</h1>
+                    <p>
+                        The Umbraco database is being configured. This process upgrades your Umbraco database.
+                    </p>
+                </div>
+                <div class="result-status-container" style="display: none;">
+                    <h1>Database upgraded</h1>
+                    <div class="success">
+                        <p>
+                            Your database has been upgraded to version: 
+					            <%=UmbracoVersion.Current.ToString(3)%>.<br />
+                            Press <b>Continue</b> to proceed.
+                        </p>
+                    </div>                    
+                </div>
+            </asp:PlaceHolder>
             <div class="loader">
                 <div class="hold">
                     <div class="progress-bar">
@@ -290,70 +323,35 @@
     </div>
 
     <script type="text/javascript">
-        var intervalId = 0;
+        jQuery(document).ready(function() {
+            updateProgressBar("5");
+            updateStatusMessage("Connecting to database..");
 
-        jQuery(document).ready(function () {
-            intervalId = setInterval("progressBarCallback()", 1000);
-            jQuery(".btn-box").hide();
-            jQuery.ajax({
+            $.ajax({
                 type: 'POST',
                 contentType: 'application/json; charset=utf-8',
                 data: '{}',
                 dataType: 'json',
-                url: 'utills/p.aspx/installOrUpgrade'
+                url: 'utills/p.aspx/installOrUpgrade',
+                success: function(data) {
+                    var json = JSON.parse(data.d);
+
+                    updateProgressBar(json.Percentage);
+                    updateStatusMessage(json.Message);
+                
+                    if (json.Success) {    
+                        $(".btn-box").show();
+                        $('.ui-progressbar-value').css("background-image", "url(../umbraco_client/installer/images/pbar.gif)");
+                        $(".result-status-container").show();
+                        $(".progress-status-container").hide();
+                    } else {
+                        $(".btn-continue").hide();
+                        $(".btn-back").show();
+                        $(".btn-box").show();
+                    }
+                }
             });
         });
-
-        function progressBarCallback() {
-            jQuery.getJSON('utills/p.aspx?feed=progress', function (data) {
-
-                updateProgressBar(data.Percentage);
-                updateStatusMessage(data.Description);
-
-                if (data.Error != "") {
-                    clearInterval(intervalId);
-                    updateStatusMessage(jQuery(".loader > strong").text(), data.Error);
-
-                    jQuery(".btn-continue").hide();
-                    jQuery(".btn-back").show();
-                    jQuery(".btn-box").show();
-                }
-
-                if (data.Percentage == 100) {
-                    clearInterval(intervalId);
-                    jQuery(".btn-box").show();
-                    jQuery('.ui-progressbar-value').css("background-image", "url(../umbraco_client/installer/images/pbar.gif)");
-                }
-            });
-        }
     </script>
 
 </asp:PlaceHolder>
-
-<asp:Panel ID="confirms" runat="server" Visible="False">
-    <asp:PlaceHolder ID="installConfirm" runat="server" Visible="False">
-        <h1>Database installed</h1>
-        <div class="success">
-            <p>
-                Umbraco
-				<%=umbraco.GlobalSettings.CurrentVersion%>
-				has now been copied to your database. Press <b>Continue</b> to proceed.
-            </p>
-        </div>
-    </asp:PlaceHolder>
-    <asp:PlaceHolder ID="upgradeConfirm" runat="server" Visible="False">
-        <h1>Database upgraded</h1>
-        <div class="success">
-            <p>
-                Your database has been upgraded to version: 
-					<%=umbraco.GlobalSettings.CurrentVersion%>.<br />
-                Press <b>Continue</b> to proceed.
-            </p>
-        </div>
-    </asp:PlaceHolder>
-    <!-- btn box -->
-    <footer class="btn-box" style="display: none;">
-        <div class="t">&nbsp;</div>
-        <asp:LinkButton class="btn-step btn btn-continue" runat="server" OnClick="gotoNextStep"><span>Continue</span></asp:LinkButton>
-    </footer>
-</asp:Panel>

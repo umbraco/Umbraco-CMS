@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Configuration;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
 using System.Web;
 using System.Web.Caching;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 
 
 namespace Umbraco.Core
@@ -23,14 +19,28 @@ namespace Umbraco.Core
     {
     	/// <summary>
         /// Constructor
-        /// </summary>
-        internal ApplicationContext()
+        /// </summary>        
+        internal ApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
+			:this()
     	{
-			//create a new application cache from the HttpRuntime.Cache
-    		ApplicationCache = HttpRuntime.Cache == null 
-				? new CacheHelper(new Cache()) 
-				: new CacheHelper(HttpRuntime.Cache);
+    		if (dbContext == null) throw new ArgumentNullException("dbContext");
+    		if (serviceContext == null) throw new ArgumentNullException("serviceContext");
+
+			_databaseContext = dbContext;
+			_services = serviceContext;			
     	}
+
+		/// <summary>
+		/// Empty constructor normally reserved for unit tests when a DatabaseContext or a ServiceContext is not
+		/// necessarily required or needs to be set after construction.
+		/// </summary>
+		internal ApplicationContext()
+		{
+			//create a new application cache from the HttpRuntime.Cache
+			ApplicationCache = HttpRuntime.Cache == null
+				? new CacheHelper(new Cache())
+				: new CacheHelper(HttpRuntime.Cache);
+		}
 
 		/// <summary>
     	/// Singleton accessor
@@ -50,7 +60,10 @@ namespace Umbraco.Core
         //   now, the boot task that setup the content store ensures that it is ready
         bool _isReady = false;
 		readonly System.Threading.ManualResetEventSlim _isReadyEvent = new System.Threading.ManualResetEventSlim(false);
-        public bool IsReady
+		private DatabaseContext _databaseContext;
+		private ServiceContext _services;
+
+		public bool IsReady
         {
             get
             {
@@ -94,7 +107,7 @@ namespace Umbraco.Core
 				try
 				{
 					string configStatus = ConfigurationStatus;
-					string currentVersion = GlobalSettings.CurrentVersion;
+					string currentVersion = UmbracoVersion.Current.ToString(3);
 
 
 					if (currentVersion != configStatus)
@@ -139,5 +152,39 @@ namespace Umbraco.Core
             if (this.IsReady)
                 throw new Exception("ApplicationContext has already been initialized.");
         }
+
+		/// <summary>
+		/// Gets the current DatabaseContext
+		/// </summary>
+		/// <remarks>
+		/// Internal set is generally only used for unit tests
+		/// </remarks>
+		public DatabaseContext DatabaseContext
+		{
+			get
+			{
+				if (_databaseContext == null)
+					throw new InvalidOperationException("The DatabaseContext has not been set on the ApplicationContext");
+				return _databaseContext;
+			}
+			internal set { _databaseContext = value; }
+		}
+		
+		/// <summary>
+		/// Gets the current ServiceContext
+		/// </summary>
+		/// <remarks>
+		/// Internal set is generally only used for unit tests
+		/// </remarks>
+		public ServiceContext Services
+		{
+			get
+			{
+				if (_services == null)
+					throw new InvalidOperationException("The ServiceContext has not been set on the ApplicationContext");
+				return _services;
+			}
+			internal set { _services = value; }
+		}
     }
 }

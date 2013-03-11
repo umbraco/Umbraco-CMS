@@ -216,7 +216,7 @@ namespace umbraco.webservices.members
             }
 
             // Loading properties to carrier
-            var props = member.getProperties;
+            var props = member.GenericProperties;
             foreach (umbraco.cms.businesslogic.property.Property prop in props)
             {
                 memberProperty carrierprop = new memberProperty();

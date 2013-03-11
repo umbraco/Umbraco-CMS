@@ -35,7 +35,7 @@ namespace umbraco.cms.presentation.Trees
 
         public BaseContentTree(string application) : base(application) { }
 
-        private User m_user;
+        private User _user;
 
         /// <summary>
         /// Returns the current User. This ensures that we don't instantiate a new User object 
@@ -45,7 +45,7 @@ namespace umbraco.cms.presentation.Trees
         {
             get
             {
-                return (m_user == null ? (m_user = UmbracoEnsuredPage.CurrentUser) : m_user);
+                return (_user == null ? (_user = UmbracoEnsuredPage.CurrentUser) : _user);
             }
         }
 
@@ -113,7 +113,7 @@ function openContent(id) {
                 node.OpenIcon = dd.ContentTypeIcon;
             }
 
-            if (dd.Published == false)
+            if (!dd.Published)
                 node.Style.DimNode();
 
             if (dd.HasPendingChanges())
@@ -246,21 +246,16 @@ function openContent(id) {
         }
         protected void SetSourcesAttributes(ref XmlTreeNode treeElement, Document dd)
         {
-			treeElement.HasChildren = dd.HasChildren;
-			if (!IsDialog)
-				treeElement.Source = GetTreeServiceUrl(dd.Id);
-			else
-				treeElement.Source = GetTreeDialogUrl(dd.Id);
+            treeElement.HasChildren = dd.ContentType.IsContainerContentType == false && dd.HasChildren;
+            treeElement.Source = IsDialog == false ? GetTreeServiceUrl(dd.Id) : GetTreeDialogUrl(dd.Id);
         }
+
         protected void SetMenuAttribute(ref XmlTreeNode treeElement, List<IAction> allowedUserActions)
         {
             //clear menu if we're to hide it
-            if (!this.ShowContextMenu)
-                treeElement.Menu = null;
-            else
-                treeElement.Menu = RemoveDuplicateMenuDividers(GetUserAllowedActions(AllowedActions, allowedUserActions));
-
+            treeElement.Menu = this.ShowContextMenu == false ? null : RemoveDuplicateMenuDividers(GetUserAllowedActions(AllowedActions, allowedUserActions));
         }
+
         #endregion
 
         /// <summary>

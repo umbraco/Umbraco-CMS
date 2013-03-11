@@ -55,8 +55,11 @@ namespace Umbraco.Tests.TestHelpers
 
 			RequestContext = MockRepository.GenerateMock<RequestContext>();
 
-			//Request
+            //Cookie collection
+		    var cookieCollection = new HttpCookieCollection();
+            cookieCollection.Add(new HttpCookie("UMB_UCONTEXT", "FBA996E7-D6BE-489B-B199-2B0F3D2DD826"));
 
+		    //Request
 			var request = MockRepository.GenerateMock<HttpRequestBase>();
 			request.Stub(x => x.AppRelativeCurrentExecutionFilePath).Return("~" + fullUrl.AbsolutePath);
 			request.Stub(x => x.PathInfo).Return(string.Empty);
@@ -64,7 +67,7 @@ namespace Umbraco.Tests.TestHelpers
 			request.Stub(x => x.RequestContext).Return(RequestContext);
 			request.Stub(x => x.Url).Return(fullUrl);
 			request.Stub(x => x.ApplicationPath).Return("/");
-			request.Stub(x => x.Cookies).Return(new HttpCookieCollection());
+            request.Stub(x => x.Cookies).Return(cookieCollection);
 			request.Stub(x => x.ServerVariables).Return(new NameValueCollection());
 			var queryStrings = HttpUtility.ParseQueryString(fullUrl.Query);
 			request.Stub(x => x.QueryString).Return(queryStrings);

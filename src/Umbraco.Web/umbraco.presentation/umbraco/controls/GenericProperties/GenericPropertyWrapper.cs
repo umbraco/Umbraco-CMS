@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using umbraco.IO;
+using umbraco.cms.businesslogic.propertytype;
 
 namespace umbraco.controls.GenericProperties
 {
@@ -16,7 +18,7 @@ namespace umbraco.controls.GenericProperties
 		private int _tabId;
 		private string _fullId = "";
 
-		public event System.EventHandler Delete;
+	    public event System.EventHandler Delete;
 
 		public cms.businesslogic.propertytype.PropertyType PropertyType 
 		{
@@ -59,7 +61,7 @@ namespace umbraco.controls.GenericProperties
 			}
 		}
 
-		public GenericPropertyWrapper()
+	    public GenericPropertyWrapper()
 		{
 			//
 			// TODO: Add constructor logic here

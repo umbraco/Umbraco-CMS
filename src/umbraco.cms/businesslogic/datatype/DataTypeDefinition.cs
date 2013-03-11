@@ -2,6 +2,7 @@ using System;
 using System.Data;
 
 using System.Collections;
+using System.Linq;
 using umbraco.DataLayer;
 using System.Xml;
 using umbraco.interfaces;
@@ -9,21 +10,23 @@ using umbraco.cms.businesslogic.propertytype;
 
 namespace umbraco.cms.businesslogic.datatype
 {
-	/// <summary>
-	/// Datatypedefinitions is the basic buildingblocks of umbraco's documents/medias/members generic datastructure 
-	/// 
-	/// A datatypedefinition encapsulates an object which implements the interface IDataType, and are used when defining
-	/// the properties of a document in the documenttype. This extra layer between IDataType and a documenttypes propertytype
-	/// are used amongst other for enabling shared prevalues.
-	/// 
-	/// </summary>
-	public class DataTypeDefinition : CMSNode
-	{
+    /// <summary>
+    /// Datatypedefinitions is the basic buildingblocks of umbraco's documents/medias/members generic datastructure 
+    /// 
+    /// A datatypedefinition encapsulates an object which implements the interface IDataType, and are used when defining
+    /// the properties of a document in the documenttype. This extra layer between IDataType and a documenttypes propertytype
+    /// are used amongst other for enabling shared prevalues.
+    /// 
+    /// </summary>
+    public class DataTypeDefinition : CMSNode
+    {
         #region Private fields
         private Guid _controlId;
 
-        private static Guid _objectType = new Guid("30a2a501-1978-4ddb-a57b-f7efed43ba3c"); 
-        #endregion
+        private static Guid _objectType = new Guid("30a2a501-1978-4ddb-a57b-f7efed43ba3c");
+	    private string _dbType;
+
+	    #endregion
 
         #region Constructors
 
@@ -37,8 +40,8 @@ namespace umbraco.cms.businesslogic.datatype
         /// Initialization of the datatypedefinition
         /// </summary>
         /// <param name="id">Datattypedefininition id</param>
-        public DataTypeDefinition(Guid id) : base(id) { } 
-        
+        public DataTypeDefinition(Guid id) : base(id) { }
+
         #endregion
 
         #region Public Properties
@@ -64,15 +67,19 @@ namespace umbraco.cms.businesslogic.datatype
             }
             set
             {
-				if (SqlHelper == null)
-					throw new InvalidOperationException("Cannot execute a SQL command when the SqlHelper is null");
-				if (value == null)
-					throw new InvalidOperationException("The value passed in is null. The DataType property cannot be set to a null value");
+                if (SqlHelper == null)
+                    throw new InvalidOperationException("Cannot execute a SQL command when the SqlHelper is null");
+                if (value == null)
+                    throw new InvalidOperationException("The value passed in is null. The DataType property cannot be set to a null value");
 
                 SqlHelper.ExecuteNonQuery("update cmsDataType set controlId = @id where nodeID = " + this.Id.ToString(),
                     SqlHelper.CreateParameter("@id", value.Id));
                 _controlId = value.Id;
             }
+        } 
+	    internal string DbType
+	    {
+            get { return _dbType; }
         } 
         #endregion
 
@@ -81,7 +88,7 @@ namespace umbraco.cms.businesslogic.datatype
         {
             //first clear the prevalues
             PreValues.DeleteByDataTypeDefinition(this.Id);
-           
+
             //next clear out the property types
             var propTypes = PropertyType.GetByDataTypeDefinition(this.Id);
             foreach (var p in propTypes)
@@ -147,7 +154,7 @@ namespace umbraco.cms.businesslogic.datatype
             dt.AppendChild(prevalues);
 
             return dt;
-        } 
+        }
         #endregion
 
         #region Static methods
@@ -172,11 +179,11 @@ namespace umbraco.cms.businesslogic.datatype
 
 
                 DataTypeDefinition dtd = MakeNew(u, _name, new Guid(_def));
-				var dataType = f.DataType(new Guid(_id));
-				if (dataType == null)
-					throw new NullReferenceException("Could not resolve a data type with id " + _id);
+                var dataType = f.DataType(new Guid(_id));
+                if (dataType == null)
+                    throw new NullReferenceException("Could not resolve a data type with id " + _id);
 
-	            dtd.DataType = dataType;
+                dtd.DataType = dataType;
                 dtd.Save();
 
                 //add prevalues
@@ -248,11 +255,11 @@ namespace umbraco.cms.businesslogic.datatype
 
             int newId = CMSNode.MakeNew(-1, _objectType, u.Id, 1, Text, UniqueId).Id;
             cms.businesslogic.datatype.controls.Factory f = new cms.businesslogic.datatype.controls.Factory();
-            
+
             // initial control id changed to empty to ensure that it'll always work no matter if 3rd party configurators fail
             // ref: http://umbraco.codeplex.com/workitem/29788
             Guid FirstcontrolId = Guid.Empty;
-           
+
             SqlHelper.ExecuteNonQuery("Insert into cmsDataType (nodeId, controlId, dbType) values (" + newId.ToString() + ",@controlId,'Ntext')",
                 SqlHelper.CreateParameter("@controlId", FirstcontrolId));
 
@@ -270,7 +277,8 @@ namespace umbraco.cms.businesslogic.datatype
         public static DataTypeDefinition GetByDataTypeId(Guid DataTypeId)
         {
             int dfId = 0;
-            foreach (DataTypeDefinition df in DataTypeDefinition.GetAll())
+            // When creating a datatype and not saving it, it will be null, so we need this check
+            foreach (DataTypeDefinition df in DataTypeDefinition.GetAll().Where(x => x.DataType != null))
                 if (df.DataType.Id == DataTypeId)
                 {
                     dfId = df.Id;
@@ -317,7 +325,7 @@ namespace umbraco.cms.businesslogic.datatype
                 System.Web.HttpRuntime.Cache.Insert(string.Format("UmbracoDataTypeDefinition{0}", id.ToString()), dt);
             }
             return (DataTypeDefinition)System.Web.HttpRuntime.Cache[string.Format("UmbracoDataTypeDefinition{0}", id.ToString())];
-        } 
+        }
         #endregion
 
         #region Protected methods
@@ -330,12 +338,13 @@ namespace umbraco.cms.businesslogic.datatype
                 if (dr.Read())
                 {
                     _controlId = dr.GetGuid("controlId");
+                    _dbType = dr.GetString("dbType");
                 }
                 else
                     throw new ArgumentException("No dataType with id = " + this.Id.ToString() + " found");
             }
-            
-        } 
+
+        }
         #endregion
 
         #region Events
@@ -366,7 +375,7 @@ namespace umbraco.cms.businesslogic.datatype
         {
             if (Deleting != null)
                 Deleting(this, e);
-        } 
+        }
         #endregion
 
     }

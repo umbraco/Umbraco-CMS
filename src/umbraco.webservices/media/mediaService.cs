@@ -278,7 +278,7 @@ namespace umbraco.webservices.media
                 carrier.ParentId = -1;
             }
 
-            foreach (Property p in m.getProperties)
+            foreach (Property p in m.GenericProperties)
             {
 
                 mediaProperty carrierprop = new mediaProperty();

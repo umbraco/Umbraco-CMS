@@ -292,8 +292,22 @@ namespace umbraco.cms.presentation
                 bool retVal = true;
                 if (accessRules != null && accessRules.HasChildNodes)
                 {
+                    string currentUserType = CurrentUser.UserType.Alias.ToLowerInvariant();
+                    
+                    //Update access rules so we'll be comparing lower case to lower case always
 
-                    string currentUserType = CurrentUser.UserType.Alias.ToLower();
+                    var denies = accessRules.SelectNodes("deny");
+                    foreach (XmlNode deny in denies)
+                    {
+                        deny.InnerText = deny.InnerText.ToLowerInvariant();
+                    }
+
+                    var grants = accessRules.SelectNodes("grant");
+                    foreach (XmlNode grant in grants)
+                    {
+                        grant.InnerText = grant.InnerText.ToLowerInvariant();
+                    }
+
                     string allowedSections = ",";
                     foreach (BusinessLogic.Application app in CurrentUser.Applications)
                     {

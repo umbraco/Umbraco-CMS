@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -35,7 +36,8 @@ namespace umbraco.cms.presentation.create.controls
                 int counter = 0;
                 bool typeInited = false;
                 StringBuilder js = new StringBuilder();
-                foreach (DocumentType dt in DocumentType.GetAllAsList())
+                var documentTypeList = DocumentType.GetAllAsList().ToList();
+                foreach (DocumentType dt in documentTypeList)
                 {
                     string docDescription = "<em>No description available...</em>";
                     if (dt.Description != null && dt.Description != "")
@@ -68,7 +70,9 @@ namespace umbraco.cms.presentation.create.controls
                             counter++;
                         }
                     }
-                    else {
+                    // The Any check is here for backwards compatibility, if none are allowed at root, then all are allowed
+                    else if (documentTypeList.Any(d => d.AllowAtRoot) == false || dt.AllowAtRoot)
+                    {
                         nodeType.Items.Add(li);
                         js.Append("typeInfo[" + counter + "] = '<img src=\"" + docImage + "\"><p>" +
                                   docDescription + "</p>'\n");

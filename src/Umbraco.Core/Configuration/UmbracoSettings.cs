@@ -25,7 +25,31 @@ namespace Umbraco.Core.Configuration
 	/// </summary>
 	internal class UmbracoSettings
 	{
-		/// <summary>
+        private static bool GetKeyValue(string key, bool defaultValue)
+        {
+            bool value;
+            string stringValue = GetKey(key);
+
+            if (string.IsNullOrWhiteSpace(stringValue))
+                return defaultValue;
+            if (bool.TryParse(stringValue, out value))
+                return value;
+            return defaultValue;
+        }
+
+        private static int GetKeyValue(string key, int defaultValue)
+        {
+            int value;
+            string stringValue = GetKey(key);
+
+            if (string.IsNullOrWhiteSpace(stringValue))
+                return defaultValue;
+            if (int.TryParse(stringValue, out value))
+                return value;
+            return defaultValue;
+        }
+
+        /// <summary>
 		/// Used in unit testing to reset all config items that were set with property setters (i.e. did not come from config)
 		/// </summary>
 		internal static void ResetSetters()
@@ -35,6 +59,8 @@ namespace Umbraco.Core.Configuration
 			_useLegacySchema = null;
 			_useDomainPrefixes = null;
 			_umbracoLibraryCacheDuration = null;
+            _trySkipIisCustomErrors = null;
+		    SettingsFilePath = null;
 		}
 
 		internal const string TempFriendlyXmlChildContainerNodename = ""; // "children";
@@ -125,11 +151,32 @@ namespace Umbraco.Core.Configuration
 		{
 			EnsureSettingsDocument();
 
+            string attrName = null;
+            var pos = key.IndexOf('@');
+            if (pos > 0)
+            {
+                attrName = key.Substring(pos + 1);
+                key = key.Substring(0, pos - 1);
+            }
+
 			var node = UmbracoSettingsXmlDoc.DocumentElement.SelectSingleNode(key);
-			if (node == null || node.FirstChild == null || node.FirstChild.Value == null)
-				return string.Empty;
-			return node.FirstChild.Value;
-		}
+            if (node == null)
+                return string.Empty;
+
+            if (pos < 0)
+            {
+                if (node.FirstChild == null || node.FirstChild.Value == null)
+                    return string.Empty;
+                return node.FirstChild.Value;
+            }
+            else
+            {
+                var attr = node.Attributes[attrName];
+                if (attr == null)
+                    return string.Empty;
+                return attr.Value;
+            }
+        }
 
 		/// <summary>
 		/// Gets a value indicating whether the media library will create new directories in the /media directory.
@@ -202,6 +249,7 @@ namespace Umbraco.Core.Configuration
 				return value != null ? value.Attributes["assembly"].Value : "";
 			}
 		}
+
 		/// <summary>
 		/// Gets the type of an external logger that can be used to store log items in 3rd party systems
 		/// </summary>
@@ -350,24 +398,13 @@ namespace Umbraco.Core.Configuration
 		{
 			get
 			{
-				try
-				{
-					if (_useDomainPrefixes.HasValue)
-						return _useDomainPrefixes.Value;
-					bool result;
-					if (bool.TryParse(GetKey("/settings/requestHandler/useDomainPrefixes"), out result))
-						return result;
-					return false;
-				}
-				catch
-				{
-					return false;
-				}
+                // default: false
+                return _useDomainPrefixes ?? GetKeyValue("/settings/requestHandler/useDomainPrefixes", false);
 			}
-			// for unit tests only
 			internal set
 			{
-				_useDomainPrefixes = value;
+                // for unit tests only
+                _useDomainPrefixes = value;
 			}
 		}
 
@@ -381,31 +418,14 @@ namespace Umbraco.Core.Configuration
 		{
 			get
 			{
-				try
-				{
-					if (GlobalSettings.UseDirectoryUrls)
-					{
-						if (_addTrailingSlash.HasValue)
-							return _addTrailingSlash.Value;
-						bool result;
-						if (bool.TryParse(GetKey("/settings/requestHandler/addTrailingSlash"), out result))
-							return result;
-						return false;
-					}
-					else
-					{
-						return false;
-					}
-				}
-				catch
-				{
-					return false;
-				}
+                // default: false
+                return GlobalSettings.UseDirectoryUrls
+                    && (_addTrailingSlash ?? GetKeyValue("/settings/requestHandler/addTrailingSlash", false));
 			}
-			// for unit tests only
 			internal set
 			{
-				_addTrailingSlash = value;
+                // for unit tests only
+                _addTrailingSlash = value;
 			}
 		}
 
@@ -622,31 +642,34 @@ namespace Umbraco.Core.Configuration
 		{
 			get
 			{
-				if (_forceSafeAliases.HasValue)
-					return _forceSafeAliases.Value;
-
-				string forceSafeAlias = GetKey("/settings/content/ForceSafeAliases");
-				if (String.IsNullOrEmpty(forceSafeAlias))
-					return true;
-				else
-				{
-					try
-					{
-						return bool.Parse(forceSafeAlias);
-					}
-					catch
-					{
-						return true;
-					}
-				}
+                // default: true
+                return _forceSafeAliases ?? GetKeyValue("/settings/content/ForceSafeAliases", true);
 			}
 			internal set
 			{
-				//used for unit  testing
+				// used for unit  testing
 				_forceSafeAliases = value;
 			}
 		}
 
+        private static bool? _trySkipIisCustomErrors;
+
+        /// <summary>
+        /// Gets or sets a value indicating where to try to skip IIS custom errors.
+        /// </summary>
+        public static bool TrySkipIisCustomErrors
+        {
+            get
+            {
+                // default: false
+                return _trySkipIisCustomErrors ?? GetKeyValue("/settings/web.routing/@trySkipIisCustomErrors", false);
+            }
+            internal set
+            {
+                // used for unit  testing
+                _trySkipIisCustomErrors = value;
+            }
+        }
 
 		/// <summary>
 		/// Gets the allowed image file types.
@@ -676,26 +699,14 @@ namespace Umbraco.Core.Configuration
 		{
 			get
 			{
-				if (_umbracoLibraryCacheDuration.HasValue)
-					return _umbracoLibraryCacheDuration.Value;
-				
-				string libraryCacheDuration = GetKey("/settings/content/UmbracoLibraryCacheDuration");
-				if (String.IsNullOrEmpty(libraryCacheDuration))
-					return 1800;
-				else
-				{
-					try
-					{
-						return int.Parse(libraryCacheDuration);
-					}
-					catch
-					{
-						return 1800;
-					}
-				}
-
+                // default: 1800
+                return _umbracoLibraryCacheDuration ?? GetKeyValue("/settings/content/UmbracoLibraryCacheDuration", 1800);
 			}
-			internal set { _umbracoLibraryCacheDuration = value; }
+			internal set
+            {
+                // for unit tests only
+                _umbracoLibraryCacheDuration = value;
+            }
 		}
 
 		/// <summary>
@@ -1051,27 +1062,12 @@ namespace Umbraco.Core.Configuration
 		{
 			get
 			{
-				try
-				{
-					if (_useLegacySchema.HasValue)
-						return _useLegacySchema.Value;
-
-					string value = GetKey("/settings/content/UseLegacyXmlSchema");
-					bool result;
-					if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out result))
-						return result;
-					return true;
-				}
-				catch (Exception)
-				{
-					//default. TODO: When we change this to a real config section we won't have to worry about parse errors
-					// and should handle defaults with unit tests properly.
-					return false;
-				}
+                // default: true
+                return _useLegacySchema ?? GetKeyValue("/settings/content/UseLegacyXmlSchema", false);
 			}
 			internal set
 			{
-				//used for unit  testing
+				// used for unit testing
 				_useLegacySchema = value;
 			}
 		}

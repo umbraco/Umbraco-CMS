@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -122,7 +123,7 @@ namespace umbraco
             }
             catch (Exception ex)
             {
-                Log.Add(LogTypes.Error, UmbracoEnsuredPage.CurrentUser, -1, "Could not remove XSLT file " + Alias + ". ERROR: " + ex.Message);
+                LogHelper.Error<DLRScriptingTasks>(string.Format("Could not remove DLR file {0} - User {1}", Alias, UmbracoEnsuredPage.CurrentUser.Id), ex);
             }
             return true;
         }

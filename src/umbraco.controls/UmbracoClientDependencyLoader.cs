@@ -5,7 +5,7 @@ using System.Text;
 using System.Web.UI;
 using ClientDependency.Core.Controls;
 using ClientDependency.Core.FileRegistration.Providers;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.uicontrols
 {
@@ -22,7 +22,7 @@ namespace umbraco.uicontrols
         public UmbracoClientDependencyLoader()
             : base()
         {
-            this.AddPath("UmbracoClient", IOHelper.ResolveUrl( SystemDirectories.Umbraco_client ));
+            this.AddPath("UmbracoClient", IOHelper.ResolveUrl( SystemDirectories.UmbracoClient ));
             this.AddPath("UmbracoRoot", IOHelper.ResolveUrl( SystemDirectories.Umbraco ));
             this.ProviderName = LoaderControlProvider.DefaultName;  
             
@@ -32,7 +32,7 @@ namespace umbraco.uicontrols
         {
             if (ClientDependencyLoader.Instance == null)
             {
-                UmbracoClientDependencyLoader loader = new UmbracoClientDependencyLoader();
+                var loader = new UmbracoClientDependencyLoader();
                 parent.Controls.Add(loader);
                 isNew = true;
                 return loader;

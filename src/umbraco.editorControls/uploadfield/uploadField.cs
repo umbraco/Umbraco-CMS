@@ -14,17 +14,16 @@ namespace umbraco.editorControls
     [ValidationProperty("IsValid")]
     public class uploadField : HtmlInputFile, IDataEditor
     {
-        private const String _thumbnailext = ".jpg";
-        private readonly cms.businesslogic.datatype.DefaultData _data;
+        private const String Thumbnailext = ".jpg";
+		private readonly cms.businesslogic.datatype.FileHandlerData _data;
         private readonly String _thumbnails;
         private String _text;
-
-        private MediaFileSystem _fs; 
+        private readonly MediaFileSystem _fs; 
 
         public uploadField(IData Data, string ThumbnailSizes)
         {
             _fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            _data = (cms.businesslogic.datatype.DefaultData) Data;
+            _data = (cms.businesslogic.datatype.FileHandlerData) Data; //this is always FileHandlerData
             _thumbnails = ThumbnailSizes;
         }
 
@@ -79,7 +78,7 @@ namespace umbraco.editorControls
             if (helper.Request(ClientID + "clear") == "1")
             {
                 // delete file
-                deleteFile(_text);
+                DeleteFile(_text);
 
                 // set filename in db to nothing
                 _text = "";
@@ -111,57 +110,38 @@ namespace umbraco.editorControls
                 // we update additional properties post image upload
                 if (_data.Value != DBNull.Value && !string.IsNullOrEmpty(_data.Value.ToString()))
                 {
-                    Content content = Content.GetContentFromVersion(_data.Version);
+					//check the FileHandlerData to see if it already loaded in the content item and set it's properties.
+					//if not, then the properties haven't changed so skip.
+	                if (_data.LoadedContentItem != null)
+	                {
+						var content = _data.LoadedContentItem;
 
-                    // update extension in UI
-                    try
-                    {
-                        var extensionControl = FindControlRecursive<noEdit>(Page, "prop_umbracoExtension");
-                        if (extensionControl != null)
-                        {
-                            extensionControl.RefreshLabel(content.getProperty("umbracoExtension").Value.ToString());
-                        }
-                    }
-                    catch
-                    {
-                    }
-
-
-                    // update file size in UI
-                    try
-                    {
-                        var bytesControl = FindControlRecursive<noEdit>(Page, "prop_umbracoBytes");
-                        if (bytesControl != null)
-                        {
-                            bytesControl.RefreshLabel(content.getProperty("umbracoBytes").Value.ToString());
-                        }
-                    }
-                    catch
-                    {
-                    }
-
-                    try
-                    {
-                        var widthControl = FindControlRecursive<noEdit>(Page, "prop_umbracoWidth");
-                        if (widthControl != null)
-                        {
-                            widthControl.RefreshLabel(content.getProperty("umbracoWidth").Value.ToString());
-                        }
-                        var heightControl = FindControlRecursive<noEdit>(Page, "prop_umbracoHeight");
-                        if (heightControl != null)
-                        {
-                            heightControl.RefreshLabel(content.getProperty("umbracoHeight").Value.ToString());
-                        }
-                    }
-                    catch
-                    {
-                    }
+						// update extension in UI				
+						UpdateLabelValue("umbracoExtension", "prop_umbracoExtension", Page, content);
+						// update file size in UI
+						UpdateLabelValue("umbracoBytes", "prop_umbracoBytes", Page, content);
+						UpdateLabelValue("umbracoWidth", "prop_umbracoWidth", Page, content);
+						UpdateLabelValue("umbracoHeight", "prop_umbracoHeight", Page, content);                        
+	                }
+					
                 }
                 Text = _data.Value.ToString();
             }
         }
 
         #endregion
+
+		private static void UpdateLabelValue(string propAlias, string controlId, Page controlPage, Content content)
+		{
+			var extensionControl = FindControlRecursive<noEdit>(controlPage, controlId);
+			if (extensionControl != null)
+			{
+				if (content.getProperty(propAlias) != null && content.getProperty(propAlias).Value != null)
+				{
+					extensionControl.RefreshLabel(content.getProperty(propAlias).Value.ToString());
+				}
+			}
+		}
 
         [Obsolete("This method is now obsolete due to a change in the way that files are handled.  If you need to check if a URL for an uploaded file is safe you should implement your own as this method will be removed in a future version", false)]
         public string SafeUrl(string url)
@@ -179,7 +159,7 @@ namespace umbraco.editorControls
                 Text = _data.Value.ToString();
         }
 
-        private void deleteFile(string fileUrl)
+        private void DeleteFile(string fileUrl)
         {
             if (fileUrl.Length > 0)
             {
@@ -200,8 +180,8 @@ namespace umbraco.editorControls
 
                     try
                     {
-                        if (_fs.FileExists(relativeThumbFilePath + _thumbnailext))
-                            _fs.DeleteFile(relativeThumbFilePath + _thumbnailext);
+                        if (_fs.FileExists(relativeThumbFilePath + Thumbnailext))
+                            _fs.DeleteFile(relativeThumbFilePath + Thumbnailext);
                     }
                     catch
                     {
@@ -214,7 +194,7 @@ namespace umbraco.editorControls
                         {
                             if (thumb != "")
                             {
-                                string relativeExtraThumbFilePath = relativeThumbFilePath + "_" + thumb + _thumbnailext;
+                                string relativeExtraThumbFilePath = relativeThumbFilePath + "_" + thumb + Thumbnailext;
 
                                 try
                                 {
@@ -275,8 +255,8 @@ namespace umbraco.editorControls
             {
                 var relativeFilePath = _fs.GetRelativePath(_text);
                 var ext = relativeFilePath.Substring(relativeFilePath.LastIndexOf(".") + 1, relativeFilePath.Length - relativeFilePath.LastIndexOf(".") - 1);
-                var relativeThumbFilePath = relativeFilePath.Replace("." + ext, "_thumb.jpg");
-                var hasThumb = false;
+                var relativeThumbFilePath = relativeFilePath.Replace("." + ext, "_thumb.jpg");	            
+				var hasThumb = false;
                 try
                 {
                     hasThumb = _fs.FileExists(relativeThumbFilePath);

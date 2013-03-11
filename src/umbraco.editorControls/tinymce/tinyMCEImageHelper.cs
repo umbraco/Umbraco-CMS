@@ -1,10 +1,13 @@
 using System;
 using System.Collections;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.Files;
+using umbraco.IO;
 
 namespace umbraco.editorControls.tinymce
 {
@@ -12,7 +15,12 @@ namespace umbraco.editorControls.tinymce
     {
         public static string cleanImages(string html)
         {
-            var allowedAttributes = UmbracoSettings.ImageAllowedAttributes.ToLower().Split(',');
+            var allowedAttributes = UmbracoSettings.ImageAllowedAttributes.ToLower().Split(',').ToList();
+            
+            //Always add src as it's essential to output any image at all
+            if (allowedAttributes.Contains("src") == false)
+                allowedAttributes.Add("src");
+            
             const string pattern = @"<img [^>]*>";
             var tags = Regex.Matches(html + " ", pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
             foreach (Match tag in tags)
@@ -41,7 +49,11 @@ namespace umbraco.editorControls.tinymce
                             {
                                 int newWidth;
                                 int newHeight;
-                                cleanTag += DoResize(ht, out newWidth, out newHeight);
+                                string newSrc;
+
+                                cleanTag += DoResize(ht, out newWidth, out newHeight, out newSrc);
+
+                                ht["src"] = newSrc;
                             }
                             catch (Exception err)
                             {
@@ -51,8 +63,7 @@ namespace umbraco.editorControls.tinymce
                                     cleanTag += " width=\"" + helper.FindAttribute(ht, "width") + "\"";
                                     cleanTag += " height=\"" + helper.FindAttribute(ht, "height") + "\"";
                                 }
-
-                                LogHelper.Error<tinyMCEImageHelper>("Error resizing image in editor", err);
+								LogHelper.Error<tinyMCEImageHelper>("Error resizing image in editor", err);
                             }
                         }
                         else
@@ -95,7 +106,7 @@ namespace umbraco.editorControls.tinymce
             return html;
         }
 
-        private static string DoResize(IDictionary attributes, out int finalWidth, out int finalHeight)
+        private static string DoResize(IDictionary attributes, out int finalWidth, out int finalHeight, out string newSrc)
         {
             var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
             var orgSrc = HttpContext.Current.Server.HtmlDecode(helper.FindAttribute(attributes, "src").Replace("%20", " "));
@@ -105,7 +116,7 @@ namespace umbraco.editorControls.tinymce
             var newWidth = int.Parse(helper.FindAttribute(attributes, "width"));
             var newHeight = int.Parse(helper.FindAttribute(attributes, "height"));
 
-            var newSrc = "";
+            newSrc = "";
 
             if (orgHeight > 0 && orgWidth > 0 && orgSrc != "")
             {
@@ -125,12 +136,12 @@ namespace umbraco.editorControls.tinymce
                     var uf = new UmbracoFile(orgPath);
                     newSrc = uf.Resize(newWidth, newHeight);
                 }
-                }
+            }
 
             finalWidth = newWidth;
             finalHeight = newHeight;
 
-            return " src=\"" + newSrc + "\"  width=\"" + newWidth + "\"  height=\"" + newHeight + "\"";
+            return " width=\"" + newWidth + "\"  height=\"" + newHeight + "\"";
         }
     }
 }

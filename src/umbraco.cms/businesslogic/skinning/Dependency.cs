@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml;
 using System.Web;
 using System.Reflection;
+using Umbraco.Core.Logging;
 
 namespace umbraco.cms.businesslogic.skinning
 {
@@ -113,8 +114,7 @@ namespace umbraco.cms.businesslogic.skinning
                 }
                 catch (Exception ex)
                 {
-                    umbraco.BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, 0,
-                        "Failed to load task type " + (taskNode.Attributes["type"] != null ? taskNode.Attributes["type"].Value : string.Empty) + ex.Message);
+					LogHelper.Error<Dependency>("Failed to load task type " + (taskNode.Attributes["type"] != null ? taskNode.Attributes["type"].Value : string.Empty), ex);
                 }
             }
 

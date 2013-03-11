@@ -12,12 +12,12 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Configuration
 {
-	//NOTE: Do not expose this class ever until we cleanup all configuration including removal of static classes, etc...
-	// we have this two tasks logged:
-	// http://issues.umbraco.org/issue/U4-58
-	// http://issues.umbraco.org/issue/U4-115	
-	
-	//TODO:  Replace checking for if the app settings exist and returning an empty string, instead return the defaults!
+    //NOTE: Do not expose this class ever until we cleanup all configuration including removal of static classes, etc...
+    // we have this two tasks logged:
+    // http://issues.umbraco.org/issue/U4-58
+    // http://issues.umbraco.org/issue/U4-115	
+
+    //TODO:  Replace checking for if the app settings exist and returning an empty string, instead return the defaults!
 
     /// <summary>
     /// The GlobalSettings Class contains general settings information for the entire Umbraco instance based on information from  web.config appsettings 
@@ -26,15 +26,30 @@ namespace Umbraco.Core.Configuration
     {
 
         #region Private static fields
-        
-		// CURRENT UMBRACO VERSION ID
-    	private const string CurrentUmbracoVersion = "4.11.3";
 
-    	private static string _reservedUrlsCache;
+        private static Version _version;
+        private static readonly object Locker = new object();
+        //make this volatile so that we can ensure thread safety with a double check lock
+    	private static volatile string _reservedUrlsCache;
         private static string _reservedPathsCache;
         private static StartsWithContainer _reservedList = new StartsWithContainer();
+        private static string _reservedPaths;
+        private static string _reservedUrls;
+        //ensure the built on (non-changeable) reserved paths are there at all times
+        private const string StaticReservedPaths = "~/app_plugins/,~/install/,";
+        private const string StaticReservedUrls = "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd,";
 
         #endregion
+
+        /// <summary>
+        /// used for unit tests
+        /// </summary>
+        internal static void ResetCache()
+        {
+            _reservedUrlsCache = null;
+            _reservedPaths = null;
+            _reservedUrls = null;
+        }
 
     	/// <summary>
         /// Gets the reserved urls from web.config.
@@ -43,11 +58,19 @@ namespace Umbraco.Core.Configuration
         public static string ReservedUrls
         {
             get
-            {
-            	return ConfigurationManager.AppSettings.ContainsKey("umbracoReservedUrls") 
-					? ConfigurationManager.AppSettings["umbracoReservedUrls"] 
-					: string.Empty;
+            {                
+                if (_reservedUrls == null)
+                {
+                    var urls = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedUrls")
+                                   ? ConfigurationManager.AppSettings["umbracoReservedUrls"]
+                                   : string.Empty;
+
+                    //ensure the built on (non-changeable) reserved paths are there at all times
+                    _reservedUrls = StaticReservedUrls + urls;    
+                }
+                return _reservedUrls;
             }
+            internal set { _reservedUrls = value; }
         }
 
         /// <summary>
@@ -58,10 +81,25 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-	            return ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths")
-		                   ? ConfigurationManager.AppSettings["umbracoReservedPaths"]
-		                   : string.Empty;
+                if (_reservedPaths == null)
+                {
+                    var reservedPaths = StaticReservedPaths;
+                    //always add the umbraco path to the list
+                    if (ConfigurationManager.AppSettings.ContainsKey("umbracoPath")
+                        && !ConfigurationManager.AppSettings["umbracoPath"].IsNullOrWhiteSpace())
+                    {
+                        reservedPaths += ConfigurationManager.AppSettings["umbracoPath"].EnsureEndsWith(',');
+                    }
+
+                    var allPaths = ConfigurationManager.AppSettings.ContainsKey("umbracoReservedPaths")
+                                    ? ConfigurationManager.AppSettings["umbracoReservedPaths"]
+                                    : string.Empty;
+
+                    _reservedPaths = reservedPaths + allPaths;
+                }
+                return _reservedPaths;
             }
+            internal set { _reservedPaths = value; }
         }
 
         /// <summary>
@@ -71,10 +109,10 @@ namespace Umbraco.Core.Configuration
         public static string ContentXmlFile
         {
             get
-            {                
-				return ConfigurationManager.AppSettings.ContainsKey("umbracoContentXML")
-					? ConfigurationManager.AppSettings["umbracoContentXML"]
-					: string.Empty;	                    
+            {
+                return ConfigurationManager.AppSettings.ContainsKey("umbracoContentXML")
+                    ? ConfigurationManager.AppSettings["umbracoContentXML"]
+                    : string.Empty;
             }
         }
 
@@ -86,9 +124,9 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-				return ConfigurationManager.AppSettings.ContainsKey("umbracoStorageDirectory")
-					? ConfigurationManager.AppSettings["umbracoStorageDirectory"]
-					: string.Empty;	                    
+                return ConfigurationManager.AppSettings.ContainsKey("umbracoStorageDirectory")
+                    ? ConfigurationManager.AppSettings["umbracoStorageDirectory"]
+                    : string.Empty;
             }
         }
 
@@ -100,34 +138,34 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-				return ConfigurationManager.AppSettings.ContainsKey("umbracoPath")
-					? IOHelper.ResolveUrl(ConfigurationManager.AppSettings["umbracoPath"])
-					: string.Empty;	                
+                return ConfigurationManager.AppSettings.ContainsKey("umbracoPath")
+                    ? IOHelper.ResolveUrl(ConfigurationManager.AppSettings["umbracoPath"])
+                    : string.Empty;
             }
         }
 
-		/// <summary>
-		/// This returns the string of the MVC Area route.
-		/// </summary>
-		/// <remarks>
-		/// THIS IS TEMPORARY AND SHOULD BE REMOVED WHEN WE MIGRATE/UPDATE THE CONFIG SETTINGS TO BE A REAL CONFIG SECTION
-		/// AND SHOULD PROBABLY BE HANDLED IN A MORE ROBUST WAY.
-		/// 
-		/// This will return the MVC area that we will route all custom routes through like surface controllers, etc...
-		/// We will use the 'Path' (default ~/umbraco) to create it but since it cannot contain '/' and people may specify a path of ~/asdf/asdf/admin
-		/// we will convert the '/' to '-' and use that as the path. its a bit lame but will work.
-		/// </remarks>
-    	internal static string UmbracoMvcArea
-    	{
-    		get 
-			{ 
-				if (Path.IsNullOrWhiteSpace())
-				{
-					throw new InvalidOperationException("Cannot create an MVC Area path without the umbracoPath specified");
-				}
-				return Path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim();
-			}
-    	}
+        /// <summary>
+        /// This returns the string of the MVC Area route.
+        /// </summary>
+        /// <remarks>
+        /// THIS IS TEMPORARY AND SHOULD BE REMOVED WHEN WE MIGRATE/UPDATE THE CONFIG SETTINGS TO BE A REAL CONFIG SECTION
+        /// AND SHOULD PROBABLY BE HANDLED IN A MORE ROBUST WAY.
+        /// 
+        /// This will return the MVC area that we will route all custom routes through like surface controllers, etc...
+        /// We will use the 'Path' (default ~/umbraco) to create it but since it cannot contain '/' and people may specify a path of ~/asdf/asdf/admin
+        /// we will convert the '/' to '-' and use that as the path. its a bit lame but will work.
+        /// </remarks>
+        internal static string UmbracoMvcArea
+        {
+            get
+            {
+                if (Path.IsNullOrWhiteSpace())
+                {
+                    throw new InvalidOperationException("Cannot create an MVC Area path without the umbracoPath specified");
+                }
+                return Path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim();
+            }
+        }
 
         /// <summary>
         /// Gets the path to umbraco's client directory (/umbraco_client by default).
@@ -147,22 +185,43 @@ namespace Umbraco.Core.Configuration
         /// Gets the database connection string
         /// </summary>
         /// <value>The database connection string.</value>
+        [Obsolete("Use System.ConfigurationManager.ConnectionStrings to get the connection with the key Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName instead")]
         public static string DbDsn
         {
             get
             {
-				return ConfigurationManager.AppSettings.ContainsKey("umbracoDbDSN")
-					? ConfigurationManager.AppSettings["umbracoDbDSN"]
-					: string.Empty;	          				
+                var settings = ConfigurationManager.ConnectionStrings[UmbracoConnectionName];
+                var connectionString = string.Empty;
+
+                if (settings != null)
+                {
+                    connectionString = settings.ConnectionString;
+
+                    // The SqlCe connectionString is formatted slightly differently, so we need to updat it
+                    if (settings.ProviderName.Contains("SqlServerCe"))
+                        connectionString = string.Format("datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;{0}", connectionString);
+                }
+
+                return connectionString;
             }
             set
             {
                 if (DbDsn != value)
                 {
-                    SaveSetting("umbracoDbDSN", value);
+                    if (value.ToLower().Contains("SQLCE4Umbraco.SqlCEHelper".ToLower()))
+                    {
+                        ApplicationContext.Current.DatabaseContext.ConfigureEmbeddedDatabaseConnection();
+                    }
+                    else
+                    {
+                        ApplicationContext.Current.DatabaseContext.ConfigureDatabaseConnection(value);
+                    } 
                 }
             }
         }
+
+        public const string UmbracoConnectionName = "umbracoDbDSN";
+        public const string UmbracoMigrationName = "Umbraco";
 
         /// <summary>
         /// Gets or sets the configuration status. This will return the version number of the currently installed umbraco instance.
@@ -172,15 +231,16 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-				return ConfigurationManager.AppSettings.ContainsKey("umbracoConfigurationStatus")
-					? ConfigurationManager.AppSettings["umbracoConfigurationStatus"]
-					: string.Empty;	        
+                return ConfigurationManager.AppSettings.ContainsKey("umbracoConfigurationStatus")
+                    ? ConfigurationManager.AppSettings["umbracoConfigurationStatus"]
+                    : string.Empty;
             }
             set
             {
                 SaveSetting("umbracoConfigurationStatus", value);
             }
         }
+
 		
         /// <summary>
         /// Saves a setting into the configuration file.
@@ -189,30 +249,55 @@ namespace Umbraco.Core.Configuration
         /// <param name="value">Value of the setting to be saved.</param>
         internal static void SaveSetting(string key, string value)
         {
-            var webConfig = new WebConfigurationFileMap();
-            var vDirs = webConfig.VirtualDirectories;
-            var vDir = FullpathToRoot;
-            foreach (VirtualDirectoryMapping v in webConfig.VirtualDirectories)
-            {
-                if (v.IsAppRoot)
-                {
-                    vDir = v.PhysicalDirectory;
-                }
-            }
+            var fileName = GetFullWebConfigFileName();
+            var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
-            string fileName = String.Concat(vDir, "web.config");
-            var xml = XDocument.Load(fileName);
             var appSettings = xml.Root.Descendants("appSettings").Single();
 
             // Update appSetting if it exists, or else create a new appSetting for the given key and value
-            var setting = appSettings.Descendants("add").Where(s => s.Attribute("key").Value == key).FirstOrDefault();
+            var setting = appSettings.Descendants("add").FirstOrDefault(s => s.Attribute("key").Value == key);
             if (setting == null)
                 appSettings.Add(new XElement("add", new XAttribute("key", key), new XAttribute("value", value)));
             else
                 setting.Attribute("value").Value = value;
 
-            xml.Save(fileName);
+            xml.Save(fileName, SaveOptions.DisableFormatting);
             ConfigurationManager.RefreshSection("appSettings");
+        }
+
+        /// <summary>
+        /// Removes a setting from the configuration file.
+        /// </summary>
+        /// <param name="key">Key of the setting to be removed.</param>
+        internal static void RemoveSetting(string key)
+        {
+            var fileName = GetFullWebConfigFileName();
+            var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
+
+            var appSettings = xml.Root.Descendants("appSettings").Single();
+            var setting = appSettings.Descendants("add").FirstOrDefault(s => s.Attribute("key").Value == key);
+
+            if (setting != null)
+            {
+                setting.Remove();
+                xml.Save(fileName, SaveOptions.DisableFormatting);
+                ConfigurationManager.RefreshSection("appSettings");
+            }
+        }
+
+        private static string GetFullWebConfigFileName()
+        {
+            var webConfig = new WebConfigurationFileMap();
+            var vDir = FullpathToRoot;
+
+            foreach (VirtualDirectoryMapping v in webConfig.VirtualDirectories)
+            {
+                if (v.IsAppRoot)
+                    vDir = v.PhysicalDirectory;
+            }
+
+            var fileName = System.IO.Path.Combine(vDir, "web.config");
+            return fileName;
         }
 
         /// <summary>
@@ -221,7 +306,7 @@ namespace Umbraco.Core.Configuration
         /// <value>The fullpath to root.</value>
         public static string FullpathToRoot
         {
-            get { return HttpRuntime.AppDomainAppPath; }
+            get { return IOHelper.GetRootDirectorySafe(); }
         }
 
         /// <summary>
@@ -254,14 +339,14 @@ namespace Umbraco.Core.Configuration
                 try
                 {
                     string configStatus = ConfigurationStatus;
-                    string currentVersion = CurrentVersion;
+                    string currentVersion = UmbracoVersion.Current.ToString(3);
 
 
                     if (currentVersion != configStatus)
                     {
-                    	LogHelper.Debug<GlobalSettings>("CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus + "'");                    	
+                        LogHelper.Debug<GlobalSettings>("CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus + "'");
                     }
-                        
+
 
                     return (configStatus == currentVersion);
                 }
@@ -318,17 +403,17 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-				try
-				{
-					return int.Parse(ConfigurationManager.AppSettings["umbracoVersionCheckPeriod"]);
-				}
-				catch
-				{
-					return 7;
-				}
+                try
+                {
+                    return int.Parse(ConfigurationManager.AppSettings["umbracoVersionCheckPeriod"]);
+                }
+                catch
+                {
+                    return 7;
+                }
             }
         }
-        
+
         /// <summary>
         /// Returns a string value to determine if umbraco should disbable xslt extensions
         /// </summary>
@@ -337,9 +422,9 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-				return ConfigurationManager.AppSettings.ContainsKey("umbracoDisableXsltExtensions")
-					? ConfigurationManager.AppSettings["umbracoDisableXsltExtensions"]
-					: string.Empty;	   
+                return ConfigurationManager.AppSettings.ContainsKey("umbracoDisableXsltExtensions")
+                    ? ConfigurationManager.AppSettings["umbracoDisableXsltExtensions"]
+                    : string.Empty;
             }
         }
 
@@ -351,9 +436,9 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-				return ConfigurationManager.AppSettings.ContainsKey("umbracoEditXhtmlMode")
-					? ConfigurationManager.AppSettings["umbracoEditXhtmlMode"]
-					: string.Empty;	   
+                return ConfigurationManager.AppSettings.ContainsKey("umbracoEditXhtmlMode")
+                    ? ConfigurationManager.AppSettings["umbracoEditXhtmlMode"]
+                    : string.Empty;
             }
         }
 
@@ -365,9 +450,9 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-				return ConfigurationManager.AppSettings.ContainsKey("umbracoDefaultUILanguage")
-					? ConfigurationManager.AppSettings["umbracoDefaultUILanguage"]
-					: string.Empty;	   
+                return ConfigurationManager.AppSettings.ContainsKey("umbracoDefaultUILanguage")
+                    ? ConfigurationManager.AppSettings["umbracoDefaultUILanguage"]
+                    : string.Empty;
             }
         }
 
@@ -379,9 +464,9 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-				return ConfigurationManager.AppSettings.ContainsKey("umbracoProfileUrl")
-					? ConfigurationManager.AppSettings["umbracoProfileUrl"]
-					: string.Empty;	   
+                return ConfigurationManager.AppSettings.ContainsKey("umbracoProfileUrl")
+                    ? ConfigurationManager.AppSettings["umbracoProfileUrl"]
+                    : string.Empty;
             }
         }
 
@@ -395,14 +480,14 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-				try
-				{
-					return bool.Parse(ConfigurationManager.AppSettings["umbracoHideTopLevelNodeFromPath"]);
-				}
-				catch
-				{
-					return false;
-				}
+                try
+                {
+                    return bool.Parse(ConfigurationManager.AppSettings["umbracoHideTopLevelNodeFromPath"]);
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
 
@@ -410,12 +495,12 @@ namespace Umbraco.Core.Configuration
         /// Gets the current version.
         /// </summary>
         /// <value>The current version.</value>
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static string CurrentVersion
         {
             get
             {
-                // change this to be hardcoded in the binary
-                return CurrentUmbracoVersion;
+                return UmbracoVersion.Current.ToString(3);
             }
         }
 
@@ -423,12 +508,12 @@ namespace Umbraco.Core.Configuration
         /// Gets the major version number.
         /// </summary>
         /// <value>The major version number.</value>
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static int VersionMajor
         {
             get
             {
-                string[] version = CurrentVersion.Split(".".ToCharArray());
-                return int.Parse(version[0]);
+                return UmbracoVersion.Current.Major;
             }
         }
 
@@ -436,12 +521,12 @@ namespace Umbraco.Core.Configuration
         /// Gets the minor version number.
         /// </summary>
         /// <value>The minor version number.</value>
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static int VersionMinor
         {
             get
             {
-                string[] version = CurrentVersion.Split(".".ToCharArray());
-                return int.Parse(version[1]);
+                return UmbracoVersion.Current.Minor;
             }
         }
 
@@ -449,12 +534,12 @@ namespace Umbraco.Core.Configuration
         /// Gets the patch version number.
         /// </summary>
         /// <value>The patch version number.</value>
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static int VersionPatch
         {
             get
             {
-                string[] version = CurrentVersion.Split(".".ToCharArray());
-                return int.Parse(version[2]);
+                return UmbracoVersion.Current.Build;
             }
         }
 
@@ -462,15 +547,12 @@ namespace Umbraco.Core.Configuration
         /// Gets the version comment (like beta or RC).
         /// </summary>
         /// <value>The version comment.</value>
+        [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static string VersionComment
         {
             get
             {
-                string[] version = CurrentVersion.Split(".".ToCharArray());
-                if (version.Length > 3)
-                    return version[3];
-                else
-                    return "";
+                return Umbraco.Core.Configuration.UmbracoVersion.CurrentComment;
             }
         }
 
@@ -520,59 +602,59 @@ namespace Umbraco.Core.Configuration
                 string license =
                     "<A href=\"http://umbraco.org/redir/license\" target=\"_blank\">the open source license MIT</A>. The umbraco UI is freeware licensed under the umbraco license.";
 
-				var versionDoc = new XmlDocument();
-				var versionReader = new XmlTextReader(IOHelper.MapPath(SystemDirectories.Umbraco + "/version.xml"));
-				versionDoc.Load(versionReader);
-				versionReader.Close();
+                var versionDoc = new XmlDocument();
+                var versionReader = new XmlTextReader(IOHelper.MapPath(SystemDirectories.Umbraco + "/version.xml"));
+                versionDoc.Load(versionReader);
+                versionReader.Close();
 
-				// check for license
-				try
-				{
-					string licenseUrl =
-						versionDoc.SelectSingleNode("/version/licensing/licenseUrl").FirstChild.Value;
-					string licenseValidation =
-						versionDoc.SelectSingleNode("/version/licensing/licenseValidation").FirstChild.Value;
-					string licensedTo =
-						versionDoc.SelectSingleNode("/version/licensing/licensedTo").FirstChild.Value;
+                // check for license
+                try
+                {
+                    string licenseUrl =
+                        versionDoc.SelectSingleNode("/version/licensing/licenseUrl").FirstChild.Value;
+                    string licenseValidation =
+                        versionDoc.SelectSingleNode("/version/licensing/licenseValidation").FirstChild.Value;
+                    string licensedTo =
+                        versionDoc.SelectSingleNode("/version/licensing/licensedTo").FirstChild.Value;
 
-					if (licensedTo != "" && licenseUrl != "")
-					{
-						license = "umbraco Commercial License<br/><b>Registered to:</b><br/>" +
-								  licensedTo.Replace("\n", "<br/>") + "<br/><b>For use with domain:</b><br/>" +
-								  licenseUrl;
-					}
-				}
-				catch
-				{
-				}
+                    if (licensedTo != "" && licenseUrl != "")
+                    {
+                        license = "umbraco Commercial License<br/><b>Registered to:</b><br/>" +
+                                  licensedTo.Replace("\n", "<br/>") + "<br/><b>For use with domain:</b><br/>" +
+                                  licenseUrl;
+                    }
+                }
+                catch
+                {
+                }
 
                 return license;
             }
         }
 
-	    /// <summary>
-	    /// Determines whether the current request is reserved based on the route table and 
-	    /// whether the specified URL is reserved or is inside a reserved path.
-	    /// </summary>
-	    /// <param name="url"></param>
-	    /// <param name="httpContext"></param>
-	    /// <param name="routes">The route collection to lookup the request in</param>
-	    /// <returns></returns>
-	    public static bool IsReservedPathOrUrl(string url, HttpContextBase httpContext, RouteCollection routes)
-		{
-			if (httpContext == null) throw new ArgumentNullException("httpContext");
-		    if (routes == null) throw new ArgumentNullException("routes");
+        /// <summary>
+        /// Determines whether the current request is reserved based on the route table and 
+        /// whether the specified URL is reserved or is inside a reserved path.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="httpContext"></param>
+        /// <param name="routes">The route collection to lookup the request in</param>
+        /// <returns></returns>
+        public static bool IsReservedPathOrUrl(string url, HttpContextBase httpContext, RouteCollection routes)
+        {
+            if (httpContext == null) throw new ArgumentNullException("httpContext");
+            if (routes == null) throw new ArgumentNullException("routes");
 
-		    //check if the current request matches a route, if so then it is reserved.
-			var route = routes.GetRouteData(httpContext);
-			if (route != null)
-				return true;
+            //check if the current request matches a route, if so then it is reserved.
+            var route = routes.GetRouteData(httpContext);
+            if (route != null)
+                return true;
 
-			//continue with the standard ignore routine
-		    return IsReservedPathOrUrl(url);
-		}
+            //continue with the standard ignore routine
+            return IsReservedPathOrUrl(url);
+        }
 
-	    /// <summary>
+        /// <summary>
         /// Determines whether the specified URL is reserved or is inside a reserved path.
         /// </summary>
         /// <param name="url">The URL to check.</param>
@@ -580,149 +662,153 @@ namespace Umbraco.Core.Configuration
         /// 	<c>true</c> if the specified URL is reserved; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsReservedPathOrUrl(string url)
-        {			
-            // check if GlobalSettings.ReservedPaths and GlobalSettings.ReservedUrls are unchanged
-            if (!object.ReferenceEquals(_reservedPathsCache, GlobalSettings.ReservedPaths)
-                || !object.ReferenceEquals(_reservedUrlsCache, GlobalSettings.ReservedUrls))
+        {
+            if (_reservedUrlsCache == null)
             {
-                // store references to strings to determine changes
-                _reservedPathsCache = GlobalSettings.ReservedPaths;
-                _reservedUrlsCache = GlobalSettings.ReservedUrls;
-
-                string _root = SystemDirectories.Root.Trim().ToLower();
-
-                // add URLs and paths to a new list
-                StartsWithContainer _newReservedList = new StartsWithContainer();
-                foreach (string reservedUrl in _reservedUrlsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+                lock (Locker)
                 {
-                    //resolves the url to support tilde chars
-                    string reservedUrlTrimmed = IOHelper.ResolveUrl(reservedUrl).Trim().ToLower();
-                    if (reservedUrlTrimmed.Length > 0)
-                        _newReservedList.Add(reservedUrlTrimmed);
+                    if (_reservedUrlsCache == null)
+                    {
+                        // store references to strings to determine changes
+                        _reservedPathsCache = GlobalSettings.ReservedPaths;
+                        _reservedUrlsCache = GlobalSettings.ReservedUrls;
+
+                        string _root = SystemDirectories.Root.Trim().ToLower();
+
+                        // add URLs and paths to a new list
+                        StartsWithContainer _newReservedList = new StartsWithContainer();
+                        foreach (string reservedUrl in _reservedUrlsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            //resolves the url to support tilde chars
+                            string reservedUrlTrimmed = IOHelper.ResolveUrl(reservedUrl).Trim().ToLower();
+                            if (reservedUrlTrimmed.Length > 0)
+                                _newReservedList.Add(reservedUrlTrimmed);
+                        }
+
+                        foreach (string reservedPath in _reservedPathsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            bool trimEnd = !reservedPath.EndsWith("/");
+                            //resolves the url to support tilde chars
+                            string reservedPathTrimmed = IOHelper.ResolveUrl(reservedPath).Trim().ToLower();
+
+                            if (reservedPathTrimmed.Length > 0)
+                                _newReservedList.Add(reservedPathTrimmed + (reservedPathTrimmed.EndsWith("/") ? "" : "/"));
+                        }
+
+                        // use the new list from now on
+                        _reservedList = _newReservedList;
+                    }
                 }
-
-                foreach (string reservedPath in _reservedPathsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    bool trimEnd = !reservedPath.EndsWith("/");
-                    //resolves the url to support tilde chars
-                    string reservedPathTrimmed = IOHelper.ResolveUrl(reservedPath).Trim().ToLower();
-
-                    if (reservedPathTrimmed.Length > 0)
-                        _newReservedList.Add(reservedPathTrimmed + (reservedPathTrimmed.EndsWith("/") ? "" : "/"));
-                }
-
-                // use the new list from now on
-                _reservedList = _newReservedList;
             }
 
-			//The url should be cleaned up before checking:
-			// * If it doesn't contain an '.' in the path then we assume it is a path based URL, if that is the case we should add an trailing '/' because all of our reservedPaths use a trailing '/'
-			// * We shouldn't be comparing the query at all
-			var pathPart = url.Split('?')[0];
-			if (!pathPart.Contains(".") && !pathPart.EndsWith("/"))
-			{
-				pathPart += "/";
-			}
+            //The url should be cleaned up before checking:
+            // * If it doesn't contain an '.' in the path then we assume it is a path based URL, if that is the case we should add an trailing '/' because all of our reservedPaths use a trailing '/'
+            // * We shouldn't be comparing the query at all
+            var pathPart = url.Split('?')[0];
+            if (!pathPart.Contains(".") && !pathPart.EndsWith("/"))
+            {
+                pathPart += "/";
+            }
 
             // return true if url starts with an element of the reserved list
-			return _reservedList.StartsWith(pathPart.ToLowerInvariant());
+            return _reservedList.StartsWith(pathPart.ToLowerInvariant());
         }
 
-		/// <summary>
-		/// Structure that checks in logarithmic time
-		/// if a given string starts with one of the added keys.
-		/// </summary>
-		private class StartsWithContainer
-		{
-			/// <summary>Internal sorted list of keys.</summary>
-			public SortedList<string, string> _list
-				= new SortedList<string, string>(StartsWithComparator.Instance);
+        /// <summary>
+        /// Structure that checks in logarithmic time
+        /// if a given string starts with one of the added keys.
+        /// </summary>
+        private class StartsWithContainer
+        {
+            /// <summary>Internal sorted list of keys.</summary>
+            public SortedList<string, string> _list
+                = new SortedList<string, string>(StartsWithComparator.Instance);
 
-			/// <summary>
-			/// Adds the specified new key.
-			/// </summary>
-			/// <param name="newKey">The new key.</param>
-			public void Add(string newKey)
-			{
-				// if the list already contains an element that begins with newKey, return
-				if (String.IsNullOrEmpty(newKey) || StartsWith(newKey))
-					return;
+            /// <summary>
+            /// Adds the specified new key.
+            /// </summary>
+            /// <param name="newKey">The new key.</param>
+            public void Add(string newKey)
+            {
+                // if the list already contains an element that begins with newKey, return
+                if (String.IsNullOrEmpty(newKey) || StartsWith(newKey))
+                    return;
 
-				// create a new collection, so the old one can still be accessed
-				SortedList<string, string> newList
-					= new SortedList<string, string>(_list.Count + 1, StartsWithComparator.Instance);
+                // create a new collection, so the old one can still be accessed
+                SortedList<string, string> newList
+                    = new SortedList<string, string>(_list.Count + 1, StartsWithComparator.Instance);
 
-				// add only keys that don't already start with newKey, others are unnecessary
-				foreach (string key in _list.Keys)
-					if (!key.StartsWith(newKey))
-						newList.Add(key, null);
-				// add the new key
-				newList.Add(newKey, null);
+                // add only keys that don't already start with newKey, others are unnecessary
+                foreach (string key in _list.Keys)
+                    if (!key.StartsWith(newKey))
+                        newList.Add(key, null);
+                // add the new key
+                newList.Add(newKey, null);
 
-				// update the list (thread safe, _list was never in incomplete state)
-				_list = newList;
-			}
+                // update the list (thread safe, _list was never in incomplete state)
+                _list = newList;
+            }
 
-			/// <summary>
-			/// Checks if the given string starts with any of the added keys.
-			/// </summary>
-			/// <param name="target">The target.</param>
-			/// <returns>true if a key is found that matches the start of target</returns>
-			/// <remarks>
-			/// Runs in O(s*log(n)), with n the number of keys and s the length of target.
-			/// </remarks>
-			public bool StartsWith(string target)
-			{
-				return _list.ContainsKey(target);
-			}
+            /// <summary>
+            /// Checks if the given string starts with any of the added keys.
+            /// </summary>
+            /// <param name="target">The target.</param>
+            /// <returns>true if a key is found that matches the start of target</returns>
+            /// <remarks>
+            /// Runs in O(s*log(n)), with n the number of keys and s the length of target.
+            /// </remarks>
+            public bool StartsWith(string target)
+            {
+                return _list.ContainsKey(target);
+            }
 
-			/// <summary>Comparator that tests if a string starts with another.</summary>
-			/// <remarks>Not a real comparator, since it is not reflexive. (x==y does not imply y==x)</remarks>
-			private sealed class StartsWithComparator : IComparer<string>
-			{
-				/// <summary>Default string comparer.</summary>
-				private readonly static Comparer<string> _stringComparer = Comparer<string>.Default;
+            /// <summary>Comparator that tests if a string starts with another.</summary>
+            /// <remarks>Not a real comparator, since it is not reflexive. (x==y does not imply y==x)</remarks>
+            private sealed class StartsWithComparator : IComparer<string>
+            {
+                /// <summary>Default string comparer.</summary>
+                private readonly static Comparer<string> _stringComparer = Comparer<string>.Default;
 
-				/// <summary>Gets an instance of the StartsWithComparator.</summary>
-				public static readonly StartsWithComparator Instance = new StartsWithComparator();
+                /// <summary>Gets an instance of the StartsWithComparator.</summary>
+                public static readonly StartsWithComparator Instance = new StartsWithComparator();
 
-				/// <summary>
-				/// Tests if whole begins with all characters of part.
-				/// </summary>
-				/// <param name="part">The part.</param>
-				/// <param name="whole">The whole.</param>
-				/// <returns>
-				/// Returns 0 if whole starts with part, otherwise performs standard string comparison.
-				/// </returns>
-				public int Compare(string part, string whole)
-				{
-					// let the default string comparer deal with null or when part is not smaller then whole
-					if (part == null || whole == null || part.Length >= whole.Length)
-						return _stringComparer.Compare(part, whole);
+                /// <summary>
+                /// Tests if whole begins with all characters of part.
+                /// </summary>
+                /// <param name="part">The part.</param>
+                /// <param name="whole">The whole.</param>
+                /// <returns>
+                /// Returns 0 if whole starts with part, otherwise performs standard string comparison.
+                /// </returns>
+                public int Compare(string part, string whole)
+                {
+                    // let the default string comparer deal with null or when part is not smaller then whole
+                    if (part == null || whole == null || part.Length >= whole.Length)
+                        return _stringComparer.Compare(part, whole);
 
-					////ensure both have a / on the end
-					//part = part.EndsWith("/") ? part : part + "/"; 
-					//whole = whole.EndsWith("/") ? whole : whole + "/";
-					//if (part.Length >= whole.Length)
-					//    return _stringComparer.Compare(part, whole);
+                    ////ensure both have a / on the end
+                    //part = part.EndsWith("/") ? part : part + "/"; 
+                    //whole = whole.EndsWith("/") ? whole : whole + "/";
+                    //if (part.Length >= whole.Length)
+                    //    return _stringComparer.Compare(part, whole);
 
-					// loop through all characters that part and whole have in common
-					int pos = 0;
-					bool match;
-					do
-					{
-						match = (part[pos] == whole[pos]);
-					} while (match && ++pos < part.Length);
+                    // loop through all characters that part and whole have in common
+                    int pos = 0;
+                    bool match;
+                    do
+                    {
+                        match = (part[pos] == whole[pos]);
+                    } while (match && ++pos < part.Length);
 
-					// return result of last comparison
-					return match ? 0 : (part[pos] < whole[pos] ? -1 : 1);
-				}
-			}
-		}
+                    // return result of last comparison
+                    return match ? 0 : (part[pos] < whole[pos] ? -1 : 1);
+                }
+            }
+        }
 
     }
 
 
 
-    
+
 }

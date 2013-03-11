@@ -27,7 +27,7 @@ namespace Umbraco.Web.Install
 		}
 
 		/// <summary>
-		/// Ensures that the user must be in the Administrator or the Install role
+		/// Ensures that the user must be logged in or that the application is not configured just yet.
 		/// </summary>
 		/// <param name="httpContext"></param>
 		/// <returns></returns>

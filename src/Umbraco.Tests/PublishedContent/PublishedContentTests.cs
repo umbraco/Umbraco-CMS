@@ -14,7 +14,7 @@ namespace Umbraco.Tests.PublishedContent
 	/// Tests the methods on IPublishedContent using the DefaultPublishedContentStore
 	/// </summary>
 	[TestFixture]
-	public class PublishedContentTests : BaseWebTest
+    public class PublishedContentTests : PublishedContentTestBase
 	{
 		protected override bool RequiresDbSetup
 		{
@@ -35,13 +35,16 @@ namespace Umbraco.Tests.PublishedContent
 		<content><![CDATA[]]></content>
 		<umbracoUrlAlias><![CDATA[this/is/my/alias, anotheralias]]></umbracoUrlAlias>
 		<umbracoNaviHide>1</umbracoNaviHide>
+		<testRecursive><![CDATA[This is the recursive val]]></testRecursive>
 		<Home id=""1173"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""sub1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173"" isDoc="""">
 			<content><![CDATA[<div>This is some content</div>]]></content>
 			<umbracoUrlAlias><![CDATA[page2/alias, 2ndpagealias]]></umbracoUrlAlias>			
+			<testRecursive><![CDATA[]]></testRecursive>
 			<Home id=""1174"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-20T18:07:54"" updateDate=""2012-07-20T19:10:27"" nodeName=""Sub2"" urlName=""sub2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1174"" isDoc="""">
 				<content><![CDATA[]]></content>
 				<umbracoUrlAlias><![CDATA[only/one/alias]]></umbracoUrlAlias>
 				<creatorName><![CDATA[Custom data with same property name as the member name]]></creatorName>
+				<testRecursive><![CDATA[]]></testRecursive>
 			</Home>
 			<Home id=""1176"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-20T18:08:08"" updateDate=""2012-07-20T19:10:52"" nodeName=""Sub 3"" urlName=""sub-3"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1176"" isDoc="""">
 				<content><![CDATA[]]></content>
@@ -62,38 +65,12 @@ namespace Umbraco.Tests.PublishedContent
 		public override void Initialize()
 		{
 			base.Initialize();
-
-			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
-				new[]
-					{
-						typeof(DatePickerPropertyEditorValueConverter),
-						typeof(TinyMcePropertyEditorValueConverter),
-						typeof(YesNoPropertyEditorValueConverter)
-					});
-
-			//need to specify a custom callback for unit tests
-			PublishedContentHelper.GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
-				{
-					if (propertyAlias == "content")
-					{
-						//return the rte type id
-						return Guid.Parse("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
-					}
-					return Guid.Empty;
-				};
-
-			var umbCtx = GetUmbracoContext("/test", 1234);
-			UmbracoContext.Current = umbCtx;
-			PublishedContentStoreResolver.Current = new PublishedContentStoreResolver(new DefaultPublishedContentStore());
 		}
 
 		public override void TearDown()
 		{
 			base.TearDown();
-
-			PropertyEditorValueConvertersResolver.Reset();
-			PublishedContentStoreResolver.Reset();
-			UmbracoContext.Current = null;
+			
 		}
 
 		internal IPublishedContent GetNode(int id)
@@ -103,6 +80,16 @@ namespace Umbraco.Tests.PublishedContent
 			var doc = contentStore.GetDocumentById(ctx, id);
 			Assert.IsNotNull(doc);
 			return doc;
+		}
+
+		[Test]
+		public void Test_Get_Recursive_Val()
+		{
+			var doc = GetNode(1174);
+			var rVal = doc.GetRecursiveValue("testRecursive");
+			var nullVal = doc.GetRecursiveValue("DoNotFindThis");
+			Assert.AreEqual("This is the recursive val", rVal);
+			Assert.AreEqual("", nullVal);
 		}
 
 		[Test]

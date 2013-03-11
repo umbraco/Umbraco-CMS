@@ -70,6 +70,10 @@ namespace umbraco.controls.Images
                 }
             }
             UploadField.DataEditor.Save();
+            //MCH NOTE: After having refactored the legacy api to use the new api under the hood, it is necessary to set the property value and save the media.
+            var prop = media.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id == UploadField.Id);
+            prop.Value = UploadField.Data.Value;
+            media.Save();
 
             // Generate xml on image
             media.XmlGenerate(new XmlDocument());

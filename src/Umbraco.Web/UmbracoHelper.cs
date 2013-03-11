@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
-using System.Web.Configuration;
 using System.Web.Security;
 using System.Web.UI;
 using System.Xml.Linq;
@@ -13,18 +12,14 @@ using HtmlAgilityPack;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 using umbraco;
 using System.Collections.Generic;
 using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.templateControls;
-using HtmlTagWrapper = Umbraco.Web.Mvc.HtmlTagWrapper;
 
 namespace Umbraco.Web
 {
@@ -64,7 +59,29 @@ namespace Umbraco.Web
 			}
 		}
 
-		/// <summary>
+        /// <summary>
+        /// Returns the current IPublishedContent item assigned to the UmbracoHelper
+        /// </summary>
+        /// <remarks>
+        /// Note that this is the assigned IPublishedContent item to the UmbracoHelper, this is not necessarily the Current IPublishedContent item
+        /// being rendered. This IPublishedContent object is contextual to the current UmbracoHelper instance.
+        /// 
+        /// In some cases accessing this property will throw an exception if there is not IPublishedContent assigned to the Helper
+        /// this will only ever happen if the Helper is constructed with an UmbracoContext and it is not a front-end request
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">Thrown if the UmbracoHelper is constructed with an UmbracoContext and it is not a front-end request</exception>
+	    public IPublishedContent AssignedContentItem
+	    {
+	        get
+	        {
+	            if (_currentPage == null)
+                    throw new InvalidOperationException("Cannot return the " + typeof(IPublishedContent).Name + " because the " + typeof(UmbracoHelper).Name + " was constructed with an " + typeof(UmbracoContext).Name + " and the current request is not a front-end request.");
+                
+                return _currentPage;
+	        }
+	    }
+
+	    /// <summary>
 		/// Renders the template for the specified pageId and an optional altTemplateId
 		/// </summary>
 		/// <param name="pageId"></param>
@@ -209,12 +226,8 @@ namespace Umbraco.Web
 
             //TODO: commented out until as it is not implemented by umbraco:item yet
             //,string formatString = "")
-		{
-			if (_currentPage == null)
-			{
-				throw new InvalidOperationException("Cannot call this method when not rendering a front-end document");
-			}
-            return Field(_currentPage, fieldAlias, altFieldAlias,
+		{			
+            return Field(AssignedContentItem, fieldAlias, altFieldAlias,
                 altText, insertBefore, insertAfter, recursive, convertLineBreaks, removeParagraphTags,
                 casing, encoding, formatAsDate, formatAsDateWithTime, formatAsDateWithTimeSeparator); // formatString);
 		}
@@ -300,8 +313,7 @@ namespace Umbraco.Web
 
 
 		    var item = new Item()
-		                   {
-		                       //NodeId = currentPage.Id.ToString();
+		                   {		        
 		                       Field = fieldAlias,
 		                       TextIfEmpty = altText,
 		                       LegacyAttributes = attributesForItem
@@ -470,17 +482,17 @@ namespace Umbraco.Web
 
 		public dynamic Content(object id)
 		{
-			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
+			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore, new DynamicNull());
 		}
 
 		public dynamic Content(int id)
 		{
-			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
+			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore, new DynamicNull());
 		}
 
 		public dynamic Content(string id)
 		{
-			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
+			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore, new DynamicNull());
 		}
 
 		public dynamic Content(params object[] ids)
@@ -574,17 +586,17 @@ namespace Umbraco.Web
 
 		public dynamic Media(object id)
 		{
-			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
+			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore, new DynamicNull());
 		}
 
 		public dynamic Media(int id)
 		{
-			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
+			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore, new DynamicNull());
 		}
 
 		public dynamic Media(string id)
 		{
-			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
+			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore, new DynamicNull());
 		}
 
 		public dynamic Media(params object[] ids)
@@ -651,7 +663,7 @@ namespace Umbraco.Web
 		{
 			int docId;
 			return int.TryParse(id, out docId)
-				       ? DocumentById(docId, store)
+				       ? DocumentById(docId, store, null)
 				       : null;
 		}
 
@@ -686,35 +698,36 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="id"></param>
 		/// <param name="store"> </param>
+		/// <param name="ifNotFound"> </param>
 		/// <returns></returns>
 		/// <remarks>
 		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass 
 		/// this result in to this method.
 		/// This method will throw an exception if the value is not of type int or string.
 		/// </remarks>
-		private dynamic DocumentById(object id, IPublishedStore store)
+		private dynamic DocumentById(object id, IPublishedStore store, object ifNotFound)
 		{
 			if (id is string)
-				return DocumentById((string)id, store);
+				return DocumentById((string)id, store, ifNotFound);
 			if (id is int)
-				return DocumentById((int)id, store);
+				return DocumentById((int)id, store, ifNotFound);
 			throw new InvalidOperationException("The value of parameter 'id' must be either a string or an integer");
 		}
 
-		private dynamic DocumentById(int id, IPublishedStore store)
+		private dynamic DocumentById(int id, IPublishedStore store, object ifNotFound)
 		{
 			var doc = store.GetDocumentById(UmbracoContext.Current, id);
 			return doc == null
-					? new DynamicNull()
+					? ifNotFound
 					: new DynamicPublishedContent(doc).AsDynamic();
 		}
 
-		private dynamic DocumentById(string id, IPublishedStore store)
+		private dynamic DocumentById(string id, IPublishedStore store, object ifNotFound)
 		{
 			int docId;
 			return int.TryParse(id, out docId)
-				? DocumentById(docId, store)
-				: new DynamicNull();
+				? DocumentById(docId, store, ifNotFound)
+				: ifNotFound;
 		}
 
 		/// <summary>
@@ -730,7 +743,8 @@ namespace Umbraco.Web
 		/// </remarks>
 		private dynamic DocumentByIds(IPublishedStore store, params object[] ids)
 		{
-			var nodes = ids.Select(eachId => DocumentById(eachId, store))
+			var dNull = new DynamicNull();
+			var nodes = ids.Select(eachId => DocumentById(eachId, store, dNull))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
 				.Cast<DynamicPublishedContent>();
 			return new DynamicPublishedContentList(nodes);
@@ -738,7 +752,8 @@ namespace Umbraco.Web
 
 		private dynamic DocumentByIds(IPublishedStore store, params int[] ids)
 		{
-			var nodes = ids.Select(eachId => DocumentById(eachId, store))
+			var dNull = new DynamicNull();
+			var nodes = ids.Select(eachId => DocumentById(eachId, store, dNull))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
 				.Cast<DynamicPublishedContent>();
 			return new DynamicPublishedContentList(nodes);
@@ -746,7 +761,8 @@ namespace Umbraco.Web
 
 		private dynamic DocumentByIds(IPublishedStore store, params string[] ids)
 		{
-			var nodes = ids.Select(eachId => DocumentById(eachId, store))
+			var dNull = new DynamicNull();
+			var nodes = ids.Select(eachId => DocumentById(eachId, store, dNull))
 				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
 				.Cast<DynamicPublishedContent>();
 			return new DynamicPublishedContentList(nodes);

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -15,33 +16,6 @@ using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Tests.Routing
 {
-	[TestFixture, RequiresSTA]
-	public class PublishedContentRequestBuilderTests : BaseRoutingTest
-	{
-
-		//[Test]
-		//public void Alt_Template()
-		//{
-		//	var template = Template.MakeNew("test", new User(0));
-		//	var altTemplate = Template.MakeNew("alt", new User(0));
-		//	var umbracoContext = GetUmbracoContext("/home?altTemplate=" + altTemplate.Alias, template.Id);
-		//	// create the new document request since we're rendering a document on the front-end
-		//	var docreq = PublishedContentRequest.CreateForFrontEndRequest(umbracoContext);
-				
-		//	//create the searcher
-		//	var searcher = new PublishedContentRequestBuilder(docreq);
-		//	//find domain
-		//	searcher.LookupDomain();
-		//	// redirect if it has been flagged
-		//	Assert.IsFalse(docreq.IsRedirect);
-			
-		//	//find the document, found will be true if the doc request has found BOTH a node and a template			
-		//	var found = searcher.LookupDocument();
-			
-		//}
-
-	}
-
 	[TestFixture, RequiresSTA]
 	public class UmbracoModuleTests : BaseRoutingTest
 	{
@@ -57,9 +31,9 @@ namespace Umbraco.Tests.Routing
 			//create the module
 			_module = new UmbracoModule();
 
-			ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", Umbraco.Core.Configuration.GlobalSettings.CurrentVersion);
-			ConfigurationManager.AppSettings.Set("umbracoReservedPaths", "~/umbraco,~/install/");
-			ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd");
+		    SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
+            //SettingsForTests.ReservedPaths = "~/umbraco,~/install/";
+            //SettingsForTests.ReservedUrls = "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd";
 
 			//create the not found handlers config
 			using (var sw = File.CreateText(Umbraco.Core.IO.IOHelper.MapPath(Umbraco.Core.IO.SystemFiles.NotFoundhandlersConfig, false)))
@@ -78,11 +52,6 @@ namespace Umbraco.Tests.Routing
 			base.TearDown();
 
 			_module.DisposeIfDisposable();
-			
-			//reset the app config
-			ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", "");
-			ConfigurationManager.AppSettings.Set("umbracoReservedPaths", "");
-			ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "");		
 		}
 
 		// do not test for /base here as it's handled before EnsureUmbracoRoutablePage is called

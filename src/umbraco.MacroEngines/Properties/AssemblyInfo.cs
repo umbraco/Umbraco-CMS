@@ -6,10 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("umbraco.MacroEngines")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Core assembly containing the Umbraco Macro Engine")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("umbraco.MacroEngines")]
-
+[assembly: AssemblyProduct("Umbraco CMS")]
 
 
 // Setting ComVisible to false makes the types in this assembly not visible 

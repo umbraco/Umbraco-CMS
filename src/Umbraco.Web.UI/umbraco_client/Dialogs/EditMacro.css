@@ -1,0 +1,25 @@
+﻿/* Custom styles for EditMacro.aspx dialog */
+
+.propertyItemheader
+{
+    width: 170px !important;
+}
+        
+.guiInputTextStandard
+{
+    width: 220px;
+}
+
+.umbracoPage a {
+	color: blue;
+	cursor: pointer;
+}
+
+select {
+	width: 200px;	
+}
+
+.macro-properties {
+	height: 420px; 
+	overflow: auto;
+}

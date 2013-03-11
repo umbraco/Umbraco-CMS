@@ -1,0 +1,230 @@
+﻿using System;
+using System.Linq;
+using NUnit.Framework;
+using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Tests.TestHelpers;
+
+namespace Umbraco.Tests.Persistence.Repositories
+{
+    [TestFixture]
+    public class RelationTypeRepositoryTest : BaseDatabaseFactoryTest
+    {
+        [SetUp]
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            CreateTestData();
+        }
+
+        [Test]
+        public void Can_Instantiate_Repository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+
+            // Act
+            var repository = new RelationTypeRepository(unitOfWork);
+
+            // Assert
+            Assert.That(repository, Is.Not.Null);
+        }
+
+        [Test]
+        public void Can_Perform_Add_On_RelationTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = new RelationTypeRepository(unitOfWork);
+
+            // Act
+            var relateMemberToContent = new RelationType(new Guid("39eb0f98-b348-42a1-8662-e7eb18487560"),
+                                                         new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"),
+                                                         "relateMemberToContent")
+                                            {IsBidirectional = true, Name = "Relate Member to Content"};
+            
+            repository.AddOrUpdate(relateMemberToContent);
+            unitOfWork.Commit();
+
+            // Assert
+            Assert.That(relateMemberToContent.HasIdentity, Is.True);
+            Assert.That(repository.Exists(relateMemberToContent.Id), Is.True);
+
+        }
+
+        [Test]
+        public void Can_Perform_Update_On_RelationTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = new RelationTypeRepository(unitOfWork);
+
+            // Act
+            var relationType = repository.Get(3);
+            relationType.Alias = relationType.Alias + "Updated";
+            relationType.Name = relationType.Name + " Updated";
+            repository.AddOrUpdate(relationType);
+            unitOfWork.Commit();
+
+            var relationTypeUpdated = repository.Get(3);
+
+            // Assert
+            Assert.That(relationTypeUpdated, Is.Not.Null);
+            Assert.That(relationTypeUpdated.HasIdentity, Is.True);
+            Assert.That(relationTypeUpdated.Alias, Is.EqualTo(relationType.Alias));
+            Assert.That(relationTypeUpdated.Name, Is.EqualTo(relationType.Name));
+        }
+
+        [Test]
+        public void Can_Perform_Delete_On_RelationTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = new RelationTypeRepository(unitOfWork);
+
+            // Act
+            var relationType = repository.Get(3);
+            repository.Delete(relationType);
+            unitOfWork.Commit();
+
+            var exists = repository.Exists(3);
+
+            // Assert
+            Assert.That(exists, Is.False);
+        }
+
+        [Test]
+        public void Can_Perform_Get_On_RelationTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = new RelationTypeRepository(unitOfWork);
+
+            // Act
+            var relationType = repository.Get(2);
+
+            // Assert
+            Assert.That(relationType, Is.Not.Null);
+            Assert.That(relationType.HasIdentity, Is.True);
+            Assert.That(relationType.Alias, Is.EqualTo("relateContentOnCopy"));
+            Assert.That(relationType.Name, Is.EqualTo("Relate Content on Copy"));
+        }
+
+        [Test]
+        public void Can_Perform_GetAll_On_RelationTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = new RelationTypeRepository(unitOfWork);
+
+            // Act
+            var relationTypes = repository.GetAll();
+
+            // Assert
+            Assert.That(relationTypes, Is.Not.Null);
+            Assert.That(relationTypes.Any(), Is.True);
+            Assert.That(relationTypes.Any(x => x == null), Is.False);
+            Assert.That(relationTypes.Count(), Is.EqualTo(3));
+        }
+
+        [Test]
+        public void Can_Perform_GetAll_With_Params_On_RelationTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = new RelationTypeRepository(unitOfWork);
+
+            // Act
+            var relationTypes = repository.GetAll(2, 3);
+
+            // Assert
+            Assert.That(relationTypes, Is.Not.Null);
+            Assert.That(relationTypes.Any(), Is.True);
+            Assert.That(relationTypes.Any(x => x == null), Is.False);
+            Assert.That(relationTypes.Count(), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void Can_Perform_Exists_On_RelationTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = new RelationTypeRepository(unitOfWork);
+
+            // Act
+            var exists = repository.Exists(3);
+            var doesntExist = repository.Exists(5);
+
+            // Assert
+            Assert.That(exists, Is.True);
+            Assert.That(doesntExist, Is.False);
+        }
+
+        [Test]
+        public void Can_Perform_Count_On_RelationTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = new RelationTypeRepository(unitOfWork);
+
+            // Act
+            var query = Query<RelationType>.Builder.Where(x => x.Alias.StartsWith("relate"));
+            int count = repository.Count(query);
+
+            // Assert
+            Assert.That(count, Is.EqualTo(3));
+        }
+
+        [Test]
+        public void Can_Perform_GetByQuery_On_RelationTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = new RelationTypeRepository(unitOfWork);
+
+            // Act
+            var childObjType = new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB");
+            var query = Query<RelationType>.Builder.Where(x => x.ChildObjectType == childObjType);
+            var result = repository.GetByQuery(query);
+
+            // Assert
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Any(), Is.True);
+            Assert.That(result.Any(x => x == null), Is.False);
+            Assert.That(result.Count(), Is.EqualTo(1));
+        }
+
+        [TearDown]
+        public override void TearDown()
+        {
+            base.TearDown();
+        }
+
+        public void CreateTestData()
+        {
+            var relateContent = new RelationType(new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"), new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"), "relateContentOnCopy"){IsBidirectional = true, Name = "Relate Content on Copy"};
+            var relateContentType = new RelationType(new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"), new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"), "relateContentTypeOnCopy") { IsBidirectional = true, Name = "Relate ContentType on Copy" };
+
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = new RelationTypeRepository(unitOfWork);
+
+            repository.AddOrUpdate(relateContent);//Id 2
+            repository.AddOrUpdate(relateContentType);//Id 3
+            unitOfWork.Commit();
+        }
+    }
+}

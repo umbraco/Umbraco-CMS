@@ -28,7 +28,7 @@ namespace Umbraco.Core.ObjectResolution
 				using (new ReadLock(ResolversLock))
 				{
 					if (_resolver == null)
-						throw new InvalidOperationException("Current has not been initialized. You must initialize Current before trying to read it.");
+						throw new InvalidOperationException("Current has not been initialized on " + typeof(TResolver) + ". You must initialize Current before trying to read it.");
 					return _resolver;
 				}
 			}

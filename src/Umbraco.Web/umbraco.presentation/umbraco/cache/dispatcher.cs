@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
 using System.Threading;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.interfaces;
 using umbraco.IO;
@@ -179,42 +181,23 @@ namespace umbraco.presentation.cache
 
         private static void LogDispatchBatchError(Exception ee)
         {
-            Log.Add(
-                       LogTypes.Error,
-                       User.GetUser(0),
-                       -1,
-                       string.Format("Error refreshing distributed list: '{0}'", ee));
+			LogHelper.Error<dispatcher>("Error refreshing distributed list", ee);
         }
 
         private static void LogDispatchBatchResult(int errorCount)
         {
-            Log.Add(
-                       LogTypes.System,
-                       User.GetUser(0),
-                       -1,
-                       string.Format("Distributed server push completed with {0} nodes reporting an error",
-                                     errorCount == 0 ? "no" : errorCount.ToString()));
+            LogHelper.Debug<dispatcher>(string.Format("Distributed server push completed with {0} nodes reporting an error", errorCount == 0 ? "no" : errorCount.ToString(CultureInfo.InvariantCulture)));
         }
 
         private static void LogDispatchNodeError(Exception ex)
         {
-            Log.Add(
-                       LogTypes.Error,
-                       User.GetUser(0),
-                       -1,
-                       string.Format("Error refreshing a node in the distributed list: '{0}'", ex));
+	        LogHelper.Error<dispatcher>("Error refreshing a node in the distributed list", ex);
         }
 
         private static void LogDispatchNodeError(WebException ex)
         {
             string url = (ex.Response != null) ? ex.Response.ResponseUri.ToString() : "invalid url (responseUri null)";
-
-            Log.Add(
-                       LogTypes.Error,
-                       User.GetUser(0),
-                       -1,
-                       string.Format("Error refreshing a node in the distributed list: '{0}', URI attempted: {1}", ex,
-                                     url));
+	        LogHelper.Error<dispatcher>("Error refreshing a node in the distributed list, URI attempted: " + url, ex);
         }
 
         /// <summary>
@@ -243,11 +226,7 @@ namespace umbraco.presentation.cache
 
         private static void LogStartDispatch()
         {
-            Log.Add(
-                       LogTypes.System,
-                       User.GetUser(0),
-                       -1,
-                       "Submitting calls to distributed servers");
+            LogHelper.Info<dispatcher>("Submitting calls to distributed servers");
         }
 
         /// <summary>

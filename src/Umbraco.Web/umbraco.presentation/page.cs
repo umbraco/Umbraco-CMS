@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
+using Property = umbraco.cms.businesslogic.property.Property;
 
 namespace umbraco
 {
@@ -86,9 +87,14 @@ namespace umbraco
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="page"/> class for a published document.
+		/// Initializes a new instance of the <see cref="page"/> class for a published document request.
 		/// </summary>
 		/// <param name="docreq">The <see cref="PublishedContentRequest"/> pointing to the document.</param>
+		/// <remarks>
+		/// The difference between creating the page with PublishedContentRequest vs an IPublishedContent item is 
+		/// that the PublishedContentRequest takes into account how a template is assigned during the routing process whereas
+		/// with an IPublishedContent item, the template id is asssigned purely based on the default.
+		/// </remarks>
 		internal page(PublishedContentRequest docreq)
 		{
 
@@ -109,6 +115,29 @@ namespace umbraco
 
 			PopulateElementData(docreq.PublishedContent);
 
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the page for a published document
+		/// </summary>
+		/// <param name="doc"></param>
+		internal page(IPublishedContent doc)
+		{
+			if (doc == null) throw new ArgumentNullException("doc");
+			
+			populatePageData(doc.Id,
+				doc.Name, doc.DocumentTypeId, doc.DocumentTypeAlias,
+				doc.WriterName, doc.CreatorName, doc.CreateDate, doc.UpdateDate,
+				doc.Path, doc.Version, doc.Parent == null ? -1 : doc.Parent.Id);
+
+			if (doc.TemplateId > 0)
+			{
+				//set the template to whatever is assigned to the doc
+				_template = doc.TemplateId;
+				_elements["template"] = _template.ToString();	
+			}			
+			
+			PopulateElementData(doc);
 		}
 
 		/// <summary>

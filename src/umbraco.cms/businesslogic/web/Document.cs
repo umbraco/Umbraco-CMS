@@ -2,21 +2,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Runtime.CompilerServices;
 using System.Xml;
-using Umbraco.Core.IO;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.Caching;
+using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
-using umbraco.cms.businesslogic.property;
-using umbraco.cms.businesslogic.relation;
 using umbraco.cms.helpers;
 using umbraco.DataLayer;
-using umbraco.IO;
-using umbraco.interfaces;
-using umbraco.cms.businesslogic.datatype.controls;
-using System.IO;
-using System.Diagnostics;
-using Umbraco.Core;
+using Property = umbraco.cms.businesslogic.property.Property;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -26,6 +23,7 @@ namespace umbraco.cms.businesslogic.web
     /// 
     /// Pubished Documents are exposed to the runtime/the public website in a cached xml document.
     /// </summary>
+    [Obsolete("Obsolete, Use Umbraco.Core.Models.Content", false)]
     public class Document : Content
     {
         #region Constructors
@@ -79,134 +77,42 @@ namespace umbraco.cms.businesslogic.web
             : base(id, optimizedMode)
         {
             this._optimizedMode = optimizedMode;
-
             if (optimizedMode)
             {
+                Content = ApplicationContext.Current.Services.ContentService.GetById(id);
+                bool hasChildren = ApplicationContext.Current.Services.ContentService.HasChildren(id);
+                int templateId = Content.Template == null ? 0 : Content.Template.Id;
 
-                using (IRecordsReader dr =
-                        SqlHelper.ExecuteReader(string.Format(m_SQLOptimizedSingle.Trim(), "umbracoNode.id = @id", "cmsContentVersion.id desc"),
-                            SqlHelper.CreateParameter("@nodeObjectType", Document._objectType),
-                            SqlHelper.CreateParameter("@id", id)))
-                {
-                    if (dr.Read())
-                    {
-                        // Initialize node and basic document properties
-                        bool _hc = false;
-                        if (dr.GetInt("children") > 0)
-                            _hc = true;
-                        int? masterContentType = null;
-                        if (!dr.IsNull("masterContentType"))
-                            masterContentType = dr.GetInt("masterContentType");
-                        SetupDocumentForTree(dr.GetGuid("uniqueId")
-                            , dr.GetShort("level")
-                            , dr.GetInt("parentId")
-                            , dr.GetInt("nodeUser")
-                            , dr.GetInt("documentUser")
-                            , dr.GetBoolean("published")
-                            , dr.GetString("path")
-                            , dr.GetString("text")
-                            , dr.GetDateTime("createDate")
-                            , dr.GetDateTime("updateDate")
-                            , dr.GetDateTime("versionDate")
-                            , dr.GetString("icon")
-                            , _hc
-                            , dr.GetString("alias")
-                            , dr.GetString("thumbnail")
-                            , dr.GetString("description")
-                            , masterContentType
-                            , dr.GetInt("contentTypeId")
-                            , dr.GetInt("templateId")
-                            );
+                SetupDocumentForTree(Content.Key, Content.Level, Content.ParentId, Content.CreatorId,
+                                     Content.WriterId,
+                                     Content.Published, Content.Path, Content.Name, Content.CreateDate,
+                                     Content.UpdateDate, Content.UpdateDate, Content.ContentType.Icon, hasChildren,
+                                     Content.ContentType.Alias, Content.ContentType.Thumbnail,
+                                     Content.ContentType.Description, null, Content.ContentType.Id,
+                                     templateId, Content.ContentType.IsContainer);
 
-                        // initialize content object
-                        InitializeContent(dr.GetInt("ContentType"), dr.GetGuid("versionId"),
-                                          dr.GetDateTime("versionDate"), dr.GetString("icon"));
+                var tmpReleaseDate = Content.ReleaseDate.HasValue ? Content.ReleaseDate.Value : new DateTime();
+                var tmpExpireDate = Content.ExpireDate.HasValue ? Content.ExpireDate.Value : new DateTime();
+                var creator = new User(Content.CreatorId, true);
+                var writer = new User(Content.WriterId, true);
 
-                        // initialize final document properties
-                        DateTime tmpReleaseDate = new DateTime();
-                        DateTime tmpExpireDate = new DateTime();
-                        if (!dr.IsNull("releaseDate"))
-                            tmpReleaseDate = dr.GetDateTime("releaseDate");
-                        if (!dr.IsNull("expireDate"))
-                            tmpExpireDate = dr.GetDateTime("expireDate");
-
-                        InitializeDocument(
-                            new User(dr.GetInt("nodeUser"), true),
-                            new User(dr.GetInt("documentUser"), true),
-                            dr.GetString("documentText"),
-                            dr.GetInt("templateId"),
-                            tmpReleaseDate,
-                            tmpExpireDate,
-                            dr.GetDateTime("updateDate"),
-                            dr.GetBoolean("published")
-                            );
-                    }
-                }
+                InitializeContent(Content.ContentType.Id, Content.Version, Content.UpdateDate,
+                                  Content.ContentType.Icon);
+                InitializeDocument(creator, writer, Content.Name, templateId, tmpReleaseDate, tmpExpireDate,
+                                   Content.UpdateDate, Content.Published);
             }
+        }
+
+        internal Document(IContent content) : base(content)
+        {
+            SetupNode(content);
         }
 
         #endregion
 
         #region Constants and Static members
-        // NH: Modified to support SQL CE 4 (doesn't support nested selects)
-        private const string m_SQLOptimizedSingle = @"
-                Select 
-                    CASE WHEN (childrenTable.total>0) THEN childrenTable.total ELSE 0 END as Children,
-                    CASE WHEN (publishedTable.publishedTotal>0) THEN publishedTable.publishedTotal ELSE 0 END as Published,
-	                cmsContentVersion.VersionId,
-                    cmsContentVersion.versionDate,	                
-	                contentTypeNode.uniqueId as ContentTypeGuid, 
-					cmsContent.ContentType, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId,
-	                published, documentUser, coalesce(templateId, cmsDocumentType.templateNodeId) as templateId, cmsDocument.text as DocumentText, releaseDate, expireDate, updateDate, 
-	                umbracoNode.createDate, umbracoNode.trashed, umbracoNode.parentId, umbracoNode.nodeObjectType, umbracoNode.nodeUser, umbracoNode.level, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.uniqueId, umbracoNode.text 
-                from 
-	                umbracoNode 
-                    inner join cmsContentVersion on cmsContentVersion.contentID = umbracoNode.id
-                    inner join cmsDocument on cmsDocument.versionId = cmsContentVersion.versionId
-                    inner join cmsContent on cmsDocument.nodeId = cmsContent.NodeId
-                    inner join cmsContentType on cmsContentType.nodeId = cmsContent.ContentType
-                    inner join umbracoNode contentTypeNode on contentTypeNode.id = cmsContentType.nodeId
-                    left join cmsDocumentType on cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1 
-                    /* SQL CE support */
-                    left outer join (select count(id) as total, parentId from umbracoNode where parentId = @id group by parentId) as childrenTable on childrenTable.parentId = umbracoNode.id
-                    left outer join (select Count(published) as publishedTotal, nodeId from cmsDocument where published = 1 And nodeId = @id group by nodeId) as publishedTable on publishedTable.nodeId = umbracoNode.id
-                    /* end SQL CE support */
-                where umbracoNode.nodeObjectType = @nodeObjectType AND {0}
-                order by {1}
-                ";
-
-        // NH: Had to modify this for SQL CE 4. Only change is that the "coalesce(publishCheck.published,0) as published" didn't work in SQL CE 4
-        // because there's already a column called published. I've changed it to isPublished and updated the other places
-        //
-        // zb-00010 #29443 : removed the following lines + added constraint on cmsDocument.newest in where clause (equivalent + handles duplicate dates)
-        //            inner join (select contentId, max(versionDate) as versionDate from cmsContentVersion group by contentId) temp
-        //                on cmsContentVersion.contentId = temp.contentId and cmsContentVersion.versionDate = temp.versionDate
-        private const string m_SQLOptimizedMany = @"
-                select count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, 
-	                cmsDocument.documentUser, coalesce(cmsDocument.templateId, cmsDocumentType.templateNodeId) as templateId, 
-	                umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as isPublished, umbracoNode.createDate, 
-                    cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsDocument.releaseDate, cmsDocument.expireDate, cmsContentType.icon, cmsContentType.alias,
-	                cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId,
-                    umbracoNode.nodeUser
-                from umbracoNode
-                    left join umbracoNode children on children.parentId = umbracoNode.id
-                    inner join cmsContent on cmsContent.nodeId = umbracoNode.id
-                    inner join cmsContentType on cmsContentType.nodeId = cmsContent.contentType
-                    inner join cmsContentVersion on cmsContentVersion.contentId = umbracoNode.id
-                    inner join cmsDocument on cmsDocument.versionId = cmsContentversion.versionId
-                    left join cmsDocument publishCheck on publishCheck.nodeId = cmsContent.nodeID and publishCheck.published = 1
-                    left join cmsDocumentType on cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1
-                where umbracoNode.nodeObjectType = @nodeObjectType AND cmsDocument.newest = 1 AND {0}
-                group by 
-	                umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, 
-	                cmsDocument.templateId, cmsDocumentType.templateNodeId, umbracoNode.path, umbracoNode.sortOrder, 
-	                coalesce(publishCheck.published,0), umbracoNode.createDate, cmsDocument.text, 
-	                cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, 
-                    cmsContentType.masterContentType, cmsContentType.nodeId, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsDocument.releaseDate, cmsDocument.expireDate, umbracoNode.nodeUser
-                order by {1}
-                ";
-
-        private const string m_SQLOptimizedForPreview = @"
+        
+        private const string SqlOptimizedForPreview = @"
                 select umbracoNode.id, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsDocument.versionId, cmsPreviewXml.xml from cmsDocument
                 inner join umbracoNode on umbracoNode.id = cmsDocument.nodeId
                 inner join cmsPreviewXml on cmsPreviewXml.nodeId = cmsDocument.nodeId and cmsPreviewXml.versionId = cmsDocument.versionId
@@ -230,6 +136,7 @@ namespace umbraco.cms.businesslogic.web
         private User _writer;
         private int? _writerId;
         private bool _optimizedMode;
+        protected internal IContent Content;
 
         /// <summary>
         /// This is used to cache the child documents of Document when the children property
@@ -237,14 +144,9 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         private IEnumerable<Document> _children = null;
 
-        // special for passing httpcontext object
-        //private HttpContext _httpContext;
-
         // special for tree performance
         private int _userId = -1;
 
-        //private Dictionary<Property, object> _knownProperties = new Dictionary<Property, object>();
-        //private Func<KeyValuePair<Property, object>, string, bool> propertyTypeByAlias = (pt, alias) => pt.Key.PropertyType.Alias == alias; 
         #endregion
 
         #region Static Methods
@@ -345,7 +247,7 @@ namespace umbraco.cms.businesslogic.web
                 }
                 else
                 {
-                    Log.Add(LogTypes.Error, d.Id, String.Format("Couldn't import property '{0}' as the property type doesn't exist on this document type", propertyAlias));
+					LogHelper.Warn<Document>(String.Format("Couldn't import property '{0}' as the property type doesn't exist on this document type", propertyAlias));
                 }
             }
 
@@ -367,56 +269,36 @@ namespace umbraco.cms.businesslogic.web
         /// <param name="u">The usercontext under which the action are performed</param>
         /// <param name="ParentId">The id of the parent to the document</param>
         /// <returns>The newly created document</returns>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.CreateContent()", false)]
         public static Document MakeNew(string Name, DocumentType dct, User u, int ParentId)
         {
             //allows you to cancel a document before anything goes to the DB
             var newingArgs = new DocumentNewingEventArgs()
-            {
-                Text = Name,
-                DocumentType = dct,
-                User = u,
-                ParentId = ParentId
-            };
+                                 {
+                                     Text = Name,
+                                     DocumentType = dct,
+                                     User = u,
+                                     ParentId = ParentId
+                                 };
             Document.OnNewing(newingArgs);
             if (newingArgs.Cancel)
             {
                 return null;
             }
 
-
-            Guid newId = Guid.NewGuid();
-
-            // Updated to match level from base node
-            CMSNode n = new CMSNode(ParentId);
-            int newLevel = n.Level;
-            newLevel++;
-
-            //create the cms node first
-            CMSNode newNode = MakeNew(ParentId, _objectType, u.Id, newLevel, Name, newId);
-
-            //we need to create an empty document and set the underlying text property
-            Document tmp = new Document(newId, true);
-            tmp.SetText(Name);
-
-            //create the content data for the new document
-            tmp.CreateContent(dct);
-
-            //now create the document data
-            SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, updateDate, Text) "
-				+ "values (1, " + tmp.Id + ", 0, " + u.Id + ", @versionId, @updateDate, @text)",
-                SqlHelper.CreateParameter("@versionId", tmp.Version),
-                SqlHelper.CreateParameter("@updateDate", DateTime.Now),
-                SqlHelper.CreateParameter("@text", tmp.Text));
+            //Create a new IContent object based on the passed in DocumentType's alias, set the name and save it
+            IContent content = ApplicationContext.Current.Services.ContentService.CreateContent(Name, ParentId, dct.Alias, u.Id);
+            ApplicationContext.Current.Services.ContentService.Save(content, u.Id);
 
             //read the whole object from the db
-            Document d = new Document(newId);
+            Document d = new Document(content);
 
             //event
             NewEventArgs e = new NewEventArgs();
             d.OnNew(e);
 
             // Log
-            Log.Add(LogTypes.New, u, d.Id, "");
+            LogHelper.Info<Document>(string.Format("New document {0}", d.Id));
 
             // Run Handler				
             umbraco.BusinessLogic.Actions.Action.RunActionHandlers(d, ActionNew.Instance);
@@ -432,44 +314,27 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         /// <param name="nodeId"></param>
         /// <returns></returns>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetById()", false)]
         public static bool IsDocument(int nodeId)
         {
             bool isDoc = false;
-            using (IRecordsReader dr =
-            SqlHelper.ExecuteReader(string.Format("select nodeId from cmsDocument where nodeId = @id"),
-                SqlHelper.CreateParameter("@id", nodeId)))
-            {
 
-                if (dr.Read())
-                {
-                    isDoc = true;
-                }
-            }
+            var content = ApplicationContext.Current.Services.ContentService.GetById(nodeId);
+            isDoc = content != null;
 
             return isDoc;
         }
 
+        
+        /// <summary>
         /// Used to get the firstlevel/root documents of the hierachy
         /// </summary>
         /// <returns>Root documents</returns>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetRootContent()", false)]
         public static Document[] GetRootDocuments()
         {
-            Guid[] topNodeIds = TopMostNodeIds(_objectType);
-
-            var docs = new List<Document>();
-            for (int i = 0; i < topNodeIds.Length; i++)
-            {
-                try
-                {
-                    docs.Add(new Document(topNodeIds[i]));
-                }
-                catch (Exception ee)
-                {
-                    Log.Add(LogTypes.Error, new CMSNode(topNodeIds[i]).Id, "GetRootDocuments: " +
-                        ee.ToString());
-                }
-            }
-            return docs.ToArray();
+            var content = ApplicationContext.Current.Services.ContentService.GetRootContent();
+            return content.Select(c => new Document(c)).ToArray();
         }
 
         public static int CountSubs(int parentId, bool publishedOnly)
@@ -478,10 +343,10 @@ namespace umbraco.cms.businesslogic.web
             {
                 return CountSubs(parentId);
             }
-            else
-            {
-                return SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM (select distinct umbracoNode.id from umbracoNode INNER JOIN cmsDocument ON cmsDocument.published = 1 and cmsDocument.nodeId = umbracoNode.id WHERE ','+path+',' LIKE '%," + parentId.ToString() + ",%') t");
-            }
+
+            return ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
+                "SELECT COUNT(*) FROM (select distinct umbracoNode.id from umbracoNode INNER JOIN cmsDocument ON cmsDocument.published = 1 and cmsDocument.nodeId = umbracoNode.id WHERE ','+path+',' LIKE '%," +
+                parentId.ToString() + ",%') t");
         }
 
         /// <summary>
@@ -490,52 +355,25 @@ namespace umbraco.cms.businesslogic.web
         /// Note: use with care: this method can result in wast amount of data being deleted.
         /// </summary>
         /// <param name="dt">The type of which documents should be deleted</param>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.DeleteContentOfType()", false)]
         public static void DeleteFromType(DocumentType dt)
         {
-            //get all document for the document type and order by level (top level first)
-            var docs = Document.GetDocumentsOfDocumentType(dt.Id)
-                .OrderByDescending(x => x.Level);
-
-            foreach (Document doc in docs)
-            {
-                //before we delete this document, we need to make sure we don't end up deleting other documents that 
-                //are not of this document type that are children. So we'll move all of it's children to the trash first.
-                foreach (Document c in doc.GetDescendants())
-                {
-                    if (c.ContentType.Id != dt.Id)
-                    {
-                        c.MoveToTrash();
-                    }
-                }
-
-                doc.DeletePermanently();
-            }
+            ApplicationContext.Current.Services.ContentService.DeleteContentOfType(dt.Id);
         }
 
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetContentOfContentType()", false)]
         public static IEnumerable<Document> GetDocumentsOfDocumentType(int docTypeId)
         {
-            var tmp = new List<Document>();
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany.Trim(), "cmsContent.contentType = @contentTypeId", "umbracoNode.sortOrder"),
-                                        SqlHelper.CreateParameter("@nodeObjectType", Document._objectType),
-                                        SqlHelper.CreateParameter("@contentTypeId", docTypeId)))
-            {
-                while (dr.Read())
-                {
-                    Document d = new Document(dr.GetInt("id"), true);
-                    d.PopulateDocumentFromReader(dr);
-                    tmp.Add(d);
-                }
-            }
-
-            return tmp.ToArray();
+            var contents = ApplicationContext.Current.Services.ContentService.GetContentOfContentType(docTypeId);
+            return contents.Select(x => new Document(x)).ToArray();
         }
 
         public static void RemoveTemplateFromDocument(int templateId)
         {
-            SqlHelper.ExecuteNonQuery("update cmsDocument set templateId = NULL where templateId = @templateId",
-                                        SqlHelper.CreateParameter("@templateId", templateId));
+            ApplicationContext.Current.DatabaseContext.Database.Execute(
+                "update cmsDocument set templateId = NULL where templateId = @TemplateId", new {TemplateId = templateId});
+            //We need to clear cache for Documents since this is touching the database directly
+            RuntimeCacheProvider.Current.Clear();
         }
 
         /// <summary>
@@ -543,48 +381,22 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         /// <param name="NodeId">The parentdocuments id</param>
         /// <returns></returns>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetChildren()", false)]
         public static Document[] GetChildrenForTree(int NodeId)
         {
-            var tmp = new List<Document>();
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany.Trim(), "umbracoNode.parentID = @parentId", "umbracoNode.sortOrder"),
-                                        SqlHelper.CreateParameter("@nodeObjectType", Document._objectType),
-                                        SqlHelper.CreateParameter("@parentId", NodeId)))
-            {
-                while (dr.Read())
-                {
-                    Document d = new Document(dr.GetInt("id"), true);
-                    d.PopulateDocumentFromReader(dr);
-                    tmp.Add(d);
-                }
-            }
-
-            return tmp.ToArray();
+            var children = ApplicationContext.Current.Services.ContentService.GetChildren(NodeId).OrderBy(c => c.SortOrder);
+            var list = children.Select(x => new Document(x));
+            return list.ToArray();
         }
 
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetChildrenByName()", false)]
         public static List<Document> GetChildrenBySearch(int NodeId, string searchString)
         {
-            var tmp = new List<Document>();
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany.Trim(), "umbracoNode.parentID = @parentId and umbracoNode.text like @search", "umbracoNode.sortOrder"),
-                                        SqlHelper.CreateParameter("@nodeObjectType", Document._objectType),
-                                        SqlHelper.CreateParameter("@search", searchString),
-                                        SqlHelper.CreateParameter("@parentId", NodeId)))
-            {
-                while (dr.Read())
-                {
-                    Document d = new Document(dr.GetInt("id"), true);
-                    d.PopulateDocumentFromReader(dr);
-                    tmp.Add(d);
-                }
-            }
-
-            return tmp;
+            var children = ApplicationContext.Current.Services.ContentService.GetChildrenByName(NodeId, searchString);
+            return children.Select(x => new Document(x)).ToList();
         }
 
-
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.RePublishAll()", false)]
         public static void RePublishAll()
         {
             XmlDocument xd = new XmlDocument();
@@ -607,8 +419,7 @@ namespace umbraco.cms.businesslogic.web
                 }
                 catch (Exception ee)
                 {
-                    Log.Add(LogTypes.Error, User.GetUser(0), dr.GetInt("nodeId"),
-                            string.Format("Error generating xml: {0}", ee));
+					LogHelper.Error<Document>("Error generating xml", ee);
                 }
             }
             dr.Close();
@@ -627,8 +438,7 @@ namespace umbraco.cms.businesslogic.web
                 }
                 catch (Exception ee)
                 {
-                    Log.Add(LogTypes.Error, User.GetUser(0), dr.GetInt("nodeId"),
-                            string.Format("Error generating preview xml: {0}", ee));
+					LogHelper.Error<Document>("Error generating preview xml", ee);
                 }
             }
             dr.Close();
@@ -638,44 +448,92 @@ namespace umbraco.cms.businesslogic.web
         /// Retrieve a list of documents with an expirationdate greater than today
         /// </summary>
         /// <returns>A list of documents with expirationdates than today</returns>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetContentForExpiration()", false)]
         public static Document[] GetDocumentsForExpiration()
         {
-            ArrayList docs = new ArrayList();
-            IRecordsReader dr =
-                SqlHelper.ExecuteReader("select distinct nodeId from cmsDocument where published = 1 and not expireDate is null and expireDate <= @today",
-                                        SqlHelper.CreateParameter("@today", DateTime.Now));
-            while (dr.Read())
-                docs.Add(dr.GetInt("nodeId"));
-            dr.Close();
-
-            Document[] retval = new Document[docs.Count];
-            for (int i = 0; i < docs.Count; i++) retval[i] = new Document((int)docs[i]);
-            return retval;
+            var contents = ApplicationContext.Current.Services.ContentService.GetContentForExpiration();
+            return contents.Select(x => new Document(x)).ToArray();
         }
 
         /// <summary>
         /// Retrieve a list of documents with with releasedate greater than today
         /// </summary>
         /// <returns>Retrieve a list of documents with with releasedate greater than today</returns>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetContentForRelease()", false)]
         public static Document[] GetDocumentsForRelease()
         {
-            ArrayList docs = new ArrayList();
-            IRecordsReader dr = SqlHelper.ExecuteReader("select distinct nodeId, level, sortOrder from cmsDocument inner join umbracoNode on umbracoNode.id = cmsDocument.nodeId where newest = 1 and not releaseDate is null and releaseDate <= @today order by [level], sortOrder",
-                                        SqlHelper.CreateParameter("@today", DateTime.Now));
-            while (dr.Read())
-                docs.Add(dr.GetInt("nodeId"));
-            dr.Close();
-
-
-            Document[] retval = new Document[docs.Count];
-            for (int i = 0; i < docs.Count; i++) retval[i] = new Document((int)docs[i]);
-
-            return retval;
+            var contents = ApplicationContext.Current.Services.ContentService.GetContentForRelease();
+            return contents.Select(x => new Document(x)).ToArray();
         }
 
         #endregion
 
         #region Public Properties
+
+        public override int sortOrder
+        {
+            get
+            {
+                return Content == null ? base.sortOrder : Content.SortOrder;
+            }
+            set
+            {
+                if (Content == null)
+                {
+                    base.sortOrder = value;
+                }
+                else
+                {
+                    Content.SortOrder = value;
+                }
+            }
+        }
+
+        public override int Level
+        {
+            get
+            {
+                return Content == null ? base.Level : Content.Level;
+            }
+            set
+            {
+                if (Content == null)
+                {
+                    base.Level = value;
+                }
+                else
+                {
+                    Content.Level = value;
+                }
+            }
+        }
+
+        public override int ParentId
+        {
+            get
+            {
+                return Content == null ? base.ParentId : Content.ParentId;
+            }
+        }
+
+        public override string Path
+        {
+            get
+            {
+                return Content == null ? base.Path : Content.Path;
+            }
+            set
+            {
+                if (Content == null)
+                {
+                    base.Path = value;
+                }
+                else
+                {
+                    Content.Path = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether the document was constructed for the optimized mode
@@ -740,27 +598,12 @@ namespace umbraco.cms.businesslogic.web
         }
 
         /// <summary>
-        /// The current HTTPContext
-        /// </summary>
-        [Obsolete("DO NOT USE THIS! Get the HttpContext via regular ASP.Net methods instead")]
-        public HttpContext HttpContext
-        {
-            set { /*THERE IS NO REASON TO DO THIS. _httpContext = value; */}
-            get
-            {
-                //if (_httpContext == null)
-                //    _httpContext = HttpContext.Current;
-                //return _httpContext;
-                return System.Web.HttpContext.Current;
-            }
-        }
-
-        /// <summary>
         /// Gets or sets a value indicating whether the document is published.
         /// </summary>
 		/// <remarks>A document can be published yet not visible, because of one or more of its
 		/// parents being unpublished. Use <c>PathPublished</c> to get a value indicating whether
 		/// the node and all its parents are published, and therefore whether the node is visible.</remarks>
+        [Obsolete("Obsolete, Use Published property on Umbraco.Core.Models.Content", false)]
         public bool Published
         {
             get { return _published; }
@@ -768,100 +611,83 @@ namespace umbraco.cms.businesslogic.web
             set
             {
                 _published = value;
-                SqlHelper.ExecuteNonQuery(
-                    string.Format("update cmsDocument set published = {0} where nodeId = {1}", Id, value ? 1 : 0));
+                if (_published)
+                {
+                    Content.ChangePublishedState(PublishedState.Published);
+                }
+                else
+                {
+                    Content.ChangePublishedState(PublishedState.Unpublished);
+                    
+                }
             }
         }
 
 		/// <summary>
 		/// Gets a value indicating whether the document and all its parents are published.
 		/// </summary>
-		public bool PathPublished
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.IsPublishable()", false)]
+        public bool PathPublished
 		{
 			get
 			{
-				// get all nodes in the path to the document, and get all matching published documents
-				// the difference should be zero if everything is published
-				// test nodeObjectType to make sure we only count _content_ nodes
-				int x = SqlHelper.ExecuteScalar<int>(@"select count(node.id) - count(doc.nodeid)
-from umbracoNode as node 
-left join cmsDocument as doc on (node.id=doc.nodeId and doc.published=1)
-where '" + Path + ",' like " + SqlHelper.Concat("node.path", "',%'") + @"
-and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
-				return (x == 0);
+				return ApplicationContext.Current.Services.ContentService.IsPublishable(Content);
 			}
 		}
 
+        [Obsolete("Obsolete, Use Name property on Umbraco.Core.Models.Content", false)]
         public override string Text
         {
             get
             {
-                return base.Text;
+                return Content.Name;
             }
             set
             {
                 value = value.Trim();
-                base.Text = value;
-                SqlHelper.ExecuteNonQuery("update cmsDocument set text = @text where versionId = @versionId",
-                                          SqlHelper.CreateParameter("@text", value),
-                                          SqlHelper.CreateParameter("@versionId", Version));
-                //CMSNode c = new CMSNode(Id);
-                //c.Text = value;
+                Content.Name = value;
             }
         }
 
         /// <summary>
         /// The date of the last update of the document
         /// </summary>
+        [Obsolete("Obsolete, Use UpdateDate property on Umbraco.Core.Models.Content", false)]
         public DateTime UpdateDate
         {
             get { return _updated; }
             set
             {
                 _updated = value;
-                SqlHelper.ExecuteNonQuery("update cmsDocument set updateDate = @value where versionId = @versionId",
-                                          SqlHelper.CreateParameter("@value", value),
-                                          SqlHelper.CreateParameter("@versionId", Version));
+                Content.UpdateDate = value;
             }
         }
 
         /// <summary>
         /// A datestamp which indicates when a document should be published, used in automated publish/unpublish scenarios
         /// </summary>
+        [Obsolete("Obsolete, Use ReleaseDate property on Umbraco.Core.Models.Content", false)]
         public DateTime ReleaseDate
         {
             get { return _release; }
             set
             {
                 _release = value;
-
-                if (_release.Year != 1 || _release.Month != 1 || _release.Day != 1)
-                    SqlHelper.ExecuteNonQuery("update cmsDocument set releaseDate = @value where versionId = @versionId",
-                                              SqlHelper.CreateParameter("@value", value),
-                                              SqlHelper.CreateParameter("@versionId", Version));
-                else
-                    SqlHelper.ExecuteNonQuery("update cmsDocument set releaseDate = NULL where versionId = @versionId",
-                                              SqlHelper.CreateParameter("@versionId", Version));
+                Content.ReleaseDate = value;
             }
         }
 
         /// <summary>
         /// A datestamp which indicates when a document should be unpublished, used in automated publish/unpublish scenarios
         /// </summary>
+        [Obsolete("Obsolete, Use ExpireDate property on Umbraco.Core.Models.Content", false)]
         public DateTime ExpireDate
         {
             get { return _expire; }
             set
             {
                 _expire = value;
-
-                if (_expire.Year != 1 || _expire.Month != 1 || _expire.Day != 1)
-                    SqlHelper.ExecuteNonQuery("update cmsDocument set expireDate = @value where versionId=@versionId",
-                                              SqlHelper.CreateParameter("@value", value),
-                                              SqlHelper.CreateParameter("@versionId", Version));
-                else
-                    SqlHelper.ExecuteNonQuery("update cmsDocument set expireDate = NULL where versionId=@versionId",
-                                              SqlHelper.CreateParameter("@versionId", Version));
+                Content.ExpireDate = value;
             }
         }
 
@@ -875,6 +701,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// 
         /// ?altTemplate=[templatealias]
         /// </summary>
+        [Obsolete("Obsolete, Use Template property on Umbraco.Core.Models.Content", false)]
         public int Template
         {
             get { return _template; }
@@ -883,15 +710,12 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
                 _template = value;
                 if (value == 0)
                 {
-                    SqlHelper.ExecuteNonQuery("update cmsDocument set templateId = @value where versionId = @versionId",
-                                              SqlHelper.CreateParameter("@value", DBNull.Value),
-                                              SqlHelper.CreateParameter("@versionId", Version));
+                    Content.Template = null;
                 }
                 else
                 {
-                    SqlHelper.ExecuteNonQuery("update cmsDocument set templateId = @value where versionId = @versionId",
-                                              SqlHelper.CreateParameter("@value", _template),
-                                              SqlHelper.CreateParameter("@versionId", Version));
+                    var template = ApplicationContext.Current.Services.FileService.GetTemplate(value);
+                    Content.Template = template;
                 }
             }
         }
@@ -899,59 +723,18 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// <summary>
         /// A collection of documents imidiately underneath this document ie. the childdocuments
         /// </summary>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetChildren()", false)]
         public new Document[] Children
         {
             get
             {
                 //cache the documents children so that this db call doesn't have to occur again
-                if (this._children == null)
-                    this._children = Document.GetChildrenForTree(this.Id);
+                if (_children == null)
+                    _children = GetChildrenForTree(Id);
 
-                return this._children.ToArray();
+                return _children.ToArray();
             }
         }
-
-
-        /// <summary>
-        /// Indexed property to return the property value by name
-        /// </summary>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        //public object this[string alias]
-        //{
-        //    get
-        //    {
-        //        if (this._optimizedMode)
-        //        {
-        //            return this._knownProperties.Single(p => propertyTypeByAlias(p, alias)).Value;
-        //        }
-        //        else
-        //        {
-        //            return this.getProperty(alias).Value;
-        //        }
-        //    }
-        //    set
-        //    {
-        //        if (this._optimizedMode)
-        //        {
-        //            if (this._knownProperties.SingleOrDefault(p => propertyTypeByAlias(p, alias)).Key == null)
-        //            {
-        //                var pt = this.getProperty(alias);
-
-        //                this._knownProperties.Add(pt, pt.Value);
-        //            }
-        //            else
-        //            {
-        //                var pt = this._knownProperties.Single(p => propertyTypeByAlias(p, alias)).Key;
-        //                this._knownProperties[pt] = value;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            this.getProperty(alias).Value = value;
-        //        }
-        //    }
-        //}
 
         #endregion
 
@@ -980,16 +763,17 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         }
 
         /// <summary>
-        /// Publishing a document
+        /// Saves and Publishes a document.
         /// A xmlrepresentation of the document and its data are exposed to the runtime data
         /// (an xmlrepresentation is added -or updated if the document previously are published) ,
         /// this will lead to a new version of the document being created, for continuing editing of
         /// the data.
         /// </summary>
         /// <param name="u">The usercontext under which the action are performed</param>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
         public void Publish(User u)
         {
-            PublishWithResult(u);
+            SaveAndPublish(u);
         }
 
         /// <summary>
@@ -1001,58 +785,25 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// </summary>
         /// <param name="u">The usercontext under which the action are performed</param>
         /// <returns>True if the publishing succeed. Possible causes for not publishing is if an event aborts the publishing</returns>
+        /// <remarks>        
+        /// This method needs to be marked with [MethodImpl(MethodImplOptions.Synchronized)]
+        /// because we execute multiple queries affecting the same data, if two thread are to do this at the same time for the same node we may have problems
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
         public bool PublishWithResult(User u)
         {
-            PublishEventArgs e = new PublishEventArgs();
+            var e = new PublishEventArgs();
             FireBeforePublish(e);
 
             if (!e.Cancel)
             {
-
-                // make a lookup to see if template is 0 as the template is not initialized in the optimized
-                // Document.Children method which is used in PublishWithChildrenWithResult methhod
-                if (_template == 0)
-                {
-                    _template = new DocumentType(this.ContentType.Id).DefaultTemplate;
-                }
-
-                _published = true;
-                string tempVersion = Version.ToString();
-                DateTime versionDate = DateTime.Now;
-                Guid newVersion = createNewVersion(versionDate);
-                
-                Log.Add(LogTypes.Publish, u, Id, "");
-
-                //PPH make sure that there is only 1 newest node, this is important in regard to schedueled publishing...
-                SqlHelper.ExecuteNonQuery("update cmsDocument set newest = 0 where nodeId = " + Id);
-
-                SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, updateDate, Text, TemplateId) "
-					+ "values (1, @id, 0, @userId, @versionId, @updateDate, @text, @template)",
-                    SqlHelper.CreateParameter("@id", Id),
-                    SqlHelper.CreateParameter("@userId", u.Id),
-                    SqlHelper.CreateParameter("@versionId", newVersion),
-                    SqlHelper.CreateParameter("@updateDate", versionDate),
-                    SqlHelper.CreateParameter("@text", Text),
-                    SqlHelper.CreateParameter("@template", _template > 0 ? (object)_template : (object)DBNull.Value) //pass null in if the template doesn't have a valid id
-					);
-
-                SqlHelper.ExecuteNonQuery("update cmsDocument set published = 0 where nodeId = " + Id);
-                SqlHelper.ExecuteNonQuery("update cmsDocument set published = 1, newest = 0 where versionId = @versionId",
-                                            SqlHelper.CreateParameter("@versionId", tempVersion));
-
-                // update release and expire dates
-                Document newDoc = new Document(Id, newVersion);
-                if (ReleaseDate != new DateTime())
-                    newDoc.ReleaseDate = ReleaseDate;
-                if (ExpireDate != new DateTime())
-                    newDoc.ExpireDate = ExpireDate;
-
-                // Update xml in db using the new document (has correct version date)
-                newDoc.XmlGenerate(new XmlDocument());
+                var result = ((ContentService)ApplicationContext.Current.Services.ContentService).Publish(Content, true, u.Id);
+                _published = result;
 
                 FireAfterPublish(e);
 
-                return true;
+                return result;
             }
             else
             {
@@ -1060,21 +811,10 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
             }
         }
 
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
         public bool PublishWithChildrenWithResult(User u)
         {
-            if (PublishWithResult(u))
-            {
-                foreach (cms.businesslogic.web.Document dc in Children.ToList())
-                {
-                    dc.PublishWithChildrenWithResult(u);
-                }
-            }
-            else
-            {
-                return false;
-            }
-
-            return true;
+            return ((ContentService)ApplicationContext.Current.Services.ContentService).PublishWithChildren(Content, true, u.Id);
         }
 
         /// <summary>
@@ -1083,58 +823,15 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// </summary>
         /// <param name="u">The usercontext under which the action are performed</param>
         /// <param name="VersionId">The unique Id of the version to roll back to</param>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Rollback()", false)]
         public void RollBack(Guid VersionId, User u)
         {
-            RollBackEventArgs e = new RollBackEventArgs();
+            var e = new RollBackEventArgs();
             FireBeforeRollBack(e);
 
             if (!e.Cancel)
             {
-                DateTime versionDate = DateTime.Now;
-                Guid newVersion = createNewVersion(versionDate);
- 
-                if (_template != 0)
-                {
-                    SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, updateDate, Text, TemplateId) "
-						+ "values (@nodeId, 0, @userId, @versionId, @updateDate, @text, @templateId)",
-						SqlHelper.CreateParameter("@nodeId", Id),
-						SqlHelper.CreateParameter("@userId", u.Id),
-                        SqlHelper.CreateParameter("@versionId", newVersion),
-                        SqlHelper.CreateParameter("@updateDate", versionDate),
-                        SqlHelper.CreateParameter("@text", Text),
-						SqlHelper.CreateParameter("@templateId", _template));
-                }
-                else
-                {
-                    SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, updateDate, Text) "
-						+ "values (@nodeId, 0, @userId, @versionId, @updateDate, @text)",
-						SqlHelper.CreateParameter("@nodeId", Id),
-						SqlHelper.CreateParameter("@userId", u.Id),
-                        SqlHelper.CreateParameter("@versionId", newVersion),
-                        SqlHelper.CreateParameter("@updateDate", versionDate),
-                        SqlHelper.CreateParameter("@text", Text));
-                }
-
-                // Get new version
-                Document dNew = new Document(Id, newVersion);
-
-                // Old version
-                Document dOld = new Document(Id, VersionId);
-
-                // Revert title
-                dNew.Text = dOld.Text;
-
-                // Revert all properties
-                var props = dOld.getProperties;
-                foreach (Property p in props)
-                    try
-                    {
-                        dNew.getProperty(p.PropertyType).Value = p.Value;
-                    }
-                    catch
-                    {
-                        // property doesn't exists
-                    }
+                Content = ApplicationContext.Current.Services.ContentService.Rollback(Id, VersionId, u.Id);
 
                 FireAfterRollBack(e);
             }
@@ -1146,40 +843,21 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// Envoking this method will publish the documents and all children recursive.
         /// </summary>
         /// <param name="u">The usercontext under which the action are performed</param>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
         public void PublishWithSubs(User u)
         {
-
             PublishEventArgs e = new PublishEventArgs();
             FireBeforePublish(e);
 
             if (!e.Cancel)
             {
-                _published = true;
-                string tempVersion = Version.ToString();
-                DateTime versionDate = DateTime.Now;
-                Guid newVersion = createNewVersion(versionDate);
-
-                SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, updateDate, Text) "
-					+ "values (" + Id + ", 0, " + u.Id + ", @versionId, @text)",
-                    SqlHelper.CreateParameter("@versionId", newVersion),
-                    SqlHelper.CreateParameter("@updateDate", versionDate),
-                    SqlHelper.CreateParameter("@text", Text));
-
-                SqlHelper.ExecuteNonQuery("update cmsDocument set published = 0 where nodeId = " + Id);
-                SqlHelper.ExecuteNonQuery("update cmsDocument set published = 1 where versionId = @versionId", SqlHelper.CreateParameter("@versionId", tempVersion));
-
-                BusinessLogic.Log.Add(LogTypes.Debug, -1, newVersion.ToString() + " - " + Id.ToString());
-
-                // Update xml in db
-                XmlGenerate(new XmlDocument());
-
-                foreach (Document dc in Children.ToList())
-                    dc.PublishWithSubs(u);
+                var published = ((ContentService)ApplicationContext.Current.Services.ContentService).PublishWithChildren(Content, true, u.Id);
 
                 FireAfterPublish(e);
             }
         }
 
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.UnPublish()", false)]
         public void UnPublish()
         {
             UnPublishEventArgs e = new UnPublishEventArgs();
@@ -1188,10 +866,8 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
 
             if (!e.Cancel)
             {
-                SqlHelper.ExecuteNonQuery(string.Format("update cmsDocument set published = 0 where nodeId = {0}", Id));
-
-                _published = false;
-
+                _published = ((ContentService)ApplicationContext.Current.Services.ContentService).UnPublish(Content, true, 0);
+                
                 FireAfterUnPublish(e);
             }
         }
@@ -1199,36 +875,77 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// <summary>
         /// Used to persist object changes to the database. 
         /// </summary>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Save()", false)]
         public override void Save()
         {
-            SaveEventArgs e = new SaveEventArgs();
+            var e = new SaveEventArgs();
             FireBeforeSave(e);
+
+            foreach (var property in GenericProperties)
+            {
+                Content.SetValue(property.PropertyType.Alias, property.Value);
+            }
 
             if (!e.Cancel)
             {
-
-                //if (this._optimizedMode)
-                //{
-                //    foreach (var property in this._knownProperties)
-                //    {
-                //        var pt = property.Key;
-                //        pt.Value = property.Value;
-                //    }
-                //}
-
-                UpdateDate = DateTime.Now; //set the updated date to now
+                var current = User.GetCurrent();
+                int userId = current == null ? 0 : current.Id;
+                ApplicationContext.Current.Services.ContentService.Save(Content, userId);
 
                 base.Save();
-                // update preview xml
-                SaveXmlPreview(new XmlDocument());
 
                 FireAfterSave(e);
             }
         }
 
+        /// <summary>
+        /// Saves and publishes a document
+        /// </summary>
+        /// <param name="u">The usercontext under which the action are performed</param>
+        /// <returns></returns>
+        public bool SaveAndPublish(User u)
+        {
+            foreach (var property in GenericProperties)
+            {
+                if(property.Value == null)
+                    continue;
+
+                Content.SetValue(property.PropertyType.Alias, property.Value);
+            }
+
+            var e = new SaveEventArgs();
+            FireBeforeSave(e);
+
+            if (!e.Cancel)
+            {
+                var publishArgs = new PublishEventArgs();
+                FireBeforePublish(publishArgs);
+
+                if (!publishArgs.Cancel)
+                {
+                    var result =
+                        ((ContentService) ApplicationContext.Current.Services.ContentService).SaveAndPublish(Content,
+                                                                                                             true, u.Id);
+
+                    base.Save();
+
+                    //Launch the After Save event since we're doing 2 things in one operation: Saving and publishing.
+                    FireAfterSave(e);
+
+                    //Now we need to fire the After publish event
+                    FireAfterPublish(publishArgs);
+
+                    return result;
+                }
+            }
+
+            return false;
+        }
+
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.HasPublishedVersion()", false)]
         public bool HasPublishedVersion()
         {
-            return (SqlHelper.ExecuteScalar<int>("select Count(published) as tmp from cmsDocument where published = 1 And nodeId =" + Id) > 0);
+            return Content.HasPublishedVersion();
         }
 
         /// <summary>
@@ -1237,70 +954,44 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// then this is considered a change.
         /// </summary>
         /// <returns></returns>
+        [Obsolete("Obsolete, Instead of calling this just check if the latest version of the content is published", false)]
         public bool HasPendingChanges()
         {
-            double timeDiff = new TimeSpan(UpdateDate.Ticks - VersionDate.Ticks).TotalMilliseconds;
-            return timeDiff > 2000;
+            return Content.Published == false;
         }
 
         /// <summary>
         /// Used for rolling back documents to a previous version
         /// </summary>
         /// <returns> Previous published versions of the document</returns>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetVersions()", false)]
         public DocumentVersionList[] GetVersions()
         {
-            ArrayList versions = new ArrayList();
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader("select documentUser, versionId, updateDate, text from cmsDocument where nodeId = @nodeId order by updateDate",
-                                        SqlHelper.CreateParameter("@nodeId", Id)))
-            {
-                while (dr.Read())
-                {
-                    DocumentVersionList dv =
-                        new DocumentVersionList(dr.GetGuid("versionId"),
-                                                dr.GetDateTime("updateDate"),
-                                                dr.GetString("text"),
-                                                User.GetUser(dr.GetInt("documentUser")));
-                    versions.Add(dv);
-                }
-            }
-
-            DocumentVersionList[] retVal = new DocumentVersionList[versions.Count];
-            int i = 0;
-            foreach (DocumentVersionList dv in versions)
-            {
-                retVal[i] = dv;
-                i++;
-            }
-            return retVal;
+            var versions = ApplicationContext.Current.Services.ContentService.GetVersions(Id);
+            return
+                versions.Select(x => new DocumentVersionList(x.Version, x.UpdateDate, x.Name, User.GetUser(x.CreatorId)))
+                        .ToArray();
         }
 
         /// <summary>
         /// Returns the published version of this document
         /// </summary>
         /// <returns>The published version of this document</returns>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetPublishedVersion()", false)]
         public DocumentVersionList GetPublishedVersion()
         {
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader("select top 1 documentUser, versionId, updateDate, text from cmsDocument where nodeId = @nodeId and published = 1 order by updateDate desc",
-                                        SqlHelper.CreateParameter("@nodeId", Id)))
-            {
-                if (dr.Read())
-                {
-                    return new DocumentVersionList(dr.GetGuid("versionId"),
-                                                dr.GetDateTime("updateDate"),
-                                                dr.GetString("text"),
-                                                User.GetUser(dr.GetInt("documentUser")));
-                }
-            }
+            var version = ApplicationContext.Current.Services.ContentService.GetPublishedVersion(Id);
+            if (version == null)
+                return null;
 
-            return null;
+            return new DocumentVersionList(version.Version, version.UpdateDate, version.Name, User.GetUser(version.CreatorId));
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns>Returns a breadcrumlike path for the document like: /ancestorname/ancestorname</returns>
+        [Obsolete("Method is not used anywhere, so its marked for deletion")]
         public string GetTextPath()
         {
             string tempPath = "";
@@ -1315,11 +1006,22 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         }
 
         /// <summary>
+        /// Overrides the moving of a <see cref="Document"/> object to a new location by changing its parent id.
+        /// </summary>
+        public override void Move(int newParentId)
+        {
+            var current = User.GetCurrent();
+            int userId = current == null ? 0 : current.Id;
+            ApplicationContext.Current.Services.ContentService.Move(Content, newParentId, userId);
+        }
+
+        /// <summary>
         /// Creates a new document of the same type and copies all data from the current onto it. Due to backwards compatibility we can't return
         /// the new Document, but it's included in the CopyEventArgs.Document if you subscribe to the AfterCopy event
         /// </summary>
         /// <param name="CopyTo">The parentid where the document should be copied to</param>
         /// <param name="u">The usercontext under which the action are performed</param>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Copy()", false)]
         public Document Copy(int CopyTo, User u)
         {
             return Copy(CopyTo, u, false);
@@ -1332,11 +1034,10 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// <param name="CopyTo"></param>
         /// <param name="u"></param>
         /// <param name="RelateToOrignal"></param>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Copy()", false)]
         public Document Copy(int CopyTo, User u, bool RelateToOrignal)
         {
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-
-            CopyEventArgs e = new CopyEventArgs();
+            var e = new CopyEventArgs();
             e.CopyTo = CopyTo;
             FireBeforeCopy(e);
             Document newDoc = null;
@@ -1344,74 +1045,16 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
             if (!e.Cancel)
             {
                 // Make the new document
-                newDoc = MakeNew(Text, new DocumentType(ContentType.Id), u, CopyTo);
+                var content = ApplicationContext.Current.Services.ContentService.Copy(Content, CopyTo, RelateToOrignal, u.Id);
+                newDoc = new Document(content);
+                
+                // Have to run the ActionNew handler to do umbEnsureUniqueName (for example)
+                BusinessLogic.Actions.Action.RunActionHandlers(newDoc, ActionNew.Instance);
+                // Then save to preserve any changes made by action handlers
+                newDoc.Save();
 
-                if (newDoc != null)
-                {
-                    // update template if a template is set
-                    if (this.Template > 0)
-                        newDoc.Template = Template;
-
-                    //update the trashed property as it could be copied inside the recycle bin
-                    newDoc.IsTrashed = this.IsTrashed;
-
-                    // Copy the properties of the current document
-                    var props = GenericProperties;
-                    foreach (Property p in props)
-                    {
-                        //copy file if it's an upload property (so it doesn't get removed when original doc get's deleted)
-
-                        IDataType uploadField = new Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
-
-                        if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id
-                        && p.Value.ToString() != ""
-                        && fs.FileExists(fs.GetRelativePath(p.Value.ToString())))
-                        {
-                            var currentPath = fs.GetRelativePath(p.Value.ToString());
-
-                            var propId = newDoc.getProperty(p.PropertyType.Alias).Id;
-                            var newPath = fs.GetRelativePath(propId, System.IO.Path.GetFileName(currentPath));
-
-                            fs.CopyFile(currentPath, newPath);
-
-                            newDoc.getProperty(p.PropertyType.Alias).Value = fs.GetUrl(newPath);
-
-                            //copy thumbs
-                            foreach (var thumbPath in fs.GetThumbnails(currentPath))
-                            {
-                                var newThumbPath = fs.GetRelativePath(propId, System.IO.Path.GetFileName(thumbPath));
-                                fs.CopyFile(thumbPath, newThumbPath);
-                            }
-
-                        }
-                        else
-                        {
-                            newDoc.getProperty(p.PropertyType.Alias).Value = p.Value;
-                        }
-
-                    }
-
-                    // Relate?
-                    if (RelateToOrignal)
-                    {
-                        Relation.MakeNew(Id, newDoc.Id, RelationType.GetByAlias("relateDocumentOnCopy"), "");
-
-                        // Add to audit trail
-                        Log.Add(LogTypes.Copy, u, newDoc.Id, "Copied and related from " + Text + " (id: " + Id.ToString() + ")");
-                    }
-
-
-                    // Copy the children
-                    //store children array here because iterating over an Array object is very inneficient.
-                    var c = Children;
-                    foreach (Document d in c)
-                        d.Copy(newDoc.Id, u, RelateToOrignal);
-
-                    e.NewDocument = newDoc;
-                }
-
+                e.NewDocument = newDoc;
                 FireAfterCopy(e);
-
             }
 
             return newDoc;
@@ -1420,6 +1063,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// <summary>
         /// Puts the current document in the trash
         /// </summary>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.MoveToRecycleBin()", false)]
         public override void delete()
         {
             MoveToTrash();
@@ -1429,6 +1073,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// With either move the document to the trash or permanently remove it from the database.
         /// </summary>
         /// <param name="deletePermanently">flag to set whether or not to completely remove it from the database or just send to trash</param>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Delete() or Umbraco.Core.Services.ContentService.MoveToRecycleBin()", false)]
         public void delete(bool deletePermanently)
         {
             if (!deletePermanently)
@@ -1445,22 +1090,14 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// Returns all decendants of the current document
         /// </summary>
         /// <returns></returns>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetDescendants()", false)]
         public override IEnumerable GetDescendants()
         {
-            var tmp = new List<Document>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany.Trim(), "umbracoNode.path LIKE '%," + this.Id + ",%'", "umbracoNode.level"),
-                                        SqlHelper.CreateParameter("@nodeObjectType", Document._objectType)))
-            {
-                while (dr.Read())
-                {
-                    Document d = new Document(dr.GetInt("id"), true);
-                    d.PopulateDocumentFromReader(dr);
-                    tmp.Add(d);
-                }
-            }
+            var descendants = Content == null
+                                  ? ApplicationContext.Current.Services.ContentService.GetDescendants(Id)
+                                  : ApplicationContext.Current.Services.ContentService.GetDescendants(Content);
 
-            return tmp.ToArray();
+            return descendants.Select(x => new Document(x.Id, true));
         }
 
         /// <summary>
@@ -1468,6 +1105,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// </summary>
         /// <param name="xd">The source xmldocument</param>
         /// <param name="x">The previous xmlrepresentation of the document</param>
+        [Obsolete("Obsolete, Doesn't appear to be used anywhere", false)]
         public void XmlNodeRefresh(XmlDocument xd, ref XmlNode x)
         {
             x.Attributes.RemoveAll();
@@ -1484,18 +1122,6 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         public override void XmlGenerate(XmlDocument xd)
         {
             XmlNode x = generateXmlWithoutSaving(xd);
-            /*
-                        if (!UmbracoSettings.UseFriendlyXmlSchema)
-                        {
-                        } else
-                        {
-                            XmlNode childNodes = xmlHelper.addTextNode(xd, "data", "");
-                            x.AppendChild(childNodes);
-                            XmlPopulate(xd, ref childNodes, false);
-                        }
-            */
-
-
             // Save to db
             saveXml(x);
         }
@@ -1556,7 +1182,8 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
                 if (p != null)
                 {
                     x.AppendChild(p.ToXml(xd));
-                    if (p.PropertyType.Alias == "umbracoUrlName" && p.Value.ToString().Trim() != string.Empty)
+                    if (p.PropertyType.Alias == "umbracoUrlName" && p.Value != null 
+                            && p.Value.ToString().Trim() != string.Empty)
                         urlName = p.Value.ToString();
                 }
 
@@ -1602,7 +1229,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
                     }
                     else
                     {
-                        Log.Add(LogTypes.System, d.Id, "Document not published so XML cannot be generated");
+                        LogHelper.Debug<Document>(string.Format("Document {0} not published so XML cannot be generated", d.Id));
                     }
                 }
 
@@ -1636,11 +1263,11 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
 
         public override List<CMSPreviewNode> GetNodesForPreview(bool childrenOnly)
         {
-            List<CMSPreviewNode> nodes = new List<CMSPreviewNode>();
+            var nodes = new List<CMSPreviewNode>();
 
             string pathExp = childrenOnly ? Path + ",%" : Path;
 
-            IRecordsReader dr = SqlHelper.ExecuteReader(String.Format(m_SQLOptimizedForPreview, pathExp));
+            IRecordsReader dr = SqlHelper.ExecuteReader(String.Format(SqlOptimizedForPreview, pathExp));
             while (dr.Read())
                 nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("versionId"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml")));
             dr.Close();
@@ -1668,37 +1295,53 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         #endregion
 
         #region Protected Methods
+        [Obsolete("Obsolete", false)]
         protected override void setupNode()
         {
-            base.setupNode();
-
-            using (var dr =
-                SqlHelper.ExecuteReader("select published, documentUser, coalesce(templateId, cmsDocumentType.templateNodeId) as templateId, text, releaseDate, expireDate, updateDate from cmsDocument inner join cmsContent on cmsDocument.nodeId = cmsContent.Nodeid left join cmsDocumentType on cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1 where versionId = @versionId",
-                                        SqlHelper.CreateParameter("@versionId", Version)))
+            if (Id == -1 || Id == -20)
             {
-                if (dr.Read())
-                {
-                    _creator = User;
-                    _writer = User.GetUser(dr.GetInt("documentUser"));
-
-                    if (!dr.IsNull("templateId"))
-                        _template = dr.GetInt("templateId");
-                    if (!dr.IsNull("releaseDate"))
-                        _release = dr.GetDateTime("releaseDate");
-                    if (!dr.IsNull("expireDate"))
-                        _expire = dr.GetDateTime("expireDate");
-                    if (!dr.IsNull("updateDate"))
-                        _updated = dr.GetDateTime("updateDate");
-                }
-                else
-                {
-                    throw new ArgumentException(string.Format("No Document exists with Version '{0}'", Version));
-                }
+                base.setupNode();
+                return;
             }
 
-            _published = HasPublishedVersion();
+            var content = Version == Guid.Empty
+                           ? ApplicationContext.Current.Services.ContentService.GetById(Id)
+                           : ApplicationContext.Current.Services.ContentService.GetByVersion(Version);
+
+            if(content == null)
+                throw new ArgumentException(string.Format("No Document exists with id '{0}'", Id));
+
+            SetupNode(content);
         }
 
+        private void SetupNode(IContent content)
+        {
+            Content = content;
+            //Setting private properties from IContentBase replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
+            base.PopulateCMSNodeFromContentBase(Content, _objectType);
+
+            //If the version is empty we update with the latest version from the current IContent.
+            if (Version == Guid.Empty)
+                Version = Content.Version;
+
+            //Setting private properties from IContent replacing Document.setupNode()
+            _creator = User.GetUser(Content.CreatorId);
+            _writer = User.GetUser(Content.WriterId);
+            _updated = Content.UpdateDate;
+
+            if (Content.Template != null)
+                _template = Content.Template.Id;
+
+            if (Content.ExpireDate.HasValue)
+                _expire = Content.ExpireDate.Value;
+
+            if (Content.ReleaseDate.HasValue)
+                _release = Content.ReleaseDate.Value;
+
+            _published = Content.Published;
+        }
+
+        [Obsolete("Obsolete", false)]
         protected void InitializeDocument(User InitUser, User InitWriter, string InitText, int InitTemplate,
                                           DateTime InitReleaseDate, DateTime InitExpireDate, DateTime InitUpdateDate,
                                           bool InitPublished)
@@ -1721,37 +1364,31 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
             _published = InitPublished;
         }
 
+        [Obsolete("Obsolete", false)]
         protected void PopulateDocumentFromReader(IRecordsReader dr)
         {
-            bool _hc = false;
-
-            if (dr.GetInt("children") > 0)
-                _hc = true;
-
-            int? masterContentType = null;
-
-            if (!dr.IsNull("masterContentType"))
-                masterContentType = dr.GetInt("masterContentType");
+            var hc = dr.GetInt("children") > 0;
 
             SetupDocumentForTree(dr.GetGuid("uniqueId")
                 , dr.GetShort("level")
                 , dr.GetInt("parentId")
                 , dr.GetInt("nodeUser")
                 , dr.GetInt("documentUser")
-                , (dr.GetInt("isPublished") == 1)
+                , !dr.GetBoolean("trashed") && (dr.GetInt("isPublished") == 1) //set published... double check trashed property
                 , dr.GetString("path")
                 , dr.GetString("text")
                 , dr.GetDateTime("createDate")
                 , dr.GetDateTime("updateDate")
                 , dr.GetDateTime("versionDate")
                 , dr.GetString("icon")
-                , _hc
+                , hc
                 , dr.GetString("alias")
                 , dr.GetString("thumbnail")
                 , dr.GetString("description")
-                , masterContentType
+                     , null
                 , dr.GetInt("contentTypeId")
-                , dr.GetInt("templateId"));
+                     , dr.GetInt("templateId")
+                     , dr.GetBoolean("isContainer"));
 
             if (!dr.IsNull("releaseDate"))
                 _release = dr.GetDateTime("releaseDate");
@@ -1767,10 +1404,11 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         #endregion
 
         #region Private Methods
+        [Obsolete("Obsolete", false)]
         private void SetupDocumentForTree(Guid uniqueId, int level, int parentId, int creator, int writer, bool publish, string path,
                                          string text, DateTime createDate, DateTime updateDate,
                                          DateTime versionDate, string icon, bool hasChildren, string contentTypeAlias, string contentTypeThumb,
-                                           string contentTypeDesc, int? masterContentType, int contentTypeId, int templateId)
+                                           string contentTypeDesc, int? masterContentType, int contentTypeId, int templateId, bool isContainer)
         {
             SetupNodeForTree(uniqueId, _objectType, level, parentId, creator, path, text, createDate, hasChildren);
 
@@ -1778,7 +1416,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
             _published = publish;
             _updated = updateDate;
             _template = templateId;
-            ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, masterContentType);
+            ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, null, isContainer);
             ContentTypeIcon = icon;
             VersionDate = versionDate;
         }
@@ -1815,6 +1453,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// Used internally to permanently delete the data from the database
         /// </summary>
         /// <returns>returns true if deletion isn't cancelled</returns>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Delete()", false)]
         private bool DeletePermanently()
         {
             DeleteEventArgs e = new DeleteEventArgs();
@@ -1823,21 +1462,18 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
 
             if (!e.Cancel)
             {
-                foreach (Document d in Children.ToList())
+                umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
+                if (Content != null)
                 {
-                    d.DeletePermanently();
+                    ApplicationContext.Current.Services.ContentService.Delete(Content);
+                }
+                else
+                {
+                    Content = ApplicationContext.Current.Services.ContentService.GetById(Id);
+                    ApplicationContext.Current.Services.ContentService.Delete(Content);
                 }
 
-                umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
-
-                // Remove all files
-                DeleteAssociatedMediaFiles();
-
-                //remove any domains associated
-                var domains = Domain.GetDomainsById(this.Id).ToList();
-                domains.ForEach(x => x.Delete());
-
-                SqlHelper.ExecuteNonQuery("delete from cmsDocument where NodeId = " + Id);
+                //Keeping the base.delete() as it looks to be clear 'private/internal cache'
                 base.delete();
 
                 FireAfterDelete(e);
@@ -1849,6 +1485,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// Used internally to move the node to the recyle bin
         /// </summary>
         /// <returns>Returns true if the move was not cancelled</returns>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.MoveToRecycleBin()", false)]
         private bool MoveToTrash()
         {
             MoveToTrashEventArgs e = new MoveToTrashEventArgs();
@@ -1858,7 +1495,15 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
             {
                 umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
                 UnPublish();
-                Move((int)RecycleBin.RecycleBinType.Content);
+                if (Content != null)
+                {
+                    ApplicationContext.Current.Services.ContentService.MoveToRecycleBin(Content);
+                }
+                else
+                {
+                    Content = ApplicationContext.Current.Services.ContentService.GetById(Id);
+                    ApplicationContext.Current.Services.ContentService.MoveToRecycleBin(Content);
+                }
                 FireAfterMoveToTrash(e);
             }
             return !e.Cancel;
@@ -1909,7 +1554,7 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// <summary>
         /// Occurs when [before save].
         /// </summary>
-        public static event SaveEventHandler BeforeSave;
+        public new static event SaveEventHandler BeforeSave;
         /// <summary>
         /// Raises the <see cref="E:BeforeSave"/> event.
         /// </summary>
@@ -1925,16 +1570,16 @@ and node.nodeObjectType='C66BA18E-EAF3-4CFF-8A22-41B16D66A972'");
         /// <summary>
         /// Occurs when [after save].
         /// </summary>
-        public static event SaveEventHandler AfterSave;
+        public new static event SaveEventHandler AfterSave;
         /// <summary>
         /// Raises the <see cref="E:AfterSave"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterSave(SaveEventArgs e)
+        protected new virtual void FireAfterSave(SaveEventArgs e)
         {
             if (AfterSave != null)
             {
-                AfterSave(this, e);
+                AfterSave(new Document(this.Id), e);
             }
         }
 

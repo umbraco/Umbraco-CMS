@@ -3,99 +3,56 @@ using System.IO;
 using System.Web.Routing;
 using System.Xml;
 using NUnit.Framework;
+using SQLCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Publishing;
+using Umbraco.Core.Services;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Tests.TestHelpers
 {
-	[TestFixture, RequiresSTA]
-	public abstract class BaseWebTest
-	{
+    [TestFixture, RequiresSTA]
+    public abstract class BaseWebTest : BaseDatabaseFactoryTest
+    {
 
-		[SetUp]
-		public virtual void Initialize()
-		{
-			TestHelper.SetupLog4NetForTests();
+        [SetUp]
+        public override void Initialize()
+        {
+            base.Initialize();            
+        }
 
-			AppDomain.CurrentDomain.SetData("DataDirectory", TestHelper.CurrentAssemblyDirectory);
+        protected override void InitializeDatabase()
+        {
+            if (RequiresDbSetup)
+                base.InitializeDatabase();
+        }
 
-			if (RequiresDbSetup)
-				TestHelper.InitializeDatabase();
-			Resolution.Freeze();
-			ApplicationContext = new ApplicationContext() { IsReady = true };
-			//we need to clear out all currently created template files
-			var masterPages = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Masterpages));
-			masterPages.GetFiles().ForEach(x => x.Delete());
-			var mvcViews = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.MvcViews));
-			mvcViews.GetFiles().ForEach(x => x.Delete());
-		}
-
-		[TearDown]
-		public virtual void TearDown()
-		{
-			//reset the app context
-			ApplicationContext.ApplicationCache.ClearAllCache();
-			ApplicationContext.Current = null;
-			Resolution.IsFrozen = false;
-			if (RequiresDbSetup)
-				TestHelper.ClearDatabase();
-
-            AppDomain.CurrentDomain.SetData("DataDirectory", null);
-
-			Cache.ClearAllCache();
-
-			UmbracoSettings.ResetSetters();
-		}	
-
-		/// <summary>
-		/// By default this unit test will create and initialize an umbraco database
-		/// </summary>
-		protected virtual bool RequiresDbSetup
-		{
-			get { return true; }
-		}
-
-		protected FakeHttpContextFactory GetHttpContextFactory(string url, RouteData routeData = null)
-		{
-			var factory = routeData != null
-			              	? new FakeHttpContextFactory(url, routeData)
-			              	: new FakeHttpContextFactory(url);
-
-
-			//set the state helper
-			StateHelper.HttpContext = factory.HttpContext;
-
-			return factory;
-		}
-
-		protected ApplicationContext ApplicationContext { get; private set; }
-
-		internal virtual IRoutesCache GetRoutesCache()
-		{
-			return new FakeRoutesCache();
-		}
-
-		protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null)
-		{
-			var ctx = new UmbracoContext(
-				GetHttpContextFactory(url, routeData).HttpContext,
-				ApplicationContext,
-				GetRoutesCache());
-			SetupUmbracoContextForTest(ctx, templateId);
-			return ctx;
-		}
-
-		protected virtual string GetXmlContent(int templateId)
-		{
-			return @"<?xml version=""1.0"" encoding=""utf-8""?>
+        [TearDown]
+        public override void TearDown()
+        {
+            base.TearDown();
+        }
+        
+        /// <summary>
+        /// By default this unit test will create and initialize an umbraco database
+        /// </summary>
+        protected virtual bool RequiresDbSetup
+        {
+            get { return true; }
+        }
+        
+        protected override string GetXmlContent(int templateId)
+        {
+            return @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE root[ 
 <!ELEMENT Home ANY>
 <!ATTLIST Home id ID #REQUIRED>
@@ -126,25 +83,7 @@ namespace Umbraco.Tests.TestHelpers
 	</Home>
 	<CustomDocument id=""1172"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1172"" isDoc="""" />
 </root>";
-		}
+        }
 
-		/// <summary>
-		/// Initlializes the UmbracoContext with specific XML
-		/// </summary>
-		/// <param name="umbracoContext"></param>
-		/// <param name="templateId"></param>
-		protected void SetupUmbracoContextForTest(UmbracoContext umbracoContext, int templateId)
-		{
-			umbracoContext.GetXmlDelegate = () =>
-				{
-					var xDoc = new XmlDocument();
-
-					//create a custom xml structure to return
-
-					xDoc.LoadXml(GetXmlContent(templateId));
-					//return the custom x doc
-					return xDoc;
-				};
-		}
-	}
+    }
 }

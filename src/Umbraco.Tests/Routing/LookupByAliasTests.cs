@@ -1,21 +1,13 @@
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Tests.Routing
 {
 	[TestFixture]
 	public class LookupByAliasTests : BaseRoutingTest
 	{
-		public override void Initialize()
-		{
-			base.Initialize();
-			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = false;
-		}
-
-		/// <summary>
+        /// <summary>
 		/// We don't need a db for this test, will run faster without one
 		/// </summary>
 		protected override bool RequiresDbSetup

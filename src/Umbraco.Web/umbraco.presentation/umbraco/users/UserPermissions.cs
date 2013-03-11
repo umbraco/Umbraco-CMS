@@ -102,11 +102,11 @@ namespace umbraco.cms.presentation.user
         /// <summary>
         /// Returns the current user permissions for the node specified
         /// </summary>
-        /// <param name="nodeID"></param>
+        /// <param name="nodeId"></param>
         /// <returns></returns>
-        public List<IAction> GetExistingNodePermission(int nodeID)
+        public List<IAction> GetExistingNodePermission(int nodeId)
         {
-            string path = GetNodePath(nodeID);
+            var path = GetNodePath(nodeId);
             if (path != "")
             {
                 //get the user and their permissions
@@ -119,13 +119,13 @@ namespace umbraco.cms.presentation.user
         /// <summary>
         /// gets path attribute for node id passed
         /// </summary>
-        /// <param name="iNodeID"></param>
+        /// <param name="iNodeId"></param>
         /// <returns></returns>
-        private string GetNodePath(int iNodeID)
+        private static string GetNodePath(int iNodeId)
         {
-            if (Document.IsDocument(iNodeID))
+            if (Document.IsDocument(iNodeId))
             {
-                Document doc = new Document(iNodeID);
+                var doc = new Document(iNodeId);
                 return doc.Path;
             } 
             
@@ -135,14 +135,13 @@ namespace umbraco.cms.presentation.user
         /// <summary>
         /// Finds all child node IDs
         /// </summary>
-        /// <param name="userID"></param>
-        /// <param name="nodeID"></param>
+        /// <param name="nodeId"></param>
         /// <returns></returns>
-        private List<int> FindChildNodes(int nodeID)
+        private static IEnumerable<int> FindChildNodes(int nodeId)
         {
-            Document[] docs = Document.GetChildrenForTree(nodeID);
-            List<int> nodeIds = new List<int>();
-            foreach (Document doc in docs)
+            var docs = Document.GetChildrenForTree(nodeId);
+            var nodeIds = new List<int>();
+            foreach (var doc in docs)
             {
                 nodeIds.Add(doc.Id);
                 if (doc.HasChildren)
@@ -153,16 +152,16 @@ namespace umbraco.cms.presentation.user
             return nodeIds;
         }
 
-        private void InsertPermissions(int[] nodeIDs, IAction permission)
+        private void InsertPermissions(IEnumerable<int> nodeIDs, IAction permission)
         {
             foreach (int i in nodeIDs)
                 InsertPermission(i, permission);
         }
 
-        private void InsertPermission(int nodeID, IAction permission)
+        private void InsertPermission(int nodeId, IAction permission)
         {
             //create a new CMSNode object but don't initialize (this prevents a db query)
-            CMSNode node = new CMSNode(nodeID, false);
+            var node = new CMSNode(nodeId, false);
             Permission.MakeNew(m_user, node, permission.Letter);
         }
 

@@ -19,12 +19,16 @@ namespace Umbraco.Tests.Routing
 
 		public override void Initialize()
 		{
+            //this ensures its reset
+            PluginManager.Current = new PluginManager();
+
+            SurfaceControllerResolver.Current = new SurfaceControllerResolver(
+                PluginManager.Current.ResolveSurfaceControllers());
+
 			base.Initialize();
-			System.Configuration.ConfigurationManager.AppSettings.Set("umbracoPath", "~/umbraco");
 
-			SurfaceControllerResolver.Current = new SurfaceControllerResolver(
-				PluginManager.Current.ResolveSurfaceControllers());
-
+		    SettingsForTests.UmbracoPath = "~/umbraco";
+            
 			var webBoot = new WebBootManager(new UmbracoApplication(), true);
 			//webBoot.Initialize();
 			//webBoot.Startup(null); -> don't call startup, we don't want any other application event handlers to bind for this test.
@@ -36,7 +40,6 @@ namespace Umbraco.Tests.Routing
 		{
 			base.TearDown();
 			RouteTable.Routes.Clear();
-			System.Configuration.ConfigurationManager.AppSettings.Set("umbracoPath", "");
 			SurfaceControllerResolver.Reset();
 		}
 
@@ -64,7 +67,11 @@ namespace Umbraco.Tests.Routing
 		}
 
 		//test all template name styles to match the ActionName
-		[TestCase("home-page")]
+        [TestCase("home-\\234^^*32page")]
+        [TestCase("home-page")]
+        [TestCase("home-\\234^^*32page")]
+        [TestCase("home-page")]
+        [TestCase("home-page")]
 		[TestCase("Home-Page")]
 		[TestCase("HomePage")]
 		[TestCase("homePage")]
@@ -84,7 +91,9 @@ namespace Umbraco.Tests.Routing
 
 			handler.GetHandlerForRoute(routingContext.UmbracoContext.HttpContext.Request.RequestContext, docRequest);
 			Assert.AreEqual("CustomDocument", routeData.Values["controller"].ToString());
-			Assert.AreEqual("HomePage", routeData.Values["action"].ToString());
+		    Assert.AreEqual(
+		        global::umbraco.cms.helpers.Casing.SafeAlias(templateName),
+		        routeData.Values["action"].ToString());
 		}
 
 

@@ -22,8 +22,6 @@ namespace umbraco.developer
     /// </summary>
     public partial class assemblyBrowser : BasePages.UmbracoEnsuredPage
     {
-
-        private string _ConnString = GlobalSettings.DbDSN;
         protected void Page_Load(object sender, System.EventArgs e)
         {
 

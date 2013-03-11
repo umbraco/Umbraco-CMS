@@ -17,7 +17,7 @@ namespace Umbraco.Core
 		/// Constructor
 		/// </summary>
 		/// <param name="refreshers"></param>		
-		internal CacheRefreshersResolver(IEnumerable<Type> refreshers)
+		internal CacheRefreshersResolver(Func<IEnumerable<Type>> refreshers)
 			: base(refreshers)
 		{
 			

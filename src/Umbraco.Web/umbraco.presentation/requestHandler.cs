@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Web;
 using System.Xml;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.template;
@@ -585,21 +586,23 @@ namespace umbraco {
         }
 
         public bool Execute(string url) {
-            try {
-                Log.Add(LogTypes.NotFound, User.GetUser(0), -1,
-                        url + " (from '" + HttpContext.Current.Request.UrlReferrer + "')");
+			try
+			{
+                LogHelper.Info<requestHandler>(string.Format("NotFound url {0} (from '{1}')", url, HttpContext.Current.Request.UrlReferrer));
 
-                // Test if the error404 not child elements
-                string error404 = umbraco.library.GetCurrentNotFoundPageId();
+				// Test if the error404 not child elements
+				string error404 = umbraco.library.GetCurrentNotFoundPageId();
 
 
-                _redirectID = int.Parse(error404);
-                HttpContext.Current.Response.StatusCode = 404;
-                return true;
-            } catch (Exception err) {
-                Log.Add(LogTypes.Debug, User.GetUser(0), -1, err.ToString());
-                return false;
-            }
+				_redirectID = int.Parse(error404);
+				HttpContext.Current.Response.StatusCode = 404;
+				return true;
+			}
+			catch (Exception err)
+			{
+				LogHelper.Error<handle404>("An error occurred", err);
+				return false;
+			}
         }
 
         public int redirectID {

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using umbraco.DataLayer;
 using System.Text.RegularExpressions;
 using System.IO;
@@ -17,10 +18,10 @@ namespace umbraco.cms.businesslogic.template
     /// <summary>
     /// Summary description for Template.
     /// </summary>
+    //[Obsolete("Obsolete, This class will eventually be phased out - Use Umbraco.Core.Models.Template", false)]
     public class Template : CMSNode
     {
-
-
+        
         #region Private members
 
         private string _OutputContentType;
@@ -319,8 +320,6 @@ namespace umbraco.cms.businesslogic.template
 
             // remove from documents
             Document.RemoveTemplateFromDocument(this.Id);
-
-
         }
 
         public void RemoveFromDocumentTypes()
@@ -328,6 +327,7 @@ namespace umbraco.cms.businesslogic.template
             foreach (DocumentType dt in DocumentType.GetAllAsList().Where(x => x.allowedTemplates.Select(t => t.Id).Contains(this.Id)))
             {
                 dt.RemoveTemplate(this.Id);
+                dt.Save();
             }
         }
 
@@ -387,8 +387,7 @@ namespace umbraco.cms.businesslogic.template
         {
             return MakeNew(Name, u, master, null);
         }
-
-
+        
         private static Template MakeNew(string name, BusinessLogic.User u, string design)
         {
             return MakeNew(name, u, null, design);
@@ -535,9 +534,10 @@ namespace umbraco.cms.businesslogic.template
         {
             // don't allow template deletion if it has child templates
             if (this.HasChildren)
-            {
-                Log.Add(LogTypes.Error, this.Id, "Can't delete a master template. Remove any bindings from child templates first.");
-                throw new InvalidOperationException("Can't delete a master template. Remove any bindings from child templates first.");
+            {                
+                var ex = new InvalidOperationException("Can't delete a master template. Remove any bindings from child templates first.");
+				LogHelper.Error<Template>("Can't delete a master template. Remove any bindings from child templates first.", ex);
+	            throw ex;
             }
 
             // NH: Changed this; if you delete a template we'll remove all references instead of 

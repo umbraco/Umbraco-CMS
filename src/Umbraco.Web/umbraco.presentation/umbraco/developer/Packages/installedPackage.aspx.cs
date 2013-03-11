@@ -3,22 +3,25 @@ using System.Data;
 using System.Configuration;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Globalization;
+using System.Linq;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
-
-using umbraco.cms.businesslogic.template;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.businesslogic.macro;
 using runtimeMacro = umbraco.macro;
 using System.Xml;
 using umbraco.IO;
 using umbraco.cms.presentation.Trees;
 using BizLogicAction = umbraco.BusinessLogic.Actions.Action;
+using Macro = umbraco.cms.businesslogic.macro.Macro;
+using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace umbraco.presentation.developer.packages
 {
@@ -447,7 +450,9 @@ namespace umbraco.presentation.developer.packages
 
            
 
-            //Remove Document types
+            //Remove Document Types
+            var contentTypes = new List<IContentType>();
+            var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             foreach (ListItem li in documentTypes.Items)
             {
                 if (li.Selected)
@@ -456,17 +461,27 @@ namespace umbraco.presentation.developer.packages
 
                     if (int.TryParse(li.Value, out nId))
                     {
-                        DocumentType s = new DocumentType(nId);
-                        if (s != null)
+                        var contentType = contentTypeService.GetContentType(nId);
+                        if (contentType != null)
                         {
-                            s.delete();
-                            pack.Data.Documenttypes.Remove(nId.ToString());
-
+                            contentTypes.Add(contentType);
+                            pack.Data.Documenttypes.Remove(nId.ToString(CultureInfo.InvariantCulture));
                             // refresh content cache when document types are removed
                             refreshCache = true;
-
                         }
                     }
+                }
+            }
+            //Order the DocumentTypes before removing them
+            if (contentTypes.Any())
+            {
+                var orderedTypes = (from contentType in contentTypes
+                                    orderby contentType.ParentId descending, contentType.Id descending 
+                                    select contentType);
+
+                foreach (var contentType in orderedTypes)
+                {
+                    contentTypeService.Delete(contentType);
                 }
             }
 
@@ -516,26 +531,34 @@ namespace umbraco.presentation.developer.packages
             }
             else
             {
-                BusinessLogic.Log.Add(global::umbraco.BusinessLogic.LogTypes.Debug, -1, "executing undo actions");
+	            LogHelper.Debug<installedPackage>("executing undo actions");
 
                 // uninstall actions
-                try {
-                    System.Xml.XmlDocument actionsXml = new System.Xml.XmlDocument();
-                    actionsXml.LoadXml("<Actions>" +  pack.Data.Actions + "</Actions>");
+				try
+				{
+					var actionsXml = new System.Xml.XmlDocument();
+					actionsXml.LoadXml("<Actions>" + pack.Data.Actions + "</Actions>");
 
-                    BusinessLogic.Log.Add(global::umbraco.BusinessLogic.LogTypes.Debug, -1, actionsXml.OuterXml);
-                    foreach (XmlNode n in actionsXml.DocumentElement.SelectNodes("//Action")) {
-                        try {
-                            cms.businesslogic.packager.PackageAction.UndoPackageAction(pack.Data.Name, n.Attributes["alias"].Value, n);
-                        } catch (Exception ex) {
-                            BusinessLogic.Log.Add(global::umbraco.BusinessLogic.LogTypes.Debug, -1, ex.ToString());
-                        }
-                    }
-                } catch (Exception ex) {
-                    BusinessLogic.Log.Add(global::umbraco.BusinessLogic.LogTypes.Debug, -1, ex.ToString());
-                }
+					LogHelper.Debug<installedPackage>(actionsXml.OuterXml);
 
-                //moved remove of files here so custom package actions can still undo
+					foreach (XmlNode n in actionsXml.DocumentElement.SelectNodes("//Action"))
+					{
+						try
+						{
+							cms.businesslogic.packager.PackageAction.UndoPackageAction(pack.Data.Name, n.Attributes["alias"].Value, n);
+						}
+						catch (Exception ex)
+						{
+							LogHelper.Error<installedPackage>("An error occurred in UndoPackageAction", ex);
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					LogHelper.Error<installedPackage>("An error occurred", ex);
+				}
+
+	            //moved remove of files here so custom package actions can still undo
                 //Remove files
                 foreach (ListItem li in files.Items)
                 {

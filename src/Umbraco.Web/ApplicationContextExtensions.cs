@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Web;
 using Umbraco.Core;
 
@@ -29,6 +26,5 @@ namespace Umbraco.Web
 			var configPath = http.Request.PhysicalApplicationPath + "\\web.config";
 			File.SetLastWriteTimeUtc(configPath, DateTime.UtcNow);
 		}
-
 	}
 }

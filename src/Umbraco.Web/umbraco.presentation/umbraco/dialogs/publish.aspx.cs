@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 
 using System.Threading;
+using Umbraco.Core.Logging;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
 
@@ -32,7 +33,7 @@ namespace umbraco.dialogs
             cms.businesslogic.web.Document d = new cms.businesslogic.web.Document(nodeId);
             pageName = d.Text;
 
-			if (d.Level > 1 && !(new cms.businesslogic.web.Document(d.ParentId).PathPublished))
+			if (d.Level > 1 && d.PathPublished == false)
 			{
 				TheForm.Visible = false;
 				theEnd.Visible = true;
@@ -92,7 +93,7 @@ namespace umbraco.dialogs
                     {
                         if (doc.Published)
                         {
-                            library.UpdateDocumentCache(doc.Id);
+                            library.UpdateDocumentCache(doc);
                         }
                     }
 
@@ -116,7 +117,7 @@ namespace umbraco.dialogs
                 {
                     if (d.PublishWithResult(base.getUser()))
                     {
-                        library.UpdateDocumentCache(d.Id);
+                        library.UpdateDocumentCache(d);
                         feedbackMsg.type = umbraco.uicontrols.Feedback.feedbacktype.success;
 						feedbackMsg.Text = ui.Text("publish", "nodePublish", d.Text, base.getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";						
                     }
@@ -141,7 +142,7 @@ namespace umbraco.dialogs
                 {
                     // Needed for supporting distributed calls
                     if (UmbracoSettings.UseDistributedCalls)
-                        library.UpdateDocumentCache(d.Id);
+                        library.UpdateDocumentCache(d);
                     else
                         documents.Add(d);
 
@@ -155,7 +156,7 @@ namespace umbraco.dialogs
                     }
                 }
                 else {
-                    BusinessLogic.Log.Add(umbraco.BusinessLogic.LogTypes.Error, d.Id, "Publishing failed due to event cancelling the publishing");
+                    LogHelper.Debug<publish>(string.Format("Publishing node {0} failed due to event cancelling the publishing", d.Id));
                 }
             }
 		}

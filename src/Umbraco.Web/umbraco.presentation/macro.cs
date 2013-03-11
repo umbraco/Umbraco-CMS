@@ -222,8 +222,8 @@ namespace umbraco
 
         private static readonly object _xsltExtensionsSyncLock = new object();
 
-        private static readonly Lazy<CacheDependency> _xsltExtensionsDependency =
-            new Lazy<CacheDependency>(() => new CacheDependency(_xsltExtensionsConfig));
+        private static readonly Func<CacheDependency> _xsltExtensionsDependency =
+            () => new CacheDependency(_xsltExtensionsConfig);
 
         /// <summary>
         /// Creates an empty macro object.
@@ -309,7 +309,7 @@ namespace umbraco
 
             Model.CacheIdentifier = GetCacheIdentifier(Model, pageElements, pageId);
 
-            if (Model.CacheDuration > 0)
+            if (!UmbracoContext.Current.InPreviewMode && Model.CacheDuration > 0)
             {
                 if (cacheMacroAsString(Model))
                 {
@@ -420,6 +420,11 @@ namespace umbraco
                         try
                         {
 							TraceInfo("umbracoMacro","Usercontrol added (" + Model.TypeName + ")");
+                            
+                            // Add tilde for v4 defined macros
+                            if (string.IsNullOrEmpty(Model.TypeName) == false && Model.TypeName.StartsWith("~") == false)
+                                Model.TypeName = "~/" + Model.TypeName;
+
                             macroControl = loadUserControl(ScriptType, Model, pageElements);
                             break;
                         }
@@ -971,7 +976,7 @@ namespace umbraco
                 _xsltExtensionsCacheKey, _xsltExtensionsSyncLock,
                 CacheItemPriority.NotRemovable, // NH 4.7.1, Changing to NotRemovable
                 null, // no refresh action
-                _xsltExtensionsDependency.Value, // depends on the .config file
+                _xsltExtensionsDependency(), // depends on the .config file
                 TimeSpan.FromDays(1), // expires in 1 day (?)
                 GetXsltExtensionsImpl);
         }
@@ -1540,15 +1545,7 @@ namespace umbraco
 
             try
             {
-                string userControlPath = fileName;
-
-                if (!userControlPath.StartsWith("~"))
-                {
-                    if (userControlPath.StartsWith("/"))
-                        userControlPath = "~" + userControlPath;
-                    else
-                        userControlPath = "~/" + userControlPath;
-                }
+                string userControlPath = IOHelper.FindFile(fileName);
 
                 if (!File.Exists(IOHelper.MapPath(userControlPath)))
                     throw new UmbracoException(string.Format("UserControl {0} does not exist.", fileName));

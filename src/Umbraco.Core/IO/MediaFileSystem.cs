@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.IO
@@ -11,8 +9,7 @@ namespace Umbraco.Core.IO
 	/// A custom file system provider for media
 	/// </summary>
 	[FileSystemProvider("media")]
-	[UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1156", "Will be declared public after 4.10")]
-	internal class MediaFileSystem : FileSystemWrapper
+	public class MediaFileSystem : FileSystemWrapper
 	{
 		public MediaFileSystem(IFileSystem wrapped)
 			: base(wrapped)
@@ -27,6 +24,15 @@ namespace Umbraco.Core.IO
 
 			return propertyId.ToString() + seperator + fileName;
 		}
+
+        public string GetRelativePath(string subfolder, string fileName)
+        {
+            var seperator = UmbracoSettings.UploadAllowDirectories
+                ? Path.DirectorySeparatorChar
+                : '-';
+
+            return subfolder + seperator + fileName;
+        }
 
 		public IEnumerable<string> GetThumbnails(string path)
 		{

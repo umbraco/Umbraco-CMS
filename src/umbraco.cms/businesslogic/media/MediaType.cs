@@ -1,10 +1,10 @@
 using System;
-using System.Data;
-using System.Runtime.CompilerServices;
 using System.Collections.Generic;
-using umbraco.DataLayer;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Caching;
 using System.Linq;
-
+using umbraco.BusinessLogic;
 
 namespace umbraco.cms.businesslogic.media
 {
@@ -13,9 +13,9 @@ namespace umbraco.cms.businesslogic.media
     /// 
     /// Due to the inheritance of the ContentType class,it enables definition of generic datafields on a Media.
     /// </summary>
+    [Obsolete("Obsolete, Use Umbraco.Core.Models.MediaType", false)]
     public class MediaType : ContentType
     {
-
         #region Constructors
 
         /// <summary>
@@ -32,11 +32,23 @@ namespace umbraco.cms.businesslogic.media
 
         public MediaType(int id, bool noSetup) : base(id, noSetup) { }
 
+        internal MediaType(IMediaType mediaType)
+            : base(mediaType)
+        {
+            SetupNode(mediaType);
+        }
+
         #endregion
 
         #region Constants and static members
 
         public static Guid _objectType = new Guid("4ea4382b-2f5a-4c2b-9587-ae9b3cf3602e");
+
+        #endregion
+
+        #region Private Members
+
+        private IMediaType _mediaType;
 
         #endregion
 
@@ -46,17 +58,11 @@ namespace umbraco.cms.businesslogic.media
         /// </summary>
         /// <param name="Alias">The alias of the MediaType</param>
         /// <returns>The MediaType with the alias</returns>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetMediaType()", false)]
         public static new MediaType GetByAlias(string Alias)
         {
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(@"SELECT nodeid from cmsContentType INNER JOIN umbracoNode on cmsContentType.nodeId = umbracoNode.id WHERE nodeObjectType=@nodeObjectType AND alias=@alias",
-                               SqlHelper.CreateParameter("@nodeObjectType", MediaType._objectType),
-                               SqlHelper.CreateParameter("@alias", Alias)))
-            {
-                if(dr.Read())
-                    return new MediaType(dr.GetInt("nodeid"));
-                else
-                    return null;
-            }
+            var mediaType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(Alias);
+            return new MediaType(mediaType);
         }
 
         /// <summary>
@@ -71,38 +77,11 @@ namespace umbraco.cms.businesslogic.media
             }
         }
 
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetMediaType()", false)]
         public static IEnumerable<MediaType> GetAllAsList()
         {
-
-            var mediaTypes = new List<MediaType>();
-
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(m_SQLOptimizedGetAll.Trim(), SqlHelper.CreateParameter("@nodeObjectType", MediaType._objectType)))
-            {
-                while (dr.Read())
-                {
-                    //check if the document id has already been added
-                    if (mediaTypes.Where(x => x.Id == dr.Get<int>("id")).Count() == 0)
-                    {
-                        //create the DocumentType object without setting up
-                        MediaType dt = new MediaType(dr.Get<int>("id"), true);
-                        //populate it's CMSNode properties
-                        dt.PopulateCMSNodeFromReader(dr);
-                        //populate it's ContentType properties
-                        dt.PopulateContentTypeNodeFromReader(dr);
-
-                        mediaTypes.Add(dt);
-                    }
-                    else
-                    {
-                        //we've already created the document type with this id, so we'll add the rest of it's templates to itself
-                        var dt = mediaTypes.Where(x => x.Id == dr.Get<int>("id")).Single();
-                    }
-                }
-            }
-
-            return mediaTypes.OrderBy(x => x.Text).ToList();
-
+            var mediaTypes = ApplicationContext.Current.Services.ContentTypeService.GetAllMediaTypes();
+            return mediaTypes.OrderBy(x => x.Name).Select(x => new MediaType(x));
         }
 
         /// <summary>
@@ -111,17 +90,18 @@ namespace umbraco.cms.businesslogic.media
         /// <param name="u">The Umbraco user context</param>
         /// <param name="Text">The name of the MediaType</param>
         /// <returns>The new MediaType</returns>
+        [Obsolete("Obsolete, Use Umbraco.Core.Models.MediaType and Umbraco.Core.Services.ContentTypeService.Save()", false)]
         public static MediaType MakeNew(BusinessLogic.User u, string Text)
         {
+            return MakeNew(u, Text, -1);
+        }
 
-            int ParentId = -1;
-            int level = 1;
-            Guid uniqueId = Guid.NewGuid();
-            CMSNode n = CMSNode.MakeNew(ParentId, _objectType, u.Id, level, Text, uniqueId);
+        internal static MediaType MakeNew(BusinessLogic.User u, string text, int parentId)
+        {
+            var mediaType = new Umbraco.Core.Models.MediaType(parentId) { Name = text, Alias = text, CreatorId = u.Id, Thumbnail = "folder.png", Icon = "folder.gif" };
+            ApplicationContext.Current.Services.ContentTypeService.Save(mediaType, u.Id);
+            var mt = new MediaType(mediaType.Id);
 
-            ContentType.Create(n.Id, Text, "");
-
-            MediaType mt = new MediaType(n.Id);
             NewEventArgs e = new NewEventArgs();
             mt.OnNew(e);
 
@@ -140,6 +120,23 @@ namespace umbraco.cms.businesslogic.media
 
             if (!e.Cancel)
             {
+                if (MasterContentType != 0)
+                    _mediaType.ParentId = MasterContentType;
+
+                foreach (var masterContentType in MasterContentTypes)
+                {
+                    var contentType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(masterContentType);
+                    _mediaType.AddContentType(contentType);
+                }
+
+                var current = User.GetCurrent();
+                int userId = current == null ? 0 : current.Id;
+                ApplicationContext.Current.Services.ContentTypeService.Save(_mediaType, userId);
+
+                //Ensure that MediaTypes are reloaded from db by clearing cache
+                InMemoryCacheProvider.Current.Clear();
+                RuntimeCacheProvider.Current.Clear();
+
                 base.Save();
 
                 FireBeforeSave(e);
@@ -156,13 +153,36 @@ namespace umbraco.cms.businesslogic.media
 
             if (!e.Cancel)
             {
-                // delete all documents of this type
-                Media.DeleteFromType(this);
-                // Delete contentType
-                base.delete();
+                // check that no media types uses me as a master
+                if (GetAllAsList().Any(dt => dt.MasterContentTypes.Contains(this.Id)))
+                {
+                    throw new ArgumentException("Can't delete a Media Type used as a Master Content Type. Please remove all references first!");
+                }
+
+                ApplicationContext.Current.Services.ContentTypeService.Delete(_mediaType);
 
                 FireAfterDelete(e);
             }
+        }
+        #endregion
+
+        #region Protected Methods
+
+        protected override void setupNode()
+        {
+            var mediaType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(Id);
+            SetupNode(mediaType);
+        }
+
+        #endregion
+
+        #region Private Methods
+        private void SetupNode(IMediaType mediaType)
+        {
+            _mediaType = mediaType;
+
+            base.PopulateContentTypeFromContentTypeBase(_mediaType);
+            base.PopulateCMSNodeFromContentTypeBase(_mediaType, _objectType);
         }
         #endregion
 

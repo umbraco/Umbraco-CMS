@@ -1,8 +1,13 @@
+using Umbraco.Core;
+using Umbraco.Core.Events;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.member;
 using umbraco.interfaces;
+using DeleteEventArgs = umbraco.cms.businesslogic.DeleteEventArgs;
 
 namespace umbraco
 {
@@ -13,47 +18,55 @@ namespace umbraco
 	{
 		public LibraryCacheRefresher()
 		{
-			if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
-			{
-				Member.AfterSave += new Member.SaveEventHandler(Member_AfterSave);
-				Member.BeforeDelete += new Member.DeleteEventHandler(Member_BeforeDelete);
-				Media.AfterSave += new Media.SaveEventHandler(Media_AfterSave);
-				Media.BeforeDelete += new Media.DeleteEventHandler(Media_BeforeDelete);
-			}
+            if (UmbracoSettings.UmbracoLibraryCacheDuration <= 0) return;
 
-			// now handled directly by the IRoutesCache implementation
-			//content.AfterUpdateDocumentCache += new content.DocumentCacheEventHandler(content_AfterUpdateDocumentCache);
-			//content.AfterRefreshContent += new content.RefreshContentEventHandler(content_AfterRefreshContent);
+
+            Member.AfterSave += MemberAfterSave;
+            Member.BeforeDelete += MemberBeforeDelete;
+
+            MediaService.Saved += MediaServiceSaved;
+            //We need to perform all of the 'before' events here because we need a reference to the
+            //media item's Path before it is moved/deleting/trashed
+            //see: http://issues.umbraco.org/issue/U4-1653
+            MediaService.Deleting += MediaServiceDeleting;
+            MediaService.Moving += MediaServiceMoving;
+            MediaService.Trashing += MediaServiceTrashing;
 		}
 
-		//void content_AfterRefreshContent(Document sender, RefreshContentEventArgs e)
-		//{
-		//    library.ClearNiceUrlCache();
-		//}
+        static void MediaServiceTrashing(IMediaService sender, MoveEventArgs<IMedia> e)
+        {
+            library.ClearLibraryCacheForMedia(e.Entity.Id);
+        }
 
-		//void content_AfterUpdateDocumentCache(Document sender, DocumentCacheEventArgs e)
-		//{
-		//    library.ClearNiceUrlCache();
-		//}
+        static void MediaServiceMoving(IMediaService sender, MoveEventArgs<IMedia> e)
+        {
+            library.ClearLibraryCacheForMedia(e.Entity.Id);
+        }
 
-		void Member_BeforeDelete(Member sender, DeleteEventArgs e)
-		{
-			library.ClearLibraryCacheForMember(sender.Id);
-		}
+        static void MediaServiceDeleting(IMediaService sender, DeleteEventArgs<IMedia> e)
+        {
+            foreach (var item in e.DeletedEntities)
+            {
+                library.ClearLibraryCacheForMedia(item.Id);
+            }
+        }
 
-		void Media_BeforeDelete(Media sender, DeleteEventArgs e)
-		{
-			library.ClearLibraryCacheForMedia(sender.Id);
-		}
+        static void MediaServiceSaved(IMediaService sender, SaveEventArgs<IMedia> e)
+        {
+            foreach (var item in e.SavedEntities)
+            {
+                library.ClearLibraryCacheForMedia(item.Id);
+            }
+        }
 
-		void Media_AfterSave(Media sender, SaveEventArgs e)
-		{
-			library.ClearLibraryCacheForMedia(sender.Id);
-		}
+        static void MemberBeforeDelete(Member sender, DeleteEventArgs e)
+        {
+            library.ClearLibraryCacheForMember(sender.Id);
+        }
 
-		void Member_AfterSave(Member sender, SaveEventArgs e)
-		{
-			library.ClearLibraryCacheForMember(sender.Id);
-		}
+        static void MemberAfterSave(Member sender, SaveEventArgs e)
+        {
+            library.ClearLibraryCacheForMember(sender.Id);
+        }
 	}
 }
