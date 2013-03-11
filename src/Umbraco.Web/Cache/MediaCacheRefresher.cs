@@ -1,13 +1,12 @@
 ﻿using System;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using umbraco.interfaces;
 
 namespace Umbraco.Web.Cache
 {
     public class MediaCacheRefresher : ICacheRefresher
     {
-        const string getmediaCacheKey = "GetMedia";
-
         public Guid UniqueIdentifier
         {
             get { return new Guid(DistributedCache.MediaCacheRefresherId); }
@@ -44,12 +43,12 @@ namespace Umbraco.Web.Cache
             foreach (var idPart in m.Path.Split(','))
             {
                 ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
-                    string.Format("UL_{0}_{1}_True", getmediaCacheKey, idPart));
+                    string.Format("UL_{0}_{1}_True", CacheKeys.GetMediaCacheKey, idPart));
 
                 // Also clear calls that only query this specific item!
                 if (idPart == m.Id.ToString())
                     ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
-                        string.Format("UL_{0}_{1}", getmediaCacheKey, id));
+                        string.Format("UL_{0}_{1}", CacheKeys.GetMediaCacheKey, id));
 
             }
         }

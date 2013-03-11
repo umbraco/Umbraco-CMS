@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using umbraco.interfaces;
 
 namespace Umbraco.Web.Cache
@@ -38,10 +39,8 @@ namespace Umbraco.Web.Cache
 
         private void ClearCache(int id)
         {
-            const string getmemberCacheKey = "GetMember";
-
             ApplicationContext.Current.ApplicationCache.
-                ClearCacheByKeySearch(string.Format("UL_{0}_{1}", getmemberCacheKey, id));
+                ClearCacheByKeySearch(string.Format("UL_{0}_{1}", CacheKeys.GetMemberCacheKey, id));
         }
 
     }

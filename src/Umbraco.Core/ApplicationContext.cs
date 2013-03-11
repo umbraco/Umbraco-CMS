@@ -40,7 +40,7 @@ namespace Umbraco.Core
 		{
 			//create a new application cache from the HttpRuntime.Cache
 			ApplicationCache = HttpRuntime.Cache == null
-				? new CacheHelper(new Cache())
+                ? new CacheHelper(new System.Web.Caching.Cache())
 				: new CacheHelper(HttpRuntime.Cache);
 		}
 

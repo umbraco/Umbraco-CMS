@@ -5,6 +5,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Runtime.CompilerServices;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.cache;
@@ -28,7 +30,7 @@ namespace umbraco.cms.businesslogic.macro
 	public class Macro		
 	{
         private static readonly object macroCacheSyncLock = new object();
-        private static readonly string umbracoMacroCacheKey = "UmbracoMacroCache";
+        //private static readonly string umbracoMacroCacheKey = "UmbracoMacroCache";
 
 		int _id;
 		bool _useInEditor;
@@ -279,10 +281,8 @@ namespace umbraco.cms.businesslogic.macro
         public virtual void Save()
         {
             //event
-            SaveEventArgs e = new SaveEventArgs();
+            var e = new SaveEventArgs();
             FireBeforeSave(e);
-
-            InvalidateCache();
 
             if (!e.Cancel) {
                 FireAfterSave(e);
@@ -496,41 +496,42 @@ namespace umbraco.cms.businesslogic.macro
 		/// <summary>
 		/// Static contructor for retrieving a macro given an alias
 		/// </summary>
-		/// <param name="Alias">The alias of the macro</param>
+        /// <param name="alias">The alias of the macro</param>
 		/// <returns>If the macro with the given alias exists, it returns the macro, else null</returns>
-
         public static Macro GetByAlias(string alias)
-        {
-            return Cache.GetCacheItem(GetCacheKey(alias), macroCacheSyncLock,
-                          TimeSpan.FromMinutes(30),
-                          delegate
-                          {
-                              try
-                              {
-                                  return new Macro(alias);
-                              }
-                              catch
-                              {
-                                  return null;
-                              }
-                          });
-        }
+		{
+		    return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+		        GetCacheKey(alias),
+		        TimeSpan.FromMinutes(30),
+		        delegate
+		            {
+		                try
+		                {
+		                    return new Macro(alias);
+		                }
+		                catch
+		                {
+		                    return null;
+		                }
+		            });
+		}
 
         public static Macro GetById(int id)
         {
-            return Cache.GetCacheItem(GetCacheKey(string.Format("macro_via_id_{0}", id)), macroCacheSyncLock,
-                          TimeSpan.FromMinutes(30),
-                          delegate
-                          {
-                              try
-                              {
-                                  return new Macro(id);
-                              }
-                              catch
-                              {
-                                  return null;
-                              }
-                          });
+            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                GetCacheKey(string.Format("macro_via_id_{0}", id)),
+                TimeSpan.FromMinutes(30),
+                delegate
+                    {
+                        try
+                        {
+                            return new Macro(id);
+                        }
+                        catch
+                        {
+                            return null;
+                        }
+                    });
         }
 
         public static MacroTypes FindMacroType(string xslt, string scriptFile, string scriptType, string scriptAssembly)
@@ -578,17 +579,11 @@ namespace umbraco.cms.businesslogic.macro
         }
 
         #region Macro Refactor
-
-        private void InvalidateCache()
-        {
-            Cache.ClearCacheItem(GetCacheKey(this.Alias));
-        }
-
+        
         private static string GetCacheKey(string alias)
         {
-            return umbracoMacroCacheKey + alias;
+            return CacheKeys.UmbracoMacroCacheKey + alias;
         }
-
 
         #endregion
 

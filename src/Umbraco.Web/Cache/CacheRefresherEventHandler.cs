@@ -87,7 +87,7 @@ namespace Umbraco.Web.Cache
         /// <param name="e"></param>
         static void MacroAfterDelete(Macro sender, DeleteEventArgs e)
         {
-            DistributedCache.Instance.RemoveMacroCache(sender.Id);
+            DistributedCache.Instance.RemoveMacroCache(sender);
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Umbraco.Web.Cache
         /// <param name="e"></param>
         static void MacroAfterSave(Macro sender, SaveEventArgs e)
         {				
-            DistributedCache.Instance.RefreshMacroCache(sender.Id);
+            DistributedCache.Instance.RefreshMacroCache(sender);
         }
 
         static void MediaServiceTrashing(IMediaService sender, Core.Events.MoveEventArgs<Core.Models.IMedia> e)

@@ -108,6 +108,7 @@
     <Compile Include="Auditing\DataAuditWriteProvider.cs" />
     <Compile Include="Auditing\IAuditWriteProvider.cs" />
     <Compile Include="CacheHelper.cs" />
+    <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="CodeAnnotations\UmbracoWillObsoleteAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoExperimentalFeatureAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoProposedPublicAttribute.cs" />
@@ -691,7 +692,7 @@
     <Compile Include="Strings\UrlSegmentProviderResolver.cs" />
     <Compile Include="Sync\DatabaseServerRegistrar.cs" />
     <Compile Include="Sync\DefaultServerMessenger.cs" />
-    <Compile Include="Sync\ICacheRefresher.cs" />
+    <Compile Include="Cache\ICacheRefresher.cs" />
     <Compile Include="Sync\ServerSyncWebServiceClient.cs">
       <SubType>Component</SubType>
     </Compile>

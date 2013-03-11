@@ -18,7 +18,7 @@ namespace Umbraco.Core
 	/// </remarks>
 	public class CacheHelper
 	{
-		private readonly Cache _cache;
+        private readonly System.Web.Caching.Cache _cache;
 
 		public CacheHelper(System.Web.Caching.Cache cache)
 		{
@@ -173,7 +173,7 @@ namespace Umbraco.Core
 						{
 							//we use Insert instead of add if for some crazy reason there is now a cache with the cache key in there, it will just overwrite it.
 							_cache.Insert(cacheKey, result, cacheDependency,
-                                timeout == null ? Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value), 
+                                timeout == null ? System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value), 
                                 TimeSpan.Zero, priority, refreshAction);
 						}
 					}

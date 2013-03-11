@@ -437,9 +437,7 @@ namespace umbraco.presentation.developer.packages
                     {
                         Macro s = new Macro(nId);
                         if (s != null && !String.IsNullOrEmpty(s.Name))
-                        {
-                            // remove from cache
-                            runtimeMacro.GetMacro(s.Id).removeFromCache();
+                        {                            
                             s.Delete();
                         }
 

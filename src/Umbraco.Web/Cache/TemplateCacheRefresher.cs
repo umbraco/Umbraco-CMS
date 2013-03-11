@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using umbraco;
 using umbraco.interfaces;
 
@@ -7,8 +8,7 @@ namespace Umbraco.Web.Cache
 {
     public class TemplateCacheRefresher : ICacheRefresher
     {
-        private const string TemplateCacheKey = "template";
-
+        
         public string Name
         {
             get
@@ -46,7 +46,7 @@ namespace Umbraco.Web.Cache
         private void RemoveFromCache(int id)
         {
             ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
-                string.Format("{0}{1}", TemplateCacheKey, id));
+                string.Format("{0}{1}", CacheKeys.TemplateCacheKey, id));
         }
 
     }

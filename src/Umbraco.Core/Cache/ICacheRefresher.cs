@@ -1,6 +1,6 @@
 ﻿using umbraco.interfaces;
 
-namespace Umbraco.Core.Sync
+namespace Umbraco.Core.Cache
 {
     /// <summary>
     /// Strongly type cache refresher that is able to refresh cache of real instances of objects as well as IDs

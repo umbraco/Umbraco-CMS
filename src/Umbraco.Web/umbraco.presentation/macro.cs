@@ -20,6 +20,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
+using Umbraco.Web.Cache;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
@@ -49,9 +50,6 @@ namespace umbraco
 
         private readonly StringBuilder mContent = new StringBuilder();
         private readonly Cache macroCache = HttpRuntime.Cache;
-
-        private static readonly object macroRuntimeCacheSyncLock = new object();
-        private static readonly string macroRuntimeCacheKey = "UmbracoRuntimeMacroCache";
 
 
         private readonly string macrosAddedKey = "macrosAdded";
@@ -141,78 +139,31 @@ namespace umbraco
         public macro(int id)
         {
             Macro m = Macro.GetById(id);
-            Model = new MacroModel(m);
+            if (m != null)
+            {
+                Model = new MacroModel(m);    
+            }
         }
 
         public macro(string alias)
         {
             Macro m = Macro.GetByAlias(alias);
-            Model = new MacroModel(m);
+            if (m != null)
+            {
+                Model = new MacroModel(m);
+            }            
         }
 
         public MacroModel Model { get; set; }
 
         public static macro GetMacro(string alias)
         {
-            // FlorisRobbemont: issue #27610 -> Presentation macro not supposed to be cached.
             return new macro(alias);
-
-            //return cms.businesslogic.cache.Cache.GetCacheItem(GetCacheKey(alias), macroRuntimeCacheSyncLock,
-            //              TimeSpan.FromMinutes(60),
-            //              delegate
-            //              {
-            //                  try
-            //                  {
-            //                      return new macro(alias);
-            //                  }
-            //                  catch
-            //                  {
-            //                      return null;
-            //                  }
-            //              });
-
-
-
-
-
         }
 
-
-
-
-
-
-
         public static macro GetMacro(int id)
-        {
-            // FlorisRobbemont: issue #27610 -> Presentation macro not supposed to be cached.
-
-
-
-
-
-
+        {        
             return new macro(id);
-
-            //return cms.businesslogic.cache.Cache.GetCacheItem(GetCacheKey(string.Format("by_id_{0}", id)), macroRuntimeCacheSyncLock,
-            //              TimeSpan.FromMinutes(60),
-            //              delegate
-            //              {
-            //                  try
-            //                  {
-            //                      return new macro(id);
-            //                  }
-            //                  catch
-            //                  {
-            //                      return null;
-            //                  }
-            //              });
-
-
-
-
-
-
         }
 
         #endregion
@@ -241,22 +192,16 @@ namespace umbraco
             return Model.Name;
         }
 
-        private static string GetCacheKey(string alias)
-        {
-            return macroRuntimeCacheKey + alias;
-        }
-
         /// <summary>
         /// Deletes macro definition from cache.
         /// </summary>
         /// <returns>True if succesfull, false if nothing has been removed</returns>
-        //TODO: Update implementation!
+        [Obsolete("Use DistributedCache.Instance.RemoveMacroCache instead, macro cache will automatically be cleared and shouldn't need to be manually cleared.")]
         public bool removeFromCache()
         {
-            if (Model.Id > 0)
-            {
-                cms.businesslogic.cache.Cache.ClearCacheItem(GetCacheKey(Model.Alias));
-            }
+            DistributedCache.Instance.RemoveMacroCache(this);
+            
+            //this always returned false... hrm. oh well i guess we leave it like that
             return false;
         }
 
@@ -921,12 +866,13 @@ namespace umbraco
             // would not be refreshed when the .config file is modified. An application
             // restart would be required. Better use the cache and add a dependency.
 			
-			// SD: Not sure what is meant by the above statement? Having these in a static variable would be preferred!
+			// SD: The only reason the above statement might be true is because the xslt extension .config file is not a 
+            // real config file!! if it was, we wouldn't have this issue. Having these in a static variable would be preferred!
 			//  If you modify a config file, the app restarts and thus all static variables are reset.
 			//  Having this stuff in cache just adds to the gigantic amount of cache data and will cause more cache turnover to happen.
 
-            return cms.businesslogic.cache.Cache.GetCacheItem(
-                _xsltExtensionsCacheKey, _xsltExtensionsSyncLock,
+            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                _xsltExtensionsCacheKey, 
                 CacheItemPriority.NotRemovable, // NH 4.7.1, Changing to NotRemovable
                 null, // no refresh action
                 _xsltExtensionsDependency(), // depends on the .config file

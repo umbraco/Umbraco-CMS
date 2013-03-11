@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Sync;
 using umbraco;
