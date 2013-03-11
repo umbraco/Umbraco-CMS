@@ -71,6 +71,7 @@
     <Compile Include="Enum.cs" />
     <Compile Include="HashCodeCombiner.cs" />
     <Compile Include="IO\FileSystemWrapper.cs" />
+    <Compile Include="MacroErrorBehaviour.cs" />
     <Compile Include="Media\IImageUrlProvider.cs" />
     <Compile Include="ObjectResolution\LazyManyObjectsResolverbase.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
