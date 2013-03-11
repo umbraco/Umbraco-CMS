@@ -1,11 +1,12 @@
 ﻿using System;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models;
 using umbraco.interfaces;
 
 namespace Umbraco.Web.Cache
 {
-    public class MediaCacheRefresher : ICacheRefresher
+    public class MediaCacheRefresher : ICacheRefresher<IMedia>
     {
         public Guid UniqueIdentifier
         {
@@ -23,35 +24,43 @@ namespace Umbraco.Web.Cache
 
         public void Refresh(int id)
         {
-            ClearCache(id);
+            ClearCache(ApplicationContext.Current.Services.MediaService.GetById(id));
         }
 
         public void Remove(int id)
         {
-            ClearCache(id);
+            ClearCache(ApplicationContext.Current.Services.MediaService.GetById(id));
         }
 
         public void Refresh(Guid id)
         {
         }
 
-        private static void ClearCache(int id)
+        public void Refresh(IMedia instance)
         {
-            var m = ApplicationContext.Current.Services.MediaService.GetById(id);
-            if (m == null) return;
+            ClearCache(instance);
+        }
 
-            foreach (var idPart in m.Path.Split(','))
+        public void Remove(IMedia instance)
+        {
+            ClearCache(instance);
+        }
+
+        private static void ClearCache(IMedia media)
+        {
+            if (media == null) return;
+
+            foreach (var idPart in media.Path.Split(','))
             {
                 ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
                     string.Format("UL_{0}_{1}_True", CacheKeys.GetMediaCacheKey, idPart));
 
                 // Also clear calls that only query this specific item!
-                if (idPart == m.Id.ToString())
+                if (idPart == media.Id.ToString())
                     ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
-                        string.Format("UL_{0}_{1}", CacheKeys.GetMediaCacheKey, id));
+                        string.Format("UL_{0}_{1}", CacheKeys.GetMediaCacheKey, media.Id));
 
             }
         }
-
     }
 }

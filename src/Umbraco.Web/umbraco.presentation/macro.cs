@@ -199,7 +199,10 @@ namespace umbraco
         [Obsolete("Use DistributedCache.Instance.RemoveMacroCache instead, macro cache will automatically be cleared and shouldn't need to be manually cleared.")]
         public bool removeFromCache()
         {
-            DistributedCache.Instance.RemoveMacroCache(this);
+            if (this.Model != null)
+            {
+                DistributedCache.Instance.RemoveMacroCache(this.Model.Id);    
+            }
             
             //this always returned false... hrm. oh well i guess we leave it like that
             return false;
