@@ -19,9 +19,9 @@ namespace Umbraco.Core.Events
         public string Alias { get; set; }
 
         /// <summary>
-        /// Filename of the faulting macro.
+        /// Filename, file path, fully qualified class name, or other key used by the macro engine to do it's processing of the faulting macro.
         /// </summary>
-        public string File { get; set; }
+        public string ItemKey { get; set; }
 
         /// <summary>
         /// Exception raised.
