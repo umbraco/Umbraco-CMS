@@ -456,6 +456,18 @@ namespace umbraco
                         macroControl = loadMacroXSLT(this, Model, pageElements);
                         break;
                     case (int)MacroTypes.Script:
+
+                        //error handler for partial views, is an action because we need to re-use it twice below
+                        Action<Exception> handleMacroScriptError = e =>
+                        {
+                            LogHelper.WarnWithException<macro>("Error loading MacroEngine script (file: " + ScriptFile + ", Type: '" + Model.TypeName + "'", true, e);
+
+                            // Invoke any error handlers for this macro
+                            var macroErrorEventArgs = new MacroErrorEventArgs { Name = Model.Name, Alias = Model.Alias, ItemKey = ScriptFile, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour };
+
+                            macroControl = RaiseAndHandleErrorForBehavior("Error loading MacroEngine script (file: " + ScriptFile + ")", macroErrorEventArgs);
+                        };
+                        
                         try
                         {
 	                        TraceInfo("umbracoMacro", "MacroEngine script added (" + ScriptFile + ")");
@@ -463,10 +475,9 @@ namespace umbraco
                             macroControl = new LiteralControl(result.Result);
                             if (result.ResultException != null)
                             {
-                                // we'll throw the error if we run in release mode, show details if we're in release mode!
                                 renderFailed = true;
-                                if (HttpContext.Current != null && !HttpContext.Current.IsDebuggingEnabled)
-                                    throw result.ResultException;
+                                Exceptions.Add(result.ResultException);
+                                handleMacroScriptError(result.ResultException);
                             }
                             break;
                         }
@@ -475,12 +486,7 @@ namespace umbraco
                             renderFailed = true;
                             Exceptions.Add(e);
 
-	                        LogHelper.WarnWithException<macro>("Error loading MacroEngine script (file: " + ScriptFile + ", Type: '" + Model.TypeName + "'", true, e);
-
-                            // Invoke any error handlers for this macro
-                            var macroErrorEventArgs = new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, ItemKey = ScriptFile, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour};
-                            
-                            macroControl = RaiseAndHandleErrorForBehavior("Error loading MacroEngine script (file: " + ScriptFile + ")", macroErrorEventArgs);
+                            handleMacroScriptError(e);	                        
 
                             break;
                         }
