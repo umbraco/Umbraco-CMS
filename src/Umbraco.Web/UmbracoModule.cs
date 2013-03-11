@@ -50,23 +50,8 @@ namespace Umbraco.Web
 			legacyRequestInitializer.InitializeRequest();
 
 			// create the UmbracoContext singleton, one per request, and assign
-			var umbracoContext = new UmbracoContext(
-				httpContext,
-				ApplicationContext.Current,
-				RoutesCacheResolver.Current.RoutesCache);
-			UmbracoContext.Current = umbracoContext;
-
-			// create the nice urls provider
-			var niceUrls = new NiceUrlProvider(PublishedContentStoreResolver.Current.PublishedContentStore, umbracoContext);
-
-			// create the RoutingContext, and assign
-			var routingContext = new RoutingContext(
-				umbracoContext,
-				DocumentLookupsResolver.Current.DocumentLookups,
-				LastChanceLookupResolver.Current.LastChanceLookup,
-				PublishedContentStoreResolver.Current.PublishedContentStore,
-				niceUrls);
-			umbracoContext.RoutingContext = routingContext;
+            // NOTE: we assign 'true' to ensure the context is replaced if it is already set (i.e. during app startup)
+            UmbracoContext.EnsureContext(httpContext, ApplicationContext.Current, true);
 		}
 
 		/// <summary>

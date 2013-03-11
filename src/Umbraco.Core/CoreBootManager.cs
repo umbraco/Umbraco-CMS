@@ -32,8 +32,7 @@ namespace Umbraco.Core
 			LogHelper.Info<CoreBootManager>("Umbraco application starting");
 			_timer = DisposableTimer.Start(x => LogHelper.Info<CoreBootManager>("Umbraco application startup complete" + " (took " + x + "ms)"));
 
-			//create the ApplicationContext
-			ApplicationContext = ApplicationContext.Current = new ApplicationContext();
+            CreateApplicationContext();
 
 			InitializeResolvers();
 
@@ -41,6 +40,15 @@ namespace Umbraco.Core
 
 			return this;
 		}
+
+        /// <summary>
+        /// Creates and assigns the application context singleton
+        /// </summary>
+        protected virtual void CreateApplicationContext()
+        {
+            //create the ApplicationContext
+            ApplicationContext = ApplicationContext.Current = new ApplicationContext();
+        }
 
 		/// <summary>
 		/// Fires after initialization and calls the callback to allow for customizations to occur
@@ -72,8 +80,7 @@ namespace Umbraco.Core
 			if (_isComplete)
 				throw new InvalidOperationException("The boot manager has already been completed");
 
-			//freeze resolution to not allow Resolvers to be modified
-			Resolution.Freeze();
+		    FreezeResolution();
 
 			//stop the timer and log the output
 			_timer.Dispose();
@@ -87,6 +94,14 @@ namespace Umbraco.Core
 
 			return this;
 		}
+
+        /// <summary>
+        /// Freeze resolution to not allow Resolvers to be modified
+        /// </summary>
+        protected virtual void FreezeResolution()
+        {
+            Resolution.Freeze();
+        }
 
 		/// <summary>
 		/// Create the resolvers
