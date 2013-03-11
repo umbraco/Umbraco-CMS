@@ -94,19 +94,6 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Override this method in order to ensure that the UmbracoContext is also created, this can only be 
-        /// created after resolution is frozen!
-        /// </summary>
-        protected override void FreezeResolution()
-        {
-            base.FreezeResolution();
-
-            //before we do anything, we'll ensure the umbraco context
-            //see: http://issues.umbraco.org/issue/U4-1717
-            UmbracoContext.EnsureContext(new HttpContextWrapper(UmbracoApplication.Context), ApplicationContext);
-        }
-
-        /// <summary>
         /// Adds custom types to the ApplicationEventsResolver
         /// </summary>
         protected override void InitializeApplicationEventsResolver()

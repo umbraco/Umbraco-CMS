@@ -81,7 +81,7 @@ namespace Umbraco.Web
             if (UmbracoContext.Current != null && !replaceContext)
                 return UmbracoContext.Current;
 
-            var umbracoContext = new UmbracoContext(httpContext, applicationContext, RoutesCacheResolver.Current.RoutesCache);
+            var umbracoContext = new UmbracoContext(httpContext, applicationContext);
 
             // create the nice urls provider
             var niceUrls = new NiceUrlProvider(PublishedContentStoreResolver.Current.PublishedContentStore, umbracoContext);
@@ -89,10 +89,11 @@ namespace Umbraco.Web
             // create the RoutingContext, and assign
             var routingContext = new RoutingContext(
                 umbracoContext,
-                DocumentLookupsResolver.Current.DocumentLookups,
-                LastChanceLookupResolver.Current.LastChanceLookup,
+                ContentFinderResolver.Current.Finders,
+                ContentLastChanceFinderResolver.Current.Finder,
                 PublishedContentStoreResolver.Current.PublishedContentStore,
-                niceUrls);
+                niceUrls,
+                RoutesCacheResolver.Current.RoutesCache);
 
             //assign the routing context back
             umbracoContext.RoutingContext = routingContext;

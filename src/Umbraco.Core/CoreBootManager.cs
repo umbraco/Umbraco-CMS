@@ -180,15 +180,7 @@ namespace Umbraco.Core
         {
             Resolution.Freeze();
         }
-
-        /// <summary>
-        /// Freeze resolution to not allow Resolvers to be modified
-        /// </summary>
-        protected virtual void FreezeResolution()
-        {
-            Resolution.Freeze();
-        }
-
+        
 		/// <summary>
 		/// Create the resolvers
 		/// </summary>
