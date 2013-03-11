@@ -2,6 +2,7 @@
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Core.CodeAnnotations;
 using Umbraco.Web.Routing;
 using umbraco;
 using umbraco.IO;
@@ -49,9 +50,35 @@ namespace Umbraco.Web
         /// during the startup process as well.
         /// See: http://issues.umbraco.org/issue/U4-1890
         /// </remarks>
+        [UmbracoProposedPublic("http://issues.umbraco.org/issue/U4-1717")]
         internal static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext)
         {
-            if (UmbracoContext.Current != null) 
+            return EnsureContext(httpContext, applicationContext, false);
+        }
+
+        /// <summary>
+        /// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
+        /// context is created and assigned.
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <param name="applicationContext"></param>
+        /// <param name="replaceContext">
+        /// if set to true will replace the current singleton with a new one, this is generally only ever used because
+        /// during application startup the base url domain will not be available so after app startup we'll replace the current
+        /// context with a new one in which we can access the httpcontext.Request object.
+        /// </param>
+        /// <returns>
+        /// The Singleton context object
+        /// </returns>
+        /// <remarks>
+        /// This is created in order to standardize the creation of the singleton. Normally it is created during a request
+        /// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
+        /// during the startup process as well.
+        /// See: http://issues.umbraco.org/issue/U4-1890
+        /// </remarks>
+        internal static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext, bool replaceContext)
+        {
+            if (UmbracoContext.Current != null && !replaceContext)
                 return UmbracoContext.Current;
 
             var umbracoContext = new UmbracoContext(httpContext, applicationContext, RoutesCacheResolver.Current.RoutesCache);
@@ -66,10 +93,10 @@ namespace Umbraco.Web
                 LastChanceLookupResolver.Current.LastChanceLookup,
                 PublishedContentStoreResolver.Current.PublishedContentStore,
                 niceUrls);
-            
+
             //assign the routing context back
             umbracoContext.RoutingContext = routingContext;
-            
+
             //assign the singleton
             UmbracoContext.Current = umbracoContext;
             return UmbracoContext.Current;

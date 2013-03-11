@@ -50,7 +50,8 @@ namespace Umbraco.Web
 			legacyRequestInitializer.InitializeRequest();
 
 			// create the UmbracoContext singleton, one per request, and assign
-            UmbracoContext.EnsureContext(httpContext, ApplicationContext.Current);
+            // NOTE: we assign 'true' to ensure the context is replaced if it is already set (i.e. during app startup)
+            UmbracoContext.EnsureContext(httpContext, ApplicationContext.Current, true);
 		}
 
 		/// <summary>
