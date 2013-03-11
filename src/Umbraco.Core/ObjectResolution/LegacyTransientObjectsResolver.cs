@@ -19,7 +19,7 @@ namespace Umbraco.Core.ObjectResolution
 	/// </remarks>
 	internal abstract class LegacyTransientObjectsResolver<TResolver, TResolved> : LazyManyObjectsResolverBase<TResolver, TResolved>
 		where TResolved : class
-		where TResolver : class
+        where TResolver : ResolverBase
 	{
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 		private ConcurrentDictionary<Guid, Type> _id2type;

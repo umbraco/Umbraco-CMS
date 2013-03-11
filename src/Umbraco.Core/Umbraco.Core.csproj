@@ -206,6 +206,7 @@
     <Compile Include="Models\TaskType.cs" />
     <Compile Include="Models\Template.cs" />
     <Compile Include="ObjectResolution\ApplicationEventsResolver.cs" />
+    <Compile Include="ObjectResolution\ResolverCollection.cs" />
     <Compile Include="Persistence\Caching\InMemoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\IRepositoryCacheProvider.cs" />
     <Compile Include="Persistence\Caching\NullCacheProvider.cs" />

@@ -3,26 +3,52 @@ using System.Threading;
 
 namespace Umbraco.Core.ObjectResolution
 {
+    /// <summary>
+    /// Base non-generic class for resolvers
+    /// </summary>
+    public abstract class ResolverBase
+    {
+        protected ResolverBase(Action resetAction)
+        {
+            //add itself to the internal collection
+            ResolverCollection.Add(this, resetAction);
+        }
+        
+    }
+
 	/// <summary>
 	/// The base class for all resolvers.
 	/// </summary>
 	/// <typeparam name="TResolver">The type of the concrete resolver class.</typeparam>
 	/// <remarks>Provides singleton management to all resolvers.</remarks>
-	public abstract class ResolverBase<TResolver> 
-		where TResolver : class
+    public abstract class ResolverBase<TResolver> : ResolverBase
+        where TResolver : ResolverBase
 	{
-		static TResolver _resolver;
-		
-		/// <summary>
-		/// The lock for the singleton.
-		/// </summary>
-		/// <remarks>
-		/// Though resharper says this is in error, it is actually correct. We want a different lock object for each generic type.
-		/// See this for details: http://confluence.jetbrains.net/display/ReSharper/Static+field+in+generic+type
-		/// </remarks>
-		static readonly ReaderWriterLockSlim ResolversLock = new ReaderWriterLockSlim();
 
-		/// <summary>
+        /// <summary>
+        /// The underlying singleton object instance
+        /// </summary>
+        static TResolver _resolver;
+
+        /// <summary>
+        /// The lock for the singleton.
+        /// </summary>
+        /// <remarks>
+        /// Though resharper says this is in error, it is actually correct. We want a different lock object for each generic type.
+        /// See this for details: http://confluence.jetbrains.net/display/ReSharper/Static+field+in+generic+type
+        /// </remarks>
+        static readonly ReaderWriterLockSlim ResolversLock = new ReaderWriterLockSlim();
+
+        /// <summary>
+        /// Constructor set the reset action for the underlying object
+        /// </summary>
+	    protected ResolverBase()
+	        : base(() => Reset())
+	    {
+
+	    }
+
+	    /// <summary>
 		/// Gets or sets the resolver singleton instance.
 		/// </summary>
 		/// <remarks>The value can be set only once, and cannot be read before it has been set.</remarks>
@@ -84,15 +110,18 @@ namespace Umbraco.Core.ObjectResolution
             //In order to reset a resolver, we always must reset the resolution
             if (resetResolution)
             {                
-                Resolution.Reset();    
+                Resolution.Reset();
             }
-            
+
+            //ensure its removed from the collection
+            ResolverCollection.Remove(_resolver);
 
             using (Resolution.Configuration)
 			using (new WriteLock(ResolversLock))
 			{
 				_resolver = null;
 			}
+            
 		}
 	}
 }

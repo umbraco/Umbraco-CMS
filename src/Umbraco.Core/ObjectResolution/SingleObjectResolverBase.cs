@@ -13,7 +13,7 @@ namespace Umbraco.Core.ObjectResolution
 	/// </remarks>
 	public abstract class SingleObjectResolverBase<TResolver, TResolved> : ResolverBase<TResolver>
 		where TResolved : class
-		where TResolver : class
+        where TResolver : ResolverBase
 	{
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 		private readonly bool _canBeNull;

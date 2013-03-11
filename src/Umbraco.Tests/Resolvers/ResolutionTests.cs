@@ -18,19 +18,25 @@ namespace Umbraco.Tests.Resolvers
         public void Setup()
         {
             TestHelper.SetupLog4NetForTests();
-
-            BaseResolver.Reset();
         }
 
         [TearDown]
         public void TearDown()
         {
             BaseResolver.Reset();
+            BaseResolver2.Reset();
+            BaseResolver3.Reset();
         }
 
         #region Resolvers and Resolved
 
         class BaseResolver : ResolverBase<BaseResolver>
+        { }
+
+        class BaseResolver2 : ResolverBase<BaseResolver2>
+        { }
+
+        class BaseResolver3 : ResolverBase<BaseResolver3>
         { }
 
         #endregion
@@ -215,5 +221,45 @@ namespace Umbraco.Tests.Resolvers
         }
 
         #endregion
+
+        [Test]
+        public void Resolver_Collection_Is_Updated()
+        {
+            BaseResolver.Current = new BaseResolver();
+            BaseResolver2.Current = new BaseResolver2();
+            BaseResolver3.Current = new BaseResolver3();
+            Assert.AreEqual(3, ResolverCollection.Count);
+        }
+
+        [Test]
+        public void Resolver_Collection_Is_Reset()
+        {
+            BaseResolver.Current = new BaseResolver();
+            BaseResolver2.Current = new BaseResolver2();
+            BaseResolver3.Current = new BaseResolver3();
+            
+            ResolverCollection.ResetAll();
+
+            Assert.AreEqual(0, ResolverCollection.Count);
+            Assert.Throws<InvalidOperationException>(() =>
+                {
+                    var c = BaseResolver.Current;
+                });
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                var c = BaseResolver2.Current;
+            });
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                var c = BaseResolver3.Current;
+            });
+
+            //this should not error!
+            BaseResolver.Current = new BaseResolver();
+            BaseResolver2.Current = new BaseResolver2();
+            BaseResolver3.Current = new BaseResolver3();
+
+            Assert.Pass();
+        }
     }
 }

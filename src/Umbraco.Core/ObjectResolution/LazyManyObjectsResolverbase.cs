@@ -20,7 +20,7 @@ namespace Umbraco.Core.ObjectResolution
 	/// </remarks>
 	internal abstract class LazyManyObjectsResolverBase<TResolver, TResolved> : ManyObjectsResolverBase<TResolver, TResolved>
 		where TResolved : class
-		where TResolver : class
+        where TResolver : ResolverBase
 	{
 		#region Constructors
 		

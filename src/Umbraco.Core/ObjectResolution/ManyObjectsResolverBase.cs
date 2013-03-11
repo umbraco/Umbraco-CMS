@@ -6,14 +6,14 @@ using System.Web;
 
 namespace Umbraco.Core.ObjectResolution
 {
-	/// <summary>
+    /// <summary>
 	/// The base class for all many-objects resolvers.
 	/// </summary>
 	/// <typeparam name="TResolver">The type of the concrete resolver class.</typeparam>
 	/// <typeparam name="TResolved">The type of the resolved objects.</typeparam>
 	public abstract class ManyObjectsResolverBase<TResolver, TResolved> : ResolverBase<TResolver>
-		where TResolved : class 
-		where TResolver : class
+		where TResolved : class
+        where TResolver : ResolverBase
 	{
 		private IEnumerable<TResolved> _applicationInstances = null;
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
