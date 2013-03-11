@@ -8,16 +8,13 @@
     </sectionGroup>
     <section name="clientDependency" type="ClientDependency.Core.Config.ClientDependencySection, ClientDependency.Core" requirePermission="false" />
     <section name="Examine" type="Examine.Config.ExamineSettings, Examine" requirePermission="false" />
-    <section name="ExamineLuceneIndexSets" type="UmbracoExamine.Config.ExamineLuceneIndexes, UmbracoExamine" requirePermission="false" />
+    <section name="ExamineLuceneIndexSets" type="Examine.LuceneEngine.Config.IndexSets, Examine" requirePermission="false" />
     <section name="FileSystemProviders" type="Umbraco.Core.Configuration.FileSystemProvidersSection, Umbraco.Core" requirePermission="false" />
     <section name="log4net" type="log4net.Config.Log4NetConfigurationSectionHandler, log4net" requirePermission="false" />
     <section name="BaseRestExtensions" type="Umbraco.Web.BaseRest.Configuration.BaseRestSection, umbraco" requirePermission="false" />
-    <sectionGroup name="umbraco">
-      <section name="infrastructure" type="Umbraco.Core.Configuration.InfrastructureSettings.Infrastructure, Umbraco.Core" requirePermission="false" />
-    </sectionGroup>
-    <sectionGroup name="system.web.webPages.razor" type="System.Web.WebPages.Razor.Configuration.RazorWebSectionGroup, System.Web.WebPages.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35">
-      <section name="host" type="System.Web.WebPages.Razor.Configuration.HostSection, System.Web.WebPages.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" requirePermission="false" />
-      <section name="pages" type="System.Web.WebPages.Razor.Configuration.RazorPagesSection, System.Web.WebPages.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" requirePermission="false" />
+    <sectionGroup name="system.web.webPages.razor" type="System.Web.WebPages.Razor.Configuration.RazorWebSectionGroup, System.Web.WebPages.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35">
+      <section name="host" type="System.Web.WebPages.Razor.Configuration.HostSection, System.Web.WebPages.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" requirePermission="false" />
+      <section name="pages" type="System.Web.WebPages.Razor.Configuration.RazorPagesSection, System.Web.WebPages.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" requirePermission="false" />
     </sectionGroup>
   </configSections>
   <urlrewritingnet configSource="config\UrlRewriting.config" />
@@ -26,10 +23,10 @@
   <Examine configSource="config\ExamineSettings.config" />
   <ExamineLuceneIndexSets configSource="config\ExamineIndex.config" />
   <FileSystemProviders configSource="config\FileSystemProviders.config" />
-  <log4net configSource="config\log4net.config" /> 
+  <log4net configSource="config\log4net.config" />
   <BaseRestExtensions configSource="config\BaseRestExtensions.config" />
   <appSettings>
-    <add key="umbracoConfigurationStatus" value="4.11.1" />
+    <add key="umbracoConfigurationStatus" value="" />
     <add key="umbracoReservedUrls" value="~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd" />
     <add key="umbracoReservedPaths" value="~/umbraco,~/install/" />
     <add key="umbracoContentXML" value="~/App_Data/umbraco.config" />
@@ -54,33 +51,12 @@
     <add key="autoFormsAuthentication" value="false" />
     <add key="log4net.Config" value="config\log4net.config" />
   </appSettings>
-  <connectionStrings>
-    <add name="umbracoDbDSN" connectionString="server=.\sqlexpress;database=dev-4.9.0;user id=dev;password=dev" providerName="System.Data.SqlServerCe.4.0" />
-  </connectionStrings>
-  <umbraco>
-    <infrastructure>
-      <repositories>
-        <repository interfaceShortTypeName="IContentRepository" repositoryFullTypeName="Umbraco.Core.Persistence.Repositories.ContentRepository, Umbraco.Core" cacheProviderFullTypeName="Umbraco.Core.Persistence.Caching.RuntimeCacheProvider, Umbraco.Core" />
-        <repository interfaceShortTypeName="IContentTypeRepository" repositoryFullTypeName="Umbraco.Core.Persistence.Repositories.ContentTypeRepository, Umbraco.Core" cacheProviderFullTypeName="Umbraco.Core.Persistence.Caching.InMemoryCacheProvider, Umbraco.Core" />
-        <repository interfaceShortTypeName="IDataTypeDefinitionRepository" repositoryFullTypeName="Umbraco.Core.Persistence.Repositories.DataTypeDefinitionRepository, Umbraco.Core" cacheProviderFullTypeName="Umbraco.Core.Persistence.Caching.NullCacheProvider, Umbraco.Core" />
-        <repository interfaceShortTypeName="IDictionaryRepository" repositoryFullTypeName="Umbraco.Core.Persistence.Repositories.DictionaryRepository, Umbraco.Core" cacheProviderFullTypeName="Umbraco.Core.Persistence.Caching.InMemoryCacheProvider, Umbraco.Core" />
-        <repository interfaceShortTypeName="ILanguageRepository" repositoryFullTypeName="Umbraco.Core.Persistence.Repositories.LanguageRepository, Umbraco.Core" cacheProviderFullTypeName="Umbraco.Core.Persistence.Caching.InMemoryCacheProvider, Umbraco.Core" />
-        <repository interfaceShortTypeName="IMacroRepository" repositoryFullTypeName="Umbraco.Core.Persistence.Repositories.MacroRepository, Umbraco.Core" cacheProviderFullTypeName="Umbraco.Core.Persistence.Caching.InMemoryCacheProvider, Umbraco.Core" />
-        <repository interfaceShortTypeName="IMediaRepository" repositoryFullTypeName="Umbraco.Core.Persistence.Repositories.MediaRepository, Umbraco.Core" cacheProviderFullTypeName="Umbraco.Core.Persistence.Caching.RuntimeCacheProvider, Umbraco.Core" />
-        <repository interfaceShortTypeName="IMediaTypeRepository" repositoryFullTypeName="Umbraco.Core.Persistence.Repositories.MediaTypeRepository, Umbraco.Core" cacheProviderFullTypeName="Umbraco.Core.Persistence.Caching.InMemoryCacheProvider, Umbraco.Core" />
-        <repository interfaceShortTypeName="IRelationRepository" repositoryFullTypeName="Umbraco.Core.Persistence.Repositories.RelationRepository, Umbraco.Core" cacheProviderFullTypeName="Umbraco.Core.Persistence.Caching.NullCacheProvider, Umbraco.Core" />
-        <repository interfaceShortTypeName="IRelationTypeRepository" repositoryFullTypeName="Umbraco.Core.Persistence.Repositories.RelationTypeRepository, Umbraco.Core" cacheProviderFullTypeName="Umbraco.Core.Persistence.Caching.NullCacheProvider, Umbraco.Core" />
-        <repository interfaceShortTypeName="IScriptRepository" repositoryFullTypeName="Umbraco.Core.Persistence.Repositories.ScriptRepository, Umbraco.Core" cacheProviderFullTypeName="Umbraco.Core.Persistence.Caching.NullCacheProvider, Umbraco.Core" />
-        <repository interfaceShortTypeName="IStylesheetRepository" repositoryFullTypeName="Umbraco.Core.Persistence.Repositories.StylesheetRepository, Umbraco.Core" cacheProviderFullTypeName="Umbraco.Core.Persistence.Caching.NullCacheProvider, Umbraco.Core" />
-        <repository interfaceShortTypeName="ITemplateRepository" repositoryFullTypeName="Umbraco.Core.Persistence.Repositories.TemplateRepository, Umbraco.Core" cacheProviderFullTypeName="Umbraco.Core.Persistence.Caching.NullCacheProvider, Umbraco.Core" />
-      </repositories>
-      <publishingStrategy type="Umbraco.Web.Publishing.PublishingStrategy, Umbraco.Web" />
-    </infrastructure>
-  </umbraco>
   <system.data>
     <DbProviderFactories>
       <remove invariant="System.Data.SqlServerCe.4.0" />
       <add name="Microsoft SQL Server Compact Data Provider 4.0" invariant="System.Data.SqlServerCe.4.0" description=".NET Framework Data Provider for Microsoft SQL Server Compact" type="System.Data.SqlServerCe.SqlCeProviderFactory, System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" />
+      <remove invariant="MySql.Data.MySqlClient" />
+      <add name="MySQL Data Provider" invariant="MySql.Data.MySqlClient" description=".Net Framework Data Provider for MySQL" type="MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data, Version=6.6.4.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d" />
     </DbProviderFactories>
   </system.data>
   <system.net>
@@ -90,6 +66,11 @@
       </smtp>
     </mailSettings>
   </system.net>
+  <connectionStrings>
+    <remove name="umbracoDbDSN" />
+    <add name="umbracoDbDSN" connectionString="server=.\sqlexpress;database=v6;user id=sa;password=test" providerName="System.Data.SqlClient" />
+    <!-- Important: If you're upgrading Umbraco, do not clear the connection string / provider name during your web.config merge. -->
+  </connectionStrings>
   <system.web>
     <customErrors mode="RemoteOnly" />
     <trace enabled="true" requestLimit="10" pageOutput="false" traceMode="SortByTime" localOnly="true" />
@@ -141,8 +122,8 @@
         <add assembly="System.Web.Abstractions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
         <add assembly="System.Web.Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
         <add assembly="System.Web.Routing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
-        <add assembly="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
-        <add assembly="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
+        <add assembly="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
+        <add assembly="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
       </assemblies>
       <buildProviders>
         <add extension=".cshtml" type="umbraco.MacroEngines.RazorBuildProvider, umbraco.MacroEngines" />
@@ -233,8 +214,8 @@
     </compilers>
   </system.codedom>
   <runtime>
-    <!-- Old asp.net ajax assembly bindings -->
     <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+      <!-- Old asp.net ajax assembly bindings -->
       <dependentAssembly>
         <assemblyIdentity name="System.Web.Extensions" publicKeyToken="31bf3856ad364e35" />
         <bindingRedirect oldVersion="1.0.0.0-1.1.0.0" newVersion="4.0.0.0" />
@@ -243,6 +224,7 @@
         <assemblyIdentity name="System.Web.Extensions.Design" publicKeyToken="31bf3856ad364e35" />
         <bindingRedirect oldVersion="1.0.0.0-1.1.0.0" newVersion="4.0.0.0" />
       </dependentAssembly>
+      <!-- Ensure correct version of MVC -->
       <dependentAssembly>
         <assemblyIdentity name="System.Web.Helpers" publicKeyToken="31bf3856ad364e35"/>
         <bindingRedirect oldVersion="1.0.0.0-2.0.0.0" newVersion="2.0.0.0"/>
