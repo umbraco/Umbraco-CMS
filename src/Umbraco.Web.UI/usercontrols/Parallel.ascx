@@ -1,0 +1,2 @@
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="Parallel.ascx.cs" Inherits="Umbraco.Web.UI.usercontrols.ParallelUserControl" %>
+<asp:Button ID="Button1" runat="server" Text="Button" onclick="Button1_Click" />

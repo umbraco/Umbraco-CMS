@@ -16,19 +16,19 @@ using System.Web.UI.WebControls;
 using System.Xml;
 using System.Xml.Xsl;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
-using umbraco.BusinessLogic.Utils;
+using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.member;
 using umbraco.DataLayer;
 using umbraco.NodeFactory;
 using umbraco.presentation.templateControls;
-using umbraco.presentation.xslt.Exslt;
 using Content = umbraco.cms.businesslogic.Content;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
 
@@ -373,6 +373,18 @@ namespace umbraco
                 switch (macroType)
                 {
 					case (int)MacroTypes.PartialView:
+
+                        //error handler for partial views, is an action because we need to re-use it twice below
+                        Action<Exception> handleError = e =>
+                            {
+                                LogHelper.WarnWithException<macro>("Error loading Partial View (file: " + ScriptFile + ")", true, e);
+
+                                // Invoke any error handlers for this macro
+                                var macroErrorEventArgs = new MacroErrorEventArgs { Name = Model.Name, Alias = Model.Alias, ItemKey = Model.ScriptName, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour };
+
+                                macroControl = RaiseAndHandleErrorForBehavior("Error loading Partial View script (file: " + ScriptFile + ")", macroErrorEventArgs);
+                            };
+
 						TraceInfo("umbracoMacro", "Partial View added (" + Model.TypeName + ")");
 						try
 						{							
@@ -380,41 +392,16 @@ namespace umbraco
 							macroControl = new LiteralControl(result.Result);
 							if (result.ResultException != null)
 							{
-								// we'll throw the error if we run in release mode, show details if we're in release mode!
 								renderFailed = true;
-								if (HttpContext.Current != null && !HttpContext.Current.IsDebuggingEnabled)
-									throw result.ResultException;
+                                Exceptions.Add(result.ResultException);
+                                handleError(result.ResultException);      
 							}
-							break;
 						}
 						catch (Exception e)
 						{
 							renderFailed = true;
 							Exceptions.Add(e);
-
-							LogHelper.WarnWithException<macro>("Error loading MacroEngine script (file: " + ScriptFile + ", Type: '" + Model.TypeName + "'",
-							                                   true,
-							                                   e);
-
-							var result =
-								new LiteralControl("Error loading MacroEngine script (file: " + ScriptFile + ")");
-
-							/*
-							string args = "<ul>";
-							foreach(object key in attributes.Keys)
-								args += "<li><strong>" + key.ToString() + ": </strong> " + attributes[key] + "</li>";
-
-							foreach (object key in pageElements.Keys)
-								args += "<li><strong>" + key.ToString() + ": </strong> " + pageElements[key] + "</li>";
-
-							args += "</ul>";
-
-							result.Text += args;
-							*/
-
-							macroControl = result;
-
-							break;
+						    handleError(e);                            
 						}
 
 		                break;
@@ -434,17 +421,20 @@ namespace umbraco
                         {
                             renderFailed = true;
                             Exceptions.Add(e);
-							LogHelper.WarnWithException<macro>("Error loading userControl (" + Model.TypeName + ")", true, e);                            
-                            macroControl = new LiteralControl("Error loading userControl '" + Model.TypeName + "'");
+							LogHelper.WarnWithException<macro>("Error loading userControl (" + Model.TypeName + ")", true, e);
+
+                            // Invoke any error handlers for this macro
+                            var macroErrorEventArgs = new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, ItemKey = Model.TypeName, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour};
+
+                            macroControl = RaiseAndHandleErrorForBehavior("Error loading userControl '" + Model.TypeName + "'", macroErrorEventArgs);
+
                             break;
                         }
                     case (int)MacroTypes.CustomControl:
                         try
                         {
-	                        TraceInfo("umbracoMacro",
-	                                  "Custom control added (" + Model.TypeName + ")");
-	                        TraceInfo("umbracoMacro",
-	                                  "ScriptAssembly (" + Model.TypeAssembly + ")");
+	                        TraceInfo("umbracoMacro", "Custom control added (" + Model.TypeName + ")");
+	                        TraceInfo("umbracoMacro", "ScriptAssembly (" + Model.TypeAssembly + ")");
                             macroControl = loadControl(Model.TypeAssembly, ScriptType, Model, pageElements);
                             break;
                         }
@@ -453,14 +443,13 @@ namespace umbraco
                             renderFailed = true;
                             Exceptions.Add(e);
 
-	                        LogHelper.WarnWithException<macro>("Error loading customControl (Assembly: " +
-	                                                           Model.TypeAssembly +
-	                                                           ", Type: '" + Model.TypeName + "'", true, e);
-                            
-                            macroControl =
-                                new LiteralControl("Error loading customControl (Assembly: " + Model.TypeAssembly +
-                                                   ", Type: '" +
-                                                   Model.TypeName + "'");
+	                        LogHelper.WarnWithException<macro>("Error loading customControl (Assembly: " + Model.TypeAssembly + ", Type: '" + Model.TypeName + "'", true, e);
+
+                            // Invoke any error handlers for this macro
+                            var macroErrorEventArgs = new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, ItemKey = Model.TypeAssembly, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour};
+
+                            macroControl = RaiseAndHandleErrorForBehavior("Error loading customControl (Assembly: " + Model.TypeAssembly + ", Type: '" + Model.TypeName + "'", macroErrorEventArgs);
+
                             break;
                         }
                     case (int)MacroTypes.XSLT:
@@ -469,8 +458,7 @@ namespace umbraco
                     case (int)MacroTypes.Script:
                         try
                         {
-	                        TraceInfo("umbracoMacro",
-	                                  "MacroEngine script added (" + ScriptFile + ")");
+	                        TraceInfo("umbracoMacro", "MacroEngine script added (" + ScriptFile + ")");
                             ScriptingMacroResult result = loadMacroScript(Model);
                             macroControl = new LiteralControl(result.Result);
                             if (result.ResultException != null)
@@ -487,36 +475,18 @@ namespace umbraco
                             renderFailed = true;
                             Exceptions.Add(e);
 
-	                        LogHelper.WarnWithException<macro>(
-		                        "Error loading MacroEngine script (file: " + ScriptFile + ", Type: '" + Model.TypeName + "'",
-		                        true,
-		                        e);
+	                        LogHelper.WarnWithException<macro>("Error loading MacroEngine script (file: " + ScriptFile + ", Type: '" + Model.TypeName + "'", true, e);
 
-                            var result =
-                                new LiteralControl("Error loading MacroEngine script (file: " + ScriptFile + ")");
-
-                            /*
-                            string args = "<ul>";
-                            foreach(object key in attributes.Keys)
-                                args += "<li><strong>" + key.ToString() + ": </strong> " + attributes[key] + "</li>";
-
-                            foreach (object key in pageElements.Keys)
-                                args += "<li><strong>" + key.ToString() + ": </strong> " + pageElements[key] + "</li>";
-
-                            args += "</ul>";
-
-                            result.Text += args;
-                            */
-
-                            macroControl = result;
+                            // Invoke any error handlers for this macro
+                            var macroErrorEventArgs = new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, ItemKey = ScriptFile, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour};
+                            
+                            macroControl = RaiseAndHandleErrorForBehavior("Error loading MacroEngine script (file: " + ScriptFile + ")", macroErrorEventArgs);
 
                             break;
                         }
                     default:
                         if (GlobalSettings.DebugMode)
-                            macroControl =
-                                new LiteralControl("&lt;Macro: " + Name + " (" + ScriptAssembly + "," + ScriptType +
-                                                   ")&gt;");
+                            macroControl = new LiteralControl("&lt;Macro: " + Name + " (" + ScriptAssembly + "," + ScriptType + ")&gt;");
                         break;
                 }
 
@@ -604,6 +574,28 @@ namespace umbraco
             }
 
             return macroControl;
+        }
+
+        /// <summary>
+        /// Raises the error event and based on the error behavior either return a control to display or throw the exception
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        private Control RaiseAndHandleErrorForBehavior(string msg, MacroErrorEventArgs args)
+        {
+            OnError(args);
+
+            switch (args.Behaviour)
+            {
+                case MacroErrorBehaviour.Inline:
+                    return new LiteralControl(msg);
+                case MacroErrorBehaviour.Silent:
+                    return new LiteralControl("");
+                case MacroErrorBehaviour.Throw:
+                default:
+                    throw args.Exception;
+            }
         }
 
         /// <summary>
@@ -774,47 +766,48 @@ namespace umbraco
 										   "</b><br/><p>" + HttpContext.Current.Server.HtmlEncode(macroXML.OuterXml) +
                                            "</p></div>");
                 }
-                else
+
+                try
                 {
+                    var xsltFile = getXslt(XsltFile);
+
                     try
                     {
-                        XslCompiledTransform xsltFile = getXslt(XsltFile);
+                        Control result = CreateControlsFromText(GetXsltTransformResult(macroXML, xsltFile));
 
-                        try
-                        {
-                            Control result = CreateControlsFromText(GetXsltTransformResult(macroXML, xsltFile));
+                        TraceInfo("umbracoMacro", "After performing transformation");
 
-							TraceInfo("umbracoMacro", "After performing transformation");
-
-                            return result;
-                        }
-                        catch (Exception e)
-                        {
-                            Exceptions.Add(e);
-							LogHelper.WarnWithException<macro>("Error parsing XSLT file", e);
-                            // inner exception code by Daniel Lindstr?m from SBBS.se
-                            Exception ie = e;
-                            while (ie != null)
-                            {
-                                TraceWarn("umbracoMacro InnerException", ie.Message, ie);
-                                ie = ie.InnerException;
-                            }
-                            return new LiteralControl("Error parsing XSLT file: \\xslt\\" + XsltFile);
-                        }
+                        return result;
                     }
                     catch (Exception e)
                     {
                         Exceptions.Add(e);
-						LogHelper.WarnWithException<macro>("Error loading XSLT " + Model.Xslt, true, e);
-                        return new LiteralControl("Error reading XSLT file: \\xslt\\" + XsltFile);
+                        LogHelper.WarnWithException<macro>("Error parsing XSLT file", e);
+                        // inner exception code by Daniel Lindstr?m from SBBS.se
+                        Exception ie = e;
+                        while (ie != null)
+                        {
+                            TraceWarn("umbracoMacro InnerException", ie.Message, ie);
+                            ie = ie.InnerException;
+                        }
+
+                        var macroErrorEventArgs = new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, ItemKey = Model.Xslt, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour};
+                        return RaiseAndHandleErrorForBehavior("Error parsing XSLT file: \\xslt\\" + XsltFile, macroErrorEventArgs);
                     }
                 }
+                catch (Exception e)
+                {
+                    Exceptions.Add(e);
+                    LogHelper.WarnWithException<macro>("Error loading XSLT " + Model.Xslt, true, e);
+                        
+                    // Invoke any error handlers for this macro
+                    var macroErrorEventArgs = new MacroErrorEventArgs {Name = Model.Name, Alias = Model.Alias, ItemKey = Model.Xslt, Exception = e, Behaviour = UmbracoSettings.MacroErrorBehaviour};
+                    return RaiseAndHandleErrorForBehavior("Error reading XSLT file: \\xslt\\" + XsltFile, macroErrorEventArgs);                        
+                }
             }
-            else
-            {
-				TraceWarn("macro", "Xslt is empty");
-                return new LiteralControl(string.Empty);
-            }
+
+            TraceWarn("macro", "Xslt is empty");
+            return new LiteralControl(string.Empty);
         }
 
         /// <summary>
@@ -1502,7 +1495,7 @@ namespace umbraco
                 string userControlPath = IOHelper.FindFile(fileName);
 
                 if (!File.Exists(IOHelper.MapPath(userControlPath)))
-                    return new LiteralControl(string.Format("UserControl {0} does not exist.", fileName));
+                    throw new UmbracoException(string.Format("UserControl {0} does not exist.", fileName));
 
                 var oControl = (UserControl)new UserControl().LoadControl(userControlPath);
 
@@ -1528,11 +1521,7 @@ namespace umbraco
             catch (Exception e)
             {
 				LogHelper.WarnWithException<macro>(string.Format("Error creating usercontrol ({0})", fileName), true, e);
-
-                return new LiteralControl(
-                    string.Format(
-                        "<div style=\"color: black; padding: 3px; border: 2px solid red\"><b style=\"color:red\">Error creating control ({0}).</b><br/> Maybe file doesn't exists or the usercontrol has a cache directive, which is not allowed! See the tracestack for more information!</div>",
-                        fileName));
+                throw;
             }
         }
 
@@ -1799,5 +1788,26 @@ namespace umbraco
             value = false;
             return false;
         }
+
+        #region Events
+
+        /// <summary>
+        /// Occurs when a macro error is raised.
+        /// </summary>
+        public static event EventHandler<MacroErrorEventArgs> Error;
+
+        /// <summary>
+        /// Raises the <see cref="MacroErrorEventArgs"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="MacroErrorEventArgs"/> instance containing the event data.</param>
+        protected void OnError(MacroErrorEventArgs e)
+        {
+            if (Error != null)
+            {
+                Error(this, e);
+            }
+        }
+
+        #endregion
     }
 }

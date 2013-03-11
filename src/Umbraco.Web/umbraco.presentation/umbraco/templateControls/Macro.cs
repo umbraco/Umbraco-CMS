@@ -183,6 +183,7 @@ namespace umbraco.presentation.templateControls
                             System.Web.HttpContext.Current.Trace.Warn("Template", "Result of macro " + tempMacro.Name + " is null");
                     } catch (Exception ee) {
                         System.Web.HttpContext.Current.Trace.Warn("Template", "Error adding macro " + tempMacro.Name, ee);
+                        throw;
                     }
                 }
             }

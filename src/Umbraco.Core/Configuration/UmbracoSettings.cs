@@ -1216,6 +1216,40 @@ namespace Umbraco.Core.Configuration
 			}
 		}
 
+		private static MacroErrorBehaviour? _macroErrorBehaviour;
+
+		/// <summary>
+		/// This configuration setting defines how to handle macro errors:
+		/// - Inline - Show error within macro as text (default and current Umbraco 'normal' behavior)
+		/// - Silent - Suppress error and hide macro
+		/// - Throw  - Throw an exception and invoke the global error handler (if one is defined, if not you'll get a YSOD)
+		/// </summary>
+		/// <value>MacroErrorBehaviour enum defining how to handle macro errors.</value>
+		public static MacroErrorBehaviour MacroErrorBehaviour
+		{
+			get
+			{
+				if (_macroErrorBehaviour == null)
+				{
+					try
+					{
+						var behaviour = MacroErrorBehaviour.Inline;
+						var value = GetKey("/settings/content/MacroErrors");
+						if (value != null)
+						{
+							Enum<MacroErrorBehaviour>.TryParse(value, true, out behaviour);
+						}
+						_macroErrorBehaviour = behaviour;
+					}
+					catch (Exception ex)
+					{
+						LogHelper.Error<UmbracoSettings>("Could not load /settings/content/MacroErrors from umbracosettings.config", ex);
+						_macroErrorBehaviour = MacroErrorBehaviour.Inline;
+					}
+				}
+				return _macroErrorBehaviour.Value;
+			}
+		}
 
 		/// <summary>
 		/// Configuration regarding webservices

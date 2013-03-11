@@ -143,8 +143,10 @@
     <Compile Include="Models\ContentBase.cs" />
     <Compile Include="Models\ContentExtensions.cs" />
     <Compile Include="Enum.cs" />
+    <Compile Include="Events\MacroErrorEventArgs.cs" />
     <Compile Include="HashCodeCombiner.cs" />
     <Compile Include="IO\FileSystemWrapper.cs" />
+    <Compile Include="MacroErrorBehaviour.cs" />
     <Compile Include="Media\IImageUrlProvider.cs" />
     <Compile Include="Models\ContentTypeBase.cs" />
     <Compile Include="Models\ContentTypeCompositionBase.cs" />
