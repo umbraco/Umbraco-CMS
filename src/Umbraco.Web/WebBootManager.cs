@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -57,7 +58,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <returns></returns>
         public override IBootManager Initialize()
-        {
+        {            
             base.Initialize();
 
             // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
@@ -77,6 +78,19 @@ namespace Umbraco.Web
             ModelBinders.Binders.Add(new KeyValuePair<Type, IModelBinder>(typeof(RenderModel), new RenderModelBinder()));
 
             return this;
+        }
+
+        /// <summary>
+        /// Override this method in order to ensure that the UmbracoContext is also created, this can only be 
+        /// created after resolution is frozen!
+        /// </summary>
+        protected override void FreezeResolution()
+        {
+            base.FreezeResolution();
+
+            //before we do anything, we'll ensure the umbraco context
+            //see: http://issues.umbraco.org/issue/U4-1717
+            UmbracoContext.EnsureContext(new HttpContextWrapper(UmbracoApplication.Context), ApplicationContext);
         }
 
         /// <summary>

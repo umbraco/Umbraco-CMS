@@ -63,9 +63,8 @@ namespace Umbraco.Core
 				new PetaPocoUnitOfWorkProvider(dbFactory), 
 				new FileUnitOfWorkProvider(), 
 				new PublishingStrategy());
-			
-			//create the ApplicationContext
-			ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext);
+
+            CreateApplicationContext(dbContext, serviceContext);
 
             InitializeApplicationEventsResolver();
 
@@ -82,6 +81,17 @@ namespace Umbraco.Core
 
 			return this;
 		}
+
+        /// <summary>
+        /// Creates and assigns the application context singleton
+        /// </summary>
+        /// <param name="dbContext"></param>
+        /// <param name="serviceContext"></param>
+        protected virtual void CreateApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
+        {
+            //create the ApplicationContext
+            ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext);
+        }
 
         /// <summary>
         /// Special method to initialize the ApplicationEventsResolver and any modifications required for it such 
@@ -138,8 +148,7 @@ namespace Umbraco.Core
 			if (_isComplete)
 				throw new InvalidOperationException("The boot manager has already been completed");
 
-			//freeze resolution to not allow Resolvers to be modified
-			Resolution.Freeze();
+		    FreezeResolution();
 
 			//stop the timer and log the output
 			_timer.Dispose();
@@ -163,6 +172,14 @@ namespace Umbraco.Core
 
 			return this;
 		}
+
+        /// <summary>
+        /// Freeze resolution to not allow Resolvers to be modified
+        /// </summary>
+        protected virtual void FreezeResolution()
+        {
+            Resolution.Freeze();
+        }
 
 		/// <summary>
 		/// Create the resolvers

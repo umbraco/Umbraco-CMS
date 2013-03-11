@@ -50,23 +50,7 @@ namespace Umbraco.Web
 			legacyRequestInitializer.InitializeRequest();
 
 			// create the UmbracoContext singleton, one per request, and assign
-			var umbracoContext = new UmbracoContext(
-				httpContext,
-				ApplicationContext.Current);
-			UmbracoContext.Current = umbracoContext;
-
-			// create the nice urls provider
-			var niceUrls = new NiceUrlProvider(PublishedContentStoreResolver.Current.PublishedContentStore, umbracoContext);
-
-			// create the RoutingContext, and assign
-			var routingContext = new RoutingContext(
-				umbracoContext,
-				ContentFinderResolver.Current.Finders,
-				ContentLastChanceFinderResolver.Current.Finder,
-				PublishedContentStoreResolver.Current.PublishedContentStore,
-                niceUrls,
-                RoutesCacheResolver.Current.RoutesCache);
-			umbracoContext.RoutingContext = routingContext;
+            UmbracoContext.EnsureContext(httpContext, ApplicationContext.Current);            
 		}
 
 		/// <summary>
