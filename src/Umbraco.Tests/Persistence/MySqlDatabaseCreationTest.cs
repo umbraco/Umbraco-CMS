@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Persistence
 
         public override ISqlSyntaxProvider SyntaxProvider
         {
-            get { return MySqlSyntaxProvider.Instance; }
+            get { return MySqlSyntax.Provider; }
         }
 
         #endregion

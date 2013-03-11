@@ -5,16 +5,16 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models
 {
-	/// <summary>
-	/// The model used when rendering Partial View Macros
-	/// </summary>
-	public class PartialViewMacroModel
-	{
+    /// <summary>
+    /// The model used when rendering Partial View Macros
+    /// </summary>
+    public class PartialViewMacroModel
+    {
 
-        public PartialViewMacroModel(IPublishedContent page, 
-            int macroId, 
-            string macroAlias, 
-            string macroName, 
+        public PartialViewMacroModel(IPublishedContent page,
+            int macroId,
+            string macroAlias,
+            string macroName,
             IDictionary<string, object> macroParams)
         {
             Content = page;
@@ -26,11 +26,11 @@ namespace Umbraco.Web.Models
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("Use the constructor accepting the macro id instead")]
-		public PartialViewMacroModel(IPublishedContent page, IDictionary<string, object> macroParams)
-		{
+        public PartialViewMacroModel(IPublishedContent page, IDictionary<string, object> macroParams)
+        {
             Content = page;
-			MacroParameters = macroParams;
-		}
+            MacroParameters = macroParams;
+        }
 
 	    [EditorBrowsable(EditorBrowsableState.Never)]
 	    [Obsolete("Use the Content property instead")]
@@ -43,7 +43,7 @@ namespace Umbraco.Web.Models
         public string MacroName { get; private set; }
         public string MacroAlias { get; private set; }
         public int MacroId { get; private set; }
-		public IDictionary<string, object> MacroParameters { get; private set; }
+        public IDictionary<string, object> MacroParameters { get; private set; }
 
-	}
+    }
 }

@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
 
         public override string ToString()
         {
-            return SyntaxConfig.SqlSyntaxProvider.Format(Index);
+            return SqlSyntaxContext.SqlSyntaxProvider.Format(Index);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Migrations
         [SetUp]
         public void SetUp()
         {
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
         }
 
         [Test]

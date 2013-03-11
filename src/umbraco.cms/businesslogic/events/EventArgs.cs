@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Umbraco.Core;
 using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.web;
 
@@ -61,5 +62,6 @@ namespace umbraco.cms.businesslogic {
     {
         public bool CancelChildren { get; set; }
     }
+
     
 }

@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Persistence
                 //assign the service context
                 new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
 
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             _database = new Database("Datasource=|DataDirectory|test.sdf",
                                      "System.Data.SqlServerCe.4.0");
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Persistence
         {
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
-            SyntaxConfig.SqlSyntaxProvider = null;
+            SqlSyntaxContext.SqlSyntaxProvider = null;
 
             //reset the app context
             ApplicationContext.Current = null;

@@ -7,21 +7,20 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
     /// <summary>
-    /// Static class that provides simple access to the MySql SqlSyntax Providers singleton
+    /// Static class that provides simple access to the MySql SqlSyntax Provider
     /// </summary>
     internal static class MySqlSyntax
     {
-        public static ISqlSyntaxProvider Provider { get { return MySqlSyntaxProvider.Instance; } }
+        public static ISqlSyntaxProvider Provider { get { return new MySqlSyntaxProvider(); } }
     }
 
     /// <summary>
     /// Represents an SqlSyntaxProvider for MySql
     /// </summary>
-    internal class MySqlSyntaxProvider : SqlSyntaxProviderBase<MySqlSyntaxProvider>
+    [SqlSyntaxProviderAttribute("MySql.Data.MySqlClient")]
+    public class MySqlSyntaxProvider : SqlSyntaxProviderBase<MySqlSyntaxProvider>
     {
-        public static MySqlSyntaxProvider Instance = new MySqlSyntaxProvider();
-
-        private MySqlSyntaxProvider()
+        public MySqlSyntaxProvider()
         {
             DefaultStringLength = 255;
             StringLengthColumnDefinitionFormat = StringLengthUnicodeColumnDefinitionFormat;

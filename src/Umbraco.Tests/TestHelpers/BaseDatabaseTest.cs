@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlServerCe;
 using System.IO;
 using NUnit.Framework;
@@ -55,6 +56,9 @@ namespace Umbraco.Tests.TestHelpers
             RepositoryResolver.Current = new RepositoryResolver(
                 new RepositoryFactory());
 
+            SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
+                new List<Type> { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) }) { CanResolveBeforeFrozen = true };
+
             Resolution.Freeze();
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
@@ -62,7 +66,7 @@ namespace Umbraco.Tests.TestHelpers
                 //assign the service context
                 new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
 
-            SyntaxConfig.SqlSyntaxProvider = SyntaxProvider;
+            SqlSyntaxContext.SqlSyntaxProvider = SyntaxProvider;
 
             //Create the umbraco database
             _database = new Database(ConnectionString, ProviderName);

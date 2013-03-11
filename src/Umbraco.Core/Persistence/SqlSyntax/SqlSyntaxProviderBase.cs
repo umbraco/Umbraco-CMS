@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// All Sql Syntax provider implementations should derive from this abstract class.
     /// </remarks>
     /// <typeparam name="TSyntax"></typeparam>
-    internal abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
+    public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         where TSyntax : ISqlSyntaxProvider
     {
         protected SqlSyntaxProviderBase()

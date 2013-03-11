@@ -114,7 +114,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 sb.AppendLine(" ");
             }
 
-            if (SyntaxConfig.SqlSyntaxProvider is MySqlSyntaxProvider)
+            if (SqlSyntaxContext.SqlSyntaxProvider is MySqlSyntaxProvider)
             {
                 sb.AppendLine("Please note that the constraints could not be validated because the current dataprovider is MySql.");
             }

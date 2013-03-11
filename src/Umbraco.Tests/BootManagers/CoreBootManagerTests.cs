@@ -6,6 +6,7 @@ using System.Web;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Persistence.SqlSyntax;
 using umbraco.interfaces;
 
 namespace Umbraco.Tests.BootManagers
@@ -28,6 +29,7 @@ namespace Umbraco.Tests.BootManagers
             _testApp = null;
             
             ApplicationEventsResolver.Reset();
+            SqlSyntaxProvidersResolver.Reset();
         }
 
         /// <summary>
@@ -67,6 +69,12 @@ namespace Umbraco.Tests.BootManagers
             protected override void InitializeResolvers()
             {
                 //Do nothing as we don't want to initialize all resolvers in this test
+                //We only include this resolver to not cause trouble for the database context
+                SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
+                    PluginManager.Current.ResolveSqlSyntaxProviders())
+                                                         {
+                                                             CanResolveBeforeFrozen = true
+                                                         };
             }
         }
 

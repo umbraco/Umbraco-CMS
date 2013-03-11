@@ -12,6 +12,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Migrations;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 using umbraco.interfaces;
 using File = System.IO.File;
@@ -501,6 +502,15 @@ namespace Umbraco.Core
         internal IEnumerable<Type> ResolveMigrationTypes()
         {
             return ResolveTypes<IMigration>();
+        }
+
+        /// <summary>
+        /// Returns all SqlSyntaxProviders with the SqlSyntaxProviderAttribute
+        /// </summary>
+        /// <returns></returns>
+        internal IEnumerable<Type> ResolveSqlSyntaxProviders()
+        {
+            return ResolveTypesWithAttribute<ISqlSyntaxProvider, SqlSyntaxProviderAttribute>();
         }
 
         /// <summary>

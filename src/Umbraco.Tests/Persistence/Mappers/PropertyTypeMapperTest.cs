@@ -11,7 +11,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Id_Property()
         {
             // Arrange
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
             string column = new PropertyTypeMapper().Map("Id");
@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Alias_Property()
         {
             // Arrange
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
             string column = new PropertyTypeMapper().Map("Alias");
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_DataTypeDefinitionId_Property()
         {
             // Arrange
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
             string column = new PropertyTypeMapper().Map("DataTypeDefinitionId");
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_SortOrder_Property()
         {
             // Arrange
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
             string column = new PropertyTypeMapper().Map("SortOrder");
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_DataTypeControlId_Property()
         {
             // Arrange
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
             string column = new PropertyTypeMapper().Map("DataTypeId");
@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_DataTypeDatabaseType_Property()
         {
             // Arrange
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             // Act
             string column = new PropertyTypeMapper().Map("DataTypeDatabaseType");

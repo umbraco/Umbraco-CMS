@@ -17,8 +17,8 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 
         public override string ToString()
         {
-            return string.Format(SyntaxConfig.SqlSyntaxProvider.DropTable,
-                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(TableName));
+            return string.Format(SqlSyntaxContext.SqlSyntaxProvider.DropTable,
+                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(TableName));
         }
     }
 }

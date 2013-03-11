@@ -28,9 +28,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
             if (string.IsNullOrEmpty(Column.TableName))
                 Column.TableName = TableName;
 
-            return string.Format(SyntaxConfig.SqlSyntaxProvider.AddColumn,
-                                 SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(Column.TableName),
-                                 SyntaxConfig.SqlSyntaxProvider.Format(Column));
+            return string.Format(SqlSyntaxContext.SqlSyntaxProvider.AddColumn,
+                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(Column.TableName),
+                                 SqlSyntaxContext.SqlSyntaxProvider.Format(Column));
         }
     }
 }

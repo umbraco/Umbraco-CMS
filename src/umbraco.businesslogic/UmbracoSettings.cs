@@ -1,11 +1,7 @@
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Web;
-using System.Web.Caching;
 using System.Xml;
-using umbraco.BusinessLogic;
+using Umbraco.Core;
 using System.Collections.Generic;
 using umbraco.MacroEngines;
 
@@ -552,6 +548,18 @@ namespace umbraco
         public static bool ResolveUrlsFromTextString
         {
 			get { return Umbraco.Core.Configuration.UmbracoSettings.ResolveUrlsFromTextString; }
+        }
+
+        /// <summary>
+        /// This configuration setting defines how to handle macro errors:
+        /// - Inline - Show error within macro as text (default and current Umbraco 'normal' behavior)
+        /// - Silent - Suppress error and hide macro
+        /// - Throw  - Throw an exception and invoke the global error handler (if one is defined, if not you'll get a YSOD)
+        /// </summary>
+        /// <value>MacroErrorBehaviour enum defining how to handle macro errors.</value>
+        public static MacroErrorBehaviour MacroErrorBehaviour
+        {
+            get { return Umbraco.Core.Configuration.UmbracoSettings.MacroErrorBehaviour; }
         }
 
         /// <summary>

@@ -9,7 +9,7 @@ namespace Umbraco.Tests.TestHelpers
         [SetUp]
         public virtual void Initialize()
         {
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntaxProvider.Instance;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             SetUp();
         }
@@ -20,7 +20,7 @@ namespace Umbraco.Tests.TestHelpers
         [TearDown]
         public virtual void TearDown()
         {
-            SyntaxConfig.SqlSyntaxProvider = null;
+            SqlSyntaxContext.SqlSyntaxProvider = null;
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Data;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
-    internal class DbTypes<TSyntax>
+    public class DbTypes<TSyntax>
         where TSyntax : ISqlSyntaxProvider
     {
         public DbType DbType;

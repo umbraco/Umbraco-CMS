@@ -171,11 +171,7 @@ namespace umbraco.MacroEngines
                 Success = false;
                 ResultException = exception;
                 HttpContext.Current.Trace.Warn("umbracoMacro", string.Format("Error Loading Razor Script (file: {0}) {1} {2}", macro.Name, exception.Message, exception.StackTrace));
-                var loading = string.Format("<div style=\"border: 1px solid #990000\">Error loading Razor Script {0}</br/>", macro.ScriptName);
-                if (GlobalSettings.DebugMode)
-                    loading = loading + exception.Message;
-                loading = loading + "</div>";
-                return loading;
+                throw;
             }
         }
 

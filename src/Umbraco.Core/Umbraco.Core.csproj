@@ -147,8 +147,10 @@
     <Compile Include="Models\ContentBase.cs" />
     <Compile Include="Models\ContentExtensions.cs" />
     <Compile Include="Enum.cs" />
+    <Compile Include="Events\MacroErrorEventArgs.cs" />
     <Compile Include="HashCodeCombiner.cs" />
     <Compile Include="IO\FileSystemWrapper.cs" />
+    <Compile Include="MacroErrorBehaviour.cs" />
     <Compile Include="Media\IImageUrlProvider.cs" />
     <Compile Include="Models\ContentTypeBase.cs" />
     <Compile Include="Models\ContentTypeCompositionBase.cs" />
@@ -476,8 +478,10 @@
     <Compile Include="Persistence\SqlSyntax\MySqlSyntaxProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlCeSyntaxProvider.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlServerSyntaxProvider.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderAttribute.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderBase.cs" />
-    <Compile Include="Persistence\SqlSyntax\SyntaxConfig.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlSyntaxContext.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlSyntaxProvidersResolver.cs" />
     <Compile Include="Persistence\TransactionType.cs" />
     <Compile Include="Persistence\UmbracoDatabase.cs" />
     <Compile Include="Persistence\UnitOfWork\FileUnitOfWork.cs" />

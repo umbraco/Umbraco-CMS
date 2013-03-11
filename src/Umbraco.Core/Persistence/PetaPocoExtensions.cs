@@ -33,10 +33,10 @@ namespace Umbraco.Core.Persistence
             var tableDefinition = DefinitionFactory.GetTableDefinition(modelType);
             var tableName = tableDefinition.Name;
 
-            string createSql = SyntaxConfig.SqlSyntaxProvider.Format(tableDefinition);
-            string createPrimaryKeySql = SyntaxConfig.SqlSyntaxProvider.FormatPrimaryKey(tableDefinition);
-            var foreignSql = SyntaxConfig.SqlSyntaxProvider.Format(tableDefinition.ForeignKeys);
-            var indexSql = SyntaxConfig.SqlSyntaxProvider.Format(tableDefinition.Indexes);
+            string createSql = SqlSyntaxContext.SqlSyntaxProvider.Format(tableDefinition);
+            string createPrimaryKeySql = SqlSyntaxContext.SqlSyntaxProvider.FormatPrimaryKey(tableDefinition);
+            var foreignSql = SqlSyntaxContext.SqlSyntaxProvider.Format(tableDefinition.ForeignKeys);
+            var indexSql = SqlSyntaxContext.SqlSyntaxProvider.Format(tableDefinition.Indexes);
 
             var tableExist = db.TableExist(tableName);
             if (overwrite && tableExist)
@@ -65,18 +65,18 @@ namespace Umbraco.Core.Persistence
                         var e = new TableCreationEventArgs();
 
                         //Turn on identity insert if db provider is not mysql
-                        if (SyntaxConfig.SqlSyntaxProvider.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
-                            db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName))));
+                        if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
+                            db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName))));
                         
                         //Call the NewTable-event to trigger the insert of base/default data
                         NewTable(tableName, db, e);
 
                         //Turn off identity insert if db provider is not mysql
-                        if (SyntaxConfig.SqlSyntaxProvider.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
-                            db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName))));
+                        if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
+                            db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName))));
 
                         //Special case for MySql
-                        if (SyntaxConfig.SqlSyntaxProvider is MySqlSyntaxProvider && tableName.Equals("umbracoUser"))
+                        if (SqlSyntaxContext.SqlSyntaxProvider is MySqlSyntaxProvider && tableName.Equals("umbracoUser"))
                         {
                             db.Update<UserDto>("SET id = @IdAfter WHERE id = @IdBefore AND userLogin = @Login", new { IdAfter = 0, IdBefore = 1, Login = "admin" });
                         }
@@ -120,18 +120,18 @@ namespace Umbraco.Core.Persistence
 
         public static void DropTable(this Database db, string tableName)
         {
-            var sql = new Sql(string.Format("DROP TABLE {0}", SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName)));
+            var sql = new Sql(string.Format("DROP TABLE {0}", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName)));
             db.Execute(sql);
         }
 
         public static bool TableExist(this Database db, string tableName)
         {
-            return SyntaxConfig.SqlSyntaxProvider.DoesTableExist(db, tableName);
+            return SqlSyntaxContext.SqlSyntaxProvider.DoesTableExist(db, tableName);
         }
 
         public static bool TableExist(this UmbracoDatabase db, string tableName)
         {
-            return SyntaxConfig.SqlSyntaxProvider.DoesTableExist(db, tableName);
+            return SqlSyntaxContext.SqlSyntaxProvider.DoesTableExist(db, tableName);
         }
 
         public static void CreateDatabaseSchema(this Database db)

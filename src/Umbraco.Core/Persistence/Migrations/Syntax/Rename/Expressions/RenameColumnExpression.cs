@@ -52,7 +52,7 @@ SELECT CONCAT(
             if (IsExpressionSupported() == false)
                 return string.Empty;
 
-            return SyntaxConfig.SqlSyntaxProvider.FormatColumnRename(TableName, OldName, NewName);
+            return SqlSyntaxContext.SqlSyntaxProvider.FormatColumnRename(TableName, OldName, NewName);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Rename.Expressions
             if (IsExpressionSupported() == false)
                 return string.Empty;
             
-            return SyntaxConfig.SqlSyntaxProvider.FormatTableRename(OldName, NewName);
+            return SqlSyntaxContext.SqlSyntaxProvider.FormatTableRename(OldName, NewName);
         }
     }
 }
