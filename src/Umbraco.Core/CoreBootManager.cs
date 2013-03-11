@@ -168,7 +168,7 @@ namespace Umbraco.Core
 				new RepositoryFactory());
 
 		    SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
-		        PluginManager.Current.ResolveSqlSyntaxProviders())
+                new[] { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) })
 		        {
 		            CanResolveBeforeFrozen = true
 		        };
