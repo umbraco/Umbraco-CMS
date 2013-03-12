@@ -195,5 +195,18 @@ namespace Umbraco.Web.Cache
                 dc.Remove(new Guid(DistributedCache.MacroCacheRefresherId), macro1 => macro1.Id, macro);
             }
         }
+
+        /// <summary>
+        /// Removes the cache amongst servers for a macro item
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="macro"></param>
+        public static void RemoveMacroCache(this DistributedCache dc, macro macro)
+        {
+            if (macro != null && macro.Model != null)
+            {
+                dc.Remove(new Guid(DistributedCache.MacroCacheRefresherId), macro1 => macro1.Model.Id, macro);
+            }
+        }
     }
 }

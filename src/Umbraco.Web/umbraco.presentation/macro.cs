@@ -201,7 +201,7 @@ namespace umbraco
         {
             if (this.Model != null)
             {
-                DistributedCache.Instance.RemoveMacroCache(this.Model.Id);    
+                DistributedCache.Instance.RemoveMacroCache(this);    
             }
             
             //this always returned false... hrm. oh well i guess we leave it like that
@@ -210,7 +210,7 @@ namespace umbraco
 
         string GetCacheIdentifier(MacroModel model, Hashtable pageElements, int pageId)
         {
-            StringBuilder id = new StringBuilder();
+            var id = new StringBuilder();
 
             var alias = string.IsNullOrEmpty(model.ScriptCode) ? model.Alias : Macro.GenerateCacheKeyFromCode(model.ScriptCode);
             id.AppendFormat("{0}-", alias);
