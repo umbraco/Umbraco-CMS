@@ -117,7 +117,7 @@ namespace Umbraco.Core
 	    {
 	        foreach (DictionaryEntry c in _cache)
 	        {
-	            if (c.Key is string && ((string) c.Key).StartsWith(keyStartsWith))
+	            if (c.Key is string && ((string) c.Key).InvariantStartsWith(keyStartsWith))
 	            {
 	                ClearCacheItem((string) c.Key);
 	            }
