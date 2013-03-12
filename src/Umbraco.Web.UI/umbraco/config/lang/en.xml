@@ -5,7 +5,7 @@
     <link>http://umbraco.org</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Manage hostnames</key>
+    <key alias="assignDomain">Culture and Hostnames</key>
     <key alias="auditTrail">Audit Trail</key>
     <key alias="browse">Browse Node</key>
     <key alias="copy">Copy</key>
@@ -36,19 +36,31 @@
     <key alias="update">Update</key>
   </area>
   <area alias="assignDomain">
+    <key alias="permissionDenied">Permission denied.</key>
     <key alias="addNew">Add new Domain</key>
-    <key alias="invalidDomain">Invalid hostname</key>
+    <key alias="remove">remove</key>
+    <key alias="invalidNode">Invalid node.</key>
+    <key alias="invalidDomain">Invalid domain format.</key>
+    <key alias="duplicateDomain">Domain has already been assigned.</key>
     <key alias="domain">Domain</key>
+    <key alias="language">Language</key>
     <key alias="domainCreated">New domain '%0%' has been created</key>
     <key alias="domainDeleted">Domain '%0%' is deleted</key>
     <key alias="domainExists">Domain '%0%' has already been assigned</key>
     <key alias="domainHelp">
-      <![CDATA[eg: example.com, www.example.com, example.com:8080,<br/>
-        https://www.example.com/, example.com/en, etc. Use * to match<br/>
-	any domain and just set the culture.]]>
+      <![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080" or
+        "https://www.example.com/".<br /><br />One-level paths in domains are supported, eg. "example.com/en". However, they
+        they should be avoided. Better use the culture setting above.]]>
     </key>
     <key alias="domainUpdated">Domain '%0%' has been updated</key>
     <key alias="orEdit">Edit Current Domains</key>
+    <key alias="inherit">Inherit</key>
+    <key alias="setLanguage">Culture</key>
+    <key alias="setLanguageHelp">
+      <![CDATA[Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br />
+      to the current node, unless a domain below applies too.]]>
+    </key>
+    <key alias="setDomains">Domains</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
