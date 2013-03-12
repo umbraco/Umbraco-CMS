@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Tests.PartialTrust;
@@ -16,7 +17,16 @@ namespace Umbraco.Tests
 			TestHelper.SetupLog4NetForTests();
 		}
 
-		[Test]
+	    [Test]
+	    public void Can_Convert_List_To_Enumerable()
+	    {
+	        var list = new List<string>() {"hello", "world", "awesome"};
+	        var result = list.TryConvertTo<IEnumerable<string>>();
+	        Assert.IsTrue(result.Success);
+            Assert.AreEqual(3, result.Result.Count());
+	    }
+
+	    [Test]
 		public void ObjectExtensions_Object_To_Dictionary()
 		{
 			//Arrange
@@ -38,7 +48,6 @@ namespace Umbraco.Tests
 		}
 
 		[Test]
-		[TestOnlyInFullTrust]
 		public void CanConvertIntToNullableInt()
 		{
 			var i = 1;
@@ -47,7 +56,6 @@ namespace Umbraco.Tests
 		}
 
 		[Test]
-		[TestOnlyInFullTrust]
 		public void CanConvertNullableIntToInt()
 		{
 			int? i = 1;
@@ -56,7 +64,6 @@ namespace Umbraco.Tests
 		}
 
 		[Test]
-		[TestOnlyInFullTrust]
 		public virtual void CanConvertStringToBool()
 		{
 			var testCases = new Dictionary<string, bool>
@@ -82,7 +89,6 @@ namespace Umbraco.Tests
 		}
 
 		[Test]
-		[TestOnlyInFullTrust]
 		public virtual void CanConvertStringToDateTime()
 		{
 			var dateTime = new DateTime(2012, 11, 10, 13, 14, 15);

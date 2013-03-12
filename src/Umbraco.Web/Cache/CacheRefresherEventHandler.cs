@@ -19,6 +19,10 @@ namespace Umbraco.Web.Cache
         {
             if (UmbracoSettings.UmbracoLibraryCacheDuration <= 0) return;
 
+            //Bind to content events - currently used for macro clearing
+            content.AfterUpdateDocumentCache += content_AfterUpdateDocumentCache;
+            content.AfterClearDocumentCache += content_AfterClearDocumentCache;
+
             //Bind to user events
 
             User.Saving += UserSaving;
@@ -48,6 +52,26 @@ namespace Umbraco.Web.Cache
             MediaService.Deleting += MediaServiceDeleting;
             MediaService.Moving += MediaServiceMoving;
             MediaService.Trashing += MediaServiceTrashing;
+        }
+
+        /// <summary>
+        /// Fires after the document cache has been cleared for a particular document
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void content_AfterClearDocumentCache(global::umbraco.cms.businesslogic.web.Document sender, DocumentCacheEventArgs e)
+        {
+            DistributedCache.Instance.ClearAllMacroCache();
+        }
+
+        /// <summary>
+        /// Fires after the document cache has been updated for a particular document
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void content_AfterUpdateDocumentCache(global::umbraco.cms.businesslogic.web.Document sender, DocumentCacheEventArgs e)
+        {
+            DistributedCache.Instance.ClearAllMacroCache();
         }
 
         static void UserDeleting(User sender, System.EventArgs e)

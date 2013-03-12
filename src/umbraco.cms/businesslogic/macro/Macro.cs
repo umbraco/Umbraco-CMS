@@ -550,7 +550,7 @@ namespace umbraco.cms.businesslogic.macro
 					       : MacroTypes.Script;
 			}
 
-	        if (!string.IsNullOrEmpty(scriptType) && scriptType.ToLower().IndexOf(".ascx") > -1)
+	        if (!string.IsNullOrEmpty(scriptType) && scriptType.ToLowerInvariant().IndexOf(".ascx", StringComparison.InvariantCultureIgnoreCase) > -1)
 		        return MacroTypes.UserControl;
 	        
 			if (!string.IsNullOrEmpty(scriptType) && !string.IsNullOrEmpty(scriptAssembly))
@@ -582,7 +582,7 @@ namespace umbraco.cms.businesslogic.macro
         
         private static string GetCacheKey(string alias)
         {
-            return CacheKeys.UmbracoMacroCacheKey + alias;
+            return CacheKeys.MacroCacheKey + alias;
         }
 
         #endregion

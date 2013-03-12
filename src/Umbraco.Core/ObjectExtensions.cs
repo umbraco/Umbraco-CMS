@@ -52,6 +52,19 @@ namespace Umbraco.Core
 		public static Attempt<T> TryConvertTo<T>(this object input)
 		{
 			var result = TryConvertTo(input, typeof(T));
+            if (!result.Success)
+            {
+                //just try a straight up conversion
+                try
+                {
+                    var converted = (T) input;
+                    return new Attempt<T>(true, converted);
+                }
+                catch (Exception e)
+                {
+                    return new Attempt<T>(e);
+                }
+            }
 			return !result.Success ? Attempt<T>.False : new Attempt<T>(true, (T)result.Result);
 		}
 
@@ -72,11 +85,21 @@ namespace Umbraco.Core
 
 			if (!destinationType.IsGenericType || destinationType.GetGenericTypeDefinition() != typeof(Nullable<>))
 			{
+                //TODO: Do a check for destination type being IEnumerable<T> and source type implementing IEnumerable<T> with
+                // the same 'T', then we'd have to find the extension method for the type AsEnumerable() and execute it.
+
 				if (TypeHelper.IsTypeAssignableFrom(destinationType, input.GetType())
 					&& TypeHelper.IsTypeAssignableFrom<IConvertible>(input))
 				{
-					var casted = Convert.ChangeType(input, destinationType);
-					return new Attempt<object>(true, casted);
+                    try
+                    {
+                        var casted = Convert.ChangeType(input, destinationType);
+                        return new Attempt<object>(true, casted);
+                    }
+                    catch (Exception e)
+                    {
+                        return new Attempt<object>(e);
+                    }
 				}
 			}
 

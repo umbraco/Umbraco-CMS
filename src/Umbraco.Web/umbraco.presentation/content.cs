@@ -7,6 +7,7 @@ using System.Threading;
 using System.Web;
 using System.Xml;
 using System.Xml.XPath;
+using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
@@ -136,9 +137,10 @@ namespace umbraco
             {
                 lock (XmlContentInternalSyncLock)
                 {
-                    // Clear macro cache
-                    Cache.ClearCacheObjectTypes("umbraco.MacroCacheContent");
-                    Cache.ClearCacheByKeySearch("macroHtml_");
+                    //SD: Cache clearance moved to event handling: CacheRefresherEventHandler
+                    //// Clear macro cache
+                    //Cache.ClearCacheObjectTypes("umbraco.MacroCacheContent");
+                    //Cache.ClearCacheByKeySearch(CacheKeys.MacroHtmlCacheKey);
 
                     // Clear library cache
                     if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
@@ -641,14 +643,15 @@ namespace umbraco
                     Action.RunActionHandlers(doc, ActionUnPublish.Instance);
                 }
 
+                //SD: changed to fire event BEFORE running the sitemap!! argh.
+                FireAfterClearDocumentCache(doc, e);
+
                 // update sitemapprovider
                 if (SiteMap.Provider is UmbracoSiteMapProvider)
                 {
                     var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
                     prov.RemoveNode(doc.Id);
-                }
-
-                FireAfterClearDocumentCache(doc, e);
+                }                
             }
         }
 

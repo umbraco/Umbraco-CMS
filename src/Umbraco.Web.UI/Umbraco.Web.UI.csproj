@@ -473,6 +473,12 @@
     <Compile Include="Umbraco\Umbraco.aspx.designer.cs">
       <DependentUpon>umbraco.aspx</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\Test.ascx.cs">
+      <DependentUpon>Test.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Test.ascx.designer.cs">
+      <DependentUpon>Test.ascx</DependentUpon>
+    </Compile>
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
     <None Include="Config\404handlers.Release.config">
@@ -1991,6 +1997,7 @@
     <None Include="umbraco_client\CodeMirror\js\mode\r\LICENSE" />
     <Content Include="umbraco_client\CodeMirror\js\mode\sieve\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\xquery\LICENSE" />
+    <Content Include="UserControls\Test.ascx" />
     <Content Include="Views\Web.config" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -2441,7 +2448,6 @@
     <Folder Include="Scripts\" />
     <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
     <Folder Include="Umbraco_Client\Tags\images\" />
-    <Folder Include="UserControls\" />
     <Folder Include="Xslt\" />
   </ItemGroup>
   <PropertyGroup>

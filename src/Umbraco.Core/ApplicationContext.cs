@@ -210,12 +210,20 @@ namespace Umbraco.Core
                 // Check again now we're inside the lock
                 if (_disposed) return;
 
-                //First we'll reset all resolvers
+                //clear the cache
+                ApplicationCache.ClearAllCache();
+                //reset all resolvers
                 ResolverCollection.ResetAll();
-                //Next resolution itself (though this should be taken care of by resetting any of the resolvers above)
+                //reset resolution itself (though this should be taken care of by resetting any of the resolvers above)
                 Resolution.Reset();
-                //Next, lets reset the plugin manager
+                //reset the plugin manager
                 PluginManager.Current = null;
+
+                //reset the instance objects
+                this.ApplicationCache = null;
+                this.DatabaseContext = null;
+                this.Services = null;
+                this.IsReady = false;
                 
                 // Indicate that the instance has been disposed.
                 _disposed = true;

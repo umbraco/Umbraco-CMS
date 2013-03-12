@@ -68,10 +68,14 @@ namespace Umbraco.Core
             {
 				lock (Locker)
 				{
-					foreach (var c in from DictionaryEntry c in _cache where _cache[c.Key.ToString()] != null && _cache[c.Key.ToString()].GetType().ToString() == typeName select c)
-					{
-						_cache.Remove(c.Key.ToString());
-					}
+				    foreach (DictionaryEntry c in _cache)
+				    {
+				        if (_cache[c.Key.ToString()] != null 
+                            && _cache[c.Key.ToString()].GetType().ToString().InvariantEquals(typeName))
+				        {
+				            _cache.Remove(c.Key.ToString());
+				        }
+				    }
 				}	            
             }
             catch (Exception e)
@@ -81,15 +85,59 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Clears all objects in the System.Web.Cache with the System.Type specified
+        /// </summary>
+	    public void ClearCacheObjectTypes<T>()
+	    {
+            try
+            {
+                lock (Locker)
+                {
+                    foreach (DictionaryEntry c in _cache)
+                    {
+                        if (_cache[c.Key.ToString()] != null
+                            && _cache[c.Key.ToString()].GetType() == typeof(T))
+                        {
+                            _cache.Remove(c.Key.ToString());
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                LogHelper.Error<CacheHelper>("Cache clearing error", e);
+            }
+	    }
+
+	    /// <summary>
         /// Clears all cache items that starts with the key passed.
         /// </summary>
         /// <param name="keyStartsWith">The start of the key</param>
         public void ClearCacheByKeySearch(string keyStartsWith)
-        {
-	        foreach (var c in from DictionaryEntry c in _cache where c.Key is string && ((string)c.Key).StartsWith(keyStartsWith) select c)
+	    {
+	        foreach (DictionaryEntry c in _cache)
 	        {
-		        ClearCacheItem((string)c.Key);
+	            if (c.Key is string && ((string) c.Key).StartsWith(keyStartsWith))
+	            {
+	                ClearCacheItem((string) c.Key);
+	            }
 	        }
+	    }
+
+	    /// <summary>
+        /// Returns a cache item by key, does not update the cache if it isn't there.
+        /// </summary>
+        /// <typeparam name="TT"></typeparam>
+        /// <param name="cacheKey"></param>
+        /// <returns></returns>
+        public TT GetCacheItem<TT>(string cacheKey)
+        {
+            var result = _cache.Get(cacheKey);
+            if (result == null)
+            {
+                return default(TT);
+            }
+            return result.TryConvertTo<TT>().Result;
         }
 
         /// <summary>
@@ -109,7 +157,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <typeparam name="TT"></typeparam>
         /// <param name="cacheKey"></param>
-        /// <param name="timeout"></param>
+        /// <param name="timeout">This will set an absolute expiration from now until the timeout</param>
         /// <param name="getCacheItem"></param>
         /// <returns></returns>
         public TT GetCacheItem<TT>(string cacheKey,
@@ -118,6 +166,15 @@ namespace Umbraco.Core
             return GetCacheItem(cacheKey, null, timeout, getCacheItem);
         }
 
+        /// <summary>
+        /// Gets (and adds if necessary) an item from the cache with the specified absolute expiration date (from NOW)
+        /// </summary>
+        /// <typeparam name="TT"></typeparam>
+        /// <param name="cacheKey"></param>
+        /// <param name="refreshAction"></param>
+        /// <param name="timeout">This will set an absolute expiration from now until the timeout</param>
+        /// <param name="getCacheItem"></param>
+        /// <returns></returns>
         public TT GetCacheItem<TT>(string cacheKey,
             CacheItemRemovedCallback refreshAction, TimeSpan timeout,
             Func<TT> getCacheItem)
@@ -125,6 +182,16 @@ namespace Umbraco.Core
             return GetCacheItem(cacheKey, CacheItemPriority.Normal, refreshAction, timeout, getCacheItem);
         }
 
+        /// <summary>
+        /// Gets (and adds if necessary) an item from the cache with the specified absolute expiration date (from NOW)
+        /// </summary>
+        /// <typeparam name="TT"></typeparam>
+        /// <param name="cacheKey"></param>
+        /// <param name="priority"></param>
+        /// <param name="refreshAction"></param>
+        /// <param name="timeout">This will set an absolute expiration from now until the timeout</param>
+        /// <param name="getCacheItem"></param>
+        /// <returns></returns>
         public TT GetCacheItem<TT>(string cacheKey,
             CacheItemPriority priority, CacheItemRemovedCallback refreshAction, TimeSpan timeout,
             Func<TT> getCacheItem)
@@ -132,6 +199,17 @@ namespace Umbraco.Core
             return GetCacheItem(cacheKey, priority, refreshAction, null, timeout, getCacheItem);
         }
 
+        /// <summary>
+        /// Gets (and adds if necessary) an item from the cache with the specified absolute expiration date (from NOW)
+        /// </summary>
+        /// <typeparam name="TT"></typeparam>
+        /// <param name="cacheKey"></param>
+        /// <param name="priority"></param>
+        /// <param name="refreshAction"></param>
+        /// <param name="cacheDependency"></param>
+        /// <param name="timeout">This will set an absolute expiration from now until the timeout</param>
+        /// <param name="getCacheItem"></param>
+        /// <returns></returns>
         public TT GetCacheItem<TT>(string cacheKey,
             CacheItemPriority priority, 
 			CacheItemRemovedCallback refreshAction,
@@ -152,7 +230,7 @@ namespace Umbraco.Core
 		/// <param name="priority"></param>
 		/// <param name="refreshAction"></param>
 		/// <param name="cacheDependency"></param>
-		/// <param name="timeout"></param>
+        /// <param name="timeout">This will set an absolute expiration from now until the timeout</param>
 		/// <param name="getCacheItem"></param>
 		/// <param name="syncLock"></param>
 		/// <returns></returns>
@@ -179,8 +257,70 @@ namespace Umbraco.Core
 					}
 				}
 			}
-			return (TT)result;
+			return result.TryConvertTo<TT>().Result;
 		}
-    }
+
+        /// <summary>
+        /// Inserts an item into the cache, if it already exists in the cache it will be replaced
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cacheKey"></param>
+        /// <param name="priority"></param>
+        /// <param name="timeout">This will set an absolute expiration from now until the timeout</param>
+        /// <param name="getCacheItem"></param>
+        public void InsertCacheItem<T>(string cacheKey,
+                                       CacheItemPriority priority,
+                                       TimeSpan timeout,
+                                       Func<T> getCacheItem)
+        {
+            InsertCacheItem(cacheKey, priority, null, null, timeout, getCacheItem);
+        }
+
+	    /// <summary>
+	    /// Inserts an item into the cache, if it already exists in the cache it will be replaced
+	    /// </summary>
+	    /// <typeparam name="T"></typeparam>
+	    /// <param name="cacheKey"></param>
+	    /// <param name="priority"></param>
+	    /// <param name="cacheDependency"></param>
+	    /// <param name="timeout">This will set an absolute expiration from now until the timeout</param>
+	    /// <param name="getCacheItem"></param>
+	    public void InsertCacheItem<T>(string cacheKey,
+	                                   CacheItemPriority priority,
+	                                   CacheDependency cacheDependency,
+	                                   TimeSpan timeout,
+	                                   Func<T> getCacheItem)
+	    {
+	        InsertCacheItem(cacheKey, priority, null, cacheDependency, timeout, getCacheItem);
+	    }
+
+        /// <summary>
+        /// Inserts an item into the cache, if it already exists in the cache it will be replaced
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cacheKey"></param>
+        /// <param name="priority"></param>
+        /// <param name="refreshAction"></param>
+        /// <param name="cacheDependency"></param>
+        /// <param name="timeout">This will set an absolute expiration from now until the timeout</param>
+        /// <param name="getCacheItem"></param>
+	    public void InsertCacheItem<T>(string cacheKey,
+	                                   CacheItemPriority priority,
+	                                   CacheItemRemovedCallback refreshAction,
+	                                   CacheDependency cacheDependency,
+	                                   TimeSpan? timeout,
+	                                   Func<T> getCacheItem)
+	    {
+	        object result = getCacheItem();
+	        if (result != null)
+	        {
+	            //we use Insert instead of add if for some crazy reason there is now a cache with the cache key in there, it will just overwrite it.
+	            _cache.Insert(cacheKey, result, cacheDependency,
+	                          timeout == null ? System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value),
+	                          TimeSpan.Zero, priority, refreshAction);
+	        }
+	    }
+
+	}
 
 }
