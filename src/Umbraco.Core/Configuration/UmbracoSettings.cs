@@ -54,7 +54,7 @@ namespace Umbraco.Core.Configuration
         /// <summary>
 		/// Used in unit testing to reset all config items that were set with property setters (i.e. did not come from config)
 		/// </summary>
-		private static void ResetSetters()
+		private static void ResetInternal()
 		{
 			_addTrailingSlash = null;			
 			_forceSafeAliases = null;
@@ -1452,7 +1452,7 @@ namespace Umbraco.Core.Configuration
         /// <remarks>To be used in unit tests.</remarks>
         internal static void Reset()
         {
-            ResetSetters();
+            ResetInternal();
 
             using (new WriteLock(SectionsLock))
             {

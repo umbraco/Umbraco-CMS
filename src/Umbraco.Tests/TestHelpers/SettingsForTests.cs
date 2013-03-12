@@ -100,7 +100,8 @@ namespace Umbraco.Tests.TestHelpers
         public static void Reset()
         {
             UmbracoSettings.Reset();
-            GlobalSettings.ResetCache();
+            GlobalSettings.Reset();
+
             foreach (var kvp in SavedAppSettings)
                 ConfigurationManager.AppSettings.Set(kvp.Key, kvp.Value);
 
