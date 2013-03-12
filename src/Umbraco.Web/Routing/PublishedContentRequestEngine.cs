@@ -166,7 +166,7 @@ namespace Umbraco.Web.Routing
 			LogHelper.Debug<PublishedContentRequestEngine>("{0}Uri=\"{1}\"", () => tracePrefix, () => _pcr.Uri);
 
 			// try to find a domain matching the current request
-			var domainAndUri = DomainHelper.DomainMatch(Domain.GetDomains().ToArray(), _pcr.Uri, false);
+            var domainAndUri = DomainHelper.DomainForUri(DomainHelper.GetAllDomains(false), _pcr.Uri);
 
 			// handle domain
 			if (domainAndUri != null)
@@ -216,7 +216,7 @@ namespace Umbraco.Web.Routing
 			var nodePath = _pcr.PublishedContent.Path;
 			LogHelper.Debug<PublishedContentRequestEngine>("{0}Path=\"{1}\"", () => tracePrefix, () => nodePath);
 			var rootNodeId = _pcr.HasDomain ? _pcr.Domain.RootNodeId : (int?)null;
-			var domain = DomainHelper.LookForWildcardDomain(Domain.GetDomains().ToArray(), nodePath, rootNodeId);
+			var domain = DomainHelper.FindWildcardDomainInPath(DomainHelper.GetAllDomains(true), nodePath, rootNodeId);
 
 			if (domain != null)
 			{
@@ -270,24 +270,22 @@ namespace Umbraco.Web.Routing
                 // recurse
                 var subdir = directory.GetDirectories(alias.Substring(0, pos)).FirstOrDefault();
                 alias = alias.Substring(pos + 1);
-                return subdir == null ? false : FindTemplateRenderingEngineInDirectory(subdir, alias, extensions);
+                return subdir != null && FindTemplateRenderingEngineInDirectory(subdir, alias, extensions);
             }
-            else
-            {
-                // look here
-                return directory.GetFiles().Any(f => extensions.Any(e => f.Name.InvariantEquals(alias + e)));
-            }
+
+            // look here
+            return directory.GetFiles().Any(f => extensions.Any(e => f.Name.InvariantEquals(alias + e)));
         }
 
 		#endregion
 
 		#region Document and template
 
-		/// <summary>
-		/// Finds the Umbraco document (if any) matching the request, and updates the PublishedContentRequest accordingly.
-		/// </summary>
-		/// <returns>A value indicating whether a document and template were found.</returns>
-		private bool FindPublishedContentAndTemplate()
+	    /// <summary>
+	    /// Finds the Umbraco document (if any) matching the request, and updates the PublishedContentRequest accordingly.
+	    /// </summary>
+	    /// <returns>A value indicating whether a document and template were found.</returns>
+	    private void FindPublishedContentAndTemplate()
 		{
 			const string tracePrefix = "FindPublishedContentAndTemplate: ";
 			LogHelper.Debug<PublishedContentRequestEngine>("{0}Path=\"{1}\"", () => tracePrefix, () => _pcr.Uri.AbsolutePath);
@@ -299,7 +297,7 @@ namespace Umbraco.Web.Routing
             // whoever called us is in charge of actually redirecting
             // -- do not process anything any further --
             if (_pcr.IsRedirect)
-	            return true;
+	            return;
 
 			// not handling umbracoRedirect here but after LookupDocument2
 			// so internal redirect, 404, etc has precedence over redirect
@@ -315,14 +313,13 @@ namespace Umbraco.Web.Routing
 
 			// handle wildcard domains
 			HandleWildcardDomains();
-
-			return _pcr.HasPublishedContent && _pcr.HasTemplate;
 		}
 
-		/// <summary>
-		/// Tries to find the document matching the request, by running the IPublishedContentFinder instances.
-		/// </summary>
-		internal void FindPublishedContent()
+	    /// <summary>
+	    /// Tries to find the document matching the request, by running the IPublishedContentFinder instances.
+	    /// </summary>
+        /// <exception cref="InvalidOperationException">There is no finder collection.</exception>
+	    internal void FindPublishedContent()
 		{
 			const string tracePrefix = "FindPublishedContent: ";
 
@@ -334,10 +331,12 @@ namespace Umbraco.Web.Routing
 				() => string.Format("{0}Begin finders", tracePrefix),
 				() => string.Format("{0}End finders, {1}", tracePrefix, (_pcr.HasPublishedContent ? "a document was found" : "no document was found"))))
 			{
-				_routingContext.PublishedContentFinders.Any(lookup => lookup.TryFindDocument(_pcr));
+			    if (_routingContext.PublishedContentFinders == null)
+                    throw new InvalidOperationException("There is no finder collection.");
+			    _routingContext.PublishedContentFinders.Any(finder => finder.TryFindDocument(_pcr));
 			}
 
-			// indicate that the published content (if any) we have at the moment is the
+		    // indicate that the published content (if any) we have at the moment is the
 			// one that was found by the standard finders before anything else took place.
 		    _pcr.SetIsInitialPublishedContent();
 		}
@@ -622,7 +621,7 @@ namespace Umbraco.Web.Routing
 		    var redirectId = _pcr.PublishedContent.GetPropertyValue("umbracoRedirect", -1);				
 		    var redirectUrl = "#";
 		    if (redirectId > 0)
-				redirectUrl = _routingContext.NiceUrlProvider.GetNiceUrl(redirectId);
+				redirectUrl = _routingContext.UrlProvider.GetUrl(redirectId);
 		    if (redirectUrl != "#")
 		        _pcr.SetRedirect(redirectUrl);
 		}

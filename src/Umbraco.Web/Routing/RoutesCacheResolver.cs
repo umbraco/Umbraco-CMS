@@ -32,7 +32,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		public IRoutesCache RoutesCache
 		{
-			get { return this.Value; }
+			get { return Value; }
 		}
 	}
 }

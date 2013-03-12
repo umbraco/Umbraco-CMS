@@ -326,6 +326,13 @@
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
     <Compile Include="Search\ExamineIndexerModel.cs" />
     <Compile Include="Search\LuceneIndexerExtensions.cs" />
+    <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.cs">
+      <DependentUpon>AssignDomain2.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.designer.cs">
+      <DependentUpon>AssignDomain2.aspx</DependentUpon>
+    </Compile>
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
@@ -379,15 +386,24 @@
     <Compile Include="RenderFieldCaseType.cs" />
     <Compile Include="RenderFieldEncodingType.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
+    <Compile Include="Routing\AliasUrlProvider.cs" />
     <Compile Include="Routing\ContentFinderByLegacy404.cs" />
     <Compile Include="Routing\ContentFinderByNotFoundHandler.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQuery.cs" />
     <Compile Include="Mvc\SurfaceControllerResolver.cs" />
     <Compile Include="Routing\ContentFinderByNotFoundHandlers.cs" />
+    <Compile Include="Routing\ISiteDomainHelper.cs" />
     <Compile Include="Routing\RoutableAttemptEventArgs.cs" />
+    <Compile Include="Routing\DefaultUrlProvider.cs" />
+    <Compile Include="Routing\DomainAndUri.cs" />
+    <Compile Include="Routing\IUrlProvider.cs" />
+    <Compile Include="Routing\SiteDomainHelper.cs" />
+    <Compile Include="Routing\SiteDomainHelperResolver.cs" />
+    <Compile Include="Routing\UrlProviderResolver.cs" />
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
     <Compile Include="Routing\EnsureRoutableOutcome.cs" />
     <Compile Include="Routing\PublishedContentRequestEngine.cs" />
+    <Compile Include="Routing\UrlProvider.cs" />
     <Compile Include="Routing\WebServicesRouteConstraint.cs" />
     <Compile Include="Search\ExamineSearcherModel.cs" />
     <Compile Include="Search\ExamineEvents.cs" />
@@ -569,7 +585,6 @@
     <Compile Include="Routing\ContentFinderByNiceUrl.cs" />
     <Compile Include="Routing\ContentFinderByNiceUrlAndTemplate.cs" />
     <Compile Include="Routing\ContentFinderByProfile.cs" />
-    <Compile Include="Routing\NiceUrlProvider.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="Routing\DomainHelper.cs" />
     <Compile Include="Routing\ContentFinderResolver.cs" />
@@ -1763,6 +1778,7 @@
     </Compile>
     <Compile Include="WebServices\BulkPublishController.cs" />
     <Compile Include="WebServices\CoreStringsController.cs" />
+    <Compile Include="WebServices\DomainsApiController.cs" />
     <Compile Include="WebServices\ExamineManagementApiController.cs" />
     <Compile Include="WebServices\FolderBrowserService.cs" />
     <Compile Include="WebServices\SaveFileController.cs" />
@@ -1786,6 +1802,9 @@
     <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardIntro.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardKits.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\StartupDashboardVideos.ascx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\TemplateSkinning.aspx" />
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\CssParser.aspx" />
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\ImageUploader.aspx" />

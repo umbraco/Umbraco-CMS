@@ -1,9 +1,6 @@
 using System;
-using System.Diagnostics;
-using System.Xml;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using umbraco.interfaces;
 using Umbraco.Core;
 
 namespace Umbraco.Web.Routing
@@ -26,10 +23,10 @@ namespace Umbraco.Web.Routing
             IPublishedContent node = null;
 			var path = docRequest.Uri.GetAbsolutePathDecoded();
 
-            int nodeId = -1;
+            var nodeId = -1;
 			if (path != "/") // no id if "/"
             {
-				string noSlashPath = path.Substring(1);
+				var noSlashPath = path.Substring(1);
 
                 if (!Int32.TryParse(noSlashPath, out nodeId))
                     nodeId = -1;

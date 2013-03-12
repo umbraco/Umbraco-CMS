@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Routing
 			
 			// get the nice url for 100111
 			routingContext = GetRoutingContext(url);
-			Assert.AreEqual("http://domain2.com/1001-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100111, true));
+			Assert.AreEqual("http://domain2.com/1001-1-1/", routingContext.UrlProvider.GetUrl(100111, true));
 
 			// check that the proper route has been cached
 			var cachedRoutes = ((DefaultRoutesCache)routingContext.RoutesCache).GetCachedRoutes();
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Routing
 			//Assert.AreEqual("1001/1001-1/1001-1-1", cachedRoutes[100111]); // yes
 
 			// what's the nice url now?
-			Assert.AreEqual("http://domain2.com/1001-1-1/", routingContext.NiceUrlProvider.GetNiceUrl(100111)); // good
+			Assert.AreEqual("http://domain2.com/1001-1-1/", routingContext.UrlProvider.GetUrl(100111)); // good
 			//Assert.AreEqual("http://domain1.com/1001-1/1001-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100111, true)); // bad
 		}
 
@@ -69,6 +69,10 @@ namespace Umbraco.Tests.Routing
 
             // ensure we can create them although the content is not in the database
             TestHelper.DropForeignKeys("umbracoDomains");
+
+            SiteDomainHelperResolver.Reset();
+            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
+            FreezeResolution();
         }
 
 		internal override IRoutesCache GetRoutesCache()

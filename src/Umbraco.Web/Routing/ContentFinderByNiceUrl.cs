@@ -1,8 +1,5 @@
-using System.Diagnostics;
-using System.Xml;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using umbraco.interfaces;
 using Umbraco.Core;
 
 namespace Umbraco.Web.Routing
@@ -97,7 +94,8 @@ namespace Umbraco.Web.Routing
                     docreq.PublishedContent = node;
 					LogHelper.Debug<ContentFinderByNiceUrl>("Query matches, id={0}", () => docreq.PublishedContent.Id);
 
-					var iscanon = _doDomainLookup && !DomainHelper.ExistsDomainInPath(docreq.Domain, node.Path);
+                    var rootNodeId = docreq.Domain == null ? (int?) null : docreq.Domain.RootNodeId;
+					var iscanon = _doDomainLookup && !DomainHelper.ExistsDomainInPath(DomainHelper.GetAllDomains(false), node.Path, rootNodeId);
 					if (!iscanon)
 						LogHelper.Debug<ContentFinderByNiceUrl>("Non canonical url");
 

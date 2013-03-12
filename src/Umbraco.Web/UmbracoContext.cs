@@ -84,7 +84,11 @@ namespace Umbraco.Web
             var umbracoContext = new UmbracoContext(httpContext, applicationContext);
 
             // create the nice urls provider
-            var niceUrls = new NiceUrlProvider(PublishedContentStoreResolver.Current.PublishedContentStore, umbracoContext);
+            // there's one per request because there are some behavior parameters that can be changed
+            var urlProvider = new UrlProvider(
+                umbracoContext,
+                PublishedContentStoreResolver.Current.PublishedContentStore,
+                UrlProviderResolver.Current.Providers);
 
             // create the RoutingContext, and assign
             var routingContext = new RoutingContext(
@@ -92,7 +96,7 @@ namespace Umbraco.Web
                 ContentFinderResolver.Current.Finders,
                 ContentLastChanceFinderResolver.Current.Finder,
                 PublishedContentStoreResolver.Current.PublishedContentStore,
-                niceUrls,
+                urlProvider,
                 RoutesCacheResolver.Current.RoutesCache);
 
             //assign the routing context back
@@ -270,13 +274,13 @@ namespace Umbraco.Web
 		/// <remarks>
 		/// If the RoutingContext is null, this will throw an exception.
 		/// </remarks>
-    	internal NiceUrlProvider NiceUrlProvider
+    	internal UrlProvider UrlProvider
     	{
     		get
     		{
     			if (RoutingContext == null)
-					throw new InvalidOperationException("Cannot access the NiceUrlProvider when the UmbracoContext's RoutingContext is null");
-    			return RoutingContext.NiceUrlProvider;
+					throw new InvalidOperationException("Cannot access the UrlProvider when the UmbracoContext's RoutingContext is null");
+    			return RoutingContext.UrlProvider;
     		}
     	}
 

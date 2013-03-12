@@ -1173,7 +1173,7 @@ namespace Umbraco.Web
 			if (firstNode == null)
 				return new DataTable(); //no children found 
 
-			var urlProvider = UmbracoContext.Current.RoutingContext.NiceUrlProvider;
+			var urlProvider = UmbracoContext.Current.RoutingContext.UrlProvider;
 
 			//use new utility class to create table so that we don't have to maintain code in many places, just one
 			var dt = Umbraco.Core.DataTableExtensions.GenerateDataTable(
@@ -1204,7 +1204,7 @@ namespace Umbraco.Web
 									{"UpdateDate", n.UpdateDate},
 									{"CreatorName", n.CreatorName},
 									{"WriterName", n.WriterName},
-									{"Url", urlProvider.GetNiceUrl(n.Id)}
+									{"Url", urlProvider.GetUrl(n.Id)}
 								};
 						var userVals = new Dictionary<string, object>();
 						foreach (var p in from IPublishedContentProperty p in n.Properties where p.Value != null select p)

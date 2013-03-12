@@ -257,7 +257,7 @@ Umbraco.Application.Actions = function () {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.openModalWindow("dialogs/assignDomain.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId, uiKeys['actions_assignDomain'], true, 500, 420);
+                UmbClientMgr.openModalWindow("dialogs/assignDomain2.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId, uiKeys['actions_assignDomain'], true, 500, 620);
             }
         },
 

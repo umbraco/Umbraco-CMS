@@ -63,9 +63,9 @@ namespace Umbraco.Web.Models
 					case PublishedItemType.Content:
 						if (UmbracoContext.Current == null)
 							throw new InvalidOperationException("Cannot resolve a Url for a content item with a null UmbracoContext.Current reference");
-						if (UmbracoContext.Current.NiceUrlProvider == null)
+						if (UmbracoContext.Current.UrlProvider == null)
 							throw new InvalidOperationException("Cannot resolve a Url for a content item with a null UmbracoContext.Current.NiceUrlProvider reference");
-						_url= UmbracoContext.Current.NiceUrlProvider.GetNiceUrl(this.Id);
+						_url= UmbracoContext.Current.UrlProvider.GetUrl(this.Id);
 						break;
 					case PublishedItemType.Media:
 						var prop = GetProperty("umbracoFile");

@@ -571,6 +571,7 @@
     <Content Include="Umbraco\Developer\RelationTypes\RelationTypesWebService.asmx" />
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionDeleteRelationType.js" />
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionNewRelationType.js" />
+    <Content Include="Umbraco\Dialogs\AssignDomain2.aspx" />
     <Content Include="Umbraco\Dialogs\EditMacro.aspx" />
     <Content Include="Umbraco\Images\delete.gif" />
     <Content Include="Umbraco\Images\delete.png" />
@@ -610,6 +611,7 @@
     <Content Include="Umbraco\Webservices\Api\MemberService.asmx" />
     <Content Include="Umbraco\Webservices\Api\StylesheetService.asmx" />
     <Content Include="Umbraco\Webservices\Api\TemplateService.asmx" />
+    <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.min.js" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Lib\codemirror.css" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Lib\codemirror.js" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\closetag.js" />
@@ -773,6 +775,8 @@
     <Content Include="Umbraco_Client\ContextMenu\Js\jquery.contextMenu.js" />
     <Content Include="Umbraco_Client\Dashboards\ExamineManagement.css" />
     <Content Include="Umbraco_Client\Dashboards\ExamineManagement.js" />
+    <Content Include="Umbraco_Client\Dialogs\AssignDomain2.js" />
+    <Content Include="Umbraco_Client\Dialogs\AssignDomain2.css" />
     <Content Include="Umbraco_Client\Dialogs\CreateDialog.css" />
     <Content Include="Umbraco_Client\Dialogs\EditMacro.css" />
     <Content Include="Umbraco_Client\Dialogs\EditMacro.js" />
