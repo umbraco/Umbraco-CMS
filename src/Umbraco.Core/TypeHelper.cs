@@ -11,9 +11,7 @@ namespace Umbraco.Core
 	/// </summary>
 	internal static class TypeHelper
 	{
-		private static readonly ConcurrentDictionary<Tuple<Type, Type>, bool> TypeCheckCache = new ConcurrentDictionary<Tuple<Type, Type>, bool>();
-		private static readonly ConcurrentDictionary<Type, bool> ValueTypeCache = new ConcurrentDictionary<Type, bool>();
-		private static readonly ConcurrentDictionary<Type, bool> ImplicitValueTypeCache = new ConcurrentDictionary<Type, bool>();
+		
 		private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache = new ConcurrentDictionary<Type, FieldInfo[]>();
 		private static readonly ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]> GetPropertiesCache = new ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]>();
 
@@ -28,8 +26,7 @@ namespace Umbraco.Core
 		/// </returns>
 		public static bool IsTypeAssignableFrom(Type contract, Type implementation)
 		{
-			// NOTE The use of a Tuple<,> here is because its Equals / GetHashCode implementation is literally 10.5x faster than KeyValuePair<,>
-			return TypeCheckCache.GetOrAdd(new Tuple<Type, Type>(contract, implementation), x => x.Item1.IsAssignableFrom(x.Item2));
+		    return contract.IsAssignableFrom(implementation);
 		}
 
 		/// <summary>
@@ -49,7 +46,7 @@ namespace Umbraco.Core
 		/// <param name="implementation">The implementation.</param>
 		public static bool IsValueType(Type implementation)
 		{
-			return ValueTypeCache.GetOrAdd(implementation, x => x.IsValueType || x.IsPrimitive);
+		    return implementation.IsValueType || implementation.IsPrimitive;
 		}
 
 		/// <summary>
@@ -58,7 +55,7 @@ namespace Umbraco.Core
 		/// <param name="implementation">The implementation.</param>
 		public static bool IsImplicitValueType(Type implementation)
 		{
-			return ImplicitValueTypeCache.GetOrAdd(implementation, x => IsValueType(implementation) || implementation.IsEnum || implementation == typeof(string));
+		    return IsValueType(implementation) || implementation.IsEnum || implementation == typeof (string);
 		}
 
 		public static bool IsTypeAssignableFrom<TContract>(object implementation)
