@@ -64,12 +64,12 @@ namespace Umbraco.Web.Routing
                 return Enumerable.Empty<string>();
 
             var n = node;
-            var domainUris = DomainHelper.DomainsForNode(n.Id, current);
+            var domainUris = DomainHelper.DomainsForNode(n.Id, current, false);
             while (domainUris == null && n != null) // n is null at root
             {
                 // move to parent node
                 n = n.Parent;
-                domainUris = n == null ? null : DomainHelper.DomainsForNode(n.Id, current);
+                domainUris = n == null ? null : DomainHelper.DomainsForNode(n.Id, current, false);
             }
 
             var path = "/" + umbracoUrlName;

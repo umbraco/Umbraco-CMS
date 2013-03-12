@@ -29,8 +29,9 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="current">The Uri of the current request.</param>
         /// <param name="domainAndUris">The list of <c>DomainAndUri</c> to filter.</param>
+        /// <param name="excludeDefault">A value indicating whether to exclude the current/default domain.</param>
         /// <returns>The selected <c>DomainAndUri</c> items.</returns>
         /// <remarks>The filter must return something, even empty, else an exception will be thrown.</remarks>
-        IEnumerable<DomainAndUri> MapDomains(Uri current, DomainAndUri[] domainAndUris);
+        IEnumerable<DomainAndUri> MapDomains(Uri current, DomainAndUri[] domainAndUris, bool excludeDefault);
     }
 }

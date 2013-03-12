@@ -194,36 +194,41 @@ namespace Umbraco.Web.Routing
             return MapDomain(domainAndUris, qualifiedSites, currentAuthority);
         }
 
-        /// <summary>
-        /// Filters a list of <c>DomainAndUri</c> to pick those that best matches the current request.
-        /// </summary>
-        /// <param name="current">The Uri of the current request.</param>
-        /// <param name="domainAndUris">The list of <c>DomainAndUri</c> to filter.</param>
-        /// <returns>The selected <c>DomainAndUri</c> items.</returns>
-        /// <remarks>The filter must return something, even empty, else an exception will be thrown.</remarks>
-        public virtual IEnumerable<DomainAndUri> MapDomains(Uri current, DomainAndUri[] domainAndUris)
+ 	    /// <summary>
+ 	    /// Filters a list of <c>DomainAndUri</c> to pick those that best matches the current request.
+ 	    /// </summary>
+ 	    /// <param name="current">The Uri of the current request.</param>
+ 	    /// <param name="domainAndUris">The list of <c>DomainAndUri</c> to filter.</param>
+        /// <param name="excludeDefault">A value indicating whether to exclude the current/default domain.</param>
+ 	    /// <returns>The selected <c>DomainAndUri</c> items.</returns>
+ 	    /// <remarks>The filter must return something, even empty, else an exception will be thrown.</remarks>
+ 	    public virtual IEnumerable<DomainAndUri> MapDomains(Uri current, DomainAndUri[] domainAndUris, bool excludeDefault)
         {
             var currentAuthority = current.GetLeftPart(UriPartial.Authority);
-            KeyValuePair<string, string[]>[] candidateSites;
-            IEnumerable<DomainAndUri> ret;
+            KeyValuePair<string, string[]>[] candidateSites = null;
+ 	        IEnumerable<DomainAndUri> ret = domainAndUris;
 
             using (ConfigReadLock) // so nothing changes between GetQualifiedSites and access to bindings
             {
                 var qualifiedSites = GetQualifiedSitesInsideLock(current);
 
-                // exclude the current one (avoid producing the absolute equivalent of what GetUrl returns)
-                var hintWithSlash = current.EndPathWithSlash();
-                var hinted = domainAndUris.FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(hintWithSlash));
-                ret = hinted == null ? domainAndUris : domainAndUris.Where(d => d != hinted);
-
-                // exclude the default one (avoid producing a possible duplicate of what GetUrl returns)
-                // only if the default one cannot be the current one ie if hinted is not null
-                if (hinted == null && domainAndUris.Any())
+                if (excludeDefault)
                 {
-                    // it is illegal to call MapDomain if domainAndUris is empty
-                    // also, domainAndUris should NOT contain current, hence the test on hinted
-                    var mainDomain = MapDomain(domainAndUris, qualifiedSites, currentAuthority); // what GetUrl would get
-                    ret = ret.Where(d => d != mainDomain);
+                    // exclude the current one (avoid producing the absolute equivalent of what GetUrl returns)
+                    var hintWithSlash = current.EndPathWithSlash();
+                    var hinted = domainAndUris.FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(hintWithSlash));
+                    if (hinted != null)
+                        ret = ret.Where(d => d != hinted);
+
+                    // exclude the default one (avoid producing a possible duplicate of what GetUrl returns)
+                    // only if the default one cannot be the current one ie if hinted is not null
+                    if (hinted == null && domainAndUris.Any())
+                    {
+                        // it is illegal to call MapDomain if domainAndUris is empty
+                        // also, domainAndUris should NOT contain current, hence the test on hinted
+                        var mainDomain = MapDomain(domainAndUris, qualifiedSites, currentAuthority); // what GetUrl would get
+                        ret = ret.Where(d => d != mainDomain);
+                    }
                 }
 
                 // we do our best, but can't do the impossible
@@ -236,17 +241,21 @@ namespace Umbraco.Web.Routing
                 // if current belongs to a site, pick every element from domainAndUris that also belong
                 // to that site -- or to any site bound to that site
 
-                candidateSites = new[] { currentSite };
-                if (_bindings != null && _bindings.ContainsKey(currentSite.Key))
-                 {
-                    var boundSites = qualifiedSites.Where(site => _bindings[currentSite.Key].Contains(site.Key));
-                    candidateSites = candidateSites.Union(boundSites).ToArray();
+                if (!currentSite.Equals(default(KeyValuePair<string, string[]>)))
+                {
+                    candidateSites = new[] { currentSite };
+                    if (_bindings != null && _bindings.ContainsKey(currentSite.Key))
+                    {
+                        var boundSites = qualifiedSites.Where(site => _bindings[currentSite.Key].Contains(site.Key));
+                        candidateSites = candidateSites.Union(boundSites).ToArray();
 
-                    // .ToArray ensures it is evaluated before the configuration lock is exited
-                 }
-             }
+                        // .ToArray ensures it is evaluated before the configuration lock is exited
+                    }
+                }
+            }
  
-            return ret.Where(d =>
+            // if we are able to filter, then filter, else return the whole lot
+            return candidateSites == null ? ret : ret.Where(d =>
                 {
                     var authority = d.Uri.GetLeftPart(UriPartial.Authority);
                     return candidateSites.Any(site => site.Value.Contains(authority));

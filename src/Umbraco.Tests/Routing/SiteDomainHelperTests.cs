@@ -236,7 +236,7 @@ namespace Umbraco.Tests.Routing
                     new DomainAndUri(new MockDomain("domain3.com"), Uri.UriSchemeHttp), // no: not same site
                     new DomainAndUri(new MockDomain("domain4.com"), Uri.UriSchemeHttp), // no: not same site
                     new DomainAndUri(new MockDomain("domain1.org"), Uri.UriSchemeHttp), // yes: same site (though bogus setup)
-                }).ToArray();
+                }, true).ToArray();
 
             Assert.AreEqual(1, output.Count());
             Assert.Contains("http://domain1.org/", output.Select(d => d.Uri.ToString()).ToArray());
@@ -251,7 +251,7 @@ namespace Umbraco.Tests.Routing
                     new DomainAndUri(new MockDomain("domain3.com"), Uri.UriSchemeHttp), // no: not same site
                     new DomainAndUri(new MockDomain("domain4.com"), Uri.UriSchemeHttp), // no: not same site
                     new DomainAndUri(new MockDomain("domain1.org"), Uri.UriSchemeHttp), // yes: same site (though bogus setup)
-                }).ToArray();
+                }, true).ToArray();
 
             Assert.AreEqual(1, output.Count());
             Assert.Contains("http://domain1.org/", output.Select(d => d.Uri.ToString()).ToArray());
@@ -270,7 +270,7 @@ namespace Umbraco.Tests.Routing
                     new DomainAndUri(new MockDomain("domain3.org"), Uri.UriSchemeHttp), // yes: bound site
                     new DomainAndUri(new MockDomain("domain4.com"), Uri.UriSchemeHttp), // no: not same site
                     new DomainAndUri(new MockDomain("domain1.org"), Uri.UriSchemeHttp), // yes: same site (though bogus setup)
-                }).ToArray();
+                }, true).ToArray();
 
             Assert.AreEqual(3, output.Count());
             Assert.Contains("http://domain1.org/", output.Select(d => d.Uri.ToString()).ToArray());
@@ -288,7 +288,7 @@ namespace Umbraco.Tests.Routing
                     new DomainAndUri(new MockDomain("domain3.org"), Uri.UriSchemeHttp), // yes: bound site
                     new DomainAndUri(new MockDomain("domain4.com"), Uri.UriSchemeHttp), // no: not same site
                     new DomainAndUri(new MockDomain("domain1.org"), Uri.UriSchemeHttp), // yes: same site (though bogus setup)
-                }).ToArray();
+                }, true).ToArray();
 
             Assert.AreEqual(3, output.Count());
             Assert.Contains("http://domain1.org/", output.Select(d => d.Uri.ToString()).ToArray());

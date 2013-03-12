@@ -77,10 +77,11 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="nodeId">The node identifier.</param>
         /// <param name="current">The uri, or null.</param>
+        /// <param name="excludeDefault">A value indicating whether to exclude the current/default domain. True by default.</param>
         /// <returns>The domains and their uris, that match the specified uri, else null.</returns>
         /// <remarks>If at least a domain is set on the node then the method returns the domains that
         /// best match the specified uri, else it returns null.</remarks>
-        internal static IEnumerable<DomainAndUri> DomainsForNode(int nodeId, Uri current)
+        internal static IEnumerable<DomainAndUri> DomainsForNode(int nodeId, Uri current, bool excludeDefault = true)
         {
             // be safe
             if (nodeId <= 0)
@@ -98,7 +99,7 @@ namespace Umbraco.Web.Routing
 
             // filter
             var helper = SiteDomainHelperResolver.Current.Helper;
-            return helper.MapDomains(current, domainAndUris).ToArray();
+            return helper.MapDomains(current, domainAndUris, excludeDefault).ToArray();
         }
 
         #endregion
