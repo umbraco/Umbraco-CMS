@@ -69,6 +69,10 @@ namespace Umbraco.Tests.Routing
 
             // ensure we can create them although the content is not in the database
             TestHelper.DropForeignKeys("umbracoDomains");
+
+            SiteDomainHelperResolver.Reset();
+            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
+            FreezeResolution();
         }
 
 		internal override IRoutesCache GetRoutesCache()

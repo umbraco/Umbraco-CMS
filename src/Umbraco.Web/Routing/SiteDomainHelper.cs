@@ -208,15 +208,23 @@ namespace Umbraco.Web.Routing
             IEnumerable<DomainAndUri> ret;
 
             using (ConfigReadLock) // so nothing changes between GetQualifiedSites and access to bindings
-             {
+            {
                 var qualifiedSites = GetQualifiedSitesInsideLock(current);
 
                 // exclude the current one (avoid producing the absolute equivalent of what GetUrl returns)
-                ret = domainAndUris.Where(d => d.Uri.GetLeftPart(UriPartial.Authority) != currentAuthority);
+                var hintWithSlash = current.EndPathWithSlash();
+                var hinted = domainAndUris.FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(hintWithSlash));
+                ret = hinted == null ? domainAndUris : domainAndUris.Where(d => d != hinted);
 
                 // exclude the default one (avoid producing a possible duplicate of what GetUrl returns)
-                var mainDomain = MapDomain(domainAndUris, qualifiedSites, currentAuthority); // what GetUrl would get
-                ret = ret.Where(d => d != mainDomain);
+                // only if the default one cannot be the current one ie if hinted is not null
+                if (hinted == null && domainAndUris.Any())
+                {
+                    // it is illegal to call MapDomain if domainAndUris is empty
+                    // also, domainAndUris should NOT contain current, hence the test on hinted
+                    var mainDomain = MapDomain(domainAndUris, qualifiedSites, currentAuthority); // what GetUrl would get
+                    ret = ret.Where(d => d != mainDomain);
+                }
 
                 // we do our best, but can't do the impossible
                 if (qualifiedSites == null)
@@ -280,6 +288,11 @@ namespace Umbraco.Web.Routing
 
         private static DomainAndUri MapDomain(DomainAndUri[] domainAndUris, Dictionary<string, string[]> qualifiedSites, string currentAuthority)
         {
+            if (domainAndUris == null)
+                throw new ArgumentNullException("domainAndUris");
+            if (!domainAndUris.Any())
+                throw new ArgumentException("Cannot be empty.", "domainAndUris");
+
             // we do our best, but can't do the impossible
             if (qualifiedSites == null)
                 return domainAndUris.First();

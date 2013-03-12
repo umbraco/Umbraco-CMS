@@ -20,6 +20,10 @@ namespace Umbraco.Tests.Routing
 
             // ensure we can create them although the content is not in the database
             TestHelper.DropForeignKeys("umbracoDomains");
+
+            SiteDomainHelperResolver.Reset();
+            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
+            FreezeResolution();
         }
 
 		internal override IRoutesCache GetRoutesCache()
@@ -370,7 +374,7 @@ namespace Umbraco.Tests.Routing
 		[Test]
 		public void Get_Nice_Url_Alternate()
 		{
-			var routingContext = GetRoutingContext("http://domain1.com/test", 1111);
+			var routingContext = GetRoutingContext("http://domain1.com/en/test", 1111);
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false;
@@ -378,13 +382,12 @@ namespace Umbraco.Tests.Routing
 			InitializeLanguagesAndDomains();
 			SetDomains5();
 
-			var result = routingContext.UrlProvider.GetOtherUrls(100111);
+		    var url = routingContext.UrlProvider.GetUrl(100111, true);
+            Assert.AreEqual("http://domain1.com/en/1001-1-1/", url);
+
+			var result = routingContext.UrlProvider.GetOtherUrls(100111).ToArray();
 			
-			// will always get absolute urls
-			// all of them
-			// including the local one - duplicate?! - then must manually exclude?
-			Assert.AreEqual(3, result.Count());
-			Assert.IsTrue(result.Contains("http://domain1.com/en/1001-1-1/"));
+			Assert.AreEqual(2, result.Count());
 			Assert.IsTrue(result.Contains("http://domain1a.com/en/1001-1-1/"));
 			Assert.IsTrue(result.Contains("http://domain1b.com/en/1001-1-1/"));
 		}

@@ -17,29 +17,6 @@ namespace Umbraco.Web.WebServices
     /// <remarks>Nothing to do with Active Directory.</remarks>
     public class DomainsApiController : UmbracoAuthorizedApiController
     {
-        [HttpGet]
-        public DomainModel[] ListDomains(int nodeId)
-        {
-            var node = ApplicationContext.Current.Services.ContentService.GetById(nodeId);
-
-            if (node == null)
-                throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest)
-                {
-                    Content = new StringContent(string.Format("There is no content node with id {0}.", nodeId)),
-                    ReasonPhrase = "Node Not Found."
-                });
-
-            if (!UmbracoUser.GetPermissions(node.Path).Contains(global::umbraco.BusinessLogic.Actions.ActionAssignDomain.Instance.Letter))
-                throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Unauthorized)
-                {
-                    Content = new StringContent("You do not have permission to assign domains on that node."),
-                    ReasonPhrase = "Permission Denied."
-                });
-
-            var domains = Routing.DomainHelper.GetNodeDomains(nodeId);
-            return domains.Select(d => new DomainModel(d.Name, d.Language.id)).ToArray();
-        }
-
         [HttpPost]
         // can't pass multiple complex args in json post request...
         public PostBackModel SaveLanguageAndDomains(PostBackModel model)
@@ -61,7 +38,7 @@ namespace Umbraco.Web.WebServices
                     });
 
             model.Valid = true;
-            var domains = Routing.DomainHelper.GetNodeDomains(model.NodeId);
+            var domains = Routing.DomainHelper.GetNodeDomains(model.NodeId, true);
             var languages = global::umbraco.cms.businesslogic.language.Language.GetAllAsList().ToArray();
             var language = model.Language > 0 ? languages.FirstOrDefault(l => l.id == model.Language) : null;
 

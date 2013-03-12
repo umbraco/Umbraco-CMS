@@ -147,7 +147,12 @@ namespace umbraco.cms.businesslogic.web
         
         internal static List<Domain> GetDomains()
         {
-			return Cache.GetCacheItem<List<Domain>>("UmbracoDomainList", getDomainsSyncLock, TimeSpan.FromMinutes(30),
+            return GetDomains(false);
+        }
+
+        internal static List<Domain> GetDomains(bool includeWildcards)
+        {
+			var domains = Cache.GetCacheItem<List<Domain>>("UmbracoDomainList", getDomainsSyncLock, TimeSpan.FromMinutes(30),
         		delegate
         		{
         			List<Domain> result = new List<Domain>();
@@ -170,6 +175,11 @@ namespace umbraco.cms.businesslogic.web
         			}
         			return result;
         		});
+
+            if (!includeWildcards)
+                domains = domains.Where(d => !d.IsWildcard).ToList();
+
+            return domains;
         }
 
         public static Domain GetDomain(string DomainName)

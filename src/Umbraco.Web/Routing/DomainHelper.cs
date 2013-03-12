@@ -17,22 +17,24 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets all domains defined in the system.
         /// </summary>
+        /// <param name="includeWildcards">A value indicating whether to include wildcard domains.</param>
         /// <returns>All domains defined in the system.</returns>
         /// <remarks>This is to temporarily abstract Umbraco's API.</remarks>
-        internal static Domain[] GetAllDomains()
+        internal static Domain[] GetAllDomains(bool includeWildcards)
         {
-            return Domain.GetDomains().ToArray();
+            return Domain.GetDomains(includeWildcards).ToArray();
         }
 
         /// <summary>
         /// Gets all domains defined in the system at a specified node.
         /// </summary>
         /// <param name="nodeId">The node identifier.</param>
+        /// <param name="includeWildcards">A value indicating whether to include wildcard domains.</param>
         /// <returns>All domains defined in the system at the specified node.</returns>
         /// <remarks>This is to temporarily abstract Umbraco's API.</remarks>
-        internal static Domain[] GetNodeDomains(int nodeId)
+        internal static Domain[] GetNodeDomains(int nodeId, bool includeWildcards)
         {
-            return Domain.GetDomainsById(nodeId);
+            return Domain.GetDomains(includeWildcards).Where(d => d.RootNodeId == nodeId).ToArray();
         }
 
         #endregion
@@ -44,7 +46,9 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="nodeId">The node identifier.</param>
         /// <param name="current">The uri, or null.</param>
-        /// <returns>The domain and its uri, if any, that best matches the specified uri.</returns>
+        /// <returns>The domain and its uri, if any, that best matches the specified uri, else null.</returns>
+        /// <remarks>If at least a domain is set on the node then the method returns the domain that
+        /// best matches the specified uri, else it returns null.</remarks>
         internal static DomainAndUri DomainForNode(int nodeId, Uri current)
         {
             // be safe
@@ -52,13 +56,19 @@ namespace Umbraco.Web.Routing
                 return null;
 
             // get the domains on that node
-            var domains = GetNodeDomains(nodeId);
+            var domains = GetNodeDomains(nodeId, false);
 
-            // filter those that match
+            // none?
+            if (!domains.Any())
+                return null;
+
+            // else filter
             var helper = SiteDomainHelperResolver.Current.Helper;
             var domainAndUri = DomainForUri(domains, current, domainAndUris => helper.MapDomain(current, domainAndUris));
 
-            // return null or the uri
+            if (domainAndUri == null)
+                throw new Exception("DomainForUri returned null.");
+
             return domainAndUri;
         }
 
@@ -67,7 +77,9 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="nodeId">The node identifier.</param>
         /// <param name="current">The uri, or null.</param>
-        /// <returns>The domains and their uris, that match the specified uri.</returns>
+        /// <returns>The domains and their uris, that match the specified uri, else null.</returns>
+        /// <remarks>If at least a domain is set on the node then the method returns the domains that
+        /// best match the specified uri, else it returns null.</remarks>
         internal static IEnumerable<DomainAndUri> DomainsForNode(int nodeId, Uri current)
         {
             // be safe
@@ -75,15 +87,18 @@ namespace Umbraco.Web.Routing
                 return null;
 
             // get the domains on that node
-            var domains = GetNodeDomains(nodeId);
+            var domains = GetNodeDomains(nodeId, false);
 
-            // filter those that match
+            // none?
+            if (!domains.Any())
+                return null;
+
+            // get the domains and their uris
             var domainAndUris = DomainsForUri(domains, current).ToArray();
 
-            // return null or a (maybe empty) enumerable of uris
+            // filter
             var helper = SiteDomainHelperResolver.Current.Helper;
-            var domainAndUris2 = helper.MapDomains(current, domainAndUris).ToArray();
-            return domainAndUris2.Any() ? domainAndUris2 : null;
+            return helper.MapDomains(current, domainAndUris).ToArray();
         }
 
         #endregion
@@ -121,17 +136,16 @@ namespace Umbraco.Web.Routing
             DomainAndUri domainAndUri;
             if (current == null)
             {
-                // take the first one by default (is that OK?)
-                domainAndUri = domainsAndUris.First();
+                // take the first one by default (what else can we do?)
+                domainAndUri = domainsAndUris.First(); // .First() protected by .Any() above
             }
             else
             {
-                // look for a domain that would be the base of the hint
-                // assume only one can match the hint (is that OK?)
+                // look for the first domain that would be the base of the hint
                 var hintWithSlash = current.EndPathWithSlash();
                 domainAndUri = domainsAndUris
                     .FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(hintWithSlash));
-                // if none matches, then try to run the filter to sort them out
+                // if none matches, then try to run the filter to pick a domain
                 if (domainAndUri == null && filter != null)
                 {
                     domainAndUri = filter(domainsAndUris);

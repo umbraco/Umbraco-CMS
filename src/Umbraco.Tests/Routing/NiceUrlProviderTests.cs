@@ -26,6 +26,10 @@ namespace Umbraco.Tests.Routing
                 true);
 
             SettingsForTests.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
+
+		    SiteDomainHelperResolver.Reset();
+            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
+            FreezeResolution();
 		}
 
 		internal override IRoutesCache GetRoutesCache()

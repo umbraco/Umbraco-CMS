@@ -25,7 +25,7 @@ namespace Umbraco.Tests.Routing
 
         void InitializeLanguagesAndDomains()
         {
-            var domains = Domain.GetDomains();
+            var domains = Domain.GetDomains(true); // we want wildcards too here
             foreach (var d in domains)
                 d.Delete();
 

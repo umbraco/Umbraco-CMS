@@ -43,7 +43,7 @@ namespace umbraco.dialogs
             pane_domains.Text = ui.Text("assignDomain", "setDomains");
             prop_language.Text = ui.Text("assignDomain", "language");
 
-            var nodeDomains = DomainHelper.GetNodeDomains(nodeId);
+            var nodeDomains = DomainHelper.GetNodeDomains(nodeId, true);
             var wildcard = nodeDomains.FirstOrDefault(d => d.IsWildcard);
 
             var sb = new StringBuilder();

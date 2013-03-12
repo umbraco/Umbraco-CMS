@@ -95,7 +95,7 @@ namespace Umbraco.Web.Routing
 					LogHelper.Debug<ContentFinderByNiceUrl>("Query matches, id={0}", () => docreq.PublishedContent.Id);
 
                     var rootNodeId = docreq.Domain == null ? (int?) null : docreq.Domain.RootNodeId;
-					var iscanon = _doDomainLookup && !DomainHelper.ExistsDomainInPath(DomainHelper.GetAllDomains(), node.Path, rootNodeId);
+					var iscanon = _doDomainLookup && !DomainHelper.ExistsDomainInPath(DomainHelper.GetAllDomains(false), node.Path, rootNodeId);
 					if (!iscanon)
 						LogHelper.Debug<ContentFinderByNiceUrl>("Non canonical url");
 
