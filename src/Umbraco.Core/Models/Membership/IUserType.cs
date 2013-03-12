@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models.Membership
 {
-    [Mapper(typeof(UserTypeMapper))]
+
     internal interface IUserType : IAggregateRoot
     {
         string Alias { get; set; }

@@ -12,7 +12,6 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    [Mapper(typeof(PropertyGroupMapper))]
     public class PropertyGroup : Entity, IEquatable<PropertyGroup>
     {
         private string _name;

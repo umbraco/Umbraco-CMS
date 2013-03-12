@@ -11,7 +11,6 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    [Mapper(typeof(RelationTypeMapper))]
     public class RelationType : Entity, IAggregateRoot
     {
         private string _name;

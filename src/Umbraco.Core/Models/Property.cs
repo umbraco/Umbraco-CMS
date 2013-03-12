@@ -11,7 +11,6 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    [Mapper(typeof(PropertyMapper))]
     public class Property : Entity
     {
         private readonly PropertyType _propertyType;

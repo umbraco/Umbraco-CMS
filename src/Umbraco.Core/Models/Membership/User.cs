@@ -16,7 +16,6 @@ namespace Umbraco.Core.Models.Membership
     /// </remarks>
     [Serializable]
     [DataContract(IsReference = true)]
-    [Mapper(typeof(UserMapper))]
     internal class User : UserProfile, IUser
     {
         private bool _hasIdentity;

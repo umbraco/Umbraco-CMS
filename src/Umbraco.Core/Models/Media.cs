@@ -9,7 +9,6 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    [Mapper(typeof(MediaMapper))]
     public class Media : ContentBase, IMedia
     {
         private IMediaType _contentType;

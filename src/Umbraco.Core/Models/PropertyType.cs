@@ -12,7 +12,6 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    [Mapper(typeof(PropertyTypeMapper))]
     public class PropertyType : Entity, IEquatable<PropertyType>
     {
         //private SerializationService _service;

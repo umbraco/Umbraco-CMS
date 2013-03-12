@@ -4,8 +4,7 @@ namespace Umbraco.Core.Models
 {
     /// <summary>
     /// Defines a ContentType, which Media is based on
-    /// </summary>
-    [Mapper(typeof(MediaTypeMapper))]
+    /// </summary
     public interface IMediaType : IContentTypeComposition
     {
          

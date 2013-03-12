@@ -5,7 +5,6 @@ using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
-    [Mapper(typeof(LanguageMapper))]
     public interface ILanguage : IAggregateRoot
     {
         /// <summary>

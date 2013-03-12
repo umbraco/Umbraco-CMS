@@ -4,7 +4,6 @@ using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
 {
-    [Mapper(typeof(DataTypeDefinitionMapper))]
     public interface IDataTypeDefinition : IUmbracoEntity
     {
         /// <summary>

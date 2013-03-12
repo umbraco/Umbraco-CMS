@@ -15,7 +15,6 @@ namespace Umbraco.Core.Models
     /// </remarks>
     [Serializable]
     [DataContract(IsReference = true)]
-    [Mapper(typeof(DataTypeDefinitionMapper))]
     public class DataTypeDefinition : Entity, IDataTypeDefinition
     {
         private int _parentId;

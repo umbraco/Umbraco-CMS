@@ -13,6 +13,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
@@ -41,6 +42,8 @@ namespace Umbraco.Tests.TestHelpers
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
+            PluginManager.Current = new PluginManager(false);
+
             //Ensure that any database connections from a previous test is disposed. This is really just double safety as its also done in the TearDown.
             if(ApplicationContext != null && DatabaseContext != null)
                 DatabaseContext.Database.Dispose();
@@ -68,6 +71,11 @@ namespace Umbraco.Tests.TestHelpers
 
             SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
                 new List<Type>{ typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) }) { CanResolveBeforeFrozen = true};
+
+            var asdf = typeof (ContentMapper);
+
+            MappingResolver.Current = new MappingResolver(
+               () => PluginManager.Current.ResolveAssignedMapperTypes());
 
             //Get the connectionstring settings from config
             var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
@@ -117,7 +125,7 @@ namespace Umbraco.Tests.TestHelpers
 			SqlCeContextGuardian.CloseBackgroundConnection();
 			
 			ApplicationContext.Current = null;
-			
+			MappingResolver.Reset();
 			RepositoryResolver.Reset();
             SqlSyntaxProvidersResolver.Reset();
             Resolution.Reset();

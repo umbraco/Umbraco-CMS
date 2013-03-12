@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Publishing
             UmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
 
             //this ensures its reset
-            PluginManager.Current = new PluginManager();
+            PluginManager.Current = new PluginManager(false);
 
             //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
             PluginManager.Current.AssembliesToScan = new[]

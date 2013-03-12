@@ -12,7 +12,6 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    [Mapper(typeof(ContentTypeMapper))]
     public class ContentType : ContentTypeCompositionBase, IContentType
     {
         private int _defaultTemplate;

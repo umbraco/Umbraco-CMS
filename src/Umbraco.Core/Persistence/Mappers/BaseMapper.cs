@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
-    internal abstract class BaseMapper
+    public abstract class BaseMapper
     {
         internal abstract void BuildMap();
 

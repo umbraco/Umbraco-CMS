@@ -14,7 +14,6 @@ namespace Umbraco.Core.Models.Membership
     /// </remarks>
     [Serializable]
     [DataContract(IsReference = true)]
-    [Mapper(typeof(UserTypeMapper))]
     internal class UserType : Entity, IUserType
     {
         [DataMember]

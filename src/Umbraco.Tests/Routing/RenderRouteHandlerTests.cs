@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Routing
 		public override void Initialize()
 		{
             //this ensures its reset
-            PluginManager.Current = new PluginManager();
+            PluginManager.Current = new PluginManager(false);
 
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
                 PluginManager.Current.ResolveSurfaceControllers());

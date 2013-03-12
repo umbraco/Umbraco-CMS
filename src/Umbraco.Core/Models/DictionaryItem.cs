@@ -12,7 +12,6 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    [Mapper(typeof(DictionaryMapper))]
     public class DictionaryItem : Entity, IDictionaryItem
     {
         private Guid _parentId;

@@ -6,7 +6,6 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Defines a ContentType, which Content is based on
     /// </summary>
-    [Mapper(typeof(ContentTypeMapper))]
     public interface IContentType : IContentTypeComposition
     {
         /// <summary>

@@ -12,7 +12,6 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    [Mapper(typeof(LanguageMapper))]
     public class Language : Entity, ILanguage
     {
         private string _isoCode;

@@ -10,7 +10,8 @@ namespace Umbraco.Core.Persistence.Mappers
     /// Represents a <see cref="RelationType"/> to DTO mapper used to translate the properties of the public api 
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
-    internal sealed class RelationTypeMapper : BaseMapper
+    [MapperFor(typeof(RelationType))]
+    public sealed class RelationTypeMapper : BaseMapper
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache = new ConcurrentDictionary<string, DtoMapModel>();
 

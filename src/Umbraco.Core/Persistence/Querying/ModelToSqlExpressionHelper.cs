@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Querying
 
         public ModelToSqlExpressionHelper()
         {
-            _mapper = MappingResolver.ResolveMapperByType(typeof(T));
+            _mapper = MappingResolver.Current.ResolveMapperByType(typeof(T));
         }
 
         protected internal virtual string Visit(Expression exp)

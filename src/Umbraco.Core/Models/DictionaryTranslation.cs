@@ -11,7 +11,6 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    [Mapper(typeof(DictionaryTranslationMapper))]
     public class DictionaryTranslation : Entity, IDictionaryTranslation
     {
         private ILanguage _language;

@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Services
 		{
 
 			//this ensures its reset
-			PluginManager.Current = new PluginManager();
+			PluginManager.Current = new PluginManager(false);
 
 			//for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
 			PluginManager.Current.AssembliesToScan = new[]

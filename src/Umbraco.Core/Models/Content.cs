@@ -12,7 +12,6 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    [Mapper(typeof(ContentMapper))]
     public class Content : ContentBase, IContent
     {
         private IContentType _contentType;

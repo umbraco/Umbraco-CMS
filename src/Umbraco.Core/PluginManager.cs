@@ -11,6 +11,7 @@ using System.Xml.Linq;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
@@ -494,6 +495,15 @@ namespace Umbraco.Core
         {
             return ResolveTypes<IMacroPropertyType>();
         }
+
+        /// <summary>
+        /// Returns all mapper types that have a MapperFor attribute defined
+        /// </summary>
+        /// <returns></returns>
+        internal IEnumerable<Type> ResolveAssignedMapperTypes()
+        {
+            return ResolveTypesWithAttribute<BaseMapper, MapperForAttribute>();
+        } 
 
         /// <summary>
         /// Returns all available IMigrations in application

@@ -7,7 +7,6 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Defines a Content object
     /// </summary>    
-    [Mapper(typeof(ContentMapper))]
     public interface IContent : IContentBase
     {
         /// <summary>

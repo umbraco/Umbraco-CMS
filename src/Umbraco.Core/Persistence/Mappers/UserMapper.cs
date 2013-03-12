@@ -6,7 +6,9 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
-    internal sealed class UserMapper : BaseMapper
+    [MapperFor(typeof(IUser))]
+    [MapperFor(typeof(User))]
+    public sealed class UserMapper : BaseMapper
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache = new ConcurrentDictionary<string, DtoMapModel>();
 

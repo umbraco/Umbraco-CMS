@@ -6,7 +6,8 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
-    internal sealed class ServerRegistrationMapper : BaseMapper
+    [MapperFor(typeof(ServerRegistration))]
+    public sealed class ServerRegistrationMapper : BaseMapper
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache = new ConcurrentDictionary<string, DtoMapModel>();
 

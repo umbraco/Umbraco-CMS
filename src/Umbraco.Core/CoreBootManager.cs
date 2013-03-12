@@ -196,6 +196,9 @@ namespace Umbraco.Core
             ServerMessengerResolver.Current = new ServerMessengerResolver(
                 new DefaultServerMessenger());
 
+            MappingResolver.Current = new MappingResolver(
+                () => PluginManager.Current.ResolveAssignedMapperTypes());
+
 			RepositoryResolver.Current = new RepositoryResolver(
 				new RepositoryFactory());
 

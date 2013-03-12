@@ -10,7 +10,9 @@ namespace Umbraco.Core.Persistence.Mappers
     /// Represents a <see cref="MediaType"/> to DTO mapper used to translate the properties of the public api 
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
-    internal sealed class MediaTypeMapper : BaseMapper
+    [MapperFor(typeof(IMediaType))]
+    [MapperFor(typeof(MediaType))]
+    public sealed class MediaTypeMapper : BaseMapper
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache = new ConcurrentDictionary<string, DtoMapModel>();
 

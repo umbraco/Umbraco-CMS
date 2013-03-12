@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             //NOTE The DataTypesResolver is only necessary because we are using the Save method in the ContentService
             //this ensures its reset
-            PluginManager.Current = new PluginManager();
+            PluginManager.Current = new PluginManager(false);
 
             //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
             PluginManager.Current.AssembliesToScan = new[]

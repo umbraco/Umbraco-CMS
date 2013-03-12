@@ -10,7 +10,9 @@ namespace Umbraco.Core.Persistence.Mappers
     /// Represents a <see cref="DataTypeDefinition"/> to DTO mapper used to translate the properties of the public api 
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
-    internal sealed class DataTypeDefinitionMapper : BaseMapper
+    [MapperFor(typeof(DataTypeDefinition))]
+    [MapperFor(typeof(IDataTypeDefinition))]
+    public sealed class DataTypeDefinitionMapper : BaseMapper
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache = new ConcurrentDictionary<string, DtoMapModel>();
 

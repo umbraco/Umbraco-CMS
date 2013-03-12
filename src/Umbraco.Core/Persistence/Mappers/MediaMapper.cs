@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Mappers
@@ -9,7 +10,9 @@ namespace Umbraco.Core.Persistence.Mappers
     /// Represents a <see cref="Models.Media"/> to DTO mapper used to translate the properties of the public api 
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
-    internal sealed class MediaMapper : BaseMapper
+    [MapperFor(typeof(IMedia))]
+    [MapperFor(typeof(Umbraco.Core.Models.Media))]
+    public sealed class MediaMapper : BaseMapper
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache = new ConcurrentDictionary<string, DtoMapModel>();
 
