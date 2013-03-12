@@ -9,7 +9,6 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using umbraco.cms.businesslogic.cache;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Linq;
@@ -29,9 +28,7 @@ namespace umbraco.cms.businesslogic.macro
 	/// </summary>
 	public class Macro		
 	{
-        private static readonly object macroCacheSyncLock = new object();
-        //private static readonly string umbracoMacroCacheKey = "UmbracoMacroCache";
-
+        
 		int _id;
 		bool _useInEditor;
         bool _renderContent;
@@ -92,11 +89,11 @@ namespace umbraco.cms.businesslogic.macro
 			}
 		}
 
-		/// <summary>
-		/// The alias of the macro - are used for retrieving the macro when parsing the <?UMBRACO_MACRO></?UMBRACO_MACRO> element,
+        /// <summary>
+		/// The alias of the macro - are used for retrieving the macro when parsing the {?UMBRACO_MACRO}{/?UMBRACO_MACRO} element,
 		/// by using the alias instead of the Id, it's possible to distribute macroes from one installation to another - since the id
 		/// is given by an autoincrementation in the database table, and might be used by another macro in the foreing umbraco
-		/// </summary>
+        /// </summary>
 		public string Alias
 		{
 			get {return _alias;}
