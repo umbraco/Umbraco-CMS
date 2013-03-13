@@ -35,12 +35,6 @@ namespace Umbraco.Tests.PublishedContent
 
             UmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
 
-            //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-            PluginManager.Current.AssembliesToScan = new[]
-				{
-					typeof(DynamicNode).Assembly
-				};
-
             //need to specify a custom callback for unit tests
             DynamicNode.GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
             {
@@ -78,10 +72,6 @@ namespace Umbraco.Tests.PublishedContent
         public override void TearDown()
         {
             base.TearDown();
-
-            PluginManager.Current.AssembliesToScan = null;
-
-            UmbracoSettings.ResetSetters();
         }
 
         protected override dynamic GetDynamicNode(int id)
