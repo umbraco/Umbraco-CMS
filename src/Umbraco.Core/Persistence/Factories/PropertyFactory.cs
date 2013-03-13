@@ -8,21 +8,13 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal class PropertyFactory : IEntityFactory<IEnumerable<Property>, IEnumerable<PropertyDataDto>>
     {
-        private readonly IContentType _contentType;
-        private readonly IMediaType _mediaType;
+        private readonly IContentTypeComposition _contentType;
         private readonly Guid _version;
         private readonly int _id;
 
-        public PropertyFactory(IContentType contentType, Guid version, int id)
+        public PropertyFactory(IContentTypeComposition contentType, Guid version, int id)
         {
             _contentType = contentType;
-            _version = version;
-            _id = id;
-        }
-
-        public PropertyFactory(IMediaType mediaType, Guid version, int id)
-        {
-            _mediaType = mediaType;
             _version = version;
             _id = id;
         }
@@ -98,22 +90,5 @@ namespace Umbraco.Core.Persistence.Factories
         }
 
         #endregion
-
-        public IEnumerable<Property> BuildMediaEntity(IEnumerable<PropertyDataDto> dtos)
-        {
-            var properties = new List<Property>();
-            foreach (var dto in dtos)
-            {
-                if (_mediaType.CompositionPropertyTypes.Any(x => x.Id == dto.PropertyTypeId))
-                {
-                    var propertyType = _mediaType.CompositionPropertyTypes.First(x => x.Id == dto.PropertyTypeId);
-                    var property = propertyType.CreatePropertyFromRawValue(dto.GetValue, dto.VersionId.Value, dto.Id);
-
-                    property.ResetDirtyProperties();
-                    properties.Add(property);
-                }
-            }
-            return properties;
-        }
     }
 }

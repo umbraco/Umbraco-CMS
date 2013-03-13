@@ -45,7 +45,7 @@ namespace umbraco.cms.presentation
 
             //validate!
             int id;
-            if (!int.TryParse(Request.QueryString["id"], out id))
+            if (int.TryParse(Request.QueryString["id"], out id) == false)
             {
                 //if this is invalid show an error
                 this.DisplayFatalError("Invalid query string");
