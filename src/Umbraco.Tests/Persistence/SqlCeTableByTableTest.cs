@@ -24,12 +24,9 @@ namespace Umbraco.Tests.Persistence
         [SetUp]
         public override void Initialize()
         {
-            TestHelper.SetupLog4NetForTests();
-            TestHelper.InitializeContentDirectories();
+            base.Initialize();
 
             string path = TestHelper.CurrentAssemblyDirectory;
-            AppDomain.CurrentDomain.SetData("DataDirectory", path);
-
             //Delete database file before continueing
             string filePath = string.Concat(path, "\\test.sdf");
             if (File.Exists(filePath))
@@ -40,17 +37,7 @@ namespace Umbraco.Tests.Persistence
             //Create the Sql CE database
             var engine = new SqlCeEngine("Datasource=|DataDirectory|test.sdf");
             engine.CreateDatabase();
-
-            RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory());
-
-            Resolution.Freeze();
-            ApplicationContext.Current = new ApplicationContext(
-                //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory()),
-                //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
-
+            
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             _database = new Database("Datasource=|DataDirectory|test.sdf",
@@ -60,14 +47,7 @@ namespace Umbraco.Tests.Persistence
         [TearDown]
         public override void TearDown()
         {
-            AppDomain.CurrentDomain.SetData("DataDirectory", null);
-
-            SqlSyntaxContext.SqlSyntaxProvider = null;
-
-            //reset the app context
-            ApplicationContext.Current = null;
-			
-            RepositoryResolver.Reset();
+            base.TearDown();
         }
 
         public override Database Database
