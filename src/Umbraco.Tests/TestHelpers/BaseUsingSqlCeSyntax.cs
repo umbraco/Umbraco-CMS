@@ -17,26 +17,6 @@ namespace Umbraco.Tests.TestHelpers
             MappingResolver.Current = new MappingResolver(
                 () => PluginManager.Current.ResolveAssignedMapperTypes());
 
-            //MappingResolver.Current = new MappingResolver(
-            //    new[]
-            //        {
-            //            typeof(ContentMapper), 
-            //            typeof(ContentTypeMapper),
-            //            typeof(DataTypeDefinitionMapper),
-            //            typeof(DictionaryMapper),
-            //            typeof(DictionaryTranslationMapper),
-            //            typeof(LanguageMapper),
-            //            typeof(MediaMapper),
-            //            typeof(MediaTypeMapper),
-            //            typeof(PropertyGroupMapper),
-            //            typeof(PropertyMapper),
-            //            typeof(PropertyTypeMapper),
-            //            typeof(RelationMapper),
-            //            typeof(RelationTypeMapper),
-            //            typeof(ServerRegistrationMapper),
-            //            typeof(UserMapper),
-            //            typeof(UserTypeMapper)
-            //        });
             Resolution.Freeze();
             SetUp();
         }

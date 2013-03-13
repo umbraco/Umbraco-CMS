@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Serialization;
 using Umbraco.Tests.CodeFirst.Definitions;
 using Umbraco.Tests.CodeFirst.TestModels;
@@ -24,21 +25,7 @@ namespace Umbraco.Tests.CodeFirst
         public override void Initialize()
         {
             UmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
-
-            //this ensures its reset
-            PluginManager.Current = new PluginManager(false);
-
-            //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-            PluginManager.Current.AssembliesToScan = new[]
-				{
-                    typeof(IDataType).Assembly,
-                    typeof(tinyMCE3dataType).Assembly,
-                    typeof (ContentTypeBase).Assembly
-				};
-
-            DataTypesResolver.Current = new DataTypesResolver(
-                () => PluginManager.Current.ResolveDataTypes());
-
+           
             base.Initialize();
 
             var serviceStackSerializer = new ServiceStackJsonSerializer();
@@ -230,17 +217,7 @@ namespace Umbraco.Tests.CodeFirst
         {
 			base.TearDown();
 
-            //reset the app context
-            DataTypesResolver.Reset();
-            ApplicationContext.Current = null;
-            PluginManager.Current = null;
-
-            string path = TestHelper.CurrentAssemblyDirectory;
-            AppDomain.CurrentDomain.SetData("DataDirectory", null);
-            
             SerializationService = null;
-
-            UmbracoSettings.ResetSetters();
         }
     }
 }

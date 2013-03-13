@@ -301,6 +301,7 @@
     <Compile Include="Templates\MasterPageHelperTests.cs" />
     <Compile Include="TestHelpers\BaseDatabaseFactoryTest.cs" />
     <Compile Include="TestHelpers\BaseRoutingTest.cs" />
+    <Compile Include="TestHelpers\BaseUmbracoApplicationTest.cs" />
     <Compile Include="TestHelpers\SettingsForTests.cs" />
     <Compile Include="GlobalSettingsTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasTests.cs" />

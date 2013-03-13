@@ -19,17 +19,7 @@ namespace Umbraco.Tests.Routing
 	public class RenderRouteHandlerTests : BaseRoutingTest
 	{
 		public override void Initialize()
-		{
-            //this ensures its reset
-            PluginManager.Current = new PluginManager(false);
-
-            SurfaceControllerResolver.Current = new SurfaceControllerResolver(
-                PluginManager.Current.ResolveSurfaceControllers());
-            UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
-                PluginManager.Current.ResolveUmbracoApiControllers());
-
-            ShortStringHelperResolver.Current = new ShortStringHelperResolver(new LegacyShortStringHelper());
-
+		{                       
 			base.Initialize();
 
 		    SettingsForTests.UmbracoPath = "~/umbraco";
@@ -41,15 +31,22 @@ namespace Umbraco.Tests.Routing
 			webBoot.CreateRoutes();
 		}
 
+        protected override void FreezeResolution()
+        {
+            SurfaceControllerResolver.Current = new SurfaceControllerResolver(
+                PluginManager.Current.ResolveSurfaceControllers());
+            UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
+                PluginManager.Current.ResolveUmbracoApiControllers());
+            ShortStringHelperResolver.Current = new ShortStringHelperResolver(new LegacyShortStringHelper());
+
+            base.FreezeResolution();
+        }
+
 		public override void TearDown()
 		{
 			base.TearDown();
 		    UmbracoContext.Current = null;
-			RouteTable.Routes.Clear();
-			SurfaceControllerResolver.Reset();
-            UmbracoApiControllerResolver.Reset();
-            ShortStringHelperResolver.Reset();
-            PluginManager.Current = null;
+			RouteTable.Routes.Clear();			
 		}
 
         Template CreateTemplate(string alias)

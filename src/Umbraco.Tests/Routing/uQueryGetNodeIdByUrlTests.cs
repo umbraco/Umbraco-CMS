@@ -51,6 +51,11 @@ namespace Umbraco.Tests.Routing
 			Umbraco.Web.UmbracoContext.Current = routingContext.UmbracoContext;
 		}
 
+        public override void TearDown()
+        {
+            Umbraco.Web.UmbracoContext.Current = null;
+            base.TearDown();
+        }
 
 		[TestCase(1046, "/home")]
 		[TestCase(1173, "/home/sub1")]

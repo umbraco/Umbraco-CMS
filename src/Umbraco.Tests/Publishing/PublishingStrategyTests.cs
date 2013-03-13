@@ -24,23 +24,9 @@ namespace Umbraco.Tests.Publishing
         [SetUp]
         public override void Initialize()
         {
-            UmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
-
-            //this ensures its reset
-            PluginManager.Current = new PluginManager(false);
-
-            //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-            PluginManager.Current.AssembliesToScan = new[]
-				{
-                    typeof(IDataType).Assembly,
-                    typeof(tinyMCE3dataType).Assembly
-				};
-
-            DataTypesResolver.Current = new DataTypesResolver(
-                () => PluginManager.Current.ResolveDataTypes());
-
             base.Initialize();
 
+            UmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);              
         }
 
         [TearDown]
@@ -49,19 +35,7 @@ namespace Umbraco.Tests.Publishing
 			base.TearDown();
             
             //ensure event handler is gone
-            PublishingStrategy.Publishing -= PublishingStrategyPublishing;
-
-            //TestHelper.ClearDatabase();
-
-            //reset the app context
-            DataTypesResolver.Reset();
-            RepositoryResolver.Reset();
-            ApplicationContext.Current = null;
-            
-            string path = TestHelper.CurrentAssemblyDirectory;
-            AppDomain.CurrentDomain.SetData("DataDirectory", null);
-
-            UmbracoSettings.ResetSetters();
+            PublishingStrategy.Publishing -= PublishingStrategyPublishing;            
         }
 
         private IContent _homePage;

@@ -17,34 +17,20 @@ namespace Umbraco.Tests.Models
     {
         [SetUp]
         public override void Initialize()
-        {
-            //this ensures its reset
-            PluginManager.Current = new PluginManager(false);
-
-            //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-            PluginManager.Current.AssembliesToScan = new[]
-				{
-                    typeof(IDataType).Assembly,
-                    typeof(tinyMCE3dataType).Assembly
-				};
-
-            DataTypesResolver.Current = new DataTypesResolver(
-                () => PluginManager.Current.ResolveDataTypes());
-
-            UrlSegmentProviderResolver.Reset();
-            UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(typeof(DefaultUrlSegmentProvider));
-
+        {                                    
             base.Initialize();
+        }
+
+        protected override void FreezeResolution()
+        {
+            UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(typeof(DefaultUrlSegmentProvider));
+            base.FreezeResolution();
         }
 
         [TearDown]
         public override void TearDown()
         {
             base.TearDown();
-
-            //reset the app context
-            DataTypesResolver.Reset();
-			UrlSegmentProviderResolver.Reset();
         }
         [Test]
         public void Can_Generate_Xml_Representation_Of_Content()

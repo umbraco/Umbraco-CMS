@@ -54,10 +54,7 @@ namespace Umbraco.Tests.PublishedContent
         public override void TearDown()
         {
             base.TearDown();
-
-            PropertyEditorValueConvertersResolver.Reset();
-            PublishedContentStoreResolver.Reset();
-            PublishedMediaStoreResolver.Reset();
+            
             UmbracoContext.Current = null;
         }
     }

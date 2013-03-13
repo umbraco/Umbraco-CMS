@@ -14,21 +14,7 @@ namespace Umbraco.Tests.Services
 	{
 		[SetUp]
 		public override void Initialize()
-		{
-
-			//this ensures its reset
-			PluginManager.Current = new PluginManager(false);
-
-			//for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-			PluginManager.Current.AssembliesToScan = new[]
-				{
-					typeof(IDataType).Assembly,
-					typeof(tinyMCE3dataType).Assembly
-				};
-
-			DataTypesResolver.Current = new DataTypesResolver(
-				() => PluginManager.Current.ResolveDataTypes());
-
+		{        
 			base.Initialize();
 
 			CreateTestData();
@@ -37,10 +23,6 @@ namespace Umbraco.Tests.Services
 		[TearDown]
 		public override void TearDown()
 		{
-			//reset the app context
-			DataTypesResolver.Reset();
-			PluginManager.Current = null;
-
 			base.TearDown();
 		}
 

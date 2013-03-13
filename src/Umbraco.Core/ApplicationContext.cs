@@ -216,14 +216,16 @@ namespace Umbraco.Core
                 ResolverCollection.ResetAll();
                 //reset resolution itself (though this should be taken care of by resetting any of the resolvers above)
                 Resolution.Reset();
-                //reset the plugin manager
-                PluginManager.Current = null;
-
+                
                 //reset the instance objects
                 this.ApplicationCache = null;
+                if (DatabaseContext != null)
+                {
+                    DatabaseContext.Database.Dispose();    
+                }
                 this.DatabaseContext = null;
                 this.Services = null;
-                this.IsReady = false;
+                this._isReady = false; //set the internal field
                 
                 // Indicate that the instance has been disposed.
                 _disposed = true;

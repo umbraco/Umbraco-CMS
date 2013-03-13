@@ -24,9 +24,9 @@ namespace Umbraco.Tests.CodeFirst
 
             //for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
             PluginManager.Current.AssembliesToScan = new[]
-                                                         {
-                                                             typeof (ContentTypeBase).Assembly
-                                                         };
+                {
+                    typeof (ContentTypeBase).Assembly
+                };
         }
 
         [Test]
