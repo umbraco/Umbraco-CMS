@@ -26,7 +26,6 @@ using umbraco.BusinessLogic;
 
 namespace Umbraco.Tests.TestHelpers
 {
-	
     /// <summary>
     /// Use this abstract class for tests that requires a Sql Ce database populated with the umbraco db schema.
     /// The PetaPoco Database class should be used through the <see cref="DefaultDatabaseFactory"/>.
@@ -34,12 +33,22 @@ namespace Umbraco.Tests.TestHelpers
     [TestFixture, RequiresSTA]
     public abstract class BaseDatabaseFactoryTest : BaseUmbracoApplicationTest
     {
-        private static volatile bool _firstRun = true;
+        //This is used to indicate that this is the first test to run in the test session, if so, we always
+        //ensure a new database file is used.
+        private static volatile bool _firstRunInTestSession = true;
         private static readonly object Locker = new object();
+        private bool _firstTestInFixture = true;
+
+        //Used to flag if its the first test in the current session
+        private bool _isFirstRunInTestSession = false;
+        //Used to flag if its the first test in the current fixture
+        private bool _isFirstTestInFixture = false;
 
         [SetUp]
         public override void Initialize()
         {
+            InitializeFirstRunFlags();
+
             base.Initialize();
 
             var path = TestHelper.CurrentAssemblyDirectory;
@@ -51,19 +60,22 @@ namespace Umbraco.Tests.TestHelpers
 				//assign the service context
 				new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
 
-            CreateDatabase();
-
             DatabaseContext.Initialize();
+
+            CreateDatabase();
 
             InitializeDatabase();
 
             //ensure the configuration matches the current version for tests
             SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
         }
-
-        protected virtual bool EnsureBrandNewDatabase
+        
+        /// <summary>
+        /// The database behavior to use for the test/fixture
+        /// </summary>
+        protected virtual DbInitBehavior DatabaseTestBehavior
         {
-            get { return false; }
+            get { return DbInitBehavior.NewSchemaPerTest; }
         }
 
         /// <summary>
@@ -71,60 +83,48 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void CreateDatabase()
         {
-            //this needs to be thread-safe
-            var isFirstRun = false;
-            if (_firstRun)
-            {
-                lock (Locker)
-                {
-                    if (_firstRun)
-                    {
-                        isFirstRun = true; //set the flag
-                        _firstRun = false;
-                    }
-                }
-            }
-
             var path = TestHelper.CurrentAssemblyDirectory;
-
-            //Ensure that any database connections from a previous test is disposed. 
-            //This is really just double safety as its also done in the TearDown.
-            if (ApplicationContext != null && DatabaseContext != null)
-                DatabaseContext.Database.Dispose();
-            SqlCeContextGuardian.CloseBackgroundConnection();
-
+            
             //Get the connectionstring settings from config
             var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
             ConfigurationManager.AppSettings.Set(Core.Configuration.GlobalSettings.UmbracoConnectionName, @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf");
 
             string dbFilePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
 
-            if (isFirstRun || EnsureBrandNewDatabase || !File.Exists(dbFilePath))
+            //create a new database file if
+            // - is the first test in the session
+            // - the database file doesn't exist
+            // - NewDbFileAndSchemaPerTest
+            // - _isFirstTestInFixture + DbInitBehavior.NewDbFileAndSchemaPerFixture
+
+            //if this is the first test in the session, always ensure a new db file is created
+            if (_isFirstRunInTestSession || !File.Exists(dbFilePath) 
+                || DatabaseTestBehavior == DbInitBehavior.NewDbFileAndSchemaPerTest
+                || (_isFirstTestInFixture && DatabaseTestBehavior == DbInitBehavior.NewDbFileAndSchemaPerFixture))
             {
-                try
-                {
-                    //Delete database file before continueing                    
-                    if (File.Exists(dbFilePath))
+                
+                RemoveDatabaseFile(ex =>
                     {
-                        File.Delete(dbFilePath);
-                    }
-                }
-                catch (Exception)
-                {
-                    //if this doesn't work we have to make sure everything is reset! otherwise
-                    // well run into issues because we've already set some things up
-                    TearDown();
-                    throw;
-                }
+                        //if this doesn't work we have to make sure everything is reset! otherwise
+                        // well run into issues because we've already set some things up
+                        TearDown();
+                        throw ex;
+                    });
 
                 //Create the Sql CE database
                 var engine = new SqlCeEngine(settings.ConnectionString);
                 engine.CreateDatabase();
             }
-            else
+
+            //clear the database if
+            // - NewSchemaPerTest
+            // - _isFirstTestInFixture + DbInitBehavior.NewSchemaPerFixture
+
+            else if (DatabaseTestBehavior == DbInitBehavior.NewSchemaPerTest
+                || (_isFirstTestInFixture && DatabaseTestBehavior == DbInitBehavior.NewSchemaPerFixture))
             {
-                TestHelper.ClearDatabase();
-            }            
+                DatabaseContext.Database.UninstallDatabaseSchema();
+            }
         }
 
         /// <summary>
@@ -152,46 +152,112 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void InitializeDatabase()
         {
-            //Create the umbraco database and its base data
-            DatabaseContext.Database.CreateDatabaseSchema(false);            
+            //create the schema and load default data if:
+            // - is the first test in the session
+            // - NewSchemaPerTest
+            // - NewDbFileAndSchemaPerTest
+            // - _isFirstTestInFixture + DbInitBehavior.NewSchemaPerFixture
+            // - _isFirstTestInFixture + DbInitBehavior.NewDbFileAndSchemaPerFixture
+
+            if (_isFirstRunInTestSession
+                || DatabaseTestBehavior == DbInitBehavior.NewSchemaPerTest
+                || (_isFirstTestInFixture && DatabaseTestBehavior == DbInitBehavior.NewSchemaPerFixture))
+            {
+                //Create the umbraco database and its base data
+                DatabaseContext.Database.CreateDatabaseSchema(false);
+            }            
+        }
+
+        [TestFixtureTearDown]
+        public void FixtureTearDown()
+        {
+            if (DatabaseTestBehavior == DbInitBehavior.NewDbFileAndSchemaPerFixture)
+            {
+                RemoveDatabaseFile();
+            }
         }
 
         [TearDown]
         public override void TearDown()
         {
-            base.TearDown();
+            _isFirstTestInFixture = false; //ensure this is false before anything!
 
-            string path = TestHelper.CurrentAssemblyDirectory;
-
-            SqlSyntaxContext.SqlSyntaxProvider = null;
-            
-			//legacy API database connection close - because a unit test using PetaPoco db-layer can trigger the usage of SqlHelper we need to ensure that a possible connection is closed.
-			SqlCeContextGuardian.CloseBackgroundConnection();
-			
-            if (EnsureBrandNewDatabase)
+            if (DatabaseTestBehavior == DbInitBehavior.NewDbFileAndSchemaPerTest)
             {
-                try
-                {
-                    string filePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
-                    if (File.Exists(filePath))
-                    {
-                        File.Delete(filePath);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.Error<BaseDatabaseFactoryTest>("Could not remove the old database file", ex);
-
-                    //We will swallow this exception! That's because a sub class might require further teardown logic.
-                }
+                RemoveDatabaseFile();
             }
-            else
+            else if (DatabaseTestBehavior == DbInitBehavior.NewSchemaPerTest)
             {
-                TestHelper.ClearDatabase();
+                DatabaseContext.Database.UninstallDatabaseSchema();
+                //TestHelper.ClearDatabase();
             }
            
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
-                            
+
+            SqlSyntaxContext.SqlSyntaxProvider = null;
+
+            base.TearDown();
+        }
+
+        private void CloseDbConnections()
+        {
+            //Ensure that any database connections from a previous test is disposed. 
+            //This is really just double safety as its also done in the TearDown.
+            if (ApplicationContext != null && DatabaseContext != null && DatabaseContext.Database != null)
+                DatabaseContext.Database.Dispose();
+            SqlCeContextGuardian.CloseBackgroundConnection();
+        }
+
+        private void InitializeFirstRunFlags()
+        {
+            //this needs to be thread-safe
+            _isFirstRunInTestSession = false;
+            if (_firstRunInTestSession)
+            {
+                lock (Locker)
+                {
+                    if (_firstRunInTestSession)
+                    {
+                        _isFirstRunInTestSession = true; //set the flag
+                        _firstRunInTestSession = false;
+                    }
+                }
+            }
+            if (_firstTestInFixture)
+            {
+                lock (Locker)
+                {
+                    if (_firstTestInFixture)
+                    {
+                        _isFirstTestInFixture = true; //set the flag
+                        _firstTestInFixture = false;
+                    }
+                }
+            }
+        }
+
+        private void RemoveDatabaseFile(Action<Exception> onFail = null)
+        {
+            CloseDbConnections();
+            string path = TestHelper.CurrentAssemblyDirectory;
+            try
+            {
+                string filePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<BaseDatabaseFactoryTest>("Could not remove the old database file", ex);
+
+                //We will swallow this exception! That's because a sub class might require further teardown logic.
+                if (onFail != null)
+                {
+                    onFail(ex);
+                }
+            }
         }
 
 	    protected ServiceContext ServiceContext

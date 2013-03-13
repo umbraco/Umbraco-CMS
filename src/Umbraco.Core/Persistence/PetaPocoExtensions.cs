@@ -139,6 +139,12 @@ namespace Umbraco.Core.Persistence
             CreateDatabaseSchema(db, true);
         }
 
+        internal static void UninstallDatabaseSchema(this Database db)
+        {
+            var creation = new DatabaseSchemaCreation(db);
+            creation.UninstallDatabaseSchema();
+        }
+
         internal static void CreateDatabaseSchema(this Database db, bool guardConfiguration)
         {
             if (guardConfiguration && ApplicationContext.Current.IsConfigured)
@@ -155,28 +161,6 @@ namespace Umbraco.Core.Persistence
 
             NewTable -= PetaPocoExtensions_NewTable;
         }
-
-        //NOTE: SD: This doesn't work because in order to create the initial data the constraints cannot exist, it is not enough
-        // to just allow identity insertion.
-        //internal static void CreateInitialData(this Database db)
-        //{
-        //    var creation = new DatabaseSchemaCreation(db);
-        //    foreach (var tableDefinition in creation.GetOrderedTableDefinitions())
-        //    {
-        //        var baseDataCreation = new BaseDataCreation(db);
-        //        var tableName = tableDefinition.Name;
-        //        //Turn on identity insert if db provider is not mysql
-        //        if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
-        //            db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName))));
-
-        //        baseDataCreation.InitializeBaseData(tableName);
-
-        //        //Turn off identity insert if db provider is not mysql
-        //        if (SqlSyntaxContext.SqlSyntaxProvider.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
-        //            db.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF;", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName))));
-        //    }
-            
-        //}
 
         public static DatabaseProviders GetDatabaseProvider(this Database db)
         {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -65,15 +66,28 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                           };
         #endregion
 
-        //SD: Commented out for now, was used to insert the data into a database that already has a schema
-        ///// <summary>
-        ///// Returns the tables in order of creation cycle
-        ///// </summary>
-        ///// <returns></returns>
-        //internal IEnumerable<TableDefinition> GetOrderedTableDefinitions()
-        //{
-        //    return OrderedTables.OrderBy(x => x.Key).Select(x => DefinitionFactory.GetTableDefinition(x.Value));            
-        //} 
+        /// <summary>
+        /// Drops all Umbraco tables in the db
+        /// </summary>
+        internal void UninstallDatabaseSchema()
+        {
+            foreach (var item in OrderedTables.OrderByDescending(x => x.Key))
+            {
+                var tableNameAttribute = item.Value.FirstAttribute<TableNameAttribute>();
+                string tableName = tableNameAttribute == null ? item.Value.Name : tableNameAttribute.Value;
+
+                try
+                {
+                    _database.DropTable(tableName);
+                }
+                catch (Exception ex)
+                {
+                    //swallow this for now, not sure how best to handle this with diff databases... though this is internal
+                    // and only used for unit tests. If this fails its because the table doesn't exist... generally!
+                    LogHelper.Error<DatabaseSchemaCreation>("Could not drop table " + tableName, ex);
+                }
+            }
+        }
 
         public DatabaseSchemaCreation(Database database)
         {

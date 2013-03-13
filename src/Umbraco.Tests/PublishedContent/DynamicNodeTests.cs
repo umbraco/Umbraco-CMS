@@ -20,6 +20,14 @@ namespace Umbraco.Tests.PublishedContent
             get { return true; }
         }
 
+        /// <summary>
+        /// We only need a new schema per fixture... speeds up testing
+        /// </summary>
+        protected override DbInitBehavior DatabaseTestBehavior
+        {
+            get { return DbInitBehavior.NewSchemaPerFixture; }
+        }
+
         public override void Initialize()
         {
             base.Initialize();
