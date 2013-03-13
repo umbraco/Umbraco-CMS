@@ -65,6 +65,16 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                           };
         #endregion
 
+        //SD: Commented out for now, was used to insert the data into a database that already has a schema
+        ///// <summary>
+        ///// Returns the tables in order of creation cycle
+        ///// </summary>
+        ///// <returns></returns>
+        //internal IEnumerable<TableDefinition> GetOrderedTableDefinitions()
+        //{
+        //    return OrderedTables.OrderBy(x => x.Key).Select(x => DefinitionFactory.GetTableDefinition(x.Value));            
+        //} 
+
         public DatabaseSchemaCreation(Database database)
         {
             _database = database;

@@ -45,6 +45,117 @@ namespace SqlCE4Umbraco
             }
         }
 
+        //SD: Commented this out, it was used to remove all data in the database but not the database schema....
+        // hoping for faster unit test performance, unfortunately I don't think it is currently possible to 
+        // install the base umbraco data without dropping constraints. For some reason I don't think the performance
+        // will be much faster dropping and re-creating constraints as opposed to just re-creating the schema.
+//        internal void ClearUmbracoDatabaseData()
+//        {
+//            var tables = new List<string>();
+//            using (var reader = ExecuteReader("select table_name from information_schema.tables where table_type <> 'VIEW' order by table_name"))            
+//            {
+//                while (reader.Read()) tables.Add(reader.GetString("table_name").Trim());
+//            }
+
+//            var pKeys = new List<Tuple<string, string>>();
+//            //first get the primary key columsn for each table:
+//            using (var reader = ExecuteReader(@"
+//select information_schema.table_constraints.table_name, column_name from information_schema.table_constraints
+//inner join information_schema.key_column_usage
+//on information_schema.table_constraints.constraint_name = information_schema.key_column_usage.constraint_name
+//where constraint_type = 'PRIMARY KEY'"))
+//            {
+//                while (reader.Read())
+//                {
+//                    pKeys.Add(new Tuple<string, string>(reader.GetString("table_name").Trim(), reader.GetString("column_name").Trim()));
+//                }
+//            }
+
+//            //exclude the umbracoNode table, it is special and has a recursive constraing so we'll deal with that last
+//            tables = tables.Where(x => !x.InvariantEquals("umbracoNode")).ToList();
+
+//            var retries = -1;
+
+//            //Clear all data in all tables except for umbracoNode... this will always be last
+//            while (tables.Any())
+//            {
+//                retries++;
+
+//                //avoid an infinite loop if there's something seriously wrong
+//                if (retries > 100)
+//                {
+//                    throw new ApplicationException("Could not clear out all of the data in the database :(");
+//                }
+
+//                var currTables = tables.ToArray();
+//                for (int index = 0; index < currTables.Count(); index++)
+//                {
+//                    var table = currTables[index];
+//                    try
+//                    {
+
+//                        //get all foreign key constraint columns for the table
+//                        var fkCols = new List<string>();
+//                        using (var reader = ExecuteReader(@"
+//select column_name
+//  from information_schema.key_column_usage
+//  inner join information_schema.table_constraints on
+//  information_schema.key_column_usage.constraint_name = 
+//  information_schema.table_constraints.constraint_name
+//where constraint_type = 'FOREIGN KEY' AND information_schema.key_column_usage.table_name = '" + table + "'"))
+//                        {
+//                            while (reader.Read()) fkCols.Add(reader.GetString("column_name").Trim());
+//                        }
+
+//                        //set the value to null for everything in these columns (we do a try catch in case null is not allowed)
+//                        foreach (var fk in fkCols)
+//                        {
+//                            try
+//                            {
+//                                ExecuteNonQuery("UPDATE " + table + " SET " + fk + " = NULL");
+//                            }
+//                            catch (Exception)
+//                            {
+//                                //swallow this exception and continue, apparently null is not allowed here
+//                            }
+//                        }
+
+//                        //SINCE SqlCe doesn't support "truncate table" we need to do this and reset the identity seed
+//                        ExecuteNonQuery("delete from [" + table + "]");
+//                        foreach (var key in pKeys.Where(x => x.Item1.InvariantEquals(table)))
+//                        {
+//                            try
+//                            {
+//                                ExecuteNonQuery("ALTER TABLE [" + table + "] ALTER COLUMN " + key.Item2 + " IDENTITY (1,1)");
+//                            }
+//                            catch (Exception)
+//                            {
+//                                //swallow... SD: we're swallowing this in case the key doesn't have an identity, there might be a better way to 
+//                                // look this up but I can't find it.
+//                            }   
+//                        }                        
+//                        tables.Remove(table); //table is complete
+//                    }
+//                    catch (Exception)
+//                    {
+//                        //swallow... SD: I know this isn't  nice but it's just as fast and trying to identify the upmost 'parent' table
+//                        // and then follow its chain down to it's bottommost 'child' table based on constraints/relations is something
+//                        // I don't feel like writing.... could figure it out manually but don't have time atm.
+//                    }
+//                }
+//            }
+
+//            //Now, we deal with umbracoNode
+//            //Set all parentId's = the first item found
+//            var firstId = ExecuteScalar<int>("Select TOP 1 id from umbracoNode");
+//            ExecuteNonQuery("UPDATE umbracoNode SET parentId = " + firstId);
+//            //now clear out the data, aparet from the foreign key we've updated too
+//            ExecuteNonQuery("delete from umbracoNode where id <> " + firstId);
+//            //finally clear out the last one
+//            ExecuteNonQuery("delete from umbracoNode");
+
+//        }
+
         /// <summary>
         /// Most likely only will be used for unit tests but will remove all tables from the database
         /// </summary>

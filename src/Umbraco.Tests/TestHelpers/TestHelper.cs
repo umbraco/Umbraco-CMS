@@ -31,6 +31,17 @@ namespace Umbraco.Tests.TestHelpers
 			dataHelper.ClearDatabase();
 		}
 
+        //public static void ClearUmbracoDatabaseData()
+        //{
+        //    var databaseSettings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
+        //    var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false) as SqlCEHelper;
+
+        //    if (dataHelper == null)
+        //        throw new InvalidOperationException("The sql helper for unit tests must be of type SqlCEHelper, check the ensure the connection string used for this test is set to use SQLCE");
+
+        //    dataHelper.ClearUmbracoDatabaseData();
+        //}
+
         public static void DropForeignKeys(string table)
         {
             var databaseSettings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];

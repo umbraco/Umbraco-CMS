@@ -14,7 +14,7 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence
 {
-    [TestFixture]
+    [TestFixture, RequiresSTA]
     public class SqlCeTableByTableTest : BaseTableByTableTest
     {
         private Database _database;

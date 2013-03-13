@@ -211,7 +211,10 @@ namespace Umbraco.Core
                 if (_disposed) return;
 
                 //clear the cache
-                ApplicationCache.ClearAllCache();
+                if (ApplicationCache != null)
+                {
+                    ApplicationCache.ClearAllCache();    
+                }
                 //reset all resolvers
                 ResolverCollection.ResetAll();
                 //reset resolution itself (though this should be taken care of by resetting any of the resolvers above)
@@ -219,9 +222,12 @@ namespace Umbraco.Core
                 
                 //reset the instance objects
                 this.ApplicationCache = null;
-                if (DatabaseContext != null)
+                if (_databaseContext != null) //need to check the internal field here
                 {
-                    DatabaseContext.Database.Dispose();    
+                    if (DatabaseContext.Database != null)
+                    {
+                        DatabaseContext.Database.Dispose();       
+                    }                    
                 }
                 this.DatabaseContext = null;
                 this.Services = null;

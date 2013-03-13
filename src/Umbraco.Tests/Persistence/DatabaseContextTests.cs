@@ -59,7 +59,8 @@ namespace Umbraco.Tests.Persistence
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
             //Delete database file before continueing
-            string filePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
+            //NOTE: we'll use a custom db file for this test since we're re-using the one created with BaseDatabaseFactoryTest
+            string filePath = string.Concat(path, "\\DatabaseContextTests.sdf");
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
@@ -68,8 +69,10 @@ namespace Umbraco.Tests.Persistence
             //Get the connectionstring settings from config
             var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
 
+            //by default the conn string is: Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf
+            //we'll just replace the sdf file with our custom one:
             //Create the Sql CE database
-            var engine = new SqlCeEngine(settings.ConnectionString);
+            var engine = new SqlCeEngine(settings.ConnectionString.Replace("UmbracoPetaPocoTests", "DatabaseContextTests"));
             engine.CreateDatabase();
 
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
