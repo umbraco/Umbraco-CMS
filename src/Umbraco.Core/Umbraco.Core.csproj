@@ -716,6 +716,13 @@
     <Compile Include="TypeFinder.cs" />
     <Compile Include="TypeHelper.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="Constants-PropertyEditors.cs">
+      <DependentUpon>Constants.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Constants-ObjectTypes.cs">
+      <DependentUpon>Constants.cs</DependentUpon>
+    </Compile>
     <Compile Include="UpgradeableReadLock.cs" />
     <Compile Include="DelegateEqualityComparer.cs" />
     <Compile Include="Media\IEmbedProvider.cs" />
