@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.listbox
 {
@@ -40,7 +41,7 @@ namespace umbraco.editorControls.listbox
 
 		public override Guid Id 
 		{
-			get {return new Guid("928639AA-9C73-4028-920C-1E55DBB68783");}
+			get { return new Guid(Constants.PropertyEditors.DropdownlistMultiplePublishKeys); }
 		}
 		public override interfaces.IDataPrevalue PrevalueEditor 
 		{

@@ -42,7 +42,7 @@ namespace umbraco.cms.businesslogic.template
         private static object templateCacheSyncLock = new object();
         private static readonly string UmbracoTemplateCacheKey = "UmbracoTemplateCache";
         private static object _templateLoaderLocker = new object();
-        private static Guid _objectType = new Guid("6fbde604-4178-42ce-a10b-8a2600a2f07d");
+        private static Guid _objectType = new Guid(Constants.ObjectTypes.Template);
 		private static readonly char[] NewLineChars = Environment.NewLine.ToCharArray();
 
         #endregion

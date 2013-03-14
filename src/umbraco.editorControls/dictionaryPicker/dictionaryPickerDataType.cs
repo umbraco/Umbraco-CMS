@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.dictionaryPicker
 {
@@ -35,7 +36,7 @@ namespace umbraco.editorControls.dictionaryPicker
 			get
 			{
 				// TODO:  Add dictionaryPickerDataType.Id getter implementation
-				return new Guid ("17B70066-F764-407d-AB05-3717F1E1C513");
+				return new Guid(Constants.PropertyEditors.DictionaryPicker);
 			}
 		}
 

@@ -20,6 +20,7 @@ using umbraco.DataLayer;
 using umbraco.presentation.nodeFactory;
 using Action = umbraco.BusinessLogic.Actions.Action;
 using Node = umbraco.NodeFactory.Node;
+using Umbraco.Core;
 
 namespace umbraco
 {
@@ -1111,7 +1112,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                             IRecordsReader dr = SqlHelper.ExecuteReader(sql,
                                                                         SqlHelper.CreateParameter("@type",
                                                                                                   new Guid(
-                                                                                                      "C66BA18E-EAF3-4CFF-8A22-41B16D66A972")))
+                                                                                                      Constants.ObjectTypes.Document)))
                             )
                         {
                             while (dr.Read())

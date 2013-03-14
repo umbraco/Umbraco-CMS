@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Tests.TestHelpers;
@@ -12,7 +13,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Clause()
         {
-            var NodeObjectType = new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972");
+            var NodeObjectType = new Guid(Constants.ObjectTypes.Document);
 
             var expected = new Sql();
             expected.Select("*")
@@ -41,7 +42,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Where_Clause()
         {
-            var NodeObjectType = new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972");
+            var NodeObjectType = new Guid(Constants.ObjectTypes.Document);
 
             var expected = new Sql();
             expected.Select("*")
@@ -72,7 +73,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Where_With_Version_Clause()
         {
-            var NodeObjectType = new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972");
+            var NodeObjectType = new Guid(Constants.ObjectTypes.Document);
             var versionId = new Guid("2b543516-a944-4ee6-88c6-8813da7aaa07");
 
             var expected = new Sql();

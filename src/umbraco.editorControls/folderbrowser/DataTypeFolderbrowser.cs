@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.folderbrowser
 {
@@ -24,7 +25,7 @@ namespace umbraco.editorControls.folderbrowser
             get { return _baseData ?? (_baseData = new cms.businesslogic.datatype.DefaultData(this)); }
         }
 
-        public override Guid Id { get { return new Guid("CCCD4AE9-F399-4ED2-8038-2E88D19E810C"); } }
+        public override Guid Id { get { return new Guid(Constants.PropertyEditors.FolderBrowser); } }
 
         public override string DataTypeName { get { return "Folder browser"; } }
 

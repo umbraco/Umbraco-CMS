@@ -6,6 +6,7 @@ using System.Xml;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.interfaces;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Strategies.DataTypes
 {
@@ -28,7 +29,7 @@ namespace Umbraco.Web.Strategies.DataTypes
 		{
 			if (UmbracoSettings.ImageAutoFillImageProperties != null)
 			{
-				var property = sender.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id == new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+				var property = sender.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id == new Guid(Constants.PropertyEditors.UploadField));
 				if (property == null)
 					return;
 
@@ -41,7 +42,7 @@ namespace Umbraco.Web.Strategies.DataTypes
 		{
 			if (UmbracoSettings.ImageAutoFillImageProperties != null)
 			{
-				var property = sender.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id == new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+				var property = sender.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id == new Guid(Constants.PropertyEditors.UploadField));
 				if (property == null)
 					return;
 

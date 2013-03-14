@@ -9,8 +9,8 @@ namespace Umbraco.Core.PropertyEditors
 		{
 			return (new[]
 				{
-					Guid.Parse("b6fb1622-afa5-4bbf-a3cc-d9672a442222"),
-					Guid.Parse("23e93522-3200-44e2-9f29-e61a6fcbb79a")
+					Guid.Parse(Constants.PropertyEditors.DateTime),
+					Guid.Parse(Constants.PropertyEditors.Date)
 				}).Contains(propertyEditorId);
 		}
 

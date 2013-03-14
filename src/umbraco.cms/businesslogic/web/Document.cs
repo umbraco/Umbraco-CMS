@@ -121,7 +121,7 @@ namespace umbraco.cms.businesslogic.web
                 order by level,sortOrder
  ";
 
-        public static Guid _objectType = new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972");
+        public static Guid _objectType = new Guid(Constants.ObjectTypes.Document);
 
         #endregion
 

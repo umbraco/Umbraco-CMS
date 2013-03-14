@@ -1089,7 +1089,7 @@ namespace umbraco.cms.businesslogic
             base.setupNode();
 
             //Try to load the ContentType/MediaType through the new public api
-            if (nodeObjectType == new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"))
+            if (nodeObjectType == new Guid(Constants.ObjectTypes.DocumentType))
             {
                 var contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(Id);
                 if (contentType != null)
@@ -1098,7 +1098,7 @@ namespace umbraco.cms.businesslogic
                     return;
                 }
             }
-            else if (nodeObjectType == new Guid("4EA4382B-2F5A-4C2B-9587-AE9B3CF3602E"))
+            else if (nodeObjectType == new Guid(Constants.ObjectTypes.MediaType))
             {
                 var mediaType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(Id);
                 if (mediaType != null)

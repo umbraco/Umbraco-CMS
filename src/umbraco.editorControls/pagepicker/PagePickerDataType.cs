@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.pagepicker
 {
@@ -36,7 +37,7 @@ namespace umbraco.editorControls.pagepicker
 		{
 			get
 			{
-				return new Guid ("158AA029-24ED-4948-939E-C3DA209E5FBA");
+				return new Guid (Constants.PropertyEditors.ContentPicker);
 			}
 		}
 

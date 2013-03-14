@@ -927,7 +927,7 @@ namespace Umbraco.Core.Services
 				uow.Commit();
 
                 //Special case for the Upload DataType
-				var uploadDataTypeId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
+				var uploadDataTypeId = new Guid(Constants.PropertyEditors.UploadField);
 				if (content.Properties.Any(x => x.PropertyType.DataTypeId == uploadDataTypeId))
 				{
 					bool isUpdated = false;
@@ -964,7 +964,7 @@ namespace Umbraco.Core.Services
 				}
 
                 //Special case for the Tags DataType
-                var tagsDataTypeId = new Guid("4023e540-92f5-11dd-ad8b-0800200c9a66");
+                var tagsDataTypeId = new Guid(Constants.PropertyEditors.Tags);
                 if (content.Properties.Any(x => x.PropertyType.DataTypeId == tagsDataTypeId))
                 {
                     var tags = uow.Database.Fetch<TagRelationshipDto>("WHERE nodeId = @Id", new {Id = content.Id});

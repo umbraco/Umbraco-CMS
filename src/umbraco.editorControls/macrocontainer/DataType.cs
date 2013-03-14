@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.macrocontainer
 {
@@ -40,7 +41,7 @@ namespace umbraco.editorControls.macrocontainer
         {
             get
             {
-                return new Guid("474FCFF8-9D2D-11DE-ABC6-AD7A56D89593");
+                return new Guid(Constants.PropertyEditors.MacroContainer);
             }
         }
         public override string DataTypeName

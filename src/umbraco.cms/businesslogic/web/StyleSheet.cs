@@ -7,6 +7,7 @@ using System.Xml;
 using umbraco.cms.businesslogic.cache;
 using umbraco.DataLayer;
 using umbraco.IO;
+using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -19,7 +20,7 @@ namespace umbraco.cms.businesslogic.web
         private string _filename = "";
         private string _content = "";
         private StylesheetProperty[] m_properties;
-        public static Guid ModuleObjectType = new Guid("9f68da4f-a3a8-44c2-8226-dcbd125e4840");
+        public static Guid ModuleObjectType = new Guid(Constants.ObjectTypes.Stylesheet);
 
         private static object stylesheetCacheSyncLock = new object();
         private static readonly string UmbracoStylesheetCacheKey = "UmbracoStylesheet";

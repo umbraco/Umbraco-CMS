@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.yesno
 {
@@ -37,7 +38,7 @@ namespace umbraco.editorControls.yesno
 		}
 		public override Guid Id 
 		{
-			get {return new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a");}
+			get {return new Guid(Constants.PropertyEditors.TrueFalse);}
 		}
 		
 

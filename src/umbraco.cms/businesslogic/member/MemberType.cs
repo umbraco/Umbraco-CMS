@@ -3,6 +3,7 @@ using System.Xml;
 using umbraco.cms.businesslogic.propertytype;
 using System.Linq;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.member
 {
@@ -13,8 +14,8 @@ namespace umbraco.cms.businesslogic.member
 	public class MemberType : ContentType
     {
         #region Private Members
-        
-        private static Guid _objectType = new Guid("9b5416fb-e72f-45a9-a07b-5a9a2709ce43");
+
+        private static Guid _objectType = new Guid(Constants.ObjectTypes.MemberType);
         
         #endregion
 

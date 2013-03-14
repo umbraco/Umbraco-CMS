@@ -1,5 +1,6 @@
 using System;
 using umbraco.interfaces;
+using Umbraco.Core;
 using datatype = umbraco.cms.businesslogic.datatype;
 
 namespace umbraco.editorControls.tags
@@ -40,7 +41,7 @@ namespace umbraco.editorControls.tags
 
         public override Guid Id
         {
-            get { return new Guid("4023e540-92f5-11dd-ad8b-0800200c9a66"); }
+            get { return new Guid(Constants.PropertyEditors.Tags); }
         }
 
         public override IDataPrevalue PrevalueEditor

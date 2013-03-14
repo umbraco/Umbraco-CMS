@@ -105,7 +105,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Guid NodeObjectTypeId
         {
-            get { return new Guid("30A2A501-1978-4DDB-A57B-F7EFED43BA3C"); }
+            get { return new Guid(Constants.ObjectTypes.DataType); }
         }
 
         #endregion

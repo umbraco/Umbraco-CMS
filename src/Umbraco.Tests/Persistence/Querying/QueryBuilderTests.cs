@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -86,7 +87,7 @@ namespace Umbraco.Tests.Persistence.Querying
             // Arrange
             var path = "-1,1046,1076,1089";
             var id = 1046;
-            var nodeObjectTypeId = new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972");
+            var nodeObjectTypeId = new Guid(Constants.ObjectTypes.Document);
 
             var sql = new Sql();
             sql.Select("*")

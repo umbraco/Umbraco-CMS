@@ -7,6 +7,7 @@ using umbraco.DataLayer;
 using System.Xml;
 using umbraco.interfaces;
 using umbraco.cms.businesslogic.propertytype;
+using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.datatype
 {
@@ -23,7 +24,7 @@ namespace umbraco.cms.businesslogic.datatype
         #region Private fields
         private Guid _controlId;
 
-        private static Guid _objectType = new Guid("30a2a501-1978-4ddb-a57b-f7efed43ba3c");
+        private static Guid _objectType = new Guid(Constants.ObjectTypes.DataType);
 	    private string _dbType;
 
 	    #endregion

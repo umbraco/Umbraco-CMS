@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.simpleEditor
 {
@@ -32,7 +33,7 @@ namespace umbraco.editorControls.simpleEditor
 		}
 		public override Guid Id 
 		{
-			get {return new Guid("60B7DABF-99CD-41eb-B8E9-4D2E669BBDE9");}
+			get { return new Guid(Constants.PropertyEditors.UltraSimpleEditor); }
 		}
 
 		public override string DataTypeName 

@@ -810,7 +810,7 @@ namespace umbraco.cms.businesslogic.packager
                 // Fix for rich text editor backwards compatibility 
                 if (dfId == 0 && dtId == new Guid("a3776494-0574-4d93-b7de-efdfdec6f2d1"))
                 {
-                    dtId = new Guid("83722133-f80c-4273-bdb6-1befaa04a612");
+                    dtId = new Guid(Constants.PropertyEditors.TinyMCE);
                     dfId = findDataTypeDefinitionFromType(ref dtId);
                 }
 

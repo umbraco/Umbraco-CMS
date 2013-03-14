@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.mediapicker
 {
@@ -38,7 +39,7 @@ namespace umbraco.editorControls.mediapicker
 		{
 			get
 			{
-				return new Guid ("EAD69342-F06D-4253-83AC-28000225583B");
+				return new Guid(Constants.PropertyEditors.MediaPicker);
 			}
 		}
 		public override string DataTypeName

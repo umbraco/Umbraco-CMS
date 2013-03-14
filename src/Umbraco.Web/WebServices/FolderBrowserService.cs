@@ -42,7 +42,7 @@ namespace Umbraco.Web.WebServices
             {
                 var fileProp = child.getProperty("umbracoFile") ?? 
                     child.GenericProperties.FirstOrDefault(x =>
-                        x.PropertyType.DataTypeDefinition.DataType.Id == new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+                        x.PropertyType.DataTypeDefinition.DataType.Id == new Guid(Constants.PropertyEditors.UploadField));
 
                 var fileUrl = fileProp != null ? fileProp.Value.ToString() : "";
                 var thumbUrl = ThumbnailProvidersResolver.Current.GetThumbnailUrl(fileUrl);

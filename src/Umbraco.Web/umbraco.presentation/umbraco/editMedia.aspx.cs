@@ -8,6 +8,7 @@ using System.Linq;
 using System.IO;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.property;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation
 {
@@ -121,7 +122,7 @@ namespace umbraco.cms.presentation
 
         private void UpdateMediaFileLinksLiteral()
         {
-            var uploadField = new Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+            var uploadField = new Factory().GetNewObject(new Guid(Constants.PropertyEditors.UploadField));
 
             // always clear, incase the upload file was removed
             this.mediaFileLinksLiteral.Text = string.Empty;

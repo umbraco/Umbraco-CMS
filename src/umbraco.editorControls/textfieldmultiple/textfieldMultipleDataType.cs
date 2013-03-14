@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.textfieldmultiple
 {
@@ -35,7 +36,7 @@ namespace umbraco.editorControls.textfieldmultiple
 		}
 		public override Guid Id 
 		{
-			get {return new Guid("67db8357-ef57-493e-91ac-936d305e0f2a");}
+			get { return new Guid(Constants.PropertyEditors.TextboxMultiple); }
 		}
 
 		public override string DataTypeName 

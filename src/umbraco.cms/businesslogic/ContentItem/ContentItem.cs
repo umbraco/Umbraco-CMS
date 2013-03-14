@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.contentitem
 {
@@ -7,7 +8,7 @@ namespace umbraco.cms.businesslogic.contentitem
 	/// </summary>
 	public class ContentItem : Content
 	{
-		private static Guid _objectType = new Guid("10e2b09f-c28b-476d-b77a-aa686435e44a");
+		private static Guid _objectType = new Guid(Constants.ObjectTypes.ContentItem);
 
 		public ContentItem(int id) : base(id)
 		{

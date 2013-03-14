@@ -565,7 +565,7 @@ namespace umbraco.cms.businesslogic
             // Remove all files
 
             var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            var uploadField = new Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+            var uploadField = new Factory().GetNewObject(new Guid(Constants.PropertyEditors.UploadField));
              
             foreach (Property p in GenericProperties)
             {               

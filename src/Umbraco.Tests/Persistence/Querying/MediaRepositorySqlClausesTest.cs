@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Tests.TestHelpers;
@@ -12,7 +13,7 @@ namespace Umbraco.Tests.Persistence.Querying
         [Test]
         public void Can_Verify_Base_Clause()
         {
-            var NodeObjectTypeId = new Guid("b796f64c-1f99-4ffb-b886-4bf4bc011a9c");
+            var NodeObjectTypeId = new Guid(Constants.ObjectTypes.Media);
 
             var expected = new Sql();
             expected.Select("*")

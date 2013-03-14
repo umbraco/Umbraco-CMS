@@ -13,7 +13,7 @@ namespace umbraco.MacroEngines.RazorDataTypeModels
 	/// This ensures that the RTE renders with HtmlString encoding and also ensures that the macro contents in it
 	/// render properly too.
 	/// </summary>
-	[RazorDataTypeModel("5e9b75ae-face-41c8-b47e-5f4b0fd82f83", 90)]
+    [RazorDataTypeModel(Constants.PropertyEditors.TinyMCEv3, 90)]
     public class HtmlStringDataTypeModel : IRazorDataTypeModel
     {
         public bool Init(int CurrentNodeId, string PropertyData, out object instance)

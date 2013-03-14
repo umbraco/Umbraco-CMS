@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.SettingControls.Pickers
 {
@@ -9,7 +10,7 @@ namespace umbraco.editorControls.SettingControls.Pickers
     {
         public MemberGroup()
         {
-            ObjectGuid = new Guid("366e63b9-880f-4e13-a61c-98069b029728");
+            ObjectGuid = new Guid(Constants.ObjectTypes.MemberGroup);
         }
     }
 }

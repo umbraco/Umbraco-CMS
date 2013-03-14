@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.label
 {
@@ -13,7 +14,7 @@ namespace umbraco.editorControls.label
 		private interfaces.IDataPrevalue _prevalueeditor;
 
 		public override string DataTypeName	{get {return "No edit";}}
-		public override Guid Id {get {return new Guid("6c738306-4c17-4d88-b9bd-6546f3771597");}}
+		public override Guid Id { get { return new Guid(Constants.PropertyEditors.NoEdit); } }
 
 	
 		public override interfaces.IDataEditor DataEditor 

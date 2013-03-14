@@ -7,6 +7,7 @@ using umbraco.BasePages;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.interfaces;
 using Media = umbraco.cms.businesslogic.media.Media;
+using Umbraco.Core;
 
 namespace umbraco.controls.Images
 {
@@ -35,7 +36,7 @@ namespace umbraco.controls.Images
         /// </summary>
         public string OnClientUpload { get; set; }
 
-        protected IDataType UploadField = DataTypeDefinition.GetByDataTypeId(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c")).DataType;
+        protected IDataType UploadField = DataTypeDefinition.GetByDataTypeId(new Guid(Constants.PropertyEditors.UploadField)).DataType;
 
         protected override void OnInit(EventArgs e)
         {

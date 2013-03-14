@@ -31,7 +31,7 @@ namespace umbraco.cms.businesslogic.member
         #region Constants and static members
         public static readonly string UmbracoMemberProviderName = "UmbracoMembershipProvider";
         public static readonly string UmbracoRoleProviderName = "UmbracoRoleProvider";
-        public static readonly Guid _objectType = new Guid("39eb0f98-b348-42a1-8662-e7eb18487560");
+        public static readonly Guid _objectType = new Guid(Constants.ObjectTypes.Member);
 
         private static readonly object m_Locker = new object();
 

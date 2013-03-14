@@ -7,6 +7,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.ultimatepicker
 {
@@ -37,7 +38,7 @@ namespace umbraco.editorControls.ultimatepicker
         }
         public override Guid Id
         {
-            get { return new Guid("cdbf0b5d-5cb2-445f-bc12-fcaaec07cf2c"); }
+            get { return new Guid(Constants.PropertyEditors.UltimatePicker); }
         }
 
         public override string DataTypeName

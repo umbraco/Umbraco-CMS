@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.relatedlinks
 {
@@ -32,7 +33,7 @@ namespace umbraco.editorControls.relatedlinks
         }
         public override Guid Id
         {
-            get { return new Guid("71b8ad1a-8dc2-425c-b6b8-faa158075e63"); }
+            get { return new Guid(Constants.PropertyEditors.RelatedLinks); }
         }
 
         public override string DataTypeName

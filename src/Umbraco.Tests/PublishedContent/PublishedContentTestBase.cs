@@ -25,7 +25,7 @@ namespace Umbraco.Tests.PublishedContent
                     if (propertyAlias == "content")
                     {
                         //return the rte type id
-                        return Guid.Parse("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
+                        return Guid.Parse(Constants.PropertyEditors.TinyMCEv3);
                     }
                     return Guid.Empty;
                 };
