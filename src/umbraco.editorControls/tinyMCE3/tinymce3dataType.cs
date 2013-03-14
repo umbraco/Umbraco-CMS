@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.tinyMCE3
 {
@@ -31,7 +32,7 @@ namespace umbraco.editorControls.tinyMCE3
         }
         public override Guid Id
         {
-            get { return new Guid("{5E9B75AE-FACE-41c8-B47E-5F4B0FD82F83}"); }
+            get { return new Guid(Constants.PropertyEditors.TinyMCEv3); }
         }
 
         public override string DataTypeName
