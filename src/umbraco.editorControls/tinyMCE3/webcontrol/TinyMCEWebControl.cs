@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -9,18 +8,15 @@ using System.IO;
 using System.Text.RegularExpressions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.property;
 using Content = umbraco.cms.businesslogic.Content;
 using ClientDependency.Core.Controls;
 using ClientDependency.Core;
-using umbraco.IO;
 
 namespace umbraco.editorControls.tinyMCE3.webcontrol
 {
-    public class TinyMCEWebControl : System.Web.UI.WebControls.TextBox
+    public class TinyMCEWebControl : TextBox
     {
         internal readonly MediaFileSystem _fs;
 
@@ -319,7 +315,8 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                         {
                             if (!ht.ContainsKey(attributeSet.Groups["attributeName"].Value.ToString()))
                             {
-                                ht.Add(attributeSet.Groups["attributeName"].Value.ToString(), attributeSet.Groups["attributeValue"].Value.ToString());
+                                ht.Add(attributeSet.Groups["attributeName"].Value.ToString(),
+                                       attributeSet.Groups["attributeValue"].Value.ToString());
                             }
                         }
                     }
@@ -332,101 +329,26 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
 
                     // Find the original filename, by removing the might added width and height
                     // NH, 4.8.1 - above replaced by loading the right media file from the db later!
-                    orgSrc =
-						global::Umbraco.Core.IO.IOHelper.ResolveUrl(orgSrc.Replace("%20", " "));
-
-                    // Check for either id or guid from media
-                    string mediaId = getIdFromSource(orgSrc, rootMediaUrl);
-
-                    Media imageMedia = null;
+                    orgSrc = IOHelper.ResolveUrl(orgSrc.Replace("%20", " "));
 
                     try
                     {
-                        int mId = int.Parse(mediaId);
-                        Property p = new Property(mId);
-                        imageMedia = new Media(Content.GetContentFromVersion(p.VersionId).Id);
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            imageMedia = new Media(Content.GetContentFromVersion(new Guid(mediaId)).Id);
-                        }
-                        catch
-                        {
-                        }
-                    }
+                        // Format the tag
+                        tempTag = tempTag + " src=\"" + IOHelper.ResolveUrl(orgSrc) + "\"";
+                        tempTag += "/>";
 
-                    // Check with the database if any media matches this url
-                    if (imageMedia != null)
-                    {
-                        try
-                        {
-                            // Format the tag
-                            tempTag = tempTag + " rel=\"" +
-                                      imageMedia.getProperty("umbracoWidth").Value.ToString() + "," +
-									  imageMedia.getProperty("umbracoHeight").Value.ToString() + "\" src=\"" + global::Umbraco.Core.IO.IOHelper.ResolveUrl(imageMedia.getProperty("umbracoFile").Value.ToString()) +
-                                      "\"";
-                            tempTag += "/>";
-
-                            // Replace the tag
-                            html = html.Replace(tag.Value, tempTag);
-                        }
-                        catch (Exception ee)
-                        {
-							LogHelper.Error<TinyMCEWebControl>("Error reading size data from media: " + imageMedia.Id.ToString() + ", ", ee);
-                        }
+                        // Replace the tag
+                        html = html.Replace(tag.Value, tempTag);
                     }
-                    else
-						LogHelper.Warn<TinyMCEWebControl>("Error reading size data from media (not found): " + orgSrc);
+                    catch (Exception ex)
+                    {
+                        LogHelper.Warn<TinyMCEWebControl>("Error reading size data from media: " + orgSrc);
+                        LogHelper.Warn<TinyMCEWebControl>(ex.Message);
+                        LogHelper.Warn<TinyMCEWebControl>(ex.StackTrace);
+                    }
                 }
             return html;
         }
-
-        private string getIdFromSource(string src, string rootMediaUrl)
-        {
-            if (!rootMediaUrl.EndsWith("/"))
-                rootMediaUrl += "/";
-
-            // important - remove out the rootMediaUrl!
-            src = src.Replace(rootMediaUrl, "");
-
-            string _id = "";
-
-            // Check for directory id naming 
-            if (src.Contains("/"))
-            {
-                string[] dirSplit = src.Split("/".ToCharArray());
-                string tempId = dirSplit[0];
-                try
-                {
-                    // id
-                    _id = int.Parse(tempId).ToString();
-                }
-                catch
-                {
-                    // guid
-                    _id = tempId;
-                }
-            }
-            else
-            {
-                string[] fileSplit = src.Split("-".ToCharArray());
-
-                // guid or id
-                if (fileSplit.Length > 3)
-                {
-                    for (int i = 0; i < 5; i++)
-                        _id += fileSplit[i] + "-";
-                    _id = _id.Substring(0, _id.Length - 1);
-                }
-                else
-                    _id = fileSplit[0];
-            }
-
-            return _id;
-        }
-
 
         private string parseMacrosToHtml(string input)
         {

@@ -347,7 +347,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var propertyDataDtos = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql);
             var propertyFactory = new PropertyFactory(contentType, versionId, id);
-            var properties = propertyFactory.BuildMediaEntity(propertyDataDtos);
+            var properties = propertyFactory.BuildEntity(propertyDataDtos);
 
             var newProperties = properties.Where(x => x.HasIdentity == false);
             foreach (var property in newProperties)
