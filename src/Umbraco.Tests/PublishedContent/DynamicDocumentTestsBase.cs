@@ -24,10 +24,10 @@ namespace Umbraco.Tests.PublishedContent
 		
 		}
 
-		protected override bool RequiresDbSetup
-		{
-			get { return false; }
-		}
+        protected override DatabaseBehavior DatabaseTestBehavior
+        {
+            get { return DatabaseBehavior.NoDatabasePerFixture; }
+        }
 
 		protected override string GetXmlContent(int templateId)
 		{

@@ -12,10 +12,10 @@ namespace Umbraco.Tests.Surface
 	[TestFixture]
 	public class PluginControllerAreaTests : BaseWebTest
 	{
-		protected override bool RequiresDbSetup
-		{
-			get { return false; }
-		}
+        protected override DatabaseBehavior DatabaseTestBehavior
+        {
+            get { return DatabaseBehavior.NoDatabasePerFixture; }
+        }
 
 		[Test]
 		public void Ensure_Same_Area1()

@@ -30,24 +30,10 @@ namespace Umbraco.Tests.TestHelpers
             base.Initialize();            
         }
 
-        protected override void InitializeDatabase()
-        {
-            if (RequiresDbSetup)
-                base.InitializeDatabase();
-        }
-
         [TearDown]
         public override void TearDown()
         {
             base.TearDown();
-        }
-        
-        /// <summary>
-        /// By default this unit test will create and initialize an umbraco database
-        /// </summary>
-        protected virtual bool RequiresDbSetup
-        {
-            get { return true; }
         }
         
         protected override string GetXmlContent(int templateId)

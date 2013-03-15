@@ -12,10 +12,10 @@ namespace Umbraco.Tests.Routing
 		/// <summary>
 		/// We don't need a db for this test, will run faster without one
 		/// </summary>
-		protected override bool RequiresDbSetup
-		{
-			get { return false; }
-		}
+        protected override DatabaseBehavior DatabaseTestBehavior
+        {
+            get { return DatabaseBehavior.NoDatabasePerFixture; }
+        }
 
 		[TestCase("/1046", 1046)]
 		[TestCase("/1046.aspx", 1046)]		

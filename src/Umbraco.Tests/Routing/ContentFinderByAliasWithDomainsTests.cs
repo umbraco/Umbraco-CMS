@@ -20,9 +20,9 @@ namespace Umbraco.Tests.Routing
             InitializeLanguagesAndDomains();
         }
 
-        protected override bool RequiresDbSetup
+        protected override DatabaseBehavior DatabaseTestBehavior
         {
-            get { return true; }
+            get { return DatabaseBehavior.NewSchemaPerFixture; }
         }
 
         void InitializeLanguagesAndDomains()

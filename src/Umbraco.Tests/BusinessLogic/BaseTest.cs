@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using NUnit.Framework;
 using SqlCE4Umbraco;
+using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -22,6 +23,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             ClearDatabase();
             ConfigurationManager.AppSettings.Set(Core.Configuration.GlobalSettings.UmbracoConnectionName, "");
+            ApplicationContext.Current.DisposeIfDisposable();
         }
 
         /// <summary>
@@ -30,6 +32,7 @@ namespace Umbraco.Tests.BusinessLogic
         [SetUp]
         public void Initialize()
         {
+            ApplicationContext.Current = new ApplicationContext(){IsReady = true};
             InitializeDatabase();
             InitializeApps();
             InitializeAppConfigFile();

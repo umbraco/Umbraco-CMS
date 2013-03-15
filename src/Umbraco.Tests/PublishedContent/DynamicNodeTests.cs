@@ -15,17 +15,12 @@ namespace Umbraco.Tests.PublishedContent
     [TestFixture]
     public class DynamicNodeTests : DynamicDocumentTestsBase<DynamicNode, DynamicNodeList>
     {
-        protected override bool RequiresDbSetup
-        {
-            get { return true; }
-        }
-
         /// <summary>
         /// We only need a new schema per fixture... speeds up testing
         /// </summary>
-        protected override DbInitBehavior DatabaseTestBehavior
+        protected override DatabaseBehavior DatabaseTestBehavior
         {
-            get { return DbInitBehavior.NewSchemaPerFixture; }
+            get { return DatabaseBehavior.NewSchemaPerFixture; }
         }
 
         public override void Initialize()

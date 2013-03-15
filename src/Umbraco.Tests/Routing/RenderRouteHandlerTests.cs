@@ -18,6 +18,11 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class RenderRouteHandlerTests : BaseRoutingTest
 	{
+        protected override DatabaseBehavior DatabaseTestBehavior
+        {
+            get { return DatabaseBehavior.NewSchemaPerFixture; }
+        }
+
 		public override void Initialize()
 		{                       
 			base.Initialize();

@@ -8,9 +8,9 @@ namespace Umbraco.Tests.Routing
     [TestFixture]
     public class ContentFinderByAliasTests : BaseRoutingTest
     {
-        protected override bool RequiresDbSetup
+        protected override DatabaseBehavior DatabaseTestBehavior
         {
-            get { return false; }
+            get { return DatabaseBehavior.NoDatabasePerFixture; }
         }
 
         [TestCase("/this/is/my/alias", 1001)]

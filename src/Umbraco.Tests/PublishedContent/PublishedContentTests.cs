@@ -17,10 +17,10 @@ namespace Umbraco.Tests.PublishedContent
 	[TestFixture]
     public class PublishedContentTests : PublishedContentTestBase
 	{
-		protected override bool RequiresDbSetup
-		{
-			get { return false; }
-		}
+        protected override DatabaseBehavior DatabaseTestBehavior
+        {
+            get { return DatabaseBehavior.NoDatabasePerFixture; }
+        }
 
 		protected override string GetXmlContent(int templateId)
 		{
