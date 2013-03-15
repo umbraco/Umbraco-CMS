@@ -51,7 +51,7 @@ namespace Umbraco.Web
 		// see also VirtualPathUtility.ToAppRelative
         public static string ToAppRelative(string virtualPath)
         {
-            if (virtualPath.StartsWith(_appPathPrefix))
+            if (virtualPath.InvariantStartsWith(_appPathPrefix))
                 virtualPath = virtualPath.Substring(_appPathPrefix.Length);
 			if (virtualPath.Length == 0)
 				virtualPath = "/";
