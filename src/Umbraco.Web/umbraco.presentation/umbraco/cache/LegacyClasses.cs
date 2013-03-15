@@ -82,7 +82,7 @@ namespace umbraco.presentation.cache
         }
     }
 
-    [Obsolete("This class is no longer used, it has been superceded by Umbraco.Web.Cache.CacheRefresherClient, however that is marked internal and these should not be used directly in your code.")]
+    [Obsolete("This class is no longer used, it has been superceded by Umbraco.Core.Sync.ServerSyncWebServiceClient, however that is marked internal and these should not be used directly in your code.")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Web.Services.WebServiceBindingAttribute(Name = "CacheRefresherSoap", Namespace = "http://umbraco.org/webservices/")]

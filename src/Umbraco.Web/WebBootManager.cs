@@ -234,23 +234,27 @@ namespace Umbraco.Web
         {
             base.InitializeResolvers();
 
-            //we should not proceed to change this if the app/database is not configured since there will 
-            // be no user, plus we don't need to have server messages sent if this is the case.
-            if (ApplicationContext.IsConfigured && ApplicationContext.DatabaseContext.IsDatabaseConfigured)
+            //Override the ServerMessengerResolver to set a username/password for the distributed calls
+            ServerMessengerResolver.Current.SetServerMessenger(new DefaultServerMessenger(() =>
             {
-                var user = User.GetUser(UmbracoSettings.DistributedCallUser);
-                try
-                {
-                    //Override the ServerMessengerResolver to set a username/password for the distributed calls
-                    ServerMessengerResolver.Current.SetServerMessenger(new DefaultServerMessenger(
-                            user.LoginName,
-                            user.GetPassword()));  
+                //we should not proceed to change this if the app/database is not configured since there will 
+                // be no user, plus we don't need to have server messages sent if this is the case.
+                if (ApplicationContext.IsConfigured && ApplicationContext.DatabaseContext.IsDatabaseConfigured)
+                {                    
+                    try
+                    {
+                        var user = User.GetUser(UmbracoSettings.DistributedCallUser);
+                        return new System.Tuple<string, string>(user.LoginName, user.GetPassword());
+                    }
+                    catch (Exception e)
+                    {
+                        LogHelper.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);
+                        return null;
+                    }
                 }
-                catch (Exception e)
-                {
-                    LogHelper.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);   
-                }
-            }
+                LogHelper.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
+                return null;
+            }));
 
             //We are going to manually remove a few cache refreshers here because we've obsoleted them and we don't want them
             // to be registered more than once

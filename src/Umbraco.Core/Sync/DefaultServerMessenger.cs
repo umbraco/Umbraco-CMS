@@ -17,9 +17,12 @@ namespace Umbraco.Core.Sync
     /// </summary>
     internal class DefaultServerMessenger : IServerMessenger
     {
-        private readonly string _login;
-        private readonly string _password;
-        private readonly bool _useDistributedCalls;
+        private readonly Func<Tuple<string, string>> _getUserNamePasswordDelegate;
+        private volatile bool _hasResolvedDelegate = false;
+        private readonly object _locker = new object();
+        private string _login;
+        private string _password;
+        private bool _useDistributedCalls;
 
         /// <summary>
         /// Without a username/password all distribuion will be disabled
@@ -36,9 +39,21 @@ namespace Umbraco.Core.Sync
         /// <param name="password"></param>
         internal DefaultServerMessenger(string login, string password)
         {
+            if (login == null) throw new ArgumentNullException("login");
+            if (password == null) throw new ArgumentNullException("password");
+
             _useDistributedCalls = UmbracoSettings.UseDistributedCalls;
             _login = login;
             _password = password;
+        }
+
+        /// <summary>
+        /// Allows to set a lazy delegate to resolve the username/password
+        /// </summary>
+        /// <param name="getUserNamePasswordDelegate"></param>
+        public DefaultServerMessenger(Func<Tuple<string, string>> getUserNamePasswordDelegate)
+        {
+            _getUserNamePasswordDelegate = getUserNamePasswordDelegate;
         }
 
         public void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher,Func<T, int> getNumericId, params T[] instances)
@@ -160,6 +175,47 @@ namespace Umbraco.Core.Sync
             }
         }
 
+        /// <summary>
+        /// If we are instantiated with a lazy delegate to get the username/password, we'll resolve it here
+        /// </summary>
+        private void EnsureLazyUsernamePasswordDelegateResolved()
+        {
+            if (!_hasResolvedDelegate && _getUserNamePasswordDelegate != null)
+            {
+                lock (_locker)
+                {
+                    if (!_hasResolvedDelegate)
+                    {
+                        _hasResolvedDelegate = true; //set flag
+
+                        try
+                        {
+                            var result = _getUserNamePasswordDelegate();
+                            if (result == null)
+                            {
+                                _login = null;
+                                _password = null;
+                                _useDistributedCalls = false;
+                            }
+                            else
+                            {
+                                _login = result.Item1;
+                                _password = result.Item2;
+                                _useDistributedCalls = UmbracoSettings.UseDistributedCalls;    
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            LogHelper.Error<DefaultServerMessenger>("Could not resolve username/password delegate, server distribution will be disabled", ex);
+                            _login = null;
+                            _password = null;
+                            _useDistributedCalls = false;
+                        }
+                    }
+                }
+            }
+        }
+
         private void InvokeMethodOnRefresherInstance(ICacheRefresher refresher, MessageType dispatchType, IEnumerable<object> ids)
         {
             if (refresher == null) throw new ArgumentNullException("refresher");
@@ -211,6 +267,8 @@ namespace Umbraco.Core.Sync
         {
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
+
+            EnsureLazyUsernamePasswordDelegateResolved();
 
             //Now, check if we are using Distrubuted calls. If there are no servers in the list then we
             // can definitely not distribute.

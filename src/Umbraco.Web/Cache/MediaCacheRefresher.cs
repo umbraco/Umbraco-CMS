@@ -53,12 +53,12 @@ namespace Umbraco.Web.Cache
             foreach (var idPart in media.Path.Split(','))
             {
                 ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
-                    string.Format("UL_{0}_{1}_True", CacheKeys.MediaCacheKey, idPart));
+                    string.Format("{0}_{1}_True", CacheKeys.MediaCacheKey, idPart));
 
                 // Also clear calls that only query this specific item!
                 if (idPart == media.Id.ToString())
                     ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
-                        string.Format("UL_{0}_{1}", CacheKeys.MediaCacheKey, media.Id));
+                        string.Format("{0}_{1}", CacheKeys.MediaCacheKey, media.Id));
 
             }
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using umbraco;
 
@@ -210,12 +211,21 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
-        /// Clears the cache for all macros
+        /// Clears the cache for all macros on the current server
         /// </summary>
         /// <param name="dc"></param>
-        public static void ClearAllMacroCache(this DistributedCache dc)
+        public static void ClearAllMacroCacheOnCurrentServer(this DistributedCache dc)
         {
-            dc.RefreshAll(new Guid(DistributedCache.MacroCacheRefresherId));
+            //NOTE: The 'false' ensure that it will only refresh on the current server, not post to all servers
+            dc.RefreshAll(new Guid(DistributedCache.MacroCacheRefresherId), false);
+        }
+
+        public static void ClearXsltCacheOnCurrentServer(this DistributedCache dc)
+        {
+            if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
+            {
+                ApplicationContext.Current.ApplicationCache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
+            }
         }
     }
 }

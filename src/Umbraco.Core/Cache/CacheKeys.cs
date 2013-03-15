@@ -6,7 +6,7 @@ namespace Umbraco.Core.Cache
     /// </summary>
     public static class CacheKeys
     {
-        public const string MediaCacheKey = "GetMedia";
+        public const string MediaCacheKey = "UL_GetMedia";
 
         //NOTE: pretty sure this is never used anymore
         internal const string MacroRuntimeCacheKey = "UmbracoRuntimeMacroCache";
@@ -16,7 +16,7 @@ namespace Umbraco.Core.Cache
         public const string MacroHtmlDateAddedCacheKey = "macroHtml_DateAdded_";
         public const string MacroControlDateAddedCacheKey = "macroControl_DateAdded_";
 
-        public const string MemberCacheKey = "GetMember";
+        public const string MemberCacheKey = "UL_GetMember";
 
         public const string TemplateCacheKey = "template";
 

@@ -137,18 +137,7 @@ namespace umbraco
             set
             {
                 lock (XmlContentInternalSyncLock)
-                {
-                    //SD: Cache clearance moved to event handling: CacheRefresherEventHandler
-                    //// Clear macro cache
-                    //Cache.ClearCacheObjectTypes("umbraco.MacroCacheContent");
-                    //Cache.ClearCacheByKeySearch(CacheKeys.MacroHtmlCacheKey);
-
-                    // Clear library cache
-                    if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
-                    {
-                        Cache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
-                    }
-
+                {                    
                     _xmlContent = value;
 
                     if (!UmbracoSettings.isXmlContentCacheDisabled && UmbracoSettings.continouslyUpdateXmlDiskCache)

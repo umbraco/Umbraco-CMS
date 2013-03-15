@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Web.Services.Protocols;
@@ -114,8 +115,23 @@ namespace Umbraco.Web.Cache
         /// <param name="factoryGuid">The unique identifier.</param>
         public void RefreshAll(Guid factoryGuid)
         {
+            RefreshAll(factoryGuid, true);
+        }
+
+        /// <summary>
+        /// Sends a request to all registered load-balanced servers to refresh all nodes
+        /// using the specified ICacheRefresher with the guid factoryGuid.
+        /// </summary>
+        /// <param name="factoryGuid">The unique identifier.</param>
+        /// <param name="allServers">
+        /// If true will send the request out to all registered LB servers, if false will only execute the current server
+        /// </param>
+        public void RefreshAll(Guid factoryGuid, bool allServers)
+        {
             ServerMessengerResolver.Current.Messenger.PerformRefreshAll(
-                ServerRegistrarResolver.Current.Registrar.Registrations,
+                allServers 
+                    ? ServerRegistrarResolver.Current.Registrar.Registrations
+                    : Enumerable.Empty<IServerAddress>(), //this ensures it will only execute against the current server
                 GetRefresherById(factoryGuid));
         }
 

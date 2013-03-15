@@ -10,6 +10,7 @@ using System.Web.UI;
 using System.Xml;
 using System.Xml.XPath;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
@@ -72,8 +73,6 @@ namespace umbraco
         public static DateTime PublishStart;
         private page _page;
         private static readonly object libraryCacheLock = new object();
-        private const string GETMEDIA_CACHE_KEY = "GetMedia";
-        private const string GETMEMBER_CACHE_KEY = "GetMember";
 
         #endregion
 
@@ -465,13 +464,11 @@ namespace umbraco
             {
                 if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
                 {
-                    XPathNodeIterator retVal = Cache.GetCacheItem<XPathNodeIterator>(String.Format(
-                        "UL_{0}_{1}_{2}", GETMEDIA_CACHE_KEY, MediaId, Deep), libraryCacheLock,
+                    XPathNodeIterator retVal = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                        string.Format(
+                            "{0}_{1}_{2}", CacheKeys.MediaCacheKey, MediaId, Deep),
                         TimeSpan.FromSeconds(UmbracoSettings.UmbracoLibraryCacheDuration),
-                        delegate
-                        {
-                            return getMediaDo(MediaId, Deep);
-                        });
+                        () => getMediaDo(MediaId, Deep));
 
                     if (retVal != null)
                         return retVal;
@@ -518,13 +515,11 @@ namespace umbraco
             {
                 if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
                 {
-                    XmlDocument retVal = Cache.GetCacheItem<XmlDocument>(String.Format(
-                        "UL_{0}_{1}", GETMEMBER_CACHE_KEY, MemberId), libraryCacheLock,
+                    var retVal = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                        string.Format(
+                            "{0}_{1}", CacheKeys.MemberCacheKey, MemberId),
                         TimeSpan.FromSeconds(UmbracoSettings.UmbracoLibraryCacheDuration),
-                        delegate
-                        {
-                            return getMemberDo(MemberId);
-                        });
+                        () => getMemberDo(MemberId));
 
                     if (retVal != null)
                         return retVal.CreateNavigator().Select("/");

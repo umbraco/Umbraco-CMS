@@ -19,7 +19,12 @@ namespace Umbraco.Web.Cache
         {
             if (UmbracoSettings.UmbracoLibraryCacheDuration <= 0) return;
 
-            //Bind to content events - currently used for macro clearing
+            //Bind to content events - currently used for:
+            // - macro clearing
+            // - clearing the xslt cache (MS.Internal.Xml.XPath.XPathSelectionIterator)
+            //NOTE: These are 'special' event handlers that will only clear cache for items on the current server
+            // that is because this event will fire based on a distributed cache call, meaning this event fires on 
+            // all servers based on the distributed cache call for updating content.
             content.AfterUpdateDocumentCache += content_AfterUpdateDocumentCache;
             content.AfterClearDocumentCache += content_AfterClearDocumentCache;
 
@@ -61,7 +66,8 @@ namespace Umbraco.Web.Cache
         /// <param name="e"></param>
         void content_AfterClearDocumentCache(global::umbraco.cms.businesslogic.web.Document sender, DocumentCacheEventArgs e)
         {
-            DistributedCache.Instance.ClearAllMacroCache();
+            DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
+            DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
         }
 
         /// <summary>
@@ -71,7 +77,8 @@ namespace Umbraco.Web.Cache
         /// <param name="e"></param>
         void content_AfterUpdateDocumentCache(global::umbraco.cms.businesslogic.web.Document sender, DocumentCacheEventArgs e)
         {
-            DistributedCache.Instance.ClearAllMacroCache();
+            DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
+            DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
         }
 
         static void UserDeleting(User sender, System.EventArgs e)
