@@ -101,9 +101,15 @@ namespace Umbraco.Tests.TestHelpers
         [TearDown]
         public virtual void TearDown()
         {
-			DatabaseContext.Database.Dispose();
-			//reset the app context            
-			ApplicationContext.ApplicationCache.ClearAllCache();
+            if (ApplicationContext != null)
+            {
+                if (DatabaseContext != null && DatabaseContext.Database != null)
+                {
+                    DatabaseContext.Database.Dispose();        
+                }
+                //reset the app context            
+                ApplicationContext.ApplicationCache.ClearAllCache();    
+            }
 
             SqlSyntaxContext.SqlSyntaxProvider = null;
             
