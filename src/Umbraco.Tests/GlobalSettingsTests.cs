@@ -1,6 +1,7 @@
 using System.Configuration;
 using System.Web.Routing;
 using NUnit.Framework;
+using Umbraco.Core.IO;
 using Umbraco.Tests.TestHelpers;
 using System.Web.Mvc;
 
@@ -22,12 +23,27 @@ namespace Umbraco.Tests
 
 		public override void TearDown()
 		{
+            //ensure this is reset
+		    SystemDirectories.Root = null;
+            SettingsForTests.UmbracoPath = "~/umbraco";
             //reset the app config		            
 			base.TearDown();
 			
 		}
 
-		[TestCase("/umbraco/umbraco.aspx")]
+        [TestCase("~/umbraco", "/", "umbraco")]
+        [TestCase("~/umbraco", "/MyVirtualDir", "umbraco")]
+        [TestCase("~/customPath", "/MyVirtualDir/", "custompath")]
+        [TestCase("~/some-wacky/nestedPath", "/MyVirtualDir", "some-wacky-nestedpath")]
+        [TestCase("~/some-wacky/nestedPath", "/MyVirtualDir/NestedVDir/", "some-wacky-nestedpath")]
+	    public void Umbraco_Mvc_Area(string path, string rootPath, string outcome)
+        {
+            SettingsForTests.UmbracoPath = path;
+            SystemDirectories.Root = rootPath;
+            Assert.AreEqual(outcome, Umbraco.Core.Configuration.GlobalSettings.UmbracoMvcArea);
+        }
+
+	    [TestCase("/umbraco/umbraco.aspx")]
 		[TestCase("/umbraco/editContent.aspx")]
 		[TestCase("/install/default.aspx")]
 		[TestCase("/install/")]

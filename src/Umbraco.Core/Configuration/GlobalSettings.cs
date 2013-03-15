@@ -156,6 +156,9 @@ namespace Umbraco.Core.Configuration
 		/// This will return the MVC area that we will route all custom routes through like surface controllers, etc...
 		/// We will use the 'Path' (default ~/umbraco) to create it but since it cannot contain '/' and people may specify a path of ~/asdf/asdf/admin
 		/// we will convert the '/' to '-' and use that as the path. its a bit lame but will work.
+		/// 
+        /// We also make sure that the virtual directory (SystemDirectories.Root) is stripped off first, otherwise we'd end up with something
+        /// like "MyVirtualDirectory-Umbraco" instead of just "Umbraco".
 		/// </remarks>
     	internal static string UmbracoMvcArea
     	{
@@ -165,7 +168,7 @@ namespace Umbraco.Core.Configuration
 				{
 					throw new InvalidOperationException("Cannot create an MVC Area path without the umbracoPath specified");
 				}
-				return Path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim();
+			    return Path.TrimStart(SystemDirectories.Root).TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();
 			}
     	}
 
