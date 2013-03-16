@@ -698,13 +698,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                         //}
                     }
                 }
-
-                //Is only called to flush cache since gpw.PropertyType.Save() isn't called
-                // clear local cache
-                cms.businesslogic.cache.Cache.ClearCacheItem("UmbracoPropertyTypeCache" + gpw.PropertyType.Id);
-                // clear cache in ContentType
-                cms.businesslogic.cache.Cache.ClearCacheItem("ContentType_PropertyTypes_Content:" + contentTypeItem.Id);
-                _contentType.ClearVirtualTabs();
             }
 
             //Update the SortOrder of the PropertyTypes

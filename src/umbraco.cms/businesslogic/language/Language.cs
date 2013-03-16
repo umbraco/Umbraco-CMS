@@ -33,7 +33,7 @@ namespace umbraco.cms.businesslogic.language
         #region Constants and static members
 
         private static object getLanguageSyncLock = new object();
-        private static readonly string UmbracoLanguageCacheKey = "UmbracoPropertyTypeCache";
+        private static readonly string UmbracoLanguageCacheKey = "UmbracoLanguageCache";
 
         private const int DefaultLanguageId = 1;
 
@@ -149,15 +149,13 @@ namespace umbraco.cms.businesslogic.language
         /// <summary>
         /// Gets the language by its culture code, if no language is found, null is returned
         /// </summary>
-        /// <param name="CultureCode">The culture code.</param>
+        /// <param name="cultureCode">The culture code.</param>
         /// <returns></returns>
         public static Language GetByCultureCode(String cultureCode)
         {
             if (new CultureInfo(cultureCode) != null)
             {
-                return GetAllAsList()
-                        .Where(x => x.CultureAlias == cultureCode)
-                        .SingleOrDefault();
+                return GetAllAsList().SingleOrDefault(x => x.CultureAlias == cultureCode);
             }
 
             return null;

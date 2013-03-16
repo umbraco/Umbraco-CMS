@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Caching;
 using Umbraco.Core.Logging;
@@ -122,6 +123,21 @@ namespace Umbraco.Core
 	                ClearCacheItem((string) c.Key);
 	            }
 	        }
+	    }
+
+        /// <summary>
+        /// Clears all cache items that have a key that matches the regular expression
+        /// </summary>
+        /// <param name="regexString"></param>
+	    public void ClearCacheByKeyExpression(string regexString)
+	    {
+            foreach (DictionaryEntry c in _cache)
+            {
+                if (c.Key is string && Regex.IsMatch(((string)c.Key), regexString))
+                {
+                    ClearCacheItem((string)c.Key);
+                }
+            }
 	    }
 
 	    /// <summary>

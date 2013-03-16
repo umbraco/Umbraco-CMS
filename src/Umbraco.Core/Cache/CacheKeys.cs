@@ -21,5 +21,14 @@ namespace Umbraco.Core.Cache
         public const string TemplateCacheKey = "template";
 
         public const string UserCacheKey = "UmbracoUser";
+
+        public const string ContentTypeCacheKey = "UmbracoContentType";
+
+        public const string ContentTypePropertiesCacheKey = "ContentType_PropertyTypes_Content:";
+        
+        public const string PropertyTypeCacheKey = "UmbracoPropertyTypeCache";
+
+        //NOTE: I'm pretty sure we don't cache anything with this key anymore
+        internal const string PropertyTypeTabCacheKey = "Tab_PropertyTypes_Content:";
     }
 }

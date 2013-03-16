@@ -211,6 +211,32 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
+        /// Remove all cache for a given content type
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="contentType"></param>
+        public static void RemoveContentTypeCache(this DistributedCache dc, IContentType contentType)
+        {
+            if (contentType != null)
+            {
+                dc.Remove(new Guid(DistributedCache.ContentTypeCacheRefresherId), x => x.Id, contentType);
+            }
+        }
+
+        /// <summary>
+        /// Remove all cache for a given media type
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="mediaType"></param>
+        public static void RemoveMediaTypeCache(this DistributedCache dc, IMediaType mediaType)
+        {
+            if (mediaType != null)
+            {
+                dc.Remove(new Guid(DistributedCache.ContentTypeCacheRefresherId), x => x.Id, mediaType);
+            }
+        }
+
+        /// <summary>
         /// Clears the cache for all macros on the current server
         /// </summary>
         /// <param name="dc"></param>

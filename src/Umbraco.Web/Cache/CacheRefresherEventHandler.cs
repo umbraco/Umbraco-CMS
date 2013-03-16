@@ -1,12 +1,15 @@
-﻿using Umbraco.Core;
+﻿using System.Collections.Generic;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.member;
 using System.Linq;
-using umbraco.cms.businesslogic.template;
+using Macro = umbraco.cms.businesslogic.macro.Macro;
+using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace Umbraco.Web.Cache
 {
@@ -25,8 +28,13 @@ namespace Umbraco.Web.Cache
             //NOTE: These are 'special' event handlers that will only clear cache for items on the current server
             // that is because this event will fire based on a distributed cache call, meaning this event fires on 
             // all servers based on the distributed cache call for updating content.
-            content.AfterUpdateDocumentCache += content_AfterUpdateDocumentCache;
-            content.AfterClearDocumentCache += content_AfterClearDocumentCache;
+            content.AfterUpdateDocumentCache += ContentAfterUpdateDocumentCache;
+            content.AfterClearDocumentCache += ContentAfterClearDocumentCache;
+
+            //Bind to content type events
+
+            ContentTypeService.SavedContentType += ContentTypeServiceSavedContentType;
+            ContentTypeService.SavedMediaType += ContentTypeServiceSavedMediaType;
 
             //Bind to user events
 
@@ -60,11 +68,31 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
+        /// Fires when a media type is saved
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void ContentTypeServiceSavedMediaType(IContentTypeService sender, Core.Events.SaveEventArgs<IMediaType> e)
+        {
+            e.SavedEntities.ForEach(x => DistributedCache.Instance.RemoveMediaTypeCache(x));
+        }
+
+        /// <summary>
+        /// Fires when a content type is saved
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void ContentTypeServiceSavedContentType(IContentTypeService sender, Core.Events.SaveEventArgs<IContentType> e)
+        {
+            e.SavedEntities.ForEach(x => DistributedCache.Instance.RemoveContentTypeCache(x));
+        }
+
+        /// <summary>
         /// Fires after the document cache has been cleared for a particular document
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void content_AfterClearDocumentCache(global::umbraco.cms.businesslogic.web.Document sender, DocumentCacheEventArgs e)
+        static void ContentAfterClearDocumentCache(global::umbraco.cms.businesslogic.web.Document sender, DocumentCacheEventArgs e)
         {
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
@@ -75,7 +103,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void content_AfterUpdateDocumentCache(global::umbraco.cms.businesslogic.web.Document sender, DocumentCacheEventArgs e)
+        static void ContentAfterUpdateDocumentCache(global::umbraco.cms.businesslogic.web.Document sender, DocumentCacheEventArgs e)
         {
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();

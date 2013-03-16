@@ -36,6 +36,7 @@ namespace Umbraco.Web.Cache
         public const string MediaCacheRefresherId = "B29286DD-2D40-4DDB-B325-681226589FEC";
         public const string MacroCacheRefresherId = "7B1E683C-5F34-43dd-803D-9699EA1E98CA";
         public const string UserCacheRefresherId = "E057AF6D-2EE6-41F4-8045-3694010F0AA6";
+        public const string ContentTypeCacheRefresherId = "6902E22C-9C10-483C-91F3-66B7CAE9E2F5";
         
         #endregion
 
