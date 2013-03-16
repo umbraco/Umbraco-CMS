@@ -70,10 +70,7 @@ namespace Umbraco.Web.Cache
                     foreach (var p in contentType.PropertyTypes)
                     {
                         ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.PropertyTypeCacheKey + p.Id);
-                    }
-                    //clears the cache for all tabs
-                    var regexMatch = string.Format("{0}_{1}_{2}", CacheKeys.PropertyTypeTabCacheKey, @"\d+", contentType.Id);
-                    ApplicationContext.Current.ApplicationCache.ClearCacheByKeyExpression(regexMatch);
+                    }                    
                     //clears the cache associated with the content type properties collection
                     ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.ContentTypePropertiesCacheKey + contentType.Id);
                     //clears the dictionary object cache of the legacy ContentType

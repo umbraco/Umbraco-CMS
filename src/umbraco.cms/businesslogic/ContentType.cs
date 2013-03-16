@@ -1405,15 +1405,11 @@ namespace umbraco.cms.businesslogic
             /// </summary>
             /// <param name="id">The id.</param>
             /// <param name="contentTypeId"></param>
-            [Obsolete("Cache for tabs is automatically refreshed by Umbraco when Property types are modified")]
+            [Obsolete("There is no cache to flush for tabs")]
             public static void FlushCache(int id, int contentTypeId)
             {
-                ApplicationContext.Current.ApplicationCache.ClearCacheItem(GenerateCacheKey(id, contentTypeId));
-            }
-
-            private static string GenerateCacheKey(int tabId, int contentTypeId)
-            {
-                return String.Format("{0}_{1}_{2}", CacheKeys.PropertyTypeTabCacheKey, tabId, contentTypeId);
+                //at some stage there was probably caching for tabs but this hasn't been in place for some time, so this method
+                //now does nothing.
             }
 
             /// <summary>

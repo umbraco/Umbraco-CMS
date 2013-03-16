@@ -28,7 +28,5 @@ namespace Umbraco.Core.Cache
         
         public const string PropertyTypeCacheKey = "UmbracoPropertyTypeCache";
 
-        //NOTE: I'm pretty sure we don't cache anything with this key anymore
-        internal const string PropertyTypeTabCacheKey = "Tab_PropertyTypes_Content:";
     }
 }
