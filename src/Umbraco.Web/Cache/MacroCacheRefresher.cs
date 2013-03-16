@@ -17,7 +17,6 @@ namespace Umbraco.Web.Cache
         {
             return new[]
                 {
-                    CacheKeys.MacroRuntimeCacheKey, 
                     CacheKeys.MacroCacheKey,
                     CacheKeys.MacroControlCacheKey,
                     CacheKeys.MacroHtmlCacheKey,
