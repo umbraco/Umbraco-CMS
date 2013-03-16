@@ -6,7 +6,7 @@ using umbraco.interfaces;
 
 namespace Umbraco.Web.Cache
 {
-    public class MemberCacheRefresher : ICacheRefresher<Member>
+    public sealed class MemberCacheRefresher : ICacheRefresher<Member>
     {
 
         public Guid UniqueIdentifier

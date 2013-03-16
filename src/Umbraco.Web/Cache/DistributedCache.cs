@@ -25,7 +25,7 @@ namespace Umbraco.Web.Cache
     /// 
     /// Dispatcher can refresh/remove content, templates and macros.
     /// </remarks>
-    public class DistributedCache
+    public sealed class DistributedCache
     {
 
         #region Public constants/Ids

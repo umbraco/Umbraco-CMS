@@ -9,7 +9,7 @@ using Umbraco.Core.Persistence.Caching;
 
 namespace Umbraco.Web.Cache
 {
-    public class ContentTypeCacheRefresher : ICacheRefresher<IContentType>, ICacheRefresher<IMediaType>
+    public sealed class ContentTypeCacheRefresher : ICacheRefresher<IContentType>, ICacheRefresher<IMediaType>
     {
         public Guid UniqueIdentifier
         {

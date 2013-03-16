@@ -8,7 +8,7 @@ namespace Umbraco.Web.Cache
     /// <summary>
     /// Handles User cache invalidation/refreshing
     /// </summary>
-    public class UserCacheRefresher : ICacheRefresher
+    public sealed class UserCacheRefresher : ICacheRefresher
     {
         public Guid UniqueIdentifier
         {

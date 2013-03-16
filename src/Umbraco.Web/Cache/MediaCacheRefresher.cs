@@ -6,7 +6,7 @@ using umbraco.interfaces;
 
 namespace Umbraco.Web.Cache
 {
-    public class MediaCacheRefresher : ICacheRefresher<IMedia>
+    public sealed class MediaCacheRefresher : ICacheRefresher<IMedia>
     {
         public Guid UniqueIdentifier
         {

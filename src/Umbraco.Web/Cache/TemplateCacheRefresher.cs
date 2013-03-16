@@ -6,7 +6,7 @@ using umbraco.interfaces;
 
 namespace Umbraco.Web.Cache
 {
-    public class TemplateCacheRefresher : ICacheRefresher
+    public sealed class TemplateCacheRefresher : ICacheRefresher
     {
         
         public string Name

@@ -11,7 +11,7 @@ namespace Umbraco.Web.Cache
     /// <summary>
     /// Used to invalidate/refresh the cache for macros
     /// </summary>
-    public class MacroCacheRefresher : ICacheRefresher<Macro>, ICacheRefresher<macro>
+    public sealed class MacroCacheRefresher : ICacheRefresher<Macro>, ICacheRefresher<macro>
     {
         internal static string[] GetAllMacroCacheKeys()
         {
