@@ -1243,7 +1243,7 @@ namespace umbraco.MacroEngines
             get
             {
                 if (n == null) return true;
-                IProperty umbracoNaviHide = n.GetProperty("umbracoNaviHide");
+                IProperty umbracoNaviHide = n.GetProperty(Constants.Conventions.Content.NaviHide);
                 if (umbracoNaviHide != null)
                 {
                     return umbracoNaviHide.Value != "1";

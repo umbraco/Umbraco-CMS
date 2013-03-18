@@ -117,7 +117,6 @@
     <Compile Include="Configuration\CaseInsensitiveEnumConfigConverter.cs" />
     <Compile Include="Configuration\ClientDependencyConfiguration.cs" />
     <Compile Include="Configuration\ConfigurationKeyAttribute.cs" />
-    <Compile Include="Configuration\ConfigurationKeyType.cs" />
     <Compile Include="Configuration\FileSystemProviderElement.cs" />
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
@@ -734,6 +733,9 @@
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     <Compile Include="Constants-ObjectTypes.cs">
+      <DependentUpon>Constants.cs</DependentUpon>
+    </Compile>
+	<Compile Include="Constants-Conventions.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     <Compile Include="UpgradeableReadLock.cs" />

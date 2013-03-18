@@ -11,6 +11,7 @@ using System.Web.UI.HtmlControls;
 
 using System.IO;
 using umbraco.IO;
+using Umbraco.Core;
 
 namespace umbraco.dialogs
 {
@@ -49,7 +50,7 @@ namespace umbraco.dialogs
 						{
 							try 
 							{
-								fileName = m.getProperty("umbracoFile").Value.ToString();
+								fileName = m.getProperty(Constants.Conventions.Media.File).Value.ToString();
 							} 
 							catch 
 							{
@@ -60,8 +61,8 @@ namespace umbraco.dialogs
 						altText = m.Text;
 						try 
 							{
-							fileWidth = int.Parse(m.getProperty("umbracoWidth").Value.ToString());
-							fileHeight = int.Parse(m.getProperty("umbracoHeight").Value.ToString());
+								fileWidth = int.Parse(m.getProperty(Constants.Conventions.Media.Width).Value.ToString());
+								fileHeight = int.Parse(m.getProperty(Constants.Conventions.Media.Height).Value.ToString());
 							}
 						catch {
 						

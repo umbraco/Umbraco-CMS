@@ -1,5 +1,6 @@
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web;
 using Umbraco.Web.Models;
@@ -66,7 +67,7 @@ namespace Umbraco.Tests.PublishedContent
 			var helper = new TestHelper(GetNode(1173));
 			var doc = helper.GetDocAsDynamic();
 			//HasProperty is only a prop on DynamicPublishedContent, NOT IPublishedContent
-			Assert.IsTrue(doc.HasProperty("umbracoUrlAlias"));
+			Assert.IsTrue(doc.HasProperty(Constants.Conventions.Content.UrlAlias));
 		}
 
 		[Test]
@@ -76,7 +77,7 @@ namespace Umbraco.Tests.PublishedContent
 			var doc = helper.GetDoc();
 			var ddoc = (dynamic) doc;
 			//HasProperty is only a prop on DynamicPublishedContent, NOT IPublishedContent
-			Assert.IsTrue(ddoc.HasProperty("umbracoUrlAlias"));
+			Assert.IsTrue(ddoc.HasProperty(Constants.Conventions.Content.UrlAlias));
 		}
 
 		/// <summary>

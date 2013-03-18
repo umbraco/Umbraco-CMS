@@ -166,7 +166,7 @@ namespace Umbraco.Web.Templates
 			//now, set the new ones for this page execution
 			_umbracoContext.HttpContext.Items["pageID"] = contentRequest.PublishedContent.Id;
 			_umbracoContext.HttpContext.Items["pageElements"] = contentRequest.UmbracoPage.Elements;
-			_umbracoContext.HttpContext.Items["altTemplate"] = null;
+			_umbracoContext.HttpContext.Items[Umbraco.Core.Constants.Conventions.Url.AltTemplate] = null;
 			_umbracoContext.PublishedContentRequest = contentRequest;
 		}
 
@@ -180,7 +180,7 @@ namespace Umbraco.Web.Templates
 			_oldPageId = _umbracoContext.HttpContext.Items["pageID"];
 			_oldPageElements = _umbracoContext.HttpContext.Items["pageElements"];
 			_oldPublishedContentRequest = _umbracoContext.PublishedContentRequest;
-			_oldAltTemplate = _umbracoContext.HttpContext.Items["altTemplate"];
+			_oldAltTemplate = _umbracoContext.HttpContext.Items[Umbraco.Core.Constants.Conventions.Url.AltTemplate];
 		}
 
 		/// <summary>
@@ -191,7 +191,7 @@ namespace Umbraco.Web.Templates
 			_umbracoContext.PublishedContentRequest = _oldPublishedContentRequest;
 			_umbracoContext.HttpContext.Items["pageID"] = _oldPageId;
 			_umbracoContext.HttpContext.Items["pageElements"] = _oldPageElements;
-			_umbracoContext.HttpContext.Items["altTemplate"] = _oldAltTemplate;
+			_umbracoContext.HttpContext.Items[Umbraco.Core.Constants.Conventions.Url.AltTemplate] = _oldAltTemplate;
 		}
 
 	}

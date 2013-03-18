@@ -191,7 +191,7 @@ namespace umbraco.MacroEngines
         {
             get
             {
-                return GetValueAsString("umbracoFile");  
+                return GetValueAsString(Constants.Conventions.Media.File);
             }
         }
 
@@ -280,7 +280,7 @@ namespace umbraco.MacroEngines
         {
             get
             {
-                return GetValueAsString("umbracoFile");
+                return GetValueAsString(Constants.Conventions.Media.File);
             }
         }
 

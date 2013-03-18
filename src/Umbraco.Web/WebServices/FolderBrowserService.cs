@@ -40,7 +40,7 @@ namespace Umbraco.Web.WebServices
             //TODO: Cache responses to speed up susequent searches
             foreach (var child in parentMedia.Children)
             {
-                var fileProp = child.getProperty("umbracoFile") ?? 
+                var fileProp = child.getProperty(Constants.Conventions.Media.File) ?? 
                     child.GenericProperties.FirstOrDefault(x =>
                         x.PropertyType.DataTypeDefinition.DataType.Id == new Guid(Constants.PropertyEditors.UploadField));
 

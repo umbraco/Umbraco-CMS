@@ -19,7 +19,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
             var result = contentService.GetAllUserPropertyNames();
 
-            Assert.IsTrue(result.Select(x => x).ContainsAll(new[] { "contents", "umbracoBytes", "umbracoExtension", "umbracoFile", "umbracoHeight", "umbracoWidth" }));
+            Assert.IsTrue(result.Select(x => x).ContainsAll(new[] { "contents", Constants.Conventions.Media.Bytes, Constants.Conventions.Media.Extension, Constants.Conventions.Media.File, Constants.Conventions.Media.Height, Constants.Conventions.Media.Width }));
         }
 
     }

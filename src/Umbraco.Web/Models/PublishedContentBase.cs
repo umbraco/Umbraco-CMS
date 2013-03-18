@@ -68,7 +68,7 @@ namespace Umbraco.Web.Models
 						_url= UmbracoContext.Current.UrlProvider.GetUrl(this.Id);
 						break;
 					case PublishedItemType.Media:
-						var prop = GetProperty("umbracoFile");
+						var prop = GetProperty(Constants.Conventions.Media.File);
 						if (prop == null)
 							throw new NotSupportedException("Cannot retreive a Url for a media item if there is no 'umbracoFile' property defined");
 						_url = prop.Value.ToString();

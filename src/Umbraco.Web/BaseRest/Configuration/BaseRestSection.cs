@@ -5,7 +5,7 @@ namespace Umbraco.Web.BaseRest.Configuration
 {
     // note: the name should be "BaseRest" but we keep it "BaseRestSection" for compat. reasons.
 
-    [ConfigurationKey("BaseRestExtensions", ConfigurationKeyType.Raw)]
+    [ConfigurationKey("BaseRestExtensions")]
     internal class BaseRestSection : UmbracoConfigurationSection
     {
         private const string KeyEnabled = "enabled";

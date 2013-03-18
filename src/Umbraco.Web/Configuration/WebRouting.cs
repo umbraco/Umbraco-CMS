@@ -7,7 +7,7 @@ namespace Umbraco.Web.Configuration
     /// <summary>
     /// The Web.Routing settings section.
     /// </summary>
-    [ConfigurationKey("web.routing", ConfigurationKeyType.Umbraco)]
+    [ConfigurationKey("umbraco/web.routing")]
     internal class WebRouting : UmbracoConfigurationSection
     {
         private const string KeyTrySkipIisCustomErrors = "trySkipIisCustomErrors";
