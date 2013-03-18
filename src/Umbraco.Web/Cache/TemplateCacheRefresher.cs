@@ -6,7 +6,14 @@ using umbraco.interfaces;
 
 namespace Umbraco.Web.Cache
 {
-    public sealed class TemplateCacheRefresher : ICacheRefresher
+
+    /// <summary>
+    /// A cache refresher to ensure template cache is updated when members change
+    /// </summary>
+    /// <remarks>
+    /// This is not intended to be used directly in your code and it should be sealed but due to legacy code we cannot seal it.
+    /// </remarks>
+    public class TemplateCacheRefresher : ICacheRefresher
     {
         
         public string Name

@@ -9,9 +9,12 @@ using System.Linq;
 namespace Umbraco.Web.Cache
 {
     /// <summary>
-    /// Used to invalidate/refresh the cache for macros
+    /// A cache refresher to ensure macro cache is updated when members change
     /// </summary>
-    public sealed class MacroCacheRefresher : ICacheRefresher<Macro>, ICacheRefresher<macro>
+    /// <remarks>
+    /// This is not intended to be used directly in your code and it should be sealed but due to legacy code we cannot seal it.
+    /// </remarks>
+    public class MacroCacheRefresher : ICacheRefresher<Macro>, ICacheRefresher<macro>
     {
         internal static string[] GetAllMacroCacheKeys()
         {

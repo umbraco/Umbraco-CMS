@@ -574,10 +574,6 @@ namespace umbraco
         #endregion
     }
 
-    [Obsolete("This class is no longer used, use Umbraco.Web.Cache.TemplateCacheRefresher instead")]
-    public class templateCacheRefresh : Umbraco.Web.Cache.TemplateCacheRefresher
-    {
-        
-    }
+    
 
 }

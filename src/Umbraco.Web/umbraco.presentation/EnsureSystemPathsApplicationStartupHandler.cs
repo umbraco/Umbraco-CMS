@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using umbraco.businesslogic;
 using umbraco.interfaces;
 
 namespace umbraco.presentation
 {
-    public class EnsureSystemPathsApplicationStartupHandler : IApplicationStartupHandler
+    public class EnsureSystemPathsApplicationStartupHandler : ApplicationEventHandler
     {
-        public EnsureSystemPathsApplicationStartupHandler()
+        protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
+            base.ApplicationInitialized(umbracoApplication, applicationContext);
+
             EnsurePathExists("~/App_Code");
             EnsurePathExists("~/App_Data");
             EnsurePathExists(SystemDirectories.AppPlugins);
@@ -23,11 +26,11 @@ namespace umbraco.presentation
             EnsurePathExists(SystemDirectories.Scripts);
             EnsurePathExists(SystemDirectories.UserControls);
             EnsurePathExists(SystemDirectories.Xslt);
-			EnsurePathExists(SystemDirectories.MvcViews);
-			EnsurePathExists(SystemDirectories.MvcViews + "/Partials");
-			EnsurePathExists(SystemDirectories.MvcViews + "/MacroPartials");
+            EnsurePathExists(SystemDirectories.MvcViews);
+            EnsurePathExists(SystemDirectories.MvcViews + "/Partials");
+            EnsurePathExists(SystemDirectories.MvcViews + "/MacroPartials");
         }
-
+        
         public void EnsurePathExists(string path)
         {
             var absolutePath = IOHelper.MapPath(path);

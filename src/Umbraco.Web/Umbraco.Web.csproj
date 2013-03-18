@@ -327,6 +327,7 @@
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
     <Compile Include="Search\ExamineIndexerModel.cs" />
     <Compile Include="Search\LuceneIndexerExtensions.cs" />
+    <Compile Include="umbraco.presentation\LegacyClasses.cs" />
     <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.cs">
       <DependentUpon>AssignDomain2.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -437,7 +438,6 @@
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\DLRMacroResult.cs" />
     <Compile Include="umbraco.presentation\install\steps\LegacyClasses.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -447,9 +447,7 @@
     <Compile Include="umbraco.presentation\install\steps\Skinning\LegacyClasses.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\LibraryCacheRefresher.cs" />
     <Compile Include="umbraco.presentation\MacroCacheContent.cs" />
-    <Compile Include="umbraco.presentation\macroCacheRefresh.cs" />
     <Compile Include="umbraco.presentation\ScriptingMacroResult.cs" />
     <Compile Include="umbraco.presentation\umbraco\cacheBrowser.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -635,7 +633,7 @@
     </Compile>
     <Compile Include="umbraco.presentation\PublishQueue.cs" />
     <Compile Include="umbraco.presentation\python.cs" />
-    <Compile Include="umbraco.presentation\requestHandler.cs">
+    <Compile Include="umbraco.presentation\NotFoundHandlers.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\requestModule.cs">

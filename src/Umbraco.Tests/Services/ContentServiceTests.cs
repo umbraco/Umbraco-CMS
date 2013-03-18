@@ -40,7 +40,21 @@ namespace Umbraco.Tests.Services
         //TODO Add test to verify there is only ONE newest document/content in cmsDocument table after updating.
         //TODO Add test to delete specific version (with and without deleting prior versions) and versions by date.
 
-        [Test]
+	    [Test]
+	    public void Can_Remove_Property_Type()
+	    {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+
+            // Act
+            var content = contentService.CreateContent("Test", -1, "umbTextpage", 0);
+
+            // Assert
+            Assert.That(content, Is.Not.Null);
+            Assert.That(content.HasIdentity, Is.False);
+	    }
+
+	    [Test]
         public void Can_Create_Content()
         {
             // Arrange
