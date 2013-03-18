@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -41,6 +43,14 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
         public virtual IUmbracoEntity Get(int id, bool loadBaseType = true)
         {
+            if (loadBaseType)
+            {
+                using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
+                {
+                    return repository.Get(id);
+                }
+            }
+
             throw new NotImplementedException();
         }
 
@@ -56,54 +66,156 @@ namespace Umbraco.Core.Services
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
         public virtual IUmbracoEntity Get<T>(int id, bool loadBaseType = true) where T : IUmbracoEntity
         {
+            if (loadBaseType)
+            {
+                using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
+                {
+                    return repository.Get(id);
+                }
+            }
+
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public virtual IUmbracoEntity GetParent(int id)
         {
-            throw new NotImplementedException();
+            using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var entity = repository.Get(id);
+                if (entity.ParentId == -1 || entity.ParentId == -20 || entity.ParentId == -21)
+                    return null;
+
+                return repository.Get(entity.ParentId);
+            }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public virtual IEnumerable<IUmbracoEntity> GetChildren(int id)
         {
-            throw new NotImplementedException();
+            using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == id);
+                var contents = repository.GetByQuery(query);
+
+                return contents;
+            }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public virtual IEnumerable<IUmbracoEntity> GetDescendents(int id)
         {
-            throw new NotImplementedException();
+            using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var entity = repository.Get(id);
+                var query = Query<IUmbracoEntity>.Builder.Where(x => x.Path.StartsWith(entity.Path) && x.Id != id);
+                var entities = repository.GetByQuery(query);
+
+                return entities;
+            }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="objectType"></param>
+        /// <returns></returns>
+        public virtual IEnumerable<IUmbracoEntity> GetRootEntities(UmbracoObjectTypes objectType)
+        {
+            var objectTypeId = objectType.GetGuid();
+            using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == -1);
+                var entities = repository.GetByQuery(query, objectTypeId);
+
+                return entities;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public virtual IEnumerable<IUmbracoEntity> GetAll<T>() where T : IUmbracoEntity
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="objectType"></param>
+        /// <returns></returns>
         public virtual IEnumerable<IUmbracoEntity> GetAll(UmbracoObjectTypes objectType)
         {
-            throw new NotImplementedException();
+            var objectTypeId = objectType.GetGuid();
+            using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(objectTypeId);
+            }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="objectTypeId"></param>
+        /// <returns></returns>
         public virtual IEnumerable<IUmbracoEntity> GetAll(Guid objectTypeId)
         {
-            throw new NotImplementedException();
+            using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(objectTypeId);
+            }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public virtual UmbracoObjectTypes GetObjectType(int id)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public virtual UmbracoObjectTypes GetObjectType(IUmbracoEntity entity)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public virtual Type GetModelType(int id)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="objectType"></param>
+        /// <returns></returns>
         public virtual Type GetModelType(UmbracoObjectTypes objectType)
         {
             throw new NotImplementedException();

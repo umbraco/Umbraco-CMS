@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
@@ -18,10 +19,18 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class EntityRepository : DisposableObject, IEntityRepository
     {
         private readonly IDatabaseUnitOfWork _work;
+        private readonly IDictionary<Guid, Func<IUmbracoEntity, IUmbracoEntity>> _propertyHandler;
 
         public EntityRepository(IDatabaseUnitOfWork work)
 		{
 		    _work = work;
+            _propertyHandler = new Dictionary<Guid, Func<IUmbracoEntity, IUmbracoEntity>>
+                                   {
+                                       {
+                                           new Guid(Constants.ObjectTypes.Document),
+                                           UpdateIsPublished
+                                       }
+                                   };
 		}
 
         /// <summary>
@@ -53,6 +62,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var entity = factory.BuildEntity(nodeDto);
             
             //TODO Update HasChildren and IsPublished
+            if (_propertyHandler.ContainsKey(entity.NodeObjectTypeId))
+            {
+                return _propertyHandler[entity.NodeObjectTypeId](entity);
+            }
 
             return entity;
         }
@@ -130,6 +143,21 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
+
+        private void UpdateHasChildren(IUmbracoEntity entity)
+        {}
+
+        private IUmbracoEntity UpdateIsPublished(IUmbracoEntity entity)
+        {
+            var umbracoEntity = entity as UmbracoEntity;
+            if (umbracoEntity != null)
+            {
+                umbracoEntity.IsPublished = true;
+                return umbracoEntity;
+            }
+
+            return entity;
+        }
 
         #region Sql Statements
 
