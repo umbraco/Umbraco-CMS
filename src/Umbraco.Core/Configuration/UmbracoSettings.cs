@@ -1483,33 +1483,18 @@ namespace Umbraco.Core.Configuration
                 if (string.IsNullOrWhiteSpace(sectionKey))
                     throw new InvalidOperationException(string.Format("Type \"{0}\" ConfigurationKeyAttribute value is null or empty.", sectionType.FullName));
 
-                var keyType = attr.KeyType;
-                var section = GetSection(sectionType, sectionKey, keyType);
+                var section = GetSection(sectionType, sectionKey);
 
                 Sections[sectionType] = section;
                 return section as T;
             }
         }
 
-        private static UmbracoConfigurationSection GetSection(Type sectionType, string key, ConfigurationKeyType keyType)
+        private static UmbracoConfigurationSection GetSection(Type sectionType, string key)
         {
             if (!sectionType.Inherits<UmbracoConfigurationSection>())
                  throw new ArgumentException(string.Format(
                     "Type \"{0}\" does not inherit from UmbracoConfigurationSection.", sectionType.FullName), "sectionType");
-
-            switch (keyType)
-            {
-                case ConfigurationKeyType.Umbraco:
-                    key = "umbraco/" + key;
-                    break;
-                case ConfigurationKeyType.Plugins:
-                    key = "umbraco.plugins/" + key;
-                    break;
-                case ConfigurationKeyType.Raw:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException("keyType", keyType, "Invalid ConfigurationKeyType value.");
-            }
 
             var section = ConfigurationManager.GetSection(key);
 

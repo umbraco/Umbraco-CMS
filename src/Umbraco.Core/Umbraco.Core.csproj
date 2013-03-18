@@ -115,7 +115,6 @@
     <Compile Include="Configuration\CaseInsensitiveEnumConfigConverter.cs" />
     <Compile Include="Configuration\ClientDependencyConfiguration.cs" />
     <Compile Include="Configuration\ConfigurationKeyAttribute.cs" />
-    <Compile Include="Configuration\ConfigurationKeyType.cs" />
     <Compile Include="Configuration\FileSystemProviderElement.cs" />
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
