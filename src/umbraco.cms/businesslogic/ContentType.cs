@@ -99,8 +99,7 @@ namespace umbraco.cms.businesslogic
         /// Used for cache so we don't have to lookup column names all the time, this is actually only used for the ChildrenAsTable methods
         /// </summary>
         private static readonly ConcurrentDictionary<string, IDictionary<string, string>> AliasToNames = new ConcurrentDictionary<string, IDictionary<string, string>>();
-
-        private static Dictionary<Tuple<string, string>, Guid> _propertyTypeCache = new Dictionary<Tuple<string, string>, Guid>();
+        private static readonly ConcurrentDictionary<Tuple<string, string>, Guid> PropertyTypeCache = new ConcurrentDictionary<Tuple<string, string>, Guid>();
 
         /// <summary>
         /// Returns a content type's columns alias -> name mapping
@@ -112,68 +111,58 @@ namespace umbraco.cms.businesslogic
         /// </remarks>
         internal static IDictionary<string, string> GetAliasesAndNames(string contentTypeAlias)
         {
-            IDictionary<string, string> cached;
-            if (AliasToNames.TryGetValue(contentTypeAlias, out cached))
-            {
-                return cached;
-            }
-
-            var ct = ContentType.GetByAlias(contentTypeAlias);
-            var userFields = ct.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
-            AliasToNames.TryAdd(contentTypeAlias, userFields);
-            return userFields;
+            return AliasToNames.GetOrAdd(contentTypeAlias, s =>
+                {
+                    var ct = ContentType.GetByAlias(contentTypeAlias);
+                    var userFields = ct.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
+                    return userFields;
+                });
         }
 
+        /// <summary>
+        /// Removes the static object cache
+        /// </summary>
+        /// <param name="contentTypeAlias"></param>
         public static void RemoveFromDataTypeCache(string contentTypeAlias)
         {
-            lock (_propertyTypeCache)
+            var toDelete = PropertyTypeCache.Keys.Where(key => string.Equals(key.first, contentTypeAlias)).ToList();
+            foreach (var key in toDelete)
             {
-                List<Tuple<string, string>> toDelete = new List<Tuple<string, string>>();
-                foreach (Tuple<string, string> key in _propertyTypeCache.Keys)
-                {
-                    if (string.Equals(key.first, contentTypeAlias))
-                    {
-                        toDelete.Add(key);
-                    }
-                }
-                foreach (Tuple<string, string> key in toDelete)
-                {
-                    _propertyTypeCache.Remove(key);
-                }
+                Guid id;
+                PropertyTypeCache.TryRemove(key, out id);
             }
-            //don't put lock around this as it is ConcurrentDictionary.
             AliasToNames.Clear();
         }
+
+        /// <summary>
+        /// Removes the static object cache
+        /// </summary>
+        internal static void RemoveAllDataTypeCache()
+        {
+            AliasToNames.Clear();
+            PropertyTypeCache.Clear();
+        }
+
         public static Guid GetDataType(string contentTypeAlias, string propertyTypeAlias)
         {
-            Tuple<string, string> key = new Tuple<string, string>()
+            var key = new Tuple<string, string>()
             {
                 first = contentTypeAlias,
                 second = propertyTypeAlias
             };
-            //The property type is not on IProperty (it's not stored in NodeFactory)
-            //first check the cache
-            if (_propertyTypeCache != null && _propertyTypeCache.ContainsKey(key))
-            {
-                return _propertyTypeCache[key];
-            }
 
-            // With 4.10 we can't do this via direct SQL as we have content type mixins
-            Guid controlId = Guid.Empty;
-            ContentType ct = GetByAlias(contentTypeAlias);
-            PropertyType pt = ct.getPropertyType(propertyTypeAlias);
-            if (pt != null)
-            {
-                controlId = pt.DataTypeDefinition.DataType.Id;
-            }
-
-            //add to cache (even if empty!)
-            if (!_propertyTypeCache.ContainsKey(key))
-            {
-                _propertyTypeCache.Add(key, controlId);
-            }
-            return controlId;
-
+            return PropertyTypeCache.GetOrAdd(key, tuple =>
+                {
+                    // With 4.10 we can't do this via direct SQL as we have content type mixins
+                    var controlId = Guid.Empty;
+                    var ct = GetByAlias(contentTypeAlias);
+                    var pt = ct.getPropertyType(propertyTypeAlias);
+                    if (pt != null)
+                    {
+                        controlId = pt.DataTypeDefinition.DataType.Id;
+                    }
+                    return controlId;
+                });  
         }
 
 
@@ -196,7 +185,7 @@ namespace umbraco.cms.businesslogic
         /// Flushes the tab cache.
         /// </summary>
         /// <param name="TabId">The tab id.</param>
-        [Obsolete("Tab cache is flushed automatically by Umbraco when a content type changes")]
+        [Obsolete("There is no cache to flush for tabs")]
         public static void FlushTabCache(int TabId, int ContentTypeId)
         {
             Tab.FlushCache(TabId, ContentTypeId);
@@ -731,7 +720,7 @@ namespace umbraco.cms.businesslogic
         [Obsolete("Use PropertyTypeGroup methods instead", false)]
         public void ClearVirtualTabs()
         {
-            // zb-00040 #29889 : clear the right cache! t.contentType is the ctype which _defines_ the tab, not the current one.
+            //NOTE: SD: There is no cache to clear so this doesn't actually do anything
             foreach (TabI t in getVirtualTabs)
                 Tab.FlushCache(t.Id, Id);
 
@@ -1132,14 +1121,13 @@ namespace umbraco.cms.businesslogic
             }
         }
 
-        [Obsolete("The content type cache is automatically cleared by Umbraco when a content type is saved")]
+        [Obsolete("The content type cache is automatically cleared by Umbraco when a content type is saved, this method is no longer used")]
         protected internal void FlushAllFromCache()
         {
             ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.ContentTypeCacheKey);
             ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.ContentTypePropertiesCacheKey);
 
-            //clear the property datatype cache used by razor
-            _propertyTypeCache = new Dictionary<Tuple<string, string>, Guid>();
+            RemoveAllDataTypeCache();
 
             ClearVirtualTabs();
         }

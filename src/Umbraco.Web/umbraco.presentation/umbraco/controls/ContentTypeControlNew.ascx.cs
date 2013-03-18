@@ -866,8 +866,14 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 _contentType.ContentTypeItem.RemovePropertyType(gpw.PropertyType.Alias);
                 _contentType.Save();
             }
-
-            gpw.GenricPropertyControl.PropertyType.delete();
+            else
+            {
+                //if it is not a document type or a media type, then continue to call the legacy delete() method.
+                //the new API for document type and media type's will ensure that the data is removed correctly and that
+                //the cache is flushed correctly (using events).  If it is not one of these types, we'll rever to the 
+                //legacy operation (... like for members i suppose ?)
+                gpw.GenricPropertyControl.PropertyType.delete();    
+            }
 
             LoadContentType(_contentType.Id);
             BindDataGenericProperties(true);

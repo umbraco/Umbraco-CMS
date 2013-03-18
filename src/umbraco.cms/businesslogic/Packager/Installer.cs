@@ -867,7 +867,7 @@ namespace umbraco.cms.businesslogic.packager
                 }
             }
 
-            // clear caching
+            // clear caching (NOTE: SD: there is no tab caching so this really doesn't do anything)
             foreach (DocumentType.TabI t in dt.getVirtualTabs.ToList())
                 DocumentType.FlushTabCache(t.Id, dt.Id);
 
