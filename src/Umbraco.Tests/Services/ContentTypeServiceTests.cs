@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers.Entities;
 
@@ -51,7 +52,7 @@ namespace Umbraco.Tests.Services
             var cts = ServiceContext.ContentTypeService;
             var dtdYesNo = ServiceContext.DataTypeService.GetDataTypeDefinitionById(-49);
             var ctBase = new ContentType(-1) { Name = "Base", Alias = "Base", Icon = "folder.gif", Thumbnail = "folder.png" };
-            ctBase.AddPropertyType(new PropertyType(dtdYesNo) { Name = "Hide From Navigation", Alias = "umbracoNaviHide" } /*,"Navigation"*/ );
+            ctBase.AddPropertyType(new PropertyType(dtdYesNo) { Name = "Hide From Navigation", Alias = Constants.Conventions.Content.NaviHide } /*,"Navigation"*/ );
             cts.Save(ctBase);
 
             var ctHomePage = new ContentType(ctBase) { Name = "Home Page", Alias = "HomePage", Icon = "settingDomain.gif", Thumbnail = "folder.png", AllowedAsRoot = true };

@@ -12,6 +12,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using umbraco.IO;
 using umbraco.NodeFactory;
+using Umbraco.Core;
 
 namespace umbraco {
     /// <summary>
@@ -358,7 +359,7 @@ namespace umbraco {
 
             // Check for internal redirects
             if (currentPage != null) {
-                XmlNode internalRedirect = currentPage.SelectSingleNode(UmbracoSettings.UseLegacyXmlSchema ? "data [@alias = 'umbracoInternalRedirectId']" : "umbracoInternalRedirectId");
+                XmlNode internalRedirect = currentPage.SelectSingleNode(UmbracoSettings.UseLegacyXmlSchema ? string.Format("data [@alias = '{0}']", Constants.Conventions.Content.InternalRedirectId) : Constants.Conventions.Content.InternalRedirectId);
                 if (internalRedirect != null && internalRedirect.FirstChild != null && !String.IsNullOrEmpty(internalRedirect.FirstChild.Value)) {
                     HttpContext.Current.Trace.Write("internalRedirection", "Found internal redirect id via umbracoInternalRedirectId property alias");
                     int internalRedirectId = 0;
@@ -428,9 +429,9 @@ namespace umbraco {
 
                 // the reason we have almost two identical queries in the xpath is to support scenarios where the user have 
                 // entered "/my-url" instead of "my-url" (ie. added a beginning slash)
-                string xpath = UmbracoSettings.UseLegacyXmlSchema ? "//node [contains(concat(',',translate(data [@alias = 'umbracoUrlAlias'], ' ', ''),','),',{0},') or contains(concat(',',translate(data [@alias = 'umbracoUrlAlias'], ' ', ''),','),',{1},')]" :
-                    "//* [@isDoc and (contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{0},') or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{1},'))]";
-                string query = String.Format(prefixXPath + xpath, tempUrl, "/" + tempUrl);
+                string xpath = UmbracoSettings.UseLegacyXmlSchema ? "//node [contains(concat(',',translate(data [@alias = '{2}'], ' ', ''),','),',{0},') or contains(concat(',',translate(data [@alias = '{2}'], ' ', ''),','),',{1},')]" :
+                    "//* [@isDoc and (contains(concat(',',translate({2}, ' ', ''),','),',{0},') or contains(concat(',',translate({2}, ' ', ''),','),',{1},'))]";
+                string query = String.Format(prefixXPath + xpath, tempUrl, "/" + tempUrl, Constants.Conventions.Content.UrlAlias);
                 XmlNode redir =
                     content.Instance.XmlContent.DocumentElement.SelectSingleNode(query);
                 if (redir != null) {
@@ -554,10 +555,10 @@ namespace umbraco {
                 {
                     _redirectID = int.Parse(urlNode.Attributes.GetNamedItem("id").Value);
 
-                    HttpContext.Current.Items["altTemplate"] = templateAlias;
+                    HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate] = templateAlias;
                     HttpContext.Current.Trace.Write("umbraco.altTemplateHandler",
                                                     string.Format("Templated changed to: '{0}'",
-                                                                  HttpContext.Current.Items["altTemplate"]));
+                                                                  HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate]));
                     _succes = true;
                 }
             }

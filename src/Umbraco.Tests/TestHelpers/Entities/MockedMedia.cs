@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models;
+﻿using Umbraco.Core;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.TestHelpers.Entities
 {
@@ -11,11 +12,11 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                  CreatorId = 0
                              };
 
-             media.SetValue("umbracoFile", "/media/test-image.png");
-             media.SetValue("umbracoWidth", "200");
-             media.SetValue("umbracoHeight", "200");
-             media.SetValue("umbracoBytes", "100");
-             media.SetValue("umbracoExtension", "png");
+             media.SetValue(Constants.Conventions.Media.File, "/media/test-image.png");
+             media.SetValue(Constants.Conventions.Media.Width, "200");
+             media.SetValue(Constants.Conventions.Media.Height, "200");
+             media.SetValue(Constants.Conventions.Media.Bytes, "100");
+             media.SetValue(Constants.Conventions.Media.Extension, "png");
 
              return media;
          }
@@ -27,9 +28,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                  CreatorId = 0
                              };
 
-             media.SetValue("umbracoFile", "/media/test-file.txt");
-             media.SetValue("umbracoBytes", "4");
-             media.SetValue("umbracoExtension", "txt");
+             media.SetValue(Constants.Conventions.Media.File, "/media/test-file.txt");
+             media.SetValue(Constants.Conventions.Media.Bytes, "4");
+             media.SetValue(Constants.Conventions.Media.Extension, "txt");
 
              return media;
          }

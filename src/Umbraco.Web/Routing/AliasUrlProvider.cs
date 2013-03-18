@@ -58,8 +58,8 @@ namespace Umbraco.Web.Routing
 
             var node = contentCache.GetDocumentById(umbracoContext, id);
             string umbracoUrlName = null;
-            if (node.HasProperty(UmbracoUrlAlias))
-                umbracoUrlName = node.GetPropertyValue<string>(UmbracoUrlAlias);
+            if (node.HasProperty(Constants.Conventions.Content.UrlAlias))
+                umbracoUrlName = node.GetPropertyValue<string>(Constants.Conventions.Content.UrlAlias);
             if (string.IsNullOrWhiteSpace(umbracoUrlName))
                 return Enumerable.Empty<string>();
 
@@ -88,8 +88,6 @@ namespace Umbraco.Web.Routing
         #endregion
 
         #region Utilities
-
-        const string UmbracoUrlAlias = "umbracoUrlAlias";
 
         private bool FindByUrlAliasEnabled
         {

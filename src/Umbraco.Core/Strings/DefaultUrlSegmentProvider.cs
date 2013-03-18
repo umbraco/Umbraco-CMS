@@ -8,8 +8,6 @@ namespace Umbraco.Core.Strings
     /// </summary>
     internal class DefaultUrlSegmentProvider : IUrlSegmentProvider
     {
-        const string UmbracoUrlName = "umbracoUrlName";
-
         /// <summary>
         /// Gets the default url segment for a specified content.
         /// </summary>
@@ -34,8 +32,8 @@ namespace Umbraco.Core.Strings
         private static string GetUrlSegmentSource(IContentBase content)
         {
             string source = null;
-            if (content.HasProperty(UmbracoUrlName))
-                source = (content.GetValue<string>(UmbracoUrlName) ?? string.Empty).Trim();
+            if (content.HasProperty(Constants.Conventions.Content.UrlName))
+                source = (content.GetValue<string>(Constants.Conventions.Content.UrlName) ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(source))
                 source = content.Name;
             return source;

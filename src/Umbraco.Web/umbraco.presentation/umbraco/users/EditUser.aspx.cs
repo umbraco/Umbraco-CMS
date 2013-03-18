@@ -18,6 +18,7 @@ using umbraco.uicontrols;
 using umbraco.providers;
 using umbraco.cms.presentation.Trees;
 using umbraco.IO;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation.user
 {
@@ -494,7 +495,7 @@ namespace umbraco.cms.presentation.user
 
                         //
                         c.MediaTypeAlias = "image";
-                        c.MediaTypeFileProperty = "umbracoFile";
+                        c.MediaTypeFileProperty = Constants.Conventions.Media.File;
                         c.ImageSupport = true;
 
                         c.Save();

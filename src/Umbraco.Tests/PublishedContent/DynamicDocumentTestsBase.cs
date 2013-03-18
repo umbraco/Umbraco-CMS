@@ -104,8 +104,8 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetDynamicNode(1173);
 
-            Assert.IsTrue(doc.HasProperty("umbracoUrlAlias"));
-            var prop = doc.GetProperty("umbracoUrlAlias");
+            Assert.IsTrue(doc.HasProperty(Constants.Conventions.Content.UrlAlias));
+            var prop = doc.GetProperty(Constants.Conventions.Content.UrlAlias);
             Assert.IsNotNull(prop);
             Assert.AreEqual("page2/alias, 2ndpagealias", prop.Value);
             Assert.AreEqual("page2/alias, 2ndpagealias", doc.umbracoUrlAlias);
@@ -413,7 +413,7 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var asDynamic = GetDynamicNode(1173);
 
-			var hasProp = asDynamic.HasProperty("umbracoUrlAlias");
+			var hasProp = asDynamic.HasProperty(Constants.Conventions.Content.UrlAlias);
 
 			Assert.AreEqual(true, (bool)hasProp);
 
@@ -437,7 +437,7 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var asDynamic = GetDynamicNode(1173);
 
-			var hasValue = asDynamic.HasValue("umbracoUrlAlias");
+			var hasValue = asDynamic.HasValue(Constants.Conventions.Content.UrlAlias);
 			var noValue = asDynamic.HasValue("blahblahblah");
 
 			Assert.IsTrue(hasValue);

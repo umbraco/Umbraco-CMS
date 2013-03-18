@@ -420,7 +420,7 @@ namespace Umbraco.Web.Routing
 				throw new InvalidOperationException("There is no PublishedContent.");
 
 			bool redirect = false;
-			var internalRedirect = _pcr.PublishedContent.GetPropertyValue<string>("umbracoInternalRedirectId");
+			var internalRedirect = _pcr.PublishedContent.GetPropertyValue<string>(Constants.Conventions.Content.InternalRedirectId);
 
 			if (!string.IsNullOrWhiteSpace(internalRedirect))
 			{
@@ -538,7 +538,7 @@ namespace Umbraco.Web.Routing
             var useAltTemplate = _pcr.IsInitialPublishedContent
                 || (UmbracoSettings.For<WebRouting>().InternalRedirectPreservesTemplate && _pcr.IsInternalRedirectPublishedContent);
             string altTemplate = useAltTemplate
-                ? _routingContext.UmbracoContext.HttpContext.Request["altTemplate"] 
+                ? _routingContext.UmbracoContext.HttpContext.Request[Constants.Conventions.Url.AltTemplate]
 				: null;
 
 			if (string.IsNullOrWhiteSpace(altTemplate))
@@ -623,7 +623,7 @@ namespace Umbraco.Web.Routing
 		{
 		    if (!_pcr.HasPublishedContent) return;
 
-		    var redirectId = _pcr.PublishedContent.GetPropertyValue("umbracoRedirect", -1);				
+		    var redirectId = _pcr.PublishedContent.GetPropertyValue(Constants.Conventions.Content.Redirect, -1);
 		    var redirectUrl = "#";
 		    if (redirectId > 0)
 				redirectUrl = _routingContext.UrlProvider.GetUrl(redirectId);
