@@ -24,7 +24,7 @@ namespace Umbraco.Web.Routing
             _umbracoContext = umbracoContext;
             _contentCache = contentCache;
             _urlProviders = urlProviders;
-            EnforceAbsoluteUrls = false;
+            Mode = UmbracoSettings.For<Configuration.WebRouting>().UrlProviderMode;
         }
 
         private readonly UmbracoContext _umbracoContext;
@@ -32,9 +32,9 @@ namespace Umbraco.Web.Routing
         private readonly IEnumerable<IUrlProvider> _urlProviders;
 
         /// <summary>
-        /// Gets or sets a value indicating whether the provider should enforce absolute urls.
+        /// Gets or sets the provider url mode.
         /// </summary>
-        public bool EnforceAbsoluteUrls { get; set; }
+        public UrlProviderMode Mode { get; set; }
 
         #endregion
 
@@ -46,13 +46,12 @@ namespace Umbraco.Web.Routing
         /// <param name="id">The published content identifier.</param>
         /// <returns>The url for the published content.</returns>
         /// <remarks>
-        /// <para>The url is absolute or relative depending on the current url, settings, and options.</para>
+        /// <para>The url is absolute or relative depending on <c>Mode</c> and on the current url.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
         public string GetUrl(int id)
         {
-            var absolute = UmbracoSettings.UseDomainPrefixes | EnforceAbsoluteUrls;
-            return GetUrl(id, _umbracoContext.CleanedUmbracoUrl, absolute);
+            return GetUrl(id, _umbracoContext.CleanedUmbracoUrl, Mode);
         }
 
         /// <summary>
@@ -62,14 +61,14 @@ namespace Umbraco.Web.Routing
         /// <param name="absolute">A value indicating whether the url should be absolute in any case.</param>
         /// <returns>The url for the published content.</returns>
         /// <remarks>
-        /// <para>The url is absolute or relative depending on the current url and settings, unless <c>absolute</c> is true,
-        /// in which case the url is always absolute.</para>
+        /// <para>The url is absolute or relative depending on <c>Mode</c> and on <c>current</c>, unless
+        /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
         public string GetUrl(int id, bool absolute)
         {
-            absolute = absolute | EnforceAbsoluteUrls;
-            return GetUrl(id, _umbracoContext.CleanedUmbracoUrl, absolute);
+            var mode = absolute ? UrlProviderMode.Absolute : Mode;
+            return GetUrl(id, _umbracoContext.CleanedUmbracoUrl, mode);
         }
 
         /// <summary>
@@ -80,14 +79,46 @@ namespace Umbraco.Web.Routing
         /// <param name="absolute">A value indicating whether the url should be absolute in any case.</param>
         /// <returns>The url for the published content.</returns>
         /// <remarks>
-        /// <para>The url is absolute or relative depending on url indicated by <c>current</c> and settings, unless
+        /// <para>The url is absolute or relative depending on <c>Mode</c> and on <c>current</c>, unless
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
         public string GetUrl(int id, Uri current, bool absolute)
         {
-            absolute = absolute | EnforceAbsoluteUrls;
-            var url = _urlProviders.Select(provider => provider.GetUrl(_umbracoContext, _contentCache, id, current, absolute)).FirstOrDefault(u => u != null);
+            var mode = absolute ? UrlProviderMode.Absolute : Mode;
+            return GetUrl(id, current, mode);
+        }
+
+        /// <summary>
+        /// Gets the nice url of a published content.
+        /// </summary>
+        /// <param name="id">The published content identifier.</param>
+        /// <param name="mode">The url mode.</param>
+        /// <returns>The url for the published content.</returns>
+        /// <remarks>
+        /// <para>The url is absolute or relative depending on <c>mode</c> and on the current url.</para>
+        /// <para>If the provider is unable to provide a url, it returns "#".</para>
+        /// </remarks>
+        public string GetUrl(int id, UrlProviderMode mode)
+        {
+            return GetUrl(id, _umbracoContext.CleanedUmbracoUrl, mode);
+        }
+
+        /// <summary>
+        /// Gets the nice url of a published content.
+        /// </summary>
+        /// <param name="id">The published content id.</param>
+        /// <param name="current">The current absolute url.</param>
+        /// <param name="mode">The url mode.</param>
+        /// <returns>The url for the published content.</returns>
+        /// <remarks>
+        /// <para>The url is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
+        /// <para>If the provider is unable to provide a url, it returns "#".</para>
+        /// </remarks>
+        public string GetUrl(int id, Uri current, UrlProviderMode mode)
+        {
+            var url = _urlProviders.Select(provider => provider.GetUrl(_umbracoContext, _contentCache, id, current, mode))
+                .FirstOrDefault(u => u != null);
             return url ?? "#"; // legacy wants this
         }
 

@@ -23,14 +23,13 @@ namespace Umbraco.Web.Routing
         /// <param name="contentCache">The content cache.</param>
         /// <param name="id">The published content id.</param>
         /// <param name="current">The current absolute url.</param>
-        /// <param name="absolute">A value indicating whether the url should be absolute in any case.</param>
+        /// <param name="mode">The url mode.</param>
         /// <returns>The url for the published content.</returns>
         /// <remarks>
-        /// <para>The url is absolute or relative depending on url indicated by <c>current</c> and settings, unless
-        /// <c>absolute</c> is true, in which case the url is always absolute.</para>
+        /// <para>The url is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
         /// <para>If the provider is unable to provide a url, it should return <c>null</c>.</para>
         /// </remarks>
-        public virtual string GetUrl(UmbracoContext umbracoContext, IPublishedContentStore contentCache, int id, Uri current, bool absolute)
+        public virtual string GetUrl(UmbracoContext umbracoContext, IPublishedContentStore contentCache, int id, Uri current, UrlProviderMode mode)
         {
             DomainAndUri domainUri;
             string path;
@@ -49,7 +48,7 @@ namespace Umbraco.Web.Routing
             {
                 // there was a route in the cache - extract domainUri and path
                 // route is /<path> or <domainRootId>/<path>
-                int pos = route.IndexOf('/');
+                var pos = route.IndexOf('/');
                 path = pos == 0 ? route : route.Substring(pos);
                 domainUri = pos == 0 ? null : DomainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current);
             }
@@ -97,7 +96,7 @@ namespace Umbraco.Web.Routing
             }
 
             // assemble the url from domainUri (maybe null) and path
-            return AssembleUrl(domainUri, path, current, absolute).ToString();
+            return AssembleUrl(domainUri, path, current, mode).ToString();
         }
 
         #endregion
@@ -185,27 +184,65 @@ namespace Umbraco.Web.Routing
 
         #region Utilities
 
-        Uri AssembleUrl(DomainAndUri domainUri, string path, Uri current, bool absolute)
+        Uri AssembleUrl(DomainAndUri domainUri, string path, Uri current, UrlProviderMode mode)
         {
             Uri uri;
 
-            if (domainUri == null)
+            // ignore vdir at that point, UriFromUmbraco will do it
+
+            if (mode == UrlProviderMode.AutoLegacy)
             {
-                // no domain was found : return an absolute or relative url
-                // ignore vdir at that point
-                if (!absolute || current == null)
-                    uri = new Uri(path, UriKind.Relative);
-                else
-                    uri = new Uri(current.GetLeftPart(UriPartial.Authority) + path);
+                mode = Core.Configuration.UmbracoSettings.UseDomainPrefixes
+                    ? UrlProviderMode.Absolute
+                    : UrlProviderMode.Auto;
             }
-            else
+
+            if (mode == UrlProviderMode.AutoLegacy)
             {
-                // a domain was found : return an absolute or relative url
-                // ignore vdir at that point
-                if (!absolute && current != null && domainUri.Uri.GetLeftPart(UriPartial.Authority) == current.GetLeftPart(UriPartial.Authority))
-                    uri = new Uri(CombinePaths(domainUri.Uri.AbsolutePath, path), UriKind.Relative); // relative
-                else
-                    uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path)); // absolute
+                mode = Core.Configuration.UmbracoSettings.UseDomainPrefixes
+                    ? UrlProviderMode.Absolute
+                    : UrlProviderMode.Auto;
+            }
+
+            if (domainUri == null) // no domain was found
+            {
+                if (current == null)
+                    mode = UrlProviderMode.Relative; // best we can do
+
+                switch (mode)
+                {
+                    case UrlProviderMode.Absolute:
+                        uri = new Uri(current.GetLeftPart(UriPartial.Authority) + path);
+                        break;
+                    case UrlProviderMode.Relative:
+                    case UrlProviderMode.Auto:
+                        uri = new Uri(path, UriKind.Relative);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("mode");
+                }
+            }
+            else // a domain was found
+            {
+                if (mode == UrlProviderMode.Auto)
+                {
+                    if (current != null && domainUri.Uri.GetLeftPart(UriPartial.Authority) == current.GetLeftPart(UriPartial.Authority))    
+                        mode = UrlProviderMode.Relative;
+                    else
+                        mode = UrlProviderMode.Absolute;
+                }
+
+                switch (mode)
+                {
+                    case UrlProviderMode.Absolute:
+                        uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
+                        break;
+                    case UrlProviderMode.Relative:
+                        uri = new Uri(CombinePaths(domainUri.Uri.AbsolutePath, path), UriKind.Relative);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("mode");
+                }
             }
 
             // UriFromUmbraco will handle vdir

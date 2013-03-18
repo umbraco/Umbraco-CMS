@@ -7,6 +7,8 @@ using System.IO;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Web.Configuration;
 
 using umbraco;
 using umbraco.cms.businesslogic.web;
@@ -444,7 +446,7 @@ namespace Umbraco.Web.Routing
 					// redirect to another page
 					var node = _routingContext.PublishedContentStore.GetDocumentById(_routingContext.UmbracoContext, internalRedirectId);
 
-                    _pcr.PublishedContent = node; 
+                    _pcr.SetInternalRedirectPublishedContent(node); // don't use .PublishedContent here
                     if (node != null)
 					{
 						redirect = true;
@@ -532,7 +534,10 @@ namespace Umbraco.Web.Routing
 			// read the alternate template alias, from querystring, form, cookie or server vars,
 			// only if the published content is the initial once, else the alternate template
 			// does not apply
-            string altTemplate = _pcr.IsInitialPublishedContent 
+            // + optionnally, apply the alternate template on internal redirects
+            var useAltTemplate = _pcr.IsInitialPublishedContent
+                || (UmbracoSettings.For<WebRouting>().InternalRedirectPreservesTemplate && _pcr.IsInternalRedirectPublishedContent);
+            string altTemplate = useAltTemplate
                 ? _routingContext.UmbracoContext.HttpContext.Request["altTemplate"] 
 				: null;
 

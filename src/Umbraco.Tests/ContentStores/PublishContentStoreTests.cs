@@ -105,7 +105,7 @@ namespace Umbraco.Tests.ContentStores
 		[TearDown]
 		public void TearDown()
 		{
-			UmbracoSettings.ResetSetters();
+			UmbracoSettings.Reset();
 		}
 
 		[Test]
