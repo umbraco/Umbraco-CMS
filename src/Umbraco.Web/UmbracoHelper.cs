@@ -13,6 +13,7 @@ using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
+using Umbraco.Core.Xml;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Templates;
@@ -451,6 +452,11 @@ namespace Umbraco.Web
             return TypedDocumentById(id, _umbracoContext.ContentCache);
 		}
 
+        public IPublishedContent TypedContentSingleAtXPath(string xpath, params XPathVariable[] vars)
+        {
+            return TypedDocumentByXPath(xpath, vars, _umbracoContext.ContentCache);
+        }
+
 		public IEnumerable<IPublishedContent> TypedContent(params object[] ids)
 		{
             return TypedDocumentsbyIds(_umbracoContext.ContentCache, ids);
@@ -481,6 +487,11 @@ namespace Umbraco.Web
 			return TypedContent(ids.ToArray());
 		}
 
+        public IEnumerable<IPublishedContent> TypedContentAtXPath(string xpath, params XPathVariable[] vars)
+        {
+            return TypedDocumentsByXPath(xpath, vars, _umbracoContext.ContentCache);
+        }
+
         public IEnumerable<IPublishedContent> TypedContentAtRoot()
         {
             return TypedDocumentsAtRoot(_umbracoContext.ContentCache);
@@ -500,6 +511,11 @@ namespace Umbraco.Web
 		{
             return DocumentById(id, _umbracoContext.ContentCache, new DynamicNull());
 		}
+
+        public dynamic ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
+        {
+            return DocumentByXPath(xpath, vars, _umbracoContext.ContentCache, new DynamicNull());
+        }
 
 		public dynamic Content(params object[] ids)
 		{
@@ -530,6 +546,11 @@ namespace Umbraco.Web
 		{
 			return Content(ids.ToArray());
 		}
+
+        public dynamic ContentAtXPath(string xpath, params XPathVariable[] vars)
+        {
+            return DocumentsByXPath(xpath, vars, _umbracoContext.ContentCache);
+        }
 
         public dynamic ContentAtRoot()
         {
@@ -688,6 +709,12 @@ namespace Umbraco.Web
 				       : null;
 		}
 
+        private IPublishedContent TypedDocumentByXPath(string xpath, XPathVariable[] vars, ContextualPublishedContentCache cache)
+        {
+            var doc = cache.GetSingleByXPath(xpath, vars);
+            return doc;
+        }
+
 		/// <summary>
 		/// Overloaded method accepting an 'object' type
 		/// </summary>
@@ -713,6 +740,12 @@ namespace Umbraco.Web
 		{
 			return ids.Select(eachId => TypedDocumentById(eachId, cache));
 		}
+
+        private IEnumerable<IPublishedContent> TypedDocumentsByXPath(string xpath, XPathVariable[] vars, ContextualPublishedContentCache cache)
+        {
+            var doc = cache.GetByXPath(xpath, vars);
+            return doc;
+        }
 
         private IEnumerable<IPublishedContent> TypedDocumentsAtRoot(ContextualPublishedCache cache)
         {
@@ -756,14 +789,14 @@ namespace Umbraco.Web
 				: ifNotFound;
 		}
 
-        private dynamic DocumentsAtRoot(ContextualPublishedCache cache)
+        private dynamic DocumentByXPath(string xpath, XPathVariable[] vars, ContextualPublishedCache cache, object ifNotFound)
         {
-            return new DynamicPublishedContentList(
-                cache.GetAtRoot()
-                    .Select(publishedContent => new DynamicPublishedContent(publishedContent))
-            );
+            var doc = cache.GetSingleByXPath(xpath, vars);
+            return doc == null
+                ? ifNotFound
+                : new DynamicPublishedContent(doc).AsDynamic();
         }
-
+        
 		/// <summary>
 		/// Overloaded method accepting an 'object' type
 		/// </summary>
@@ -802,7 +835,23 @@ namespace Umbraco.Web
 			return new DynamicPublishedContentList(nodes);
 		}
 
-		#endregion
+        private dynamic DocumentsByXPath(string xpath, XPathVariable[] vars, ContextualPublishedCache cache)
+        {
+            return new DynamicPublishedContentList(
+                cache.GetByXPath(xpath, vars)
+                    .Select(publishedContent => new DynamicPublishedContent(publishedContent))
+            );
+        }
+
+        private dynamic DocumentsAtRoot(ContextualPublishedCache cache)
+        {
+            return new DynamicPublishedContentList(
+                cache.GetAtRoot()
+                    .Select(publishedContent => new DynamicPublishedContent(publishedContent))
+            );
+        }
+
+        #endregion
 
 		#region Search
 
