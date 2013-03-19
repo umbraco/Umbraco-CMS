@@ -45,7 +45,8 @@ namespace Umbraco.Web.Configuration
         /// <summary>
         /// Gets or sets the url provider mode.
         /// </summary>
-        [ConfigurationProperty(KeyUrlProviderMode, DefaultValue = Routing.UrlProviderMode.AutoLegacy, IsRequired = false)]
+        /// <remarks>If the section is present then default is Auto, else default is AutoLegacy.</remarks>
+        [ConfigurationProperty(KeyUrlProviderMode, DefaultValue = Routing.UrlProviderMode.Auto, IsRequired = false)]
         [TypeConverter(typeof(CaseInsensitiveEnumConfigConverter<Routing.UrlProviderMode>))]
         public Routing.UrlProviderMode UrlProviderMode
         {
@@ -53,7 +54,7 @@ namespace Umbraco.Web.Configuration
             {
                 return _urlProviderMode ?? (IsPresent
                     ? (Routing.UrlProviderMode)this[KeyUrlProviderMode]
-                    : Routing.UrlProviderMode.Auto);
+                    : Routing.UrlProviderMode.AutoLegacy);
             }
             internal set { _urlProviderMode = value; }
         }
