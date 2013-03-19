@@ -1216,8 +1216,7 @@ namespace Umbraco.Core.Services
                     }
                 }
                 Audit.Add(AuditTypes.Publish, "RePublish All completed, the xml has been regenerated in the database", 0, -1);
-            }            
-            }
+            }                        
         }
 
 	    /// <summary>
@@ -1469,8 +1468,7 @@ namespace Umbraco.Core.Services
                 Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId, content.Id);
 
                 return new Attempt<PublishStatus>(publishStatus.StatusType == PublishStatusType.Success, publishStatus);
-	        }	        
-	        }
+	        }	        	        
         }
 
 	    /// <summary>
