@@ -314,6 +314,11 @@ namespace Umbraco.Core.Sync
             //We are using distributed calls, so lets make them...
             try
             {
+
+                //TODO: We should try to figure out the current server's address and if it matches any of the ones
+                // in the ServerAddress list, then just refresh directly on this server and exclude that server address
+                // from the list, this will save an internal request.
+
                 using (var cacheRefresher = new ServerSyncWebServiceClient())
                 {
                     var asyncResultsList = new List<IAsyncResult>();

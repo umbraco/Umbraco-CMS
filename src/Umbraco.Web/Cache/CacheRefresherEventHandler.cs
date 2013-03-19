@@ -2,6 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
 using umbraco;
 using umbraco.BusinessLogic;
@@ -84,7 +85,25 @@ namespace Umbraco.Web.Cache
         /// <param name="e"></param>
         static void ContentTypeServiceSavedContentType(IContentTypeService sender, Core.Events.SaveEventArgs<IContentType> e)
         {
-            e.SavedEntities.ForEach(x => DistributedCache.Instance.RemoveContentTypeCache(x));
+            //NOTE: This needs to be put in the Service layer...
+
+            //var needsContentRefresh = e.SavedEntities.Any(contentType =>
+            //    {
+            //        //before we send the call to update the cache, we need to determine if we need to refresh the xml content 
+            //        //in the database. This is to be done when:
+            //        // - a content type changes it's alias
+            //        // - if a content type has it's property removed
+            //        //here we need to check if the alias of the content type changed or if one of the properties was removed.                    
+            //        var dirty = contentType as IRememberBeingDirty;                    
+            //        return dirty != null && (dirty.WasPropertyDirty("Alias") || dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved"));
+            //    });
+
+            ////if we need to refresh the content cache, we need to re-create the xml content in the database before sending out
+            ////the request to refresh the application cache
+            //ApplicationContext.Current.Services.ContentService.RePublishAll();
+
+            //now send the cache refresh call!
+            e.SavedEntities.ForEach(contentType => DistributedCache.Instance.RemoveContentTypeCache(contentType));
         }
 
         /// <summary>
