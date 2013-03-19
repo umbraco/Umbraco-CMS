@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Xml;
 using NUnit.Framework;
@@ -79,7 +80,8 @@ namespace Umbraco.Tests.PublishedCache
                 new PublishedContentCache(), 
                 new PublishedMediaCache());
 
-			_umbracoContext.GetXmlDelegate = () =>
+		    var cache = new PublishedContentCache();
+            cache.GetXmlDelegate = (user, preview) =>
 				{
 					var xDoc = new XmlDocument();
 
@@ -90,14 +92,18 @@ namespace Umbraco.Tests.PublishedCache
 					return xDoc;
 				};
 
-            _cache = new ContextualPublishedContentCache(new PublishedContentCache(), _umbracoContext);		
+            _cache = new ContextualPublishedContentCache(cache, _umbracoContext);		
 		}
 
 		private void SetupForLegacy()
 		{
 			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = true;
-			_umbracoContext.GetXmlDelegate = () =>
-			{
+
+            var cache = PublishedContentCacheResolver.Current.PublishedContentCache as PublishedContentCache;
+            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the legacy one is supported.");
+
+            cache.GetXmlDelegate = (user, preview) =>
+            {
 				var xDoc = new XmlDocument();
 
 				//create a custom xml structure to return

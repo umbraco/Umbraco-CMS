@@ -232,53 +232,6 @@ namespace Umbraco.Web
         /// </summary>
         internal ContextualPublishedMediaCache MediaCache { get; private set; }
 
-    	private Func<XmlDocument> _xmlDelegate; 
-
-		/// <summary>
-		/// Gets/sets the delegate used to retreive the Xml content, generally the setter is only used for unit tests
-		/// and by default if it is not set will use the standard delegate which ONLY works when in the context an Http Request
-		/// </summary>
-		/// <remarks>
-		/// If not defined, we will use the standard delegate which ONLY works when in the context an Http Request
-		/// mostly because the 'content' object heavily relies on HttpContext, SQL connections and a bunch of other stuff
-		/// that when run inside of a unit test fails.
-		/// </remarks>
-    	internal Func<XmlDocument> GetXmlDelegate
-    	{
-    		get
-    		{				
-    			return _xmlDelegate ?? (_xmlDelegate = () =>
-    				{
-    					if (InPreviewMode)
-    					{
-    						if (_previewContent == null)
-    						{
-    							_previewContent = new PreviewContent(UmbracoUser, new Guid(StateHelper.Cookies.Preview.GetValue()), true);
-    							if (_previewContent.ValidPreviewSet)
-    								_previewContent.LoadPreviewset();
-    						}
-    						if (_previewContent.ValidPreviewSet)
-    							return _previewContent.XmlContent;
-    					}
-    					return content.Instance.XmlContent;
-    				});
-    		}
-			set { _xmlDelegate = value; }
-    	} 
-
-        /// <summary>
-        /// Returns the XML Cache document
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// This is marked internal for now because perhaps we might return a wrapper like CacheData so that it doesn't have a reliance
-        /// specifically on XML.
-        /// </remarks>
-        internal XmlDocument GetXml()
-        {
-        	return GetXmlDelegate();
-        }
-
 		/// <summary>
 		/// Boolean value indicating whether the current request is a front-end umbraco request
 		/// </summary>
