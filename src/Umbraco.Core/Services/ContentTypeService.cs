@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
@@ -458,6 +459,60 @@ namespace Umbraco.Core.Services
 
             }
             return dtd.ToString();
+        }
+
+        /// <summary>
+        /// Imports and saves package xml as <see cref="IContentType"/>
+        /// </summary>
+        /// <param name="element">Xml to import</param>
+        /// <returns>An enumrable list of generated ContentTypes</returns>
+        public List<IContentType> Import(XElement element)
+        {
+            var name = element.Name.LocalName;
+            if (name.Equals("DocumentTypes") == false)
+            {
+                throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called 'DocumentTypes'.");
+            }
+
+            var list = new List<IContentType>();
+            var documentTypes = from doc in element.Elements("DocumentType") select doc;
+            foreach (var documentType in documentTypes)
+            {
+                //TODO Check if the ContentType already exists by looking up the alias
+                list.Add(CreateContentTypeFromXml(documentType));
+            }
+
+            Save(list);
+            return list;
+        }
+
+        private IContentType CreateContentTypeFromXml(XElement documentType)
+        {
+            var infoElement = documentType.Element("Info");
+            var name = infoElement.Element("Name").Value;
+            var alias = infoElement.Element("Alias").Value;
+            var masterElement = infoElement.Element("Master");//Name of the master corresponds to the parent
+            var icon = infoElement.Element("Icon").Value;
+            var thumbnail = infoElement.Element("Thumbnail").Value;
+            var description = infoElement.Element("Description").Value;
+            var allowAtRoot = infoElement.Element("AllowAtRoot").Value;
+            var defaultTemplate = infoElement.Element("DefaultTemplate").Value;
+            var allowedTemplatesElement = infoElement.Elements("AllowedTemplates");
+
+            var structureElement = documentType.Element("Structure");
+            var genericPropertiesElement = documentType.Element("GenericProperties");
+            var tabElement = documentType.Element("Tab");
+
+            var contentType = new ContentType(-1)
+                                  {
+                                      Alias = alias,
+                                      Name = name,
+                                      Icon = icon,
+                                      Thumbnail = thumbnail,
+                                      AllowedAsRoot = allowAtRoot.ToLowerInvariant().Equals("true"),
+                                      Description = description
+                                  };
+            return contentType;
         }
 
         #region Event Handlers

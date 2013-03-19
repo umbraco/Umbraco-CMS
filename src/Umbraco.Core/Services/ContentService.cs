@@ -60,27 +60,8 @@ namespace Umbraco.Core.Services
 	    /// <returns><see cref="IContent"/></returns>
 	    public IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = 0)
 		{
-		    IContentType contentType = null;
-            IContent content = null;
-
-			var uow = _uowProvider.GetUnitOfWork();
-		    using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
-		    {
-		        var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
-		        var contentTypes = repository.GetByQuery(query);
-
-		        if (!contentTypes.Any())
-		            throw new Exception(string.Format("No ContentType matching the passed in Alias: '{0}' was found",
-		                                              contentTypeAlias));
-
-		        contentType = contentTypes.First();
-
-		        if (contentType == null)
-		            throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null",
-		                                              contentTypeAlias));
-		    }
-
-            content = new Content(name, parentId, contentType);
+		    IContentType contentType = FindContentTypeByAlias(contentTypeAlias);
+            IContent content = new Content(name, parentId, contentType);
 
 			if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
 				return content;
@@ -106,27 +87,8 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IContent"/></returns>
         public IContent CreateContent(string name, IContent parent, string contentTypeAlias, int userId = 0)
         {
-            IContentType contentType = null;
-            IContent content = null;
-
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
-            {
-                var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
-                var contentTypes = repository.GetByQuery(query);
-
-                if (!contentTypes.Any())
-                    throw new Exception(string.Format("No ContentType matching the passed in Alias: '{0}' was found",
-                                                      contentTypeAlias));
-
-                contentType = contentTypes.First();
-
-                if (contentType == null)
-                    throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null",
-                                                      contentTypeAlias));
-            }
-
-            content = new Content(name, parent, contentType);
+            IContentType contentType = FindContentTypeByAlias(contentTypeAlias);
+            IContent content = new Content(name, parent, contentType);
 
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parent), this))
                 return content;
@@ -1001,6 +963,166 @@ namespace Umbraco.Core.Services
 
 		    return content;
 	    }
+
+        /// <summary>
+        /// Imports and saves package xml as <see cref="IContent"/>
+        /// </summary>
+        /// <param name="element">Xml to import</param>
+        /// <returns>An enumrable list of generated content</returns>
+        public IEnumerable<IContent> Import(XElement element)
+        {
+            var name = element.Name.LocalName;
+            if (name.Equals("DocumentSet"))
+            {
+                //This is a regular deep-structured import
+                var roots = from doc in element.Elements()
+                           where (string) doc.Attribute("isDoc") == ""
+                           select doc;
+
+                var contents = ParseRootXml(roots);
+                Save(contents);
+
+                return contents;
+            }
+
+            var attribute = element.Attribute("isDoc");
+            if (attribute != null)
+            {
+                //This is a single doc import
+                var elements = new List<XElement> { element };
+                var contents = ParseRootXml(elements);
+                Save(contents);
+
+                return contents;
+            }
+
+            throw new ArgumentException(
+                "The passed in XElement is not valid! It does not contain a root element called "+
+                "'DocumentSet' (for structured imports) nor is the first element a Document (for single document import).");
+        }
+
+	    private IEnumerable<IContent> ParseRootXml(IEnumerable<XElement> roots)
+	    {
+            var contentTypes = new Dictionary<string, IContentType>();
+	        var contents = new List<IContent>();
+	        foreach (var root in roots)
+	        {
+	            bool isLegacySchema = root.Name.LocalName.ToLowerInvariant().Equals("node");
+	            string contentTypeAlias = isLegacySchema
+	                                          ? root.Attribute("nodeTypeAlias").Value
+	                                          : root.Name.LocalName;
+
+	            if (contentTypes.ContainsKey(contentTypeAlias) == false)
+	            {
+	                var contentType = FindContentTypeByAlias(contentTypeAlias);
+                    contentTypes.Add(contentTypeAlias, contentType);
+	            }
+
+                var content = CreateContentFromXml(root, contentTypes[contentTypeAlias], null, -1, isLegacySchema);
+                contents.Add(content);
+
+                var children = from child in root.Elements()
+                               where (string)child.Attribute("isDoc") == ""
+                               select child;
+                if(children.Any())
+                    contents.AddRange(CreateContentFromXml(children, content, contentTypes, isLegacySchema));
+	        }
+            return contents;
+	    }
+
+        private IEnumerable<IContent> CreateContentFromXml(IEnumerable<XElement> children, IContent parent, Dictionary<string, IContentType> contentTypes, bool isLegacySchema)
+	    {
+	        var list = new List<IContent>();
+	        foreach (var child in children)
+	        {
+	            string contentTypeAlias = isLegacySchema
+	                                          ? child.Attribute("nodeTypeAlias").Value
+	                                          : child.Name.LocalName;
+
+                if (contentTypes.ContainsKey(contentTypeAlias) == false)
+                {
+                    var contentType = FindContentTypeByAlias(contentTypeAlias);
+                    contentTypes.Add(contentTypeAlias, contentType);
+                }
+
+                //Create and add the child to the list
+                var content = CreateContentFromXml(child, contentTypes[contentTypeAlias], parent, default(int), isLegacySchema);
+                list.Add(content);
+
+                //Recursive call
+	            XElement child1 = child;
+	            var grandChildren = from grand in child1.Elements()
+	                                where (string) grand.Attribute("isDoc") == ""
+	                                select grand;
+
+	            if (grandChildren.Any())
+	                list.AddRange(CreateContentFromXml(grandChildren, content, contentTypes, isLegacySchema));
+	        }
+
+	        return list;
+	    }
+
+	    private IContent CreateContentFromXml(XElement element, IContentType contentType, IContent parent, int parentId, bool isLegacySchema)
+	    {
+	        var id = element.Attribute("id").Value;
+            var level = element.Attribute("level").Value;
+            var sortOrder = element.Attribute("sortOrder").Value;
+            var nodeName = element.Attribute("nodeName").Value;
+            var path = element.Attribute("path").Value;
+            var template = element.Attribute("template").Value;
+
+            var properties = from property in element.Elements()
+                             where property.Attribute("isDoc") == null
+                             select property;
+
+            IContent content = parent == null
+                                   ? new Content(nodeName, parentId, contentType)
+                                         {
+                                             Level = int.Parse(level),
+                                             SortOrder = int.Parse(sortOrder)
+                                         }
+                                   : new Content(nodeName, parent, contentType)
+                                         {
+                                             Level = int.Parse(level),
+                                             SortOrder = int.Parse(sortOrder)
+                                         };
+
+	        foreach (var property in properties)
+	        {
+                string propertyTypeAlias = isLegacySchema ? property.Attribute("alias").Value : property.Name.LocalName;
+                if(content.HasProperty(propertyTypeAlias))
+	                content.SetValue(propertyTypeAlias, property.Value);
+	        }
+
+	        return content;
+	    }
+
+	    private IContentType FindContentTypeByAlias(string contentTypeAlias)
+        {
+            using (var repository = _repositoryFactory.CreateContentTypeRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
+                var types = repository.GetByQuery(query);
+
+                if (!types.Any())
+                    throw new Exception(
+                        string.Format("No ContentType matching the passed in Alias: '{0}' was found",
+                                      contentTypeAlias));
+
+                var contentType = types.First();
+
+                if (contentType == null)
+                    throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null",
+                                                      contentTypeAlias));
+
+                return contentType;
+            }
+        }
+
+	    public XElement Export(IContent content, bool deep = false)
+        {
+            throw new NotImplementedException();
+        }
 
         #region Internal Methods
         /// <summary>

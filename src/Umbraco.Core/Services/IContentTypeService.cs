@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Xml.Linq;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
@@ -149,5 +150,12 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the <see cref="IMediaType"/></param>
         /// <returns>True if the media type has any children otherwise False</returns>
         bool MediaTypeHasChildren(int id);
+
+        /// <summary>
+        /// Imports and saves package xml as <see cref="IContentType"/>
+        /// </summary>
+        /// <param name="element">Xml to import</param>
+        /// <returns>An enumrable list of generated ContentTypes</returns>
+        List<IContentType> Import(XElement element);
     }
 }
