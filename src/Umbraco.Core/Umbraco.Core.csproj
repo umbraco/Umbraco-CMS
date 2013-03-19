@@ -166,6 +166,7 @@
     <Compile Include="Models\Css\TrieNode.cs" />
     <Compile Include="Models\DictionaryItem.cs" />
     <Compile Include="Models\DictionaryTranslation.cs" />
+    <Compile Include="Models\EntityBase\IRememberBeingDirty.cs" />
     <Compile Include="Models\EntityBase\IUmbracoEntity.cs" />
     <Compile Include="Models\File.cs" />
     <Compile Include="Models\IDataTypeDefinition.cs" />

@@ -31,6 +31,8 @@ namespace Umbraco.Core.Models
         private PropertyGroupCollection _propertyGroups;
         private PropertyTypeCollection _propertyTypes;
         private IEnumerable<ContentTypeSort> _allowedContentTypes;
+        private bool _hasPropertyTypeBeenRemoved;
+
 
         protected ContentTypeBase(int parentId)
         {
@@ -68,6 +70,8 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo AllowedContentTypesSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<ContentTypeSort>>(x => x.AllowedContentTypes);
         private static readonly PropertyInfo PropertyGroupCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, PropertyGroupCollection>(x => x.PropertyGroups);
         private static readonly PropertyInfo PropertyTypeCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<PropertyType>>(x => x.PropertyTypes);
+        private static readonly PropertyInfo HasPropertyTypeBeenRemovedSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.HasPropertyTypeBeenRemoved);
+
 
         protected void PropertyGroupsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -153,8 +157,11 @@ namespace Umbraco.Core.Models
             get { return _alias; }
             set
             {
-                _alias = value.ToSafeAlias();
-                OnPropertyChanged(AliasSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                    {
+                        _alias = value.ToSafeAlias();
+                        return _alias;
+                    }, _alias, AliasSelector);
             }
         }
 
@@ -323,6 +330,24 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// A boolean flag indicating if a property type has been removed from this instance.
+        /// </summary>
+        /// <remarks>
+        /// This is currently (specifically) used in order to know that we need to refresh the content cache which 
+        /// needs to occur when a property has been removed from a content type
+        /// </remarks>
+        [IgnoreDataMember]
+        internal bool HasPropertyTypeBeenRemoved
+        {
+            get { return _hasPropertyTypeBeenRemoved; }
+            private set
+            {
+                _hasPropertyTypeBeenRemoved = value;
+                OnPropertyChanged(HasPropertyTypeBeenRemovedSelector);
+            }
+        }
+
+        /// <summary>
         /// Checks whether a PropertyType with a given alias already exists
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
@@ -396,6 +421,15 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias">Alias of the <see cref="PropertyType"/> to remove</param>
         public void RemovePropertyType(string propertyTypeAlias)
         {
+
+            //check if the property exist in one of our collections
+            if (PropertyGroups.Any(group => group.PropertyTypes.Any(pt => pt.Alias == propertyTypeAlias))
+                || _propertyTypes.Any(x => x.Alias == propertyTypeAlias))
+            {
+                //set the flag that a property has been removed
+                HasPropertyTypeBeenRemoved = true;
+            }
+
             foreach (var propertyGroup in PropertyGroups)
             {
                 propertyGroup.PropertyTypes.RemoveItem(propertyTypeAlias);
@@ -403,7 +437,7 @@ namespace Umbraco.Core.Models
 
             if (_propertyTypes.Any(x => x.Alias == propertyTypeAlias))
             {
-                _propertyTypes.RemoveItem(propertyTypeAlias);
+                _propertyTypes.RemoveItem(propertyTypeAlias);               
             }
         }
 

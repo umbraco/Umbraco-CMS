@@ -405,6 +405,51 @@ namespace Umbraco.Tests.Models
         }
 
         [Test]
+        public void After_Committing_Changes_Was_Dirty_Is_True()
+        {
+            // Arrange
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            contentType.ResetDirtyProperties(); //reset 
+
+            // Act
+            contentType.Alias = "newAlias";
+            contentType.ResetDirtyProperties(); //this would be like committing the entity
+
+            // Assert
+            Assert.That(contentType.IsDirty(), Is.False);
+            Assert.That(contentType.WasDirty(), Is.True);
+            Assert.That(contentType.WasPropertyDirty("Alias"), Is.True);
+        }
+
+        [Test]
+        public void If_Not_Committed_Was_Dirty_Is_False()
+        {
+            // Arrange
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+
+            // Act
+            contentType.Alias = "newAlias";           
+
+            // Assert
+            Assert.That(contentType.IsDirty(), Is.True);
+            Assert.That(contentType.WasDirty(), Is.False);
+        }
+
+        [Test]
+        public void Detect_That_A_Property_Is_Removed()
+        {
+            // Arrange
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            Assert.That(contentType.WasPropertyDirty("HasPropertyTypeBeenRemoved"), Is.False);
+
+            // Act
+            contentType.RemovePropertyType("title");
+
+            // Assert
+            Assert.That(contentType.IsPropertyDirty("HasPropertyTypeBeenRemoved"), Is.True);
+        }
+
+        [Test]
         public void Adding_PropertyType_To_PropertyGroup_On_ContentType_Results_In_Dirty_Entity()
         {
             // Arrange

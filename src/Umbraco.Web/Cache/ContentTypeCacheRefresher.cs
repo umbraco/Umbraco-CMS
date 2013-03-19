@@ -5,6 +5,7 @@ using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 
@@ -87,12 +88,34 @@ namespace Umbraco.Web.Cache
         /// - InMemoryCacheProvider.Current.Clear();
         /// - RuntimeCacheProvider.Current.Clear(); 
         ///         
-        /// TODO: Needs to update any content items that this effects for the xml cache... currently it would seem that this is not handled! 
-        ///       it is only handled in the ContentTypeControlNew.ascx, not by business logic/events. - The xml cache needs to be updated when the doc type alias changes or when a property type is removed, the ContentService.RePublishAll should be executed anytime either of these happens.
+        /// TODO: Needs to update any content items that this effects for the xml cache... 
+        ///       it is only handled in the ContentTypeControlNew.ascx, not by business logic/events. - The xml cache needs to be updated 
+        ///       when the doc type alias changes or when a property type is removed, the ContentService.RePublishAll should be executed anytime either of these happens.
         /// </remarks>
         private static void ClearContentTypeCache(params IContentTypeBase[] contentTypes)
         {
-            contentTypes.ForEach(ClearContentTypeCache);
+            var needsContentRefresh = false;
+            
+            contentTypes.ForEach(contentType =>
+                {
+                    //clear the cache for each item
+                    ClearContentTypeCache(contentType);
+
+                    //here we need to check if the alias of the content type changed or if one of the properties was removed.                    
+                    var dirty = contentType as IRememberBeingDirty;
+                    if (dirty == null) return;
+                    if (dirty.WasPropertyDirty("Alias") || dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved"))
+                    {
+                        needsContentRefresh = true;
+                    }
+                });
+
+            //need to refresh the xml content cache if required
+            if (needsContentRefresh)
+            {
+                var pageRefresher = CacheRefreshersResolver.Current.GetById(new Guid(DistributedCache.PageCacheRefresherId));
+                pageRefresher.RefreshAll();
+            }
 
             //clear the cache providers if there were any content types to clear
             if (contentTypes.Any())
@@ -110,6 +133,9 @@ namespace Umbraco.Web.Cache
         /// See notes for the other overloaded ClearContentTypeCache for 
         /// full details on clearing cache.
         /// </remarks>
+        /// <returns>
+        /// Return true if the alias of the content type changed
+        /// </returns>
         private static void ClearContentTypeCache(IContentTypeBase contentType)
         {
             //clears the cache for each property type associated with the content type
@@ -131,7 +157,7 @@ namespace Umbraco.Web.Cache
             foreach (var dto in dtos)
             {
                 ClearContentTypeCache(dto.ChildId);
-            }
+            }            
         }
 
         /// <summary>
