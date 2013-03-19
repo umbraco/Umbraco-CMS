@@ -8,6 +8,7 @@ using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Xml;
+using Umbraco.Core;
 using umbraco.IO;
 using umbraco.NodeFactory;
 using umbraco.cms.businesslogic.web;
@@ -391,7 +392,7 @@ namespace umbraco
             // Check for internal redirects
             if (currentPage != null)
             {
-                XmlNode internalRedirect = currentPage.SelectSingleNode(UmbracoSettings.UseLegacyXmlSchema ? "data [@alias = 'umbracoInternalRedirectId']" : "umbracoInternalRedirectId");
+                XmlNode internalRedirect = currentPage.SelectSingleNode(UmbracoSettings.UseLegacyXmlSchema ? string.Format("data [@alias = '{0}']", Constants.Conventions.Content.InternalRedirectId) : Constants.Conventions.Content.InternalRedirectId);
                 if (internalRedirect != null && internalRedirect.FirstChild != null && !String.IsNullOrEmpty(internalRedirect.FirstChild.Value))
                 {
                     HttpContext.Current.Trace.Write("internalRedirection", "Found internal redirect id via umbracoInternalRedirectId property alias");
