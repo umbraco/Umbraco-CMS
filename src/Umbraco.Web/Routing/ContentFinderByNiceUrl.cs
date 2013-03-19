@@ -58,7 +58,7 @@ namespace Umbraco.Web.Routing
 			// first ask the cache for a node
 			// return '0' if in preview mode
         	var nodeId = !docreq.RoutingContext.UmbracoContext.InPreviewMode
-							? docreq.RoutingContext.UmbracoContext.RoutingContext.RoutesCache.GetNodeId(route)
+							? docreq.RoutingContext.RoutesCache.GetNodeId(route)
         	             	: 0;
 
 			// if a node was found, get it by id and ensure it exists
