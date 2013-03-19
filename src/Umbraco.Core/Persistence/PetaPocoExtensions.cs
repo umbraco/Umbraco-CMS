@@ -120,7 +120,17 @@ namespace Umbraco.Core.Persistence
 
         public static void DropTable(this Database db, string tableName)
         {
-            var sql = new Sql(string.Format("DROP TABLE {0}", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName)));
+            var sql = new Sql(string.Format(
+                SqlSyntaxContext.SqlSyntaxProvider.DropTable,
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName)));
+            db.Execute(sql);
+        }
+
+        public static void TruncateTable(this Database db, string tableName)
+        {
+            var sql = new Sql(string.Format(
+                SqlSyntaxContext.SqlSyntaxProvider.TruncateTable,
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName)));
             db.Execute(sql);
         }
 

@@ -31,6 +31,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string InsertData { get; }
         string UpdateData { get; }
         string DeleteData { get; }
+        string TruncateTable { get; }
         string CreateConstraint { get; }
         string DeleteConstraint { get; }
         string CreateForeignKeyConstraint { get; }
