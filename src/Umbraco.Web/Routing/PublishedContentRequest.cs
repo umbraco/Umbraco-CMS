@@ -2,6 +2,8 @@ using System;
 using System.Globalization;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Web.Configuration;
 using umbraco;
 using umbraco.cms.businesslogic.web;
 
@@ -104,11 +106,30 @@ namespace Umbraco.Web.Routing
 			set
 			{
 				_publishedContent = value;
+                IsInternalRedirectPublishedContent = false;
 				TemplateModel = null;
 			}
 		}
 
 		/// <summary>
+        /// Sets the requested content, following an internal redirect.
+        /// </summary>
+        /// <param name="content">The requested content.</param>
+        /// <remarks>Depending on <c>UmbracoSettings.InternalRedirectPreservesTemplate</c>, will
+        /// preserve or reset the template, if any.</remarks>
+        public void SetInternalRedirectPublishedContent(IPublishedContent content)
+        {
+            // unless a template has been set already by the finder,
+            // template should be null at that point. 
+            var initial = IsInitialPublishedContent;
+            var template = _template;
+            PublishedContent = content;
+            IsInternalRedirectPublishedContent = (initial && !IsInitialPublishedContent);
+            if (IsInternalRedirectPublishedContent && UmbracoSettings.For<WebRouting>().InternalRedirectPreservesTemplate)
+                _template = template;
+        }
+
+        /// <summary>
 		/// Gets the initial requested content.
 		/// </summary>
 		/// <remarks>The initial requested content is the content that was found by the finders,
@@ -133,7 +154,14 @@ namespace Umbraco.Web.Routing
         {
             // note: it can very well be null if the initial content was not found
             _initialPublishedContent = _publishedContent;
+            IsInternalRedirectPublishedContent = false;
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the current published has been obtained from the
+        /// initial published content following internal redirections exclusively.
+        /// </summary>
+        public bool IsInternalRedirectPublishedContent { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the content request has a content.

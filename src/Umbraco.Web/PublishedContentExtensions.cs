@@ -66,7 +66,7 @@ namespace Umbraco.Web
 					var umbHelper = new UmbracoHelper(UmbracoContext.Current);
 					return umbHelper.NiceUrl(doc.Id);
 				case PublishedItemType.Media:
-					var prop = doc.GetProperty("umbracoFile");
+					var prop = doc.GetProperty(Constants.Conventions.Media.File);
 					if (prop == null)
 						throw new NotSupportedException("Cannot retreive a Url for a media item if there is no 'umbracoFile' property defined");
 					return prop.Value.ToString();

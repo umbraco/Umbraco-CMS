@@ -27,7 +27,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             //reset settings
             SettingsForTests.Reset();
-            UmbracoSettings.ResetSetters();
+
             TestHelper.CleanContentDirectories();
             //reset the app context, this should reset most things that require resetting like ALL resolvers
             ApplicationContext.Current.DisposeIfDisposable();

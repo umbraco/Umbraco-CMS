@@ -2,6 +2,7 @@
 using System.Xml.XPath;
 using Umbraco.Core.Media;
 using umbraco;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Media.ImageUrlProviders
 {
@@ -22,7 +23,7 @@ namespace Umbraco.Web.Media.ImageUrlProviders
 
             if (nodeIterator.Current != null)
             {
-                var filename = GetProperty(nodeIterator, "umbracoFile");
+                var filename = GetProperty(nodeIterator, Constants.Conventions.Media.File);
                 var withThumb = AddThumbInfo(filename, parameters);
                 url = AddCropInfo(withThumb, parameters);
             }

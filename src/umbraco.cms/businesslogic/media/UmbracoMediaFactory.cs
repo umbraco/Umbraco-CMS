@@ -7,6 +7,7 @@ using System.Threading;
 using System.Xml;
 using Umbraco.Core.IO;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.media
 {
@@ -84,7 +85,7 @@ namespace umbraco.cms.businesslogic.media
             {
                 if (childMedia.ContentType.Alias == MediaTypeAlias)
                 {
-                    var prop = childMedia.getProperty("umbracoFile");
+                    var prop = childMedia.getProperty(Constants.Conventions.Media.File);
                     if (prop != null)
                     {
                         var destFilePath = FileSystem.GetRelativePath(prop.Id, fileName);

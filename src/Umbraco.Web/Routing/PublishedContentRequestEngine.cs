@@ -7,6 +7,8 @@ using System.IO;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Web.Configuration;
 
 using umbraco;
 using umbraco.cms.businesslogic.web;
@@ -418,7 +420,7 @@ namespace Umbraco.Web.Routing
 				throw new InvalidOperationException("There is no PublishedContent.");
 
 			bool redirect = false;
-			var internalRedirect = _pcr.PublishedContent.GetPropertyValue<string>("umbracoInternalRedirectId");
+			var internalRedirect = _pcr.PublishedContent.GetPropertyValue<string>(Constants.Conventions.Content.InternalRedirectId);
 
 			if (!string.IsNullOrWhiteSpace(internalRedirect))
 			{
@@ -444,7 +446,7 @@ namespace Umbraco.Web.Routing
 					// redirect to another page
 					var node = _routingContext.PublishedContentStore.GetDocumentById(_routingContext.UmbracoContext, internalRedirectId);
 
-                    _pcr.PublishedContent = node; 
+                    _pcr.SetInternalRedirectPublishedContent(node); // don't use .PublishedContent here
                     if (node != null)
 					{
 						redirect = true;
@@ -532,8 +534,11 @@ namespace Umbraco.Web.Routing
 			// read the alternate template alias, from querystring, form, cookie or server vars,
 			// only if the published content is the initial once, else the alternate template
 			// does not apply
-            string altTemplate = _pcr.IsInitialPublishedContent 
-                ? _routingContext.UmbracoContext.HttpContext.Request["altTemplate"] 
+            // + optionnally, apply the alternate template on internal redirects
+            var useAltTemplate = _pcr.IsInitialPublishedContent
+                || (UmbracoSettings.For<WebRouting>().InternalRedirectPreservesTemplate && _pcr.IsInternalRedirectPublishedContent);
+            string altTemplate = useAltTemplate
+                ? _routingContext.UmbracoContext.HttpContext.Request[Constants.Conventions.Url.AltTemplate]
 				: null;
 
 			if (string.IsNullOrWhiteSpace(altTemplate))
@@ -618,7 +623,7 @@ namespace Umbraco.Web.Routing
 		{
 		    if (!_pcr.HasPublishedContent) return;
 
-		    var redirectId = _pcr.PublishedContent.GetPropertyValue("umbracoRedirect", -1);				
+		    var redirectId = _pcr.PublishedContent.GetPropertyValue(Constants.Conventions.Content.Redirect, -1);
 		    var redirectUrl = "#";
 		    if (redirectId > 0)
 				redirectUrl = _routingContext.UrlProvider.GetUrl(redirectId);

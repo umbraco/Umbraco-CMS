@@ -336,7 +336,7 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var doc = GetNode(1173);
 
-			var hasProp = doc.HasProperty("umbracoUrlAlias");
+			var hasProp = doc.HasProperty(Constants.Conventions.Content.UrlAlias);
 
 			Assert.AreEqual(true, (bool)hasProp);
 
@@ -348,7 +348,7 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var doc = GetNode(1173);
 
-			var hasValue = doc.HasValue("umbracoUrlAlias");
+			var hasValue = doc.HasValue(Constants.Conventions.Content.UrlAlias);
 			var noValue = doc.HasValue("blahblahblah");
 
 			Assert.IsTrue(hasValue);

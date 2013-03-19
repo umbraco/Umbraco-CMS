@@ -81,11 +81,11 @@ namespace umbraco.controls.Images
             pane_upload.Visible = false;
             
             //this seems real ugly since we apparently already have the properties above (props)... but this data layer is insane and undecipherable:)
-            string mainImage = media.getProperty("umbracoFile").Value.ToString();
+            string mainImage = media.getProperty(Constants.Conventions.Media.File).Value.ToString();
             string extension = mainImage.Substring(mainImage.LastIndexOf(".") + 1, mainImage.Length - mainImage.LastIndexOf(".") - 1);            
             var thumbnail = mainImage.Remove(mainImage.Length - extension.Length - 1, extension.Length + 1) + "_thumb.jpg";
-            string width = media.getProperty("umbracoWidth").Value.ToString();
-            string height = media.getProperty("umbracoHeight").Value.ToString();
+            string width = media.getProperty(Constants.Conventions.Media.Width).Value.ToString();
+            string height = media.getProperty(Constants.Conventions.Media.Height).Value.ToString();
             int id = media.Id;
 
             feedback.Style.Add("margin-top", "8px");

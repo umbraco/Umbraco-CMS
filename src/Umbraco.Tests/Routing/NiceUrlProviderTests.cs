@@ -155,7 +155,7 @@ namespace Umbraco.Tests.Routing
 			Assert.AreEqual("http://example.com/home/sub1/custom-sub-1/", routingContext.UrlProvider.GetUrl(1177));
 
             SettingsForTests.UseDomainPrefixes = false;
-			routingContext.UrlProvider.EnforceAbsoluteUrls = true;
+			routingContext.UrlProvider.Mode = UrlProviderMode.Absolute;
 			Assert.AreEqual("http://example.com/home/sub1/custom-sub-1/", routingContext.UrlProvider.GetUrl(1177));
 		}
 
@@ -172,7 +172,7 @@ namespace Umbraco.Tests.Routing
             SettingsForTests.UseDomainPrefixes = true;
 			Assert.AreEqual("#", routingContext.UrlProvider.GetUrl(999999));
             SettingsForTests.UseDomainPrefixes = false;
-			routingContext.UrlProvider.EnforceAbsoluteUrls = true;
+			routingContext.UrlProvider.Mode = UrlProviderMode.Absolute;
 			Assert.AreEqual("#", routingContext.UrlProvider.GetUrl(999999));
 		}
 	}

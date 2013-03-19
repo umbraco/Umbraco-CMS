@@ -368,7 +368,7 @@ namespace Umbraco.Tests.Routing
 			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.UrlProvider.GetUrl(100311));
 
             SettingsForTests.UseDomainPrefixes = false;
-            routingContext.UrlProvider.EnforceAbsoluteUrls = true;
+            routingContext.UrlProvider.Mode = UrlProviderMode.Absolute;
 			Assert.AreEqual("http://domain1.com/en/1001-1-1/", routingContext.UrlProvider.GetUrl(100111));
 			Assert.AreEqual("http://domain3.com/en/1003-1-1/", routingContext.UrlProvider.GetUrl(100311));
 		}

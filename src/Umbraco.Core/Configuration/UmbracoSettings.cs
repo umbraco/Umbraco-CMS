@@ -6,9 +6,11 @@ using System.Threading;
 using System.Web;
 using System.Web.Caching;
 using System.Xml;
+using System.Configuration;
 
 using System.Collections.Generic;
 using Umbraco.Core.Logging;
+using Umbraco.Core.CodeAnnotations;
 
 
 namespace Umbraco.Core.Configuration
@@ -52,15 +54,14 @@ namespace Umbraco.Core.Configuration
         /// <summary>
 		/// Used in unit testing to reset all config items that were set with property setters (i.e. did not come from config)
 		/// </summary>
-		internal static void ResetSetters()
+		private static void ResetInternal()
 		{
 			_addTrailingSlash = null;			
 			_forceSafeAliases = null;
 			_useLegacySchema = null;
 			_useDomainPrefixes = null;
 			_umbracoLibraryCacheDuration = null;
-            _trySkipIisCustomErrors = null;
-		    SettingsFilePath = null;
+            SettingsFilePath = null;
 		}
 
 		internal const string TempFriendlyXmlChildContainerNodename = ""; // "children";
@@ -503,7 +504,7 @@ namespace Umbraco.Core.Configuration
 		private static IEnumerable<RazorDataTypeModelStaticMappingItem> _razorDataTypeModelStaticMapping;
 		private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
 
-		public static IEnumerable<RazorDataTypeModelStaticMappingItem> RazorDataTypeModelStaticMapping
+		internal static IEnumerable<RazorDataTypeModelStaticMappingItem> RazorDataTypeModelStaticMapping
 		{
 			get
 			{
@@ -652,23 +653,22 @@ namespace Umbraco.Core.Configuration
 			}
 		}
 
-        private static bool? _trySkipIisCustomErrors;
+        /// <summary>
+        /// Gets a value indicating whether to try to skip IIS custom errors.
+        /// </summary>
+        [UmbracoWillObsolete("Use UmbracoSettings.For<WebRouting>.TrySkipIisCustomErrors instead.")]
+        internal static bool TrySkipIisCustomErrors
+        {
+            get { return GetKeyValue("/settings/web.routing/@trySkipIisCustomErrors", false); }
+        }
 
         /// <summary>
-        /// Gets or sets a value indicating where to try to skip IIS custom errors.
+        /// Gets a value indicating whether internal redirect preserves the template.
         /// </summary>
-        public static bool TrySkipIisCustomErrors
-        {
-            get
-            {
-                // default: false
-                return _trySkipIisCustomErrors ?? GetKeyValue("/settings/web.routing/@trySkipIisCustomErrors", false);
-            }
-            internal set
-            {
-                // used for unit  testing
-                _trySkipIisCustomErrors = value;
-            }
+        [UmbracoWillObsolete("Use UmbracoSettings.For<WebRouting>.InternalRedirectPerservesTemplate instead.")]
+        internal static bool InternalRedirectPreservesTemplate
+	    {
+            get { return GetKeyValue("/settings/web.routing/@internalRedirectPreservesTemplate", false); }
         }
 
 		/// <summary>
@@ -1440,6 +1440,80 @@ namespace Umbraco.Core.Configuration
 			}
 
 			#endregion
-		}
-	}
+        }
+
+        #region Extensible settings
+
+        /// <summary>
+        /// Resets settings that were set programmatically, to their initial values.
+        /// </summary>
+        /// <remarks>To be used in unit tests.</remarks>
+        internal static void Reset()
+        {
+            ResetInternal();
+
+            using (new WriteLock(SectionsLock))
+            {
+                foreach (var section in Sections.Values)
+                    section.ResetSection();
+            }
+        }
+
+        private static readonly ReaderWriterLockSlim SectionsLock = new ReaderWriterLockSlim();
+        private static readonly Dictionary<Type, UmbracoConfigurationSection> Sections = new Dictionary<Type, UmbracoConfigurationSection>();
+
+        /// <summary>
+        /// Gets the specified UmbracoConfigurationSection.
+        /// </summary>
+        /// <typeparam name="T">The type of the UmbracoConfigurationSectiont.</typeparam>
+        /// <returns>The UmbracoConfigurationSection of the specified type.</returns>
+        internal static T For<T>()
+            where T : UmbracoConfigurationSection, new()
+        {
+            var sectionType = typeof (T);
+            using (new WriteLock(SectionsLock))
+            {
+                if (Sections.ContainsKey(sectionType)) return Sections[sectionType] as T;
+
+                var attr = sectionType.GetCustomAttribute<ConfigurationKeyAttribute>(false);
+                if (attr == null)
+                    throw new InvalidOperationException(string.Format("Type \"{0}\" is missing attribute ConfigurationKeyAttribute.", sectionType.FullName));
+
+                var sectionKey = attr.ConfigurationKey;
+                if (string.IsNullOrWhiteSpace(sectionKey))
+                    throw new InvalidOperationException(string.Format("Type \"{0}\" ConfigurationKeyAttribute value is null or empty.", sectionType.FullName));
+
+                var section = GetSection(sectionType, sectionKey);
+
+                Sections[sectionType] = section;
+                return section as T;
+            }
+        }
+
+        private static UmbracoConfigurationSection GetSection(Type sectionType, string key)
+        {
+            if (!sectionType.Inherits<UmbracoConfigurationSection>())
+                 throw new ArgumentException(string.Format(
+                    "Type \"{0}\" does not inherit from UmbracoConfigurationSection.", sectionType.FullName), "sectionType");
+
+            var section = ConfigurationManager.GetSection(key);
+
+            if (section != null && section.GetType() != sectionType)
+                throw new InvalidCastException(string.Format("Section at key \"{0}\" is of type \"{1}\" and not \"{2}\".",
+                    key, section.GetType().FullName, sectionType.FullName));
+
+            if (section != null) return section as UmbracoConfigurationSection;
+
+            section = Activator.CreateInstance(sectionType) as UmbracoConfigurationSection;
+
+            if (section == null)
+                throw new NullReferenceException(string.Format(
+                    "Activator failed to create an instance of type \"{0}\" for key\"{1}\" and returned null.",
+                    sectionType.FullName, key));
+
+            return section as UmbracoConfigurationSection;
+        }
+
+        #endregion
+    }
 }
