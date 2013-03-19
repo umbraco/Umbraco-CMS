@@ -42,6 +42,14 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return false;
         }
 
+        /// <summary>
+        /// SqlCe doesn't support the Truncate Table syntax, so we just have to do a DELETE FROM which is slower but we have no choice.
+        /// </summary>
+        public override string TruncateTable
+        {
+            get { return "DELETE FROM {0}"; }
+        }
+
         public override string GetIndexType(IndexTypes indexTypes)
         {
             string indexType;

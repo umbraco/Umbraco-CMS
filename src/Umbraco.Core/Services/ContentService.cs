@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Xml.Linq;
 using Umbraco.Core.Auditing;
@@ -25,6 +26,9 @@ namespace Umbraco.Core.Services
 		private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 		private readonly IPublishingStrategy _publishingStrategy;
         private readonly RepositoryFactory _repositoryFactory;
+        //Support recursive locks because some of the methods that require locking call other methods that require locking. 
+        //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
+        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion); 
 
         public ContentService()
             : this(new RepositoryFactory())
@@ -369,15 +373,28 @@ namespace Umbraco.Core.Services
             return IsPublishable(content, false);
         }
 
-	    /// <summary>
-	    /// Re-Publishes all Content
-	    /// </summary>
-	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
-	    /// <returns>True if publishing succeeded, otherwise False</returns>
-	    public bool RePublishAll(int userId = 0)
-	    {
-	        return RePublishAllDo(false, userId);
-	    }
+        /// <summary>
+        /// This will rebuild the xml structures for content in the database. 
+        /// </summary>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        /// <remarks>
+        /// This is used for when a document type alias or a document type property is changed, the xml will need to 
+        /// be regenerated.
+        /// </remarks>
+        public bool RePublishAll(int userId = 0)
+        {
+            try
+            {
+                RePublishAllDo();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<ContentService>("An error occurred executing RePublishAll", ex);
+                return false;
+            }
+        }
 
 	    /// <summary>
         /// Publishes a single <see cref="IContent"/> object
@@ -452,41 +469,43 @@ namespace Umbraco.Core.Services
                 if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(contents), this))
 				return;
             }
+	        using (new WriteLock(Locker))
+	        {
+	            var containsNew = contents.Any(x => x.HasIdentity == false);
 
-			var containsNew = contents.Any(x => x.HasIdentity == false);
+	            var uow = _uowProvider.GetUnitOfWork();
+	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+	            {
+	                if (containsNew)
+	                {
+	                    foreach (var content in contents)
+	                    {
+	                        content.WriterId = userId;
 
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateContentRepository(uow))
-			{
-				if (containsNew)
-				{
-					foreach (var content in contents)
-					{
-					    content.WriterId = userId;
+	                        //Only change the publish state if the "previous" version was actually published
+	                        if (content.Published)
+	                            content.ChangePublishedState(PublishedState.Saved);
 
-						//Only change the publish state if the "previous" version was actually published
-						if (content.Published)
-                            content.ChangePublishedState(PublishedState.Saved);
+	                        repository.AddOrUpdate(content);
+	                        uow.Commit();
+	                    }
+	                }
+	                else
+	                {
+	                    foreach (var content in contents)
+	                    {
+	                        content.WriterId = userId;
+	                        repository.AddOrUpdate(content);
+	                    }
+	                    uow.Commit();
+	                }
+	            }
 
-						repository.AddOrUpdate(content);
-						uow.Commit();
-					}
-				}
-				else
-				{
-					foreach (var content in contents)
-					{
-						content.WriterId = userId;
-						repository.AddOrUpdate(content);
-					}
-					uow.Commit();
-				}
-			}
-			
-            if(raiseEvents)
-                Saved.RaiseEvent(new SaveEventArgs<IContent>(contents, false), this);
+	            if (raiseEvents)
+	                Saved.RaiseEvent(new SaveEventArgs<IContent>(contents, false), this);
 
-			Audit.Add(AuditTypes.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, -1);
+	            Audit.Add(AuditTypes.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, -1);
+	        }
 	    }
 		
 	    /// <summary>
@@ -496,38 +515,41 @@ namespace Umbraco.Core.Services
 	    /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
 	    /// <param name="userId">Optional Id of the user issueing the delete operation</param>
 	    public void DeleteContentOfType(int contentTypeId, int userId = 0)
-	    {	        
-			using (var uow = _uowProvider.GetUnitOfWork())
-			{
-				var repository = _repositoryFactory.CreateContentRepository(uow);
-				//NOTE What about content that has the contenttype as part of its composition?
-				var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == contentTypeId);
-				var contents = repository.GetByQuery(query);
+	    {
+	        using (new WriteLock(Locker))
+	        {
+	            using (var uow = _uowProvider.GetUnitOfWork())
+	            {
+	                var repository = _repositoryFactory.CreateContentRepository(uow);
+	                //NOTE What about content that has the contenttype as part of its composition?
+	                var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == contentTypeId);
+	                var contents = repository.GetByQuery(query);
 
-				if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(contents), this))
-					return;
+	                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(contents), this))
+	                    return;
 
-				foreach (var content in contents.OrderByDescending(x => x.ParentId))
-				{
-					//Look for children of current content and move that to trash before the current content is deleted
-					var c = content;
-					var childQuery = Query<IContent>.Builder.Where(x => x.Path.StartsWith(c.Path));
-					var children = repository.GetByQuery(childQuery);
+	                foreach (var content in contents.OrderByDescending(x => x.ParentId))
+	                {
+	                    //Look for children of current content and move that to trash before the current content is deleted
+	                    var c = content;
+	                    var childQuery = Query<IContent>.Builder.Where(x => x.Path.StartsWith(c.Path));
+	                    var children = repository.GetByQuery(childQuery);
 
-					foreach (var child in children)
-					{
-						if (child.ContentType.Id != contentTypeId)
-							MoveToRecycleBin(child, userId);
-					}
+	                    foreach (var child in children)
+	                    {
+	                        if (child.ContentType.Id != contentTypeId)
+	                            MoveToRecycleBin(child, userId);
+	                    }
 
-					//Permantly delete the content
-					Delete(content, userId);
-				}	
-			}
+	                    //Permantly delete the content
+	                    Delete(content, userId);
+	                }
+	            }
 
-			Audit.Add(AuditTypes.Delete,
-					  string.Format("Delete Content of Type {0} performed by user", contentTypeId),
-					  userId, -1);
+	            Audit.Add(AuditTypes.Delete,
+	                      string.Format("Delete Content of Type {0} performed by user", contentTypeId),
+	                      userId, -1);
+	        }
 	    }
 
 	    /// <summary>
@@ -541,32 +563,35 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting the Content</param>
 		public void Delete(IContent content, int userId = 0)
 		{
-	        if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(content), this)) 
-				return;
+	        using (new WriteLock(Locker))
+	        {
+	            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(content), this))
+	                return;
 
-			//Make sure that published content is unpublished before being deleted
-			if (HasPublishedVersion(content.Id))
-			{
-				UnPublish(content, userId);
-			}
+	            //Make sure that published content is unpublished before being deleted
+	            if (HasPublishedVersion(content.Id))
+	            {
+	                UnPublish(content, userId);
+	            }
 
-			//Delete children before deleting the 'possible parent'
-			var children = GetChildren(content.Id);
-			foreach (var child in children)
-			{
-				Delete(child, userId);
-			}
+	            //Delete children before deleting the 'possible parent'
+	            var children = GetChildren(content.Id);
+	            foreach (var child in children)
+	            {
+	                Delete(child, userId);
+	            }
 
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateContentRepository(uow))
-			{
-				repository.Delete(content);
-				uow.Commit();
-			}
+	            var uow = _uowProvider.GetUnitOfWork();
+	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+	            {
+	                repository.Delete(content);
+	                uow.Commit();
+	            }
 
-			Deleted.RaiseEvent(new DeleteEventArgs<IContent>(content, false), this);
+	            Deleted.RaiseEvent(new DeleteEventArgs<IContent>(content, false), this);
 
-			Audit.Add(AuditTypes.Delete, "Delete Content performed by user", userId, content.Id);
+	            Audit.Add(AuditTypes.Delete, "Delete Content performed by user", userId, content.Id);
+	        }
 		}
 
 		/// <summary>
@@ -577,22 +602,22 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
 		public void DeleteVersions(int id, DateTime versionDate, int userId = 0)
 		{
-			//TODO: We should check if we are going to delete the most recent version because if that happens it means the 
-			// entity is completely deleted and we should raise the normal Deleting/Deleted event
+            //TODO: We should check if we are going to delete the most recent version because if that happens it means the 
+            // entity is completely deleted and we should raise the normal Deleting/Deleted event
 
-			if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, dateToRetain: versionDate), this))
-				return;
+            if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, dateToRetain: versionDate), this))
+                return;
 
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateContentRepository(uow))
-			{
-				repository.DeleteVersions(id, versionDate);
-				uow.Commit();
-			}
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                repository.DeleteVersions(id, versionDate);
+                uow.Commit();
+            }
 
-			DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate), this);
-			
-			Audit.Add(AuditTypes.Delete, "Delete Content by version date performed by user", userId, -1);
+            DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, dateToRetain: versionDate), this);
+
+            Audit.Add(AuditTypes.Delete, "Delete Content by version date performed by user", userId, -1);
 		}
 
 		/// <summary>
@@ -604,28 +629,31 @@ namespace Umbraco.Core.Services
 	    /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
 	    public void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = 0)
 	    {
-			//TODO: We should check if we are going to delete the most recent version because if that happens it means the 
-			// entity is completely deleted and we should raise the normal Deleting/Deleted event
+		    using (new WriteLock(Locker))
+		    {
+                //TODO: We should check if we are going to delete the most recent version because if that happens it means the 
+                // entity is completely deleted and we should raise the normal Deleting/Deleted event
 
-            if (deletePriorVersions)
-            {
-                var content = GetByVersion(versionId);
-                DeleteVersions(id, content.UpdateDate, userId);
-            }
+                if (deletePriorVersions)
+                {
+                    var content = GetByVersion(versionId);
+                    DeleteVersions(id, content.UpdateDate, userId);
+                }
 
-			if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion: versionId), this))
-				return;
+                if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion: versionId), this))
+                    return;
 
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateContentRepository(uow))
-			{
-				repository.DeleteVersion(versionId);
-				uow.Commit();
-			}
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateContentRepository(uow))
+                {
+                    repository.DeleteVersion(versionId);
+                    uow.Commit();
+                }
 
-			DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, specificVersion:versionId), this);
+                DeletedVersions.RaiseEvent(new DeleteRevisionsEventArgs(id, false, specificVersion: versionId), this);
 
-			Audit.Add(AuditTypes.Delete, "Delete Content by version performed by user", userId, -1);
+                Audit.Add(AuditTypes.Delete, "Delete Content by version performed by user", userId, -1);
+		    }		    
 	    }
 
 	    /// <summary>
@@ -636,43 +664,46 @@ namespace Umbraco.Core.Services
 	    /// <param name="userId">Optional Id of the User deleting the Content</param>
 	    public void MoveToRecycleBin(IContent content, int userId = 0)
 	    {
-			if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, -20), this))
-				return;
-
-			//Make sure that published content is unpublished before being moved to the Recycle Bin
-			if (HasPublishedVersion(content.Id))
-			{
-				UnPublish(content, userId);
-			}
-
-            //Unpublish descendents of the content item that is being moved to trash
-	        var descendants = GetDescendants(content).ToList();
-	        foreach (var descendant in descendants)
+	        using (new WriteLock(Locker))
 	        {
-                UnPublish(descendant, userId);
-	        }
+                if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, -20), this))
+                    return;
 
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateContentRepository(uow))
-			{
-			    content.WriterId = userId;
-				content.ChangeTrashedState(true);
-				repository.AddOrUpdate(content);
+                //Make sure that published content is unpublished before being moved to the Recycle Bin
+                if (HasPublishedVersion(content.Id))
+                {
+                    UnPublish(content, userId);
+                }
 
-                //Loop through descendants to update their trash state, but ensuring structure by keeping the ParentId
-			    foreach (var descendant in descendants)
-			    {
-                    descendant.WriterId = userId;
-                    descendant.ChangeTrashedState(true, descendant.ParentId);
-                    repository.AddOrUpdate(descendant);
-			    }
+                //Unpublish descendents of the content item that is being moved to trash
+                var descendants = GetDescendants(content).ToList();
+                foreach (var descendant in descendants)
+                {
+                    UnPublish(descendant, userId);
+                }
 
-				uow.Commit();
-			}
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateContentRepository(uow))
+                {
+                    content.WriterId = userId;
+                    content.ChangeTrashedState(true);
+                    repository.AddOrUpdate(content);
 
-			Trashed.RaiseEvent(new MoveEventArgs<IContent>(content, false, -20), this);
+                    //Loop through descendants to update their trash state, but ensuring structure by keeping the ParentId
+                    foreach (var descendant in descendants)
+                    {
+                        descendant.WriterId = userId;
+                        descendant.ChangeTrashedState(true, descendant.ParentId);
+                        repository.AddOrUpdate(descendant);
+                    }
 
-			Audit.Add(AuditTypes.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
+                    uow.Commit();
+                }
+
+                Trashed.RaiseEvent(new MoveEventArgs<IContent>(content, false, -20), this);
+
+                Audit.Add(AuditTypes.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
+	        }	        
 	    }
 
 	    /// <summary>
@@ -688,84 +719,87 @@ namespace Umbraco.Core.Services
 	    /// <param name="userId">Optional Id of the User moving the Content</param>
 	    public void Move(IContent content, int parentId, int userId = 0)
 	    {
-	        //This ensures that the correct method is called if this method is used to Move to recycle bin.
-	        if (parentId == -20)
+	        using (new WriteLock(Locker))
 	        {
-	            MoveToRecycleBin(content, userId);
-	            return;
-	        }
-
-	        if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, parentId), this))
-	            return;
-
-	        content.WriterId = userId;
-            if (parentId == -1)
-            {
-                content.Path = string.Concat("-1,", content.Id);
-                content.Level = 1;                
-            }
-            else
-            {
-                var parent = GetById(parentId);
-                content.Path = string.Concat(parent.Path, ",", content.Id);
-                content.Level = parent.Level + 1;
-            }
-	        
-
-	        //If Content is being moved away from Recycle Bin, its state should be un-trashed
-	        if (content.Trashed && parentId != -20)
-	        {
-	            content.ChangeTrashedState(false, parentId);
-	        }
-	        else
-	        {
-	            content.ParentId = parentId;
-	        }
-
-	        //If Content is published, it should be (re)published from its new location
-	        if (content.Published)
-	        {
-                //If Content is Publishable its saved and published
-                //otherwise we save the content without changing the publish state, and generate new xml because the Path, Level and Parent has changed.
-                if (IsPublishable(content))
+                //This ensures that the correct method is called if this method is used to Move to recycle bin.
+                if (parentId == -20)
                 {
-                    SaveAndPublish(content, userId);
+                    MoveToRecycleBin(content, userId);
+                    return;
+                }
+
+                if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, parentId), this))
+                    return;
+
+                content.WriterId = userId;
+                if (parentId == -1)
+                {
+                    content.Path = string.Concat("-1,", content.Id);
+                    content.Level = 1;
                 }
                 else
                 {
-                    Save(content, false, userId, true);
+                    var parent = GetById(parentId);
+                    content.Path = string.Concat(parent.Path, ",", content.Id);
+                    content.Level = parent.Level + 1;
+                }
 
-                    using (var uow = _uowProvider.GetUnitOfWork())
+
+                //If Content is being moved away from Recycle Bin, its state should be un-trashed
+                if (content.Trashed && parentId != -20)
+                {
+                    content.ChangeTrashedState(false, parentId);
+                }
+                else
+                {
+                    content.ParentId = parentId;
+                }
+
+                //If Content is published, it should be (re)published from its new location
+                if (content.Published)
+                {
+                    //If Content is Publishable its saved and published
+                    //otherwise we save the content without changing the publish state, and generate new xml because the Path, Level and Parent has changed.
+                    if (IsPublishable(content))
                     {
-                        var xml = content.ToXml();
-                        var poco = new ContentXmlDto {NodeId = content.Id, Xml = xml.ToString(SaveOptions.None)};
-                        var exists =
-                            uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new {Id = content.Id}) !=
-                            null;
-                        int result = exists
-                                         ? uow.Database.Update(poco)
-                                         : Convert.ToInt32(uow.Database.Insert(poco));
+                        SaveAndPublish(content, userId);
+                    }
+                    else
+                    {
+                        Save(content, false, userId, true);
+
+                        using (var uow = _uowProvider.GetUnitOfWork())
+                        {
+                            var xml = content.ToXml();
+                            var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
+                            var exists =
+                                uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = content.Id }) !=
+                                null;
+                            int result = exists
+                                             ? uow.Database.Update(poco)
+                                             : Convert.ToInt32(uow.Database.Insert(poco));
+                        }
                     }
                 }
-	        }
-	        else
-	        {
-	            Save(content, userId);
-	        }
+                else
+                {
+                    Save(content, userId);
+                }
 
-	        //Ensure that Path and Level is updated on children
-	        var children = GetChildren(content.Id);
-	        if (children.Any())
-	        {
-	            foreach (var child in children)
-	            {
-	                Move(child, content.Id, userId);
-	            }
-	        }
+                //Ensure that Path and Level is updated on children
+                var children = GetChildren(content.Id);
+                if (children.Any())
+                {
+                    foreach (var child in children)
+                    {
+                        Move(child, content.Id, userId);
+                    }
+                }
 
-	        Moved.RaiseEvent(new MoveEventArgs<IContent>(content, false, parentId), this);
+                Moved.RaiseEvent(new MoveEventArgs<IContent>(content, false, parentId), this);
 
-			Audit.Add(AuditTypes.Move, "Move Content performed by user", userId, content.Id);
+                Audit.Add(AuditTypes.Move, "Move Content performed by user", userId, content.Id);
+	        }	        
 		}
 
         /// <summary>
@@ -807,105 +841,108 @@ namespace Umbraco.Core.Services
         /// <returns>The newly created <see cref="IContent"/> object</returns>
         public IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = 0)
         {
-			var copy = ((Content)content).Clone();
-			copy.ParentId = parentId;
+            using (new WriteLock(Locker))
+            {
+                var copy = ((Content) content).Clone();
+                copy.ParentId = parentId;
 
-            // A copy should never be set to published automatically even if the original was.
-            copy.ChangePublishedState(PublishedState.Unpublished);
+                // A copy should never be set to published automatically even if the original was.
+                copy.ChangePublishedState(PublishedState.Unpublished);
 
-			if (Copying.IsRaisedEventCancelled(new CopyEventArgs<IContent>(content, copy, parentId), this))
-				return null;
+                if (Copying.IsRaisedEventCancelled(new CopyEventArgs<IContent>(content, copy, parentId), this))
+                    return null;
 
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateContentRepository(uow))
-			{
-				content.WriterId = userId;
-				repository.AddOrUpdate(copy);
-				uow.Commit();
-
-                //Special case for the Upload DataType
-				var uploadDataTypeId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
-				if (content.Properties.Any(x => x.PropertyType.DataTypeId == uploadDataTypeId))
-				{
-					bool isUpdated = false;
-					var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-
-					//Loop through properties to check if the content contains media that should be deleted
-					foreach (var property in content.Properties.Where(x => x.PropertyType.DataTypeId == uploadDataTypeId
-						&& string.IsNullOrEmpty(x.Value.ToString()) == false))
-					{
-						if (fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
-						{
-							var currentPath = fs.GetRelativePath(property.Value.ToString());
-							var propertyId = copy.Properties.First(x => x.Alias == property.Alias).Id;
-							var newPath = fs.GetRelativePath(propertyId, System.IO.Path.GetFileName(currentPath));
-
-							fs.CopyFile(currentPath, newPath);
-							copy.SetValue(property.Alias, fs.GetUrl(newPath));
-
-							//Copy thumbnails
-							foreach (var thumbPath in fs.GetThumbnails(currentPath))
-							{
-								var newThumbPath = fs.GetRelativePath(propertyId, System.IO.Path.GetFileName(thumbPath));
-								fs.CopyFile(thumbPath, newThumbPath);
-							}
-							isUpdated = true;
-						}
-					}
-
-					if (isUpdated)
-					{
-						repository.AddOrUpdate(copy);
-						uow.Commit();
-					}
-				}
-
-                //Special case for the Tags DataType
-                var tagsDataTypeId = new Guid("4023e540-92f5-11dd-ad8b-0800200c9a66");
-                if (content.Properties.Any(x => x.PropertyType.DataTypeId == tagsDataTypeId))
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateContentRepository(uow))
                 {
-                    var tags = uow.Database.Fetch<TagRelationshipDto>("WHERE nodeId = @Id", new {Id = content.Id});
-                    foreach (var tag in tags)
+                    content.WriterId = userId;
+                    repository.AddOrUpdate(copy);
+                    uow.Commit();
+
+                    //Special case for the Upload DataType
+                    var uploadDataTypeId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
+                    if (content.Properties.Any(x => x.PropertyType.DataTypeId == uploadDataTypeId))
                     {
-                        uow.Database.Insert(new TagRelationshipDto {NodeId = copy.Id, TagId = tag.TagId});
+                        bool isUpdated = false;
+                        var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+
+                        //Loop through properties to check if the content contains media that should be deleted
+                        foreach (var property in content.Properties.Where(x => x.PropertyType.DataTypeId == uploadDataTypeId
+                                                                               && string.IsNullOrEmpty(x.Value.ToString()) == false))
+                        {
+                            if (fs.FileExists(IOHelper.MapPath(property.Value.ToString())))
+                            {
+                                var currentPath = fs.GetRelativePath(property.Value.ToString());
+                                var propertyId = copy.Properties.First(x => x.Alias == property.Alias).Id;
+                                var newPath = fs.GetRelativePath(propertyId, System.IO.Path.GetFileName(currentPath));
+
+                                fs.CopyFile(currentPath, newPath);
+                                copy.SetValue(property.Alias, fs.GetUrl(newPath));
+
+                                //Copy thumbnails
+                                foreach (var thumbPath in fs.GetThumbnails(currentPath))
+                                {
+                                    var newThumbPath = fs.GetRelativePath(propertyId, System.IO.Path.GetFileName(thumbPath));
+                                    fs.CopyFile(thumbPath, newThumbPath);
+                                }
+                                isUpdated = true;
+                            }
+                        }
+
+                        if (isUpdated)
+                        {
+                            repository.AddOrUpdate(copy);
+                            uow.Commit();
+                        }
+                    }
+
+                    //Special case for the Tags DataType
+                    var tagsDataTypeId = new Guid("4023e540-92f5-11dd-ad8b-0800200c9a66");
+                    if (content.Properties.Any(x => x.PropertyType.DataTypeId == tagsDataTypeId))
+                    {
+                        var tags = uow.Database.Fetch<TagRelationshipDto>("WHERE nodeId = @Id", new {Id = content.Id});
+                        foreach (var tag in tags)
+                        {
+                            uow.Database.Insert(new TagRelationshipDto {NodeId = copy.Id, TagId = tag.TagId});
+                        }
                     }
                 }
-			}
 
-			//NOTE This 'Relation' part should eventually be delegated to a RelationService
-			if (relateToOriginal)
-			{
-				RelationType relationType = null;
-				using (var relationTypeRepository = _repositoryFactory.CreateRelationTypeRepository(uow))
-				{
-					relationType = relationTypeRepository.Get(1);
-				}
+                //NOTE This 'Relation' part should eventually be delegated to a RelationService
+                if (relateToOriginal)
+                {
+                    RelationType relationType = null;
+                    using (var relationTypeRepository = _repositoryFactory.CreateRelationTypeRepository(uow))
+                    {
+                        relationType = relationTypeRepository.Get(1);
+                    }
 
-				using (var relationRepository = _repositoryFactory.CreateRelationRepository(uow))
-				{
-					var relation = new Relation(content.Id, copy.Id, relationType);
-					relationRepository.AddOrUpdate(relation);
-					uow.Commit();
-				}
+                    using (var relationRepository = _repositoryFactory.CreateRelationRepository(uow))
+                    {
+                        var relation = new Relation(content.Id, copy.Id, relationType);
+                        relationRepository.AddOrUpdate(relation);
+                        uow.Commit();
+                    }
 
-				Audit.Add(AuditTypes.Copy,
-						  string.Format("Copied content with Id: '{0}' related to original content with Id: '{1}'",
-										copy.Id, content.Id), copy.WriterId, copy.Id);
-			}
+                    Audit.Add(AuditTypes.Copy,
+                              string.Format("Copied content with Id: '{0}' related to original content with Id: '{1}'",
+                                            copy.Id, content.Id), copy.WriterId, copy.Id);
+                }
 
-			//Look for children and copy those as well
-			var children = GetChildren(content.Id);
-			foreach (var child in children)
-			{
-				Copy(child, copy.Id, relateToOriginal, userId);
-			}
+                //Look for children and copy those as well
+                var children = GetChildren(content.Id);
+                foreach (var child in children)
+                {
+                    Copy(child, copy.Id, relateToOriginal, userId);
+                }
 
-			Copied.RaiseEvent(new CopyEventArgs<IContent>(content, copy, false, parentId), this);
+                Copied.RaiseEvent(new CopyEventArgs<IContent>(content, copy, false, parentId), this);
 
-			Audit.Add(AuditTypes.Copy, "Copy Content performed by user", content.WriterId, content.Id);
+                Audit.Add(AuditTypes.Copy, "Copy Content performed by user", content.WriterId, content.Id);
 
-			return copy;
-		}
+                return copy;
+            }
+        }
 
 		/// <summary>
 		/// Sends an <see cref="IContent"/> to Publication, which executes handlers and events for the 'Send to Publication' action.
@@ -942,26 +979,26 @@ namespace Umbraco.Core.Services
 	    /// <returns>The newly created <see cref="IContent"/> object</returns>
 	    public IContent Rollback(int id, Guid versionId, int userId = 0)
 	    {
-	        var content = GetByVersion(versionId);
+            var content = GetByVersion(versionId);
 
-			if (RollingBack.IsRaisedEventCancelled(new RollbackEventArgs<IContent>(content), this))
-				return content;
+            if (RollingBack.IsRaisedEventCancelled(new RollbackEventArgs<IContent>(content), this))
+                return content;
 
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateContentRepository(uow))
-			{
-				content.WriterId = userId;
-			    content.CreatorId = userId;
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                content.WriterId = userId;
+                content.CreatorId = userId;
 
-				repository.AddOrUpdate(content);
-				uow.Commit();
-			}
+                repository.AddOrUpdate(content);
+                uow.Commit();
+            }
 
-			RolledBack.RaiseEvent(new RollbackEventArgs<IContent>(content, false), this);
+            RolledBack.RaiseEvent(new RollbackEventArgs<IContent>(content, false), this);
 
-			Audit.Add(AuditTypes.RollBack, "Content rollback performed by user", content.WriterId, content.Id);
+            Audit.Add(AuditTypes.RollBack, "Content rollback performed by user", content.WriterId, content.Id);
 
-		    return content;
+            return content;
 	    }
 
         /// <summary>
@@ -1125,17 +1162,7 @@ namespace Umbraco.Core.Services
         }
 
         #region Internal Methods
-        /// <summary>
-        /// Internal method to Re-Publishes all Content for legacy purposes.
-        /// </summary>
-        /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this RePublish method. By default this method will not update the cache.</param>
-        /// <returns>True if publishing succeeded, otherwise False</returns>
-        internal bool RePublishAll(bool omitCacheRefresh = true, int userId = 0)
-        {
-            return RePublishAllDo(omitCacheRefresh, userId);
-        }
-
+        
         /// <summary>
         /// Internal method that Publishes a single <see cref="IContent"/> object for legacy purposes.
         /// </summary>
@@ -1206,65 +1233,61 @@ namespace Umbraco.Core.Services
         #region Private Methods
 
         /// <summary>
-        /// Re-Publishes all Content
+        /// Rebuilds all xml content in the cmsContentXml table for all published documents
         /// </summary>
-        /// <param name="userId">Optional Id of the User issueing the publishing</param>
-        /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this RePublish method. By default this method will update the cache.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        private bool RePublishAllDo(bool omitCacheRefresh = false, int userId = 0)
+        private void RePublishAllDo(params int[] contentTypeIds)
         {
-            var list = new List<IContent>();
-            var updated = new List<IContent>();
-
-            //Consider creating a Path query instead of recursive method:
-            //var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith("-1"));
-
-            var rootContent = GetRootContent();
-            foreach (var content in rootContent)
+            using (new WriteLock(Locker))
             {
-                if (content.IsValid())
-                {
-                    list.Add(content);
-                    list.AddRange(GetDescendants(content));
-                }
-            }
+                var list = new List<IContent>();
 
-            //Publish and then update the database with new status
-            var published = _publishingStrategy.PublishWithChildren(list, userId);
-            if (published)
-            {
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentRepository(uow))
                 {
-                    //Only loop through content where the Published property has been updated
-                    foreach (var item in list.Where(x => ((ICanBeDirty)x).IsPropertyDirty("Published")))
+                    if (!contentTypeIds.Any())
                     {
-                        item.WriterId = userId;
-                        repository.AddOrUpdate(item);
-                        updated.Add(item);
+                        //since we're updating all records, it will be much faster to just clear the table first
+                        uow.Database.TruncateTable("cmsContentXml");
+
+                        //get all content items that are published
+                        //  Consider creating a Path query instead of recursive method:
+                        //  var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith("-1"));
+                        var rootContent = GetRootContent();
+                        foreach (var content in rootContent.Where(content => content.Published))
+                        {
+                            list.Add(content);
+                            list.AddRange(GetPublishedDescendants(content));
+                        }
+                    }
+                    else
+                    {
+                        foreach (var id in contentTypeIds)
+                        {
+                            //first we'll clear out the data from the cmsContentXml table for this type
+                            uow.Database.Execute(@"delete from cmsContentXml where nodeId in 
+(select cmsDocument.nodeId from cmsDocument 
+	inner join cmsContent on cmsDocument.nodeId = cmsContent.nodeId
+	where published = 1 and contentType = @contentTypeId)", new { contentTypeId = id });
+
+                            //now get all published content objects of this type and add to the list
+                            list.AddRange(GetContentOfContentType(id).Where(content => content.Published));
+                        }
                     }
 
-                    uow.Commit();
-
-                    foreach (var c in updated)
+                    foreach (var c in list)
                     {
+                        //generate the xml
                         var xml = c.ToXml();
+                        //create the dto to insert
                         var poco = new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) };
-                        var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = c.Id }) !=
-                                     null;
-                        int result = exists
-                                         ? uow.Database.Update(poco)
-                                         : Convert.ToInt32(uow.Database.Insert(poco));
+                        //insert it into the database
+                        uow.Database.Insert(poco);
                     }
                 }
-                //Updating content to published state is finished, so we fire event through PublishingStrategy to have cache updated
-                if (omitCacheRefresh == false)
-                    _publishingStrategy.PublishingFinalized(updated, true);
+
+                Audit.Add(AuditTypes.Publish, "RePublish All completed, the xml has been regenerated in the database", 0, -1);
             }
-
-            Audit.Add(AuditTypes.Publish, "RePublish All performed by user", userId, -1);
-
-            return published;
         }
 
         /// <summary>
@@ -1350,28 +1373,31 @@ namespace Umbraco.Core.Services
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
         private bool UnPublishDo(IContent content, bool omitCacheRefresh = false, int userId = 0)
         {
-            var unpublished = _publishingStrategy.UnPublish(content, userId);
-            if (unpublished)
+            using (new WriteLock(Locker))
             {
-                var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateContentRepository(uow))
+                var unpublished = _publishingStrategy.UnPublish(content, userId);
+                if (unpublished)
                 {
-                    content.WriterId = userId;
-                    repository.AddOrUpdate(content);
+                    var uow = _uowProvider.GetUnitOfWork();
+                    using (var repository = _repositoryFactory.CreateContentRepository(uow))
+                    {
+                        content.WriterId = userId;
+                        repository.AddOrUpdate(content);
 
-                    //Remove 'published' xml from the cmsContentXml table for the unpublished content
-                    uow.Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new { Id = content.Id });
+                        //Remove 'published' xml from the cmsContentXml table for the unpublished content
+                        uow.Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new { Id = content.Id });
 
-                    uow.Commit();
+                        uow.Commit();
+                    }
+                    //Delete xml from db? and call following method to fire event through PublishingStrategy to update cache
+                    if (omitCacheRefresh == false)
+                        _publishingStrategy.UnPublishingFinalized(content);
+
+                    Audit.Add(AuditTypes.UnPublish, "UnPublish performed by user", userId, content.Id);
                 }
-                //Delete xml from db? and call following method to fire event through PublishingStrategy to update cache
-                if (omitCacheRefresh == false)
-                    _publishingStrategy.UnPublishingFinalized(content);
 
-                Audit.Add(AuditTypes.UnPublish, "UnPublish performed by user", userId, content.Id);
-            }
-
-            return unpublished;
+                return unpublished;
+            }            
         }
 
 	    /// <summary>
@@ -1390,97 +1416,100 @@ namespace Umbraco.Core.Services
                 return false;
             }
 
-            //Has this content item previously been published? If so, we don't need to refresh the children
-	        var previouslyPublished = HasPublishedVersion(content.Id);
-	        var validForPublishing = true;
+	        using (new WriteLock(Locker))
+	        {
+	            //Has this content item previously been published? If so, we don't need to refresh the children
+	            var previouslyPublished = HasPublishedVersion(content.Id);
+	            var validForPublishing = true;
 
-            //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
-            if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
-            {
-                LogHelper.Info<ContentService>(
-                    string.Format(
-                        "Content '{0}' with Id '{1}' could not be published because its parent is not published.",
-                        content.Name, content.Id));
-                validForPublishing = false;
-            }
+	            //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
+	            if (content.ParentId != -1 && content.ParentId != -20 && IsPublishable(content) == false)
+	            {
+	                LogHelper.Info<ContentService>(
+	                    string.Format(
+	                        "Content '{0}' with Id '{1}' could not be published because its parent is not published.",
+	                        content.Name, content.Id));
+	                validForPublishing = false;
+	            }
 
-            //Content contains invalid property values and can therefore not be published - fire event?
-            if (!content.IsValid())
-            {
-                LogHelper.Info<ContentService>(
-                    string.Format(
-                        "Content '{0}' with Id '{1}' could not be published because of invalid properties.",
-                        content.Name, content.Id));
-                validForPublishing = false;
-            }
+	            //Content contains invalid property values and can therefore not be published - fire event?
+	            if (!content.IsValid())
+	            {
+	                LogHelper.Info<ContentService>(
+	                    string.Format(
+	                        "Content '{0}' with Id '{1}' could not be published because of invalid properties.",
+	                        content.Name, content.Id));
+	                validForPublishing = false;
+	            }
 
-            //Publish and then update the database with new status
-	        bool published = validForPublishing && _publishingStrategy.Publish(content, userId);
+	            //Publish and then update the database with new status
+	            bool published = validForPublishing && _publishingStrategy.Publish(content, userId);
 
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateContentRepository(uow))
-            {
-                //Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
-                content.WriterId = userId;
+	            var uow = _uowProvider.GetUnitOfWork();
+	            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+	            {
+	                //Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
+	                content.WriterId = userId;
 
-                repository.AddOrUpdate(content);
+	                repository.AddOrUpdate(content);
 
-                uow.Commit();
+	                uow.Commit();
 
-                var xml = content.ToXml();
-                //Preview Xml
-                var previewPoco = new PreviewXmlDto
-                {
-                    NodeId = content.Id,
-                    Timestamp = DateTime.Now,
-                    VersionId = content.Version,
-                    Xml = xml.ToString(SaveOptions.None)
-                };
-                var previewExists =
-                    uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
-                                                               new { Id = content.Id, Version = content.Version }) != 0;
-                int previewResult = previewExists
-                                        ? uow.Database.Update<PreviewXmlDto>(
-                                            "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
-                                            new
-                                                {
-                                                    Xml = previewPoco.Xml,
-                                                    Timestamp = previewPoco.Timestamp,
-                                                    Id = previewPoco.NodeId,
-                                                    Version = previewPoco.VersionId
-                                                })
-                                        : Convert.ToInt32(uow.Database.Insert(previewPoco));
+	                var xml = content.ToXml();
+	                //Preview Xml
+	                var previewPoco = new PreviewXmlDto
+	                    {
+	                        NodeId = content.Id,
+	                        Timestamp = DateTime.Now,
+	                        VersionId = content.Version,
+	                        Xml = xml.ToString(SaveOptions.None)
+	                    };
+	                var previewExists =
+	                    uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
+	                                                    new {Id = content.Id, Version = content.Version}) != 0;
+	                int previewResult = previewExists
+	                                        ? uow.Database.Update<PreviewXmlDto>(
+	                                            "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
+	                                            new
+	                                                {
+	                                                    Xml = previewPoco.Xml,
+	                                                    Timestamp = previewPoco.Timestamp,
+	                                                    Id = previewPoco.NodeId,
+	                                                    Version = previewPoco.VersionId
+	                                                })
+	                                        : Convert.ToInt32(uow.Database.Insert(previewPoco));
 
-                if (published)
-                {
-                    //Content Xml
-                    var contentPoco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
-                    var contentExists = uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = content.Id }) != 0;
-                    int contentResult = contentExists
-                                            ? uow.Database.Update(contentPoco)
-                                            : Convert.ToInt32(uow.Database.Insert(contentPoco));
+	                if (published)
+	                {
+	                    //Content Xml
+	                    var contentPoco = new ContentXmlDto {NodeId = content.Id, Xml = xml.ToString(SaveOptions.None)};
+	                    var contentExists = uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new {Id = content.Id}) != 0;
+	                    int contentResult = contentExists
+	                                            ? uow.Database.Update(contentPoco)
+	                                            : Convert.ToInt32(uow.Database.Insert(contentPoco));
 
-                }
-            }
+	                }
+	            }
 
-            if(raiseEvents)
-                Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
+	            if (raiseEvents)
+	                Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
 
-            //Save xml to db and call following method to fire event through PublishingStrategy to update cache
-            if (published && omitCacheRefresh == false)
-                _publishingStrategy.PublishingFinalized(content);
+	            //Save xml to db and call following method to fire event through PublishingStrategy to update cache
+	            if (published && omitCacheRefresh == false)
+	                _publishingStrategy.PublishingFinalized(content);
 
-            //We need to check if children and their publish state to ensure that we 'republish' content that was previously published
-            if (published && omitCacheRefresh == false && previouslyPublished == false && HasChildren(content.Id))
-            {
-                var descendants = GetPublishedDescendants(content);
+	            //We need to check if children and their publish state to ensure that we 'republish' content that was previously published
+	            if (published && omitCacheRefresh == false && previouslyPublished == false && HasChildren(content.Id))
+	            {
+	                var descendants = GetPublishedDescendants(content);
 
-                _publishingStrategy.PublishingFinalized(descendants, false);
-            }
+	                _publishingStrategy.PublishingFinalized(descendants, false);
+	            }
 
-            Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId, content.Id);
+	            Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId, content.Id);
 
-            return published;
+	            return published;
+	        }
         }
 
 	    /// <summary>
@@ -1498,47 +1527,50 @@ namespace Umbraco.Core.Services
                 return;
             }
 
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateContentRepository(uow))
-            {
-                content.WriterId = userId;
+	        using (new WriteLock(Locker))
+	        {
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateContentRepository(uow))
+                {
+                    content.WriterId = userId;
 
-                //Only change the publish state if the "previous" version was actually published
-                if (changeState && content.Published)
-                    content.ChangePublishedState(PublishedState.Saved);
+                    //Only change the publish state if the "previous" version was actually published
+                    if (changeState && content.Published)
+                        content.ChangePublishedState(PublishedState.Saved);
 
-                repository.AddOrUpdate(content);
-                uow.Commit();
+                    repository.AddOrUpdate(content);
+                    uow.Commit();
 
-                //Preview Xml
-                var xml = content.ToXml();
-                var previewPoco = new PreviewXmlDto
-                                      {
-                                          NodeId = content.Id,
-                                          Timestamp = DateTime.Now,
-                                          VersionId = content.Version,
-                                          Xml = xml.ToString(SaveOptions.None)
-                                      };
-                var previewExists =
-                    uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
-                                                               new { Id = content.Id, Version = content.Version }) != 0;
-                int previewResult = previewExists
-                                        ? uow.Database.Update<PreviewXmlDto>(
-                                            "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
-                                            new
+                    //Preview Xml
+                    var xml = content.ToXml();
+                    var previewPoco = new PreviewXmlDto
+                    {
+                        NodeId = content.Id,
+                        Timestamp = DateTime.Now,
+                        VersionId = content.Version,
+                        Xml = xml.ToString(SaveOptions.None)
+                    };
+                    var previewExists =
+                        uow.Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
+                                                                   new { Id = content.Id, Version = content.Version }) != 0;
+                    int previewResult = previewExists
+                                            ? uow.Database.Update<PreviewXmlDto>(
+                                                "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
+                                                new
                                                 {
                                                     Xml = previewPoco.Xml,
                                                     Timestamp = previewPoco.Timestamp,
                                                     Id = previewPoco.NodeId,
                                                     Version = previewPoco.VersionId
                                                 })
-                                        : Convert.ToInt32(uow.Database.Insert(previewPoco));
-            }
+                                            : Convert.ToInt32(uow.Database.Insert(previewPoco));
+                }
 
-            if(raiseEvents)
-                Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
+                if (raiseEvents)
+                    Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
 
-            Audit.Add(AuditTypes.Save, "Save Content performed by user", userId, content.Id);
+                Audit.Add(AuditTypes.Save, "Save Content performed by user", userId, content.Id);
+	        }	        
         }
 
         /// <summary>

@@ -436,6 +436,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public virtual string InsertData { get { return "INSERT INTO {0} ({1}) VALUES ({2})"; } }
         public virtual string UpdateData { get { return "UPDATE {0} SET {1} WHERE {2}"; } }
         public virtual string DeleteData { get { return "DELETE FROM {0} WHERE {1}"; } }
+        public virtual string TruncateTable { get { return "TRUNCATE TABLE {0}"; } }
 
         public virtual string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})"; } }
         public virtual string DeleteConstraint { get { return "ALTER TABLE {0} DROP CONSTRAINT {1}"; } }

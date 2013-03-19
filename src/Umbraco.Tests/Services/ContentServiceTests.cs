@@ -298,18 +298,30 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
-            var contentType = contentTypeService.GetContentType("umbTextpage");
+            var rootContent = contentService.GetRootContent();
+            foreach (var c in rootContent)
+            {
+                contentService.PublishWithChildren(c);
+            }
+            //for testing we need to clear out the contentXml table so we can see if it worked
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var uow =  provider.GetUnitOfWork();
+            using (RepositoryResolver.Current.ResolveByType<IContentRepository>(uow))
+            {
+                uow.Database.TruncateTable("cmsContentXml");
+            }
 
             // Act
             var published = contentService.RePublishAll(0);
-            var contents = contentService.GetContentOfContentType(contentType.Id);
 
             // Assert
-            Assert.That(published, Is.True);
-            Assert.That(contents.First(x => x.Id == 1046).Published, Is.True);//No restrictions, so should be published
-            Assert.That(contents.First(x => x.Id == 1047).Published, Is.True);//Released 5 mins ago, so should be published
-            Assert.That(contents.First(x => x.Id == 1049).Published, Is.False);//Trashed content, so shouldn't be published
+            Assert.IsTrue(published);
+            var allContent = rootContent.Concat(rootContent.SelectMany(x => contentService.GetDescendants(x.Id)));
+            uow = provider.GetUnitOfWork();
+            using (var repo = RepositoryResolver.Current.ResolveByType<IContentRepository>(uow))
+            {
+                Assert.AreEqual(allContent.Count(), uow.Database.ExecuteScalar<int>("select count(*) from cmsContentXml"));
+            }
         }
 
         [Test]
