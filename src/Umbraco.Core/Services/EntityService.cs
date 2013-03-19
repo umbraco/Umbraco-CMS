@@ -51,6 +51,7 @@ namespace Umbraco.Core.Services
                 }
             }
 
+            //TODO Implementing loading from the various services
             throw new NotImplementedException();
         }
 
@@ -74,6 +75,7 @@ namespace Umbraco.Core.Services
                 }
             }
 
+            //TODO Implementing loading from the various services
             throw new NotImplementedException();
         }
 
@@ -151,6 +153,8 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public virtual IEnumerable<IUmbracoEntity> GetAll<T>() where T : IUmbracoEntity
         {
+            //TODO Implement this so the type passed in is verified against types on UmbracoObjectTypes
+            //and then used to get all through the method below.
             throw new NotImplementedException();
         }
 
@@ -188,6 +192,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public virtual UmbracoObjectTypes GetObjectType(int id)
         {
+            //TODO Implement so the entity is fetched from the db and then the Guid is used to resolve the UmbracoObjectType
             throw new NotImplementedException();
         }
 
@@ -198,6 +203,8 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public virtual UmbracoObjectTypes GetObjectType(IUmbracoEntity entity)
         {
+            //TODO Implement this so the entity is cast to UmbracoEntity - if valid get the guid id and then resolve the UmbracoObjectType
+            //otherwise fetch the IUmbracoEntity from the db and do it similar to above.
             throw new NotImplementedException();
         }
 
@@ -208,6 +215,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public virtual Type GetModelType(int id)
         {
+            //TODO Implement so the IUmbracoEntity is fetched from the db and then used to resolve the real type, ie. IContent, IMedia etc.
             throw new NotImplementedException();
         }
 
@@ -218,6 +226,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public virtual Type GetModelType(UmbracoObjectTypes objectType)
         {
+            //TODO Implement so the real type is returned fro the UmbracoObjectType's attribute.
             throw new NotImplementedException();
         }
     }
