@@ -109,6 +109,8 @@
     <Compile Include="Auditing\IAuditWriteProvider.cs" />
     <Compile Include="CacheHelper.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
+    <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
+    <Compile Include="CodeAnnotations\UmbracoObjectTypeAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoWillObsoleteAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoExperimentalFeatureAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoProposedPublicAttribute.cs" />
@@ -210,6 +212,9 @@
     <Compile Include="Models\Task.cs" />
     <Compile Include="Models\TaskType.cs" />
     <Compile Include="Models\Template.cs" />
+    <Compile Include="Models\UmbracoEntity.cs" />
+    <Compile Include="Models\UmbracoObjectTypes.cs" />
+    <Compile Include="Models\UmbracoObjectTypesExtensions.cs" />
     <Compile Include="ObjectResolution\ApplicationEventsResolver.cs" />
     <Compile Include="ObjectResolution\ResolverCollection.cs" />
     <Compile Include="Persistence\Caching\InMemoryCacheProvider.cs" />
@@ -217,6 +222,7 @@
     <Compile Include="Persistence\Caching\NullCacheProvider.cs" />
     <Compile Include="Persistence\Caching\RuntimeCacheProvider.cs" />
     <Compile Include="Persistence\Factories\ServerRegistrationFactory.cs" />
+    <Compile Include="Persistence\Factories\UmbracoEntityFactory.cs" />
     <Compile Include="Persistence\FaultHandling\ITransientErrorDetectionStrategy.cs" />
     <Compile Include="Persistence\FaultHandling\RetryingEventArgs.cs" />
     <Compile Include="Persistence\FaultHandling\RetryLimitExceededException.cs" />
@@ -440,7 +446,9 @@
     <Compile Include="Persistence\Repositories\ContentTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\DataTypeDefinitionRepository.cs" />
     <Compile Include="Persistence\Repositories\DictionaryRepository.cs" />
+    <Compile Include="Persistence\Repositories\EntityRepository.cs" />
     <Compile Include="Persistence\Repositories\FileRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IEntityRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IContentRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IContentTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IDataTypeDefinitionRepository.cs" />
@@ -674,6 +682,7 @@
     <Compile Include="Services\ContentService.cs" />
     <Compile Include="Services\ContentTypeService.cs" />
     <Compile Include="Services\DataTypeService.cs" />
+    <Compile Include="Services\EntityService.cs" />
     <Compile Include="Services\FileService.cs" />
     <Compile Include="Services\IContentService.cs" />
     <Compile Include="Services\IContentTypeService.cs" />
