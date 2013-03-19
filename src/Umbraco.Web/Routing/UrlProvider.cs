@@ -114,7 +114,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(int id, Uri current, UrlProviderMode mode)
         {
-            var url = _urlProviders.Select(provider => provider.GetUrl(_umbracoContext, _umbracoContext.ContentCache, id, current, mode))
+            var url = _urlProviders.Select(provider => provider.GetUrl(_umbracoContext, id, current, mode))
                 .FirstOrDefault(u => u != null);
             return url ?? "#"; // legacy wants this
         }
@@ -151,7 +151,7 @@ namespace Umbraco.Web.Routing
         public IEnumerable<string> GetOtherUrls(int id, Uri current)
         {
             // providers can return null or an empty list or a non-empty list, be prepared
-            var urls = _urlProviders.SelectMany(provider => provider.GetOtherUrls(_umbracoContext, _umbracoContext.ContentCache, id, current) ?? Enumerable.Empty<string>());
+            var urls = _urlProviders.SelectMany(provider => provider.GetOtherUrls(_umbracoContext, id, current) ?? Enumerable.Empty<string>());
 
             return urls;
         }
