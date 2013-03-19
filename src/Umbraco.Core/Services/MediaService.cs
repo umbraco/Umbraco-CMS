@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Xml.Linq;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
@@ -20,6 +21,9 @@ namespace Umbraco.Core.Services
 	{
 		private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 		private readonly RepositoryFactory _repositoryFactory;
+        //Support recursive locks because some of the methods that require locking call other methods that require locking. 
+        //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
+        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion); 
 
 		public MediaService(RepositoryFactory repositoryFactory)
 			: this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
@@ -359,32 +363,35 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Id of the User moving the Media</param>
 		public void Move(IMedia media, int parentId, int userId = 0)
 		{
-            //This ensures that the correct method is called if this method is used to Move to recycle bin.
-            if (parentId == -21)
-            {
-                MoveToRecycleBin(media, userId);
-                return;
-            }
+		    using (new WriteLock(Locker))
+		    {
+		        //This ensures that the correct method is called if this method is used to Move to recycle bin.
+		        if (parentId == -21)
+		        {
+		            MoveToRecycleBin(media, userId);
+		            return;
+		        }
 
-			if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, parentId), this))
-				return;
+		        if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, parentId), this))
+		            return;
 
-			media.ParentId = parentId;
-			Save(media, userId);
+		        media.ParentId = parentId;
+		        Save(media, userId);
 
-            //Ensure that Path and Level is updated on children
-            var children = GetChildren(media.Id);
-            if (children.Any())
-            {
-                var parentPath = media.Path;
-                var parentLevel = media.Level;
-                var updatedDescendents = UpdatePathAndLevelOnChildren(children, parentPath, parentLevel);
-                Save(updatedDescendents, userId);
-            }
+		        //Ensure that Path and Level is updated on children
+		        var children = GetChildren(media.Id);
+		        if (children.Any())
+		        {
+		            var parentPath = media.Path;
+		            var parentLevel = media.Level;
+		            var updatedDescendents = UpdatePathAndLevelOnChildren(children, parentPath, parentLevel);
+		            Save(updatedDescendents, userId);
+		        }
 
-			Moved.RaiseEvent(new MoveEventArgs<IMedia>(media, false, parentId), this);
+		        Moved.RaiseEvent(new MoveEventArgs<IMedia>(media, false, parentId), this);
 
-			Audit.Add(AuditTypes.Move, "Move Media performed by user", userId, media.Id);
+		        Audit.Add(AuditTypes.Move, "Move Media performed by user", userId, media.Id);
+		    }
 		}
 
 	    /// <summary>
@@ -456,32 +463,42 @@ namespace Umbraco.Core.Services
 	    /// <param name="mediaTypeId">Id of the <see cref="IMediaType"/></param>
 	    /// <param name="userId">Optional id of the user deleting the media</param>
 	    public void DeleteMediaOfType(int mediaTypeId, int userId = 0)
-	    {			
-	        var uow = _uowProvider.GetUnitOfWork();
-	        using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+        {
+	        using (new WriteLock(Locker))
 	        {
-				//NOTE What about media that has the contenttype as part of its composition?
-				//The ContentType has to be removed from the composition somehow as it would otherwise break
-				//Dbl.check+test that the ContentType's Id is removed from the ContentType2ContentType table
-				var query = Query<IMedia>.Builder.Where(x => x.ContentTypeId == mediaTypeId);
-				var contents = repository.GetByQuery(query);
+	            var uow = _uowProvider.GetUnitOfWork();
+	            using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+	            {
+	                //NOTE What about media that has the contenttype as part of its composition?
+	                //The ContentType has to be removed from the composition somehow as it would otherwise break
+	                //Dbl.check+test that the ContentType's Id is removed from the ContentType2ContentType table
+	                var query = Query<IMedia>.Builder.Where(x => x.ContentTypeId == mediaTypeId);
+	                var contents = repository.GetByQuery(query);
 
-				if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMedia>(contents), this))
-					return;
+	                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMedia>(contents), this))
+	                    return;
 
-				foreach (var content in contents)
-				{
-					((Core.Models.Media)content).ChangeTrashedState(true);
-					repository.AddOrUpdate(content);
-				}
+	                foreach (var content in contents.OrderByDescending(x => x.ParentId))
+	                {
+	                    //Look for children of current content and move that to trash before the current content is deleted
+	                    var c = content;
+	                    var childQuery = Query<IMedia>.Builder.Where(x => x.Path.StartsWith(c.Path));
+	                    var children = repository.GetByQuery(childQuery);
 
-				uow.Commit();
+	                    foreach (var child in children)
+	                    {
+	                        if (child.ContentType.Id != mediaTypeId)
+	                            MoveToRecycleBin(child, userId);
+	                    }
 
-				Deleted.RaiseEvent(new DeleteEventArgs<IMedia>(contents, false), this);
-	        }			
+	                    //Permantly delete the content
+	                    Delete(content, userId);
+	                }
+	            }
 
-			Audit.Add(AuditTypes.Delete, "Delete Media items by Type performed by user", userId, -1);
-	    }
+	            Audit.Add(AuditTypes.Delete, "Delete Media items by Type performed by user", userId, -1);
+	        }
+        }
 
 	    /// <summary>
 	    /// Permanently deletes an <see cref="IMedia"/> object
@@ -576,25 +593,28 @@ namespace Umbraco.Core.Services
 				return;
             }
 
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
-			{
-				media.CreatorId = userId;
-				repository.AddOrUpdate(media);
-				uow.Commit();
+	        using (new WriteLock(Locker))
+	        {
+	            var uow = _uowProvider.GetUnitOfWork();
+	            using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+	            {
+	                media.CreatorId = userId;
+	                repository.AddOrUpdate(media);
+	                uow.Commit();
 
-                var xml = media.ToXml();
-                var poco = new ContentXmlDto { NodeId = media.Id, Xml = xml.ToString(SaveOptions.None) };
-                var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = media.Id }) != null;
-                int result = exists
-                                 ? uow.Database.Update(poco)
-                                 : Convert.ToInt32(uow.Database.Insert(poco));
-			}
+	                var xml = media.ToXml();
+	                var poco = new ContentXmlDto {NodeId = media.Id, Xml = xml.ToString(SaveOptions.None)};
+	                var exists = uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new {Id = media.Id}) != null;
+	                int result = exists
+	                                 ? uow.Database.Update(poco)
+	                                 : Convert.ToInt32(uow.Database.Insert(poco));
+	            }
 
-            if(raiseEvents)
-			    Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this);
+	            if (raiseEvents)
+	                Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this);
 
-	        Audit.Add(AuditTypes.Save, "Save Media performed by user", media.CreatorId, media.Id);
+	            Audit.Add(AuditTypes.Save, "Save Media performed by user", media.CreatorId, media.Id);
+	        }
 	    }
 
 	    /// <summary>
