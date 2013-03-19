@@ -17,7 +17,7 @@ namespace Umbraco.Web
 	{
 		internal static IEnumerable<IPublishedContent> ConvertSearchResultToPublishedContent(
 			this IEnumerable<SearchResult> results,
-			IPublishedCache contentCache)
+			ContextualPublishedCache cache)
 		{
 			//TODO: The search result has already returned a result which SHOULD include all of the data to create an IPublishedContent, 
 			// however thsi is currently not the case: 
@@ -27,9 +27,7 @@ namespace Umbraco.Web
 			
 			foreach (var result in results.OrderByDescending(x => x.Score))
 			{
-				var doc = contentCache.GetById(
-					UmbracoContext.Current,
-					result.Id);
+				var doc = cache.GetById(result.Id);
 				if (doc == null) continue; //skip if this doesn't exist in the cache				
 				doc.Properties.Add(
 					new PropertyResult("examineScore", result.Score.ToString(), Guid.Empty, PropertyResultType.CustomProperty));				

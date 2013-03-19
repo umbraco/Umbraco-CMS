@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.LegacyXmlCache;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
@@ -16,7 +17,7 @@ namespace Umbraco.Tests.PublishedCache
 	{
 		private FakeHttpContextFactory _httpContextFactory;
 		private UmbracoContext _umbracoContext;
-		private PublishedContentCache _cache;
+		private ContextualPublishedContentCache _cache;
 
 		private string GetLegacyXml()
 		{
@@ -89,7 +90,7 @@ namespace Umbraco.Tests.PublishedCache
 					return xDoc;
 				};
 
-			_cache = new PublishedContentCache();			
+            _cache = new ContextualPublishedContentCache(new PublishedContentCache(), _umbracoContext);		
 		}
 
 		private void SetupForLegacy()
@@ -135,7 +136,7 @@ namespace Umbraco.Tests.PublishedCache
 		[Test]
 		public void Get_Root_Docs()
 		{
-			var result = _cache.GetAtRoot(_umbracoContext);
+			var result = _cache.GetAtRoot();
 			Assert.AreEqual(2, result.Count());
 			Assert.AreEqual(1046, result.ElementAt(0).Id);
 			Assert.AreEqual(1172, result.ElementAt(1).Id);
@@ -162,7 +163,7 @@ namespace Umbraco.Tests.PublishedCache
 		[TestCase("/home/Sub'Apostrophe", 1177)]
 		public void Get_Node_By_Route(string route, int nodeId)
 		{
-			var result = _cache.GetByRoute(_umbracoContext, route, false);
+			var result = _cache.GetByRoute(route, false);
 			Assert.IsNotNull(result);
 			Assert.AreEqual(nodeId, result.Id);
 		}
@@ -181,7 +182,7 @@ namespace Umbraco.Tests.PublishedCache
 		[TestCase("/Sub1", 1173)]
 		public void Get_Node_By_Route_Hiding_Top_Level_Nodes(string route, int nodeId)
 		{
-			var result = _cache.GetByRoute(_umbracoContext, route, true);
+			var result = _cache.GetByRoute(route, true);
 			Assert.IsNotNull(result);
 			Assert.AreEqual(nodeId, result.Id);
 		}

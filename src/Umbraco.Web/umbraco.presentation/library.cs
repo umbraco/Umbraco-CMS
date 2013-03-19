@@ -327,9 +327,7 @@ namespace umbraco
         /// <returns>Returns a string with the data from the given element of a node</returns>
         public static string GetItem(int nodeID, String alias)
         {
-	        var doc = PublishedContentCacheResolver.Current.PublishedContentCache.GetById(
-		        Umbraco.Web.UmbracoContext.Current,
-		        nodeID);
+	        var doc = Umbraco.Web.UmbracoContext.Current.ContentCache.GetById(nodeID);
 
 			if (doc == null)
 				return string.Empty;

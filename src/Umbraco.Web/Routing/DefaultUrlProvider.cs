@@ -55,7 +55,7 @@ namespace Umbraco.Web.Routing
             else
             {
                 // there was no route in the cache - create a route
-                var node = umbracoContext.ContentCache.GetById(umbracoContext, id);
+                var node = umbracoContext.ContentCache.GetById(id);
                 if (node == null)
                 {
                     LogHelper.Warn<DefaultUrlProvider>(
@@ -135,7 +135,7 @@ namespace Umbraco.Web.Routing
             else
             {
                 // there was no route in the cache - create a route
-                var node = umbracoContext.ContentCache.GetById(umbracoContext, id);
+                var node = umbracoContext.ContentCache.GetById(id);
                 if (node == null)
                 {
                     LogHelper.Warn<DefaultUrlProvider>(
@@ -283,7 +283,7 @@ namespace Umbraco.Web.Routing
             // that's the way it works pre-4.10 and we try to be backward compat for the time being
             if (node.Parent == null)
             {
-                var rootNode = umbracoContext.ContentCache.GetByRoute(umbracoContext, "/", true);
+                var rootNode = umbracoContext.ContentCache.GetByRoute("/", true);
                 if (rootNode.Id == node.Id) // remove only if we're the default node
                     pathParts.RemoveAt(pathParts.Count - 1);
             }

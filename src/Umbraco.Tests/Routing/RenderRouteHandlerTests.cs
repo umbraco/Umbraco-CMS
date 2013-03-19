@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Routing
 			var routingContext = GetRoutingContext("~/dummy-page", template.Id, routeData);
 			var docRequest = new PublishedContentRequest(routingContext.UmbracoContext.CleanedUmbracoUrl, routingContext)
 			{
-                PublishedContent = routingContext.UmbracoContext.ContentCache.GetById(routingContext.UmbracoContext, 1174),
+                PublishedContent = routingContext.UmbracoContext.ContentCache.GetById(1174),
 				TemplateModel = template
 			};
 
@@ -112,7 +112,7 @@ namespace Umbraco.Tests.Routing
 			var routingContext = GetRoutingContext("~/dummy-page", template.Id, routeData, true);
 			var docRequest = new PublishedContentRequest(routingContext.UmbracoContext.CleanedUmbracoUrl, routingContext)
 				{
-                    PublishedContent = routingContext.UmbracoContext.ContentCache.GetById(routingContext.UmbracoContext, 1172), 
+                    PublishedContent = routingContext.UmbracoContext.ContentCache.GetById(1172), 
 					TemplateModel = template
 				};
 

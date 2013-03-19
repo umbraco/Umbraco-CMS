@@ -6,11 +6,13 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
 using umbraco;
 using System.Linq;
+using umbraco.BusinessLogic;
+using umbraco.presentation.preview;
 
 namespace Umbraco.Web.PublishedCache.LegacyXmlCache
 {
     internal class PublishedContentCache : IPublishedContentCache
-	{
+    {
 		#region XPath Strings
 
 		class XPathStringsDefinition
@@ -82,7 +84,9 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
 
 		#endregion
 
-		private static IPublishedContent ConvertToDocument(XmlNode xmlNode)
+        #region Converters
+
+        private static IPublishedContent ConvertToDocument(XmlNode xmlNode)
 		{
 		    return xmlNode == null ? null : new Models.XmlPublishedContent(xmlNode);
 		}   
@@ -91,11 +95,13 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
         {
             return xmlNodes.Cast<XmlNode>().Select(xmlNode => new Models.XmlPublishedContent(xmlNode));
         }
-		
-    	public virtual IPublishedContent GetById(UmbracoContext umbracoContext, int nodeId)
-    	{
-    		if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
 
+        #endregion
+
+        #region Getters
+
+        public virtual IPublishedContent GetById(UmbracoContext umbracoContext, int nodeId)
+    	{
     		return ConvertToDocument(GetXml(umbracoContext).GetElementById(nodeId.ToString()));
     	}
 
@@ -106,7 +112,6 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
 
         public IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, string xpath, params XPathVariable[] vars)
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
             if (xpath == null) throw new ArgumentNullException("xpath");
             if (string.IsNullOrWhiteSpace(xpath)) return null;
 
@@ -119,7 +124,6 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
 
         public IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, string xpath, params XPathVariable[] vars)
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
             if (xpath == null) throw new ArgumentNullException("xpath");
             if (string.IsNullOrWhiteSpace(xpath)) return Enumerable.Empty<IPublishedContent>();
 
@@ -131,9 +135,8 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
         }
         
         //FIXME keep here or remove?
-		public IPublishedContent GetByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null)
+        public IPublishedContent GetByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null)
         {
-			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
 			if (route == null) throw new ArgumentNullException("route");
 
 			//set the default to be what is in the settings
@@ -165,9 +168,8 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
         }
 
         // FIXME MOVE THAT ONE OUT OF HERE?
-		public IPublishedContent GetByUrlAlias(UmbracoContext umbracoContext, int rootNodeId, string alias)
+        public IPublishedContent GetByUrlAlias(UmbracoContext umbracoContext, int rootNodeId, string alias)
         {
-			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
 			if (alias == null) throw new ArgumentNullException("alias");
 
 			// the alias may be "foo/bar" or "/foo/bar"
@@ -197,21 +199,70 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
 
         public bool HasContent(UmbracoContext umbracoContext)
         {
-	        var xml = GetXml(umbracoContext);
+	        var xml = GetXml(umbracoContext, false);
 			if (xml == null)
 				return false;
 			var node = xml.SelectSingleNode(XPathStrings.RootDocuments);
 			return node != null;
         }
 
-        static XmlDocument GetXml(UmbracoContext umbracoContext)
-		{
-			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+        #endregion
 
-			return umbracoContext.GetXml();
-		}
+        #region Legacy Xml
 
-		static readonly char[] SlashChar = new[] { '/' };
+        private PreviewContent _previewContent;
+        private Func<User, bool, XmlDocument> _xmlDelegate;
+
+        /// <summary>
+        /// Gets/sets the delegate used to retreive the Xml content, generally the setter is only used for unit tests
+        /// and by default if it is not set will use the standard delegate which ONLY works when in the context an Http Request
+        /// </summary>
+        /// <remarks>
+        /// If not defined, we will use the standard delegate which ONLY works when in the context an Http Request
+        /// mostly because the 'content' object heavily relies on HttpContext, SQL connections and a bunch of other stuff
+        /// that when run inside of a unit test fails.
+        /// </remarks>
+        internal Func<User, bool, XmlDocument> GetXmlDelegate
+        {
+            get
+            {
+                return _xmlDelegate ?? (_xmlDelegate = (user, preview) =>
+                {
+                    if (preview)
+                    {
+                        if (_previewContent == null)
+                        {
+                            _previewContent = new PreviewContent(user, new Guid(global::umbraco.BusinessLogic.StateHelper.Cookies.Preview.GetValue()), true);
+                            if (_previewContent.ValidPreviewSet)
+                                _previewContent.LoadPreviewset();
+                        }
+                        if (_previewContent.ValidPreviewSet)
+                            return _previewContent.XmlContent;
+                    }
+                    return content.Instance.XmlContent;
+                });
+            }
+            set
+            {
+                _xmlDelegate = value;
+            }
+        }
+
+        internal XmlDocument GetXml(UmbracoContext umbracoContext)
+        {
+            return GetXmlDelegate(umbracoContext.UmbracoUser, umbracoContext.InPreviewMode);
+        }
+
+        internal XmlDocument GetXml(UmbracoContext umbracoContext, bool inPreviewMode)
+        {
+            return GetXmlDelegate(umbracoContext.UmbracoUser, inPreviewMode);
+        }
+
+        #endregion
+
+        #region XPathQuery
+
+        static readonly char[] SlashChar = new[] { '/' };
 
         protected string CreateXpathQuery(int startNodeId, string path, bool hideTopLevelNodeFromPath, out IEnumerable<XPathVariable> vars)
         {
@@ -290,5 +341,7 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
 
             return xpath;
         }
+
+        #endregion
     }
 }

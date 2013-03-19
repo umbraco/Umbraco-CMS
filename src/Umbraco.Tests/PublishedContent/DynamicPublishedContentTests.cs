@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web;
 using Umbraco.Web.Models;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.LegacyXmlCache;
 
 namespace Umbraco.Tests.PublishedContent
@@ -27,8 +28,8 @@ namespace Umbraco.Tests.PublishedContent
 			//var template = Template.MakeNew("test", new User(0));
 			//var ctx = GetUmbracoContext("/test", template.Id);
 			var ctx = GetUmbracoContext("/test", 1234);
-			var contentStore = new PublishedContentCache();
-			var doc = contentStore.GetById(ctx, id);
+            var cache = new ContextualPublishedContentCache(new PublishedContentCache(), ctx);
+			var doc = cache.GetById(id);
 			Assert.IsNotNull(doc);
 			var dynamicNode = new DynamicPublishedContent(doc);
 			Assert.IsNotNull(dynamicNode);

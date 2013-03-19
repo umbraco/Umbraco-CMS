@@ -29,7 +29,6 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
 	/// </remarks>
 	internal class PublishedMediaCache : IPublishedMediaCache
 	{
-
 		public PublishedMediaCache()
 		{			
 		}
@@ -39,8 +38,8 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
 	    /// </summary>
 	    /// <param name="searchProvider"></param>
 	    /// <param name="indexProvider"></param>
-        internal PublishedMediaCache(BaseSearchProvider searchProvider, BaseIndexProvider indexProvider)
-		{
+	    internal PublishedMediaCache(BaseSearchProvider searchProvider, BaseIndexProvider indexProvider)
+	    {
 		    _searchProvider = searchProvider;
 		    _indexProvider = indexProvider;
 		}

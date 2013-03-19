@@ -103,9 +103,7 @@ namespace umbraco.presentation.templateControls
                     //moved the following from the catch block up as this will allow fallback options alt text etc to work
 
 					//get the publishedcontent item
-					var publishedContent = PublishedContentCacheResolver.Current.PublishedContentCache.GetById(
-						Umbraco.Web.UmbracoContext.Current,
-						tempNodeId.Value);
+					var publishedContent = Umbraco.Web.UmbracoContext.Current.ContentCache.GetById(tempNodeId.Value);
 
 					var itemPage = new page(publishedContent);                    
 					tempElementContent = new item(publishedContent, itemPage.Elements, item.LegacyAttributes).FieldContent;

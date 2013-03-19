@@ -131,8 +131,8 @@ namespace Umbraco.Web
             HttpContext = httpContext;            
             Application = applicationContext;
 
-            ContentCache = contentCache;
-            MediaCache = mediaCache;
+            ContentCache = new ContextualPublishedContentCache(contentCache, this);
+            MediaCache = new ContextualPublishedMediaCache(mediaCache, this);
 
 			// set the urls...
 			//original request url
@@ -225,12 +225,12 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets or sets the published content cache.
         /// </summary>
-        internal IPublishedContentCache ContentCache { get; private set; }
+        internal ContextualPublishedContentCache ContentCache { get; private set; }
 
         /// <summary>
         /// Gets or sets the published media cache.
         /// </summary>
-        internal IPublishedMediaCache MediaCache { get; private set; }
+        internal ContextualPublishedMediaCache MediaCache { get; private set; }
 
     	private Func<XmlDocument> _xmlDelegate; 
 

@@ -54,9 +54,7 @@ namespace Umbraco.Web.Templates
 			// terribly much for this implementation since we are just creating a doc content request to modify it's properties manually.
 			var contentRequest = new PublishedContentRequest(_umbracoContext.CleanedUmbracoUrl, _umbracoContext.RoutingContext);
 
-            var doc = contentRequest.RoutingContext.UmbracoContext.ContentCache.GetById(
-					contentRequest.RoutingContext.UmbracoContext,
-					PageId);
+            var doc = contentRequest.RoutingContext.UmbracoContext.ContentCache.GetById(PageId);
 
 			if (doc == null)
 			{

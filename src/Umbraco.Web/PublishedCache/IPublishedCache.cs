@@ -9,20 +9,44 @@ using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.PublishedCache
 {
-	/// <summary>
-	/// Defines the methods for published documents
-	/// </summary>
-	[UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1153",
+    /// <summary>
+    /// Provides access to cached contents.
+    /// </summary>
+    [UmbracoExperimentalFeature("http://issues.umbraco.org/issue/U4-1153",
         "We need to create something like the IPublishListener interface to have proper published content storage.")]
     internal interface IPublishedCache
     {
-        // FIXME do we need the context here?!
-        // FIXME write documentation
+	    /// <summary>
+	    /// Gets a content identified by its unique identifier.
+	    /// </summary>
+	    /// <param name="umbracoContext">The context.</param>
+	    /// <param name="contentId">The content unique identifier.</param>
+	    /// <returns>The content, or null.</returns>
+	    IPublishedContent GetById(UmbracoContext umbracoContext, int contentId);
 
-		IPublishedContent GetById(UmbracoContext umbracoContext, int nodeId);
-		IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext);
+        /// <summary>
+        /// Gets contents at root.
+        /// </summary>
+        /// <param name="umbracoContext">The context.</param>
+        /// <returns>The contents.</returns>
+        IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext);
 
-	    IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, string xpath, XPathVariable[] vars);
+        /// <summary>
+        /// Gets a content resulting from an XPath query.
+        /// </summary>
+        /// <param name="umbracoContext">The context.</param>
+        /// <param name="xpath">The XPath query.</param>
+        /// <param name="vars">Optional XPath variables.</param>
+        /// <returns>The content, or null.</returns>
+        IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, string xpath, XPathVariable[] vars);
+
+        /// <summary>
+        /// Gets contents resulting from an XPath query.
+        /// </summary>
+        /// <param name="umbracoContext">The context.</param>
+        /// <param name="xpath">The XPath query.</param>
+        /// <param name="vars">Optional XPath variables.</param>
+        /// <returns>The contents.</returns>
         IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, string xpath, XPathVariable[] vars);
 
 	    // ... GetXPath single or multi

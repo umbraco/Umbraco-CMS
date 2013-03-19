@@ -76,9 +76,7 @@ namespace Umbraco.Web.Routing
 				if (handler.Execute(url) && handler.redirectID > 0)
 				{
 				    var redirectId = handler.redirectID;
-                    docRequest.PublishedContent = docRequest.RoutingContext.UmbracoContext.ContentCache.GetById(
-						docRequest.RoutingContext.UmbracoContext,
-						redirectId);
+                    docRequest.PublishedContent = docRequest.RoutingContext.UmbracoContext.ContentCache.GetById(redirectId);
 
                     if (!docRequest.HasPublishedContent)
                     {

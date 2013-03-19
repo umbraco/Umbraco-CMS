@@ -270,7 +270,7 @@ namespace Umbraco.Web
 				s = searchProvider;
 
 			var results = s.Search(criteria);
-			return results.ConvertSearchResultToPublishedContent(PublishedContentCacheResolver.Current.PublishedContentCache);
+			return results.ConvertSearchResultToPublishedContent(UmbracoContext.Current.ContentCache);
 		}
 		#endregion
 
@@ -1128,7 +1128,7 @@ namespace Umbraco.Web
         {
             //get the root docs if parent is null
             return content.Parent == null
-                       ? PublishedContentCacheResolver.Current.PublishedContentCache.GetAtRoot(UmbracoContext.Current)
+                       ? UmbracoContext.Current.ContentCache.GetAtRoot()
                        : content.Parent.Children;
         } 
 

@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.LegacyXmlCache;
 using umbraco.BusinessLogic;
 
@@ -41,8 +42,8 @@ namespace Umbraco.Tests.PublishedCache
 			var mChild2 = global::umbraco.cms.businesslogic.media.Media.MakeNew("Child2", mType, user, mRoot2.Id);
 			
 			var ctx = GetUmbracoContext("/test", 1234);
-			var mediaStore = new PublishedMediaCache();
-			var roots = mediaStore.GetAtRoot(ctx);
+            var cache = new ContextualPublishedMediaCache(new PublishedMediaCache(), ctx);
+			var roots = cache.GetAtRoot();
 			Assert.AreEqual(2, roots.Count());
 			Assert.IsTrue(roots.Select(x => x.Id).ContainsAll(new[] {mRoot1.Id, mRoot2.Id}));
 

@@ -8,6 +8,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.LegacyXmlCache;
 
 namespace Umbraco.Tests.PublishedContent
@@ -82,8 +83,8 @@ namespace Umbraco.Tests.PublishedContent
 		internal IPublishedContent GetNode(int id)
 		{
 			var ctx = GetUmbracoContext("/test", 1234);
-			var cache = new PublishedContentCache();
-			var doc = cache.GetById(ctx, id);
+			var cache = new ContextualPublishedContentCache(new PublishedContentCache(), ctx);
+			var doc = cache.GetById(id);
 			Assert.IsNotNull(doc);
 			return doc;
 		}
