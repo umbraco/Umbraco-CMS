@@ -27,7 +27,7 @@ namespace Umbraco.Web.Routing
 			{
 				LogHelper.Debug<ContentFinderByLegacy404>("Got id={0}.", () => id);
 
-				content = pcr.RoutingContext.PublishedContentCache.GetById(
+				content = pcr.RoutingContext.UmbracoContext.ContentCache.GetById(
 						pcr.RoutingContext.UmbracoContext,
 						id);
 

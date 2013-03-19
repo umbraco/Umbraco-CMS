@@ -66,7 +66,7 @@ namespace Umbraco.Web.Routing
             IPublishedContent node = null;
             if (nodeId > 0)
             {
-                node = docreq.RoutingContext.PublishedContentCache.GetById(
+                node = docreq.RoutingContext.UmbracoContext.ContentCache.GetById(
 					docreq.RoutingContext.UmbracoContext,
 					nodeId);
 
@@ -85,7 +85,7 @@ namespace Umbraco.Web.Routing
             if (node == null)
             {
 				LogHelper.Debug<ContentFinderByNiceUrl>("Cache miss, query");
-				node = docreq.RoutingContext.PublishedContentCache.GetByRoute(
+                node = docreq.RoutingContext.UmbracoContext.ContentCache.GetByRoute(
 					docreq.RoutingContext.UmbracoContext,
 					route);
 

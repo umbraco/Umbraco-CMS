@@ -72,8 +72,11 @@ namespace Umbraco.Tests.PublishedCache
 			//ensure the StateHelper is using our custom context
 			StateHelper.HttpContext = _httpContextFactory.HttpContext;
 			
-			_umbracoContext = new UmbracoContext(_httpContextFactory.HttpContext, 
-				new ApplicationContext());
+			_umbracoContext = new UmbracoContext(
+                _httpContextFactory.HttpContext, 
+				new ApplicationContext(),
+                new PublishedContentCache(), 
+                new PublishedMediaCache());
 
 			_umbracoContext.GetXmlDelegate = () =>
 				{

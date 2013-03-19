@@ -21,6 +21,7 @@ using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 
@@ -279,7 +280,9 @@ namespace Umbraco.Tests.TestHelpers
         {
             var ctx = new UmbracoContext(
                 GetHttpContextFactory(url, routeData).HttpContext,
-                ApplicationContext);
+                ApplicationContext,
+                new PublishedContentCache(), 
+                new PublishedMediaCache());
             SetupUmbracoContextForTest(ctx, templateId);
             return ctx;
         }

@@ -25,7 +25,6 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoContext
     {
-
         private const string HttpContextItemName = "Umbraco.Web.UmbracoContext";
         private static readonly object Locker = new object();
 
@@ -82,13 +81,16 @@ namespace Umbraco.Web
             if (UmbracoContext.Current != null && !replaceContext)
                 return UmbracoContext.Current;
 
-            var umbracoContext = new UmbracoContext(httpContext, applicationContext);
+            var umbracoContext = new UmbracoContext(
+                httpContext,
+                applicationContext,
+                PublishedContentCacheResolver.Current.PublishedContentCache,
+                PublishedMediaCacheResolver.Current.PublishedMediaCache);
 
             // create the nice urls provider
             // there's one per request because there are some behavior parameters that can be changed
             var urlProvider = new UrlProvider(
                 umbracoContext,
-                PublishedContentCacheResolver.Current.PublishedContentCache,
                 UrlProviderResolver.Current.Providers);
 
             // create the RoutingContext, and assign
@@ -96,7 +98,6 @@ namespace Umbraco.Web
                 umbracoContext,
                 ContentFinderResolver.Current.Finders,
                 ContentLastChanceFinderResolver.Current.Finder,
-                PublishedContentCacheResolver.Current.PublishedContentCache,
                 urlProvider,
                 RoutesCacheResolver.Current.RoutesCache);
 
@@ -113,9 +114,13 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="httpContext"></param>
         /// <param name="applicationContext"> </param>
+        /// <param name="contentCache">The published content cache.</param>
+        /// <param name="mediaCache">The published media cache.</param>
         internal UmbracoContext(
 			HttpContextBase httpContext, 
-			ApplicationContext applicationContext)
+			ApplicationContext applicationContext,
+            IPublishedContentCache contentCache,
+            IPublishedMediaCache mediaCache)
         {
             if (httpContext == null) throw new ArgumentNullException("httpContext");
             if (applicationContext == null) throw new ArgumentNullException("applicationContext");
@@ -125,6 +130,9 @@ namespace Umbraco.Web
 
             HttpContext = httpContext;            
             Application = applicationContext;
+
+            ContentCache = contentCache;
+            MediaCache = mediaCache;
 
 			// set the urls...
 			//original request url
@@ -213,6 +221,16 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <remarks>That is, lowercase, no trailing slash after path, no .aspx...</remarks>
 		internal Uri CleanedUmbracoUrl { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the published content cache.
+        /// </summary>
+        internal IPublishedContentCache ContentCache { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the published media cache.
+        /// </summary>
+        internal IPublishedMediaCache MediaCache { get; private set; }
 
     	private Func<XmlDocument> _xmlDelegate; 
 

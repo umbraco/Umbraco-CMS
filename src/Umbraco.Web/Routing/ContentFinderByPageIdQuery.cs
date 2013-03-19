@@ -14,7 +14,7 @@ namespace Umbraco.Web.Routing
 			int pageId;
 			if (int.TryParse(docRequest.RoutingContext.UmbracoContext.HttpContext.Request["umbPageID"], out pageId))
 			{
-				var doc = docRequest.RoutingContext.PublishedContentCache.GetById(
+				var doc = docRequest.RoutingContext.UmbracoContext.ContentCache.GetById(
 					docRequest.RoutingContext.UmbracoContext,
 					pageId);
 

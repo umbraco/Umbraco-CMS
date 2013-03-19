@@ -34,13 +34,11 @@ namespace Umbraco.Tests.Routing
 			var t = Template.MakeNew("test", new User(0));
 
 			var umbracoContext = GetUmbracoContext(url, t.Id);
-			var cache = new PublishedContentCache();
-            var urlProvider = new UrlProvider(umbracoContext, cache, new IUrlProvider[] { new DefaultUrlProvider() });
+            var urlProvider = new UrlProvider(umbracoContext, new IUrlProvider[] { new DefaultUrlProvider() });
 			var routingContext = new RoutingContext(
 				umbracoContext,
 				lookups,
 				new FakeLastChanceFinder(),
-				cache,
                 urlProvider,
                 GetRoutesCache());
 

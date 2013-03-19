@@ -28,13 +28,11 @@ namespace Umbraco.Tests.TestHelpers
 	    protected RoutingContext GetRoutingContext(string url, int templateId, RouteData routeData = null, bool setUmbracoContextCurrent = false)
 		{
 			var umbracoContext = GetUmbracoContext(url, templateId, routeData);
-			var cache = new PublishedContentCache();
-            var urlProvider = new UrlProvider(umbracoContext, cache, new IUrlProvider[] { new DefaultUrlProvider() });
+            var urlProvider = new UrlProvider(umbracoContext, new IUrlProvider[] { new DefaultUrlProvider() });
 			var routingContext = new RoutingContext(
 				umbracoContext,
 				Enumerable.Empty<IContentFinder>(),
 				new FakeLastChanceFinder(),
-				cache,
                 urlProvider,
                 GetRoutesCache());
 
