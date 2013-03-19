@@ -175,9 +175,27 @@ namespace Umbraco.Core.Models.EntityBase
         /// </remarks>
         public virtual void ResetDirtyProperties()
         {
-            //copy the changed properties to the last changed properties
-            _lastPropertyChangedInfo = _propertyChangedInfo.ToDictionary(v => v.Key, v => v.Value);
-            
+            ResetDirtyProperties(true);
+        }
+
+        /// <summary>
+        /// Resets dirty properties by clearing the dictionary used to track changes.
+        /// </summary>
+        /// <param name="rememberPreviouslyChangedProperties">
+        /// true if we are to remember the last changes made after resetting
+        /// </param>
+        /// <remarks>
+        /// Please note that resetting the dirty properties could potentially
+        /// obstruct the saving of a new or updated entity.
+        /// </remarks>
+        internal void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+        {
+            if (rememberPreviouslyChangedProperties)
+            {
+                //copy the changed properties to the last changed properties
+                _lastPropertyChangedInfo = _propertyChangedInfo.ToDictionary(v => v.Key, v => v.Value);   
+            }            
+
             _propertyChangedInfo.Clear();
         }
 

@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IContent BuildEntity(DocumentDto dto)
         {
-            return new Content(dto.Text, dto.ContentVersionDto.ContentDto.NodeDto.ParentId, _contentType)
+            var content = new Content(dto.Text, dto.ContentVersionDto.ContentDto.NodeDto.ParentId, _contentType)
             {
                 Id = _id,
                 Key =
@@ -53,6 +53,10 @@ namespace Umbraco.Core.Persistence.Factories
                 ReleaseDate = dto.ReleaseDate.HasValue ? dto.ReleaseDate.Value : (DateTime?)null,
                 Version = dto.ContentVersionDto.VersionId
             };
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            content.ResetDirtyProperties(false);
+            return content;
         }
 
         public DocumentDto BuildDto(IContent entity)

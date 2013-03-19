@@ -10,11 +10,15 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IDictionaryItem BuildEntity(DictionaryDto dto)
         {
-            return new DictionaryItem(dto.Parent, dto.Key)
+            var item = new DictionaryItem(dto.Parent, dto.Key)
                        {
                            Id = dto.PrimaryKey, 
                            Key = dto.UniqueId
                        };
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            item.ResetDirtyProperties(false);
+            return item;
         }
 
         public DictionaryDto BuildDto(IDictionaryItem entity)

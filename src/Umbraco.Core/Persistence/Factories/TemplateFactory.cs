@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Factories
         
         public Template BuildEntity(TemplateDto dto)
         {
-            return new Template(string.Empty, dto.NodeDto.Text, dto.Alias)
+            var template = new Template(string.Empty, dto.NodeDto.Text, dto.Alias)
                        {
                            CreateDate = dto.NodeDto.CreateDate,
                            Id = dto.NodeId,
@@ -39,6 +39,10 @@ namespace Umbraco.Core.Persistence.Factories
                            SortOrder = dto.NodeDto.SortOrder,
                            NodePath = dto.NodeDto.Path
                        };
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            template.ResetDirtyProperties(false);
+            return template;
         }
 
         public TemplateDto BuildDto(Template entity)

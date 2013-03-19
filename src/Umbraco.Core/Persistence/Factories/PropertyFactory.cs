@@ -33,8 +33,9 @@ namespace Umbraco.Core.Persistence.Factories
                                    : propertyType.CreatePropertyFromRawValue(propertyDataDto.GetValue,
                                                                              propertyDataDto.VersionId.Value,
                                                                              propertyDataDto.Id);
-
-                property.ResetDirtyProperties();
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                property.ResetDirtyProperties(false);
                 properties.Add(property);
             }
 

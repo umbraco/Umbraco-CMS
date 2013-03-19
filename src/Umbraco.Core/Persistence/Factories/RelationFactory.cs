@@ -23,6 +23,9 @@ namespace Umbraco.Core.Persistence.Factories
                                  Id = dto.Id,
                                  UpdateDate = dto.Datetime
                              };
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            entity.ResetDirtyProperties(false);
             return entity;
         }
 

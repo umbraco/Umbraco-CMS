@@ -9,13 +9,17 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IUserType BuildEntity(UserTypeDto dto)
         {
-            return new UserType
+            var userType = new UserType
                        {
                            Alias = dto.Alias,
                            Id = dto.Id,
                            Name = dto.Name,
                            Permissions = dto.DefaultPermissions
                        };
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            userType.ResetDirtyProperties(false);
+            return userType;
         }
 
         public UserTypeDto BuildDto(IUserType entity)
