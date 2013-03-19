@@ -38,15 +38,6 @@ namespace Umbraco.Tests
             Core.Configuration.UmbracoSettings.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
 		}
 
-        protected override void FreezeResolution()
-        {
-            //set the current umbraco context and a published content cache
-            PublishedContentCacheResolver.Current = new PublishedContentCacheResolver(
-                new PublishedContentCache());
-
-            base.FreezeResolution();
-        }
-
 		public override void TearDown()
 		{
 			base.TearDown();
@@ -102,7 +93,7 @@ namespace Umbraco.Tests
 		/// <returns></returns>
 		private string LegacyGetItem(int nodeId, string alias)
 		{
-            var cache = PublishedContentCacheResolver.Current.PublishedContentCache as PublishedContentCache;
+            var cache = UmbracoContext.Current.ContentCache.InnerCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the legacy one is supported.");
             var umbracoXML = cache.GetXml(UmbracoContext.Current); // = UmbracoContext.Current.GetXml();
 

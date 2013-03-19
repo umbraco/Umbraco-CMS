@@ -25,6 +25,12 @@ namespace Umbraco.Web.PublishedCache
         }
 
         /// <summary>
+        /// Gets the inner IPublishedContentCache.
+        /// </summary>
+        /// <remarks>For unit tests.</remarks>
+        internal IPublishedContentCache InnerCache { get { return _cache; } }
+
+        /// <summary>
         /// Gets a content identified by its unique identifier.
         /// </summary>
         /// <param name="contentId">The content unique identifier.</param>
@@ -80,11 +86,10 @@ namespace Umbraco.Web.PublishedCache
         /// <summary>
         /// Gets a value indicating whether the underlying non-contextual cache contains published content.
         /// </summary>
-        /// <param name="umbracoContext">The context.</param>
         /// <returns>A value indicating whether the underlying non-contextual cache contains published content.</returns>
-        public bool HasContent(UmbracoContext umbracoContext)
+        public bool HasContent()
         {
-            return _cache.HasContent(umbracoContext);
+            return _cache.HasContent();
         }
     }
 }

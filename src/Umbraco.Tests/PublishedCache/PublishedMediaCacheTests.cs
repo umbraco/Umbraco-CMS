@@ -16,7 +16,7 @@ using umbraco.BusinessLogic;
 namespace Umbraco.Tests.PublishedCache
 {
 	[TestFixture]
-    public class PublishMediaStoreTests : PublishedContentTestBase
+    public class PublishMediaCacheTests : PublishedContentTestBase
 	{
 		public override void Initialize()
 		{

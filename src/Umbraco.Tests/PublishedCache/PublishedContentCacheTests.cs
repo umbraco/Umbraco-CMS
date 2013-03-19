@@ -14,7 +14,7 @@ using umbraco.BusinessLogic;
 namespace Umbraco.Tests.PublishedCache
 {
 	[TestFixture]
-	public class PublishContentStoreTests
+	public class PublishContentCacheTests
 	{
 		private FakeHttpContextFactory _httpContextFactory;
 		private UmbracoContext _umbracoContext;
@@ -73,43 +73,38 @@ namespace Umbraco.Tests.PublishedCache
 			_httpContextFactory = new FakeHttpContextFactory("~/Home");
 			//ensure the StateHelper is using our custom context
 			StateHelper.HttpContext = _httpContextFactory.HttpContext;
-			
-			_umbracoContext = new UmbracoContext(
+
+            var cache = new PublishedContentCache
+                {
+                    GetXmlDelegate = (user, preview) =>
+                        {
+                            var doc = new XmlDocument();
+                            doc.LoadXml(GetXml());
+                            return doc;
+                        }
+                };
+
+		    _umbracoContext = new UmbracoContext(
                 _httpContextFactory.HttpContext, 
 				new ApplicationContext(),
-                new PublishedContentCache(), 
+                cache, 
                 new PublishedMediaCache());
 
-		    var cache = new PublishedContentCache();
-            cache.GetXmlDelegate = (user, preview) =>
-				{
-					var xDoc = new XmlDocument();
-
-					//create a custom xml structure to return
-
-					xDoc.LoadXml(GetXml());
-					//return the custom x doc
-					return xDoc;
-				};
-
-            _cache = new ContextualPublishedContentCache(cache, _umbracoContext);		
+		    _cache = _umbracoContext.ContentCache;
 		}
 
 		private void SetupForLegacy()
 		{
 			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = true;
 
-            var cache = PublishedContentCacheResolver.Current.PublishedContentCache as PublishedContentCache;
+            var cache = _umbracoContext.ContentCache.InnerCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the legacy one is supported.");
 
             cache.GetXmlDelegate = (user, preview) =>
             {
-				var xDoc = new XmlDocument();
-
-				//create a custom xml structure to return
-				xDoc.LoadXml(GetLegacyXml());
-				//return the custom x doc
-				return xDoc;
+				var doc = new XmlDocument();
+				doc.LoadXml(GetLegacyXml());
+				return doc;
 			};
 		}
 
@@ -129,7 +124,7 @@ namespace Umbraco.Tests.PublishedCache
 		[Test]
 		public void Has_Content()
 		{
-			Assert.IsTrue(_cache.HasContent(_umbracoContext));
+			Assert.IsTrue(_cache.HasContent());
 		}
 
 		[Test]

@@ -66,25 +66,10 @@ namespace Umbraco.Tests.PublishedContent
 </root>";
 		}
 
-		public override void Initialize()
-		{
-			base.Initialize();
-            
-		}
-
-
-
-		public override void TearDown()
-		{
-			base.TearDown();
-			
-		}
-
 		internal IPublishedContent GetNode(int id)
 		{
 			var ctx = GetUmbracoContext("/test", 1234);
-			var cache = new ContextualPublishedContentCache(new PublishedContentCache(), ctx);
-			var doc = cache.GetById(id);
+			var doc = ctx.ContentCache.GetById(id);
 			Assert.IsNotNull(doc);
 			return doc;
 		}

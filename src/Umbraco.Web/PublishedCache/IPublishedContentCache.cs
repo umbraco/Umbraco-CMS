@@ -18,8 +18,7 @@ namespace Umbraco.Web.PublishedCache
         /// <summary>
         /// Gets a value indicating whether the cache contains published content.
         /// </summary>
-        /// <param name="umbracoContext">The context.</param>
         /// <returns>A value indicating whether the cache contains published content.</returns>
-        bool HasContent(UmbracoContext umbracoContext);
+        bool HasContent();
     }
 }

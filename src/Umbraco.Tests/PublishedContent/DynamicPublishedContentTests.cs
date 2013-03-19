@@ -28,8 +28,7 @@ namespace Umbraco.Tests.PublishedContent
 			//var template = Template.MakeNew("test", new User(0));
 			//var ctx = GetUmbracoContext("/test", template.Id);
 			var ctx = GetUmbracoContext("/test", 1234);
-            var cache = new ContextualPublishedContentCache(new PublishedContentCache(), ctx);
-			var doc = cache.GetById(id);
+			var doc = ctx.ContentCache.GetById(id);
 			Assert.IsNotNull(doc);
 			var dynamicNode = new DynamicPublishedContent(doc);
 			Assert.IsNotNull(dynamicNode);

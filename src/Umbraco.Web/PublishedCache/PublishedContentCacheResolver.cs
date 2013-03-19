@@ -19,17 +19,17 @@ namespace Umbraco.Web.PublishedCache
         /// <summary>
         /// Sets the content cache.
         /// </summary>
-        /// <param name="publishedContentCache">The content cache.</param>
+        /// <param name="contentCache">The content cache.</param>
         /// <remarks>For developers, at application startup.</remarks>
-        public void SetContentStore(IPublishedContentCache publishedContentCache)
+        public void SetContentCache(IPublishedContentCache contentCache)
 		{
-			Value = publishedContentCache;
+			Value = contentCache;
 		}
 
 		/// <summary>
 		/// Gets the content cache.
 		/// </summary>
-		public IPublishedContentCache PublishedContentCache
+		public IPublishedContentCache ContentCache
 		{
 			get { return Value; }
 		}

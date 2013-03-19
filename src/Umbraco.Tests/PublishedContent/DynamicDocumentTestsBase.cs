@@ -13,17 +13,6 @@ namespace Umbraco.Tests.PublishedContent
 	[TestFixture]
     public abstract class DynamicDocumentTestsBase<TDocument, TDocumentList> : PublishedContentTestBase
 	{
-		public override void Initialize()
-		{
-			base.Initialize();
-		}
-
-		public override void TearDown()
-		{
-			base.TearDown();
-		
-		}
-
         protected override DatabaseBehavior DatabaseTestBehavior
         {
             get { return DatabaseBehavior.NoDatabasePerFixture; }

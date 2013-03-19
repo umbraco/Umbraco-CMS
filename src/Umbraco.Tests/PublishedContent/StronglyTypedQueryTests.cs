@@ -76,8 +76,7 @@ namespace Umbraco.Tests.PublishedContent
 		internal IPublishedContent GetNode(int id)
 		{
 			var ctx = UmbracoContext.Current;
-            var cache = new ContextualPublishedContentCache(new PublishedContentCache(), ctx);
-			var doc = cache.GetById(id);
+			var doc = ctx.ContentCache.GetById(id);
 			Assert.IsNotNull(doc);
 			return doc;
 		}

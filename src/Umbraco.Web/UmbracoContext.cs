@@ -84,7 +84,7 @@ namespace Umbraco.Web
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 applicationContext,
-                PublishedContentCacheResolver.Current.PublishedContentCache,
+                PublishedContentCacheResolver.Current.ContentCache,
                 PublishedMediaCacheResolver.Current.PublishedMediaCache);
 
             // create the nice urls provider

@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Services
 			}
 			else
 			{
-				Assert.Fail("ERROR! " + _error);
+			    throw new Exception("Error!", _error);
 			}
 			
 		}

@@ -197,9 +197,9 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
 		    return GetSingleByXPath(umbracoContext, xpath, var);
         }
 
-        public bool HasContent(UmbracoContext umbracoContext)
+        public bool HasContent()
         {
-	        var xml = GetXml(umbracoContext, false);
+	        var xml = GetXml();
 			if (xml == null)
 				return false;
 			var node = xml.SelectSingleNode(XPathStrings.RootDocuments);
@@ -253,9 +253,9 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
             return GetXmlDelegate(umbracoContext.UmbracoUser, umbracoContext.InPreviewMode);
         }
 
-        internal XmlDocument GetXml(UmbracoContext umbracoContext, bool inPreviewMode)
+        internal XmlDocument GetXml()
         {
-            return GetXmlDelegate(umbracoContext.UmbracoUser, inPreviewMode);
+            return GetXmlDelegate(null, false);
         }
 
         #endregion
