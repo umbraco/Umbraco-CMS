@@ -417,6 +417,7 @@ namespace Umbraco.Core.Services
 
                 Audit.Add(AuditTypes.Delete, string.Format("Delete MediaTypes performed by user"), userId, -1);
             }
+            }
         }
 
         /// <summary>

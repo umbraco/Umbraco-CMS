@@ -469,15 +469,15 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// This will rebuild the xml structures for content in the database. 
-	    /// </summary>
-	    /// <param name="userId">Optional Id of the User issueing the publishing</param>
-	    /// <returns>True if publishing succeeded, otherwise False</returns>
+        /// </summary>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
         /// <remarks>
         /// This is used for when a document type alias or a document type property is changed, the xml will need to 
         /// be regenerated.
         /// </remarks>
-	    public bool RePublishAll(int userId = 0)
-	    {
+        public bool RePublishAll(int userId = 0)
+        {
             try
             {
                 RePublishAllDo();
@@ -488,7 +488,7 @@ namespace Umbraco.Core.Services
                 LogHelper.Error<ContentService>("An error occurred executing RePublishAll", ex);
                 return false;
             }            
-	    }
+        }
 
 	    /// <summary>
         /// Publishes a single <see cref="IContent"/> object
@@ -1215,9 +1215,9 @@ namespace Umbraco.Core.Services
                         uow.Database.Insert(poco);
                     }
                 }
-
                 Audit.Add(AuditTypes.Publish, "RePublish All completed, the xml has been regenerated in the database", 0, -1);
             }            
+            }
         }
 
 	    /// <summary>
@@ -1429,12 +1429,12 @@ namespace Umbraco.Core.Services
                                             ? uow.Database.Update<PreviewXmlDto>(
                                                 "SET xml = @Xml, timestamp = @Timestamp WHERE nodeId = @Id AND versionId = @Version",
                                                 new
-                                                {
-                                                    Xml = previewPoco.Xml,
-                                                    Timestamp = previewPoco.Timestamp,
-                                                    Id = previewPoco.NodeId,
-                                                    Version = previewPoco.VersionId
-                                                })
+	                                                {
+	                                                    Xml = previewPoco.Xml,
+	                                                    Timestamp = previewPoco.Timestamp,
+	                                                    Id = previewPoco.NodeId,
+	                                                    Version = previewPoco.VersionId
+	                                                })
                                             : Convert.ToInt32(uow.Database.Insert(previewPoco));
 
                     if (published)
@@ -1470,6 +1470,7 @@ namespace Umbraco.Core.Services
 
                 return new Attempt<PublishStatus>(publishStatus.StatusType == PublishStatusType.Success, publishStatus);
 	        }	        
+	        }
         }
 
 	    /// <summary>
