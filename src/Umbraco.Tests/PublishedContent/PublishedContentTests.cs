@@ -8,6 +8,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -64,25 +66,10 @@ namespace Umbraco.Tests.PublishedContent
 </root>";
 		}
 
-		public override void Initialize()
-		{
-			base.Initialize();
-            
-		}
-
-
-
-		public override void TearDown()
-		{
-			base.TearDown();
-			
-		}
-
 		internal IPublishedContent GetNode(int id)
 		{
 			var ctx = GetUmbracoContext("/test", 1234);
-			var contentStore = new DefaultPublishedContentStore();
-			var doc = contentStore.GetDocumentById(ctx, id);
+			var doc = ctx.ContentCache.GetById(id);
 			Assert.IsNotNull(doc);
 			return doc;
 		}

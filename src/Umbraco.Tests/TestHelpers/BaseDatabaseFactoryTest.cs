@@ -21,6 +21,8 @@ using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 
@@ -277,10 +279,21 @@ namespace Umbraco.Tests.TestHelpers
 
         protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null)
         {
+            var cache = new PublishedContentCache();
+
+            cache.GetXmlDelegate = (user, preview) =>
+                {
+                    var doc = new XmlDocument();
+                    doc.LoadXml(GetXmlContent(templateId));
+                    return doc;
+                };
+
             var ctx = new UmbracoContext(
                 GetHttpContextFactory(url, routeData).HttpContext,
-                ApplicationContext);
-            SetupUmbracoContextForTest(ctx, templateId);
+                ApplicationContext,
+                cache, 
+                new PublishedMediaCache());
+
             return ctx;
         }
 
@@ -300,25 +313,6 @@ namespace Umbraco.Tests.TestHelpers
         internal virtual IRoutesCache GetRoutesCache()
         {
             return new FakeRoutesCache();
-        }
-
-        /// <summary>
-        /// Initlializes the UmbracoContext with specific XML
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        /// <param name="templateId"></param>
-        protected void SetupUmbracoContextForTest(UmbracoContext umbracoContext, int templateId)
-        {
-            umbracoContext.GetXmlDelegate = () =>
-            {
-                var xDoc = new XmlDocument();
-
-                //create a custom xml structure to return
-
-                xDoc.LoadXml(GetXmlContent(templateId));
-                //return the custom x doc
-                return xDoc;
-            };
         }
 
         protected virtual string GetXmlContent(int templateId)

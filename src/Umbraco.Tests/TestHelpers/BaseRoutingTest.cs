@@ -6,6 +6,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.TestHelpers
@@ -27,13 +28,11 @@ namespace Umbraco.Tests.TestHelpers
 	    protected RoutingContext GetRoutingContext(string url, int templateId, RouteData routeData = null, bool setUmbracoContextCurrent = false)
 		{
 			var umbracoContext = GetUmbracoContext(url, templateId, routeData);
-			var contentStore = new DefaultPublishedContentStore();
-            var urlProvider = new UrlProvider(umbracoContext, contentStore, new IUrlProvider[] { new DefaultUrlProvider() });
+            var urlProvider = new UrlProvider(umbracoContext, new IUrlProvider[] { new DefaultUrlProvider() });
 			var routingContext = new RoutingContext(
 				umbracoContext,
 				Enumerable.Empty<IContentFinder>(),
 				new FakeLastChanceFinder(),
-				contentStore,
                 urlProvider,
                 GetRoutesCache());
 

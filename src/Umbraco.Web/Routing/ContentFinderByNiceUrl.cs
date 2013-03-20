@@ -58,7 +58,7 @@ namespace Umbraco.Web.Routing
 			// first ask the cache for a node
 			// return '0' if in preview mode
         	var nodeId = !docreq.RoutingContext.UmbracoContext.InPreviewMode
-							? docreq.RoutingContext.UmbracoContext.RoutingContext.RoutesCache.GetNodeId(route)
+							? docreq.RoutingContext.RoutesCache.GetNodeId(route)
         	             	: 0;
 
 			// if a node was found, get it by id and ensure it exists
@@ -66,9 +66,7 @@ namespace Umbraco.Web.Routing
             IPublishedContent node = null;
             if (nodeId > 0)
             {
-				node = docreq.RoutingContext.PublishedContentStore.GetDocumentById(
-					docreq.RoutingContext.UmbracoContext,
-					nodeId);
+                node = docreq.RoutingContext.UmbracoContext.ContentCache.GetById(nodeId);
 
                 if (node != null)
                 {
@@ -85,9 +83,7 @@ namespace Umbraco.Web.Routing
             if (node == null)
             {
 				LogHelper.Debug<ContentFinderByNiceUrl>("Cache miss, query");
-				node = docreq.RoutingContext.PublishedContentStore.GetDocumentByRoute(
-					docreq.RoutingContext.UmbracoContext,
-					route);
+                node = docreq.RoutingContext.UmbracoContext.ContentCache.GetByRoute(route);
 
                 if (node != null)
                 {

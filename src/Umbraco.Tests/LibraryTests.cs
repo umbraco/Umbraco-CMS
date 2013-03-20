@@ -6,6 +6,8 @@ using System.Text;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 using umbraco;
 
 namespace Umbraco.Tests
@@ -35,15 +37,6 @@ namespace Umbraco.Tests
 
             Core.Configuration.UmbracoSettings.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
 		}
-
-        protected override void FreezeResolution()
-        {
-            //set the current umbraco context and a published content store
-            PublishedContentStoreResolver.Current = new PublishedContentStoreResolver(
-                new DefaultPublishedContentStore());
-
-            base.FreezeResolution();
-        }
 
 		public override void TearDown()
 		{
@@ -100,8 +93,11 @@ namespace Umbraco.Tests
 		/// <returns></returns>
 		private string LegacyGetItem(int nodeId, string alias)
 		{
-			var umbracoXML = UmbracoContext.Current.GetXml();
-			string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data [@alias='{0}']" : "./{0}";
+            var cache = UmbracoContext.Current.ContentCache.InnerCache as PublishedContentCache;
+            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the legacy one is supported.");
+            var umbracoXML = cache.GetXml(UmbracoContext.Current); // = UmbracoContext.Current.GetXml();
+
+            string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data [@alias='{0}']" : "./{0}";
 			if (umbracoXML.GetElementById(nodeId.ToString()) != null)
 				if (
 					",id,parentID,level,writerID,template,sortOrder,createDate,updateDate,nodeName,writerName,path,"

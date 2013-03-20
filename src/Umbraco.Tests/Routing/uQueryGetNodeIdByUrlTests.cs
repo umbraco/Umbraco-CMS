@@ -7,6 +7,7 @@ using Umbraco.Tests.Stubs;
 using Umbraco.Tests.TestHelpers;
 using System.Configuration;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.template;
@@ -33,13 +34,11 @@ namespace Umbraco.Tests.Routing
 			var t = Template.MakeNew("test", new User(0));
 
 			var umbracoContext = GetUmbracoContext(url, t.Id);
-			var contentStore = new DefaultPublishedContentStore();
-            var urlProvider = new UrlProvider(umbracoContext, contentStore, new IUrlProvider[] { new DefaultUrlProvider() });
+            var urlProvider = new UrlProvider(umbracoContext, new IUrlProvider[] { new DefaultUrlProvider() });
 			var routingContext = new RoutingContext(
 				umbracoContext,
 				lookups,
 				new FakeLastChanceFinder(),
-				contentStore,
                 urlProvider,
                 GetRoutesCache());
 

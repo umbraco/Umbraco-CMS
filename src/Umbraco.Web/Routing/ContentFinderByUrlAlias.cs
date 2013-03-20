@@ -24,8 +24,7 @@ namespace Umbraco.Web.Routing
 
 			if (docRequest.Uri.AbsolutePath != "/") // no alias if "/"
 			{
-				node = docRequest.RoutingContext.PublishedContentStore.GetDocumentByUrlAlias(
-					docRequest.RoutingContext.UmbracoContext, 
+				node = docRequest.RoutingContext.UmbracoContext.ContentCache.GetByUrlAlias(
 					docRequest.HasDomain ? docRequest.Domain.RootNodeId : 0, 
 					docRequest.Uri.GetAbsolutePathDecoded());
 

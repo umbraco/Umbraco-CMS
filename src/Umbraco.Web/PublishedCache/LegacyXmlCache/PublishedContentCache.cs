@@ -2,29 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
-using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
-using Umbraco.Web.Routing;
 using umbraco;
-using umbraco.NodeFactory;
-using umbraco.interfaces;
 using System.Linq;
+using umbraco.BusinessLogic;
+using umbraco.presentation.preview;
 
-namespace Umbraco.Web
+namespace Umbraco.Web.PublishedCache.LegacyXmlCache
 {
-	/// <summary>
-    /// An IPublishedContentStore which uses the Xml cache system to return data
-    /// </summary>
-    internal class DefaultPublishedContentStore : IPublishedContentStore
-	{
+    internal class PublishedContentCache : IPublishedContentCache
+    {
 		#region XPath Strings
 
 		class XPathStringsDefinition
 		{
 			public int Version { get; private set; }
 
-			public string Root { get { return "/root"; } }
+			public static string Root { get { return "/root"; } }
 			public string RootDocuments { get; private set; }
 			public string DescendantDocumentById { get; private set; }
 			public string DescendantDocumentByAlias { get; private set; }
@@ -70,7 +65,7 @@ namespace Umbraco.Web
 			}
 		}
 
-		static XPathStringsDefinition XPathStringsValue = null;
+		static XPathStringsDefinition _xPathStringsValue;
 		static XPathStringsDefinition XPathStrings
 		{
 			get
@@ -80,38 +75,68 @@ namespace Umbraco.Web
 				// that switch schemas fail - so cache and refresh when needed,
 				// ie never when running the actual site
 
-				int version = UmbracoSettings.UseLegacyXmlSchema ? 0 : 1;
-				if (XPathStringsValue == null || XPathStringsValue.Version != version)
-					XPathStringsValue = new XPathStringsDefinition(version);
-				return XPathStringsValue;
+				var version = UmbracoSettings.UseLegacyXmlSchema ? 0 : 1;
+				if (_xPathStringsValue == null || _xPathStringsValue.Version != version)
+					_xPathStringsValue = new XPathStringsDefinition(version);
+				return _xPathStringsValue;
 			}
 		}
 
 		#endregion
 
-		private IPublishedContent ConvertToDocument(XmlNode xmlNode)
+        #region Converters
+
+        private static IPublishedContent ConvertToDocument(XmlNode xmlNode)
 		{
-			if (xmlNode == null)
-				return null;
+		    return xmlNode == null ? null : new Models.XmlPublishedContent(xmlNode);
+		}   
 
-			return new Models.XmlPublishedContent(xmlNode);
-		}
-		
-    	public virtual IPublishedContent GetDocumentById(UmbracoContext umbracoContext, int nodeId)
+        private static IEnumerable<IPublishedContent> ConvertToDocuments(XmlNodeList xmlNodes)
+        {
+            return xmlNodes.Cast<XmlNode>().Select(xmlNode => new Models.XmlPublishedContent(xmlNode));
+        }
+
+        #endregion
+
+        #region Getters
+
+        public virtual IPublishedContent GetById(UmbracoContext umbracoContext, int nodeId)
     	{
-    		if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-
     		return ConvertToDocument(GetXml(umbracoContext).GetElementById(nodeId.ToString()));
     	}
 
-		public IEnumerable<IPublishedContent> GetRootDocuments(UmbracoContext umbracoContext)
+		public IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext)
 		{
 			return (from XmlNode x in GetXml(umbracoContext).SelectNodes(XPathStrings.RootDocuments) select ConvertToDocument(x)).ToList();
 		}
 
-		public IPublishedContent GetDocumentByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null)
+        public IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, string xpath, params XPathVariable[] vars)
         {
-			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (xpath == null) throw new ArgumentNullException("xpath");
+            if (string.IsNullOrWhiteSpace(xpath)) return null;
+
+            var xml = GetXml(umbracoContext);
+            var node = vars == null
+                ? xml.SelectSingleNode(xpath)
+                : xml.SelectSingleNode(xpath, vars);
+            return ConvertToDocument(node);
+        }
+
+        public IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, string xpath, params XPathVariable[] vars)
+        {
+            if (xpath == null) throw new ArgumentNullException("xpath");
+            if (string.IsNullOrWhiteSpace(xpath)) return Enumerable.Empty<IPublishedContent>();
+
+            var xml = GetXml(umbracoContext);
+            var nodes = vars == null
+                ? xml.SelectNodes(xpath)
+                : xml.SelectNodes(xpath, vars);
+            return ConvertToDocuments(nodes);
+        }
+        
+        //FIXME keep here or remove?
+        public IPublishedContent GetByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null)
+        {
 			if (route == null) throw new ArgumentNullException("route");
 
 			//set the default to be what is in the settings
@@ -120,31 +145,31 @@ namespace Umbraco.Web
 			//the route always needs to be lower case because we only store the urlName attribute in lower case
         	route = route.ToLowerInvariant();
 
-			int pos = route.IndexOf('/');
-			string path = pos == 0 ? route : route.Substring(pos);
-			int startNodeId = pos == 0 ? 0 : int.Parse(route.Substring(0, pos));
+			var pos = route.IndexOf('/');
+			var path = pos == 0 ? route : route.Substring(pos);
+			var startNodeId = pos == 0 ? 0 : int.Parse(route.Substring(0, pos));
             IEnumerable<XPathVariable> vars;
 
             var xpath = CreateXpathQuery(startNodeId, path, hideTopLevelNode.Value, out vars);
 
 			//check if we can find the node in our xml cache
-			var found = GetXml(umbracoContext).SelectSingleNode(xpath, vars);
+		    var content = GetSingleByXPath(umbracoContext, xpath, vars == null ? null : vars.ToArray());
 
 			// if hideTopLevelNodePath is true then for url /foo we looked for /*/foo
 			// but maybe that was the url of a non-default top-level node, so we also
 			// have to look for /foo (see note in NiceUrlProvider).
-			if (found == null && hideTopLevelNode.Value && path.Length > 1 && path.IndexOf('/', 1) < 0)
+			if (content == null && hideTopLevelNode.Value && path.Length > 1 && path.IndexOf('/', 1) < 0)
 			{
 				xpath = CreateXpathQuery(startNodeId, path, false, out vars);
-				found = GetXml(umbracoContext).SelectSingleNode(xpath, vars);
+                content = GetSingleByXPath(umbracoContext, xpath, vars == null ? null : vars.ToArray());
 			}
 
-        	return ConvertToDocument(found);
+		    return content;
         }
 
-		public IPublishedContent GetDocumentByUrlAlias(UmbracoContext umbracoContext, int rootNodeId, string alias)
+        // FIXME MOVE THAT ONE OUT OF HERE?
+        public IPublishedContent GetByUrlAlias(UmbracoContext umbracoContext, int rootNodeId, string alias)
         {
-			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
 			if (alias == null) throw new ArgumentNullException("alias");
 
 			// the alias may be "foo/bar" or "/foo/bar"
@@ -153,7 +178,7 @@ namespace Umbraco.Web
 
             alias = alias.TrimStart('/');
             var xpathBuilder = new StringBuilder();
-            xpathBuilder.Append(XPathStrings.Root);
+            xpathBuilder.Append(XPathStringsDefinition.Root);
 
 			if (rootNodeId > 0)
 				xpathBuilder.AppendFormat(XPathStrings.DescendantDocumentById, rootNodeId);
@@ -169,26 +194,75 @@ namespace Umbraco.Web
 
 			var xpath = xpathBuilder.ToString();
 
-			return ConvertToDocument(GetXml(umbracoContext).SelectSingleNode(xpath, var));
+		    return GetSingleByXPath(umbracoContext, xpath, var);
         }
 
-        public bool HasContent(UmbracoContext umbracoContext)
+        public bool HasContent()
         {
-	        var xml = GetXml(umbracoContext);
+	        var xml = GetXml();
 			if (xml == null)
 				return false;
 			var node = xml.SelectSingleNode(XPathStrings.RootDocuments);
 			return node != null;
         }
 
-		XmlDocument GetXml(UmbracoContext umbracoContext)
-		{
-			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+        #endregion
 
-			return umbracoContext.GetXml();
-		}
+        #region Legacy Xml
 
-		static readonly char[] SlashChar = new char[] { '/' };
+        private PreviewContent _previewContent;
+        private Func<User, bool, XmlDocument> _xmlDelegate;
+
+        /// <summary>
+        /// Gets/sets the delegate used to retreive the Xml content, generally the setter is only used for unit tests
+        /// and by default if it is not set will use the standard delegate which ONLY works when in the context an Http Request
+        /// </summary>
+        /// <remarks>
+        /// If not defined, we will use the standard delegate which ONLY works when in the context an Http Request
+        /// mostly because the 'content' object heavily relies on HttpContext, SQL connections and a bunch of other stuff
+        /// that when run inside of a unit test fails.
+        /// </remarks>
+        internal Func<User, bool, XmlDocument> GetXmlDelegate
+        {
+            get
+            {
+                return _xmlDelegate ?? (_xmlDelegate = (user, preview) =>
+                {
+                    if (preview)
+                    {
+                        if (_previewContent == null)
+                        {
+                            _previewContent = new PreviewContent(user, new Guid(global::umbraco.BusinessLogic.StateHelper.Cookies.Preview.GetValue()), true);
+                            if (_previewContent.ValidPreviewSet)
+                                _previewContent.LoadPreviewset();
+                        }
+                        if (_previewContent.ValidPreviewSet)
+                            return _previewContent.XmlContent;
+                    }
+                    return content.Instance.XmlContent;
+                });
+            }
+            set
+            {
+                _xmlDelegate = value;
+            }
+        }
+
+        internal XmlDocument GetXml(UmbracoContext umbracoContext)
+        {
+            return GetXmlDelegate(umbracoContext.UmbracoUser, umbracoContext.InPreviewMode);
+        }
+
+        internal XmlDocument GetXml()
+        {
+            return GetXmlDelegate(null, false);
+        }
+
+        #endregion
+
+        #region XPathQuery
+
+        static readonly char[] SlashChar = new[] { '/' };
 
         protected string CreateXpathQuery(int startNodeId, string path, bool hideTopLevelNodeFromPath, out IEnumerable<XPathVariable> vars)
         {
@@ -201,7 +275,7 @@ namespace Umbraco.Web
                 if (startNodeId > 0)
                 {
 					// if in a domain then use the root node of the domain
-					xpath = string.Format(XPathStrings.Root + XPathStrings.DescendantDocumentById, startNodeId);                    
+					xpath = string.Format(XPathStringsDefinition.Root + XPathStrings.DescendantDocumentById, startNodeId);                    
                 }
                 else
                 {
@@ -234,11 +308,11 @@ namespace Umbraco.Web
 					if (hideTopLevelNodeFromPath)
 						xpathBuilder.Append(XPathStrings.RootDocuments); // first node is not in the url
 					else
-						xpathBuilder.Append(XPathStrings.Root);
+						xpathBuilder.Append(XPathStringsDefinition.Root);
                 }
                 else
                 {
-					xpathBuilder.AppendFormat(XPathStrings.Root + XPathStrings.DescendantDocumentById, startNodeId);
+					xpathBuilder.AppendFormat(XPathStringsDefinition.Root + XPathStrings.DescendantDocumentById, startNodeId);
 					// always "hide top level" when there's a domain
                 }
 
@@ -267,5 +341,7 @@ namespace Umbraco.Web
 
             return xpath;
         }
+
+        #endregion
     }
 }

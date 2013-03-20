@@ -5,6 +5,7 @@ using System.Threading;
 
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Web.PublishedCache;
 using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Web.Routing
@@ -20,7 +21,6 @@ namespace Umbraco.Web.Routing
         /// Gets the nice url of a published content.
         /// </summary>
         /// <param name="umbracoContext">The Umbraco context.</param>
-        /// <param name="contentCache">The content cache.</param>
         /// <param name="id">The published content id.</param>
         /// <param name="current">The current absolute url.</param>
         /// <param name="mode">The url mode.</param>
@@ -29,7 +29,7 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
         /// <para>If the provider is unable to provide a url, it should return <c>null</c>.</para>
         /// </remarks>
-        public virtual string GetUrl(UmbracoContext umbracoContext, IPublishedContentStore contentCache, int id, Uri current, UrlProviderMode mode)
+        public virtual string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode)
         {
             DomainAndUri domainUri;
             string path;
@@ -55,7 +55,7 @@ namespace Umbraco.Web.Routing
             else
             {
                 // there was no route in the cache - create a route
-                var node = contentCache.GetDocumentById(umbracoContext, id);
+                var node = umbracoContext.ContentCache.GetById(id);
                 if (node == null)
                 {
                     LogHelper.Warn<DefaultUrlProvider>(
@@ -83,7 +83,7 @@ namespace Umbraco.Web.Routing
 
                 // no domain, respect HideTopLevelNodeFromPath for legacy purposes
                 if (domainUri == null && global::umbraco.GlobalSettings.HideTopLevelNodeFromPath)
-                    ApplyHideTopLevelNodeFromPath(umbracoContext, contentCache, node, pathParts);
+                    ApplyHideTopLevelNodeFromPath(umbracoContext, node, pathParts);
 
                 // assemble the route
                 pathParts.Reverse();
@@ -107,7 +107,6 @@ namespace Umbraco.Web.Routing
         /// Gets the other urls of a published content.
         /// </summary>
         /// <param name="umbracoContext">The Umbraco context.</param>
-        /// <param name="contentCache">The content cache.</param>
         /// <param name="id">The published content id.</param>
         /// <param name="current">The current absolute url.</param>
         /// <returns>The other urls for the published content.</returns>
@@ -115,7 +114,7 @@ namespace Umbraco.Web.Routing
         /// <para>Other urls are those that <c>GetUrl</c> would not return in the current context, but would be valid
         /// urls for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// </remarks>
-        public virtual IEnumerable<string> GetOtherUrls(UmbracoContext umbracoContext, IPublishedContentStore contentCache, int id, Uri current)
+        public virtual IEnumerable<string> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
             string path;
             IEnumerable<DomainAndUri> domainUris;
@@ -136,7 +135,7 @@ namespace Umbraco.Web.Routing
             else
             {
                 // there was no route in the cache - create a route
-                var node = contentCache.GetDocumentById(umbracoContext, id);
+                var node = umbracoContext.ContentCache.GetById(id);
                 if (node == null)
                 {
                     LogHelper.Warn<DefaultUrlProvider>(
@@ -164,7 +163,7 @@ namespace Umbraco.Web.Routing
 
                 // no domain, respect HideTopLevelNodeFromPath for legacy purposes
                 if (domainUris == null && global::umbraco.GlobalSettings.HideTopLevelNodeFromPath)
-                    ApplyHideTopLevelNodeFromPath(umbracoContext, contentCache, node, pathParts);
+                    ApplyHideTopLevelNodeFromPath(umbracoContext, node, pathParts);
 
                 // assemble the route
                 pathParts.Reverse();
@@ -272,7 +271,7 @@ namespace Umbraco.Web.Routing
             return uris.Select(UriUtility.UriFromUmbraco);
         }
 
-        static void ApplyHideTopLevelNodeFromPath(UmbracoContext umbracoContext, IPublishedContentStore contentCache, Core.Models.IPublishedContent node, IList<string> pathParts)
+        static void ApplyHideTopLevelNodeFromPath(UmbracoContext umbracoContext, Core.Models.IPublishedContent node, IList<string> pathParts)
         {
             // in theory if hideTopLevelNodeFromPath is true, then there should be only once
             // top-level node, or else domains should be assigned. but for backward compatibility
@@ -284,7 +283,7 @@ namespace Umbraco.Web.Routing
             // that's the way it works pre-4.10 and we try to be backward compat for the time being
             if (node.Parent == null)
             {
-                var rootNode = contentCache.GetDocumentByRoute(umbracoContext, "/", true);
+                var rootNode = umbracoContext.ContentCache.GetByRoute("/", true);
                 if (rootNode.Id == node.Id) // remove only if we're the default node
                     pathParts.RemoveAt(pathParts.Count - 1);
             }

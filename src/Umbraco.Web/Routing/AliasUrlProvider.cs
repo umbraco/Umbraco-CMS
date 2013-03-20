@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Routing
 {
@@ -20,7 +21,6 @@ namespace Umbraco.Web.Routing
         /// Gets the nice url of a published content.
         /// </summary>
         /// <param name="umbracoContext">The Umbraco context.</param>
-        /// <param name="contentCache">The content cache.</param>
         /// <param name="id">The published content id.</param>
         /// <param name="current">The current absolute url.</param>
         /// <param name="mode">The url mode.</param>
@@ -30,7 +30,7 @@ namespace Umbraco.Web.Routing
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// <para>If the provider is unable to provide a url, it should return <c>null</c>.</para>
         /// </remarks>
-        public string GetUrl(UmbracoContext umbracoContext, IPublishedContentStore contentCache, int id, Uri current, UrlProviderMode mode)
+        public string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode)
         {
             return null; // we have nothing to say
         }
@@ -43,7 +43,6 @@ namespace Umbraco.Web.Routing
         /// Gets the other urls of a published content.
         /// </summary>
         /// <param name="umbracoContext">The Umbraco context.</param>
-        /// <param name="contentCache">The content cache.</param>
         /// <param name="id">The published content id.</param>
         /// <param name="current">The current absolute url.</param>
         /// <returns>The other urls for the published content.</returns>
@@ -51,12 +50,12 @@ namespace Umbraco.Web.Routing
         /// <para>Other urls are those that <c>GetUrl</c> would not return in the current context, but would be valid
         /// urls for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// </remarks>
-        public IEnumerable<string> GetOtherUrls(UmbracoContext umbracoContext, IPublishedContentStore contentCache, int id, Uri current)
+        public IEnumerable<string> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
             if (!FindByUrlAliasEnabled)
                 return Enumerable.Empty<string>(); // we have nothing to say
 
-            var node = contentCache.GetDocumentById(umbracoContext, id);
+            var node = umbracoContext.ContentCache.GetById(id);
             string umbracoUrlName = null;
             if (node.HasProperty(Constants.Conventions.Content.UrlAlias))
                 umbracoUrlName = node.GetPropertyValue<string>(Constants.Conventions.Content.UrlAlias);
