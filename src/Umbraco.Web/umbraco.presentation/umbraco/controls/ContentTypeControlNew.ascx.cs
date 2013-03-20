@@ -194,11 +194,6 @@ namespace umbraco.controls
             // reload content type (due to caching)
             LoadContentType();
 
-            // Only if the doctype alias changed, cause a regeneration of the xml cache file since
-            // the xml element names will need to be updated to reflect the new alias
-            if (docTypeAliasChanged)
-                RegenerateXmlCaches();
-
             BindDataGenericProperties(true);
 
             // we need to re-bind the alias as the SafeAlias method can have changed it
@@ -236,16 +231,7 @@ namespace umbraco.controls
                 _contentType = new ContentType(docTypeId);
             }
         }
-
-        /// <summary>
-        /// Regenerates the XML caches. Used after a document type alias has been changed.
-        /// </summary>
-        private void RegenerateXmlCaches()
-        {
-            Document.RePublishAll();
-            library.RefreshContent();
-        }
-
+        
         /// <summary>
         /// Updates the Node in the Tree
         /// </summary>
