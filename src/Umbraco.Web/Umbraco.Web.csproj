@@ -320,6 +320,7 @@
     <Compile Include="BaseRest\RestExtensionAttribute.cs" />
     <Compile Include="BaseRest\RestExtensionMethodAttribute.cs" />
     <Compile Include="BaseRest\RestExtensionMethodInfo.cs" />
+    <Compile Include="ContextualPublishedCacheExtensions.cs" />
     <Compile Include="PublishedCache\ContextualPublishedContentCache.cs" />
     <Compile Include="PublishedCache\ContextualPublishedCache.cs" />
     <Compile Include="PublishedCache\ContextualPublishedMediaCache.cs" />
