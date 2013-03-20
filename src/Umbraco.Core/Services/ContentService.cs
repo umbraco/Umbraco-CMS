@@ -470,7 +470,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// This will rebuild the xml structures for content in the database. 
         /// </summary>
-        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="userId">This is not used for anything</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
         /// <remarks>
         /// This is used for when a document type alias or a document type property is changed, the xml will need to 
@@ -490,7 +490,26 @@ namespace Umbraco.Core.Services
             }            
         }
 
-	    /// <summary>
+        /// <summary>
+        /// This will rebuild the xml structures for content in the database. 
+        /// </summary>
+        /// <param name="contentTypeIds">
+        /// If specified will only rebuild the xml for the content type's specified, otherwise will update the structure
+        /// for all published content.
+        /// </param>
+        internal void RePublishAll(params int[] contentTypeIds)
+        {
+            try
+            {
+                RePublishAllDo(contentTypeIds);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<ContentService>("An error occurred executing RePublishAll", ex);
+            }     
+        }
+
+        /// <summary>
         /// Publishes a single <see cref="IContent"/> object
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to publish</param>

@@ -19,6 +19,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
             content.PropertyValues(obj);
 
+            content.ResetDirtyProperties(false);
+
             return content;
         }
 
@@ -34,6 +36,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
                 };
 
             content.PropertyValues(obj);
+
+            content.ResetDirtyProperties(false);
 
             return content;
         }
@@ -51,6 +55,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
 			content.PropertyValues(obj);
 
+            content.ResetDirtyProperties(false);
+
 			return content;
 		}
 
@@ -67,6 +73,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
                 };
 
             content.PropertyValues(obj);
+
+            content.ResetDirtyProperties(false);
 
             return content;
         }
@@ -89,6 +97,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
                     };
 
                 content.PropertyValues(obj);
+
+                content.ResetDirtyProperties(false);
+
                 list.Add(content);
             }
 

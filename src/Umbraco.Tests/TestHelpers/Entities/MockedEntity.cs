@@ -17,4 +17,10 @@ namespace Umbraco.Tests.TestHelpers.Entities
         [DataMember]
         public string Value { get; set; }
     }
+
+    public class CustomMockedEntity : MockedEntity
+    {
+        [DataMember]
+        public string Title { get; set; }
+    }
 }

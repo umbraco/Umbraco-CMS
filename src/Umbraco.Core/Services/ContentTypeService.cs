@@ -8,6 +8,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -116,6 +117,56 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// This is called after an IContentType is saved and is used to update the content xml structures in the database
+        /// if they are required to be updated.
+        /// </summary>
+        /// <param name="contentTypes"></param>
+        private void UpdateContentXmlStructure(params IContentType[] contentTypes)
+        {
+
+            var toUpdate = new List<IContentType>();
+
+            foreach (var contentType in contentTypes)
+            {
+                //we need to determine if we need to refresh the xml content in the database. This is to be done when:
+                // - a content type changes it's alias
+                // - if a content type has it's property removed
+                //here we need to check if the alias of the content type changed or if one of the properties was removed.                    
+                var dirty = contentType as IRememberBeingDirty;
+                if (dirty != null && (dirty.WasPropertyDirty("Alias") || dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved")))
+                {
+                    //if the alias was changed then we only need to update the xml structures for content of the current content type.
+                    //if a property was deleted then we need to update the xml structures for any content of the current content type
+                    // and any of the content type's child content types.
+                    if (dirty.WasPropertyDirty("Alias") && !dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved"))
+                    {
+                        //if only the alias changed then only update the current content type                        
+                        toUpdate.Add(contentType);
+                    }
+                    else
+                    {
+                        //if a property was deleted (and maybe the alias changed too), the update all content of the current content type
+                        // and all of it's desscendant doc types.     
+                        toUpdate.AddRange(contentType.DescendantsAndSelf());
+                    }                    
+                }
+            }
+
+            var typedContentService = _contentService as ContentService;
+            if (typedContentService != null && toUpdate.Any())
+            {
+                typedContentService.RePublishAll(toUpdate.Select(x => x.Id).ToArray());
+            }
+            else if (toUpdate.Any())
+            {
+                //this should never occur, the content service should always be typed but we'll check anyways.
+                _contentService.RePublishAll();
+            }
+
+            
+        }
+
+        /// <summary>
         /// Saves a single <see cref="IContentType"/> object
         /// </summary>
         /// <param name="contentType"><see cref="IContentType"/> to save</param>
@@ -124,18 +175,21 @@ namespace Umbraco.Core.Services
         {
 	        if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(contentType), this)) 
 				return;
-	        
-			var uow = _uowProvider.GetUnitOfWork();
-	        using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
-	        {
-		        contentType.CreatorId = userId;
-		        repository.AddOrUpdate(contentType);
 
-		        uow.Commit();
+            using (new WriteLock(Locker))
+            {
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
+                {
+                    contentType.CreatorId = userId;
+                    repository.AddOrUpdate(contentType);
 
-				SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(contentType, false), this);
-	        }
+                    uow.Commit();
+                }
 
+                UpdateContentXmlStructure(contentType);
+            }
+            SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(contentType, false), this);
 	        Audit.Add(AuditTypes.Save, string.Format("Save ContentType performed by user"), userId, contentType.Id);
         }
 
@@ -146,24 +200,30 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the ContentType</param>
         public void Save(IEnumerable<IContentType> contentTypes, int userId = 0)
         {
-	        if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(contentTypes), this)) 
+            var asArray = contentTypes.ToArray();
+
+            if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(asArray), this)) 
 				return;
-	        
-			var uow = _uowProvider.GetUnitOfWork();
-	        using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
-	        {
-		        foreach (var contentType in contentTypes)
-		        {
-		            contentType.CreatorId = userId;
-			        repository.AddOrUpdate(contentType);					
-		        }
 
-				//save it all in one go
-				uow.Commit();
+            using (new WriteLock(Locker))
+            {
 
-		        SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(contentTypes, false), this);
-	        }
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
+                {
+                    foreach (var contentType in asArray)
+                    {
+                        contentType.CreatorId = userId;
+                        repository.AddOrUpdate(contentType);
+                    }
 
+                    //save it all in one go
+                    uow.Commit();
+                }
+
+                UpdateContentXmlStructure(asArray);
+            }
+            SavedContentType.RaiseEvent(new SaveEventArgs<IContentType>(asArray, false), this);
 	        Audit.Add(AuditTypes.Save, string.Format("Save ContentTypes performed by user"), userId, -1);
         }
 
@@ -205,13 +265,14 @@ namespace Umbraco.Core.Services
         /// </remarks>
         public void Delete(IEnumerable<IContentType> contentTypes, int userId = 0)
         {
-	        if (DeletingContentType.IsRaisedEventCancelled(new DeleteEventArgs<IContentType>(contentTypes), this)) 
+            var asArray = contentTypes.ToArray();
+
+            if (DeletingContentType.IsRaisedEventCancelled(new DeleteEventArgs<IContentType>(asArray), this)) 
 				return;
 
             using (new WriteLock(Locker))
             {
-                var contentTypeList = contentTypes.ToList();
-                foreach (var contentType in contentTypeList)
+                foreach (var contentType in asArray)
                 {
                     _contentService.DeleteContentOfType(contentType.Id);
                 }
@@ -219,14 +280,14 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
                 {
-                    foreach (var contentType in contentTypeList)
+                    foreach (var contentType in asArray)
                     {
                         repository.Delete(contentType);
                     }
 
                     uow.Commit();
 
-                    DeletedContentType.RaiseEvent(new DeleteEventArgs<IContentType>(contentTypes, false), this);
+                    DeletedContentType.RaiseEvent(new DeleteEventArgs<IContentType>(asArray, false), this);
                 }
 
                 Audit.Add(AuditTypes.Delete, string.Format("Delete ContentTypes performed by user"), userId, -1);
@@ -335,14 +396,16 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user savging the MediaTypes</param>
         public void Save(IEnumerable<IMediaType> mediaTypes, int userId = 0)
         {
-			if (SavingMediaType.IsRaisedEventCancelled(new SaveEventArgs<IMediaType>(mediaTypes), this))
+            var asArray = mediaTypes.ToArray();
+
+            if (SavingMediaType.IsRaisedEventCancelled(new SaveEventArgs<IMediaType>(asArray), this))
 				return;
 
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
 			{
 
-				foreach (var mediaType in mediaTypes)
+                foreach (var mediaType in asArray)
 				{
 					mediaType.CreatorId = userId;
 					repository.AddOrUpdate(mediaType);					
@@ -351,7 +414,7 @@ namespace Umbraco.Core.Services
 				//save it all in one go
 				uow.Commit();
 
-				SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(mediaTypes, false), this);
+                SavedMediaType.RaiseEvent(new SaveEventArgs<IMediaType>(asArray, false), this);
 			}
 
 			Audit.Add(AuditTypes.Save, string.Format("Save MediaTypes performed by user"), userId, -1);
@@ -392,13 +455,14 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         /// <remarks>Deleting a <see cref="IMediaType"/> will delete all the <see cref="IMedia"/> objects based on this <see cref="IMediaType"/></remarks>
         public void Delete(IEnumerable<IMediaType> mediaTypes, int userId = 0)
-        {            
-	        if (DeletingMediaType.IsRaisedEventCancelled(new DeleteEventArgs<IMediaType>(mediaTypes), this)) 
+        {
+            var asArray = mediaTypes.ToArray();
+
+            if (DeletingMediaType.IsRaisedEventCancelled(new DeleteEventArgs<IMediaType>(asArray), this)) 
 				return;
             using (new WriteLock(Locker))
             {
-                var mediaTypeList = mediaTypes.ToList();
-                foreach (var mediaType in mediaTypeList)
+                foreach (var mediaType in asArray)
                 {
                     _mediaService.DeleteMediaOfType(mediaType.Id);
                 }
@@ -406,13 +470,13 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
                 {
-                    foreach (var mediaType in mediaTypeList)
+                    foreach (var mediaType in asArray)
                     {
                         repository.Delete(mediaType);
                     }
                     uow.Commit();
 
-                    DeletedMediaType.RaiseEvent(new DeleteEventArgs<IMediaType>(mediaTypes, false), this);
+                    DeletedMediaType.RaiseEvent(new DeleteEventArgs<IMediaType>(asArray, false), this);
                 }
 
                 Audit.Add(AuditTypes.Delete, string.Format("Delete MediaTypes performed by user"), userId, -1);

@@ -114,6 +114,7 @@
     <Compile Include="CodeAnnotations\UmbracoWillObsoleteAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoExperimentalFeatureAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoProposedPublicAttribute.cs" />
+    <Compile Include="ConcurrentHashSet.cs" />
     <Compile Include="Configuration\CaseInsensitiveEnumConfigConverter.cs" />
     <Compile Include="Configuration\ClientDependencyConfiguration.cs" />
     <Compile Include="Configuration\ConfigurationKeyAttribute.cs" />
@@ -160,6 +161,7 @@
     <Compile Include="Media\IImageUrlProvider.cs" />
     <Compile Include="Models\ContentTypeBase.cs" />
     <Compile Include="Models\ContentTypeCompositionBase.cs" />
+    <Compile Include="Models\ContentTypeExtensions.cs" />
     <Compile Include="Models\ContentTypeSort.cs" />
     <Compile Include="Models\Css\CssCompactor.cs" />
     <Compile Include="Models\Css\CssParser.cs" />
@@ -736,7 +738,7 @@
     <Compile Include="Constants-ObjectTypes.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
-	<Compile Include="Constants-Conventions.cs">
+    <Compile Include="Constants-Conventions.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     <Compile Include="UpgradeableReadLock.cs" />

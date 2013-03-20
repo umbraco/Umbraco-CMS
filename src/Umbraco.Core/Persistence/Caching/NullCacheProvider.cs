@@ -46,6 +46,11 @@ namespace Umbraco.Core.Persistence.Caching
             return;
         }
 
+        public void Clear(Type type)
+        {
+            return;
+        }
+
         #endregion
     }
 }

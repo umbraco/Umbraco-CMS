@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Caching;
 using System.Threading;
 using Umbraco.Core.Models.EntityBase;
@@ -25,7 +26,7 @@ namespace Umbraco.Core.Persistence.Caching
         #endregion
 
         //TODO Save this in cache as well, so its not limited to a single server usage
-        private ConcurrentDictionary<string, string> _keyTracker = new ConcurrentDictionary<string, string>();
+        private readonly ConcurrentHashSet<string> _keyTracker = new ConcurrentHashSet<string>();
         private ObjectCache _memoryCache = new MemoryCache("in-memory");
         private static readonly ReaderWriterLockSlim ClearLock = new ReaderWriterLockSlim();
 
@@ -46,7 +47,7 @@ namespace Umbraco.Core.Persistence.Caching
 
         public IEnumerable<IEntity> GetAllByType(Type type)
         {
-            foreach (var key in _keyTracker.Keys)
+            foreach (var key in _keyTracker)
             {
                 if (key.StartsWith(type.Name))
                 {
@@ -59,8 +60,7 @@ namespace Umbraco.Core.Persistence.Caching
         {
             var key = GetCompositeId(type, entity.Id);
             var exists = _memoryCache.GetCacheItem(key) != null;
-
-            _keyTracker.TryAdd(key, key);
+            _keyTracker.TryAdd(key);
             if (exists)
             {
                 _memoryCache.Set(key, entity, new CacheItemPolicy { SlidingExpiration = TimeSpan.FromMinutes(5) });
@@ -72,16 +72,37 @@ namespace Umbraco.Core.Persistence.Caching
 
         public void Delete(Type type, IEntity entity)
         {
-            string throwaway = null;
             var key = GetCompositeId(type, entity.Id);
-            var keyBeSure = _keyTracker.TryGetValue(key, out throwaway);
-            object itemRemoved = _memoryCache.Remove(key);
-            _keyTracker.TryRemove(key, out throwaway);
+            _memoryCache.Remove(key);
+            _keyTracker.Remove(key);
+        }
+
+        /// <summary>
+        /// Clear cache by type
+        /// </summary>
+        /// <param name="type"></param>
+        public void Clear(Type type)
+        {
+            using (new WriteLock(ClearLock))
+            {
+                var keys = new string[_keyTracker.Count];
+                _keyTracker.CopyTo(keys, 0);
+                var keysToRemove = new List<string>();
+                foreach (var key in keys.Where(x => x.StartsWith(string.Format("{0}-", type.Name))))
+                {
+                    _keyTracker.Remove(key);
+                    keysToRemove.Add(key);
+                }
+                foreach (var key in keysToRemove)
+                {
+                    _memoryCache.Remove(key);
+                }
+            }
         }
 
         public void Clear()
         {
-            using (new ReadLock(ClearLock))
+            using (new WriteLock(ClearLock))
             {
                 _keyTracker.Clear();
                 _memoryCache.DisposeIfDisposable();

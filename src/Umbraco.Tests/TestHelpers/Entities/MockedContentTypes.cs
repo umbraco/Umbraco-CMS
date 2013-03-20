@@ -7,12 +7,12 @@ namespace Umbraco.Tests.TestHelpers.Entities
 {
     public class MockedContentTypes
     {
-        public static ContentType CreateTextpageContentType()
+        public static ContentType CreateTextpageContentType(string alias = "textPage", string name = "Text Page")
         {
             var contentType = new ContentType(-1)
                                   {
-                                      Alias = "textPage",
-                                      Name = "Text Page",
+                                      Alias = alias,
+                                      Name = name,
                                       Description = "ContentType used for Text pages",
                                       Icon = ".sprTreeDoc3",
                                       Thumbnail = "doc.png",
@@ -31,6 +31,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
             contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
             contentType.PropertyGroups.Add(new PropertyGroup(metaCollection) { Name = "Meta", SortOrder = 2 });
+
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
 
             return contentType;
         }
@@ -54,6 +57,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
             metaCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "metadescription", Name = "Meta Description", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -89 });
 
             contentType.PropertyGroups.Add(new PropertyGroup(metaCollection) { Name = "Meta", SortOrder = 2 });
+
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
 
             return contentType;
         }
@@ -79,6 +85,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
             contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
 
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
+
             return contentType;
         }
 
@@ -101,6 +110,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
 			contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Ntext) { Alias = "author", Name = "Author", Description = "Name of the author", HelpText = "", Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -88 });
 
 			contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
 
 			return contentType;
 		}	    
@@ -126,6 +138,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
             contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
 
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
+
             return contentType;
         }
 
@@ -144,6 +159,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                   };
 
             contentType.PropertyGroups.Add(new PropertyGroup(collection) { Name = "Content", SortOrder = 1 });
+
+            //ensure that nothing is marked as dirty
+            contentType.ResetDirtyProperties(false);
 
             return contentType;
         }
@@ -167,6 +185,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Nvarchar) { Alias = "videoFile", Name = "Video File", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
 
             mediaType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Media", SortOrder = 1 });
+
+            //ensure that nothing is marked as dirty
+            mediaType.ResetDirtyProperties(false);
 
             return mediaType;
         }
@@ -193,6 +214,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentCollection.Add(new PropertyType(new Guid(), DataTypeDatabaseType.Integer) { Alias = Constants.Conventions.Media.Extension, Name = "File Extension", Description = "", HelpText = "", Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -90 });
 
             mediaType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Media", SortOrder = 1 });
+
+            //ensure that nothing is marked as dirty
+            mediaType.ResetDirtyProperties(false);
 
             return mediaType;
         }

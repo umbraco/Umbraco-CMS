@@ -45,5 +45,11 @@ namespace Umbraco.Core.Persistence.Caching
         /// <param name="type"></param>
         /// <param name="entity"></param>
         void Delete(Type type, IEntity entity);
+
+        /// <summary>
+        /// Clears the cache by type
+        /// </summary>
+        /// <param name="type"></param>
+        void Clear(Type type);
     }
 }
