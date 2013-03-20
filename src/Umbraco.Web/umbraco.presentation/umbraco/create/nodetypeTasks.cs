@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Core;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -68,11 +69,11 @@ namespace umbraco
 
         public bool Delete()
         {
-            new cms.businesslogic.web.DocumentType(ParentID).delete();
-
-            //after a document type is deleted, we clear the cache, as some content will now have disappeared.
-            library.RefreshContent();
-
+            var docType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(ParentID);
+            if (docType != null)
+            {
+                ApplicationContext.Current.Services.ContentTypeService.Delete(docType);
+            }
             return false;
         }
 

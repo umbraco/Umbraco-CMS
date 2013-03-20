@@ -8,6 +8,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 
 namespace Umbraco.Web.Cache
 {
@@ -87,7 +89,8 @@ namespace Umbraco.Web.Cache
         /// - ContentType.RemoveFromDataTypeCache (clears static object/dictionary cache)
         /// - InMemoryCacheProvider.Current.Clear();
         /// - RuntimeCacheProvider.Current.Clear(); 
-        ///         
+        /// - RoutesCache.Clear();        
+        /// 
         /// TODO: Needs to update any content items that this effects for the xml cache... 
         ///       it is only handled in the ContentTypeControlNew.ascx, not by business logic/events. - The xml cache needs to be updated 
         ///       when the doc type alias changes or when a property type is removed, the ContentService.RePublishAll should be executed anytime either of these happens.
@@ -101,12 +104,17 @@ namespace Umbraco.Web.Cache
                     //clear the cache for each item
                     ClearContentTypeCache(contentType);
 
-                    //here we need to check if the alias of the content type changed or if one of the properties was removed.                    
-                    var dirty = contentType as IRememberBeingDirty;
-                    if (dirty == null) return;
-                    if (dirty.WasPropertyDirty("Alias") || dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved"))
+                    //we only need to do this for IContentType NOT for IMediaType, we don't want to refresh the whole cache
+                    //if a media type has changed.
+                    if (contentType is IContentType)
                     {
-                        needsContentRefresh = true;
+                        //here we need to check if the alias of the content type changed or if one of the properties was removed.                    
+                        var dirty = contentType as IRememberBeingDirty;
+                        if (dirty == null) return;
+                        if (dirty.WasPropertyDirty("Alias") || dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved"))
+                        {
+                            needsContentRefresh = true;
+                        }
                     }
                 });
 
@@ -121,7 +129,20 @@ namespace Umbraco.Web.Cache
             if (contentTypes.Any())
             {
                 InMemoryCacheProvider.Current.Clear();
-                RuntimeCacheProvider.Current.Clear();   
+                RuntimeCacheProvider.Current.Clear();
+
+                //we only need to do this for IContentType NOT for IMediaType, we don't want to refresh the whole routes
+                //cache if only a media type has changed.
+                if (contentTypes.Any(x => x is IContentType))
+                {
+                    //we need to clear the routes cache here!
+                    //TODO: Is there a better way to handle this without casting ?
+                    var contentCache = PublishedContentCacheResolver.Current.ContentCache as PublishedContentCache;
+                    if (contentCache != null)
+                    {
+                        contentCache.RoutesCache.Clear();
+                    }
+                }                
             }
         }
 

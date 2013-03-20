@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web.Security;
+using Umbraco.Core;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -57,7 +58,11 @@ namespace umbraco
 
         public bool Delete()
         {
-            new cms.businesslogic.media.MediaType(_parentID).delete();
+            var mediaType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(ParentID);
+            if (mediaType != null)
+            {
+                ApplicationContext.Current.Services.ContentTypeService.Delete(mediaType);
+            }
             return false;
         }
 
