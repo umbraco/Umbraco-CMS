@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml.Linq;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
@@ -178,6 +180,7 @@ namespace Umbraco.Core.Services
         {
             throw new NotImplementedException();
         }
+
         #endregion
 
         #region ContentTypes
@@ -191,13 +194,15 @@ namespace Umbraco.Core.Services
         public IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = 0)
         {
             var name = element.Name.LocalName;
-            if (name.Equals("DocumentTypes") == false)
+            if (name.Equals("DocumentTypes") == false && name.Equals("DocumentType"))
             {
-                throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called 'DocumentTypes'.");
+                throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called 'DocumentTypes' for multiple imports or 'DocumentType' for a single import.");
             }
 
             _importedContentTypes = new Dictionary<string, IContentType>();
-            var documentTypes = (from doc in element.Elements("DocumentType") select doc).ToList();
+            var documentTypes = name.Equals("DocumentTypes")
+                                    ? (from doc in element.Elements("DocumentType") select doc).ToList()
+                                    : new List<XElement> {element.Element("DocumentType")};
             //NOTE it might be an idea to sort the doctype XElements based on dependencies
             //before creating the doc types - should also allow for a better structure/inheritance support.
             foreach (var documentType in documentTypes)
@@ -438,6 +443,7 @@ namespace Umbraco.Core.Services
                 return contentType;
             }
         }
+
         #endregion
 
         #region DataTypes
@@ -494,6 +500,109 @@ namespace Umbraco.Core.Services
                 _dataTypeService.SavePreValues(dataTypeDefinition.Id, values);
             }
         }
+        #endregion
+
+        #region Dictionary Items
+        #endregion
+
+        #region Files
+        #endregion
+
+        #region Languages
+        #endregion
+
+        #region Macros
+        #endregion
+
+        #region Media
+        #endregion
+
+        #region MediaTypes
+        #endregion
+
+        #region Package Manifest
+        #endregion
+
+        #region Templates
+
+        /// <summary>
+        /// Imports and saves package xml as <see cref="ITemplate"/>
+        /// </summary>
+        /// <param name="element">Xml to import</param>
+        /// <param name="userId">Optional user id</param>
+        /// <returns>An enumrable list of generated Templates</returns>
+        public IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = 0)
+        {
+            var name = element.Name.LocalName;
+            if (name.Equals("Templates") == false && name.Equals("Template"))
+            {
+                throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called 'Templates' for multiple imports or 'Template' for a single import.");
+            }
+
+            var templates = new List<ITemplate>();
+            var templateElements = name.Equals("Templates")
+                                       ? (from doc in element.Elements("Template") select doc).ToList()
+                                       : new List<XElement> { element.Element("Template") };
+
+            var fields = new List<TopologicalSorter.DependencyField<XElement>>();
+            foreach (XElement tempElement in templateElements)
+            {
+                var dependencies = new List<string>();
+                if(tempElement.Element("Master") != null && string.IsNullOrEmpty(tempElement.Element("Master").Value) == false)
+                    dependencies.Add(tempElement.Element("Master").Value);
+
+                var field = new TopologicalSorter.DependencyField<XElement>
+                                {
+                                    Alias = tempElement.Element("Alias").Value,
+                                    Item = new Lazy<XElement>(() => tempElement),
+                                    DependsOn = dependencies.ToArray()
+                                };
+
+                fields.Add(field);
+            }
+            //Sort templates by dependencies to a potential master template
+            var sortedElements = TopologicalSorter.RetrieveMappedItems(fields);
+            foreach (var templateElement in sortedElements)
+            {
+                var templateName = templateElement.Element("Name").Value;
+                var alias = templateElement.Element("Alias").Value;
+                var design = templateElement.Element("Design").Value;
+                var masterElement = templateElement.Element("Master");
+
+                var isMasterPage = IsMasterPageSyntax(design);
+                var path = isMasterPage ? MasterpagePath(alias) : ViewPath(alias);
+
+                var template = new Template(path, templateName, alias) { Content = design };
+                if (masterElement != null && string.IsNullOrEmpty(masterElement.Value) == false)
+                {
+                    template.MasterTemplateAlias = masterElement.Value;
+                    var masterTemplate = templates.FirstOrDefault(x => x.Alias == masterElement.Value);
+                    if(masterTemplate != null)
+                        template.MasterTemplateId = new Lazy<int>(() => masterTemplate.Id);
+                }
+                templates.Add(template);
+            }
+
+            _fileService.SaveTemplate(templates, userId);
+            return templates;
+        }
+
+        private bool IsMasterPageSyntax(string code)
+        {
+            return Regex.IsMatch(code, @"<%@\s*Master", RegexOptions.IgnoreCase) ||
+                code.InvariantContains("<umbraco:Item") || code.InvariantContains("<asp:") || code.InvariantContains("<umbraco:Macro");
+        }
+
+        private string ViewPath(string alias)
+        {
+            return SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
+        }
+
+        private string MasterpagePath(string alias)
+        {
+            return IOHelper.MapPath(SystemDirectories.Masterpages + "/" + alias.Replace(" ", "") + ".master");
+        }
+
         #endregion
     }
 }

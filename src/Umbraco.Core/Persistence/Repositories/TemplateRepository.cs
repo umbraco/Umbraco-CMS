@@ -71,7 +71,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var masterTemplate = Get(dto.Master.Value);
                 template.MasterTemplateAlias = masterTemplate.Alias;
-                template.MasterTemplateId = dto.Master.Value;
+                template.MasterTemplateId = new Lazy<int>(() => dto.Master.Value);
             }
 
             if (_viewsFileSystem.FileExists(csViewName))
@@ -172,11 +172,13 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 if (entity.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
                 {
-                    _viewsFileSystem.AddFile(entity.Name, stream, true);
+                    string viewName = string.Concat(entity.Alias, ".cshtml");
+                    _viewsFileSystem.AddFile(viewName, stream, true);
                 }
                 else
                 {
-                    _masterpagesFileSystem.AddFile(entity.Name, stream, true);
+                    string masterpageName = string.Concat(entity.Alias, ".master");
+                    _masterpagesFileSystem.AddFile(masterpageName, stream, true);
                 }
             }
 
@@ -223,11 +225,13 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 if (entity.GetTypeOfRenderingEngine() == RenderingEngine.Mvc)
                 {
-                    _viewsFileSystem.AddFile(entity.Name, stream, true);
+                    string viewName = string.Concat(entity.Alias, ".cshtml");
+                    _viewsFileSystem.AddFile(viewName, stream, true);
                 }
                 else
                 {
-                    _masterpagesFileSystem.AddFile(entity.Name, stream, true);
+                    string masterpageName = string.Concat(entity.Alias, ".master");
+                    _masterpagesFileSystem.AddFile(masterpageName, stream, true);
                 }
             }
 

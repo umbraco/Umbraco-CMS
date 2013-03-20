@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace Umbraco.Tests.Services.Importing
 {
     [TestFixture, RequiresSTA]
-    public class ContentImportTests : BaseServiceTest
+    public class PackageImportTests : BaseServiceTest
     {
         [SetUp]
         public override void Initialize()
@@ -20,7 +20,26 @@ namespace Umbraco.Tests.Services.Importing
         }
 
         [Test]
-        public void ContentTypeService_Can_Import_Package_Xml()
+        public void PackagingService_Can_Import_Template_Package_Xml()
+        {
+            // Arrange
+            string strXml = ImportResources.package;
+            var xml = XElement.Parse(strXml);
+            var element = xml.Descendants("Templates").First();
+            var packagingService = ServiceContext.PackagingService;
+
+            // Act
+            var templates = packagingService.ImportTemplates(element);
+            var numberOfTemplates = (from doc in element.Elements("Template") select doc).Count();
+
+            // Assert
+            Assert.That(templates, Is.Not.Null);
+            Assert.That(templates.Any(), Is.True);
+            Assert.That(templates.Count(), Is.EqualTo(numberOfTemplates));
+        }
+
+        [Test]
+        public void PackagingService_Can_Import_ContentType_Package_Xml()
         {
             // Arrange
             string strXml = ImportResources.package;
@@ -44,7 +63,7 @@ namespace Umbraco.Tests.Services.Importing
         }
 
         [Test]
-        public void ContentService_Can_Import_Package_Xml()
+        public void PackagingService_Can_Import_Content_Package_Xml()
         {
             // Arrange
             string strXml = ImportResources.package;

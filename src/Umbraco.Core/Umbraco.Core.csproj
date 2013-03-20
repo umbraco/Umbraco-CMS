@@ -657,6 +657,7 @@
     <Compile Include="Services\PackagingService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Services\UserService.cs" />
+    <Compile Include="TopologicalSorter.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="ReadLock.cs" />
     <Compile Include="TypeFinder.cs" />

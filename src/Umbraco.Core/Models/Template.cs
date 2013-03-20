@@ -52,7 +52,7 @@ namespace Umbraco.Core.Models
         internal string NodePath { get; set; }
 
         [DataMember]
-        internal int MasterTemplateId { get; set; }
+        internal Lazy<int> MasterTemplateId { get; set; }
 
         [DataMember]
         internal string MasterTemplateAlias { get; set; }
