@@ -40,8 +40,11 @@ namespace Umbraco.Core.Models
             get { return _parentId; }
             set
             {
-                _parentId = value;
-                OnPropertyChanged(ParentIdSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _parentId = value;
+                    return _parentId;
+                }, _parentId, ParentIdSelector);
             }
         }
 
@@ -54,8 +57,11 @@ namespace Umbraco.Core.Models
             get { return _childId; }
             set
             {
-                _childId = value;
-                OnPropertyChanged(ChildIdSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _childId = value;
+                    return _childId;
+                }, _childId, ChildIdSelector);
             }
         }
 
@@ -68,8 +74,11 @@ namespace Umbraco.Core.Models
             get { return _relationType; }
             set
             {
-                _relationType = value;
-                OnPropertyChanged(RelationTypeSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _relationType = value;
+                    return _relationType;
+                }, _relationType, RelationTypeSelector);
             }
         }
 
@@ -82,8 +91,11 @@ namespace Umbraco.Core.Models
             get { return _comment; }
             set
             {
-                _comment = value;
-                OnPropertyChanged(CommentSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _comment = value;
+                    return _comment;
+                }, _comment, CommentSelector);
             }
         }
 

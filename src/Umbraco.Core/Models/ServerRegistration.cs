@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Sync;
@@ -7,6 +8,14 @@ namespace Umbraco.Core.Models
 {
     internal class ServerRegistration : Entity, IServerAddress, IAggregateRoot
     {
+        private string _serverAddress;
+        private string _computerName;
+        private bool _isActive;
+
+        private static readonly PropertyInfo ServerAddressSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, string>(x => x.ServerAddress);
+        private static readonly PropertyInfo ComputerNameSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, string>(x => x.ComputerName);
+        private static readonly PropertyInfo IsActiveSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, bool>(x => x.IsActive);
+
         public ServerRegistration()
         {
 
@@ -45,8 +54,43 @@ namespace Umbraco.Core.Models
             ComputerName = computerName;
         }
 
-        public string ServerAddress { get; set; }
-        public string ComputerName { get; set; }
-        public bool IsActive { get; set; }
+        public string ServerAddress
+        {
+            get { return _serverAddress; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _serverAddress = value;
+                    return _serverAddress;
+                }, _serverAddress, ServerAddressSelector);
+            }
+        }
+
+        public string ComputerName
+        {
+            get { return _computerName; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _computerName = value;
+                    return _computerName;
+                }, _computerName, ComputerNameSelector);
+            }
+        }
+
+        public bool IsActive
+        {
+            get { return _isActive; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _isActive = value;
+                    return _isActive;
+                }, _isActive, IsActiveSelector);
+            }
+        }
     }
 }

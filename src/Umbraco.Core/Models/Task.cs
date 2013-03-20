@@ -40,8 +40,11 @@ namespace Umbraco.Core.Models
             get { return _closed; }
             set
             {
-                _closed = value;
-                OnPropertyChanged(ClosedSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _closed = value;
+                    return _closed;
+                }, _closed, ClosedSelector);
             }
         }
 
@@ -54,8 +57,11 @@ namespace Umbraco.Core.Models
             get { return _taskType; }
             set
             {
-                _taskType = value;
-                OnPropertyChanged(TaskTypeSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _taskType = value;
+                    return _taskType;
+                }, _taskType, TaskTypeSelector);
             }
         }
 
@@ -68,8 +74,11 @@ namespace Umbraco.Core.Models
             get { return _entityId; }
             set
             {
-                _entityId = value;
-                OnPropertyChanged(EntityIdSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _entityId = value;
+                    return _entityId;
+                }, _entityId, EntityIdSelector);                
             }
         }
 
@@ -82,8 +91,11 @@ namespace Umbraco.Core.Models
             get { return _ownerUserId; }
             set
             {
-                _ownerUserId = value;
-                OnPropertyChanged(OwnerUserIdSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _ownerUserId = value;
+                    return _ownerUserId;
+                }, _ownerUserId, OwnerUserIdSelector);    
             }
         }
 
@@ -96,8 +108,11 @@ namespace Umbraco.Core.Models
             get { return _assigneeUserId; }
             set
             {
-                _assigneeUserId = value;
-                OnPropertyChanged(AssigneeUserIdSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _assigneeUserId = value;
+                    return _assigneeUserId;
+                }, _assigneeUserId, AssigneeUserIdSelector);    
             }
         }
 
@@ -110,8 +125,11 @@ namespace Umbraco.Core.Models
             get { return _comment; }
             set
             {
-                _comment = value;
-                OnPropertyChanged(CommentSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _comment = value;
+                    return _comment;
+                }, _comment, CommentSelector);    
             }
         }
     }

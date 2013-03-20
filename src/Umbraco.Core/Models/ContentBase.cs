@@ -120,8 +120,11 @@ namespace Umbraco.Core.Models
             get { return _name; }
             set
             {
-                _name = value;
-                OnPropertyChanged(NameSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _name = value;
+                    return _name;
+                }, _name, NameSelector);
             }
         }
 
@@ -134,8 +137,11 @@ namespace Umbraco.Core.Models
             get { return _sortOrder; }
             set
             {
-                _sortOrder = value;
-                OnPropertyChanged(SortOrderSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _sortOrder = value;
+                    return _sortOrder;
+                }, _sortOrder, SortOrderSelector);
             }
         }
 
@@ -148,8 +154,11 @@ namespace Umbraco.Core.Models
             get { return _level; }
             set
             {
-                _level = value;
-                OnPropertyChanged(LevelSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _level = value;
+                    return _level;
+                }, _level, LevelSelector);
             }
         }
 
@@ -162,8 +171,11 @@ namespace Umbraco.Core.Models
             get { return _path; }
             set
             {
-                _path = value;
-                OnPropertyChanged(PathSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _path = value;
+                    return _path;
+                }, _path, PathSelector);
             }
         }
 
@@ -176,8 +188,11 @@ namespace Umbraco.Core.Models
             get { return _creatorId; }
             set
             {
-                _creatorId = value;
-                OnPropertyChanged(CreatorIdSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _creatorId = value;
+                    return _creatorId;
+                }, _creatorId, CreatorIdSelector);
             }
         }
         
@@ -192,8 +207,11 @@ namespace Umbraco.Core.Models
             get { return _trashed; }
             internal set
             {
-                _trashed = value;
-                OnPropertyChanged(TrashedSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _trashed = value;
+                    return _trashed;
+                }, _trashed, TrashedSelector);
             }
         }
 
@@ -212,8 +230,11 @@ namespace Umbraco.Core.Models
             get { return _contentTypeId; }
             protected set
             {
-                _contentTypeId = value;
-                OnPropertyChanged(DefaultContentTypeIdSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _contentTypeId = value;
+                    return _contentTypeId;
+                }, _contentTypeId, DefaultContentTypeIdSelector);
             }
         }
 

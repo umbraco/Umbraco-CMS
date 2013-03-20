@@ -34,8 +34,11 @@ namespace Umbraco.Core.Models
             get { return _isoCode; }
             set
             {
-                _isoCode = value;
-                OnPropertyChanged(IsoCodeSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _isoCode = value;
+                    return _isoCode;
+                }, _isoCode, IsoCodeSelector);
             }
         }
 
@@ -48,8 +51,11 @@ namespace Umbraco.Core.Models
             get { return _cultureName; }
             set
             {
-                _cultureName = value;
-                OnPropertyChanged(CultureNameSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _cultureName = value;
+                    return _cultureName;
+                }, _cultureName, CultureNameSelector);
             }
         }
 

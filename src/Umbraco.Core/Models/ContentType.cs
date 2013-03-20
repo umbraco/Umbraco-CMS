@@ -48,8 +48,11 @@ namespace Umbraco.Core.Models
             get { return _defaultTemplate; }
             set
             {
-                _defaultTemplate = value;
-                OnPropertyChanged(DefaultTemplateSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _defaultTemplate = value;
+                    return _defaultTemplate;
+                }, _defaultTemplate, DefaultTemplateSelector);
             }
         }
 
@@ -62,8 +65,11 @@ namespace Umbraco.Core.Models
             get { return _allowedTemplates; }
             set
             {
-                _allowedTemplates = value;
-                OnPropertyChanged(AllowedTemplatesSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _allowedTemplates = value;
+                    return _allowedTemplates;
+                }, _allowedTemplates, AllowedTemplatesSelector);
             }
         }
 

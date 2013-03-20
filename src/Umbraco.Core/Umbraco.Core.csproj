@@ -175,6 +175,7 @@
     <Compile Include="Models\DictionaryTranslation.cs" />
     <Compile Include="Models\EntityBase\IRememberBeingDirty.cs" />
     <Compile Include="Models\EntityBase\IUmbracoEntity.cs" />
+    <Compile Include="Models\EntityBase\TracksChangesEntityBase.cs" />
     <Compile Include="Models\File.cs" />
     <Compile Include="Models\IDataTypeDefinition.cs" />
     <Compile Include="Models\IDictionaryItem.cs" />
@@ -211,6 +212,7 @@
     <Compile Include="Models\RelationType.cs" />
     <Compile Include="Models\Script.cs" />
     <Compile Include="Models\Stylesheet.cs" />
+    <Compile Include="Models\StylesheetProperty.cs" />
     <Compile Include="Models\Task.cs" />
     <Compile Include="Models\TaskType.cs" />
     <Compile Include="Models\Template.cs" />

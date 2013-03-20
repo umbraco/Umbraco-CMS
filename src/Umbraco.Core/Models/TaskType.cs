@@ -30,8 +30,11 @@ namespace Umbraco.Core.Models
             get { return _alias; }
             set
             {
-                _alias = value;
-                OnPropertyChanged(AliasSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _alias = value;
+                    return _alias;
+                }, _alias, AliasSelector);    
             }
         }
     }

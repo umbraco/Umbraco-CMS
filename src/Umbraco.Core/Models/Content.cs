@@ -103,8 +103,11 @@ namespace Umbraco.Core.Models
             }
             set
             {
-                _template = value;
-                OnPropertyChanged(TemplateSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _template = value;
+                    return _template;
+                }, _template, TemplateSelector);
             }
         }
 
@@ -142,8 +145,11 @@ namespace Umbraco.Core.Models
             get { return _published; }
             internal set
             {
-                _published = value;
-                OnPropertyChanged(PublishedSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _published = value;
+                    return _published;
+                }, _published, PublishedSelector);
             }
         }
 
@@ -159,8 +165,11 @@ namespace Umbraco.Core.Models
             get { return _language; }
             set
             {
-                _language = value;
-                OnPropertyChanged(LanguageSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _language = value;
+                    return _language;
+                }, _language, LanguageSelector);
             }
         }
 
@@ -173,8 +182,11 @@ namespace Umbraco.Core.Models
             get { return _releaseDate; }
             set
             {
-                _releaseDate = value;
-                OnPropertyChanged(ReleaseDateSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _releaseDate = value;
+                    return _releaseDate;
+                }, _releaseDate, ReleaseDateSelector);
             }
         }
 
@@ -187,8 +199,11 @@ namespace Umbraco.Core.Models
             get { return _expireDate; }
             set
             {
-                _expireDate = value;
-                OnPropertyChanged(ExpireDateSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _expireDate = value;
+                    return _expireDate;
+                }, _expireDate, ExpireDateSelector);
             }
         }
 
@@ -201,8 +216,11 @@ namespace Umbraco.Core.Models
             get { return _writer; }
             set
             {
-                _writer = value;
-                OnPropertyChanged(WriterSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _writer = value;
+                    return _writer;
+                }, _writer, WriterSelector);
             }
         }
 
@@ -217,8 +235,11 @@ namespace Umbraco.Core.Models
             get { return _nodeName; }
             set
             {
-                _nodeName = value;
-                OnPropertyChanged(NodeNameSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _nodeName = value;
+                    return _nodeName;
+                }, _nodeName, NodeNameSelector);
             }
         }
 
