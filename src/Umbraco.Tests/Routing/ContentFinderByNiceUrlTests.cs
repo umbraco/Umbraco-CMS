@@ -1,6 +1,8 @@
+using System;
 using System.Configuration;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.template;
@@ -34,10 +36,10 @@ namespace Umbraco.Tests.Routing
 			var routingContext = GetRoutingContext(urlString);
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
 			var docreq = new PublishedContentRequest(url, routingContext);
-			var lookup = new ContentFinderByNiceUrl(false);
+			var lookup = new ContentFinderByNiceUrl();
 		    SettingsForTests.HideTopLevelNodeFromPath = true;
 
-			var result = lookup.TryFindDocument(docreq);
+			var result = lookup.TryFindContent(docreq);
 
 			if (expectedId > 0)
 			{
@@ -61,10 +63,10 @@ namespace Umbraco.Tests.Routing
 			var routingContext = GetRoutingContext(urlString);
 			var url = routingContext.UmbracoContext.CleanedUmbracoUrl;	//very important to use the cleaned up umbraco url		
 			var docreq = new PublishedContentRequest(url, routingContext);			
-			var lookup = new ContentFinderByNiceUrl(false);
+			var lookup = new ContentFinderByNiceUrl();
             SettingsForTests.HideTopLevelNodeFromPath = false;
 
-			var result = lookup.TryFindDocument(docreq);
+			var result = lookup.TryFindContent(docreq);
 
 			Assert.IsTrue(result);
 			Assert.AreEqual(expectedId, docreq.PublishedContent.Id);

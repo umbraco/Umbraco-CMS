@@ -31,69 +31,25 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public virtual string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode)
         {
-            DomainAndUri domainUri;
-            string path;
-
             if (!current.IsAbsoluteUri)
-// ReSharper disable LocalizableElement
                 throw new ArgumentException("Current url must be absolute.", "current");
-// ReSharper restore LocalizableElement
 
-            // do not read cache if previewing
-            var route = umbracoContext.InPreviewMode
-                ? null
-                : umbracoContext.RoutingContext.RoutesCache.GetRoute(id);
+            // will not use cache if previewing
+            var route = umbracoContext.ContentCache.GetRouteById(id);
 
-            if (!string.IsNullOrEmpty(route))
+            if (string.IsNullOrWhiteSpace(route))
             {
-                // there was a route in the cache - extract domainUri and path
-                // route is /<path> or <domainRootId>/<path>
-                var pos = route.IndexOf('/');
-                path = pos == 0 ? route : route.Substring(pos);
-                domainUri = pos == 0 ? null : DomainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current);
+                LogHelper.Warn<DefaultUrlProvider>(
+                    "Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
+                    () => id);
+                return null;
             }
-            else
-            {
-                // there was no route in the cache - create a route
-                var node = umbracoContext.ContentCache.GetById(id);
-                if (node == null)
-                {
-                    LogHelper.Warn<DefaultUrlProvider>(
-                        "Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
-                        () => id);
 
-                    return null;
-                }
-
-                // walk up from that node until we hit a node with a domain,
-                // or we reach the content root, collecting urls in the way
-                var pathParts = new List<string>();
-                var n = node;
-                domainUri = DomainHelper.DomainForNode(n.Id, current);
-                while (domainUri == null && n != null) // n is null at root
-                {
-                    // get the url
-                    var urlName = n.UrlName;
-                    pathParts.Add(urlName);
-
-                    // move to parent node
-                    n = n.Parent;
-                    domainUri = n == null ? null : DomainHelper.DomainForNode(n.Id, current);
-                }
-
-                // no domain, respect HideTopLevelNodeFromPath for legacy purposes
-                if (domainUri == null && global::umbraco.GlobalSettings.HideTopLevelNodeFromPath)
-                    ApplyHideTopLevelNodeFromPath(umbracoContext, node, pathParts);
-
-                // assemble the route
-                pathParts.Reverse();
-                path = "/" + string.Join("/", pathParts); // will be "/" or "/foo" or "/foo/bar" etc
-                route = (n == null ? "" : n.Id.ToString()) + path;
-
-                // do not store if previewing
-                if (!umbracoContext.InPreviewMode)
-                    umbracoContext.RoutingContext.RoutesCache.Store(id, route);
-            }
+            // extract domainUri and path
+            // route is /<path> or <domainRootId>/<path>
+            var pos = route.IndexOf('/');
+            var path = pos == 0 ? route : route.Substring(pos);
+            var domainUri = pos == 0 ? null : DomainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current);
 
             // assemble the url from domainUri (maybe null) and path
             return AssembleUrl(domainUri, path, current, mode).ToString();
@@ -116,64 +72,22 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public virtual IEnumerable<string> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
-            string path;
-            IEnumerable<DomainAndUri> domainUris;
+            // will not use cache if previewing
+            var route = umbracoContext.ContentCache.GetRouteById(id);
 
-            // will not read cache if previewing!
-            var route = umbracoContext.InPreviewMode
-                ? null
-                : umbracoContext.RoutingContext.RoutesCache.GetRoute(id);
-
-            if (!string.IsNullOrEmpty(route))
+            if (string.IsNullOrWhiteSpace(route))
             {
-                // there was a route in the cache - extract domainUri and path
-                // route is /<path> or <domainRootId>/<path>
-                int pos = route.IndexOf('/');
-                path = pos == 0 ? route : route.Substring(pos);
-                domainUris = pos == 0 ? null : DomainHelper.DomainsForNode(int.Parse(route.Substring(0, pos)), current);
+                LogHelper.Warn<DefaultUrlProvider>(
+                    "Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
+                    () => id);
+                return null;
             }
-            else
-            {
-                // there was no route in the cache - create a route
-                var node = umbracoContext.ContentCache.GetById(id);
-                if (node == null)
-                {
-                    LogHelper.Warn<DefaultUrlProvider>(
-                        "Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
-                        () => id);
 
-                    return null;
-                }
-
-                // walk up from that node until we hit a node with domains,
-                // or we reach the content root, collecting urls in the way
-                var pathParts = new List<string>();
-                var n = node;
-                domainUris = DomainHelper.DomainsForNode(n.Id, current);
-                while (domainUris == null && n != null) // n is null at root
-                {
-                    // get the url
-                    var urlName = node.UrlName;
-                    pathParts.Add(urlName);
-
-                    // move to parent node
-                    n = n.Parent;
-                    domainUris = n == null ? null : DomainHelper.DomainsForNode(n.Id, current);
-                }
-
-                // no domain, respect HideTopLevelNodeFromPath for legacy purposes
-                if (domainUris == null && global::umbraco.GlobalSettings.HideTopLevelNodeFromPath)
-                    ApplyHideTopLevelNodeFromPath(umbracoContext, node, pathParts);
-
-                // assemble the route
-                pathParts.Reverse();
-                path = "/" + string.Join("/", pathParts); // will be "/" or "/foo" or "/foo/bar" etc
-                route = (n == null ? "" : n.Id.ToString()) + path;
-
-                // do not store if previewing
-                if (!umbracoContext.InPreviewMode)
-                    umbracoContext.RoutingContext.RoutesCache.Store(id, route);
-            }
+            // extract domainUri and path
+            // route is /<path> or <domainRootId>/<path>
+            var pos = route.IndexOf('/');
+            var path = pos == 0 ? route : route.Substring(pos);
+            var domainUris = pos == 0 ? null : DomainHelper.DomainsForNode(int.Parse(route.Substring(0, pos)), current);
 
             // assemble the alternate urls from domainUris (maybe empty) and path
             return AssembleUrls(domainUris, path).Select(uri => uri.ToString());
@@ -269,28 +183,6 @@ namespace Umbraco.Web.Routing
             // UriFromUmbraco will handle vdir
             // meaning it will add vdir into domain urls too!
             return uris.Select(UriUtility.UriFromUmbraco);
-        }
-
-        static void ApplyHideTopLevelNodeFromPath(UmbracoContext umbracoContext, Core.Models.IPublishedContent node, IList<string> pathParts)
-        {
-            // in theory if hideTopLevelNodeFromPath is true, then there should be only once
-            // top-level node, or else domains should be assigned. but for backward compatibility
-            // we add this check - we look for the document matching "/" and if it's not us, then
-            // we do not hide the top level path
-            // it has to be taken care of in IPublishedContentStore.GetDocumentByRoute too so if
-            // "/foo" fails (looking for "/*/foo") we try also "/foo". 
-            // this does not make much sense anyway esp. if both "/foo/" and "/bar/foo" exist, but
-            // that's the way it works pre-4.10 and we try to be backward compat for the time being
-            if (node.Parent == null)
-            {
-                var rootNode = umbracoContext.ContentCache.GetByRoute("/", true);
-                if (rootNode.Id == node.Id) // remove only if we're the default node
-                    pathParts.RemoveAt(pathParts.Count - 1);
-            }
-            else
-            {
-                pathParts.RemoveAt(pathParts.Count - 1);
-            }
         }
 
         #endregion

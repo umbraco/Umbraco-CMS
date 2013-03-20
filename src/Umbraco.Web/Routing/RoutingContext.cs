@@ -16,19 +16,16 @@ namespace Umbraco.Web.Routing
 	    /// <param name="contentFinders">The document lookups resolver.</param>
 	    /// <param name="contentLastChanceFinder"> </param>
 	    /// <param name="urlProvider">The nice urls provider.</param>
-	    /// <param name="routesCache">The routes cache.</param>
 	    internal RoutingContext(
 			UmbracoContext umbracoContext,
 			IEnumerable<IContentFinder> contentFinders,
 			IContentFinder contentLastChanceFinder,
-            UrlProvider urlProvider,
-            IRoutesCache routesCache)
+            UrlProvider urlProvider)
         {
 			UmbracoContext = umbracoContext;
 			PublishedContentFinders = contentFinders;
 			PublishedContentLastChanceFinder = contentLastChanceFinder;
         	UrlProvider = urlProvider;
-            RoutesCache = routesCache;
         }
 
 		/// <summary>
@@ -50,10 +47,5 @@ namespace Umbraco.Web.Routing
 		/// Gets the urls provider.
 		/// </summary>
 		internal UrlProvider UrlProvider { get; private set; }
-
-        /// <summary>
-        /// Gets the <see cref="IRoutesCache"/>
-        /// </summary>
-        internal IRoutesCache RoutesCache { get; private set; }
     }
 }

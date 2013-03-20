@@ -17,11 +17,6 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class uQueryGetNodeIdByUrlTests : BaseRoutingTest
 	{
-		internal override IRoutesCache GetRoutesCache()
-		{
-			return new DefaultRoutesCache(false);
-		}
-
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -39,8 +34,7 @@ namespace Umbraco.Tests.Routing
 				umbracoContext,
 				lookups,
 				new FakeLastChanceFinder(),
-                urlProvider,
-                GetRoutesCache());
+                urlProvider);
 
 			//assign the routing context back to the umbraco context
 			umbracoContext.RoutingContext = routingContext;

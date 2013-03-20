@@ -73,6 +73,16 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
+        /// Gets a value indicating whether a specified node has domains.
+        /// </summary>
+        /// <param name="nodeId">The node identifier.</param>
+        /// <returns>True if the node has domains, else false.</returns>
+        internal static bool NodeHasDomains(int nodeId)
+        {
+            return nodeId > 0 && GetNodeDomains(nodeId, false).Any();
+        }
+
+        /// <summary>
         /// Find the domains for the specified node, if any, that match a specified uri.
         /// </summary>
         /// <param name="nodeId">The node identifier.</param>

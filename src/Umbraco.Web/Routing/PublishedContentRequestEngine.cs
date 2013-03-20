@@ -335,7 +335,7 @@ namespace Umbraco.Web.Routing
 			{
 			    if (_routingContext.PublishedContentFinders == null)
                     throw new InvalidOperationException("There is no finder collection.");
-			    _routingContext.PublishedContentFinders.Any(finder => finder.TryFindDocument(_pcr));
+			    _routingContext.PublishedContentFinders.Any(finder => finder.TryFindContent(_pcr));
 			}
 
 		    // indicate that the published content (if any) we have at the moment is the
@@ -369,7 +369,7 @@ namespace Umbraco.Web.Routing
 
 					// if it fails then give up, there isn't much more that we can do
 					var lastChance = _routingContext.PublishedContentLastChanceFinder;
-					if (lastChance == null || !lastChance.TryFindDocument(_pcr))
+					if (lastChance == null || !lastChance.TryFindContent(_pcr))
 					{
 						LogHelper.Debug<PublishedContentRequestEngine>("{0}Failed to find a document, give up", () => tracePrefix);
 						break;

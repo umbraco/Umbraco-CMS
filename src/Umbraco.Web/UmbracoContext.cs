@@ -98,8 +98,7 @@ namespace Umbraco.Web
                 umbracoContext,
                 ContentFinderResolver.Current.Finders,
                 ContentLastChanceFinderResolver.Current.Finder,
-                urlProvider,
-                RoutesCacheResolver.Current.RoutesCache);
+                urlProvider);
 
             //assign the routing context back
             umbracoContext.RoutingContext = routingContext;

@@ -21,7 +21,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-		public bool TryFindDocument(PublishedContentRequest docRequest)
+		public bool TryFindContent(PublishedContentRequest docRequest)
         {
 			HandlePageNotFound(docRequest);
             return docRequest.HasPublishedContent;
@@ -55,7 +55,7 @@ namespace Umbraco.Web.Routing
                 {
                     var finderName = finder.GetType().FullName;
                     LogHelper.Debug<ContentFinderByNotFoundHandlers>("Replace handler '{0}' by new finder '{1}'.", () => handlerName, () => finderName);
-                    if (finder.TryFindDocument(docRequest))
+                    if (finder.TryFindContent(docRequest))
                     {
                         // do NOT set docRequest.PublishedContent again here as 
                         // it would clear any template that the finder might have set

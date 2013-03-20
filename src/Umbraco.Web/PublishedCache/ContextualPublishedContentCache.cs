@@ -19,7 +19,7 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="cache">A published content cache.</param>
         /// <param name="umbracoContext">A context.</param>
         public ContextualPublishedContentCache(IPublishedContentCache cache, UmbracoContext umbracoContext)
-            : base(umbracoContext)
+            : base(umbracoContext, cache)
         {
             _cache = cache;
         }
@@ -31,65 +31,31 @@ namespace Umbraco.Web.PublishedCache
         internal IPublishedContentCache InnerCache { get { return _cache; } }
 
         /// <summary>
-        /// Gets a content identified by its unique identifier.
+        /// Gets content identified by a route.
         /// </summary>
-        /// <param name="contentId">The content unique identifier.</param>
+        /// <param name="route">The route</param>
+        /// <param name="hideTopLevelNode">FIXME</param>
         /// <returns>The content, or null.</returns>
-        public override IPublishedContent GetById(int contentId)
-        {
-            return _cache.GetById(UmbracoContext, contentId);
-        }
-
-        /// <summary>
-        /// Gets contents at root.
-        /// </summary>
-        /// <returns>The contents.</returns>
-        public override IEnumerable<IPublishedContent> GetAtRoot()
-        {
-            return _cache.GetAtRoot(UmbracoContext);
-        }
-
-        /// <summary>
-        /// Gets a content resulting from an XPath query.
-        /// </summary>
-        /// <param name="xpath">The XPath query.</param>
-        /// <param name="vars">Optional XPath variables.</param>
-        /// <returns>The content, or null.</returns>
-        public override IPublishedContent GetSingleByXPath(string xpath, Core.Xml.XPathVariable[] vars)
-        {
-            return _cache.GetSingleByXPath(UmbracoContext, xpath, vars);
-        }
-
-        /// <summary>
-        /// Gets contents resulting from an XPath query.
-        /// </summary>
-        /// <param name="xpath">The XPath query.</param>
-        /// <param name="vars">Optional XPath variables.</param>
-        /// <returns>The contents.</returns>
-        public override IEnumerable<IPublishedContent> GetByXPath(string xpath, Core.Xml.XPathVariable[] vars)
-        {
-            return _cache.GetByXPath(UmbracoContext, xpath, vars);
-        }
-
-        // FIXME do we want that one here?
+        /// <remarks>A valid route is either a simple path eg <c>/foo/bar/nil</c> or a root node id and a path, eg <c>123/foo/bar/nil</c>.</remarks>
         public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null)
         {
             return _cache.GetByRoute(UmbracoContext, route, hideTopLevelNode);
+        }
+
+        /// <summary>
+        /// Gets the route for a content identified by its unique identifier.
+        /// </summary>
+        /// <param name="contentId">The content unique identifier.</param>
+        /// <returns>The route.</returns>
+        public string GetRouteById(int contentId)
+        {
+            return _cache.GetRouteById(UmbracoContext, contentId);
         }
 
         // FIXME do we want that one here?
         public IPublishedContent GetByUrlAlias(int rootNodeId, string alias)
         {
             return _cache.GetByUrlAlias(UmbracoContext, rootNodeId, alias);
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the underlying non-contextual cache contains published content.
-        /// </summary>
-        /// <returns>A value indicating whether the underlying non-contextual cache contains published content.</returns>
-        public bool HasContent()
-        {
-            return _cache.HasContent();
         }
     }
 }

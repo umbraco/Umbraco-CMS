@@ -33,8 +33,7 @@ namespace Umbraco.Tests.TestHelpers
 				umbracoContext,
 				Enumerable.Empty<IContentFinder>(),
 				new FakeLastChanceFinder(),
-                urlProvider,
-                GetRoutesCache());
+                urlProvider);
 
 			//assign the routing context back to the umbraco context
 			umbracoContext.RoutingContext = routingContext;

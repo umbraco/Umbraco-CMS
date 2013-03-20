@@ -13,7 +13,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		/// <param name="pcr">The <c>PublishedContentRequest</c>.</param>		
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-		public bool TryFindDocument(PublishedContentRequest pcr)
+		public bool TryFindContent(PublishedContentRequest pcr)
 		{
 			LogHelper.Debug<ContentFinderByLegacy404>("Looking for a page to handle 404.");
 

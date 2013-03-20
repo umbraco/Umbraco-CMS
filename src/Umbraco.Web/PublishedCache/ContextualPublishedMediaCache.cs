@@ -19,50 +19,9 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="cache">A published media cache.</param>
         /// <param name="umbracoContext">A context.</param>
         public ContextualPublishedMediaCache(IPublishedMediaCache cache, UmbracoContext umbracoContext)
-            : base(umbracoContext)
+            : base(umbracoContext, cache)
         {
             _cache = cache;
-        }
-
-        /// <summary>
-        /// Gets a content identified by its unique identifier.
-        /// </summary>
-        /// <param name="contentId">The content unique identifier.</param>
-        /// <returns>The content, or null.</returns>
-        public override IPublishedContent GetById(int contentId)
-        {
-            return _cache.GetById(UmbracoContext, contentId);
-        }
-
-        /// <summary>
-        /// Gets contents at root.
-        /// </summary>
-        /// <returns>The contents.</returns>
-        public override IEnumerable<IPublishedContent> GetAtRoot()
-        {
-            return _cache.GetAtRoot(UmbracoContext);
-        }
-
-        /// <summary>
-        /// Gets a content resulting from an XPath query.
-        /// </summary>
-        /// <param name="xpath">The XPath query.</param>
-        /// <param name="vars">Optional XPath variables.</param>
-        /// <returns>The content, or null.</returns>
-        public override IPublishedContent GetSingleByXPath(string xpath, Core.Xml.XPathVariable[] vars)
-        {
-            return _cache.GetSingleByXPath(UmbracoContext, xpath, vars);
-        }
-
-        /// <summary>
-        /// Gets contents resulting from an XPath query.
-        /// </summary>
-        /// <param name="xpath">The XPath query.</param>
-        /// <param name="vars">Optional XPath variables.</param>
-        /// <returns>The contents.</returns>
-        public override IEnumerable<IPublishedContent> GetByXPath(string xpath, Core.Xml.XPathVariable[] vars)
-        {
-            return _cache.GetByXPath(UmbracoContext, xpath, vars);
         }
     }
 }

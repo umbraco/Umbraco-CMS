@@ -330,6 +330,7 @@
     <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
     <Compile Include="Mvc\ControllerFactoryExtensions.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
+    <Compile Include="PublishedCache\LegacyXmlCache\RoutesCache.cs" />
     <Compile Include="Routing\UrlProviderMode.cs" />
     <Compile Include="Search\ExamineIndexerModel.cs" />
     <Compile Include="Search\LuceneIndexerExtensions.cs" />
@@ -595,9 +596,6 @@
     <Compile Include="Routing\ContentFinderResolver.cs" />
     <Compile Include="Routing\PublishedContentRequest.cs" />
     <Compile Include="Routing\IContentFinder.cs" />
-    <Compile Include="Routing\IRoutesCache.cs" />
-    <Compile Include="Routing\DefaultRoutesCache.cs" />
-    <Compile Include="Routing\RoutesCacheResolver.cs" />
     <Compile Include="Routing\RoutingContext.cs" />
     <Compile Include="umbraco.presentation\EnsureSystemPathsApplicationStartupHandler.cs" />
     <Compile Include="umbraco.presentation\install\steps\Definitions\LegacyClasses.cs">
