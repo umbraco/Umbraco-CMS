@@ -363,7 +363,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                 }).ToList();
 
             //Reset dirty properties
-            Parallel.ForEach(list, currentFile => currentFile.ResetDirtyProperties());
+            Parallel.ForEach(list, currentFile => currentFile.ResetDirtyProperties(false));
 
             return new PropertyTypeCollection(list);
         }

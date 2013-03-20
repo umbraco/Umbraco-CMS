@@ -52,7 +52,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 //Do something if adding fails? (Should hopefully not be possible unless someone create a circular reference)
             }
 
-            ((ICanBeDirty)contentType).ResetDirtyProperties();
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            ((Entity)contentType).ResetDirtyProperties(false);
             return contentType;
         }
 

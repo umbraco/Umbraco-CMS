@@ -63,7 +63,9 @@ namespace Umbraco.Core.Persistence.Factories
                     propertyType.ResetDirtyProperties(false);
                     group.PropertyTypes.Add(propertyType);
                 }
-                group.ResetDirtyProperties();
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                group.ResetDirtyProperties(false);
                 propertyGroups.Add(group);
             }
 

@@ -53,7 +53,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             media.Properties = GetPropertyCollection(id, dto.VersionId, mediaType);
 
-            ((ICanBeDirty)media).ResetDirtyProperties();
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            ((Entity)media).ResetDirtyProperties(false);
             return media;
         }
 
@@ -157,7 +159,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             media.Properties = GetPropertyCollection(dto.NodeId, dto.VersionId, mediaType);
 
-            ((ICanBeDirty)media).ResetDirtyProperties();
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            ((Entity)media).ResetDirtyProperties(false);
             return media;
         }
 

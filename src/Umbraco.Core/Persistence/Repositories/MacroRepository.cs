@@ -48,8 +48,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var o = _serializationService.FromStream(file, typeof(Macro));
             var macro = o as IMacro;
 
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
             if(macro != null)
-                ((ICanBeDirty)macro).ResetDirtyProperties();
+                ((Entity)macro).ResetDirtyProperties(false);
 
             return macro;
         }

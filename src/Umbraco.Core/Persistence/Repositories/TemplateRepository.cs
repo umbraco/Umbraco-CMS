@@ -91,6 +91,10 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            template.ResetDirtyProperties(false);
+
             return template;
         }
 

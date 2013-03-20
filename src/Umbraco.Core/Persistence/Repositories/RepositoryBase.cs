@@ -98,6 +98,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 _cache.Save(typeof(TEntity), entity);
             }
 
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            var asEntity = entity as Entity;
+            if (asEntity != null)
+            {
+                asEntity.ResetDirtyProperties(false);
+            }
             return entity;
         }
 

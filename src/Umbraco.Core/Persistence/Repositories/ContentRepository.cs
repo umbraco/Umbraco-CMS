@@ -436,7 +436,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             content.Properties = GetPropertyCollection(dto.NodeId, versionId, contentType);
 
-            ((ICanBeDirty)content).ResetDirtyProperties();
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            ((Entity)content).ResetDirtyProperties(false);
             return content;
         }
 
