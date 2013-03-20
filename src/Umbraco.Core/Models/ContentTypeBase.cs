@@ -115,8 +115,11 @@ namespace Umbraco.Core.Models
             get { return _name; }
             set
             {
-                _name = value;
-                OnPropertyChanged(NameSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _name = value;
+                    return _name;
+                }, _name, NameSelector);
             }
         }
 
@@ -129,8 +132,11 @@ namespace Umbraco.Core.Models
             get { return _level; }
             set
             {
-                _level = value;
-                OnPropertyChanged(LevelSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _level = value;
+                    return _level;
+                }, _level, LevelSelector);
             }
         }
 
@@ -143,8 +149,11 @@ namespace Umbraco.Core.Models
             get { return _path; }
             set
             {
-                _path = value;
-                OnPropertyChanged(PathSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _path = value;
+                    return _path;
+                }, _path, PathSelector);
             }
         }
 
@@ -174,8 +183,11 @@ namespace Umbraco.Core.Models
             get { return _description; }
             set
             {
-                _description = value;
-                OnPropertyChanged(DescriptionSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _description = value;
+                    return _description;
+                }, _description, DescriptionSelector);
             }
         }
 
@@ -188,8 +200,11 @@ namespace Umbraco.Core.Models
             get { return _sortOrder; }
             set
             {
-                _sortOrder = value;
-                OnPropertyChanged(SortOrderSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _sortOrder = value;
+                    return _sortOrder;
+                }, _sortOrder, SortOrderSelector);
             }
         }
 
@@ -202,8 +217,11 @@ namespace Umbraco.Core.Models
             get { return _icon; }
             set
             {
-                _icon = value;
-                OnPropertyChanged(IconSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _icon = value;
+                    return _icon;
+                }, _icon, IconSelector);
             }
         }
 
@@ -216,8 +234,11 @@ namespace Umbraco.Core.Models
             get { return _thumbnail; }
             set
             {
-                _thumbnail = value;
-                OnPropertyChanged(ThumbnailSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _thumbnail = value;
+                    return _thumbnail;
+                }, _thumbnail, ThumbnailSelector);
             }
         }
 
@@ -230,8 +251,11 @@ namespace Umbraco.Core.Models
             get { return _creatorId; }
             set
             {
-                _creatorId = value;
-                OnPropertyChanged(CreatorIdSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _creatorId = value;
+                    return _creatorId;
+                }, _creatorId, CreatorIdSelector);
             }
         }
 
@@ -244,8 +268,11 @@ namespace Umbraco.Core.Models
             get { return _allowedAsRoot; }
             set
             {
-                _allowedAsRoot = value;
-                OnPropertyChanged(AllowedAsRootSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _allowedAsRoot = value;
+                    return _allowedAsRoot;
+                }, _allowedAsRoot, AllowedAsRootSelector);
             }
         }
 
@@ -261,8 +288,11 @@ namespace Umbraco.Core.Models
             get { return _isContainer; }
             set
             {
-                _isContainer = value;
-                OnPropertyChanged(IsContainerSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _isContainer = value;
+                    return _isContainer;
+                }, _isContainer, IsContainerSelector);
             }
         }
 
@@ -276,8 +306,11 @@ namespace Umbraco.Core.Models
             get { return _trashed; }
             set
             {
-                _trashed = value;
-                OnPropertyChanged(TrashedSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _trashed = value;
+                    return _trashed;
+                }, _trashed, TrashedSelector);
             }
         }
 
@@ -290,8 +323,11 @@ namespace Umbraco.Core.Models
             get { return _allowedContentTypes; }
             set
             {
-                _allowedContentTypes = value;
-                OnPropertyChanged(AllowedContentTypesSelector);
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _allowedContentTypes = value;
+                    return _allowedContentTypes;
+                }, _allowedContentTypes, AllowedContentTypesSelector);
             }
         }
 
