@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Routing
 			routingContext.UmbracoContext.HttpContext.Request.Stub(x => x["umbPageID"])
 				.Return(routingContext.UmbracoContext.HttpContext.Request.QueryString["umbPageID"]);
 
-			var result = lookup.TryFindDocument(docRequest);
+			var result = lookup.TryFindContent(docRequest);
 
 			Assert.IsTrue(result);
 			Assert.AreEqual(docRequest.PublishedContent.Id, nodeMatch);

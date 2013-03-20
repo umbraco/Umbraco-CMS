@@ -288,6 +288,8 @@ namespace Umbraco.Tests.TestHelpers
                     return doc;
                 };
 
+            PublishedContentCache.UnitTesting = true;
+
             var ctx = new UmbracoContext(
                 GetHttpContextFactory(url, routeData).HttpContext,
                 ApplicationContext,
@@ -308,11 +310,6 @@ namespace Umbraco.Tests.TestHelpers
             StateHelper.HttpContext = factory.HttpContext;
 
             return factory;
-        }
-
-        internal virtual IRoutesCache GetRoutesCache()
-        {
-            return new FakeRoutesCache();
         }
 
         protected virtual string GetXmlContent(int templateId)

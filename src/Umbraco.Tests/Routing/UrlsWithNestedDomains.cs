@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.language;
 using Umbraco.Web.Routing;
@@ -37,7 +38,9 @@ namespace Umbraco.Tests.Routing
 			Assert.AreEqual("http://domain2.com/1001-1-1/", routingContext.UrlProvider.GetUrl(100111, true));
 
 			// check that the proper route has been cached
-			var cachedRoutes = ((DefaultRoutesCache)routingContext.RoutesCache).GetCachedRoutes();
+		    var cache = routingContext.UmbracoContext.ContentCache.InnerCache as PublishedContentCache;
+            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the legacy one is supported.");
+		    var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
 			Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]);
 
 			// route a rogue url
@@ -49,12 +52,12 @@ namespace Umbraco.Tests.Routing
 
 			// check that it's been routed
 			var lookup = new ContentFinderByNiceUrl();
-			var result = lookup.TryFindDocument(pcr);
+			var result = lookup.TryFindContent(pcr);
 			Assert.IsTrue(result);
 			Assert.AreEqual(100111, pcr.PublishedContent.Id);
 
 			// has the cache been polluted?
-			cachedRoutes = ((DefaultRoutesCache)routingContext.RoutesCache).GetCachedRoutes();
+            cachedRoutes = cache.RoutesCache.GetCachedRoutes();
 			Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]); // no
 			//Assert.AreEqual("1001/1001-1/1001-1-1", cachedRoutes[100111]); // yes
 
@@ -76,12 +79,6 @@ namespace Umbraco.Tests.Routing
             SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
             base.FreezeResolution();
         }
-
-		internal override IRoutesCache GetRoutesCache()
-		{
-			return new DefaultRoutesCache(false);
-		}
-
 
 		void InitializeLanguagesAndDomains()
 		{

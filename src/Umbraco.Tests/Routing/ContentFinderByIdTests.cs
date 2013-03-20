@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Routing
 			var lookup = new ContentFinderByIdPath();
 		
 
-			var result = lookup.TryFindDocument(docRequest);
+			var result = lookup.TryFindContent(docRequest);
 
 			Assert.IsTrue(result);
 			Assert.AreEqual(docRequest.PublishedContent.Id, nodeMatch);

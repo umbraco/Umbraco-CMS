@@ -20,7 +20,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-		public override bool TryFindDocument(PublishedContentRequest docRequest)
+		public override bool TryFindContent(PublishedContentRequest docRequest)
         {
             IPublishedContent node = null;
 			var path = docRequest.Uri.GetAbsolutePathDecoded();
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Routing
 					LogHelper.Debug<ContentFinderByProfile>("Path \"{0}\" is the profile path", () => path);
 
 					var route = docRequest.HasDomain ? (docRequest.Domain.RootNodeId.ToString() + path) : path;
-					node = LookupDocumentNode(docRequest, route);
+					node = FindContent(docRequest, route);
 
                     if (node != null)
                     {

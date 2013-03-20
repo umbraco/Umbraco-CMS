@@ -160,7 +160,7 @@ namespace Umbraco.Tests.Routing
 			pcr.Engine.FindDomain();
 
 			var lookup = new ContentFinderByNiceUrl();
-			var result = lookup.TryFindDocument(pcr);
+			var result = lookup.TryFindContent(pcr);
 			Assert.IsTrue(result);
 			Assert.AreEqual(expectedId, pcr.PublishedContent.Id);
 		}
@@ -199,7 +199,7 @@ namespace Umbraco.Tests.Routing
 			Assert.AreEqual(expectedCulture, pcr.Culture.Name);
 
 			var lookup = new ContentFinderByNiceUrl();
-			var result = lookup.TryFindDocument(pcr);
+			var result = lookup.TryFindContent(pcr);
 			Assert.IsTrue(result);
 			Assert.AreEqual(expectedId, pcr.PublishedContent.Id);
 		}

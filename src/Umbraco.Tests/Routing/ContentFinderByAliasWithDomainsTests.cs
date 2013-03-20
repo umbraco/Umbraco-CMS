@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Routing
                 Assert.AreEqual(expectedCulture, pcr.Culture.Name);
 
             var finder = new ContentFinderByUrlAlias();
-            var result = finder.TryFindDocument(pcr);
+            var result = finder.TryFindContent(pcr);
 
             if (expectedNode > 0)
             {

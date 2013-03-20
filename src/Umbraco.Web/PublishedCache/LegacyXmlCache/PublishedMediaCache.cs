@@ -77,6 +77,8 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
             throw new NotImplementedException("PublishedMediaCache does not support XPath queries.");
         }
         
+        public bool HasContent() { throw new NotImplementedException(); }
+
         private ExamineManager GetExamineManagerSafe()
 		{
 			try

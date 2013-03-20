@@ -4,7 +4,7 @@ namespace Umbraco.Tests.Stubs
 {
 	internal class FakeLastChanceFinder : IContentFinder
 	{
-		public bool TryFindDocument(PublishedContentRequest docRequest)
+		public bool TryFindContent(PublishedContentRequest docRequest)
 		{
 			return false;
 		}

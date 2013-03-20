@@ -49,8 +49,11 @@ namespace Umbraco.Web.PublishedCache
         /// <returns>The contents.</returns>
         IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, string xpath, XPathVariable[] vars);
 
-	    // ... GetXPath single or multi
-	    // ... pass the helper and NOT the store, so we're consistent?!
+        /// <summary>
+        /// Gets a value indicating whether the cache contains published content.
+        /// </summary>
+        /// <returns>A value indicating whether the cache contains published content.</returns>
+        bool HasContent();
 
 	    //TODO: SD: We should make this happen! This will allow us to natively do a GetByDocumentType query
 	    // on the UmbracoHelper (or an internal DataContext that it uses, etc...)

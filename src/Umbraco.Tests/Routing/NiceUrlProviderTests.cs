@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
@@ -34,11 +35,6 @@ namespace Umbraco.Tests.Routing
 
             base.FreezeResolution();
         }
-
-		internal override IRoutesCache GetRoutesCache()
-		{
-			return new DefaultRoutesCache(false);
-		}
 
 		/// <summary>
 		/// This checks that when we retreive a NiceUrl for multiple items that there are no issues with cache overlap 
@@ -76,7 +72,9 @@ namespace Umbraco.Tests.Routing
 				Assert.AreEqual(randomSample.Value, result);
 			}
 
-			var cachedRoutes = ((DefaultRoutesCache)routingContext.RoutesCache).GetCachedRoutes();
+            var cache = routingContext.UmbracoContext.ContentCache.InnerCache as PublishedContentCache;
+            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the legacy one is supported.");
+            var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
 			Assert.AreEqual(8, cachedRoutes.Count);
 
 			foreach (var sample in samples)
@@ -85,7 +83,7 @@ namespace Umbraco.Tests.Routing
 				Assert.AreEqual(sample.Value, cachedRoutes[sample.Key]);
 			}
 
-			var cachedIds = ((DefaultRoutesCache)routingContext.RoutesCache).GetCachedIds();
+			var cachedIds = cache.RoutesCache.GetCachedIds();
 			Assert.AreEqual(8, cachedIds.Count);
 
 			foreach (var sample in samples)

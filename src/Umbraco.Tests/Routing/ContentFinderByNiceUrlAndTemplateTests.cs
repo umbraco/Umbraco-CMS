@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Routing
 
 		    SettingsForTests.HideTopLevelNodeFromPath = false;
 
-			var result = lookup.TryFindDocument(docRequest);
+			var result = lookup.TryFindContent(docRequest);
 
 			Assert.IsTrue(result);
 			Assert.IsNotNull(docRequest.PublishedContent);

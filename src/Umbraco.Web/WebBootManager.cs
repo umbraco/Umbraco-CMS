@@ -313,7 +313,7 @@ namespace Umbraco.Web
 
             SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
 
-            RoutesCacheResolver.Current = new RoutesCacheResolver(new DefaultRoutesCache(_isForTesting == false));
+            PublishedContentCache.UnitTesting = _isForTesting;
 
             ThumbnailProvidersResolver.Current = new ThumbnailProvidersResolver(
                 PluginManager.Current.ResolveThumbnailProviders());
@@ -323,7 +323,6 @@ namespace Umbraco.Web
 
             CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(
                 new DefaultCultureDictionaryFactory());
-
         }
 
     }

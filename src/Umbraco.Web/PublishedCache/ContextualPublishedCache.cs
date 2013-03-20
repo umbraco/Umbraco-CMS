@@ -12,10 +12,12 @@ namespace Umbraco.Web.PublishedCache
     internal abstract class ContextualPublishedCache
     {
         protected readonly UmbracoContext UmbracoContext;
+        private readonly IPublishedCache _cache;
 
-        protected ContextualPublishedCache(UmbracoContext umbracoContext)
+        protected ContextualPublishedCache(UmbracoContext umbracoContext, IPublishedCache cache)
         {
             UmbracoContext = umbracoContext;
+            _cache = cache;
         }
 
         /// <summary>
@@ -23,13 +25,19 @@ namespace Umbraco.Web.PublishedCache
         /// </summary>
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The content, or null.</returns>
-        public abstract IPublishedContent GetById(int contentId);
+        public virtual IPublishedContent GetById(int contentId)
+        {
+            return _cache.GetById(UmbracoContext, contentId);
+        }
 
         /// <summary>
         /// Gets contents at root.
         /// </summary>
         /// <returns>The contents.</returns>
-        public abstract IEnumerable<IPublishedContent> GetAtRoot();
+        public virtual IEnumerable<IPublishedContent> GetAtRoot()
+        {
+            return _cache.GetAtRoot(UmbracoContext);
+        }
 
         /// <summary>
         /// Gets a content resulting from an XPath query.
@@ -37,7 +45,10 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="xpath">The XPath query.</param>
         /// <param name="vars">Optional XPath variables.</param>
         /// <returns>The content, or null.</returns>
-        public abstract IPublishedContent GetSingleByXPath(string xpath, Core.Xml.XPathVariable[] vars);
+        public virtual IPublishedContent GetSingleByXPath(string xpath, Core.Xml.XPathVariable[] vars)
+        {
+            return _cache.GetSingleByXPath(UmbracoContext, xpath, vars);
+        }
 
         /// <summary>
         /// Gets contents resulting from an XPath query.
@@ -45,6 +56,18 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="xpath">The XPath query.</param>
         /// <param name="vars">Optional XPath variables.</param>
         /// <returns>The contents.</returns>
-        public abstract IEnumerable<IPublishedContent> GetByXPath(string xpath, Core.Xml.XPathVariable[] vars);
+        public virtual IEnumerable<IPublishedContent> GetByXPath(string xpath, Core.Xml.XPathVariable[] vars)
+        {
+            return _cache.GetByXPath(UmbracoContext, xpath, vars);
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the underlying non-contextual cache contains published content.
+        /// </summary>
+        /// <returns>A value indicating whether the underlying non-contextual cache contains published content.</returns>
+        public virtual bool HasContent()
+        {
+            return _cache.HasContent();
+        }
     }
 }

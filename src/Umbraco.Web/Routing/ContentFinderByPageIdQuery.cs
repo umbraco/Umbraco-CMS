@@ -9,7 +9,7 @@ namespace Umbraco.Web.Routing
 	/// </remarks>
 	internal class ContentFinderByPageIdQuery : IContentFinder
 	{
-		public bool TryFindDocument(PublishedContentRequest docRequest)
+		public bool TryFindContent(PublishedContentRequest docRequest)
 		{
 			int pageId;
 			if (int.TryParse(docRequest.RoutingContext.UmbracoContext.HttpContext.Request["umbPageID"], out pageId))

@@ -5,6 +5,7 @@ using System.Text;
 using System.Configuration;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.language;
@@ -27,11 +28,6 @@ namespace Umbraco.Tests.Routing
             SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
             base.FreezeResolution();
         }
-
-		internal override IRoutesCache GetRoutesCache()
-		{
-			return new DefaultRoutesCache(false);
-		}
 
 		void InitializeLanguagesAndDomains()
 		{
@@ -314,10 +310,12 @@ namespace Umbraco.Tests.Routing
 			ignore = routingContext.UrlProvider.GetUrl(100111, new Uri("http://domain2.com"), false);
 			ignore = routingContext.UrlProvider.GetUrl(1002, new Uri("http://domain2.com"), false);
 
-			var cachedRoutes = ((DefaultRoutesCache)routingContext.RoutesCache).GetCachedRoutes();
-			Assert.AreEqual(7, cachedRoutes.Count);
+            var cache = routingContext.UmbracoContext.ContentCache.InnerCache as PublishedContentCache;
+            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the legacy one is supported.");
+            var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
+            Assert.AreEqual(7, cachedRoutes.Count);
 
-			var cachedIds = ((DefaultRoutesCache)routingContext.RoutesCache).GetCachedIds();
+			var cachedIds = cache.RoutesCache.GetCachedIds();
 			Assert.AreEqual(7, cachedIds.Count);
 
 			CheckRoute(cachedRoutes, cachedIds, 1001, "1001/");

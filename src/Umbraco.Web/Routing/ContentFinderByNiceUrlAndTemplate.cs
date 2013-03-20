@@ -19,7 +19,7 @@ namespace Umbraco.Web.Routing
 		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		/// <remarks>If successful, also assigns the template.</remarks>
-		public override bool TryFindDocument(PublishedContentRequest docRequest)
+		public override bool TryFindContent(PublishedContentRequest docRequest)
         {
             IPublishedContent node = null;
 			string path = docRequest.Uri.GetAbsolutePathDecoded();
@@ -39,7 +39,7 @@ namespace Umbraco.Web.Routing
 					LogHelper.Debug<ContentFinderByNiceUrlAndTemplate>("Valid template: \"{0}\"", () => templateAlias);
 
 					var route = docRequest.HasDomain ? (docRequest.Domain.RootNodeId.ToString() + path) : path;
-					node = LookupDocumentNode(docRequest, route);
+					node = FindContent(docRequest, route);
 
                     if (node != null)
 						docRequest.TemplateModel = template;
