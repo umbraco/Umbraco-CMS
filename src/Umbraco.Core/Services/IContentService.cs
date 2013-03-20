@@ -288,12 +288,5 @@ namespace Umbraco.Core.Services
         /// <param name="content"><see cref="IContent"/> to check if anscestors are published</param>
         /// <returns>True if the Content can be published, otherwise False</returns>
         bool IsPublishable(IContent content);
-
-        /// <summary>
-        /// Imports and saves package xml as <see cref="IContent"/>
-        /// </summary>
-        /// <param name="element">Xml to import</param>
-        /// <returns>An enumrable list of generated content</returns>
-        IEnumerable<IContent> Import(XElement element);
     }
 }

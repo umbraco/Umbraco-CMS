@@ -26,16 +26,21 @@ namespace Umbraco.Tests.Services.Importing
             string strXml = ImportResources.package;
             var xml = XElement.Parse(strXml);
             var element = xml.Descendants("DocumentTypes").First();
-            var contentTypeService = ServiceContext.ContentTypeService;
+            var dataTypeElement = xml.Descendants("DataTypes").First();
+            var packagingService = ServiceContext.PackagingService;
 
             // Act
-            var contentTypes = contentTypeService.Import(element);
+            var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement);
+            var contentTypes = packagingService.ImportContentTypes(element);
             var numberOfDocTypes = (from doc in element.Elements("DocumentType") select doc).Count();
 
             // Assert
+            Assert.That(dataTypeDefinitions, Is.Not.Null);
+            Assert.That(dataTypeDefinitions.Any(), Is.True);
             Assert.That(contentTypes, Is.Not.Null);
             Assert.That(contentTypes.Any(), Is.True);
             Assert.That(contentTypes.Count(), Is.EqualTo(numberOfDocTypes));
+            Assert.That(contentTypes.Count(x => x.ParentId == -1), Is.EqualTo(1));
         }
 
         [Test]
@@ -44,20 +49,22 @@ namespace Umbraco.Tests.Services.Importing
             // Arrange
             string strXml = ImportResources.package;
             var xml = XElement.Parse(strXml);
+            var dataTypeElement = xml.Descendants("DataTypes").First();
             var docTypesElement = xml.Descendants("DocumentTypes").First();
             var element = xml.Descendants("DocumentSet").First();
-            var contentService = ServiceContext.ContentService;
-            var contentTypeService = ServiceContext.ContentTypeService;
+            var packagingService = ServiceContext.PackagingService;
 
             // Act
-            var contentTypes = contentTypeService.Import(docTypesElement);
-            var contents = contentService.Import(element);
+            var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement);
+            var contentTypes = packagingService.ImportContentTypes(docTypesElement);
+            var contents = packagingService.ImportContent(element);
             var numberOfDocs = (from doc in element.Descendants()
                                 where (string) doc.Attribute("isDoc") == ""
                                 select doc).Count();
 
             // Assert
             Assert.That(contents, Is.Not.Null);
+            Assert.That(dataTypeDefinitions.Any(), Is.True);
             Assert.That(contentTypes.Any(), Is.True);
             Assert.That(contents.Any(), Is.True);
             Assert.That(contents.Count(), Is.EqualTo(numberOfDocs));

@@ -762,7 +762,7 @@ namespace umbraco.cms.businesslogic.packager
                 tabNames += tabs[t].Caption + ";";
 
 
-
+            //So the Tab is added to the DocumentType and then to this Hashtable, but its never used anywhere - WHY?
             Hashtable ht = new Hashtable();
             foreach (XmlNode t in n.SelectNodes("Tabs/Tab"))
             {

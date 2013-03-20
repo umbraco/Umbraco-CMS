@@ -328,8 +328,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public ITemplate Get(string alias)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where("cmsTemplate.alias = @Alias", new { Alias = alias });
+            var sql = GetBaseQuery(false)
+                .Where<TemplateDto>(x => x.Alias == alias);
 
             var dto = Database.Fetch<TemplateDto, NodeDto>(sql).FirstOrDefault();
 

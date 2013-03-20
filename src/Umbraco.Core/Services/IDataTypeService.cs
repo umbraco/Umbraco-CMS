@@ -39,6 +39,13 @@ namespace Umbraco.Core.Services
         void Save(IDataTypeDefinition dataTypeDefinition, int userId = 0);
 
         /// <summary>
+        /// Saves a collection of <see cref="IDataTypeDefinition"/>
+        /// </summary>
+        /// <param name="dataTypeDefinitions"><see cref="IDataTypeDefinition"/> to save</param>
+        /// <param name="userId">Id of the user issueing the save</param>
+        void Save(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, int userId = 0);
+
+        /// <summary>
         /// Deletes an <see cref="IDataTypeDefinition"/>
         /// </summary>
         /// <remarks>
@@ -75,5 +82,12 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the <see cref="IDataTypeDefinition"/> to retrieve prevalues from</param>
         /// <returns>An enumerable list of string values</returns>
         IEnumerable<string> GetPreValuesByDataTypeId(int id);
+
+        /// <summary>
+        /// Saves a list of PreValues for a given DataTypeDefinition
+        /// </summary>
+        /// <param name="id">Id of the DataTypeDefinition to save PreValues for</param>
+        /// <param name="values">List of string values to save</param>
+        void SavePreValues(int id, IEnumerable<string> values);
     }
 }
