@@ -30,5 +30,8 @@ namespace Umbraco.Core.Cache
 
         public const string DomainCacheKey = "UmbracoDomainList";
 
+        public const string StylesheetCacheKey = "UmbracoStylesheet";
+        public const string StylesheetPropertyCacheKey = "UmbracoStylesheetProperty";
+
     }
 }

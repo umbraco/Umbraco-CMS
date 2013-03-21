@@ -279,6 +279,58 @@ namespace Umbraco.Web.Cache
         } 
         #endregion
 
+        #region Stylesheet Cache
+
+        public static void RefreshStylesheetPropertyCache(this DistributedCache dc, global::umbraco.cms.businesslogic.web.StylesheetProperty styleSheetProperty)
+        {
+            if (styleSheetProperty != null)
+            {
+                dc.Refresh(new Guid(DistributedCache.StylesheetPropertyCacheRefresherId), styleSheetProperty.Id);
+            }
+        }
+
+        public static void RemoveStylesheetPropertyCache(this DistributedCache dc, global::umbraco.cms.businesslogic.web.StylesheetProperty styleSheetProperty)
+        {
+            if (styleSheetProperty != null)
+            {
+                dc.Remove(new Guid(DistributedCache.StylesheetPropertyCacheRefresherId), styleSheetProperty.Id);
+            }
+        }
+
+        public static void RefreshStylesheetCache(this DistributedCache dc, StyleSheet styleSheet)
+        {
+            if (styleSheet != null)
+            {
+                dc.Refresh(new Guid(DistributedCache.StylesheetCacheRefresherId), styleSheet.Id);
+            }
+        }
+
+        public static void RemoveStylesheetCache(this DistributedCache dc, StyleSheet styleSheet)
+        {
+            if (styleSheet != null)
+            {
+                dc.Remove(new Guid(DistributedCache.StylesheetCacheRefresherId), styleSheet.Id);
+            }
+        }
+
+        public static void RefreshStylesheetCache(this DistributedCache dc, Umbraco.Core.Models.Stylesheet styleSheet)
+        {
+            if (styleSheet != null)
+            {
+                dc.Refresh(new Guid(DistributedCache.StylesheetCacheRefresherId), styleSheet.Id);
+            }
+        }
+
+        public static void RemoveStylesheetCache(this DistributedCache dc, Umbraco.Core.Models.Stylesheet styleSheet)
+        {
+            if (styleSheet != null)
+            {
+                dc.Remove(new Guid(DistributedCache.StylesheetCacheRefresherId), styleSheet.Id);
+            }
+        }
+
+        #endregion
+
         #region Domain Cache
 
         public static void RefreshDomainCache(this DistributedCache dc, Domain domain)

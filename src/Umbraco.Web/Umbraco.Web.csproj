@@ -273,6 +273,8 @@
     <Compile Include="Cache\MediaCacheRefresher.cs" />
     <Compile Include="Cache\MemberCacheRefresher.cs" />
     <Compile Include="Cache\PageCacheRefresher.cs" />
+    <Compile Include="Cache\StylesheetCacheRefresher.cs" />
+    <Compile Include="Cache\StylesheetPropertyCacheRefresher.cs" />
     <Compile Include="Cache\TemplateCacheRefresher.cs" />
     <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />

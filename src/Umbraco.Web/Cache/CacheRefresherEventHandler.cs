@@ -21,15 +21,16 @@ namespace Umbraco.Web.Cache
     public class CacheRefresherEventHandler : ApplicationEventHandler
     {
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {
-            //Bind to content events - currently used for:
-            // - macro clearing
-            // - clearing the xslt cache (MS.Internal.Xml.XPath.XPathSelectionIterator)
-            //NOTE: These are 'special' event handlers that will only clear cache for items on the current server
-            // that is because this event will fire based on a distributed cache call, meaning this event fires on 
-            // all servers based on the distributed cache call for updating content.
-            content.AfterUpdateDocumentCache += ContentAfterUpdateDocumentCache;
-            content.AfterClearDocumentCache += ContentAfterClearDocumentCache;
+        {          
+            //Bind to stylesheet events
+            //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
+
+            global::umbraco.cms.businesslogic.web.StylesheetProperty.AfterSave += StylesheetPropertyAfterSave;
+            global::umbraco.cms.businesslogic.web.StylesheetProperty.AfterDelete += StylesheetPropertyAfterDelete;
+            global::umbraco.cms.businesslogic.web.StyleSheet.AfterDelete += StyleSheetAfterDelete;
+            global::umbraco.cms.businesslogic.web.StyleSheet.AfterSave += StyleSheetAfterSave;
+            FileService.SavedStylesheet += FileServiceSavedStylesheet;
+            FileService.DeletedStylesheet += FileServiceDeletedStylesheet;
 
             //Bind to domain events
 
@@ -84,6 +85,39 @@ namespace Umbraco.Web.Cache
             MediaService.Trashing += MediaServiceTrashing;
         }
 
+        #region Stylesheet and stylesheet property event handlers
+        static void StylesheetPropertyAfterSave(global::umbraco.cms.businesslogic.web.StylesheetProperty sender, SaveEventArgs e)
+        {
+            DistributedCache.Instance.RefreshStylesheetPropertyCache(sender);
+        }
+
+        static void StylesheetPropertyAfterDelete(global::umbraco.cms.businesslogic.web.StylesheetProperty sender, DeleteEventArgs e)
+        {
+            DistributedCache.Instance.RemoveStylesheetPropertyCache(sender);
+        }
+
+        static void FileServiceDeletedStylesheet(IFileService sender, Core.Events.DeleteEventArgs<Stylesheet> e)
+        {
+            e.DeletedEntities.ForEach(DistributedCache.Instance.RemoveStylesheetCache);
+        }
+
+        static void FileServiceSavedStylesheet(IFileService sender, Core.Events.SaveEventArgs<Stylesheet> e)
+        {
+            e.SavedEntities.ForEach(DistributedCache.Instance.RefreshStylesheetCache);
+        }
+
+        static void StyleSheetAfterSave(StyleSheet sender, SaveEventArgs e)
+        {
+            DistributedCache.Instance.RefreshStylesheetCache(sender);
+        }
+
+        static void StyleSheetAfterDelete(StyleSheet sender, DeleteEventArgs e)
+        {
+            DistributedCache.Instance.RemoveStylesheetCache(sender);
+        } 
+        #endregion
+
+        #region Domain event handlers
         static void DomainNew(Domain sender, NewEventArgs e)
         {
             DistributedCache.Instance.RefreshDomainCache(sender);
@@ -97,8 +131,10 @@ namespace Umbraco.Web.Cache
         static void DomainAfterSave(Domain sender, SaveEventArgs e)
         {
             DistributedCache.Instance.RefreshDomainCache(sender);
-        }
+        } 
+        #endregion
 
+        #region Language event handlers
         /// <summary>
         /// Fires when a langauge is deleted
         /// </summary>
@@ -147,8 +183,10 @@ namespace Umbraco.Web.Cache
         static void LanguageAfterDelete(global::umbraco.cms.businesslogic.language.Language sender, DeleteEventArgs e)
         {
             DistributedCache.Instance.RemoveLanguageCache(sender);
-        }
+        } 
+        #endregion
 
+        #region Content/media Type event handlers
         /// <summary>
         /// Fires when a media type is deleted
         /// </summary>
@@ -185,32 +223,12 @@ namespace Umbraco.Web.Cache
         /// <param name="sender"></param>
         /// <param name="e"></param>
         static void ContentTypeServiceSavedContentType(IContentTypeService sender, Core.Events.SaveEventArgs<IContentType> e)
-        {           
+        {
             e.SavedEntities.ForEach(contentType => DistributedCache.Instance.RefreshContentTypeCache(contentType));
-        }
-
-        /// <summary>
-        /// Fires after the document cache has been cleared for a particular document
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        static void ContentAfterClearDocumentCache(global::umbraco.cms.businesslogic.web.Document sender, DocumentCacheEventArgs e)
-        {
-            DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
-            DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
-        }
-
-        /// <summary>
-        /// Fires after the document cache has been updated for a particular document
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        static void ContentAfterUpdateDocumentCache(global::umbraco.cms.businesslogic.web.Document sender, DocumentCacheEventArgs e)
-        {
-            DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
-            DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
-        }
-
+        } 
+        #endregion
+        
+        #region User event handlers
         static void UserDeleting(User sender, System.EventArgs e)
         {
             DistributedCache.Instance.RemoveUserCache(sender.Id);
@@ -219,8 +237,10 @@ namespace Umbraco.Web.Cache
         static void UserSaving(User sender, System.EventArgs e)
         {
             DistributedCache.Instance.RefreshUserCache(sender.Id);
-        }
+        } 
+        #endregion
 
+        #region Template event handlers
         /// <summary>
         /// Removes cache for template
         /// </summary>
@@ -239,8 +259,10 @@ namespace Umbraco.Web.Cache
         static void TemplateAfterSave(Template sender, SaveEventArgs e)
         {
             DistributedCache.Instance.RefreshTemplateCache(sender.Id);
-        }
+        } 
+        #endregion
 
+        #region Macro event handlers
         /// <summary>
         /// Flush macro from cache
         /// </summary>
@@ -257,13 +279,15 @@ namespace Umbraco.Web.Cache
         /// <param name="sender"></param>
         /// <param name="e"></param>
         static void MacroAfterSave(Macro sender, SaveEventArgs e)
-        {				
+        {
             DistributedCache.Instance.RefreshMacroCache(sender);
-        }
+        } 
+        #endregion
 
+        #region Media event handlers
         static void MediaServiceTrashing(IMediaService sender, Core.Events.MoveEventArgs<Core.Models.IMedia> e)
         {
-            DistributedCache.Instance.RemoveMediaCache(e.Entity);            
+            DistributedCache.Instance.RemoveMediaCache(e.Entity);
         }
 
         static void MediaServiceMoving(IMediaService sender, Core.Events.MoveEventArgs<Core.Models.IMedia> e)
@@ -279,16 +303,19 @@ namespace Umbraco.Web.Cache
         static void MediaServiceSaved(IMediaService sender, Core.Events.SaveEventArgs<Core.Models.IMedia> e)
         {
             DistributedCache.Instance.RefreshMediaCache(e.SavedEntities.ToArray());
-        }
+        } 
+        #endregion
 
+        #region Member event handlers
         static void MemberBeforeDelete(Member sender, DeleteEventArgs e)
         {
-            DistributedCache.Instance.RemoveMemberCache(sender.Id);            
+            DistributedCache.Instance.RemoveMemberCache(sender.Id);
         }
 
         static void MemberAfterSave(Member sender, SaveEventArgs e)
         {
             DistributedCache.Instance.RefreshMemberCache(sender.Id);
-        }
+        } 
+        #endregion
     }
 }

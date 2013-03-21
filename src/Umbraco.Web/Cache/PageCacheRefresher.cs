@@ -61,6 +61,8 @@ namespace Umbraco.Web.Cache
         public override void Refresh(int id)
         {
             content.Instance.UpdateDocumentCache(id);
+            DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
+            DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
             base.Refresh(id);
         }
 
@@ -71,18 +73,24 @@ namespace Umbraco.Web.Cache
         public override void Remove(int id)
         {
             content.Instance.ClearDocumentCache(id);
+            DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
+            DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
             base.Remove(id);
         }
 
         public override void Refresh(IContent instance)
         {
             content.Instance.UpdateDocumentCache(new Document(instance));
+            DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
+            DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
             base.Refresh(instance);
         }
 
         public override void Remove(IContent instance)
         {
             content.Instance.ClearDocumentCache(new Document(instance));
+            DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
+            DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
             base.Remove(instance);
         }
     }

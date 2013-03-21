@@ -13,10 +13,9 @@ namespace umbraco.cms.businesslogic.cache
     /// class so that is why the class declaration is not marked obsolete.
     /// We haven't migrated it because I don't know why it is needed.
     /// </remarks>
+    [Obsolete("Use the ApplicationContext.Current.ApplicationCache instead")]
     public class Cache
     {
-        private static readonly object m_Locker = new object();
-
         /// <summary>
         /// Clears everything in umbraco's runtime cache, which means that not only
         /// umbraco content is removed, but also other cache items from pages running in
