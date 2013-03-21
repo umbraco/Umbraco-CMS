@@ -46,6 +46,7 @@ namespace Umbraco.Web.Cache
         public const string DomainCacheRefresherId = "11290A79-4B57-4C99-AD72-7748A3CF38AF";
         public const string StylesheetCacheRefresherId = "E0633648-0DEB-44AE-9A48-75C3A55CB670";
         public const string StylesheetPropertyCacheRefresherId = "2BC7A3A4-6EB1-4FBC-BAA3-C9E7B6D36D38";
+        public const string DataTypeCacheRefresherId = "35B16C25-A17E-45D7-BC8F-EDAB1DCC28D2";
 
         #endregion
 

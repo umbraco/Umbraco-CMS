@@ -48,6 +48,29 @@ namespace Umbraco.Web.Cache
 
         #endregion
 
+        #region Data type cache
+        /// <summary>
+        /// Refreshes the cache amongst servers for a template
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="dataTypeId"></param>
+        public static void RefreshDataTypeCache(this DistributedCache dc, int dataTypeId)
+        {
+            dc.Refresh(new Guid(DistributedCache.DataTypeCacheRefresherId), dataTypeId);
+        }
+
+        /// <summary>
+        /// Removes the cache amongst servers for a template
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="dataTypeId"></param>
+        public static void RemoveDataTypeCache(this DistributedCache dc, int dataTypeId)
+        {
+            dc.Remove(new Guid(DistributedCache.DataTypeCacheRefresherId), dataTypeId);
+        }
+
+        #endregion
+
         #region Page cache
         /// <summary>
         /// Refreshes the cache amongst servers for all pages

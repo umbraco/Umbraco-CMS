@@ -3,6 +3,7 @@ using System.Data;
 
 using System.Collections;
 using System.Linq;
+using Umbraco.Core.Cache;
 using umbraco.DataLayer;
 using System.Xml;
 using umbraco.interfaces;
@@ -101,7 +102,7 @@ namespace umbraco.cms.businesslogic.datatype
             SqlHelper.ExecuteNonQuery("delete from cmsDataType where nodeId=@nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
             base.delete();
 
-            cache.Cache.ClearCacheItem(string.Format("UmbracoDataTypeDefinition{0}", Id));
+            OnDeleting(new EventArgs());
         }
 
         [Obsolete("Use the standard delete() method instead")]
@@ -117,22 +118,6 @@ namespace umbraco.cms.businesslogic.datatype
         {
             OnSaving(EventArgs.Empty);
         }
-
-        /*
-		public SortedList PreValues {
-			get {
-				SortedList retVal = new SortedList();
-				SqlDataReader dr = SqlHelper.ExecuteReader("select id, value from cmsDataTypePreValues where dataTypeNodeId = @nodeId order by sortOrder", SqlHelper.CreateParameter("@nodeId", this.Id));
-				while (dr.Read()) 
-				{
-					retVal.Add(dr.GetString("id"), dr.GetString("value"));
-				}
-				dr.Close();
-
-				return retVal;
-				}
-		}
-		*/
 
         public XmlElement ToXml(XmlDocument xd)
         {
@@ -171,12 +156,12 @@ namespace umbraco.cms.businesslogic.datatype
             )
             {
 
-                BusinessLogic.User u = umbraco.BusinessLogic.User.GetCurrent();
+                BusinessLogic.User u = BusinessLogic.User.GetCurrent();
 
                 if (u == null)
                     u = BusinessLogic.User.GetUser(0);
 
-                cms.businesslogic.datatype.controls.Factory f = new umbraco.cms.businesslogic.datatype.controls.Factory();
+                var f = new controls.Factory();
 
 
                 DataTypeDefinition dtd = MakeNew(u, _name, new Guid(_def));
@@ -309,23 +294,17 @@ namespace umbraco.cms.businesslogic.datatype
 
         public static DataTypeDefinition GetDataTypeDefinition(int id)
         {
-            if (System.Web.HttpRuntime.Cache[string.Format("UmbracoDataTypeDefinition{0}", id.ToString())] == null)
-            {
-                DataTypeDefinition dt = new DataTypeDefinition(id);
-                System.Web.HttpRuntime.Cache.Insert(string.Format("UmbracoDataTypeDefinition{0}", id.ToString()), dt);
-            }
-            return (DataTypeDefinition)System.Web.HttpRuntime.Cache[string.Format("UmbracoDataTypeDefinition{0}", id.ToString())];
+            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                string.Format("{0}{1}", CacheKeys.DataTypeCacheKey, id),
+                () => new DataTypeDefinition(id));
         }
 
         [Obsolete("Use GetDataTypeDefinition(int id) instead", false)]
         public static DataTypeDefinition GetDataTypeDefinition(Guid id)
         {
-            if (System.Web.HttpRuntime.Cache[string.Format("UmbracoDataTypeDefinition{0}", id.ToString())] == null)
-            {
-                DataTypeDefinition dt = new DataTypeDefinition(id);
-                System.Web.HttpRuntime.Cache.Insert(string.Format("UmbracoDataTypeDefinition{0}", id.ToString()), dt);
-            }
-            return (DataTypeDefinition)System.Web.HttpRuntime.Cache[string.Format("UmbracoDataTypeDefinition{0}", id.ToString())];
+            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                string.Format("{0}{1}", CacheKeys.DataTypeCacheKey, id),
+                () => new DataTypeDefinition(id));
         }
         #endregion
 
@@ -355,7 +334,7 @@ namespace umbraco.cms.businesslogic.datatype
         public delegate void DeleteEventHandler(DataTypeDefinition sender, EventArgs e);
 
         /// <summary>
-        /// Occurs when a macro is saved.
+        /// Occurs when a data type is saved.
         /// </summary>
         public static event SaveEventHandler Saving;
         protected virtual void OnSaving(EventArgs e)

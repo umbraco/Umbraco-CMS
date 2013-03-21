@@ -166,18 +166,5 @@ namespace umbraco.cms.businesslogic.relation
         
 		#endregion
 
-        /// <summary>
-        /// Occurs when [after delete].
-        /// </summary>
-        public static event EventHandler<DeleteEventArgs> AfterDelete;
-        /// <summary>
-        /// Raises the <see cref="AfterDelete"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        private void FireAfterDelete(DeleteEventArgs e)
-        {
-            if (AfterDelete != null)
-                AfterDelete(this, e);
-        }
 	}
 }

@@ -22,6 +22,15 @@ namespace Umbraco.Web.Cache
     {
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {          
+
+            //Bind to data type events
+            //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
+
+            global::umbraco.cms.businesslogic.datatype.DataTypeDefinition.Deleting += DataTypeDefinitionDeleting;
+            global::umbraco.cms.businesslogic.datatype.DataTypeDefinition.Saving += DataTypeDefinitionSaving;
+            DataTypeService.Deleted += DataTypeServiceDeleted;
+            DataTypeService.Saved += DataTypeServiceSaved;
+
             //Bind to stylesheet events
             //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
 
@@ -87,6 +96,28 @@ namespace Umbraco.Web.Cache
             MediaService.Moving += MediaServiceMoving;
             MediaService.Trashing += MediaServiceTrashing;
         }
+
+        #region DataType event handlers
+        static void DataTypeServiceSaved(IDataTypeService sender, Core.Events.SaveEventArgs<IDataTypeDefinition> e)
+        {
+            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshDataTypeCache(x.Id));
+        }
+
+        static void DataTypeServiceDeleted(IDataTypeService sender, Core.Events.DeleteEventArgs<IDataTypeDefinition> e)
+        {
+            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveDataTypeCache(x.Id));
+        }
+
+        static void DataTypeDefinitionSaving(global::umbraco.cms.businesslogic.datatype.DataTypeDefinition sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RefreshDataTypeCache(sender.Id);
+        }
+
+        static void DataTypeDefinitionDeleting(global::umbraco.cms.businesslogic.datatype.DataTypeDefinition sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RemoveDataTypeCache(sender.Id);
+        } 
+        #endregion
 
         #region Stylesheet and stylesheet property event handlers
         static void StylesheetPropertyAfterSave(global::umbraco.cms.businesslogic.web.StylesheetProperty sender, SaveEventArgs e)

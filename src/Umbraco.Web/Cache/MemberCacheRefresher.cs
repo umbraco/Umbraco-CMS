@@ -27,7 +27,7 @@ namespace Umbraco.Web.Cache
 
         public override string Name
         {
-            get { return "Clears Member Cache from umbraco.library"; }
+            get { return "Clears Member Cache"; }
         }
         
         public override void Refresh(int id)
