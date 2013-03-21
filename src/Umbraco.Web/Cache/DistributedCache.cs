@@ -16,6 +16,11 @@ using umbraco.interfaces;
 
 namespace Umbraco.Web.Cache
 {
+    //public class CacheUpdatedEventArgs : EventArgs
+    //{
+        
+    //}
+
     /// <summary>
     /// DistributedCache is used to invalidate cache throughout the application which also takes in to account load balancing environments automatically
     /// </summary>
@@ -41,6 +46,23 @@ namespace Umbraco.Web.Cache
         #endregion
 
         private static readonly DistributedCache InstanceObject = new DistributedCache();
+
+        ///// <summary>
+        ///// Fired when any cache refresher method has fired
+        ///// </summary>
+        ///// <remarks>
+        ///// This could be used by developers to know when a cache refresher has executed on the local server. 
+        ///// Similarly to the content.AfterUpdateDocumentCache which fires locally on each machine.
+        ///// </remarks>
+        //public event EventHandler<CacheUpdatedEventArgs> CacheChanged;
+
+        //private void OnCacheChanged(CacheUpdatedEventArgs args)
+        //{
+        //    if (CacheChanged != null)
+        //    {
+        //        CacheChanged(this, args);
+        //    }
+        //}
 
         /// <summary>
         /// Constructor
@@ -110,6 +132,20 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
+        /// Sends a request to all registered load-balanced servers to refresh data based on the custom json payload
+        /// using the specified ICacheRefresher with the guid factoryGuid.
+        /// </summary>
+        /// <param name="factoryGuid"></param>
+        /// <param name="jsonPayload"></param>
+        public void RefreshByJson(Guid factoryGuid, string jsonPayload)
+        {
+            ServerMessengerResolver.Current.Messenger.PerformRefresh(
+                ServerRegistrarResolver.Current.Registrar.Registrations,
+                GetRefresherById(factoryGuid),
+                jsonPayload);
+        }
+
+        /// <summary>
         /// Sends a request to all registered load-balanced servers to refresh all nodes
         /// using the specified ICacheRefresher with the guid factoryGuid.
         /// </summary>
@@ -165,6 +201,20 @@ namespace Umbraco.Web.Cache
                 GetRefresherById(factoryGuid),
                 getNumericId,
                 instances);
+        }
+
+        /// <summary>
+        /// Sends a request to all registered load-balanced servers to remove data based on the custom json payload
+        /// using the specified ICacheRefresher with the guid factoryGuid.
+        /// </summary>
+        /// <param name="factoryGuid"></param>
+        /// <param name="jsonPayload"></param>
+        public void RemoveByJson(Guid factoryGuid, string jsonPayload)
+        {
+            ServerMessengerResolver.Current.Messenger.PerformRemove(
+                ServerRegistrarResolver.Current.Registrar.Registrations,
+                GetRefresherById(factoryGuid),
+                jsonPayload);
         }
 
         private static ICacheRefresher GetRefresherById(Guid uniqueIdentifier)
