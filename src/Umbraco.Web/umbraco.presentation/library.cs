@@ -516,7 +516,7 @@ namespace umbraco
                 {
                     var retVal = ApplicationContext.Current.ApplicationCache.GetCacheItem(
                         string.Format(
-                            "{0}_{1}", CacheKeys.MemberCacheKey, MemberId),
+                            "{0}_{1}", CacheKeys.MemberLibraryCacheKey, MemberId),
                         TimeSpan.FromSeconds(UmbracoSettings.UmbracoLibraryCacheDuration),
                         () => getMemberDo(MemberId));
 

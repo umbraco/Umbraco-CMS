@@ -14,7 +14,8 @@ namespace Umbraco.Core.Cache
         public const string MacroHtmlDateAddedCacheKey = "macroHtml_DateAdded_";
         public const string MacroControlDateAddedCacheKey = "macroControl_DateAdded_";
 
-        public const string MemberCacheKey = "UL_GetMember";
+        public const string MemberLibraryCacheKey = "UL_GetMember";
+        public const string MemberBusinessLogicCacheKey = "MemberCacheItem_";
 
         public const string TemplateFrontEndCacheKey = "template";
         public const string TemplateBusinessLogicCacheKey = "UmbracoTemplateCache";

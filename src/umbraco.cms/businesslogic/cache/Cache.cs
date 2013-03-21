@@ -67,6 +67,7 @@ namespace umbraco.cms.businesslogic.cache
         /// Retrieve all cached items
         /// </summary>
         /// <returns>A hastable containing all cacheitems</returns>
+        [Obsolete("This method should not be used, use other methods to return specific cached items")]
         public static System.Collections.Hashtable ReturnCacheItemsOrdred()
         {
             System.Collections.Hashtable ht = new System.Collections.Hashtable();

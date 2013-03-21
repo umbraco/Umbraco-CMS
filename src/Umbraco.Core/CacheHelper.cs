@@ -140,6 +140,16 @@ namespace Umbraco.Core
             }
 	    }
 
+        public IEnumerable<T> GetCacheItemsByKeySearch<T>(string keyStartsWith)
+        {
+            return (from DictionaryEntry c in _cache 
+                    where c.Key is string && ((string) c.Key).InvariantStartsWith(keyStartsWith) 
+                    select c.Value.TryConvertTo<T>() 
+                    into attempt 
+                    where attempt.Success 
+                    select attempt.Result).ToList();
+        }
+
 	    /// <summary>
         /// Returns a cache item by key, does not update the cache if it isn't there.
         /// </summary>

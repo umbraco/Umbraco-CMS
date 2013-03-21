@@ -45,7 +45,9 @@ namespace Umbraco.Web.Cache
         private void ClearCache(int id)
         {
             ApplicationContext.Current.ApplicationCache.
-                ClearCacheByKeySearch(string.Format("{0}_{1}", CacheKeys.MemberCacheKey, id));
+                ClearCacheByKeySearch(string.Format("{0}_{1}", CacheKeys.MemberLibraryCacheKey, id));
+            ApplicationContext.Current.ApplicationCache.
+                ClearCacheByKeySearch(string.Format("{0}{1}", CacheKeys.MemberBusinessLogicCacheKey, id));
         }
     }
 }
