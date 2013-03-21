@@ -23,6 +23,7 @@ namespace Umbraco.Core.Services
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private Dictionary<string, IContentType> _importedContentTypes;
+
         //Support recursive locks because some of the methods that require locking call other methods that require locking. 
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
@@ -176,7 +177,7 @@ namespace Umbraco.Core.Services
             return content;
         }
 
-        public XElement Export(IContent content, bool deep = false)
+        internal XElement Export(IContent content, bool deep = false)
         {
             throw new NotImplementedException();
         }
