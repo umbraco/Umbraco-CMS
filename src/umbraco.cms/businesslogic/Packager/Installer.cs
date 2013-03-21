@@ -475,11 +475,13 @@ namespace umbraco.cms.businesslogic.packager
                 #endregion
 
                 #region Documents
-                var documentElement = rootElement.Descendants("DocumentSet").First();
-                var content = packagingService.ImportContent(documentElement, -1, currentUser.Id);
-                var firstContentItem = content.First();
-                insPack.Data.ContentNodeId = firstContentItem.Id.ToString(CultureInfo.InvariantCulture);
-
+                var documentElement = rootElement.Descendants("DocumentSet").FirstOrDefault();
+                if (documentElement != null)
+                {
+                    var content = packagingService.ImportContent(documentElement, -1, currentUser.Id);
+                    var firstContentItem = content.First();
+                    insPack.Data.ContentNodeId = firstContentItem.Id.ToString(CultureInfo.InvariantCulture);
+                }
                 /*foreach (XmlElement n in _packageConfig.DocumentElement.SelectNodes("Documents/DocumentSet [@importMode = 'root']/*"))
                 {
                     insPack.Data.ContentNodeId = cms.businesslogic.web.Document.Import(-1, currentUser, n).ToString();
