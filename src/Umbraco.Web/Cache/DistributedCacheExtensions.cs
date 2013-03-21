@@ -278,6 +278,42 @@ namespace Umbraco.Web.Cache
         } 
         #endregion
 
+        #region Language Cache
+
+        public static void RefreshLanguageCache(this DistributedCache dc, ILanguage language)
+        {
+            if (language != null)
+            {
+                dc.Refresh(new Guid(DistributedCache.LanguageCacheRefresherId), language.Id);
+            }
+        }
+
+        public static void RemoveLanguageCache(this DistributedCache dc, ILanguage language)
+        {
+            if (language != null)
+            {
+                dc.Remove(new Guid(DistributedCache.LanguageCacheRefresherId), language.Id);
+            }
+        }
+
+        public static void RefreshLanguageCache(this DistributedCache dc, global::umbraco.cms.businesslogic.language.Language language)
+        {
+            if (language != null)
+            {
+                dc.Refresh(new Guid(DistributedCache.LanguageCacheRefresherId), language.id);
+            }
+        }
+
+        public static void RemoveLanguageCache(this DistributedCache dc, global::umbraco.cms.businesslogic.language.Language language)
+        {
+            if (language != null)
+            {
+                dc.Remove(new Guid(DistributedCache.LanguageCacheRefresherId), language.id);
+            }
+        }
+
+        #endregion
+
         public static void ClearXsltCacheOnCurrentServer(this DistributedCache dc)
         {
             if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)

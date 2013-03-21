@@ -30,6 +30,15 @@ namespace Umbraco.Web.Cache
             content.AfterUpdateDocumentCache += ContentAfterUpdateDocumentCache;
             content.AfterClearDocumentCache += ContentAfterClearDocumentCache;
 
+            //Bind to language events
+            //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
+
+            global::umbraco.cms.businesslogic.language.Language.AfterDelete += LanguageAfterDelete;
+            global::umbraco.cms.businesslogic.language.Language.New += LanguageNew;
+            global::umbraco.cms.businesslogic.language.Language.AfterSave += LanguageAfterSave;
+            LocalizationService.SavedLanguage += LocalizationServiceSavedLanguage;
+            LocalizationService.DeletedLanguage += LocalizationServiceDeletedLanguage;
+
             //Bind to content type events
 
             ContentTypeService.SavedContentType += ContentTypeServiceSavedContentType;
@@ -66,6 +75,56 @@ namespace Umbraco.Web.Cache
             MediaService.Deleting += MediaServiceDeleting;
             MediaService.Moving += MediaServiceMoving;
             MediaService.Trashing += MediaServiceTrashing;
+        }
+
+        /// <summary>
+        /// Fires when a langauge is deleted
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void LocalizationServiceDeletedLanguage(ILocalizationService sender, Core.Events.DeleteEventArgs<ILanguage> e)
+        {
+            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveLanguageCache(x));
+        }
+
+        /// <summary>
+        /// Fires when a langauge is saved
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void LocalizationServiceSavedLanguage(ILocalizationService sender, Core.Events.SaveEventArgs<ILanguage> e)
+        {
+            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshLanguageCache(x));
+        }
+
+        /// <summary>
+        /// Fires when a langauge is saved
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void LanguageAfterSave(global::umbraco.cms.businesslogic.language.Language sender, SaveEventArgs e)
+        {
+            DistributedCache.Instance.RefreshLanguageCache(sender);
+        }
+
+        /// <summary>
+        /// Fires when a langauge is created
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void LanguageNew(global::umbraco.cms.businesslogic.language.Language sender, NewEventArgs e)
+        {
+            DistributedCache.Instance.RefreshLanguageCache(sender);
+        }
+
+        /// <summary>
+        /// Fires when a langauge is deleted
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void LanguageAfterDelete(global::umbraco.cms.businesslogic.language.Language sender, DeleteEventArgs e)
+        {
+            DistributedCache.Instance.RemoveLanguageCache(sender);
         }
 
         /// <summary>

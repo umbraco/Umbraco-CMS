@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Xml;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.cache;
 using umbraco.DataLayer;
@@ -31,12 +33,7 @@ namespace umbraco.cms.businesslogic.language
         #endregion
 
         #region Constants and static members
-
-        private static object getLanguageSyncLock = new object();
-        private static readonly string UmbracoLanguageCacheKey = "UmbracoLanguageCache";
-
-        private const int DefaultLanguageId = 1;
-
+        
         /// <summary>
         /// Gets the SQL helper.
         /// </summary>
@@ -47,8 +44,6 @@ namespace umbraco.cms.businesslogic.language
         }
 
         protected internal const string m_SQLOptimizedGetAll = @"select * from umbracoLanguage";
-
-        private static readonly object m_Locker = new object();
 
         #endregion
         
@@ -93,17 +88,10 @@ namespace umbraco.cms.businesslogic.language
                 SqlHelper.ExecuteNonQuery(
                     "insert into umbracoLanguage (languageISOCode) values (@CultureCode)",
                     SqlHelper.CreateParameter("@CultureCode", CultureCode));
-
-                InvalidateCache();
-
+                
                 NewEventArgs e = new NewEventArgs();
                 GetByCultureCode(CultureCode).OnNew(e);
             }
-        }
-
-        private static void InvalidateCache()
-        {
-            Cache.ClearCacheItem(UmbracoLanguageCacheKey);
         }
 
         /// <summary>
@@ -127,23 +115,24 @@ namespace umbraco.cms.businesslogic.language
         /// </remarks>
         public static IEnumerable<Language> GetAllAsList()
         {
-            return Cache.GetCacheItem<IEnumerable<Language>>(UmbracoLanguageCacheKey, getLanguageSyncLock, TimeSpan.FromMinutes(60),
-                delegate
-                {
-                    var languages = new List<Language>();
-
-                    using (IRecordsReader dr = SqlHelper.ExecuteReader(m_SQLOptimizedGetAll))
+            return ApplicationContext.Current.ApplicationCache.GetCacheItem<IEnumerable<Language>>(
+                CacheKeys.LanguageCacheKey,
+                TimeSpan.FromMinutes(60),
+                () =>
                     {
-                        while (dr.Read())
+                        var languages = new List<Language>();
+                        using (var dr = SqlHelper.ExecuteReader(m_SQLOptimizedGetAll))
                         {
-                            //create the ContentType object without setting up
-                            Language ct = new Language();
-                            ct.PopulateFromReader(dr);
-                            languages.Add(ct);
+                            while (dr.Read())
+                            {
+                                //create the ContentType object without setting up
+                                var ct = new Language();
+                                ct.PopulateFromReader(dr);
+                                languages.Add(ct);
+                            }
                         }
-                    }
-                    return languages;
-                });
+                        return languages;
+                    });
         }
 
         /// <summary>
@@ -252,7 +241,6 @@ namespace umbraco.cms.businesslogic.language
 
             if (!e.Cancel)
             {
-                InvalidateCache();
                 FireAfterSave(e);
             }
         }
@@ -286,8 +274,6 @@ namespace umbraco.cms.businesslogic.language
                 {
                     //remove the dictionary entries first
                     Item.RemoveByLanguage(id);
-
-                    InvalidateCache();
 
                     SqlHelper.ExecuteNonQuery("delete from umbracoLanguage where id = @id",
                         SqlHelper.CreateParameter("@id", id));

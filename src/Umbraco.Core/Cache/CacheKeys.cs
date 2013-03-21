@@ -26,5 +26,7 @@ namespace Umbraco.Core.Cache
         
         public const string PropertyTypeCacheKey = "UmbracoPropertyTypeCache";
 
+        public const string LanguageCacheKey = "UmbracoLanguageCache";
+
     }
 }
