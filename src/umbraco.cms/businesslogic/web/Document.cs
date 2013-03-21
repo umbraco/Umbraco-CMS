@@ -288,6 +288,10 @@ namespace umbraco.cms.businesslogic.web
 
             //Create a new IContent object based on the passed in DocumentType's alias, set the name and save it
             IContent content = ApplicationContext.Current.Services.ContentService.CreateContent(Name, ParentId, dct.Alias, u.Id);
+            //The content object will only be null if the 'Creating' event has been cancelled, so we return null.
+            if (content == null)
+                return null;
+
             //don't raise events here (false), they will get raised with the d.Save() call.
             ApplicationContext.Current.Services.ContentService.Save(content, u.Id, false); 
 
@@ -302,7 +306,7 @@ namespace umbraco.cms.businesslogic.web
             LogHelper.Info<Document>(string.Format("New document {0}", d.Id));
 
             // Run Handler				
-            umbraco.BusinessLogic.Actions.Action.RunActionHandlers(d, ActionNew.Instance);
+            BusinessLogic.Actions.Action.RunActionHandlers(d, ActionNew.Instance);
 
             // Save doc
             d.Save();

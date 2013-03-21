@@ -77,11 +77,21 @@ namespace umbraco.cms.businesslogic.media
         [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.CreateMedia()", false)]
         public static Media MakeNew(string Name, MediaType dct, BusinessLogic.User u, int ParentId)
         {
+            var e = new NewEventArgs();
+            OnNewing(e);
+            if (e.Cancel)
+            {
+                return null;
+            }
+
             var media = ApplicationContext.Current.Services.MediaService.CreateMedia(Name, ParentId, dct.Alias, u.Id);
+            //The media object will only be null if the 'Creating' event has been cancelled
+            if (media == null)
+                return null;
+
             ApplicationContext.Current.Services.MediaService.Save(media);
             var tmp = new Media(media);
 
-            NewEventArgs e = new NewEventArgs();
             tmp.OnNew(e);
 
             return tmp;
@@ -502,6 +512,15 @@ namespace umbraco.cms.businesslogic.media
         {
             if (New != null)
                 New(this, e);
+        }
+
+        public static event EventHandler<NewEventArgs> Newing;
+        protected static void OnNewing(NewEventArgs e)
+        {
+            if (Newing != null)
+            {
+                Newing(null, e);
+            }
         }
 
         /// <summary>

@@ -13,6 +13,10 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
+    /// <summary>
+    /// Represents the Packaging Service, which provides import/export functionality for the Core models of the API
+    /// using xml representation. This is primarily used by the Package functionality.
+    /// </summary>
     public class PackagingService : IService
     {
         private readonly IContentService _contentService;

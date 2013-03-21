@@ -65,11 +65,12 @@ namespace Umbraco.Core.Services
 	    public IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = 0)
 		{
 		    IContentType contentType = FindContentTypeByAlias(contentTypeAlias);
-            IContent content = new Content(name, parentId, contentType);
+            IContent content = null;
 
 			if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
 				return content;
 
+	        content = new Content(name, parentId, contentType);
 	        content.CreatorId = userId;
 			content.WriterId = userId;
 
@@ -92,11 +93,12 @@ namespace Umbraco.Core.Services
         public IContent CreateContent(string name, IContent parent, string contentTypeAlias, int userId = 0)
         {
             IContentType contentType = FindContentTypeByAlias(contentTypeAlias);
-            IContent content = new Content(name, parent, contentType);
+            IContent content = null;
 
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parent), this))
                 return content;
 
+            content = new Content(name, parent, contentType);
             content.CreatorId = userId;
             content.WriterId = userId;
 

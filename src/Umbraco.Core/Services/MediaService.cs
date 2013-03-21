@@ -46,7 +46,11 @@ namespace Umbraco.Core.Services
 	    /// <returns><see cref="IMedia"/></returns>
 	    public IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = 0)
 	    {
+	        Models.Media media = null;
 	        IMediaType mediaType = null;
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this))
+                return media;
+
 	        var uow = _uowProvider.GetUnitOfWork();
 	        using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
 	        {
@@ -64,10 +68,7 @@ namespace Umbraco.Core.Services
 	                                                  mediaTypeAlias));
 	        }
 
-	        var media = new Models.Media(name, parentId, mediaType);
-
-			if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this))
-				return media;
+	        media = new Models.Media(name, parentId, mediaType);
 
 			media.CreatorId = userId;
 
@@ -89,7 +90,12 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia CreateMedia(string name, IMedia parent, string mediaTypeAlias, int userId = 0)
         {
+            Models.Media media = null;
             IMediaType mediaType = null;
+
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parent), this))
+                return media;
+
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
             {
@@ -107,10 +113,7 @@ namespace Umbraco.Core.Services
                                                       mediaTypeAlias));
             }
 
-            var media = new Models.Media(name, parent, mediaType);
-
-            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parent), this))
-                return media;
+            media = new Models.Media(name, parent, mediaType);
 
             media.CreatorId = userId;
 
