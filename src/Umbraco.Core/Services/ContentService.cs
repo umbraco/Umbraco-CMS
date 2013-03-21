@@ -732,9 +732,9 @@ namespace Umbraco.Core.Services
 
                 if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, parentId), this))
                     return;
-
+	            
                 content.WriterId = userId;
-                if (parentId == -1)
+	            if (parentId == -1)
                 {
                     content.Path = string.Concat("-1,", content.Id);
                     content.Level = 1;
