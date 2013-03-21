@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.Models;
+using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.PublishedCache
 {
@@ -45,7 +46,12 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="xpath">The XPath query.</param>
         /// <param name="vars">Optional XPath variables.</param>
         /// <returns>The content, or null.</returns>
-        public virtual IPublishedContent GetSingleByXPath(string xpath, Core.Xml.XPathVariable[] vars)
+        /// <remarks>
+        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single
+        /// value which itself is <c>null</c>, then variables are ignored.</para>
+        /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
+        /// </remarks>
+        public virtual IPublishedContent GetSingleByXPath(string xpath, params XPathVariable[] vars)
         {
             return _cache.GetSingleByXPath(UmbracoContext, xpath, vars);
         }
@@ -56,7 +62,12 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="xpath">The XPath query.</param>
         /// <param name="vars">Optional XPath variables.</param>
         /// <returns>The contents.</returns>
-        public virtual IEnumerable<IPublishedContent> GetByXPath(string xpath, Core.Xml.XPathVariable[] vars)
+        /// <remarks>
+        /// <para>If <param name="vars" /> is <c>null</c>, or is empty, or contains only one single
+        /// value which itself is <c>null</c>, then variables are ignored.</para>
+        /// <para>The XPath expression should reference variables as <c>$var</c>.</para>
+        /// </remarks>
+        public virtual IEnumerable<IPublishedContent> GetByXPath(string xpath, params XPathVariable[] vars)
         {
             return _cache.GetByXPath(UmbracoContext, xpath, vars);
         }

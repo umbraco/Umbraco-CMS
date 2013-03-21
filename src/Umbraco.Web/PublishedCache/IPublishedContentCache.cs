@@ -29,8 +29,5 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The route.</returns>
         string GetRouteById(UmbracoContext umbracoContext, int contentId);
-
-        // FIXME do we want that one?
-        IPublishedContent GetByUrlAlias(UmbracoContext umbracoContext, int rootNodeId, string alias);
     }
 }

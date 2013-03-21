@@ -34,7 +34,7 @@ namespace Umbraco.Web.PublishedCache
         /// Gets content identified by a route.
         /// </summary>
         /// <param name="route">The route</param>
-        /// <param name="hideTopLevelNode">FIXME</param>
+        /// <param name="hideTopLevelNode">A value forcing the HideTopLevelNode setting.</param>
         /// <returns>The content, or null.</returns>
         /// <remarks>A valid route is either a simple path eg <c>/foo/bar/nil</c> or a root node id and a path, eg <c>123/foo/bar/nil</c>.</remarks>
         public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null)
@@ -50,12 +50,6 @@ namespace Umbraco.Web.PublishedCache
         public string GetRouteById(int contentId)
         {
             return _cache.GetRouteById(UmbracoContext, contentId);
-        }
-
-        // FIXME do we want that one here?
-        public IPublishedContent GetByUrlAlias(int rootNodeId, string alias)
-        {
-            return _cache.GetByUrlAlias(UmbracoContext, rootNodeId, alias);
         }
     }
 }
