@@ -442,7 +442,7 @@ namespace Umbraco.Core.Models
                 oldPropertyGroup.PropertyTypes.RemoveItem(propertyTypeAlias);
             }
 
-            propertyType.PropertyGroupId = default(int);
+            propertyType.PropertyGroupId = new Lazy<int>(() => default(int));
             propertyType.ResetDirtyProperties();
 
             var propertyGroup = PropertyGroups.First(x => x.Name == propertyGroupName);

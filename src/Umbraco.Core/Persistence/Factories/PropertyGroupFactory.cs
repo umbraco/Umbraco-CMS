@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -44,6 +45,7 @@ namespace Umbraco.Core.Persistence.Factories
                 var typeDtos = groupDto.PropertyTypeDtos.Where(x => x.Id > 0);
                 foreach (var typeDto in typeDtos)
                 {
+                    var tempGroupDto = groupDto;
                     var propertyType = new PropertyType(typeDto.DataTypeDto.ControlId,
                                                              typeDto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
                                                 {
@@ -56,7 +58,7 @@ namespace Umbraco.Core.Persistence.Factories
                                                     Mandatory = typeDto.Mandatory,
                                                     SortOrder = typeDto.SortOrder,
                                                     ValidationRegExp = typeDto.ValidationRegExp,
-                                                    PropertyGroupId = groupDto.Id
+                                                    PropertyGroupId = new Lazy<int>(() => tempGroupDto.Id)
                                                 };
                     //on initial construction we don't want to have dirty properties tracked
                     // http://issues.umbraco.org/issue/U4-1946

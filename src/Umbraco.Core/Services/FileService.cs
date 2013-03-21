@@ -256,6 +256,31 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Saves a collection of <see cref="Template"/> objects
+        /// </summary>
+        /// <param name="templates">List of <see cref="Template"/> to save</param>
+        /// <param name="userId">Optional id of the user</param>
+        public void SaveTemplate(IEnumerable<ITemplate> templates, int userId = 0)
+        {
+            if (SavingTemplate.IsRaisedEventCancelled(new SaveEventArgs<ITemplate>(templates), this))
+                return;
+
+            var uow = _dataUowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateTemplateRepository(uow))
+            {
+                foreach (var template in templates)
+                {
+                    repository.AddOrUpdate(template);
+                }
+                uow.Commit();
+
+                SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(templates, false), this);
+            }
+
+            Audit.Add(AuditTypes.Save, string.Format("Save Template performed by user"), userId, -1);
+        }
+
+        /// <summary>
         /// Deletes a template by its alias
         /// </summary>
         /// <param name="alias">Alias of the <see cref="ITemplate"/> to delete</param>

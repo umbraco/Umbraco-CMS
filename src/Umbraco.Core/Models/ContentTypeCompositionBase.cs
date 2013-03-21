@@ -140,8 +140,8 @@ namespace Umbraco.Core.Models
 
             if (CompositionPropertyGroups.Any(x => x.Name == groupName))
             {
-                var first = CompositionPropertyGroups.First(x => x.Name == groupName && x.ParentId.HasValue == false);
-                propertyGroup.ParentId = first.Id;
+                var firstGroup = CompositionPropertyGroups.First(x => x.Name == groupName && x.ParentId.HasValue == false);
+                propertyGroup.SetLazyParentId(new Lazy<int?>(() => firstGroup.Id));
             }
 
             if (PropertyGroups.Any())
@@ -166,7 +166,7 @@ namespace Umbraco.Core.Models
             {
                 if (PropertyGroups.Contains(propertyGroupName))
                 {
-                    propertyType.PropertyGroupId = PropertyGroups[propertyGroupName].Id;
+                    propertyType.PropertyGroupId = new Lazy<int>(() => PropertyGroups[propertyGroupName].Id);
                     PropertyGroups[propertyGroupName].PropertyTypes.Add(propertyType);
                 }
                 else
@@ -179,7 +179,8 @@ namespace Umbraco.Core.Models
                     {
                         var parentPropertyGroup = CompositionPropertyGroups.First(x => x.Name == propertyGroupName && x.ParentId.HasValue == false);
                         propertyGroup.SortOrder = parentPropertyGroup.SortOrder;
-                        propertyGroup.ParentId = parentPropertyGroup.Id;
+                        //propertyGroup.ParentId = parentPropertyGroup.Id;
+                        propertyGroup.SetLazyParentId(new Lazy<int?>(() => parentPropertyGroup.Id));
                     }
 
                     PropertyGroups.Add(propertyGroup);

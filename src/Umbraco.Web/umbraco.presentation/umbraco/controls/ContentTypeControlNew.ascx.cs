@@ -648,40 +648,26 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 propertyType.DataTypeDefinitionId = dataTypeDefinition.Id;
                 propertyType.DataTypeId = dataTypeDefinition.ControlId;
 
-                if (propertyType.PropertyGroupId != gpw.GenricPropertyControl.Tab)
+                if (propertyType.PropertyGroupId.Value != gpw.GenricPropertyControl.Tab)
                 {
                     if (gpw.GenricPropertyControl.Tab == 0)
                     {
-                        propertyType.PropertyGroupId = 0;
+                        propertyType.PropertyGroupId = new Lazy<int>(() => 0);
                     }
                     else if (contentTypeItem.PropertyGroups.Any(x => x.Id == gpw.GenricPropertyControl.Tab))
                     {
-                        propertyType.PropertyGroupId = gpw.GenricPropertyControl.Tab;
+                        propertyType.PropertyGroupId = new Lazy<int>(() => gpw.GenricPropertyControl.Tab);
                     }
                     else if (contentTypeItem.PropertyGroups.Any(x => x.ParentId == gpw.GenricPropertyControl.Tab))
                     {
                         var propertyGroup = contentTypeItem.PropertyGroups.First(x => x.ParentId == gpw.GenricPropertyControl.Tab);
-                        propertyType.PropertyGroupId = propertyGroup.Id;
+                        propertyType.PropertyGroupId = new Lazy<int>(() => propertyGroup.Id);
                     }
                     else
                     {
                         var propertyGroup = contentTypeItem.CompositionPropertyGroups.First(x => x.Id == gpw.GenricPropertyControl.Tab);
                         contentTypeItem.AddPropertyGroup(propertyGroup.Name);
                         contentTypeItem.MovePropertyType(propertyType.Alias, propertyGroup.Name);
-
-                        //if (
-                        //    contentTypeItem.CompositionPropertyGroups.Any(
-                        //        x => x.ParentId == gpw.GenricPropertyControl.Tab))
-                        //{
-                        //    var propertyGroups = contentTypeItem.CompositionPropertyGroups.Where(x => x.ParentId == gpw.GenricPropertyControl.Tab);
-                        //    var propertyGroup = propertyGroups.First();
-                        //    propertyType.PropertyGroupId = propertyGroup.Id;
-                        //}
-                        //else
-                        //{
-                        //    var propertyGroup = contentTypeItem.CompositionPropertyGroups.First(x => x.Id == gpw.GenricPropertyControl.Tab);
-                        //    contentTypeItem.AddPropertyGroup(propertyGroup.Name);
-                        //}
                     }
                 }
             }

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using System.Threading;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
@@ -560,7 +562,7 @@ namespace Umbraco.Core.Services
             }
             return dtd.ToString();
         }
-
+        
         #region Event Handlers
 
 		/// <summary>

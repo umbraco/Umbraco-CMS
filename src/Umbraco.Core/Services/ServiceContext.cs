@@ -20,6 +20,7 @@ namespace Umbraco.Core.Services
         private Lazy<DataTypeService> _dataTypeService;
         private Lazy<FileService> _fileService;
         private Lazy<LocalizationService> _localizationService;
+        private Lazy<PackagingService> _packagingService;
         private Lazy<ServerRegistrationService> _serverRegistrationService;
         private Lazy<EntityService> _entityService;
 
@@ -76,6 +77,8 @@ namespace Umbraco.Core.Services
             if(_localizationService == null)
 				_localizationService = new Lazy<LocalizationService>(() => new LocalizationService(provider, repositoryFactory.Value));
 
+            if(_packagingService == null)
+                _packagingService = new Lazy<PackagingService>(() => new PackagingService(_contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value, _fileService.Value, repositoryFactory.Value, provider));
             if (_entityService == null)
                 _entityService = new Lazy<EntityService>(() => new EntityService(provider, repositoryFactory.Value));
         }
@@ -142,6 +145,14 @@ namespace Umbraco.Core.Services
         public IMediaService MediaService
         {
 			get { return _mediaService.Value; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="PackagingService"/>
+        /// </summary>
+        public PackagingService PackagingService
+        {
+            get { return _packagingService.Value; }
         }
 
         /// <summary>

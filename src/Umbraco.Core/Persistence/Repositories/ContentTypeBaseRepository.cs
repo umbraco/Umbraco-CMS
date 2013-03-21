@@ -122,7 +122,12 @@ namespace Umbraco.Core.Persistence.Repositories
             //Insert collection of allowed content types
             foreach (var allowedContentType in entity.AllowedContentTypes)
             {
-                Database.Insert(new ContentTypeAllowedContentTypeDto { Id = entity.Id, AllowedId = allowedContentType.Id.Value, SortOrder = allowedContentType.SortOrder });
+                Database.Insert(new ContentTypeAllowedContentTypeDto
+                                    {
+                                        Id = entity.Id,
+                                        AllowedId = allowedContentType.Id.Value,
+                                        SortOrder = allowedContentType.SortOrder
+                                    });
             }
 
             var propertyFactory = new PropertyGroupFactory(nodeDto.NodeId);
@@ -139,14 +144,18 @@ namespace Umbraco.Core.Persistence.Repositories
                 foreach (var propertyType in propertyGroup.PropertyTypes)
                 {
                     if (propertyType.IsPropertyDirty("PropertyGroupId") == false)
-                        propertyType.PropertyGroupId = propertyGroup.Id;
+                    {
+                        var tempGroup = propertyGroup;
+                        propertyType.PropertyGroupId = new Lazy<int>(() => tempGroup.Id);
+                    }
                 }
             }
 
             //Insert PropertyTypes
             foreach (var propertyType in entity.PropertyTypes)
             {
-                var propertyTypeDto = propertyFactory.BuildPropertyTypeDto(propertyType.PropertyGroupId, propertyType);
+                var tabId = propertyType.PropertyGroupId != null ? propertyType.PropertyGroupId.Value : default(int);
+                var propertyTypeDto = propertyFactory.BuildPropertyTypeDto(tabId, propertyType);
                 int typePrimaryKey = Convert.ToInt32(Database.Insert(propertyTypeDto));
                 propertyType.Id = typePrimaryKey; //Set Id on new PropertyType
 
@@ -286,15 +295,18 @@ namespace Umbraco.Core.Persistence.Repositories
                 foreach (var propertyType in propertyGroup.PropertyTypes)
                 {
                     if (propertyType.IsPropertyDirty("PropertyGroupId") == false)
-                        propertyType.PropertyGroupId = propertyGroup.Id;
+                    {
+                        var tempGroup = propertyGroup;
+                        propertyType.PropertyGroupId = new Lazy<int>(() => tempGroup.Id);
+                    }
                 }
             }
 
             //Run through all PropertyTypes to insert or update entries
             foreach (var propertyType in entity.PropertyTypes)
             {
-                var propertyTypeDto = propertyGroupFactory.BuildPropertyTypeDto(propertyType.PropertyGroupId,
-                                                                                propertyType);
+                var tabId = propertyType.PropertyGroupId != null ? propertyType.PropertyGroupId.Value : default(int);
+                var propertyTypeDto = propertyGroupFactory.BuildPropertyTypeDto(tabId, propertyType);
                 int typePrimaryKey = propertyType.HasIdentity
                                          ? Database.Update(propertyTypeDto)
                                          : Convert.ToInt32(Database.Insert(propertyTypeDto));

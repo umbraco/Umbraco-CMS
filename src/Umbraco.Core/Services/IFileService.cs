@@ -116,5 +116,12 @@ namespace Umbraco.Core.Services
         /// <param name="template"><see cref="ITemplate"/> to validate</param>
         /// <returns>True if Script is valid, otherwise false</returns>
         bool ValidateTemplate(ITemplate template);
+
+        /// <summary>
+        /// Saves a collection of <see cref="Template"/> objects
+        /// </summary>
+        /// <param name="templates">List of <see cref="Template"/> to save</param>
+        /// <param name="userId">Optional id of the user</param>
+        void SaveTemplate(IEnumerable<ITemplate> templates, int userId = 0);
     }
 }

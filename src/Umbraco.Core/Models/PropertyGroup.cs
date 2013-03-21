@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     public class PropertyGroup : Entity, IEquatable<PropertyGroup>
     {
         private string _name;
-        private int? _parentId;
+        private Lazy<int?> _parentId;
         private int _sortOrder;
         private PropertyTypeCollection _propertyTypes;
 
@@ -64,14 +64,16 @@ namespace Umbraco.Core.Models
         [DataMember]
         public int? ParentId
         {
-            get { return _parentId; }
+            get
+            {
+                if (_parentId == null)
+                    return default(int?);
+                return _parentId.Value;
+            }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _parentId = value;
-                    return _parentId;
-                }, _parentId, ParentIdSelector);
+                _parentId = new Lazy<int?>(() => value);
+                OnPropertyChanged(ParentIdSelector);
             }
         }
 
@@ -104,6 +106,15 @@ namespace Umbraco.Core.Models
                 _propertyTypes = value;
                 _propertyTypes.CollectionChanged += PropertyTypesChanged;
             }
+        }
+
+        /// <summary>
+        /// Sets the ParentId from the lazy integer id
+        /// </summary>
+        /// <param name="id">Id of the Parent</param>
+        internal void SetLazyParentId(Lazy<int?> id)
+        {
+            _parentId = id;
         }
 
         public bool Equals(PropertyGroup other)

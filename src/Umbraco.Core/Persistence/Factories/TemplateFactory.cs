@@ -29,16 +29,20 @@ namespace Umbraco.Core.Persistence.Factories
         public Template BuildEntity(TemplateDto dto)
         {
             var template = new Template(string.Empty, dto.NodeDto.Text, dto.Alias)
-                       {
-                           CreateDate = dto.NodeDto.CreateDate,
-                           Id = dto.NodeId,
-                           Key = dto.NodeDto.UniqueId.Value,
-                           CreatorId = dto.NodeDto.UserId.Value,
-                           Level = dto.NodeDto.Level,
-                           ParentId = dto.NodeDto.ParentId,
-                           SortOrder = dto.NodeDto.SortOrder,
-                           NodePath = dto.NodeDto.Path
-                       };
+                               {
+                                   CreateDate = dto.NodeDto.CreateDate,
+                                   Id = dto.NodeId,
+                                   Key = dto.NodeDto.UniqueId.Value,
+                                   CreatorId = dto.NodeDto.UserId.Value,
+                                   Level = dto.NodeDto.Level,
+                                   ParentId = dto.NodeDto.ParentId,
+                                   SortOrder = dto.NodeDto.SortOrder,
+                                   NodePath = dto.NodeDto.Path
+                               };
+            
+            if(dto.Master.HasValue)
+                template.MasterTemplateId = new Lazy<int>(() => dto.Master.Value);
+
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
             template.ResetDirtyProperties(false);
@@ -53,6 +57,11 @@ namespace Umbraco.Core.Persistence.Factories
                            Design = entity.Content,
                            NodeDto = BuildNodeDto(entity)
                        };
+
+            if (entity.MasterTemplateId != null && entity.MasterTemplateId.Value != default(int))
+            {
+                dto.Master = entity.MasterTemplateId.Value;
+            }
 
             if (entity.HasIdentity)
             {

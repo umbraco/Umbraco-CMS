@@ -8,6 +8,17 @@ namespace Umbraco.Core.Models
     /// </summary>
     public class ContentTypeSort : IValueObject
     {
+        public ContentTypeSort()
+        {
+        }
+
+        public ContentTypeSort(Lazy<int> id, int sortOrder, string @alias)
+        {
+            Id = id;
+            SortOrder = sortOrder;
+            Alias = alias;
+        }
+
         /// <summary>
         /// Gets or sets the Id of the ContentType
         /// </summary>

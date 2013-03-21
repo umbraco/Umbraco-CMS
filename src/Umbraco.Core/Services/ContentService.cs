@@ -68,27 +68,8 @@ namespace Umbraco.Core.Services
 	    /// <returns><see cref="IContent"/></returns>
 	    public IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = 0)
 		{
-		    IContentType contentType = null;
-            IContent content = null;
-
-			var uow = _uowProvider.GetUnitOfWork();
-		    using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
-		    {
-		        var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
-		        var contentTypes = repository.GetByQuery(query);
-
-		        if (!contentTypes.Any())
-		            throw new Exception(string.Format("No ContentType matching the passed in Alias: '{0}' was found",
-		                                              contentTypeAlias));
-
-		        contentType = contentTypes.First();
-
-		        if (contentType == null)
-		            throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null",
-		                                              contentTypeAlias));
-		    }
-
-            content = new Content(name, parentId, contentType);
+		    IContentType contentType = FindContentTypeByAlias(contentTypeAlias);
+            IContent content = new Content(name, parentId, contentType);
 
 			if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
 				return content;
@@ -114,27 +95,8 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IContent"/></returns>
         public IContent CreateContent(string name, IContent parent, string contentTypeAlias, int userId = 0)
         {
-            IContentType contentType = null;
-            IContent content = null;
-
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
-            {
-                var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
-                var contentTypes = repository.GetByQuery(query);
-
-                if (!contentTypes.Any())
-                    throw new Exception(string.Format("No ContentType matching the passed in Alias: '{0}' was found",
-                                                      contentTypeAlias));
-
-                contentType = contentTypes.First();
-
-                if (contentType == null)
-                    throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null",
-                                                      contentTypeAlias));
-            }
-
-            content = new Content(name, parent, contentType);
+            IContentType contentType = FindContentTypeByAlias(contentTypeAlias);
+            IContent content = new Content(name, parent, contentType);
 
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parent), this))
                 return content;
@@ -1583,6 +1545,28 @@ namespace Umbraco.Core.Services
             }
 
             return true;
+        }
+
+        private IContentType FindContentTypeByAlias(string contentTypeAlias)
+        {
+            using (var repository = _repositoryFactory.CreateContentTypeRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
+                var types = repository.GetByQuery(query);
+
+                if (!types.Any())
+                    throw new Exception(
+                        string.Format("No ContentType matching the passed in Alias: '{0}' was found",
+                                      contentTypeAlias));
+
+                var contentType = types.First();
+
+                if (contentType == null)
+                    throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null",
+                                                      contentTypeAlias));
+
+                return contentType;
+            }
         }
 
         #endregion

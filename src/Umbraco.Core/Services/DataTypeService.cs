@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
@@ -19,6 +20,7 @@ namespace Umbraco.Core.Services
     {
 	    private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
+        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
         public DataTypeService()
             : this(new RepositoryFactory())
@@ -105,11 +107,26 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of string values</returns>
         public IEnumerable<string> GetPreValuesByDataTypeId(int id)
         {
-            var uow = _uowProvider.GetUnitOfWork();
-            var dtos = uow.Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new {Id = id});
-            var list = dtos.Select(x => x.Value).ToList();
-            uow.Dispose();
-            return list;
+            using (var uow = _uowProvider.GetUnitOfWork())
+            {
+                var dtos = uow.Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new {Id = id});
+                var list = dtos.Select(x => x.Value).ToList();
+                return list;
+            }
+        }
+
+        /// <summary>
+        /// Gets a specific PreValue by its Id
+        /// </summary>
+        /// <param name="id">Id of the PreValue to retrieve the value from</param>
+        /// <returns>PreValue as a string</returns>
+        public string GetPreValueAsString(int id)
+        {
+            using (var uow = _uowProvider.GetUnitOfWork())
+            {
+                var dto = uow.Database.FirstOrDefault<DataTypePreValueDto>("WHERE id = @Id", new { Id = id });
+                return dto != null ? dto.Value : string.Empty;
+            }
         }
 
         /// <summary>
@@ -121,18 +138,84 @@ namespace Umbraco.Core.Services
         {
 	        if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this)) 
 				return;
-	        
-			var uow = _uowProvider.GetUnitOfWork();
-	        using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow))
-	        {
-		        dataTypeDefinition.CreatorId = userId;
-		        repository.AddOrUpdate(dataTypeDefinition);
-		        uow.Commit();
 
-		        Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this);
-	        }
+            using (new WriteLock(Locker))
+            {
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow))
+                {
+                    dataTypeDefinition.CreatorId = userId;
+                    repository.AddOrUpdate(dataTypeDefinition);
+                    uow.Commit();
 
-	        Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
+                    Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this);
+                }
+            }
+
+            Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
+        }
+
+        /// <summary>
+        /// Saves a collection of <see cref="IDataTypeDefinition"/>
+        /// </summary>
+        /// <param name="dataTypeDefinitions"><see cref="IDataTypeDefinition"/> to save</param>
+        /// <param name="userId">Id of the user issueing the save</param>
+        public void Save(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, int userId = 0)
+        {
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions), this))
+                return;
+
+            using (new WriteLock(Locker))
+            {
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateDataTypeDefinitionRepository(uow))
+                {
+                    foreach (var dataTypeDefinition in dataTypeDefinitions)
+                    {
+                        dataTypeDefinition.CreatorId = userId;
+                        repository.AddOrUpdate(dataTypeDefinition);
+                    }
+                    uow.Commit();
+
+                    Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions, false), this);
+                }
+            }
+            Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition performed by user"), userId, -1);
+        }
+
+        /// <summary>
+        /// Saves a list of PreValues for a given DataTypeDefinition
+        /// </summary>
+        /// <param name="id">Id of the DataTypeDefinition to save PreValues for</param>
+        /// <param name="values">List of string values to save</param>
+        public void SavePreValues(int id, IEnumerable<string> values)
+        {
+            using (new WriteLock(Locker))
+            {
+                using (var uow = _uowProvider.GetUnitOfWork())
+                {
+                    var sortOrderObj =
+                        uow.Database.ExecuteScalar<object>(
+                            "SELECT max(sortorder) FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = id });
+                    int sortOrder;
+                    if (sortOrderObj == null || int.TryParse(sortOrderObj.ToString(), out sortOrder) == false)
+                    {
+                        sortOrder = 1;
+                    }
+
+                    using (var transaction = uow.Database.GetTransaction())
+                    {
+                        foreach (var value in values)
+                        {
+                            var dto = new DataTypePreValueDto { DataTypeNodeId = id, Value = value, SortOrder = sortOrder };
+                            uow.Database.Insert(dto);
+                            sortOrder++;
+                        }
+
+                        transaction.Complete();
+                    }
+                }
+            }
         }
 
         /// <summary>

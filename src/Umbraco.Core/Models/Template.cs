@@ -124,18 +124,7 @@ namespace Umbraco.Core.Models
         }
 
         [DataMember]
-        internal int MasterTemplateId
-        {
-            get { return _masterTemplateId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _masterTemplateId = value;
-                    return _masterTemplateId;
-                }, _masterTemplateId, MasterTemplateIdSelector);    
-            }
-        }
+        internal Lazy<int> MasterTemplateId { get; set; }
 
         [DataMember]
         internal string MasterTemplateAlias

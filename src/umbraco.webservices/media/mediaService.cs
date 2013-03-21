@@ -137,6 +137,7 @@ namespace umbraco.webservices.media
 
             Media m = new Media(id);
 
+            //TODO Fix this as the Id of the umbracoFile-property is no longer used
             var path = _fs.GetRelativePath(m.getProperty(Constants.Conventions.Media.File).Id, filename);
 
             var stream = new MemoryStream();

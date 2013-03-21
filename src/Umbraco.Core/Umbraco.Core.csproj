@@ -702,9 +702,11 @@
     <Compile Include="Services\MacroService.cs" />
     <Compile Include="Services\MediaService.cs" />
     <Compile Include="Services\ServerRegistrationService.cs" />
+    <Compile Include="Services\PackagingService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />
+    <Compile Include="TopologicalSorter.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
     <Compile Include="Strings\IUrlSegmentProvider.cs" />
     <Compile Include="Strings\UrlSegmentProviderResolver.cs" />

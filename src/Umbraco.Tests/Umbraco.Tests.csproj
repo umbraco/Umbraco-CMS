@@ -294,6 +294,12 @@
     <Compile Include="Services\ContentServicePerformanceTest.cs" />
     <Compile Include="Services\ContentServiceTests.cs" />
     <Compile Include="Services\ContentTypeServiceTests.cs" />
+    <Compile Include="Services\Importing\PackageImportTests.cs" />
+    <Compile Include="Services\Importing\ImportResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ImportResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Services\ThreadSafetyServiceTest.cs" />
     <Compile Include="Surface\PluginControllerAreaTests.cs" />
     <Compile Include="Sync\ConfigServerRegistrarTests.cs" />
@@ -437,10 +443,15 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>SqlResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="UmbracoExamine\TestFiles.resx">
+    <EmbeddedResource Include="Services\Importing\ImportResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+ <EmbeddedResource Include="UmbracoExamine\TestFiles.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>TestFiles.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
@@ -475,6 +486,11 @@
     <Content Include="Migrations\SqlScripts\SqlCeTotal-480.sql" />
     <Content Include="Migrations\SqlScripts\SqlServerTotal-480.sql" />
     <Content Include="UmbracoExamine\TestFiles\media.xml" />
+    <Content Include="Services\Importing\InheritedDocTypes-Package.xml" />
+    <Content Include="Services\Importing\StandardMvc-Package.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Services\Importing\uBlogsy-Package.xml" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
