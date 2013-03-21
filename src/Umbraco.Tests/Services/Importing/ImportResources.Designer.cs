@@ -63,6 +63,31 @@ namespace Umbraco.Tests.Services.Importing {
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
         ///&lt;umbPackage&gt;
+        ///  &lt;files /&gt;
+        ///  &lt;info&gt;
+        ///    &lt;package&gt;
+        ///      &lt;name&gt;DocTypeError&lt;/name&gt;
+        ///      &lt;version&gt;1&lt;/version&gt;
+        ///      &lt;license url=&quot;http://www.opensource.org/licenses/mit-license.php&quot;&gt;Personal license&lt;/license&gt;
+        ///      &lt;url&gt;http://www.iseli-webconsulting.de&lt;/url&gt;
+        ///      &lt;requirements&gt;
+        ///        &lt;major&gt;3&lt;/major&gt;
+        ///        &lt;minor&gt;0&lt;/minor&gt;
+        ///        &lt;patch&gt;0&lt;/patch&gt;
+        ///      &lt;/requirements&gt;
+        ///    &lt;/package&gt;
+        ///    &lt;author&gt;
+        ///      &lt;name&gt;Iseli Webconsulting&lt;/name&gt; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InheritedDocTypes_Package {
+            get {
+                return ResourceManager.GetString("InheritedDocTypes_Package", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+        ///&lt;umbPackage&gt;
         ///  &lt;files&gt;
         ///    &lt;file&gt;
         ///      &lt;guid&gt;Map.cshtml&lt;/guid&gt;
@@ -81,9 +106,34 @@ namespace Umbraco.Tests.Services.Importing {
         ///    &lt;/file&gt;
         /// [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string package {
+        internal static string StandardMvc_Package {
             get {
-                return ResourceManager.GetString("package", resourceCulture);
+                return ResourceManager.GetString("StandardMvc_Package", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+        ///&lt;umbPackage&gt;
+        ///  &lt;files&gt;
+        ///    &lt;file&gt;
+        ///      &lt;guid&gt;uBlogsy.BusinessLogic.dll&lt;/guid&gt;
+        ///      &lt;orgPath&gt;/bin&lt;/orgPath&gt;
+        ///      &lt;orgName&gt;uBlogsy.BusinessLogic.dll&lt;/orgName&gt;
+        ///    &lt;/file&gt;
+        ///    &lt;file&gt;
+        ///      &lt;guid&gt;uBlogsy.BusinessLogic.pdb&lt;/guid&gt;
+        ///      &lt;orgPath&gt;/bin&lt;/orgPath&gt;
+        ///      &lt;orgName&gt;uBlogsy.BusinessLogic.pdb&lt;/orgName&gt;
+        ///    &lt;/file&gt;
+        ///    &lt;file&gt;
+        ///      &lt;guid&gt;uBlogsy.Common.dll&lt;/guid&gt;
+        ///      &lt;orgPath&gt;/bin&lt;/orgPath&gt;
+        ///      &lt;orgName&gt;uBlogsy.Common.dll&lt;/orgNam [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string uBlogsy_Package {
+            get {
+                return ResourceManager.GetString("uBlogsy_Package", resourceCulture);
             }
         }
     }

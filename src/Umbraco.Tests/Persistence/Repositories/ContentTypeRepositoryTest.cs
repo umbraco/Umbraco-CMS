@@ -258,7 +258,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(updated.PropertyGroups.Count(), Is.EqualTo(2));
             Assert.That(updated.PropertyTypes.Count(), Is.EqualTo(5));
             Assert.That(updated.PropertyTypes.Any(x => x.Alias == "urlAlias"), Is.True);
-            Assert.AreEqual(updated.PropertyTypes.First(x => x.Alias == "urlAlias").PropertyGroupId, default(int));
+            Assert.AreEqual(updated.PropertyTypes.First(x => x.Alias == "urlAlias").PropertyGroupId.Value, default(int));
         }
 
         [Test]

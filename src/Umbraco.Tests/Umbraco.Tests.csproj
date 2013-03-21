@@ -424,9 +424,11 @@
     <Content Include="Migrations\SqlScripts\SqlCe-SchemaAndData-4110.sql" />
     <Content Include="Migrations\SqlScripts\SqlCeTotal-480.sql" />
     <Content Include="Migrations\SqlScripts\SqlServerTotal-480.sql" />
-    <Content Include="Services\Importing\package.xml">
+    <Content Include="Services\Importing\InheritedDocTypes-Package.xml" />
+    <Content Include="Services\Importing\StandardMvc-Package.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Services\Importing\uBlogsy-Package.xml" />
     <Content Include="TestHelpers\ExamineHelpers\media.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

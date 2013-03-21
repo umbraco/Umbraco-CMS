@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -47,9 +46,10 @@ namespace Umbraco.Core.Services
         /// Imports and saves package xml as <see cref="IContent"/>
         /// </summary>
         /// <param name="element">Xml to import</param>
-        /// <param name="userId"></param>
+        /// <param name="parentId">Optional parent Id for the content being imported</param>
+        /// <param name="userId">Optional Id of the user performing the import</param>
         /// <returns>An enumrable list of generated content</returns>
-        public IEnumerable<IContent> ImportContent(XElement element, int userId = 0)
+        public IEnumerable<IContent> ImportContent(XElement element, int parentId = -1, int userId = 0)
         {
             var name = element.Name.LocalName;
             if (name.Equals("DocumentSet"))
@@ -59,7 +59,7 @@ namespace Umbraco.Core.Services
                             where (string)doc.Attribute("isDoc") == ""
                             select doc;
 
-                var contents = ParseDocumentRootXml(roots);
+                var contents = ParseDocumentRootXml(roots, parentId);
                 _contentService.Save(contents, userId);
 
                 return contents;
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Services
             {
                 //This is a single doc import
                 var elements = new List<XElement> { element };
-                var contents = ParseDocumentRootXml(elements);
+                var contents = ParseDocumentRootXml(elements, parentId);
                 _contentService.Save(contents, userId);
 
                 return contents;
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Services
                 "'DocumentSet' (for structured imports) nor is the first element a Document (for single document import).");
         }
 
-        private IEnumerable<IContent> ParseDocumentRootXml(IEnumerable<XElement> roots)
+        private IEnumerable<IContent> ParseDocumentRootXml(IEnumerable<XElement> roots, int parentId)
         {
             var contents = new List<IContent>();
             foreach (var root in roots)
@@ -97,7 +97,7 @@ namespace Umbraco.Core.Services
                     _importedContentTypes.Add(contentTypeAlias, contentType);
                 }
 
-                var content = CreateContentFromXml(root, _importedContentTypes[contentTypeAlias], null, -1, isLegacySchema);
+                var content = CreateContentFromXml(root, _importedContentTypes[contentTypeAlias], null, parentId, isLegacySchema);
                 contents.Add(content);
 
                 var children = from child in root.Elements()
@@ -264,6 +264,9 @@ namespace Umbraco.Core.Services
                                             Alias = infoElement.Element("Alias").Value
                                         };
 
+            if (parent != null)
+                contentType.AddContentType(parent);
+
             return UpdateContentTypeFromXml(documentType, contentType);
         }
 
@@ -311,17 +314,20 @@ namespace Umbraco.Core.Services
                 contentType.AllowedTemplates = allowedTemplates;
             }
 
-            var defaultTemplate = _fileService.GetTemplate(defaultTemplateElement.Value);
-            if (defaultTemplate != null)
+            if (string.IsNullOrEmpty(defaultTemplateElement.Value) == false)
             {
-                contentType.SetDefaultTemplate(defaultTemplate);
-            }
-            else
-            {
-                LogHelper.Warn<PackagingService>(
-                    string.Format(
-                        "Packager: Error handling default template. Default template with alias '{0}' could not be found.",
-                        defaultTemplateElement.Value));
+                var defaultTemplate = _fileService.GetTemplate(defaultTemplateElement.Value);
+                if (defaultTemplate != null)
+                {
+                    contentType.SetDefaultTemplate(defaultTemplate);
+                }
+                else
+                {
+                    LogHelper.Warn<PackagingService>(
+                        string.Format(
+                            "Packager: Error handling default template. Default template with alias '{0}' could not be found.",
+                            defaultTemplateElement.Value));
+                }
             }
         }
 
@@ -561,7 +567,7 @@ namespace Umbraco.Core.Services
                 fields.Add(field);
             }
             //Sort templates by dependencies to a potential master template
-            var sortedElements = TopologicalSorter.RetrieveMappedItems(fields);
+            var sortedElements = TopologicalSorter.GetSortedItems(fields);
             foreach (var templateElement in sortedElements)
             {
                 var templateName = templateElement.Element("Name").Value;

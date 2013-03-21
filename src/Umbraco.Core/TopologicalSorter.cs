@@ -110,7 +110,7 @@ namespace Umbraco.Core
         #endregion
 
         #region Internal Staic methods
-        internal static IEnumerable<T> RetrieveMappedItems<T>(List<DependencyField<T>> fields) where T : class 
+        internal static IEnumerable<T> GetSortedItems<T>(List<DependencyField<T>> fields) where T : class 
         {
             int[] sortOrder = GetTopologicalSortOrder(fields);
             var list = new List<T>();
