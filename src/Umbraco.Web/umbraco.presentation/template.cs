@@ -10,6 +10,7 @@ using System.Web.UI;
 using System.Collections;
 using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using umbraco.DataLayer;
@@ -29,15 +30,10 @@ namespace umbraco
 
         readonly StringBuilder _templateOutput = new StringBuilder();
 
-        // Cache
-        //static System.Web.Caching.Cache templateCache = System.Web.HttpRuntime.Cache;
-
         private string _templateDesign = "";
         int _masterTemplate = -1;
         private string _templateName = "";
         private string _templateAlias = "";
-
-        private const string CacheKey = "template";
 
         #endregion
 
@@ -498,7 +494,7 @@ namespace umbraco
             var tId = templateID;
 
             var t = ApplicationContext.Current.ApplicationCache.GetCacheItem(
-               string.Format("{0}{1}", CacheKey, tId), () =>
+               string.Format("{0}{1}", CacheKeys.TemplateFrontEndCacheKey, tId), () =>
                {
                    using (var templateData = SqlHelper.ExecuteReader("select nodeId, alias, master, text, design from cmsTemplate inner join umbracoNode node on node.id = cmsTemplate.nodeId where nodeId = @templateID", SqlHelper.CreateParameter("@templateID", templateID)))
                    {

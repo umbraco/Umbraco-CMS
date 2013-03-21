@@ -60,9 +60,12 @@ namespace Umbraco.Web.Cache
             User.Deleting += UserDeleting;
 
             //Bind to template events
+            //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
 
             Template.AfterSave += TemplateAfterSave;
             Template.AfterDelete += TemplateAfterDelete;
+            FileService.SavedTemplate += FileServiceSavedTemplate;
+            FileService.DeletedTemplate += FileServiceDeletedTemplate;
 
             //Bind to macro events
 
@@ -241,6 +244,27 @@ namespace Umbraco.Web.Cache
         #endregion
 
         #region Template event handlers
+
+        /// <summary>
+        /// Removes cache for template
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void FileServiceDeletedTemplate(IFileService sender, Core.Events.DeleteEventArgs<ITemplate> e)
+        {
+            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveTemplateCache(x.Id));
+        }
+
+        /// <summary>
+        /// Refresh cache for template
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void FileServiceSavedTemplate(IFileService sender, Core.Events.SaveEventArgs<ITemplate> e)
+        {
+            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshTemplateCache(x.Id));
+        }
+        
         /// <summary>
         /// Removes cache for template
         /// </summary>

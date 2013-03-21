@@ -45,6 +45,7 @@ namespace Umbraco.Web.Cache
         {
             dc.Remove(new Guid(DistributedCache.TemplateRefresherId), templateId);
         } 
+
         #endregion
 
         #region Page cache
