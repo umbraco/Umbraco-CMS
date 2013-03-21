@@ -893,6 +893,9 @@ namespace umbraco.cms.businesslogic.web
                 int userId = current == null ? 0 : current.Id;
                 ApplicationContext.Current.Services.ContentService.Save(Content, userId);
 
+                base.VersionDate = Content.UpdateDate;
+                this.UpdateDate = Content.UpdateDate;
+
                 base.Save();
 
                 FireAfterSave(e);
@@ -927,6 +930,8 @@ namespace umbraco.cms.businesslogic.web
                     var result =
                         ((ContentService) ApplicationContext.Current.Services.ContentService).SaveAndPublish(Content,
                                                                                                              true, u.Id);
+                    base.VersionDate = Content.UpdateDate;
+                    this.UpdateDate = Content.UpdateDate;
 
                     base.Save();
 

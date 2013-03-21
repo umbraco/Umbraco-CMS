@@ -249,7 +249,7 @@ namespace umbraco.cms.businesslogic.media
         [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.Save()", false)]
         public override void Save()
         {
-            SaveEventArgs e = new SaveEventArgs();
+            var e = new SaveEventArgs();
             FireBeforeSave(e);
 
             foreach (var property in GenericProperties)
@@ -262,6 +262,8 @@ namespace umbraco.cms.businesslogic.media
                 var current = User.GetCurrent();
                 int userId = current == null ? 0 : current.Id;
                 ApplicationContext.Current.Services.MediaService.Save(MediaItem, userId);
+
+                base.VersionDate = MediaItem.UpdateDate;
 
                 base.Save();
 
