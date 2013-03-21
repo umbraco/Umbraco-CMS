@@ -48,10 +48,9 @@ namespace Umbraco.Web
         /// This is created in order to standardize the creation of the singleton. Normally it is created during a request
         /// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
         /// during the startup process as well.
-        /// See: http://issues.umbraco.org/issue/U4-1890
+        /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
         /// </remarks>
-        [UmbracoProposedPublic("http://issues.umbraco.org/issue/U4-1717")]
-        internal static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext)
+        public static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext)
         {
             return EnsureContext(httpContext, applicationContext, false);
         }
@@ -74,9 +73,9 @@ namespace Umbraco.Web
         /// This is created in order to standardize the creation of the singleton. Normally it is created during a request
         /// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
         /// during the startup process as well.
-        /// See: http://issues.umbraco.org/issue/U4-1890
+        /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
         /// </remarks>
-        internal static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext, bool replaceContext)
+        public static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext, bool replaceContext)
         {
             if (UmbracoContext.Current != null && !replaceContext)
                 return UmbracoContext.Current;
