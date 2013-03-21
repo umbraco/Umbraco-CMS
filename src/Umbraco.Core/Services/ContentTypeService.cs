@@ -9,6 +9,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -101,6 +102,26 @@ namespace Umbraco.Core.Services
             }
         }
 
+        ///// <summary>
+        ///// Returns the content type descendant Ids for the content type specified
+        ///// </summary>
+        ///// <param name="contentTypeId"></param>
+        ///// <returns></returns>
+        //internal IEnumerable<int> GetDescendantContentTypeIds(int contentTypeId)
+        //{            
+        //    using (var uow = _uowProvider.GetUnitOfWork())
+        //    {
+        //        //method to return the child content type ids for the id specified
+        //        Func<int, int[]> getChildIds =
+        //            parentId =>
+        //            uow.Database.Fetch<ContentType2ContentTypeDto>("WHERE parentContentTypeId = @Id", new {Id = parentId})
+        //               .Select(x => x.ChildId).ToArray();
+
+        //        //recursively get all descendant ids
+        //        return getChildIds(contentTypeId).FlattenList(getChildIds);                
+        //    }
+        //} 
+
         /// <summary>
         /// Checks whether an <see cref="IContentType"/> item has any children
         /// </summary>
@@ -120,20 +141,23 @@ namespace Umbraco.Core.Services
         /// This is called after an IContentType is saved and is used to update the content xml structures in the database
         /// if they are required to be updated.
         /// </summary>
-        /// <param name="contentTypes"></param>
+        /// <param name="contentTypes">A tuple of a content type and a boolean indicating if it is new (HasIdentity was false before committing)</param>
         private void UpdateContentXmlStructure(params IContentType[] contentTypes)
         {
 
-            var toUpdate = new List<IContentType>();
+            var toUpdate = new List<IContentTypeBase>();
 
             foreach (var contentType in contentTypes)
             {
                 //we need to determine if we need to refresh the xml content in the database. This is to be done when:
+                // - the item is not new (already existed in the db)
                 // - a content type changes it's alias
                 // - if a content type has it's property removed
                 //here we need to check if the alias of the content type changed or if one of the properties was removed.                    
                 var dirty = contentType as IRememberBeingDirty;
-                if (dirty != null && (dirty.WasPropertyDirty("Alias") || dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved")))
+                if (dirty != null 
+                    && !dirty.WasPropertyDirty("HasIdentity") //ensure it's now 'new'
+                    && (dirty.WasPropertyDirty("Alias") || dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved")))
                 {
                     //if the alias was changed then we only need to update the xml structures for content of the current content type.
                     //if a property was deleted then we need to update the xml structures for any content of the current content type
@@ -145,7 +169,7 @@ namespace Umbraco.Core.Services
                     }
                     else
                     {
-                        //if a property was deleted (and maybe the alias changed too), the update all content of the current content type
+                        //if a property was deleted (and maybe the alias changed too), then update all content of the current content type
                         // and all of it's desscendant doc types.     
                         toUpdate.AddRange(contentType.DescendantsAndSelf());
                     }                    
@@ -207,7 +231,6 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
-
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentTypeRepository(uow))
                 {

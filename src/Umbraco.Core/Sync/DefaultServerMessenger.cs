@@ -56,6 +56,15 @@ namespace Umbraco.Core.Sync
             _getUserNamePasswordDelegate = getUserNamePasswordDelegate;
         }
 
+        public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, string jsonPayload)
+        {
+            if (servers == null) throw new ArgumentNullException("servers");
+            if (refresher == null) throw new ArgumentNullException("refresher");
+            if (jsonPayload == null) throw new ArgumentNullException("jsonPayload");
+
+            MessageSeversForIdsOrJson(servers, refresher, MessageType.RefreshByJson, jsonPayload: jsonPayload);
+        }
+
         public void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher,Func<T, int> getNumericId, params T[] instances)
         {
             if (servers == null) throw new ArgumentNullException("servers");
@@ -82,6 +91,15 @@ namespace Umbraco.Core.Sync
                 instances);
         }
 
+        public void PerformRemove(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, string jsonPayload)
+        {
+            if (servers == null) throw new ArgumentNullException("servers");
+            if (refresher == null) throw new ArgumentNullException("refresher");
+            if (jsonPayload == null) throw new ArgumentNullException("jsonPayload");
+
+            MessageSeversForIdsOrJson(servers, refresher, MessageType.RemoveByJson, jsonPayload: jsonPayload);
+        }
+
         public void PerformRemove<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
         {
             if (servers == null) throw new ArgumentNullException("servers");
@@ -100,7 +118,7 @@ namespace Umbraco.Core.Sync
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
 
-            MessageSeversForManyIds(servers, refresher, MessageType.RemoveById, numericIds.Cast<object>());
+            MessageSeversForIdsOrJson(servers, refresher, MessageType.RemoveById, numericIds.Cast<object>());
         }
 
         public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params int[] numericIds)
@@ -108,7 +126,7 @@ namespace Umbraco.Core.Sync
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
 
-            MessageSeversForManyIds(servers, refresher, MessageType.RefreshById, numericIds.Cast<object>());
+            MessageSeversForIdsOrJson(servers, refresher, MessageType.RefreshById, numericIds.Cast<object>());
         }
 
         public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params Guid[] guidIds)
@@ -116,12 +134,12 @@ namespace Umbraco.Core.Sync
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
 
-            MessageSeversForManyIds(servers, refresher, MessageType.RefreshById, guidIds.Cast<object>());
+            MessageSeversForIdsOrJson(servers, refresher, MessageType.RefreshById, guidIds.Cast<object>());
         }
 
         public void PerformRefreshAll(IEnumerable<IServerAddress> servers, ICacheRefresher refresher)
         {
-            MessageSeversForManyIds(servers, refresher, MessageType.RefreshAll, Enumerable.Empty<object>().ToArray());
+            MessageSeversForIdsOrJson(servers, refresher, MessageType.RefreshAll, Enumerable.Empty<object>().ToArray());
         }
 
         private void InvokeMethodOnRefresherInstance<T>(ICacheRefresher refresher, MessageType dispatchType, Func<T, object> getId, IEnumerable<T> instances)
@@ -216,7 +234,7 @@ namespace Umbraco.Core.Sync
             }
         }
 
-        private void InvokeMethodOnRefresherInstance(ICacheRefresher refresher, MessageType dispatchType, IEnumerable<object> ids)
+        private void InvokeMethodOnRefresherInstance(ICacheRefresher refresher, MessageType dispatchType, IEnumerable<object> ids = null, string jsonPayload = null)
         {
             if (refresher == null) throw new ArgumentNullException("refresher");
 
@@ -227,35 +245,55 @@ namespace Umbraco.Core.Sync
             }
             else
             {
-                foreach (var id in ids)
+                if (ids != null)
                 {
+                    foreach (var id in ids)
+                    {
+                        //if we are not, then just invoke the call on the cache refresher
+                        switch (dispatchType)
+                        {
+                            case MessageType.RefreshById:
+                                if (id is int)
+                                {
+                                    refresher.Refresh((int) id);
+                                }
+                                else if (id is Guid)
+                                {
+                                    refresher.Refresh((Guid) id);
+                                }
+                                else
+                                {
+                                    throw new InvalidOperationException("The id must be either an int or a Guid");
+                                }
+
+                                break;
+                            case MessageType.RemoveById:
+                                refresher.Remove((int) id);
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    //we can only proceed if the cache refresher is IJsonCacheRefresher!
+                    var jsonRefresher = refresher as IJsonCacheRefresher;
+                    if (jsonRefresher == null)
+                    {
+                        throw new InvalidOperationException("The cache refresher " + refresher.GetType() + " is not of type " + typeof(IJsonCacheRefresher));
+                    }
+
                     //if we are not, then just invoke the call on the cache refresher
                     switch (dispatchType)
-                    {                        
-                        case MessageType.RefreshById:
-                            if (id is int)
-                            {
-                                refresher.Refresh((int)id);
-                            }
-                            else if (id is Guid)
-                            {
-                                refresher.Refresh((Guid)id);
-                            }
-                            else
-                            {
-                                throw new InvalidOperationException("The id must be either an int or a Guid");
-                            }
-
+                    {
+                        case MessageType.RefreshByJson:
+                            jsonRefresher.Refresh(jsonPayload);
                             break;
-                        case MessageType.RemoveById:
-                            refresher.Remove((int)id);
+                        case MessageType.RemoveByJson:
+                            jsonRefresher.Remove(jsonPayload);
                             break;
                     }
                 }
             }
-
-            
-            
         }
 
         private void MessageSeversForManyObjects<T>(
@@ -268,8 +306,6 @@ namespace Umbraco.Core.Sync
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
 
-            EnsureLazyUsernamePasswordDelegateResolved();
-
             //Now, check if we are using Distrubuted calls. If there are no servers in the list then we
             // can definitely not distribute.
             if (!_useDistributedCalls || !servers.Any())
@@ -280,36 +316,42 @@ namespace Umbraco.Core.Sync
             }
 
             //if we are distributing calls then we'll need to do it by id
-            MessageSeversForManyIds(servers, refresher, dispatchType, instances.Select(getId));
+            MessageSeversForIdsOrJson(servers, refresher, dispatchType, instances.Select(getId));
         }
 
-        private void MessageSeversForManyIds(
+        private void MessageSeversForIdsOrJson(
             IEnumerable<IServerAddress> servers,
             ICacheRefresher refresher,
             MessageType dispatchType,
-            IEnumerable<object> ids)
+            IEnumerable<object> ids = null,
+            string jsonPayload = null)
         {
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
             Type arrayType = null;
-            foreach (var id in ids)
+            if (ids != null)
             {
-                if (!(id is int) && (!(id is Guid)))
-                    throw new ArgumentException("The id must be either an int or a Guid");
-                if (arrayType == null)
-                    arrayType = id.GetType();
-                if (arrayType != id.GetType())
-                    throw new ArgumentException("The array must contain the same type of " + arrayType);
+                foreach (var id in ids)
+                {
+                    if (!(id is int) && (!(id is Guid)))
+                        throw new ArgumentException("The id must be either an int or a Guid");
+                    if (arrayType == null)
+                        arrayType = id.GetType();
+                    if (arrayType != id.GetType())
+                        throw new ArgumentException("The array must contain the same type of " + arrayType);
+                }
             }
-
+            
             //Now, check if we are using Distrubuted calls. If there are no servers in the list then we
             // can definitely not distribute.
             if (!_useDistributedCalls || !servers.Any())
             {
                 //if we are not, then just invoke the call on the cache refresher
-                InvokeMethodOnRefresherInstance(refresher, dispatchType, ids);
+                InvokeMethodOnRefresherInstance(refresher, dispatchType, ids, jsonPayload);
                 return;
             }
+            
+            EnsureLazyUsernamePasswordDelegateResolved();
 
             //We are using distributed calls, so lets make them...
             try
@@ -334,6 +376,16 @@ namespace Umbraco.Core.Sync
                         // Add the returned WaitHandle to the list for later checking
                         switch (dispatchType)
                         {
+                            case MessageType.RefreshByJson:
+                                asyncResultsList.Add(
+                                    cacheRefresher.BeginRefreshByJson(
+                                        refresher.UniqueIdentifier, jsonPayload, _login, _password, null, null));
+                                break;
+                            case MessageType.RemoveByJson:
+                                asyncResultsList.Add(
+                                    cacheRefresher.BeginRemoveByJson(
+                                        refresher.UniqueIdentifier, jsonPayload, _login, _password, null, null));
+                                break;
                             case MessageType.RefreshAll:
                                 asyncResultsList.Add(
                                     cacheRefresher.BeginRefreshAll(
@@ -383,6 +435,12 @@ namespace Umbraco.Core.Sync
                             // Find out if the call succeeded
                             switch (dispatchType)
                             {
+                                case MessageType.RefreshByJson:
+                                    cacheRefresher.EndRefreshByJson(t);
+                                    break;
+                                case MessageType.RemoveByJson:
+                                    cacheRefresher.EndRemoveByJson(t);
+                                    break;
                                 case MessageType.RefreshAll:
                                     cacheRefresher.EndRefreshAll(t);
                                     break;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web.Script.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
@@ -20,8 +21,90 @@ namespace Umbraco.Web.Cache
     /// <remarks>
     /// This is not intended to be used directly in your code
     /// </remarks>
-    public sealed class ContentTypeCacheRefresher : ICacheRefresher<IContentType>, ICacheRefresher<IMediaType>
+    public sealed class ContentTypeCacheRefresher : IJsonCacheRefresher
     {
+
+        #region Static helpers
+
+        /// <summary>
+        /// Converts the json to a JsonPayload object
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        private static JsonPayload[] DeserializeFromJsonPayload(string json)
+        {
+            var serializer = new JavaScriptSerializer();
+            var jsonObject = serializer.Deserialize<JsonPayload[]>(json);
+            return jsonObject;
+        }
+
+        /// <summary>
+        /// Converts a content type to a jsonPayload object
+        /// </summary>
+        /// <param name="contentType"></param>
+        /// <param name="isDeleted">if the item was deleted</param>
+        /// <returns></returns>
+        private static JsonPayload FromContentType(IContentTypeBase contentType, bool isDeleted = false)
+        {
+            var payload = new JsonPayload
+                {
+                    Alias = contentType.Alias,
+                    Id = contentType.Id,
+                    PropertyTypeIds = contentType.PropertyTypes.Select(x => x.Id).ToArray(),
+                    //either IContentType or IMediaType
+                    Type = (contentType is IContentType) ? typeof(IContentType).Name : typeof(IMediaType).Name,
+                    DescendantPayloads = contentType.Descendants().Select(x => FromContentType(x)).ToArray(),
+                    WasDeleted = isDeleted
+                };
+            //here we need to check if the alias of the content type changed or if one of the properties was removed.                    
+            var dirty = contentType as IRememberBeingDirty;
+            if (dirty != null)
+            {
+                payload.PropertyRemoved = dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved");
+                payload.AliasChanged = dirty.WasPropertyDirty("Alias");
+                payload.IsNew = dirty.WasPropertyDirty("HasIdentity");
+            }
+            return payload;
+        }
+
+        /// <summary>
+        /// Creates the custom Json payload used to refresh cache amongst the servers
+        /// </summary>
+        /// <param name="isDeleted">specify false if this is an update, otherwise true if it is a deletion</param>
+        /// <param name="contentTypes"></param>
+        /// <returns></returns>
+        internal static string SerializeToJsonPayload(bool isDeleted, params IContentTypeBase[] contentTypes)
+        {
+            var serializer = new JavaScriptSerializer();
+            var items = contentTypes.Select(x => FromContentType(x, isDeleted)).ToArray();
+            var json = serializer.Serialize(items);
+            return json;
+        }
+
+        #endregion
+
+        #region Sub classes
+
+        private class JsonPayload
+        {
+            public JsonPayload()
+            {
+                WasDeleted = false;
+                IsNew = false;
+            }
+            public string Alias { get; set; }
+            public int Id { get; set; }
+            public int[] PropertyTypeIds { get; set; }
+            public string Type { get; set; }
+            public bool AliasChanged { get; set; }
+            public bool PropertyRemoved { get; set; }
+            public JsonPayload[] DescendantPayloads { get; set; }
+            public bool WasDeleted { get; set; }
+            public bool IsNew { get; set; }
+        }
+
+        #endregion
+
         public Guid UniqueIdentifier
         {
             get { return new Guid(DistributedCache.ContentTypeCacheRefresherId); }
@@ -45,42 +128,42 @@ namespace Umbraco.Web.Cache
 
         public void Refresh(int id)
         {
-            ClearContentTypeCache(id);
+            ClearContentTypeCache(false, id);
         }
 
         public void Remove(int id)
         {
-            ClearContentTypeCache(id);
+            ClearContentTypeCache(true, id);
         }
 
         public void Refresh(Guid id)
         {
+        }        
+        
+        /// <summary>
+        /// Refreshes the cache using the custom jsonPayload provided
+        /// </summary>
+        /// <param name="jsonPayload"></param>
+        public void Refresh(string jsonPayload)
+        {
+            var payload = DeserializeFromJsonPayload(jsonPayload);
+            ClearContentTypeCache(payload);
         }
 
-        public void Refresh(IContentType instance)
+        /// <summary>
+        /// Removes the cache using the custom jsonPayload provided
+        /// </summary>
+        /// <param name="jsonPayload"></param>
+        public void Remove(string jsonPayload)
         {
-            ClearContentTypeCache(instance);
-        }
-
-        public void Remove(IContentType instance)
-        {
-            ClearContentTypeCache(instance);
-        }
-
-        public void Refresh(IMediaType instance)
-        {
-            ClearContentTypeCache(instance);
-        }
-
-        public void Remove(IMediaType instance)
-        {
-            ClearContentTypeCache(instance);
+            var payload = DeserializeFromJsonPayload(jsonPayload);
+            ClearContentTypeCache(payload);
         }
 
         /// <summary>
         /// This clears out all cache associated with a content type
         /// </summary>
-        /// <param name="contentTypes"></param>
+        /// <param name="payloads"></param>
         /// <remarks>
         /// The cache that is required to be cleared when a content type is updated is as follows:
         /// - ApplicationCache (keys to clear):
@@ -95,26 +178,23 @@ namespace Umbraco.Web.Cache
         ///       it is only handled in the ContentTypeControlNew.ascx, not by business logic/events. - The xml cache needs to be updated 
         ///       when the doc type alias changes or when a property type is removed, the ContentService.RePublishAll should be executed anytime either of these happens.
         /// </remarks>
-        private static void ClearContentTypeCache(params IContentTypeBase[] contentTypes)
+        private static void ClearContentTypeCache(IEnumerable<JsonPayload> payloads)
         {
             var needsContentRefresh = false;
             
-            contentTypes.ForEach(contentType =>
+            payloads.ForEach(payload =>
                 {
                     //clear the cache for each item
-                    ClearContentTypeCache(contentType);
-
-                    //we only need to do this for IContentType NOT for IMediaType, we don't want to refresh the whole cache
-                    //if a media type has changed.
-                    if (contentType is IContentType)
+                    ClearContentTypeCache(payload);
+                    
+                    //we only need to do this for IContentType NOT for IMediaType, we don't want to refresh the whole cache.
+                    //if the item was deleted or the alias changed or property removed then we need to refresh the content.
+                    //and, don't refresh the cache if it is new.
+                    if (payload.Type == typeof(IContentType).Name
+                        && !payload.IsNew 
+                        && (payload.WasDeleted || payload.AliasChanged || payload.PropertyRemoved))
                     {
-                        //here we need to check if the alias of the content type changed or if one of the properties was removed.                    
-                        var dirty = contentType as IRememberBeingDirty;
-                        if (dirty == null) return;
-                        if (dirty.WasPropertyDirty("Alias") || dirty.WasPropertyDirty("HasPropertyTypeBeenRemoved"))
-                        {
-                            needsContentRefresh = true;
-                        }
+                        needsContentRefresh = true;
                     }
                 });
 
@@ -126,14 +206,16 @@ namespace Umbraco.Web.Cache
             }
 
             //clear the cache providers if there were any content types to clear
-            if (contentTypes.Any())
+            if (payloads.Any())
             {
                 InMemoryCacheProvider.Current.Clear();
                 RuntimeCacheProvider.Current.Clear();
 
                 //we only need to do this for IContentType NOT for IMediaType, we don't want to refresh the whole routes
                 //cache if only a media type has changed.
-                if (contentTypes.Any(x => x is IContentType))
+                //we don't want to update the routes cache if all of the content types here are new.
+                if (payloads.Any(x => x.Type ==  typeof(IContentType).Name) 
+                    && !payloads.All(x => x.IsNew)) //if they are all new then don't proceed
                 {
                     //we need to clear the routes cache here!
                     //TODO: Is there a better way to handle this without casting ?
@@ -149,7 +231,7 @@ namespace Umbraco.Web.Cache
         /// <summary>
         /// Clears cache for an individual IContentTypeBase object
         /// </summary>
-        /// <param name="contentType"></param>
+        /// <param name="payload"></param>
         /// <remarks>
         /// See notes for the other overloaded ClearContentTypeCache for 
         /// full details on clearing cache.
@@ -157,44 +239,43 @@ namespace Umbraco.Web.Cache
         /// <returns>
         /// Return true if the alias of the content type changed
         /// </returns>
-        private static void ClearContentTypeCache(IContentTypeBase contentType)
+        private static void ClearContentTypeCache(JsonPayload payload)
         {
             //clears the cache for each property type associated with the content type
-            foreach (var p in contentType.PropertyTypes)
+            foreach (var pid in payload.PropertyTypeIds)
             {
-                ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.PropertyTypeCacheKey + p.Id);
+                ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.PropertyTypeCacheKey + pid);
             }
             //clears the cache associated with the Content type itself
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, contentType.Id));
+            ApplicationContext.Current.ApplicationCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, payload.Id));
             //clears the cache associated with the content type properties collection
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.ContentTypePropertiesCacheKey + contentType.Id);
+            ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.ContentTypePropertiesCacheKey + payload.Id);
             
             //clears the dictionary object cache of the legacy ContentType
-            global::umbraco.cms.businesslogic.ContentType.RemoveFromDataTypeCache(contentType.Alias);
+            global::umbraco.cms.businesslogic.ContentType.RemoveFromDataTypeCache(payload.Alias);
 
             //need to recursively clear the cache for each child content type
-            // performance related to http://issues.umbraco.org/issue/U4-1714
-            var dtos = ApplicationContext.Current.DatabaseContext.Database.Fetch<ContentType2ContentTypeDto>("WHERE parentContentTypeId = @Id", new { Id = contentType.Id });
-            foreach (var dto in dtos)
+            foreach (var descendant in payload.DescendantPayloads)
             {
-                ClearContentTypeCache(dto.ChildId);
+                ClearContentTypeCache(descendant);
             }            
         }
 
         /// <summary>
         /// Clears the cache for any content type with the specified Ids
         /// </summary>
+        /// <param name="isDeleted">true if the entity was deleted, false if it is just an update</param>
         /// <param name="ids"></param>
-        private static void ClearContentTypeCache(params int[] ids)
+        private static void ClearContentTypeCache(bool isDeleted, params int[] ids)
         {
             ClearContentTypeCache(
                 ids.Select(
                     x =>
                     ApplicationContext.Current.Services.ContentTypeService.GetContentType(x) as IContentTypeBase)
                    .WhereNotNull()
+                   .Select(x => FromContentType(x, isDeleted))
                    .ToArray());
         }
 
-        
     }
 }

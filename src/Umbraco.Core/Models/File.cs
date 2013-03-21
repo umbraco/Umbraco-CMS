@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models
     public abstract class File : Entity, IFile
     {
         private string _path;
-        private string _content;
+        private string _content = string.Empty; //initialize to empty string, not null
 
         protected File(string path)
         {

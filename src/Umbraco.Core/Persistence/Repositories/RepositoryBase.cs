@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <typeparam name="TEntity">Type of <see cref="IAggregateRoot"/> entity for which the repository is used</typeparam>
     /// <typeparam name="TId">Type of the Id used for this entity</typeparam>
     internal abstract class RepositoryBase<TId, TEntity> : DisposableObject, IRepositoryQueryable<TId, TEntity>, IUnitOfWorkRepository 
-		where TEntity : IAggregateRoot
+		where TEntity : class, IAggregateRoot
     {
 		private readonly IUnitOfWork _work;
         private readonly IRepositoryCacheProvider _cache;
@@ -98,13 +98,17 @@ namespace Umbraco.Core.Persistence.Repositories
                 _cache.Save(typeof(TEntity), entity);
             }
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            var asEntity = entity as Entity;
-            if (asEntity != null)
+            if (entity != null)
             {
-                asEntity.ResetDirtyProperties(false);
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                Entity asEntity = entity as Entity;
+                if (asEntity != null)
+                {
+                    asEntity.ResetDirtyProperties(false);
+                }
             }
+            
             return entity;
         }
 

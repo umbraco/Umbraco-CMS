@@ -1,16 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models
 {
-    public static class ContentTypeExtensions
+    internal static class ContentTypeExtensions
     {
         /// <summary>
         /// Get all descendant content types
         /// </summary>
         /// <param name="contentType"></param>
         /// <returns></returns>
-        public static IEnumerable<IContentType> Descendants(this IContentType contentType)
+        public static IEnumerable<IContentTypeBase> Descendants(this IContentTypeBase contentType)
         {
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             var descendants = contentTypeService.GetContentTypeChildren(contentType.Id)
@@ -23,13 +24,21 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="contentType"></param>
         /// <returns></returns>
-        public static IEnumerable<IContentType> DescendantsAndSelf(this IContentType contentType)
+        public static IEnumerable<IContentTypeBase> DescendantsAndSelf(this IContentTypeBase contentType)
         {
-            var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
-            var descendants = contentTypeService.GetContentTypeChildren(contentType.Id)
-                                                .FlattenList(type => contentTypeService.GetContentTypeChildren(type.Id));
             var descendantsAndSelf = new[] { contentType }.Concat(contentType.Descendants());
             return descendantsAndSelf;
         }
+
+        ///// <summary>
+        ///// Returns the descendant content type Ids for the given content type
+        ///// </summary>
+        ///// <param name="contentType"></param>
+        ///// <returns></returns>
+        //public static IEnumerable<int> DescendantIds(this IContentTypeBase contentType)
+        //{
+        //    return ((ContentTypeService) ApplicationContext.Current.Services.ContentTypeService)
+        //        .GetDescendantContentTypeIds(contentType.Id);
+        //}
     }
 }

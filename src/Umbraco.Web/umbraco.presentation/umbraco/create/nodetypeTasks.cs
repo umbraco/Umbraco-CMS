@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -43,26 +44,27 @@ namespace umbraco
 
         public bool Save()
         {
-            var dt = cms.businesslogic.web.DocumentType.MakeNew(BusinessLogic.User.GetUser(_userID), Alias.Replace("'", "''"));
-            dt.IconUrl = "folder.gif";
-
+            //NOTE: TypeID is the parent id!
+            //NOTE: ParentID is aparently a flag to determine if we are to create a template! Hack much ?! :P
+            var contentType = new ContentType(TypeID != 0 ? TypeID : -1)
+                {
+                    CreatorId = _userID,
+                    Alias = Alias.Replace("'", "''"),
+                    Icon = "folder.gif",
+                    Name = Alias.Replace("'", "''")
+                };
             // Create template?
             if (ParentID == 1)
             {
-                cms.businesslogic.template.Template[] t = { cms.businesslogic.template.Template.MakeNew(_alias, BusinessLogic.User.GetUser(_userID)) };
-                dt.allowedTemplates = t;
-                dt.DefaultTemplate = t[0].Id;
+                var template = new Template(string.Empty, _alias, _alias);
+                ApplicationContext.Current.Services.FileService.SaveTemplate(template, _userID);
+
+                contentType.AllowedTemplates = new[] {template};
+                contentType.DefaultTemplateId = template.Id;
             }
+            ApplicationContext.Current.Services.ContentTypeService.Save(contentType);
 
-            // Master Content Type?
-            if (TypeID != 0)
-            {
-                dt.MasterContentType = TypeID;
-            }
-
-            dt.Save();
-
-            m_returnUrl = "settings/editNodeTypeNew.aspx?id=" + dt.Id.ToString();
+            m_returnUrl = "settings/editNodeTypeNew.aspx?id=" + contentType.Id.ToString();
 
             return true;
         }
@@ -75,13 +77,6 @@ namespace umbraco
                 ApplicationContext.Current.Services.ContentTypeService.Delete(docType);
             }
             return false;
-        }
-
-        public nodetypeTasks()
-        {
-            //
-            // TODO: Add constructor logic here
-            //
         }
 
         #region ITaskReturnUrl Members

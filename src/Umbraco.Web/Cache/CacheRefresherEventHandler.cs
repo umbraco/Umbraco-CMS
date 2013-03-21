@@ -21,8 +21,6 @@ namespace Umbraco.Web.Cache
     {
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
-            if (UmbracoSettings.UmbracoLibraryCacheDuration <= 0) return;
-
             //Bind to content events - currently used for:
             // - macro clearing
             // - clearing the xslt cache (MS.Internal.Xml.XPath.XPathSelectionIterator)
@@ -97,7 +95,7 @@ namespace Umbraco.Web.Cache
         /// <param name="e"></param>
         static void ContentTypeServiceSavedMediaType(IContentTypeService sender, Core.Events.SaveEventArgs<IMediaType> e)
         {
-            e.SavedEntities.ForEach(x => DistributedCache.Instance.RemoveMediaTypeCache(x));
+            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshMediaTypeCache(x));
         }
 
         /// <summary>
@@ -107,7 +105,7 @@ namespace Umbraco.Web.Cache
         /// <param name="e"></param>
         static void ContentTypeServiceSavedContentType(IContentTypeService sender, Core.Events.SaveEventArgs<IContentType> e)
         {           
-            e.SavedEntities.ForEach(contentType => DistributedCache.Instance.RemoveContentTypeCache(contentType));
+            e.SavedEntities.ForEach(contentType => DistributedCache.Instance.RefreshContentTypeCache(contentType));
         }
 
         /// <summary>

@@ -7,6 +7,8 @@
     {
         RefreshAll,
         RefreshById,
-        RemoveById
+        RefreshByJson,
+        RemoveById,
+        RemoveByJson
     }
 }

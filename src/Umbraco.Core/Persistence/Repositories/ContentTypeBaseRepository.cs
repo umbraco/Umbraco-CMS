@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <typeparam name="TId"></typeparam>
     /// <typeparam name="TEntity"></typeparam>
     internal abstract class ContentTypeBaseRepository<TId, TEntity> : PetaPocoRepositoryBase<TId, TEntity>
-        where TEntity : IContentTypeComposition
+        where TEntity : class, IContentTypeComposition
     {
 		protected ContentTypeBaseRepository(IDatabaseUnitOfWork work)
 			: base(work)

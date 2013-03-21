@@ -9,6 +9,17 @@ namespace Umbraco.Core.Sync
     /// </summary>
     internal interface IServerMessenger
     {
+
+        /// <summary>
+        /// Performs a refresh and sends along the JSON payload to each server
+        /// </summary>
+        /// <param name="servers"></param>
+        /// <param name="refresher"></param>
+        /// <param name="jsonPayload">
+        /// A pre-formatted custom json payload to be sent to the servers, the cache refresher will deserialize and use to refresh cache
+        /// </param>
+        void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, string jsonPayload);
+
         /// <summary>
         /// Performs a sync against all instance objects
         /// </summary>
@@ -28,6 +39,16 @@ namespace Umbraco.Core.Sync
         /// <param name="getGuidId">A delegate to return the Id for each instance to be used to sync to other servers</param>
         /// <param name="instances"></param>
         void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances);
+
+        /// <summary>
+        /// Performs a remove and sends along the JSON payload to each server
+        /// </summary>
+        /// <param name="servers"></param>
+        /// <param name="refresher"></param>
+        /// <param name="jsonPayload">
+        /// A pre-formatted custom json payload to be sent to the servers, the cache refresher will deserialize and use to remove cache
+        /// </param>
+        void PerformRemove(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, string jsonPayload);
 
         /// <summary>
         /// Removes the cache for the specified items

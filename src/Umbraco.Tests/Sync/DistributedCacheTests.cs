@@ -132,8 +132,15 @@ namespace Umbraco.Tests.Sync
             public List<int> IntIdsRefreshed = new List<int>(); 
             public List<Guid> GuidIdsRefreshed = new List<Guid>();
             public List<int> IntIdsRemoved = new List<int>();
+            public List<string> PayloadsRemoved = new List<string>();
+            public List<string> PayloadsRefreshed = new List<string>(); 
             public int CountOfFullRefreshes = 0;
-            
+
+
+            public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, string jsonPayload)
+            {
+                PayloadsRefreshed.Add(jsonPayload);
+            }
 
             public void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
             {
@@ -143,6 +150,11 @@ namespace Umbraco.Tests.Sync
             public void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
             {
                 GuidIdsRefreshed.AddRange(instances.Select(getGuidId));
+            }
+
+            public void PerformRemove(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, string jsonPayload)
+            {
+                PayloadsRemoved.Add(jsonPayload);
             }
 
             public void PerformRemove<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)

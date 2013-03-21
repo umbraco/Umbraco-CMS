@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Models.EntityBase
@@ -16,6 +17,15 @@ namespace Umbraco.Core.Models.EntityBase
         private int? _hash;
         private int _id;
         private Guid _key;
+        private DateTime _createDate;
+        private DateTime _updateDate;
+
+        private static readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<Entity, int>(x => x.Id);
+        private static readonly PropertyInfo KeySelector = ExpressionHelper.GetPropertyInfo<Entity, Guid>(x => x.Key);
+        private static readonly PropertyInfo CreateDateSelector = ExpressionHelper.GetPropertyInfo<Entity, DateTime>(x => x.CreateDate);
+        private static readonly PropertyInfo UpdateDateSelector = ExpressionHelper.GetPropertyInfo<Entity, DateTime>(x => x.UpdateDate);
+        private static readonly PropertyInfo HasIdentitySelector = ExpressionHelper.GetPropertyInfo<Entity, bool>(x => x.HasIdentity);
+        
 
         /// <summary>
         /// Integer Id
@@ -29,8 +39,12 @@ namespace Umbraco.Core.Models.EntityBase
             }
             set
             {
-                _id = value;
-                HasIdentity = true;
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _id = value;
+                    HasIdentity = true; //set the has Identity
+                    return _id;
+                }, _id, IdSelector);
             }
         }
         
@@ -49,20 +63,49 @@ namespace Umbraco.Core.Models.EntityBase
 
                 return _key;
             }
-            set { _key = value; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _key = value;
+                    return _key;
+                }, _key, KeySelector);
+            }
         }
 
         /// <summary>
         /// Gets or sets the Created Date
         /// </summary>
         [DataMember]
-        public DateTime CreateDate { get; set; }
+        public DateTime CreateDate
+        {
+            get { return _createDate; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _createDate = value;
+                    return _createDate;
+                }, _createDate, CreateDateSelector);
+            }
+        }
 
         /// <summary>
         /// Gets or sets the Modified Date
         /// </summary>
         [DataMember]
-        public DateTime UpdateDate { get; set; }
+        public DateTime UpdateDate
+        {
+            get { return _updateDate; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _updateDate = value;
+                    return _updateDate;
+                }, _updateDate, UpdateDateSelector);
+            }
+        }
 
         internal virtual void ResetIdentity()
         {
@@ -98,7 +141,11 @@ namespace Umbraco.Core.Models.EntityBase
             }
             protected set
             {
-                _hasIdentity = value;
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _hasIdentity = value;
+                    return _hasIdentity;
+                }, _hasIdentity, HasIdentitySelector);
             }
         }
 
