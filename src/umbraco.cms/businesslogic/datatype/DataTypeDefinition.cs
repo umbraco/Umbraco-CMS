@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Data;
-
 using System.Collections;
 using System.Linq;
-using Umbraco.Core.Models;
 using umbraco.DataLayer;
 using System.Xml;
 using umbraco.interfaces;
@@ -25,14 +21,6 @@ namespace umbraco.cms.businesslogic.datatype
         #region Private fields
         private Guid _controlId;
 
-        private static Dictionary<string, DataTypeDatabaseType> _databaseTypes =
-            new Dictionary<string, DataTypeDatabaseType>
-                {
-                    {"Integer", DataTypeDatabaseType.Integer},
-                    {"Date", DataTypeDatabaseType.Date},
-                    {"Ntext", DataTypeDatabaseType.Ntext},
-                    {"Nvarchar", DataTypeDatabaseType.Nvarchar}
-                };
         private static Guid _objectType = new Guid("30a2a501-1978-4ddb-a57b-f7efed43ba3c");
 	    private string _dbType;
 
