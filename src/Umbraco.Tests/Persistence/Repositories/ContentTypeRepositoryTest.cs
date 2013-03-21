@@ -248,17 +248,18 @@ namespace Umbraco.Tests.Persistence.Repositories
                                    SortOrder = 1,
                                    DataTypeDefinitionId = -88
                                };
-            var list = new List<PropertyType> {urlAlias};
-            ((ContentType) contentType).PropertyTypes = list;
+            
+            var addedPropertyType = contentType.AddPropertyType(urlAlias);
             repository.AddOrUpdate(contentType);
             unitOfWork.Commit();
 
             // Assert
             var updated = repository.Get(1046);
+            Assert.That(addedPropertyType, Is.True);
             Assert.That(updated.PropertyGroups.Count(), Is.EqualTo(2));
             Assert.That(updated.PropertyTypes.Count(), Is.EqualTo(5));
             Assert.That(updated.PropertyTypes.Any(x => x.Alias == "urlAlias"), Is.True);
-            Assert.AreEqual(updated.PropertyTypes.First(x => x.Alias == "urlAlias").PropertyGroupId.Value, default(int));
+            Assert.That(updated.PropertyTypes.First(x => x.Alias == "urlAlias").PropertyGroupId, Is.Null);
         }
 
         [Test]
