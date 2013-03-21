@@ -774,7 +774,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
         public void Publish(User u)
         {
-            SaveAndPublish(u);
+            this.Published = SaveAndPublish(u);
         }
 
         /// <summary>
