@@ -1,12 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 
 using System.Collections;
 using System.Linq;
+using Umbraco.Core.Models;
 using umbraco.DataLayer;
 using System.Xml;
 using umbraco.interfaces;
-using umbraco.cms.businesslogic.propertytype;
+using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 
 namespace umbraco.cms.businesslogic.datatype
 {
@@ -23,6 +25,14 @@ namespace umbraco.cms.businesslogic.datatype
         #region Private fields
         private Guid _controlId;
 
+        private static Dictionary<string, DataTypeDatabaseType> _databaseTypes =
+            new Dictionary<string, DataTypeDatabaseType>
+                {
+                    {"Integer", DataTypeDatabaseType.Integer},
+                    {"Date", DataTypeDatabaseType.Date},
+                    {"Ntext", DataTypeDatabaseType.Ntext},
+                    {"Nvarchar", DataTypeDatabaseType.Nvarchar}
+                };
         private static Guid _objectType = new Guid("30a2a501-1978-4ddb-a57b-f7efed43ba3c");
 	    private string _dbType;
 
@@ -117,36 +127,21 @@ namespace umbraco.cms.businesslogic.datatype
             OnSaving(EventArgs.Empty);
         }
 
-        /*
-		public SortedList PreValues {
-			get {
-				SortedList retVal = new SortedList();
-				SqlDataReader dr = SqlHelper.ExecuteReader("select id, value from cmsDataTypePreValues where dataTypeNodeId = @nodeId order by sortOrder", SqlHelper.CreateParameter("@nodeId", this.Id));
-				while (dr.Read()) 
-				{
-					retVal.Add(dr.GetString("id"), dr.GetString("value"));
-				}
-				dr.Close();
-
-				return retVal;
-				}
-		}
-		*/
-
         public XmlElement ToXml(XmlDocument xd)
         {
             XmlElement dt = xd.CreateElement("DataType");
             dt.Attributes.Append(xmlHelper.addAttribute(xd, "Name", Text));
             dt.Attributes.Append(xmlHelper.addAttribute(xd, "Id", this.DataType.Id.ToString()));
             dt.Attributes.Append(xmlHelper.addAttribute(xd, "Definition", this.UniqueId.ToString()));
+            dt.Attributes.Append(xmlHelper.addAttribute(xd, "DatabaseType", this.DbType));
 
             // templates
             XmlElement prevalues = xd.CreateElement("PreValues");
             foreach (DictionaryEntry item in PreValues.GetPreValues(this.Id))
             {
                 XmlElement prevalue = xd.CreateElement("PreValue");
-                prevalue.Attributes.Append(xmlHelper.addAttribute(xd, "Id", ((umbraco.cms.businesslogic.datatype.PreValue)item.Value).Id.ToString()));
-                prevalue.Attributes.Append(xmlHelper.addAttribute(xd, "Value", ((umbraco.cms.businesslogic.datatype.PreValue)item.Value).Value));
+                prevalue.Attributes.Append(xmlHelper.addAttribute(xd, "Id", ((PreValue)item.Value).Id.ToString()));
+                prevalue.Attributes.Append(xmlHelper.addAttribute(xd, "Value", ((PreValue)item.Value).Value));
 
                 prevalues.AppendChild(prevalue);
             }
@@ -166,18 +161,14 @@ namespace umbraco.cms.businesslogic.datatype
 
 
             //Make sure that the dtd is not already present
-            if (!CMSNode.IsNode(new Guid(_def))
-            )
+            if (!CMSNode.IsNode(new Guid(_def)))
             {
-
-                BusinessLogic.User u = umbraco.BusinessLogic.User.GetCurrent();
+                BusinessLogic.User u = BusinessLogic.User.GetCurrent();
 
                 if (u == null)
                     u = BusinessLogic.User.GetUser(0);
 
-                cms.businesslogic.datatype.controls.Factory f = new umbraco.cms.businesslogic.datatype.controls.Factory();
-
-
+                controls.Factory f = new controls.Factory();
                 DataTypeDefinition dtd = MakeNew(u, _name, new Guid(_def));
                 var dataType = f.DataType(new Guid(_id));
                 if (dataType == null)
@@ -189,8 +180,6 @@ namespace umbraco.cms.businesslogic.datatype
                 //add prevalues
                 foreach (XmlNode xmlPv in xmlData.SelectNodes("PreValues/PreValue"))
                 {
-
-
                     XmlAttribute val = xmlPv.Attributes["Value"];
 
                     if (val != null)

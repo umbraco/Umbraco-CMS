@@ -478,11 +478,20 @@ namespace Umbraco.Core.Services
                 var dataTypeDefinitionName = dataTypeElement.Attribute("Name").Value;
                 var dataTypeId = new Guid(dataTypeElement.Attribute("Id").Value);
                 var dataTypeDefinitionId = new Guid(dataTypeElement.Attribute("Definition").Value);
+                var databaseTypeAttribute = dataTypeElement.Attribute("DatabaseType");
 
                 var definition = _dataTypeService.GetDataTypeDefinitionById(dataTypeDefinitionId);
                 if (definition == null)
                 {
-                    var dataTypeDefinition = new DataTypeDefinition(-1, dataTypeId) { Key = dataTypeDefinitionId, Name = dataTypeDefinitionName };
+                    var databaseType = databaseTypeAttribute != null
+                                           ? databaseTypeAttribute.Value.EnumParse<DataTypeDatabaseType>(true)
+                                           : DataTypeDatabaseType.Ntext;
+                    var dataTypeDefinition = new DataTypeDefinition(-1, dataTypeId)
+                                                 {
+                                                     Key = dataTypeDefinitionId,
+                                                     Name = dataTypeDefinitionName,
+                                                     DatabaseType = databaseType
+                                                 };
                     dataTypes.Add(dataTypeDefinitionName, dataTypeDefinition);
                 }
             }

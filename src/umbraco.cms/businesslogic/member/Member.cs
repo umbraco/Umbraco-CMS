@@ -588,7 +588,7 @@ namespace umbraco.cms.businesslogic.member
                         if (property.Value != null)
                         {
                             string dbType = property.PropertyType.DataTypeDefinition.DbType;
-                            if (dbType.Equals("Int"))
+                            if (dbType.Equals("Integer"))
                             {
                                 int value = 0;
                                 if (int.TryParse(property.Value.ToString(), out value))
