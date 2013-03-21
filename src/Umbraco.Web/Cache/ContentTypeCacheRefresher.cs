@@ -21,7 +21,7 @@ namespace Umbraco.Web.Cache
     /// <remarks>
     /// This is not intended to be used directly in your code
     /// </remarks>
-    public sealed class ContentTypeCacheRefresher : IJsonCacheRefresher
+    public sealed class ContentTypeCacheRefresher : JsonCacheRefresherBase<ContentTypeCacheRefresher>
     {
 
         #region Static helpers
@@ -105,16 +105,21 @@ namespace Umbraco.Web.Cache
 
         #endregion
 
-        public Guid UniqueIdentifier
+        protected override ContentTypeCacheRefresher Instance
+        {
+            get { return this; }
+        }
+
+        public override Guid UniqueIdentifier
         {
             get { return new Guid(DistributedCache.ContentTypeCacheRefresherId); }
         }
-        public string Name
+        public override string Name
         {
             get { return "ContentTypeCacheRefresher"; }
         }
 
-        public void RefreshAll()
+        public override void RefreshAll()
         {
             //all property type cache
             ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.PropertyTypeCacheKey);
@@ -124,40 +129,42 @@ namespace Umbraco.Web.Cache
             ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.ContentTypeCacheKey);
             //clear static object cache
             global::umbraco.cms.businesslogic.ContentType.RemoveAllDataTypeCache();
+
+            base.RefreshAll();
         }
 
-        public void Refresh(int id)
+        public override void Refresh(int id)
         {
             ClearContentTypeCache(false, id);
+            base.Refresh(id);
         }
 
-        public void Remove(int id)
+        public override void Remove(int id)
         {
             ClearContentTypeCache(true, id);
+            base.Remove(id);
         }
 
-        public void Refresh(Guid id)
-        {
-        }        
-        
         /// <summary>
         /// Refreshes the cache using the custom jsonPayload provided
         /// </summary>
         /// <param name="jsonPayload"></param>
-        public void Refresh(string jsonPayload)
+        public override void Refresh(string jsonPayload)
         {
             var payload = DeserializeFromJsonPayload(jsonPayload);
             ClearContentTypeCache(payload);
+            base.Refresh(jsonPayload);
         }
 
         /// <summary>
         /// Removes the cache using the custom jsonPayload provided
         /// </summary>
         /// <param name="jsonPayload"></param>
-        public void Remove(string jsonPayload)
+        public override void Remove(string jsonPayload)
         {
             var payload = DeserializeFromJsonPayload(jsonPayload);
             ClearContentTypeCache(payload);
+            base.Remove(jsonPayload);
         }
 
         /// <summary>
@@ -173,10 +180,6 @@ namespace Umbraco.Web.Cache
         /// - InMemoryCacheProvider.Current.Clear();
         /// - RuntimeCacheProvider.Current.Clear(); 
         /// - RoutesCache.Clear();        
-        /// 
-        /// TODO: Needs to update any content items that this effects for the xml cache... 
-        ///       it is only handled in the ContentTypeControlNew.ascx, not by business logic/events. - The xml cache needs to be updated 
-        ///       when the doc type alias changes or when a property type is removed, the ContentService.RePublishAll should be executed anytime either of these happens.
         /// </remarks>
         private static void ClearContentTypeCache(IEnumerable<JsonPayload> payloads)
         {

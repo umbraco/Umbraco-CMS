@@ -13,10 +13,14 @@ namespace Umbraco.Web.Cache
     /// <remarks>
     /// This is not intended to be used directly in your code and it should be sealed but due to legacy code we cannot seal it.
     /// </remarks>
-    public class TemplateCacheRefresher : ICacheRefresher
+    public class TemplateCacheRefresher : CacheRefresherBase<TemplateCacheRefresher>
     {
-        
-        public string Name
+        protected override TemplateCacheRefresher Instance
+        {
+            get { return this; }
+        }
+
+        public override string Name
         {
             get
             {
@@ -24,7 +28,7 @@ namespace Umbraco.Web.Cache
             }
         }
 
-        public Guid UniqueIdentifier
+        public override Guid UniqueIdentifier
         {
             get
             {
@@ -32,22 +36,16 @@ namespace Umbraco.Web.Cache
             }
         }
 
-        public void RefreshAll()
-        {
-        }
-
-        public void Refresh(Guid id)
-        {
-        }
-
-        public void Refresh(int id)
+        public override void Refresh(int id)
         {
             RemoveFromCache(id);
+            base.Refresh(id);
         }
 
-        public void Remove(int id)
+        public override void Remove(int id)
         {
             RemoveFromCache(id);
+            base.Remove(id);
         }
 
         private void RemoveFromCache(int id)

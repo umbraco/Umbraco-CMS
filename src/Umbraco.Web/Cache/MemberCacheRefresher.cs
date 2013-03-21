@@ -12,52 +12,40 @@ namespace Umbraco.Web.Cache
     /// <remarks>
     /// This is not intended to be used directly in your code and it should be sealed but due to legacy code we cannot seal it.
     /// </remarks>
-    public class MemberCacheRefresher : ICacheRefresher<Member>
+    public class MemberCacheRefresher : CacheRefresherBase<MemberCacheRefresher>
     {
 
-        public Guid UniqueIdentifier
+        protected override MemberCacheRefresher Instance
+        {
+            get { return this; }
+        }
+
+        public override Guid UniqueIdentifier
         {
             get { return new Guid(DistributedCache.MemberCacheRefresherId); }
         }
 
-        public string Name
+        public override string Name
         {
             get { return "Clears Member Cache from umbraco.library"; }
         }
-
-        public void RefreshAll()
-        {
-        }
-
-        public void Refresh(int id)
+        
+        public override void Refresh(int id)
         {
             ClearCache(id);
+            base.Refresh(id);
         }
 
-        public void Remove(int id)
+        public override void Remove(int id)
         {
             ClearCache(id);
-        }
-
-        public void Refresh(Guid id)
-        {
-            
+            base.Remove(id);
         }
 
         private void ClearCache(int id)
         {
             ApplicationContext.Current.ApplicationCache.
                 ClearCacheByKeySearch(string.Format("{0}_{1}", CacheKeys.MemberCacheKey, id));
-        }
-
-        public void Refresh(Member instance)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Remove(Member instance)
-        {
-            throw new NotImplementedException();
         }
     }
 }

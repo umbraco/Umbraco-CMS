@@ -3,12 +3,14 @@
     /// <summary>
     /// The message type to be used for syncing across servers
     /// </summary>
-    internal enum MessageType
+    public enum MessageType
     {
         RefreshAll,
         RefreshById,
         RefreshByJson,
         RemoveById,
-        RemoveByJson
+        RemoveByJson,
+        RefreshByInstance,
+        RemoveByInstance
     }
 }

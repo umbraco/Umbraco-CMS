@@ -16,13 +16,19 @@ namespace Umbraco.Web.Cache
     /// If Load balancing is enabled (by default disabled, is set in umbracoSettings.config) PageCacheRefresher will be called
     /// everytime content is added/updated/removed to ensure that the content cache is identical on all load balanced servers
     /// </remarks>    
-    public class PageCacheRefresher : ICacheRefresher<IContent>
-    {       
+    public class PageCacheRefresher : TypedCacheRefresherBase<PageCacheRefresher, IContent>
+    {
+
+        protected override PageCacheRefresher Instance
+        {
+            get { return this; }
+        }
+
         /// <summary>
         /// Gets the unique identifier of the CacheRefresher.
         /// </summary>
         /// <value>The unique identifier.</value>
-        public Guid UniqueIdentifier
+        public override Guid UniqueIdentifier
         {
             get
             {
@@ -34,7 +40,7 @@ namespace Umbraco.Web.Cache
         /// Gets the name of the CacheRefresher
         /// </summary>
         /// <value>The name.</value>
-        public string Name
+        public override string Name
         {
             get { return "Page Refresher"; }
         }
@@ -42,46 +48,42 @@ namespace Umbraco.Web.Cache
         /// <summary>
         /// Refreshes all nodes in umbraco.
         /// </summary>
-        public void RefreshAll()
+        public override void RefreshAll()
         {
             content.Instance.RefreshContentFromDatabaseAsync();
-        }
-
-        /// <summary>
-        /// Not used with content.
-        /// </summary>
-        /// <param name="id">The id.</param>
-        public void Refresh(Guid id)
-        {
-            // Not used when pages
+            base.RefreshAll();
         }
 
         /// <summary>
         /// Refreshes the cache for the node with specified id
         /// </summary>
         /// <param name="id">The id.</param>
-        public void Refresh(int id)
+        public override void Refresh(int id)
         {
             content.Instance.UpdateDocumentCache(id);
+            base.Refresh(id);
         }
 
         /// <summary>
         /// Removes the node with the specified id from the cache
         /// </summary>
         /// <param name="id">The id.</param>
-        public void Remove(int id)
+        public override void Remove(int id)
         {
             content.Instance.ClearDocumentCache(id);
+            base.Remove(id);
         }
 
-        public void Refresh(IContent instance)
+        public override void Refresh(IContent instance)
         {
             content.Instance.UpdateDocumentCache(new Document(instance));
+            base.Refresh(instance);
         }
 
-        public void Remove(IContent instance)
+        public override void Remove(IContent instance)
         {
             content.Instance.ClearDocumentCache(new Document(instance));
+            base.Remove(instance);
         }
     }
 }

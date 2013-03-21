@@ -120,16 +120,7 @@ namespace Umbraco.Web.Cache
         #endregion
 
         #region Media Cache
-        /// <summary>
-        /// Refreshes the cache amongst servers for a media item
-        /// </summary>
-        /// <param name="dc"></param>
-        /// <param name="mediaId"></param>
-        public static void RefreshMediaCache(this DistributedCache dc, int mediaId)
-        {
-            dc.Refresh(new Guid(DistributedCache.MediaCacheRefresherId), mediaId);
-        }
-
+        
         /// <summary>
         /// Refreshes the cache amongst servers for a media item
         /// </summary>
@@ -137,7 +128,8 @@ namespace Umbraco.Web.Cache
         /// <param name="media"></param>
         public static void RefreshMediaCache(this DistributedCache dc, params IMedia[] media)
         {
-            dc.Refresh(new Guid(DistributedCache.MediaCacheRefresherId), x => x.Id, media);
+            dc.RefreshByJson(new Guid(DistributedCache.MediaCacheRefresherId), 
+                MediaCacheRefresher.SerializeToJsonPayload(media));
         }
 
         /// <summary>
@@ -145,6 +137,11 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="dc"></param>
         /// <param name="mediaId"></param>
+        /// <remarks>
+        /// Clearing by Id will never work for load balanced scenarios for media since we require a Path
+        /// to clear all of the cache but the media item will be removed before the other servers can
+        /// look it up. Only here for legacy purposes.
+        /// </remarks>
         public static void RemoveMediaCache(this DistributedCache dc, int mediaId)
         {
             dc.Remove(new Guid(DistributedCache.MediaCacheRefresherId), mediaId);
@@ -157,8 +154,10 @@ namespace Umbraco.Web.Cache
         /// <param name="media"></param>
         public static void RemoveMediaCache(this DistributedCache dc, params IMedia[] media)
         {
-            dc.Remove(new Guid(DistributedCache.MediaCacheRefresherId), x => x.Id, media);
+            dc.RemoveByJson(new Guid(DistributedCache.MediaCacheRefresherId), 
+                MediaCacheRefresher.SerializeToJsonPayload(media));
         } 
+
         #endregion
 
         #region Macro Cache
@@ -177,35 +176,16 @@ namespace Umbraco.Web.Cache
         /// Refreshes the cache amongst servers for a macro item
         /// </summary>
         /// <param name="dc"></param>
-        /// <param name="macroId"></param>
-        public static void RefreshMacroCache(this DistributedCache dc, int macroId)
-        {
-            dc.Refresh(new Guid(DistributedCache.MacroCacheRefresherId), macroId);
-        }
-
-        /// <summary>
-        /// Refreshes the cache amongst servers for a macro item
-        /// </summary>
-        /// <param name="dc"></param>
         /// <param name="macro"></param>
         public static void RefreshMacroCache(this DistributedCache dc, global::umbraco.cms.businesslogic.macro.Macro macro)
         {
             if (macro != null)
             {
-                dc.Refresh(new Guid(DistributedCache.MacroCacheRefresherId), macro1 => macro1.Id, macro);
+                dc.RefreshByJson(new Guid(DistributedCache.MacroCacheRefresherId),
+                    MacroCacheRefresher.SerializeToJsonPayload(macro));
             }
         }
-
-        /// <summary>
-        /// Removes the cache amongst servers for a macro item
-        /// </summary>
-        /// <param name="dc"></param>
-        /// <param name="macroId"></param>
-        public static void RemoveMacroCache(this DistributedCache dc, int macroId)
-        {
-            dc.Remove(new Guid(DistributedCache.MacroCacheRefresherId), macroId);
-        }
-
+        
         /// <summary>
         /// Removes the cache amongst servers for a macro item
         /// </summary>
@@ -215,7 +195,8 @@ namespace Umbraco.Web.Cache
         {
             if (macro != null)
             {
-                dc.Remove(new Guid(DistributedCache.MacroCacheRefresherId), macro1 => macro1.Id, macro);
+                dc.RemoveByJson(new Guid(DistributedCache.MacroCacheRefresherId),
+                    MacroCacheRefresher.SerializeToJsonPayload(macro));
             }
         }
 
@@ -228,7 +209,8 @@ namespace Umbraco.Web.Cache
         {
             if (macro != null && macro.Model != null)
             {
-                dc.Remove(new Guid(DistributedCache.MacroCacheRefresherId), macro1 => macro1.Model.Id, macro);
+                dc.RemoveByJson(new Guid(DistributedCache.MacroCacheRefresherId),
+                    MacroCacheRefresher.SerializeToJsonPayload(macro));
             }
         } 
         #endregion

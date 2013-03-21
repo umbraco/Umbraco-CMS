@@ -109,7 +109,11 @@
     <Compile Include="Auditing\IAuditWriteProvider.cs" />
     <Compile Include="CacheHelper.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
+    <Compile Include="Cache\CacheRefresherBase.cs" />
+    <Compile Include="Cache\CacheRefresherEventArgs.cs" />
     <Compile Include="Cache\IJsonCacheRefresher.cs" />
+    <Compile Include="Cache\JsonCacheRefresherBase.cs" />
+    <Compile Include="Cache\TypedCacheRefresherBase.cs" />
     <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoObjectTypeAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoWillObsoleteAttribute.cs" />
