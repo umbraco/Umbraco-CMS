@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
@@ -40,7 +42,7 @@ namespace umbraco.cms.businesslogic.web
 
 		public Domain(int Id)
         {
-            initDomain(Id);
+            InitDomain(Id);
         }
 
         public Domain(string DomainName)
@@ -50,10 +52,10 @@ namespace umbraco.cms.businesslogic.web
 				SqlHelper.CreateParameter("@DomainName", DomainName));
             if (result == null || !(result is int))
                 throw new Exception(string.Format("Domain name '{0}' does not exists", DomainName));
-            initDomain((int) result);
+            InitDomain((int) result);
         }
 
-        private void initDomain(int id)
+        private void InitDomain(int id)
         {
             using (IRecordsReader dr = SqlHelper.ExecuteReader(
 				"select domainDefaultLanguage, domainRootStructureID, domainName from umbracoDomains where id = @ID",
@@ -112,39 +114,30 @@ namespace umbraco.cms.businesslogic.web
 
         public void Delete()
         {
-            DeleteEventArgs e = new DeleteEventArgs();
+            var e = new DeleteEventArgs();
             FireBeforeDelete(e);
 
-            if (!e.Cancel) {
+            if (!e.Cancel) 
+            {
                 SqlHelper.ExecuteNonQuery(string.Format("delete from umbracoDomains where id = {0}", Id));
-                InvalidateCache();
-
                 FireAfterDelete(e);
             }
         }
 
         public void Save(){
-            SaveEventArgs e = new SaveEventArgs();
+            var e = new SaveEventArgs();
             FireBeforeSave(e);
 
-            if (!e.Cancel) {
-                InvalidateCache();
-
+            if (!e.Cancel) 
+            {              
                 //Add save method here at some point so this actually does something besides fire events... 
-
                 FireAfterSave(e);
             }
         }
 
         #region Statics
 
-		private static void InvalidateCache()
-		{
-			Cache.ClearCacheItem("UmbracoDomainList");
-		}
 
-		private static readonly object getDomainsSyncLock = new object();
-        
         internal static List<Domain> GetDomains()
         {
             return GetDomains(false);
@@ -152,29 +145,29 @@ namespace umbraco.cms.businesslogic.web
 
         internal static List<Domain> GetDomains(bool includeWildcards)
         {
-			var domains = Cache.GetCacheItem<List<Domain>>("UmbracoDomainList", getDomainsSyncLock, TimeSpan.FromMinutes(30),
-        		delegate
-        		{
-        			List<Domain> result = new List<Domain>();
-        			using(IRecordsReader dr = SqlHelper.ExecuteReader(
-                                                            "select id, domainName from umbracoDomains"))
-        			{
-        				while(dr.Read())
-        				{
-        					string domainName = dr.GetString("domainName");
-        					int domainId = dr.GetInt("id");
-
-							if (result.Find(delegate(Domain d) { return d.Name == domainName; }) == null)
-								result.Add(new Domain(domainId));
-							else
-							{
-								LogHelper.Warn<Domain>(string.Format("Domain already exists in list ({0})", domainName));
-							}
-        						
-        				}
-        			}
-        			return result;
-        		});
+            var domains = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                CacheKeys.DomainCacheKey,
+                TimeSpan.FromMinutes(30),
+                () =>
+                    {
+                        var result = new List<Domain>();
+                        using (var dr = SqlHelper.ExecuteReader(
+                            "select id, domainName from umbracoDomains"))
+                        {
+                            while (dr.Read())
+                            {
+                                var domainName = dr.GetString("domainName");
+                                var domainId = dr.GetInt("id");
+                                if (result.Find(d => d.Name == domainName) == null)
+                                    result.Add(new Domain(domainId));
+                                else
+                                {
+                                    LogHelper.Warn<Domain>(string.Format("Domain already exists in list ({0})", domainName));
+                                }
+                            }
+                        }
+                        return result;
+                    });
 
             if (!includeWildcards)
                 domains = domains.Where(d => !d.IsWildcard).ToList();
@@ -208,26 +201,20 @@ namespace umbraco.cms.businesslogic.web
         {
             if (Exists(DomainName.ToLower()))
                 throw new Exception("Domain " + DomainName + " already exists!");
-            else
-            {
-                //need to check if the language exists first
-                if (Language.GetAllAsList().Where(x => x.id == LanguageId).SingleOrDefault() == null)
-                {
-                    throw new ArgumentException("No language exists for the LanguageId specified");
-                }
-                
-                SqlHelper.ExecuteNonQuery("insert into umbracoDomains (domainDefaultLanguage, domainRootStructureID, domainName) values (@domainDefaultLanguage, @domainRootStructureID, @domainName)",
-                                          SqlHelper.CreateParameter("@domainDefaultLanguage", LanguageId),
-                                          SqlHelper.CreateParameter("@domainRootStructureID", RootNodeId),
-                                          SqlHelper.CreateParameter("@domainName", DomainName.ToLower()));
-
-            	InvalidateCache();
-                NewEventArgs e = new NewEventArgs();
-                new Domain(DomainName).OnNew(e);
-            }
-
             
+            //need to check if the language exists first
+            if (Language.GetAllAsList().SingleOrDefault(x => x.id == LanguageId) == null)
+            {
+                throw new ArgumentException("No language exists for the LanguageId specified");
+            }
+                
+            SqlHelper.ExecuteNonQuery("insert into umbracoDomains (domainDefaultLanguage, domainRootStructureID, domainName) values (@domainDefaultLanguage, @domainRootStructureID, @domainName)",
+                                      SqlHelper.CreateParameter("@domainDefaultLanguage", LanguageId),
+                                      SqlHelper.CreateParameter("@domainRootStructureID", RootNodeId),
+                                      SqlHelper.CreateParameter("@domainName", DomainName.ToLower()));
 
+            var e = new NewEventArgs();
+            new Domain(DomainName).OnNew(e);
         }
 
         #endregion

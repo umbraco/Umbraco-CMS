@@ -9,6 +9,7 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.member;
 using System.Linq;
+using umbraco.cms.businesslogic.web;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
 using Template = umbraco.cms.businesslogic.template.Template;
 
@@ -29,6 +30,12 @@ namespace Umbraco.Web.Cache
             // all servers based on the distributed cache call for updating content.
             content.AfterUpdateDocumentCache += ContentAfterUpdateDocumentCache;
             content.AfterClearDocumentCache += ContentAfterClearDocumentCache;
+
+            //Bind to domain events
+
+            Domain.AfterSave += DomainAfterSave;
+            Domain.AfterDelete += DomainAfterDelete;
+            Domain.New += DomainNew;
 
             //Bind to language events
             //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
@@ -75,6 +82,21 @@ namespace Umbraco.Web.Cache
             MediaService.Deleting += MediaServiceDeleting;
             MediaService.Moving += MediaServiceMoving;
             MediaService.Trashing += MediaServiceTrashing;
+        }
+
+        static void DomainNew(Domain sender, NewEventArgs e)
+        {
+            DistributedCache.Instance.RefreshDomainCache(sender);
+        }
+
+        static void DomainAfterDelete(Domain sender, DeleteEventArgs e)
+        {
+            DistributedCache.Instance.RemoveDomainCache(sender);
+        }
+
+        static void DomainAfterSave(Domain sender, SaveEventArgs e)
+        {
+            DistributedCache.Instance.RefreshDomainCache(sender);
         }
 
         /// <summary>

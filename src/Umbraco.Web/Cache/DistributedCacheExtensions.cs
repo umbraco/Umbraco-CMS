@@ -4,6 +4,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using umbraco;
+using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Web.Cache
 {
@@ -276,6 +277,26 @@ namespace Umbraco.Web.Cache
                     ContentTypeCacheRefresher.SerializeToJsonPayload(true, mediaType));
             }
         } 
+        #endregion
+
+        #region Domain Cache
+
+        public static void RefreshDomainCache(this DistributedCache dc, Domain domain)
+        {
+            if (domain != null)
+            {
+                dc.Refresh(new Guid(DistributedCache.DomainCacheRefresherId), domain.Id);
+            }
+        }
+
+        public static void RemoveDomainCache(this DistributedCache dc, Domain domain)
+        {
+            if (domain != null)
+            {
+                dc.Remove(new Guid(DistributedCache.DomainCacheRefresherId), domain.Id);
+            }
+        }
+
         #endregion
 
         #region Language Cache
