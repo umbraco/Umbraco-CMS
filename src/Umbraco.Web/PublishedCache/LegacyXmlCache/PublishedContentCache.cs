@@ -196,7 +196,6 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
 			public static string Root { get { return "/root"; } }
 			public string RootDocuments { get; private set; }
 			public string DescendantDocumentById { get; private set; }
-			public string DescendantDocumentByAlias { get; private set; }
 			public string ChildDocumentByUrlName { get; private set; }
             public string ChildDocumentByUrlNameVar { get; private set; }
             public string RootDocumentWithLowestSortOrder { get; private set; }
@@ -211,10 +210,6 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
 					case 0:
 						RootDocuments = "/root/node";
 						DescendantDocumentById = "//node [@id={0}]";
-						DescendantDocumentByAlias = "//node[("
-							+ "contains(concat(',',translate(data [@alias='umbracoUrlAlias'], ' ', ''),','),',{0},')"
-							+ " or contains(concat(',',translate(data [@alias='umbracoUrlAlias'], ' ', ''),','),',/{0},')"
-							+ ")]";
 						ChildDocumentByUrlName = "/node [@urlName='{0}']";
 						ChildDocumentByUrlNameVar = "/node [@urlName=${0}]";
 						RootDocumentWithLowestSortOrder = "/root/node [not(@sortOrder > ../node/@sortOrder)][1]";
@@ -224,10 +219,6 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
 					case 1:
 						RootDocuments = "/root/* [@isDoc]";
 						DescendantDocumentById = "//* [@isDoc and @id={0}]";
-						DescendantDocumentByAlias = "//* [@isDoc and ("
-							+ "contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{0},')"
-							+ " or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',/{0},')"
-							+ ")]";
 						ChildDocumentByUrlName = "/* [@isDoc and @urlName='{0}']";
 						ChildDocumentByUrlNameVar = "/* [@isDoc and @urlName=${0}]";
 						RootDocumentWithLowestSortOrder = "/root/* [@isDoc and not(@sortOrder > ../* [@isDoc]/@sortOrder)][1]";
@@ -306,36 +297,6 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
                 ? xml.SelectNodes(xpath)
                 : xml.SelectNodes(xpath, vars);
             return ConvertToDocuments(nodes);
-        }
-        
-        // FIXME MOVE THAT ONE OUT OF HERE?
-        public IPublishedContent GetByUrlAlias(UmbracoContext umbracoContext, int rootNodeId, string alias)
-        {
-			if (alias == null) throw new ArgumentNullException("alias");
-
-			// the alias may be "foo/bar" or "/foo/bar"
-            // there may be spaces as in "/foo/bar,  /foo/nil"
-            // these should probably be taken care of earlier on
-
-            alias = alias.TrimStart('/');
-            var xpathBuilder = new StringBuilder();
-            xpathBuilder.Append(XPathStringsDefinition.Root);
-
-			if (rootNodeId > 0)
-				xpathBuilder.AppendFormat(XPathStrings.DescendantDocumentById, rootNodeId);
-
-            XPathVariable var = null;
-            if (alias.Contains('\'') || alias.Contains('"'))
-            {
-                // use a var, escaping gets ugly pretty quickly
-                var = new XPathVariable("alias", alias);
-                alias = "$alias";
-            }
-			xpathBuilder.AppendFormat(XPathStrings.DescendantDocumentByAlias, alias);
-
-			var xpath = xpathBuilder.ToString();
-
-		    return GetSingleByXPath(umbracoContext, xpath, var);
         }
 
         public bool HasContent()
