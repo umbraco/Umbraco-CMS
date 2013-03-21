@@ -49,13 +49,6 @@ namespace Umbraco.Web.PublishedCache.LegacyXmlCache
             global::umbraco.content.AfterUpdateDocumentCache += (sender, e) => Clear();
             global::umbraco.content.AfterClearDocumentCache += (sender, e) => Clear();
 
-            // domains - whenever a domain change we must clear the cache
-            //  because routes contain the id of root nodes of domains
-            //  TODO could we do partial updates instead of clearing the whole cache?
-            global::umbraco.cms.businesslogic.web.Domain.AfterDelete += (sender, e) => Clear();
-            global::umbraco.cms.businesslogic.web.Domain.AfterSave += (sender, e) => Clear();
-            global::umbraco.cms.businesslogic.web.Domain.New += (sender, e) => Clear();
-
             // FIXME
             // the content class needs to be refactored - at the moment 
             // content.XmlContentInternal setter does not trigger any event

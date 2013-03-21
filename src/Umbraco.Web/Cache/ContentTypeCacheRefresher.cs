@@ -220,8 +220,7 @@ namespace Umbraco.Web.Cache
                 if (payloads.Any(x => x.Type ==  typeof(IContentType).Name) 
                     && !payloads.All(x => x.IsNew)) //if they are all new then don't proceed
                 {
-                    //we need to clear the routes cache here!
-                    //TODO: Is there a better way to handle this without casting ?
+                    //we need to clear the routes cache here!                    
                     var contentCache = PublishedContentCacheResolver.Current.ContentCache as PublishedContentCache;
                     if (contentCache != null)
                     {

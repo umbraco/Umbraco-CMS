@@ -1,6 +1,8 @@
 ﻿using System;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.LegacyXmlCache;
 
 namespace Umbraco.Web.Cache
 {
@@ -26,14 +28,25 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(int id)
         {
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.DomainCacheKey);
+            ClearCache();
             base.Refresh(id);
         }
 
         public override void Remove(int id)
         {
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.DomainCacheKey);
+            ClearCache();
             base.Remove(id);
+        }
+
+        private void ClearCache()
+        {
+            ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.DomainCacheKey);
+            //we need to clear the routes cache here!                    
+            var contentCache = PublishedContentCacheResolver.Current.ContentCache as PublishedContentCache;
+            if (contentCache != null)
+            {
+                contentCache.RoutesCache.Clear();
+            }
         }
     }
 }
