@@ -47,7 +47,8 @@ namespace Umbraco.Core.Services
 	    /// <returns><see cref="IMedia"/></returns>
 	    public IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = 0)
 	    {
-	        IMediaType mediaType = null;
+            IMediaType mediaType;
+	        
 	        var uow = _uowProvider.GetUnitOfWork();
 	        using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
 	        {
@@ -67,8 +68,11 @@ namespace Umbraco.Core.Services
 
 	        var media = new Models.Media(name, parentId, mediaType);
 
-			if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this))
-				return media;
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this))
+            {
+                media.WasCancelled = true;
+                return media;
+            }
 
 			media.CreatorId = userId;
 
@@ -90,7 +94,8 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia CreateMedia(string name, IMedia parent, string mediaTypeAlias, int userId = 0)
         {
-            IMediaType mediaType = null;
+            IMediaType mediaType;
+
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
             {
@@ -109,9 +114,11 @@ namespace Umbraco.Core.Services
             }
 
             var media = new Models.Media(name, parent, mediaType);
-
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parent), this))
+            {
+                media.WasCancelled = true;
                 return media;
+            }
 
             media.CreatorId = userId;
 

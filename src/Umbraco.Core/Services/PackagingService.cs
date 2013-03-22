@@ -13,6 +13,10 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
+    /// <summary>
+    /// Represents the Packaging Service, which provides import/export functionality for the Core models of the API
+    /// using xml representation. This is primarily used by the Package functionality.
+    /// </summary>
     public class PackagingService : IService
     {
         private readonly IContentService _contentService;
@@ -23,6 +27,7 @@ namespace Umbraco.Core.Services
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private Dictionary<string, IContentType> _importedContentTypes;
+
         //Support recursive locks because some of the methods that require locking call other methods that require locking. 
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
@@ -60,7 +65,8 @@ namespace Umbraco.Core.Services
                             select doc;
 
                 var contents = ParseDocumentRootXml(roots, parentId);
-                _contentService.Save(contents, userId);
+                if(contents.Any())
+                    _contentService.Save(contents, userId);
 
                 return contents;
             }
@@ -71,7 +77,8 @@ namespace Umbraco.Core.Services
                 //This is a single doc import
                 var elements = new List<XElement> { element };
                 var contents = ParseDocumentRootXml(elements, parentId);
-                _contentService.Save(contents, userId);
+                if (contents.Any())
+                    _contentService.Save(contents, userId);
 
                 return contents;
             }
@@ -176,7 +183,7 @@ namespace Umbraco.Core.Services
             return content;
         }
 
-        public XElement Export(IContent content, bool deep = false)
+        internal XElement Export(IContent content, bool deep = false)
         {
             throw new NotImplementedException();
         }
@@ -194,7 +201,7 @@ namespace Umbraco.Core.Services
         public IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = 0)
         {
             var name = element.Name.LocalName;
-            if (name.Equals("DocumentTypes") == false && name.Equals("DocumentType"))
+            if (name.Equals("DocumentTypes") == false && name.Equals("DocumentType") == false)
             {
                 throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called 'DocumentTypes' for multiple imports or 'DocumentType' for a single import.");
             }
@@ -279,7 +286,9 @@ namespace Umbraco.Core.Services
             contentType.Icon = infoElement.Element("Icon").Value;
             contentType.Thumbnail = infoElement.Element("Thumbnail").Value;
             contentType.Description = infoElement.Element("Description").Value;
-            contentType.AllowedAsRoot = infoElement.Element("AllowAtRoot").Value.ToLowerInvariant().Equals("true");
+            //NOTE AllowAtRoot is a new property in the package xml so we need to verify it exists before using it.
+            if (infoElement.Element("AllowAtRoot") != null)
+                contentType.AllowedAsRoot = infoElement.Element("AllowAtRoot").Value.ToLowerInvariant().Equals("true");
 
             UpdateContentTypesAllowedTemplates(contentType, infoElement.Element("AllowedTemplates"), defaultTemplateElement);
             UpdateContentTypesTabs(contentType, documentType.Element("Tab"));
@@ -463,32 +472,47 @@ namespace Umbraco.Core.Services
         public IEnumerable<IDataTypeDefinition> ImportDataTypeDefinitions(XElement element, int userId = 0)
         {
             var name = element.Name.LocalName;
-            if (name.Equals("DataTypes") == false)
+            if (name.Equals("DataTypes") == false && name.Equals("DataType") == false)
             {
-                throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called 'DataTypes'.");
+                throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called 'DataTypes' for multiple imports or 'DataType' for a single import.");
             }
 
             var dataTypes = new Dictionary<string, IDataTypeDefinition>();
-            var dataTypeElements = element.Elements("DataType").ToList();
+            var dataTypeElements = name.Equals("DataTypes")
+                                       ? (from doc in element.Elements("DataType") select doc).ToList()
+                                       : new List<XElement> {element.Element("DataType")};
+
             foreach (var dataTypeElement in dataTypeElements)
             {
                 var dataTypeDefinitionName = dataTypeElement.Attribute("Name").Value;
                 var dataTypeId = new Guid(dataTypeElement.Attribute("Id").Value);
                 var dataTypeDefinitionId = new Guid(dataTypeElement.Attribute("Definition").Value);
+                var databaseTypeAttribute = dataTypeElement.Attribute("DatabaseType");
 
                 var definition = _dataTypeService.GetDataTypeDefinitionById(dataTypeDefinitionId);
+                //If the datatypedefinition doesn't already exist we create a new new according to the one in the package xml
                 if (definition == null)
                 {
-                    var dataTypeDefinition = new DataTypeDefinition(-1, dataTypeId) { Key = dataTypeDefinitionId, Name = dataTypeDefinitionName };
+                    var databaseType = databaseTypeAttribute != null
+                                           ? databaseTypeAttribute.Value.EnumParse<DataTypeDatabaseType>(true)
+                                           : DataTypeDatabaseType.Ntext;
+                    var dataTypeDefinition = new DataTypeDefinition(-1, dataTypeId)
+                                                 {
+                                                     Key = dataTypeDefinitionId,
+                                                     Name = dataTypeDefinitionName,
+                                                     DatabaseType = databaseType
+                                                 };
                     dataTypes.Add(dataTypeDefinitionName, dataTypeDefinition);
                 }
             }
 
             var list = dataTypes.Select(x => x.Value).ToList();
-            _dataTypeService.Save(list, userId);
+            if (list.Any())
+            {
+                _dataTypeService.Save(list, userId);
 
-            SavePrevaluesFromXml(list, dataTypeElements);
-
+                SavePrevaluesFromXml(list, dataTypeElements);
+            }
             return list;
         }
 
@@ -540,7 +564,7 @@ namespace Umbraco.Core.Services
         public IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = 0)
         {
             var name = element.Name.LocalName;
-            if (name.Equals("Templates") == false && name.Equals("Template"))
+            if (name.Equals("Templates") == false && name.Equals("Template") == false)
             {
                 throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called 'Templates' for multiple imports or 'Template' for a single import.");
             }
@@ -589,7 +613,9 @@ namespace Umbraco.Core.Services
                 templates.Add(template);
             }
 
-            _fileService.SaveTemplate(templates, userId);
+            if(templates.Any())
+                _fileService.SaveTemplate(templates, userId);
+
             return templates;
         }
 

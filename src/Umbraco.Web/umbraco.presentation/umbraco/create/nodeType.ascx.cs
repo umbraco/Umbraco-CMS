@@ -1,3 +1,5 @@
+using Umbraco.Core;
+
 namespace umbraco.cms.presentation.create.controls
 {
 	using System;
@@ -44,9 +46,14 @@ namespace umbraco.cms.presentation.create.controls
 		}
 
         protected void validationDoctypeName(object sender, ServerValidateEventArgs e) {
-            if (cms.businesslogic.web.DocumentType.GetByAlias(rename.Text) != null)
+            if (DocumentType.GetByAlias(rename.Text) != null)
                 e.IsValid = false;
-            
+        }
+
+        protected void validationDoctypeAlias(object sender, ServerValidateEventArgs e)
+        {
+            if (string.IsNullOrEmpty(rename.Text.ToSafeAlias()))
+                e.IsValid = false;
         }
 
 		protected void sbmt_Click(object sender, System.EventArgs e)
