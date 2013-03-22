@@ -85,15 +85,20 @@ namespace umbraco.cms.businesslogic.media
                 if (childMedia.ContentType.Alias == MediaTypeAlias)
                 {
                     var prop = childMedia.getProperty("umbracoFile");
-                    if (prop != null)
+                    if (prop != null && prop.Value != null)
                     {
-                        var destFilePath = FileSystem.GetRelativePath(prop.Id, fileName);
-                        var destFileUrl = FileSystem.GetUrl(destFilePath);
-
-                        if (prop.Value.ToString() == destFileUrl)
+                        int subfolderId;
+                        var subfolder = prop.Value.ToString().Replace(FileSystem.GetUrl("/"), "").Split('/')[0];
+                        if (int.TryParse(subfolder, out subfolderId))
                         {
-                            existingMedia = childMedia;
-                            return true;
+                            var destFilePath = FileSystem.GetRelativePath(subfolderId, fileName);
+                            var destFileUrl = FileSystem.GetUrl(destFilePath);
+
+                            if (prop.Value.ToString() == destFileUrl)
+                            {
+                                existingMedia = childMedia;
+                                return true;
+                            }
                         }
                     }
                 }

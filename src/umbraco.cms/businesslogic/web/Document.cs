@@ -7,6 +7,7 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
@@ -288,8 +289,8 @@ namespace umbraco.cms.businesslogic.web
 
             //Create a new IContent object based on the passed in DocumentType's alias, set the name and save it
             IContent content = ApplicationContext.Current.Services.ContentService.CreateContent(Name, ParentId, dct.Alias, u.Id);
-            //The content object will only be null if the 'Creating' event has been cancelled, so we return null.
-            if (content == null)
+            //The content object will only have the 'WasCancelled' flag set to 'True' if the 'Creating' event has been cancelled, so we return null.
+            if (((Entity)content).WasCancelled)
                 return null;
 
             //don't raise events here (false), they will get raised with the d.Save() call.

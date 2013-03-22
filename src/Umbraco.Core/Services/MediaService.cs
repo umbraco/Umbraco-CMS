@@ -46,11 +46,8 @@ namespace Umbraco.Core.Services
 	    /// <returns><see cref="IMedia"/></returns>
 	    public IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = 0)
 	    {
-	        Models.Media media = null;
-	        IMediaType mediaType = null;
-            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this))
-                return media;
-
+            IMediaType mediaType;
+	        
 	        var uow = _uowProvider.GetUnitOfWork();
 	        using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
 	        {
@@ -68,7 +65,13 @@ namespace Umbraco.Core.Services
 	                                                  mediaTypeAlias));
 	        }
 
-	        media = new Models.Media(name, parentId, mediaType);
+	        var media = new Models.Media(name, parentId, mediaType);
+
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this))
+            {
+                media.WasCancelled = true;
+                return media;
+            }
 
 			media.CreatorId = userId;
 
@@ -90,11 +93,7 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia CreateMedia(string name, IMedia parent, string mediaTypeAlias, int userId = 0)
         {
-            Models.Media media = null;
-            IMediaType mediaType = null;
-
-            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parent), this))
-                return media;
+            IMediaType mediaType;
 
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMediaTypeRepository(uow))
@@ -113,7 +112,12 @@ namespace Umbraco.Core.Services
                                                       mediaTypeAlias));
             }
 
-            media = new Models.Media(name, parent, mediaType);
+            var media = new Models.Media(name, parent, mediaType);
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parent), this))
+            {
+                media.WasCancelled = true;
+                return media;
+            }
 
             media.CreatorId = userId;
 
