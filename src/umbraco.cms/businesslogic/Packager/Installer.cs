@@ -291,12 +291,15 @@ namespace umbraco.cms.businesslogic.packager
                 var packagingService = ApplicationContext.Current.Services.PackagingService;
 
                 #region DataTypes
-                var dataTypeElement = rootElement.Descendants("DataTypes").First();
-                var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement, currentUser.Id);
-                foreach (var dataTypeDefinition in dataTypeDefinitions)
+                var dataTypeElement = rootElement.Descendants("DataTypes").FirstOrDefault();
+                if(dataTypeElement != null)
                 {
-                    insPack.Data.DataTypes.Add(dataTypeDefinition.Id.ToString(CultureInfo.InvariantCulture));
-                    //saveNeeded = true;
+                    var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement, currentUser.Id);
+                    foreach (var dataTypeDefinition in dataTypeDefinitions)
+                    {
+                        insPack.Data.DataTypes.Add(dataTypeDefinition.Id.ToString(CultureInfo.InvariantCulture));
+                        //saveNeeded = true;
+                    }
                 }
                 /*foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("//DataType"))
                 {
@@ -358,12 +361,15 @@ namespace umbraco.cms.businesslogic.packager
                 #endregion
                 
                 #region Templates
-                var templateElement = rootElement.Descendants("Templates").First();
-                var templates = packagingService.ImportTemplates(templateElement, currentUser.Id);
-                foreach (var template in templates)
+                var templateElement = rootElement.Descendants("Templates").FirstOrDefault();
+                if (templateElement != null)
                 {
-                    insPack.Data.Templates.Add(template.Id.ToString(CultureInfo.InvariantCulture));
-                    //saveNeeded = true;
+                    var templates = packagingService.ImportTemplates(templateElement, currentUser.Id);
+                    foreach (var template in templates)
+                    {
+                        insPack.Data.Templates.Add(template.Id.ToString(CultureInfo.InvariantCulture));
+                        //saveNeeded = true;
+                    }
                 }
 
                 //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
@@ -415,12 +421,15 @@ namespace umbraco.cms.businesslogic.packager
                 #endregion
 
                 #region DocumentTypes
-                var docTypeElement = rootElement.Descendants("DocumentTypes").First();
-                var contentTypes = packagingService.ImportContentTypes(docTypeElement, currentUser.Id);
-                foreach (var contentType in contentTypes)
+                var docTypeElement = rootElement.Descendants("DocumentTypes").FirstOrDefault();
+                if (docTypeElement != null)
                 {
-                    insPack.Data.Documenttypes.Add(contentType.Id.ToString(CultureInfo.InvariantCulture));
-                    //saveNeeded = true;
+                    var contentTypes = packagingService.ImportContentTypes(docTypeElement, currentUser.Id);
+                    foreach (var contentType in contentTypes)
+                    {
+                        insPack.Data.Documenttypes.Add(contentType.Id.ToString(CultureInfo.InvariantCulture));
+                        //saveNeeded = true;
+                    }
                 }
 
                 //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
@@ -575,11 +584,14 @@ namespace umbraco.cms.businesslogic.packager
             var packagingService = ApplicationContext.Current.Services.PackagingService;
 
             #region DataTypes
-            var dataTypeElement = rootElement.Descendants("DataTypes").First();
-            var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement, currentUser.Id);
-            foreach (var dataTypeDefinition in dataTypeDefinitions)
+            var dataTypeElement = rootElement.Descendants("DataTypes").FirstOrDefault();
+            if(dataTypeElement != null)
             {
-                insPack.Data.DataTypes.Add(dataTypeDefinition.Id.ToString(CultureInfo.InvariantCulture));
+                var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement, currentUser.Id);
+                foreach (var dataTypeDefinition in dataTypeDefinitions)
+                {
+                    insPack.Data.DataTypes.Add(dataTypeDefinition.Id.ToString(CultureInfo.InvariantCulture));
+                }
             }
             #endregion
 
@@ -636,11 +648,14 @@ namespace umbraco.cms.businesslogic.packager
             #endregion
 
             #region Install Templates
-            var templateElement = rootElement.Descendants("Templates").First();
-            var templates = packagingService.ImportTemplates(templateElement, currentUser.Id);
-            foreach (var template in templates)
+            var templateElement = rootElement.Descendants("Templates").FirstOrDefault();
+            if (templateElement != null)
             {
-                insPack.Data.Templates.Add(template.Id.ToString(CultureInfo.InvariantCulture));
+                var templates = packagingService.ImportTemplates(templateElement, currentUser.Id);
+                foreach (var template in templates)
+                {
+                    insPack.Data.Templates.Add(template.Id.ToString(CultureInfo.InvariantCulture));
+                }
             }
             /*foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Templates/Template"))
             {
@@ -677,11 +692,14 @@ namespace umbraco.cms.businesslogic.packager
             #endregion
 
             #region Install DocumentTypes
-            var docTypeElement = rootElement.Descendants("DocumentTypes").First();
-            var contentTypes = packagingService.ImportContentTypes(docTypeElement, currentUser.Id);
-            foreach (var contentType in contentTypes)
+            var docTypeElement = rootElement.Descendants("DocumentTypes").FirstOrDefault();
+            if (docTypeElement != null)
             {
-                insPack.Data.Documenttypes.Add(contentType.Id.ToString(CultureInfo.InvariantCulture));
+                var contentTypes = packagingService.ImportContentTypes(docTypeElement, currentUser.Id);
+                foreach (var contentType in contentTypes)
+                {
+                    insPack.Data.Documenttypes.Add(contentType.Id.ToString(CultureInfo.InvariantCulture));
+                }
             }
             /*foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("DocumentTypes/DocumentType"))
             {
@@ -737,12 +755,14 @@ namespace umbraco.cms.businesslogic.packager
             #endregion
 
             #region Install Documents
-            var documentElement = rootElement.Descendants("DocumentSet").First();
-            var content = packagingService.ImportContent(documentElement, -1, currentUser.Id);
+            var documentElement = rootElement.Descendants("DocumentSet").FirstOrDefault(); 
+            if(documentElement != null)
+            {
+                var content = packagingService.ImportContent(documentElement, -1, currentUser.Id);
 
-            var firstContentItem = content.First();
-            insPack.Data.ContentNodeId = firstContentItem.Id.ToString(CultureInfo.InvariantCulture);
-
+                var firstContentItem = content.First();
+                insPack.Data.ContentNodeId = firstContentItem.Id.ToString(CultureInfo.InvariantCulture);
+            }
             /*foreach (XmlElement n in _packageConfig.DocumentElement.SelectNodes("Documents/DocumentSet [@importMode = 'root']/*"))
             {
                 Document.Import(-1, currentUser, n);
