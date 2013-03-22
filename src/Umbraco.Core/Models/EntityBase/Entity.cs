@@ -19,12 +19,14 @@ namespace Umbraco.Core.Models.EntityBase
         private Guid _key;
         private DateTime _createDate;
         private DateTime _updateDate;
+        private bool _wasCancelled;
 
         private static readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<Entity, int>(x => x.Id);
         private static readonly PropertyInfo KeySelector = ExpressionHelper.GetPropertyInfo<Entity, Guid>(x => x.Key);
         private static readonly PropertyInfo CreateDateSelector = ExpressionHelper.GetPropertyInfo<Entity, DateTime>(x => x.CreateDate);
         private static readonly PropertyInfo UpdateDateSelector = ExpressionHelper.GetPropertyInfo<Entity, DateTime>(x => x.UpdateDate);
         private static readonly PropertyInfo HasIdentitySelector = ExpressionHelper.GetPropertyInfo<Entity, bool>(x => x.HasIdentity);
+        private static readonly PropertyInfo WasCancelledSelector = ExpressionHelper.GetPropertyInfo<Entity, bool>(x => x.WasCancelled);
         
 
         /// <summary>
@@ -87,6 +89,26 @@ namespace Umbraco.Core.Models.EntityBase
                     _createDate = value;
                     return _createDate;
                 }, _createDate, CreateDateSelector);
+            }
+        }
+
+        /// <summary>
+        /// /// Gets or sets the WasCancelled flag, which is used to track
+        /// whether some action against an entity was cancelled through some event.
+        /// This only exists so we have a way to check if an event was cancelled through
+        /// the new api, which also needs to take effect in the legacy api.
+        /// </summary>
+        [IgnoreDataMember]
+        internal bool WasCancelled
+        {
+            get { return _wasCancelled; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _wasCancelled = value;
+                    return _wasCancelled;
+                }, _wasCancelled, WasCancelledSelector);
             }
         }
 

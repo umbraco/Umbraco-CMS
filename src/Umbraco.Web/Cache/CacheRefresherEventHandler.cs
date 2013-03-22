@@ -26,7 +26,7 @@ namespace Umbraco.Web.Cache
             //Bind to data type events
             //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
 
-            global::umbraco.cms.businesslogic.datatype.DataTypeDefinition.Deleting += DataTypeDefinitionDeleting;
+            global::umbraco.cms.businesslogic.datatype.DataTypeDefinition.AfterDelete += DataTypeDefinitionDeleting;
             global::umbraco.cms.businesslogic.datatype.DataTypeDefinition.Saving += DataTypeDefinitionSaving;
             DataTypeService.Deleted += DataTypeServiceDeleted;
             DataTypeService.Saved += DataTypeServiceSaved;

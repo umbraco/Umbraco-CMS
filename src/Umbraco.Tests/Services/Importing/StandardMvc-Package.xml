@@ -2256,7 +2256,7 @@ table th, td {border: 0px solid #fff;}
   <DictionaryItems />
   <Languages />
   <DataTypes>
-    <DataType Name="SW Page Picker" Id="7e062c13-7c41-4ad9-b389-41d88aeef87c" Definition="d719387b-8261-48ac-b94b-00654896d114">
+    <DataType Name="SW Page Picker" Id="7e062c13-7c41-4ad9-b389-41d88aeef87c" Definition="d719387b-8261-48ac-b94b-00654896d114" DatabaseType="Ntext">
       <PreValues>
         <PreValue Id="5" Value="content" />
         <PreValue Id="6" Value="" />

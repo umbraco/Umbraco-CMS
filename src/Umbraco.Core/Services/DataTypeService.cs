@@ -246,7 +246,7 @@ namespace Umbraco.Core.Services
 
 			        foreach (var group in contentType.PropertyGroups)
 			        {
-				        var types = @group.PropertyTypes.Where(x => x.DataTypeDefinitionId == dataTypeDefinition.Id);
+				        var types = @group.PropertyTypes.Where(x => x.DataTypeDefinitionId == dataTypeDefinition.Id).ToList();
 				        foreach (var propertyType in types)
 				        {
 					        @group.PropertyTypes.Remove(propertyType);
