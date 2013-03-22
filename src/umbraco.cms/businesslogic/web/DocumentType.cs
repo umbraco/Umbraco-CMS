@@ -7,7 +7,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Caching;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.propertytype;
 using umbraco.DataLayer;
 using System.Collections.Generic;
 using Umbraco.Core;
@@ -551,7 +550,12 @@ namespace umbraco.cms.businesslogic.web
         protected virtual void FireAfterSave(SaveEventArgs e)
         {
             if (AfterSave != null)
-                AfterSave(this, e);
+            {
+                var updated = this._contentType == null
+                                  ? new DocumentType(this.Id)
+                                  : new DocumentType(this._contentType);
+                AfterSave(updated, e);
+            }
         }
 
         /// <summary>
