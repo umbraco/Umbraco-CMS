@@ -23,6 +23,11 @@ namespace Umbraco.Tests.Routing
             TestHelper.DropForeignKeys("umbracoDomains");            
         }
 
+        protected override DatabaseBehavior DatabaseTestBehavior
+        {
+            get { return DatabaseBehavior.NewSchemaPerFixture; }
+        }
+
         protected override void FreezeResolution()
         {
             SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());

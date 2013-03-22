@@ -60,7 +60,12 @@ namespace Umbraco.Tests.TestHelpers
 				//assign the db context
 				new DatabaseContext(new DefaultDatabaseFactory()),
 				//assign the service context
-				new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
+				new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy()),
+                //disable cache
+                false)
+                {
+                    IsReady = true
+                };
 
             DatabaseContext.Initialize();
 

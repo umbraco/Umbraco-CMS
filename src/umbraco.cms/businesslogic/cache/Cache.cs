@@ -118,7 +118,7 @@ namespace umbraco.cms.businesslogic.cache
         {
 			var helper = new CacheHelper(System.Web.HttpRuntime.Cache);
 			Func<TT> f = () => getCacheItem();
-			return helper.GetCacheItem(cacheKey, priority, refreshAction, cacheDependency, timeout, f, syncLock);
+			return helper.GetCacheItem(cacheKey, priority, refreshAction, cacheDependency, timeout, f);
         }
     }
 }

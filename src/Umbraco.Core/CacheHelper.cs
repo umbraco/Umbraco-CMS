@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Caching;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
@@ -17,29 +18,33 @@ namespace Umbraco.Core
 	/// <remarks>
 	/// This class may be opened publicly at some point but needs a review of what is absoletely necessary.
 	/// </remarks>
-	public class CacheHelper
+    public class CacheHelper  //: CacheProviderBase
 	{
-        private readonly System.Web.Caching.Cache _cache;
+	    private readonly bool _enableCache;
+	    private readonly HttpRuntimeCacheProvider _httpCache;
+	    private readonly NullCacheProvider _nullCache = new NullCacheProvider();
 
 		public CacheHelper(System.Web.Caching.Cache cache)
+            : this(cache, true)
 		{
-			_cache = cache;
 		}
 
-		private static readonly object Locker = new object();
-
-        /// <summary>
-        /// Clears everything in umbraco's runtime cache, which means that not only
-        /// umbraco content is removed, but also other cache items from pages running in
-        /// the same application / website. Use with care :-)
-        /// </summary>
+	    internal CacheHelper(System.Web.Caching.Cache cache, bool enableCache)
+	    {
+            _httpCache = new HttpRuntimeCacheProvider(cache);
+	        _enableCache = enableCache;
+	    }
+        
         public void ClearAllCache()
         {                         
-			var cacheEnumerator = _cache.GetEnumerator();
-            while (cacheEnumerator.MoveNext())
-            {
-                _cache.Remove(cacheEnumerator.Key.ToString());
-            }
+			if (!_enableCache)
+			{
+			    _nullCache.ClearAllCache();
+			}
+			else
+			{
+			    _httpCache.ClearAllCache();
+			}
         }
 
         /// <summary>
@@ -48,12 +53,13 @@ namespace Umbraco.Core
         /// <param name="key">Key</param>
         public void ClearCacheItem(string key)
         {
-            // NH 10 jan 2012
-            // Patch by the always wonderful Stéphane Gay to avoid cache null refs
-            lock (Locker)
+            if (!_enableCache)
             {
-	            if (_cache[key] == null) return;
-	            _cache.Remove(key);;
+                _nullCache.ClearCacheItem(key);
+            }
+            else
+            {
+                _httpCache.ClearCacheItem(key);
             }
         }
 
@@ -65,23 +71,13 @@ namespace Umbraco.Core
         /// <param name="typeName">The name of the System.Type which should be cleared from cache ex "System.Xml.XmlDocument"</param>
         public void ClearCacheObjectTypes(string typeName)
         {
-            try
+            if (!_enableCache)
             {
-				lock (Locker)
-				{
-				    foreach (DictionaryEntry c in _cache)
-				    {
-				        if (_cache[c.Key.ToString()] != null 
-                            && _cache[c.Key.ToString()].GetType().ToString().InvariantEquals(typeName))
-				        {
-				            _cache.Remove(c.Key.ToString());
-				        }
-				    }
-				}	            
+                _nullCache.ClearCacheObjectTypes(typeName);
             }
-            catch (Exception e)
+            else
             {
-				LogHelper.Error<CacheHelper>("Cache clearing error", e);
+                _httpCache.ClearCacheObjectTypes(typeName);
             }
         }
 
@@ -90,23 +86,13 @@ namespace Umbraco.Core
         /// </summary>
 	    public void ClearCacheObjectTypes<T>()
 	    {
-            try
+            if (!_enableCache)
             {
-                lock (Locker)
-                {
-                    foreach (DictionaryEntry c in _cache)
-                    {
-                        if (_cache[c.Key.ToString()] != null
-                            && _cache[c.Key.ToString()].GetType() == typeof(T))
-                        {
-                            _cache.Remove(c.Key.ToString());
-                        }
-                    }
-                }
+                _nullCache.ClearCacheObjectTypes<T>();
             }
-            catch (Exception e)
+            else
             {
-                LogHelper.Error<CacheHelper>("Cache clearing error", e);
+                _httpCache.ClearCacheObjectTypes<T>();
             }
 	    }
 
@@ -116,13 +102,14 @@ namespace Umbraco.Core
         /// <param name="keyStartsWith">The start of the key</param>
         public void ClearCacheByKeySearch(string keyStartsWith)
 	    {
-	        foreach (DictionaryEntry c in _cache)
-	        {
-	            if (c.Key is string && ((string) c.Key).InvariantStartsWith(keyStartsWith))
-	            {
-	                ClearCacheItem((string) c.Key);
-	            }
-	        }
+            if (!_enableCache)
+            {
+                _nullCache.ClearCacheByKeySearch(keyStartsWith);
+            }
+            else
+            {
+                _httpCache.ClearCacheByKeySearch(keyStartsWith);
+            }
 	    }
 
         /// <summary>
@@ -131,23 +118,26 @@ namespace Umbraco.Core
         /// <param name="regexString"></param>
 	    public void ClearCacheByKeyExpression(string regexString)
 	    {
-            foreach (DictionaryEntry c in _cache)
+            if (!_enableCache)
             {
-                if (c.Key is string && Regex.IsMatch(((string)c.Key), regexString))
-                {
-                    ClearCacheItem((string)c.Key);
-                }
+                _nullCache.ClearCacheByKeyExpression(regexString);
+            }
+            else
+            {
+                _httpCache.ClearCacheByKeyExpression(regexString);
             }
 	    }
 
         public IEnumerable<T> GetCacheItemsByKeySearch<T>(string keyStartsWith)
         {
-            return (from DictionaryEntry c in _cache 
-                    where c.Key is string && ((string) c.Key).InvariantStartsWith(keyStartsWith) 
-                    select c.Value.TryConvertTo<T>() 
-                    into attempt 
-                    where attempt.Success 
-                    select attempt.Result).ToList();
+            if (!_enableCache)
+            {
+                return _nullCache.GetCacheItemsByKeySearch<T>(keyStartsWith);
+            }
+            else
+            {
+                return _httpCache.GetCacheItemsByKeySearch<T>(keyStartsWith);
+            }
         }
 
 	    /// <summary>
@@ -158,12 +148,14 @@ namespace Umbraco.Core
         /// <returns></returns>
         public TT GetCacheItem<TT>(string cacheKey)
         {
-            var result = _cache.Get(cacheKey);
-            if (result == null)
+            if (!_enableCache)
             {
-                return default(TT);
+                return _nullCache.GetCacheItem<TT>(cacheKey);
             }
-            return result.TryConvertTo<TT>().Result;
+            else
+            {
+                return _httpCache.GetCacheItem<TT>(cacheKey);
+            }
         }
 
         /// <summary>
@@ -175,7 +167,14 @@ namespace Umbraco.Core
         /// <returns></returns>
         public TT GetCacheItem<TT>(string cacheKey, Func<TT> getCacheItem)
         {
-            return GetCacheItem(cacheKey, CacheItemPriority.Normal, null, null, null, getCacheItem, Locker);
+            if (!_enableCache)
+            {
+                return _nullCache.GetCacheItem<TT>(cacheKey, getCacheItem);
+            }
+            else
+            {
+                return _httpCache.GetCacheItem<TT>(cacheKey, getCacheItem);
+            }
         }
 
         /// <summary>
@@ -189,7 +188,14 @@ namespace Umbraco.Core
         public TT GetCacheItem<TT>(string cacheKey,
             TimeSpan timeout, Func<TT> getCacheItem)
         {
-            return GetCacheItem(cacheKey, null, timeout, getCacheItem);
+            if (!_enableCache)
+            {
+                return _nullCache.GetCacheItem<TT>(cacheKey, timeout, getCacheItem);
+            }
+            else
+            {
+                return _httpCache.GetCacheItem<TT>(cacheKey, timeout, getCacheItem);
+            }
         }
 
         /// <summary>
@@ -205,7 +211,14 @@ namespace Umbraco.Core
             CacheItemRemovedCallback refreshAction, TimeSpan timeout,
             Func<TT> getCacheItem)
         {
-            return GetCacheItem(cacheKey, CacheItemPriority.Normal, refreshAction, timeout, getCacheItem);
+            if (!_enableCache)
+            {
+                return _nullCache.GetCacheItem<TT>(cacheKey, refreshAction, timeout, getCacheItem);
+            }
+            else
+            {
+                return _httpCache.GetCacheItem<TT>(cacheKey, refreshAction, timeout, getCacheItem);
+            }
         }
 
         /// <summary>
@@ -222,7 +235,14 @@ namespace Umbraco.Core
             CacheItemPriority priority, CacheItemRemovedCallback refreshAction, TimeSpan timeout,
             Func<TT> getCacheItem)
         {
-            return GetCacheItem(cacheKey, priority, refreshAction, null, timeout, getCacheItem);
+            if (!_enableCache)
+            {
+                return _nullCache.GetCacheItem<TT>(cacheKey, priority, refreshAction, timeout, getCacheItem);
+            }
+            else
+            {
+                return _httpCache.GetCacheItem<TT>(cacheKey, priority, refreshAction, timeout, getCacheItem);
+            }
         }
 
         /// <summary>
@@ -243,49 +263,16 @@ namespace Umbraco.Core
 			TimeSpan timeout, 
 			Func<TT> getCacheItem)
         {
-	        return GetCacheItem(cacheKey, priority, refreshAction, cacheDependency, timeout, getCacheItem, Locker);
+            if (!_enableCache)
+            {
+                return _nullCache.GetCacheItem<TT>(cacheKey, priority, refreshAction, cacheDependency, timeout, getCacheItem);
+            }
+            else
+            {
+                return _httpCache.GetCacheItem<TT>(cacheKey, priority, refreshAction, cacheDependency, timeout, getCacheItem);
+            }
         }
-
-		/// <summary>
-		/// This is used only for legacy purposes as I did not want to change all of the locking to one lock found on this object, 
-		/// however, the reason this is used for legacy purposes is because I see zero reason to use different sync locks, just the one
-		/// lock (Locker) on this class should be sufficient.
-		/// </summary>
-		/// <typeparam name="TT"></typeparam>
-		/// <param name="cacheKey"></param>
-		/// <param name="priority"></param>
-		/// <param name="refreshAction"></param>
-		/// <param name="cacheDependency"></param>
-        /// <param name="timeout">This will set an absolute expiration from now until the timeout</param>
-		/// <param name="getCacheItem"></param>
-		/// <param name="syncLock"></param>
-		/// <returns></returns>
-		internal TT GetCacheItem<TT>(string cacheKey,
-			CacheItemPriority priority, CacheItemRemovedCallback refreshAction,
-			CacheDependency cacheDependency, TimeSpan? timeout, Func<TT> getCacheItem, object syncLock)
-		{
-			var result = _cache.Get(cacheKey);
-			if (result == null)
-			{
-				lock (syncLock)
-				{
-					result = _cache.Get(cacheKey);
-					if (result == null)
-					{
-						result = getCacheItem();
-						if (result != null)
-						{
-							//we use Insert instead of add if for some crazy reason there is now a cache with the cache key in there, it will just overwrite it.
-							_cache.Insert(cacheKey, result, cacheDependency,
-                                timeout == null ? System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value), 
-                                TimeSpan.Zero, priority, refreshAction);
-						}
-					}
-				}
-			}
-			return result.TryConvertTo<TT>().Result;
-		}
-
+		
         /// <summary>
         /// Inserts an item into the cache, if it already exists in the cache it will be replaced
         /// </summary>
@@ -299,7 +286,14 @@ namespace Umbraco.Core
                                        TimeSpan timeout,
                                        Func<T> getCacheItem)
         {
-            InsertCacheItem(cacheKey, priority, null, null, timeout, getCacheItem);
+            if (!_enableCache)
+            {
+                _nullCache.InsertCacheItem<T>(cacheKey, priority, timeout, getCacheItem);
+            }
+            else
+            {
+                _httpCache.InsertCacheItem<T>(cacheKey, priority, timeout, getCacheItem);
+            }
         }
 
 	    /// <summary>
@@ -317,7 +311,14 @@ namespace Umbraco.Core
 	                                   TimeSpan timeout,
 	                                   Func<T> getCacheItem)
 	    {
-	        InsertCacheItem(cacheKey, priority, null, cacheDependency, timeout, getCacheItem);
+            if (!_enableCache)
+            {
+                _nullCache.InsertCacheItem<T>(cacheKey, priority, cacheDependency, timeout, getCacheItem);
+            }
+            else
+            {
+                _httpCache.InsertCacheItem<T>(cacheKey, priority, cacheDependency, timeout, getCacheItem);
+            }
 	    }
 
         /// <summary>
@@ -337,14 +338,14 @@ namespace Umbraco.Core
 	                                   TimeSpan? timeout,
 	                                   Func<T> getCacheItem)
 	    {
-	        object result = getCacheItem();
-	        if (result != null)
-	        {
-	            //we use Insert instead of add if for some crazy reason there is now a cache with the cache key in there, it will just overwrite it.
-	            _cache.Insert(cacheKey, result, cacheDependency,
-	                          timeout == null ? System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value),
-	                          TimeSpan.Zero, priority, refreshAction);
-	        }
+            if (!_enableCache)
+            {
+                _nullCache.InsertCacheItem<T>(cacheKey, priority, refreshAction, cacheDependency, timeout, getCacheItem);
+            }
+            else
+            {
+                _httpCache.InsertCacheItem<T>(cacheKey, priority, refreshAction, cacheDependency, timeout, getCacheItem);
+            }
 	    }
 
 	}
