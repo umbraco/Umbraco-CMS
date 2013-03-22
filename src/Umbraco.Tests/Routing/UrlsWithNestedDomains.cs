@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.PublishedCache.LegacyXmlCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.language;
 using Umbraco.Web.Routing;

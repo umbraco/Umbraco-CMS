@@ -19,7 +19,7 @@ using umbraco;
 using umbraco.cms.businesslogic;
 using ContentType = umbraco.cms.businesslogic.ContentType;
 
-namespace Umbraco.Web.PublishedCache.LegacyXmlCache
+namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
 	/// <summary>
 	/// An IPublishedMediaStore that first checks for the media in Examine, and then reverts to the database

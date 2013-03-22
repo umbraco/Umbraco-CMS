@@ -19,7 +19,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.UmbracoExamine;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.PublishedCache.LegacyXmlCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using UmbracoExamine;
 using UmbracoExamine.DataServices;
 using umbraco.BusinessLogic;

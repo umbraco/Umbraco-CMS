@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using Umbraco.Core.ObjectResolution;
 
-namespace Umbraco.Web.PublishedCache.LegacyXmlCache
+namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
     class RoutesCache
     {

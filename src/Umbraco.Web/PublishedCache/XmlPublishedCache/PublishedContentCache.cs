@@ -12,7 +12,7 @@ using System.Linq;
 using umbraco.BusinessLogic;
 using umbraco.presentation.preview;
 
-namespace Umbraco.Web.PublishedCache.LegacyXmlCache
+namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
     internal class PublishedContentCache : IPublishedContentCache
     {
