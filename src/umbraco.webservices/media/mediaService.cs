@@ -1,16 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Web.Services;
 using Umbraco.Core.Media;
-using umbraco.IO;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.property;
 using Umbraco.Core.IO;
 using System.Xml;
-using System.Web;
 using System.Text.RegularExpressions;
 using System.Linq;
 using System.Web.Script.Services;
@@ -41,12 +39,11 @@ namespace umbraco.webservices.media
         [WebMethod]
         public void update(mediaCarrier carrier, string username, string password)
         {
-
             Authenticate(username, password);
 
             if (carrier == null) throw new Exception("No carrier specified");
 
-            Media m = new Media(carrier.Id);
+            var m = new Media(carrier.Id);
 
             if (carrier.MediaProperties != null)
             {
@@ -68,7 +65,6 @@ namespace umbraco.webservices.media
         [WebMethod]
         public int create(mediaCarrier carrier, string username, string password)
         {
-
             Authenticate(username, password);
 
             if (carrier == null) throw new Exception("No carrier specified");
@@ -76,12 +72,10 @@ namespace umbraco.webservices.media
             if (carrier.TypeId == 0) throw new Exception("Type must be specified");
             if (carrier.Text == null || carrier.Text.Length == 0) carrier.Text = "unnamed";
 
-            umbraco.BusinessLogic.User user = GetUser(username, password);
+            BusinessLogic.User user = GetUser(username, password);
 
-
-            MediaType mt = new MediaType(carrier.TypeId);
-
-            Media m = Media.MakeNew(carrier.Text, mt, user, carrier.ParentId);
+            var mt = new MediaType(carrier.TypeId);
+            var m = Media.MakeNew(carrier.Text, mt, user, carrier.ParentId);
 
             if (carrier.MediaProperties != null)
             {
@@ -134,10 +128,10 @@ namespace umbraco.webservices.media
 			filename = filename.Replace(@"\", global::Umbraco.Core.IO.IOHelper.DirSepChar.ToString());
 			filename = filename.Substring(filename.LastIndexOf(global::Umbraco.Core.IO.IOHelper.DirSepChar) + 1, filename.Length - filename.LastIndexOf(global::Umbraco.Core.IO.IOHelper.DirSepChar) - 1).ToLower();
 
-            Media m = new Media(id);
+            var m = new Media(id);
 
-            //TODO Fix this as the Id of the umbracoFile-property is no longer used
-            var path = _fs.GetRelativePath(m.getProperty("umbracoFile").Id, filename);
+            var numberedFolder = MediaSubfolderCounter.Current.Increment();
+            var path = _fs.GetRelativePath(numberedFolder.ToString(CultureInfo.InvariantCulture), filename);
 
             var stream = new MemoryStream();
             stream.Write(contents, 0, contents.Length);
@@ -149,7 +143,7 @@ namespace umbraco.webservices.media
             m.getProperty("umbracoExtension").Value = Path.GetExtension(filename).Substring(1);
             m.getProperty("umbracoBytes").Value = _fs.GetSize(path);
 
-
+            m.Save();
         }
 
         [WebMethod]
@@ -157,9 +151,7 @@ namespace umbraco.webservices.media
         {
             Authenticate(username, password);
 
-
             Media m = new Media(id);
-
 
             return createCarrier(m);
         }
@@ -169,7 +161,7 @@ namespace umbraco.webservices.media
         {
             Authenticate(username, password);
 
-            List<mediaCarrier> carriers = new List<mediaCarrier>();
+            var carriers = new List<mediaCarrier>();
             Media[] mediaList;
 
             if (parentId < 1)
@@ -256,19 +248,18 @@ namespace umbraco.webservices.media
 
         private mediaCarrier createCarrier(Media m)
         {
-            mediaCarrier carrier = new mediaCarrier();
-            carrier.Id = m.Id;
-            carrier.Text = m.Text;
-
-            carrier.TypeAlias = m.ContentType.Alias;
-            carrier.TypeId = m.ContentType.Id;
-
-            carrier.CreateDateTime = m.CreateDateTime;
-            carrier.HasChildren = m.HasChildren;
-            carrier.Level = m.Level;
-
-            carrier.Path = m.Path;
-            carrier.SortOrder = m.sortOrder;
+            var carrier = new mediaCarrier
+                              {
+                                  Id = m.Id,
+                                  Text = m.Text,
+                                  TypeAlias = m.ContentType.Alias,
+                                  TypeId = m.ContentType.Id,
+                                  CreateDateTime = m.CreateDateTime,
+                                  HasChildren = m.HasChildren,
+                                  Level = m.Level,
+                                  Path = m.Path,
+                                  SortOrder = m.sortOrder
+                              };
 
             try
             {
@@ -281,10 +272,9 @@ namespace umbraco.webservices.media
 
             foreach (Property p in m.GenericProperties)
             {
+                var carrierprop = new mediaProperty();
 
-                mediaProperty carrierprop = new mediaProperty();
-
-                if (p.Value == System.DBNull.Value)
+                if (p.Value == DBNull.Value)
                 {
                     carrierprop.PropertyValue = "";
                 }
