@@ -5,6 +5,7 @@ using System.Collections;
 using System.Linq;
 using umbraco.DataLayer;
 using System.Xml;
+using umbraco.cms.businesslogic.media;
 using umbraco.interfaces;
 using umbraco.cms.businesslogic.propertytype;
 
@@ -80,21 +81,28 @@ namespace umbraco.cms.businesslogic.datatype
         #region Public methods
         public override void delete()
         {
-            //first clear the prevalues
-            PreValues.DeleteByDataTypeDefinition(this.Id);
-
-            //next clear out the property types
-            var propTypes = PropertyType.GetByDataTypeDefinition(this.Id);
-            foreach (var p in propTypes)
+            DeleteEventArgs e = new DeleteEventArgs();
+            FireBeforeDelete(e);
+            if (!e.Cancel)
             {
-                p.delete();
+                //first clear the prevalues
+                PreValues.DeleteByDataTypeDefinition(this.Id);
+
+                //next clear out the property types
+                var propTypes = PropertyType.GetByDataTypeDefinition(this.Id);
+                foreach (var p in propTypes)
+                {
+                    p.delete();
+                }
+
+                //delete the cmsDataType role, then the umbracoNode
+                SqlHelper.ExecuteNonQuery("delete from cmsDataType where nodeId=@nodeId",
+                                          SqlHelper.CreateParameter("@nodeId", this.Id));
+                base.delete();
+
+                cache.Cache.ClearCacheItem(string.Format("UmbracoDataTypeDefinition{0}", Id));
+                FireAfterDelete(e);
             }
-
-            //delete the cmsDataType role, then the umbracoNode
-            SqlHelper.ExecuteNonQuery("delete from cmsDataType where nodeId=@nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
-            base.delete();
-
-            cache.Cache.ClearCacheItem(string.Format("UmbracoDataTypeDefinition{0}", Id));
         }
 
         [Obsolete("Use the standard delete() method instead")]
@@ -363,12 +371,42 @@ namespace umbraco.cms.businesslogic.datatype
                 New(this, e);
         }
 
+        [Obsolete("This event is not used! Use the BeforeDelete or AfterDelete events")]
         public static event DeleteEventHandler Deleting;
         protected virtual void OnDeleting(EventArgs e)
         {
             if (Deleting != null)
                 Deleting(this, e);
         }
+
+        /// <summary>
+        /// Occurs when [before delete].
+        /// </summary>
+        public new static event DeleteEventHandler BeforeDelete;
+        /// <summary>
+        /// Raises the <see cref="E:BeforeDelete"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        protected new virtual void FireBeforeDelete(DeleteEventArgs e)
+        {
+            if (BeforeDelete != null)
+                BeforeDelete(this, e);
+        }
+
+        /// <summary>
+        /// Occurs when [after delete].
+        /// </summary>
+        public new static event DeleteEventHandler AfterDelete;
+        /// <summary>
+        /// Raises the <see cref="E:AfterDelete"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        protected new virtual void FireAfterDelete(DeleteEventArgs e)
+        {
+            if (AfterDelete != null)
+                AfterDelete(this, e);
+        }
+
         #endregion
 
     }
