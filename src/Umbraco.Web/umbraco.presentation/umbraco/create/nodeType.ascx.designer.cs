@@ -40,15 +40,6 @@ namespace umbraco.cms.presentation.create.controls {
         protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
         
         /// <summary>
-        /// CustomValidation1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CustomValidator CustomValidation1;
-        
-        /// <summary>
         /// rename control.
         /// </summary>
         /// <remarks>
@@ -74,6 +65,24 @@ namespace umbraco.cms.presentation.create.controls {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox Textbox1;
+        
+        /// <summary>
+        /// CustomValidation1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CustomValidator CustomValidation1;
+        
+        /// <summary>
+        /// CustomValidation2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CustomValidator CustomValidation2;
         
         /// <summary>
         /// sbmt control.

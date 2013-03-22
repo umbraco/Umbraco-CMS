@@ -266,7 +266,10 @@ namespace Umbraco.Core.Persistence.Repositories
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
                 entity.Level = parent.Level + 1;
-                var maxSortOrder = Database.ExecuteScalar<int>("SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId", new { ParentId = entity.ParentId });
+                var maxSortOrder =
+                    Database.ExecuteScalar<int>(
+                        "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
+                        new {ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId});
                 entity.SortOrder = maxSortOrder + 1;
             }
 
