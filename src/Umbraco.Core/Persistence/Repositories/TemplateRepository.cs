@@ -182,6 +182,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
+            //TODO Possibly ensure unique alias here (as is done in the legacy Template class)?
+
             //Save to db
             var template = entity as Template;
             var factory = new TemplateFactory(NodeObjectTypeId);

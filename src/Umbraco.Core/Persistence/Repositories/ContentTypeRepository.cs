@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -167,6 +168,19 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(IContentType entity)
         {
+            Mandate.That<Exception>(string.IsNullOrEmpty(entity.Alias) == false,
+                                    () =>
+                                        {
+                                            var message =
+                                                string.Format(
+                                                    "ContentType '{0}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                                                    entity.Name);
+                                            var exception = new Exception(message);
+
+                                            LogHelper.Error<ContentTypeRepository>(message, exception);
+                                            throw exception;
+                                        });
+
             ((ContentType)entity).AddingEntity();
 
             var factory = new ContentTypeFactory(NodeObjectTypeId);
@@ -192,6 +206,19 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(IContentType entity)
         {
+            Mandate.That<Exception>(string.IsNullOrEmpty(entity.Alias) == false,
+                                    () =>
+                                        {
+                                            var message =
+                                                string.Format(
+                                                    "ContentType '{0}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                                                    entity.Name);
+                                            var exception = new Exception(message);
+
+                                            LogHelper.Error<ContentTypeRepository>(message, exception);
+                                            throw exception;
+                                        });
+
             //Updates Modified date
             ((ContentType)entity).UpdatingEntity();
 
