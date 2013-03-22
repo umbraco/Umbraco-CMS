@@ -15,7 +15,7 @@ namespace Umbraco.Core.Strings
         internal ShortStringHelperResolver(IShortStringHelper helper)
             : base(helper)
         {
-            Resolution.Frozen += (sender, args) => helper.Freeze();
+            Resolution.Frozen += (sender, args) => Value.Freeze();
         }
         
         /// <summary>
