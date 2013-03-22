@@ -18,6 +18,11 @@
 			public const string ContentItemType = "7A333C54-6F43-40A4-86A2-18688DC7E532";
 
 			/// <summary>
+			/// Guid for the Content Recycle Bin.
+			/// </summary>
+			public const string ContentRecycleBin = "01BB7FF2-24DC-4C0C-95A2-C24EF72BBAC8";
+
+			/// <summary>
 			/// Guid for a DataType object.
 			/// </summary>
 			public const string DataType = "30A2A501-1978-4DDB-A57B-F7EFED43BA3C";
@@ -38,6 +43,11 @@
 			public const string Media = "B796F64C-1F99-4FFB-B886-4BF4BC011A9C";
 
 			/// <summary>
+			/// Guid for the Media Recycle Bin.
+			/// </summary>
+			public const string MediaRecycleBin = "CF3D8E34-1C1C-41e9-AE56-878B57B32113";
+
+			/// <summary>
 			/// Guid for a Media Type object.
 			/// </summary>
 			public const string MediaType = "4EA4382B-2F5A-4C2B-9587-AE9B3CF3602E";
@@ -56,11 +66,6 @@
 			/// Guid for a Member Type object.
 			/// </summary>
 			public const string MemberType = "9B5416FB-E72F-45A9-A07B-5A9A2709CE43";
-
-			/// <summary>
-			/// Guid for the Recycle Bin.
-			/// </summary>
-			public const string RecycleBin = "01BB7FF2-24DC-4C0C-95A2-C24EF72BBAC8";
 
 			/// <summary>
 			/// Guid for a Stylesheet object.

@@ -15,6 +15,7 @@ using umbraco.presentation;
 using umbraco.BusinessLogic.Actions;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core;
 
 namespace umbraco.dialogs
 {
@@ -40,7 +41,7 @@ namespace umbraco.dialogs
 			{
                 int nodeId = int.Parse(helper.Request("nodeId"));
                 //ensure they have access to create under this node!!
-                if (helper.Request("app") == "media" || CheckCreatePermissions(nodeId))
+                if (helper.Request("app") == Constants.Applications.Media || CheckCreatePermissions(nodeId))
                 {
                     //pane_chooseName.Text = ui.Text("create", "updateData", this.getUser());
                     cms.businesslogic.CMSNode c = new cms.businesslogic.CMSNode(nodeId);

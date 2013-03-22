@@ -60,7 +60,7 @@ namespace umbraco.controls.Images
 
         protected void SubmitButton_Click(object sender, EventArgs e)
         {
-            var media = Media.MakeNew(TextBoxTitle.Text, cms.businesslogic.media.MediaType.GetByAlias("image"), BasePage.Current.getUser(), int.Parse(MediaPickerControl.Value));
+            var media = Media.MakeNew(TextBoxTitle.Text, cms.businesslogic.media.MediaType.GetByAlias(Constants.Conventions.MediaTypes.Image), BasePage.Current.getUser(), int.Parse(MediaPickerControl.Value));
 
             foreach (var property in media.GenericProperties)
             {

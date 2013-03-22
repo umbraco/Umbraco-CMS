@@ -447,11 +447,11 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
- <EmbeddedResource Include="UmbracoExamine\TestFiles.resx">
+    <EmbeddedResource Include="UmbracoExamine\TestFiles.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>TestFiles.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
-
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">

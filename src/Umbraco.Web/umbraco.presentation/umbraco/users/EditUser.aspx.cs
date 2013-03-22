@@ -117,7 +117,7 @@ namespace umbraco.cms.presentation.user
             DefaultToLiveEditing.Checked = u.DefaultToLiveEditing;
 
             PlaceHolder medias = new PlaceHolder();
-            mediaPicker.AppAlias = "media";
+            mediaPicker.AppAlias = Constants.Applications.Media;
             mediaPicker.TreeAlias = "media";
 
             if (u.StartMediaId > 0)
@@ -128,7 +128,7 @@ namespace umbraco.cms.presentation.user
             medias.Controls.Add(mediaPicker);
 
             PlaceHolder content = new PlaceHolder();
-            contentPicker.AppAlias = "content";
+            contentPicker.AppAlias = Constants.Applications.Content;
             contentPicker.TreeAlias = "content";
 
             if (u.StartNodeId > 0)
@@ -246,7 +246,7 @@ namespace umbraco.cms.presentation.user
             // Handle content and media pickers
 
             PlaceHolder medias = new PlaceHolder();
-            cMediaPicker.AppAlias = "media";
+            cMediaPicker.AppAlias = Constants.Applications.Media;
             cMediaPicker.TreeAlias = "media";
 
             if (userChannel.MediaFolder > 0)
@@ -257,7 +257,7 @@ namespace umbraco.cms.presentation.user
             medias.Controls.Add(cMediaPicker);
 
             PlaceHolder content = new PlaceHolder();
-            cContentPicker.AppAlias = "content";
+            cContentPicker.AppAlias = Constants.Applications.Content;
             cContentPicker.TreeAlias = "content";
 
             if (userChannel.StartNode > 0)
@@ -494,7 +494,7 @@ namespace umbraco.cms.presentation.user
                         c.DocumentTypeAlias = cDocumentType.SelectedValue;
 
                         //
-                        c.MediaTypeAlias = "image";
+                        c.MediaTypeAlias = Constants.Conventions.MediaTypes.Image; // [LK:2013-03-22] This was previously lowercase; unsure if using const will cause an issue.
                         c.MediaTypeFileProperty = Constants.Conventions.Media.File;
                         c.ImageSupport = true;
 

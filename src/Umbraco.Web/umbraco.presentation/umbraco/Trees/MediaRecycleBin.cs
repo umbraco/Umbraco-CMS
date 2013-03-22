@@ -25,11 +25,12 @@ using umbraco.DataLayer;
 using umbraco.BusinessLogic.Actions;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Core;
 
 
 namespace umbraco.cms.presentation.Trees
 {
-    [Tree("media", "mediaRecycleBin", "Recycle Bin", "folder.gif", "folder_o.gif", initialize : false)]
+    [Tree(Constants.Applications.Media, "mediaRecycleBin", "Recycle Bin", "folder.gif", "folder_o.gif", initialize : false)]
 	public class MediaRecycleBin : BaseMediaTree
 	{
 		public MediaRecycleBin(string application) : base(application) { }

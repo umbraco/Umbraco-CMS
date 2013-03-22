@@ -73,7 +73,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             Application.Apps = new List<Application>()
                 {
-                    new Application("content", "content", "content", 0)
+                    new Application(Constants.Applications.Content, "content", "content", 0)
                 };
         }
 

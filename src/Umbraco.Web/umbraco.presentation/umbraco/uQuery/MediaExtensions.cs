@@ -191,7 +191,7 @@ namespace umbraco
 		/// <returns></returns>
 		public static string GetImageUrl(this Media media)
 		{
-			if (media.ContentType.Alias.Equals("Image"))
+			if (media.ContentType.Alias.Equals(Constants.Conventions.MediaTypes.Image))
 			{
 				var url = media.GetProperty<string>(Constants.Conventions.Media.File);
 				if (!string.IsNullOrEmpty(url))
@@ -210,7 +210,7 @@ namespace umbraco
 		/// <returns></returns>
 		public static string GetImageThumbnailUrl(this Media media)
 		{
-			if (media.ContentType.Alias.Equals("Image"))
+			if (media.ContentType.Alias.Equals(Constants.Conventions.MediaTypes.Image))
 			{
 				var url = media.GetProperty<string>(Constants.Conventions.Media.File);
 				if (!string.IsNullOrEmpty(url))

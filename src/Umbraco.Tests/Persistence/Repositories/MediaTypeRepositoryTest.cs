@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Assert
             Assert.That(mediaType, Is.Not.Null);
             Assert.That(mediaType.Id, Is.EqualTo(1033));
-            Assert.That(mediaType.Name, Is.EqualTo("File"));
+            Assert.That(mediaType.Name, Is.EqualTo(Constants.Conventions.MediaTypes.File));
         }
 
         [Test]

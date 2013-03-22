@@ -70,6 +70,27 @@
 			}
 
 			/// <summary>
+			/// Defines the alias identifiers for Umbraco media types.
+			/// </summary>
+			public static class MediaTypes
+			{
+				/// <summary>
+				/// MediaType alias for a file.
+				/// </summary>
+				public const string File = "File";
+
+				/// <summary>
+				/// MediaType alias for a folder.
+				/// </summary>
+				public const string Folder = "Folder";
+
+				/// <summary>
+				/// MediaType alias for an image.
+				/// </summary>
+				public const string Image = "Image";
+			}
+
+			/// <summary>
 			/// Constants for Umbraco URLs/Querystrings.
 			/// </summary>
 			public static class Url

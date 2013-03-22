@@ -9,7 +9,7 @@ namespace umbraco.cms.businesslogic.media
     {
         public override string MediaTypeAlias
         {
-            get { return "Image"; }
+            get { return Constants.Conventions.MediaTypes.Image; }
         }
 
         public override List<string> Extensions

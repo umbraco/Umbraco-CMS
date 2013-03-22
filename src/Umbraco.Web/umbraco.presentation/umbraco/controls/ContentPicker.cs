@@ -10,6 +10,7 @@ using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
 using umbraco.presentation;
 using umbraco.uicontrols.TreePicker;
+using Umbraco.Core;
 
 namespace umbraco.controls
 {
@@ -19,7 +20,7 @@ namespace umbraco.controls
 
         public ContentPicker()
         {
-            AppAlias = "content";
+            AppAlias = Constants.Applications.Content;
             TreeAlias = "content";
         }
 

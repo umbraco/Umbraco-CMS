@@ -25,6 +25,7 @@ using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
 using umbraco.BusinessLogic.Actions;
 using System.Linq;
+using Umbraco.Core;
 
 
 namespace umbraco
@@ -32,7 +33,7 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of all umbraco users into the users application tree
 	/// </summary>
-    [Tree("users", "users", "Users")]
+    [Tree(Constants.Applications.Users, "users", "Users")]
     public class loadUsers : BaseTree
 	{
         public loadUsers(string application) : base(application) { }

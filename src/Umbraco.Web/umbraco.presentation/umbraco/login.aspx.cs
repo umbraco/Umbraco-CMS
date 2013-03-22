@@ -16,6 +16,7 @@ using umbraco.businesslogic.Exceptions;
 using umbraco.IO;
 using umbraco.cms.businesslogic.web;
 using System.Linq;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation
 {
@@ -168,7 +169,7 @@ namespace umbraco.cms.presentation
             {
                 BusinessLogic.User.MakeNew(loginName, loginName, string.Empty, email, BusinessLogic.UserType.GetUserType(2));
                 BusinessLogic.User u = new BusinessLogic.User(loginName);
-                u.addApplication("content");
+                u.addApplication(Constants.Applications.Content);
             }
         }
 

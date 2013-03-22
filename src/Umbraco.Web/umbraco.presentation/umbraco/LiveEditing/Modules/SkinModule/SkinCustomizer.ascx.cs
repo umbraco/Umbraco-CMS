@@ -15,6 +15,7 @@ using umbraco.BusinessLogic;
 using umbraco.NodeFactory;
 using umbraco.cms.businesslogic.packager;
 using System.IO;
+using Umbraco.Core;
 
 namespace umbraco.presentation.LiveEditing.Modules.SkinModule
 {
@@ -227,7 +228,7 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (User.GetCurrent().GetApplications().Find(t => t.alias.ToLower() == "settings") == null)
+            if (User.GetCurrent().GetApplications().Find(t => string.Equals(t.alias, Constants.Applications.Settings, StringComparison.OrdinalIgnoreCase)) == null)
             {
                 throw new Exception("The current user can't edit skins as the user doesn't have access to the Settings section!");
             }

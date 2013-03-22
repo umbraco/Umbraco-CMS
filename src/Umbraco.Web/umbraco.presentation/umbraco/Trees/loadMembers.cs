@@ -23,6 +23,7 @@ using umbraco.interfaces;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Core;
 
 
 namespace umbraco
@@ -30,7 +31,7 @@ namespace umbraco
     /// <summary>
     /// Handles loading of the member application into the application tree
     /// </summary>
-    [Tree("member", "member", "Members")]
+    [Tree(Constants.Applications.Members, "member", "Members")]
     public class loadMembers : BaseTree
     {
         public loadMembers(string application) : base(application) { }

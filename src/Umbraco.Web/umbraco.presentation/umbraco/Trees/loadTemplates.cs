@@ -30,7 +30,7 @@ using umbraco.cms.businesslogic.skinning;
 
 namespace umbraco
 {
-    [Tree("settings", "templates", "Templates", sortOrder: 1)]
+    [Tree(Constants.Applications.Settings, "templates", "Templates", sortOrder: 1)]
     public class loadTemplates : BaseTree
     {
         public loadTemplates(string application) : base(application) {}

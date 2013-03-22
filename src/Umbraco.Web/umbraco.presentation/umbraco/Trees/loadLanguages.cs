@@ -24,11 +24,12 @@ using umbraco.DataLayer;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
 using umbraco.BusinessLogic.Actions;
+using Umbraco.Core;
 
 
 namespace umbraco
 {
-    [Tree("settings", "languages", "Languages", sortOrder: 4)]
+    [Tree(Constants.Applications.Settings, "languages", "Languages", sortOrder: 4)]
     public class loadLanguages : BaseTree
 	{
         public loadLanguages(string application) : base(application) { }
