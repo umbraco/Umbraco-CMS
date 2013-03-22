@@ -65,7 +65,8 @@ namespace Umbraco.Core.Services
                             select doc;
 
                 var contents = ParseDocumentRootXml(roots, parentId);
-                _contentService.Save(contents, userId);
+                if(contents.Any())
+                    _contentService.Save(contents, userId);
 
                 return contents;
             }
@@ -76,7 +77,8 @@ namespace Umbraco.Core.Services
                 //This is a single doc import
                 var elements = new List<XElement> { element };
                 var contents = ParseDocumentRootXml(elements, parentId);
-                _contentService.Save(contents, userId);
+                if (contents.Any())
+                    _contentService.Save(contents, userId);
 
                 return contents;
             }
@@ -505,10 +507,12 @@ namespace Umbraco.Core.Services
             }
 
             var list = dataTypes.Select(x => x.Value).ToList();
-            _dataTypeService.Save(list, userId);
+            if (list.Any())
+            {
+                _dataTypeService.Save(list, userId);
 
-            SavePrevaluesFromXml(list, dataTypeElements);
-
+                SavePrevaluesFromXml(list, dataTypeElements);
+            }
             return list;
         }
 
@@ -609,7 +613,9 @@ namespace Umbraco.Core.Services
                 templates.Add(template);
             }
 
-            _fileService.SaveTemplate(templates, userId);
+            if(templates.Any())
+                _fileService.SaveTemplate(templates, userId);
+
             return templates;
         }
 
