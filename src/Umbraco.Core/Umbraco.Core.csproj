@@ -741,13 +741,19 @@
     <Compile Include="TypeHelper.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Constants-Applications.cs">
+      <DependentUpon>Constants.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Constants-Conventions.cs">
+      <DependentUpon>Constants.cs</DependentUpon>
+    </Compile>
     <Compile Include="Constants-PropertyEditors.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     <Compile Include="Constants-ObjectTypes.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
-    <Compile Include="Constants-Conventions.cs">
+    <Compile Include="Constants-System.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     <Compile Include="UpgradeableReadLock.cs" />
