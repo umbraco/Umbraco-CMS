@@ -199,7 +199,7 @@ namespace Umbraco.Core.Services
         public IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = 0)
         {
             var name = element.Name.LocalName;
-            if (name.Equals("DocumentTypes") == false && name.Equals("DocumentType"))
+            if (name.Equals("DocumentTypes") == false && name.Equals("DocumentType") == false)
             {
                 throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called 'DocumentTypes' for multiple imports or 'DocumentType' for a single import.");
             }
@@ -470,13 +470,16 @@ namespace Umbraco.Core.Services
         public IEnumerable<IDataTypeDefinition> ImportDataTypeDefinitions(XElement element, int userId = 0)
         {
             var name = element.Name.LocalName;
-            if (name.Equals("DataTypes") == false)
+            if (name.Equals("DataTypes") == false && name.Equals("DataType") == false)
             {
-                throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called 'DataTypes'.");
+                throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called 'DataTypes' for multiple imports or 'DataType' for a single import.");
             }
 
             var dataTypes = new Dictionary<string, IDataTypeDefinition>();
-            var dataTypeElements = element.Elements("DataType").ToList();
+            var dataTypeElements = name.Equals("DataTypes")
+                                       ? (from doc in element.Elements("DataType") select doc).ToList()
+                                       : new List<XElement> {element.Element("DataType")};
+
             foreach (var dataTypeElement in dataTypeElements)
             {
                 var dataTypeDefinitionName = dataTypeElement.Attribute("Name").Value;
@@ -557,7 +560,7 @@ namespace Umbraco.Core.Services
         public IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = 0)
         {
             var name = element.Name.LocalName;
-            if (name.Equals("Templates") == false && name.Equals("Template"))
+            if (name.Equals("Templates") == false && name.Equals("Template") == false)
             {
                 throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called 'Templates' for multiple imports or 'Template' for a single import.");
             }
