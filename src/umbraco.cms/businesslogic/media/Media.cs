@@ -1,6 +1,7 @@
 using System;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using System.Collections;
@@ -85,8 +86,8 @@ namespace umbraco.cms.businesslogic.media
             }
 
             var media = ApplicationContext.Current.Services.MediaService.CreateMedia(Name, ParentId, dct.Alias, u.Id);
-            //The media object will only be null if the 'Creating' event has been cancelled
-            if (media == null)
+            //The media object will only have the 'WasCancelled' flag set to 'True' if the 'Creating' event has been cancelled
+            if (((Entity)media).WasCancelled)
                 return null;
 
             ApplicationContext.Current.Services.MediaService.Save(media);
