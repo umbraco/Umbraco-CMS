@@ -485,7 +485,7 @@ namespace Umbraco.Core.Services
                 var databaseTypeAttribute = dataTypeElement.Attribute("DatabaseType");
 
                 var definition = _dataTypeService.GetDataTypeDefinitionById(dataTypeDefinitionId);
-                if (definition == null)
+                if (definition != null)
                 {
                     var databaseType = databaseTypeAttribute != null
                                            ? databaseTypeAttribute.Value.EnumParse<DataTypeDatabaseType>(true)
