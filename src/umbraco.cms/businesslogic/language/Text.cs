@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Data;
 using System.Linq;
 using umbraco.DataLayer;
@@ -19,9 +20,9 @@ namespace umbraco.cms.businesslogic.language
     /// </summary>
     public class Item
     {
-        private static Hashtable _items = Hashtable.Synchronized(new Hashtable());
-        private static volatile bool m_IsInitialize = false;
-        private static readonly object m_Locker = new object();
+        private static readonly ConcurrentDictionary<Guid, Dictionary<int, string>> Items = new ConcurrentDictionary<Guid, Dictionary<int, string>>();        
+        private static volatile bool _isInitialize;
+        private static readonly object Locker = new object();
 
         /// <summary>
         /// Gets the SQL helper.
@@ -35,150 +36,142 @@ namespace umbraco.cms.businesslogic.language
         /// <summary>
         /// Populates the global hash table with the data from the database.
         /// </summary>
-        private static void ensureData()
+        private static void EnsureData()
         {
-            if (!m_IsInitialize)
+            if (!_isInitialize)
             {
-                lock (m_Locker)
+                lock (Locker)
                 {
                     //double check
-                    if (!m_IsInitialize)
+                    if (!_isInitialize)
                     {
                         // load all data
                         using (IRecordsReader dr = SqlHelper.ExecuteReader("Select LanguageId, UniqueId,[value] from cmsLanguageText order by UniqueId"))
                         {
                             while (dr.Read())
                             {
-                                int LanguageId = dr.GetInt("LanguageId");
-                                Guid UniqueId = dr.GetGuid("UniqueId");
-                                string text = dr.GetString("value");
+                                var languageId = dr.GetInt("LanguageId");
+                                var uniqueId = dr.GetGuid("UniqueId");
+                                var text = dr.GetString("value");
 
-                                updateCache(LanguageId, UniqueId, text);
+                                UpdateCache(languageId, uniqueId, text);
                             }
                         }                        
-                        m_IsInitialize = true;
+                        _isInitialize = true;
                     }                    
                 }
                
             }
         }
 
-        private static void updateCache(int LanguageId, Guid key, string text)
+        private static void UpdateCache(int languageId, Guid key, string text)
         {
-            // test if item already exist in items and update internal data or insert new internal data
-            if (_items.ContainsKey(key))
-            {
-                System.Collections.Hashtable languagevalues = (System.Collections.Hashtable)_items[key];
-                
-                // check if the current language key is used
-                if (languagevalues.ContainsKey(LanguageId))
+            Items.AddOrUpdate(key, guid =>
                 {
-                    languagevalues[LanguageId] = text;
-                }
-                else
-                {
-                    languagevalues.Add(LanguageId, text);
-                }
-            }
-            else
-            {
-                // insert 
-                Hashtable languagevalues = Hashtable.Synchronized(new Hashtable());
-                languagevalues.Add(LanguageId, text);
-                _items.Add(key, languagevalues);
-            }
+                    var languagevalues = new Dictionary<int, string> {{languageId, text}};
+                    return languagevalues;
+                }, (guid, dictionary) =>
+                    {
+                        // add/update the text for the id
+                        dictionary[languageId] = text;
+                        return dictionary;
+                    });
         }
-
-
+        
         /// <summary>
         /// Retrieves the value of a languagetranslated item given the key
         /// </summary>
         /// <param name="key">Unique identifier</param>
-        /// <param name="LanguageId">Umbraco languageid</param>
+        /// <param name="languageId">Umbraco languageid</param>
         /// <returns>The language translated text</returns>
-        public static string Text(Guid key, int LanguageId)
+        public static string Text(Guid key, int languageId)
         {
-            ensureData();
+            EnsureData();
 
-            if (hasText(key, LanguageId))
-                return ((System.Collections.Hashtable)_items[key])[LanguageId].ToString();
-            else
-                throw new ArgumentException("Key being requested does not exist");
+            Dictionary<int, string> val;
+            if (Items.TryGetValue(key, out val))
+            {
+                return val[languageId];
+            }            
+            throw new ArgumentException("Key being requested does not exist");
         }
 
         /// <summary>
-        /// 
+        /// returns True if there is a value associated to the unique identifier with the specified language
         /// </summary>
         /// <param name="key">Unique identifier</param>
-        /// <param name="LanguageId">Umbraco language id</param>
+        /// <param name="languageId">Umbraco language id</param>
         /// <returns>returns True if there is a value associated to the unique identifier with the specified language</returns>
-        public static bool hasText(Guid key, int LanguageId)
+        public static bool hasText(Guid key, int languageId)
         {
-            ensureData();
+            EnsureData();
 
-            if (_items.ContainsKey(key))
+            Dictionary<int, string> val;
+            if (Items.TryGetValue(key, out val))
             {
-                System.Collections.Hashtable tmp = (System.Collections.Hashtable)_items[key];
-                return tmp.ContainsKey(LanguageId);
+                return val.ContainsKey(languageId);
             }
             return false;
         }
+        
         /// <summary>
         /// Updates the value of the language translated item, throws an exeption if the
         /// key does not exist
         /// </summary>
-        /// <param name="LanguageId">Umbraco language id</param>
+        /// <param name="languageId">Umbraco language id</param>
         /// <param name="key">Unique identifier</param>
         /// <param name="value">The new dictionaryvalue</param>
 
-        public static void setText(int LanguageId, Guid key, string value)
+        public static void setText(int languageId, Guid key, string value)
         {
-            ensureData();
+            EnsureData();
 
-            if (!hasText(key, LanguageId)) throw new ArgumentException("Key does not exist");
+            if (!hasText(key, languageId)) throw new ArgumentException("Key does not exist");
             
             SqlHelper.ExecuteNonQuery("Update cmsLanguageText set [value] = @value where LanguageId = @languageId And UniqueId = @key",
                 SqlHelper.CreateParameter("@value", value),
-                SqlHelper.CreateParameter("@languageId", LanguageId),
+                SqlHelper.CreateParameter("@languageId", languageId),
                 SqlHelper.CreateParameter("@key", key));
 
-            updateCache(LanguageId, key, value);
+            UpdateCache(languageId, key, value);
         }
 
         /// <summary>
         /// Adds a new languagetranslated item to the collection
         /// 
         /// </summary>
-        /// <param name="LanguageId">Umbraco languageid</param>
+        /// <param name="languageId">Umbraco languageid</param>
         /// <param name="key">Unique identifier</param>
         /// <param name="value"></param>
-        public static void addText(int LanguageId, Guid key, string value)
+        public static void addText(int languageId, Guid key, string value)
         {
-            ensureData();
+            EnsureData();
 
-            if (hasText(key, LanguageId)) throw new ArgumentException("Key being add'ed already exists");
+            if (hasText(key, languageId)) throw new ArgumentException("Key being add'ed already exists");
             
             SqlHelper.ExecuteNonQuery("Insert Into cmsLanguageText (languageId,UniqueId,[value]) values (@languageId, @key, @value)",
-                SqlHelper.CreateParameter("@languageId", LanguageId),
+                SqlHelper.CreateParameter("@languageId", languageId),
                 SqlHelper.CreateParameter("@key", key),
                 SqlHelper.CreateParameter("@value", value));
 
-            updateCache(LanguageId, key, value);
+            UpdateCache(languageId, key, value);
         }
+        
         /// <summary>
         /// Removes all languagetranslated texts associated to the unique identifier.
         /// </summary>
         /// <param name="key">Unique identifier</param>
         public static void removeText(Guid key)
         {
-            ensureData();
+            EnsureData();
 
             // remove from database
             SqlHelper.ExecuteNonQuery("Delete from cmsLanguageText where UniqueId =  @key",
                 SqlHelper.CreateParameter("@key", key));
 
             // remove from cache
-            _items.Remove(key);
+            Dictionary<int, string> val;
+            Items.TryRemove(key, out val);
         }
 
         /// <summary>
@@ -188,22 +181,25 @@ namespace umbraco.cms.businesslogic.language
         /// <param name="languageId"></param>
         public static void RemoveByLanguage(int languageId)
         {
-            ensureData();
+            EnsureData();
 
             // remove from database
             SqlHelper.ExecuteNonQuery("Delete from cmsLanguageText where languageId =  @languageId",
                 SqlHelper.CreateParameter("@languageId", languageId));
 
-            //delete all of the items belonging to the language
-            foreach (var entry in _items.Values.Cast<Hashtable>())
+            //we need to lock here because the inner dictionary is not concurrent, seems overkill to have a nested concurrent dictionary
+            lock (Locker)
             {
-                if (entry.Contains(languageId))
+                //delete all of the items belonging to the language
+                foreach (var entry in Items.Values)
                 {
-                    entry.Remove(languageId);
-                }
-                
+                    if (entry.ContainsKey(languageId))
+                    {
+                        entry.Remove(languageId);
+                    }
+                }    
             }
-
+            
         }
     }
 }
