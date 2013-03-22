@@ -138,12 +138,12 @@ namespace Umbraco.Tests.PublishedCache
 				};
 			result.Fields.Add("__IndexType", "media");
 			result.Fields.Add("__NodeId", "1234");
-			result.Fields.Add("__NodeTypeAlias", "Image");
+			result.Fields.Add("__NodeTypeAlias", Constants.Conventions.MediaTypes.Image);
 			result.Fields.Add("__Path", "-1,1234");
 			result.Fields.Add("__nodeName", "Test");
 			result.Fields.Add("id", "1234");
 			result.Fields.Add("nodeName", "Test");
-			result.Fields.Add("nodeTypeAlias", "Image");
+			result.Fields.Add("nodeTypeAlias", Constants.Conventions.MediaTypes.Image);
 			result.Fields.Add("parentID", "-1");
 			result.Fields.Add("path", "-1,1234");
 			result.Fields.Add("updateDate", "2012-07-16T10:34:09");

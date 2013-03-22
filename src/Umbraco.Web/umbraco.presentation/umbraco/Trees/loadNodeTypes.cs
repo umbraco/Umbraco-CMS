@@ -8,11 +8,12 @@ using umbraco.businesslogic;
 using umbraco.interfaces;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Core;
 
 
 namespace umbraco
 {
-    [Tree("settings", "nodeTypes", "Document Types", sortOrder: 6)]
+    [Tree(Constants.Applications.Settings, "nodeTypes", "Document Types", sortOrder: 6)]
     public class loadNodeTypes : BaseTree
     {
 

@@ -18,8 +18,8 @@ namespace umbraco.cms.businesslogic
         /// </remarks>
         public enum RecycleBinType
         {
-            Content = -20,
-            Media = -21
+            Content = Constants.System.RecycleBinContent,
+            Media = Constants.System.RecycleBinMedia
         }
 
         private const string m_ChildCountSQL = @"select count(id) from umbracoNode where nodeObjectType = @nodeObjectType and path like '%,{0},%'";

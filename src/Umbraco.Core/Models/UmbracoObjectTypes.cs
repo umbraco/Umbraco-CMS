@@ -85,7 +85,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Recycle Bin
         /// </summary>
-        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.RecycleBin)]
+        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.ContentRecycleBin)]
         [FriendlyName("Recycle Bin")]
         RecycleBin,
 

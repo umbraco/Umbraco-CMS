@@ -6,6 +6,7 @@ using System.Web.UI.WebControls;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.interfaces;
 using umbraco.uicontrols.TreePicker;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.MultiNodeTreePicker
 {
@@ -27,7 +28,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
         {
             get
             {
-                return GetPreValue(PropertyIndex.TreeType, x => x.Value, "content");
+                return GetPreValue(PropertyIndex.TreeType, x => x.Value, Constants.Applications.Content);
             }
         }
 
@@ -346,10 +347,10 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 
                 switch (SelectedTreeType.ToLower())
                 {
-                    case "content":
+                    case Constants.Applications.Content:
                         StartContentNodeIdPicker.Value = StartNodeId.ToString();
                         break;
-                    case "media":
+                    case Constants.Applications.Media:
                     default:
                         StartMediaNodeIdPicker.Value = StartNodeId.ToString();
                         break;
@@ -371,8 +372,8 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 
 
             TreeTypeDropDown = new DropDownList { ID = "TreeTypeList" };
-            TreeTypeDropDown.Items.Add(new ListItem("Content", "content"));
-            TreeTypeDropDown.Items.Add(new ListItem("Media", "media"));
+            TreeTypeDropDown.Items.Add(new ListItem("Content", Constants.Applications.Content));
+            TreeTypeDropDown.Items.Add(new ListItem("Media", Constants.Applications.Media));
             TreeTypeDropDown.AutoPostBack = true;
             AddPreValueRow(MNTPResources.Lbl_SelectTreeType, "", TreeTypeDropDown);
 

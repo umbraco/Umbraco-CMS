@@ -36,7 +36,7 @@ namespace umbraco.cms.presentation
         protected void Page_Load(object sender, System.EventArgs e)
         {
             var apps = this.getUser().Applications.ToList();
-            bool userHasAccesstodefaultApp = apps.Where(x => x.alias == "content").Count() > 0;
+            bool userHasAccesstodefaultApp = apps.Where(x => x.alias == Umbraco.Core.Constants.Applications.Content).Count() > 0;
 
             // Load user module icons ..
             if (apps.Count() > 1)
@@ -82,7 +82,7 @@ namespace umbraco.cms.presentation
             }
             else
             {
-                DefaultApp = "content";
+                DefaultApp = Umbraco.Core.Constants.Applications.Content;
             }
 
 

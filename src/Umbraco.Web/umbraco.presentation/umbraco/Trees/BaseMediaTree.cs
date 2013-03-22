@@ -7,6 +7,7 @@ using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.property;
 using umbraco.interfaces;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation.Trees
 {
@@ -87,7 +88,7 @@ function openMedia(id) {
                         }
                         else
                         {
-                            if (dd.ContentType.Alias.ToLower() == "folder")
+                            if (string.Equals(dd.ContentType.Alias, Constants.Conventions.MediaTypes.Folder, StringComparison.OrdinalIgnoreCase))
                             {
                                 xNode.Action = "javascript:jQuery('.umbTree #" + dd.Id.ToString() + "').click();";
                             }

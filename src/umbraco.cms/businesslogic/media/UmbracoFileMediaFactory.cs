@@ -14,7 +14,7 @@ namespace umbraco.cms.businesslogic.media
     {
         public override string MediaTypeAlias
         {
-            get { return "File"; }
+            get { return Constants.Conventions.MediaTypes.File; }
         }
 
         public override List<string> Extensions

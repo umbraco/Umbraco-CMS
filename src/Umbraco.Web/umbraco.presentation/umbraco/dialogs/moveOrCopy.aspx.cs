@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic;
 using umbraco.cms.presentation.user;
 using umbraco.interfaces;
 using Umbraco.Web;
+using Umbraco.Core;
 
 namespace umbraco.dialogs
 {
@@ -34,7 +35,7 @@ namespace umbraco.dialogs
                 //Document Type copy Hack...
                 var app = Request.GetItemAsString("app");
 
-                if (app == "settings")
+                if (app == Constants.Applications.Settings)
                 {
                     pane_form.Visible = false;
                     pane_form_notice.Visible = false;
@@ -72,7 +73,7 @@ namespace umbraco.dialogs
                     var cmsNode = new CMSNode(int.Parse(Request.GetItemAsString("id")));
 
                     var validAction = true;
-                    if (app == "content" && cmsNode.HasChildren)
+                    if (app == Constants.Applications.Content && cmsNode.HasChildren)
                         validAction = ValidAction(Request.GetItemAsString("mode") == "cut" ? 'M' : 'O');
 
 
@@ -177,7 +178,7 @@ namespace umbraco.dialogs
 
         public void HandleMoveOrCopy(object sender, EventArgs e)
         {
-            if (Request["app"] == "settings")
+            if (Request["app"] == Constants.Applications.Settings)
                 HandleDocumentTypeCopy();
             else
                 HandleDocumentMoveOrCopy();
@@ -243,7 +244,7 @@ namespace umbraco.dialogs
 
                     if (Request["mode"] == "cut")
                     {
-                        if (Request["app"] == "content")
+                        if (Request["app"] == Constants.Applications.Content)
                         {
                             //PPH changed this to document instead of cmsNode to handle republishing.
                             var documentId = int.Parse(Request.GetItemAsString("id"));

@@ -196,7 +196,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
         {
             var mediaType = new MediaType(-1)
             {
-                Alias = "image",
+                Alias = Constants.Conventions.MediaTypes.Image,
                 Name = "Image",
                 Description = "ContentType used for images",
                 Icon = ".sprTreeDoc3",

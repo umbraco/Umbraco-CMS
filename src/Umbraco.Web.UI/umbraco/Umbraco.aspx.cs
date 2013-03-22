@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.UI;
 using Umbraco.Core.IO;
 using umbraco;
+using Umbraco.Core;
 
 namespace Umbraco.Web.UI.Umbraco
 {
@@ -18,7 +19,7 @@ namespace Umbraco.Web.UI.Umbraco
         protected void Page_Load(object sender, System.EventArgs e)
         {
             var apps = UmbracoUser.Applications.ToList();
-            bool userHasAccesstodefaultApp = apps.Any(x => x.alias == "content");
+            bool userHasAccesstodefaultApp = apps.Any(x => x.alias == Constants.Applications.Content);
 
             // Load user module icons ..
             if (apps.Count() > 1)
@@ -64,7 +65,7 @@ namespace Umbraco.Web.UI.Umbraco
             }
             else
             {
-                DefaultApp = "content";
+                DefaultApp = Constants.Applications.Content;
             }
 
 

@@ -30,7 +30,7 @@ namespace umbraco.cms.businesslogic.media
             {
                 var parentNode = new Media(parentNodeId);
 
-                return parentNodeId <= -1 || user.Applications.Any(app => app.alias.ToLower() == "media") && (user.StartMediaId <= 0 || ("," + parentNode.Path + ",").Contains("," + user.StartMediaId + ",")) && parentNode.ContentType.AllowedChildContentTypeIDs.Contains(MediaType.GetByAlias(MediaTypeAlias).Id);
+                return parentNodeId <= -1 || user.Applications.Any(app => app.alias.ToLower() == Constants.Applications.Media) && (user.StartMediaId <= 0 || ("," + parentNode.Path + ",").Contains("," + user.StartMediaId + ",")) && parentNode.ContentType.AllowedChildContentTypeIDs.Contains(MediaType.GetByAlias(MediaTypeAlias).Id);
             }
             catch
             {

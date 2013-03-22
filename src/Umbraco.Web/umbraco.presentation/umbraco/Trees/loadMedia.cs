@@ -29,7 +29,7 @@ using Umbraco.Core;
 
 namespace umbraco
 {
-    [Tree("media", "media", "Media")]
+    [Tree(Constants.Applications.Media, "media", "Media")]
     public class loadMedia : BaseMediaTree
     {
 

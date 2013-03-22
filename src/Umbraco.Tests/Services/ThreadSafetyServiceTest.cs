@@ -149,14 +149,14 @@ namespace Umbraco.Tests.Services
 						//create 2 content items
 
                         string name1 = "test" + Guid.NewGuid();
-					    var folder1 = mediaService.CreateMedia(name1, -1, "Folder", 0);
+					    var folder1 = mediaService.CreateMedia(name1, -1, Constants.Conventions.MediaTypes.Folder, 0);
 						Debug.WriteLine("Saving folder1 on thread: " + Thread.CurrentThread.ManagedThreadId);
 						mediaService.Save(folder1, 0);
 
 						Thread.Sleep(100); //quick pause for maximum overlap!
 
                         string name = "test" + Guid.NewGuid();
-                        var folder2 = mediaService.CreateMedia(name, -1, "Folder", 0);
+                        var folder2 = mediaService.CreateMedia(name, -1, Constants.Conventions.MediaTypes.Folder, 0);
 						Debug.WriteLine("Saving folder2 on thread: " + Thread.CurrentThread.ManagedThreadId);
 						mediaService.Save(folder2, 0);
 					}

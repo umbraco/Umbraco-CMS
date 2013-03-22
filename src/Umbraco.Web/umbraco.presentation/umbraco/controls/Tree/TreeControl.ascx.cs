@@ -16,6 +16,7 @@ using System.Web.Services;
 using System.Drawing;
 using umbraco.BusinessLogic;
 using System.Linq;
+using Umbraco.Core;
 
 namespace umbraco.controls.Tree
 {
@@ -53,7 +54,7 @@ namespace umbraco.controls.Tree
         /// <summary>
         /// If there is not application or tree specified in a query string then this is the application to load.
         /// </summary>
-        private const string DEFAULT_APP = "content";
+        private const string DEFAULT_APP = Constants.Applications.Content;
 
         private List<BaseTree> m_ActiveTrees = new List<BaseTree>();
         private List<BaseTree> m_AllAppTrees = new List<BaseTree>();

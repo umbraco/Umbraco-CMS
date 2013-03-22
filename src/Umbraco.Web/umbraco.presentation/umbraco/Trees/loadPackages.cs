@@ -23,10 +23,11 @@ using umbraco.interfaces;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Core;
 
 namespace umbraco
 {
-    [Tree("developer", "packagerPackages", "Packager Packages", initialize: false, sortOrder: 1)]
+    [Tree(Constants.Applications.Developer, "packagerPackages", "Packager Packages", initialize: false, sortOrder: 1)]
     public class loadPackages : BaseTree
     {
 

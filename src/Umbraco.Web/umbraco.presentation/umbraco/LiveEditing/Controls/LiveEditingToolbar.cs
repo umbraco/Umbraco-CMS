@@ -97,7 +97,7 @@ namespace umbraco.presentation.LiveEditing.Controls
         {
             // SKINNING
             // verify access to settings area
-            if (User.GetCurrent().GetApplications().Find(t => t.alias.ToLower() == "settings") != null)
+            if (User.GetCurrent().GetApplications().Find(t => string.Equals(t.alias, Umbraco.Core.Constants.Applications.Settings, StringComparison.OrdinalIgnoreCase)) != null)
             {
                 //only add if there is a skin
                 NodeFactory.Node n = NodeFactory.Node.GetCurrent();

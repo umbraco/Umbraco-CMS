@@ -88,7 +88,7 @@ namespace umbraco
 			/// <summary>
 			/// Recycle Bin
 			/// </summary>
-			[Guid(Constants.ObjectTypes.RecycleBin)]
+			[Guid(Constants.ObjectTypes.ContentRecycleBin)]
 			[FriendlyName("Recycle Bin")]
 			RecycleBin,
 

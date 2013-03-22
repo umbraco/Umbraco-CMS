@@ -24,11 +24,12 @@ using umbraco.DataLayer;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
 using umbraco.BusinessLogic.Actions;
+using Umbraco.Core;
 
 
 namespace umbraco
 {
-    [Tree("settings", "stylesheets", "Stylesheets")]
+    [Tree(Constants.Applications.Settings, "stylesheets", "Stylesheets")]
 	public class loadStylesheets : BaseTree
 	{
         public loadStylesheets(string application) : base(application) { }

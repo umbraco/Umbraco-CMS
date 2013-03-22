@@ -25,7 +25,7 @@ namespace Umbraco.Tests.LegacyApi
         public void Can_Verify_AllowedChildContentTypes_On_MediaType()
         {
             // Arrange
-            var folder = MediaType.GetByAlias("Folder");
+            var folder = MediaType.GetByAlias(Constants.Conventions.MediaTypes.Folder);
             var folderStructure = folder.AllowedChildContentTypeIDs.ToList();
             folderStructure.Add(1045);
 
@@ -34,7 +34,7 @@ namespace Umbraco.Tests.LegacyApi
             folder.Save();
 
             // Assert
-            var updated = MediaType.GetByAlias("Folder");
+            var updated = MediaType.GetByAlias(Constants.Conventions.MediaTypes.Folder);
 
             Assert.That(updated.AllowedChildContentTypeIDs.Any(), Is.True);
             Assert.That(updated.AllowedChildContentTypeIDs.Any(x => x == 1045), Is.True);

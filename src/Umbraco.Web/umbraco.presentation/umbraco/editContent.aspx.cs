@@ -502,7 +502,7 @@ namespace umbraco.cms.presentation
         private bool CheckUserValidation()
         {
             // Validate permissions
-            if (!base.ValidateUserApp("content"))
+            if (!base.ValidateUserApp(Constants.Applications.Content))
             {
                 ShowUserValidationError("<h3>The current user doesn't have access to this application</h3><p>Please contact the system administrator if you think that you should have access.</p>");
                 return false;
