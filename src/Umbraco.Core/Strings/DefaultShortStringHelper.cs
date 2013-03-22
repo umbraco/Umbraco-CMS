@@ -20,6 +20,11 @@ namespace Umbraco.Core.Strings
     {
         #region Ctor and vars
 
+        static DefaultShortStringHelper()
+        {
+            InitializeLegacyUrlReplaceCharacters();
+        }
+
         /// <summary>
         /// Freezes the helper so it can prevents its configuration from being modified.
         /// </summary>
@@ -43,6 +48,33 @@ namespace Umbraco.Core.Strings
         //{
         //    ValidStringCharacters = ValidStringCharactersSource.ToCharArray();
         //}
+
+        #endregion
+
+        #region Legacy UrlReplaceCharacters
+
+        static readonly Dictionary<string, string> UrlReplaceCharacters = new Dictionary<string, string>();
+
+        static void InitializeLegacyUrlReplaceCharacters()
+        {
+            var replaceChars = UmbracoSettings.UrlReplaceCharacters;
+            foreach (var node in replaceChars.SelectNodes("char").Cast<System.Xml.XmlNode>())
+            {
+                var org = node.Attributes.GetNamedItem("org");
+                if (org != null && org.Value != "")
+                    UrlReplaceCharacters[org.Value] = XmlHelper.GetNodeValue(node);
+            }
+        }
+
+        /// <summary>
+        /// Returns a new string in which characters have been replaced according to the Umbraco settings UrlReplaceCharacters.
+        /// </summary>
+        /// <param name="s">The string to filter.</param>
+        /// <returns>The filtered string.</returns>
+        public static string ApplyUrlReplaceCharacters(string s)
+        {
+            return s.ReplaceMany(UrlReplaceCharacters);
+        }
 
         #endregion
 
