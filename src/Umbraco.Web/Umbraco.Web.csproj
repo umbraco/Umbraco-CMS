@@ -329,13 +329,13 @@
     <Compile Include="PublishedCache\ContextualPublishedContentCache.cs" />
     <Compile Include="PublishedCache\ContextualPublishedCache.cs" />
     <Compile Include="PublishedCache\ContextualPublishedMediaCache.cs" />
-    <Compile Include="PublishedCache\LegacyXmlCache\PublishedMediaCache.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\PublishedMediaCache.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
     <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
     <Compile Include="Mvc\ControllerFactoryExtensions.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
-    <Compile Include="PublishedCache\LegacyXmlCache\RoutesCache.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\RoutesCache.cs" />
     <Compile Include="Routing\UrlProviderMode.cs" />
     <Compile Include="Search\ExamineIndexerModel.cs" />
     <Compile Include="Search\LuceneIndexerExtensions.cs" />
@@ -554,7 +554,7 @@
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="Mvc\ViewContextExtensions.cs" />
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
-    <Compile Include="PublishedCache\LegacyXmlCache\PublishedContentCache.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\PublishedContentCache.cs" />
     <Compile Include="Routing\PublishedContentNotFoundHandler.cs" />
     <Compile Include="Models\XmlPublishedContent.cs" />
     <Compile Include="Models\XmlPublishedContentProperty.cs" />

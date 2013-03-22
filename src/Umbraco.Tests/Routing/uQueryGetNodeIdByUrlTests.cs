@@ -7,7 +7,7 @@ using Umbraco.Tests.Stubs;
 using Umbraco.Tests.TestHelpers;
 using System.Configuration;
 using Umbraco.Web;
-using Umbraco.Web.PublishedCache.LegacyXmlCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.template;

@@ -10,7 +10,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.PublishedCache.LegacyXmlCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Web.Cache
 {

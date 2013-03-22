@@ -5,7 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.PublishedCache.LegacyXmlCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Tests.PublishedContent
 {
