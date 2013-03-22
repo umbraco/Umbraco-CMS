@@ -330,7 +330,7 @@
     <Compile Include="businesslogic\language\Language.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\language\Text.cs">
+    <Compile Include="businesslogic\language\Item.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="businesslogic\macro\Macro.cs">

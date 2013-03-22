@@ -31,8 +31,10 @@ namespace Umbraco.Web.Cache
         }
 
         public override void Remove(int id)
-        {
+        {            
             ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.LanguageCacheKey);
+            //when a language is removed we must also clear the text cache!
+            global::umbraco.cms.businesslogic.language.Item.ClearCache();
             base.Remove(id);
         }
     }

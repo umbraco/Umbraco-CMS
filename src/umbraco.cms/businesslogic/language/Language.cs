@@ -82,29 +82,31 @@ namespace umbraco.cms.businesslogic.language
         /// Creates a new language given the culture code - ie. da-dk  (denmark)
         /// </summary>
         /// <param name="cultureCode">Culturecode of the language</param>
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public static void MakeNew(string cultureCode)
         {
-            var culture = GetCulture(cultureCode);
-            if (culture != null)
+            lock (Locker)
             {
-                //insert it
-                SqlHelper.ExecuteNonQuery(
-                    "insert into umbracoLanguage (languageISOCode) values (@CultureCode)",
-                    SqlHelper.CreateParameter("@CultureCode", cultureCode));
-
-                //get it's id
-                var newId = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoLanguage WHERE languageISOCode=@cultureCode", SqlHelper.CreateParameter("@cultureCode", cultureCode));
-
-                //load it and raise events
-                using (var dr = SqlHelper.ExecuteReader(string.Format("{0} where id = {1}", m_SQLOptimizedGetAll, newId)))
+                var culture = GetCulture(cultureCode);
+                if (culture != null)
                 {
-                    while (dr.Read())
+                    //insert it
+                    SqlHelper.ExecuteNonQuery(
+                        "insert into umbracoLanguage (languageISOCode) values (@CultureCode)",
+                        SqlHelper.CreateParameter("@CultureCode", cultureCode));
+
+                    //get it's id
+                    var newId = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoLanguage WHERE languageISOCode=@cultureCode", SqlHelper.CreateParameter("@cultureCode", cultureCode));
+
+                    //load it and raise events
+                    using (var dr = SqlHelper.ExecuteReader(string.Format("{0} where id = {1}", m_SQLOptimizedGetAll, newId)))
                     {
-                        
-                        var ct = new Language();
-                        ct.PopulateFromReader(dr);
-                        ct.OnNew(new NewEventArgs());
+                        while (dr.Read())
+                        {
+
+                            var ct = new Language();
+                            ct.PopulateFromReader(dr);
+                            ct.OnNew(new NewEventArgs());
+                        }
                     }
                 }
             }

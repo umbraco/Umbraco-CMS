@@ -11,7 +11,7 @@ namespace Umbraco.Web.Cache
     /// <summary>
     /// Extension methods for DistrubutedCache
     /// </summary>
-    public static class DistributedCacheExtensions
+    internal static class DistributedCacheExtensions
     {
         #region User cache
         public static void RemoveUserCache(this DistributedCache dc, int userId)
@@ -47,6 +47,30 @@ namespace Umbraco.Web.Cache
         } 
 
         #endregion
+
+        #region Dictionary cache
+        /// <summary>
+        /// Refreshes the cache amongst servers for a dictionary item
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="dictionaryItemId"></param>
+        public static void RefreshDictionaryCache(this DistributedCache dc, int dictionaryItemId)
+        {
+            dc.Refresh(new Guid(DistributedCache.DictionaryCacheRefresherId), dictionaryItemId);
+        }
+
+        /// <summary>
+        /// Refreshes the cache amongst servers for a dictionary item
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="dictionaryItemId"></param>
+        public static void RemoveDictionaryCache(this DistributedCache dc, int dictionaryItemId)
+        {
+            dc.Remove(new Guid(DistributedCache.DictionaryCacheRefresherId), dictionaryItemId);
+        }
+
+        #endregion
+
 
         #region Data type cache
         /// <summary>
@@ -179,7 +203,7 @@ namespace Umbraco.Web.Cache
         /// <param name="media"></param>
         public static void RemoveMediaCache(this DistributedCache dc, params IMedia[] media)
         {
-            dc.RemoveByJson(new Guid(DistributedCache.MediaCacheRefresherId), 
+            dc.RefreshByJson(new Guid(DistributedCache.MediaCacheRefresherId), 
                 MediaCacheRefresher.SerializeToJsonPayload(media));
         } 
 
@@ -220,7 +244,7 @@ namespace Umbraco.Web.Cache
         {
             if (macro != null)
             {
-                dc.RemoveByJson(new Guid(DistributedCache.MacroCacheRefresherId),
+                dc.RefreshByJson(new Guid(DistributedCache.MacroCacheRefresherId),
                     MacroCacheRefresher.SerializeToJsonPayload(macro));
             }
         }
@@ -234,7 +258,7 @@ namespace Umbraco.Web.Cache
         {
             if (macro != null && macro.Model != null)
             {
-                dc.RemoveByJson(new Guid(DistributedCache.MacroCacheRefresherId),
+                dc.RefreshByJson(new Guid(DistributedCache.MacroCacheRefresherId),
                     MacroCacheRefresher.SerializeToJsonPayload(macro));
             }
         } 
@@ -282,7 +306,7 @@ namespace Umbraco.Web.Cache
             if (contentType != null)
             {
                 //dc.Remove(new Guid(DistributedCache.ContentTypeCacheRefresherId), x => x.Id, contentType);
-                dc.RemoveByJson(new Guid(DistributedCache.ContentTypeCacheRefresherId),
+                dc.RefreshByJson(new Guid(DistributedCache.ContentTypeCacheRefresherId),
                     ContentTypeCacheRefresher.SerializeToJsonPayload(true, contentType));
             }
         }
@@ -297,7 +321,7 @@ namespace Umbraco.Web.Cache
             if (mediaType != null)
             {
                 //dc.Remove(new Guid(DistributedCache.ContentTypeCacheRefresherId), x => x.Id, mediaType);
-                dc.RemoveByJson(new Guid(DistributedCache.ContentTypeCacheRefresherId),
+                dc.RefreshByJson(new Guid(DistributedCache.ContentTypeCacheRefresherId),
                     ContentTypeCacheRefresher.SerializeToJsonPayload(true, mediaType));
             }
         } 

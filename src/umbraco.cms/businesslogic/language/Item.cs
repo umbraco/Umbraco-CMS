@@ -10,14 +10,13 @@ using System.Collections.Generic;
 namespace umbraco.cms.businesslogic.language
 {
     /// <summary>
-    /// Item class contains method for accessing language translated text, its a generic component which
-    /// can be used for storing language translated content, all items are associated to an unique identifier (Guid)
-    /// 
-    /// The data is cached and are usable in the public website.
-    /// 
-    /// Primarily used by the built-in dictionary
-    /// 
+    /// THIS CLASS IS NOT INTENDED TO BE USED DIRECTLY IN YOUR CODE, USE THE umbraco.cms.businesslogic.Dictionary class instead
     /// </summary>
+    /// <remarks>
+    /// This class is used by the DictionaryItem, all caching is handled in the DictionaryItem.Save() method which will ensure that
+    /// cache is invalidated if anything is changed.
+    /// </remarks>
+    [Obsolete("THIS CLASS IS NOT INTENDED TO BE USED DIRECTLY IN YOUR CODE, USE THE umbraco.cms.businesslogic.Dictionary class instead")]
     public class Item
     {
         private static readonly ConcurrentDictionary<Guid, Dictionary<int, string>> Items = new ConcurrentDictionary<Guid, Dictionary<int, string>>();        
@@ -36,7 +35,7 @@ namespace umbraco.cms.businesslogic.language
         /// <summary>
         /// Populates the global hash table with the data from the database.
         /// </summary>
-        private static void EnsureData()
+        private static void EnsureCache()
         {
             if (!_isInitialize)
             {
@@ -54,7 +53,16 @@ namespace umbraco.cms.businesslogic.language
                                 var uniqueId = dr.GetGuid("UniqueId");
                                 var text = dr.GetString("value");
 
-                                UpdateCache(languageId, uniqueId, text);
+                                Items.AddOrUpdate(uniqueId, guid =>
+                                    {
+                                        var languagevalues = new Dictionary<int, string> { { languageId, text } };
+                                        return languagevalues;
+                                    }, (guid, dictionary) =>
+                                        {
+                                            // add/update the text for the id
+                                            dictionary[languageId] = text;
+                                            return dictionary;
+                                        });
                             }
                         }                        
                         _isInitialize = true;
@@ -64,20 +72,16 @@ namespace umbraco.cms.businesslogic.language
             }
         }
 
-        private static void UpdateCache(int languageId, Guid key, string text)
+        /// <summary>
+        /// Clears the cache, this is used for cache refreshers to ensure that the cache is up to date across all servers 
+        /// </summary>
+        internal static void ClearCache()
         {
-            Items.AddOrUpdate(key, guid =>
-                {
-                    var languagevalues = new Dictionary<int, string> {{languageId, text}};
-                    return languagevalues;
-                }, (guid, dictionary) =>
-                    {
-                        // add/update the text for the id
-                        dictionary[languageId] = text;
-                        return dictionary;
-                    });
+            Items.Clear();
+            //reset the flag so that we re-lookup the cache
+            _isInitialize = false;
         }
-        
+
         /// <summary>
         /// Retrieves the value of a languagetranslated item given the key
         /// </summary>
@@ -86,7 +90,7 @@ namespace umbraco.cms.businesslogic.language
         /// <returns>The language translated text</returns>
         public static string Text(Guid key, int languageId)
         {
-            EnsureData();
+            EnsureCache();
 
             Dictionary<int, string> val;
             if (Items.TryGetValue(key, out val))
@@ -104,7 +108,7 @@ namespace umbraco.cms.businesslogic.language
         /// <returns>returns True if there is a value associated to the unique identifier with the specified language</returns>
         public static bool hasText(Guid key, int languageId)
         {
-            EnsureData();
+            EnsureCache();
 
             Dictionary<int, string> val;
             if (Items.TryGetValue(key, out val))
@@ -124,16 +128,12 @@ namespace umbraco.cms.businesslogic.language
 
         public static void setText(int languageId, Guid key, string value)
         {
-            EnsureData();
-
             if (!hasText(key, languageId)) throw new ArgumentException("Key does not exist");
             
             SqlHelper.ExecuteNonQuery("Update cmsLanguageText set [value] = @value where LanguageId = @languageId And UniqueId = @key",
                 SqlHelper.CreateParameter("@value", value),
                 SqlHelper.CreateParameter("@languageId", languageId),
                 SqlHelper.CreateParameter("@key", key));
-
-            UpdateCache(languageId, key, value);
         }
 
         /// <summary>
@@ -145,16 +145,12 @@ namespace umbraco.cms.businesslogic.language
         /// <param name="value"></param>
         public static void addText(int languageId, Guid key, string value)
         {
-            EnsureData();
-
             if (hasText(key, languageId)) throw new ArgumentException("Key being add'ed already exists");
             
             SqlHelper.ExecuteNonQuery("Insert Into cmsLanguageText (languageId,UniqueId,[value]) values (@languageId, @key, @value)",
                 SqlHelper.CreateParameter("@languageId", languageId),
                 SqlHelper.CreateParameter("@key", key),
                 SqlHelper.CreateParameter("@value", value));
-
-            UpdateCache(languageId, key, value);
         }
         
         /// <summary>
@@ -163,15 +159,9 @@ namespace umbraco.cms.businesslogic.language
         /// <param name="key">Unique identifier</param>
         public static void removeText(Guid key)
         {
-            EnsureData();
-
             // remove from database
             SqlHelper.ExecuteNonQuery("Delete from cmsLanguageText where UniqueId =  @key",
                 SqlHelper.CreateParameter("@key", key));
-
-            // remove from cache
-            Dictionary<int, string> val;
-            Items.TryRemove(key, out val);
         }
 
         /// <summary>
@@ -181,25 +171,10 @@ namespace umbraco.cms.businesslogic.language
         /// <param name="languageId"></param>
         public static void RemoveByLanguage(int languageId)
         {
-            EnsureData();
-
             // remove from database
             SqlHelper.ExecuteNonQuery("Delete from cmsLanguageText where languageId =  @languageId",
                 SqlHelper.CreateParameter("@languageId", languageId));
 
-            //we need to lock here because the inner dictionary is not concurrent, seems overkill to have a nested concurrent dictionary
-            lock (Locker)
-            {
-                //delete all of the items belonging to the language
-                foreach (var entry in Items.Values)
-                {
-                    if (entry.ContainsKey(languageId))
-                    {
-                        entry.Remove(languageId);
-                    }
-                }    
-            }
-            
         }
     }
 }

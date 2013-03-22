@@ -95,12 +95,6 @@ namespace Umbraco.Web.Cache
             base.Refresh(jsonPayload);
         }
 
-        public override void Remove(string jsonPayload)
-        {
-            ClearCache(DeserializeFromJsonPayload(jsonPayload));
-            base.Remove(jsonPayload);
-        }
-
         public override void Refresh(int id)
         {
             ClearCache(FromMedia(ApplicationContext.Current.Services.MediaService.GetById(id)));

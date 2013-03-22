@@ -91,15 +91,6 @@ namespace Umbraco.Core.Sync
                 instances);
         }
 
-        public void PerformRemove(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, string jsonPayload)
-        {
-            if (servers == null) throw new ArgumentNullException("servers");
-            if (refresher == null) throw new ArgumentNullException("refresher");
-            if (jsonPayload == null) throw new ArgumentNullException("jsonPayload");
-
-            MessageSeversForIdsOrJson(servers, refresher, MessageType.RemoveByJson, jsonPayload: jsonPayload);
-        }
-
         public void PerformRemove<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
         {
             if (servers == null) throw new ArgumentNullException("servers");
@@ -283,15 +274,7 @@ namespace Umbraco.Core.Sync
                     }
 
                     //if we are not, then just invoke the call on the cache refresher
-                    switch (dispatchType)
-                    {
-                        case MessageType.RefreshByJson:
-                            jsonRefresher.Refresh(jsonPayload);
-                            break;
-                        case MessageType.RemoveByJson:
-                            jsonRefresher.Remove(jsonPayload);
-                            break;
-                    }
+                    jsonRefresher.Refresh(jsonPayload);
                 }
             }
         }
@@ -380,12 +363,7 @@ namespace Umbraco.Core.Sync
                                 asyncResultsList.Add(
                                     cacheRefresher.BeginRefreshByJson(
                                         refresher.UniqueIdentifier, jsonPayload, _login, _password, null, null));
-                                break;
-                            case MessageType.RemoveByJson:
-                                asyncResultsList.Add(
-                                    cacheRefresher.BeginRemoveByJson(
-                                        refresher.UniqueIdentifier, jsonPayload, _login, _password, null, null));
-                                break;
+                                break;                            
                             case MessageType.RefreshAll:
                                 asyncResultsList.Add(
                                     cacheRefresher.BeginRefreshAll(
@@ -437,9 +415,6 @@ namespace Umbraco.Core.Sync
                             {
                                 case MessageType.RefreshByJson:
                                     cacheRefresher.EndRefreshByJson(t);
-                                    break;
-                                case MessageType.RemoveByJson:
-                                    cacheRefresher.EndRemoveByJson(t);
                                     break;
                                 case MessageType.RefreshAll:
                                     cacheRefresher.EndRefreshAll(t);

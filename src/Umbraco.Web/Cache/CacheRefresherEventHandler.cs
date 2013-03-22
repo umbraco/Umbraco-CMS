@@ -23,6 +23,15 @@ namespace Umbraco.Web.Cache
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {          
 
+            //Bind to dictionary events
+            //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
+
+            global::umbraco.cms.businesslogic.Dictionary.DictionaryItem.New += DictionaryItemNew;
+            global::umbraco.cms.businesslogic.Dictionary.DictionaryItem.Saving +=DictionaryItemSaving;
+            global::umbraco.cms.businesslogic.Dictionary.DictionaryItem.Deleted +=DictionaryItemDeleted;
+            LocalizationService.DeletedDictionaryItem += LocalizationServiceDeletedDictionaryItem;
+            LocalizationService.SavedDictionaryItem += LocalizationServiceSavedDictionaryItem;
+
             //Bind to data type events
             //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
 
@@ -97,6 +106,35 @@ namespace Umbraco.Web.Cache
             MediaService.Trashing += MediaServiceTrashing;
         }
 
+        #region Dictionary event handlers
+
+        static void LocalizationServiceSavedDictionaryItem(ILocalizationService sender, Core.Events.SaveEventArgs<IDictionaryItem> e)
+        {
+            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshDictionaryCache(x.Id));
+        }
+
+        static void LocalizationServiceDeletedDictionaryItem(ILocalizationService sender, Core.Events.DeleteEventArgs<IDictionaryItem> e)
+        {
+            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveDictionaryCache(x.Id));
+        }
+
+        static void DictionaryItemDeleted(global::umbraco.cms.businesslogic.Dictionary.DictionaryItem sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RemoveDictionaryCache(sender.id);
+        }
+
+        static void DictionaryItemSaving(global::umbraco.cms.businesslogic.Dictionary.DictionaryItem sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RefreshDictionaryCache(sender.id);
+        }
+
+        static void DictionaryItemNew(global::umbraco.cms.businesslogic.Dictionary.DictionaryItem sender, System.EventArgs e)
+        {
+            DistributedCache.Instance.RefreshDictionaryCache(sender.id);
+        } 
+
+        #endregion
+
         #region DataType event handlers
         static void DataTypeServiceSaved(IDataTypeService sender, Core.Events.SaveEventArgs<IDataTypeDefinition> e)
         {
@@ -132,12 +170,12 @@ namespace Umbraco.Web.Cache
 
         static void FileServiceDeletedStylesheet(IFileService sender, Core.Events.DeleteEventArgs<Stylesheet> e)
         {
-            e.DeletedEntities.ForEach(DistributedCache.Instance.RemoveStylesheetCache);
+            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveStylesheetCache(x));
         }
 
         static void FileServiceSavedStylesheet(IFileService sender, Core.Events.SaveEventArgs<Stylesheet> e)
         {
-            e.SavedEntities.ForEach(DistributedCache.Instance.RefreshStylesheetCache);
+            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshStylesheetCache(x));
         }
 
         static void StyleSheetAfterSave(StyleSheet sender, SaveEventArgs e)

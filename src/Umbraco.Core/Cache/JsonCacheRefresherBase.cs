@@ -16,10 +16,5 @@ namespace Umbraco.Core.Cache
         {            
             OnCacheUpdated(Instance, new CacheRefresherEventArgs(jsonPayload, MessageType.RefreshByJson));
         }
-
-        public virtual void Remove(string jsonPayload)
-        {
-            OnCacheUpdated(Instance, new CacheRefresherEventArgs(jsonPayload, MessageType.RemoveByJson));
-        }
     }
 }
