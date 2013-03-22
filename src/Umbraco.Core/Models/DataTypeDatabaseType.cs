@@ -15,12 +15,12 @@ namespace Umbraco.Core.Models
     public enum DataTypeDatabaseType
     {
         [EnumMember]
-        Integer,
-        [EnumMember]
-        Date,
+        Ntext,
         [EnumMember]
         Nvarchar,
         [EnumMember]
-        Ntext /*, Object*/
+        Integer,
+        [EnumMember]
+        Date
     }
 }

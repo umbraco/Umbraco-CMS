@@ -95,6 +95,15 @@ namespace Umbraco.Core.Models.EntityBase
         /// </summary>
         [DataMember]
         public DateTime UpdateDate
+        /// Gets or sets the WasCancelled flag, which is used to track
+        /// whether some action against an entity was cancelled through some event.
+        /// This only exists so we have a way to check if an event was cancelled through
+        /// the new api, which also needs to take effect in the legacy api.
+        /// </summary>
+        [IgnoreDataMember]
+        internal bool WasCancelled { get; set; }
+
+        /// <summary>
         {
             get { return _updateDate; }
             set

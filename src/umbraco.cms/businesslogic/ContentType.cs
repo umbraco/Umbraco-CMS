@@ -600,10 +600,17 @@ namespace umbraco.cms.businesslogic
                 if (value != MasterContentType)
                 {
                     //TODO: Add support for multiple masters
-                    foreach (var mct in MasterContentTypes)
+                    /*foreach (var mct in MasterContentTypes)
                     {
                         RemoveParentContentType(mct);
+                    }*/
+
+                    if (MasterContentTypes.Count > 0)
+                    {
+                        var masterId = MasterContentTypes[0];
+                        RemoveParentContentType(masterId);
                     }
+
                     AddParentContentType(value);
                 }
             }

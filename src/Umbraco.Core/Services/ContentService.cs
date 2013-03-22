@@ -68,11 +68,14 @@ namespace Umbraco.Core.Services
 	    /// <returns><see cref="IContent"/></returns>
 	    public IContent CreateContent(string name, int parentId, string contentTypeAlias, int userId = 0)
 		{
-		    IContentType contentType = FindContentTypeByAlias(contentTypeAlias);
-            IContent content = new Content(name, parentId, contentType);
+		    var contentType = FindContentTypeByAlias(contentTypeAlias);
+            var content = new Content(name, parentId, contentType); ;
 
 			if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
-				return content;
+			{
+			    content.WasCancelled = true;
+			    return content;
+			}
 
 	        content.CreatorId = userId;
 			content.WriterId = userId;
@@ -95,11 +98,14 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IContent"/></returns>
         public IContent CreateContent(string name, IContent parent, string contentTypeAlias, int userId = 0)
         {
-            IContentType contentType = FindContentTypeByAlias(contentTypeAlias);
-            IContent content = new Content(name, parent, contentType);
+            var contentType = FindContentTypeByAlias(contentTypeAlias);
+            var content = new Content(name, parent, contentType);
 
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parent), this))
+            {
+                content.WasCancelled = true;
                 return content;
+            }
 
             content.CreatorId = userId;
             content.WriterId = userId;
@@ -814,9 +820,9 @@ namespace Umbraco.Core.Services
 
                 if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IContent>(content, parentId), this))
                     return;
-
+	            
                 content.WriterId = userId;
-                if (parentId == -1)
+	            if (parentId == -1)
                 {
                     content.Path = string.Concat("-1,", content.Id);
                     content.Level = 1;
