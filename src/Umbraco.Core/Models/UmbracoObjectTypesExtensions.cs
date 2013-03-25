@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Models
@@ -8,6 +9,8 @@ namespace Umbraco.Core.Models
     /// </summary>
     public static class UmbracoObjectTypesExtensions
     {
+        private static readonly Dictionary<UmbracoObjectTypes, Guid> UmbracoObjectTypeCache = new Dictionary<UmbracoObjectTypes,Guid>();
+
         /// <summary>
         /// Get an UmbracoObjectTypes value from it's name
         /// </summary>
@@ -45,9 +48,14 @@ namespace Umbraco.Core.Models
         /// <returns>a GUID value of the UmbracoObjectTypes</returns>
         public static Guid GetGuid(this UmbracoObjectTypes umbracoObjectType)
         {
+            if (UmbracoObjectTypeCache.ContainsKey(umbracoObjectType))
+                return UmbracoObjectTypeCache[umbracoObjectType];
+
             var attribute = umbracoObjectType.GetType().FirstAttribute<UmbracoObjectTypeAttribute>();
             if (attribute == null)
                 return Guid.Empty;
+
+            UmbracoObjectTypeCache.Add(umbracoObjectType, attribute.ObjectId);
 
             return attribute.ObjectId;
         }
