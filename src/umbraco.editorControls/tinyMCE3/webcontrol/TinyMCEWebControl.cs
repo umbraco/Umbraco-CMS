@@ -329,7 +329,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
 
                 try
                 {
-                    var pathStart = orgSrc.Substring(0, orgSrc.LastIndexOf("_", StringComparison.Ordinal)) + "%";
+                    var pathStart = orgSrc.Contains("_") ? orgSrc.Substring(0, orgSrc.LastIndexOf("_", StringComparison.Ordinal)) + "%" : orgSrc;
 
                     var mediaId = BusinessLogic.Application.SqlHelper.ExecuteScalar<int>(string.Format("SELECT contentNodeId FROM cmsPropertyData WHERE dataNvarchar LIKE '{0}'", pathStart));
 
