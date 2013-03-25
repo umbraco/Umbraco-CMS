@@ -9,7 +9,6 @@
         RefreshById,
         RefreshByJson,
         RemoveById,
-        RemoveByJson,
         RefreshByInstance,
         RemoveByInstance
     }

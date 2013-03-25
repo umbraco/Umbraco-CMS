@@ -45,34 +45,7 @@ namespace Umbraco.Core.Sync
         {
             this.EndInvoke(asyncResult);
         }
-
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://umbraco.org/webservices/RemoveByJson", RequestNamespace = "http://umbraco.org/webservices/", ResponseNamespace = "http://umbraco.org/webservices/", Use = System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
-        public void RemoveByJson(System.Guid uniqueIdentifier, string jsonPayload, string Login, string Password)
-        {
-            this.Invoke("RemoveByJson", new object[] {
-														  uniqueIdentifier,
-														  jsonPayload,
-														  Login,
-														  Password});
-        }
-
-        /// <remarks/>
-        public System.IAsyncResult BeginRemoveByJson(System.Guid uniqueIdentifier, string jsonPayload, string Login, string Password, System.AsyncCallback callback, object asyncState)
-        {
-            return this.BeginInvoke("RemoveByJson", new object[] {
-																	  uniqueIdentifier,
-																	  jsonPayload,
-																	  Login,
-																	  Password}, callback, asyncState);
-        }
-
-        /// <remarks/>
-        public void EndRemoveByJson(System.IAsyncResult asyncResult)
-        {
-            this.EndInvoke(asyncResult);
-        }
-
+        
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://umbraco.org/webservices/RefreshByJson", RequestNamespace = "http://umbraco.org/webservices/", ResponseNamespace = "http://umbraco.org/webservices/", Use = System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
         public void RefreshByJson(System.Guid uniqueIdentifier, string jsonPayload, string Login, string Password)

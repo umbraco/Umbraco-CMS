@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Data;
 using System.Xml;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace umbraco.cms.businesslogic
     {
         private static volatile bool _cacheIsEnsured = false;
         private static readonly object Locker = new object();
-        private static readonly Hashtable DictionaryItems = Hashtable.Synchronized(new Hashtable());
+        private static readonly ConcurrentDictionary<string, DictionaryItem> DictionaryItems = new ConcurrentDictionary<string, DictionaryItem>();
         private static readonly Guid TopLevelParent = new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde");
 
         protected static ISqlHelper SqlHelper
@@ -48,10 +49,7 @@ namespace umbraco.cms.businesslogic
                                     dr.GetGuid("id"),
                                     dr.GetGuid("parent"));
 
-                                if (!DictionaryItems.ContainsKey(item.key))
-                                {
-                                    DictionaryItems.Add(item.key, item);
-                                }
+                                DictionaryItems.TryAdd(item.key, item);
                             }
                         }
 
@@ -59,6 +57,16 @@ namespace umbraco.cms.businesslogic
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Used by the cache refreshers to clear the cache on distributed servers
+        /// </summary>
+        internal static void ClearCache()
+        {
+            DictionaryItems.Clear();
+            //ensure the flag is reset so that EnsureCache will re-cache everything
+            _cacheIsEnsured = false;
         }
 
         /// <summary>
@@ -70,7 +78,7 @@ namespace umbraco.cms.businesslogic
             {
                 EnsureCache();
 
-                return DictionaryItems.Values.Cast<DictionaryItem>()
+                return DictionaryItems.Values
                     .Where(x => x.ParentId == TopLevelParent).OrderBy(item => item.key)
                     .ToArray();
             }
@@ -107,7 +115,7 @@ namespace umbraco.cms.businesslogic
             {
                 EnsureCache();
 
-                var item = DictionaryItems.Values.Cast<DictionaryItem>().SingleOrDefault(x => x.key == key);
+                var item = DictionaryItems.Values.SingleOrDefault(x => x.key == key);
 
                 if (item == null)
                 {
@@ -124,7 +132,7 @@ namespace umbraco.cms.businesslogic
             {
                 EnsureCache();
 
-                var item = DictionaryItems.Values.Cast<DictionaryItem>().SingleOrDefault(x => x.UniqueId == id);
+                var item = DictionaryItems.Values.SingleOrDefault(x => x.UniqueId == id);
 
                 if (item == null)
                 {
@@ -141,7 +149,7 @@ namespace umbraco.cms.businesslogic
             {
                 EnsureCache();
 
-                var item = DictionaryItems.Values.Cast<DictionaryItem>().SingleOrDefault(x => x.id == id);
+                var item = DictionaryItems.Values.SingleOrDefault(x => x.id == id);
 
                 if (item == null)
                 {
@@ -161,7 +169,8 @@ namespace umbraco.cms.businesslogic
             /// </summary>
             public bool IsTopMostItem()
             {
-                return DictionaryItems.Values.Cast<DictionaryItem>()
+                EnsureCache();
+                return DictionaryItems.Values
                     .Where(x => x.id == id)
                     .Select(x => x.ParentId)
                     .SingleOrDefault() == TopLevelParent;
@@ -174,9 +183,10 @@ namespace umbraco.cms.businesslogic
             {
                 get
                 {
+                    EnsureCache();
                     if (_parent == null)
                     {
-                        var p = DictionaryItems.Values.Cast<DictionaryItem>().SingleOrDefault(x => x.UniqueId == this.ParentId);
+                        var p = DictionaryItems.Values.SingleOrDefault(x => x.UniqueId == this.ParentId);
 
                         if (p == null)
                         {
@@ -205,7 +215,8 @@ namespace umbraco.cms.businesslogic
             {
                 get
                 {
-                    return DictionaryItems.Values.Cast<DictionaryItem>()
+                    EnsureCache();
+                    return DictionaryItems.Values
                         .Where(x => x.ParentId == this.UniqueId).OrderBy(item => item.key)
                         .ToArray();
                 }
@@ -221,7 +232,8 @@ namespace umbraco.cms.businesslogic
             {
                 get
                 {
-                    return (SqlHelper.ExecuteScalar<int>("select count([key]) as tmp from cmsDictionary where parent=@uniqueId", SqlHelper.CreateParameter("@uniqueId", UniqueId)) > 0);
+                    EnsureCache();
+                    return DictionaryItems.Values.Any(x => x.ParentId == UniqueId);
                 }
             }
 
@@ -239,10 +251,7 @@ namespace umbraco.cms.businesslogic
                         {
                             SqlHelper.ExecuteNonQuery("Update cmsDictionary set [key] = @key WHERE pk = @Id", SqlHelper.CreateParameter("@key", value),
                                 SqlHelper.CreateParameter("@Id", id));
-
-                            //remove the cached item since the key is different
-                            DictionaryItems.Remove(key);
-
+                            
                             using (IRecordsReader dr =
                                 SqlHelper.ExecuteReader("Select pk, id, [key], parent from cmsDictionary where id=@id",
                             SqlHelper.CreateParameter("@id", this.UniqueId)))
@@ -254,12 +263,10 @@ namespace umbraco.cms.businesslogic
                                         dr.GetString("key"),
                                         dr.GetGuid("id"),
                                         dr.GetGuid("parent"));
-
-                                    DictionaryItems.Add(item.key, item);
                                 }
                                 else
                                 {
-                                    throw new DataException("Could not load updated created dictionary item with id " + id.ToString());
+                                    throw new DataException("Could not load updated created dictionary item with id " + id);
                                 }
                             }
 
@@ -285,13 +292,13 @@ namespace umbraco.cms.businesslogic
 
             public void setValue(int languageId, string value)
             {
-                // Calling Save method triggers the Saving event
-                Save();
-
                 if (Item.hasText(UniqueId, languageId))
                     Item.setText(languageId, UniqueId, value);
                 else
                     Item.addText(languageId, UniqueId, value);
+
+                // Calling Save method triggers the Saving event
+                Save();
             }
 
             public string Value()
@@ -310,13 +317,13 @@ namespace umbraco.cms.businesslogic
             /// <param name="value"></param>
             public void setValue(string value)
             {
-                // Calling Save method triggers the Saving event
-                Save();
-
                 if (Item.hasText(UniqueId, 0))
                     Item.setText(0, UniqueId, value);
                 else
                     Item.addText(0, UniqueId, value);
+
+                // Calling Save method triggers the Saving event
+                Save();
             }
 
             public static int addKey(string key, string defaultValue, string parentKey)
@@ -353,11 +360,12 @@ namespace umbraco.cms.businesslogic
                 // remove key from database
                 SqlHelper.ExecuteNonQuery("delete from cmsDictionary where [key] = @key", SqlHelper.CreateParameter("@key", key));
 
-                // Remove key from cache
-                DictionaryItems.Remove(key);
+                OnDeleted(EventArgs.Empty);
             }
 
-            [Obsolete("Does not save the dictionary item, use setValue() instead.")]
+            /// <summary>
+            /// ensures events fire after setting proeprties
+            /// </summary>
             public void Save()
             {
                 OnSaving(EventArgs.Empty);
@@ -403,12 +411,12 @@ namespace umbraco.cms.businesslogic
                 DictionaryItem newItem;
                 bool retVal = false;
 
-                if (!DictionaryItem.hasKey(key))
+                if (!hasKey(key))
                 {
                     if (parent != null)
-                        DictionaryItem.addKey(key, " ", parent.key);
+                        addKey(key, " ", parent.key);
                     else
-                        DictionaryItem.addKey(key, " ");
+                        addKey(key, " ");
 
                     if (values.Count > 0)
                     {
@@ -467,9 +475,7 @@ namespace umbraco.cms.businesslogic
                                 dr.GetString("key"),
                                 dr.GetGuid("id"),
                                 dr.GetGuid("parent"));
-
-                            DictionaryItems.Add(item.key, item);
-
+                            
                             item.setValue(defaultValue);
 
                             item.OnNew(EventArgs.Empty);
@@ -513,6 +519,13 @@ namespace umbraco.cms.businesslogic
             {
                 if (Deleting != null)
                     Deleting(this, e);
+            }
+
+            public static event DeleteEventHandler Deleted;
+            protected virtual void OnDeleted(EventArgs e)
+            {
+                if (Deleted != null)
+                    Deleted(this, e);
             }
             #endregion
         }

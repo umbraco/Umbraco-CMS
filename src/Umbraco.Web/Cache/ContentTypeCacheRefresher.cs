@@ -157,17 +157,6 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
-        /// Removes the cache using the custom jsonPayload provided
-        /// </summary>
-        /// <param name="jsonPayload"></param>
-        public override void Remove(string jsonPayload)
-        {
-            var payload = DeserializeFromJsonPayload(jsonPayload);
-            ClearContentTypeCache(payload);
-            base.Remove(jsonPayload);
-        }
-
-        /// <summary>
         /// This clears out all cache associated with a content type
         /// </summary>
         /// <param name="payloads"></param>

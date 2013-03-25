@@ -238,6 +238,7 @@ namespace Umbraco.Tests.BusinessLogic
             var newKey = "NEWKEY" + Guid.NewGuid().ToString("N");
             
             d.key = newKey;
+            d.Save();
             Assert.AreNotEqual(oldKey, d.key);
             Assert.AreEqual(newKey, d.key);
 

@@ -61,7 +61,8 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void SetupApplicationContext()
         {
-            ApplicationContext.Current = new ApplicationContext {IsReady = true};
+            //DO NOT ENABLE CACHE
+            ApplicationContext.Current = new ApplicationContext(false) {IsReady = true};
         }
 
         /// <summary>

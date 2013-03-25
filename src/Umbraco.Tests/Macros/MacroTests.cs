@@ -18,7 +18,8 @@ namespace Umbraco.Tests.Macros
         [SetUp]
         public void Setup()
         {
-            ApplicationContext.Current = new ApplicationContext();
+            //we DO want cache enabled for these tests
+            ApplicationContext.Current = new ApplicationContext(true);
         }
 
         [TearDown]

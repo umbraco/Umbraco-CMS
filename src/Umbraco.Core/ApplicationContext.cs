@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Threading;
 using System.Web;
 using System.Web.Caching;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
@@ -23,26 +24,46 @@ namespace Umbraco.Core
         /// Constructor
         /// </summary>        
         internal ApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
-			:this()
+            : this(dbContext, serviceContext, true)
     	{
-    		if (dbContext == null) throw new ArgumentNullException("dbContext");
-    		if (serviceContext == null) throw new ArgumentNullException("serviceContext");
-
-			_databaseContext = dbContext;
-			_services = serviceContext;			
+    			
     	}
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="dbContext"></param>
+        /// <param name="serviceContext"></param>
+        /// <param name="enableCache"></param>
+        internal ApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext, bool enableCache)
+            : this(enableCache)
+        {
+            if (dbContext == null) throw new ArgumentNullException("dbContext");
+            if (serviceContext == null) throw new ArgumentNullException("serviceContext");
+
+            _databaseContext = dbContext;
+            _services = serviceContext;		
+        }
 
 		/// <summary>
 		/// Empty constructor normally reserved for unit tests when a DatabaseContext or a ServiceContext is not
 		/// necessarily required or needs to be set after construction.
 		/// </summary>
-		internal ApplicationContext()
-		{
-			//create a new application cache from the HttpRuntime.Cache
-			ApplicationCache = HttpRuntime.Cache == null
-                ? new CacheHelper(new System.Web.Caching.Cache())
-				: new CacheHelper(HttpRuntime.Cache);
+		internal ApplicationContext() : this(true)
+		{			
 		}
+
+        /// <summary>
+        /// Constructor used to specify if we will enable application cache or not
+        /// </summary>
+        /// <param name="enableCache"></param>
+        internal ApplicationContext(bool enableCache)
+        {
+            //create a new application cache from the HttpRuntime.Cache
+            ApplicationCache = HttpRuntime.Cache == null
+                ? new CacheHelper(new System.Web.Caching.Cache(), enableCache)
+                : new CacheHelper(HttpRuntime.Cache, enableCache);
+        }
 
 		/// <summary>
     	/// Singleton accessor

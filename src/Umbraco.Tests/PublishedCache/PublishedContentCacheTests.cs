@@ -70,6 +70,9 @@ namespace Umbraco.Tests.PublishedCache
 		{
 			TestHelper.SetupLog4NetForTests();
 
+            //create the app context 
+            ApplicationContext.Current = new ApplicationContext(false);
+
 			_httpContextFactory = new FakeHttpContextFactory("~/Home");
 			//ensure the StateHelper is using our custom context
 			StateHelper.HttpContext = _httpContextFactory.HttpContext;
@@ -85,8 +88,8 @@ namespace Umbraco.Tests.PublishedCache
                 };
 
 		    _umbracoContext = new UmbracoContext(
-                _httpContextFactory.HttpContext, 
-				new ApplicationContext(),
+                _httpContextFactory.HttpContext,
+                ApplicationContext.Current,
                 cache, 
                 new PublishedMediaCache());
 

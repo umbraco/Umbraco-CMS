@@ -149,22 +149,17 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(string jsonPayload)
         {
-            Remove(jsonPayload);
-            base.Refresh(jsonPayload);
-        }
-
-        public override void Remove(string jsonPayload)
-        {
             var payloads = DeserializeFromJsonPayload(jsonPayload);
 
             payloads.ForEach(payload =>
-                {
-                    GetCacheKeysForAlias(payload.Alias).ForEach(
-                        alias =>
-                        ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(alias));
-                });
+            {
+                GetCacheKeysForAlias(payload.Alias).ForEach(
+                    alias =>
+                    ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(alias));
+            });
 
-            base.Remove(jsonPayload);
+            base.Refresh(jsonPayload);
         }
+
     }
 }

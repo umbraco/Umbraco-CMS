@@ -47,6 +47,7 @@ namespace Umbraco.Web.Cache
         public const string StylesheetCacheRefresherId = "E0633648-0DEB-44AE-9A48-75C3A55CB670";
         public const string StylesheetPropertyCacheRefresherId = "2BC7A3A4-6EB1-4FBC-BAA3-C9E7B6D36D38";
         public const string DataTypeCacheRefresherId = "35B16C25-A17E-45D7-BC8F-EDAB1DCC28D2";
+        public const string DictionaryCacheRefresherId = "D1D7E227-F817-4816-BFE9-6C39B6152884";
 
         #endregion
 
@@ -206,21 +207,7 @@ namespace Umbraco.Web.Cache
                 GetRefresherById(factoryGuid),
                 getNumericId,
                 instances);
-        }
-
-        /// <summary>
-        /// Sends a request to all registered load-balanced servers to remove data based on the custom json payload
-        /// using the specified ICacheRefresher with the guid factoryGuid.
-        /// </summary>
-        /// <param name="factoryGuid"></param>
-        /// <param name="jsonPayload"></param>
-        public void RemoveByJson(Guid factoryGuid, string jsonPayload)
-        {
-            ServerMessengerResolver.Current.Messenger.PerformRemove(
-                ServerRegistrarResolver.Current.Registrar.Registrations,
-                GetRefresherById(factoryGuid),
-                jsonPayload);
-        }
+        }       
 
         private static ICacheRefresher GetRefresherById(Guid uniqueIdentifier)
         {

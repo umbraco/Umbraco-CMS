@@ -245,9 +245,7 @@ namespace umbraco.cms.businesslogic
 
         private List<int> m_AllowedChildContentTypeIDs = null;
         private List<TabI> m_VirtualTabs = null;
-
-        private static readonly object propertyTypesCacheSyncLock = new object();
-
+        
         protected internal IContentTypeComposition ContentTypeItem;
 
         #endregion
