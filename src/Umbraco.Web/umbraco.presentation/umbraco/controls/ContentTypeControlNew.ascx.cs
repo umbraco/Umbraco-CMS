@@ -187,6 +187,7 @@ namespace umbraco.controls
 
             // reload content type (due to caching)
             LoadContentType();
+            BindTabs();
 
             // Only if the doctype alias changed, cause a regeneration of the xml cache file since
             // the xml element names will need to be updated to reflect the new alias
@@ -897,7 +898,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             dt.Columns.Add("id");
             dt.Columns.Add("order");
 
-            foreach (var grp in _contentType.PropertyTypeGroups)
+            foreach (var grp in _contentType.PropertyTypeGroups.OrderBy(p => p.SortOrder))
             {
                 if (grp.ContentTypeId == _contentType.Id && grp.ParentId == 0)
                 {
