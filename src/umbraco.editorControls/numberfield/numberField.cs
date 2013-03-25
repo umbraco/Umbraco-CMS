@@ -75,8 +75,8 @@ namespace umbraco.editorControls
             set
             {
                 int integer;
-                
-                if (int.TryParse(value, NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out integer))
+
+                if (int.TryParse(value, NumberStyles.AllowThousands | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out integer))
                 {
                     base.Text = integer.ToString();
                 }
