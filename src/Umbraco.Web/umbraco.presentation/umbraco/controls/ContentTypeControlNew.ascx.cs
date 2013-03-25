@@ -651,7 +651,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 propertyType.DataTypeDefinitionId = dataTypeDefinition.Id;
                 propertyType.DataTypeId = dataTypeDefinition.ControlId;
 
-                if (propertyType.PropertyGroupId.Value != gpw.GenricPropertyControl.Tab)
+                if (propertyType.PropertyGroupId == null || propertyType.PropertyGroupId.Value != gpw.GenricPropertyControl.Tab)
                 {
                     if (gpw.GenricPropertyControl.Tab == 0)
                     {
