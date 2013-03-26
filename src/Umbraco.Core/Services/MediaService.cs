@@ -303,8 +303,8 @@ namespace Umbraco.Core.Services
         {
             var umbracoFileValue = mediaPath;
             var isResized = mediaPath.Contains("_") && mediaPath.Contains("x");
-            // If the image has been resized we strip the last part of the original "/media/1024/koala_403x328.jpg" url.
-            // We're can then find propertydata containing the left part.
+            
+            // If the image has been resized we strip the "_403x328" of the original "/media/1024/koala_403x328.jpg" url.
             if (isResized)
             {
                 
