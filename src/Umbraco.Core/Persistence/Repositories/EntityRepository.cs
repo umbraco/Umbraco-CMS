@@ -158,7 +158,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //NOTE Should this account for newest = 1 ? Scenarios: unsaved, saved not published, published
 
             if (isContent)
-                sql.LeftJoin("LEFT JOIN cmsDocument document").On("document.nodeId = main.id");
+                sql.LeftJoin("cmsDocument document").On("document.nodeId = main.id");
 
             return sql;
         }
