@@ -295,20 +295,22 @@ namespace Umbraco.Core.Services
 		}
 
         /// <summary>
-        /// Gets an <see cref="IMedia"/> object from the url of the 'umbracoFile' property.
+        /// Gets an <see cref="IMedia"/> object from the path stored in the 'umbracoFile' property.
         /// </summary>
-        /// <param name="mediaUrl">Url of the media item to retreive</param>
+        /// <param name="mediaPath">Path of the media item to retreive (for example: /media/1024/koala_403x328.jpg)</param>
         /// <returns><see cref="IMedia"/></returns>
-        public IMedia GetMediaByUrl(string mediaUrl)
+        public IMedia GetMediaByPath(string mediaPath)
         {
-            var umbracoFileValue = mediaUrl;
-            var isReszed = mediaUrl.Contains("_") && mediaUrl.Contains("x");
-            //If the image has been resized we strip the "_403x328" of the original "/media/1024/koala_403x328.jpg" url
-            if (isReszed)
+            var umbracoFileValue = mediaPath;
+            var isResized = mediaPath.Contains("_") && mediaPath.Contains("x");
+            // If the image has been resized we strip the last part of the original "/media/1024/koala_403x328.jpg" url.
+            // We're can then find propertydata containing the left part.
+            if (isResized)
             {
-                var underscoreIndex = mediaUrl.LastIndexOf('_');
-                var dotIndex = mediaUrl.LastIndexOf('.');
-                umbracoFileValue = string.Concat(mediaUrl.Substring(0, underscoreIndex), mediaUrl.Substring(dotIndex));
+                
+                var underscoreIndex = mediaPath.LastIndexOf('_');
+                var dotIndex = mediaPath.LastIndexOf('.');
+                umbracoFileValue = string.Concat(mediaPath.Substring(0, underscoreIndex), mediaPath.Substring(dotIndex));
             }
 
             var sql = new Sql()
@@ -317,15 +319,12 @@ namespace Umbraco.Core.Services
                 .InnerJoin<PropertyTypeDto>()
                 .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
                 .Where<PropertyTypeDto>(x => x.Alias == "umbracoFile")
-                .Where<PropertyDataDto>(x => x.Text == umbracoFileValue);
+                .Where<PropertyDataDto>(x => x.VarChar == umbracoFileValue);
 
             using (var uow = _uowProvider.GetUnitOfWork())
             {
                 var propertyDataDto = uow.Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql).FirstOrDefault();
-                if (propertyDataDto == null)
-                    return null;
-
-                return GetById(propertyDataDto.NodeId);
+                return propertyDataDto == null ? null : GetById(propertyDataDto.NodeId);
             }
         }
 

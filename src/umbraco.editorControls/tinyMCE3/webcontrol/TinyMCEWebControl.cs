@@ -325,21 +325,8 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
 
                 orgSrc = IOHelper.ResolveUrl(orgSrc.Replace("%20", " "));
 
-                IMedia imageMedia = null;
-
-                try
-                {
-                    var pathStart = orgSrc.Contains("_") ? orgSrc.Substring(0, orgSrc.LastIndexOf("_", StringComparison.Ordinal)) + "%" : orgSrc;
-
-                    var mediaId = BusinessLogic.Application.SqlHelper.ExecuteScalar<int>(string.Format("SELECT contentNodeId FROM cmsPropertyData WHERE dataNvarchar LIKE '{0}'", pathStart));
-
-                    var mediaService = ApplicationContext.Current.Services.MediaService;
-                    imageMedia = mediaService.GetById(mediaId);
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.Error<TinyMCEWebControl>("Error getting media item", ex);
-                }
+                var mediaService = ApplicationContext.Current.Services.MediaService;
+                var imageMedia = mediaService.GetMediaByPath(orgSrc);
 
                 if (imageMedia == null)
                 {
