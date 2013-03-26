@@ -139,7 +139,8 @@ namespace umbraco.cms.businesslogic
                 }
                 foreach (Tuple<string, string> key in toDelete)
                 {
-                    _propertyTypeCache.Remove(key);
+                    if(_propertyTypeCache != null)
+                        _propertyTypeCache.Remove(key);
                 }
             }
             //don't put lock around this as it is ConcurrentDictionary.
