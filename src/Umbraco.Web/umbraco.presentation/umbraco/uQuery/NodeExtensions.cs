@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Xml;
 using umbraco.cms.businesslogic.web;
+using umbraco.interfaces;
 using umbraco.NodeFactory;
 
 namespace umbraco
@@ -19,7 +20,7 @@ namespace umbraco
         /// <param name="node">The node.</param>
         /// <param name="level">The level.</param>
         /// <returns>Returns an ancestor node by path level.</returns>
-        public static Node GetAncestorByPathLevel(this Node node, int level)
+        public static INode GetAncestorByPathLevel(this INode node, int level)
         {
             var nodeId = uQuery.GetNodeIdByPathLevel(node.Path, level);
             return uQuery.GetNode(nodeId);
@@ -31,13 +32,13 @@ namespace umbraco
         /// </summary>
         /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
         /// <returns>Node as IEnumerable</returns>
-        public static IEnumerable<Node> GetAncestorNodes(this Node node)
+        public static IEnumerable<INode> GetAncestorNodes(this INode node)
         {
             var ancestor = node.Parent;
 
             while (ancestor != null)
             {
-                yield return ancestor as Node;
+                yield return ancestor as INode;
 
                 ancestor = ancestor.Parent;
             }
@@ -48,7 +49,7 @@ namespace umbraco
         /// </summary>
         /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
         /// <returns>Node as IEnumerable</returns>
-        public static IEnumerable<Node> GetAncestorOrSelfNodes(this Node node)
+        public static IEnumerable<INode> GetAncestorOrSelfNodes(this INode node)
         {
             yield return node;
 
@@ -63,11 +64,11 @@ namespace umbraco
         /// </summary>
         /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
         /// <returns>Node as IEumerable</returns>
-        public static IEnumerable<Node> GetPrecedingSiblingNodes(this Node node)
+        public static IEnumerable<INode> GetPrecedingSiblingNodes(this INode node)
         {
             if (node.Parent != null)
             {
-                var parentNode = node.Parent as Node;
+                var parentNode = node.Parent as INode;
                 foreach (var precedingSiblingNode in parentNode.GetChildNodes().Where(childNode => childNode.SortOrder < node.SortOrder))
                 {
                     yield return precedingSiblingNode;
@@ -80,11 +81,11 @@ namespace umbraco
         /// </summary>
         /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
         /// <returns>Node as IEumerable</returns>
-        public static IEnumerable<Node> GetFollowingSiblingNodes(this Node node)
+        public static IEnumerable<INode> GetFollowingSiblingNodes(this INode node)
         {
             if (node.Parent != null)
             {
-                var parentNode = node.Parent as Node;
+                var parentNode = node.Parent as INode;
                 foreach (var followingSiblingNode in parentNode.GetChildNodes().Where(childNode => childNode.SortOrder > node.SortOrder))
                 {
                     yield return followingSiblingNode;
@@ -97,11 +98,11 @@ namespace umbraco
         /// </summary>
         /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
         /// <returns>Node as IEumerable</returns>
-        public static IEnumerable<Node> GetSiblingNodes(this Node node)
+        public static IEnumerable<INode> GetSiblingNodes(this INode node)
         {
             if (node.Parent != null)
             {
-                var parentNode = node.Parent as Node;
+                var parentNode = node.Parent as INode;
                 foreach (var siblingNode in parentNode.GetChildNodes().Where(childNode => childNode.Id != node.Id))
                 {
                     yield return siblingNode;
@@ -114,7 +115,7 @@ namespace umbraco
         /// </summary>
         /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
         /// <returns>Node as IEnumerable</returns>
-        public static IEnumerable<Node> GetDescendantOrSelfNodes(this Node node)
+        public static IEnumerable<INode> GetDescendantOrSelfNodes(this INode node)
         {
             yield return node;
 
@@ -131,9 +132,9 @@ namespace umbraco
         /// </summary>
         /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
         /// <returns>Node as IEnumerable</returns>
-        public static IEnumerable<Node> GetDescendantNodes(this Node node)
+        public static IEnumerable<INode> GetDescendantNodes(this INode node)
         {
-            foreach (Node child in node.Children)
+            foreach (INode child in node.ChildrenAsList)
             {
                 yield return child;
 
@@ -151,9 +152,9 @@ namespace umbraco
         /// <param name="node">The <c>umbraco.presentation.nodeFactory.Node</c>.</param>
         /// <param name="func">The func</param>
         /// <returns>Nodes as IEnumerable</returns>
-        public static IEnumerable<Node> GetDescendantNodes(this Node node, Func<Node, bool> func)
+        public static IEnumerable<INode> GetDescendantNodes(this INode node, Func<INode, bool> func)
         {
-            foreach (Node child in node.Children)
+            foreach (INode child in node.ChildrenAsList)
             {
                 if (func(child))
                 {
@@ -174,7 +175,7 @@ namespace umbraco
         /// <param name="node">The <c>umbraco.presentation.nodeFactory.Node</c>.</param>
         /// <param name="documentTypeAlias">The document type alias.</param>
         /// <returns>Nodes as IEnumerable</returns>
-        public static IEnumerable<Node> GetDescendantNodesByType(this Node node, string documentTypeAlias)
+        public static IEnumerable<INode> GetDescendantNodesByType(this INode node, string documentTypeAlias)
         {
             return node.GetDescendantNodes().Where(x => x.NodeTypeAlias == documentTypeAlias);
         }
@@ -187,9 +188,9 @@ namespace umbraco
         /// </summary>
         /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
         /// <returns>Node as IEnumerable</returns>
-        public static IEnumerable<Node> GetChildNodes(this Node node)
+        public static IEnumerable<INode> GetChildNodes(this INode node)
         {
-            foreach (Node child in node.Children)
+            foreach (INode child in node.ChildrenAsList)
             {
                 yield return child;
             }
@@ -201,9 +202,9 @@ namespace umbraco
         /// <param name="node">The <c>umbraco.presentation.nodeFactory.Node</c>.</param>
         /// <param name="func">The func.</param>
         /// <returns>Nodes as IEnumerable</returns>
-        public static IEnumerable<Node> GetChildNodes(this Node node, Func<Node, bool> func)
+        public static IEnumerable<INode> GetChildNodes(this INode node, Func<Node, bool> func)
         {
-            foreach (Node child in node.Children)
+            foreach (Node child in node.ChildrenAsList)
             {
                 if (func(child))
                 {
@@ -218,7 +219,7 @@ namespace umbraco
         /// <param name="node">The <c>umbraco.presentation.nodeFactory.Node</c>.</param>
         /// <param name="documentTypeAlias">The document type alias.</param>
         /// <returns>Nodes as IEnumerable</returns>
-        public static IEnumerable<Node> GetChildNodesByType(this Node node, string documentTypeAlias)
+        public static IEnumerable<INode> GetChildNodesByType(this INode node, string documentTypeAlias)
         {
             return node.GetChildNodes(n => n.NodeTypeAlias == documentTypeAlias);
         }
@@ -229,11 +230,11 @@ namespace umbraco
         /// <param name="parentNode">an umbraco.presentation.nodeFactory.Node object</param>
         /// <param name="nodeName">name of node to search for</param>
         /// <returns>null or Node</returns>
-        public static Node GetChildNodeByName(this Node parentNode, string nodeName)
+        public static INode GetChildNodeByName(this INode parentNode, string nodeName)
         {
-            Node node = null;
+            INode node = null;
 
-            foreach (Node child in parentNode.Children)
+            foreach (INode child in parentNode.ChildrenAsList)
             {
                 if (child.Name == nodeName)
                 {
@@ -255,7 +256,7 @@ namespace umbraco
         /// <returns>
         ///   <c>true</c> if the specified node has property; otherwise, <c>false</c>.
         /// </returns>
-        public static bool HasProperty(this Node node, string propertyAlias)
+        public static bool HasProperty(this INode node, string propertyAlias)
         {
             var property = node.GetProperty(propertyAlias);
             return (property != null);
@@ -268,7 +269,7 @@ namespace umbraco
         /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
         /// <param name="propertyAlias">alias of property to get</param>
         /// <returns>default(T) or property cast to (T)</returns>
-        public static T GetProperty<T>(this Node node, string propertyAlias)
+        public static T GetProperty<T>(this INode node, string propertyAlias)
         {
             // check to see if return object handles it's own object hydration
             if (typeof(uQuery.IGetProperty).IsAssignableFrom(typeof(T)))
@@ -342,7 +343,7 @@ namespace umbraco
         /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
         /// <param name="propertyAlias">alias of propety to get</param>
         /// <returns>empty string, or property value as string</returns>
-        private static string GetPropertyAsString(this Node node, string propertyAlias)
+        private static string GetPropertyAsString(this INode node, string propertyAlias)
         {
             var propertyValue = string.Empty;
             var property = node.GetProperty(propertyAlias);
@@ -361,7 +362,7 @@ namespace umbraco
         /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
         /// <param name="propertyAlias">alias of propety to get</param>
         /// <returns>true if can cast value, else false for all other circumstances</returns>
-        private static bool GetPropertyAsBoolean(this Node node, string propertyAlias)
+        private static bool GetPropertyAsBoolean(this INode node, string propertyAlias)
         {
             var propertyValue = false;
             var property = node.GetProperty(propertyAlias);
@@ -389,7 +390,7 @@ namespace umbraco
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
-        public static int Level(this Node node)
+        public static int Level(this INode node)
         {
             return node.Path.Split(',').Length - 1;
         }
@@ -399,7 +400,7 @@ namespace umbraco
         /// </summary>
         /// <param name="node">The node.</param>
         /// <returns>Returns an <c>XmlNode</c> for the selected Node</returns>
-        public static XmlNode ToXml(this Node node)
+        public static XmlNode ToXml(this INode node)
         {
             return ((IHasXmlNode)umbraco.library.GetXmlNodeById(node.Id.ToString()).Current).GetNode();
         }
@@ -411,7 +412,7 @@ namespace umbraco
         /// <param name="propertyAlias">property alias</param>
         /// <param name="cropName">name of crop to get url for</param>
         /// <returns>emtpy string or url</returns>
-        public static string GetImageCropperUrl(this Node node, string propertyAlias, string cropName)
+        public static string GetImageCropperUrl(this INode node, string propertyAlias, string cropName)
         {
             string cropUrl = string.Empty;
 
@@ -452,7 +453,7 @@ namespace umbraco
         /// <param name="propertyAlias">alias of property to set</param>
         /// <param name="value">value to set</param>
         /// <returns>the same node object on which this is an extension method</returns>
-        public static Node SetProperty(this Node node, string propertyAlias, object value)
+        public static INode SetProperty(this INode node, string propertyAlias, object value)
         {
             var document = new Document(node.Id);
 
@@ -467,7 +468,7 @@ namespace umbraco
         /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
         /// <param name="useAdminUser">if true then publishes under the context of User(0), if false uses current user</param>
         /// <returns>the same node object on which this is an extension method</returns>
-        public static Node Publish(this Node node, bool useAdminUser)
+        public static INode Publish(this INode node, bool useAdminUser)
         {
             var document = new Document(node.Id);
 
@@ -483,7 +484,7 @@ namespace umbraco
         /// <returns>
         /// Returns a random node from a collection of nodes.
         /// </returns>
-        public static Node GetRandom(this IList<Node> nodes)
+        public static INode GetRandom(this IList<INode> nodes)
         {
             var random = umbraco.library.GetRandom();
             return nodes[random.Next(0, nodes.Count)];
@@ -497,9 +498,9 @@ namespace umbraco
         /// <returns>
         /// Returns the specified number of random nodes from a collection of nodes.
         /// </returns>
-        public static IEnumerable<Node> GetRandom(this IList<Node> nodes, int numberOfItems)
+        public static IEnumerable<INode> GetRandom(this IList<INode> nodes, int numberOfItems)
         {
-            var output = new List<Node>(numberOfItems);
+            var output = new List<INode>(numberOfItems);
 
             while (output.Count < numberOfItems)
             {
@@ -518,7 +519,7 @@ namespace umbraco
         /// </summary>
         /// <param name="node">The node.</param>
         /// <returns></returns>
-        public static string GetFullNiceUrl(this Node node)
+        public static string GetFullNiceUrl(this INode node)
         {
             if (!string.IsNullOrEmpty(node.NiceUrl) && node.NiceUrl[0] == '/')
             {
@@ -534,7 +535,7 @@ namespace umbraco
         /// <param name="node">The node.</param>
         /// <param name="language">The language.</param>
         /// <returns></returns>
-        public static string GetFullNiceUrl(this Node node, string language)
+        public static string GetFullNiceUrl(this INode node, string language)
         {
             return node.GetFullNiceUrl(language, false);
         }
@@ -546,7 +547,7 @@ namespace umbraco
         /// <param name="language">The language.</param>
         /// <param name="ssl">if set to <c>true</c> [SSL].</param>
         /// <returns></returns>
-        public static string GetFullNiceUrl(this Node node, string language, bool ssl)
+        public static string GetFullNiceUrl(this INode node, string language, bool ssl)
         {
             foreach (var domain in library.GetCurrentDomains(node.Id))
             {
@@ -565,7 +566,7 @@ namespace umbraco
         /// <param name="node">The node.</param>
         /// <param name="domain">The domain.</param>
         /// <returns></returns>
-        public static string GetFullNiceUrl(this Node node, Domain domain)
+        public static string GetFullNiceUrl(this INode node, Domain domain)
         {
             return node.GetFullNiceUrl(domain, false);
         }
@@ -577,7 +578,7 @@ namespace umbraco
         /// <param name="domain">The domain.</param>
         /// <param name="ssl">if set to <c>true</c> [SSL].</param>
         /// <returns></returns>
-        public static string GetFullNiceUrl(this Node node, Domain domain, bool ssl)
+        public static string GetFullNiceUrl(this INode node, Domain domain, bool ssl)
         {
             // TODO: [OA] Document on Codeplex
             if (!string.IsNullOrEmpty(node.NiceUrl) && node.NiceUrl[0] == '/')
