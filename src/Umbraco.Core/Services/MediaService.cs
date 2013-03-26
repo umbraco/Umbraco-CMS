@@ -295,6 +295,41 @@ namespace Umbraco.Core.Services
 		}
 
         /// <summary>
+        /// Gets an <see cref="IMedia"/> object from the url of the 'umbracoFile' property.
+        /// </summary>
+        /// <param name="mediaUrl">Url of the media item to retreive</param>
+        /// <returns><see cref="IMedia"/></returns>
+        public IMedia GetMediaByUrl(string mediaUrl)
+        {
+            var umbracoFileValue = mediaUrl;
+            var isReszed = mediaUrl.Contains("_") && mediaUrl.Contains("x");
+            //If the image has been resized we strip the "_403x328" of the original "/media/1024/koala_403x328.jpg" url
+            if (isReszed)
+            {
+                var underscoreIndex = mediaUrl.LastIndexOf('_');
+                var dotIndex = mediaUrl.LastIndexOf('.');
+                umbracoFileValue = string.Concat(mediaUrl.Substring(0, underscoreIndex), mediaUrl.Substring(dotIndex));
+            }
+
+            var sql = new Sql()
+                .Select("*")
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>()
+                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .Where<PropertyTypeDto>(x => x.Alias == "umbracoFile")
+                .Where<PropertyDataDto>(x => x.Text == umbracoFileValue);
+
+            using (var uow = _uowProvider.GetUnitOfWork())
+            {
+                var propertyDataDto = uow.Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql).FirstOrDefault();
+                if (propertyDataDto == null)
+                    return null;
+
+                return GetById(propertyDataDto.NodeId);
+            }
+        }
+
+        /// <summary>
         /// Checks whether an <see cref="IMedia"/> item has any children
         /// </summary>
         /// <param name="id">Id of the <see cref="IMedia"/></param>
