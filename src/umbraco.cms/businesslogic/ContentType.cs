@@ -144,7 +144,7 @@ namespace umbraco.cms.businesslogic
                 }
                 foreach (Tuple<string, string> key in toDelete)
                 {
-                    if(_propertyTypeCache.ContainsKey(key))
+                    if(_propertyTypeCache != null)
                         _propertyTypeCache.Remove(key);
                 }				
             }
