@@ -380,7 +380,11 @@ namespace Umbraco.Core.Services
                 // For backwards compatibility, if no datatype with that ID can be found, we're letting this fail silently.
                 // This means that the property will not be created.
                 if(dataTypeDefinition == null)
+                {
+                    LogHelper.Warn<PackagingService>(string.Format("Packager: Error handling creation of PropertyType '{0}'. Could not find DataTypeDefintion with unique id '{1}' nor one referencing the DataType with control id '{2}'. Did the package creator forget to package up custom datatypes?",
+                                                        property.Element("Name").Value, dataTypeDefinitionId, dataTypeId));
                     continue;
+                }
 
                 var propertyType = new PropertyType(dataTypeDefinition)
                                        {
