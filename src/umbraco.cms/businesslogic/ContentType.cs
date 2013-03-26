@@ -139,6 +139,7 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         internal static void RemoveAllDataTypeCache()
         {
+
             AliasToNames.Clear();
             PropertyTypeCache.Clear();
         }

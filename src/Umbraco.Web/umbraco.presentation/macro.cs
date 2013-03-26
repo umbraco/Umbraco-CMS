@@ -366,7 +366,7 @@ namespace umbraco
                             break;
                         }
                     case (int)MacroTypes.XSLT:
-                        macroControl = LoadMacroXSLT(this, Model, pageElements, true);
+                        macroControl = LoadMacroXslt(this, Model, pageElements, true);
                         break;
                     case (int)MacroTypes.Script:
 
@@ -767,7 +767,7 @@ namespace umbraco
                 HttpRuntime.Cache.Remove("macroXslt_" + XsltFile);
         }
 
-        internal Control LoadMacroXSLT(macro macro, MacroModel model, Hashtable pageElements, bool throwError)
+        internal Control LoadMacroXslt(macro macro, MacroModel model, Hashtable pageElements, bool throwError)
         {
             if (XsltFile.Trim() != string.Empty)
             {
@@ -847,6 +847,11 @@ namespace umbraco
 
             TraceWarn("macro", "Xslt is empty");
             return new LiteralControl(string.Empty);
+        }
+
+        public Control loadMacroXSLT(macro macro, MacroModel model, Hashtable pageElements)
+        {
+            return LoadMacroXslt(macro, model, pageElements, false);
         }
 
         public Control loadMacroXSLT(macro macro, MacroModel model, Hashtable pageElements)

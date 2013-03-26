@@ -1,18 +1,18 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Collections;
 using System.Collections.Specialized;
-using System.IO;
 using System.Text.RegularExpressions;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using umbraco.cms.businesslogic.media;
-using umbraco.cms.businesslogic.property;
-using Content = umbraco.cms.businesslogic.Content;
+using Umbraco.Core.Models;
 using ClientDependency.Core.Controls;
 using ClientDependency.Core;
+using File = System.IO.File;
 
 namespace umbraco.editorControls.tinyMCE3.webcontrol
 {
@@ -70,7 +70,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
             base.Attributes.Add("style", "visibility: hidden");
             config.Add("mode", "exact");
             config.Add("theme", "umbraco");
-			config.Add("umbraco_path", global::Umbraco.Core.IO.IOHelper.ResolveUrl(global::Umbraco.Core.IO.SystemDirectories.Umbraco));
+            config.Add("umbraco_path", global::Umbraco.Core.IO.IOHelper.ResolveUrl(global::Umbraco.Core.IO.SystemDirectories.Umbraco));
             CssClass = "tinymceContainer";
             plugin.ConfigSection configSection = (plugin.ConfigSection)System.Web.HttpContext.Current.GetSection("TinyMCE");
 
@@ -101,7 +101,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
             // update macro's and images in text
             if (_nodeId != 0)
             {
-                base.Text = parseMacrosToHtml(formatMedia(base.Text));
+                base.Text = ParseMacrosToHtml(FormatMedia(base.Text));
             }
 
         }
@@ -215,8 +215,8 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                     suffix = "_" + this.mode;
 
                 outURI = this.InstallPath + "/tiny_mce_src" + suffix + ".js";
-				if (!File.Exists(global::Umbraco.Core.IO.IOHelper.MapPath(outURI)))
-					throw new Exception("Could not locate TinyMCE by URI:" + outURI + ", Physical path:" + global::Umbraco.Core.IO.IOHelper.MapPath(outURI) + ". Make sure that you configured the installPath to a valid location in your web.config. This path should be an relative or site absolute URI to where TinyMCE is located.");
+                if (!File.Exists(global::Umbraco.Core.IO.IOHelper.MapPath(outURI)))
+                    throw new Exception("Could not locate TinyMCE by URI:" + outURI + ", Physical path:" + global::Umbraco.Core.IO.IOHelper.MapPath(outURI) + ". Make sure that you configured the installPath to a valid location in your web.config. This path should be an relative or site absolute URI to where TinyMCE is located.");
 
                 // Collect themes, languages and plugins and build gzip URI
                 // TODO: Make sure gzip is re-enabled
@@ -282,75 +282,80 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
         }
 
 
-        private string formatMedia(string html)
+        private string FormatMedia(string html)
         {
             // root media url
             var rootMediaUrl = _fs.GetUrl("");
 
             // Find all media images
-            var pattern = String.Format("<img [^>]*src=\"(?<mediaString>{0}[^\"]*)\" [^>]*>", rootMediaUrl);
+            var pattern = string.Format("<img [^>]*src=\"(?<mediaString>{0}[^\"]*)\" [^>]*>", rootMediaUrl);
 
-            MatchCollection tags =
-                Regex.Matches(html, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-            
+            var tags = Regex.Matches(html, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+
             foreach (Match tag in tags)
-                if (tag.Groups.Count > 0)
+            {
+                if (tag.Groups.Count <= 0)
+                    continue;
+
+                // Replace /> to ensure we're in old-school html mode
+                var tempTag = "<img";
+                var orgSrc = tag.Groups["mediaString"].Value;
+
+                // gather all attributes
+                // TODO: This should be replaced with a general helper method - but for now we'll wanna leave umbraco.dll alone for this patch
+                var ht = new Hashtable();
+                var m = Regex.Matches(tag.Value.Replace(">", " >"),
+                                  "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"|(?<attributeName>\\S*)=(?<attributeValue>[^\"|\\s]*)\\s",
+                                  RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+
+                //GE: Add ContainsKey check and expand the ifs for readability
+                foreach (Match attributeSet in m)
                 {
-                    // Replace /> to ensure we're in old-school html mode
-                    string tempTag = "<img";
-                    string orgSrc = tag.Groups["mediaString"].Value;
-
-                    // gather all attributes
-                    // TODO: This should be replaced with a general helper method - but for now we'll wanna leave umbraco.dll alone for this patch
-                    Hashtable ht = new Hashtable();
-                    MatchCollection m =
-                        Regex.Matches(tag.Value.Replace(">", " >"),
-                                      "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"|(?<attributeName>\\S*)=(?<attributeValue>[^\"|\\s]*)\\s",
-                                      RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-
-                    //GE: Add ContainsKey check and expand the ifs for readability
-                    foreach (Match attributeSet in m)
+                    if (attributeSet.Groups["attributeName"].Value.ToLower() != "src" && ht.ContainsKey(attributeSet.Groups["attributeName"].Value) == false)
                     {
-                        if (attributeSet.Groups["attributeName"].Value.ToString().ToLower() != "src")
-                        {
-                            if (!ht.ContainsKey(attributeSet.Groups["attributeName"].Value.ToString()))
-                            {
-                                ht.Add(attributeSet.Groups["attributeName"].Value.ToString(),
-                                       attributeSet.Groups["attributeValue"].Value.ToString());
-                            }
-                        }
-                    }
-
-                    // build the element
-                    // Build image tag
-                    IDictionaryEnumerator ide = ht.GetEnumerator();
-                    while (ide.MoveNext())
-                        tempTag += " " + ide.Key.ToString() + "=\"" + ide.Value.ToString() + "\"";
-
-                    // Find the original filename, by removing the might added width and height
-                    // NH, 4.8.1 - above replaced by loading the right media file from the db later!
-                    orgSrc = IOHelper.ResolveUrl(orgSrc.Replace("%20", " "));
-
-                    try
-                    {
-                        // Format the tag
-                        tempTag = tempTag + " src=\"" + IOHelper.ResolveUrl(orgSrc) + "\"";
-                        tempTag += "/>";
-
-                        // Replace the tag
-                        html = html.Replace(tag.Value, tempTag);
-                    }
-                    catch (Exception ex)
-                    {
-                        LogHelper.Warn<TinyMCEWebControl>("Error reading size data from media: " + orgSrc);
-                        LogHelper.Warn<TinyMCEWebControl>(ex.Message);
-                        LogHelper.Warn<TinyMCEWebControl>(ex.StackTrace);
+                        ht.Add(attributeSet.Groups["attributeName"].Value, attributeSet.Groups["attributeValue"].Value);
                     }
                 }
+
+                // build the element
+                // Build image tag
+                var ide = ht.GetEnumerator();
+                while (ide.MoveNext())
+                    tempTag += string.Format(" {0}=\"{1}\"", ide.Key, ide.Value);
+
+                orgSrc = IOHelper.ResolveUrl(orgSrc.Replace("%20", " "));
+
+                var mediaService = ApplicationContext.Current.Services.MediaService;
+                var imageMedia = mediaService.GetMediaByPath(orgSrc);
+
+                if (imageMedia == null)
+                {
+                    tempTag = string.Format("{0} src=\"{1}\" />", tempTag, IOHelper.ResolveUrl(orgSrc));
+                }
+                else
+                {
+                    var widthProperty = imageMedia.Properties.FirstOrDefault(x => x.Alias == "umbracoWidth");
+                    var heightProperty = imageMedia.Properties.FirstOrDefault(x => x.Alias == "umbracoHeight");
+                    var umbracoFileProperty = imageMedia.Properties.FirstOrDefault(x => x.Alias == "umbracoFile");
+
+                    // Format the tag
+                    if (widthProperty != null && heightProperty != null && umbracoFileProperty != null)
+                    {
+                        tempTag = string.Format("{0} rel=\"{1},{2}\" src=\"{3}\" />",
+                                                tempTag,
+                                                widthProperty.Value,
+                                                heightProperty.Value,
+                                                umbracoFileProperty.Value);
+                    }
+                }
+
+                html = html.Replace(tag.Value, tempTag);
+            }
+
             return html;
         }
 
-        private string parseMacrosToHtml(string input)
+        private string ParseMacrosToHtml(string input)
         {
             int nodeId = _nodeId;
             Guid versionId = _versionId;
@@ -416,7 +421,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                 }
                 catch (Exception ee)
                 {
-					LogHelper.Error<TinyMCEWebControl>("Macro Parsing Error", ee);
+                    LogHelper.Error<TinyMCEWebControl>("Macro Parsing Error", ee);
                     string div = "<div class=\"umbMacroHolder mceNonEditable\"><p style=\"color: red\"><strong>umbraco was unable to parse a macro tag, which means that parts of this content might be corrupt.</strong> <br /><br />Best solution is to rollback to a previous version by right clicking the node in the tree and then try to insert the macro again. <br/><br/>Please report this to your system administrator as well - this error has been logged.</p></div>";
                     content = content.Replace(tag.Groups[1].Value, div);
                 }
