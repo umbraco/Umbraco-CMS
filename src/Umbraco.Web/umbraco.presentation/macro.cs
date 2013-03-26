@@ -765,15 +765,6 @@ namespace umbraco
                 HttpRuntime.Cache.Remove("macroXslt_" + XsltFile);
         }
 
-        private Hashtable keysToLowerCase(Hashtable input)
-        {
-            var retval = new Hashtable();
-            foreach (object key in input.Keys)
-                retval.Add(key.ToString().ToLower(), input[key]);
-
-            return retval;
-        }
-
         internal Control LoadMacroXslt(macro macro, MacroModel model, Hashtable pageElements, bool throwError)
         {
             if (XsltFile.Trim() != string.Empty)
