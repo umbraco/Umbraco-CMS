@@ -311,18 +311,11 @@ namespace Umbraco.Core.Sync
         {
             if (servers == null) throw new ArgumentNullException("servers");
             if (refresher == null) throw new ArgumentNullException("refresher");
-            Type arrayType = null;
-            if (ids != null)
+            
+            Type arrayType;
+            if (!ValidateIdArray(ids, out arrayType))
             {
-                foreach (var id in ids)
-                {
-                    if (!(id is int) && (!(id is Guid)))
-                        throw new ArgumentException("The id must be either an int or a Guid");
-                    if (arrayType == null)
-                        arrayType = id.GetType();
-                    if (arrayType != id.GetType())
-                        throw new ArgumentException("The array must contain the same type of " + arrayType);
-                }
+                throw new ArgumentException("The id must be either an int or a Guid");
             }
             
             //Now, check if we are using Distrubuted calls. If there are no servers in the list then we
@@ -336,6 +329,35 @@ namespace Umbraco.Core.Sync
             
             EnsureLazyUsernamePasswordDelegateResolved();
 
+            PerformDistributedCall(servers, refresher, dispatchType, ids, arrayType, jsonPayload);
+        }
+
+        private bool ValidateIdArray(IEnumerable<object> ids, out Type arrayType)
+        {
+            arrayType = null;
+            if (ids != null)
+            {
+                foreach (var id in ids)
+                {
+                    if (!(id is int) && (!(id is Guid)))
+                        return false; //
+                    if (arrayType == null)
+                        arrayType = id.GetType();
+                    if (arrayType != id.GetType())
+                        throw new ArgumentException("The array must contain the same type of " + arrayType);
+                }
+            }
+            return true;
+        }
+
+        protected virtual void PerformDistributedCall(
+            IEnumerable<IServerAddress> servers,
+            ICacheRefresher refresher,
+            MessageType dispatchType, 
+            IEnumerable<object> ids = null,
+            Type idArrayType = null,
+            string jsonPayload = null)
+        {
             //We are using distributed calls, so lets make them...
             try
             {
@@ -351,6 +373,7 @@ namespace Umbraco.Core.Sync
                     LogStartDispatch();
 
                     // Go through each configured node submitting a request asynchronously
+                    //NOTE: 'asynchronously' in this case does not mean that it will continue while we give the page back to the user!
                     foreach (var n in servers)
                     {
                         //set the server address
@@ -363,14 +386,19 @@ namespace Umbraco.Core.Sync
                                 asyncResultsList.Add(
                                     cacheRefresher.BeginRefreshByJson(
                                         refresher.UniqueIdentifier, jsonPayload, _login, _password, null, null));
-                                break;                            
+                                break;
                             case MessageType.RefreshAll:
                                 asyncResultsList.Add(
                                     cacheRefresher.BeginRefreshAll(
                                         refresher.UniqueIdentifier, _login, _password, null, null));
                                 break;
                             case MessageType.RefreshById:
-                                if (arrayType == typeof(int))
+                                if (idArrayType == null)
+                                {
+                                    throw new InvalidOperationException("Cannot refresh by id if the idArrayType is null");
+                                }
+
+                                if (idArrayType == typeof(int))
                                 {
                                     var serializer = new JavaScriptSerializer();
                                     var jsonIds = serializer.Serialize(ids.Cast<int>().ToArray());
@@ -384,9 +412,9 @@ namespace Umbraco.Core.Sync
                                     //so we'll just iterate
                                     asyncResultsList.AddRange(
                                         ids.Select(i => cacheRefresher.BeginRefreshByGuid(
-                                            refresher.UniqueIdentifier, (Guid) i, _login, _password, null, null)));
+                                            refresher.UniqueIdentifier, (Guid)i, _login, _password, null, null)));
                                 }
-                                
+
                                 break;
                             case MessageType.RemoveById:
                                 //we don't currently support bulk removing so we'll iterate
@@ -420,7 +448,12 @@ namespace Umbraco.Core.Sync
                                     cacheRefresher.EndRefreshAll(t);
                                     break;
                                 case MessageType.RefreshById:
-                                    if (arrayType == typeof(int))
+                                    if (idArrayType == null)
+                                    {
+                                        throw new InvalidOperationException("Cannot refresh by id if the idArrayType is null");
+                                    }
+
+                                    if (idArrayType == typeof(int))
                                     {
                                         cacheRefresher.EndRefreshById(t);
                                     }
