@@ -45,7 +45,7 @@ namespace umbraco
         /// <returns>Node as IEnumerable</returns>
         public static IEnumerable<Node> GetAncestorNodes(this Node node)
         {
-            return (IEnumerable<Node>) GetAncestorNodes((INode)node);
+            return GetAncestorNodes((INode)node).Cast<Node>();
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace umbraco
         /// <returns>Node as IEnumerable</returns>
         public static IEnumerable<Node> GetAncestorOrSelfNodes(this Node node)
         {
-            return (IEnumerable<Node>) GetAncestorOrSelfNodes((INode)node);
+            return GetAncestorOrSelfNodes((INode)node).Cast<Node>();
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace umbraco
         /// <returns>Node as IEumerable</returns>
         public static IEnumerable<Node> GetPrecedingSiblingNodes(this Node node)
         {
-            return (IEnumerable<Node>) GetPrecedingSiblingNodes((INode)node);
+            return GetPrecedingSiblingNodes((INode)node).Cast<Node>();
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace umbraco
         /// <returns>Node as IEumerable</returns>
         public static IEnumerable<Node> GetFollowingSiblingNodes(this Node node)
         {
-            return (IEnumerable<Node>) GetFollowingSiblingNodes((INode)node);
+            return GetFollowingSiblingNodes((INode)node).Cast<Node>();
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace umbraco
         /// <returns>Node as IEumerable</returns>
         public static IEnumerable<Node> GetSiblingNodes(this Node node)
         {
-            return (IEnumerable<Node>) GetSiblingNodes((INode)node);
+            return GetSiblingNodes((INode)node).Cast<Node>();
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace umbraco
         /// <returns>Node as IEnumerable</returns>
         public static IEnumerable<Node> GetDescendantOrSelfNodes(this Node node)
         {
-            return (IEnumerable<Node>) GetDescendantOrSelfNodes((INode)node);
+            return GetDescendantOrSelfNodes((INode)node).Cast<Node>();
         }
 
         /// <summary>
@@ -206,7 +206,7 @@ namespace umbraco
         /// <returns>Node as IEnumerable</returns>
         public static IEnumerable<Node> GetDescendantNodes(this Node node)
         {
-            return (IEnumerable<Node>) GetDescendantNodes((INode) node);
+            return GetDescendantNodes((INode) node).Cast<Node>();
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace umbraco
         /// <returns>Nodes as IEnumerable</returns>
         public static IEnumerable<Node> GetDescendantNodes(this Node node, Func<Node, bool> func)
         {
-            return (IEnumerable<Node>) GetDescendantNodes((INode)node, (Func<INode, bool>) func);
+            return GetDescendantNodes((INode)node, (Func<INode, bool>) func).Cast<Node>();
         }
 
         /// <summary>
@@ -273,7 +273,7 @@ namespace umbraco
         /// <returns>Nodes as IEnumerable</returns>
         public static IEnumerable<Node> GetDescendantNodesByType(this Node node, string documentTypeAlias)
         {
-            return (IEnumerable<Node>) GetDescendantNodesByType((INode)node, documentTypeAlias);
+            return GetDescendantNodesByType((INode)node, documentTypeAlias).Cast<Node>();
         }
 
         /// <summary>
@@ -298,7 +298,7 @@ namespace umbraco
         /// <returns>Node as IEnumerable</returns>
         public static IEnumerable<Node> GetChildNodes(this Node node)
         {
-            return (IEnumerable<Node>) GetChildNodes((INode)node);
+            return GetChildNodes((INode)node).Cast<Node>();
         }
 
         /// <summary>
@@ -311,10 +311,7 @@ namespace umbraco
         /// <returns>INode as IEnumerable</returns>
         public static IEnumerable<INode> GetChildNodes(this INode node)
         {
-            foreach (INode child in node.ChildrenAsList)
-            {
-                yield return child;
-            }
+            return node.ChildrenAsList;
         }
 
         /// <summary>
@@ -325,7 +322,7 @@ namespace umbraco
         /// <returns>Nodes as IEnumerable</returns>
         public static IEnumerable<Node> GetChildNodes(this Node node, Func<Node, bool> func)
         {
-            return (IEnumerable<Node>) GetChildNodes((INode)node, (Func<INode, bool>) func);
+            return GetChildNodes((INode)node, (Func<INode, bool>) func).Cast<Node>();
         }
 
         /// <summary>
@@ -334,9 +331,9 @@ namespace umbraco
         /// <param name="node">The <c>umbraco.interfaces.INode</c>.</param>
         /// <param name="func">The func.</param>
         /// <returns>INodes as IEnumerable</returns>
-        public static IEnumerable<INode> GetChildNodes(this INode node, Func<Node, bool> func)
+        public static IEnumerable<INode> GetChildNodes(this INode node, Func<INode, bool> func)
         {
-            foreach (Node child in node.ChildrenAsList)
+            foreach (INode child in node.ChildrenAsList)
             {
                 if (func(child))
                 {
@@ -353,7 +350,7 @@ namespace umbraco
         /// <returns>Nodes as IEnumerable</returns>
         public static IEnumerable<Node> GetChildNodesByType(this Node node, string documentTypeAlias)
         {
-            return (IEnumerable<Node>) GetChildNodesByType((INode)node, documentTypeAlias);
+            return GetChildNodesByType((INode)node, documentTypeAlias).Cast<Node>();
         }
 
         /// <summary>
@@ -386,20 +383,7 @@ namespace umbraco
         /// <returns>null or INode</returns>
         public static INode GetChildNodeByName(this INode parentNode, string nodeName)
         {
-            INode node = null;
-
-            foreach (INode child in parentNode.ChildrenAsList)
-            {
-                if (child.Name == nodeName)
-                {
-                    node = child;
-                    break;
-                }
-            }
-
-            return node;
-
-            //// return node.GetChildNodes(n => n.Name == nodeName);
+            return parentNode.ChildrenAsList.FirstOrDefault(child => child.Name == nodeName);
         }
 
         /// <summary>
@@ -461,6 +445,8 @@ namespace umbraco
 
                 return (T)t;
             }
+
+            //TODO: This should be converted to our extension method TryConvertTo<T> ....
 
             var typeConverter = TypeDescriptor.GetConverter(typeof(T));
             if (typeConverter != null)
@@ -744,7 +730,7 @@ namespace umbraco
         /// </returns>
         public static Node GetRandom(this IList<Node> nodes)
         {
-            return GetRandom(nodes);
+            return (Node)GetRandom(nodes.Cast<INode>().ToList());
         }
 
         /// <summary>
@@ -770,7 +756,8 @@ namespace umbraco
         /// </returns>
         public static IEnumerable<Node> GetRandom(this IList<Node> nodes, int numberOfItems)
         {
-            return GetRandom(nodes, numberOfItems);
+            var randomNodes = GetRandom(nodes.Cast<INode>().ToList(), numberOfItems);
+            return randomNodes.Cast<Node>().ToList();
         }
 
         /// <summary>
@@ -851,9 +838,9 @@ namespace umbraco
         /// <param name="language">The language.</param>
         /// <param name="ssl">if set to <c>true</c> [SSL].</param>
         /// <returns></returns>
-        public static string GetFullNiceUrl(this Node node, string langauge, bool ssl)
+        public static string GetFullNiceUrl(this Node node, string language, bool ssl)
         {
-            return GetFullNiceUrl((INode)node, langauge, ssl);
+            return GetFullNiceUrl((INode)node, language, ssl);
         }
 
         /// <summary>
