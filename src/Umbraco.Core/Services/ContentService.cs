@@ -12,6 +12,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
@@ -934,7 +935,7 @@ namespace Umbraco.Core.Services
                               string.Format("Copied content with Id: '{0}' related to original content with Id: '{1}'",
                                             copy.Id, content.Id), copy.WriterId, copy.Id);
                 }
-
+                
                 //Look for children and copy those as well
                 var children = GetChildren(content.Id);
                 foreach (var child in children)
@@ -945,6 +946,8 @@ namespace Umbraco.Core.Services
                 Copied.RaiseEvent(new CopyEventArgs<IContent>(content, copy, false, parentId), this);
 
                 Audit.Add(AuditTypes.Copy, "Copy Content performed by user", content.WriterId, content.Id);
+                
+                RuntimeCacheProvider.Current.Clear();
 
                 return copy;
             }
