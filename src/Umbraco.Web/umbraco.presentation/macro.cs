@@ -854,11 +854,6 @@ namespace umbraco
             return LoadMacroXslt(macro, model, pageElements, false);
         }
 
-        public Control loadMacroXSLT(macro macro, MacroModel model, Hashtable pageElements)
-        {
-            return LoadMacroXSLT(macro, model, pageElements, false);
-        }
-
         /// <summary>
         /// Parses the text for umbraco Item controls that need to be rendered.
         /// </summary>
