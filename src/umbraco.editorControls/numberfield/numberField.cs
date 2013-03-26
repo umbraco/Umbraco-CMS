@@ -76,7 +76,8 @@ namespace umbraco.editorControls
                     base.Text = "";//Resets the text-field in case the value is removed
 
                     int integer;//The value will only be parsed if it contains a valid value
-                    if (int.TryParse(value, NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out integer))
+                
+                if (int.TryParse(value, NumberStyles.AllowThousands | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out integer))
                     {
                         base.Text = integer.ToString(CultureInfo.InvariantCulture);
                     }

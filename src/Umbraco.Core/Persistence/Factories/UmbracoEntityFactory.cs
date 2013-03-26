@@ -1,12 +1,12 @@
 ﻿using System.Globalization;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class UmbracoEntityFactory : IEntityFactory<UmbracoEntity, NodeDto>
+    internal class UmbracoEntityFactory : IEntityFactory<UmbracoEntity, EntityRepository.UmbracoEntityDto>
     {
-        public UmbracoEntity BuildEntity(NodeDto dto)
+        public UmbracoEntity BuildEntity(EntityRepository.UmbracoEntityDto dto)
         {
             var entity = new UmbracoEntity(dto.Trashed)
                              {
@@ -20,15 +20,15 @@ namespace Umbraco.Core.Persistence.Factories
                                  ParentId = dto.ParentId,
                                  Path = dto.Path,
                                  SortOrder = dto.SortOrder,
-                                 HasChildren = false,
-                                 IsPublished = false
+                                 HasChildren = dto.Children > 0,
+                                 IsPublished = dto.HasPublishedVersion.HasValue && dto.HasPublishedVersion.Value > 0
                              };
             return entity;
         }
 
-        public NodeDto BuildDto(UmbracoEntity entity)
+        public EntityRepository.UmbracoEntityDto BuildDto(UmbracoEntity entity)
         {
-            var node = new NodeDto
+            var node = new EntityRepository.UmbracoEntityDto
                            {
                                CreateDate = entity.CreateDate,
                                Level = short.Parse(entity.Level.ToString(CultureInfo.InvariantCulture)),

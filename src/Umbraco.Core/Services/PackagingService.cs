@@ -291,7 +291,7 @@ namespace Umbraco.Core.Services
                 contentType.AllowedAsRoot = infoElement.Element("AllowAtRoot").Value.ToLowerInvariant().Equals("true");
 
             UpdateContentTypesAllowedTemplates(contentType, infoElement.Element("AllowedTemplates"), defaultTemplateElement);
-            UpdateContentTypesTabs(contentType, documentType.Element("Tab"));
+            UpdateContentTypesTabs(contentType, documentType.Element("Tabs"));
             UpdateContentTypesProperties(contentType, documentType.Element("GenericProperties"));
 
             return contentType;
@@ -375,14 +375,12 @@ namespace Umbraco.Core.Services
                     {
                         dataTypeDefinition = dataTypeDefinitions.First();
                     }
-                    else
-                    {
-                        throw new Exception(
-                            String.Format(
-                                "Packager: Error handling creation of PropertyType '{0}'. Could not find DataTypeDefintion with unique id '{1}' nor one referencing the DataType with control id '{2}'.",
-                                property.Element("Name").Value, dataTypeDefinitionId, dataTypeId));
-                    }
                 }
+                
+                // For backwards compatibility, if no datatype with that ID can be found, we're letting this fail silently.
+                // This means that the property will not be created.
+                if(dataTypeDefinition == null)
+                    continue;
 
                 var propertyType = new PropertyType(dataTypeDefinition)
                                        {

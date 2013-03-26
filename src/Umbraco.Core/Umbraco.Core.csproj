@@ -309,6 +309,7 @@
     <Compile Include="Persistence\Mappers\RelationMapper.cs" />
     <Compile Include="Persistence\Mappers\RelationTypeMapper.cs" />
     <Compile Include="Persistence\Mappers\ServerRegistrationMapper.cs" />
+    <Compile Include="Persistence\Mappers\UmbracoEntityMapper.cs" />
     <Compile Include="Persistence\Mappers\UserMapper.cs" />
     <Compile Include="Persistence\Mappers\UserTypeMapper.cs" />
     <Compile Include="Persistence\Migrations\IMigration.cs" />

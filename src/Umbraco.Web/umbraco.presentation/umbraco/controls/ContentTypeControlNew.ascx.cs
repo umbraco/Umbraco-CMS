@@ -193,6 +193,7 @@ namespace umbraco.controls
 
             // reload content type (due to caching)
             LoadContentType();
+            BindTabs();
 
             BindDataGenericProperties(true);
 
@@ -648,7 +649,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 propertyType.DataTypeDefinitionId = dataTypeDefinition.Id;
                 propertyType.DataTypeId = dataTypeDefinition.ControlId;
 
-                if (propertyType.PropertyGroupId.Value != gpw.GenricPropertyControl.Tab)
+                if (propertyType.PropertyGroupId == null || propertyType.PropertyGroupId.Value != gpw.GenricPropertyControl.Tab)
                 {
                     if (gpw.GenricPropertyControl.Tab == 0)
                     {
@@ -893,7 +894,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             dt.Columns.Add("id");
             dt.Columns.Add("order");
 
-            foreach (var grp in _contentType.PropertyTypeGroups)
+            foreach (var grp in _contentType.PropertyTypeGroups.OrderBy(p => p.SortOrder))
             {
                 if (grp.ContentTypeId == _contentType.Id && grp.ParentId == 0)
                 {
