@@ -117,8 +117,10 @@ namespace Umbraco.Core.Models
             if (fileName.LastIndexOf(@"\") > 0)
                 fileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
 
-            if (string.IsNullOrEmpty(fileName) == false)
-                SetFileOnContent(content, propertyTypeAlias, fileName, value.InputStream);
+            var name = IOHelper.SafeFileName(fileName);
+
+            if (string.IsNullOrEmpty(name) == false)
+                SetFileOnContent(content, propertyTypeAlias, name, value.InputStream);
         }
 
         /// <summary>
@@ -131,8 +133,10 @@ namespace Umbraco.Core.Models
         public static void SetValue(this IContentBase content, string propertyTypeAlias, string fileName,
                                     Stream fileStream)
         {
-            if (string.IsNullOrEmpty(fileName) == false && fileStream != null)
-                SetFileOnContent(content, propertyTypeAlias, fileName, fileStream);
+            var name = IOHelper.SafeFileName(fileName);
+
+            if (string.IsNullOrEmpty(name) == false && fileStream != null)
+                SetFileOnContent(content, propertyTypeAlias, name, fileStream);
         }
 
         private static void SetFileOnContent(IContentBase content, string propertyTypeAlias, string name, Stream fileStream)

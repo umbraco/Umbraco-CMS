@@ -7,6 +7,7 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
@@ -288,7 +289,12 @@ namespace umbraco.cms.businesslogic.web
 
             //Create a new IContent object based on the passed in DocumentType's alias, set the name and save it
             IContent content = ApplicationContext.Current.Services.ContentService.CreateContent(Name, ParentId, dct.Alias, u.Id);
-            ApplicationContext.Current.Services.ContentService.Save(content, u.Id);
+            //The content object will only have the 'WasCancelled' flag set to 'True' if the 'Creating' event has been cancelled, so we return null.
+            if (((Entity)content).WasCancelled)
+                return null;
+
+            //don't raise events here (false), they will get raised with the d.Save() call.
+            ApplicationContext.Current.Services.ContentService.Save(content, u.Id, false); 
 
             //read the whole object from the db
             Document d = new Document(content);
@@ -301,7 +307,7 @@ namespace umbraco.cms.businesslogic.web
             LogHelper.Info<Document>(string.Format("New document {0}", d.Id));
 
             // Run Handler				
-            umbraco.BusinessLogic.Actions.Action.RunActionHandlers(d, ActionNew.Instance);
+            BusinessLogic.Actions.Action.RunActionHandlers(d, ActionNew.Instance);
 
             // Save doc
             d.Save();
@@ -333,7 +339,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetRootContent()", false)]
         public static Document[] GetRootDocuments()
         {
-            var content = ApplicationContext.Current.Services.ContentService.GetRootContent();
+            var content = ApplicationContext.Current.Services.ContentService.GetRootContent().OrderBy(x => x.SortOrder);
             return content.Select(c => new Document(c)).ToArray();
         }
 
@@ -773,7 +779,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
         public void Publish(User u)
         {
-            SaveAndPublish(u);
+            this.Published = SaveAndPublish(u);
         }
 
         /// <summary>
@@ -892,6 +898,9 @@ namespace umbraco.cms.businesslogic.web
                 int userId = current == null ? 0 : current.Id;
                 ApplicationContext.Current.Services.ContentService.Save(Content, userId);
 
+                base.VersionDate = Content.UpdateDate;
+                this.UpdateDate = Content.UpdateDate;
+
                 base.Save();
 
                 FireAfterSave(e);
@@ -926,6 +935,8 @@ namespace umbraco.cms.businesslogic.web
                     var result =
                         ((ContentService) ApplicationContext.Current.Services.ContentService).SaveAndPublish(Content,
                                                                                                              true, u.Id);
+                    base.VersionDate = Content.UpdateDate;
+                    this.UpdateDate = Content.UpdateDate;
 
                     base.Save();
 
@@ -1010,9 +1021,17 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         public override void Move(int newParentId)
         {
-            var current = User.GetCurrent();
-            int userId = current == null ? 0 : current.Id;
-            ApplicationContext.Current.Services.ContentService.Move(Content, newParentId, userId);
+            MoveEventArgs e = new MoveEventArgs();
+            base.FireBeforeMove(e);
+
+            if (!e.Cancel)
+            {
+                var current = User.GetCurrent();
+                int userId = current == null ? 0 : current.Id;
+                ApplicationContext.Current.Services.ContentService.Move(Content, newParentId, userId);
+            }
+
+            base.FireAfterMove(e);
         }
 
         /// <summary>

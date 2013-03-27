@@ -20,22 +20,22 @@ namespace umbraco.editorControls.XPathDropDownList
         /// <summary>
         /// Field for the data.
         /// </summary>
-        private IData m_Data;
+        private IData data;
 
         /// <summary>
         /// Field for the options.
         /// </summary>
-        private XPathDropDownListOptions m_Options;
+        private XPathDropDownListOptions options;
 
         /// <summary>
         /// Field for the CustomValidator.
         /// </summary>
-        private CustomValidator m_CustomValidator = new CustomValidator();
+        private CustomValidator customValidator = new CustomValidator();
 
         /// <summary>
         /// Field for the DropDownList.
         /// </summary>
-        private DropDownList m_DropDownList = new DropDownList();
+        private DropDownList dropDownList = new DropDownList();
 
         /// <summary>
         /// Gets a value indicating whether [treat as rich text editor].
@@ -82,8 +82,8 @@ namespace umbraco.editorControls.XPathDropDownList
         /// <param name="options"></param>
         internal XPathDropDownListDataEditor(IData data, XPathDropDownListOptions options)
         {
-            this.m_Data = data;
-            this.m_Options = options;
+            this.data = data;
+            this.options = options;
         }
 
         /// <summary>
@@ -91,16 +91,34 @@ namespace umbraco.editorControls.XPathDropDownList
         /// </summary>
         protected override void CreateChildControls()
         {
-            this.m_DropDownList.DataSource = uQuery.GetNodesByXPath(this.m_Options.XPath).ToNameIds();
-            this.m_DropDownList.DataTextField = "Value";
-            this.m_DropDownList.DataValueField = this.m_Options.UseId ? "Key" : "Value";
-            this.m_DropDownList.DataBind();
+            switch (this.options.UmbracoObjectType)
+            {
+                case uQuery.UmbracoObjectType.Unknown:
+                case uQuery.UmbracoObjectType.Document:
+
+                    this.dropDownList.DataSource = uQuery.GetNodesByXPath(this.options.XPath).Where(x => x.Id != -1).ToNameIds();
+                    break;
+
+                case uQuery.UmbracoObjectType.Media:
+
+                    this.dropDownList.DataSource = uQuery.GetMediaByXPath(this.options.XPath).Where(x => x.Id != -1).ToNameIds();
+                    break;
+
+                case uQuery.UmbracoObjectType.Member:
+
+                    this.dropDownList.DataSource = uQuery.GetMembersByXPath(this.options.XPath).ToNameIds();
+                    break;
+            }
+            
+            this.dropDownList.DataTextField = "Value";
+            this.dropDownList.DataValueField = this.options.UseId ? "Key" : "Value";
+            this.dropDownList.DataBind();
 
             // Add a default please select value
-            this.m_DropDownList.Items.Insert(0, new ListItem(string.Concat(ui.Text("choose"), "..."), "-1"));
+            this.dropDownList.Items.Insert(0, new ListItem(string.Concat(ui.Text("choose"), "..."), "-1"));
 
-            this.Controls.Add(this.m_CustomValidator);
-            this.Controls.Add(this.m_DropDownList);
+            this.Controls.Add(this.customValidator);
+            this.Controls.Add(this.dropDownList);
         }
 
         /// <summary>
@@ -112,10 +130,10 @@ namespace umbraco.editorControls.XPathDropDownList
             base.OnLoad(e);
             this.EnsureChildControls();
 
-            if (!this.Page.IsPostBack)
+            if (!this.Page.IsPostBack && this.data.Value != null)
             {
                 // Get selected items from Node Name or Node Id
-                var dropDownListItem = this.m_DropDownList.Items.FindByValue(this.m_Data.Value.ToString());
+                var dropDownListItem = this.dropDownList.Items.FindByValue(this.data.Value.ToString());
                 if (dropDownListItem != null)
                 {
                     dropDownListItem.Selected = true;
@@ -128,22 +146,22 @@ namespace umbraco.editorControls.XPathDropDownList
         /// </summary>
         public void Save()
         {
-            Property property = new Property(((umbraco.cms.businesslogic.datatype.DefaultData)this.m_Data).PropertyId);
-            if (property.PropertyType.Mandatory && this.m_DropDownList.SelectedValue == "-1")
+            Property property = new Property(((umbraco.cms.businesslogic.datatype.DefaultData)this.data).PropertyId);
+            if (property.PropertyType.Mandatory && this.dropDownList.SelectedValue == "-1")
             {
                 // Property is mandatory, but no value selected in the DropDownList
-                this.m_CustomValidator.IsValid = false;
+                this.customValidator.IsValid = false;
 
                 DocumentType documentType = new DocumentType(property.PropertyType.ContentTypeId);
                 ContentType.TabI tab = documentType.getVirtualTabs.Where(x => x.Id == property.PropertyType.TabId).FirstOrDefault();
 
                 if (tab != null)
                 {
-                    this.m_CustomValidator.ErrorMessage = ui.Text("errorHandling", "errorMandatory", new string[] { property.PropertyType.Alias, tab.Caption }, User.GetCurrent());
+                    this.customValidator.ErrorMessage = ui.Text("errorHandling", "errorMandatory", new string[] { property.PropertyType.Alias, tab.Caption }, User.GetCurrent());
                 }
             }
 
-            this.m_Data.Value = this.m_DropDownList.SelectedValue;
+            this.data.Value = this.dropDownList.SelectedValue;
         }
     }
 }

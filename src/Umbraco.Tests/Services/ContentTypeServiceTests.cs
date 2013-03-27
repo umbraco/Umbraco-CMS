@@ -43,6 +43,34 @@ namespace Umbraco.Tests.Services
 			}
 		}
 
+        [Test]
+        public void Can_Save_ContentType_Structure_And_Create_Content_Based_On_It()
+        {
+            // Arrange
+            var cs = ServiceContext.ContentService;
+            var cts = ServiceContext.ContentTypeService;
+            var dtdYesNo = ServiceContext.DataTypeService.GetDataTypeDefinitionById(-49);
+            var ctBase = new ContentType(-1) { Name = "Base", Alias = "Base", Icon = "folder.gif", Thumbnail = "folder.png" };
+            ctBase.AddPropertyType(new PropertyType(dtdYesNo) { Name = "Hide From Navigation", Alias = "umbracoNaviHide" } /*,"Navigation"*/ );
+            cts.Save(ctBase);
+
+            var ctHomePage = new ContentType(ctBase) { Name = "Home Page", Alias = "HomePage", Icon = "settingDomain.gif", Thumbnail = "folder.png", AllowedAsRoot = true };
+            bool addedContentType = ctHomePage.AddContentType(ctBase);
+            ctHomePage.AddPropertyType(new PropertyType(dtdYesNo) { Name = "Some property", Alias = "someProperty" }  /*,"Navigation"*/ );
+            cts.Save(ctHomePage);
+
+            // Act
+            var homeDoc = cs.CreateContent("Home Page", -1, "HomePage");
+            cs.SaveAndPublish(homeDoc);
+
+            // Assert
+            Assert.That(ctBase.HasIdentity, Is.True);
+            Assert.That(ctHomePage.HasIdentity, Is.True);
+            Assert.That(homeDoc.HasIdentity, Is.True);
+            Assert.That(homeDoc.ContentTypeId, Is.EqualTo(ctHomePage.Id));
+            Assert.That(addedContentType, Is.True);
+        }
+
 		private IEnumerable<IContentType> CreateContentTypeHierarchy()
 		{
 			//create the master type

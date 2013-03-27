@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
             if (IsExpressionSupported() == false)
                 return string.Empty;
 
-            return SyntaxConfig.SqlSyntaxProvider.Format(ForeignKey);
+            return SqlSyntaxContext.SqlSyntaxProvider.Format(ForeignKey);
         }
     }
 }

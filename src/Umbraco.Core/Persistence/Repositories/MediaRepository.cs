@@ -246,8 +246,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
                 entity.Level = parent.Level + 1;
-                var maxSortOrder = Database.ExecuteScalar<int>("SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId", new { ParentId = entity.ParentId });
-                entity.SortOrder = maxSortOrder;
+                var maxSortOrder =
+                    Database.ExecuteScalar<int>(
+                        "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
+                        new { ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId });
+                entity.SortOrder = maxSortOrder + 1;
             }
 
             var factory = new MediaFactory(NodeObjectTypeId, entity.Id);
@@ -347,7 +350,18 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var propertyDataDtos = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql);
             var propertyFactory = new PropertyFactory(contentType, versionId, id);
-            var properties = propertyFactory.BuildMediaEntity(propertyDataDtos);
+            var properties = propertyFactory.BuildEntity(propertyDataDtos);
+
+            var newProperties = properties.Where(x => x.HasIdentity == false);
+            foreach (var property in newProperties)
+            {
+                var propertyDataDto = new PropertyDataDto { NodeId = id, PropertyTypeId = property.PropertyTypeId, VersionId = versionId };
+                int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
+
+                property.Version = versionId;
+                property.Id = primaryKey;
+            }
+
             return new PropertyCollection(properties);
         }
     }

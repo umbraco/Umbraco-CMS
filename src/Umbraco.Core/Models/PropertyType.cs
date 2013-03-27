@@ -18,7 +18,7 @@ namespace Umbraco.Core.Models
         private string _alias;
         private string _description;
         private int _dataTypeDefinitionId;
-        private int _propertyGroupId;
+        private Lazy<int> _propertyGroupId;
         private Guid _dataTypeId;
         private DataTypeDatabaseType _dataTypeDatabaseType;
         private bool _mandatory;
@@ -61,7 +61,7 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo HelpTextSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.HelpText);
         private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.SortOrder);
         private static readonly PropertyInfo ValidationRegExpSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.ValidationRegExp);
-        private static readonly PropertyInfo PropertyGroupIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, int>(x => x.PropertyGroupId);
+        private static readonly PropertyInfo PropertyGroupIdSelector = ExpressionHelper.GetPropertyInfo<PropertyType, Lazy<int>>(x => x.PropertyGroupId);
 
         /// <summary>
         /// Gets of Sets the Name of the PropertyType
@@ -153,7 +153,7 @@ namespace Umbraco.Core.Models
         /// Gets or Sets the PropertyGroup's Id for which this PropertyType belongs
         /// </summary>
         [DataMember]
-        internal int PropertyGroupId
+        internal Lazy<int> PropertyGroupId
         {
             get { return _propertyGroupId; }
             set
@@ -335,8 +335,8 @@ namespace Umbraco.Core.Models
             if (Mandatory && (value == null || string.IsNullOrEmpty(value.ToString())))
                 return false;
 
-            //Check against Regular Expression for Legacy DataTypes
-            if(!string.IsNullOrEmpty(ValidationRegExp))
+            //Check against Regular Expression for Legacy DataTypes - Validation exists and value is not null:
+            if(string.IsNullOrEmpty(ValidationRegExp) == false && (value != null && string.IsNullOrEmpty(value.ToString()) == false))
             {
                 var regexPattern = new Regex(ValidationRegExp);
                 return regexPattern.IsMatch(value.ToString());

@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions
         {
             var table = new TableDefinition{Name = TableName, SchemaName = SchemaName, Columns = Columns};
 
-            return string.Format(SyntaxConfig.SqlSyntaxProvider.Format(table));
+            return string.Format(SqlSyntaxContext.SqlSyntaxProvider.Format(table));
         }
     }
 }

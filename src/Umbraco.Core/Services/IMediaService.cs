@@ -177,5 +177,12 @@ namespace Umbraco.Core.Services
         /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
         void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = 0);
+
+        /// <summary>
+        /// Gets an <see cref="IMedia"/> object from the path stored in the 'umbracoFile' property.
+        /// </summary>
+        /// <param name="mediaPath">Path of the media item to retreive (for example: /media/1024/koala_403x328.jpg)</param>
+        /// <returns><see cref="IMedia"/></returns>
+        IMedia GetMediaByPath(string mediaPath);
     }
 }

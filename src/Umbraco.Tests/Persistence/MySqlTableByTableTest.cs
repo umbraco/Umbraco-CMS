@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Persistence
                 //assign the service context
                 new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
 
-            SyntaxConfig.SqlSyntaxProvider = MySqlSyntaxProvider.Instance;
+            SqlSyntaxContext.SqlSyntaxProvider = MySqlSyntax.Provider;
 
             _database = new Database("Server = 169.254.120.3; Database = testdb; Uid = umbraco; Pwd = umbraco",
                                      "MySql.Data.MySqlClient");

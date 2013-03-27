@@ -11,7 +11,7 @@ namespace Umbraco.Web.Dynamics
     internal class Grouping<K, T> : IGrouping<K, T> where T : DynamicObject
     {
         public K Key { get; set; }
-        public IEnumerable<T> Elements;
+        public IEnumerable<T> Elements { get; set; }
 
         public IEnumerator<T> GetEnumerator()
         {

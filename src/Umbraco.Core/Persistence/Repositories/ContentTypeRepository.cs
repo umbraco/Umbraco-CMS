@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -93,7 +94,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContentType>(sqlClause, query);
-            var sql = translator.Translate();
+            var sql = translator.Translate()
+                .OrderBy<NodeDto>(x => x.Text);
 
             var dtos = Database.Fetch<DocumentTypeDto, ContentTypeDto, NodeDto>(sql);
 
@@ -166,6 +168,19 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(IContentType entity)
         {
+            Mandate.That<Exception>(string.IsNullOrEmpty(entity.Alias) == false,
+                                    () =>
+                                        {
+                                            var message =
+                                                string.Format(
+                                                    "ContentType '{0}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                                                    entity.Name);
+                                            var exception = new Exception(message);
+
+                                            LogHelper.Error<ContentTypeRepository>(message, exception);
+                                            throw exception;
+                                        });
+
             ((ContentType)entity).AddingEntity();
 
             var factory = new ContentTypeFactory(NodeObjectTypeId);
@@ -191,6 +206,19 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(IContentType entity)
         {
+            Mandate.That<Exception>(string.IsNullOrEmpty(entity.Alias) == false,
+                                    () =>
+                                        {
+                                            var message =
+                                                string.Format(
+                                                    "ContentType '{0}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                                                    entity.Name);
+                                            var exception = new Exception(message);
+
+                                            LogHelper.Error<ContentTypeRepository>(message, exception);
+                                            throw exception;
+                                        });
+
             //Updates Modified date
             ((ContentType)entity).UpdatingEntity();
 
@@ -199,6 +227,12 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
+                entity.Level = parent.Level + 1;
+                var maxSortOrder =
+                    Database.ExecuteScalar<int>(
+                        "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
+                        new { ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId });
+                entity.SortOrder = maxSortOrder + 1;
             }
 
             var factory = new ContentTypeFactory(NodeObjectTypeId);

@@ -17,10 +17,10 @@ namespace umbraco.cms.businesslogic
     /// </summary>
     public class Dictionary
     {
-        private static volatile bool cacheIsEnsured = false;
-        private static readonly object m_Locker = new object();
-        private static Hashtable DictionaryItems = Hashtable.Synchronized(new Hashtable());
-        private static Guid topLevelParent = new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde");
+        private static volatile bool _cacheIsEnsured = false;
+        private static readonly object Locker = new object();
+        private static readonly Hashtable DictionaryItems = Hashtable.Synchronized(new Hashtable());
+        private static readonly Guid TopLevelParent = new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde");
 
         protected static ISqlHelper SqlHelper
         {
@@ -30,13 +30,13 @@ namespace umbraco.cms.businesslogic
         /// <summary>
         /// Reads all items from the database and stores in local cache
         /// </summary>
-        private static void ensureCache()
+        private static void EnsureCache()
         {
-            if (!cacheIsEnsured)
+            if (!_cacheIsEnsured)
             {
-                lock (m_Locker)
+                lock (Locker)
                 {
-                    if (!cacheIsEnsured)
+                    if (!_cacheIsEnsured)
                     {
                         using (IRecordsReader dr = SqlHelper.ExecuteReader("Select pk, id, [key], parent from cmsDictionary"))
                         {
@@ -55,7 +55,7 @@ namespace umbraco.cms.businesslogic
                             }
                         }
 
-                        cacheIsEnsured = true;
+                        _cacheIsEnsured = true;
                     }
                 }
             }
@@ -68,10 +68,10 @@ namespace umbraco.cms.businesslogic
         {
             get
             {
-                ensureCache();
+                EnsureCache();
 
                 return DictionaryItems.Values.Cast<DictionaryItem>()
-                    .Where(x => x.ParentId == topLevelParent).OrderBy(item => item.key)
+                    .Where(x => x.ParentId == TopLevelParent).OrderBy(item => item.key)
                     .ToArray();
             }
         }
@@ -105,11 +105,9 @@ namespace umbraco.cms.businesslogic
 
             public DictionaryItem(string key)
             {
-                ensureCache();
+                EnsureCache();
 
-                var item = DictionaryItems.Values.Cast<DictionaryItem>()
-                    .Where(x => x.key == key)
-                    .SingleOrDefault();
+                var item = DictionaryItems.Values.Cast<DictionaryItem>().SingleOrDefault(x => x.key == key);
 
                 if (item == null)
                 {
@@ -124,11 +122,9 @@ namespace umbraco.cms.businesslogic
 
             public DictionaryItem(Guid id)
             {
-                ensureCache();
+                EnsureCache();
 
-                var item = DictionaryItems.Values.Cast<DictionaryItem>()
-                    .Where(x => x.UniqueId == id)
-                    .SingleOrDefault();
+                var item = DictionaryItems.Values.Cast<DictionaryItem>().SingleOrDefault(x => x.UniqueId == id);
 
                 if (item == null)
                 {
@@ -143,11 +139,9 @@ namespace umbraco.cms.businesslogic
 
             public DictionaryItem(int id)
             {
-                ensureCache();
+                EnsureCache();
 
-                var item = DictionaryItems.Values.Cast<DictionaryItem>()
-                    .Where(x => x.id == id)
-                    .SingleOrDefault();
+                var item = DictionaryItems.Values.Cast<DictionaryItem>().SingleOrDefault(x => x.id == id);
 
                 if (item == null)
                 {
@@ -170,7 +164,7 @@ namespace umbraco.cms.businesslogic
                 return DictionaryItems.Values.Cast<DictionaryItem>()
                     .Where(x => x.id == id)
                     .Select(x => x.ParentId)
-                    .SingleOrDefault() == topLevelParent;
+                    .SingleOrDefault() == TopLevelParent;
             }
 
             /// <summary>
@@ -182,9 +176,7 @@ namespace umbraco.cms.businesslogic
                 {
                     if (_parent == null)
                     {
-                        var p = DictionaryItems.Values.Cast<DictionaryItem>()
-                            .Where(x => x.UniqueId == this.ParentId)
-                            .SingleOrDefault();
+                        var p = DictionaryItems.Values.Cast<DictionaryItem>().SingleOrDefault(x => x.UniqueId == this.ParentId);
 
                         if (p == null)
                         {
@@ -221,7 +213,7 @@ namespace umbraco.cms.businesslogic
 
             public static bool hasKey(string key)
             {
-                ensureCache();
+                EnsureCache();
                 return DictionaryItems.ContainsKey(key);
             }
 
@@ -243,7 +235,7 @@ namespace umbraco.cms.businesslogic
                 {
                     if (!hasKey(value))
                     {
-                        lock (m_Locker)
+                        lock (Locker)
                         {
                             SqlHelper.ExecuteNonQuery("Update cmsDictionary set [key] = @key WHERE pk = @Id", SqlHelper.CreateParameter("@key", value),
                                 SqlHelper.CreateParameter("@Id", id));
@@ -329,7 +321,7 @@ namespace umbraco.cms.businesslogic
 
             public static int addKey(string key, string defaultValue, string parentKey)
             {
-                ensureCache();
+                EnsureCache();
 
                 if (hasKey(parentKey))
                 {
@@ -342,8 +334,8 @@ namespace umbraco.cms.businesslogic
 
             public static int addKey(string key, string defaultValue)
             {
-                ensureCache();
-                int retval = createKey(key, topLevelParent, defaultValue);
+                EnsureCache();
+                int retval = createKey(key, TopLevelParent, defaultValue);
                 return retval;
             }
 

@@ -48,6 +48,7 @@ namespace umbraco.MacroEngines
 
 		private DynamicNodeList _cachedChildren;
 		private readonly ConcurrentDictionary<string, object> _cachedMemberOutput = new ConcurrentDictionary<string, object>();
+        private readonly ConcurrentDictionary<string, PropertyResult> _cachedProperties = new ConcurrentDictionary<string, PropertyResult>();
 
         internal readonly DynamicBackingItem n;
 
@@ -462,12 +463,82 @@ namespace umbraco.MacroEngines
 			return GetDataTypeCallback(docTypeAlias, propertyAlias);
 		}
 
+        /// <summary>
+        /// Returns the value from the property result and ensure it is filtered through the razor data type converters
+        /// </summary>
+        /// <param name="propResult"></param>
+        /// <param name="result">The value result for the property</param>
+        /// <returns>true if getting the property data was successful</returns>
+        private bool TryGetPropertyData(PropertyResult propResult, out object result)
+        {
+            if (propResult == null) throw new ArgumentNullException("propResult");
+            //special casing for true/false properties
+            //int/decimal are handled by ConvertPropertyValueByDataType
+            //fallback is stringT
+            if (n.NodeTypeAlias == null && propResult.Alias == null)
+            {
+                throw new ArgumentNullException("No node alias or property alias available. Unable to look up the datatype of the property you are trying to fetch.");
+            }
+
+            //contextAlias is the node which the property data was returned from
+            //Guid dataType = ContentType.GetDataType(data.ContextAlias, data.Alias);					
+            var dataType = GetDataType(propResult.ContextAlias, propResult.Alias);
+
+            var staticMapping = UmbracoSettings.RazorDataTypeModelStaticMapping
+                .FirstOrDefault(mapping => mapping.Applies(dataType, propResult.ContextAlias, propResult.Alias));
+            
+            if (staticMapping != null)
+            {
+                var dataTypeType = Type.GetType(staticMapping.TypeName);
+                if (dataTypeType != null)
+                {
+                    object valueOutput = null;
+                    if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, propResult.Value, out valueOutput))
+                    {
+                        result = valueOutput;
+                        return true;
+                    }
+                    LogHelper.Warn<DynamicNode>(string.Format("Failed to create the instance of the model binder"));
+                }
+                else
+                {
+                    LogHelper.Warn<DynamicNode>(string.Format("staticMapping type name {0} came back as null from Type.GetType; check the casing, assembly presence, assembly framework version, namespace", staticMapping.TypeName));
+                }
+            }
+
+            if (RazorDataTypeModelTypes != null && RazorDataTypeModelTypes.Any(model => model.Key.Item1 == dataType) && dataType != Guid.Empty)
+            {
+                var razorDataTypeModelDefinition = RazorDataTypeModelTypes.Where(model => model.Key.Item1 == dataType).OrderByDescending(model => model.Key.Item2).FirstOrDefault();
+                if (!(razorDataTypeModelDefinition.Equals(default(KeyValuePair<System.Tuple<Guid, int>, Type>))))
+                {
+                    Type dataTypeType = razorDataTypeModelDefinition.Value;
+                    object valueResult = null;
+                    if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, propResult.Value, out valueResult))
+                    {
+                        result = valueResult;
+                        return true;
+                    }
+                    LogHelper.Warn<DynamicNode>(string.Format("Failed to create the instance of the model binder"));
+                }
+                else
+                {
+                    LogHelper.Warn<DynamicNode>(string.Format("Could not get the dataTypeType for the RazorDataTypeModel"));
+                }
+            }
+
+            result = propResult.Value;
+            //convert the string value to a known type
+            var returnVal = ConvertPropertyValueByDataType(ref result, propResult.Alias, dataType);
+            
+            return returnVal;
+        }
+
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
 			var name = binder.Name;
 
 			//check the cache first!
-			if (_cachedMemberOutput.TryGetValue(name, out result))
+            if (_cachedMemberOutput.TryGetValue(binder.Name, out result))
 			{
 				return true;
 			}
@@ -478,7 +549,7 @@ namespace umbraco.MacroEngines
             {
                 result = GetChildrenAsList;
 				//cache the result so we don't have to re-process the whole thing
-				_cachedMemberOutput.TryAdd(name, result);
+                _cachedMemberOutput.TryAdd(binder.Name, result);
                 return true;
             }
             if (binder.Name.InvariantEquals("parentId"))
@@ -489,7 +560,7 @@ namespace umbraco.MacroEngines
                     throw new InvalidOperationException(string.Format("The node {0} does not have a parent", Id));
                 }
                 result = parent.Id;
-                _cachedMemberOutput.TryAdd(name, result);
+                _cachedMemberOutput.TryAdd(binder.Name, result);
                 return true;
             }
 
@@ -502,87 +573,26 @@ namespace umbraco.MacroEngines
                     name = name.Substring(1, name.Length - 1);
                     recursive = true;
                 }
-                var data = n.GetProperty(name, recursive, out propertyExists);
-                // check for nicer support of Pascal Casing EVEN if alias is camelCasing:
-                if (data == null && name.Substring(0, 1).ToUpper() == name.Substring(0, 1) && !propertyExists)
+                    
+                PropertyResult prop;
+                if (!_cachedProperties.TryGetValue(binder.Name, out prop))
                 {
-                    data = n.GetProperty(name.Substring(0, 1).ToLower() + name.Substring((1)), recursive, out propertyExists);
+                    prop = n.GetProperty(name, recursive, out propertyExists);
+                    // check for nicer support of Pascal Casing EVEN if alias is camelCasing:
+                    if (prop == null && name.Substring(0, 1).ToUpper() == name.Substring(0, 1) && !propertyExists)
+                    {
+                        prop = n.GetProperty(name.Substring(0, 1).ToLower() + name.Substring((1)), recursive, out propertyExists);
+                    }
                 }
-
-                if (data != null)
+                    
+                if (prop != null)
                 {
-                    result = data.Value;
-                    //special casing for true/false properties
-                    //int/decimal are handled by ConvertPropertyValueByDataType
-                    //fallback is stringT
-                    if (n.NodeTypeAlias == null && data.Alias == null)
+                    if (TryGetPropertyData(prop, out result))
                     {
-                        throw new ArgumentNullException("No node alias or property alias available. Unable to look up the datatype of the property you are trying to fetch.");
+                        //cache the result so we don't have to re-process the whole thing
+                        _cachedMemberOutput.TryAdd(binder.Name, result);
+                        return true;
                     }
-
-                    //contextAlias is the node which the property data was returned from
-                    //Guid dataType = ContentType.GetDataType(data.ContextAlias, data.Alias);					
-                	var dataType = GetDataType(data.ContextAlias, data.Alias);
-                    
-                    var staticMapping = UmbracoSettings.RazorDataTypeModelStaticMapping.FirstOrDefault(mapping =>
-                    {
-                        return mapping.Applies(dataType, data.ContextAlias, data.Alias);
-                    });
-                    if (staticMapping != null)
-                    {
-
-                        Type dataTypeType = Type.GetType(staticMapping.TypeName);
-                        if (dataTypeType != null)
-                        {
-                            object instance = null;
-                            if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, data.Value, out instance))
-                            {
-                                result = instance;
-								//cache the result so we don't have to re-process the whole thing
-								_cachedMemberOutput.TryAdd(name, result);
-                                return true;
-                            }
-                            else
-                            {
-								LogHelper.Warn<DynamicNode>(string.Format("Failed to create the instance of the model binder"));                            
-                            }
-                        }
-                        else
-                        {
-							LogHelper.Warn<DynamicNode>(string.Format("staticMapping type name {0} came back as null from Type.GetType; check the casing, assembly presence, assembly framework version, namespace", staticMapping.TypeName));                            
-                        }
-                    }
-                    
-                    if (RazorDataTypeModelTypes != null && RazorDataTypeModelTypes.Any(model => model.Key.Item1 == dataType) && dataType != Guid.Empty)
-                    {
-                        var razorDataTypeModelDefinition = RazorDataTypeModelTypes.Where(model => model.Key.Item1 == dataType).OrderByDescending(model => model.Key.Item2).FirstOrDefault();
-                        if (!(razorDataTypeModelDefinition.Equals(default(KeyValuePair<System.Tuple<Guid, int>, Type>))))
-                        {
-                            Type dataTypeType = razorDataTypeModelDefinition.Value;
-                            object instance = null;
-                            if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, data.Value, out instance))
-                            {
-                                result = instance;
-								//cache the result so we don't have to re-process the whole thing
-								_cachedMemberOutput.TryAdd(name, result);
-                                return true;
-                            }
-                            else
-                            {
-								LogHelper.Warn<DynamicNode>(string.Format("Failed to create the instance of the model binder"));
-                            }
-                        }
-                        else
-                        {
-							LogHelper.Warn<DynamicNode>(string.Format("Could not get the dataTypeType for the RazorDataTypeModel"));                            
-                        }
-                    }
-                    
-					//convert the string value to a known type
-                    var returnVal = ConvertPropertyValueByDataType(ref result, name, dataType);
-					//cache the result so we don't have to re-process the whole thing
-					_cachedMemberOutput.TryAdd(name, result);
-	                return returnVal;
                 }
 
                 //check if the alias is that of a child type
@@ -598,7 +608,7 @@ namespace umbraco.MacroEngines
                     {
                         result = new DynamicNodeList(filteredTypeChildren);
 						//cache the result so we don't have to re-process the whole thing
-						_cachedMemberOutput.TryAdd(name, result);
+                        _cachedMemberOutput.TryAdd(binder.Name, result);
                         return true;
                     }
 
@@ -610,7 +620,7 @@ namespace umbraco.MacroEngines
 
                 if (result != null)
                 {
-                    _cachedMemberOutput.TryAdd(name, result);
+                    _cachedMemberOutput.TryAdd(binder.Name, result);
                     return true;
                 }
 
@@ -1025,8 +1035,9 @@ namespace umbraco.MacroEngines
         }
         public DynamicNodeList Descendants(Func<DynamicBackingItem, bool> func)
         {
-            var flattenedNodes = this.n.ChildrenAsList.Map(func, (DynamicBackingItem n) => { return n.ChildrenAsList; });
-            return new DynamicNodeList(flattenedNodes.ToList().ConvertAll(DynamicBackingItem => new DynamicNode(DynamicBackingItem)));
+            //var flattenedNodes = this.n.ChildrenAsList.Map(func, (DynamicBackingItem n) => { return n.ChildrenAsList; });
+            var flattenedNodes = this.n.ChildrenAsList.FlattenList(item => item.ChildrenAsList).Where(func);
+            return new DynamicNodeList(flattenedNodes.Select(dynamicBackingItem => new DynamicNode(dynamicBackingItem)));
         }
         public DynamicNodeList DescendantsOrSelf(int level)
         {
@@ -1049,8 +1060,9 @@ namespace umbraco.MacroEngines
                 {
                     thisNode.Add(this.n);
                 }
-                var flattenedNodes = this.n.ChildrenAsList.Map(func, (DynamicBackingItem n) => { return n.ChildrenAsList; });
-                return new DynamicNodeList(thisNode.Concat(flattenedNodes).ToList().ConvertAll(DynamicBackingItem => new DynamicNode(DynamicBackingItem)));
+                //var flattenedNodes = this.n.ChildrenAsList.Map(func, (DynamicBackingItem n) => { return n.ChildrenAsList; });
+                var flattenedNodes = this.n.ChildrenAsList.FlattenList(item => item.ChildrenAsList).Where(func);
+                return new DynamicNodeList(thisNode.Concat(flattenedNodes).Select(dynamicBackingItem => new DynamicNode(dynamicBackingItem)));
             }
             return new DynamicNodeList(new List<DynamicBackingItem>());
         }
@@ -1331,14 +1343,12 @@ namespace umbraco.MacroEngines
         {
             if (n == null) return null;
 
-            object result;
-            IProperty prop;
+            PropertyResult prop;
+            
             //check the cache first!
-            if (_cachedMemberOutput.TryGetValue(alias, out result))
-            {
-                prop = result as IProperty;
-                if (prop != null)
-                    return prop;
+            if (_cachedProperties.TryGetValue(alias, out prop))
+            {                                
+                return prop;
             }
 
             try
@@ -1354,6 +1364,12 @@ namespace umbraco.MacroEngines
                         prop = n.GetProperty(alias);
                     }
                 }
+                if (prop == null && alias.StartsWith("_"))
+                {
+                    //if the prop is still null but it starts with an _ then we'll check recursively
+                    var recursiveAlias = alias.Substring(1, alias.Length - 1);
+                    prop = n.GetProperty(recursiveAlias, true);
+                }
             }
             catch (Exception)
             {
@@ -1364,7 +1380,7 @@ namespace umbraco.MacroEngines
                 return null;
 
             //cache it!
-            _cachedMemberOutput.TryAdd(alias, prop);
+            _cachedProperties.TryAdd(alias, prop);
 
             return prop;
         }

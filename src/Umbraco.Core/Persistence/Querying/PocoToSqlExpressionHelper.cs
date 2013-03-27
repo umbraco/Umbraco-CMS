@@ -468,6 +468,9 @@ namespace Umbraco.Core.Persistence.Querying
             if(fieldType == typeof(DateTime))
                 return "'" + EscapeParam(((DateTime)value).ToString(CultureInfo.InvariantCulture)) + "'";
 
+            if (fieldType == typeof(bool))
+                return ((bool)value) ? Convert.ToString(1, CultureInfo.InvariantCulture) : Convert.ToString(0, CultureInfo.InvariantCulture);
+
             return ShouldQuoteValue(fieldType)
                     ? "'" + EscapeParam(value) + "'"
                     : value.ToString();
@@ -487,8 +490,8 @@ namespace Umbraco.Core.Persistence.Querying
         {
             var column = pocoData.Columns.FirstOrDefault(x => x.Value.PropertyInfo.Name == name);
             return string.Format("{0}.{1}",
-                SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(pocoData.TableInfo.TableName),
-                SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(column.Value.ColumnName));
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(pocoData.TableInfo.TableName),
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(column.Value.ColumnName));
         }
 
         protected string RemoveQuote(string exp)

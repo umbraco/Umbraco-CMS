@@ -183,16 +183,26 @@ namespace Umbraco.Core.IO
             }
         }
 
+	    private static string _root;
+        /// <summary>
+        /// Gets the root path of the application
+        /// </summary>
         public static string Root
         {
             get
             {
-                string appPath = HttpRuntime.AppDomainAppVirtualPath ?? string.Empty;
-                if (appPath == "/")
-                    appPath = string.Empty;
+                if (_root == null)
+                {
+                    string appPath = HttpRuntime.AppDomainAppVirtualPath ?? string.Empty;
+                    if (appPath == "/")
+                        appPath = string.Empty;
 
-                return appPath;
+                    _root = appPath;    
+                }
+                return _root;
             }
+            //Only required for unit tests
+            internal set { _root = value; }
         }
     }
 

@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Persistence
             var engine = new SqlCeEngine(settings.ConnectionString);
             engine.CreateDatabase();
 
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntaxProvider.Instance;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 
             //Create the umbraco database
 			_dbContext.Database.CreateDatabaseSchema(false);

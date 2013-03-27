@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
             string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
 
-            return sql.From(SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName));
+            return sql.From(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName));
         }
 
         public static Sql Where<T>(this Sql sql, Expression<Func<T, bool>> predicate)
@@ -38,8 +38,8 @@ namespace Umbraco.Core.Persistence
             string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
 
             var syntax = string.Format("{0}.{1}",
-                SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName),
-                SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(columnName));
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName),
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(columnName));
 
             return sql.OrderBy(syntax);
         }
@@ -54,8 +54,8 @@ namespace Umbraco.Core.Persistence
             string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
 
             var syntax = string.Format("{0}.{1} DESC",
-                SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName),
-                SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(columnName));
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName),
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(columnName));
 
             return sql.OrderBy(syntax);
         }
@@ -65,7 +65,7 @@ namespace Umbraco.Core.Persistence
             var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
             var columnName = column.FirstAttribute<ColumnAttribute>().Name;
 
-            return sql.GroupBy(SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(columnName));
+            return sql.GroupBy(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(columnName));
         }
 
         public static Sql.SqlJoinClause InnerJoin<T>(this Sql sql)
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Persistence
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
             string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
 
-            return sql.InnerJoin(SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName));
+            return sql.InnerJoin(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName));
         }
 
         public static Sql.SqlJoinClause LeftJoin<T>(this Sql sql)
@@ -83,7 +83,7 @@ namespace Umbraco.Core.Persistence
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
             string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
 
-            return sql.LeftJoin(SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName));
+            return sql.LeftJoin(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName));
         }
 
         public static Sql.SqlJoinClause LeftOuterJoin<T>(this Sql sql)
@@ -92,7 +92,7 @@ namespace Umbraco.Core.Persistence
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
             string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
 
-            return sql.LeftOuterJoin(SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName));
+            return sql.LeftOuterJoin(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName));
         }
 
         public static Sql.SqlJoinClause RightJoin<T>(this Sql sql)
@@ -101,7 +101,7 @@ namespace Umbraco.Core.Persistence
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
             string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
 
-            return sql.RightJoin(SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(tableName));
+            return sql.RightJoin(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName));
         }
 
         public static Sql On<TLeft, TRight>(this Sql.SqlJoinClause sql, Expression<Func<TLeft, object>> leftMember,
@@ -118,10 +118,10 @@ namespace Umbraco.Core.Persistence
             var rightColumnName = right.FirstAttribute<ColumnAttribute>().Name;
 
             string onClause = string.Format("{0}.{1} = {2}.{3}", 
-                SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(leftTableName),
-                SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(leftColumnName),
-                SyntaxConfig.SqlSyntaxProvider.GetQuotedTableName(rightTableName),
-                SyntaxConfig.SqlSyntaxProvider.GetQuotedColumnName(rightColumnName));
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(leftTableName),
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(leftColumnName),
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(rightTableName),
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(rightColumnName));
             return sql.On(onClause);
         }
     }

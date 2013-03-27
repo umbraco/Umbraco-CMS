@@ -2,6 +2,7 @@ using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml;
+using Umbraco.Core;
 using umbraco.cms.businesslogic.datatype.controls;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +41,11 @@ namespace umbraco.cms.presentation
             InitializeComponent();
             base.OnInit(e);
 
-            _media = new cms.businesslogic.media.Media(int.Parse(Request.QueryString["id"]));
+            int id = int.Parse(Request.QueryString["id"]);
+
+            //Loading Media via new public service to ensure that the Properties are loaded correct
+            var media = ApplicationContext.Current.Services.MediaService.GetById(id);
+            _media = new cms.businesslogic.media.Media(media);
 
             // Save media on first load
             bool exists = SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @nodeId",

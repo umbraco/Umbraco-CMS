@@ -209,7 +209,7 @@ namespace umbraco.controls
             // zb-00036 #29889 : fix property types getter to get the right set of properties
             // ge : had a bit of a corrupt db and got weird NRE errors so rewrote this to catch the error and rethrow with detail
             var propertyTypes = tab.GetPropertyTypes(_content.ContentType.Id);
-            foreach (var propertyType in propertyTypes)
+            foreach (var propertyType in propertyTypes.OrderBy(x => x.SortOrder))
             {
                 var property = _content.getProperty(propertyType);
                 if (property != null && tabPage != null)

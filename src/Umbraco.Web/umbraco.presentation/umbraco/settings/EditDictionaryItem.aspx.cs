@@ -88,8 +88,12 @@ namespace umbraco.settings
 
 		private void save_click(object sender, System.Web.UI.ImageClickEventArgs e) {
 			
-            foreach (TextBox t in languageFields) {
-				if (t.Text != "") {
+            foreach (TextBox t in languageFields) 
+            {
+                //check for null but allow empty string!
+                // http://issues.umbraco.org/issue/U4-1931
+				if (t.Text != null) 
+                {
 					currentItem.setValue(int.Parse(t.ID),t.Text);
 				}
 			}

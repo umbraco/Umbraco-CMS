@@ -187,6 +187,7 @@ namespace umbraco.controls
 
             // reload content type (due to caching)
             LoadContentType();
+            BindTabs();
 
             // Only if the doctype alias changed, cause a regeneration of the xml cache file since
             // the xml element names will need to be updated to reflect the new alias
@@ -651,40 +652,26 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 propertyType.DataTypeDefinitionId = dataTypeDefinition.Id;
                 propertyType.DataTypeId = dataTypeDefinition.ControlId;
 
-                if (propertyType.PropertyGroupId != gpw.GenricPropertyControl.Tab)
+                if (propertyType.PropertyGroupId == null || propertyType.PropertyGroupId.Value != gpw.GenricPropertyControl.Tab)
                 {
                     if (gpw.GenricPropertyControl.Tab == 0)
                     {
-                        propertyType.PropertyGroupId = 0;
+                        propertyType.PropertyGroupId = new Lazy<int>(() => 0);
                     }
                     else if (contentTypeItem.PropertyGroups.Any(x => x.Id == gpw.GenricPropertyControl.Tab))
                     {
-                        propertyType.PropertyGroupId = gpw.GenricPropertyControl.Tab;
+                        propertyType.PropertyGroupId = new Lazy<int>(() => gpw.GenricPropertyControl.Tab);
                     }
                     else if (contentTypeItem.PropertyGroups.Any(x => x.ParentId == gpw.GenricPropertyControl.Tab))
                     {
                         var propertyGroup = contentTypeItem.PropertyGroups.First(x => x.ParentId == gpw.GenricPropertyControl.Tab);
-                        propertyType.PropertyGroupId = propertyGroup.Id;
+                        propertyType.PropertyGroupId = new Lazy<int>(() => propertyGroup.Id);
                     }
                     else
                     {
                         var propertyGroup = contentTypeItem.CompositionPropertyGroups.First(x => x.Id == gpw.GenricPropertyControl.Tab);
                         contentTypeItem.AddPropertyGroup(propertyGroup.Name);
                         contentTypeItem.MovePropertyType(propertyType.Alias, propertyGroup.Name);
-
-                        //if (
-                        //    contentTypeItem.CompositionPropertyGroups.Any(
-                        //        x => x.ParentId == gpw.GenricPropertyControl.Tab))
-                        //{
-                        //    var propertyGroups = contentTypeItem.CompositionPropertyGroups.Where(x => x.ParentId == gpw.GenricPropertyControl.Tab);
-                        //    var propertyGroup = propertyGroups.First();
-                        //    propertyType.PropertyGroupId = propertyGroup.Id;
-                        //}
-                        //else
-                        //{
-                        //    var propertyGroup = contentTypeItem.CompositionPropertyGroups.First(x => x.Id == gpw.GenricPropertyControl.Tab);
-                        //    contentTypeItem.AddPropertyGroup(propertyGroup.Name);
-                        //}
                     }
                 }
 
@@ -911,7 +898,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             dt.Columns.Add("id");
             dt.Columns.Add("order");
 
-            foreach (var grp in _contentType.PropertyTypeGroups)
+            foreach (var grp in _contentType.PropertyTypeGroups.OrderBy(p => p.SortOrder))
             {
                 if (grp.ContentTypeId == _contentType.Id && grp.ParentId == 0)
                 {

@@ -41,11 +41,11 @@ namespace Umbraco.Core.Persistence.Repositories
                .RightJoin<PropertyTypeDto>()
                .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
                .InnerJoin<DataTypeDto>()
-               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
-               .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
+               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId);
 
             var translator = new SqlTranslator<PropertyType>(sqlClause, query);
-            var sql = translator.Translate();
+            var sql = translator.Translate()
+                                .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
 
@@ -108,7 +108,12 @@ namespace Umbraco.Core.Persistence.Repositories
             //Insert collection of allowed content types
             foreach (var allowedContentType in entity.AllowedContentTypes)
             {
-                Database.Insert(new ContentTypeAllowedContentTypeDto { Id = entity.Id, AllowedId = allowedContentType.Id.Value, SortOrder = allowedContentType.SortOrder });
+                Database.Insert(new ContentTypeAllowedContentTypeDto
+                                    {
+                                        Id = entity.Id,
+                                        AllowedId = allowedContentType.Id.Value,
+                                        SortOrder = allowedContentType.SortOrder
+                                    });
             }
 
             var propertyFactory = new PropertyGroupFactory(nodeDto.NodeId);
@@ -119,22 +124,31 @@ namespace Umbraco.Core.Persistence.Repositories
                 var tabDto = propertyFactory.BuildGroupDto(propertyGroup);
                 var primaryKey = Convert.ToInt32(Database.Insert(tabDto));
                 propertyGroup.Id = primaryKey;//Set Id on PropertyGroup
+
+                //Ensure that the PropertyGroup's Id is set on the PropertyTypes within a group
+                //unless the PropertyGroupId has already been changed.
+                foreach (var propertyType in propertyGroup.PropertyTypes)
+                {
+                    if (propertyType.IsPropertyDirty("PropertyGroupId") == false)
+                    {
+                        var tempGroup = propertyGroup;
+                        propertyType.PropertyGroupId = new Lazy<int>(() => tempGroup.Id);
+                    }
+                }
             }
 
             //Insert PropertyTypes
-            foreach (var propertyGroup in entity.PropertyGroups)
+            foreach (var propertyType in entity.PropertyTypes)
             {
-                foreach (var propertyType in propertyGroup.PropertyTypes)
-                {
-                    var propertyTypeDto = propertyFactory.BuildPropertyTypeDto(propertyGroup.Id, propertyType);
-                    var primaryKey = Convert.ToInt32(Database.Insert(propertyTypeDto));
-                    propertyType.Id = primaryKey;//Set Id on PropertyType
+                var tabId = propertyType.PropertyGroupId != null ? propertyType.PropertyGroupId.Value : default(int);
+                var propertyTypeDto = propertyFactory.BuildPropertyTypeDto(tabId, propertyType);
+                int typePrimaryKey = Convert.ToInt32(Database.Insert(propertyTypeDto));
+                propertyType.Id = typePrimaryKey; //Set Id on new PropertyType
 
-                    //Update the current PropertyType with correct ControlId and DatabaseType
-                    var dataTypeDto = Database.FirstOrDefault<DataTypeDto>("WHERE nodeId = @Id", new { Id = propertyTypeDto.DataTypeId });
-                    propertyType.DataTypeId = dataTypeDto.ControlId;
-                    propertyType.DataTypeDatabaseType = dataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true);
-                }
+                //Update the current PropertyType with correct ControlId and DatabaseType
+                var dataTypeDto = Database.FirstOrDefault<DataTypeDto>("WHERE nodeId = @Id", new { Id = propertyTypeDto.DataTypeId });
+                propertyType.DataTypeId = dataTypeDto.ControlId;
+                propertyType.DataTypeDatabaseType = dataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true);
             }
         }
 
@@ -267,15 +281,18 @@ namespace Umbraco.Core.Persistence.Repositories
                 foreach (var propertyType in propertyGroup.PropertyTypes)
                 {
                     if (propertyType.IsPropertyDirty("PropertyGroupId") == false)
-                        propertyType.PropertyGroupId = propertyGroup.Id;
+                    {
+                        var tempGroup = propertyGroup;
+                        propertyType.PropertyGroupId = new Lazy<int>(() => tempGroup.Id);
+                    }
                 }
             }
 
             //Run through all PropertyTypes to insert or update entries
             foreach (var propertyType in entity.PropertyTypes)
             {
-                var propertyTypeDto = propertyGroupFactory.BuildPropertyTypeDto(propertyType.PropertyGroupId,
-                                                                                propertyType);
+                var tabId = propertyType.PropertyGroupId != null ? propertyType.PropertyGroupId.Value : default(int);
+                var propertyTypeDto = propertyGroupFactory.BuildPropertyTypeDto(tabId, propertyType);
                 int typePrimaryKey = propertyType.HasIdentity
                                          ? Database.Update(propertyTypeDto)
                                          : Convert.ToInt32(Database.Insert(propertyTypeDto));

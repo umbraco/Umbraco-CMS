@@ -112,7 +112,7 @@ namespace Umbraco.Core
         public void ConfigureEmbeddedDatabaseConnection()
         {
             const string providerName = "System.Data.SqlServerCe.4.0";
-            const string connectionString = "Datasource=|DataDirectory|Umbraco.sdf";
+            const string connectionString = @"Data Source=|DataDirectory|\Umbraco.sdf";
 
             SaveConnectionString(connectionString, providerName);
 
@@ -337,21 +337,22 @@ namespace Umbraco.Core
 
         internal void Initialize(string providerName)
         {
-            if (providerName.StartsWith("MySql"))
-            {
-                SyntaxConfig.SqlSyntaxProvider = MySqlSyntax.Provider;
-            }
-            else if (providerName.Contains("SqlServerCe"))
-            {
-                SyntaxConfig.SqlSyntaxProvider = SqlCeSyntax.Provider;
-            }
-            else
-            {
-                SyntaxConfig.SqlSyntaxProvider = SqlServerSyntax.Provider;
-            }
-
             _providerName = providerName;
-            _configured = true;
+
+            try
+            {
+                SqlSyntaxContext.SqlSyntaxProvider =
+                    SqlSyntaxProvidersResolver.Current.GetByProviderNameOrDefault(providerName);
+                
+                _configured = true;
+            }
+            catch (Exception e)
+            {
+                _configured = false;
+
+                LogHelper.Info<DatabaseContext>("Initialization of the DatabaseContext failed with following error: " + e.Message);
+                LogHelper.Info<DatabaseContext>(e.StackTrace);
+            }
         }
 
         internal DatabaseSchemaResult ValidateDatabaseSchema()
@@ -388,7 +389,7 @@ namespace Umbraco.Core
                 var message = string.Empty;
 
                 var database = new UmbracoDatabase(_connectionString, ProviderName);
-                var supportsCaseInsensitiveQueries = SyntaxConfig.SqlSyntaxProvider.SupportsCaseInsensitiveQueries(database);
+                var supportsCaseInsensitiveQueries = SqlSyntaxContext.SqlSyntaxProvider.SupportsCaseInsensitiveQueries(database);
                 if (supportsCaseInsensitiveQueries  == false)
                 {
                     message = "<p>&nbsp;</p><p>The database you're trying to use does not support case insensitive queries. <br />We currently do not support these types of databases.</p>" +
@@ -411,7 +412,7 @@ namespace Umbraco.Core
                 }
                 else
                 {
-                    if (SyntaxConfig.SqlSyntaxProvider == MySqlSyntaxProvider.Instance)
+                    if (SqlSyntaxContext.SqlSyntaxProvider.GetType() == typeof(MySqlSyntaxProvider))
                     {
                         message = "<p>&nbsp;</p><p>Congratulations, the database step ran successfully!</p>" +
                                   "<p>Note: You're using MySQL and the database instance you're connecting to seems to support case insensitive queries.</p>" +

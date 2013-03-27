@@ -232,7 +232,6 @@ namespace Umbraco.Core
                     "NuGet.",
                     "RouteDebugger,",
                     "SqlCE4Umbraco,",
-                    "Umbraco.Core,",
                     "umbraco.datalayer,",
                     "umbraco.interfaces,",										
 					"umbraco.providers,",

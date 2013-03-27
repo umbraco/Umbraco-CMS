@@ -12,7 +12,7 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
         [SetUp]
         public void SetUp()
         {
-            SyntaxConfig.SqlSyntaxProvider = SqlCeSyntaxProvider.Instance;
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
         }
 
         [Test]
@@ -21,10 +21,10 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
             var type = typeof (NodeDto);
             var definition = DefinitionFactory.GetTableDefinition(type);
 
-            string create = SyntaxConfig.SqlSyntaxProvider.Format(definition);
-            string primaryKey = SyntaxConfig.SqlSyntaxProvider.FormatPrimaryKey(definition);
-            var indexes = SyntaxConfig.SqlSyntaxProvider.Format(definition.Indexes);
-            var keys = SyntaxConfig.SqlSyntaxProvider.Format(definition.ForeignKeys);
+            string create = SqlSyntaxContext.SqlSyntaxProvider.Format(definition);
+            string primaryKey = SqlSyntaxContext.SqlSyntaxProvider.FormatPrimaryKey(definition);
+            var indexes = SqlSyntaxContext.SqlSyntaxProvider.Format(definition.Indexes);
+            var keys = SqlSyntaxContext.SqlSyntaxProvider.Format(definition.ForeignKeys);
 
             Console.WriteLine(create);
             Console.WriteLine(primaryKey);
@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
         [TearDown]
         public void TearDown()
         {
-            SyntaxConfig.SqlSyntaxProvider = null;
+            SqlSyntaxContext.SqlSyntaxProvider = null;
         }
     }
 }

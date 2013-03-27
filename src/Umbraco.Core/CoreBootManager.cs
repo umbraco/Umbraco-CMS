@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
@@ -10,6 +8,7 @@ using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
@@ -61,26 +60,35 @@ namespace Umbraco.Core
 				new PetaPocoUnitOfWorkProvider(dbFactory), 
 				new FileUnitOfWorkProvider(), 
 				new PublishingStrategy());
-			
-			//create the ApplicationContext
-			ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext);
 
-            //initialize the DatabaseContext
-			dbContext.Initialize();
+            CreateApplicationContext(dbContext, serviceContext);
 
             InitializeApplicationEventsResolver();
 
 			InitializeResolvers();
-            
+
+            //initialize the DatabaseContext
+            dbContext.Initialize();
+
             //now we need to call the initialize methods
             ApplicationEventsResolver.Current.ApplicationEventHandlers
                 .ForEach(x => x.OnApplicationInitialized(UmbracoApplication, ApplicationContext));
-
 
 			_isInitialized = true;
 
 			return this;
 		}
+
+        /// <summary>
+        /// Creates and assigns the application context singleton
+        /// </summary>
+        /// <param name="dbContext"></param>
+        /// <param name="serviceContext"></param>
+        protected virtual void CreateApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
+        {
+            //create the ApplicationContext
+            ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext);
+        }
 
         /// <summary>
         /// Special method to initialize the ApplicationEventsResolver and any modifications required for it such 
@@ -135,8 +143,7 @@ namespace Umbraco.Core
 			if (_isComplete)
 				throw new InvalidOperationException("The boot manager has already been completed");
 
-			//freeze resolution to not allow Resolvers to be modified
-			Resolution.Freeze();
+		    FreezeResolution();
 
 			//stop the timer and log the output
 			_timer.Dispose();
@@ -161,6 +168,14 @@ namespace Umbraco.Core
 			return this;
 		}
 
+        /// <summary>
+        /// Freeze resolution to not allow Resolvers to be modified
+        /// </summary>
+        protected virtual void FreezeResolution()
+        {
+            Resolution.Freeze();
+        }
+
 		/// <summary>
 		/// Create the resolvers
 		/// </summary>
@@ -168,6 +183,12 @@ namespace Umbraco.Core
 		{
 			RepositoryResolver.Current = new RepositoryResolver(
 				new RepositoryFactory());
+
+		    SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
+                new[] { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) })
+		        {
+		            CanResolveBeforeFrozen = true
+		        };
 
 			CacheRefreshersResolver.Current = new CacheRefreshersResolver(
 				() => PluginManager.Current.ResolveCacheRefreshers());

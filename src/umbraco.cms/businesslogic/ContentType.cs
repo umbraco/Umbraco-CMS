@@ -139,7 +139,8 @@ namespace umbraco.cms.businesslogic
                 }
                 foreach (Tuple<string, string> key in toDelete)
                 {
-                    _propertyTypeCache.Remove(key);
+                    if(_propertyTypeCache != null)
+                        _propertyTypeCache.Remove(key);
                 }
             }
             //don't put lock around this as it is ConcurrentDictionary.
@@ -632,10 +633,17 @@ namespace umbraco.cms.businesslogic
                 if (value != MasterContentType)
                 {
                     //TODO: Add support for multiple masters
-                    foreach (var mct in MasterContentTypes)
+                    /*foreach (var mct in MasterContentTypes)
                     {
                         RemoveParentContentType(mct);
+                    }*/
+
+                    if (MasterContentTypes.Count > 0)
+                    {
+                        var masterId = MasterContentTypes[0];
+                        RemoveParentContentType(masterId);
                     }
+
                     AddParentContentType(value);
                 }
             }
@@ -1392,14 +1400,23 @@ namespace umbraco.cms.businesslogic
             }
 
             // zb-00036 #29889 : yet we may want to be able to get *all* property types
+            // Note: This will get ALL PropertyTypes that is associated with a specific Tab 
+            // regardless of the PropertyTypes belonging to the current ContentType.
             public List<PropertyType> GetAllPropertyTypes()
             {
-                var tmp = new List<PropertyType>();
+                var db = ApplicationContext.Current.DatabaseContext.Database;
+                var propertyTypeDtos = db.Fetch<PropertyTypeDto>("WHERE propertyTypeGroupId = @Id", new {Id = _id});
+                var tmp = propertyTypeDtos
+                            .Select(propertyTypeDto => PropertyType.GetPropertyType(propertyTypeDto.Id))
+                            .ToList();
 
-                using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(@"select id from cmsPropertyType where propertyTypeGroupId = {0}", _id)))
+                var propertyTypeGroupDtos = db.Fetch<PropertyTypeGroupDto>("WHERE parentGroupId = @Id", new {Id = _id});
+                foreach (var propertyTypeGroupDto in propertyTypeGroupDtos)
                 {
-                    while (dr.Read())
-                        tmp.Add(PropertyType.GetPropertyType(dr.GetInt("id")));
+                    var inheritedPropertyTypeDtos = db.Fetch<PropertyTypeDto>("WHERE propertyTypeGroupId = @Id", new { Id = propertyTypeGroupDto.Id });
+                    tmp.AddRange(inheritedPropertyTypeDtos
+                                     .Select(propertyTypeDto => PropertyType.GetPropertyType(propertyTypeDto.Id))
+                                     .ToList());
                 }
 
                 return tmp;

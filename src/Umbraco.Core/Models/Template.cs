@@ -29,8 +29,8 @@ namespace Umbraco.Core.Models
             base.Path = path;
             ParentId = -1;
             Key = name.EncodeAsGuid();
-            _name = name;
-            _alias = alias;
+            _name = name.Replace("/", ".").Replace("\\", "");
+            _alias = alias.ToSafeAlias();
 
             CreateDate = DateTime.Now;
             UpdateDate = DateTime.Now;
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Models
         internal string NodePath { get; set; }
 
         [DataMember]
-        internal int MasterTemplateId { get; set; }
+        internal Lazy<int> MasterTemplateId { get; set; }
 
         [DataMember]
         internal string MasterTemplateAlias { get; set; }

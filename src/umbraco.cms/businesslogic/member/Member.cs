@@ -588,12 +588,20 @@ namespace umbraco.cms.businesslogic.member
                         if (property.Value != null)
                         {
                             string dbType = property.PropertyType.DataTypeDefinition.DbType;
-                            if (dbType.Equals("Int"))
+                            if (dbType.Equals("Integer"))
                             {
-                                int value = 0;
-                                if (int.TryParse(property.Value.ToString(), out value))
+                                if (property.Value is bool)
                                 {
-                                    poco.Integer = value;
+                                    int val = Convert.ToInt32(property.Value);
+                                    poco.Integer = val;
+                                }
+                                else
+                                {
+                                    int value = 0;
+                                    if (int.TryParse(property.Value.ToString(), out value))
+                                    {
+                                        poco.Integer = value;
+                                    }
                                 }
                             }
                             else if (dbType.Equals("Date"))

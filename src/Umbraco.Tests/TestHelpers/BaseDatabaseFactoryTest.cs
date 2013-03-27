@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
@@ -64,6 +66,9 @@ namespace Umbraco.Tests.TestHelpers
             RepositoryResolver.Current = new RepositoryResolver(
                 new RepositoryFactory());
 
+            SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
+                new List<Type>{ typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) }) { CanResolveBeforeFrozen = true};
+
             //Get the connectionstring settings from config
             var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
             ConfigurationManager.AppSettings.Set(Core.Configuration.GlobalSettings.UmbracoConnectionName, @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf");
@@ -80,6 +85,9 @@ namespace Umbraco.Tests.TestHelpers
 				new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy())) { IsReady = true };
 
             InitializeDatabase();
+
+            //ensure the configuration matches the current version for tests
+            SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
         }
 
         protected virtual void InitializeDatabase()
@@ -93,18 +101,25 @@ namespace Umbraco.Tests.TestHelpers
         [TearDown]
         public virtual void TearDown()
         {
-			DatabaseContext.Database.Dispose();
-			//reset the app context            
-			ApplicationContext.ApplicationCache.ClearAllCache();
+            if (ApplicationContext != null)
+            {
+                if (DatabaseContext != null && DatabaseContext.Database != null)
+                {
+                    DatabaseContext.Database.Dispose();        
+                }
+                //reset the app context            
+                ApplicationContext.ApplicationCache.ClearAllCache();    
+            }
 
-            SyntaxConfig.SqlSyntaxProvider = null;
-
+            SqlSyntaxContext.SqlSyntaxProvider = null;
+            
 			//legacy API database connection close - because a unit test using PetaPoco db-layer can trigger the usage of SqlHelper we need to ensure that a possible connection is closed.
 			SqlCeContextGuardian.CloseBackgroundConnection();
 			
 			ApplicationContext.Current = null;
 			Resolution.IsFrozen = false;
 			RepositoryResolver.Reset();
+            SqlSyntaxProvidersResolver.Reset();
 
             TestHelper.CleanContentDirectories();
 			

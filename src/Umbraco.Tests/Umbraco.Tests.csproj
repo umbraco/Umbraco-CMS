@@ -262,6 +262,13 @@
     <Compile Include="Services\ContentServicePerformanceTest.cs" />
     <Compile Include="Services\ContentServiceTests.cs" />
     <Compile Include="Services\ContentTypeServiceTests.cs" />
+    <Compile Include="Services\DataTypeServiceTests.cs" />
+    <Compile Include="Services\Importing\PackageImportTests.cs" />
+    <Compile Include="Services\Importing\ImportResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ImportResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Services\ThreadSafetyServiceTest.cs" />
     <Compile Include="Surface\PluginControllerAreaTests.cs" />
     <Compile Include="Templates\MasterPageHelperTests.cs" />
@@ -376,6 +383,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>SqlResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Services\Importing\ImportResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="TestHelpers\ExamineHelpers\ExamineResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ExamineResources.Designer.cs</LastGenOutput>
@@ -414,6 +425,11 @@
     <Content Include="Migrations\SqlScripts\SqlCe-SchemaAndData-4110.sql" />
     <Content Include="Migrations\SqlScripts\SqlCeTotal-480.sql" />
     <Content Include="Migrations\SqlScripts\SqlServerTotal-480.sql" />
+    <Content Include="Services\Importing\InheritedDocTypes-Package.xml" />
+    <Content Include="Services\Importing\StandardMvc-Package.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Services\Importing\uBlogsy-Package.xml" />
     <Content Include="TestHelpers\ExamineHelpers\media.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

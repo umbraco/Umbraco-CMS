@@ -262,6 +262,7 @@
     <Compile Include="Media\ImageUrlProviders\ImageUrlProvider.cs" />
     <Compile Include="Models\DynamicPublishedContent.cs" />
     <Compile Include="Models\DynamicPublishedContentList.cs" />
+    <Compile Include="Models\IOwnerCollectionAware.cs" />
     <Compile Include="Models\PartialViewMacroModel.cs" />
     <Compile Include="Models\PublishedContentBase.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
@@ -278,6 +279,7 @@
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
     <Compile Include="Mvc\UmbracoAuthorizeAttribute.cs" />
+    <Compile Include="Mvc\NotChildAction.cs" />
     <Compile Include="Mvc\UmbracoAuthorizedController.cs" />
     <Compile Include="Mvc\UmbracoViewPage.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
@@ -2034,7 +2036,7 @@
     <Content Include="umbraco.presentation\umbraco\create\media.ascx" />
     <Content Include="umbraco.presentation\umbraco\create\member.ascx" />
     <Content Include="umbraco.presentation\umbraco\create\nodeType.ascx">
-      <SubType>UserControl</SubType>
+      <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\create\simple.ascx" />
     <Content Include="umbraco.presentation\umbraco\create\xslt.ascx">

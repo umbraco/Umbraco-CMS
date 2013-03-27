@@ -68,17 +68,19 @@ namespace umbraco.editorControls
         /// </summary>
         public override string Text
         {
-            get
-            {
-                return base.Text;
-            }           
+            get { return base.Text; }
             set
             {
-                int integer;
-                
-                if (int.TryParse(value, NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out integer))
+                if (value != null)
                 {
-                    base.Text = integer.ToString();
+                    base.Text = "";//Resets the text-field in case the value is removed
+
+                    int integer;//The value will only be parsed if it contains a valid value
+                
+                if (int.TryParse(value, NumberStyles.AllowThousands | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out integer))
+                    {
+                        base.Text = integer.ToString(CultureInfo.InvariantCulture);
+                    }
                 }
             }
         }
