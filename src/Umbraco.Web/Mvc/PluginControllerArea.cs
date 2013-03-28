@@ -85,7 +85,7 @@ namespace Umbraco.Web.Mvc
         {
             foreach (var s in apiControllers)
             {
-                this.RouteControllerPlugin(s.ControllerName, s.ControllerType, routes, "Api", "Index", UrlParameter.Optional, "api");
+                this.RouteControllerPlugin(s.ControllerName, s.ControllerType, routes, "Api", "", UrlParameter.Optional, "api", isMvc: false);
             }
         }
 	}
