@@ -29,7 +29,8 @@ namespace Umbraco.Core.Models
         /// <param name="computerName"></param>
         /// <param name="createDate"></param>
         /// <param name="updateDate"></param>
-        public ServerRegistration(int id, string serverAddress, string computerName, DateTime createDate, DateTime updateDate)
+        /// <param name="isActive"></param>
+        public ServerRegistration(int id, string serverAddress, string computerName, DateTime createDate, DateTime updateDate, bool isActive)
         {
             UpdateDate = updateDate;
             CreateDate = createDate;
@@ -37,6 +38,7 @@ namespace Umbraco.Core.Models
             Id = id;
             ServerAddress = serverAddress;
             ComputerName = computerName;
+            IsActive = isActive;
         }
 
         /// <summary>

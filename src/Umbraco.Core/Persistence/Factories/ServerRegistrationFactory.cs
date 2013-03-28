@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public ServerRegistration BuildEntity(ServerRegistrationDto dto)
         {
-            var model = new ServerRegistration(dto.Id, dto.Address, dto.ComputerName, dto.DateRegistered, dto.LastNotified);
+            var model = new ServerRegistration(dto.Id, dto.Address, dto.ComputerName, dto.DateRegistered, dto.LastNotified, dto.IsActive);
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
             model.ResetDirtyProperties(false);
