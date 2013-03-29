@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Data;
@@ -11,33 +11,34 @@ using System.Web.UI.HtmlControls;
 
 using System.Xml.XPath;
 using System.Xml;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.presentation
 {
-    /// <summary>
-    /// Summary description for create.
-    /// </summary>
-    public partial class Create : BasePages.UmbracoEnsuredPage
+
+    public class Create : BasePages.UmbracoEnsuredPage
     {
         protected umbWindow createWindow;
-        protected System.Web.UI.WebControls.Label helpText;
-        protected System.Web.UI.WebControls.TextBox rename;
-        protected System.Web.UI.WebControls.Label Label1;
-        protected System.Web.UI.WebControls.ListBox nodeType;
+        protected Label helpText;
+        protected TextBox rename;
+        protected Label Label1;
+        protected ListBox nodeType;
+        protected PlaceHolder UI;
 
-        protected void Page_Load(object sender, System.EventArgs e)
+        protected override void OnLoad(EventArgs e)
         {
-            // Load create definitions
-            string nodeType = Request.QueryString["nodeType"];
+            base.OnLoad(e);
 
-            XmlDocument createDef = new XmlDocument();
-            XmlTextReader defReader = new XmlTextReader(IOHelper.MapPath(SystemFiles.CreateUiXml));
+            // Load create definitions
+            var nodeType = Request.QueryString["nodeType"];
+
+            var createDef = new XmlDocument();
+            var defReader = new XmlTextReader(IOHelper.MapPath(SystemFiles.CreateUiXml));
             createDef.Load(defReader);
             defReader.Close();
 
             // Find definition for current nodeType
-            XmlNode def = createDef.SelectSingleNode("//nodeType [@alias = '" + nodeType + "']");
+            var def = createDef.SelectSingleNode("//nodeType [@alias = '" + nodeType + "']");
             if (def == null)
             {
                 throw new ArgumentException("The create dialog for \"" + nodeType + "\" does not match anything defined in the \"" + SystemFiles.CreateUiXml + "\". This could mean an incorrectly installed package or a corrupt UI file");
@@ -46,7 +47,7 @@ namespace umbraco.cms.presentation
             try
             {
                 //headerTitle.Text = title.Text;
-                UI.Controls.Add(new UserControl().LoadControl(SystemDirectories.Umbraco + def.SelectSingleNode("./usercontrol").FirstChild.Value));
+                UI.Controls.Add(LoadControl(SystemDirectories.Umbraco + def.SelectSingleNode("./usercontrol").FirstChild.Value));
             }
             catch (Exception ex)
             {
@@ -54,24 +55,6 @@ namespace umbraco.cms.presentation
             }
         }
 
-        #region Web Form Designer generated code
-        override protected void OnInit(EventArgs e)
-        {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
-            base.OnInit(e);
-        }
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-
-        }
-        #endregion
     }
 }
