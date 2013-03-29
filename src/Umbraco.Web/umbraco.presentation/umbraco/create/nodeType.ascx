@@ -5,8 +5,8 @@
 </p>
 
 <div style="MARGIN-TOP: 0px"><%=umbraco.ui.Text("name")%>:
-<asp:RequiredFieldValidator id="RequiredFieldValidator1" ErrorMessage="*" ControlToValidate="rename" runat="server">*</asp:RequiredFieldValidator>
-<asp:TextBox id="rename" Runat="server" Width="350" CssClass="bigInput"></asp:TextBox>
+    <asp:RequiredFieldValidator id="RequiredFieldValidator1" ErrorMessage="*" ControlToValidate="rename" runat="server">*</asp:RequiredFieldValidator><br />
+    <asp:TextBox id="rename" Runat="server" Width="350" CssClass="bigInput"></asp:TextBox>
 </div>
 
 <div style="margin-top: 0px; margin-left: -3px; margin-bottom: 0;">
