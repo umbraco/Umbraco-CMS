@@ -209,7 +209,7 @@ namespace Umbraco.Core.Services
             _importedContentTypes = new Dictionary<string, IContentType>();
             var documentTypes = name.Equals("DocumentTypes")
                                     ? (from doc in element.Elements("DocumentType") select doc).ToList()
-                                    : new List<XElement> {element.Element("DocumentType")};
+                                    : new List<XElement> {element};
             //NOTE it might be an idea to sort the doctype XElements based on dependencies
             //before creating the doc types - should also allow for a better structure/inheritance support.
             foreach (var documentType in documentTypes)
