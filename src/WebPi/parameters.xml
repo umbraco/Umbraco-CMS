@@ -132,21 +132,29 @@
   </parameter>
 
   <!-- This is the hidden connection string with the newly created db account that is used in the web.config -->
-  <parameter name="Connection String" description="Connection string to enter into config" defaultValue="server={Database Server};database={Database Name};uid={Database Administrator};Pwd={Database Administrator Password};" tags="Hidden,SQL,SQLConnectionString">
+  <parameter name="Connection String" description="Connection string to enter into config" defaultValue="server={Database Server};database={Database Name};uid={Database Administrator};Pwd={Database Administrator Password};" tags="Hidden,SQL,SQLConnectionString,NoStore">
     <parameterEntry type="ProviderPath" scope="dbfullsql" match="installSQL2.sql" />
   </parameter>
 
   <parameter name="SQLCE Database Location" defaultValue="datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf" 
-             tags="SQLCE, Hidden">
+             tags="SQLCE, Hidden,NoStore">
     <parameterEntry type="XmlFile" scope="\\web.config$" match="//appSettings/add[@key='umbracoDbDSN']/@value" />
   </parameter>
   
   <!-- This is the hidden connection string with the newly created db account that is used in the web.config -->
   <parameter name="Connection String for Config" description="Connection string to enter into config" 
              defaultValue="server={Database Server};database={Database Name};user id={Database Username};password={Database Password}" 
-             tags="SQL, Hidden">
+             tags="SQL, Hidden,NoStore">
     <!-- scope=”web.config” will look for all web.config files under the root directory . Using scope=”\\web.config$” will select only the root web.config -->
     <parameterEntry type="XmlFile" scope="\\web.config$" match="//appSettings/add[@key='umbracoDbDSN']/@value" />
+  </parameter>
+
+ <!-- This is the hidden connection string with the newly created db account that is used in the web.config -->
+  <parameter name="Connection String for Config1" description="Connection string to enter into config" 
+             defaultValue="server={Database Server};database={Database Name};user id={Database Username};password={Database Password}" 
+             tags="SQL, Hidden,SQLConnectionString">
+    <!-- scope=”web.config” will look for all web.config files under the root directory . Using scope=”\\web.config$” will select only the root web.config -->
+    <parameterEntry type="XmlFile" scope="\\web.config$" match="//connectionStrings/add[@name='umbracoDbDSN']/@connectionString" />
   </parameter>
 
 </parameters>
