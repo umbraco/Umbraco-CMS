@@ -8,9 +8,10 @@
 //------------------------------------------------------------------------------
 
 namespace Umbraco.Web.UI.Umbraco {
-    
-    
-    public partial class Create {
+
+
+    public partial class CreateDialog
+    {
         
         /// <summary>
         /// AccessError control.

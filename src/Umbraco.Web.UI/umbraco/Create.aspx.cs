@@ -9,7 +9,7 @@ using umbraco.cms.presentation.Trees;
 
 namespace Umbraco.Web.UI.Umbraco
 {
-    public partial class Create : global::umbraco.cms.presentation.Create
+    public partial class CreateDialog : global::umbraco.cms.presentation.Create
     {
 
         //protected override void OnLoad(EventArgs e)

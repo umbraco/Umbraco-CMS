@@ -1,4 +1,4 @@
-<%@ Page Language="c#" MasterPageFile="masterpages/umbracoDialog.Master" Codebehind="Create.aspx.cs" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Umbraco.Create" %>
+<%@ Page Language="c#" MasterPageFile="masterpages/umbracoDialog.Master" Codebehind="CreateDialog.aspx.cs" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Umbraco.CreateDialog" %>
 
 <%@ Register Namespace="umbraco" TagPrefix="umb" Assembly="umbraco" %>
 
