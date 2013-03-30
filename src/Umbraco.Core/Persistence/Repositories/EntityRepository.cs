@@ -59,7 +59,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public virtual IUmbracoEntity Get(int id, Guid objectTypeId)
         {
             bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
-            var sql = GetBaseWhere(GetBase, isContent, objectTypeId, id).Append(GetGroupBy());
+            var sql = GetBaseWhere(GetBase, isContent, objectTypeId, id).Append(GetGroupBy(isContent));
             var nodeDto = _work.Database.FirstOrDefault<UmbracoEntityDto>(sql);
             if (nodeDto == null)
                 return null;
@@ -82,7 +82,7 @@ namespace Umbraco.Core.Persistence.Repositories
             else
             {
                 bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
-                var sql = GetBaseWhere(GetBase, isContent, objectTypeId).Append(GetGroupBy());
+                var sql = GetBaseWhere(GetBase, isContent, objectTypeId).Append(GetGroupBy(isContent));
                 var dtos = _work.Database.Fetch<UmbracoEntityDto>(sql);
 
                 var factory = new UmbracoEntityFactory();
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sqlClause = GetBase(false);
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
-            var sql = translator.Translate().Append(GetGroupBy());
+            var sql = translator.Translate().Append(GetGroupBy(false));
 
             var dtos = _work.Database.Fetch<UmbracoEntityDto>(sql);
 
@@ -114,7 +114,7 @@ namespace Umbraco.Core.Persistence.Repositories
             bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
             var sqlClause = GetBaseWhere(GetBase, isContent, objectTypeId);
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
-            var sql = translator.Translate().Append(GetGroupBy());
+            var sql = translator.Translate().Append(GetGroupBy(isContent));
 
             var dtos = _work.Database.Fetch<UmbracoEntityDto>(sql);
 
@@ -143,22 +143,26 @@ namespace Umbraco.Core.Persistence.Repositories
                                   "main.text",
                                   "main.nodeObjectType",
                                   "main.createDate",
-                                  "COUNT(parent.parentID) as children",
-                                  isContent
-                                      ? "SUM(CONVERT(int, document.published)) as published"
-                                      : "SUM(0) as published"
+                                  "COUNT(parent.parentID) as children"
                               };
+
+            if (isContent)
+            {
+                columns.Add("published.versionId as publishedVerison");
+                columns.Add("latest.versionId as newestVersion");
+            }
 
             var sql = new Sql()
                 .Select(columns.ToArray())
-                .From("FROM umbracoNode main")
+                .From("umbracoNode main")
                 .LeftJoin("umbracoNode parent").On("parent.parentID = main.id");
 
 
-            //NOTE Should this account for newest = 1 ? Scenarios: unsaved, saved not published, published
-
             if (isContent)
-                sql.LeftJoin("cmsDocument document").On("document.nodeId = main.id");
+            {
+                sql.LeftJoin("(SELECT nodeId, versionId FROM cmsDocument WHERE published = 1 GROUP BY nodeId, versionId) as published").On("main.id = published.nodeId");
+                sql.LeftJoin("(SELECT nodeId, versionId FROM cmsDocument WHERE newest = 1 GROUP BY nodeId, versionId) as latest").On("main.id = latest.nodeId");
+            }
 
             return sql;
         }
@@ -174,7 +178,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = baseQuery(isContent)
                 .Where("main.id = @Id", new {Id = id})
-                .Append(GetGroupBy());
+                .Append(GetGroupBy(isContent));
             return sql;
         }
 
@@ -186,12 +190,31 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected virtual Sql GetGroupBy()
+        protected virtual Sql GetGroupBy(bool isContent)
         {
+            var columns = new List<object>
+                              {
+                                  "main.id",
+                                  "main.trashed",
+                                  "main.parentID",
+                                  "main.nodeUser",
+                                  "main.level",
+                                  "main.path",
+                                  "main.sortOrder",
+                                  "main.uniqueID",
+                                  "main.text",
+                                  "main.nodeObjectType",
+                                  "main.createDate"
+                              };
+
+            if (isContent)
+            {
+                columns.Add("published.versionId");
+                columns.Add("latest.versionId");
+            }
+
             var sql = new Sql()
-                .GroupBy("main.id", "main.trashed", "main.parentID", "main.nodeUser", "main.level",
-                         "main.path", "main.sortOrder", "main.uniqueID", "main.text",
-                         "main.nodeObjectType", "main.createDate")
+                .GroupBy(columns.ToArray())
                 .OrderBy("main.sortOrder");
             return sql;
         }
@@ -218,8 +241,11 @@ namespace Umbraco.Core.Persistence.Repositories
             [Column("children")]
             public int Children { get; set; }
 
-            [Column("published")]
-            public int? HasPublishedVersion { get; set; }
+            [Column("publishedVerison")]
+            public Guid PublishedVersion { get; set; }
+
+            [Column("newestVerison")]
+            public Guid NewestVersion { get; set; }
         }
         #endregion
     }

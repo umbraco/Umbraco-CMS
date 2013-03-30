@@ -51,7 +51,15 @@ namespace Umbraco.Core.Models
             if (UmbracoObjectTypeCache.ContainsKey(umbracoObjectType))
                 return UmbracoObjectTypeCache[umbracoObjectType];
 
-            var attribute = umbracoObjectType.GetType().FirstAttribute<UmbracoObjectTypeAttribute>();
+            var type = typeof(UmbracoObjectTypes);
+            var memInfo = type.GetMember(umbracoObjectType.ToString());
+            var attributes = memInfo[0].GetCustomAttributes(typeof(UmbracoObjectTypeAttribute),
+                false);
+
+            if (attributes.Length == 0)
+                return Guid.Empty;
+
+            var attribute = ((UmbracoObjectTypeAttribute)attributes[0]);
             if (attribute == null)
                 return Guid.Empty;
 
@@ -77,7 +85,15 @@ namespace Umbraco.Core.Models
         /// <returns>a string of the FriendlyName</returns>
         public static string GetFriendlyName(this UmbracoObjectTypes umbracoObjectType)
         {
-            var attribute = umbracoObjectType.GetType().FirstAttribute<FriendlyNameAttribute>();
+            var type = typeof(UmbracoObjectTypes);
+            var memInfo = type.GetMember(umbracoObjectType.ToString());
+            var attributes = memInfo[0].GetCustomAttributes(typeof(UmbracoObjectTypeAttribute),
+                false);
+
+            if (attributes.Length == 0)
+                return string.Empty;
+
+            var attribute = ((UmbracoObjectTypeAttribute)attributes[0]);
             if (attribute == null)
                 return string.Empty;
 

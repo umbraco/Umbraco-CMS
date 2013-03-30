@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 
@@ -20,9 +21,16 @@ namespace Umbraco.Core.Persistence.Factories
                                  ParentId = dto.ParentId,
                                  Path = dto.Path,
                                  SortOrder = dto.SortOrder,
-                                 HasChildren = dto.Children > 0,
-                                 IsPublished = dto.HasPublishedVersion.HasValue && dto.HasPublishedVersion.Value > 0
+                                 HasChildren = dto.Children > 0
                              };
+
+            entity.IsPublished = dto.PublishedVersion != default(Guid) ||
+                                 (dto.NewestVersion != default(Guid) && dto.PublishedVersion == dto.NewestVersion);
+            entity.IsDraft = dto.NewestVersion != default(Guid) &&
+                             (dto.PublishedVersion == default(Guid) || dto.PublishedVersion != dto.NewestVersion);
+            entity.HasPendingChanges = dto.PublishedVersion != default(Guid) && dto.NewestVersion != default(Guid) &&
+                                       dto.PublishedVersion != dto.NewestVersion;
+
             return entity;
         }
 

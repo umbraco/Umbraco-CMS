@@ -18,6 +18,8 @@ namespace Umbraco.Core.Models
         private bool _trashed;
         private bool _hasChildren;
         private bool _isPublished;
+        private bool _isDraft;
+        private bool _hasPendingChanges;
         private Guid _nodeObjectTypeId;
 
         private static readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, int>(x => x.CreatorId);
@@ -29,6 +31,8 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo TrashedSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.Trashed);
         private static readonly PropertyInfo HasChildrenSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.HasChildren);
         private static readonly PropertyInfo IsPublishedSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.IsPublished);
+        private static readonly PropertyInfo IsDraftSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.IsDraft);
+        private static readonly PropertyInfo HasPendingChangesSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, bool>(x => x.HasPendingChanges);
         private static readonly PropertyInfo NodeObjectTypeIdSelector = ExpressionHelper.GetPropertyInfo<UmbracoEntity, Guid>(x => x.NodeObjectTypeId);
 
         public UmbracoEntity()
@@ -154,6 +158,32 @@ namespace Umbraco.Core.Models
                     _isPublished = value;
                     return _isPublished;
                 }, _isPublished, IsPublishedSelector);  
+            }
+        }
+
+        public bool IsDraft
+        {
+            get { return _isPublished; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _isDraft = value;
+                    return _isDraft;
+                }, _isDraft, IsDraftSelector);
+            }
+        }
+
+        public bool HasPendingChanges
+        {
+            get { return _hasPendingChanges; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _hasPendingChanges = value;
+                    return _hasPendingChanges;
+                }, _hasPendingChanges, HasPendingChangesSelector);
             }
         }
 
