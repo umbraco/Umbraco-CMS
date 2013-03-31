@@ -114,11 +114,13 @@ namespace Umbraco.Web
         /// <param name="applicationContext"> </param>
         /// <param name="contentCache">The published content cache.</param>
         /// <param name="mediaCache">The published media cache.</param>
+        /// <param name="preview">An optional value overriding detection of preview mode.</param>
         internal UmbracoContext(
 			HttpContextBase httpContext, 
 			ApplicationContext applicationContext,
             IPublishedContentCache contentCache,
-            IPublishedMediaCache mediaCache)
+            IPublishedMediaCache mediaCache,
+            bool? preview = null)
         {
             if (httpContext == null) throw new ArgumentNullException("httpContext");
             if (applicationContext == null) throw new ArgumentNullException("applicationContext");
@@ -131,6 +133,7 @@ namespace Umbraco.Web
 
             ContentCache = new ContextualPublishedContentCache(contentCache, this);
             MediaCache = new ContextualPublishedMediaCache(mediaCache, this);
+            InPreviewMode = preview ?? DetectInPreviewModeFromRequest();
 
 			// set the urls...
 			//original request url
@@ -319,22 +322,21 @@ namespace Umbraco.Web
         /// <summary>
         /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>
-        public bool InPreviewMode
-        {
-            get
-            {
-                var request = GetRequestFromContext();
-                if (request == null || request.Url == null)
-                    return false;
+        public bool InPreviewMode { get; private set; }
 
-                var currentUrl = request.Url.AbsolutePath;
-                // zb-00004 #29956 : refactor cookies names & handling
-                return
-                    StateHelper.Cookies.Preview.HasValue // has preview cookie
-                    && UmbracoUser != null // has user
-					&& !currentUrl.StartsWith(Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco)); // is not in admin UI
-            }
-        }   
+        private bool DetectInPreviewModeFromRequest()
+        {
+            var request = GetRequestFromContext();
+            if (request == null || request.Url == null)
+                return false;
+
+            var currentUrl = request.Url.AbsolutePath;
+            // zb-00004 #29956 : refactor cookies names & handling
+            return
+                StateHelper.Cookies.Preview.HasValue // has preview cookie
+                && UmbracoUser != null // has user
+                && !currentUrl.StartsWith(Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco)); // is not in admin UI
+        }
         
         private HttpRequestBase GetRequestFromContext()
         {

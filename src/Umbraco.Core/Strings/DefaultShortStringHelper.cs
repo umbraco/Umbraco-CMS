@@ -58,9 +58,14 @@ namespace Umbraco.Core.Strings
         static void InitializeLegacyUrlReplaceCharacters()
         {
             var replaceChars = UmbracoSettings.UrlReplaceCharacters;
-            foreach (var node in replaceChars.SelectNodes("char").Cast<System.Xml.XmlNode>())
+            if (replaceChars == null) return;
+            var nodes = replaceChars.SelectNodes("char");
+            if (nodes == null) return;
+            foreach (var node in nodes.Cast<System.Xml.XmlNode>())
             {
-                var org = node.Attributes.GetNamedItem("org");
+                var attributes = node.Attributes;
+                if (attributes == null) continue;
+                var org = attributes.GetNamedItem("org");
                 if (org != null && org.Value != "")
                     UrlReplaceCharacters[org.Value] = XmlHelper.GetNodeValue(node);
             }
