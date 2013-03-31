@@ -293,6 +293,9 @@ namespace Umbraco.Web
         /// </summary>
         public int? PageId
         {
+            // TODO - this is dirty old legacy tricks, we should clean it up at some point
+            // also, what is a "custom page" and when should this be either null, or different
+            // from PublishedContentRequest.PublishedContent.Id ??
             get
             {
                 try

@@ -327,8 +327,6 @@ namespace umbraco
 			{				
 				template templateDesign = new template(templateId);
 			
-				HttpContext.Current.Items["umbPageObject"] = this;
-
 				_pageContentControl = templateDesign.ParseWithControls(this);
 				_pageContent.Append(templateDesign.TemplateContent);
 			}

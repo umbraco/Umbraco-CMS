@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Security;
@@ -14,6 +15,7 @@ using System.Web.Caching;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml;
+using System.Xml.XPath;
 using System.Xml.Xsl;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -42,7 +44,6 @@ namespace umbraco
     public class macro
     {
         #region private properties
-
 
         /// <summary>Cache for <see cref="GetPredefinedXsltExtensions"/>.</summary>
         private static Dictionary<string, object> _predefinedExtensions;
@@ -767,17 +768,20 @@ namespace umbraco
                 HttpRuntime.Cache.Remove("macroXslt_" + XsltFile);
         }
 
+        #region LoadMacroXslt
+
+        // gets the control for the macro, using GetXsltTransform methods for execution
+        // will pick XmlDocument or Navigator mode depending on the capabilities of the published caches
         internal Control LoadMacroXslt(macro macro, MacroModel model, Hashtable pageElements, bool throwError)
         {
             if (XsltFile.Trim() != string.Empty)
             {
-                // Get main XML
-                var umbracoXml = umbraco.content.Instance.XmlContent;
+                XmlDocument macroXml = null;
 
-                // Create XML document for Macro
-                var macroXml = new XmlDocument();
+                // get master xml document
+                XmlDocument umbracoXml = umbraco.content.Instance.XmlContent;   
+                macroXml = new XmlDocument();
                 macroXml.LoadXml("<macro/>");
-
                 foreach (var prop in macro.Model.Properties)
                 {
                     AddMacroXmlNode(umbracoXml, macroXml, prop.Key, prop.Type, prop.Value);
@@ -785,10 +789,11 @@ namespace umbraco
 
                 if (HttpContext.Current.Request.QueryString["umbDebug"] != null && GlobalSettings.DebugMode)
                 {
+                    var outerXml = macroXml.OuterXml;
                     return
                         new LiteralControl("<div style=\"border: 2px solid green; padding: 5px;\"><b>Debug from " +
                                            macro.Name +
-                                           "</b><br/><p>" + HttpContext.Current.Server.HtmlEncode(macroXml.OuterXml) +
+                                           "</b><br/><p>" + HttpContext.Current.Server.HtmlEncode(outerXml) +
                                            "</p></div>");
                 }
 
@@ -798,7 +803,8 @@ namespace umbraco
 
                     try
                     {
-                        var result = CreateControlsFromText(GetXsltTransformResult(macroXml, xsltFile));
+                        var transformed = GetXsltTransformResult(macroXml, xsltFile);
+                        var result = CreateControlsFromText(transformed);
 
                         TraceInfo("umbracoMacro", "After performing transformation");
 
@@ -849,10 +855,13 @@ namespace umbraco
             return new LiteralControl(string.Empty);
         }
 
+        // gets the control for the macro, using GetXsltTransform methods for execution
         public Control loadMacroXSLT(macro macro, MacroModel model, Hashtable pageElements)
         {
             return LoadMacroXslt(macro, model, pageElements, false);
         }
+
+        #endregion
 
         /// <summary>
         /// Parses the text for umbraco Item controls that need to be rendered.
@@ -908,13 +917,16 @@ namespace umbraco
             return container;
         }
 
-        public static string GetXsltTransformResult(XmlDocument macroXML, XslCompiledTransform xslt)
+        #region GetXsltTransform
+
+        // gets the result of the xslt transform with no parameters - XmlDocument mode
+        public static string GetXsltTransformResult(XmlDocument macroXml, XslCompiledTransform xslt)
         {
-            return GetXsltTransformResult(macroXML, xslt, null);
+            return GetXsltTransformResult(macroXml, xslt, null);
         }
 
-        public static string GetXsltTransformResult(XmlDocument macroXML, XslCompiledTransform xslt,
-                                                    Dictionary<string, object> parameters)
+        // gets the result of the xslt transform - XmlDocument mode
+        public static string GetXsltTransformResult(XmlDocument macroXml, XslCompiledTransform xslt, Dictionary<string, object> parameters)
         {
             TextWriter tw = new StringWriter();
 
@@ -938,9 +950,48 @@ namespace umbraco
 
             // Do transformation
 			TraceInfo("umbracoMacro", "Before performing transformation");
-            xslt.Transform(macroXML.CreateNavigator(), xslArgs, tw);
+            xslt.Transform(macroXml.CreateNavigator(), xslArgs, tw);
 			return TemplateUtilities.ResolveUrlsFromTextString(tw.ToString());
         }
+
+        // gets the result of the xslt transform with no parameters - Navigator mode
+        public static string GetXsltTransformResult(XPathNavigator macroNavigator, XPathNavigator contentNavigator,
+            XslCompiledTransform xslt)
+        {
+            return GetXsltTransformResult(macroNavigator, contentNavigator, xslt, null);
+        }
+
+        // gets the result of the xslt transform - Navigator mode
+        public static string GetXsltTransformResult(XPathNavigator macroNavigator, XPathNavigator contentNavigator,
+            XslCompiledTransform xslt, Dictionary<string, object> parameters)
+        {
+            TextWriter tw = new StringWriter();
+
+            TraceInfo("umbracoMacro", "Before adding extensions");
+            XsltArgumentList xslArgs = AddXsltExtensions();
+            var lib = new library();
+            xslArgs.AddExtensionObject("urn:umbraco.library", lib);
+            TraceInfo("umbracoMacro", "After adding extensions");
+
+            // Add parameters
+            if (parameters == null || !parameters.ContainsKey("currentPage"))
+            {
+                var current = contentNavigator.Clone().Select("//* [@id=" + HttpContext.Current.Items["pageID"] + "]");
+                xslArgs.AddParam("currentPage", string.Empty, current);
+            }
+            if (parameters != null)
+            {
+                foreach (var parameter in parameters)
+                    xslArgs.AddParam(parameter.Key, string.Empty, parameter.Value);
+            }
+
+            // Do transformation
+            TraceInfo("umbracoMacro", "Before performing transformation");
+            xslt.Transform(macroNavigator, xslArgs, tw);
+            return TemplateUtilities.ResolveUrlsFromTextString(tw.ToString());
+        }
+
+        #endregion
 
         public static XsltArgumentList AddXsltExtensions()
         {
@@ -972,9 +1023,6 @@ namespace umbraco
                 TimeSpan.FromDays(1), // expires in 1 day (?)
                 GetXsltExtensionsImpl);
         }
-
-        // zb-00041 #29966 : cache the extensions
-
 
         private static Dictionary<string, object> GetXsltExtensionsImpl()
         {
@@ -1093,21 +1141,17 @@ namespace umbraco
             return xslArgs;
         }
 
-        private void AddMacroXmlNode(XmlDocument umbracoXml, XmlDocument macroXml, String macroPropertyAlias,
-                                     String macroPropertyType, String macroPropertyValue)
+        #region LoadMacroXslt (2)
+
+        // add elements to the <macro> root node, corresponding to parameters
+        private void AddMacroXmlNode(XmlDocument umbracoXml, XmlDocument macroXml,
+            string macroPropertyAlias, string macroPropertyType, string macroPropertyValue)
         {
             XmlNode macroXmlNode = macroXml.CreateNode(XmlNodeType.Element, macroPropertyAlias, string.Empty);
             var x = new XmlDocument();
 
-            var currentId = -1;
-            // If no value is passed, then use the current pageID as value
-            if (macroPropertyValue == string.Empty)
-            {
-                var umbPage = (page)HttpContext.Current.Items["umbPageObject"];
-                if (umbPage == null)
-                    return;
-                currentId = umbPage.PageID;
-            }
+            // if no value is passed, then use the current "pageID" as value
+            var contentId = macroPropertyValue == string.Empty ? UmbracoContext.Current.PageId.ToString() : macroPropertyValue;
 
 	        TraceInfo("umbracoMacro",
 	                  "Xslt node adding search start (" + macroPropertyAlias + ",'" +
@@ -1116,29 +1160,20 @@ namespace umbraco
             {
                 case "contentTree":
                     var nodeId = macroXml.CreateAttribute("nodeID");
-                    if (macroPropertyValue != string.Empty)
-                        nodeId.Value = macroPropertyValue;
-                    else
-                        nodeId.Value = currentId.ToString();
+                    nodeId.Value = contentId;
                     macroXmlNode.Attributes.SetNamedItem(nodeId);
 
                     // Get subs
                     try
                     {
-                        macroXmlNode.AppendChild(macroXml.ImportNode(umbracoXml.GetElementById(nodeId.Value), true));
+                        macroXmlNode.AppendChild(macroXml.ImportNode(umbracoXml.GetElementById(contentId), true));
                     }
                     catch
-                    {
-                        break;
-                    }
+                    { }
                     break;
-                case "contentCurrent":
-                    x.LoadXml("<nodes/>");
-                    XmlNode currentNode;
-                    if (macroPropertyValue != string.Empty)
-                        currentNode = macroXml.ImportNode(umbracoXml.GetElementById(macroPropertyValue), true);
-                    else
-                        currentNode = macroXml.ImportNode(umbracoXml.GetElementById(currentId.ToString()), true);
+
+                case "contentPicker":
+                    var currentNode = macroXml.ImportNode(umbracoXml.GetElementById(contentId), true);
 
                     // remove all sub content nodes
                     foreach (XmlNode n in currentNode.SelectNodes("node|*[@isDoc]"))
@@ -1147,37 +1182,36 @@ namespace umbraco
                     macroXmlNode.AppendChild(currentNode);
 
                     break;
-                case "contentSubs":
-                    x.LoadXml("<nodes/>");
-                    if (macroPropertyValue != string.Empty)
-                        x.FirstChild.AppendChild(x.ImportNode(umbracoXml.GetElementById(macroPropertyValue), true));
-                    else
-                        x.FirstChild.AppendChild(x.ImportNode(umbracoXml.GetElementById(currentId.ToString()), true));
-                    macroXmlNode.InnerXml = TransformMacroXml(x, "macroGetSubs.xsl");
+
+                case "contentSubs": // disable that one, it does not work anyway...
+                    //x.LoadXml("<nodes/>");
+                    //x.FirstChild.AppendChild(x.ImportNode(umbracoXml.GetElementById(contentId), true));
+                    //macroXmlNode.InnerXml = TransformMacroXml(x, "macroGetSubs.xsl");
                     break;
+
                 case "contentAll":
-                    x.ImportNode(umbracoXml.DocumentElement.LastChild, true);
+                    macroXmlNode.AppendChild(macroXml.ImportNode(umbracoXml.DocumentElement, true));
                     break;
+
                 case "contentRandom":
-                    XmlNode source = umbracoXml.GetElementById(macroPropertyValue);
+                    XmlNode source = umbracoXml.GetElementById(contentId);
 					if (source != null)
 					{
-						XmlNodeList sourceList = source.SelectNodes("node|*[@isDoc]");
+						var sourceList = source.SelectNodes("node|*[@isDoc]");
 						if (sourceList.Count > 0)
 						{
 							int rndNumber;
-							Random r = library.GetRandom();
+							var r = library.GetRandom();
 							lock (r)
 							{
 								rndNumber = r.Next(sourceList.Count);
 							}
-							XmlNode node = macroXml.ImportNode(sourceList[rndNumber], true);
+							var node = macroXml.ImportNode(sourceList[rndNumber], true);
 							// remove all sub content nodes
 							foreach (XmlNode n in node.SelectNodes("node|*[@isDoc]"))
 								node.RemoveChild(n);
 
 							macroXmlNode.AppendChild(node);
-							break;
 						}
 						else
 							TraceWarn("umbracoMacro",
@@ -1189,10 +1223,12 @@ namespace umbraco
 						          "Error adding random node - parent (" + macroPropertyValue +
 						          ") doesn't exists!");
                     break;
+
                 case "mediaCurrent":
                     var c = new Content(int.Parse(macroPropertyValue));
                     macroXmlNode.AppendChild(macroXml.ImportNode(c.ToXml(umbraco.content.Instance.XmlContent, false), true));
                     break;
+
                 default:
                     macroXmlNode.InnerText = HttpContext.Current.Server.HtmlDecode(macroPropertyValue);
                     break;
@@ -1200,21 +1236,7 @@ namespace umbraco
             macroXml.FirstChild.AppendChild(macroXmlNode);
         }
 
-        private static string TransformMacroXml(XmlDocument xmlSource, string xsltFile)
-        {
-            var sb = new StringBuilder();
-            var sw = new StringWriter(sb);
-
-            XslCompiledTransform result = getXslt(xsltFile);
-            //XmlDocument xslDoc = new XmlDocument();
-
-            result.Transform(xmlSource.CreateNavigator(), null, sw);
-
-            if (sw.ToString() != string.Empty)
-                return sw.ToString();
-            else
-                return string.Empty;
-        }
+        #endregion
 
 		/// <summary>
 		/// Renders a Partial View Macro
@@ -1277,8 +1299,6 @@ namespace umbraco
             retVal.Result = ret;
             return retVal;
         }
-
-
 
         [Obsolete("Replaced with loadMacroScript", true)]
         public DLRMacroResult loadMacroDLR(MacroModel macro)
